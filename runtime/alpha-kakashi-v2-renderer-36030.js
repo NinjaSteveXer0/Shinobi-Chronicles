@@ -12,7 +12,7 @@ const PATCH_ID="academy_kakashi_v2_renderer_36030_2026_09_22";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const STYLE_ID="kakashi-v2-renderer-36030-style";
 const ROOT_ID="kakashi-v2-scene-board";
-let rendering=false;
+let rendering=false,lastProjectionSnapshot=null;
 
 function esc(v){return String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
 function active(){try{return typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;}catch(_e){return null;}}
@@ -49,7 +49,7 @@ function installStyle(){
 #${ROOT_ID} .kv2-objective{justify-self:end;box-sizing:border-box;width:min(100%,390px);padding:8px 11px;border:1px solid rgba(75,209,220,.46);background:rgba(2,12,16,.82);box-shadow:0 10px 30px rgba(0,0,0,.32);font-size:clamp(9px,.68vw,12px);line-height:1.35;color:#e9eeeb}
 #${ROOT_ID} .kv2-objective b{display:block;margin-bottom:3px;color:#67dce5;font-size:7px;letter-spacing:.14em}
 #${ROOT_ID} .kv2-actors{position:absolute;left:3.5%;right:3.5%;top:13.2%;bottom:29%;z-index:4;pointer-events:none}
-#${ROOT_ID} .kv2-actor{position:absolute;left:var(--kv2-x,5%);bottom:var(--kv2-y,0);width:var(--kv2-w,min(20vw,220px));height:var(--kv2-h,min(52vh,380px));max-height:100%;display:flex;align-items:flex-end;justify-content:center;filter:drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0);transition:none!important}
+#${ROOT_ID} .kv2-actor{position:absolute;left:var(--sc-stage-anchor-x,var(--kv2-x,5%));bottom:var(--kv2-y,0);width:var(--kv2-w,min(20vw,220px));height:var(--kv2-h,min(52vh,380px));max-height:100%;display:flex;align-items:flex-end;justify-content:center;opacity:.78;filter:saturate(.82) brightness(.88) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0);transition:filter .14s ease,opacity .14s ease!important}\n#${ROOT_ID} .kv2-actors[data-count="1"] .kv2-actor{--kv2-w:min(29vw,330px);--kv2-h:min(62vh,465px)}\n#${ROOT_ID} .kv2-actors[data-count="2"] .kv2-actor{--kv2-w:min(25vw,292px);--kv2-h:min(59vh,435px)}\n#${ROOT_ID} .kv2-actors[data-count="3"] .kv2-actor{--kv2-w:min(21vw,235px);--kv2-h:min(53vh,390px)}\n#${ROOT_ID} .kv2-actors[data-count="4"] .kv2-actor,#${ROOT_ID} .kv2-actors[data-count="5"] .kv2-actor{--kv2-w:min(18vw,195px);--kv2-h:min(48vh,350px)}\n#${ROOT_ID} .kv2-actor.is-focus{opacity:1;filter:saturate(1.05) brightness(1.08) drop-shadow(0 22px 30px rgba(0,0,0,.55));z-index:4}
 #${ROOT_ID} .kv2-actor[data-slot="kakashi"]{--kv2-x:4%;--kv2-w:min(20vw,220px)}
 #${ROOT_ID} .kv2-actor[data-slot="mi"]{--kv2-x:29%;--kv2-w:min(19vw,210px)}
 #${ROOT_ID} .kv2-actor[data-slot="ps"]{--kv2-x:52%;--kv2-w:min(19vw,210px)}
@@ -83,7 +83,7 @@ function installStyle(){
 @keyframes kv2ActorFlee36030{from{opacity:1;transform:translate3d(0,0,0) scale(1)}to{opacity:0;transform:translate3d(135%,0,0) scale(.94)}}
 @keyframes kv2ActorFade36030{from{opacity:1}to{opacity:0}}
 #${ROOT_ID} .kv2-card-frame{position:absolute;inset:0;border:1px solid rgba(210,172,80,.28);background:linear-gradient(180deg,transparent 50%,rgba(1,6,9,.68));box-shadow:inset 0 0 0 1px rgba(255,255,255,.018)}
-#${ROOT_ID} .kv2-actor-label{position:absolute;left:6%;right:6%;bottom:3%;padding:6px 8px;border:1px solid rgba(208,168,75,.4);background:rgba(2,7,11,.88);text-align:center;font-size:8px;font-weight:900;letter-spacing:.11em;color:#eee2c7;text-shadow:0 1px 2px #000}
+#${ROOT_ID} .kv2-actor-label{position:absolute;left:6%;right:6%;bottom:3%;padding:6px 8px;border:1px solid rgba(208,168,75,.4);background:rgba(2,7,11,.88);text-align:center;font-size:8px;font-weight:900;letter-spacing:.11em;color:#eee2c7;text-shadow:0 1px 2px #000}\n#${ROOT_ID} .kv2-actor-state{display:table;margin:4px auto 0;padding:2px 6px;border:1px solid rgba(92,215,225,.35);background:rgba(4,23,28,.82);color:#7fe1e8;font-size:7px;font-weight:900;letter-spacing:.08em}\n#${ROOT_ID} .kv2-object-layer{position:absolute;inset:0;z-index:16;pointer-events:none}\n#${ROOT_ID} .kv2-package-token{position:absolute;top:42%;left:var(--sc-stage-anchor-x,50%);width:64px;height:45px;transform:translate(-8%,-50%);display:grid;place-items:center;border:1px solid rgba(221,178,73,.75);background:linear-gradient(145deg,rgba(42,30,12,.95),rgba(12,14,13,.96));box-shadow:0 12px 28px rgba(0,0,0,.48),0 0 18px rgba(221,178,73,.12);color:#e4c66e;font-size:7px;font-weight:900;letter-spacing:.12em}\n#${ROOT_ID} .kv2-package-token::before{content:"";position:absolute;width:32px;height:21px;border:1px solid rgba(226,190,100,.64);background:linear-gradient(135deg,#4a3a21,#21190f);transform:rotate(-4deg)}\n#${ROOT_ID} .kv2-package-token span{position:absolute;top:calc(100% + 5px);white-space:nowrap;padding:3px 5px;background:rgba(2,8,11,.82);border:1px solid rgba(215,174,76,.32)}\n#${ROOT_ID} .kv2-package-token[hidden]{display:none!important}\n#${ROOT_ID} .kv2-departure-ghost{position:absolute!important;z-index:13!important;pointer-events:none!important}
 #${ROOT_ID} .kv2-dialogue{position:absolute;left:7%;right:7%;bottom:3.7%;min-height:19%;max-height:23%;z-index:30;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto 1fr auto;column-gap:18px;padding:14px 18px 12px;border:1px solid rgba(211,171,78,.68);background:linear-gradient(180deg,rgba(3,10,15,.88),rgba(2,7,11,.96));box-shadow:0 20px 55px rgba(0,0,0,.52),inset 0 0 0 1px rgba(255,255,255,.025);backdrop-filter:blur(5px)}
 #${ROOT_ID} .kv2-speaker{grid-column:1;grid-row:1;color:#e3bd5f;font-size:9px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;min-height:13px}
 #${ROOT_ID} .kv2-text{grid-column:1/-1;grid-row:2;margin-top:6px;overflow:auto;white-space:pre-wrap;color:#e8ece8;font-size:clamp(12px,.98vw,16px);line-height:1.42;text-shadow:0 1px 2px #000}
@@ -137,7 +137,10 @@ function actorMarkup(actor){
   figure.dataset.slot=actorSlot(actor);
   const frame=document.createElement("div");frame.className="kv2-card-frame";
   const img=document.createElement("img");img.alt="";img.src=String(actor.image||"");
-  const label=document.createElement("figcaption");label.className="kv2-actor-label";label.textContent=String(actor.label||"");
+  const label=document.createElement("figcaption");label.className="kv2-actor-label";
+  const name=document.createElement("strong");name.textContent=String(actor.label||"");
+  const state=document.createElement("small");state.className="kv2-actor-state";state.hidden=true;
+  label.append(name,state);
   figure.append(frame,img,label);
   return figure;
 }
@@ -156,6 +159,7 @@ function ensureRoot(layer){
       <div class="kv2-actions"></div><button class="kv2-next" type="button" data-kv2-advance="true" aria-label="Continue">›</button>
     </section>
     <article class="kv2-receipt"><span>SHINOBI CHRONICLES · RECORD</span><h1>CHRONICLE RECEIPT</h1><pre></pre><button type="button" data-kv2-advance="true">CONTINUE</button></article>
+    <div class="kv2-object-layer" aria-hidden="true"><div class="kv2-package-token" data-story-object-id="PACKAGE" hidden><span>PACKAGE</span></div></div>
     <div class="kv2-ghost-layer" aria-hidden="true"></div>
     <div class="kv2-wipe"></div>`;
   layer.appendChild(root);
