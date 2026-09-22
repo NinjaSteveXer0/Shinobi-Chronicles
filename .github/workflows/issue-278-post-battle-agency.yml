@@ -1,0 +1,35 @@
+name: Issue 278 Post-Battle Player Agency
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'game.js'
+      - 'runtime/**'
+      - 'tools/qa_issue_278_post_battle_agency.js'
+      - '.github/workflows/issue-278-post-battle-agency.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - 'game.js'
+      - 'runtime/**'
+      - 'tools/qa_issue_278_post_battle_agency.js'
+      - '.github/workflows/issue-278-post-battle-agency.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  post-battle-player-agency:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Global post-Battle player-agency gate
+        run: |
+          node --check tools/qa_issue_278_post_battle_agency.js
+          node tools/qa_issue_278_post_battle_agency.js

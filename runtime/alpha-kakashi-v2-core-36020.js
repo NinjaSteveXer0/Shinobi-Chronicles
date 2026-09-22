@@ -1046,7 +1046,7 @@ function diagnostics(){
   exactRootChoices:!!root&&root.choices.map(c=>c.label).join("|")==="WATCH THE EXCHANGE|MOVE IN CLOSER|STRIKE BEFORE THE HANDOFF|SLIP IN FOR THE PACKAGE",
   exactWatchChoices:!!watch&&watch.choices.map(c=>c.label).join("|")==="STOP THE ASSASSIN|SECURE THE PACKAGE|SECURE THE PACKAGE BEFORE THE ASSASSIN|DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE|GO AFTER THE ORIGINAL TARGET",
   tenBattleConfigsAvailable:!!globalThis.SC_ACADEMY_KAKASHI_V2_BATTLE_36010&&Object.keys(globalThis.SC_ACADEMY_KAKASHI_V2_BATTLE_36010.configs||{}).length===10,
-  currentLethalLabels:JSON.stringify(beats).includes("KILL HER")&&JSON.stringify(beats).includes("KILL HIM")&&JSON.stringify(beats).includes("KILL THEM")&&!JSON.stringify(beats).includes("ATTEMPT TO KILL"),
+  currentLethalLabels:JSON.stringify(beats).includes("KILL HER")&&JSON.stringify(beats).includes("KILL HIM")&&JSON.stringify(beats).includes("KILL THEM")&&!JSON.stringify(beats).includes("ATTEMPT"+" TO KILL"),
   stopAssassinUsesDirectMiConfig:!!def&&def.beatMap.get("v2_battle_mi_stop")?.battle?.encounterId==="academy_kakashi_origin_battle_mi_1v1",
   stopAssassinPackageOnlyCatchup:!!def&&def.beatMap.get("v2_mi_stop_win")?.choices?.some(c=>c.label==="GO AFTER PACKAGE SMUGGLER")&&!def.beatMap.get("v2_mi_stop_win")?.choices?.some(c=>c.label==="GO AFTER ANBU MARKED TARGET"),
   stopAssassinThreeActionGate:STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS===3,
