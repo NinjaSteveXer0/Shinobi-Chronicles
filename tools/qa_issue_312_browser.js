@@ -226,16 +226,20 @@ async function shot(page,name,selector=null){
     const substitution=await page.evaluate(()=>{
       const p=resolveBattlePerformanceProjection33000(),lane=document.querySelector(".battle2-performance-stage"),stage=document.querySelector(".alpha-code-battle-stage");
       const actor=stage?.querySelector(".battle2-performance-role-actor"),target=stage?.querySelector(".battle2-performance-role-target"),center=lane?.querySelector(".battle2-performance-center");
+      const chip=stage?.querySelector(".battle2-performance-result-chip");
       const rect=node=>{const r=node?.getBoundingClientRect();return r?{left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}:null;};
       const overlaps=(a,b)=>!!a&&!!b&&!(a.right<=b.left||a.left>=b.right||a.bottom<=b.top||a.top>=b.bottom);
-      const actorRect=rect(actor),targetRect=rect(target),centerRect=rect(center);
+      const actorRect=rect(actor),targetRect=rect(target),centerRect=rect(center),stageRect=rect(stage);
       return{
         p,
         performancePortraits:lane?.querySelectorAll("img").length||0,
         canonicalCards:stage?.querySelectorAll(".battle-live-active-card-player,.battle-live-active-card-enemy").length||0,
         actorRoles:stage?.querySelectorAll(".battle2-performance-role-actor").length||0,
         targetRoles:stage?.querySelectorAll(".battle2-performance-role-target").length||0,
+        resultChips:stage?.querySelectorAll(".battle2-performance-result-chip").length||0,
+        resultChipOnExactTarget:!!(chip&&target&&chip.parentElement===target),
         performanceActive:stage?.classList.contains("battle2-performance-active")||false,
+        centerWidthRatio:centerRect&&stageRect&&stageRect.width?centerRect.width/stageRect.width:null,
         centerOverlapsActor:overlaps(centerRect,actorRect),
         centerOverlapsTarget:overlaps(centerRect,targetRect)
       };
@@ -247,9 +251,12 @@ async function shot(page,name,selector=null){
     assert.strictEqual(substitution.canonicalCards,2,"#312 canonical current actor/opponent hierarchy missing");
     assert.strictEqual(substitution.actorRoles,1,"#312 committed actor was not promoted on canonical Battle card");
     assert.strictEqual(substitution.targetRoles,1,"#312 exact target was not promoted on canonical Battle card");
+    assert.strictEqual(substitution.resultChips,1,"#312 factual result feedback must have one participant-local receipt");
+    assert.strictEqual(substitution.resultChipOnExactTarget,true,"#312 result receipt is not attached to the exact target");
     assert.strictEqual(substitution.performanceActive,true,"#312 canonical Battle performance phase not active");
-    assert.strictEqual(substitution.centerOverlapsActor,false,"#312 result panel overlaps promoted actor");
-    assert.strictEqual(substitution.centerOverlapsTarget,false,"#312 result panel overlaps promoted target");
+    assert(substitution.centerWidthRatio!==null&&substitution.centerWidthRatio<=0.14,"#312 action label still occupies too much battlefield center: "+substitution.centerWidthRatio);
+    assert.strictEqual(substitution.centerOverlapsActor,false,"#312 compact action label overlaps promoted actor");
+    assert.strictEqual(substitution.centerOverlapsTarget,false,"#312 compact action label overlaps promoted target");
     const battlePaint=await page.evaluate(()=>{
       const selectors=[
         "#story-scene-presentation-layer","#screen-overlay",".overlay-content-box","#overlay-content-container",
@@ -294,16 +301,20 @@ async function shot(page,name,selector=null){
     await shot(page,"04-battle-overlay.png","#screen-overlay");
     await shot(page,"04-battle-performance-only.png",".battle2-performance-stage");
     await shot(page,"04-battle-substitution-performance.png",".alpha-code-battle-stage");
-    await page.waitForTimeout(700);
+    await page.waitForTimeout(1050);
     const settledBattle=await page.evaluate(()=>{
       const stage=document.querySelector(".alpha-code-battle-stage");
       return{
         active:stage?.classList.contains("battle2-performance-active")||false,
-        roles:stage?.querySelectorAll(".battle2-performance-role-actor,.battle2-performance-role-target").length||0
+        roles:stage?.querySelectorAll(".battle2-performance-role-actor,.battle2-performance-role-target").length||0,
+        resultChips:stage?.querySelectorAll(".battle2-performance-result-chip").length||0,
+        actionLabelOpacity:Number(getComputedStyle(stage?.querySelector(".battle2-performance-stage")).opacity||0)
       };
     });
     assert.strictEqual(settledBattle.active,false,"#312 Battle performance did not restore stable composition");
     assert.strictEqual(settledBattle.roles,0,"#312 Battle performance roles leaked after settle");
+    assert.strictEqual(settledBattle.resultChips,0,"#312 target-local result receipt leaked after settle");
+    assert(settledBattle.actionLabelOpacity<=0.01,"#312 compact action label remained visually persistent after settle");
 
     await seed("hit");
     await page.waitForSelector('.battle2-performance-stage[data-result="HIT"]',{state:"visible",timeout:8000});
