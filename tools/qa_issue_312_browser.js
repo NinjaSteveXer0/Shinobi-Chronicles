@@ -754,6 +754,44 @@ async function shot(page,name,selector=null){
     }));
     assert.strictEqual(amtSecondSelection.selectedSkillId,nextReadyId,"#312 another legal player Skill could not be selected after enemy resolution");
 
+    await page.locator(".battle-live-use-skill").click();
+    await page.waitForFunction(()=>{
+      const battleId=currentBattle?.battleId;
+      const rows=(ensureBattleRuntimeState()?.evidence||[]).filter(row=>row&&row.battleId===battleId);
+      return rows.filter(row=>row.eventType==="enemy_authored_action_completed"&&row.actorRef?.participantId==="academy_kakashi_origin_amt").length>=2;
+    },null,{timeout:5000});
+
+    const amtLifecycleAfterSecond=await page.evaluate(()=>{
+      const battleId=currentBattle.battleId;
+      const rows=(ensureBattleRuntimeState().evidence||[]).filter(row=>row&&row.battleId===battleId);
+      const playerCompletions=rows.filter(row=>row.eventType==="skill_action_completed"&&row.actorRef?.participantId==="academy_kakashi");
+      const enemyCompletions=rows.filter(row=>row.eventType==="enemy_authored_action_completed"&&row.actorRef?.participantId==="academy_kakashi_origin_amt");
+      const scheduler=evaluateEnemyActionScheduler();
+      return{
+        playerCompletions:playerCompletions.map(row=>({skillId:row.skillId,resolved:row.data?.resolved})),
+        enemyCompletions:enemyCompletions.map(row=>({skillId:row.skillId,resolved:row.data?.resolved})),
+        playerOpportunity:getBattleActionOpportunityIndex("player","academy_kakashi"),
+        enemyOpportunity:getBattleActionOpportunityIndex("enemy","academy_kakashi_origin_amt"),
+        schedulerReady:scheduler?.ready===true,
+        schedulerEligibleIds:(scheduler?.eligibleActionIds||[]).slice()
+      };
+    });
+    console.log("ISSUE312_AMT_LIFECYCLE_AFTER_SECOND "+JSON.stringify(amtLifecycleAfterSecond));
+    assert.strictEqual(amtLifecycleAfterSecond.playerCompletions.length,2,"#312 second player opportunity did not commit exactly once: "+JSON.stringify(amtLifecycleAfterSecond));
+    assert.strictEqual(amtLifecycleAfterSecond.enemyCompletions.length,2,"#312 second player opportunity did not receive exactly one AMT response: "+JSON.stringify(amtLifecycleAfterSecond));
+    assert.strictEqual(amtLifecycleAfterSecond.enemyCompletions[1].skillId,"enemy_anbu_style_operative_tanto_flash","#312 AMT must follow Wire with Tantō Flash under the authorised deterministic rhythm");
+    assert.strictEqual(amtLifecycleAfterSecond.enemyCompletions[1].resolved,true,"#312 AMT Tantō response did not resolve");
+    assert.strictEqual(amtLifecycleAfterSecond.playerOpportunity,amtLifecycleLaunch.playerOpportunityBefore+2,"#312 player lifecycle stalled after the second committed action");
+    assert.strictEqual(amtLifecycleAfterSecond.enemyOpportunity,amtLifecycleLaunch.enemyOpportunityBefore+2,"#312 enemy lifecycle stalled after the second response");
+    assert.strictEqual(amtLifecycleAfterSecond.schedulerReady,true,"#312 AMT scheduler deadlocked after Wire -> Tantō");
+    assert(amtLifecycleAfterSecond.schedulerEligibleIds.includes("enemy_anbu_style_operative_silent_body_flicker"),"#312 AMT Body Flicker is not available after Tantō: "+JSON.stringify(amtLifecycleAfterSecond));
+
+    await amtSkillsButton.click();
+    await page.waitForFunction(()=>{
+      const stage=document.querySelector(".alpha-code-battle-stage");
+      return stage?.dataset.formationTray==="skills"&&!!stage.querySelector(".battle-live-skill-deck");
+    },null,{timeout:3000});
+
     const errors=await runtimeErrorGate.assertClean("issue312_story_battle_benchmark");
     const result={
       pass:true,
