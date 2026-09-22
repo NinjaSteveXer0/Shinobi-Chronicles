@@ -502,7 +502,7 @@
         "installBattlePerformance33000"
       ],
       "permittedAdapters": [
-        "runtime/alpha-kakashi-v2-battle-36010.js"
+        "academy_kakashi_v2_battle_adapter_36010"
       ],
       "retiredOwners": [],
       "saveSchemaRefs": [],
