@@ -116,7 +116,7 @@ for(const required of [
   "origin_academy_iwabee_prologue",
   "origin_academy_metal_lee_prologue",
   "origin_academy_kakashi_anbu_retrieval",
-  "origin_academy_obito_prologue"
+  "origin_academy_obito_journey_to_training"
 ]){
   assert(productionSceneIds.includes(required),"#311 required Origin scene missing from reachability audit: "+required);
 }
