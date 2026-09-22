@@ -10,6 +10,16 @@ on:
       - 'tools/qa_issue_188_story_decision_runtime.js'
       - 'tools/qa_story_factual_resolver_34600.js'
       - 'tools/qa_kakashi_v2_legacy_exclusion.js'
+      - 'runtime/academy-kakashi-v2-content-36000.js'
+      - 'runtime/alpha-kakashi-v2-battle-36010.js'
+      - 'runtime/alpha-kakashi-v2-rewards-36015.js'
+      - 'runtime/alpha-kakashi-v2-core-36020.js'
+      - 'runtime/alpha-kakashi-v2-renderer-36030.js'
+      - 'runtime/alpha-kakashi-v2-transition-36040.js'
+      - 'tools/qa_kakashi_v2_clean_room.js'
+      - 'tools/qa_kakashi_v2_route_matrix.js'
+      - 'tools/qa_kakashi_v2_assets.js'
+      - 'tools/qa_kakashi_v2_writing_authority.js'
       - '.github/workflows/issue-188-story-decision.yml'
   push:
     branches: [ main ]
@@ -21,6 +31,12 @@ on:
       - 'tools/qa_issue_188_story_decision_runtime.js'
       - 'tools/qa_story_factual_resolver_34600.js'
       - 'tools/qa_kakashi_v2_legacy_exclusion.js'
+      - 'runtime/alpha-kakashi-v2-battle-36010.js'
+      - 'runtime/alpha-kakashi-v2-rewards-36015.js'
+      - 'runtime/alpha-kakashi-v2-core-36020.js'
+      - 'runtime/alpha-kakashi-v2-renderer-36030.js'
+      - 'runtime/alpha-kakashi-v2-transition-36040.js'
+      - 'tools/qa_kakashi_v2_clean_room.js'
       - '.github/workflows/issue-188-story-decision.yml'
   workflow_dispatch:
 
@@ -44,9 +60,27 @@ jobs:
           node --check tools/qa_issue_188_story_decision_runtime.js
           node --check tools/qa_story_factual_resolver_34600.js
           node --check tools/qa_kakashi_v2_legacy_exclusion.js
+          node --check runtime/academy-kakashi-v2-content-36000.js
+          node --check runtime/alpha-kakashi-v2-battle-36010.js
+          node --check runtime/alpha-kakashi-v2-rewards-36015.js
+          node --check runtime/alpha-kakashi-v2-core-36020.js
+          node --check runtime/alpha-kakashi-v2-renderer-36030.js
+          node --check runtime/alpha-kakashi-v2-transition-36040.js
+          node --check tools/qa_kakashi_v2_clean_room.js
+          node --check tools/qa_kakashi_v2_writing_authority.js
       - name: Neutral Story decision runtime
         run: node tools/qa_issue_188_story_decision_runtime.js
       - name: Neutral Story factual resolver
         run: node tools/qa_story_factual_resolver_34600.js
       - name: Kakashi V2 legacy exclusion
         run: node tools/qa_kakashi_v2_legacy_exclusion.js
+      - name: Kakashi V2 clean-room runtime
+        run: node tools/qa_kakashi_v2_clean_room.js
+
+      - name: Kakashi V2 route and asset closure
+        run: |
+          node --check tools/qa_kakashi_v2_route_matrix.js
+          node tools/qa_kakashi_v2_route_matrix.js
+          node --check tools/qa_kakashi_v2_assets.js
+          node tools/qa_kakashi_v2_assets.js
+          node tools/qa_kakashi_v2_writing_authority.js

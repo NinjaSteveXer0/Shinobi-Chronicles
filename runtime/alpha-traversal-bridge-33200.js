@@ -247,36 +247,51 @@
 })();
 
 // ============================================================================
-// ISSUE #105 / #175 — GENERIC TERMINAL ORIGIN SCENE-BOARD ACTIVATION
+// ISSUE #105 / #175 / ACADEMY KAKASHI V2 — TERMINAL STORY RUNTIME CHAIN
 //
-// 33700 remains the shared screen-first expression layer for the non-Kakashi
-// Origins. The generic 33900 Scene Board now loads directly after 33700.
-// Academy Kakashi V2 will register its own clean-room board consumer later.
+// Shared generic layers load first. Academy Kakashi V2 then registers one fresh
+// state core, one Battle adapter, one renderer and one transition controller.
+// No retired Kakashi runtime module is part of this chain.
 // ============================================================================
 (function activateOriginSceneBoardTerminalChain33200(){
   if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
 
-  const SCENE_BOARD_BUILD="scene-board-generic-20260922-1";
-
-  function load33900(){
-    if(globalThis.SC_STORY_SCENE_BOARD_33900||document.getElementById("sc-story-scene-board-33900-script"))return;
-    const script=document.createElement("script");
-    script.id="sc-story-scene-board-33900-script";
-    script.src=`runtime/alpha-story-scene-board-33900.js?v=${SCENE_BOARD_BUILD}`;
-    script.async=false;
+  const BUILD="kakashi-v2-clean-room-20260922-2";
+  function loadOne(id,src,ready,next){
+    if(ready()){if(next)next();return;}
+    let script=document.getElementById(id);
+    if(script){if(next)script.addEventListener("load",next,{once:true});return;}
+    script=document.createElement("script");script.id=id;script.src=`${src}?v=${BUILD}`;script.async=false;
+    if(next)script.addEventListener("load",next,{once:true});
     document.head.appendChild(script);
+  }
+  function load36040(){loadOne("sc-kakashi-v2-transition-36040-script","runtime/alpha-kakashi-v2-transition-36040.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_TRANSITION_36040);}
+  function load36030(){loadOne("sc-kakashi-v2-renderer-36030-script","runtime/alpha-kakashi-v2-renderer-36030.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_RENDERER_36030,load36040);}
+  function load36020(){loadOne("sc-kakashi-v2-core-36020-script","runtime/alpha-kakashi-v2-core-36020.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_CORE_36020,load36030);}
+  function load36015(){loadOne("sc-kakashi-v2-rewards-36015-script","runtime/alpha-kakashi-v2-rewards-36015.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_REWARDS_36015,load36020);}
+  function load36010(){loadOne("sc-kakashi-v2-battle-36010-script","runtime/alpha-kakashi-v2-battle-36010.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_BATTLE_36010,load36015);}
+  function load36000(){loadOne("sc-kakashi-v2-content-36000-script","runtime/academy-kakashi-v2-content-36000.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_CONTENT_36000,load36010);}
+  function load34600(){loadOne("sc-story-factual-resolver-34600-script","runtime/alpha-story-factual-resolver-34600.js",()=>!!globalThis.SC_STORY_FACTUAL_RESOLVER_34600,load36000);}
+  function load34000(){loadOne("sc-story-decision-realisation-34000-script","runtime/alpha-story-decision-realisation-34000.js",()=>!!globalThis.SC_STORY_DECISION_REALISATION_34000,load34600);}
+  function load33900(){loadOne("sc-story-scene-board-33900-script","runtime/alpha-story-scene-board-33900.js",()=>!!globalThis.SC_STORY_SCENE_BOARD_33900,load34000);}
+  function load33700(){loadOne("sc-alpha-origin-screen-first-33700-script","runtime/alpha-origin-screen-first-33700.js",()=>!!globalThis.SC_ALPHA_ORIGIN_SCREEN_FIRST_33700,load33900);}
+
+  function after33600(){
+    if(globalThis.SC_ALPHA_EARLY_STORY_MODERNIZATION_33600){load33700();return;}
+    const modernization=document.getElementById("sc-alpha-early-story-modernization-33600-script");
+    if(modernization){modernization.addEventListener("load",load33700,{once:true});return;}
+    // 33600 is itself created from the 33510 load event. If 33200 reaches this
+    // terminal chain before that future element exists, wait on 33510 rather
+    // than silently dropping the V2 activation chain.
+    const reaction=document.getElementById("sc-alpha-origin-choice-reaction-33510-script");
+    if(reaction){reaction.addEventListener("load",()=>{const modern=document.getElementById("sc-alpha-early-story-modernization-33600-script");if(globalThis.SC_ALPHA_EARLY_STORY_MODERNIZATION_33600)load33700();else if(modern)modern.addEventListener("load",load33700,{once:true});},{once:true});return;}
+    // Last-resort parser-order fail-closed retry. No V2 module is loaded before
+    // 33600; this only rechecks whether its legitimate predecessor appeared.
+    setTimeout(after33600,0);
   }
 
   if(globalThis.SC_ALPHA_ORIGIN_SCREEN_FIRST_33700){load33900();return;}
   const existing=document.getElementById("sc-alpha-origin-screen-first-33700-script");
   if(existing){existing.addEventListener("load",load33900,{once:true});return;}
-
-  const modernization=document.getElementById("sc-alpha-early-story-modernization-33600-script");
-  if(modernization){
-    modernization.addEventListener("load",()=>{
-      const screenFirst=document.getElementById("sc-alpha-origin-screen-first-33700-script");
-      if(globalThis.SC_ALPHA_ORIGIN_SCREEN_FIRST_33700)load33900();
-      else if(screenFirst)screenFirst.addEventListener("load",load33900,{once:true});
-    },{once:true});
-  }
-})();;
+  after33600();
+})();

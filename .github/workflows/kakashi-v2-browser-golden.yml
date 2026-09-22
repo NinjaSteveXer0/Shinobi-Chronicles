@@ -1,0 +1,68 @@
+name: Kakashi V2 Installed Browser Golden
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'runtime/academy-kakashi-v2-content-36000.js'
+      - 'runtime/alpha-kakashi-v2-*.js'
+      - 'runtime/alpha-origin-scenes-32900-integrator.js'
+      - 'runtime/alpha-traversal-bridge-33200.js'
+      - 'tools/qa_kakashi_v2_browser.js'
+      - '.github/workflows/kakashi-v2-browser-golden.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  installed-browser-kakashi-v2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python3 -m http.server 8080 > /tmp/kakashi-v2-http.log 2>&1 &
+          echo $! > /tmp/kakashi-v2-http.pid
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/kakashi-v2-http.log
+          exit 1
+
+      - name: Run installed-browser Kakashi V2 replay
+        env:
+          KAKASHI_V2_BASE_URL: http://127.0.0.1:8080/index.html
+          KAKASHI_V2_BROWSER_OUT: artifacts/kakashi-v2-browser
+        run: xvfb-run -a node tools/qa_kakashi_v2_browser.js
+
+      - name: Preserve server log
+        if: always()
+        run: |
+          mkdir -p artifacts/kakashi-v2-browser
+          cp /tmp/kakashi-v2-http.log artifacts/kakashi-v2-browser/http-server.log || true
+
+      - name: Upload installed-browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kakashi-v2-installed-browser-evidence
+          path: artifacts/kakashi-v2-browser
+          if-no-files-found: warn

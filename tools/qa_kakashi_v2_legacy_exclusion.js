@@ -73,7 +73,7 @@ for(const file of productionTextFiles){
     const base=path.basename(retired);
     if(src.includes(base))staleReferences.push({file,retired});
   }
-  if(src.includes("runtime/alpha-kakashi-"))staleReferences.push({file,retired:"runtime/alpha-kakashi-*"});
+  if(/runtime\/alpha-kakashi-(?!v2-)/.test(src))staleReferences.push({file,retired:"runtime/alpha-kakashi-(legacy)"});
 }
 assert.deepStrictEqual(staleReferences,[],"retired Kakashi runtime remains reachable from production source");
 
@@ -96,6 +96,12 @@ assert(!core.includes("SC_ALPHA_KAKASHI"));
 const traversal=fs.readFileSync("runtime/alpha-traversal-bridge-33200.js","utf8");
 assert(traversal.includes("runtime/alpha-story-scene-board-33900.js"));
 assert(!traversal.includes("alpha-kakashi-original-origin-restoration-33800.js"));
+for(const required of [
+  "runtime/alpha-kakashi-v2-battle-36010.js",
+  "runtime/alpha-kakashi-v2-core-36020.js",
+  "runtime/alpha-kakashi-v2-renderer-36030.js",
+  "runtime/alpha-kakashi-v2-transition-36040.js"
+])assert(traversal.includes(required),`V2 runtime loader missing: ${required}`);
 
 const choiceReaction=fs.readFileSync("runtime/alpha-origin-choice-reaction-33510.js","utf8");
 const modernization=fs.readFileSync("runtime/alpha-early-story-modernization-33600.js","utf8");
@@ -133,6 +139,6 @@ console.log(JSON.stringify({
   productionFilesScanned:productionTextFiles.length,
   staleReferences:0,
   kakashiLegacyExecutionReachable:false,
-  kakashiV2Implemented:false,
+  kakashiV2Implemented:true,
   browserGoldenClaimed:false
 },null,2));
