@@ -1,0 +1,175 @@
+name: Shinobi Chronicles Merge Safety Gate
+
+on:
+  pull_request:
+  merge_group:
+
+permissions:
+  contents: read
+
+jobs:
+  merge-safety-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Resolve exact comparison refs
+        id: refs
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require("fs");
+          const event=JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH,"utf8"));
+          let base=null;
+          let head=null;
+          if(process.env.GITHUB_EVENT_NAME==="pull_request"){
+            base=event.pull_request&&event.pull_request.base&&event.pull_request.base.sha;
+            head=event.pull_request&&event.pull_request.head&&event.pull_request.head.sha;
+          }else if(process.env.GITHUB_EVENT_NAME==="merge_group"){
+            base=event.merge_group&&event.merge_group.base_sha;
+            head=event.merge_group&&event.merge_group.head_sha;
+          }
+          if(!base||!head){
+            console.error("Unable to resolve merge-safety base/head for "+process.env.GITHUB_EVENT_NAME);
+            process.exit(2);
+          }
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,"base="+base+"\nhead="+head+"\n");
+          console.log(JSON.stringify({event:process.env.GITHUB_EVENT_NAME,base,head},null,2));
+          NODE
+
+      - name: Ensure comparison commits are available
+        shell: bash
+        env:
+          BASE_SHA: ${{ steps.refs.outputs.base }}
+          HEAD_SHA: ${{ steps.refs.outputs.head }}
+        run: |
+          git cat-file -e "$BASE_SHA^{commit}" || git fetch --no-tags origin "$BASE_SHA"
+          git cat-file -e "$HEAD_SHA^{commit}" || git fetch --no-tags origin "$HEAD_SHA"
+
+      - name: Classify changed files
+        id: classify
+        shell: bash
+        env:
+          BASE_SHA: ${{ steps.refs.outputs.base }}
+          HEAD_SHA: ${{ steps.refs.outputs.head }}
+        run: |
+          node tools/merge_safety_gate_305.js             --base "$BASE_SHA"             --head "$HEAD_SHA"             --github-output "$GITHUB_OUTPUT"
+
+      - name: Merge-safety manifest and classifier sanity
+        run: |
+          node --check tools/merge_safety_gate_305.js
+          node --check tools/qa_merge_safety_gate_305.js
+          node tools/qa_merge_safety_gate_305.js
+
+      - name: Set up Python for runtime candidate
+        if: steps.classify.outputs.runtime == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install runtime QA dependency
+        if: steps.classify.outputs.runtime == 'true'
+        run: python -m pip install --disable-pip-version-check Pillow
+
+      - name: Runtime ownership, retirement and Alpha closure
+        if: steps.classify.outputs.runtime == 'true'
+        run: |
+          node --check tools/qa_runtime_ownership_safety_300.js
+          node tools/qa_runtime_ownership_safety_300.js
+          node --check tools/qa_kakashi_v2_legacy_exclusion.js
+          node tools/qa_kakashi_v2_legacy_exclusion.js
+          python tools/qa_issue_141_pre_alpha_runtime_closure.py
+
+      - name: Story and Origin runtime closure
+        if: steps.classify.outputs.story == 'true' || steps.classify.outputs.origin == 'true'
+        run: |
+          node --check tools/qa_issue_188_story_decision_runtime.js
+          node tools/qa_issue_188_story_decision_runtime.js
+          node --check tools/qa_story_factual_resolver_34600.js
+          node tools/qa_story_factual_resolver_34600.js
+          node --check tools/qa_alpha_origin_scenes_32900_runtime.js
+          node tools/qa_alpha_origin_scenes_32900_runtime.js
+          node --check tools/qa_issue_105_origin_browser_realisation_runtime.js
+          node tools/qa_issue_105_origin_browser_realisation_runtime.js
+          node --check tools/qa_issue_105_origin_screen_first_activation.js
+          node tools/qa_issue_105_origin_screen_first_activation.js
+
+      - name: Battle runtime closure
+        if: steps.classify.outputs.battle == 'true'
+        run: |
+          python tools/qa_alpha_battle_browser_32600.py
+          node --check tools/qa_issue_141_arc1_battle_return_runtime.js
+          node tools/qa_issue_141_arc1_battle_return_runtime.js
+          node --check tools/qa_issue_278_post_battle_agency.js
+          node tools/qa_issue_278_post_battle_agency.js
+
+      - name: Kakashi V2 route and ownership closure
+        if: steps.classify.outputs.kakashi == 'true'
+        run: |
+          node --check tools/qa_kakashi_v2_clean_room.js
+          node tools/qa_kakashi_v2_clean_room.js
+          node --check tools/qa_kakashi_v2_legacy_exclusion.js
+          node tools/qa_kakashi_v2_legacy_exclusion.js
+          node --check tools/qa_kakashi_v2_route_matrix.js
+          node tools/qa_kakashi_v2_route_matrix.js
+          node --check tools/qa_kakashi_v2_assets.js
+          node tools/qa_kakashi_v2_assets.js
+
+      - name: Install Playwright for Kakashi browser cardinality
+        if: steps.classify.outputs.kakashi == 'true'
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server for Kakashi browser cardinality
+        if: steps.classify.outputs.kakashi == 'true'
+        run: |
+          python3 -m http.server 8080 > /tmp/merge-safety-http.log 2>&1 &
+          echo $! > /tmp/merge-safety-http.pid
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/merge-safety-http.log
+          exit 1
+
+      - name: Kakashi installed-browser cardinality
+        if: steps.classify.outputs.kakashi == 'true'
+        env:
+          KAKASHI_V2_BASE_URL: http://127.0.0.1:8080/index.html
+          KAKASHI_V2_BROWSER_OUT: artifacts/merge-safety-kakashi-browser
+        run: xvfb-run -a node tools/qa_kakashi_v2_browser.js
+
+      - name: Stop local Alpha server
+        if: always() && steps.classify.outputs.kakashi == 'true'
+        run: |
+          if [ -f /tmp/merge-safety-http.pid ]; then
+            kill "$(cat /tmp/merge-safety-http.pid)" || true
+          fi
+
+      - name: Merge-safety receipt
+        if: always()
+        shell: bash
+        run: |
+          echo "classes=${{ steps.classify.outputs.classes }}"
+          echo "docs_only=${{ steps.classify.outputs.docs_only }}"
+          echo "runtime=${{ steps.classify.outputs.runtime }}"
+          echo "story=${{ steps.classify.outputs.story }}"
+          echo "origin=${{ steps.classify.outputs.origin }}"
+          echo "kakashi=${{ steps.classify.outputs.kakashi }}"
+          echo "battle=${{ steps.classify.outputs.battle }}"
+          echo "save_schema=${{ steps.classify.outputs.save_schema }}"
+          echo "workflow_safety=${{ steps.classify.outputs.workflow_safety }}"
+          echo "fail_closed=${{ steps.classify.outputs.fail_closed }}"
