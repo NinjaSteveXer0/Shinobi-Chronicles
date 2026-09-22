@@ -117,6 +117,9 @@ function installStyle(){
 #${ROOT_ID}[data-battle-action-only="true"] .kv2-dialogue{display:grid!important;width:min(56%,720px);padding:10px 14px;grid-template-rows:1fr}
 #${ROOT_ID}[data-battle-action-only="true"] .kv2-actions{grid-row:1;margin-top:0;grid-template-columns:1fr}
 #${ROOT_ID} .kv2-receipt button{margin-top:24px;width:100%;min-height:40px;border:1px solid rgba(95,215,225,.42);border-radius:10px;background:rgba(7,33,39,.72);color:#78dfe7;font-weight:900;letter-spacing:.1em;cursor:pointer}
+#${ROOT_ID} .kv2-transition-memory{position:absolute;inset:0;z-index:11;background-position:center;background-size:cover;background-repeat:no-repeat;opacity:1;pointer-events:none}
+#${ROOT_ID} .kv2-transition-memory[hidden]{display:none!important}
+#${ROOT_ID}[data-transition-active="true"] .kv2-actions,#${ROOT_ID}[data-transition-active="true"] .kv2-receipt button{pointer-events:none!important}
 #${ROOT_ID} .kv2-wipe{position:absolute;inset:-3%;z-index:999;opacity:0;pointer-events:none;transition:opacity .32s cubic-bezier(.2,.65,.2,1),transform .46s cubic-bezier(.2,.65,.2,1),filter .32s ease;transform:scale(1.02);filter:blur(0)}
 #${ROOT_ID} .kv2-wipe.is-hard{background:radial-gradient(circle at 50% 45%,rgba(4,9,13,.72),#000 68%);backdrop-filter:blur(5px)}
 #${ROOT_ID} .kv2-wipe.is-soft{background:linear-gradient(90deg,rgba(4,15,20,.05),rgba(4,15,20,.76) 45%,rgba(4,15,20,.76) 55%,rgba(4,15,20,.05));backdrop-filter:blur(2px)}
@@ -182,6 +185,7 @@ function ensureRoot(layer){
     <aside class="kv2-speech" aria-live="polite" hidden><div class="kv2-speech-name"></div><div class="kv2-speech-text"></div></aside>
     <article class="kv2-receipt"><span>SHINOBI CHRONICLES · RECORD</span><h1>CHRONICLE RECEIPT</h1><pre></pre><button type="button" data-kv2-advance="true">CONTINUE</button></article>
     <div class="kv2-object-layer" aria-hidden="true"><div class="kv2-package-token" data-story-object-id="PACKAGE" hidden><span>PACKAGE</span></div></div>
+    <div class="kv2-transition-memory" aria-hidden="true" hidden></div>
     <div class="kv2-ghost-layer" aria-hidden="true"></div>
     <div class="kv2-wipe"></div>`;
   layer.appendChild(root);
@@ -594,6 +598,17 @@ function setWipe(mode){
   wipe.classList.toggle("is-covering",kind==="hard"||kind==="soft");
   return true;
 }
+function setTransitionMemory(backdropPath,visible){
+  const root=document.getElementById(ROOT_ID),memory=root&&root.querySelector(".kv2-transition-memory");if(!root||!memory)return false;
+  if(visible===true&&backdropPath){
+    const safe=String(backdropPath).replace(/\\/g,"\\\\").replace(/"/g,'\\"');
+    memory.style.backgroundImage=`linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.42)),url("${safe}")`;
+    memory.hidden=false;root.dataset.transitionActive="true";
+  }else{
+    memory.hidden=true;memory.style.backgroundImage="";delete root.dataset.transitionActive;
+  }
+  return true;
+}
 const PRE_RENDER=typeof renderStoryScenePresentationLayer==="function"?renderStoryScenePresentationLayer:null;
 if(PRE_RENDER){
   globalThis.renderStoryScenePresentationLayer=function kakashiV2RendererWrapper(){
@@ -643,6 +658,7 @@ function diagnostics(){
     stageWideAdvanceGuard:String(bind).includes('root.dataset.hasChoices==="true"')&&String(bind).includes("Date.now()-revealed<360"),
     actorLinkedSpeech:String(syncSpeech).includes("--kv2-speech-x")&&installStyle.toString().includes(".kv2-speech"),
     watchCuePerformance:String(playCuePresentation).includes("v2_watch_exchange")&&String(playCuePresentation).includes("SURPRISE_ENTRY")&&String(playCuePresentation).includes("FAR_ENTRY_LEFT"),
+    hardTransitionPreservesOutgoingEnvironment:String(setTransitionMemory).includes("kv2-transition-memory")&&installStyle.toString().includes("data-transition-active"),
     fiveChoiceLayoutNoScroll:installStyle.toString().includes("repeat(3,minmax(0,1fr))")&&installStyle.toString().includes("overflow:visible"),
     noMutationObserver:!String(render).includes("MutationObserver"),
     battleSuspendsStoryProjection:String(storySuspendedForBattle).includes("pendingBattle")&&String(storySuspendedForBattle).includes('rc.type==="story_scene"'),
@@ -655,6 +671,7 @@ function diagnostics(){
 }
 globalThis.renderAcademyKakashiV236030=render;
 globalThis.setAcademyKakashiV2Wipe36030=setWipe;
+globalThis.setAcademyKakashiV2TransitionMemory36030=setTransitionMemory;
 globalThis.playAcademyKakashiV2CuePresentation36030=playCuePresentation;
 globalThis.prepareAcademyKakashiV2VisualSnapshot36030=preparePreCommitVisualSnapshot;
 globalThis.cancelAcademyKakashiV2VisualSnapshot36030=cancelPreparedVisualSnapshot;
