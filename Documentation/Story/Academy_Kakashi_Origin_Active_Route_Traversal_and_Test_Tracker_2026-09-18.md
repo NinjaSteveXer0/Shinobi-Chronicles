@@ -592,3 +592,58 @@ Anti-regression cleanup also marks:
 This is Writing closure only.
 
 Coding/runtime implementation, CE factual resolution consumption, installed-browser traversal and Browser Golden remain separate.
+
+
+## 2026-09-22 — Player-facing Story / dialogue quality pass
+
+Stephen authorised a full dramatist/director pass over the current Academy Kakashi V2 player-facing Story.
+
+Authority:
+`Documentation/Story/Academy_Kakashi_Player_Facing_Story_Dialogue_Quality_Pass_2026-09-22.md`
+
+Authority commit:
+`fdecd05b30befc6ca318742f3e9e5c8481f57a22`
+
+Live expression implementation commits:
+- `02d544ed1c7261a9177a23cb2ff09a8043c5a4d0`
+- `519bc52486fb60760965104a19cb197b9bb213d3`
+- `3cb5416509ad682e5573608ece58d8611fc1d153`
+- `a7a31ff82db2df2ce1d360390b154afb726a7644`
+- `6be81a79bdb6d24386211c5da8c4e92c719dd493`
+
+Pass scope included:
+- live consumed scene catalogue;
+- Stop Assassin pursuit / post-Battle sequences;
+- Move In Closer success/failure;
+- Pakkun / AMT pursuit and interrogation;
+- Demand Package / Take Him Down;
+- package-missing PS;
+- Cut Off / improved Pickpocket;
+- dynamic rooftop ANBU report;
+- private Minato evaluation;
+- removal of player-facing authoring/runtime terminology;
+- correction of narration/dialogue item typing.
+
+Preserved:
+- exact current choice labels;
+- route causality;
+- Battle results;
+- package facts;
+- participant life/custody/release;
+- Knowledge;
+- rewards;
+- Pakkun semantics;
+- chronology.
+
+Acceptance:
+- edited V2 core and content parse as executable JavaScript;
+- current root / Scene03A exact choice labels remain unchanged;
+- player-facing internal-authority jargon scan GREEN.
+
+Current installed-browser Golden predates these text/runtime expression edits.
+
+Browser/runtime revalidation remains separate.
+
+One choreography boundary remains outside Writing-only scope:
+several current disposition choices are contractually asserted by the browser Golden to transition directly to `v2_report`.
+Adding intermediate aftermath beats requires Coding / Runtime + Golden expectation updates together.
