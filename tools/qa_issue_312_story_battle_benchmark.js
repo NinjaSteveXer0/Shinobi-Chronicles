@@ -69,13 +69,13 @@ assert(kv2Rewards.includes("Field Recovery Pill")&&kv2Rewards.includes("authorit
 assert(kv2Rewards.includes("renderVictoryOverlay36015"),"#312 Victory screen must consume the authoritative Kakashi reward projection");
 
 assert(battleSource.includes("installFormationStage33000"),"#312 shared Battle owner is missing Formation Stage composition");
-assert(battleSource.includes("getBattleDeploymentParticipant")&&battle.includes("deployedFormation33000"),"#312 Formation Stage must consume deployed participant truth");
+assert(battleSource.includes("getBattleDeploymentParticipant")&&battleSource.includes("deployedFormation33000"),"#312 Formation Stage must consume deployed participant truth");
 assert(battleSource.includes('return peak<=1?"duel":peak>=4?"arc":"wedge"'),"#312 adaptive duel / wedge / arc formation modes missing");
-assert(battleSource.includes('"SKILLS"')&&battle.includes('"ITEMS"')&&battle.includes('"SUMMONS"')&&battle.includes("primary.length===3"),"#312 primary action dock must be exactly Skills / Items / Summons");
-assert(battleSource.includes("battle2-formation-withdraw")&&battle.includes("invokeBattleWithdrawAction"),"#312 Withdraw semantic action must remain available outside the primary dock");
-assert(battleSource.includes("selectedTargetRef")&&battle.includes("formationNodeForRef33000"),"#312 contextual exact-target formation focus missing");
+assert(battleSource.includes('"SKILLS"')&&battleSource.includes('"ITEMS"')&&battleSource.includes('"SUMMONS"')&&battleSource.includes("primary.length===3"),"#312 primary action dock must be exactly Skills / Items / Summons");
+assert(battleSource.includes("battle2-formation-withdraw")&&battleSource.includes("invokeBattleWithdrawAction"),"#312 Withdraw semantic action must remain available outside the primary dock");
+assert(battleSource.includes("selectedTargetRef")&&battleSource.includes("formationNodeForRef33000"),"#312 contextual exact-target formation focus missing");
 assert(battleSource.includes('stage.dataset.formationTray="closed"'),"#312 action playback must contract the secondary tray");
-assert(battleSource.includes('data-formation-hidden="true"')||battle.includes('dataset.formationHidden="true"'),"#312 undeployed/reserve formation furniture is not being suppressed");
+assert(battleSource.includes('data-formation-hidden="true"')||battleSource.includes('dataset.formationHidden="true"'),"#312 undeployed/reserve formation furniture is not being suppressed");
 
 assert(battleSource.includes("resolveBattlePerformanceProjection33000"),"#312 shared Battle performance projection missing");
 assert(battleSource.includes("currentBattle.runtime")||battleSource.includes("ensureBattleRuntimeState"),"#312 Battle performance must read canonical runtime evidence");
