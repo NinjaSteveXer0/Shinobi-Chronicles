@@ -66,10 +66,14 @@ function playPostCommitTransition(prev,next){
   const kind=transitionKind(prev,next);if(!kind)return{played:false};
   const lethalDelay=kind==="hard"&&hasLethalConsequenceInFlight()?460:0;
   const coverFor=kind==="hard"?360:150;
+  if(kind==="hard"){
+    try{if(typeof setAcademyKakashiV2TransitionMemory36030==="function")setAcademyKakashiV2TransitionMemory36030(prev&&prev.backdrop||null,true);}catch(_e){}
+  }
   const start=()=>{
     wipeMode=kind;wipeCovering=true;render();
-    lastTransition={type:kind==="hard"?"cinematic_scene_change":"same_environment_beat_shift",fromBeatId:prev&&prev.id||null,toBeatId:next&&next.id||null,semanticAlreadyCommitted:true,lethalConsequenceDelayMs:lethalDelay,startedAt:Date.now()};
+    lastTransition={type:kind==="hard"?"cinematic_scene_change":"same_environment_beat_shift",fromBeatId:prev&&prev.id||null,toBeatId:next&&next.id||null,semanticAlreadyCommitted:true,outgoingEnvironmentPreserved:kind==="hard",lethalConsequenceDelayMs:lethalDelay,startedAt:Date.now()};
     later(()=>{
+      if(kind==="hard"){try{if(typeof setAcademyKakashiV2TransitionMemory36030==="function")setAcademyKakashiV2TransitionMemory36030(null,false);}catch(_e){}}
       wipeCovering=false;render();
       later(()=>{wipeMode=null;render();lastTransition={...lastTransition,completedAt:Date.now()};},kind==="hard"?320:180);
     },coverFor);
@@ -133,6 +137,7 @@ globalThis.advanceAcademyKakashiV236040=advance;
 globalThis.getAcademyKakashiV2TransitionState36040=getState;
 globalThis.resetAcademyKakashiV2Transition36040=()=>{
   clearTimers();wipeCovering=false;wipeMode=null;lastTransition=null;
+  try{if(typeof setAcademyKakashiV2TransitionMemory36030==="function")setAcademyKakashiV2TransitionMemory36030(null,false);}catch(_e){}
   const root=typeof document!=="undefined"?document.getElementById("kakashi-v2-scene-board"):null;
   if(root&&typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(root,"kakashi_transition_reset");
   resetForBeat();render();return{success:true};
@@ -153,6 +158,7 @@ function diagnostics(){
     semanticCommitPrecedesPresentation:String(semanticAdvance).indexOf("PRE_ADVANCE")<String(semanticAdvance).indexOf("render()"),
     animationCannotBlockStoryTruth:!String(semanticAdvance).includes("locked")&&!String(semanticAdvance).includes("await")&&!String(playPostCommitTransition).includes("PRE_ADVANCE"),
     transitionHierarchyIsPostCommitPresentation:String(playPostCommitTransition).includes("semanticAlreadyCommitted:true")&&String(transitionKind).includes('"hard"')&&String(transitionKind).includes('"soft"'),
+    hardTransitionPreservesOutgoingScene:String(playPostCommitTransition).includes("setAcademyKakashiV2TransitionMemory36030")&&String(playPostCommitTransition).includes("outgoingEnvironmentPreserved"),
     cuePresentationDoesNotCommitTruth:String(advance).includes("playAcademyKakashiV2CuePresentation36030")&&String(advance).includes("semanticBeatUnchanged:true"),
     sharedChoreographyReset:String(globalThis.resetAcademyKakashiV2Transition36040).includes("cancelStoryChoreography33900"),
     noActorDomAnimationOwnership:!String(semanticAdvance).includes("querySelector")&&!String(advance).includes("clone"+"Node"),
