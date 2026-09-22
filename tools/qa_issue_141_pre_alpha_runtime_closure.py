@@ -66,6 +66,12 @@ NODE_GATES = [
     "tools/qa_runtime_ownership_safety_300.js",
     "tools/qa_issue_278_post_battle_agency.js",
     "tools/qa_issue_303_runtime_build_fingerprint.js",
+    "tools/qa_contract_integrity_311.js",
+    "tools/qa_story_reachability_311.js",
+    "tools/qa_save_compatibility_311.js",
+    "tools/qa_reference_integrity_311.js",
+    "tools/qa_browser_runtime_error_gate_311.js",
+    "tools/qa_release_candidate_evidence_311.js",
 ]
 
 EXTERNAL_ASSET_GATES = [
