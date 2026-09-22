@@ -16,6 +16,9 @@ const PS="academy_kakashi_origin_package_smuggler";
 const MI="academy_kakashi_origin_masked_interceptor";
 const PAKKUN="pakkun_origin_unfamiliar_ninken";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
+const AMT_TANTO_BASE_PL=6,AMT_FLICKER_BOOST_PL=2;
+const PS_SEAL_BURST_PL=5;
+const MI_BLADE_BASE_PL=5,MI_FALSE_RETREAT_BOOST_PL=2;
 
 const CONFIGS=Object.freeze({
   academy_kakashi_origin_battle_amt_1v1:Object.freeze({id:"academy_kakashi_origin_battle_amt_1v1",opposition:[AMT],pakkun:false,timingGate:null}),
@@ -37,7 +40,17 @@ const PROFILE=Object.freeze({
 });
 
 function clone(v){try{return typeof cloneBattleRuntimeValue==="function"?cloneBattleRuntimeValue(v):JSON.parse(JSON.stringify(v));}catch(_){return v;}}
-function battleMeta(){if(!currentBattle)return null;return currentBattle.kakashiV2||(currentBattle.kakashiV2={lastEnemyActionByParticipant:{},pakkunRemainingPL:16});}
+function battleMeta(){if(!currentBattle)return null;return currentBattle.kakashiV2||(currentBattle.kakashiV2={lastEnemyActionByParticipant:{},usedEnemyActionIds:[],pakkunRemainingPL:16});}
+function actionUsed(id){
+  const meta=battleMeta();return !!(meta&&Array.isArray(meta.usedEnemyActionIds)&&meta.usedEnemyActionIds.includes(String(id||"")));
+}
+function markEnemyAction(enemy,id){
+  const meta=battleMeta();if(!meta||!enemy||!id)return;
+  if(!meta.lastEnemyActionByParticipant||typeof meta.lastEnemyActionByParticipant!=="object")meta.lastEnemyActionByParticipant={};
+  meta.lastEnemyActionByParticipant[enemy.id]=String(id);
+  if(!Array.isArray(meta.usedEnemyActionIds))meta.usedEnemyActionIds=[];
+  if(!meta.usedEnemyActionIds.includes(String(id)))meta.usedEnemyActionIds.push(String(id));
+}
 function lastEnemyAction(id){
   const meta=battleMeta();if(meta&&meta.lastEnemyActionByParticipant&&meta.lastEnemyActionByParticipant[id])return meta.lastEnemyActionByParticipant[id];
   const rows=currentBattle&&currentBattle.runtime&&Array.isArray(currentBattle.runtime.evidence)?currentBattle.runtime.evidence:[];
@@ -54,22 +67,28 @@ function addSelfMarker(enemy,key,skillId,envelope){
   const prior=sourceState(key,enemy.id);if(prior)removeBattleTransientState(prior.stateId);
   return addBattleTransientState({stateKey:key,sourceSide:"enemy",sourceParticipantId:enemy.id,targetSide:"enemy",targetParticipantId:enemy.id,ownerRef:{type:"skill",id:skillId},data:{activationActionId:envelope&&envelope.actionId||null,kakashiV2:true}});
 }
-function movementControlAction(id,discipline,conditionKey){
+function movementControlAction(id,discipline,conditionKey,{oncePerBattle=false}={}){
   return {
-    id,skillId:id,actionClass:"enemy_control_technique",traits:["movement_control_only","not_stun","no_story_custody"],
-    evaluateAvailability({enemy,target}){return{available:!!enemy&&!!target&&!targetCondition(conditionKey,target.id,enemy.id),reason:"target_already_movement_controlled"};},
+    id,skillId:id,actionClass:"enemy_control_technique",traits:["movement_control_only","not_stun","no_story_custody",...(oncePerBattle?["once_per_battle"]:[])],
+    evaluateAvailability({enemy,target}){
+      if(!enemy||!target)return{available:false,reason:"participant_missing"};
+      if(oncePerBattle&&actionUsed(id))return{available:false,reason:"once_per_battle_used"};
+      return{available:!targetCondition(conditionKey,target.id,enemy.id),reason:"target_already_movement_controlled"};
+    },
     resolve({enemy,target,envelope}){
       if(!enemy||!target)return{resolved:false,reason:"control_participant_missing"};
+      if(oncePerBattle&&actionUsed(id))return{resolved:false,reason:"once_per_battle_used"};
       const live=resolveAuthoredDynamicControlStrength({sourceSide:"enemy",sourceParticipantId:enemy.id,discipline});
       if(!live||live.success!==true)return{resolved:false,reason:"control_strength_unavailable"};
       const applied=createAlphaMovementControlCondition({conditionKey,conditionType:"physical_restraint",sourceSide:"enemy",sourceParticipantId:enemy.id,sourceRefs:[{type:"origin_opposition_profile",id:enemy.id}],sourceSkillId:id,actionId:envelope.actionId,targetSide:"player",targetParticipantId:target.id,strength:live.strength,resolverDiscipline:discipline,durationActionOpportunities:1,extraData:{blanketStun:false,storyCustody:false,kakashiV2:true}});
-      return{resolved:!!(applied&&applied.condition),branch:"movement_control_only",damageApplied:false,conditionRefs:applied&&applied.condition?[applied.condition.conditionId]:[]};
+      const resolved=!!(applied&&applied.condition);if(resolved)markEnemyAction(enemy,id);
+      return{resolved,branch:"movement_control_only",damageApplied:false,conditionRefs:applied&&applied.condition?[applied.condition.conditionId]:[]};
     }
   };
 }
 function directAction(id,basePL,discipline,{boostMarker=null,boost=0}={}){
   return {
-    id,skillId:id,actionClass:"enemy_authored_action",traits:["one_authored_damage_packet"],
+    id,skillId:id,actionClass:"enemy_authored_action",traits:["one_authored_damage_packet"],authoredAttackPL:basePL,conditionalBoostAttackPL:boost,
     evaluateAvailability({enemy,target}){
       if(!enemy||!target)return{available:false,reason:"participant_missing"};
       if(enemy.id===AMT){
@@ -88,6 +107,7 @@ function directAction(id,basePL,discipline,{boostMarker=null,boost=0}={}){
       const action=makeEnemyFixedDamageAction(id,attackPL,{primaryDiscipline:discipline,traits:["one_authored_damage_packet"]});
       const result=action.resolve({enemy,target,envelope,currentBattle});
       if(marker)removeBattleTransientState(marker.stateId);
+      if(result&&result.resolved===true)markEnemyAction(enemy,id);
       return result;
     }
   };
@@ -96,7 +116,7 @@ function setupAction(id,key,discipline,availability){
   return {
     id,skillId:id,actionClass:"enemy_context_technique",traits:["setup_only","no_extra_turn","no_hidden_speed"],
     evaluateAvailability(ctx){return availability?availability(ctx):{available:!sourceState(key,ctx.enemy&&ctx.enemy.id)};},
-    resolve({enemy,envelope}){const state=addSelfMarker(enemy,key,id,envelope);return{resolved:!!state,branch:"authored_setup",damageApplied:false,stateRefs:state?[state.stateId]:[]};}
+    resolve({enemy,envelope}){const state=addSelfMarker(enemy,key,id,envelope);if(state)markEnemyAction(enemy,id);return{resolved:!!state,branch:"authored_setup",damageApplied:false,stateRefs:state?[state.stateId]:[]};}
   };
 }
 function compatibleSmugglerCondition(enemy){
@@ -106,7 +126,7 @@ function smugglerRelease(){
   const id="enemy_fuinjutsu_smuggler_seal_release";
   return{id,skillId:id,actionClass:"enemy_support_technique",traits:["bounded_single_state_release"],
     evaluateAvailability({enemy}){return{available:!!enemy&&!!compatibleSmugglerCondition(enemy),reason:"no_compatible_state"};},
-    resolve({enemy,envelope}){const c=compatibleSmugglerCondition(enemy);if(!c)return{resolved:false,reason:"no_compatible_state"};const removed=removeBattleCondition(c.conditionId,{reason:"smuggler_seal_release",actionId:envelope.actionId,targetRef:createBattleParticipantRef("enemy",enemy.id)});return{resolved:removed===true,branch:"bounded_state_release",damageApplied:false,conditionRefs:[c.conditionId]};}
+    resolve({enemy,envelope}){const c=compatibleSmugglerCondition(enemy);if(!c)return{resolved:false,reason:"no_compatible_state"};const removed=removeBattleCondition(c.conditionId,{reason:"smuggler_seal_release",actionId:envelope.actionId,targetRef:createBattleParticipantRef("enemy",enemy.id)});if(removed===true)markEnemyAction(enemy,id);return{resolved:removed===true,branch:"bounded_state_release",damageApplied:false,conditionRefs:[c.conditionId]};}
   };
 }
 function interceptorGuard(){
@@ -117,7 +137,7 @@ function interceptorGuard(){
       const meta=battleMeta(),remaining=getBattleRemainingPL("enemy",enemy.id),max=enemy&&Number(enemy.calibratedBasePL)||14;
       return{available:remaining<=max*0.5&&meta.decoySubstitutionUsed!==true&&!sourceState("decoy_substitution_guard",enemy.id),reason:"decoy_guard_not_due"};
     },
-    resolve(ctx){const result=base.resolve(ctx);if(result&&result.resolved===true)battleMeta().decoySubstitutionUsed=true;return result;}
+    resolve(ctx){const result=base.resolve(ctx);if(result&&result.resolved===true){battleMeta().decoySubstitutionUsed=true;markEnemyAction(ctx.enemy,id);}return result;}
   };
 }
 
@@ -133,22 +153,53 @@ function registerProfiles(){
     };
   });
   enemyDatabase[AMT].authoredBattleActions=[
-    movementControlAction("enemy_anbu_style_operative_wire_capture","Bukijutsu","wire_capture"),
+    movementControlAction("enemy_anbu_style_operative_wire_capture","Bukijutsu","wire_capture",{oncePerBattle:true}),
     setupAction("enemy_anbu_style_operative_silent_body_flicker","silent_body_flicker_position","Ninjutsu",({enemy,target})=>({available:!!targetCondition("wire_capture",target.id,enemy.id)&&!sourceState("silent_body_flicker_position",enemy.id)&&lastEnemyAction(enemy.id)==="enemy_anbu_style_operative_tanto_flash",reason:"amt_flicker_not_due"})),
-    directAction("enemy_anbu_style_operative_tanto_flash",26,"Bukijutsu",{boostMarker:"silent_body_flicker_position",boost:4})
+    directAction("enemy_anbu_style_operative_tanto_flash",AMT_TANTO_BASE_PL,"Bukijutsu",{boostMarker:"silent_body_flicker_position",boost:AMT_FLICKER_BOOST_PL})
   ];
   enemyDatabase[PS].authoredBattleActions=[
     smugglerRelease(),
     movementControlAction("enemy_fuinjutsu_smuggler_binding_tag","Fuinjutsu","binding_tag"),
-    directAction("enemy_fuinjutsu_smuggler_contraband_seal_burst",22,"Fuinjutsu")
+    directAction("enemy_fuinjutsu_smuggler_contraband_seal_burst",PS_SEAL_BURST_PL,"Fuinjutsu")
   ];
   enemyDatabase[MI].authoredBattleActions=[
     interceptorGuard(),
     setupAction("enemy_decoy_assassin_false_retreat","false_retreat_opening",null,({enemy})=>({available:!sourceState("false_retreat_opening",enemy.id),reason:"false_retreat_already_live"})),
-    directAction("enemy_decoy_assassin_concealed_blade",26,"Bukijutsu",{boostMarker:"false_retreat_opening",boost:4})
+    directAction("enemy_decoy_assassin_concealed_blade",MI_BLADE_BASE_PL,"Bukijutsu",{boostMarker:"false_retreat_opening",boost:MI_FALSE_RETREAT_BOOST_PL})
   ];
   return{success:true};
 }
+
+const PRE_CHOOSE_ENEMY_ACTION=typeof chooseEnemyAuthoredBattleAction==="function"?chooseEnemyAuthoredBattleAction:null;
+function chooseAcademyKakashiV2EnemyAction36010(schedulerState=null){
+  const meta=currentBattle&&currentBattle.kakashiV2;
+  if(!meta||!Array.isArray(meta.oppositionParticipantIds))return PRE_CHOOSE_ENEMY_ACTION?PRE_CHOOSE_ENEMY_ACTION.apply(this,arguments):{success:false,reason:"enemy_scheduler_authority_missing"};
+  const state=schedulerState&&schedulerState.ready===true?schedulerState:(typeof evaluateEnemyActionScheduler==="function"?evaluateEnemyActionScheduler():null);
+  if(!state||state.ready!==true)return PRE_CHOOSE_ENEMY_ACTION?PRE_CHOOSE_ENEMY_ACTION(state):{success:false,reason:state&&state.reason||"enemy_scheduler_unavailable"};
+  const enemyId=String(state.enemyId||"");
+  const candidates=Array.isArray(state.eligibleActions)?state.eligibleActions:[];
+  const byId=id=>candidates.find(a=>a&&a.id===id)||null;
+  let action=null;
+  if(enemyId===AMT){
+    action=byId("enemy_anbu_style_operative_tanto_flash")&&sourceState("silent_body_flicker_position",AMT)?byId("enemy_anbu_style_operative_tanto_flash"):null;
+    if(!action&&!actionUsed("enemy_anbu_style_operative_wire_capture"))action=byId("enemy_anbu_style_operative_wire_capture");
+    if(!action&&lastEnemyAction(AMT)==="enemy_anbu_style_operative_tanto_flash")action=byId("enemy_anbu_style_operative_silent_body_flicker");
+    if(!action)action=byId("enemy_anbu_style_operative_tanto_flash");
+  }else if(enemyId===PS){
+    action=byId("enemy_fuinjutsu_smuggler_seal_release")||byId("enemy_fuinjutsu_smuggler_binding_tag")||byId("enemy_fuinjutsu_smuggler_contraband_seal_burst");
+  }else if(enemyId===MI){
+    action=sourceState("false_retreat_opening",MI)?byId("enemy_decoy_assassin_concealed_blade"):null;
+    if(!action)action=byId("enemy_decoy_assassin_decoy_substitution");
+    if(!action)action=byId("enemy_decoy_assassin_false_retreat");
+  }
+  if(!action)return PRE_CHOOSE_ENEMY_ACTION?PRE_CHOOSE_ENEMY_ACTION(state):{success:false,reason:"no_semantically_eligible_enemy_action"};
+  return{success:true,action,eligibleActionIds:candidates.map(a=>a.id),randomnessAppliedAfterEligibility:false,equalSelectionWeight:false,deterministicKakashiOriginAI:true};
+}
+if(PRE_CHOOSE_ENEMY_ACTION){
+  globalThis.chooseEnemyAuthoredBattleAction=chooseAcademyKakashiV2EnemyAction36010;
+  try{chooseEnemyAuthoredBattleAction=globalThis.chooseEnemyAuthoredBattleAction;}catch(_error){}
+}
+
 function config(id){return CONFIGS[String(id||"")]||null;}
 function launchKey(spec,def){return [spec.storyOccurrenceId,spec.sourceAnchorRef,spec.bindingRef,def.id].map(String).join("|");}
 function ensureLaunchStore(){if(!playerData.kakashiV2BattleLaunches||typeof playerData.kakashiV2BattleLaunches!=="object")playerData.kakashiV2BattleLaunches={};return playerData.kakashiV2BattleLaunches;}
@@ -175,7 +226,7 @@ function launch(spec={}){
     patchId:PATCH_ID,battleConfigId:def.id,battleOccurrenceId:occurrenceId,
     storyOccurrenceId:String(spec.storyOccurrenceId||""),sourceAnchorRef:String(spec.sourceAnchorRef||""),bindingRef:String(spec.bindingRef||""),
     oppositionParticipantIds:[...def.opposition],pakkunAuthorized:def.pakkun===true,pakkunRemainingPL:def.pakkun?16:0,
-    timingGate:clone(def.timingGate),lastEnemyActionByParticipant:{},decoySubstitutionUsed:false,packageCustodyDelta:"none"
+    timingGate:clone(def.timingGate),lastEnemyActionByParticipant:{},usedEnemyActionIds:[],decoySubstitutionUsed:false,packageCustodyDelta:"none"
   };
   store[key]={battleOccurrenceId:occurrenceId,battleConfigId:def.id,createdAt:Date.now()};
   savePlayerData();saveTestState();openOverlay("combat");
@@ -268,7 +319,9 @@ function diagnostics(){
     exactAMT:PROFILE[AMT].pl===18&&JSON.stringify(PROFILE[AMT].stats)===JSON.stringify({nin:14,tai:17,buki:19,fuin:10,kin:11,gen:13,stamina:17}),
     exactPS:PROFILE[PS].pl===10&&JSON.stringify(PROFILE[PS].stats)===JSON.stringify({nin:9,tai:7,buki:8,fuin:11,kin:9,gen:6,stamina:10}),
     exactMI:PROFILE[MI].pl===14&&JSON.stringify(PROFILE[MI].stats)===JSON.stringify({nin:11,tai:14,buki:15,fuin:8,kin:8,gen:10,stamina:13}),
-    exactAttackPL:enemyDatabase[AMT].authoredBattleActions.some(a=>a.id==="enemy_anbu_style_operative_tanto_flash")&&enemyDatabase[PS].authoredBattleActions.some(a=>a.id==="enemy_fuinjutsu_smuggler_contraband_seal_burst")&&enemyDatabase[MI].authoredBattleActions.some(a=>a.id==="enemy_decoy_assassin_concealed_blade"),
+    exactAttackPL:enemyDatabase[AMT].authoredBattleActions.some(a=>a.id==="enemy_anbu_style_operative_tanto_flash"&&a.authoredAttackPL===6&&a.conditionalBoostAttackPL===2)&&enemyDatabase[PS].authoredBattleActions.some(a=>a.id==="enemy_fuinjutsu_smuggler_contraband_seal_burst"&&a.authoredAttackPL===5)&&enemyDatabase[MI].authoredBattleActions.some(a=>a.id==="enemy_decoy_assassin_concealed_blade"&&a.authoredAttackPL===5&&a.conditionalBoostAttackPL===2),
+    amtWireOncePerBattle:String(movementControlAction).includes("oncePerBattle")&&enemyDatabase[AMT].authoredBattleActions.some(a=>a.id==="enemy_anbu_style_operative_wire_capture"&&a.traits.includes("once_per_battle")),
+    deterministicOpponentAI:typeof globalThis.chooseEnemyAuthoredBattleAction==="function"&&String(globalThis.chooseEnemyAuthoredBattleAction).includes("deterministicKakashiOriginAI"),
     noAutoScaling:Object.values(PROFILE).every(p=>enemyDatabase[p.id].provenance.noAutoScaling===true),
     timingGatesExact:CONFIGS.academy_kakashi_origin_battle_seq_mi.timingGate.maximumControllerActions===4&&CONFIGS.academy_kakashi_origin_battle_seq_ps.timingGate.maximumControllerActions===3,
     pakkunTemporaryOnly:!String(pakkunAction).includes("grantEntityOwnership")&&!String(pakkunAction).includes("attachEntitySummonToCharacter"),
