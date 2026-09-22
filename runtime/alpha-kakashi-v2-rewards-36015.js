@@ -93,12 +93,17 @@ function registerTrainingTanto(){
   return{success:true,idempotent:false};
 }
 
+function currentBattleState36015(){
+  try{return typeof currentBattle==="object"&&currentBattle?currentBattle:null;}catch(_error){}
+  return globalThis.currentBattle&&typeof globalThis.currentBattle==="object"?globalThis.currentBattle:null;
+}
 function storyOccurrenceFromBattle(){
-  const dep=globalThis.currentBattle&&currentBattle.kakashiV2;
+  const battle=currentBattleState36015();
+  const dep=battle&&battle.kakashiV2;
   return dep&&dep.storyOccurrenceId?String(dep.storyOccurrenceId):null;
 }
 function battlePlan(){
-  const battle=globalThis.currentBattle;
+  const battle=currentBattleState36015();
   const dep=battle&&battle.kakashiV2;
   if(!battle||!dep||!battle.outcome||battle.outcome.type!=="victory")return null;
   const configId=String(dep.battleConfigId||battle.encounterId||"");
