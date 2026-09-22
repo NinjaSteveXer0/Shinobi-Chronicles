@@ -581,7 +581,39 @@ addBeat("v2_amt_seq_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA AL
  C("amt_seq_anbu","TAKE HIM BACK TO THE ANBU","v2_report",{patch:()=>{dispose("AMT","ANBU");history("AMT_TO_ANBU");}}),
  C("amt_seq_collect","RESTRAIN HIM AND COLLECT THE OTHERS","v2_group_collect",{available:()=>state().fieldSecured.length>0,patch:()=>{addField("AMT");history("COLLECT_ALL_FIELD_SECURED");}})
 ]});
-addBeat("v2_group_collect",{mode:"choice",backdrop:B.alleyAlt,location:"KONOHA · COLLECTION",objective:"Transfer the restrained participants.",actors:["kakashi","amt","ps"],preset:"escort",cues:[N("Kakashi secures ANBU Marked Target with ninja wire."),N("He retraces the route and collects every earlier field-secured captive who remains available."),N("Each restraint remains a separate participant state."),N("Now the group has to be transferred to legitimate institutional custody.")],choices:[
+function groupCollectActorKeys(){
+ const s=state(),keys=["kakashi","amt"];
+ if(s&&s.fieldSecured.includes("PS"))keys.push("ps");
+ if(s&&s.fieldSecured.includes("MI"))keys.push("mi");
+ return keys;
+}
+function groupCollectCues(){
+ const s=state(),out=[
+  N("ANBU Marked Target remains on the ground."),N("Kakashi looks back the way they came."),N("There are still people waiting behind him."),N("Pakkun follows his eye."),
+  Q("PAKKUN","We're going back."),Q("KAKASHI","I left prisoners behind."),Q("PAKKUN","I noticed."),N("Kakashi draws out the ninja wire."),
+  N("ANBU Marked Target sees it."),Q("ANBU MARKED TARGET","You've been doing this all night?"),N("Kakashi secures his wrists."),Q("KAKASHI","More than I expected."),
+  N("Pakkun gives the wire a look."),Q("PAKKUN","You're going to need more of that."),N("Kakashi checks what remains."),Q("KAKASHI","I know."),
+  N("Pakkun starts down the street."),Q("PAKKUN","Good. I wasn't offering mine."),N("Kakashi looks at him."),N("Pakkun keeps walking.")
+ ];
+ if(s&&s.fieldSecured.includes("PS"))out.push(
+  N("Package Smuggler is exactly where Kakashi left him."),N("His eyes move first to Kakashi."),N("Then to ANBU Marked Target under restraint."),N("Then to Pakkun."),
+  Q("PACKAGE SMUGGLER","You actually came back."),Q("KAKASHI","I said I would."),N("Package Smuggler looks at ANBU Marked Target."),Q("PACKAGE SMUGGLER","And you brought company."),
+  Q("ANBU MARKED TARGET","Don't."),Q("PACKAGE SMUGGLER","I haven't said anything yet."),Q("ANBU MARKED TARGET","That was the warning."),
+  N("Pakkun looks between them."),Q("PAKKUN","This is going well."),N("Kakashi releases Package Smuggler from the fixed anchor without removing his restraints."),
+  N("He brings him into the escort."),Q("PACKAGE SMUGGLER","I'm starting to miss the tree."),Q("KAKASHI","You weren't at the tree."),
+  N("Package Smuggler looks at him."),Q("PACKAGE SMUGGLER","You know what I mean.")
+ );
+ if(s&&s.fieldSecured.includes("MI"))out.push(
+  N("Masked Interceptor is still beneath the Sakura tree."),N("Her attention settles on Kakashi first."),N("Then the restrained people with him."),
+  ...(s.fieldSecured.includes("PS")?[N("Package Smuggler notices the look."),Q("PACKAGE SMUGGLER","Don't."),N("Masked Interceptor says nothing."),Q("PACKAGE SMUGGLER","You were going to say something."),Q("MASKED INTERCEPTOR","I didn't need to."),N("Pakkun gives Package Smuggler a brief look."),Q("PAKKUN","She really didn't.")]:[]),
+  N("Kakashi removes the line fixing Masked Interceptor to the tree."),N("The restraint around her remains."),N("She joins the escort."),N("Her eyes move to Kakashi."),
+  Q("MASKED INTERCEPTOR","You got all the way back."),Q("KAKASHI","I said I would."),Q("MASKED INTERCEPTOR","No."),N("She looks over the group."),
+  Q("MASKED INTERCEPTOR","You said you'd finish what you started."),N("A moment."),Q("MASKED INTERCEPTOR","This is certainly one interpretation."),
+  N("Kakashi starts walking."),Q("KAKASHI","Keep moving."),N("This time the faint amusement behind her mask is obvious.")
+ );
+ return out;
+}
+addBeat("v2_group_collect",{mode:"choice",backdrop:B.alleyAlt,location:"KONOHA · COLLECTION",objective:"Transfer the restrained participants.",actors:()=>groupCollectActorKeys(),preset:"escort",cues:()=>groupCollectCues(),choices:[
  C("group_all_anbu","TAKE THEM ALL BACK TO ANBU","v2_report",{patch:()=>{disposeGroup("ANBU",["MI","PS","AMT"].filter(r=>state().fieldSecured.includes(r)));history("GROUP_TO_ANBU");}}),
  C("group_all_police","TAKE THEM ALL TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>{disposeGroup("POLICE",["MI","PS","AMT"].filter(r=>state().fieldSecured.includes(r)));history("GROUP_TO_POLICE");}})
 ]});
@@ -871,7 +903,8 @@ function cuesFor(beatId){
 function projectionFor(beatId){
  const row=manifest[String(beatId||"")];if(!row)return null;
  const s=state(),cues=cuesFor(beatId);
- return{...row,cues,state:s,actors:(row.actors||[]).map(key=>A[key]||null).filter(Boolean)};
+ const actorKeys=typeof row.actors==="function"?row.actors({state:s,runtime:active()}):(row.actors||[]);
+ return{...row,cues,state:s,actors:(actorKeys||[]).map(key=>A[key]||null).filter(Boolean)};
 }
 function diagnostics(){
  const def=getStorySceneDefinition(SCENE_ID);
