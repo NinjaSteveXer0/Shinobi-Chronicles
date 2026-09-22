@@ -196,6 +196,33 @@ assert(transitionSource.includes("is-falling")&&transitionSource.includes("is-fl
       if(beat.battle.defeatBeatId)assert(ids.has(beat.battle.defeatBeatId),`missing defeat beat from ${beat.beatId}`);
     }
   }
+  const incoming=new Map(def.beats.map(b=>[b.beatId,[]]));
+  for(const beat of def.beats){
+    const targets=[];
+    if(beat.nextBeatId)targets.push(beat.nextBeatId);
+    for(const choice of beat.choices||[])if(choice.nextBeatId)targets.push(choice.nextBeatId);
+    if(beat.battle){if(beat.battle.victoryBeatId)targets.push(beat.battle.victoryBeatId);if(beat.battle.defeatBeatId)targets.push(beat.battle.defeatBeatId);}
+    for(const target of targets)if(incoming.has(target))incoming.get(target).push(beat.beatId);
+  }
+  const reachable=new Set([def.entryBeatId]),queue=[def.entryBeatId];
+  while(queue.length){
+    const id=queue.shift(),beat=def.beatMap.get(id);if(!beat)continue;
+    const targets=[];
+    if(beat.nextBeatId)targets.push(beat.nextBeatId);
+    for(const choice of beat.choices||[])if(choice.nextBeatId)targets.push(choice.nextBeatId);
+    if(beat.battle){if(beat.battle.victoryBeatId)targets.push(beat.battle.victoryBeatId);if(beat.battle.defeatBeatId)targets.push(beat.battle.defeatBeatId);}
+    for(const target of targets)if(ids.has(target)&&!reachable.has(target)){reachable.add(target);queue.push(target);}
+  }
+  const unreachable=def.beats.map(b=>b.beatId).filter(id=>!reachable.has(id));
+  assert.deepStrictEqual(unreachable,[],"clean-room graph contains unreachable/dead beats");
+
+  const forbiddenPlayerFacingPhrases=[
+    "Battle-finisher requirement","factual pursuit result","Story-authorised","participant state",
+    "manufacture custody","cannot reroll on refresh","non-authorised Battle action",
+    "combinatorial per-target","No Chronicle state is available"
+  ];
+  for(const phrase of forbiddenPlayerFacingPhrases)assert(!coreSource.includes(`N("${phrase}`)&&!coreSource.includes(`Q("${phrase}`),`player-facing implementation prose leaked: ${phrase}`);
+
   const root=def.beatMap.get("v2_scene02_tail");
   assert.strictEqual(JSON.stringify(Array.from(root.choices).map(c=>c.label)),JSON.stringify(["WATCH THE EXCHANGE","MOVE IN CLOSER","STRIKE BEFORE THE HANDOFF","SLIP IN FOR THE PACKAGE"]));
   const watch=def.beatMap.get("v2_watch_exchange");
