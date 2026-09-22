@@ -58,7 +58,7 @@ assert(!kv2Transition.includes("locked=true"),"#312 Story truth must not wait on
 
 assert(kv2Renderer.includes(".kv2-speech")&&kv2Renderer.includes("syncSpeech"),"#312 actor-linked speech surface missing");
 assert(kv2Renderer.includes("CLICK ANYWHERE TO CONTINUE")&&!kv2Renderer.includes('class="kv2-next"'),"#312 arrow-only continuation must be retired");
-assert(kv2Renderer.includes('root.dataset.hasChoices==="true"')&&kv2Renderer.includes("Date.now()-revealed<360"),"#312 choice reveal must block click-through / accidental commitment");
+assert(kv2Renderer.includes('root.dataset.hasChoices==="true"')&&kv2Renderer.includes('root.dataset.transitionActive==="true"')&&kv2Renderer.includes("Date.now()-revealed<360"),"#312 choice reveal / cinematic transition must block click-through / accidental commitment");
 assert(kv2Renderer.includes("repeat(3,minmax(0,1fr))")&&kv2Renderer.includes("max-height:none;overflow:visible"),"#312 five-choice desktop layout must not require an internal scrollbar");
 assert(kv2Renderer.includes('p.id!=="v2_watch_exchange"')&&kv2Renderer.includes("SURPRISE_ENTRY")&&kv2Renderer.includes("FAR_ENTRY_LEFT"),"#312 WATCH exchange cue choreography missing");
 assert(kv2Renderer.includes('if(idx<10)mi.dataset.kv2CueWithheld="true"'),"#312 Masked Interceptor must remain visually withheld until her authored reveal cue");
