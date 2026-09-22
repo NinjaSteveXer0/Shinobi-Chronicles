@@ -296,11 +296,11 @@ function lethalReportCues(s){
   const out=[];
   if(dead.length===2){
     const names=dead.map(ref=>ref==="MI"?"masked shinobi":ref==="PS"?"receiver":"original target");
-    Q;
+
     out.push(Q("KAKASHI",`The ${names[0]} and the ${names[1]} are dead.`));
     const survivor=["MI","PS","AMT"].find(ref=>!dead.includes(ref));
     out.push(...participantReportCues(s,survivor));
-    N;
+
     out.push(N("The operative does not reduce the night to a body count. He waits until Kakashi has finished the third person's outcome too."));
     return out;
   }
@@ -368,12 +368,12 @@ function lethalMinatoCues(s){
   else if(dead.length===2){
     const survivor=["MI","PS","AMT"].find(ref=>!dead.includes(ref));
     const survivorState=s.participants[survivor]&&s.participants[survivor].state;
-    Q;
+
     out.push(Q("MINATO","Two deliberate deaths."));
     if(survivorState==="RELEASED")out.push(Q("MINATO","And he let the third person walk."));
     else if(["ANBU_CUSTODY","POLICE_CUSTODY","FIELD_SECURED_PENDING_COLLECTION"].includes(survivorState))out.push(Q("MINATO","But he kept the third person alive."));
     else out.push(Q("MINATO","The third outcome wasn't his to finish."));
-    N;
+
     out.push(N("Minato lets the difference sit before moving on."));
   }else if(dead.length===1){
     const ref=dead[0];
@@ -606,7 +606,7 @@ addBeat("v2_ps_pursuit_success",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",
 addBeat("v2_battle_ps_seq",{mode:"battle_transition",backdrop:B.fight,location:"KONOHA · PL BATTLE",objective:"Recover the package.",actors:["kakashi","ps"],preset:"battle_pair",cues:[N("Kakashi Hatake vs Package Smuggler.")],battle:battle("academy_kakashi_origin_battle_seq_ps","ps_seq","v2_ps_seq_win","v2_ps_seq_loss","AK_SA_022")});
 addBeat("v2_ps_seq_loss",{backdrop:B.fight,location:"KONOHA · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_seq",ctx,s=>{s.participants.PS.state="ESCAPED";s.participants.AMT.state="ESCAPED";s.package.holder="PS";}),cues:[
  N("Package Smuggler finds the opening first."),N("Kakashi tries to close it."),N("Too late."),N("The man breaks past him."),
- N("The package remains with its last factual holder."),N("By the time Kakashi can move after him again, the street ahead is empty.")
+ N("The package goes with Package Smuggler."),N("By the time Kakashi can move after him again, the street ahead is empty.")
 ],nextBeatId:"v2_report"});
 addBeat("v2_ps_seq_win",{mode:"choice",backdrop:B.fight,location:"KONOHA · NIGHT",objective:null,actors:["kakashi","ps"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_seq",ctx,s=>{s.participants.PS.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;}),cues:[
  N("Package Smuggler goes down."),N("For a moment, Kakashi stays on him."),N("Makes sure he is not getting straight back up."),N("Then his attention moves."),N("To the package."),
