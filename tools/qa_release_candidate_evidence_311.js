@@ -25,7 +25,7 @@ for(const field of CONTRACT.requiredFields){
 }
 assert(/^[0-9a-f]{40}$/.test(manifest.candidateHead),"#311 candidateHead invalid");
 assert.strictEqual(manifest.expectedLocalHead,manifest.candidateHead,"#311 expected local head must match candidate");
-assert.strictEqual(manifest.runtimeFingerprint,"SC-ALPHA-RUNTIME-R303-2026-09-22-A","#311 runtime fingerprint drift");
+assert.strictEqual(manifest.runtimeFingerprint,"SC-ALPHA-RUNTIME-R303-2026-09-22-B","#311 runtime fingerprint drift");
 assert.strictEqual(manifest.saveCompatibilityResult,"GREEN");
 assert.strictEqual(manifest.browserErrorResult,"GREEN");
 assert.strictEqual(manifest.localSyncRequirement,"NOT_REQUIRED");
