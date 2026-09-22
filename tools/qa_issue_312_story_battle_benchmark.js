@@ -27,11 +27,15 @@ for(const token of ["ENTER","EXIT","FOCUS","REPOSITION","APPROACH","RETREAT","LU
 }
 assert(storySource.includes("Math.min(650"),"#312 ordinary Story choreography must be bounded");
 assert(storySource.includes("cancelStoryChoreography33900"),"#312 cancellable Story choreography missing");
+assert(storySource.includes('data-sc-choreography-pending-entry'),"#312 shared Story owner must pre-stage entrants before their ENTER cue");
+assert(storySource.includes("reused:true"),"#312 same-scope Story choreography must not replay on harmless rerender");
 
 assert(kv2Renderer.includes("playStoryChoreography33900"),"#312 Kakashi must consume shared Story choreography");
 assert(kv2Renderer.includes("applyStoryStageAnchor33900"),"#312 Kakashi must consume shared semantic anchors");
 assert(kv2Renderer.includes('data-story-object-id="PACKAGE"'),"#312 package token missing");
 assert(kv2Renderer.includes('data-count="1"')&&kv2Renderer.includes('data-count="2"'),"#312 actor prominence must adapt to cast count");
+assert(kv2Renderer.indexOf("for(const row of departures)")<kv2Renderer.indexOf("const prevIds"),"#312 committed departures must stage before newly entered actors");
+assert(!kv2Renderer.includes('JSON.stringify(previous.participantStates)!==JSON.stringify(next.participantStates)'),"#312 harmless participant-state refresh must not replay actor choreography");
 assert(kv2Transition.includes("semanticAlreadyCommitted:true"),"#312 wipe must be post-commit presentation");
 assert(!kv2Transition.includes("cloneNode"),"#312 transition adapter must not own actor animation DOM");
 assert(!kv2Transition.includes("locked=true"),"#312 Story truth must not wait on animation lock");
@@ -43,6 +47,14 @@ for(const token of ["PHYSICAL_STRIKE","HEAVY_STRIKE","PROJECTILE","CHAKRA_RANGED
   assert(battleSource.includes(token),"#312 Battle presentation class missing "+token);
 }
 assert(battleSource.includes("resolveUIPortraitProjection")&&battleSource.includes("resolveBattleEnemyPortraitProjection"),"#312 Battle staging must use Battle portrait authority");
+assert(battleSource.includes("applyBattlePerformanceRoles33000")&&battleSource.includes(".battle-live-active-card-player")&&battleSource.includes(".battle-live-active-card-enemy"),"#312 Battle performance must promote canonical combatants");
+{
+  const start=battleSource.indexOf("function battlePerformanceMarkup33000");
+  const end=battleSource.indexOf("function battlePerformanceRoleNode33000",start);
+  const markupSource=battleSource.slice(start,end);
+  assert(start>=0&&end>start&&!markupSource.includes("<img"),"#312 Battle performance must not duplicate actor/target portrait images");
+}
+assert(battleSource.includes("host.dataset.actionId===p.actionId"),"#312 stale Battle performance settle must not clear a newer action");
 assert(battleSource.includes("suspendCallerStoryPresentation33000")&&battleSource.includes("markStoryPresentationHidden33900"),"#312 Story-called Battle must suspend the shared Story presentation layer");
 
 const storyOwner=ownership.responsibilities.find(x=>x.responsibilityId==="story.scene.presentation.shared");
