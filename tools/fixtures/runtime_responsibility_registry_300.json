@@ -442,6 +442,35 @@
         "tools/qa_kakashi_v2_route_matrix.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
+    },
+    {
+      "responsibilityId": "runtime.build_fingerprint",
+      "canonicalOwner": "runtime/alpha-runtime-build-fingerprint-303.js",
+      "ownerType": "development_runtime_diagnostic",
+      "directCallers": [
+        "index.html"
+      ],
+      "stateReads": [],
+      "stateWrites": [
+        "globalThis.SC_RUNTIME_BUILD_FINGERPRINT_303",
+        "globalThis.getRuntimeBuildFingerprint",
+        "globalThis.runRuntimeBuildFingerprint303Diagnostics"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-runtime-build-fingerprint-303.js"
+      ],
+      "extensionHooks": [
+        "getRuntimeBuildFingerprint",
+        "runRuntimeBuildFingerprint303Diagnostics"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [],
+      "saveSchemaRefs": [],
+      "qaRefs": [
+        "tools/qa_issue_303_runtime_build_fingerprint.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
     }
   ],
   "adapters": [

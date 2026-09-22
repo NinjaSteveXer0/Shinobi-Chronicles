@@ -4,6 +4,10 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
+      - 'index.html'
+      - 'runtime/alpha-runtime-build-fingerprint-303.js'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
+      - 'tools/qa_issue_303_runtime_build_fingerprint.js'
       - 'runtime/academy-kakashi-v2-content-36000.js'
       - 'runtime/alpha-kakashi-v2-*.js'
       - 'runtime/alpha-origin-scenes-32900-integrator.js'

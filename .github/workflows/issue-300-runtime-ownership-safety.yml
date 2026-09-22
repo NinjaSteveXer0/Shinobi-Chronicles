@@ -5,12 +5,15 @@ on:
   pull_request:
     paths:
       - 'runtime/alpha-traversal-bridge-33200.js'
+      - 'runtime/alpha-runtime-build-fingerprint-303.js'
       - 'runtime/alpha-story-scene-board-33900.js'
       - 'runtime/alpha-story-decision-realisation-34000.js'
       - 'runtime/alpha-story-factual-resolver-34600.js'
       - 'runtime/academy-kakashi-v2-content-36000.js'
       - 'runtime/alpha-kakashi-v2-*.js'
       - 'tools/fixtures/runtime_*_300.json'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
+      - 'tools/qa_issue_303_runtime_build_fingerprint.js'
       - 'tools/qa_runtime_ownership_safety_300.js'
       - 'tools/qa_kakashi_v2_legacy_exclusion.js'
       - 'tools/qa_kakashi_v2_browser.js'
@@ -19,12 +22,15 @@ on:
     branches: [ main ]
     paths:
       - 'runtime/alpha-traversal-bridge-33200.js'
+      - 'runtime/alpha-runtime-build-fingerprint-303.js'
       - 'runtime/alpha-story-scene-board-33900.js'
       - 'runtime/alpha-story-decision-realisation-34000.js'
       - 'runtime/alpha-story-factual-resolver-34600.js'
       - 'runtime/academy-kakashi-v2-content-36000.js'
       - 'runtime/alpha-kakashi-v2-*.js'
       - 'tools/fixtures/runtime_*_300.json'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
+      - 'tools/qa_issue_303_runtime_build_fingerprint.js'
       - 'tools/qa_runtime_ownership_safety_300.js'
       - 'tools/qa_kakashi_v2_legacy_exclusion.js'
       - '.github/workflows/issue-300-runtime-ownership-safety.yml'

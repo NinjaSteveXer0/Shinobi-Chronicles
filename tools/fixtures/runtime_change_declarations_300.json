@@ -58,6 +58,27 @@
         "tools/qa_runtime_ownership_safety_300.js"
       ],
       "replaces": []
+    },
+    {
+      "changeId": "issue-303-runtime-build-fingerprint-2026-09-22",
+      "classification": "NEW",
+      "responsibilityIds": [
+        "runtime.build_fingerprint"
+      ],
+      "owner": "runtime/alpha-runtime-build-fingerprint-303.js",
+      "directCallers": [
+        "index.html"
+      ],
+      "stateTouched": [
+        "globalThis.SC_RUNTIME_BUILD_FINGERPRINT_303",
+        "globalThis.getRuntimeBuildFingerprint"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_303_runtime_build_fingerprint.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": []
     }
   ]
 }

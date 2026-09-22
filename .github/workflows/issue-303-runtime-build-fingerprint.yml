@@ -1,0 +1,47 @@
+name: Issue 303 Runtime Build Fingerprint
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'runtime/alpha-runtime-build-fingerprint-303.js'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
+      - 'tools/qa_issue_303_runtime_build_fingerprint.js'
+      - 'tools/fixtures/runtime_responsibility_registry_300.json'
+      - 'tools/fixtures/runtime_change_declarations_300.json'
+      - '.github/workflows/issue-303-runtime-build-fingerprint.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - 'index.html'
+      - 'runtime/alpha-runtime-build-fingerprint-303.js'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
+      - 'tools/qa_issue_303_runtime_build_fingerprint.js'
+      - 'tools/fixtures/runtime_responsibility_registry_300.json'
+      - 'tools/fixtures/runtime_change_declarations_300.json'
+      - '.github/workflows/issue-303-runtime-build-fingerprint.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  runtime-build-fingerprint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Runtime fingerprint source and manifest parity
+        run: |
+          node --check runtime/alpha-runtime-build-fingerprint-303.js
+          node --check tools/qa_issue_303_runtime_build_fingerprint.js
+          node tools/qa_issue_303_runtime_build_fingerprint.js
+
+      - name: Runtime ownership remains singular
+        run: |
+          node --check tools/qa_runtime_ownership_safety_300.js
+          node tools/qa_runtime_ownership_safety_300.js
