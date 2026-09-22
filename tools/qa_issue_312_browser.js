@@ -130,7 +130,26 @@ async function shot(page,name,selector=null){
       assert(result?.success&&result.semanticBeatUnchanged===true&&result.cueIndex===index,JSON.stringify(result));
     }
 
-    for(let i=1;i<=5;i++)await advanceWatchCue(i);
+    await advanceWatchCue(1);
+    await page.waitForTimeout(80);
+    const watchEarly=await page.evaluate(()=>{
+      const root=document.getElementById("kakashi-v2-scene-board");
+      const mi=root.querySelector('.kv2-actor[data-slot="mi"]');
+      const style=mi?getComputedStyle(mi):null;
+      return{
+        cue:getAcademyKakashiV2TransitionState36040()?.cueIndex,
+        hidden:mi?.hidden===true,
+        withheld:mi?.dataset.kv2CueWithheld==="true",
+        display:style?.display||null,
+        opacity:style?Number(style.opacity):1
+      };
+    });
+    assert.strictEqual(watchEarly.cue,1);
+    assert.strictEqual(watchEarly.hidden,true,"#312 MI became mounted-visible during early WATCH narration");
+    assert.strictEqual(watchEarly.withheld,true,"#312 MI lost authored withholding before surprise entrance");
+    assert(watchEarly.display==="none"||watchEarly.opacity<=0.01,"#312 MI is visible at WATCH 2/10: "+JSON.stringify(watchEarly));
+
+    for(let i=2;i<=5;i++)await advanceWatchCue(i);
     await page.waitForTimeout(430);
     let watch=await page.evaluate(()=>{
       const root=document.getElementById("kakashi-v2-scene-board");
@@ -177,21 +196,42 @@ async function shot(page,name,selector=null){
     watch=await page.evaluate(()=>{
       const root=document.getElementById("kakashi-v2-scene-board");
       const mi=root.querySelector('.kv2-actor[data-slot="mi"]');
+      const amt=root.querySelector('.kv2-actor[data-slot="amt"]');
       return{
         miAnchor:mi?.dataset.scStageAnchor,
         miWithheld:mi?.dataset.kv2CueWithheld==="true",
+        miHidden:mi?.hidden===true,
         miOpacity:mi?Number(getComputedStyle(mi).opacity):0,
+        amtLeft:amt?.getBoundingClientRect().left||0,
         choreography:getStoryChoreographyState33900(root)
       };
     });
     assert.strictEqual(watch.miAnchor,"CENTER");
-    assert.strictEqual(watch.miWithheld,false,"#312 Masked Interceptor remained hidden after authored SURPRISE_ENTRY");
+    assert.strictEqual(watch.miWithheld,false,"#312 Masked Interceptor remained withheld after authored SURPRISE_ENTRY");
+    assert.strictEqual(watch.miHidden,false,"#312 Masked Interceptor remained hard-hidden after authored SURPRISE_ENTRY");
     assert(watch.miOpacity>=0.75,"#312 Masked Interceptor did not become visible after authored entrance: "+watch.miOpacity);
     assert(watch.choreography.completedKinds.includes("LUNGE"),"#312 MI entrance did not visibly drive toward Package Smuggler");
     await shot(page,"02-story-handoff-surprise-entry.png","#kakashi-v2-scene-board");
 
     await advanceWatchCue(11);
-    await page.waitForTimeout(720);
+    await page.waitForTimeout(170);
+    const breakawayMid=await page.evaluate(()=>{
+      const root=document.getElementById("kakashi-v2-scene-board");
+      const amt=root.querySelector('.kv2-actor[data-slot="amt"]');
+      const state=getStoryChoreographyState33900(root);
+      return{
+        active:amt?.dataset.scChoreographyActive||null,
+        left:amt?.getBoundingClientRect().left||0,
+        opacity:amt?Number(getComputedStyle(amt).opacity):1,
+        animationName:amt?getComputedStyle(amt).animationName:null,
+        choreography:state
+      };
+    });
+    assert.strictEqual(breakawayMid.active,"FLEE","#312 AMT breakaway is not using the shared FLEE choreography");
+    assert(breakawayMid.left<watch.amtLeft-8,"#312 AMT card did not move left while running away: "+JSON.stringify({before:watch.amtLeft,mid:breakawayMid}));
+    assert(String(breakawayMid.animationName||"").includes("scChoreoFlee33900"),"#312 AMT FLEE keyframe is not active: "+JSON.stringify(breakawayMid));
+
+    await page.waitForTimeout(550);
     const breakaway=await page.evaluate(()=>{
       const root=document.getElementById("kakashi-v2-scene-board");
       const amt=root.querySelector('.kv2-actor[data-slot="amt"]');
@@ -199,11 +239,13 @@ async function shot(page,name,selector=null){
       return{
         amtDeparted:amt?.classList.contains("kv2-cue-departed")===true,
         amtOpacity:amt?Number(getComputedStyle(amt).opacity):1,
-        psAnchor:ps?.dataset.scStageAnchor
+        psAnchor:ps?.dataset.scStageAnchor,
+        choreography:getStoryChoreographyState33900(root)
       };
     });
     assert.strictEqual(breakaway.amtDeparted,true,"#312 ANBU Marked Target did not visibly break away");
     assert(breakaway.amtOpacity<=0.01,"#312 AMT lingered after breakaway");
+    assert(breakaway.choreography.completedKinds.includes("FLEE"),"#312 AMT FLEE did not complete: "+JSON.stringify(breakaway.choreography));
     assert.strictEqual(breakaway.psAnchor,"OPPONENT_RIGHT");
 
     for(let i=12;i<=17;i++)await advanceWatchCue(i);
@@ -279,7 +321,7 @@ async function shot(page,name,selector=null){
     assert(stop.anchors.every(a=>a.width>=245),"#312 battle-pair Story prominence too small");
     assert.strictEqual(stop.ghostCount,0,"#312 committed departures survived after choreography settled");
     assert.strictEqual(stop.pendingEntryCount,0,"#312 entrant remained hidden after choreography settled");
-    assert(stop.choreography.lastKinds.includes("FOCUS")&&stop.choreography.lastKinds.includes("LUNGE"),"#312 shared FOCUS -> LUNGE choreography receipt missing: "+JSON.stringify(stop.choreography));
+    assert(stop.choreography.lastKinds.includes("FOCUS")&&stop.choreography.lastKinds.includes("LUNGE")&&stop.choreography.lastKinds.includes("STRIKE"),"#312 shared FOCUS -> LUNGE -> STRIKE choreography receipt missing: "+JSON.stringify(stop.choreography));
     assert(stop.choreography.completedKinds.includes("ENTER"),"#312 Kakashi entry completion receipt missing: "+JSON.stringify(stop.choreography));
     assert(stop.transition.pass,JSON.stringify(stop.transition));
     await page.waitForFunction(()=>{
@@ -677,7 +719,9 @@ async function shot(page,name,selector=null){
       const player=stage?.querySelector(".battle-live-active-card-player");
       const enemy=stage?.querySelector(".battle-live-active-card-enemy");
       const vs=stage?.querySelector(".battle-code-vs");
+      const playerPower=stage?.querySelector(".battle-live-power-player"),enemyPower=stage?.querySelector(".battle-live-power-enemy");
       const sr=stage?.getBoundingClientRect(),pr=player?.getBoundingClientRect(),er=enemy?.getBoundingClientRect();
+      const ppr=playerPower?.getBoundingClientRect(),epr=enemyPower?.getBoundingClientRect();
       const visibleSupports=[...stage.querySelectorAll(".battle2-formation-support")].filter(node=>{
         const style=getComputedStyle(node),rect=node.getBoundingClientRect();
         return style.display!=="none"&&style.visibility!=="hidden"&&rect.width>0&&rect.height>0;
@@ -687,6 +731,8 @@ async function shot(page,name,selector=null){
         playerWidthRatio:sr&&pr?pr.width/sr.width:0,
         enemyWidthRatio:sr&&er?er.width/sr.width:0,
         confrontationGapRatio:sr&&pr&&er?(er.left-(pr.left+pr.width))/sr.width:1,
+        playerPowerLeftRatio:sr&&ppr?(ppr.left-sr.left)/sr.width:0,
+        enemyPowerLeftRatio:sr&&epr?(epr.left-sr.left)/sr.width:1,
         visibleSupports,
         vsOpacity:vs?Number(getComputedStyle(vs).opacity):0
       };
@@ -695,6 +741,8 @@ async function shot(page,name,selector=null){
     assert(duelComposition.playerWidthRatio>=0.33&&duelComposition.enemyWidthRatio>=0.33,"#312 sparse duel combatants are still undersized: "+JSON.stringify(duelComposition));
     assert(duelComposition.confrontationGapRatio<=0.17,"#312 sparse duel leaves an excessive empty confrontation gap: "+JSON.stringify(duelComposition));
     assert.strictEqual(duelComposition.visibleSupports,0,"#312 sparse duel rendered fake/empty support furniture: "+JSON.stringify(duelComposition));
+    assert(duelComposition.playerPowerLeftRatio>=0.31&&duelComposition.playerPowerLeftRatio<=0.36,"#312 player PL ring did not move inward: "+JSON.stringify(duelComposition));
+    assert(duelComposition.enemyPowerLeftRatio>=0.65&&duelComposition.enemyPowerLeftRatio<=0.70,"#312 enemy PL ring did not move inward: "+JSON.stringify(duelComposition));
     assert(duelComposition.vsOpacity>=0.5,"#312 sparse duel confrontation marker is too visually weak: "+JSON.stringify(duelComposition));
 
     const amtSkillsButton=page.locator('.battle-live-action-family-row button[data-formation-family="skills"]');
@@ -749,14 +797,14 @@ async function shot(page,name,selector=null){
     assert.strictEqual(amtLifecycleAfterFirst.enemyOpportunity,amtLifecycleLaunch.enemyOpportunityBefore+1,"#312 enemy opportunity did not advance exactly once");
     assert.strictEqual(amtLifecycleAfterFirst.selectedSkillId,"academy_kakashi_clone_feint","#312 repeat-Skill presentation did not reselect the successfully used Skill");
     assert(amtLifecycleAfterFirst.selectedTargetRef&&amtLifecycleAfterFirst.selectedTargetRef.participantId==="academy_kakashi_origin_amt","#312 repeat-Skill presentation lost the current legal target: "+JSON.stringify(amtLifecycleAfterFirst.selectedTargetRef));
+    assert.strictEqual(amtLifecycleAfterFirst.tray,"skills","#312 Skills tray closed after the first Skill / AMT response");
 
-    await amtSkillsButton.click();
     await page.waitForFunction(()=>{
       const stage=document.querySelector(".alpha-code-battle-stage");
       const deck=stage?.querySelector(".battle-live-skill-deck");
       return stage?.dataset.formationTray==="skills"&&!!deck&&getComputedStyle(deck).display!=="none";
     },null,{timeout:3000});
-    const amtReopened=await page.evaluate(()=>{
+    const amtPersistent=await page.evaluate(()=>{
       const stage=document.querySelector(".alpha-code-battle-stage");
       const state=syncBattleActionRegionState();
       const cards=[...stage.querySelectorAll(".battle-live-skill-deck .battle-dev-skill-card:not(.is-empty)")];
@@ -766,11 +814,11 @@ async function shot(page,name,selector=null){
         readySkillIds:cards.filter(node=>!node.disabled).map(node=>node.dataset.skillId||null)
       };
     });
-    assert.strictEqual(amtReopened.tray,"skills","#312 SKILLS tray did not reopen after AMT response");
-    assert.strictEqual(amtReopened.selectedSkillId,"academy_kakashi_clone_feint","#312 repeat-Skill presentation drifted after AMT response");
-    assert(amtReopened.readySkillIds.length>0,"#312 no legal Skill remains selectable after AMT response: "+JSON.stringify(amtReopened));
+    assert.strictEqual(amtPersistent.tray,"skills","#312 SKILLS tray did not remain open after AMT response");
+    assert.strictEqual(amtPersistent.selectedSkillId,"academy_kakashi_clone_feint","#312 repeat-Skill presentation drifted after AMT response");
+    assert(amtPersistent.readySkillIds.length>0,"#312 no legal Skill remains selectable after AMT response: "+JSON.stringify(amtPersistent));
 
-    const nextReadyId=amtReopened.readySkillIds.find(id=>id!==amtReopened.selectedSkillId)||amtReopened.readySkillIds[0];
+    const nextReadyId=amtPersistent.readySkillIds.find(id=>id!==amtPersistent.selectedSkillId)||amtPersistent.readySkillIds[0];
     await page.locator('.battle-live-skill-deck .battle-dev-skill-card[data-skill-id="'+nextReadyId+'"]').click();
     await page.waitForFunction(()=>{
       const battleId=currentBattle?.battleId;
@@ -789,6 +837,7 @@ async function shot(page,name,selector=null){
         enemyCompletions:enemyCompletions.map(row=>({skillId:row.skillId,resolved:row.data?.resolved})),
         playerOpportunity:getBattleActionOpportunityIndex("player","academy_kakashi"),
         enemyOpportunity:getBattleActionOpportunityIndex("enemy","academy_kakashi_origin_amt"),
+        tray:document.querySelector(".alpha-code-battle-stage")?.dataset.formationTray||null,
         schedulerReady:scheduler?.ready===true,
         schedulerEligibleIds:(scheduler?.eligibleActionIds||[]).slice()
       };
@@ -800,13 +849,14 @@ async function shot(page,name,selector=null){
     assert.strictEqual(amtLifecycleAfterSecond.enemyCompletions[1].resolved,true,"#312 AMT Tantō response did not resolve");
     assert.strictEqual(amtLifecycleAfterSecond.playerOpportunity,amtLifecycleLaunch.playerOpportunityBefore+2,"#312 player lifecycle stalled after the second committed action");
     assert.strictEqual(amtLifecycleAfterSecond.enemyOpportunity,amtLifecycleLaunch.enemyOpportunityBefore+2,"#312 enemy lifecycle stalled after the second response");
+    assert.strictEqual(amtLifecycleAfterSecond.tray,"skills","#312 Skills tray closed after the second Skill / AMT response");
     assert.strictEqual(amtLifecycleAfterSecond.schedulerReady,true,"#312 AMT scheduler deadlocked after Wire -> Tantō");
     assert(amtLifecycleAfterSecond.schedulerEligibleIds.includes("enemy_anbu_style_operative_silent_body_flicker"),"#312 AMT Body Flicker is not available after Tantō: "+JSON.stringify(amtLifecycleAfterSecond));
 
-    await amtSkillsButton.click();
     await page.waitForFunction(()=>{
       const stage=document.querySelector(".alpha-code-battle-stage");
-      return stage?.dataset.formationTray==="skills"&&!!stage.querySelector(".battle-live-skill-deck");
+      const deck=stage?.querySelector(".battle-live-skill-deck");
+      return stage?.dataset.formationTray==="skills"&&!!deck&&getComputedStyle(deck).display!=="none";
     },null,{timeout:3000});
 
     const errors=await runtimeErrorGate.assertClean("issue312_story_battle_benchmark");
