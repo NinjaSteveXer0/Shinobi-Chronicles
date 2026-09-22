@@ -614,5 +614,9 @@
       "owner": "game.js",
       "responsibilityId": "origin.completion.shared"
     }
-  ]
+  ],
+  "proofOnlyIssue305": {
+    "purpose": "corrected_runtime_merge_safety_green_proof",
+    "productionAuthority": false
+  }
 }
