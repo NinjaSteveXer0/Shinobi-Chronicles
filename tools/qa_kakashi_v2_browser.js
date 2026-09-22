@@ -433,6 +433,72 @@ async function cleanRoute(browser){
   return{checkpoints,animation,completion,browserErrors};
 }
 
+async function assertRepeatedBattleReentry(page){
+  // Repeat the same Story -> Battle -> Story seam after one successful cycle.
+  await page.evaluate(()=>{
+    const rt=getActiveStorySceneRuntime();
+    rt.beatId="v2_battle_mi_stop";
+    rt.pendingBattle=null;
+    rt.battleResume=null;
+    rt.localContext.__kakashiV2Presentation36040={beatId:"v2_battle_mi_stop",cueIndex:999,settled:true};
+    renderAcademyKakashiV236030();
+  });
+  await drain(page);
+  const launched=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040());
+  assert(launched&&launched.success===true,JSON.stringify(launched));
+  await page.waitForFunction(()=>!!(typeof currentBattle!=="undefined"&&currentBattle&&currentBattle.returnContext&&currentBattle.returnContext.type==="story_scene"),null,{timeout:12000});
+  const resumed=await page.evaluate(()=>{
+    currentBattle.outcome={type:"victory",completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};
+    currentBattle.battleOver=true;
+    currentBattle.active=false;
+    return resumeBattleCallerAfterCompletion("victory");
+  });
+  assert(resumed&&resumed.success===true,JSON.stringify(resumed));
+  await page.waitForSelector("#kakashi-v2-scene-board",{state:"visible",timeout:12000});
+  await page.evaluate(()=>resetAcademyKakashiV2Transition36040());
+  await waitUnlocked(page,"v2_mi_stop_win");
+
+  const stableBefore=await page.evaluate(()=>({
+    state:JSON.stringify(getAcademyKakashiV2State36020()),
+    rootCount:document.querySelectorAll("#kakashi-v2-scene-board").length,
+    renderer:runAcademyKakashiV2Renderer36030Diagnostics(),
+    transition:runAcademyKakashiV2Transition36040Diagnostics()
+  }));
+  await pause(350);
+  const stableAfter=await page.evaluate(()=>({
+    state:JSON.stringify(getAcademyKakashiV2State36020()),
+    rootCount:document.querySelectorAll("#kakashi-v2-scene-board").length,
+    renderer:runAcademyKakashiV2Renderer36030Diagnostics(),
+    transition:runAcademyKakashiV2Transition36040Diagnostics()
+  }));
+  assert.strictEqual(stableBefore.rootCount,1,"re-entry duplicate Story root before settle");
+  assert.strictEqual(stableAfter.rootCount,1,"re-entry duplicate Story root after settle");
+  assert.strictEqual(stableAfter.state,stableBefore.state,"stale timer/listener recommitted semantic state after re-entry");
+  assert(stableBefore.renderer.pass&&stableAfter.renderer.pass,JSON.stringify({stableBefore,stableAfter}));
+  assert(stableBefore.transition.pass&&stableAfter.transition.pass,JSON.stringify({stableBefore,stableAfter}));
+
+  // Re-prove one physical action -> one presentation cue after repeated Battle return.
+  await page.evaluate(()=>{
+    const rt=getActiveStorySceneRuntime();
+    rt.beatId="v2_scene01_rooftop";
+    rt.pendingBattle=null;
+    rt.battleResume=null;
+    resetAcademyKakashiV2Transition36040();
+    renderAcademyKakashiV236030();
+  });
+  await waitUnlocked(page,"v2_scene01_rooftop");
+  const singleAdvance=await assertSingleAdvancePaths(page);
+  return{
+    repeatedBattleReturns:2,
+    rootCardinalityStable:true,
+    semanticStateStableAfterSettle:true,
+    rendererDiagnosticsGreen:true,
+    transitionDiagnosticsGreen:true,
+    oneClickOneCueAfterReentry:singleAdvance.singleAdvanceClick===true,
+    oneKeyboardOneCueAfterReentry:singleAdvance.singleAdvanceKeyboard===true
+  };
+}
+
 async function visualAndBattle(browser){
   const {context,page,runtimeErrorGate}=await boot(browser);
   await drain(page);
@@ -523,9 +589,10 @@ async function visualAndBattle(browser){
   assert.strictEqual(post.pendingBattle,null);
   assert(post.battleResume&&post.battleResume.outcome==="victory",JSON.stringify(post));
   await shot(page,"11-story-return-after-battle.png");
+  const lifecycleReentry=await assertRepeatedBattleReentry(page);
   const browserErrors=await runtimeErrorGate.assertClean("visualAndBattle");
   await context.close();
-  return{watch,kill,battle,post,browserErrors};
+  return{watch,kill,battle,post,lifecycleReentry,browserErrors};
 }
 
 async function browserRouteMatrix(browser){
