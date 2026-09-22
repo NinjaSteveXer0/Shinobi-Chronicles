@@ -16,7 +16,7 @@
         "retiredKakashiOwner": "runtime/alpha-kakashi-scene-board-polish-33910.js"
       },
       "expect": {
-        "onboardingStatus": "chronicle_origin_pending",
+        "onboardingStatus": "identity_selection_pending",
         "activeStoryBeat": null,
         "ryo": 25,
         "exp": 7
