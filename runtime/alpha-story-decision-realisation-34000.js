@@ -352,52 +352,7 @@ const api=Object.freeze({
 globalThis.SC_STORY_DECISION_REALISATION_34000=api;
 globalThis.runStoryDecisionRealisation34000Diagnostics=runStoryDecisionRealisation34000Diagnostics;
 
-// Academy Kakashi is the first required neutral Story consumer. 34000 may load
-// before the later 33800/33900 cinematic chain, so wait for both without
-// mutating their load order. This remains browser-only activation; headless QA
-// may load the adapter directly.
-(function scheduleKakashiFinalAdapter34100(){
-  if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
-  let attempts=0;
-  const tryLoad=()=>{
-    if(globalThis.SC_ALPHA_KAKASHI_FINAL_34100)return;
-    if(globalThis.SC_ALPHA_KAKASHI_ORIGINAL_33800&&globalThis.SC_STORY_SCENE_BOARD_33900){
-      const id="sc-alpha-kakashi-final-34100-script";
-      if(document.getElementById(id))return;
-      const script=document.createElement("script");script.id=id;script.async=false;
-      // Historical delivery-QA markers only; active URL is generation 25.
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-18
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-19
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-20
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-21
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-22
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-23
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-24
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-25
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-26
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-27
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-28
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-29
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-30
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-31
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-32
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-33
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-34
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-35
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-36
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-37
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-38
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-39
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-40
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-41
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-67
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-68
-      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-69
-      script.src="runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-70";
-      document.head.appendChild(script);return;
-    }
-    attempts+=1;if(attempts<240&&typeof setTimeout==="function")setTimeout(tryLoad,50);
-  };
-  tryLoad();
-})();
+// Origin-specific consumers are loaded by their own entry paths.
+// The neutral Story Decision core intentionally owns no Academy Kakashi loader.
+
 })();
