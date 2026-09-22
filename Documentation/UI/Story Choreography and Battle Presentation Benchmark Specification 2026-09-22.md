@@ -92,8 +92,11 @@ The benchmark uses one full-stage composition with five layers:
 Primary Alpha target remains a landscape browser stage. At 1366×768 through 1920×1080:
 
 - actor plane: approximately top 12% to bottom 28%;
-- ordinary actor card width: approximately 18–22vw, hard-capped around 250px unless the canonical renderer uses equivalent proportional sizing;
-- actor card height: approximately 46–56vh, preserving full card aspect/identity;
+- actor/card prominence is **adaptive to visible participant count and viewport**, not fixed to one scale;
+- as an initial composition target, crowded three/four-actor beats may sit around 18–22vw per ordinary card, but this is a starting range rather than a hard ceiling;
+- one/two-actor beats should deliberately give actors materially more visual presence when space permits, including exceeding ~250px width where that improves the scene read;
+- card height should preserve full card aspect/identity while using the available stage height aggressively enough that place + people, not HUD/text, remain the dominant read;
+- do not shrink actors merely to preserve empty stage space;
 - dialogue lane: approximately 18–24vh maximum;
 - encounter controls: one compact lower rail or 2×2 action grid, never a full-screen modal;
 - top HUD: content-sized only; no tall sidebars over the scene.
@@ -150,7 +153,9 @@ Focus transition target: 120–180ms.
 - visually distinct from character dialogue;
 - typically centered or lower-left in a compact dark-glass strip;
 - should carry meaning, nuance, observer-safe sensory detail or internal thought;
-- should not restate an obvious movement the stage has just shown.
+- should not restate an obvious movement the stage has just shown;
+- accessible/textual equivalents remain mandatory, but ordinary visible narration should not duplicate simple physical choreography word-for-word;
+- use narration for nuance, observer Knowledge, sensory detail, causality, internal thought, or action that cannot be safely/readably staged.
 
 ## 6. Story encounter state
 
@@ -239,7 +244,11 @@ Global cue rules:
 - compatible cues may overlap when readability improves;
 - no choreography completion callback may commit Story state;
 - save/load may restore settled presentation without replaying/duplicating the fact;
-- skip/fast may collapse motion but never skip semantic receipts.
+- skip/fast may collapse motion but never skip semantic receipts;
+- choreography/playback queues are **occurrence/turn/beat scoped**;
+- leaving a Story scene, entering Battle, returning from Battle, loading a save, skipping/fast-forwarding, or superseding a cue invalidates stale queued presentation from the prior scope;
+- a cancelled cue may settle immediately to the current authoritative presentation state, but it may never rollback, recommit, or duplicate semantics;
+- no stale animation may play after authoritative state has advanced beyond the cue that produced it.
 
 ## 10. Kakashi Story benchmark sequence
 
@@ -293,7 +302,11 @@ The Battle benchmark should make the committed result readable in causal order:
 
 > **ACTOR -> ACTION -> TARGET -> IMPACT/RESPONSE -> RESULT -> UPDATED STATE -> NEXT ACTOR**
 
-Use the current Battle shell as the framing surface, but create a clear central performance lane.
+`UI/battle.png` and the current Battle shell are **reference material, not sacred composition authority**. The benchmark may reorganise the Battle composition through the canonical Battle renderer whenever the existing arrangement is what makes combat read as portraits/cards plus a falling PL number.
+
+Do not satisfy this benchmark by layering motion/effects over an otherwise unchanged weak composition. Preserve Combat semantics and existing approved asset ontology, but the **presentation hierarchy itself may change** within the canonical Battle owner.
+
+Create a clear performance lane in whatever canonical composition best communicates the resolved action.
 
 ### Battle composition
 
@@ -425,7 +438,17 @@ Status chips should be compact and near the relevant participant. They display s
 
 ## 17. Story -> Battle -> Story visual continuity
 
-Benchmark continuity should feel like one occurrence:
+Benchmark continuity should feel like one occurrence.
+
+### Screen direction / spatial continuity
+
+- actors retain their semantic side/anchor across consecutive beats unless an authored/reconciled `REPOSITION` or equivalent cue changes it;
+- Story -> Battle -> Story return must not arbitrarily swap left/right relationships merely because a renderer re-renders;
+- surprise entry, flee, lunge and object transfer originate from and resolve toward stable semantic anchors;
+- re-rendering the same settled scene state must not visually teleport participants;
+- when Battle uses a different composition language, return mapping must still restore the Story Scene Board's authoritative pre/post-Battle spatial relationships rather than inventing new ones.
+
+Benchmark continuity should therefore feel like one occurrence:
 
 - Story Scene Board holds the Sakura-tree situation;
 - Battle enters through the current caller contract;
@@ -526,7 +549,8 @@ Coding / Runtime should implement one canonical shared presentation slice with t
 
 ### Battle
 
-- performance lane over the existing Battle composition;
+- one coherent canonical Battle composition; `UI/battle.png` is reference-only and may be reorganised rather than preserved literally;
+- performance lane/hierarchy that makes actor/action/target/result causality the dominant read;
 - actor/action/target/result sequencing;
 - hit/miss/evade/guard/substitution truthfulness;
 - result delta before/with PL transition;
@@ -574,6 +598,15 @@ Coding / Runtime should implement one canonical shared presentation slice with t
 9. reduced-motion remains readable;
 10. Battle returns to the same Story occurrence through the existing caller contract.
 
+### Experiential acceptance gate
+
+Source-level tests, regressions and technical GREEN are necessary but **not sufficient** for acceptance.
+
+- if Battle passes source QA but still reads in Stephen's browser as **pictures/cards plus PL with effects**, the Battle benchmark is **NOT accepted**;
+- if Story technically animates but still reads as prose describing mostly static cards, the Story benchmark is **NOT accepted**;
+- if either benchmark misses the experiential target, refine or replace the **same canonical presentation owner** rather than creating another overlay/renderer;
+- technical compliance must not be used to justify broad propagation of a presentation Stephen has not accepted.
+
 ### Golden gate
 
 `browserGoldenClaimed = false` until Stephen personally approves the installed-browser benchmark.
@@ -585,6 +618,19 @@ Do not propagate the choreography/performance pattern across all Origins/Story/B
 **NONE for the representative benchmark.**
 
 If runtime discovers that `academy_kakashi` lacks an approved Battle portrait mapping, that is a separate exact asset-mapping blocker and must return to UI / Assets. Do not substitute the Story card.
+
+## 25. #316 hardening lock
+
+These clarifications are binding for #312 implementation:
+
+1. **Current Battle shell is not sacred.** `UI/battle.png` is an available reference asset, not a mandate to preserve the existing composition.
+2. **Actor prominence is adaptive.** One/two-actor Story beats must not inherit crowded-scene sizing that makes cards feel insignificant.
+3. **Screen direction is persistent.** Stable semantic anchors survive re-render and Story -> Battle -> Story return unless authoritative choreography repositions them.
+4. **Cue queues are scoped and cancellable.** Stale presentation dies when the occurrence/turn/beat advances; cancellation never changes semantics.
+5. **Experiential acceptance outranks technical-only GREEN.** If the browser still feels like static cards/text or portraits + PL with effects, the benchmark is not accepted.
+6. **Text and motion should complement, not redundantly narrate each other.** Accessibility text stays complete; ordinary visible prose should not re-describe simple choreography already shown.
+
+No new image assets, Story outcomes, Combat mechanics or renderer owners are authorised by this hardening.
 
 ## Final lock
 
