@@ -111,7 +111,7 @@ async function shot(page,name,selector=null){
       const actions=root.querySelector(".kv2-actions");
       return{
         cue:getAcademyKakashiV2TransitionState36040()?.cueIndex,
-        miPending:mi?.dataset.scChoreographyPendingEntry==="true",
+        miWithheld:mi?.dataset.kv2CueWithheld==="true",
         miOpacity:mi?Number(getComputedStyle(mi).opacity):1,
         actionsVisible:actions?getComputedStyle(actions).display!=="none":false,
         canAdvance:root.dataset.canAdvance,
@@ -119,7 +119,7 @@ async function shot(page,name,selector=null){
       };
     });
     assert.strictEqual(watchOpening.cue,0);
-    assert.strictEqual(watchOpening.miPending,true,"#312 MI must be visually withheld until the authored surprise-entry cue");
+    assert.strictEqual(watchOpening.miWithheld,true,"#312 MI must be visually withheld until the authored surprise-entry cue");
     assert(watchOpening.miOpacity<=0.01,"#312 MI is visible before her authored entrance: "+watchOpening.miOpacity);
     assert.strictEqual(watchOpening.actionsVisible,false,"#312 choices appeared before WATCH narration completed");
     assert.strictEqual(watchOpening.canAdvance,"true");
@@ -160,12 +160,12 @@ async function shot(page,name,selector=null){
       const root=document.getElementById("kakashi-v2-scene-board");
       return{
         cue:getAcademyKakashiV2TransitionState36040()?.cueIndex,
-        miPending:root.querySelector('.kv2-actor[data-slot="mi"]')?.dataset.scChoreographyPendingEntry==="true",
+        miWithheld:root.querySelector('.kv2-actor[data-slot="mi"]')?.dataset.kv2CueWithheld==="true",
         lastKinds:getStoryChoreographyState33900(root).lastKinds
       };
     });
     assert.strictEqual(anticipation.cue,9);
-    assert.strictEqual(anticipation.miPending,true);
+    assert.strictEqual(anticipation.miWithheld,true);
     assert(anticipation.lastKinds.includes("FOCUS"),"#312 'movement snaps' anticipation focus missing");
 
     await advanceWatchCue(10);
@@ -179,13 +179,13 @@ async function shot(page,name,selector=null){
       const mi=root.querySelector('.kv2-actor[data-slot="mi"]');
       return{
         miAnchor:mi?.dataset.scStageAnchor,
-        miPending:mi?.dataset.scChoreographyPendingEntry==="true",
+        miWithheld:mi?.dataset.kv2CueWithheld==="true",
         miOpacity:mi?Number(getComputedStyle(mi).opacity):0,
         choreography:getStoryChoreographyState33900(root)
       };
     });
     assert.strictEqual(watch.miAnchor,"CENTER");
-    assert.strictEqual(watch.miPending,false,"#312 Masked Interceptor remained hidden after authored SURPRISE_ENTRY");
+    assert.strictEqual(watch.miWithheld,false,"#312 Masked Interceptor remained hidden after authored SURPRISE_ENTRY");
     assert(watch.miOpacity>=0.75,"#312 Masked Interceptor did not become visible after authored entrance: "+watch.miOpacity);
     assert(watch.choreography.completedKinds.includes("LUNGE"),"#312 MI entrance did not visibly drive toward Package Smuggler");
     await shot(page,"02-story-handoff-surprise-entry.png","#kakashi-v2-scene-board");
