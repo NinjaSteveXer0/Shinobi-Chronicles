@@ -107,7 +107,8 @@ async function inspect(page,label){
   const row=await page.evaluate(()=>{
     const root=document.getElementById("kakashi-v2-scene-board");
     const visible=n=>!!n&&n.getClientRects().length>0&&getComputedStyle(n).display!=="none"&&getComputedStyle(n).visibility!=="hidden"&&Number(getComputedStyle(n).opacity)!==0;
-    const legacy=[...document.querySelectorAll("#story-scene-presentation-layer .sc-story-panel,#story-scene-presentation-layer .sc-chronicle-layout")].filter(visible);
+    const legacy=[...document.querySelectorAll("#story-scene-presentation-layer .sc-story-panel,#story-scene-presentation-layer .sc-chronicle-layout,.sc-dialogue-panel-33910,.sc-narration-panel-33910")].filter(visible);
+    const canonicalRoots=[...document.querySelectorAll("#kakashi-v2-scene-board")].filter(visible);
     const dialogue=root&&root.querySelector(".kv2-dialogue");
     const receipt=root&&root.querySelector(".kv2-receipt");
     return{
@@ -116,6 +117,7 @@ async function inspect(page,label){
       geometry:runAcademyKakashiV2Geometry36030(),
       renderer:runAcademyKakashiV2Renderer36030Diagnostics(),
       transition:runAcademyKakashiV2Transition36040Diagnostics(),
+      visibleCanonicalRoots:canonicalRoots.length,
       visibleLegacyStorySurfaces:legacy.length,
       visibleDialogueSurfaces:visible(dialogue)?1:0,
       receiptVisible:visible(receipt)
@@ -123,6 +125,7 @@ async function inspect(page,label){
   });
   assert(row.renderer.pass,label+" renderer: "+JSON.stringify(row.renderer));
   assert(row.transition.pass,label+" transition: "+JSON.stringify(row.transition));
+  assert.strictEqual(row.visibleCanonicalRoots,1,label+" canonical Story root cardinality");
   assert.strictEqual(row.visibleLegacyStorySurfaces,0,label+" legacy Story surface visible");
   if(row.preset==="chronicle_receipt"){
     assert.strictEqual(row.visibleDialogueSurfaces,0,label+" receipt must replace dialogue");
@@ -134,6 +137,53 @@ async function inspect(page,label){
   return row;
 }
 
+
+async function assertSingleAdvancePaths(page){
+  const before=await page.evaluate(()=>({
+    beatId:getActiveStorySceneRuntime()?.beatId||null,
+    state:getAcademyKakashiV2TransitionState36040()
+  }));
+  assert(before.state&&before.state.cueCount>=3,"single-advance fixture needs at least three cues");
+
+  await page.locator("#kakashi-v2-scene-board .kv2-dialogue").click({position:{x:24,y:24}});
+  await pause(70);
+  const afterClick=await page.evaluate(()=>({
+    beatId:getActiveStorySceneRuntime()?.beatId||null,
+    state:getAcademyKakashiV2TransitionState36040()
+  }));
+  const singleAdvanceClick=afterClick.beatId===before.beatId&&afterClick.state.cueIndex===before.state.cueIndex+1;
+  assert.strictEqual(singleAdvanceClick,true,"one dialogue click must advance exactly one cue: "+JSON.stringify({before,afterClick}));
+
+  await page.keyboard.press("Enter");
+  await pause(70);
+  const afterKeyboard=await page.evaluate(()=>({
+    beatId:getActiveStorySceneRuntime()?.beatId||null,
+    state:getAcademyKakashiV2TransitionState36040()
+  }));
+  const singleAdvanceKeyboard=afterKeyboard.beatId===before.beatId&&afterKeyboard.state.cueIndex===afterClick.state.cueIndex+1;
+  assert.strictEqual(singleAdvanceKeyboard,true,"one keyboard action must advance exactly one cue: "+JSON.stringify({afterClick,afterKeyboard}));
+
+  const reset=await page.evaluate(()=>globalThis.resetAcademyKakashiV2Transition36040());
+  assert(reset&&reset.success===true,JSON.stringify(reset));
+  const resetState=await page.evaluate(()=>getAcademyKakashiV2TransitionState36040());
+  assert.strictEqual(resetState.cueIndex,0,"single-advance fixture failed to reset cursor");
+  return{singleAdvanceClick,singleAdvanceKeyboard};
+}
+
+async function assertSingleChoiceSurface(page,label){
+  await drain(page);
+  const row=await page.evaluate(()=>{
+    const visible=n=>!!n&&n.getClientRects().length>0&&getComputedStyle(n).display!=="none"&&getComputedStyle(n).visibility!=="hidden"&&Number(getComputedStyle(n).opacity)!==0;
+    const root=document.getElementById("kakashi-v2-scene-board");
+    const canonical=[...root.querySelectorAll(".kv2-actions")].filter(n=>visible(n)&&n.querySelectorAll("button").length>0);
+    const legacy=[...document.querySelectorAll("#story-scene-presentation-layer .sc-chronicle-actions,#story-scene-presentation-layer .sc-story-choice")].filter(visible);
+    return{canonicalChoiceSurfaces:canonical.length,legacyChoiceSurfaces:legacy.length,choiceButtons:canonical.reduce((n,box)=>n+box.querySelectorAll("button").length,0)};
+  });
+  assert.strictEqual(row.canonicalChoiceSurfaces,1,label+" canonical choice surface cardinality");
+  assert.strictEqual(row.legacyChoiceSurfaces,0,label+" legacy choice surface visible");
+  assert(row.choiceButtons>0,label+" expected at least one authored choice");
+  return{label,...row};
+}
 
 async function fastDrain(page){
   const result=await page.evaluate(()=>{
@@ -298,6 +348,7 @@ async function cleanRoute(browser){
   assert.strictEqual(await currentBeat(page),"v2_scene01_rooftop");
   checkpoints.push(await inspect(page,"rooftop"));
   await shot(page,"01-rooftop.png");
+  checkpoints.push(await assertSingleAdvancePaths(page));
 
   await page.evaluate(()=>{globalThis.__kv2RootRef=document.getElementById("kakashi-v2-scene-board");});
   const first=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040());
@@ -318,6 +369,7 @@ async function cleanRoute(browser){
   await waitUnlocked(page,"v2_scene02_tail");
   checkpoints.push(await inspect(page,"tail"));
   await shot(page,"03-alley-tail.png");
+  checkpoints.push(await assertSingleChoiceSurface(page,"tail choices"));
 
   await page.evaluate(()=>{
     const s=getAcademyKakashiV2State36020();

@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "allowedClassifications": [
+    "NEW",
+    "EXTENDS",
+    "REPLACES"
+  ],
+  "declarations": [
+    {
+      "changeId": "academy-kakashi-v2-clean-room-2026-09-22",
+      "classification": "REPLACES",
+      "responsibilityIds": [
+        "origin.academy_kakashi.v2.story_state",
+        "origin.academy_kakashi.v2.story_dom",
+        "origin.academy_kakashi.v2.semantic_advance",
+        "origin.academy_kakashi.v2.story_to_battle",
+        "origin.academy_kakashi.v2.reward_commit",
+        "origin.academy_kakashi.v2.chronicle_receipt"
+      ],
+      "owner": "Academy Kakashi V2 36000/36010/36015/36020/36030/36040 clean-room line",
+      "directCallers": [
+        "runtime/alpha-traversal-bridge-33200.js"
+      ],
+      "stateTouched": [
+        "activeStorySceneRuntime.localContext.kakashiV2",
+        "currentBattle.kakashiV2",
+        "Kakashi V2 reward receipts"
+      ],
+      "productionLoader": "runtime/alpha-traversal-bridge-33200.js",
+      "qaRefs": [
+        "tools/qa_kakashi_v2_legacy_exclusion.js",
+        "tools/qa_kakashi_v2_clean_room.js",
+        "tools/qa_kakashi_v2_browser.js"
+      ],
+      "replaces": [
+        "runtime/alpha-kakashi-final-origin-adapter-34100.js",
+        "runtime/alpha-kakashi-scene-board-polish-33910.js",
+        "runtime/alpha-kakashi-origin-battle-deployment-34300.js",
+        "runtime/alpha-kakashi-origin-rewards-34800.js",
+        "runtime/alpha-kakashi-terminal-debrief-35100.js"
+      ]
+    },
+    {
+      "changeId": "issue-300-runtime-ownership-safety-gate-2026-09-22",
+      "classification": "NEW",
+      "responsibilityIds": [
+        "runtime.safety.registry",
+        "runtime.safety.pre_golden_gate"
+      ],
+      "owner": "tools/qa_runtime_ownership_safety_300.js",
+      "directCallers": [
+        "tools/qa_issue_141_pre_alpha_runtime_closure.py",
+        ".github/workflows/issue-300-runtime-ownership-safety.yml"
+      ],
+      "stateTouched": [],
+      "productionLoader": null,
+      "qaRefs": [
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": []
+    }
+  ]
+}

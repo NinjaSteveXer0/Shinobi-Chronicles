@@ -62,6 +62,7 @@ NODE_GATES = [
     "tools/qa_issue_155_anbu_root_runtime.js",
     "tools/qa_issue_141_traversal_runtime.js",
     "tools/qa_issue_151_arc1_reward_exact_head.js",
+    "tools/qa_runtime_ownership_safety_300.js",
 ]
 
 EXTERNAL_ASSET_GATES = [

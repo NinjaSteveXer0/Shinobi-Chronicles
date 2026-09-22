@@ -1,0 +1,589 @@
+{
+  "schemaVersion": 1,
+  "authority": {
+    "issue": 300,
+    "document": "Documentation/Coordination/Runtime_Change_Safety_Ownership_Retirement_and_Golden_Promotion_Gate_2026-09-22.md",
+    "benchmark": "academy_kakashi_v2",
+    "browserGoldenClaimed": false
+  },
+  "productionDynamicChain": [
+    "runtime/alpha-origin-screen-first-33700.js",
+    "runtime/alpha-story-scene-board-33900.js",
+    "runtime/alpha-story-decision-realisation-34000.js",
+    "runtime/alpha-story-factual-resolver-34600.js",
+    "runtime/academy-kakashi-v2-content-36000.js",
+    "runtime/alpha-kakashi-v2-battle-36010.js",
+    "runtime/alpha-kakashi-v2-rewards-36015.js",
+    "runtime/alpha-kakashi-v2-core-36020.js",
+    "runtime/alpha-kakashi-v2-renderer-36030.js",
+    "runtime/alpha-kakashi-v2-transition-36040.js"
+  ],
+  "responsibilities": [
+    {
+      "responsibilityId": "story.scene.presentation.shared",
+      "canonicalOwner": "runtime/alpha-story-scene-board-33900.js",
+      "ownerType": "shared_presentation_infrastructure",
+      "directCallers": [
+        "runtime/alpha-traversal-bridge-33200.js"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime.sceneId",
+        "activeStorySceneRuntime.beatId",
+        "activeStorySceneRuntime.localContext"
+      ],
+      "stateWrites": [
+        "activeStorySceneRuntime.localContext.__storyPerformanceCursor33900"
+      ],
+      "productionLoadPath": [
+        "runtime/alpha-traversal-bridge-33200.js",
+        "runtime/alpha-story-scene-board-33900.js"
+      ],
+      "extensionHooks": [
+        "registerStorySceneBoardDefinition",
+        "unregisterStorySceneBoardDefinition"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "playerData.activeStorySceneRuntime.localContext.__storyPerformanceCursor33900"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_188_story_decision_runtime.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "story.intent.commit.shared",
+      "canonicalOwner": "runtime/alpha-story-decision-realisation-34000.js",
+      "ownerType": "shared_semantic_runtime",
+      "directCallers": [
+        "runtime/alpha-kakashi-v2-core-36020.js"
+      ],
+      "stateReads": [
+        "playerData.storyDecisionRealisation"
+      ],
+      "stateWrites": [
+        "playerData.storyDecisionRealisation.intentCommits",
+        "playerData.storyDecisionRealisation.receipts"
+      ],
+      "productionLoadPath": [
+        "runtime/alpha-traversal-bridge-33200.js",
+        "runtime/alpha-story-decision-realisation-34000.js"
+      ],
+      "extensionHooks": [
+        "registerStoryAdapter",
+        "registerResolver",
+        "commitStoryIntent"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "playerData.storyDecisionRealisation"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_188_story_decision_runtime.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "story.factual.resolver.shared",
+      "canonicalOwner": "runtime/alpha-story-factual-resolver-34600.js",
+      "ownerType": "shared_semantic_runtime",
+      "directCallers": [
+        "runtime/alpha-kakashi-v2-core-36020.js"
+      ],
+      "stateReads": [
+        "playerData.storyFactualResolver"
+      ],
+      "stateWrites": [
+        "playerData.storyFactualResolver.receipts"
+      ],
+      "productionLoadPath": [
+        "runtime/alpha-traversal-bridge-33200.js",
+        "runtime/alpha-story-factual-resolver-34600.js"
+      ],
+      "extensionHooks": [
+        "registerStoryFactualResolverBinding",
+        "resolveStoryFactualAction"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [
+        "runtime/alpha-kakashi-factual-bindings-34700.js",
+        "runtime/alpha-kakashi-factual-state-commit-34120.js"
+      ],
+      "saveSchemaRefs": [
+        "playerData.storyFactualResolver"
+      ],
+      "qaRefs": [
+        "tools/qa_story_factual_resolver_34600.js",
+        "tools/qa_kakashi_v2_legacy_exclusion.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "battle.return.story_scene.shared",
+      "canonicalOwner": "runtime/alpha-alpha-sprint-33100.js",
+      "ownerType": "shared_battle_return_runtime",
+      "directCallers": [
+        "runtime/alpha-battle-modern-33000.js"
+      ],
+      "stateReads": [
+        "currentBattle.returnContext",
+        "activeStorySceneRuntime"
+      ],
+      "stateWrites": [
+        "activeStorySceneRuntime.pendingBattle"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-alpha-sprint-33100.js"
+      ],
+      "extensionHooks": [
+        "resumeBattleCallerAfterCompletion"
+      ],
+      "permittedAdapters": [
+        "academy_kakashi_v2_battle_adapter_36010"
+      ],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "currentBattle.returnContext",
+        "activeStorySceneRuntime.pendingBattle"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_141_arc1_battle_return_runtime.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "origin.academy_kakashi.v2.story_state",
+      "canonicalOwner": "runtime/alpha-kakashi-v2-core-36020.js",
+      "ownerType": "origin_semantic_owner",
+      "directCallers": [
+        "runtime/alpha-kakashi-v2-transition-36040.js",
+        "runtime/alpha-kakashi-v2-renderer-36030.js"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime",
+        "activeStorySceneRuntime.localContext.kakashiV2"
+      ],
+      "stateWrites": [
+        "activeStorySceneRuntime.localContext.kakashiV2"
+      ],
+      "productionLoadPath": [
+        "runtime/alpha-traversal-bridge-33200.js",
+        "runtime/alpha-kakashi-v2-core-36020.js"
+      ],
+      "extensionHooks": [
+        "getAcademyKakashiV2Presentation36020",
+        "getAcademyKakashiV2State36020"
+      ],
+      "permittedAdapters": [
+        "academy_kakashi_v2_battle_adapter_36010",
+        "academy_kakashi_v2_reward_adapter_36015"
+      ],
+      "retiredOwners": [
+        "runtime/alpha-kakashi-deterministic-kill-35810.js",
+        "runtime/alpha-kakashi-direct-opening-consumer-34710.js",
+        "runtime/alpha-kakashi-field-secured-35920.js",
+        "runtime/alpha-kakashi-final-authority-guard-34200.js",
+        "runtime/alpha-kakashi-final-origin-adapter-34100-core.js",
+        "runtime/alpha-kakashi-final-origin-adapter-34100.js",
+        "runtime/alpha-kakashi-final-sequential-consumer-34410.js",
+        "runtime/alpha-kakashi-immediate-custody-35800.js",
+        "runtime/alpha-kakashi-konoha-route-closure-35910.js",
+        "runtime/alpha-kakashi-konoha-writing-closure-35900.js",
+        "runtime/alpha-kakashi-loss-ending-35820.js",
+        "runtime/alpha-kakashi-move-closer-closure-35930.js",
+        "runtime/alpha-kakashi-original-origin-restoration-33800.js",
+        "runtime/alpha-kakashi-pakkun-interception-35300.js",
+        "runtime/alpha-kakashi-post-mi-death-pursuit-35830.js",
+        "runtime/alpha-kakashi-scene03a-35700.js",
+        "runtime/alpha-kakashi-scene03a-choice-consumer-35710.js",
+        "runtime/alpha-kakashi-scene04a-35710.js",
+        "runtime/alpha-kakashi-scene05a-l-35750.js",
+        "runtime/alpha-kakashi-scene05a-w-35730.js",
+        "runtime/alpha-kakashi-scene06a-w2c-35760.js",
+        "runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js",
+        "runtime/alpha-kakashi-w2c-ending-35770.js",
+        "runtime/alpha-kakashi-w2c-nonkill-35780.js"
+      ],
+      "saveSchemaRefs": [
+        "activeStorySceneRuntime.localContext.kakashiV2"
+      ],
+      "qaRefs": [
+        "tools/qa_kakashi_v2_clean_room.js",
+        "tools/qa_kakashi_v2_route_matrix.js",
+        "tools/qa_kakashi_v2_legacy_exclusion.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "origin.academy_kakashi.v2.story_dom",
+      "canonicalOwner": "runtime/alpha-kakashi-v2-renderer-36030.js",
+      "ownerType": "origin_presentation_owner",
+      "directCallers": [
+        "runtime/alpha-kakashi-v2-transition-36040.js",
+        "renderStoryScenePresentationLayer"
+      ],
+      "stateReads": [
+        "getAcademyKakashiV2Presentation36020",
+        "getAcademyKakashiV2TransitionState36040"
+      ],
+      "stateWrites": [
+        "DOM#kakashi-v2-scene-board"
+      ],
+      "productionLoadPath": [
+        "runtime/alpha-traversal-bridge-33200.js",
+        "runtime/alpha-kakashi-v2-renderer-36030.js"
+      ],
+      "extensionHooks": [
+        "renderAcademyKakashiV236030",
+        "setAcademyKakashiV2Wipe36030"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [
+        "runtime/alpha-kakashi-scene-board-polish-33910.js",
+        "runtime/alpha-kakashi-story-presentation-compat-33920.js",
+        "runtime/alpha-kakashi-objective-presentation-35720.js",
+        "runtime/alpha-kakashi-terminal-scene-board-35610.js",
+        "runtime/alpha-kakashi-dynamic-terminal-35940.js",
+        "runtime/alpha-kakashi-browser-acceptance-35950.js",
+        "runtime/alpha-kakashi-browser-red-fixes-34400.js"
+      ],
+      "saveSchemaRefs": [],
+      "qaRefs": [
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_kakashi_v2_legacy_exclusion.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "origin.academy_kakashi.v2.semantic_advance",
+      "canonicalOwner": "runtime/alpha-kakashi-v2-transition-36040.js",
+      "ownerType": "origin_transition_owner",
+      "directCallers": [
+        "runtime/alpha-kakashi-v2-renderer-36030.js"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime.beatId",
+        "activeStorySceneRuntime.localContext.__kakashiV2Presentation36040"
+      ],
+      "stateWrites": [
+        "activeStorySceneRuntime.localContext.__kakashiV2Presentation36040"
+      ],
+      "productionLoadPath": [
+        "runtime/alpha-traversal-bridge-33200.js",
+        "runtime/alpha-kakashi-v2-transition-36040.js"
+      ],
+      "extensionHooks": [
+        "advanceAcademyKakashiV236040",
+        "getAcademyKakashiV2TransitionState36040"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [
+        "runtime/alpha-kakashi-browser-red-fixes-34400.js",
+        "runtime/alpha-kakashi-browser-acceptance-35950.js"
+      ],
+      "saveSchemaRefs": [
+        "activeStorySceneRuntime.localContext.__kakashiV2Presentation36040"
+      ],
+      "qaRefs": [
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_kakashi_v2_clean_room.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "origin.academy_kakashi.v2.story_to_battle",
+      "canonicalOwner": "runtime/alpha-kakashi-v2-battle-36010.js",
+      "ownerType": "origin_battle_adapter",
+      "directCallers": [
+        "runtime/alpha-kakashi-v2-core-36020.js"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime.pendingBattle",
+        "currentBattle"
+      ],
+      "stateWrites": [
+        "currentBattle.kakashiV2"
+      ],
+      "productionLoadPath": [
+        "runtime/alpha-traversal-bridge-33200.js",
+        "runtime/alpha-kakashi-v2-battle-36010.js"
+      ],
+      "extensionHooks": [
+        "launchAcademyKakashiV2Battle36010",
+        "projectAcademyKakashiV2BattleResult36010"
+      ],
+      "permittedAdapters": [
+        "academy_kakashi_v2_battle_adapter_36010"
+      ],
+      "retiredOwners": [
+        "runtime/alpha-kakashi-origin-battle-deployment-34300.js",
+        "runtime/alpha-kakashi-battle-interaction-hotfix-34500.js",
+        "runtime/alpha-kakashi-substitution-34900.js"
+      ],
+      "saveSchemaRefs": [
+        "currentBattle.kakashiV2",
+        "activeStorySceneRuntime.pendingBattle"
+      ],
+      "qaRefs": [
+        "tools/qa_kakashi_v2_clean_room.js",
+        "tools/qa_kakashi_v2_route_matrix.js",
+        "tools/qa_kakashi_v2_legacy_exclusion.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "origin.academy_kakashi.v2.reward_commit",
+      "canonicalOwner": "runtime/alpha-kakashi-v2-rewards-36015.js",
+      "ownerType": "origin_reward_adapter",
+      "directCallers": [
+        "runtime/alpha-kakashi-v2-core-36020.js",
+        "claimCurrentBattleRewards"
+      ],
+      "stateReads": [
+        "currentBattle.kakashiV2",
+        "activeStorySceneRuntime.localContext.kakashiV2"
+      ],
+      "stateWrites": [
+        "playerData currency/inventory through existing reward authorities",
+        "Kakashi V2 idempotence receipts"
+      ],
+      "productionLoadPath": [
+        "runtime/alpha-traversal-bridge-33200.js",
+        "runtime/alpha-kakashi-v2-rewards-36015.js"
+      ],
+      "extensionHooks": [
+        "commitAcademyKakashiV2TerminalRewards36015",
+        "claimCurrentBattleRewards"
+      ],
+      "permittedAdapters": [
+        "academy_kakashi_v2_reward_adapter_36015"
+      ],
+      "retiredOwners": [
+        "runtime/alpha-kakashi-origin-rewards-34800.js",
+        "runtime/alpha-kakashi-battle-development-35740.js"
+      ],
+      "saveSchemaRefs": [
+        "Kakashi V2 reward receipt store"
+      ],
+      "qaRefs": [
+        "tools/qa_kakashi_v2_clean_room.js",
+        "tools/qa_kakashi_v2_route_matrix.js",
+        "tools/qa_kakashi_v2_legacy_exclusion.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "origin.academy_kakashi.v2.chronicle_receipt",
+      "canonicalOwner": "runtime/alpha-kakashi-v2-renderer-36030.js",
+      "ownerType": "origin_presentation_owner",
+      "directCallers": [
+        "runtime/alpha-kakashi-v2-core-36020.js"
+      ],
+      "stateReads": [
+        "committed Kakashi V2 terminal/history state"
+      ],
+      "stateWrites": [
+        "DOM#kakashi-v2-scene-board .kv2-receipt"
+      ],
+      "productionLoadPath": [
+        "runtime/alpha-traversal-bridge-33200.js",
+        "runtime/alpha-kakashi-v2-renderer-36030.js"
+      ],
+      "extensionHooks": [
+        "chronicle_receipt preset"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [
+        "runtime/alpha-kakashi-terminal-debrief-35100.js",
+        "runtime/alpha-kakashi-dynamic-terminal-35940.js",
+        "runtime/alpha-kakashi-terminal-scene-board-35610.js"
+      ],
+      "saveSchemaRefs": [],
+      "qaRefs": [
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_kakashi_v2_clean_room.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "origin.completion.shared",
+      "canonicalOwner": "game.js",
+      "ownerType": "shared_origin_completion_runtime",
+      "directCallers": [
+        "runtime/alpha-kakashi-v2-core-36020.js",
+        "runtime/alpha-origin-scenes-32900-core.js"
+      ],
+      "stateReads": [
+        "playerData Origin state",
+        "activeStorySceneRuntime"
+      ],
+      "stateWrites": [
+        "Origin completion/history state"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "game.js"
+      ],
+      "extensionHooks": [
+        "completeChronicleOriginPrologue"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [
+        "runtime/alpha-kakashi-terminal-debrief-35100.js"
+      ],
+      "saveSchemaRefs": [
+        "playerData Origin completion/history"
+      ],
+      "qaRefs": [
+        "tools/qa_kakashi_v2_clean_room.js",
+        "tools/qa_kakashi_v2_route_matrix.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    }
+  ],
+  "adapters": [
+    {
+      "adapterId": "academy_kakashi_v2_battle_adapter_36010",
+      "reason": "Translate Kakashi V2 Story battle requests and authored opponent configuration into the existing shared Battle runtime without creating a second Battle system.",
+      "owner": "runtime/alpha-kakashi-v2-battle-36010.js",
+      "sourceOwner": "runtime/alpha-kakashi-v2-core-36020.js",
+      "targetOwner": "runtime/alpha-battle-modern-33000.js",
+      "exactBehaviorBridged": "Story battle request, Battle caller identity, Kakashi V2 configuration, factual result projection.",
+      "retirementCondition": "Review when a shared Origin Story-to-Battle adapter can consume all Kakashi V2 deployment requirements without changing current Battle semantics.",
+      "milestone": "shared Origin runtime propagation review",
+      "qaRef": "tools/qa_kakashi_v2_clean_room.js",
+      "temporary": false
+    },
+    {
+      "adapterId": "academy_kakashi_v2_reward_adapter_36015",
+      "reason": "Translate exact Kakashi V2 source-scoped material rewards into existing currency/inventory authorities with idempotent receipts.",
+      "owner": "runtime/alpha-kakashi-v2-rewards-36015.js",
+      "sourceOwner": "runtime/alpha-kakashi-v2-core-36020.js",
+      "targetOwner": "game.js",
+      "exactBehaviorBridged": "Immediate Battle reward claim and terminal reward commit without creating a second inventory/currency system.",
+      "retirementCondition": "Review when shared Origin reward consumption natively supports the exact source-scoped Kakashi V2 contract.",
+      "milestone": "shared Origin runtime propagation review",
+      "qaRef": "tools/qa_kakashi_v2_clean_room.js",
+      "temporary": false
+    }
+  ],
+  "surfaceContracts": [
+    {
+      "surfaceId": "academy_kakashi_v2_story_surface",
+      "owners": [
+        "runtime/alpha-kakashi-v2-renderer-36030.js"
+      ],
+      "rootSelector": "#kakashi-v2-scene-board",
+      "visibleTextSelector": ".kv2-dialogue",
+      "visibleChoiceSelector": ".kv2-actions",
+      "competingSelectors": [
+        ".sc-story-panel",
+        ".sc-chronicle-layout",
+        ".sc-dialogue-panel-33910",
+        ".sc-narration-panel-33910"
+      ],
+      "semanticAdvanceOwner": "runtime/alpha-kakashi-v2-transition-36040.js",
+      "browserQaRef": "tools/qa_kakashi_v2_browser.js"
+    }
+  ],
+  "semanticOwners": [
+    {
+      "semanticId": "story.intent.commit",
+      "owner": "runtime/alpha-story-decision-realisation-34000.js",
+      "responsibilityId": "story.intent.commit.shared"
+    },
+    {
+      "semanticId": "story.factual.binding.register",
+      "owner": "runtime/alpha-story-factual-resolver-34600.js",
+      "responsibilityId": "story.factual.resolver.shared"
+    },
+    {
+      "semanticId": "battle.return.story_scene",
+      "owner": "runtime/alpha-alpha-sprint-33100.js",
+      "responsibilityId": "battle.return.story_scene.shared"
+    },
+    {
+      "semanticId": "academy_kakashi.v2.render",
+      "owner": "runtime/alpha-kakashi-v2-renderer-36030.js",
+      "responsibilityId": "origin.academy_kakashi.v2.story_dom"
+    },
+    {
+      "semanticId": "academy_kakashi.v2.advance",
+      "owner": "runtime/alpha-kakashi-v2-transition-36040.js",
+      "responsibilityId": "origin.academy_kakashi.v2.semantic_advance"
+    },
+    {
+      "semanticId": "academy_kakashi.v2.battle.launch",
+      "owner": "runtime/alpha-kakashi-v2-battle-36010.js",
+      "responsibilityId": "origin.academy_kakashi.v2.story_to_battle"
+    },
+    {
+      "semanticId": "academy_kakashi.v2.reward.commit",
+      "owner": "runtime/alpha-kakashi-v2-rewards-36015.js",
+      "responsibilityId": "origin.academy_kakashi.v2.reward_commit"
+    },
+    {
+      "semanticId": "origin.complete",
+      "owner": "game.js",
+      "responsibilityId": "origin.completion.shared"
+    }
+  ],
+  "globalWrapperChains": [
+    {
+      "symbol": "renderStoryScenePresentationLayer",
+      "chain": [
+        "runtime/alpha-story-scene-board-33900.js",
+        "runtime/alpha-kakashi-v2-renderer-36030.js"
+      ],
+      "canonicalActiveOwner": "runtime/alpha-kakashi-v2-renderer-36030.js",
+      "activationCondition": "active Story scene is origin_academy_kakashi_anbu_retrieval",
+      "qaRefs": [
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "symbol": "advanceStoryScene",
+      "chain": [
+        "runtime/alpha-story-scene-board-33900.js",
+        "runtime/alpha-kakashi-v2-transition-36040.js"
+      ],
+      "canonicalActiveOwner": "runtime/alpha-kakashi-v2-transition-36040.js",
+      "activationCondition": "active Story scene is origin_academy_kakashi_anbu_retrieval",
+      "qaRefs": [
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    }
+  ],
+  "stateWriterClaims": [
+    {
+      "stateRef": "activeStorySceneRuntime.localContext.kakashiV2",
+      "owner": "runtime/alpha-kakashi-v2-core-36020.js",
+      "responsibilityId": "origin.academy_kakashi.v2.story_state"
+    },
+    {
+      "stateRef": "activeStorySceneRuntime.localContext.__kakashiV2Presentation36040",
+      "owner": "runtime/alpha-kakashi-v2-transition-36040.js",
+      "responsibilityId": "origin.academy_kakashi.v2.semantic_advance"
+    },
+    {
+      "stateRef": "currentBattle.kakashiV2",
+      "owner": "runtime/alpha-kakashi-v2-battle-36010.js",
+      "responsibilityId": "origin.academy_kakashi.v2.story_to_battle"
+    },
+    {
+      "stateRef": "academyKakashiV2.rewardReceipts",
+      "owner": "runtime/alpha-kakashi-v2-rewards-36015.js",
+      "responsibilityId": "origin.academy_kakashi.v2.reward_commit"
+    },
+    {
+      "stateRef": "chronicleOrigin.prologueCompleted",
+      "owner": "game.js",
+      "responsibilityId": "origin.completion.shared"
+    }
+  ]
+}
