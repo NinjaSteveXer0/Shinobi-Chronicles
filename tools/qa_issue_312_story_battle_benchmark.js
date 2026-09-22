@@ -15,6 +15,7 @@ const kv2Renderer=read("runtime/alpha-kakashi-v2-renderer-36030.js");
 const kv2Transition=read("runtime/alpha-kakashi-v2-transition-36040.js");
 const kv2Core=read("runtime/alpha-kakashi-v2-core-36020.js");
 const kv2Battle=read("runtime/alpha-kakashi-v2-battle-36010.js");
+const kv2Rewards=read("runtime/alpha-kakashi-v2-rewards-36015.js");
 const ownership=JSON.parse(read("tools/fixtures/runtime_responsibility_registry_300.json"));
 
 assert(!storySource.includes("new MutationObserver"),"#312 shared Story owner must not depend on MutationObserver");
@@ -49,9 +50,23 @@ assert(kv2Renderer.indexOf("for(const row of departures)")<kv2Renderer.indexOf("
   const renderSource=kv2Renderer.slice(renderStart,renderEnd);
   assert(renderStart>=0&&renderEnd>renderStart&&!renderSource.includes('JSON.stringify(previous.participantStates)!==JSON.stringify(next.participantStates)'),"#312 harmless participant-state refresh must not replay actor choreography");
 }
-assert(kv2Transition.includes("semanticAlreadyCommitted:true"),"#312 wipe must be post-commit presentation");
+assert(kv2Transition.includes("semanticAlreadyCommitted:true"),"#312 transition must be post-commit presentation");
+assert(kv2Transition.includes('"hard"')&&kv2Transition.includes('"soft"')&&kv2Transition.includes("same_environment_beat_shift"),"#312 hard/soft cinematic transition hierarchy missing");
+assert(kv2Transition.includes("playAcademyKakashiV2CuePresentation36030"),"#312 cue-level card performance must run during narration stepping");
 assert(!kv2Transition.includes("cloneNode"),"#312 transition adapter must not own actor animation DOM");
 assert(!kv2Transition.includes("locked=true"),"#312 Story truth must not wait on animation lock");
+
+assert(kv2Renderer.includes(".kv2-speech")&&kv2Renderer.includes("syncSpeech"),"#312 actor-linked speech surface missing");
+assert(kv2Renderer.includes("CLICK ANYWHERE TO CONTINUE")&&!kv2Renderer.includes('class="kv2-next"'),"#312 arrow-only continuation must be retired");
+assert(kv2Renderer.includes('root.dataset.hasChoices==="true"')&&kv2Renderer.includes("Date.now()-revealed<360"),"#312 choice reveal must block click-through / accidental commitment");
+assert(kv2Renderer.includes("repeat(3,minmax(0,1fr))")&&kv2Renderer.includes("max-height:none;overflow:visible"),"#312 five-choice desktop layout must not require an internal scrollbar");
+assert(kv2Renderer.includes('p.id!=="v2_watch_exchange"')&&kv2Renderer.includes("SURPRISE_ENTRY")&&kv2Renderer.includes("FAR_ENTRY_LEFT"),"#312 WATCH exchange cue choreography missing");
+assert(kv2Renderer.includes('if(idx<10)mi.dataset.scChoreographyPendingEntry="true"'),"#312 Masked Interceptor must remain visually withheld until her authored reveal cue");
+assert(kv2Renderer.includes("border-radius:16px")&&kv2Renderer.includes("backdrop-filter:blur(8px)"),"#312 modern compact narration/speech styling missing");
+
+assert(kv2Rewards.includes("ensureKakashiV2BattleRewardProjection36015"),"#312 Kakashi reward projection self-heal missing");
+assert(kv2Rewards.includes("Field Recovery Pill")&&kv2Rewards.includes("authoritativeProjectionRepaired"),"#312 MI authoritative reward projection must expose the locked item package");
+assert(kv2Rewards.includes("renderVictoryOverlay36015"),"#312 Victory screen must consume the authoritative Kakashi reward projection");
 
 assert(battleSource.includes("resolveBattlePerformanceProjection33000"),"#312 shared Battle performance projection missing");
 assert(battleSource.includes("currentBattle.runtime")||battleSource.includes("ensureBattleRuntimeState"),"#312 Battle performance must read canonical runtime evidence");
