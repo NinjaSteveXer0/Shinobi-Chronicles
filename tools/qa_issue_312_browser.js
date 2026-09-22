@@ -731,8 +731,8 @@ async function shot(page,name,selector=null){
         playerWidthRatio:sr&&pr?pr.width/sr.width:0,
         enemyWidthRatio:sr&&er?er.width/sr.width:0,
         confrontationGapRatio:sr&&pr&&er?(er.left-(pr.left+pr.width))/sr.width:1,
-        playerPowerLeftRatio:sr&&ppr?(ppr.left-sr.left)/sr.width:0,
-        enemyPowerLeftRatio:sr&&epr?(epr.left-sr.left)/sr.width:1,
+        playerPowerCenterRatio:sr&&ppr?(ppr.left+ppr.width/2-sr.left)/sr.width:0,
+        enemyPowerCenterRatio:sr&&epr?(epr.left+epr.width/2-sr.left)/sr.width:1,
         visibleSupports,
         vsOpacity:vs?Number(getComputedStyle(vs).opacity):0
       };
@@ -741,8 +741,8 @@ async function shot(page,name,selector=null){
     assert(duelComposition.playerWidthRatio>=0.33&&duelComposition.enemyWidthRatio>=0.33,"#312 sparse duel combatants are still undersized: "+JSON.stringify(duelComposition));
     assert(duelComposition.confrontationGapRatio<=0.17,"#312 sparse duel leaves an excessive empty confrontation gap: "+JSON.stringify(duelComposition));
     assert.strictEqual(duelComposition.visibleSupports,0,"#312 sparse duel rendered fake/empty support furniture: "+JSON.stringify(duelComposition));
-    assert(duelComposition.playerPowerLeftRatio>=0.31&&duelComposition.playerPowerLeftRatio<=0.36,"#312 player PL ring did not move inward: "+JSON.stringify(duelComposition));
-    assert(duelComposition.enemyPowerLeftRatio>=0.65&&duelComposition.enemyPowerLeftRatio<=0.70,"#312 enemy PL ring did not move inward: "+JSON.stringify(duelComposition));
+    assert(duelComposition.playerPowerCenterRatio>=0.32&&duelComposition.playerPowerCenterRatio<=0.34,"#312 player PL ring did not move inward: "+JSON.stringify(duelComposition));
+    assert(duelComposition.enemyPowerCenterRatio>=0.66&&duelComposition.enemyPowerCenterRatio<=0.68,"#312 enemy PL ring did not move inward: "+JSON.stringify(duelComposition));
     assert(duelComposition.vsOpacity>=0.5,"#312 sparse duel confrontation marker is too visually weak: "+JSON.stringify(duelComposition));
 
     const amtSkillsButton=page.locator('.battle-live-action-family-row button[data-formation-family="skills"]');
