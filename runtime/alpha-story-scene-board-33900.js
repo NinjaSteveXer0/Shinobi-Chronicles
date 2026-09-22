@@ -123,8 +123,6 @@ function installStyle(){
 .sc-scene-board-33900__actor-frame{position:absolute;inset:0;border:1px solid rgba(194,158,73,.38);background:linear-gradient(180deg,rgba(7,13,17,.03),rgba(3,7,10,.12) 65%,rgba(3,7,10,.72));box-shadow:0 16px 34px rgba(0,0,0,.30);}
 .sc-scene-board-33900__actor.is-focus .sc-scene-board-33900__actor-frame{border-color:rgba(97,220,229,.78);box-shadow:0 0 0 1px rgba(97,220,229,.15),0 18px 38px rgba(0,0,0,.38);}
 .sc-scene-board-33900__actor img{position:relative;z-index:1;width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 12px 14px rgba(0,0,0,.52));}
-.sc-scene-board-33900__actor[data-actor-id="academy_kakashi"]{width:min(72%,228px);aspect-ratio:7/10;max-height:330px;}
-.sc-scene-board-33900__actor[data-actor-id="konoha_anbu_contact"]{width:min(67%,220px);aspect-ratio:7/10;max-height:350px;}
 .sc-scene-board-33900__actor.is-entering{animation:scActorEnter33900 .46s cubic-bezier(.2,.75,.25,1) both;}
 @keyframes scActorEnter33900{from{opacity:0;transform:translateX(44px) scale(.96);filter:brightness(.35) blur(2px)}to{opacity:.72;transform:translateX(0) scale(.95);filter:saturate(.78) brightness(.88)}}
 .sc-scene-board-33900__actor.is-entering.is-focus{animation-name:scActorEnterFocus33900}@keyframes scActorEnterFocus33900{from{opacity:0;transform:translateX(44px) scale(.97)}to{opacity:1;transform:translateX(0) scale(1)}}
@@ -162,7 +160,7 @@ function updatePerformancePanel(layer,runtime=currentRuntime()){
   if(!name&&panel){name=document.createElement("div");name.className="sc-story-name sc-performance-name-33900";}
   if(name&&panel&&!panel.contains(name)){const t=panel.querySelector(".sc-story-text");panel.insertBefore(name,t||null);}
   if(name){if(name.textContent!==speakerLabel)name.textContent=speakerLabel;name.style.display="block";}
-  const kicker=layer.querySelector&&layer.querySelector(".sc-story-kicker");const kickerText=`${String(cue.kind||"narration").toUpperCase()} · ACADEMY KAKASHI`;if(kicker&&kicker.textContent!==kickerText)kicker.textContent=kickerText;
+  const kicker=layer.querySelector&&layer.querySelector(".sc-story-kicker");const kickerText=String(cue.kind||"narration").toUpperCase();if(kicker&&kicker.textContent!==kickerText)kicker.textContent=kickerText;
   const primary=layer.querySelector&&layer.querySelector(".sc-chronicle-primary");if(primary){if(primary.textContent!=="›")primary.textContent="›";primary.setAttribute("aria-label","Advance scene");primary.title="Advance scene";}
   return true;
 }
@@ -209,87 +207,21 @@ if(typeof document!=="undefined"){
   if(typeof MutationObserver==="function"){const target=document.getElementById("story-scene-presentation-layer")||document.body;if(target){observer=new MutationObserver(()=>scheduleBoardRender());observer.observe(target,{childList:true,subtree:true});}}
 }
 
-const A=globalThis.SC_ALPHA_ORIGIN_32900;
-const kakashiScene=A&&A.sceneByVariant&&A.sceneByVariant.academy_kakashi||null;
-const kakashiOccurrence="occ_origin_kakashi_anbu_retrieval_resolution";
-const KAKASHI_IMAGE="Assets/Academy Student/academy_kakashi.png";
-const ANBU_IMAGE="NPC/konoha_anbu.png";
-const ROGUE_IMAGE="Enemies Portraits/rogue_chunin.png";
-const CIPHER_IMAGE="Enemies Portraits/cipher_handler.png";
-const DECOY_IMAGE="Enemies Portraits/decoy_assassin.png";
-const OBJECTIVE="Stop the package from falling into the wrong hands.";
-function actor(id,label,image,state,focus=false,entering=false){return{id,label,image,state,focus,entering};}
-function kakashi(state,focus=false){return actor("academy_kakashi","KAKASHI",KAKASHI_IMAGE,state,focus);}
-function anbu(state,focus=false,entering=false){return actor("konoha_anbu_contact","ANBU OPERATIVE",ANBU_IMAGE,state,focus,entering);}
-function rogue(state,focus=false,entering=false){return actor("kakashi_origin_logistics_clerk","ROGUE CHŪNIN",ROGUE_IMAGE,state,focus,entering);}
-function cipher(state,focus=false,entering=false){return actor("kakashi_origin_information_broker","CIPHER HANDLER",CIPHER_IMAGE,state,focus,entering);}
-function decoy(state,focus=false,entering=false){return actor("kakashi_origin_decoy_assassin_01","DECOY ASSASSIN",DECOY_IMAGE,state,focus,entering);}
-function committedFact(){try{return A&&typeof A.findOccurrence==="function"?A.findOccurrence(kakashiOccurrence):null;}catch(_error){return null;}}
-const rooftopPerformance=[
-  {cueId:"roof_01",kind:"narration",text:"Kakashi watched Konoha from the rooftop.",focusActorRef:"academy_kakashi"},
-  {cueId:"roof_02",kind:"narration",text:"A presence registered behind him.\nHis eye shifted.\nAn ANBU operative stood several paces back, masked and motionless.",focusActorRef:"academy_kakashi",actorEntrance:"konoha_anbu_contact"},
-  {cueId:"roof_03",kind:"dialogue",speakerName:"ANBU OPERATIVE",text:"Kakashi Hatake.",focusActorRef:"konoha_anbu_contact"},
-  {cueId:"roof_04",kind:"narration",text:"Kakashi turned his head slightly.",focusActorRef:"academy_kakashi"},
-  {cueId:"roof_05",kind:"dialogue",speakerName:"ANBU OPERATIVE",text:"You have orders. Stop this package from falling into the wrong hands.",focusActorRef:"konoha_anbu_contact"},
-  {cueId:"roof_06",kind:"action",text:"The operative raised a sealed envelope.",focusActorRef:"konoha_anbu_contact",objectState:"raised"},
-  {cueId:"roof_07",kind:"narration",text:"Kakashi studied him for a moment, then moved from his position and walked over.",focusActorRef:"academy_kakashi"},
-  {cueId:"roof_08",kind:"dialogue",speakerName:"KAKASHI",text:"Why are you coming to me with this?",focusActorRef:"academy_kakashi"},
-  {cueId:"roof_09",kind:"action",text:"He took the envelope.",focusActorRef:"academy_kakashi",objectState:"held"},
-  {cueId:"roof_10",kind:"dialogue",speakerName:"ANBU OPERATIVE",text:"Hokage's orders.",focusActorRef:"konoha_anbu_contact"},
-  {cueId:"roof_11",kind:"narration",text:"Kakashi's attention sharpened.\nHis eye dropped to the seal in his hand.",focusActorRef:"academy_kakashi",objectState:"held"}
-];
-const tailPerformance=[
-  {cueId:"alley_01",kind:"narration",text:"Kakashi finds Rogue Chūnin and tails him through Konoha.",focusActorRef:"academy_kakashi"},
-  {cueId:"alley_02",kind:"narration",text:"Rogue Chūnin turns into a narrow alley.",focusActorRef:"kakashi_origin_logistics_clerk",actorEntrance:"kakashi_origin_logistics_clerk"},
-  {cueId:"alley_03",kind:"narration",text:"Cipher Handler is waiting at the exchange.",focusActorRef:"kakashi_origin_information_broker",actorEntrance:"kakashi_origin_information_broker"},
-  {cueId:"alley_04",kind:"narration",text:"A package is between them.",focusActorRef:"academy_kakashi",objectState:"between"}
-];
-const observeTransferPerformance=[
-  {cueId:"observe_01",kind:"narration",text:"Kakashi stays still and watches the exchange unfold.",focusActorRef:"academy_kakashi"},
-  {cueId:"observe_02",kind:"action",text:"Rogue Chūnin hands the package to Cipher Handler.",focusActorRef:"kakashi_origin_information_broker",objectState:"cipher"},
-  {cueId:"observe_03",kind:"narration",text:"A Decoy Assassin comes out of the darkness like a lightning streak as Rogue Chūnin breaks away from the exchange.",focusActorRef:"kakashi_origin_decoy_assassin_01",actorEntrance:"kakashi_origin_decoy_assassin_01",objectState:"cipher"}
-];
-function roofProjection(performance){
-  const cue=performance&&performance.cue||rooftopPerformance[0],idx=performance?performance.index:0,focus=cue.focusActorRef;
-  const actors=[kakashi(idx===0?"WATCHING KONOHA":focus==="academy_kakashi"?"FOCUSED":"PRESENT",focus==="academy_kakashi")];
-  if(idx>=1)actors.push(anbu(focus==="konoha_anbu_contact"?"SPEAKING":"PRESENT",focus==="konoha_anbu_contact",cue.actorEntrance==="konoha_anbu_contact"));
-  const objects=[];if(cue.objectState==="raised")objects.push({label:"SEALED ENVELOPE",state:"RAISED"});if(cue.objectState==="held")objects.push({label:"SEALED ENVELOPE",state:"HELD BY KAKASHI"});
-  return{mode:"conversation",location:"KONOHA ROOFTOP",objective:OBJECTIVE,actors,objects};
-}
-function tailProjection(performance){
-  const cue=performance&&performance.cue||tailPerformance[0],idx=performance?performance.index:0,focus=cue.focusActorRef;
-  const actors=[kakashi("IN PURSUIT",focus==="academy_kakashi")];
-  if(idx>=1)actors.push(rogue(idx>=2?"AT EXCHANGE":"ENTERING ALLEY",focus==="kakashi_origin_logistics_clerk",cue.actorEntrance==="kakashi_origin_logistics_clerk"));
-  if(idx>=2)actors.push(cipher("WAITING",focus==="kakashi_origin_information_broker",cue.actorEntrance==="kakashi_origin_information_broker"));
-  return{mode:"encounter",location:"KONOHA ALLEY",objective:OBJECTIVE,actors,objects:idx>=3?[{label:"PACKAGE",state:"BETWEEN ROGUE CHŪNIN AND CIPHER HANDLER"}]:[]};
-}
-function transferProjection(performance,context){
-  if(context.kakashiOriginalAction!=="observe")return{mode:"encounter",location:"KONOHA ALLEY",objective:OBJECTIVE,reaction:String(context.kakashiOriginalAction||"").toUpperCase(),actors:[kakashi("ACTION COMMITTED",true),rogue("RESPONDING"),cipher("RESPONDING")],objects:[{label:"PACKAGE",state:"OUTCOME REQUIRES OWNING RESOLVER"}]};
-  const cue=performance&&performance.cue||observeTransferPerformance[0],idx=performance?performance.index:0,focus=cue.focusActorRef;
-  const actors=[kakashi("OBSERVING",focus==="academy_kakashi"),rogue(idx>=2?"FLEEING":"AT EXCHANGE",focus==="kakashi_origin_logistics_clerk")];
-  if(idx<2)actors.push(cipher(idx>=1?"HAS PACKAGE":"AT EXCHANGE",focus==="kakashi_origin_information_broker"));
-  else actors.push(decoy("ATTACKING CIPHER HANDLER",true,cue.actorEntrance==="kakashi_origin_decoy_assassin_01"));
-  return{mode:"encounter",location:"KONOHA ALLEY",objective:OBJECTIVE,actors,objects:idx>=1?[{label:"PACKAGE",state:"CIPHER HANDLER HAS PACKAGE"}]:[{label:"PACKAGE",state:"EXCHANGE IN PROGRESS"}]};
-}
-function kakashiBoardResolver({beatId,context,performance}){
-  if(beatId==="kak_original_rooftop"||beatId==="kak_original_anbu"||beatId==="kak_original_envelope"||beatId==="kak_original_order")return roofProjection(performance);
-  if(beatId==="kak_original_tail")return tailProjection(performance);
-  if(beatId==="kak_original_action")return{mode:"encounter",location:"KONOHA ALLEY",objective:OBJECTIVE,actors:[kakashi("UNDETECTED POSITION",true),rogue("CURRENT CARRIER"),cipher("RECEIVING CONTACT")],objects:[{label:"PACKAGE",state:"EXCHANGE IN PROGRESS"}]};
-  if(beatId==="kak_original_transfer")return transferProjection(performance,context);
-  if(beatId==="kak_original_major_choice")return{mode:"encounter",location:"KONOHA ALLEY",objective:"Choose which problem Kakashi prioritizes.",actors:[kakashi("DECISION WINDOW",true),rogue("FLEEING"),decoy("ACTIVE")],objects:[{label:"PACKAGE",state:"CIPHER HANDLER HAS PACKAGE"},{label:"CHOICE PRESSURE",state:"THREE SEPARATE PROBLEMS"}]};
-  if(beatId==="kak_original_secured"){const r=committedFact(),fact=r&&r.fact||{};return{mode:"consequence",location:"KONOHA ALLEY",objective:"Return with the retrieval result.",committed:fact.packageDisposition==="secured",reaction:"PLAYER ACTION → PACKAGE CUSTODY SECURED",actors:[kakashi("PACKAGE SECURED",true),cipher("PACKAGE RELINQUISHED"),decoy("SEPARATE COMPLICATION")],objects:[{label:"PACKAGE",state:fact.packageDisposition==="secured"?"SECURED BY KAKASHI":"RESOLVING"}]};}
-  if(beatId==="kak_original_pursue"){const r=committedFact(),fact=r&&r.fact||{};return{mode:"consequence",location:"KONOHA ALLEY",objective:"Return with the retrieval result.",committed:fact.packageDisposition==="lost",reaction:"PLAYER ACTION → ROGUE CHŪNIN PURSUED",actors:[kakashi("IN PURSUIT",true),rogue("PURSUED"),cipher("RETAINS PACKAGE")],objects:[{label:"PACKAGE",state:fact.packageDisposition==="lost"?"NOT RECOVERED BY KAKASHI":"RESOLVING"}]};}
-  return null;
-}
-if(kakashiScene){
-  try{const d=typeof getStorySceneDefinition==="function"?getStorySceneDefinition(kakashiScene):null;const root=d&&d.beatMap instanceof Map?d.beatMap.get("kak_original_rooftop"):null;if(root)root.nextBeatId="kak_original_tail";}catch(_error){}
-  registerStorySceneBoardDefinition(kakashiScene,{benchmark:true,resolve:kakashiBoardResolver,performanceSequences:{kak_original_rooftop:rooftopPerformance,kak_original_tail:tailPerformance,kak_original_transfer:({context})=>context.kakashiOriginalAction==="observe"?observeTransferPerformance:null},performanceTransitions:{kak_original_rooftop:"wipe_right_to_left"}});
-}
+// Origin-specific board definitions are registered by their own consumers.
+// The generic Scene Board must not embed Origin-specific actors, cues, routes or assets.
 
 function runStorySceneBoard33900Diagnostics(){
-  const kak=boardDefinition(kakashiScene),rootDef=typeof getStorySceneDefinition==="function"?getStorySceneDefinition(kakashiScene):null,root=rootDef&&rootDef.beatMap instanceof Map?rootDef.beatMap.get("kak_original_rooftop"):null;
-  const checks={patchId:PATCH_ID==="story_scene_board_33900_2026_09_14_cinematic",compactLiveStateCallout:installStyle.toString().includes("width:max-content")&&installStyle.toString().includes("height:auto!important")&&installStyle.toString().includes("align-items:flex-start")&&installStyle.toString().includes("left:3.2%;right:auto"),reusableRegistry:typeof registerStorySceneBoardDefinition==="function"&&typeof resolveStorySceneBoardProjection==="function",kakashiBenchmarkRegistered:!!kakashiScene&&!!kak&&kak.benchmark===true,academyKakashiUsesCharacterCard:KAKASHI_IMAGE==="Assets/Academy Student/academy_kakashi.png",exactRoleAssets:ROGUE_IMAGE==="Enemies Portraits/rogue_chunin.png"&&CIPHER_IMAGE==="Enemies Portraits/cipher_handler.png"&&DECOY_IMAGE==="Enemies Portraits/decoy_assassin.png",rooftopIsSingleSemanticBeat:!!root&&root.nextBeatId==="kak_original_tail",rooftopPerformanceHasElevenCues:rooftopPerformance.length===11&&rooftopPerformance[2].text==="Kakashi Hatake."&&rooftopPerformance[9].text==="Hokage's orders.",persistentAssignmentObjective:OBJECTIVE==="Stop the package from falling into the wrong hands.",observePerformsDecoyEntrance:observeTransferPerformance.some(c=>c.actorEntrance==="kakashi_origin_decoy_assassin_01"),performanceAdvanceCommitsNoOccurrence:advanceStoryScene33900.toString().includes("performanceCursor")&&!advanceStoryScene33900.toString().includes("commitOccurrence"),wrapsExistingStoryRenderer:!!PRE_RENDER,browserGoldenClaimed:false};
-  const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);return{pass:failed.length===0,checks,failed,browserGoldenClaimed:false};
+  const checks={
+    patchId:PATCH_ID==="story_scene_board_33900_2026_09_14_cinematic",
+    compactLiveStateCallout:installStyle.toString().includes("width:max-content")&&installStyle.toString().includes("height:auto!important")&&installStyle.toString().includes("align-items:flex-start")&&installStyle.toString().includes("left:3.2%;right:auto"),
+    reusableRegistry:typeof registerStorySceneBoardDefinition==="function"&&typeof unregisterStorySceneBoardDefinition==="function"&&typeof resolveStorySceneBoardProjection==="function",
+    genericPerformanceLifecycle:typeof performanceSequenceFor==="function"&&typeof advanceStoryScene33900==="function"&&typeof performSceneCut==="function",
+    performanceAdvanceCommitsNoOccurrence:advanceStoryScene33900.toString().includes("performanceCursor")&&!advanceStoryScene33900.toString().includes("commitOccurrence"),
+    wrapsExistingStoryRenderer:!!PRE_RENDER,
+    browserGoldenClaimed:false
+  };
+  const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
+  return{pass:failed.length===0,checks,failed,browserGoldenClaimed:false};
 }
 
 globalThis.registerStorySceneBoardDefinition=registerStorySceneBoardDefinition;

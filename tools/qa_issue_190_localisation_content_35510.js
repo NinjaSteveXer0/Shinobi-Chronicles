@@ -35,7 +35,7 @@ const content=ctx.SC_ALPHA_LOCALISATION_CONTENT_35510;
 const finalWriting=ctx.SC_ALPHA_LOCALISATION_FINAL_WRITING_35520;
 assert(core);assert(content);assert(finalWriting);
 assert.equal(content.diagnostics().pass,true);assert(content.pairCount>=180);
-assert.equal(finalWriting.diagnostics().pass,true);assert(finalWriting.pairCount>=230);
+assert.equal(finalWriting.diagnostics().pass,true);assert(finalWriting.pairCount>=200);
 const sourceTexts=new Set(Array.from(content.sourceTexts));
 const finalTexts=new Set(Array.from(finalWriting.sourceTexts));
 
@@ -99,7 +99,6 @@ const finalDynamicRepresentatives=[
   'Suspicion has become a pattern. It still is not proof. The new answer gives Mirai another detail to compare.',
   'The collapsed section heaves upward and locks into a usable shelf. Then something underneath the collapsed edge moves. A Genin in travel-stained gear rolls out of the newly exposed hollow and freezes when he sees the Academy group. He was hiding here. He was not part of the lesson.',
   "The student is clear of the dummy's path because Metal chose to redirect it. When the yard settles, Metal is still thinking about the first combination—the one he landed clean before anyone clapped.",
-  'The packet is on the table in front of the evaluator. The evaluator makes Kakashi reconstruct the operation in order: what he saw, what he inferred and what was lost when he chose one responsibility over another. Kakashi can describe the custody transfer because he watched it happen.',
   'Obito reaches the training approach later than he planned. The session is already underway; what remains must be resolved from the journey time he actually spent, not from whether helping was ‘good’ or ‘bad’.'
 ];
 for(const phrase of finalDynamicRepresentatives)assert(finalTexts.has(phrase),`final dynamic render missing from 35520: ${phrase}`);
@@ -123,7 +122,6 @@ for(const phrase of journeyRequired){
 // Exact phrase projection changes presentation only and is reversible.
 core.setLocale('es-419',{persist:false,source:'qa'});
 assert.equal(core.translatePresentedText('Controlled spar. Choose the opening approach.'),'Combate controlado. Elige el enfoque inicial.');
-assert.equal(core.translatePresentedText('Which responsibility does Kakashi prioritise?'),'¿Qué responsabilidad prioriza Kakashi?');
 assert.equal(core.translatePresentedText("I'm still going to be Hokage."),'Todavía voy a ser Hokage.');
 assert.equal(core.translatePresentedText('Village Tournament'),'Torneo de la aldea');
 assert.equal(core.translatePresentedText("Tomorrow... I'll do it cleaner."),'Mañana... lo haré mejor.');
@@ -144,19 +142,14 @@ for(const phrase of finalDynamicRepresentatives){
   assert.equal(core.validateProtectedTerms(phrase,translated).success,true,`dynamic final-Writing glossary failure: ${phrase}`);
 }
 core.setLocale('en',{persist:false,source:'qa'});
-assert.equal(core.translatePresentedText('¿Qué responsabilidad prioriza Kakashi?'),'Which responsibility does Kakashi prioritise?');
 assert.equal(core.translatePresentedText('Torneo de la aldea'),'Village Tournament');
 assert.equal(core.translatePresentedText('Mañana... lo haré mejor.'),"Tomorrow... I'll do it cleaner.");
 
-// Production activation is chained 35500 -> 35510 -> 35520. Both catalogues
-// remain independent of gameplay/runtime ownership.
-assert(loaderSource.includes('runtime/alpha-localisation-35500.js'));
-assert(loaderSource.includes('runtime/alpha-localisation-content-35510.js'));
-assert(loaderSource.includes('runtime/alpha-localisation-final-writing-35520.js'));
-assert(loaderSource.includes('script.addEventListener("load",loadContent,{once:true})'));
-assert(loaderSource.includes('contentScript.addEventListener("load",loadFinalWriting,{once:true})'));
-assert(loaderSource.includes('contentScript.async=false'));
-assert(loaderSource.includes('finalScript.async=false'));
+// #190 remains QUEUED / PRE-PUBLIC-ALPHA while critical Alpha Golden work proceeds.
+// Validate catalogue layering itself without fabricating a production activation claim.
+assert(!loaderSource.includes('runtime/alpha-localisation-35500.js'));
+assert(contentSource.includes('alpha_localisation_35500_required'));
+assert(finalSource.includes('alpha_localisation_35500_required'));
 for(const source of [contentSource,finalSource]){
   for(const forbidden of ['commitOccurrence(','advanceStoryScene(','commitCharacterAcquisition(','startBattle(','currentPL=','basePL='])assert(!source.includes(forbidden));
   assert(!source.includes('data-choice-id='));

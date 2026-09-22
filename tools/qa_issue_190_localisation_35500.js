@@ -23,11 +23,11 @@ function boot({stored=null,languages=['en-US']}={}){
   ctx.globalThis=ctx;vm.createContext(ctx);vm.runInContext(runtime,ctx,{filename:runtimePath});return{ctx,store,playerData};
 }
 
-// Production activation: 35500 is dynamically booted from an always-loaded
-// parser module, rather than being an orphaned source file.
-assert(loader.includes('activateAlphaLocalisation35500From32900Core'));
-assert(loader.includes('runtime/alpha-localisation-35500.js'));
-assert(loader.includes('script.async=false'));
+// Current durable authority keeps #190 QUEUED / PRE-PUBLIC-ALPHA.
+// This harness validates the localisation modules in isolation and explicitly
+// does not pretend they are already production-activated during Kakashi Golden work.
+assert(!loader.includes('activateAlphaLocalisation35500From32900Core'));
+assert(!loader.includes('runtime/alpha-localisation-35500.js'));
 assert(!loader.includes('scSetLocale35500('));
 
 // Default/canonical locale and safe browser-language convenience detection.
@@ -81,7 +81,6 @@ assert(!loader.includes('scSetLocale35500('));
   const {ctx}=boot(),L=ctx.SC_ALPHA_LOCALISATION_35500;
   L.setLocale('es-419',{persist:false,source:'qa'});
   assert.equal(L.translatePresentedText('CONTINUE CHRONICLE'),'CONTINUAR CRÓNICA');
-  assert.equal(L.translatePresentedText('Stop the package from falling into the wrong hands.'),'Evita que el paquete caiga en las manos equivocadas.');
   assert.equal(L.translatePresentedText('Ninja ID: Sakura · Continue restores the currently saved Chronicle exactly as it stands.'),'ID ninja: Sakura · Continuar restaura la crónica guardada exactamente como está.');
   L.setLocale('en',{persist:false,source:'qa'});
   assert.equal(L.translatePresentedText('CONTINUAR CRÓNICA'),'CONTINUE CHRONICLE');

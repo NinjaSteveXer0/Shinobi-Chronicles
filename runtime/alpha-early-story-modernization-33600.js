@@ -160,21 +160,8 @@ function patchMetal(){
   return commit(def);
 }
 
-function patchKakashi(){
-  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const def=editable(A.sceneByVariant.academy_kakashi);if(!def)return false;
-  text(def,"kak_clerk","The logistics clerk keeps one hand near the sealed packet and checks the same reflection twice while crossing the market lane. Either he is nervous or he knows someone is following him. Kakashi does not need to decide which yet.");
-  label(def,"kak_clerk","shadow_the_clerk","Stay invisible. Watch who receives it.");
-  label(def,"kak_clerk","question_the_clerk","Step in now and force the route into the open.");
-  label(def,"kak_clerk","cut_ahead","Cut ahead. Be where the packet is going.");
-  text(def,"kak_choice","Then the retrieval fractures into three problems at once: a confirmed packet, an assassin creating pressure and an apparent carrier moving away. Kakashi can pursue all three badly or choose which fact matters most.");
-  const debrief=beat(def,"kak_debrief");if(debrief)debrief.presentationResolver=()=>{const ctx=local();const route=ctx.kakashiRetrievalChoice==="secure_package"?"The packet is on the table in front of the evaluator.":"The packet is not.";const evidence=ctx.kakashiFirstChoice==="shadow_the_clerk"?"Kakashi can describe the custody transfer because he watched it happen.":ctx.kakashiFirstChoice==="question_the_clerk"?"Some of what Kakashi knows came from answers he had to weigh against movement he observed.":"Kakashi predicted the destination correctly without pretending he witnessed the route that led there.";return{text:`${route} The evaluator makes Kakashi reconstruct the operation in order: what he saw, what he inferred and what was lost when he chose one responsibility over another. ${evidence}`};};
-  label(def,"kak_reflect","objective","The objective mattered. Everything else was noise.");
-  label(def,"kak_reflect","proof","Proof mattered. Guessing correctly is still guessing.");
-  label(def,"kak_reflect","responsibility","The hard part was deciding which responsibility was actually mine.");
-  const reflection=beat(def,"kak_reflection_result");if(reflection)reflection.text="";
-  text(def,"kak_sakumo","Sakumo is at the Hatake threshold when Kakashi gets home. He takes one look at his son's face and does not ask whether he passed. “You picked one.” Kakashi's eyes narrow slightly. “I had to.” Sakumo nods once. “That's usually when the choice matters.”");
-  return commit(def);
-}
+// Academy Kakashi legacy expression patch retired for clean-room V2.
+// 33600 continues to modernize the other Origins only.
 
 function patchObito(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const def=editable(A.sceneByVariant.academy_obito);if(!def)return false;
@@ -207,7 +194,7 @@ function patchObito(){
 
 const originResults={
   hinata:patchHinata(),izuno:patchIzuno(),mirai:patchMirai(),menmaReviewedNotRestructured:true,
-  kushina:patchKushina(),kurenai:patchKurenai(),iwabee:patchIwabee(),metal:patchMetal(),kakashi:patchKakashi(),obito:patchObito()
+  kushina:patchKushina(),kurenai:patchKurenai(),iwabee:patchIwabee(),metal:patchMetal(),obito:patchObito()
 };
 
 // #121 early-Arc production consumer. 33600 is already a terminal browser
@@ -235,7 +222,8 @@ function runAlphaEarlyStoryModernization33600Diagnostics(){
   const checks={
     patchId:PATCH_ID==="alpha_early_story_modernization_33600_2026_09_13",
     writingAuthorityPinned:WRITING_AUTHORITY_COMMIT==="57697fb9dfd7920a2466c64cf7813d99f424f24e",
-    tenOriginsReviewed:Object.keys(originResults).length===10&&Object.values(originResults).every(Boolean),
+    nonKakashiOriginsReviewed:Object.keys(originResults).length===9&&Object.values(originResults).every(Boolean),
+    kakashiLegacyExpressionRetired:!Object.prototype.hasOwnProperty.call(originResults,"kakashi"),
     kushinaOpeningModernized:!!(kush&&kush.beatMap&&String(kush.beatMap.get("kus_crisis")?.text||"").includes("three strokes ago")),
     kurenaiSystemGuardrailRemoved:!!(kur&&kur.beatMap&&!String(kur.beatMap.get("kur_result")?.text||"").includes("personality")),
     metalSystemGuardrailRemoved:!!(metal&&metal.beatMap&&!String(metal.beatMap.get("met_private")?.text||"").includes("legitimately demonstrates")),
