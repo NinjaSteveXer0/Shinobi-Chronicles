@@ -256,7 +256,7 @@
 (function activateOriginSceneBoardTerminalChain33200(){
   if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
 
-  const BUILD="kakashi-v2-clean-room-20260922-2";
+  const BUILD="kakashi-v2-clean-room-20260923-4";
   function loadOne(id,src,ready,next){
     if(ready()){if(next)next();return;}
     let script=document.getElementById(id);

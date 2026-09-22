@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "runtimeGeneration": "SC-ALPHA-RUNTIME-R303-2026-09-22-A",
+  "runtimeGeneration": "SC-ALPHA-RUNTIME-R303-2026-09-22-C",
   "authorityRef": "Documentation/Coordination/Alpha_Second_Wave_Regression_and_Integrity_Safeguards_2026-09-22.md",
   "compatibilityHorizon": "current plus one representative pre-characterOwnership Alpha shape",
   "fixtures": [

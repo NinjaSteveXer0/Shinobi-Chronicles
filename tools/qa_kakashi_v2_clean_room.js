@@ -29,12 +29,12 @@ assert(!/querySelector|document\.|createElement/.test(coreOperationalSource),"St
 assert(!/querySelector|document\.|createElement/.test(battleSource.split("function installPakkunBattleButtons")[0]),"Battle semantic adapter touches Story/presentation DOM");
 assert(rendererSource.includes('>*:not(#${ROOT_ID}){display:none!important}'),"renderer does not suppress native Story layer");
 assert(rendererSource.includes("kv2-dialogue")&&rendererSource.includes("chronicle_receipt"),"renderer missing singular dialogue/Receipt modes");
-assert(transitionSource.includes("kakashi_v2_transition_locked"),"transition lock missing");
-assert(transitionSource.includes("kv2-actor-ghost"),"one-shot actor exit animation missing");
+assert(!transitionSource.includes("kakashi_v2_transition_locked")&&transitionSource.includes("semanticAlreadyCommitted:true"),"#312 transition must not gate Story truth behind animation");
+assert(rendererSource.includes("kv2-actor-ghost")&&rendererSource.includes("playStoryChoreography33900"),"#312 actor exits must use renderer + shared choreography");
 assert(!rendererSource.split("function ensureRoot")[0].includes("root.innerHTML"),"renderer source unexpectedly rebuilds root before mount");
 assert(!rendererSource.slice(rendererSource.indexOf("function syncActors"),rendererSource.indexOf("function bind")).includes("root.innerHTML"),"cue render remounts Scene Board root");
 assert(rendererSource.includes("kv2-ghost-layer"),"persistent actor ghost layer missing");
-assert(transitionSource.includes("is-falling")&&transitionSource.includes("is-fleeing")&&transitionSource.includes("is-fading"),"distinct actor exit modes missing");
+assert(rendererSource.includes("is-falling")&&rendererSource.includes("is-fleeing")&&rendererSource.includes("is-fading"),"distinct actor exit regression markers missing");
 
 // Reward authority uses the existing Currency / Inventory / Battle claim surfaces
 // while proving exact source values and idempotence.

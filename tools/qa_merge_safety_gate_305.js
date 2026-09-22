@@ -42,6 +42,7 @@ assert(WORKFLOW.includes("tools/qa_reference_integrity_311.js"),"#311 reference 
 assert(WORKFLOW.includes("tools/qa_story_reachability_311.js"),"#311 Story reachability not wired into merge gate");
 assert(WORKFLOW.includes("tools/qa_browser_runtime_error_gate_311.js"),"#311 browser error policy not wired into merge gate");
 assert(WORKFLOW.includes("tools/qa_release_candidate_evidence_311.js"),"#311 release evidence QA not wired into merge gate");
+assert(WORKFLOW.includes("tools/qa_issue_312_story_battle_benchmark.js"),"#312 Story/Battle benchmark QA not wired into merge gate");
 
 // Existing #300 negative fixtures are part of the merge-gate proof. The gate
 // must consume the same canonical detector instead of creating a second owner.

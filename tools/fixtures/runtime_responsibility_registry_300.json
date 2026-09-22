@@ -40,7 +40,11 @@
       ],
       "extensionHooks": [
         "registerStorySceneBoardDefinition",
-        "unregisterStorySceneBoardDefinition"
+        "unregisterStorySceneBoardDefinition",
+        "applyStoryStageAnchor33900",
+        "playStoryChoreography33900",
+        "cancelStoryChoreography33900",
+        "getStoryChoreographyState33900"
       ],
       "permittedAdapters": [],
       "retiredOwners": [],
@@ -49,7 +53,9 @@
       ],
       "qaRefs": [
         "tools/qa_issue_188_story_decision_runtime.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_312_story_battle_benchmark.js",
+        "tools/qa_issue_312_browser.js"
       ]
     },
     {
@@ -469,6 +475,41 @@
       "saveSchemaRefs": [],
       "qaRefs": [
         "tools/qa_issue_303_runtime_build_fingerprint.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "battle.presentation.shared",
+      "canonicalOwner": "runtime/alpha-battle-modern-33000.js",
+      "ownerType": "shared_presentation_infrastructure",
+      "directCallers": [
+        "index.html",
+        "game.js:renderCombatOverlay"
+      ],
+      "stateReads": [
+        "currentBattle.battleId",
+        "currentBattle.runtime.evidence",
+        "currentBattle.deployment",
+        "currentBattle active participant and target refs"
+      ],
+      "stateWrites": [],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-battle-modern-33000.js"
+      ],
+      "extensionHooks": [
+        "resolveBattlePerformanceProjection33000",
+        "installBattlePerformance33000"
+      ],
+      "permittedAdapters": [
+        "academy_kakashi_v2_battle_adapter_36010"
+      ],
+      "retiredOwners": [],
+      "saveSchemaRefs": [],
+      "qaRefs": [
+        "tools/qa_alpha_battle_browser_32600.py",
+        "tools/qa_issue_312_story_battle_benchmark.js",
+        "tools/qa_issue_312_browser.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
     }

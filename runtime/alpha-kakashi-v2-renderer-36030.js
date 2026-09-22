@@ -12,7 +12,7 @@ const PATCH_ID="academy_kakashi_v2_renderer_36030_2026_09_22";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const STYLE_ID="kakashi-v2-renderer-36030-style";
 const ROOT_ID="kakashi-v2-scene-board";
-let rendering=false;
+let rendering=false,lastProjectionSnapshot=null,pendingVisualSnapshot=null;
 
 function esc(v){return String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
 function active(){try{return typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;}catch(_e){return null;}}
@@ -49,7 +49,7 @@ function installStyle(){
 #${ROOT_ID} .kv2-objective{justify-self:end;box-sizing:border-box;width:min(100%,390px);padding:8px 11px;border:1px solid rgba(75,209,220,.46);background:rgba(2,12,16,.82);box-shadow:0 10px 30px rgba(0,0,0,.32);font-size:clamp(9px,.68vw,12px);line-height:1.35;color:#e9eeeb}
 #${ROOT_ID} .kv2-objective b{display:block;margin-bottom:3px;color:#67dce5;font-size:7px;letter-spacing:.14em}
 #${ROOT_ID} .kv2-actors{position:absolute;left:3.5%;right:3.5%;top:13.2%;bottom:29%;z-index:4;pointer-events:none}
-#${ROOT_ID} .kv2-actor{position:absolute;left:var(--kv2-x,5%);bottom:var(--kv2-y,0);width:var(--kv2-w,min(20vw,220px));height:var(--kv2-h,min(52vh,380px));max-height:100%;display:flex;align-items:flex-end;justify-content:center;filter:drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0);transition:none!important}
+#${ROOT_ID} .kv2-actor{position:absolute;left:var(--sc-stage-anchor-x,var(--kv2-x,5%));bottom:var(--kv2-y,0);width:var(--kv2-w,min(20vw,220px));height:var(--kv2-h,min(52vh,380px));max-height:100%;display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.96) brightness(.96) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0);transition:filter .14s ease,opacity .14s ease!important}\n#${ROOT_ID} .kv2-actors[data-count="1"] .kv2-actor{--kv2-w:min(29vw,330px);--kv2-h:min(62vh,465px)}\n#${ROOT_ID} .kv2-actors[data-count="2"] .kv2-actor{--kv2-w:min(25vw,292px);--kv2-h:min(59vh,435px)}\n#${ROOT_ID} .kv2-actors[data-count="3"] .kv2-actor{--kv2-w:min(21vw,235px);--kv2-h:min(53vh,390px)}\n#${ROOT_ID} .kv2-actors[data-count="4"] .kv2-actor,#${ROOT_ID} .kv2-actors[data-count="5"] .kv2-actor{--kv2-w:min(18vw,195px);--kv2-h:min(48vh,350px)}\n#${ROOT_ID} .kv2-actor.is-focus{opacity:1;filter:saturate(1.05) brightness(1.08) drop-shadow(0 22px 30px rgba(0,0,0,.55));z-index:4}
 #${ROOT_ID} .kv2-actor[data-slot="kakashi"]{--kv2-x:4%;--kv2-w:min(20vw,220px)}
 #${ROOT_ID} .kv2-actor[data-slot="mi"]{--kv2-x:29%;--kv2-w:min(19vw,210px)}
 #${ROOT_ID} .kv2-actor[data-slot="ps"]{--kv2-x:52%;--kv2-w:min(19vw,210px)}
@@ -75,36 +75,60 @@ function installStyle(){
 #${ROOT_ID} .kv2-actor img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}
 #${ROOT_ID} .kv2-actor.is-entering{animation:kv2ActorEnter36030 .48s cubic-bezier(.2,.75,.24,1) both}
 #${ROOT_ID} .kv2-ghost-layer{position:absolute;inset:0;z-index:12;pointer-events:none;overflow:hidden}\n#${ROOT_ID} .kv2-actor-ghost{position:absolute!important;z-index:1!important;margin:0!important;pointer-events:none!important}
-#${ROOT_ID} .kv2-actor-ghost.is-falling{animation:kv2ActorFall36030 .54s cubic-bezier(.55,.05,.78,.25) both}
-#${ROOT_ID} .kv2-actor-ghost.is-fleeing{animation:kv2ActorFlee36030 .48s cubic-bezier(.4,.05,.8,.3) both}
-#${ROOT_ID} .kv2-actor-ghost.is-fading{animation:kv2ActorFade36030 .32s ease both}
+#${ROOT_ID} .kv2-actor-ghost.is-falling{will-change:transform,opacity}
+#${ROOT_ID} .kv2-actor-ghost.is-fleeing{will-change:transform,opacity}
+#${ROOT_ID} .kv2-actor-ghost.is-fading{will-change:transform,opacity}
 @keyframes kv2ActorEnter36030{from{opacity:0;transform:translate3d(56px,0,0) scale(.96);filter:brightness(.45) blur(1px)}to{opacity:1;transform:translate3d(0,0,0) scale(1);filter:drop-shadow(0 18px 24px rgba(0,0,0,.48))}}
 @keyframes kv2ActorFall36030{from{opacity:1;transform:translate3d(0,0,0) rotate(0)}to{opacity:0;transform:translate3d(0,118%,0) rotate(5deg)}}
 @keyframes kv2ActorFlee36030{from{opacity:1;transform:translate3d(0,0,0) scale(1)}to{opacity:0;transform:translate3d(135%,0,0) scale(.94)}}
 @keyframes kv2ActorFade36030{from{opacity:1}to{opacity:0}}
 #${ROOT_ID} .kv2-card-frame{position:absolute;inset:0;border:1px solid rgba(210,172,80,.28);background:linear-gradient(180deg,transparent 50%,rgba(1,6,9,.68));box-shadow:inset 0 0 0 1px rgba(255,255,255,.018)}
-#${ROOT_ID} .kv2-actor-label{position:absolute;left:6%;right:6%;bottom:3%;padding:6px 8px;border:1px solid rgba(208,168,75,.4);background:rgba(2,7,11,.88);text-align:center;font-size:8px;font-weight:900;letter-spacing:.11em;color:#eee2c7;text-shadow:0 1px 2px #000}
-#${ROOT_ID} .kv2-dialogue{position:absolute;left:7%;right:7%;bottom:3.7%;min-height:19%;max-height:23%;z-index:30;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto 1fr auto;column-gap:18px;padding:14px 18px 12px;border:1px solid rgba(211,171,78,.68);background:linear-gradient(180deg,rgba(3,10,15,.88),rgba(2,7,11,.96));box-shadow:0 20px 55px rgba(0,0,0,.52),inset 0 0 0 1px rgba(255,255,255,.025);backdrop-filter:blur(5px)}
-#${ROOT_ID} .kv2-speaker{grid-column:1;grid-row:1;color:#e3bd5f;font-size:9px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;min-height:13px}
-#${ROOT_ID} .kv2-text{grid-column:1/-1;grid-row:2;margin-top:6px;overflow:auto;white-space:pre-wrap;color:#e8ece8;font-size:clamp(12px,.98vw,16px);line-height:1.42;text-shadow:0 1px 2px #000}
-#${ROOT_ID} .kv2-progress{grid-column:2;grid-row:1;color:#63747a;font-size:8px;font-weight:900;letter-spacing:.08em}
-#${ROOT_ID} .kv2-actions{grid-column:1/-1;grid-row:3;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 8px;margin-top:10px;max-height:10vh;overflow:auto}
-#${ROOT_ID} .kv2-actions button{min-height:34px;border:1px solid rgba(211,171,78,.55);background:linear-gradient(180deg,rgba(13,26,32,.94),rgba(5,13,18,.97));color:#eee2c8;padding:7px 10px;text-align:left;font-size:clamp(7px,.55vw,10px);font-weight:900;letter-spacing:.075em;cursor:pointer}
-#${ROOT_ID} .kv2-actions button:hover,#${ROOT_ID} .kv2-actions button:focus-visible{border-color:#68dce6;color:#8ce5ec;outline:none;background:rgba(10,42,49,.96)}
-#${ROOT_ID} .kv2-next{grid-column:2;grid-row:3;justify-self:end;align-self:end;width:36px;height:30px;border:1px solid rgba(92,215,225,.42);background:rgba(6,30,36,.8);color:#71dee7;font-size:19px;font-weight:900;cursor:pointer}
-#${ROOT_ID} .kv2-battle{grid-column:1/-1!important;text-align:center!important;border-color:rgba(206,91,72,.66)!important;color:#f2c0ae!important;background:linear-gradient(180deg,rgba(67,20,15,.82),rgba(27,9,8,.95))!important}
-#${ROOT_ID}[data-preset="chronicle_receipt"] .kv2-top,#${ROOT_ID}[data-preset="chronicle_receipt"] .kv2-actors,#${ROOT_ID}[data-preset="chronicle_receipt"] .kv2-dialogue{display:none!important}
-#${ROOT_ID} .kv2-receipt{display:none;position:absolute;left:50%;top:50%;width:min(780px,78vw);max-height:76vh;transform:translate(-50%,-50%);z-index:40;box-sizing:border-box;padding:34px 38px;border:1px solid rgba(214,173,74,.72);background:linear-gradient(165deg,rgba(6,13,17,.98),rgba(2,7,10,.99));box-shadow:0 36px 90px rgba(0,0,0,.72),inset 0 0 50px rgba(201,162,73,.03);overflow:auto}
+#${ROOT_ID} .kv2-actor-label{position:absolute;left:6%;right:6%;bottom:3%;padding:6px 8px;border:1px solid rgba(208,168,75,.4);background:rgba(2,7,11,.88);text-align:center;font-size:8px;font-weight:900;letter-spacing:.11em;color:#eee2c7;text-shadow:0 1px 2px #000}\n#${ROOT_ID} .kv2-actor-state{display:table;margin:4px auto 0;padding:2px 6px;border:1px solid rgba(92,215,225,.35);background:rgba(4,23,28,.82);color:#7fe1e8;font-size:7px;font-weight:900;letter-spacing:.08em}\n#${ROOT_ID} .kv2-object-layer{position:absolute;inset:0;z-index:16;pointer-events:none}\n#${ROOT_ID} .kv2-package-token{position:absolute;top:42%;left:var(--sc-stage-anchor-x,50%);width:64px;height:45px;transform:translate(-8%,-50%);display:grid;place-items:center;border:1px solid rgba(221,178,73,.75);background:linear-gradient(145deg,rgba(42,30,12,.95),rgba(12,14,13,.96));box-shadow:0 12px 28px rgba(0,0,0,.48),0 0 18px rgba(221,178,73,.12);color:#e4c66e;font-size:7px;font-weight:900;letter-spacing:.12em}\n#${ROOT_ID} .kv2-package-token::before{content:"";position:absolute;width:32px;height:21px;border:1px solid rgba(226,190,100,.64);background:linear-gradient(135deg,#4a3a21,#21190f);transform:rotate(-4deg)}\n#${ROOT_ID} .kv2-package-token span{position:absolute;top:calc(100% + 5px);white-space:nowrap;padding:3px 5px;background:rgba(2,8,11,.82);border:1px solid rgba(215,174,76,.32)}\n#${ROOT_ID} .kv2-package-token[hidden]{display:none!important}\n#${ROOT_ID} .kv2-departure-ghost{position:absolute!important;z-index:13!important;pointer-events:none!important}\n#${ROOT_ID} .kv2-departure-ghost{display:flex;align-items:flex-end;justify-content:center;opacity:.78;filter:saturate(.82) brightness(.88) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0)}\n#${ROOT_ID} .kv2-departure-ghost img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}
+#${ROOT_ID} .kv2-dialogue{position:absolute;left:50%;bottom:3%;width:min(72%,980px);min-height:0;max-height:none;z-index:30;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto;column-gap:14px;padding:11px 15px 12px;transform:translateX(-50%);border:1px solid rgba(93,215,225,.32);border-radius:16px;background:linear-gradient(180deg,rgba(5,16,22,.88),rgba(2,9,14,.95));box-shadow:0 18px 48px rgba(0,0,0,.46),inset 0 0 0 1px rgba(255,255,255,.025);backdrop-filter:blur(8px)}
+#${ROOT_ID} .kv2-speaker{grid-column:1;grid-row:1;color:#e3bd5f;font-size:8px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;min-height:11px}
+#${ROOT_ID} .kv2-text{grid-column:1/-1;grid-row:2;margin-top:4px;max-height:8.5vh;overflow:auto;white-space:pre-wrap;color:#eef3f1;font-size:clamp(12px,.94vw,15px);line-height:1.42;text-shadow:0 1px 2px #000}
+#${ROOT_ID} .kv2-progress{grid-column:2;grid-row:1;color:#71858c;font-size:8px;font-weight:900;letter-spacing:.08em}
+#${ROOT_ID} .kv2-continue-hint{grid-column:1/-1;grid-row:3;justify-self:end;margin-top:5px;color:#6fcfd8;font-size:7px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;opacity:.72}
+#${ROOT_ID}[data-cue-kind="dialogue"] .kv2-dialogue{display:none}
+#${ROOT_ID}[data-has-choices="true"] .kv2-dialogue{display:grid;width:min(88%,1280px);padding:11px 13px 13px;border-color:rgba(211,171,78,.55);border-radius:18px;background:linear-gradient(180deg,rgba(4,13,18,.94),rgba(2,8,12,.98))}
+#${ROOT_ID}[data-has-choices="true"] .kv2-text{max-height:none}
+#${ROOT_ID}[data-has-choices="true"] .kv2-continue-hint{display:none}
+#${ROOT_ID} .kv2-speech{position:absolute;left:var(--kv2-speech-x,50%);bottom:23.5%;z-index:31;width:min(36vw,500px);box-sizing:border-box;transform:translateX(-50%);padding:12px 15px 13px;border:1px solid rgba(103,221,230,.55);border-radius:16px;background:linear-gradient(145deg,rgba(4,18,24,.94),rgba(2,9,14,.97));box-shadow:0 18px 48px rgba(0,0,0,.48),0 0 22px rgba(78,210,220,.08);backdrop-filter:blur(8px);pointer-events:none}
+#${ROOT_ID} .kv2-speech[hidden]{display:none!important}
+#${ROOT_ID} .kv2-speech::after{content:"";position:absolute;left:var(--kv2-speech-tail,50%);top:-8px;width:14px;height:14px;transform:translateX(-50%) rotate(45deg);border-left:1px solid rgba(103,221,230,.5);border-top:1px solid rgba(103,221,230,.5);background:rgba(2,9,14,.97)}
+#${ROOT_ID} .kv2-speech[data-speaker-side="opposition"]{border-color:rgba(218,176,77,.58);background:linear-gradient(145deg,rgba(25,18,6,.93),rgba(8,10,12,.97));box-shadow:0 18px 48px rgba(0,0,0,.48),0 0 22px rgba(218,176,77,.08)}
+#${ROOT_ID} .kv2-speech[data-speaker-side="opposition"]::after{border-color:rgba(218,176,77,.52);background:rgba(8,10,12,.97)}
+#${ROOT_ID} .kv2-speech-name{color:#78dfe7;font-size:8px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}
+#${ROOT_ID} .kv2-speech[data-speaker-side="opposition"] .kv2-speech-name{color:#e5c66f}
+#${ROOT_ID} .kv2-speech-text{margin-top:5px;color:#f0f4f1;font-size:clamp(12px,.96vw,16px);line-height:1.42;text-shadow:0 1px 2px #000}
+#${ROOT_ID} .kv2-actions{grid-column:1/-1;grid-row:3;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px;max-height:none;overflow:visible}
+#${ROOT_ID} .kv2-actions button{position:relative;min-height:40px;border:1px solid rgba(211,171,78,.48);border-radius:10px;background:linear-gradient(180deg,rgba(13,27,33,.96),rgba(5,13,18,.98));color:#eee2c8;padding:8px 10px 8px 36px;text-align:left;font-size:clamp(7px,.56vw,10px);font-weight:900;letter-spacing:.07em;cursor:pointer;transition:border-color .14s ease,color .14s ease,transform .14s ease,background .14s ease}
+#${ROOT_ID} .kv2-actions button::before{content:attr(data-intent-icon);position:absolute;left:11px;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:16px;height:16px;border:1px solid rgba(112,215,224,.3);border-radius:50%;color:#74dce4;font-size:10px}
+#${ROOT_ID} .kv2-actions button:hover,#${ROOT_ID} .kv2-actions button:focus-visible{border-color:#68dce6;color:#8ce5ec;outline:none;background:rgba(10,42,49,.96);transform:translateY(-1px)}
+#${ROOT_ID} .kv2-battle{grid-column:1/-1!important;text-align:center!important;padding-left:10px!important;border-color:rgba(206,91,72,.66)!important;color:#f2c0ae!important;background:linear-gradient(180deg,rgba(67,20,15,.82),rgba(27,9,8,.95))!important}
+#${ROOT_ID} .kv2-battle::before{display:none!important}
+#${ROOT_ID}[data-preset="chronicle_receipt"] .kv2-top,#${ROOT_ID}[data-preset="chronicle_receipt"] .kv2-actors,#${ROOT_ID}[data-preset="chronicle_receipt"] .kv2-dialogue,#${ROOT_ID}[data-preset="chronicle_receipt"] .kv2-speech{display:none!important}
+#${ROOT_ID} .kv2-receipt{display:none;position:absolute;left:50%;top:50%;width:min(780px,78vw);max-height:76vh;transform:translate(-50%,-50%);z-index:40;box-sizing:border-box;padding:34px 38px;border:1px solid rgba(214,173,74,.72);border-radius:18px;background:linear-gradient(165deg,rgba(6,13,17,.98),rgba(2,7,10,.99));box-shadow:0 36px 90px rgba(0,0,0,.72),inset 0 0 50px rgba(201,162,73,.03);overflow:auto}
 #${ROOT_ID} .kv2-receipt span{display:block;color:#64dae3;font-size:9px;font-weight:900;letter-spacing:.16em}
 #${ROOT_ID} .kv2-receipt h1{margin:9px 0 18px;color:#e5c66f;font:900 clamp(21px,2.1vw,34px)/1 Georgia,serif;letter-spacing:.05em}
 #${ROOT_ID} .kv2-receipt pre{margin:0;white-space:pre-wrap;color:#e1e6e1;font:600 clamp(11px,.83vw,14px)/1.65 inherit}
 #${ROOT_ID}[data-preset="chronicle_receipt"] .kv2-receipt{display:block}
-#${ROOT_ID}[data-battle-action-only="true"] .kv2-speaker,#${ROOT_ID}[data-battle-action-only="true"] .kv2-progress,#${ROOT_ID}[data-battle-action-only="true"] .kv2-text{display:none!important}
-#${ROOT_ID}[data-battle-action-only="true"] .kv2-dialogue{min-height:8%;max-height:10%;grid-template-rows:1fr;padding:10px 14px}
-#${ROOT_ID}[data-battle-action-only="true"] .kv2-actions{grid-row:1;margin-top:0;max-height:none}\n#${ROOT_ID} .kv2-receipt button{margin-top:24px;width:100%;min-height:40px;border:1px solid rgba(95,215,225,.42);background:rgba(7,33,39,.72);color:#78dfe7;font-weight:900;letter-spacing:.1em;cursor:pointer}
-#${ROOT_ID} .kv2-wipe{position:absolute;inset:0;z-index:999;background:#000;opacity:0;pointer-events:none;transition:opacity .22s ease}
-#${ROOT_ID} .kv2-wipe.is-covering{opacity:1;pointer-events:auto}
-@media(max-width:900px){#${ROOT_ID} .kv2-actors{left:1.5%;right:1.5%;bottom:31%}#${ROOT_ID} .kv2-actor{--kv2-w:min(19vw,170px);--kv2-h:min(44vh,290px)}#${ROOT_ID} .kv2-actor[data-slot="pakkun"]{--kv2-w:min(13vw,120px);--kv2-h:min(30vh,210px)}#${ROOT_ID} .kv2-dialogue{left:3%;right:3%;bottom:2.5%;max-height:26%;min-height:22%}#${ROOT_ID} .kv2-top{left:2.5%;right:2.5%;grid-template-columns:1fr minmax(190px,42%)}}
+#${ROOT_ID}[data-battle-action-only="true"] .kv2-speaker,#${ROOT_ID}[data-battle-action-only="true"] .kv2-progress,#${ROOT_ID}[data-battle-action-only="true"] .kv2-text,#${ROOT_ID}[data-battle-action-only="true"] .kv2-continue-hint{display:none!important}
+#${ROOT_ID}[data-battle-action-only="true"] .kv2-dialogue{display:grid!important;width:min(56%,720px);padding:10px 14px;grid-template-rows:1fr}
+#${ROOT_ID}[data-battle-action-only="true"] .kv2-actions{grid-row:1;margin-top:0;grid-template-columns:1fr}
+#${ROOT_ID} .kv2-receipt button{margin-top:24px;width:100%;min-height:40px;border:1px solid rgba(95,215,225,.42);border-radius:10px;background:rgba(7,33,39,.72);color:#78dfe7;font-weight:900;letter-spacing:.1em;cursor:pointer}
+#${ROOT_ID} .kv2-transition-memory{position:absolute;inset:0;z-index:11;background-position:center;background-size:cover;background-repeat:no-repeat;opacity:1;pointer-events:none}
+#${ROOT_ID} .kv2-transition-memory[hidden]{display:none!important}
+#${ROOT_ID}[data-transition-active="true"] .kv2-actions,#${ROOT_ID}[data-transition-active="true"] .kv2-receipt button{pointer-events:none!important}
+#${ROOT_ID} .kv2-wipe{position:absolute;inset:-3%;z-index:999;opacity:0;pointer-events:none;transition:opacity .32s cubic-bezier(.2,.65,.2,1),transform .46s cubic-bezier(.2,.65,.2,1),filter .32s ease;transform:scale(1.02);filter:blur(0)}
+#${ROOT_ID} .kv2-wipe.is-hard{background:radial-gradient(circle at 50% 45%,rgba(4,9,13,.72),#000 68%);backdrop-filter:blur(5px)}
+#${ROOT_ID} .kv2-wipe.is-soft{background:linear-gradient(90deg,rgba(4,15,20,.05),rgba(4,15,20,.76) 45%,rgba(4,15,20,.76) 55%,rgba(4,15,20,.05));backdrop-filter:blur(2px)}
+#${ROOT_ID} .kv2-wipe.is-covering{opacity:1;pointer-events:auto;transform:scale(1);filter:blur(.2px)}
+#${ROOT_ID}[data-can-advance="true"]{cursor:pointer}
+#${ROOT_ID}[data-has-choices="true"]{cursor:default}
+#${ROOT_ID} .kv2-actor.kv2-cue-departed{opacity:0!important;pointer-events:none!important}
+#${ROOT_ID} [data-sc-choreography-pending-entry="true"],#${ROOT_ID} [data-kv2-cue-withheld="true"]{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+@media(max-width:900px){#${ROOT_ID} .kv2-actors{left:1.5%;right:1.5%;bottom:31%}#${ROOT_ID} .kv2-actor{--kv2-w:min(19vw,170px);--kv2-h:min(44vh,290px)}#${ROOT_ID} .kv2-actor[data-slot="pakkun"]{--kv2-w:min(13vw,120px);--kv2-h:min(30vh,210px)}#${ROOT_ID} .kv2-dialogue{width:94%;bottom:2.5%}#${ROOT_ID} .kv2-speech{width:min(70vw,480px);bottom:26%}#${ROOT_ID} .kv2-actions{grid-template-columns:repeat(2,minmax(0,1fr))}#${ROOT_ID} .kv2-top{left:2.5%;right:2.5%;grid-template-columns:1fr minmax(190px,42%)}}
 @media(prefers-reduced-motion:reduce){#${ROOT_ID} .kv2-wipe{transition:none!important}#${ROOT_ID} .kv2-actor.is-entering,#${ROOT_ID} .kv2-actor-ghost{animation:none!important}}
 `;
   document.head.appendChild(s);
@@ -137,7 +161,10 @@ function actorMarkup(actor){
   figure.dataset.slot=actorSlot(actor);
   const frame=document.createElement("div");frame.className="kv2-card-frame";
   const img=document.createElement("img");img.alt="";img.src=String(actor.image||"");
-  const label=document.createElement("figcaption");label.className="kv2-actor-label";label.textContent=String(actor.label||"");
+  const label=document.createElement("figcaption");label.className="kv2-actor-label";
+  const name=document.createElement("strong");name.textContent=String(actor.label||"");
+  const state=document.createElement("small");state.className="kv2-actor-state";state.hidden=true;
+  label.append(name,state);
   figure.append(frame,img,label);
   return figure;
 }
@@ -153,9 +180,12 @@ function ensureRoot(layer){
     <div class="kv2-actors"></div>
     <section class="kv2-dialogue" aria-live="polite">
       <div class="kv2-speaker"></div><div class="kv2-progress"></div><div class="kv2-text"></div>
-      <div class="kv2-actions"></div><button class="kv2-next" type="button" data-kv2-advance="true" aria-label="Continue">›</button>
+      <div class="kv2-actions"></div><div class="kv2-continue-hint" aria-hidden="true">CLICK ANYWHERE TO CONTINUE</div>
     </section>
+    <aside class="kv2-speech" aria-live="polite" hidden><div class="kv2-speech-name"></div><div class="kv2-speech-text"></div></aside>
     <article class="kv2-receipt"><span>SHINOBI CHRONICLES · RECORD</span><h1>CHRONICLE RECEIPT</h1><pre></pre><button type="button" data-kv2-advance="true">CONTINUE</button></article>
+    <div class="kv2-object-layer" aria-hidden="true"><div class="kv2-package-token" data-story-object-id="PACKAGE" hidden><span>PACKAGE</span></div></div>
+    <div class="kv2-transition-memory" aria-hidden="true" hidden></div>
     <div class="kv2-ghost-layer" aria-hidden="true"></div>
     <div class="kv2-wipe"></div>`;
   layer.appendChild(root);
@@ -171,7 +201,193 @@ function setBackdrop(root,path){
   const value=`linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.42)),url("${safe}")`;
   if(node.style.backgroundImage!==value)node.style.backgroundImage=value;
 }
-function syncActors(root,actors){
+function actorAnchor(actor,p=null){
+  const slot=actorSlot(actor),preset=String(p&&p.preset||"standard"),slots=(p&&p.actors||[]).map(actorSlot);
+  if(["rooftop_2_person","tail","battle_pair"].includes(preset))return slot==="kakashi"?"PLAYER_LEFT":"OPPONENT_RIGHT";
+  if(preset==="sakura_3_person")return slot==="amt"?"INNER_LEFT":slot==="ps"?"CENTER":"OPPONENT_RIGHT";
+  if(preset==="sakura_group"){
+    if(slot==="kakashi")return"PLAYER_LEFT";
+    if(slot==="pakkun")return"INNER_LEFT";
+    if(slot==="mi")return"OPPONENT_RIGHT";
+    if(slot==="amt")return slots.includes("pakkun")?"INNER_RIGHT":"INNER_LEFT";
+    if(slot==="ps")return slots.includes("pakkun")?"CENTER":"INNER_RIGHT";
+  }
+  if(preset==="escort")return slot==="kakashi"?"PLAYER_LEFT":slot==="mi"?"INNER_LEFT":slot==="ps"?"CENTER":slot==="amt"?"INNER_RIGHT":"OPPONENT_RIGHT";
+  if(preset==="anbu_report")return slot==="anbu"?"PLAYER_LEFT":slot==="pakkun"?"CENTER":"OPPONENT_RIGHT";
+  if(preset==="hokage_report")return slot==="anbu"?"PLAYER_LEFT":"OPPONENT_RIGHT";
+  if(slot==="kakashi")return"PLAYER_LEFT";
+  if(slot==="minato"||slot==="anbu"||slot==="mi")return"OPPONENT_RIGHT";
+  if(slot==="amt")return"INNER_LEFT";
+  if(slot==="ps")return"INNER_RIGHT";
+  if(slot==="pakkun")return"CENTER";
+  return"CENTER";
+}
+function participantStateForActor(p,actor){
+  const s=p&&p.state||{},slot=actorSlot(actor);
+  if(slot==="mi")return s.participants&&s.participants.MI&&s.participants.MI.state||null;
+  if(slot==="ps")return s.participants&&s.participants.PS&&s.participants.PS.state||null;
+  if(slot==="amt")return s.participants&&s.participants.AMT&&s.participants.AMT.state||null;
+  if(slot==="pakkun")return s.pakkun&&s.pakkun.present===true?"PRESENT":null;
+  return null;
+}
+function readableActorState(p,actor){
+  const raw=participantStateForActor(p,actor);
+  const slot=actorSlot(actor),holder=p&&p.state&&p.state.package&&p.state.package.holder||null;
+  const key=slot==="mi"?"MI":slot==="ps"?"PS":slot==="amt"?"AMT":slot==="kakashi"?"KAKASHI":slot==="anbu"?"ANBU":null;
+  if(key&&holder===key)return"HAS PACKAGE";
+  const map={BATTLE_DEFEATED:"DEFEATED",FIELD_SECURED_PENDING_COLLECTION:"RESTRAINED",ANBU_CUSTODY:"ANBU CUSTODY",POLICE_CUSTODY:"POLICE CUSTODY",ESCAPED:"ESCAPED",RELEASED:"RELEASED",DEAD:"DEAD"};
+  return raw&&map[raw]||null;
+}
+function speakerActorId(p,cue){
+  const name=String(cue&&cue.speakerName||"").toUpperCase();
+  if(!name)return null;
+  const aliases=[
+    [/KAKASHI/,"kakashi"],[/MASKED INTERCEPTOR|INTERCEPTOR/,"mi"],[/PACKAGE SMUGGLER|SMUGGLER/,"ps"],
+    [/ANBU MARKED TARGET|MARKED TARGET/,"amt"],[/PAKKUN/,"pakkun"],[/MINATO|HOKAGE/,"minato"],[/ANBU/,"anbu"]
+  ];
+  const slot=(aliases.find(([re])=>re.test(name))||[])[1]||null;
+  const actor=(p&&p.actors||[]).find(a=>actorSlot(a)===slot);
+  return actor&&actor.id||null;
+}
+function holderSlot(holder){
+  return holder==="AMT"?"amt":holder==="PS"?"ps":holder==="MI"?"mi":holder==="KAKASHI"?"kakashi":holder==="ANBU"?"anbu":null;
+}
+function holderActor(p,holder){
+  const slot=holderSlot(holder);
+  return (p&&p.actors||[]).find(a=>actorSlot(a)===slot)||null;
+}
+function snapshotProjection(p){
+  if(!p)return null;
+  const participants=p.state&&p.state.participants||{};
+  return{
+    id:String(p.id||""),
+    preset:String(p.preset||"standard"),
+    actors:(p.actors||[]).map(a=>({id:String(a.id||""),slot:actorSlot(a),anchor:actorAnchor(a,p)})),
+    packageHolder:p.state&&p.state.package&&p.state.package.holder||null,
+    participantStates:{MI:participants.MI&&participants.MI.state||null,PS:participants.PS&&participants.PS.state||null,AMT:participants.AMT&&participants.AMT.state||null}
+  };
+}
+function departureMode(previous,next,id){
+  const prev=(previous&&previous.actors||[]).find(a=>a.id===id);
+  const key=prev&&prev.slot==="mi"?"MI":prev&&prev.slot==="ps"?"PS":prev&&prev.slot==="amt"?"AMT":null;
+  const state=key&&next&&next.participantStates&&next.participantStates[key]||null;
+  if(state==="ESCAPED"||state==="RELEASED")return"FLEE";
+  if(state==="DEAD"||state==="BATTLE_DEFEATED")return"COLLAPSE";
+  return"EXIT";
+}
+function departureGhostClass(kind){return kind==="COLLAPSE"?"is-falling":kind==="FLEE"?"is-fleeing":"is-fading";}
+function captureDepartureVisuals(root,previous){
+  if(!root||!previous)return[];
+  const rr=root.getBoundingClientRect(),out=[];
+  for(const row of previous.actors||[]){
+    const live=[...root.querySelectorAll(".kv2-actors > .kv2-actor")].find(n=>n.dataset.actorId===row.id);
+    if(!live)continue;
+    const rect=live.getBoundingClientRect();
+    out.push({
+      originalId:row.id,
+      clone:live.cloneNode(true),
+      left:Math.max(0,rect.left-rr.left),
+      top:Math.max(0,rect.top-rr.top),
+      width:rect.width,
+      height:rect.height
+    });
+  }
+  return out;
+}
+function appendDepartureGhost(root,visual,kind){
+  const ghostLayer=root&&root.querySelector(".kv2-ghost-layer");
+  if(!ghostLayer||!visual||!visual.clone)return null;
+  const ghost=visual.clone,ghostId="departure:"+visual.originalId;
+  ghost.dataset.actorId=ghostId;
+  ghost.classList.remove("kv2-actor","is-entering","is-focus");
+  ghost.classList.add("kv2-departure-ghost","kv2-actor-ghost",departureGhostClass(kind));
+  ghost.style.left=visual.left+"px";ghost.style.top=visual.top+"px";ghost.style.bottom="auto";
+  ghost.style.width=visual.width+"px";ghost.style.height=visual.height+"px";
+  ghostLayer.appendChild(ghost);
+  const cleanup=()=>{try{ghost.remove();}catch(_e){}};
+  ghost.addEventListener("animationend",cleanup,{once:true});setTimeout(cleanup,1800);
+  return{originalId:visual.originalId,ghostId,kind};
+}
+function materializeDepartureGhosts(root,capture,next){
+  if(!root||!capture||!capture.previous||!next)return[];
+  for(const stale of [...root.querySelectorAll(".kv2-departure-ghost")])stale.remove();
+  const nextIds=new Set((next.actors||[]).map(a=>a.id)),out=[];
+  for(const visual of capture.actorVisuals||[]){
+    if(nextIds.has(visual.originalId))continue;
+    const ghost=appendDepartureGhost(root,visual,departureMode(capture.previous,next,visual.originalId));
+    if(ghost)out.push(ghost);
+  }
+  return out;
+}
+function prepareDepartureGhosts(root,previous,next){
+  const capture={previous,actorVisuals:captureDepartureVisuals(root,previous)};
+  return materializeDepartureGhosts(root,capture,next);
+}
+function preparePreCommitVisualSnapshot(){
+  if(typeof document==="undefined")return{success:true,headless:true};
+  const root=document.getElementById(ROOT_ID),p=projection();
+  const previous=lastProjectionSnapshot||snapshotProjection(p);
+  if(!root||!previous)return{success:false,reason:"kakashi_v2_visual_snapshot_unavailable"};
+  pendingVisualSnapshot={previous,actorVisuals:captureDepartureVisuals(root,previous)};
+  return{success:true,actorCount:pendingVisualSnapshot.actorVisuals.length,beatId:previous.id,presentationOnly:true};
+}
+function cancelPreparedVisualSnapshot(reason="cancelled"){
+  const existed=!!pendingVisualSnapshot;pendingVisualSnapshot=null;
+  return{success:true,cancelled:existed,reason,presentationOnly:true};
+}
+function syncPackageToken(root,p){
+  const token=root.querySelector('[data-story-object-id="PACKAGE"]');if(!token)return;
+  const holder=p&&p.state&&p.state.package&&p.state.package.holder||null;
+  const actor=holderActor(p,holder);
+  if(!holder||!actor){token.hidden=true;return;}
+  token.hidden=false;token.dataset.packageHolder=String(holder);
+  const finalAnchor=actorAnchor(actor,p);
+  if(typeof applyStoryStageAnchor33900==="function")applyStoryStageAnchor33900(token,finalAnchor);
+  else token.style.setProperty("--sc-stage-anchor-x","50%");
+  token.dataset.packageAnchor=finalAnchor;
+}
+function deriveProjectionChoreography(root,previous,next,p,departures=[]){
+  if(!previous||!next)return[];
+  const cues=[];
+  // Depart committed outgoing actors before revealing newly mounted actors.
+  // The shared owner pre-stages ENTER subjects as invisible until their cue starts,
+  // preventing a semantic commit from painting an accidental four-card tableau.
+  for(const row of departures)cues.push({kind:row.kind,actorId:row.ghostId,removeOnComplete:true});
+  const prevIds=new Set((previous.actors||[]).map(a=>a.id));
+  for(const actor of next.actors||[]){
+    if(!prevIds.has(actor.id)){
+      if(next.id==="v2_watch_exchange"&&actor.slot==="mi")continue;
+      cues.push({kind:actor.slot==="mi"?"SURPRISE_ENTRY":"ENTER",actorId:actor.id,fromAnchor:actor.slot==="mi"?"FAR_ENTRY_RIGHT":null});
+    }
+  }
+  if(previous.packageHolder&&next.packageHolder&&previous.packageHolder!==next.packageHolder){
+    const from=(previous.actors||[]).find(a=>a.slot===holderSlot(previous.packageHolder));
+    const to=(next.actors||[]).find(a=>a.slot===holderSlot(next.packageHolder));
+    if(from&&to)cues.push({kind:"OBJECT_TRANSFER",objectId:"PACKAGE",fromAnchor:from.anchor,toAnchor:to.anchor});
+  }
+  if(previous.id==="v2_watch_exchange"&&next.id==="v2_stop_assassin_setup"){
+    const kakashi=(p.actors||[]).find(a=>actorSlot(a)==="kakashi"),mi=(p.actors||[]).find(a=>actorSlot(a)==="mi");
+    if(kakashi&&mi)cues.push({kind:"FOCUS",actorId:kakashi.id},{kind:"LUNGE",actorId:kakashi.id,targetId:mi.id});
+  }
+  if(next.id==="v2_mi_stop_win"&&next.participantStates.MI==="BATTLE_DEFEATED"){
+    const mi=(p.actors||[]).find(a=>actorSlot(a)==="mi");
+    if(mi)cues.push({kind:"RECOIL",actorId:mi.id},{kind:"COLLAPSE",actorId:mi.id});
+  }
+  return cues;
+}
+function playProjectionTransition(root,previous,next,p,departures=[]){
+  if(typeof playStoryChoreography33900!=="function"||!previous||!next)return{success:true,skipped:true};
+  const cues=deriveProjectionChoreography(root,previous,next,p,departures);
+  const rt=active();
+  const actorSignature=(next.actors||[]).map(a=>a.id+"@"+a.anchor).join("|");
+  // Actor choreography belongs to the Story occurrence/participant layout.
+  // Same-beat factual object updates (for example AMT -> PS package handoff)
+  // must not cancel or replay actor entry/exit choreography already in flight.
+  const scopeKey=(rt&&rt.instanceId||"kakashi")+":"+previous.id+"->"+next.id+":"+actorSignature;
+  return playStoryChoreography33900({root,scopeKey,cues});
+}
+
+function syncActors(root,actors,p){
   const box=root.querySelector(".kv2-actors");if(!box)return;
   const desired=Array.isArray(actors)?actors:[];
   box.dataset.count=String(desired.length);
@@ -184,17 +400,30 @@ function syncActors(root,actors){
     const id=String(actor.id||"");
     let node=existing.get(id);
     if(!node){node=actorMarkup(actor);existing.set(id,node);}
-    const img=node.querySelector("img"),label=node.querySelector(".kv2-actor-label");
+    const img=node.querySelector("img"),label=node.querySelector(".kv2-actor-label"),name=label&&label.querySelector("strong"),stateNode=label&&label.querySelector(".kv2-actor-state");
     if(img&&img.getAttribute("src")!==String(actor.image||""))img.setAttribute("src",String(actor.image||""));
-    if(label&&label.textContent!==String(actor.label||""))label.textContent=String(actor.label||"");
+    if(name&&name.textContent!==String(actor.label||""))name.textContent=String(actor.label||"");
+    const stateText=readableActorState(p,actor);
+    if(stateNode){stateNode.hidden=!stateText;if(stateNode.textContent!==String(stateText||""))stateNode.textContent=String(stateText||"");}
     const slot=actorSlot(actor);if(node.dataset.slot!==slot)node.dataset.slot=slot;
+    if(typeof applyStoryStageAnchor33900==="function")applyStoryStageAnchor33900(node,actorAnchor(actor,p));
     box.appendChild(node);
   }
+}
+function choiceIntentIcon(label){
+  const s=String(label||"").toUpperCase();
+  if(/WATCH|OBSERVE|WAIT/.test(s))return"◉";
+  if(/PACKAGE|SECURE|PICK|SLIP/.test(s))return"◆";
+  if(/STOP|DEFEAT|STRIKE|KILL|ATTACK/.test(s))return"↯";
+  if(/FOLLOW|GO AFTER|PURSUE|MOVE/.test(s))return"➜";
+  if(/RESTRAIN|ANBU|POLICE/.test(s))return"⊙";
+  return"◇";
 }
 function syncActions(root,actions){
   const box=root.querySelector(".kv2-actions");if(!box)return;
   const signature=JSON.stringify(actions||[]);
   if(box.dataset.signature===signature)return;
+  const hadActions=box.children.length>0;
   box.dataset.signature=signature;
   box.replaceChildren();
   for(const action of actions||[]){
@@ -202,9 +431,82 @@ function syncActions(root,actions){
     if(action.choiceId)button.dataset.kv2Choice=String(action.choiceId);
     else button.dataset.kv2Advance="true";
     if(action.battle===true)button.className="kv2-battle";
+    button.dataset.intentIcon=choiceIntentIcon(action.label);
     button.textContent=String(action.label||"");
     box.appendChild(button);
   }
+  if((actions||[]).length&&!hadActions)box.dataset.revealedAt=String(Date.now());
+}
+function actorNodeBySlot(root,slot){
+  return [...root.querySelectorAll(".kv2-actor")].find(node=>node.dataset.slot===slot)||null;
+}
+function applyWatchExchangeStaticState(root,p,t){
+  if(!p||p.id!=="v2_watch_exchange")return;
+  const idx=Number(t&&t.cueIndex)||0,amt=actorNodeBySlot(root,"amt"),ps=actorNodeBySlot(root,"ps"),mi=actorNodeBySlot(root,"mi");
+  if(amt&&typeof applyStoryStageAnchor33900==="function")applyStoryStageAnchor33900(amt,idx>=5?"PLAYER_LEFT":"INNER_LEFT");
+  if(ps&&typeof applyStoryStageAnchor33900==="function")applyStoryStageAnchor33900(ps,idx>=6?"OPPONENT_RIGHT":"INNER_RIGHT");
+  if(mi&&typeof applyStoryStageAnchor33900==="function")applyStoryStageAnchor33900(mi,"CENTER");
+  if(mi){
+    if(idx<10)mi.dataset.kv2CueWithheld="true";
+    else delete mi.dataset.kv2CueWithheld;
+  }
+  if(amt){
+    const moving=String(root.dataset.kv2CueMotion||"")==="v2_watch_exchange:11";
+    amt.classList.toggle("kv2-cue-departed",idx>=11&&!moving);
+  }
+  const token=root.querySelector('[data-story-object-id="PACKAGE"]');
+  if(token&&!token.hidden&&token.dataset.packageHolder==="PS"&&idx>=6&&typeof applyStoryStageAnchor33900==="function"){
+    applyStoryStageAnchor33900(token,"OPPONENT_RIGHT");
+    token.dataset.packageAnchor="OPPONENT_RIGHT";
+  }
+}
+function syncSpeech(root,p,cue,focused){
+  const speech=root.querySelector(".kv2-speech");if(!speech)return;
+  const isDialogue=cue&&cue.kind==="dialogue"&&focused;
+  speech.hidden=!isDialogue;
+  if(!isDialogue)return;
+  const actor=[...root.querySelectorAll(".kv2-actor")].find(node=>node.dataset.actorId===focused)||null;
+  const name=speech.querySelector(".kv2-speech-name"),text=speech.querySelector(".kv2-speech-text");
+  if(name&&name.textContent!==String(cue.speakerName||""))name.textContent=String(cue.speakerName||"");
+  if(text&&text.textContent!==String(cue.text||""))text.textContent=String(cue.text||"");
+  const slot=actor&&actor.dataset.slot||"unknown";
+  speech.dataset.speakerSlot=slot;
+  speech.dataset.speakerSide=slot==="kakashi"||slot==="pakkun"?"player":"opposition";
+  if(actor&&typeof actor.getBoundingClientRect==="function"){
+    const rr=root.getBoundingClientRect(),ar=actor.getBoundingClientRect();
+    if(rr.width>0){
+      const actorCenter=ar.left+ar.width/2;
+      const pct=Math.max(20,Math.min(80,((actorCenter-rr.left)/rr.width)*100));
+      speech.style.setProperty("--kv2-speech-x",pct+"%");
+      const sr=speech.getBoundingClientRect();
+      const tailPct=sr.width>0?Math.max(14,Math.min(86,((actorCenter-sr.left)/sr.width)*100)):50;
+      speech.style.setProperty("--kv2-speech-tail",tailPct+"%");
+    }
+  }
+}
+function playCuePresentation(cueIndex){
+  const root=typeof document!=="undefined"?document.getElementById(ROOT_ID):null,p=projection();
+  if(!root||!p||p.id!=="v2_watch_exchange"||typeof playStoryChoreography33900!=="function")return{success:true,skipped:true};
+  const idx=Number(cueIndex)||0,amt=(p.actors||[]).find(a=>actorSlot(a)==="amt"),ps=(p.actors||[]).find(a=>actorSlot(a)==="ps"),mi=(p.actors||[]).find(a=>actorSlot(a)==="mi");
+  let cues=[];
+  if(idx===5&&amt)cues=[{kind:"REPOSITION",actorId:amt.id,fromAnchor:"INNER_LEFT",toAnchor:"PLAYER_LEFT",durationMs:360}];
+  else if(idx===6&&ps)cues=[{kind:"REPOSITION",actorId:ps.id,fromAnchor:"INNER_RIGHT",toAnchor:"OPPONENT_RIGHT",durationMs:360}];
+  else if(idx===9&&ps)cues=[{kind:"FOCUS",actorId:ps.id,durationMs:210}];
+  else if(idx===10&&mi&&ps){
+    const node=actorNodeBySlot(root,"mi");if(node&&typeof applyStoryStageAnchor33900==="function")applyStoryStageAnchor33900(node,"CENTER");
+    cues=[{kind:"SURPRISE_ENTRY",actorId:mi.id,fromAnchor:"FAR_ENTRY_RIGHT",durationMs:330},{kind:"LUNGE",actorId:mi.id,targetId:ps.id,durationMs:240}];
+  }else if(idx===11&&amt)cues=[{kind:"REPOSITION",actorId:amt.id,fromAnchor:"PLAYER_LEFT",toAnchor:"FAR_ENTRY_LEFT",durationMs:300}];
+  if(!cues.length)return{success:true,skipped:true};
+  const scopeKey=(active()&&active().instanceId||"kakashi")+":cue:"+p.id+":"+idx;
+  root.dataset.kv2CueMotion=p.id+":"+idx;
+  const result=playStoryChoreography33900({root,scopeKey,cues});
+  const total=cues.reduce((n,row)=>n+Number(row.durationMs||0),0)+40;
+  setTimeout(()=>{
+    if(!root.isConnected)return;
+    if(idx===11){const node=actorNodeBySlot(root,"amt");if(node)node.classList.add("kv2-cue-departed");}
+    if(root.dataset.kv2CueMotion===p.id+":"+idx)delete root.dataset.kv2CueMotion;
+  },Math.max(120,total));
+  return result;
 }
 function syncStandard(root,p,t){
   const cue=currentCue(p,t),speaker=cue.kind==="dialogue"?cue.speakerName:(cue.kind==="record"?"CHRONICLE RECEIPT":"NARRATION");
@@ -212,7 +514,13 @@ function syncStandard(root,p,t){
   const location=root.querySelector(".kv2-location"),objective=root.querySelector(".kv2-objective"),objectiveText=objective&&objective.querySelector("span");
   if(location&&location.textContent!==String(p.location||"KONOHA · NIGHT"))location.textContent=String(p.location||"KONOHA · NIGHT");
   if(objective){objective.style.display=p.objective?"":"none";if(objectiveText&&objectiveText.textContent!==String(p.objective||""))objectiveText.textContent=String(p.objective||"");}
-  syncActors(root,Array.isArray(p.actors)?p.actors:[]);
+  syncActors(root,Array.isArray(p.actors)?p.actors:[],p);
+  syncPackageToken(root,p);
+  applyWatchExchangeStaticState(root,p,t);
+  const focused=speakerActorId(p,cue);
+  for(const node of root.querySelectorAll(".kv2-actor"))node.classList.toggle("is-focus",!!focused&&node.dataset.actorId===focused);
+  syncSpeech(root,p,cue,focused);
+  root.dataset.cueKind=String(cue.kind||"narration");
   const speakerNode=root.querySelector(".kv2-speaker"),progress=root.querySelector(".kv2-progress"),textNode=root.querySelector(".kv2-text");
   if(speakerNode&&speakerNode.textContent!==String(speaker||""))speakerNode.textContent=String(speaker||"");
   const progressText=`${Math.min((Number(t.cueIndex)||0)+1,Math.max(1,Number(t.cueCount)||1))} / ${Math.max(1,Number(t.cueCount)||1)}`;
@@ -226,7 +534,8 @@ function syncStandard(root,p,t){
   const actions=choices.length?choices.map(row=>({choiceId:row.choiceId,label:row.label})):battleReady?[{label:"BEGIN PL BATTLE",battle:true}]:[];
   syncActions(root,actions);
   const actionBox=root.querySelector(".kv2-actions");if(actionBox)actionBox.style.display=actions.length?"grid":"none";
-  const next=root.querySelector(".kv2-next");if(next)next.style.display=!actions.length&&(!t.atEnd||semanticNext)?"":"none";
+  root.dataset.hasChoices=actions.length?"true":"false";
+  root.dataset.canAdvance=!actions.length&&(!t.atEnd||semanticNext)?"true":"false";
 }
 function syncReceipt(root,p,t){
   root.dataset.battleActionOnly="false";
@@ -238,30 +547,82 @@ function syncReceipt(root,p,t){
 function render(){
   if(rendering||typeof document==="undefined")return false;
   const layer=document.getElementById("story-scene-presentation-layer");
-  if(!isActive()){if(layer){delete layer.dataset.kakashiV2;const stale=document.getElementById(ROOT_ID);if(stale)stale.remove();}return false;}
+  if(!isActive()){
+    pendingVisualSnapshot=null;
+    const rt=active();
+    if(layer){
+      delete layer.dataset.kakashiV2;
+      const stale=document.getElementById(ROOT_ID);
+      if(stale){if(typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(stale,"story_suspended_or_exited");stale.remove();}
+    }
+    if(!rt||rt.sceneId!==SCENE_ID)lastProjectionSnapshot=null;
+    return false;
+  }
   if(!layer)return false;
   const p=projection();if(!p)return false;
   rendering=true;
   try{
     installStyle();layer.dataset.kakashiV2="true";const root=ensureRoot(layer);root.dataset.preset=p.preset||"standard";
+    const prepared=pendingVisualSnapshot,previous=prepared&&prepared.previous||lastProjectionSnapshot,next=snapshotProjection(p),semanticChanged=!!previous&&!!next&&(previous.id!==next.id||previous.packageHolder!==next.packageHolder||JSON.stringify(previous.actors)!==JSON.stringify(next.actors));
+    const departures=semanticChanged?(prepared?materializeDepartureGhosts(root,prepared,next):prepareDepartureGhosts(root,previous,next)):[];
+    pendingVisualSnapshot=null;
     const t=cueState();
     if(p.preset==="chronicle_receipt")syncReceipt(root,p,t);else syncStandard(root,p,t);
+    if(semanticChanged)playProjectionTransition(root,previous,next,p,departures);
+    lastProjectionSnapshot=next;
     bind(root);return true;
   }finally{rendering=false;}
 }
 function bind(root){
-  for(const b of root.querySelectorAll("[data-kv2-choice]"))b.onclick=()=>globalThis.advanceAcademyKakashiV236040?globalThis.advanceAcademyKakashiV236040(b.dataset.kv2Choice):advanceStoryScene(b.dataset.kv2Choice);
-  for(const b of root.querySelectorAll("[data-kv2-advance]"))b.onclick=()=>globalThis.advanceAcademyKakashiV236040?globalThis.advanceAcademyKakashiV236040():advanceStoryScene();
-  const box=root.querySelector(".kv2-dialogue");
-  if(box)box.onclick=e=>{if(e.target&&e.target.closest&&e.target.closest("button"))return;globalThis.advanceAcademyKakashiV236040?globalThis.advanceAcademyKakashiV236040():advanceStoryScene();};
+  const actionBox=root.querySelector(".kv2-actions");
+  for(const b of root.querySelectorAll("[data-kv2-choice]"))b.onclick=e=>{
+    if(e){e.preventDefault();e.stopPropagation();}
+    const revealed=Number(actionBox&&actionBox.dataset.revealedAt||0);
+    if(revealed&&Date.now()-revealed<360)return;
+    globalThis.advanceAcademyKakashiV236040?globalThis.advanceAcademyKakashiV236040(b.dataset.kv2Choice):advanceStoryScene(b.dataset.kv2Choice);
+  };
+  for(const b of root.querySelectorAll("[data-kv2-advance]"))b.onclick=e=>{
+    if(e){e.preventDefault();e.stopPropagation();}
+    globalThis.advanceAcademyKakashiV236040?globalThis.advanceAcademyKakashiV236040():advanceStoryScene();
+  };
+  root.onclick=e=>{
+    if(e.defaultPrevented)return;
+    if(e.target&&e.target.closest&&e.target.closest("button,.kv2-actions,.kv2-receipt"))return;
+    if(root.dataset.hasChoices==="true"||root.dataset.canAdvance!=="true"||root.dataset.transitionActive==="true")return;
+    const wipe=root.querySelector(".kv2-wipe");if(wipe&&wipe.classList.contains("is-covering"))return;
+    globalThis.advanceAcademyKakashiV236040?globalThis.advanceAcademyKakashiV236040():advanceStoryScene();
+  };
 }
-function setWipe(covering){
+function setWipe(mode){
   const root=document.getElementById(ROOT_ID),wipe=root&&root.querySelector(".kv2-wipe");if(!wipe)return false;
-  wipe.classList.toggle("is-covering",covering===true);return true;
+  const kind=mode===true?"hard":String(mode||"");
+  wipe.classList.toggle("is-hard",kind==="hard");
+  wipe.classList.toggle("is-soft",kind==="soft");
+  wipe.classList.toggle("is-covering",kind==="hard"||kind==="soft");
+  return true;
+}
+function setTransitionMemory(backdropPath,visible){
+  const root=document.getElementById(ROOT_ID),memory=root&&root.querySelector(".kv2-transition-memory");if(!root||!memory)return false;
+  if(visible===true&&backdropPath){
+    const safe=String(backdropPath).replace(/\\/g,"\\\\").replace(/"/g,'\\"');
+    memory.style.backgroundImage=`linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.42)),url("${safe}")`;
+    memory.hidden=false;root.dataset.transitionActive="true";
+  }else{
+    memory.hidden=true;memory.style.backgroundImage="";delete root.dataset.transitionActive;
+  }
+  return true;
 }
 const PRE_RENDER=typeof renderStoryScenePresentationLayer==="function"?renderStoryScenePresentationLayer:null;
 if(PRE_RENDER){
-  globalThis.renderStoryScenePresentationLayer=function kakashiV2RendererWrapper(){const result=PRE_RENDER.apply(this,arguments);if(isActive())render();return result;};
+  globalThis.renderStoryScenePresentationLayer=function kakashiV2RendererWrapper(){
+  const result=PRE_RENDER.apply(this,arguments);
+  const rt=active();
+  // Even while Battle suspends Kakashi projection, run the renderer cleanup
+  // path after the generic Story renderer so the preserved Story runtime cannot
+  // reopen an opaque presentation layer above the Battle overlay.
+  if(rt&&rt.sceneId===SCENE_ID)render();
+  return result;
+};
   try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_e){}
 }
 if(typeof document!=="undefined"){
@@ -281,14 +642,31 @@ function diagnostics(){
     soleKakashiRoot:ROOT_ID==="kakashi-v2-scene-board",
     hidesNativeStorySurface:installStyle.toString().includes('>*:not(#')&&installStyle.toString().includes('{display:none!important}'),
     protectedObjectiveRegion:installStyle.toString().includes("grid-template-columns:minmax(0,1fr) minmax(240px,34%)"),
-    protectedDialogueRegion:installStyle.toString().includes("bottom:29%")&&installStyle.toString().includes("bottom:3.7%"),
+    protectedDialogueRegion:installStyle.toString().includes("bottom:29%")&&installStyle.toString().includes("bottom:3%"),
     receiptReplacesScene:installStyle.toString().includes('[data-preset="chronicle_receipt"] .kv2-top')&&String(syncReceipt).includes("kv2-receipt"),
     projectionComesFromCore:String(projection).includes("getAcademyKakashiV2Presentation36020"),
     stableKeyedActorDom:!String(syncStandard).includes("innerHTML")&&!String(syncActors).includes("innerHTML")&&String(syncActors).includes("appendChild(node)"),
     persistentGhostLayer:String(ensureRoot).includes("kv2-ghost-layer"),
+    preCommitVisualSnapshotIsPresentationOnly:String(preparePreCommitVisualSnapshot).includes("presentationOnly:true")&&String(preparePreCommitVisualSnapshot).includes("captureDepartureVisuals"),
     deterministicActorSlots:String(actorSlot).includes("academy_kakashi_origin_masked_interceptor")&&installStyle.toString().includes('data-slot="minato"'),
+    sharedSemanticAnchors:String(syncActors).includes("applyStoryStageAnchor33900")&&String(actorAnchor).includes("PLAYER_LEFT")&&String(actorAnchor).includes("OPPONENT_RIGHT"),
+    adaptiveActorProminence:installStyle.toString().includes('data-count="1"')&&installStyle.toString().includes('data-count="2"'),
+    sharedChoreographyConsumer:String(playProjectionTransition).includes("playStoryChoreography33900"),
+    departuresPrecedeNewEntries:String(deriveProjectionChoreography).indexOf("for(const row of departures)")<String(deriveProjectionChoreography).indexOf("const prevIds"),
+    departureGhostCleanupOwnedByCue:String(deriveProjectionChoreography).includes("removeOnComplete:true"),
+    actorScopeIgnoresObjectState:String(playProjectionTransition).includes("actorSignature")&&!String(playProjectionTransition).includes("next.packageHolder"),
+    semanticDiffIgnoresHarmlessParticipantRefresh:!String(render).includes('JSON.stringify(previous.participantStates)!==JSON.stringify(next.participantStates)'),
+    packageTokenConsumesHolderTruth:String(syncPackageToken).includes("state.package")&&String(syncPackageToken).includes("packageHolder"),
+    speakerFocusUsesCurrentCue:String(syncStandard).includes("speakerActorId"),
+    stageWideAdvanceGuard:String(bind).includes('root.dataset.hasChoices==="true"')&&String(bind).includes("Date.now()-revealed<360"),
+    actorLinkedSpeech:String(syncSpeech).includes("--kv2-speech-x")&&installStyle.toString().includes(".kv2-speech"),
+    watchCuePerformance:String(playCuePresentation).includes("v2_watch_exchange")&&String(playCuePresentation).includes("SURPRISE_ENTRY")&&String(playCuePresentation).includes("FAR_ENTRY_LEFT"),
+    hardTransitionPreservesOutgoingEnvironment:String(setTransitionMemory).includes("kv2-transition-memory")&&installStyle.toString().includes("data-transition-active"),
+    fiveChoiceLayoutNoScroll:installStyle.toString().includes("repeat(3,minmax(0,1fr))")&&installStyle.toString().includes("overflow:visible"),
     noMutationObserver:!String(render).includes("MutationObserver"),
     battleSuspendsStoryProjection:String(storySuspendedForBattle).includes("pendingBattle")&&String(storySuspendedForBattle).includes('rc.type==="story_scene"'),
+    sharedLayerVisibilityOwner:!String(render).includes("layer.style.display")&&!installStyle.toString().includes("kakashi-v2-battle-suspended"),
+    wrapperRunsSuspensionCleanup:String(globalThis.renderStoryScenePresentationLayer).includes("rt&&rt.sceneId===SCENE_ID")&&String(globalThis.renderStoryScenePresentationLayer).includes("render()"),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
@@ -296,6 +674,11 @@ function diagnostics(){
 }
 globalThis.renderAcademyKakashiV236030=render;
 globalThis.setAcademyKakashiV2Wipe36030=setWipe;
+globalThis.setAcademyKakashiV2TransitionMemory36030=setTransitionMemory;
+globalThis.playAcademyKakashiV2CuePresentation36030=playCuePresentation;
+globalThis.prepareAcademyKakashiV2VisualSnapshot36030=preparePreCommitVisualSnapshot;
+globalThis.cancelAcademyKakashiV2VisualSnapshot36030=cancelPreparedVisualSnapshot;
+globalThis.playAcademyKakashiV2ProjectionTransition36030=playProjectionTransition;
 globalThis.runAcademyKakashiV2Renderer36030Diagnostics=diagnostics;
 globalThis.runAcademyKakashiV2Geometry36030=geometryDiagnostics;
 globalThis.SC_ACADEMY_KAKASHI_V2_RENDERER_36030=Object.freeze({patchId:PATCH_ID,rootId:ROOT_ID,browserGoldenClaimed:false});

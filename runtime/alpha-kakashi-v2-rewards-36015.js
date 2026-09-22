@@ -93,12 +93,17 @@ function registerTrainingTanto(){
   return{success:true,idempotent:false};
 }
 
+function currentBattleState36015(){
+  try{return typeof currentBattle==="object"&&currentBattle?currentBattle:null;}catch(_error){}
+  return globalThis.currentBattle&&typeof globalThis.currentBattle==="object"?globalThis.currentBattle:null;
+}
 function storyOccurrenceFromBattle(){
-  const dep=globalThis.currentBattle&&currentBattle.kakashiV2;
+  const battle=currentBattleState36015();
+  const dep=battle&&battle.kakashiV2;
   return dep&&dep.storyOccurrenceId?String(dep.storyOccurrenceId):null;
 }
 function battlePlan(){
-  const battle=globalThis.currentBattle;
+  const battle=currentBattleState36015();
   const dep=battle&&battle.kakashiV2;
   if(!battle||!dep||!battle.outcome||battle.outcome.type!=="victory")return null;
   const configId=String(dep.battleConfigId||battle.encounterId||"");
@@ -114,22 +119,58 @@ function battlePlan(){
   return{configId,storyOccurrenceId,battleOccurrenceId,cashSourceId:null,ryo:0,pill:false};
 }
 
+function ensureKakashiV2BattleRewardProjection36015(finishingShinobi=null){
+  const plan=battlePlan();
+  if(!plan)return{handled:false};
+  const existing=currentBattle&&currentBattle.rewards||{};
+  const existingPlan=existing&&existing.kakashiV2RewardPlan||null;
+  const exact=existing.generated===true&&existing.kakashiV2===true&&existingPlan&&
+    String(existingPlan.configId||"")===String(plan.configId||"")&&
+    String(existingPlan.storyOccurrenceId||"")===String(plan.storyOccurrenceId||"")&&
+    String(existingPlan.battleOccurrenceId||"")===String(plan.battleOccurrenceId||"");
+  if(exact)return{handled:true,repaired:false,rewards:existing,plan:clone(existingPlan)};
+  const outcome=currentBattle&&currentBattle.outcome||{};
+  let finisherName=finishingShinobi&&finishingShinobi.name||existing.finishingShinobi||null;
+  if(!finisherName&&outcome.finishingShinobiId&&typeof getPlayerCharacter==="function"){
+    try{const row=getPlayerCharacter(outcome.finishingShinobiId);finisherName=row&&row.name||null;}catch(_e){}
+  }
+  const items=plan.pill?[{id:"field_recovery_pill",name:"Field Recovery Pill",rarity:"Common"}]:[];
+  currentBattle.rewards={
+    generated:true,
+    claimed:existing.claimed===true,
+    ryo:Number(plan.ryo)||0,
+    exp:0,
+    items,
+    rareDrops:[],
+    finishingShinobi:finisherName,
+    mvp:existing.mvp||null,
+    kakashiV2:true,
+    kakashiV2RewardPlan:clone(plan),
+    requiresExplicitPostClaimContinue:true,
+    authoritativeProjectionRepaired:true
+  };
+  return{handled:true,repaired:true,rewards:currentBattle.rewards,plan:clone(plan)};
+}
+
 const PRE_GENERATE=typeof generateBattleRewards==="function"?generateBattleRewards:null;
 function generateBattleRewards36015(enemy,finishingShinobi){
   const generic=PRE_GENERATE?PRE_GENERATE.apply(this,arguments):null;
-  const plan=battlePlan();
-  if(!plan)return generic;
-  const items=plan.pill?[{id:"field_recovery_pill",name:"Field Recovery Pill",rarity:"Common"}]:[];
-  currentBattle.rewards={
-    generated:true,claimed:false,ryo:plan.ryo,exp:0,items,rareDrops:[],
-    finishingShinobi:finishingShinobi?finishingShinobi.name:null,
-    kakashiV2:true,kakashiV2RewardPlan:clone(plan),requiresExplicitPostClaimContinue:true
-  };
-  return currentBattle.rewards;
+  const repaired=ensureKakashiV2BattleRewardProjection36015(finishingShinobi);
+  return repaired.handled===true?repaired.rewards:generic;
 }
 if(PRE_GENERATE){
   globalThis.generateBattleRewards=generateBattleRewards36015;
   try{generateBattleRewards=globalThis.generateBattleRewards;}catch(_error){}
+}
+
+const PRE_VICTORY_RENDER=typeof renderVictoryOverlay==="function"?renderVictoryOverlay:null;
+function renderVictoryOverlay36015(container){
+  try{ensureKakashiV2BattleRewardProjection36015();}catch(_e){}
+  return PRE_VICTORY_RENDER?PRE_VICTORY_RENDER.apply(this,arguments):false;
+}
+if(PRE_VICTORY_RENDER){
+  globalThis.renderVictoryOverlay=renderVictoryOverlay36015;
+  try{renderVictoryOverlay=globalThis.renderVictoryOverlay;}catch(_error){}
 }
 
 function snapshotRewardMutation(){
@@ -149,6 +190,7 @@ function restoreRewardMutation(snap){
   if(currentBattle)currentBattle.claimedAt=snap.claimedAt;
 }
 function claimKakashiV2BattleRewards(){
+  try{ensureKakashiV2BattleRewardProjection36015();}catch(_e){}
   const rewards=currentBattle&&currentBattle.rewards,plan=rewards&&rewards.kakashiV2RewardPlan;
   if(!rewards||rewards.generated!==true||!plan)return{handled:false};
   if(rewards.claimed===true)return{handled:true,success:false,reason:"battle_rewards_already_claimed"};
@@ -272,6 +314,8 @@ function diagnostics(){
     exactTanto:!!tanto&&tanto.type==="weapon"&&tanto.weaponClass==="Tanto"&&tanto.stackable===false&&Number(tanto.statModifiers&&tanto.statModifiers.buki)===1,
     noKillRewardPredicate:!String(previewTerminal).includes('state==="DEAD"')&&!String(exceptionalState).includes("DEAD"),
     noParallelInventory:!String(commitItemSource).includes("inventory.push")&&String(commitItemSource).includes("addItemToInventory"),
+    victoryProjectionSelfHeals:String(ensureKakashiV2BattleRewardProjection36015).includes("authoritativeProjectionRepaired")&&String(renderVictoryOverlay36015).includes("ensureKakashiV2BattleRewardProjection36015"),
+    exactMIBattleProjection:String(ensureKakashiV2BattleRewardProjection36015).includes("Field Recovery Pill")&&String(battlePlan).includes("ryo:50"),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
@@ -279,6 +323,7 @@ function diagnostics(){
 }
 
 const catalog=registerTrainingTanto();if(!catalog.success)throw new Error(catalog.reason);
+globalThis.ensureAcademyKakashiV2BattleRewardProjection36015=ensureKakashiV2BattleRewardProjection36015;
 globalThis.previewAcademyKakashiV2TerminalRewards36015=previewTerminal;
 globalThis.commitAcademyKakashiV2TerminalRewards36015=commitTerminal;
 globalThis.getAcademyKakashiV2RewardReceipts36015=receiptsFor;

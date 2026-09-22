@@ -92,10 +92,12 @@ function directAction(id,basePL,discipline,{boostMarker=null,boost=0}={}){
     evaluateAvailability({enemy,target}){
       if(!enemy||!target)return{available:false,reason:"participant_missing"};
       if(enemy.id===AMT){
-        const wire=targetCondition("wire_capture",target.id,enemy.id);
         const marker=sourceState("silent_body_flicker_position",enemy.id);
         const prior=lastEnemyAction(enemy.id);
-        return{available:!!wire&&(!!marker||prior!=="enemy_anbu_style_operative_tanto_flash"),reason:"amt_priority_other_action"};
+        // Combat authority: Wire is a once/Battle movement-control opener, not a
+        // prerequisite for later attacks. After a Tantō Flash, Body Flicker owns
+        // the next enemy opportunity; otherwise Tantō remains a legal fallback.
+        return{available:!!marker||prior!=="enemy_anbu_style_operative_tanto_flash",reason:"amt_priority_body_flicker"};
       }
       if(enemy.id===PS)return{available:!!targetCondition("binding_tag",target.id,enemy.id),reason:"smuggler_priority_binding"};
       if(enemy.id===MI)return{available:!!sourceState("false_retreat_opening",enemy.id),reason:"interceptor_priority_setup"};
@@ -154,7 +156,7 @@ function registerProfiles(){
   });
   enemyDatabase[AMT].authoredBattleActions=[
     movementControlAction("enemy_anbu_style_operative_wire_capture","Bukijutsu","wire_capture",{oncePerBattle:true}),
-    setupAction("enemy_anbu_style_operative_silent_body_flicker","silent_body_flicker_position","Ninjutsu",({enemy,target})=>({available:!!targetCondition("wire_capture",target.id,enemy.id)&&!sourceState("silent_body_flicker_position",enemy.id)&&lastEnemyAction(enemy.id)==="enemy_anbu_style_operative_tanto_flash",reason:"amt_flicker_not_due"})),
+    setupAction("enemy_anbu_style_operative_silent_body_flicker","silent_body_flicker_position","Ninjutsu",({enemy})=>({available:!!enemy&&!sourceState("silent_body_flicker_position",enemy.id)&&lastEnemyAction(enemy.id)==="enemy_anbu_style_operative_tanto_flash",reason:"amt_flicker_not_due"})),
     directAction("enemy_anbu_style_operative_tanto_flash",AMT_TANTO_BASE_PL,"Bukijutsu",{boostMarker:"silent_body_flicker_position",boost:AMT_FLICKER_BOOST_PL})
   ];
   enemyDatabase[PS].authoredBattleActions=[
