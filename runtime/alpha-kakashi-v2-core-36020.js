@@ -818,7 +818,7 @@ addBeat("v2_stay_package_failure",{backdrop:B.sakura,location:"SAKURA TREE · NI
  N("Because committing the mistake to memory takes less time than repeating it."),N("Then he turns toward the only place left where somebody is expecting him."),N("ANBU.")
 ],nextBeatId:"v2_report"});
 addBeat("v2_stay_package_intercept",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Recover the package.",actors:["kakashi","amt","pakkun"],preset:"intercept",onEnter:()=>setPakkun(true),cues:[N("Kakashi cuts inside the target's route."),N("ANBU Marked Target comes around the far side and sees him."),N("Too late."),N("A small ninken stands in the middle of the exit."),Q("ANBU MARKED TARGET","Seriously?"),N("Kakashi arrives behind him."),Q("PAKKUN","This yours?"),Q("KAKASHI","Apparently."),Q("KAKASHI","Thanks."),N("No introduction."),N("No names exchanged."),Q("ANBU MARKED TARGET","You've been chasing this thing all night."),Q("KAKASHI","You've been running with it."),Q("ANBU MARKED TARGET","Fair."),Q("PAKKUN","Trouble?"),Q("KAKASHI","Probably."),Q("PAKKUN","Useful."),N("The pursuit is over."),N("The package problem isn't.")],choices:[
- C("demand_package","DEMAND THE PACKAGE","v2_demand_setup",{patch:()=>history("DEMAND_PACKAGE")}),
+ C("demand_package","DEMAND THE PACKAGE","v2_battle_demand_amt",{patch:()=>history("DEMAND_PACKAGE")}),
  C("take_him_down","TAKE HIM DOWN","v2_take_down_setup",{patch:()=>history("TAKE_HIM_DOWN")}),
  C("ask_where","ASK WHERE THE PACKAGE WAS GOING","v2_ask_where",{patch:()=>history("ASK_WHERE_PACKAGE_GOING")})
 ]});
@@ -833,7 +833,7 @@ addBeat("v2_ask_where",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLE
  N("Kakashi glances toward him."),Q("KAKASHI","Apparently."),N("ANBU Marked Target exhales through his nose."),Q("ANBU MARKED TARGET","You two always like this?"),
  N("Pakkun looks at Kakashi."),N("Kakashi looks at Pakkun."),N("Neither answers him.")
 ],choices:[
- C("ask_then_demand","DEMAND THE PACKAGE","v2_demand_setup"),
+ C("ask_then_demand","DEMAND THE PACKAGE","v2_battle_demand_amt"),
  C("ask_then_take","TAKE HIM DOWN","v2_take_down_setup")
 ]});
 addBeat("v2_battle_demand_amt",{mode:"battle_transition",backdrop:B.intercept,location:"KONOHA ALLEYWAY · PL BATTLE",objective:"Recover the package.",actors:["kakashi","amt","pakkun"],preset:"battle_trio",cues:[N("Kakashi Hatake and the ninken face ANBU Marked Target.")],battle:battle("academy_kakashi_origin_battle_kakashi_pakkun_vs_amt","demand_amt","v2_demand_win","v2_demand_loss","AK_SA_008")});
