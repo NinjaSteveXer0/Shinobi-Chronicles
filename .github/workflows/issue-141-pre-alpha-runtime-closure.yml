@@ -10,6 +10,7 @@ on:
       - 'runtime/**'
       - 'tools/qa_*.py'
       - 'tools/qa_*.js'
+      - 'tools/fixtures/runtime_*_300.json'
       - '.github/workflows/issue-141-pre-alpha-runtime-closure.yml'
   pull_request:
     paths:
@@ -18,6 +19,7 @@ on:
       - 'runtime/**'
       - 'tools/qa_*.py'
       - 'tools/qa_*.js'
+      - 'tools/fixtures/runtime_*_300.json'
       - '.github/workflows/issue-141-pre-alpha-runtime-closure.yml'
 
 jobs:
