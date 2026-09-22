@@ -123,16 +123,35 @@ async function shot(page,name,selector=null){
     await choose(page,"STOP THE ASSASSIN","v2_stop_assassin_setup");
     const elapsed=Date.now()-start;
     assert(elapsed<900,"#312 Story semantic choice waited for presentation animation: "+elapsed+"ms");
+    const stopEntryPhase=await page.evaluate(()=>{
+      const root=document.getElementById("kakashi-v2-scene-board");
+      const real=[...root.querySelectorAll(".kv2-actors > .kv2-actor")].map(n=>({slot:n.dataset.slot,id:n.dataset.actorId,pending:n.dataset.scChoreographyPendingEntry==="true"}));
+      const ghosts=[...root.querySelectorAll(".kv2-departure-ghost")].map(n=>({id:n.dataset.actorId,active:n.dataset.scChoreographyActive||null}));
+      const before=getStoryChoreographyState33900(root);
+      renderAcademyKakashiV236030();renderAcademyKakashiV236030();
+      const after=getStoryChoreographyState33900(root);
+      return{real,ghosts,before,after,ghostCountAfter:root.querySelectorAll(".kv2-departure-ghost").length};
+    });
+    assert.deepStrictEqual(stopEntryPhase.real.map(x=>x.slot),["kakashi","mi"],"#312 committed STOP state must contain only Kakashi + MI real actors");
+    assert(stopEntryPhase.real.find(x=>x.slot==="kakashi")?.pending===true,"#312 Kakashi must remain staged until intentional ENTER begins");
+    assert(stopEntryPhase.ghosts.length===2&&stopEntryPhase.ghosts.some(x=>x.active==="EXIT"),"#312 AMT/PS departures must begin before Kakashi entry: "+JSON.stringify(stopEntryPhase));
+    assert.strictEqual(stopEntryPhase.ghostCountAfter,2,"#312 repeated same-beat render duplicated/removed departure ghosts");
+    assert.strictEqual(stopEntryPhase.before.scopeKey,stopEntryPhase.after.scopeKey,"#312 repeated same-beat render changed choreography scope");
+    assert.strictEqual(stopEntryPhase.before.cueIndex,stopEntryPhase.after.cueIndex,"#312 repeated same-beat render replayed choreography");
+
+    await page.waitForSelector('#kakashi-v2-scene-board .kv2-actor[data-slot="kakashi"][data-sc-choreography-active="ENTER"]',{state:"attached",timeout:1800});
     await page.waitForFunction(()=>{
       const root=document.getElementById("kakashi-v2-scene-board");
       const state=root&&getStoryChoreographyState33900(root);
-      return !!state&&Array.isArray(state.lastKinds)&&state.lastKinds.includes("LUNGE");
-    },null,{timeout:2200});
+      return !!state&&state.state==="settled";
+    },null,{timeout:2600});
     const stop=await page.evaluate(()=>{
       const root=document.getElementById("kakashi-v2-scene-board");
       return{
         beat:getActiveStorySceneRuntime()?.beatId,
-        anchors:[...document.querySelectorAll("#kakashi-v2-scene-board .kv2-actor")].map(n=>({slot:n.dataset.slot,anchor:n.dataset.scStageAnchor,width:n.getBoundingClientRect().width})),
+        anchors:[...root.querySelectorAll(".kv2-actors > .kv2-actor")].map(n=>({slot:n.dataset.slot,anchor:n.dataset.scStageAnchor,width:n.getBoundingClientRect().width})),
+        ghostCount:root.querySelectorAll(".kv2-departure-ghost").length,
+        pendingEntryCount:root.querySelectorAll("[data-sc-choreography-pending-entry]").length,
         choreography:getStoryChoreographyState33900(root),
         transition:runAcademyKakashiV2Transition36040Diagnostics()
       };
@@ -140,6 +159,8 @@ async function shot(page,name,selector=null){
     assert.strictEqual(stop.beat,"v2_stop_assassin_setup");
     assert.deepStrictEqual(stop.anchors.map(x=>x.anchor),["PLAYER_LEFT","OPPONENT_RIGHT"]);
     assert(stop.anchors.every(a=>a.width>=245),"#312 battle-pair Story prominence too small");
+    assert.strictEqual(stop.ghostCount,0,"#312 committed departures survived after choreography settled");
+    assert.strictEqual(stop.pendingEntryCount,0,"#312 entrant remained hidden after choreography settled");
     assert(stop.choreography.lastKinds.includes("FOCUS")&&stop.choreography.lastKinds.includes("LUNGE"),"#312 shared FOCUS -> LUNGE choreography receipt missing: "+JSON.stringify(stop.choreography));
     assert(stop.transition.pass,JSON.stringify(stop.transition));
     await page.waitForFunction(()=>{
@@ -203,14 +224,32 @@ async function shot(page,name,selector=null){
     await seed("substitution");
     await page.waitForSelector('.battle2-performance-stage[data-result="SUBSTITUTION"]',{state:"visible",timeout:8000});
     const substitution=await page.evaluate(()=>{
-      const p=resolveBattlePerformanceProjection33000(),stage=document.querySelector(".battle2-performance-stage");
-      return{p,afterimages:stage?.querySelectorAll(".battle2-performance-afterimage").length||0,actorImages:stage?.querySelectorAll(".battle2-performance-actor img,.battle2-performance-target>img:not(.battle2-performance-afterimage)").length||0};
+      const p=resolveBattlePerformanceProjection33000(),lane=document.querySelector(".battle2-performance-stage"),stage=document.querySelector(".alpha-code-battle-stage");
+      const actor=stage?.querySelector(".battle2-performance-role-actor"),target=stage?.querySelector(".battle2-performance-role-target"),center=lane?.querySelector(".battle2-performance-center");
+      const rect=node=>{const r=node?.getBoundingClientRect();return r?{left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}:null;};
+      const overlaps=(a,b)=>!!a&&!!b&&!(a.right<=b.left||a.left>=b.right||a.bottom<=b.top||a.top>=b.bottom);
+      const actorRect=rect(actor),targetRect=rect(target),centerRect=rect(center);
+      return{
+        p,
+        performancePortraits:lane?.querySelectorAll("img").length||0,
+        canonicalCards:stage?.querySelectorAll(".battle-live-active-card-player,.battle-live-active-card-enemy").length||0,
+        actorRoles:stage?.querySelectorAll(".battle2-performance-role-actor").length||0,
+        targetRoles:stage?.querySelectorAll(".battle2-performance-role-target").length||0,
+        performanceActive:stage?.classList.contains("battle2-performance-active")||false,
+        centerOverlapsActor:overlaps(centerRect,actorRect),
+        centerOverlapsTarget:overlaps(centerRect,targetRect)
+      };
     });
     assert.strictEqual(substitution.p.result,"SUBSTITUTION");
     assert.strictEqual(substitution.p.finalDamage,0);
     assert.strictEqual(substitution.p.exactTarget,true);
-    assert.strictEqual(substitution.afterimages,1);
-    assert.strictEqual(substitution.actorImages,2);
+    assert.strictEqual(substitution.performancePortraits,0,"#312 performance layer duplicated Battle portraits");
+    assert.strictEqual(substitution.canonicalCards,2,"#312 canonical current actor/opponent hierarchy missing");
+    assert.strictEqual(substitution.actorRoles,1,"#312 committed actor was not promoted on canonical Battle card");
+    assert.strictEqual(substitution.targetRoles,1,"#312 exact target was not promoted on canonical Battle card");
+    assert.strictEqual(substitution.performanceActive,true,"#312 canonical Battle performance phase not active");
+    assert.strictEqual(substitution.centerOverlapsActor,false,"#312 result panel overlaps promoted actor");
+    assert.strictEqual(substitution.centerOverlapsTarget,false,"#312 result panel overlaps promoted target");
     const battlePaint=await page.evaluate(()=>{
       const selectors=[
         "#story-scene-presentation-layer","#screen-overlay",".overlay-content-box","#overlay-content-container",
@@ -255,6 +294,16 @@ async function shot(page,name,selector=null){
     await shot(page,"04-battle-overlay.png","#screen-overlay");
     await shot(page,"04-battle-performance-only.png",".battle2-performance-stage");
     await shot(page,"04-battle-substitution-performance.png",".alpha-code-battle-stage");
+    await page.waitForTimeout(700);
+    const settledBattle=await page.evaluate(()=>{
+      const stage=document.querySelector(".alpha-code-battle-stage");
+      return{
+        active:stage?.classList.contains("battle2-performance-active")||false,
+        roles:stage?.querySelectorAll(".battle2-performance-role-actor,.battle2-performance-role-target").length||0
+      };
+    });
+    assert.strictEqual(settledBattle.active,false,"#312 Battle performance did not restore stable composition");
+    assert.strictEqual(settledBattle.roles,0,"#312 Battle performance roles leaked after settle");
 
     await seed("hit");
     await page.waitForSelector('.battle2-performance-stage[data-result="HIT"]',{state:"visible",timeout:8000});
@@ -274,8 +323,8 @@ async function shot(page,name,selector=null){
     const result={
       pass:true,
       issue:312,
-      story:{rooftop,watch,stop,semanticChoiceElapsedMs:elapsed},
-      battle:{config:launched.config,substitution:substitution.p,hit,defeat},
+      story:{rooftop,watch,stopEntryPhase,stop,semanticChoiceElapsedMs:elapsed},
+      battle:{config:launched.config,substitution:substitution.p,settledBattle,hit,defeat},
       browserErrors:errors,
       sourceHeadlessGreenClaimed:false,
       automatedBrowserGreen:true,
