@@ -80,6 +80,7 @@ jobs:
       - name: Validate Academy Kakashi V2 clean-room runtime
         run: |
           node --check runtime/alpha-kakashi-v2-battle-36010.js
+          node --check runtime/alpha-kakashi-v2-rewards-36015.js
           node --check runtime/alpha-kakashi-v2-core-36020.js
           node --check runtime/alpha-kakashi-v2-renderer-36030.js
           node --check runtime/alpha-kakashi-v2-transition-36040.js
