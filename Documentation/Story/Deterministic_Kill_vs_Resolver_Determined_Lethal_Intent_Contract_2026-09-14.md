@@ -1,3 +1,6 @@
+> **2026-09-23 ACADEMY KAKASHI V2 NARROW SUPERSESSION**  
+> Stephen has explicitly changed the Academy Kakashi Origin V2 projection. In that Origin only, visible **KILL** choices now commit lethal intent and resolve to exactly **KILLED | ESCAPED** per target. The older Kakashi benchmark below stating that KILL guarantees death is superseded for Academy Kakashi V2 by `Documentation/Story/Academy_Kakashi_Kill_and_Restrain_Two_Outcome_Resolver_and_Scene_Authority_2026-09-23.md` @ `469de7c67ece78364c947953abef07e32856c1ba`. This notice does not silently change unrelated Stories.
+
 # Shinobi Chronicles — Deterministic Kill vs Resolver-Determined Lethal Intent Contract
 
 **Date:** 2026-09-14  
