@@ -183,3 +183,38 @@ When several characters are present:
 > **The Kakashi Origin should now feel like people inhabiting a tense night in Konoha, not a state machine explaining itself through prose.**
 
 > **Where this authority changes delegated/derived wording, the improved player-facing expression supersedes the older wording while preserving the older file's semantic facts.**
+
+
+## Implementation record — 2026-09-22
+
+The current clean-room Academy Kakashi V2 player-facing runtime has been rewritten under this authority.
+
+### Live files
+
+- `runtime/academy-kakashi-v2-content-36000.js`
+- `runtime/alpha-kakashi-v2-core-36020.js`
+
+### Commit lineage
+
+- `02d544ed1c7261a9177a23cb2ff09a8043c5a4d0` — first player-facing content rewrite;
+- `519bc52486fb60760965104a19cb197b9bb213d3` — live consumed scene-family performance polish;
+- `3cb5416509ad682e5573608ece58d8611fc1d153` — dynamic ANBU debrief + private Minato performance rewrite;
+- `a7a31ff82db2df2ce1d360390b154afb726a7644` — removal of remaining player-facing rules/debug language;
+- `6be81a79bdb6d24386211c5da8c4e92c719dd493` — final 30-beat inline V2 performance rewrite.
+
+### Acceptance checks completed
+
+- both edited JavaScript runtime files parse as executable source;
+- current exact Scene 02 and Scene 03A choice labels remain present unchanged;
+- scan for player-facing internal-authority phrases such as `actual committed state`, `exact chronology`, `factual shortcut`, `aggregate prisoner state`, `hidden-operation truth`, `last factual holder` and `second roll` is clean;
+- route topology and factual consequence commits were not changed by the Writing pass.
+
+### Runtime choreography boundary
+
+Several current V2 disposition choices intentionally transition directly to `v2_report`.
+
+The installed-browser Golden test currently asserts those direct transition targets.
+
+This Writing pass therefore does **not** insert new intermediate route beats.
+
+Where an immediate post-choice choreography beat is later desired, Coding / Runtime must change that route topology and its Golden expectations together. That is a presentation/choreography follow-up, not an unresolved Story fact.
