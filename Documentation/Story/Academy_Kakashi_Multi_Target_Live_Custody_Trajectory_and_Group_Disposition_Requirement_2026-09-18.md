@@ -1,3 +1,6 @@
+> **2026-09-23 ACADEMY KAKASHI V2 SUPERSESSION**  
+> Stephen has removed the remaining controlled/field-secured custody machinery from the playable Academy Kakashi V2 flow. Kakashi now uses exactly **RESTRAIN -> RESTRAINED | ESCAPED** per target. `CONTROLLED_DEFEATED`, `DEFEATED_BUT_NOT_CONTROLLED`, `FIELD_SECURED_PENDING_COLLECTION`, and `COLLECTED_ACTIVE_ESCORT` are not consumed by the current Kakashi V2 Story/runtime contract. The all-three capture trajectory remains, keyed from each exact participant's simple **RESTRAINED** fact and ordinary authored location/continuity metadata. Current authority: `Documentation/Story/Academy_Kakashi_Kill_and_Restrain_Two_Outcome_Resolver_and_Scene_Authority_2026-09-23.md` @ `469de7c67ece78364c947953abef07e32856c1ba`.
+
 # Academy Kakashi Origin — Multi-Target Live Custody Trajectory and Group Disposition Requirement
 
 > **2026-09-19 SUPERSESSION NOTICE**  
