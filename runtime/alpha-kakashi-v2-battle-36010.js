@@ -15,7 +15,7 @@ const AMT="academy_kakashi_origin_amt";
 const PS="academy_kakashi_origin_package_smuggler";
 const MI="academy_kakashi_origin_masked_interceptor";
 const PAKKUN="pakkun_origin_unfamiliar_ninken";
-const SCENE_ID="origin_academy_kakashi_prologue";
+const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 
 const CONFIGS=Object.freeze({
   academy_kakashi_origin_battle_amt_1v1:Object.freeze({id:"academy_kakashi_origin_battle_amt_1v1",opposition:[AMT],pakkun:false,timingGate:null}),
