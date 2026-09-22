@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-23  
 **Owner:** Stephen / World — Missions / Events / Rewards  
-**Status:** **STEPHEN-APPROVED REWARD RECALIBRATION — KILL-SPECIFIC MATERIAL REWARD EXCLUDED / UNRESOLVED**
+**Status:** **STEPHEN-APPROVED REWARD RECALIBRATION — FULL ROUTE-ANCHOR REWARD MODEL LOCKED; TERMINAL-CAP ARITHMETIC STILL OPEN**
 
 ## 1. Purpose
 
@@ -77,6 +77,82 @@ The following remain approved:
 - existing qualifying MI Field Recovery Pill source/fallback;
 - Academy Training Tantō under the authorised exceptional predicate.
 
+## 3A. Approved route-anchor development / history rewards
+
+Stephen's sign-off covers the route anchors found in the full Kakashi Origin scan. These are rewards even where they are intentionally non-material.
+
+### WATCH THE EXCHANGE / factual surveillance
+
+Where Kakashi actually performs valid observation:
+
+- preserve exact Surveillance-specialist evidence when the committed facts demonstrate `reconnaissance.surveillance_specialist:observation_integrity`;
+- a later substantive factual report may separately demonstrate `reconnaissance.surveillance_specialist:surveillance_reporting`;
+- no Ryō is granted merely for passively watching.
+
+### GET CLOSER
+
+Consume the closed fieldcraft contract:
+
+- legitimate covert-approach attempt -> `fieldcraft.stealth_approach:covert_approach_attempt`, significance 1;
+- useful successful undetected positioning / route execution -> same causal-root fieldcraft evidence at significance 2;
+- if independently authored as exceptional -> significance may become 3.
+
+If successful Get Closer produces the already-authored verified handoff-contingency intelligence, that intelligence **qualifies for the existing +25 actionable-intelligence reward**.
+
+This is an eligibility correction to the reward predicate, not a second payment for learning the same underlying fact twice. If another route later obtains the same factual intelligence, idempotence must prevent duplicate payout for the same intelligence source.
+
+### Direct / improved pickpocket
+
+Consume the closed fieldcraft contract:
+
+- materially executed failed attempt -> `fieldcraft.covert_acquisition:covert_acquisition_attempt`, significance 1;
+- successful covert transfer/package acquisition -> same causal-root fieldcraft evidence at significance 2 with exact successful tags where demonstrated;
+- clean undetected exceptional acquisition -> significance may become 3.
+
+A successful clean pickpocket continues to receive:
+
+- **+75 Ryō package recovery**;
+- **+25 Ryō exceptional field execution**;
+- **Academy Training Tantō** eligibility;
+- the above covert-acquisition fieldcraft evidence.
+
+A failed pickpocket that becomes the 3-v-1 preserves the failed-attempt fieldcraft evidence; winning the Battle does not erase it.
+
+### Route prediction / Sakura cutoff
+
+Where the committed facts show Kakashi actually predicts the route and executes the intercept, project exact Tracker-nin evidence for:
+
+`reconnaissance.tracker_nin:route_intercept_execution`
+
+Do not award this merely because the player selected a button labelled CUT THEM OFF.
+
+Any resulting 2-v-1 Battle reward remains the separately approved **100 Ryō immediate**.
+
+### Information extraction
+
+Where Kakashi's questioning genuinely extracts new relevant information:
+
+- the existing **+25 Ryō actionable-intelligence** source applies once to the verified intelligence;
+- exact `intelligence.interrogator:information_extraction` evidence may project where the committed exchange satisfies that competency;
+- `credibility_assessment` requires actual assessment of reliability/contradiction and is not implied merely by asking.
+
+### Restrain / multi-subject extraction
+
+RESTRAIN is itself a meaningful authored specialist-action seam.
+
+- field restraint alone does **not** equal institutional delivery or cash custody reward;
+- a tactically planned restrain-and-continue sequence may support exact `covert_operations.extraction_specialist:extraction_planning` evidence where the facts genuinely demonstrate planning;
+- actual later recovery/escort/delivery of the participant may support `covert_operations.extraction_specialist:subject_recovery`;
+- restraining, collecting and delivering all three can factually demonstrate both competencies from the same causal Origin source, but must not counterfeit multiple independent-source breadth.
+
+The material delivery tiers are defined below.
+
+### 3-v-1 / sequential exceptional history
+
+The failed-pickpocket 3-v-1 victory and the authorised sequential MI -> PS -> AMT performance benchmark retain their Chronicle/achievement-history significance in addition to their material rewards.
+
+The same factual occurrence must not be duplicated into fake independent specialist evidence merely because it satisfies several reward/history predicates.
+
 ## 4. Live-capture reward tiers
 
 The former flat rule where one live captive and three live captives both paid the same +25 is superseded.
@@ -100,6 +176,12 @@ receives the **same material full-extraction reward**.
 
 The institution selected remains meaningful Chronicle/history/Knowledge/Access context and may affect later World/CE opportunities. It must not become a hidden morality-based better/worse payout.
 
+For a full three-person live transfer:
+
+- ANBU delivery commits a distinct **ANBU full-capture institutional record** and creates future ANBU hotspot/opportunity eligibility;
+- Uchiha Police delivery commits a distinct **UPF full-capture institutional record** and creates future Uchiha Police hotspot/opportunity eligibility;
+- both remain eligible for strong Extraction Specialist evidence where the exact planning/recovery competencies were demonstrated.
+
 ## 5. Release
 
 Release receives:
@@ -108,53 +190,73 @@ Release receives:
 - **no material penalty or clawback**;
 - all Battle/action/objective rewards legitimately earned before release remain intact.
 
-The principal value of release is Chronicle/shared-history consequence: a surviving participant can remember the decision and remain available for later CE/World/Story use, including recurring named-character or hotspot-event consequences where later authored.
+The principal value of release is Chronicle/shared-history consequence: a surviving participant can remember the decision and remain available for later CE/World/Story use, including recurring named-character or hotspot-event consequences where later authored. A committed release therefore creates **future participant-history opportunity eligibility** without inventing mercy points.
 
-## 6. KILL — material reward deliberately NOT locked here
+## 6. KILL / ASSASSINATION — approved non-material reward package
 
-Stephen explicitly did **not** sign off the prior proposed kill-material treatment.
+Stephen rejected the earlier treatment where a post-Battle kill effectively produced no reward beyond what had already been earned.
 
-Therefore this document does not create or deny any new kill-specific material package beyond already-earned Battle/objective rewards.
+The corrected rule is:
 
-Do not infer:
+> **A lethal disposition receives no corpse bounty and no morality penalty, but an authored assassination attempt is itself a legitimate reward-producing specialist action.**
 
-- a corpse bounty;
-- a morality penalty;
-- loss of Battle rewards;
-- loss of objective rewards;
-- a new kill-specific Ryō source.
+Already-earned Battle/objective rewards are always preserved.
 
-The exact material treatment of the kill disposition remains separately unresolved until Stephen closes it.
-
-## 7. Lethal action and Special Jōnin development — semantic direction
-
-Separate from the unresolved kill-specific material reward:
-
-An authored lethal action can be legitimate specialist-development work.
-
-Current Special Jōnin authority already uses persistent qualification evidence rather than a generic `Assassination EXP` currency.
-
-For `covert_operations.assassin`, relevant competencies include:
-
-- `target_isolation`;
-- `covert_execution`.
-
-The correct rule is:
-
-> A kill is not automatically Assassin evidence. A committed authored assassination attempt may project Assassin qualification evidence when the factual resolver outcome demonstrates the exact authorised competency.
-
-Kakashi Origin lethal resolution is intentionally simplified to only:
+Kakashi Origin lethal resolution is intentionally simplified to exactly:
 
 - `KILLED`; or
 - `ESCAPED`.
 
 Do **not** restore the older SURVIVED / INTERRUPTED outcome set.
 
-`KILLED` may support successful Assassin evidence where exact competency predicates are factually demonstrated.
+### KILLED
 
-`ESCAPED` preserves lethal intent / attempted-assassination Chronicle history and may support partial specialist evidence only for competencies genuinely demonstrated; it must not counterfeit successful execution.
+When the resolver commits `KILLED`:
 
-Exact evidence tags/significance/capstone treatment remain Progression / Development authority.
+- preserve all previously earned Battle/objective/material rewards;
+- commit the successful lethal action to Chronicle history;
+- project exact `covert_operations.assassin` qualification evidence for the competency tags the resolver facts genuinely demonstrate;
+- `target_isolation` and `covert_execution` remain the relevant exact Assassin competencies;
+- Minato retains observer-bounded knowledge/evaluation when the result is reported;
+- the reporting ANBU operative retains observer history;
+- the ANBU institution receives the report as institutional record;
+- the institutional lethal-history record creates **future ANBU hotspot / opportunity eligibility** for authored content that chooses to consume it.
+
+There is **no kill-specific Ryō or loot source**. The reward is specialist development plus persistent Chronicle/institutional opportunity value, not a morality punishment or corpse bounty.
+
+### ESCAPED
+
+When the resolver commits `ESCAPED`:
+
+- preserve all previously earned Battle/objective/material rewards;
+- commit attempted-assassination / lethal-intent history;
+- preserve the target as alive and escaped;
+- project only the Assassin evidence actually demonstrated by the failed attempt; never counterfeit successful `covert_execution`;
+- the surviving target remembers the attempt under observer-bounded history;
+- Minato / ANBU may learn the failed attempt through the factual report;
+- the surviving target remains available for later recurring-character / hotspot / relationship content.
+
+### Repeated lethal resolution / all three killed
+
+If Kakashi successfully kills MI, PS and AMT through authored lethal resolvers:
+
+- each exact death remains a participant-specific Chronicle fact;
+- the Origin records the repeated deliberate lethal-resolution pattern;
+- the pattern may strengthen the same causal-source Assassin evidence according to Progression's significance rules;
+- it must **not** counterfeit three independent specialist sources merely because three participants died;
+- Minato may remember/evaluate the repeated pattern;
+- ANBU institutional records preserve the report;
+- the pattern creates a distinct **future ANBU lethal-profile hotspot / opportunity eligibility** for later World/CE content.
+
+This is the corrected reward for the dark route.
+
+### Special Jōnin architecture boundary
+
+Current Special Jōnin authority uses persistent qualification evidence rather than a generic `Assassination EXP` currency.
+
+The intended player-facing meaning of “hidden Assassination EXP” is therefore hidden Assassin qualification progress/evidence.
+
+Exact evidence weighting/significance and any capstone designation remain Progression / Development authority and must consume the committed resolver facts rather than infer from a dialogue label alone.
 
 ## 8. Minato / ANBU institutional history
 
@@ -233,4 +335,4 @@ Coding must not use the old cap to silently erase an approved reward tier while 
 
 ## Final lock
 
-> **Academy Kakashi rewards now scale with factual encounter difficulty and completed objectives. Live capture scales materially with the number successfully delivered, release is primarily Chronicle value, RESTRAIN remains a first-class disposition, and lethal specialist development is separate from the still-unresolved kill-specific material reward.**
+> **Academy Kakashi rewards now scale with factual encounter difficulty and completed objectives. Observation, covert approach, covert acquisition, tracking, interrogation, restraint/extraction, capture, lethal resolution and release can all create legitimate reward value through the correct material, fieldcraft, specialist-evidence, Chronicle or future-opportunity channel. No route is made mechanically inferior merely because its authored disposition is darker or lighter.**
