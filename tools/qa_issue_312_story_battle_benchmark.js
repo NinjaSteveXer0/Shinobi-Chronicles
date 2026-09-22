@@ -76,8 +76,9 @@ assert(kv2Renderer.includes("kv2-transition-memory.is-releasing")&&kv2Renderer.i
   const renderStart=kv2Renderer.indexOf("function render(){");
   const renderEnd=kv2Renderer.indexOf("function bind(",renderStart);
   const renderSource=kv2Renderer.slice(renderStart,renderEnd);
-  assert(renderStart>=0&&renderEnd>renderStart&&renderSource.includes('root.dataset.transitionActive="true"')&&renderSource.indexOf('root.dataset.transitionActive="true"')<renderSource.indexOf("pendingVisualSnapshot=null"),"#312 next-scene Story UI must be suppressed before the hard transition begins");
+  assert(renderStart>=0&&renderEnd>renderStart&&renderSource.includes('root.dataset.transitionActive="true"')&&renderSource.includes("rendered underneath the preserved outgoing environment"),"#312 hard transition must mark the handoff while the committed next scene remains underneath the outgoing visual memory");
 }
+assert(kv2Renderer.includes('data-transition-active="true"] .kv2-ghost-layer{z-index:46}')&&kv2Renderer.includes(".kv2-transition-memory{position:absolute;inset:0;z-index:45"),"#312 outgoing transition tableau must layer above the committed next scene without blanking its narration surface");
 assert(kv2Renderer.includes('ghost.className="kv2-departure-ghost kv2-actor-ghost'),"#312 outgoing actor ghosts must not inherit stale live choreography classes");
 assert(kv2Transition.includes("?650:0"),"#312 hard scene transition must leave enough presentation time for the lethal fall to be visible");
 assert(kv2Renderer.includes("border-radius:16px")&&kv2Renderer.includes("backdrop-filter:blur(8px)"),"#312 modern compact narration/speech styling missing");
