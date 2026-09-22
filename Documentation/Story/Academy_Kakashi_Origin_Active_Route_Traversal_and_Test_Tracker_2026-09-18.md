@@ -683,3 +683,39 @@ Validation:
 - targeted shared-house-voice scan GREEN;
 - source/runtime expression validated;
 - installed-browser validation remains separate.
+## 2026-09-23 — Final character-performance acceptance pass
+
+Final live-runtime speaker-fingerprint / plot-puppet acceptance completed after the active-cast anchor re-pass.
+
+Runtime expression commits:
+
+- `1cb74396a40bb767c7eff108f3b3f519af30460d` — content performance refinement;
+- `561f5ba7c8e24e7362d50236ac8923852a13052d` — core/debrief performance acceptance.
+
+Material corrections:
+- Pakkun de-quip / practical autonomy;
+- younger, more direct Academy Kakashi;
+- MI removed from unnecessary banter;
+- PS humour reduced where pressure has become immediate;
+- AMT premise/boundary voice strengthened;
+- ANBU / Minato report exchanges changed from form-like enumeration to operational synthesis.
+
+Preserved:
+- all closed Story semantics;
+- exact player choice labels;
+- Battle/package/life/death/restraint/custody/release/Knowledge/reward facts;
+- current direct disposition -> `v2_report` topology.
+
+Post-write source validation:
+- both live V2 JS files parse GREEN;
+- locked-choice scan GREEN;
+- targeted house-voice/internal-language scan GREEN;
+- representative direct-`v2_report` topology checks GREEN.
+
+Status:
+- **SOURCE / RUNTIME EXPRESSION VALIDATED**
+- **INSTALLED-BROWSER VALIDATION AFTER THIS ACCEPTANCE PASS: NOT YET PROVEN**
+- **BROWSER GOLDEN AFTER THIS ACCEPTANCE PASS: NOT CLAIMED**
+
+Coordination:
+- #312 / PR #318 predates these latest Writing commits and must reconcile current `36000` / `36020` before merge.
