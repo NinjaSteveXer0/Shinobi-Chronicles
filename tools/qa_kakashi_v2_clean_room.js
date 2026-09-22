@@ -214,7 +214,7 @@ assert(transitionSource.includes("is-falling")&&transitionSource.includes("is-fl
     for(const target of targets)if(ids.has(target)&&!reachable.has(target)){reachable.add(target);queue.push(target);}
   }
   const unreachable=def.beats.map(b=>b.beatId).filter(id=>!reachable.has(id));
-  assert.deepStrictEqual(unreachable,[],"clean-room graph contains unreachable/dead beats");
+  assert.strictEqual(unreachable.length,0,`clean-room graph contains unreachable/dead beats: ${unreachable.join(",")}`);
 
   const forbiddenPlayerFacingPhrases=[
     "Battle-finisher requirement","factual pursuit result","Story-authorised","participant state",
