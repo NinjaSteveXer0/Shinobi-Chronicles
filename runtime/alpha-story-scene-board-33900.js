@@ -323,12 +323,17 @@ const PRE_RENDER=typeof renderStoryScenePresentationLayer==="function"?renderSto
 function markStoryPresentationHidden33900(reason="hidden"){
   if(typeof document==="undefined")return false;
   const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;
-  layer.dataset.scPresentationHidden="true";layer.dataset.scPresentationHiddenReason=String(reason);layer.style.display="none";return true;
+  layer.dataset.scPresentationHidden="true";layer.dataset.scPresentationHiddenReason=String(reason);
+  layer.style.setProperty("display","none","important");
+  return true;
 }
 function clearStoryPresentationHidden33900(){
   if(typeof document==="undefined")return false;
   const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;
-  delete layer.dataset.scPresentationHidden;delete layer.dataset.scPresentationHiddenReason;return true;
+  const wasHidden=layer.dataset.scPresentationHidden==="true";
+  delete layer.dataset.scPresentationHidden;delete layer.dataset.scPresentationHiddenReason;
+  if(wasHidden&&layer.style.getPropertyPriority("display")==="important")layer.style.removeProperty("display");
+  return true;
 }
 function storyPresentationBattleSuspended33900(){
   try{
@@ -412,7 +417,7 @@ function runStorySceneBoard33900Diagnostics(){
       String(RENDER_WRAPPER_33900).includes("storyPresentationBattleSuspended33900")&&
       String(RENDER_WRAPPER_33900).includes("markStoryPresentationHidden33900")&&
       String(markStoryPresentationHidden33900).includes("scPresentationHidden")&&
-      String(markStoryPresentationHidden33900).includes("style.display")&&
+      String(markStoryPresentationHidden33900).includes('setProperty("display","none","important")')&&
       installStyle.toString().includes("data-sc-presentation-hidden"),
     wrapsExistingStoryRenderer:!!PRE_RENDER,
     browserGoldenClaimed:false
