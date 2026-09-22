@@ -1,6 +1,6 @@
 // ALPHA ORIGIN CHOICE REACTION 33510
 // Completes the player-visible choice-response pass begun by 33500 for the
-// remaining 32900 Origins: Kushina, Kakashi and Obito.
+// remaining non-Kakashi 32900 Origins: Kushina and Obito.
 (function installAlphaOriginChoiceReaction33510(){
 "use strict";
 if(globalThis.SC_ALPHA_ORIGIN_CHOICE_REACTION_33510)return;
@@ -31,26 +31,7 @@ function patchKushina(){
   return commit(def);
 }
 
-function patchKakashi(){
-  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
-  const def=editable(A.sceneByVariant.academy_kakashi);if(!def)return false;
-  const debrief=beat(def,"kak_debrief"),reflect=beat(def,"kak_reflect");if(!debrief||!reflect)return false;
-  debrief.presentationResolver=()=>{
-    const ctx=A.local();
-    const intel=ctx.kakashiFirstChoice==="shadow_the_clerk"?"HIGH":ctx.kakashiFirstChoice==="question_the_clerk"?"MIXED":"LOW";
-    const disposition=ctx.kakashiRetrievalChoice==="secure_package"?"SECURED":"LOST";
-    const route=ctx.kakashiRetrievalChoice==="secure_package"
-      ?"Kakashi stayed with the confirmed packet and secured it from the broker."
-      :"Kakashi left the confirmed packet position to pursue the apparent carrier; the real packet was lost while he was away.";
-    return{text:`${route} The Academy debrief records the two truths separately: PACKAGE ${disposition}; RETRIEVAL INTELLIGENCE ${intel}.`};
-  };
-  for(const c of reflect.choices||[])c.nextBeatId="kak_reflection_result";
-  add(def,{beatId:"kak_reflection_result",mode:"dialogue",speakerName:"KAKASHI",presentationResolver:()=>{
-    const value=A.local().kakashiReflection;
-    return{text:{objective:"Recovering the objective.",proof:"Knowing what I could prove.",responsibility:"Knowing which responsibility was mine."}[value]||"Kakashi keeps his own interpretation of the assessment."};
-  },nextBeatId:"kak_sakumo"});
-  return commit(def);
-}
+// Academy Kakashi legacy choice-reaction patch retired for clean-room V2.
 
 function obitoResponse(key,value){
   const rows={
@@ -98,8 +79,8 @@ function patchObito(){
   return commit(def);
 }
 
-const result={kushina:patchKushina(),kakashi:patchKakashi(),obito:patchObito()};
-function runAlphaOriginChoiceReaction33510Diagnostics(){const A=globalThis.SC_ALPHA_ORIGIN_32900;const kush=A&&definition(A.sceneByVariant.academy_kushina),kak=A&&definition(A.sceneByVariant.academy_kakashi),obi=A&&definition(A.sceneByVariant.academy_obito);const checks={patchId:PATCH_ID==="alpha_origin_choice_reaction_33510_2026_09_13",allThreePatched:Object.values(result).every(Boolean),kushinaChoiceResult:!!(kush&&kush.beatMap&&kush.beatMap.has("kus_contact_result")),kakashiDecisionDebrief:!!(kak&&kak.beatMap&&typeof kak.beatMap.get("kak_debrief")?.presentationResolver==="function"),obitoChoiceReaction:!!(obi&&obi.beatMap&&typeof obi.beatMap.get("obi_vegetables")?.presentationResolver==="function"),browserGoldenClaimed:false};const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);return{patchId:PATCH_ID,pass:failed.length===0,checks,failed,patched:[...patched],browserGoldenClaimed:false};}
+const result={kushina:patchKushina(),obito:patchObito()};
+function runAlphaOriginChoiceReaction33510Diagnostics(){const A=globalThis.SC_ALPHA_ORIGIN_32900;const kush=A&&definition(A.sceneByVariant.academy_kushina),obi=A&&definition(A.sceneByVariant.academy_obito);const checks={patchId:PATCH_ID==="alpha_origin_choice_reaction_33510_2026_09_13",bothNonKakashiOriginsPatched:Object.values(result).every(Boolean),kakashiLegacyPatchRetired:!Object.prototype.hasOwnProperty.call(result,"kakashi"),kushinaChoiceResult:!!(kush&&kush.beatMap&&kush.beatMap.has("kus_contact_result")),obitoChoiceReaction:!!(obi&&obi.beatMap&&typeof obi.beatMap.get("obi_vegetables")?.presentationResolver==="function"),browserGoldenClaimed:false};const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);return{patchId:PATCH_ID,pass:failed.length===0,checks,failed,patched:[...patched],browserGoldenClaimed:false};}
 globalThis.SC_ALPHA_ORIGIN_CHOICE_REACTION_33510=Object.freeze({patchId:PATCH_ID,result:{...result},browserGoldenClaimed:false});
 globalThis.runAlphaOriginChoiceReaction33510Diagnostics=runAlphaOriginChoiceReaction33510Diagnostics;
 })();
