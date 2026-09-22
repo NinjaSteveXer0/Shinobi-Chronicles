@@ -108,6 +108,7 @@ function normalizeStoryChoreographyCue33900(raw={}){
     fromAnchor:raw.fromAnchor?normalizeStageAnchor33900(raw.fromAnchor):null,
     toAnchor:raw.toAnchor?normalizeStageAnchor33900(raw.toAnchor):null,
     resultLabel:raw.resultLabel?String(raw.resultLabel):null,
+    removeOnComplete:raw.removeOnComplete===true,
     durationMs:storyChoreographyReducedMotion33900()?Math.min(100,bounded):bounded
   };
 }
@@ -127,6 +128,7 @@ function cancelStoryChoreography33900(root,reason="superseded"){
   }
   for(const node of root.querySelectorAll?root.querySelectorAll("[data-sc-choreography-target]"):[])delete node.dataset.scChoreographyTarget;
   for(const node of root.querySelectorAll?root.querySelectorAll("[data-sc-choreography-pending-entry]"):[])delete node.dataset.scChoreographyPendingEntry;
+  for(const node of root.querySelectorAll?root.querySelectorAll("[data-sc-choreography-remove-on-complete]"):[])try{node.remove();}catch(_error){}
   root.dataset.scChoreographyState="settled";
   root.dataset.scChoreographyCancelReason=String(reason);
   choreographyControllers.delete(root);
@@ -155,6 +157,7 @@ function applyStoryChoreographyCue33900(root,cue){
   const className="sc-choreo-"+row.kind.toLowerCase().replaceAll("_","-");
   if((row.kind==="ENTER"||row.kind==="SURPRISE_ENTRY")&&node.dataset)delete node.dataset.scChoreographyPendingEntry;
   node.dataset.scChoreographyActive=row.kind;
+  if(row.removeOnComplete&&node.dataset)node.dataset.scChoreographyRemoveOnComplete="true";
   node.style.setProperty("--sc-choreo-duration",row.durationMs+"ms");
   if(row.fromAnchor)node.style.setProperty("--sc-choreo-from-x",SEMANTIC_STAGE_ANCHORS[row.fromAnchor]+"%");
   if(row.toAnchor)node.style.setProperty("--sc-choreo-to-x",SEMANTIC_STAGE_ANCHORS[row.toAnchor]+"%");
@@ -197,8 +200,12 @@ function playStoryChoreography33900({root,scopeKey,cues=[]}={}){
       if(applied.node){
         applied.node.classList.remove("sc-choreo-"+applied.cue.kind.toLowerCase().replaceAll("_","-"));
         delete applied.node.dataset.scChoreographyActive;
+        if(applied.cue.removeOnComplete){
+          delete applied.node.dataset.scChoreographyRemoveOnComplete;
+          try{applied.node.remove();}catch(_error){}
+        }
       }
-      if(applied.target)delete applied.target.dataset.scChoreographyTarget;
+      if(applied.target&&applied.target.isConnected)delete applied.target.dataset.scChoreographyTarget;
       run(index+1);
     },duration);
   };
@@ -428,6 +435,7 @@ function runStorySceneBoard33900Diagnostics(){
     scopedCancellableQueue:String(playStoryChoreography33900).includes("scopeKey")&&String(cancelStoryChoreography33900).includes("cancelled=true"),
     sameScopeDoesNotReplay:String(playStoryChoreography33900).includes("reused:true"),
     entryPreflightPreventsFlash:String(playStoryChoreography33900).includes("scChoreographyPendingEntry")&&installStyle.toString().includes("data-sc-choreography-pending-entry"),
+    presentationOnlySubjectCleanup:String(normalizeStoryChoreographyCue33900).includes("removeOnComplete")&&String(playStoryChoreography33900).includes("applied.cue.removeOnComplete"),
     teardownCancelsChoreography:String(clearBoard).includes("cancelStoryChoreography33900"),
     noMutationObserver:OBSERVER_DRIVEN_RENDERING===false,
     authoritativePresentationHide:!!PRE_HIDE&&String(globalThis.hideStoryScenePresentationLayer).includes("markStoryPresentationHidden33900"),
