@@ -262,111 +262,59 @@ const CONTENT={
       "scene_05a_l_exact": [
         {
           "kind": "narration",
-          "text": "The opening is small."
+          "text": "Masked Interceptor catches the first small opening Kakashi gives her and drives him into the stone beneath the Sakura tree."
         },
         {
           "kind": "narration",
-          "text": "Masked Interceptor takes it."
+          "text": "Before he can reset, she has his arm behind him and his shoulder pinned."
         },
         {
           "kind": "narration",
-          "text": "Kakashi hits the stone beneath the Sakura tree."
+          "text": "Kakashi tests the hold once. She tightens just enough to end the argument."
         },
         {
           "kind": "narration",
-          "text": "Before he can recover, she is on him."
+          "text": "Then her attention leaves him."
         },
         {
           "kind": "narration",
-          "text": "His arm is forced behind his back."
+          "text": "Not because he stopped mattering."
         },
         {
           "kind": "narration",
-          "text": "His shoulder pinned."
+          "text": "Because the package is already disappearing down the street with Package Smuggler."
         },
         {
           "kind": "narration",
-          "text": "Kakashi twists once."
+          "text": "The pressure vanishes."
         },
         {
           "kind": "narration",
-          "text": "She tightens the hold."
+          "text": "Kakashi turns in time to see her break after him."
         },
         {
           "kind": "narration",
-          "text": "Enough to stop him."
+          "text": "By the time he forces himself upright, both of them are gone."
         },
         {
           "kind": "narration",
-          "text": "Then her attention shifts."
+          "text": "ANBU Marked Target vanished even earlier."
         },
         {
           "kind": "narration",
-          "text": "Not to Kakashi."
+          "text": "Kakashi listens to the empty street for something he can still use."
         },
         {
           "kind": "narration",
-          "text": "Down the street."
+          "text": "Nothing answers."
         },
         {
           "kind": "narration",
-          "text": "Toward the route Package Smuggler took."
+          "text": "No footfall. No roof tile. No second chance at the trail."
         },
         {
           "kind": "narration",
-          "text": "The pressure disappears."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi turns his head just in time to see Masked Interceptor break away."
-        },
-        {
-          "kind": "narration",
-          "text": "She runs."
-        },
-        {
-          "kind": "narration",
-          "text": "Fast."
-        },
-        {
-          "kind": "narration",
-          "text": "After Package Smuggler."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi forces himself back to his feet."
-        },
-        {
-          "kind": "narration",
-          "text": "By then she is gone."
-        },
-        {
-          "kind": "narration",
-          "text": "So is Package Smuggler."
-        },
-        {
-          "kind": "narration",
-          "text": "The package went with him."
-        },
-        {
-          "kind": "narration",
-          "text": "ANBU Marked Target disappeared even earlier."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi looks down the empty street."
-        },
-        {
-          "kind": "narration",
-          "text": "No trail."
-        },
-        {
-          "kind": "narration",
-          "text": "No one left to follow."
-        },
-        {
-          "kind": "narration",
-          "text": "The package is beyond his reach now."
+          "text": "The package is out of reach."
         }
       ]
     }
@@ -385,31 +333,15 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Kakashi moves before either man can finish."
+          "text": "Kakashi drops between them before the transfer can happen."
         },
         {
           "kind": "narration",
-          "text": "No waiting."
+          "text": "ANBU Marked Target jerks the package back."
         },
         {
           "kind": "narration",
-          "text": "No attempt to learn more."
-        },
-        {
-          "kind": "narration",
-          "text": "He drops directly into the space between them."
-        },
-        {
-          "kind": "narration",
-          "text": "ANBU Marked Target pulls the package back."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler turns toward Kakashi instead."
-        },
-        {
-          "kind": "narration",
-          "text": "The quiet handoff is over before it can happen."
+          "text": "Package Smuggler turns on Kakashi instead."
         },
         {
           "kind": "dialogue",
@@ -423,28 +355,16 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "ANBU Marked Target shifts the package away from Kakashi."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler moves to the other side."
-        },
-        {
-          "kind": "narration",
-          "text": "Two angles."
-        },
-        {
-          "kind": "narration",
-          "text": "One objective."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi settles into stance."
+          "text": "The two men spread just far enough to make Kakashi split his attention."
         },
         {
           "kind": "dialogue",
           "speakerName": "ANBU MARKED TARGET",
           "text": "“You're alone.”"
+        },
+        {
+          "kind": "narration",
+          "text": "Kakashi settles into stance."
         },
         {
           "kind": "dialogue",
@@ -453,7 +373,7 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Neither man gives him time to explain what he means."
+          "text": "Neither man waits to find out what he means."
         }
       ],
       "3_kakashi_loses_the_2_v_1": [
@@ -463,35 +383,23 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "ANBU Marked Target does not wait for a second chance."
+          "text": "ANBU Marked Target does not wait for him to recover."
         },
         {
           "kind": "narration",
-          "text": "Package Smuggler pulls back with him."
+          "text": "Package Smuggler withdraws with him."
         },
         {
           "kind": "narration",
-          "text": "The interrupted handoff never becomes clean."
+          "text": "The handoff never finishes cleanly, but that no longer matters—they both know Kakashi is there."
         },
         {
           "kind": "narration",
-          "text": "It no longer needs to."
+          "text": "ANBU Marked Target keeps the package as the two men disappear together."
         },
         {
           "kind": "narration",
-          "text": "They already know Kakashi is there."
-        },
-        {
-          "kind": "narration",
-          "text": "ANBU Marked Target keeps the package and both men withdraw together."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi forces himself back to his feet."
-        },
-        {
-          "kind": "narration",
-          "text": "The street is empty."
+          "text": "Kakashi forces himself upright into an empty street."
         },
         {
           "kind": "narration",
@@ -499,11 +407,7 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "There is nothing left here for her to take from Kakashi."
-        },
-        {
-          "kind": "narration",
-          "text": "He never had the package."
+          "text": "There is nothing here for her to take from him; Kakashi never had the package."
         }
       ],
       "4_kakashi_wins_the_2_v_1": [
@@ -630,39 +534,27 @@ const CONTENT={
       "7_mi_defeats_kakashi": [
         {
           "kind": "narration",
-          "text": "Masked Interceptor breaks through Kakashi's defence."
+          "text": "Masked Interceptor breaks through Kakashi's defence and goes straight for the hand protecting the package."
         },
         {
           "kind": "narration",
-          "text": "He keeps one hand near the package."
+          "text": "Kakashi tries to turn with her."
         },
         {
           "kind": "narration",
-          "text": "She notices."
+          "text": "She wins the exchange."
         },
         {
           "kind": "narration",
-          "text": "The next exchange is about that hand."
+          "text": "The package comes loose, and she catches it before it hits the ground."
         },
         {
           "kind": "narration",
-          "text": "Kakashi loses it."
+          "text": "For half a second she studies the seal."
         },
         {
           "kind": "narration",
-          "text": "The package comes free."
-        },
-        {
-          "kind": "narration",
-          "text": "Masked Interceptor catches it before it hits the ground."
-        },
-        {
-          "kind": "narration",
-          "text": "For half a second, she looks down at the seal."
-        },
-        {
-          "kind": "narration",
-          "text": "Then back at Kakashi."
+          "text": "Then she looks back at Kakashi."
         },
         {
           "kind": "dialogue",
@@ -676,7 +568,7 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "A small pause."
+          "text": "She gives that the smallest consideration."
         },
         {
           "kind": "dialogue",
@@ -685,23 +577,15 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "She disappears with the package."
+          "text": "Then she is gone with the package."
         },
         {
           "kind": "narration",
-          "text": "Kakashi looks toward the two men he defeated earlier."
+          "text": "The two men Kakashi defeated earlier are still alive where the first fight left them."
         },
         {
           "kind": "narration",
-          "text": "Still alive."
-        },
-        {
-          "kind": "narration",
-          "text": "Still where the fights left them."
-        },
-        {
-          "kind": "narration",
-          "text": "But Kakashi no longer controls the objective, and he is in no condition to turn the street into a third confrontation."
+          "text": "He no longer has the objective, and he is in no condition to start a third fight."
         }
       ],
       "8_kakashi_defeats_mi": [
@@ -711,27 +595,23 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Kakashi stays between her and the package until he is certain she is not getting another attempt."
+          "text": "Kakashi stays between her and the package until he is certain the fight is finished."
         },
         {
           "kind": "narration",
-          "text": "Then he looks across the street."
+          "text": "Then he takes in the street."
         },
         {
           "kind": "narration",
-          "text": "ANBU Marked Target."
+          "text": "ANBU Marked Target is down."
         },
         {
           "kind": "narration",
-          "text": "Package Smuggler."
+          "text": "Package Smuggler is down."
         },
         {
           "kind": "narration",
-          "text": "Masked Interceptor."
-        },
-        {
-          "kind": "narration",
-          "text": "All three defeated."
+          "text": "Masked Interceptor is down."
         },
         {
           "kind": "narration",
@@ -739,11 +619,11 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "This time, nothing else arrives."
+          "text": "Nothing else is coming."
         },
         {
           "kind": "narration",
-          "text": "The next decision is his."
+          "text": "What happens to the three defeated shinobi is his decision now."
         }
       ],
       "9_take_them_to_the_uchiha_police_force": [
@@ -1111,43 +991,27 @@ const CONTENT={
       "1_slip_in_for_the_package": [
         {
           "kind": "narration",
-          "text": "Kakashi does not wait for the handoff."
+          "text": "Kakashi watches the space between the two men instead of the men themselves."
         },
         {
           "kind": "narration",
-          "text": "He watches the space between the two men instead."
+          "text": "The package is still with ANBU Marked Target. Package Smuggler is waiting to receive it."
         },
         {
           "kind": "narration",
-          "text": "The package is still with ANBU Marked Target."
+          "text": "Neither expects a third hand in the exchange."
         },
         {
           "kind": "narration",
-          "text": "Package Smuggler is waiting to receive it."
+          "text": "Kakashi drops from cover quietly enough that the street never reacts."
         },
         {
           "kind": "narration",
-          "text": "Neither of them is looking for a third set of hands."
+          "text": "He closes the distance one measured step at a time."
         },
         {
           "kind": "narration",
-          "text": "That is the opening."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi drops from cover without making the street notice him."
-        },
-        {
-          "kind": "narration",
-          "text": "One step."
-        },
-        {
-          "kind": "narration",
-          "text": "Then another."
-        },
-        {
-          "kind": "narration",
-          "text": "Close enough now to see the edge of the package beneath ANBU Marked Target's clothing."
+          "text": "Soon he can see the edge of the package beneath ANBU Marked Target's clothing."
         },
         {
           "kind": "narration",
@@ -1155,7 +1019,7 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "If he is clean."
+          "text": "If the timing is right."
         }
       ],
       "2_resolver_success_the_package_disappears": [
@@ -1169,19 +1033,11 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Not with force."
+          "text": "Two fingers catch the edge as the man's hand moves."
         },
         {
           "kind": "narration",
-          "text": "With timing."
-        },
-        {
-          "kind": "narration",
-          "text": "Two fingers catch the edge."
-        },
-        {
-          "kind": "narration",
-          "text": "A turn of the wrist."
+          "text": "A turn of the wrist, hidden inside the handoff motion, is enough."
         },
         {
           "kind": "narration",
@@ -1193,11 +1049,7 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Package Smuggler looks at him."
-        },
-        {
-          "kind": "narration",
-          "text": "Then at the hand that should be holding something."
+          "text": "Package Smuggler looks at the empty hand."
         },
         {
           "kind": "dialogue",
@@ -1206,11 +1058,7 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "ANBU Marked Target looks down."
-        },
-        {
-          "kind": "narration",
-          "text": "Once."
+          "text": "ANBU Marked Target checks once."
         },
         {
           "kind": "narration",
@@ -1218,27 +1066,11 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "He is already gone."
+          "text": "He is already over the wall and onto the next roof."
         },
         {
           "kind": "narration",
-          "text": "Over the wall."
-        },
-        {
-          "kind": "narration",
-          "text": "Across the next roof."
-        },
-        {
-          "kind": "narration",
-          "text": "Into a part of Konoha where neither man knows which shadow belongs to him."
-        },
-        {
-          "kind": "narration",
-          "text": "By the time they understand that the exchange failed, the package is secured against Kakashi's side."
-        },
-        {
-          "kind": "narration",
-          "text": "He does not look back."
+          "text": "By the time the two men understand the exchange has failed, Kakashi has the package secured against his side."
         }
       ],
       "3_pickpocket_success_anbu_return": [
@@ -1364,15 +1196,7 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Not enough to hold him."
-        },
-        {
-          "kind": "narration",
-          "text": "Enough to ruin the theft."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler moves immediately."
+          "text": "It is not enough to hold him, but it is enough to ruin the theft."
         },
         {
           "kind": "dialogue",
@@ -1381,23 +1205,15 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "The package stays with ANBU Marked Target."
+          "text": "Kakashi breaks contact and lands in the open while the package stays with ANBU Marked Target."
         },
         {
           "kind": "narration",
-          "text": "Kakashi breaks contact and lands in the open."
+          "text": "Movement cuts out of the darkness beside the street."
         },
         {
           "kind": "narration",
-          "text": "The quiet exchange is over."
-        },
-        {
-          "kind": "narration",
-          "text": "Then the darkness beside the street moves."
-        },
-        {
-          "kind": "narration",
-          "text": "A masked figure cuts into the scene at speed."
+          "text": "A masked shinobi enters at speed."
         },
         {
           "kind": "narration",
@@ -1409,15 +1225,11 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "For one moment, everybody is looking at somebody different."
+          "text": "For one heartbeat, everyone is facing a different problem."
         },
         {
           "kind": "narration",
           "text": "Then Masked Interceptor sees Kakashi too."
-        },
-        {
-          "kind": "narration",
-          "text": "Whatever her original line was, there is no clean route through the exchange anymore."
         },
         {
           "kind": "dialogue",
@@ -1441,45 +1253,29 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Kakashi's eye moves across all three."
+          "text": "Kakashi wanted the package without a fight."
         },
         {
           "kind": "narration",
-          "text": "He wanted the package without a fight."
-        },
-        {
-          "kind": "narration",
-          "text": "He has managed to get everybody instead."
+          "text": "Now all three of them know exactly where he is."
         }
       ],
       "6_kakashi_loses_the_3_v_1": [
         {
           "kind": "narration",
-          "text": "Three opponents are too much."
+          "text": "Three opponents keep forcing Kakashi to answer one threat before he can finish with the last."
         },
         {
           "kind": "narration",
-          "text": "Not because Kakashi stops thinking."
+          "text": "ANBU Marked Target finds the opening that finally puts him down."
         },
         {
           "kind": "narration",
-          "text": "Because every answer creates another problem before he can finish the first one."
+          "text": "Kakashi never gets control of the package."
         },
         {
           "kind": "narration",
-          "text": "The opening finally comes from ANBU Marked Target."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi goes down."
-        },
-        {
-          "kind": "narration",
-          "text": "The package never reaches him."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler is the first to move away."
+          "text": "Package Smuggler is the first to pull away."
         },
         {
           "kind": "narration",
@@ -1487,7 +1283,7 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Masked Interceptor stays for half a breath longer."
+          "text": "Masked Interceptor stays half a breath longer."
         },
         {
           "kind": "narration",
@@ -1496,7 +1292,7 @@ const CONTENT={
         {
           "kind": "dialogue",
           "speakerName": "MASKED INTERCEPTOR",
-          "text": "“You nearly made that much more interesting.”"
+          "text": "“You nearly made that interesting.”"
         },
         {
           "kind": "narration",
@@ -1504,19 +1300,7 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Kakashi lies still until following them would be pursuit by guesswork."
-        },
-        {
-          "kind": "narration",
-          "text": "Three people entered the fight."
-        },
-        {
-          "kind": "narration",
-          "text": "Three people leave it."
-        },
-        {
-          "kind": "narration",
-          "text": "The package leaves with them."
+          "text": "Kakashi stays down until following any of them would mean choosing a direction at random."
         }
       ],
       "7_kakashi_wins_the_3_v_1": [
@@ -1526,39 +1310,27 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "For the first time since Kakashi entered the exchange, nobody else is moving."
+          "text": "For the first time since Kakashi entered the exchange, the street is still."
         },
         {
           "kind": "narration",
-          "text": "Three defeated shinobi."
+          "text": "He goes to ANBU Marked Target first and takes the package."
         },
         {
           "kind": "narration",
-          "text": "One package."
+          "text": "The seal is intact."
         },
         {
           "kind": "narration",
-          "text": "Kakashi goes to the objective first."
+          "text": "Kakashi secures it, then turns back to the three defeated shinobi."
         },
         {
           "kind": "narration",
-          "text": "ANBU Marked Target is no longer in a position to keep it from him."
+          "text": "Winning the fight recovered the objective."
         },
         {
           "kind": "narration",
-          "text": "Kakashi takes the package, checks the seal and secures it against himself."
-        },
-        {
-          "kind": "narration",
-          "text": "Then he looks back at the three people on the ground."
-        },
-        {
-          "kind": "narration",
-          "text": "Winning the fight solved the package problem."
-        },
-        {
-          "kind": "narration",
-          "text": "It did not decide what happens to them."
+          "text": "It did not decide what happens to the people on the ground."
         }
       ],
       "8_take_them_to_the_uchiha_police_force": [
@@ -1986,71 +1758,43 @@ const CONTENT={
       "3_success_let_the_handoff_happen": [
         {
           "kind": "narration",
-          "text": "Kakashi stays where the shadows still cover him."
+          "text": "Kakashi stays inside the alley shadow."
         },
         {
           "kind": "narration",
-          "text": "He has already heard enough to know what the two men expect to happen."
+          "text": "He has already heard the contingency the two men expect to follow. Now he waits to see whether they follow it."
         },
         {
           "kind": "narration",
-          "text": "That makes waiting easier to understand."
+          "text": "ANBU Marked Target draws out the package."
         },
         {
           "kind": "narration",
-          "text": "Not safer."
+          "text": "Package Smuggler takes it."
         },
         {
           "kind": "narration",
-          "text": "ANBU Marked Target takes the package from beneath his clothing."
+          "text": "The first man starts to leave exactly as promised."
         },
         {
           "kind": "narration",
-          "text": "Package Smuggler's hand is still waiting."
+          "text": "Then movement tears out of the dark beside the street."
         },
         {
           "kind": "narration",
-          "text": "The transfer completes."
+          "text": "A masked shinobi drives straight at Package Smuggler."
         },
         {
           "kind": "narration",
-          "text": "The instant it does, Kakashi's earlier information becomes fact."
+          "text": "Kakashi's attention snaps to her."
         },
         {
           "kind": "narration",
-          "text": "ANBU Marked Target starts to leave."
+          "text": "Moving closer gave him more information."
         },
         {
           "kind": "narration",
-          "text": "Package Smuggler turns with the objective."
-        },
-        {
-          "kind": "narration",
-          "text": "Then the darkness beside the street moves."
-        },
-        {
-          "kind": "narration",
-          "text": "Fast."
-        },
-        {
-          "kind": "narration",
-          "text": "A masked figure tears into the exchange line toward Package Smuggler."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi's eye snaps to her."
-        },
-        {
-          "kind": "narration",
-          "text": "He had moved closer to learn more."
-        },
-        {
-          "kind": "narration",
-          "text": "Now he has more information—"
-        },
-        {
-          "kind": "narration",
-          "text": "and one more person."
+          "text": "It also put him near enough to see the night become more complicated in real time."
         }
       ],
       "5_success_attempt_the_pickpocket": [
@@ -2222,15 +1966,11 @@ const CONTENT={
       "9_failure_cut_them_off_at_the_sakura_tree": [
         {
           "kind": "narration",
-          "text": "Both men go down inside the space Kakashi cut them into."
+          "text": "Both men go down inside the space Kakashi forced them into."
         },
         {
           "kind": "narration",
-          "text": "Pakkun stays near the exit."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi goes to ANBU Marked Target."
+          "text": "Pakkun stays near the exit while Kakashi checks ANBU Marked Target first."
         },
         {
           "kind": "narration",
@@ -2238,19 +1978,19 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "He recovers it."
+          "text": "Kakashi takes it and secures it."
         },
         {
           "kind": "narration",
-          "text": "Then looks at both defeated men."
+          "text": "Then he turns back to the two defeated men."
         },
         {
           "kind": "narration",
-          "text": "Both are still on the ground, alive and within reach."
+          "text": "Both are alive."
         },
         {
           "kind": "narration",
-          "text": "Neither has gone anywhere yet."
+          "text": "Neither is going anywhere before Kakashi decides what happens next."
         }
       ]
     }
@@ -2261,7 +2001,7 @@ const CONTENT={
       "1_secure_the_package": [
         {
           "kind": "narration",
-          "text": "Kakashi moves before Package Smuggler can turn the exchange into distance."
+          "text": "Kakashi moves before Package Smuggler can turn the handoff into distance."
         },
         {
           "kind": "narration",
@@ -2269,19 +2009,11 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Kakashi lets him."
+          "text": "Kakashi lets him go—for the moment."
         },
         {
           "kind": "narration",
-          "text": "For now."
-        },
-        {
-          "kind": "narration",
-          "text": "The package is the part of the mission he can still put his hand on."
-        },
-        {
-          "kind": "narration",
-          "text": "He drops into the street and goes straight for the man carrying it."
+          "text": "The package is still close enough to recover, so Kakashi drops into the street after the man carrying it."
         },
         {
           "kind": "narration",
@@ -2289,19 +2021,11 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "So does Masked Interceptor."
+          "text": "Masked Interceptor sees the same thing."
         },
         {
           "kind": "narration",
-          "text": "Her line changes immediately."
-        },
-        {
-          "kind": "narration",
-          "text": "She had been closing on Package Smuggler."
-        },
-        {
-          "kind": "narration",
-          "text": "Now Kakashi is between her and the same man."
+          "text": "Her path changes. She had been closing on Package Smuggler; now Kakashi is between them."
         },
         {
           "kind": "dialogue",
@@ -2310,11 +2034,7 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Kakashi does not."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler shifts the package behind his body."
+          "text": "Kakashi stays where he is."
         },
         {
           "kind": "dialogue",
@@ -2337,19 +2057,7 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Kakashi's eye moves once between them."
-        },
-        {
-          "kind": "narration",
-          "text": "One wants the man."
-        },
-        {
-          "kind": "narration",
-          "text": "One has the objective."
-        },
-        {
-          "kind": "narration",
-          "text": "Neither is moving out of his way."
+          "text": "Kakashi tracks both of them once and stops looking for a clean exit."
         },
         {
           "kind": "dialogue",
@@ -2363,7 +2071,7 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Package Smuggler takes the opening and reaches for his weapon."
+          "text": "Package Smuggler reaches for his weapon."
         },
         {
           "kind": "narration",
@@ -2372,24 +2080,16 @@ const CONTENT={
         {
           "kind": "narration",
           "text": "Masked Interceptor moves too."
-        },
-        {
-          "kind": "narration",
-          "text": "The decision to go for the package has become a fight with both of them."
         }
       ],
       "3_kakashi_loses_the_2_v_1": [
         {
           "kind": "narration",
-          "text": "Kakashi loses the opening."
+          "text": "Kakashi loses the opening, and Package Smuggler uses it immediately."
         },
         {
           "kind": "narration",
-          "text": "Package Smuggler does not waste it."
-        },
-        {
-          "kind": "narration",
-          "text": "By the time Kakashi can properly track the street again, the package is already moving away with him."
+          "text": "By the time Kakashi can track the street again, the receiver is already pulling away with the package."
         },
         {
           "kind": "narration",
@@ -2397,15 +2097,7 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Masked Interceptor remains."
-        },
-        {
-          "kind": "narration",
-          "text": "For a moment."
-        },
-        {
-          "kind": "narration",
-          "text": "She pulls Kakashi's arms behind him and binds them tight enough that the result of the fight cannot be mistaken."
+          "text": "Masked Interceptor stays just long enough to put Kakashi's arms behind him and bind them tight."
         },
         {
           "kind": "narration",
@@ -2413,11 +2105,11 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "No give."
+          "text": "It holds."
         },
         {
           "kind": "narration",
-          "text": "Masked Interceptor looks toward the route Package Smuggler took."
+          "text": "Masked Interceptor looks down the route Package Smuggler took."
         },
         {
           "kind": "dialogue",
@@ -2431,53 +2123,29 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "She leaves him there and disappears after Package Smuggler."
+          "text": "She leaves him there and disappears after the package."
         },
         {
           "kind": "narration",
-          "text": "Kakashi listens until her steps are gone."
+          "text": "Kakashi works at the restraint until the street has gone quiet."
         },
         {
           "kind": "narration",
-          "text": "Then starts working on the restraint."
-        },
-        {
-          "kind": "narration",
-          "text": "By the time he gets free, the street is empty."
-        },
-        {
-          "kind": "narration",
-          "text": "The package is gone."
-        },
-        {
-          "kind": "narration",
-          "text": "So are all three people who mattered to the exchange."
+          "text": "When he finally gets free, there is no one left to chase."
         }
       ],
       "4_kakashi_wins_the_2_v_1": [
         {
           "kind": "narration",
-          "text": "The fight ends with both immediate opponents down."
+          "text": "The fight ends with Package Smuggler and Masked Interceptor both down."
         },
         {
           "kind": "narration",
-          "text": "Kakashi does not celebrate."
+          "text": "Kakashi goes to the package before either of them."
         },
         {
           "kind": "narration",
-          "text": "His attention goes to the package first."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler is still close enough to reach."
-        },
-        {
-          "kind": "narration",
-          "text": "The package is closer."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi takes it from the defeated man's grasp, checks the seal and secures it against his body."
+          "text": "He takes it from Package Smuggler's grasp, checks the seal, and secures it against himself."
         },
         {
           "kind": "narration",
@@ -2485,23 +2153,15 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Masked Interceptor is still down."
+          "text": "The original target has distance now."
         },
         {
           "kind": "narration",
-          "text": "Package Smuggler is still down."
+          "text": "The two people at Kakashi's feet are still alive, still beaten, and still close enough for him to decide what to do with them."
         },
         {
           "kind": "narration",
-          "text": "Both are still down. Neither can tell him what he never learned."
-        },
-        {
-          "kind": "narration",
-          "text": "But the package is back in his hands."
-        },
-        {
-          "kind": "narration",
-          "text": "For the first time since the exchange, the mission objective is secure."
+          "text": "For the first time since the exchange broke apart, the package is back under his control."
         }
       ],
       "6_branch_b1_stay_on_the_first_man": [
@@ -3107,27 +2767,15 @@ const CONTENT={
       "1_secure_the_package_before_the_assassin": [
         {
           "kind": "narration",
-          "text": "Masked Interceptor moves."
+          "text": "Masked Interceptor moves and Package Smuggler reacts."
         },
         {
           "kind": "narration",
-          "text": "Package Smuggler reacts."
+          "text": "Kakashi sees the opening neither of them intended to create."
         },
         {
           "kind": "narration",
-          "text": "Kakashi sees the gap between them."
-        },
-        {
-          "kind": "narration",
-          "text": "Not a gap in the street."
-        },
-        {
-          "kind": "narration",
-          "text": "A gap in timing."
-        },
-        {
-          "kind": "narration",
-          "text": "For one instant, all three are moving toward the same point."
+          "text": "For one heartbeat, all three are committed to the same point."
         },
         {
           "kind": "narration",
@@ -3151,29 +2799,17 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "The distance collapses."
+          "text": "The distance between all three disappears at once."
         }
       ],
       "2_resolver_success_clean_extraction": [
         {
           "kind": "narration",
-          "text": "Kakashi gets there first."
+          "text": "Kakashi reaches Package Smuggler first."
         },
         {
           "kind": "narration",
-          "text": "His hand closes around Package Smuggler's wrist."
-        },
-        {
-          "kind": "narration",
-          "text": "Not the weapon hand."
-        },
-        {
-          "kind": "narration",
-          "text": "The arm holding the package."
-        },
-        {
-          "kind": "narration",
-          "text": "He turns with the man's momentum."
+          "text": "He catches the arm holding the package and turns with the man's momentum."
         },
         {
           "kind": "narration",
@@ -3185,15 +2821,7 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Package Smuggler's expression changes half a second too late."
-        },
-        {
-          "kind": "narration",
-          "text": "Masked Interceptor reaches them a heartbeat after that."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi is already moving."
+          "text": "Package Smuggler realises what happened half a second too late."
         },
         {
           "kind": "dialogue",
@@ -3202,27 +2830,19 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Kakashi does not stop to answer."
+          "text": "Masked Interceptor reaches them a heartbeat later."
         },
         {
           "kind": "narration",
-          "text": "He clears the line between them with the package secured against him."
+          "text": "Kakashi is already leaving."
         },
         {
           "kind": "narration",
-          "text": "Masked Interceptor checks her pursuit for one instant."
+          "text": "She checks her pursuit for one instant, looking from Kakashi to Package Smuggler."
         },
         {
           "kind": "narration",
-          "text": "Looks at Kakashi."
-        },
-        {
-          "kind": "narration",
-          "text": "Then back at Package Smuggler."
-        },
-        {
-          "kind": "narration",
-          "text": "Her apparent target is still standing in front of her."
+          "text": "Her original target is still in front of her."
         },
         {
           "kind": "narration",
@@ -3230,7 +2850,7 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "He disappears into the night with the objective."
+          "text": "He clears the street with the package secured against him."
         }
       ],
       "3_success_return_to_anbu": [
@@ -3399,31 +3019,19 @@ const CONTENT={
       "1_entry_deal_with_her_first": [
         {
           "kind": "narration",
-          "text": "Package Smuggler is already moving away with the objective."
+          "text": "Package Smuggler is already pulling away with the package. ANBU Marked Target is farther ahead."
         },
         {
           "kind": "narration",
-          "text": "ANBU Marked Target is farther ahead."
+          "text": "Masked Interceptor is the only threat still closing on Kakashi."
         },
         {
           "kind": "narration",
-          "text": "Masked Interceptor is the immediate violent pressure."
+          "text": "He chooses her first."
         },
         {
           "kind": "narration",
-          "text": "Kakashi makes the priority explicit."
-        },
-        {
-          "kind": "narration",
-          "text": "Her first."
-        },
-        {
-          "kind": "narration",
-          "text": "The package can wait a few more seconds."
-        },
-        {
-          "kind": "narration",
-          "text": "He turns into Masked Interceptor's line instead of chasing Package Smuggler."
+          "text": "Kakashi turns into her line instead of chasing the package."
         },
         {
           "kind": "narration",
@@ -3431,11 +3039,11 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Every second Kakashi spends here becomes distance somewhere else."
+          "text": "Every second Kakashi spends here gives the receiver more distance."
         },
         {
           "kind": "narration",
-          "text": "Masked Interceptor commits."
+          "text": "Masked Interceptor commits to the fight."
         },
         {
           "kind": "narration",
@@ -3445,27 +3053,19 @@ const CONTENT={
       "2_mi_battle_defeat": [
         {
           "kind": "narration",
-          "text": "Masked Interceptor wins the exchange between them."
+          "text": "Masked Interceptor wins the fight."
         },
         {
           "kind": "narration",
-          "text": "That is enough."
+          "text": "By then Package Smuggler has been buying distance for the entire exchange."
         },
         {
           "kind": "narration",
-          "text": "Package Smuggler had already been buying distance with every second of the fight."
+          "text": "Kakashi looks down the route the package took."
         },
         {
           "kind": "narration",
-          "text": "Now the distance is gone from recoverable to unknown."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi looks toward the route the package took."
-        },
-        {
-          "kind": "narration",
-          "text": "Nothing useful remains."
+          "text": "Nothing useful remains to follow."
         },
         {
           "kind": "narration",
@@ -3473,15 +3073,11 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Package Smuggler is gone with the objective."
+          "text": "Package Smuggler is gone with the package."
         },
         {
           "kind": "narration",
-          "text": "Whatever Masked Interceptor does next must come from what actually happens here."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi does not invent it afterward to make the report cleaner."
+          "text": "Masked Interceptor is the only person still close enough for Kakashi to read, and even that lasts only as long as she chooses to stay."
         }
       ],
       "3_mi_victory_in_5_action_opportunities": [
@@ -3579,31 +3175,27 @@ const CONTENT={
       "5_ps_catch_up_failure": [
         {
           "kind": "narration",
-          "text": "Kakashi takes the next junction too late."
+          "text": "Kakashi reaches the next junction too late."
         },
         {
           "kind": "narration",
-          "text": "He checks the street."
+          "text": "He checks the street, then the roofs above it."
         },
         {
           "kind": "narration",
-          "text": "Then the roofline."
+          "text": "No movement."
         },
         {
           "kind": "narration",
-          "text": "Nothing."
+          "text": "Package Smuggler has disappeared into the village with the package."
         },
         {
           "kind": "narration",
-          "text": "Package Smuggler has disappeared into the village with the objective."
+          "text": "Kakashi had a real chance to catch him after the first fight."
         },
         {
           "kind": "narration",
-          "text": "The opening Kakashi preserved by beating Masked Interceptor quickly was real."
-        },
-        {
-          "kind": "narration",
-          "text": "So was the possibility of losing it."
+          "text": "It closed before he could use it."
         }
       ],
       "6_ps_catch_up_success": [
@@ -3613,15 +3205,11 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "The man hears him coming."
+          "text": "The man hears him coming and looks back."
         },
         {
           "kind": "narration",
-          "text": "Looks back."
-        },
-        {
-          "kind": "narration",
-          "text": "His expression sinks."
+          "text": "His expression drops."
         },
         {
           "kind": "dialogue",
@@ -3643,35 +3231,11 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Kakashi cuts him off."
+          "text": "Kakashi cuts him off before he can turn the corner."
         },
         {
           "kind": "narration",
-          "text": "The man stops."
-        },
-        {
-          "kind": "narration",
-          "text": "Looks at the road behind him."
-        },
-        {
-          "kind": "narration",
-          "text": "Then at Kakashi."
-        },
-        {
-          "kind": "narration",
-          "text": "No Masked Interceptor now."
-        },
-        {
-          "kind": "narration",
-          "text": "No ANBU Marked Target."
-        },
-        {
-          "kind": "narration",
-          "text": "Just the two of them."
-        },
-        {
-          "kind": "narration",
-          "text": "And the package."
+          "text": "The man checks the empty road behind him, then Kakashi."
         },
         {
           "kind": "dialogue",
@@ -4005,77 +3569,49 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Kakashi follows."
+          "text": "Kakashi follows through two turns, then three, reading the little things the man leaves behind without meaning to."
         },
         {
           "kind": "narration",
-          "text": "One turn."
+          "text": "A roof tile shifted out of line. A fresh landing mark. Dust kicked from a wall."
         },
         {
           "kind": "narration",
-          "text": "Then another."
+          "text": "Then the trail stops."
         },
         {
           "kind": "narration",
-          "text": "The trail thins."
+          "text": "Kakashi checks the next roof and the crossing below before he admits it."
         },
         {
           "kind": "narration",
-          "text": "A roof tile shifted here."
+          "text": "There is no fourth sign."
         },
         {
           "kind": "narration",
-          "text": "A landing there."
+          "text": "The package is already gone in the other direction, and the man ahead has become a guess."
         },
         {
           "kind": "narration",
-          "text": "Then nothing."
+          "text": "Kakashi chose one problem to follow."
         },
         {
           "kind": "narration",
-          "text": "Kakashi stops."
-        },
-        {
-          "kind": "narration",
-          "text": "Not because he wants to."
-        },
-        {
-          "kind": "narration",
-          "text": "Because chasing a guess is no longer tracking."
-        },
-        {
-          "kind": "narration",
-          "text": "The package is gone in the other direction."
-        },
-        {
-          "kind": "narration",
-          "text": "The man is gone ahead."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi chose one."
-        },
-        {
-          "kind": "narration",
-          "text": "And lost him too."
+          "text": "Now he has lost that one too."
         }
       ],
       "3_pursuit_success_pakkun_corners_amt": [
         {
           "kind": "narration",
-          "text": "ANBU Marked Target rounds the next corner."
+          "text": "ANBU Marked Target rounds the next corner and stops short."
         },
         {
           "kind": "narration",
-          "text": "Then stops."
+          "text": "A small ninken is sitting in the middle of the street ahead of him."
         },
         {
           "kind": "narration",
-          "text": "A small ninken is sitting in the street ahead of him."
-        },
-        {
-          "kind": "narration",
-          "text": "He stares down at it."
+          "text": "The man looks down at it."
         },
         {
           "kind": "narration",
@@ -4086,30 +3622,18 @@ const CONTENT={
           "text": "Kakashi lands behind."
         },
         {
-          "kind": "narration",
-          "text": "Pakkun's ears lift."
-        },
-        {
           "kind": "dialogue",
           "speakerName": "PAKKUN",
           "text": "“This yours?”"
         },
         {
           "kind": "narration",
-          "text": "Kakashi looks at ANBU Marked Target."
+          "text": "Kakashi keeps his eye on the man caught between them."
         },
         {
           "kind": "dialogue",
           "speakerName": "KAKASHI",
           "text": "“Apparently.”"
-        },
-        {
-          "kind": "narration",
-          "text": "ANBU Marked Target looks between them."
-        },
-        {
-          "kind": "narration",
-          "text": "Then at Kakashi."
         },
         {
           "kind": "dialogue",
@@ -4123,17 +3647,17 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "That answer bothers him more than an accusation would have."
+          "text": "That answer lands harder than an accusation."
         },
         {
           "kind": "dialogue",
           "speakerName": "ANBU MARKED TARGET",
-          "text": "“Then why are you still following me?”"
+          "text": "“Then why are you still here?”"
         },
         {
           "kind": "dialogue",
           "speakerName": "KAKASHI",
-          "text": "“You were the one I started with.”"
+          "text": "“You were the first man in the exchange.”"
         },
         {
           "kind": "dialogue",
@@ -4147,7 +3671,7 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Kakashi settles his stance."
+          "text": "Kakashi settles into stance."
         },
         {
           "kind": "dialogue",
@@ -4156,25 +3680,16 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Pakkun rises."
-        },
-        {
-          "kind": "narration",
           "text": "ANBU Marked Target glances toward the alley mouth."
         },
         {
           "kind": "narration",
-          "text": "Pakkun notices."
+          "text": "Pakkun rises."
         },
         {
           "kind": "dialogue",
           "speakerName": "PAKKUN",
-          "text": "“He's thinking about running.”"
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "KAKASHI",
-          "text": "“I know.”"
+          "text": "“If you're going to run, pick a direction.”"
         },
         {
           "kind": "dialogue",
