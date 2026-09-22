@@ -4,6 +4,7 @@
 const fs=require("fs");
 const path=require("path");
 const assert=require("assert");
+const crypto=require("crypto");
 const {chromium}=require("playwright");
 
 const BASE=process.env.KAKASHI_V2_BASE_URL||"http://127.0.0.1:8080/index.html";
@@ -275,7 +276,12 @@ async function visualAndBattle(browser){
   try{
     const clean=await cleanRoute(browser);
     const visualBattle=await visualAndBattle(browser);
-    const result={pass:true,clean,visualBattle,browserGoldenClaimed:false};
+    const pngs=fs.readdirSync(OUT).filter(name=>name.endsWith(".png")).sort();
+    const hashes=pngs.map(name=>crypto.createHash("sha256").update(fs.readFileSync(path.join(OUT,name))).digest("hex"));
+    const uniqueScreenshots=new Set(hashes).size;
+    assert(pngs.length>=11,"installed-browser evidence screenshots missing");
+    assert(uniqueScreenshots>=8,"browser evidence is visually static/occluded: "+JSON.stringify({pngs,uniqueScreenshots}));
+    const result={pass:true,clean,visualBattle,pngCount:pngs.length,uniqueScreenshots,browserGoldenClaimed:false};
     fs.writeFileSync(path.join(OUT,"results.json"),JSON.stringify(result,null,2));
     console.log(JSON.stringify(result,null,2));
   }finally{
