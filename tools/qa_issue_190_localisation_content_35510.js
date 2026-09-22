@@ -145,15 +145,11 @@ core.setLocale('en',{persist:false,source:'qa'});
 assert.equal(core.translatePresentedText('Torneo de la aldea'),'Village Tournament');
 assert.equal(core.translatePresentedText('Mañana... lo haré mejor.'),"Tomorrow... I'll do it cleaner.");
 
-// Production activation is chained 35500 -> 35510 -> 35520. Both catalogues
-// remain independent of gameplay/runtime ownership.
-assert(loaderSource.includes('runtime/alpha-localisation-35500.js'));
-assert(loaderSource.includes('runtime/alpha-localisation-content-35510.js'));
-assert(loaderSource.includes('runtime/alpha-localisation-final-writing-35520.js'));
-assert(loaderSource.includes('script.addEventListener("load",loadContent,{once:true})'));
-assert(loaderSource.includes('contentScript.addEventListener("load",loadFinalWriting,{once:true})'));
-assert(loaderSource.includes('contentScript.async=false'));
-assert(loaderSource.includes('finalScript.async=false'));
+// #190 remains QUEUED / PRE-PUBLIC-ALPHA while critical Alpha Golden work proceeds.
+// Validate catalogue layering itself without fabricating a production activation claim.
+assert(!loaderSource.includes('runtime/alpha-localisation-35500.js'));
+assert(contentSource.includes('alpha_localisation_35500_required'));
+assert(finalSource.includes('alpha_localisation_35500_required'));
 for(const source of [contentSource,finalSource]){
   for(const forbidden of ['commitOccurrence(','advanceStoryScene(','commitCharacterAcquisition(','startBattle(','currentPL=','basePL='])assert(!source.includes(forbidden));
   assert(!source.includes('data-choice-id='));
