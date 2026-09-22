@@ -62,13 +62,20 @@ function playPostCommitWipe(prev,next){
 }
 function semanticAdvance(choiceId=null){
   const previous=projection();
-  // #312 invariant: Story truth commits first. No animation callback or timeout
-  // decides whether this choice/advance occurs.
+  // Capture only a detached visual snapshot before commit so the canonical
+  // Story renderer may replace DOM without losing the outgoing actor image.
+  // No choreography plays and no Story truth depends on this snapshot.
+  try{if(typeof prepareAcademyKakashiV2VisualSnapshot36030==="function")prepareAcademyKakashiV2VisualSnapshot36030();}catch(_e){}
+  // #312 invariant: Story truth commits synchronously before wipe/motion.
   let result=null;
   try{result=choiceId==null?PRE_ADVANCE():PRE_ADVANCE(choiceId);}catch(error){
+    try{if(typeof cancelAcademyKakashiV2VisualSnapshot36030==="function")cancelAcademyKakashiV2VisualSnapshot36030("semantic_exception");}catch(_e){}
     return{success:false,reason:"kakashi_v2_semantic_advance_exception",error:String(error&&error.message||error)};
   }
-  if(!result||result.success!==true)return result||{success:false,reason:"kakashi_v2_semantic_advance_failed"};
+  if(!result||result.success!==true){
+    try{if(typeof cancelAcademyKakashiV2VisualSnapshot36030==="function")cancelAcademyKakashiV2VisualSnapshot36030("semantic_rejected");}catch(_e){}
+    return result||{success:false,reason:"kakashi_v2_semantic_advance_failed"};
+  }
   if(active())resetForBeat();
   render();
   const next=projection();
@@ -122,6 +129,7 @@ function diagnostics(){
     wrapsStoryAdvance:globalThis.advanceStoryScene!==PRE_ADVANCE,
     cueAdvanceDoesNotCommitStory:String(advance).includes("semanticBeatUnchanged:true"),
     semanticAdvanceDelegates:String(semanticAdvance).includes("PRE_ADVANCE"),
+    outgoingSnapshotCapturedBeforeCommit:String(semanticAdvance).indexOf("prepareAcademyKakashiV2VisualSnapshot36030")<String(semanticAdvance).indexOf("PRE_ADVANCE"),
     semanticCommitPrecedesPresentation:String(semanticAdvance).indexOf("PRE_ADVANCE")<String(semanticAdvance).indexOf("render()"),
     animationCannotBlockStoryTruth:!String(semanticAdvance).includes("locked")&&!String(semanticAdvance).includes("await")&&!String(playPostCommitWipe).includes("PRE_ADVANCE"),
     blackWipeIsPostCommitPresentation:String(playPostCommitWipe).includes("semanticAlreadyCommitted:true"),
