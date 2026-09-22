@@ -213,7 +213,7 @@ async function shot(page,name,selector=null){
     assert.strictEqual(substitution.actorImages,2);
     const battlePaint=await page.evaluate(()=>{
       const selectors=[
-        "#screen-overlay",".overlay-content-box","#overlay-content-container",
+        "#story-scene-presentation-layer","#screen-overlay",".overlay-content-box","#overlay-content-container",
         ".battle-live-screen",".alpha-code-battle-stage",".battle2-performance-host",
         ".battle2-performance-stage",".battle-live-active-card-player",".battle-live-active-card-enemy"
       ];
@@ -246,6 +246,11 @@ async function shot(page,name,selector=null){
     });
     console.log("ISSUE312_BATTLE_PAINT_DIAGNOSTIC "+JSON.stringify(battlePaint));
     fs.writeFileSync(path.join(OUT,"battle-paint-diagnostic.json"),JSON.stringify(battlePaint,null,2));
+    const storyPaint=battlePaint.nodes.find(row=>row.selector==="#story-scene-presentation-layer");
+    const stagePaint=battlePaint.nodes.find(row=>row.selector===".alpha-code-battle-stage");
+    assert(storyPaint&&(storyPaint.display==="none"||storyPaint.visibility==="hidden"),"#312 preserved Story layer still occludes Battle: "+JSON.stringify(storyPaint));
+    assert(stagePaint&&stagePaint.opacity==="1"&&stagePaint.display!=="none"&&String(stagePaint.backgroundImage).includes("gradient"),"#312 Battle stage paint contract failed: "+JSON.stringify(stagePaint));
+    assert(!battlePaint.stack.some(row=>row.id==="story-scene-presentation-layer"),"#312 Story layer remains in Battle center hit-test stack: "+JSON.stringify(battlePaint.stack));
     await page.screenshot({path:path.join(OUT,"04-battle-full-page.png"),fullPage:false,timeout:12000});
     await shot(page,"04-battle-overlay.png","#screen-overlay");
     await shot(page,"04-battle-performance-only.png",".battle2-performance-stage");
