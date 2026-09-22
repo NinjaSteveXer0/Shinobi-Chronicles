@@ -39,6 +39,8 @@ on:
       - 'runtime/alpha-kakashi-v2-renderer-36030.js'
       - 'runtime/alpha-kakashi-v2-transition-36040.js'
       - 'tools/qa_kakashi_v2_clean_room.js'
+      - 'tools/qa_runtime_ownership_safety_300.js'
+      - 'tools/fixtures/runtime_*_300.json'
       - '.github/workflows/issue-188-story-decision.yml'
   workflow_dispatch:
 
