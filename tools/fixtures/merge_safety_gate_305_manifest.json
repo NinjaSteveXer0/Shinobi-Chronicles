@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "issue": 305,
+  "workflowName": "Shinobi Chronicles Merge Safety Gate",
+  "requiredStatus": "merge-safety-gate",
+  "alwaysRunEvents": [
+    "pull_request",
+    "merge_group"
+  ],
+  "classes": [
+    "DOCS_ONLY",
+    "RUNTIME_CORE",
+    "STORY_RUNTIME",
+    "ORIGIN_RUNTIME",
+    "KAKASHI_V2",
+    "BATTLE_RUNTIME",
+    "SAVE_SCHEMA",
+    "WORKFLOW_SAFETY"
+  ],
+  "failClosedUnknownRuntime": true,
+  "docsOnlyWaitsForPathFilteredRuntimeChecks": false,
+  "runtimeSafety": {
+    "ownership": "tools/qa_runtime_ownership_safety_300.js",
+    "legacyExclusion": "tools/qa_kakashi_v2_legacy_exclusion.js",
+    "alphaClosure": "tools/qa_issue_141_pre_alpha_runtime_closure.py"
+  },
+  "negativeFixtures": {
+    "duplicateRuntimeResponsibility": "duplicateResponsibilityRejected",
+    "retiredOwnerReintroduced": "retiredOwnerReintroducedRejected",
+    "duplicateVisibleStoryOwner": "duplicateRendererOwnerRejected"
+  },
+  "branchProtectionActivationOwnedBy": "CE/Stephen",
+  "rulesetMutationAllowed": false
+}
