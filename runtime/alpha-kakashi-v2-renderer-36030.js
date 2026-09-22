@@ -124,7 +124,7 @@ function installStyle(){
 #${ROOT_ID}[data-can-advance="true"]{cursor:pointer}
 #${ROOT_ID}[data-has-choices="true"]{cursor:default}
 #${ROOT_ID} .kv2-actor.kv2-cue-departed{opacity:0!important;pointer-events:none!important}
-#${ROOT_ID} [data-sc-choreography-pending-entry="true"]{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+#${ROOT_ID} [data-sc-choreography-pending-entry="true"],#${ROOT_ID} [data-kv2-cue-withheld="true"]{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
 @media(max-width:900px){#${ROOT_ID} .kv2-actors{left:1.5%;right:1.5%;bottom:31%}#${ROOT_ID} .kv2-actor{--kv2-w:min(19vw,170px);--kv2-h:min(44vh,290px)}#${ROOT_ID} .kv2-actor[data-slot="pakkun"]{--kv2-w:min(13vw,120px);--kv2-h:min(30vh,210px)}#${ROOT_ID} .kv2-dialogue{width:94%;bottom:2.5%}#${ROOT_ID} .kv2-speech{width:min(70vw,480px);bottom:26%}#${ROOT_ID} .kv2-actions{grid-template-columns:repeat(2,minmax(0,1fr))}#${ROOT_ID} .kv2-top{left:2.5%;right:2.5%;grid-template-columns:1fr minmax(190px,42%)}}
 @media(prefers-reduced-motion:reduce){#${ROOT_ID} .kv2-wipe{transition:none!important}#${ROOT_ID} .kv2-actor.is-entering,#${ROOT_ID} .kv2-actor-ghost{animation:none!important}}
 `;
@@ -443,8 +443,8 @@ function applyWatchExchangeStaticState(root,p,t){
   if(ps&&typeof applyStoryStageAnchor33900==="function")applyStoryStageAnchor33900(ps,idx>=6?"OPPONENT_RIGHT":"INNER_RIGHT");
   if(mi&&typeof applyStoryStageAnchor33900==="function")applyStoryStageAnchor33900(mi,"CENTER");
   if(mi){
-    if(idx<10)mi.dataset.scChoreographyPendingEntry="true";
-    else delete mi.dataset.scChoreographyPendingEntry;
+    if(idx<10)mi.dataset.kv2CueWithheld="true";
+    else delete mi.dataset.kv2CueWithheld;
   }
   if(amt){
     const moving=String(root.dataset.kv2CueMotion||"")==="v2_watch_exchange:11";
