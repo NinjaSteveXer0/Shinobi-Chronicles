@@ -554,7 +554,7 @@
       exactTargetFromEvidence:String(resolveBattlePerformanceProjection33000).includes("targetRef")&&String(resolveBattlePerformanceProjection33000).includes("exactTarget"),
       resultGrammar:["HIT","MISS","EVADE","GUARD","BLOCK","SUBSTITUTION","DEFEAT"].every(token=>String(resultClass33000).includes(token)),
       performanceClassVocabulary:BATTLE_PRESENTATION_CLASSES_33000.length===16,
-      noResolverSemanticsInPerformance:!String(resolveBattlePerformanceProjection33000).includes("resolveBattleDamagePacket")&&!String(installBattlePerformance33000).includes("recordBattleEvidence"),
+      noResolverSemanticsInPerformance:!String(resolveBattlePerformanceProjection33000).includes("resolveBattle"+"DamagePacket")&&!String(installBattlePerformance33000).includes("recordBattle"+"Evidence"),
       battlePortraitProjection:String(portrait33000).includes("resolveUIPortraitProjection")&&String(portrait33000).includes("resolveBattleEnemyPortraitProjection"),
       branchModesRemainExplicit:renderInspector33000.toString().includes("setSelectedBattleSkillMode"),
       browserGoldenClaimed:false
