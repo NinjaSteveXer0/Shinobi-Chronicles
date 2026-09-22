@@ -865,6 +865,39 @@ async function shot(page,name,selector=null){
       return stage?.dataset.formationTray==="skills"&&!!deck&&getComputedStyle(deck).display!=="none";
     },null,{timeout:3000});
 
+    const psVictoryOverlay=await page.evaluate(()=>{
+      const dep=currentBattle.kakashiV2;
+      const prior={
+        battleConfigId:dep.battleConfigId,
+        battleOccurrenceId:dep.battleOccurrenceId,
+        storyOccurrenceId:dep.storyOccurrenceId,
+        encounterId:currentBattle.encounterId,
+        outcome:currentBattle.outcome?cloneBattleRuntimeValue(currentBattle.outcome):null,
+        rewards:currentBattle.rewards?cloneBattleRuntimeValue(currentBattle.rewards):null
+      };
+      dep.battleConfigId="academy_kakashi_origin_battle_seq_ps";
+      dep.battleOccurrenceId="issue312_ps_reward_overlay";
+      dep.storyOccurrenceId="issue312_ps_reward_story";
+      currentBattle.encounterId="academy_kakashi_origin_battle_seq_ps";
+      currentBattle.outcome={type:"victory",completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};
+      currentBattle.rewards={generated:true,claimed:false,ryo:0,exp:0,items:[],rareDrops:[]};
+      openOverlay("victory");
+      const text=String(document.getElementById("screen-overlay")?.textContent||"").replace(/\s+/g," ").trim();
+      const reward=cloneBattleRuntimeValue(currentBattle.rewards);
+      dep.battleConfigId=prior.battleConfigId;
+      dep.battleOccurrenceId=prior.battleOccurrenceId;
+      dep.storyOccurrenceId=prior.storyOccurrenceId;
+      currentBattle.encounterId=prior.encounterId;
+      currentBattle.outcome=prior.outcome;
+      currentBattle.rewards=prior.rewards;
+      openOverlay("combat");
+      return{reward,text};
+    });
+    assert.strictEqual(psVictoryOverlay.reward.ryo,50,"#312 PS Victory overlay did not consume the locked 50 Ryō reward: "+JSON.stringify(psVictoryOverlay));
+    assert.strictEqual(psVictoryOverlay.reward.exp,0,"#312 PS Victory overlay invented generic Character EXP");
+    assert.deepStrictEqual(psVictoryOverlay.reward.items,[],"#312 PS Victory overlay invented an Item");
+    assert(psVictoryOverlay.text.includes("50"),"#312 actual PS Victory overlay still renders zero cash: "+psVictoryOverlay.text);
+
     const errors=await runtimeErrorGate.assertClean("issue312_story_battle_benchmark");
     const result={
       pass:true,
