@@ -5,7 +5,9 @@ const fs=require("fs");
 const vm=require("vm");
 const assert=require("assert");
 
+const CONTENT_PATH="runtime/academy-kakashi-v2-content-36000.js";
 const CORE_PATH="runtime/alpha-kakashi-v2-core-36020.js";
+const contentSource=fs.readFileSync(CONTENT_PATH,"utf8");
 const coreSource=fs.readFileSync(CORE_PATH,"utf8");
 const scenes=new Map();
 const factualDefinitions=new Map();
@@ -50,6 +52,7 @@ const context={
 };
 context.globalThis=context;
 vm.createContext(context);
+vm.runInContext(contentSource,context,{filename:CONTENT_PATH});
 vm.runInContext(coreSource,context,{filename:CORE_PATH});
 
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
