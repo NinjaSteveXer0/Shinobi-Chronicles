@@ -16,7 +16,17 @@ let rendering=false;
 
 function esc(v){return String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
 function active(){try{return typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;}catch(_e){return null;}}
-function isActive(){const rt=active();return !!rt&&rt.sceneId===SCENE_ID;}
+function storySuspendedForBattle(){
+  const rt=active();if(!rt||rt.sceneId!==SCENE_ID)return false;
+  const pending=rt.pendingBattle&&rt.pendingBattle.battleId;
+  if(!pending)return false;
+  try{
+    const battle=typeof currentBattle!=="undefined"?currentBattle:null;
+    const rc=battle&&battle.returnContext||null;
+    return !!(battle&&rc&&rc.type==="story_scene"&&rc.sceneId===SCENE_ID);
+  }catch(_e){return false;}
+}
+function isActive(){const rt=active();return !!rt&&rt.sceneId===SCENE_ID&&!storySuspendedForBattle();}
 function projection(){
   const rt=active();if(!rt||rt.sceneId!==SCENE_ID||typeof getAcademyKakashiV2Presentation36020!=="function")return null;
   return getAcademyKakashiV2Presentation36020(rt.beatId);
@@ -278,6 +288,7 @@ function diagnostics(){
     persistentGhostLayer:String(ensureRoot).includes("kv2-ghost-layer"),
     deterministicActorSlots:String(actorSlot).includes("academy_kakashi_origin_masked_interceptor")&&installStyle.toString().includes('data-slot="minato"'),
     noMutationObserver:!String(render).includes("MutationObserver"),
+    battleSuspendsStoryProjection:String(storySuspendedForBattle).includes("pendingBattle")&&String(storySuspendedForBattle).includes('rc.type==="story_scene"'),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
