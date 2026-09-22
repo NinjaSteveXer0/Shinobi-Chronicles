@@ -329,7 +329,7 @@ function minatoPackageCues(s,{lethal=false}={}){
   if(lethal){
     if(recovered)return[
       Q("MINATO","And the package?"),
-      Q("ANBU OPERATIVE","Recovered."),
+      Q("ANBU OPERATIVE","Recovered and returned."),
       N("Minato nods once."),
       Q("MINATO","Keep that separate from the deaths.")
     ];
@@ -342,12 +342,12 @@ function minatoPackageCues(s,{lethal=false}={}){
   }
   if(recovered)return[
     Q("MINATO","He brought the package back."),
-    Q("ANBU OPERATIVE","Yes."),
+    Q("ANBU OPERATIVE","It came back with him."),
     Q("MINATO","What did he give up to do it?")
   ];
   return[
     Q("MINATO","He lost the package."),
-    Q("ANBU OPERATIVE","Yes."),
+    Q("ANBU OPERATIVE","It never returned to our side."),
     Q("MINATO","What did he come back with?")
   ];
 }
@@ -356,30 +356,28 @@ function lethalMinatoCues(s){
   const out=[N("The ANBU operative finishes the report. Minato stays quiet long enough to make sure there is nothing else coming.")];
   if(dead.length===3)out.push(
     Q("MINATO","Three deaths. None of them in the fight itself."),
-    Q("ANBU OPERATIVE","Correct."),
+    Q("ANBU OPERATIVE","All three were alive when their fights ended."),
     N("Minato looks down at the report."),
     Q("MINATO","So he knew when each fight was over."),
-    Q("ANBU OPERATIVE","Yes."),
+    Q("ANBU OPERATIVE","There is no sign he mistook their condition."),
     Q("MINATO","And still made the same decision three times."),
-    Q("ANBU OPERATIVE","Yes."),
+    Q("ANBU OPERATIVE","Three times."),
     N("Minato closes the file halfway."),
     Q("MINATO","Then that's the part I care about. Not the number.")
   );
   else if(dead.length===2){
     const survivor=["MI","PS","AMT"].find(ref=>!dead.includes(ref));
     const survivorState=s.participants[survivor]&&s.participants[survivor].state;
-
     out.push(Q("MINATO","Two deliberate deaths."));
-    if(survivorState==="RELEASED")out.push(Q("MINATO","And he let the third person walk."));
-    else if(["ANBU_CUSTODY","POLICE_CUSTODY","FIELD_SECURED_PENDING_COLLECTION"].includes(survivorState))out.push(Q("MINATO","But he kept the third person alive."));
-    else out.push(Q("MINATO","The third outcome wasn't his to finish."));
-
+    if(survivorState==="RELEASED")out.push(Q("ANBU OPERATIVE","The third person was released alive."),Q("MINATO","So the third result was a different choice."));
+    else if(["ANBU_CUSTODY","POLICE_CUSTODY","FIELD_SECURED_PENDING_COLLECTION"].includes(survivorState))out.push(Q("ANBU OPERATIVE","The third person remained alive under control."),Q("MINATO","Then he did not treat every defeat the same."));
+    else out.push(Q("ANBU OPERATIVE","The third outcome was no longer his to finish."),Q("MINATO","Then keep it separate."));
     out.push(N("Minato lets the difference sit before moving on."));
   }else if(dead.length===1){
     const ref=dead[0];
-    if(ref==="MI")out.push(Q("MINATO","The masked shinobi is the one he chose to kill."),N("Minato reads what came before and after it."),Q("MINATO","One death only matters if we understand when he decided on it."));
-    else if(ref==="PS")out.push(Q("MINATO","The receiver is dead."),N("Minato's finger stops on the package line."),Q("MINATO","Don't merge that with whether he recovered the objective."));
-    else out.push(Q("MINATO","The original target is the one who died."),N("Minato looks back to the first line of the assignment."),Q("MINATO","He began the night following that man and ended it deciding whether he lived."));
+    if(ref==="MI")out.push(Q("MINATO","The masked shinobi is the one he chose to kill."),Q("ANBU OPERATIVE","After her fight was already over."),N("Minato reads what came before and after it."),Q("MINATO","Then one death only matters if we understand when he decided on it."));
+    else if(ref==="PS")out.push(Q("MINATO","The receiver is dead."),Q("ANBU OPERATIVE","Killed after defeat."),N("Minato's finger stops on the package line."),Q("MINATO","Don't merge that with whether he recovered the objective."));
+    else out.push(Q("MINATO","The original target is the one who died."),Q("ANBU OPERATIVE","After Kakashi had already beaten him."),N("Minato looks back to the first line of the assignment."),Q("MINATO","He began the night following that man and ended it deciding whether he lived."));
   }
   out.push(...minatoPackageCues(s,{lethal:true}));
   return out;
@@ -387,58 +385,60 @@ function lethalMinatoCues(s){
 function nonlethalMinatoCues(s){
   const out=[N("The ANBU operative finishes the report."),...minatoPackageCues(s)];
   const states=Object.values(s.participants||{}).map(r=>r&&r.state);
-  if(states.includes("ANBU_CUSTODY"))out.push(
-    Q("MINATO","He brought someone back alive."),
-    Q("ANBU OPERATIVE","Yes."),
-    Q("MINATO","Because he couldn't finish the fight?"),
-    Q("ANBU OPERATIVE","No."),
-    Q("MINATO","Then custody was part of the decision.")
+  const anbuCount=states.filter(x=>x==="ANBU_CUSTODY").length;
+  const policeCount=states.filter(x=>x==="POLICE_CUSTODY").length;
+  const fieldCount=states.filter(x=>x==="FIELD_SECURED_PENDING_COLLECTION").length;
+  const released=states.filter(x=>x==="RELEASED").length;
+
+  if(anbuCount)out.push(
+    Q("MINATO",anbuCount>1?"He brought them back alive.":"He brought one of them back alive."),
+    Q("ANBU OPERATIVE",anbuCount>1?`${anbuCount} were transferred into ANBU custody.`:"The transfer was deliberate; Kakashi had control."),
+    Q("MINATO","Then don't write that as a fight he failed to finish."),
+    Q("ANBU OPERATIVE","Understood.")
   );
-  else if(states.includes("POLICE_CUSTODY"))out.push(
+  else if(policeCount)out.push(
     Q("MINATO","He chose the Police instead of bringing them here."),
-    Q("ANBU OPERATIVE","Yes."),
+    Q("ANBU OPERATIVE",policeCount>1?`${policeCount} were transferred alive.`:"The transfer was alive and deliberate."),
     N("Minato considers that."),
-    Q("MINATO","He wanted the handoff outside ANBU. Record it that way.")
+    Q("MINATO","Then record the institution he chose. That matters.")
   );
-  else if(states.includes("FIELD_SECURED_PENDING_COLLECTION"))out.push(
+  else if(fieldCount)out.push(
     Q("MINATO","He restrained them and kept moving."),
-    Q("ANBU OPERATIVE","Yes."),
+    Q("ANBU OPERATIVE",fieldCount>1?"He left exact locations for collection.":"He left an exact location for collection."),
     Q("MINATO","Then he treated custody as something to manage, not something that ended the mission.")
   );
-  else if(states.includes("RELEASED")){
-    const released=states.filter(x=>x==="RELEASED").length;
+  else if(released){
     if(released>1)out.push(
       Q("MINATO","He had them under control and let them go."),
-      Q("ANBU OPERATIVE","Yes."),
+      Q("ANBU OPERATIVE","The releases were deliberate."),
       Q("MINATO","Then that wasn't an escape. It was his decision.")
     );
     else out.push(
       Q("MINATO","He had control and chose release."),
-      Q("ANBU OPERATIVE","Yes."),
+      Q("ANBU OPERATIVE","Deliberately."),
       Q("MINATO",s.package.recovered||s.package.returned?"The objective was already secure.":"And the mission wasn't.")
     );
   }
+
   const clean=(s.resolvers.directPickpocket&&s.resolvers.directPickpocket.selectedOutcomeRef==="PICKPOCKET_DIRECT_SUCCESS")||(s.resolvers.improvedPickpocket&&s.resolvers.improvedPickpocket.selectedOutcomeRef==="PICKPOCKET_IMPROVED_SUCCESS");
   if(clean)out.push(
     Q("MINATO","No fight?"),
-    Q("ANBU OPERATIVE","No."),
-    Q("MINATO","And the package still came back."),
-    Q("ANBU OPERATIVE","Yes."),
+    Q("ANBU OPERATIVE","None. He took the package without exposing himself."),
+    Q("MINATO","And it still came back."),
+    Q("ANBU OPERATIVE","It did."),
     N("A faint approval reaches Minato's expression."),
     Q("MINATO","Good. Not every successful mission needs to become a battle.")
   );
   if(s.knowledge.getCloserContingency)out.push(
     Q("MINATO","He stayed long enough to hear the contingency."),
-    Q("ANBU OPERATIVE","Yes."),
-    Q("MINATO","And reported the part they never said as unknown."),
-    Q("ANBU OPERATIVE","Yes."),
-    Q("MINATO","Good.")
+    Q("ANBU OPERATIVE","Long enough to learn it. He still reported the downstream destination as unknown."),
+    Q("MINATO","Good. He separated what he heard from what he guessed.")
   );
   if(s.knowledge.askWhere)out.push(
     Q("MINATO","He questioned the carrier before committing to the fight."),
+    Q("ANBU OPERATIVE","The carrier only knew his part ended at the handoff."),
+    Q("MINATO","So Kakashi found the edge of the man's knowledge."),
     Q("ANBU OPERATIVE","Yes."),
-    Q("MINATO","And learned where the carrier's knowledge ended."),
-    Q("ANBU OPERATIVE","At the handoff."),
     N("Minato nods."),
     Q("MINATO","That's useful even without a destination.")
   );
