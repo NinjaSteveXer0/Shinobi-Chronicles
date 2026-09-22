@@ -724,6 +724,12 @@ async function browserRouteMatrix(browser){
     await chooseLabel(page,"RESTRAIN HER AND CONTINUE","v2_mi_restrained_next");
     await chooseLabel(page,"GO AFTER PACKAGE SMUGGLER","v2_ps_pursuit_resolver");
     await advanceTo(page,"v2_battle_ps_seq");
+    const psBattleScene=await page.evaluate(()=>{
+      const beatId=getActiveStorySceneRuntime()?.beatId||null;
+      const p=getAcademyKakashiV2Presentation36020(beatId);
+      return{beat:beatId,backdrop:p?.backdrop||null,location:p?.location||null};
+    });
+    assert.strictEqual(psBattleScene.backdrop,"Kakashi Origin Backdrop/konoha_alleyway_alt_night.png","PS pursuit Battle jumped back to the Sakura-tree arena: "+JSON.stringify(psBattleScene));
     await launchAndReturnBattle(page,{outcome:"defeat",actions:2,expectedBeat:"v2_ps_seq_loss"});
     const s=await stateSnapshot(page);
     assert.strictEqual(s.participants.MI.state,"FIELD_SECURED_PENDING_COLLECTION");

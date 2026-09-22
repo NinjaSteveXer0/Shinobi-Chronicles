@@ -173,6 +173,22 @@ if(PRE_VICTORY_RENDER){
   try{renderVictoryOverlay=globalThis.renderVictoryOverlay;}catch(_error){}
 }
 
+// Some overlay routers retain the original Victory renderer instead of looking
+// up the later wrapper dynamically. Repair the authoritative reward projection
+// before the Victory overlay is opened so both retained and dynamic renderers
+// consume the same currentBattle.rewards object.
+const PRE_OPEN_OVERLAY=typeof openOverlay==="function"?openOverlay:null;
+function openOverlay36015(type){
+  if(String(type||"").toLowerCase()==="victory"){
+    try{ensureKakashiV2BattleRewardProjection36015();}catch(_e){}
+  }
+  return PRE_OPEN_OVERLAY?PRE_OPEN_OVERLAY.apply(this,arguments):false;
+}
+if(PRE_OPEN_OVERLAY){
+  globalThis.openOverlay=openOverlay36015;
+  try{openOverlay=globalThis.openOverlay;}catch(_error){}
+}
+
 function snapshotRewardMutation(){
   return{
     ryo:Number(ensurePlayer().ryo)||0,
@@ -315,6 +331,7 @@ function diagnostics(){
     noKillRewardPredicate:!String(previewTerminal).includes('state==="DEAD"')&&!String(exceptionalState).includes("DEAD"),
     noParallelInventory:!String(commitItemSource).includes("inventory.push")&&String(commitItemSource).includes("addItemToInventory"),
     victoryProjectionSelfHeals:String(ensureKakashiV2BattleRewardProjection36015).includes("authoritativeProjectionRepaired")&&String(renderVictoryOverlay36015).includes("ensureKakashiV2BattleRewardProjection36015"),
+    victoryOpenProjectsBeforeGenericRender:String(openOverlay36015).includes('"victory"')&&String(openOverlay36015).indexOf("ensureKakashiV2BattleRewardProjection36015")<String(openOverlay36015).indexOf("PRE_OPEN_OVERLAY"),
     exactMIBattleProjection:String(ensureKakashiV2BattleRewardProjection36015).includes("Field Recovery Pill")&&String(battlePlan).includes("ryo:50"),
     browserGoldenClaimed:false
   };

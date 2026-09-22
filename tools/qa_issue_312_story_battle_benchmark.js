@@ -70,7 +70,15 @@ assert(kv2Renderer.includes("mi.hidden=true")&&kv2Renderer.includes("mi.hidden=f
 assert(kv2Renderer.includes("normalizeCueLocalActorState")&&kv2Renderer.includes("kv2-cue-departed")&&kv2Renderer.includes("node.hidden=false"),"#312 WATCH-only hidden/departed presentation state must not leak into later beats");
 assert(kv2Renderer.includes('next.id==="v2_direct_strike_setup"')&&kv2Renderer.includes('kind:"STRIKE"'),"#312 STRIKE BEFORE THE HANDOFF must visibly drive Kakashi into the authored attack");
 assert(kv2Renderer.includes("kv2ActorFall36030")&&kv2Renderer.includes('data-sc-choreography-active="COLLAPSE"')&&kv2Renderer.includes('state==="KILLED"'),"#312 lethal Story departure must visibly fall off-screen and remain forward-compatible with KILLED truth");
-assert(kv2Renderer.includes("materializeRetainedHoldGhosts")&&kv2Renderer.includes("kv2-outgoing-hold-ghost")&&kv2Renderer.includes('data-transition-active="true"] .kv2-actors'),"#312 hard Story transitions must freeze retained outgoing actors while departure motion plays");
+assert(kv2Renderer.includes("materializeRetainedHoldGhosts")&&kv2Renderer.includes("kv2-outgoing-hold-ghost")&&kv2Renderer.includes('data-transition-active="true"] .kv2-ghost-layer{z-index:46}')&&kv2Renderer.includes(".kv2-transition-memory{position:absolute;inset:0;z-index:45"),"#312 hard Story transitions must preserve outgoing actors above the outgoing environment while the committed next scene remains underneath");
+assert(kv2Renderer.includes("kv2-transition-memory.is-releasing")&&kv2Renderer.includes("is-hard.is-covering{opacity:.58}")&&kv2Renderer.includes("transitionMemoryReleaseTimer"),"#312 hard Story scene changes must use the outgoing-scene crossfade rather than an opaque black cut");
+{
+  const renderStart=kv2Renderer.indexOf("function render(){");
+  const renderEnd=kv2Renderer.indexOf("function bind(",renderStart);
+  const renderSource=kv2Renderer.slice(renderStart,renderEnd);
+  assert(renderStart>=0&&renderEnd>renderStart&&renderSource.includes('root.dataset.transitionActive="true"')&&renderSource.includes("rendered underneath the preserved outgoing environment"),"#312 hard transition must mark the handoff while the committed next scene remains underneath the outgoing visual memory");
+}
+assert(kv2Renderer.includes('data-transition-active="true"] .kv2-ghost-layer{z-index:46}')&&kv2Renderer.includes(".kv2-transition-memory{position:absolute;inset:0;z-index:45"),"#312 outgoing transition tableau must layer above the committed next scene without blanking its narration surface");
 assert(kv2Renderer.includes('ghost.className="kv2-departure-ghost kv2-actor-ghost'),"#312 outgoing actor ghosts must not inherit stale live choreography classes");
 assert(kv2Transition.includes("?650:0"),"#312 hard scene transition must leave enough presentation time for the lethal fall to be visible");
 assert(kv2Renderer.includes("border-radius:16px")&&kv2Renderer.includes("backdrop-filter:blur(8px)"),"#312 modern compact narration/speech styling missing");
@@ -91,6 +99,7 @@ assert(battleSource.includes("battle2-formation-withdraw")&&battleSource.include
 assert(battleSource.includes("selectedTargetRef")&&battleSource.includes("formationNodeForRef33000"),"#312 contextual exact-target formation focus missing");
 assert(battleSource.includes("if(state&&state.selectedSkillId)return false")&&battleSource.includes("Preserve that DOM verbatim"),"#312 hover inspector must not replace the canonical selected-Skill action/mode/cancel surface");
 assert(battleSource.includes('const preserveSkills=formationTrayMode33000==="skills"||stage.dataset.formationTray==="skills"')&&battleSource.includes("if(!preserveSkills)"),"#312 committed Skill playback must preserve an already-open Skills tray for fast Battle flow");
+assert(kv2Rewards.includes("function openOverlay36015")&&kv2Rewards.includes("ensureKakashiV2BattleRewardProjection36015")&&kv2Rewards.indexOf("ensureKakashiV2BattleRewardProjection36015",kv2Rewards.indexOf("function openOverlay36015"))<kv2Rewards.indexOf("PRE_OPEN_OVERLAY",kv2Rewards.indexOf("function openOverlay36015")),"#312 Kakashi Victory must project authored rewards before generic overlay rendering");
 assert(battleSource.includes("const played=playedBattlePerformanceKeys33000.has(key)")&&battleSource.includes("if(!played){"),"#312 settled performance receipts must not replay tray mutations");
 assert(battleSource.includes('data-formation-hidden="true"')||battleSource.includes('dataset.formationHidden="true"'),"#312 undeployed/reserve formation furniture is not being suppressed");
 

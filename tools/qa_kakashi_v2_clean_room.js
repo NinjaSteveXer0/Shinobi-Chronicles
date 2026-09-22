@@ -35,6 +35,7 @@ assert(!rendererSource.split("function ensureRoot")[0].includes("root.innerHTML"
 assert(!rendererSource.slice(rendererSource.indexOf("function syncActors"),rendererSource.indexOf("function bind")).includes("root.innerHTML"),"cue render remounts Scene Board root");
 assert(rendererSource.includes("kv2-ghost-layer"),"persistent actor ghost layer missing");
 assert(rendererSource.includes("is-falling")&&rendererSource.includes("is-fleeing")&&rendererSource.includes("is-fading"),"distinct actor exit regression markers missing");
+assert(coreSource.includes('addBeat("v2_battle_ps_seq",{mode:"battle_transition",backdrop:B.alleyAlt')&&coreSource.includes('addBeat("v2_ps_seq_win",{mode:"choice",backdrop:B.alleyAlt')&&coreSource.includes('addBeat("v2_ps_seq_loss",{backdrop:B.alleyAlt'),"PS pursuit Battle/post-Battle must remain in the authorised side-street backdrop");
 
 // Reward authority uses the existing Currency / Inventory / Battle claim surfaces
 // while proving exact source values and idempotence.
@@ -85,6 +86,20 @@ assert(rendererSource.includes("is-falling")&&rendererSource.includes("is-fleein
   assert.strictEqual(context.playerData.ryo,50);
   assert.strictEqual(context.playerData.inventory.find(x=>x.id==="field_recovery_pill").quantity,1);
 
+  context.currentBattle={
+    battleId:"qa_ps_battle",encounterId:"academy_kakashi_origin_battle_seq_ps",
+    outcome:{type:"victory"},
+    rewards:{generated:false,claimed:false},
+    kakashiV2:{battleConfigId:"academy_kakashi_origin_battle_seq_ps",battleOccurrenceId:"qa_ps_battle",storyOccurrenceId:"qa_origin"}
+  };
+  const psImmediate=context.generateBattleRewards({rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]}},{name:"Kakashi"});
+  assert.strictEqual(psImmediate.ryo,50,"PS exact solo victory must project 50 Ryō");
+  assert.strictEqual(psImmediate.exp,0);
+  assert.deepStrictEqual(Array.from(psImmediate.items),[],"PS exact solo victory must remain cash-only");
+  assert.strictEqual(context.claimCurrentBattleRewards(),true);
+  assert.strictEqual(context.playerData.ryo,100,"PS Battle claim did not add exactly 50 Ryō");
+  assert.strictEqual(context.playerData.inventory.filter(x=>x.id==="field_recovery_pill").reduce((n,x)=>n+(x.quantity||1),0),1,"PS Battle must not grant another Field Recovery Pill");
+
   const state={
     package:{holder:"ANBU",returned:true,recovered:true},
     knowledge:{askWhere:true},
@@ -99,7 +114,7 @@ assert(rendererSource.includes("is-falling")&&rendererSource.includes("is-fleein
   assert.strictEqual(terminal.grantedRyo,250);
   assert.strictEqual(terminal.pillGranted,0,"immediate MI pill must suppress terminal fallback");
   assert.strictEqual(terminal.trainingTantoGranted,1);
-  assert.strictEqual(context.playerData.ryo,300);
+  assert.strictEqual(context.playerData.ryo,350);
   assert.strictEqual(context.playerData.inventory.filter(x=>x.id==="field_recovery_pill").reduce((n,x)=>n+(x.quantity||1),0),1);
   assert.strictEqual(context.playerData.inventory.filter(x=>x.id==="academy_training_tanto").length,1);
   const before=JSON.stringify({ryo:context.playerData.ryo,inventory:context.playerData.inventory});
