@@ -132,9 +132,10 @@ function enter(id,battleResume=null){
   return b;
 }
 function availableChoice(label){
-  const row=(beat().choices||[]).find(c=>c.label===label);
-  assert(row,`choice ${label} missing at ${activeRuntime.beatId}`);
-  if(typeof row.availability==="function")assert.strictEqual(row.availability().available,true,`choice ${label} unavailable at ${activeRuntime.beatId}`);
+  const rows=(beat().choices||[]).filter(c=>c.label===label);
+  assert(rows.length,`choice ${label} missing at ${activeRuntime.beatId}`);
+  const row=rows.find(candidate=>typeof candidate.availability!=="function"||candidate.availability().available===true);
+  assert(row,`choice ${label} unavailable at ${activeRuntime.beatId}`);
   return row;
 }
 function choose(label){
