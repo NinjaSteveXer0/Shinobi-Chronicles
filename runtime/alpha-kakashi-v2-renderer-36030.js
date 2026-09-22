@@ -323,11 +323,14 @@ function syncPackageToken(root,p){
 function deriveProjectionChoreography(root,previous,next,p,departures=[]){
   if(!previous||!next)return[];
   const cues=[];
+  // Depart committed outgoing actors before revealing newly mounted actors.
+  // The shared owner pre-stages ENTER subjects as invisible until their cue starts,
+  // preventing a semantic commit from painting an accidental four-card tableau.
+  for(const row of departures)cues.push({kind:row.kind,actorId:row.ghostId});
   const prevIds=new Set((previous.actors||[]).map(a=>a.id));
   for(const actor of next.actors||[]){
     if(!prevIds.has(actor.id))cues.push({kind:actor.slot==="mi"?"SURPRISE_ENTRY":"ENTER",actorId:actor.id,fromAnchor:actor.slot==="mi"?"FAR_ENTRY_RIGHT":null});
   }
-  for(const row of departures)cues.push({kind:row.kind,actorId:row.ghostId});
   if(previous.packageHolder&&next.packageHolder&&previous.packageHolder!==next.packageHolder){
     const from=(previous.actors||[]).find(a=>a.slot===holderSlot(previous.packageHolder));
     const to=(next.actors||[]).find(a=>a.slot===holderSlot(next.packageHolder));
@@ -347,7 +350,8 @@ function playProjectionTransition(root,previous,next,p,departures=[]){
   if(typeof playStoryChoreography33900!=="function"||!previous||!next)return{success:true,skipped:true};
   const cues=deriveProjectionChoreography(root,previous,next,p,departures);
   const rt=active();
-  const scopeKey=(rt&&rt.instanceId||"kakashi")+":"+next.id+":"+previous.id+"->"+next.id+":"+String(next.packageHolder||"");
+  const actorSignature=(next.actors||[]).map(a=>a.id+"@"+a.anchor).join("|");
+  const scopeKey=(rt&&rt.instanceId||"kakashi")+":"+previous.id+"->"+next.id+":"+String(next.packageHolder||"")+":"+actorSignature;
   return playStoryChoreography33900({root,scopeKey,cues});
 }
 
@@ -440,7 +444,7 @@ function render(){
   rendering=true;
   try{
     installStyle();layer.dataset.kakashiV2="true";const root=ensureRoot(layer);root.dataset.preset=p.preset||"standard";
-    const prepared=pendingVisualSnapshot,previous=prepared&&prepared.previous||lastProjectionSnapshot,next=snapshotProjection(p),semanticChanged=!!previous&&!!next&&(previous.id!==next.id||previous.packageHolder!==next.packageHolder||JSON.stringify(previous.actors)!==JSON.stringify(next.actors)||JSON.stringify(previous.participantStates)!==JSON.stringify(next.participantStates));
+    const prepared=pendingVisualSnapshot,previous=prepared&&prepared.previous||lastProjectionSnapshot,next=snapshotProjection(p),semanticChanged=!!previous&&!!next&&(previous.id!==next.id||previous.packageHolder!==next.packageHolder||JSON.stringify(previous.actors)!==JSON.stringify(next.actors));
     const departures=semanticChanged?(prepared?materializeDepartureGhosts(root,prepared,next):prepareDepartureGhosts(root,previous,next)):[];
     pendingVisualSnapshot=null;
     const t=cueState();
@@ -500,6 +504,8 @@ function diagnostics(){
     sharedSemanticAnchors:String(syncActors).includes("applyStoryStageAnchor33900")&&String(actorAnchor).includes("PLAYER_LEFT")&&String(actorAnchor).includes("OPPONENT_RIGHT"),
     adaptiveActorProminence:installStyle.toString().includes('data-count="1"')&&installStyle.toString().includes('data-count="2"'),
     sharedChoreographyConsumer:String(playProjectionTransition).includes("playStoryChoreography33900"),
+    departuresPrecedeNewEntries:String(deriveProjectionChoreography).indexOf("for(const row of departures)")<String(deriveProjectionChoreography).indexOf("const prevIds"),
+    semanticDiffIgnoresHarmlessParticipantRefresh:!String(render).includes('JSON.stringify(previous.participantStates)!==JSON.stringify(next.participantStates)'),
     packageTokenConsumesHolderTruth:String(syncPackageToken).includes("state.package")&&String(syncPackageToken).includes("packageHolder"),
     speakerFocusUsesCurrentCue:String(syncStandard).includes("speakerActorId"),
     noMutationObserver:!String(render).includes("MutationObserver"),
