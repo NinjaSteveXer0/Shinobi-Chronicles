@@ -39,7 +39,6 @@ function installStyle(){
   if(typeof document==="undefined"||!document.head||document.getElementById(STYLE_ID))return;
   const s=document.createElement("style");s.id=STYLE_ID;s.textContent=`
 #story-scene-presentation-layer[data-kakashi-v2="true"]{display:block!important;background:#020508!important;overflow:hidden!important;align-items:stretch!important;justify-content:stretch!important}
-#story-scene-presentation-layer[data-kakashi-v2-battle-suspended="true"]{display:none!important;pointer-events:none!important}
 #story-scene-presentation-layer[data-kakashi-v2="true"]>*:not(#${ROOT_ID}){display:none!important}
 #${ROOT_ID}{position:absolute;inset:0;z-index:1;overflow:hidden;background:#020508;color:#e9dfca;font-family:inherit;isolation:isolate}
 #${ROOT_ID} .kv2-backdrop{position:absolute;inset:0;z-index:-3;background-position:center;background-size:cover;background-repeat:no-repeat;transform:scale(1.001)}
@@ -427,13 +426,11 @@ function render(){
   const layer=document.getElementById("story-scene-presentation-layer");
   if(!isActive()){
     pendingVisualSnapshot=null;
-    const rt=active(),suspended=!!rt&&rt.sceneId===SCENE_ID&&storySuspendedForBattle();
+    const rt=active();
     if(layer){
       delete layer.dataset.kakashiV2;
       const stale=document.getElementById(ROOT_ID);
       if(stale){if(typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(stale,"story_suspended_or_exited");stale.remove();}
-      if(suspended){layer.style.display="none";layer.innerHTML="";layer.dataset.kakashiV2BattleSuspended="true";}
-      else delete layer.dataset.kakashiV2BattleSuspended;
     }
     if(!rt||rt.sceneId!==SCENE_ID)lastProjectionSnapshot=null;
     return false;
@@ -442,7 +439,7 @@ function render(){
   const p=projection();if(!p)return false;
   rendering=true;
   try{
-    installStyle();delete layer.dataset.kakashiV2BattleSuspended;layer.dataset.kakashiV2="true";const root=ensureRoot(layer);root.dataset.preset=p.preset||"standard";
+    installStyle();layer.dataset.kakashiV2="true";const root=ensureRoot(layer);root.dataset.preset=p.preset||"standard";
     const prepared=pendingVisualSnapshot,previous=prepared&&prepared.previous||lastProjectionSnapshot,next=snapshotProjection(p),semanticChanged=!!previous&&!!next&&(previous.id!==next.id||previous.packageHolder!==next.packageHolder||JSON.stringify(previous.actors)!==JSON.stringify(next.actors)||JSON.stringify(previous.participantStates)!==JSON.stringify(next.participantStates));
     const departures=semanticChanged?(prepared?materializeDepartureGhosts(root,prepared,next):prepareDepartureGhosts(root,previous,next)):[];
     pendingVisualSnapshot=null;
@@ -507,8 +504,7 @@ function diagnostics(){
     speakerFocusUsesCurrentCue:String(syncStandard).includes("speakerActorId"),
     noMutationObserver:!String(render).includes("MutationObserver"),
     battleSuspendsStoryProjection:String(storySuspendedForBattle).includes("pendingBattle")&&String(storySuspendedForBattle).includes('rc.type==="story_scene"'),
-    battleSuspensionHidesWholeStoryLayer:String(render).includes('layer.style.display="none"')&&String(render).includes('kakashiV2BattleSuspended'),
-    battleSuspensionCssIsAuthoritative:installStyle.toString().includes('data-kakashi-v2-battle-suspended="true"')&&installStyle.toString().includes("display:none!important"),
+    sharedLayerVisibilityOwner:!String(render).includes("layer.style.display")&&!installStyle.toString().includes("kakashi-v2-battle-suspended"),
     wrapperRunsSuspensionCleanup:String(globalThis.renderStoryScenePresentationLayer).includes("rt&&rt.sceneId===SCENE_ID")&&String(globalThis.renderStoryScenePresentationLayer).includes("render()"),
     browserGoldenClaimed:false
   };
