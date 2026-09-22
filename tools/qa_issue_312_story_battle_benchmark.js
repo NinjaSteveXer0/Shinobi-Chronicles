@@ -65,6 +65,7 @@ assert(kv2Renderer.includes('root.dataset.hasChoices==="true"')&&kv2Renderer.inc
 assert(kv2Renderer.includes("repeat(3,minmax(0,1fr))")&&kv2Renderer.includes("max-height:none;overflow:visible"),"#312 five-choice desktop layout must not require an internal scrollbar");
 assert(kv2Renderer.includes('p.id!=="v2_watch_exchange"')&&kv2Renderer.includes("SURPRISE_ENTRY")&&kv2Renderer.includes('kind:"FLEE"'),"#312 WATCH exchange surprise-entry / true-flee choreography missing");
 assert(kv2Renderer.includes("mi.hidden=true")&&kv2Renderer.includes("mi.hidden=false"),"#312 Masked Interceptor must remain hard-withheld until her authored reveal cue");
+assert(kv2Renderer.includes("normalizeCueLocalActorState")&&kv2Renderer.includes("kv2-cue-departed")&&kv2Renderer.includes("node.hidden=false"),"#312 WATCH-only hidden/departed presentation state must not leak into later beats");
 assert(kv2Renderer.includes('next.id==="v2_direct_strike_setup"')&&kv2Renderer.includes('kind:"STRIKE"'),"#312 STRIKE BEFORE THE HANDOFF must visibly drive Kakashi into the authored attack");
 assert(kv2Renderer.includes("kv2ActorFall36030")&&kv2Renderer.includes('data-sc-choreography-active="COLLAPSE"')&&kv2Renderer.includes('state==="KILLED"'),"#312 lethal Story departure must visibly fall off-screen and remain forward-compatible with KILLED truth");
 assert(kv2Transition.includes("?650:0"),"#312 hard scene transition must leave enough presentation time for the lethal fall to be visible");
