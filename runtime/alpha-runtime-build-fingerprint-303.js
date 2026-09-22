@@ -25,7 +25,8 @@
       "runtime-ownership-safety-300",
       "post-battle-agency-278",
       "story-battle-performance-312",
-      "battle-formation-stage-319"
+      "battle-formation-stage-319",
+      "story-battle-motion-quick-skills"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
