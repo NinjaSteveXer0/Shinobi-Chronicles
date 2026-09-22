@@ -274,17 +274,24 @@
   function load34600(){loadOne("sc-story-factual-resolver-34600-script","runtime/alpha-story-factual-resolver-34600.js",()=>!!globalThis.SC_STORY_FACTUAL_RESOLVER_34600,load36000);}
   function load34000(){loadOne("sc-story-decision-realisation-34000-script","runtime/alpha-story-decision-realisation-34000.js",()=>!!globalThis.SC_STORY_DECISION_REALISATION_34000,load34600);}
   function load33900(){loadOne("sc-story-scene-board-33900-script","runtime/alpha-story-scene-board-33900.js",()=>!!globalThis.SC_STORY_SCENE_BOARD_33900,load34000);}
+  function load33700(){loadOne("sc-alpha-origin-screen-first-33700-script","runtime/alpha-origin-screen-first-33700.js",()=>!!globalThis.SC_ALPHA_ORIGIN_SCREEN_FIRST_33700,load33900);}
+
+  function after33600(){
+    if(globalThis.SC_ALPHA_EARLY_STORY_MODERNIZATION_33600){load33700();return;}
+    const modernization=document.getElementById("sc-alpha-early-story-modernization-33600-script");
+    if(modernization){modernization.addEventListener("load",load33700,{once:true});return;}
+    // 33600 is itself created from the 33510 load event. If 33200 reaches this
+    // terminal chain before that future element exists, wait on 33510 rather
+    // than silently dropping the V2 activation chain.
+    const reaction=document.getElementById("sc-alpha-origin-choice-reaction-33510-script");
+    if(reaction){reaction.addEventListener("load",()=>{const modern=document.getElementById("sc-alpha-early-story-modernization-33600-script");if(globalThis.SC_ALPHA_EARLY_STORY_MODERNIZATION_33600)load33700();else if(modern)modern.addEventListener("load",load33700,{once:true});},{once:true});return;}
+    // Last-resort parser-order fail-closed retry. No V2 module is loaded before
+    // 33600; this only rechecks whether its legitimate predecessor appeared.
+    setTimeout(after33600,0);
+  }
 
   if(globalThis.SC_ALPHA_ORIGIN_SCREEN_FIRST_33700){load33900();return;}
   const existing=document.getElementById("sc-alpha-origin-screen-first-33700-script");
   if(existing){existing.addEventListener("load",load33900,{once:true});return;}
-
-  const modernization=document.getElementById("sc-alpha-early-story-modernization-33600-script");
-  if(modernization){
-    modernization.addEventListener("load",()=>{
-      const screenFirst=document.getElementById("sc-alpha-origin-screen-first-33700-script");
-      if(globalThis.SC_ALPHA_ORIGIN_SCREEN_FIRST_33700)load33900();
-      else if(screenFirst)screenFirst.addEventListener("load",load33900,{once:true});
-    },{once:true});
-  }
+  after33600();
 })();
