@@ -12,7 +12,7 @@
 (function installAlphaBattleModern33000(){
   "use strict";
 
-  const PATCH_ID="alpha_battle_modern_33000_2026_09_22_performance";
+  const PATCH_ID="alpha_battle_modern_33000_2026_09_23_formation_stage";
   const YOUTH_READING_TARGET="12-13";
   const KNOWN_SETUP_LABELS=Object.freeze({
     academy_menma_clone_feint:"SHADOW CLONE FEINT"
@@ -306,6 +306,216 @@
     hint.innerHTML=`<span><b>HOVER</b> LEARN</span><i>·</i><span><b>CLICK</b> USE</span>`;
   }
 
+  // --------------------------------------------------------------------------
+  // FORMATION STAGE — current UI authority
+  // Presentation-only composition over the existing Battle deployment/action APIs.
+  // --------------------------------------------------------------------------
+  let formationTrayMode33000=null;
+
+  const PRIOR_OPEN_SKILLS_33000=typeof openBattleSkillsActionFamily==="function"?openBattleSkillsActionFamily:null;
+  const PRIOR_OPEN_ITEMS_33000=typeof openBattleItemActionFamily==="function"?openBattleItemActionFamily:null;
+  const PRIOR_OPEN_SUMMONS_33000=typeof openBattleSummonActionFamily==="function"?openBattleSummonActionFamily:null;
+  const PRIOR_CLOSE_ITEMS_33000=typeof closeBattleItemActionFamily==="function"?closeBattleItemActionFamily:null;
+  const PRIOR_CLOSE_SUMMONS_33000=typeof closeBattleSummonActionFamily==="function"?closeBattleSummonActionFamily:null;
+
+  function refreshFormationActionPresentation33000(){
+    try{if(typeof refreshBattleActionRegionPresentation==="function")refreshBattleActionRegionPresentation();}catch(_error){}
+  }
+  function toggleFormationTray33000(mode,opener,args){
+    if(formationTrayMode33000===mode){
+      formationTrayMode33000=null;
+      refreshFormationActionPresentation33000();
+      return{success:true,presentationOnly:true,trayMode:"closed",semanticActionFamilyUnchanged:true};
+    }
+    formationTrayMode33000=mode;
+    const result=opener?opener.apply(this,args||[]):{success:false,reason:"action_family_api_missing"};
+    if(!(result&&result.success===true))formationTrayMode33000=null;
+    return result;
+  }
+  if(PRIOR_OPEN_SKILLS_33000){
+    globalThis.openBattleSkillsActionFamily=function formationSkills33000(){
+      return toggleFormationTray33000.call(this,"skills",PRIOR_OPEN_SKILLS_33000,arguments);
+    };
+    try{openBattleSkillsActionFamily=globalThis.openBattleSkillsActionFamily;}catch(_error){}
+  }
+  if(PRIOR_OPEN_ITEMS_33000){
+    globalThis.openBattleItemActionFamily=function formationItems33000(){
+      return toggleFormationTray33000.call(this,"items",PRIOR_OPEN_ITEMS_33000,arguments);
+    };
+    try{openBattleItemActionFamily=globalThis.openBattleItemActionFamily;}catch(_error){}
+  }
+  if(PRIOR_OPEN_SUMMONS_33000){
+    globalThis.openBattleSummonActionFamily=function formationSummons33000(){
+      return toggleFormationTray33000.call(this,"summon",PRIOR_OPEN_SUMMONS_33000,arguments);
+    };
+    try{openBattleSummonActionFamily=globalThis.openBattleSummonActionFamily;}catch(_error){}
+  }
+  if(PRIOR_CLOSE_ITEMS_33000){
+    globalThis.closeBattleItemActionFamily=function formationCloseItems33000(){
+      formationTrayMode33000=null;
+      return PRIOR_CLOSE_ITEMS_33000.apply(this,arguments);
+    };
+    try{closeBattleItemActionFamily=globalThis.closeBattleItemActionFamily;}catch(_error){}
+  }
+  if(PRIOR_CLOSE_SUMMONS_33000){
+    globalThis.closeBattleSummonActionFamily=function formationCloseSummons33000(){
+      formationTrayMode33000=null;
+      return PRIOR_CLOSE_SUMMONS_33000.apply(this,arguments);
+    };
+    try{closeBattleSummonActionFamily=globalThis.closeBattleSummonActionFamily;}catch(_error){}
+  }
+
+  function deployedFormation33000(side){
+    const out=[];
+    if(typeof getBattleDeploymentParticipant!=="function")return out;
+    for(let slot=1;slot<=4;slot+=1){
+      let participant=null;
+      try{participant=getBattleDeploymentParticipant(side,slot)||null;}catch(_error){participant=null;}
+      if(participant)out.push({side,slot,participantId:String(participant.id||""),participant});
+    }
+    return out;
+  }
+  function formationMode33000(){
+    const player=deployedFormation33000("player"),enemy=deployedFormation33000("enemy");
+    const peak=Math.max(player.length,enemy.length);
+    return peak<=1?"duel":peak>=4?"arc":"wedge";
+  }
+  function formationPortrait33000(side,participant){
+    if(!participant)return null;
+    try{
+      const projection=side==="player"
+        ?(typeof resolveUIPortraitProjection==="function"?resolveUIPortraitProjection(participant):null)
+        :(typeof resolveBattleEnemyPortraitProjection==="function"?resolveBattleEnemyPortraitProjection(participant):null);
+      return projection&&projection.path?String(projection.path):null;
+    }catch(_error){return null;}
+  }
+  function formationNodeForRef33000(stage,ref){
+    if(!stage||!ref||!ref.side||!ref.participantId)return null;
+    const side=String(ref.side),participantId=String(ref.participantId);
+    const active=side==="player"
+      ?stage.querySelector(".battle-live-active-card-player")
+      :stage.querySelector(".battle-live-active-card-enemy");
+    if(active&&String(active.dataset.participantId||"")===participantId)return active;
+    return [...stage.querySelectorAll('.battle-live-roster-'+side+' .battle-live-roster-slot[data-participant-id]')]
+      .find(node=>String(node.dataset.participantId||"")===participantId)||null;
+  }
+  function selectedFormationTarget33000(){
+    try{
+      const state=typeof syncBattleActionRegionState==="function"?syncBattleActionRegionState():null;
+      if(state&&state.selectedTargetRef&&state.selectedTargetRef.side&&state.selectedTargetRef.participantId){
+        return{side:String(state.selectedTargetRef.side),participantId:String(state.selectedTargetRef.participantId),selected:true};
+      }
+    }catch(_error){}
+    const enemy=getActiveBattleEnemy33000();
+    return enemy?{side:"enemy",participantId:String(enemy.id||""),selected:false}:null;
+  }
+  function projectFormationActivePortrait33000(stage,side,row){
+    const node=side==="player"?stage.querySelector(".battle-live-active-card-player"):stage.querySelector(".battle-live-active-card-enemy");
+    if(!node||!row)return null;
+    node.dataset.participantId=row.participantId;
+    node.dataset.formationSide=side;
+    node.dataset.formationSlot="1";
+    node.classList.add("battle2-formation-participant","battle2-formation-active");
+    const img=node.querySelector(".battle-live-active-card-image");
+    const portrait=formationPortrait33000(side,row.participant);
+    if(img&&portrait&&img.getAttribute("src")!==portrait){
+      img.setAttribute("src",portrait);
+      img.dataset.formationPortrait="true";
+    }
+    const heading=node.querySelector(".battle-live-active-card-heading");
+    if(heading)heading.textContent=side==="player"?"ACTIVE SHINOBI":"ACTIVE OPPOSITION";
+    return node;
+  }
+  function projectFormationSupports33000(stage,side,rows){
+    const roster=stage.querySelector(".battle-live-roster-"+side);
+    if(!roster)return[];
+    const ids=new Map(rows.map(row=>[row.slot,row]));
+    const nodes=[...roster.querySelectorAll(".battle-live-roster-slot")];
+    for(const node of nodes){
+      const slot=Number(node.dataset.slot)||0,row=ids.get(slot)||null;
+      node.classList.remove("battle2-formation-participant","battle2-formation-support","battle2-formation-focus","battle2-formation-recessed");
+      delete node.dataset.participantId;delete node.dataset.formationSide;delete node.dataset.formationSlot;
+      if(slot===1||slot>=5||!row||node.classList.contains("is-empty")){
+        node.dataset.formationHidden="true";
+        continue;
+      }
+      delete node.dataset.formationHidden;
+      node.dataset.participantId=row.participantId;
+      node.dataset.formationSide=side;
+      node.dataset.formationSlot=String(slot);
+      node.classList.add("battle2-formation-participant","battle2-formation-support");
+    }
+    return nodes;
+  }
+  function installFormationDock33000(stage){
+    const row=stage&&stage.querySelector(".battle-live-action-family-row");if(!row)return false;
+    const buttons=[...row.querySelectorAll("button")];
+    for(const button of buttons){
+      const handler=String(button.getAttribute("onclick")||"");
+      if(handler.includes("openBattleSkillsActionFamily")){
+        button.dataset.formationFamily="skills";button.textContent="SKILLS";
+      }else if(handler.includes("openBattleItemActionFamily")){
+        button.dataset.formationFamily="items";button.textContent="ITEMS";
+      }else if(handler.includes("openBattleSummonActionFamily")){
+        button.dataset.formationFamily="summons";button.textContent="SUMMONS";
+      }
+    }
+    const withdraw=row.querySelector(".battle-live-withdraw-action");
+    if(withdraw){
+      withdraw.classList.remove("battle-live-action-family","battle-live-withdraw-action");
+      withdraw.classList.add("battle2-formation-withdraw");
+      withdraw.textContent="WITHDRAW";
+      withdraw.setAttribute("aria-label","Withdraw active shinobi");
+      stage.appendChild(withdraw);
+    }
+    const primary=[...row.querySelectorAll("button[data-formation-family]")];
+    row.dataset.primaryFamilies=primary.map(b=>b.textContent.trim()).join("|");
+    row.dataset.primaryCount=String(primary.length);
+    stage.dataset.formationTray=formationTrayMode33000||"closed";
+    for(const button of primary)button.classList.toggle("is-selected",stage.dataset.formationTray===button.dataset.formationFamily.replace("summons","summon"));
+    return primary.length===3;
+  }
+  function installFormationStage33000(stage){
+    if(!stage)return null;
+    const player=deployedFormation33000("player"),enemy=deployedFormation33000("enemy"),mode=formationMode33000();
+    stage.dataset.formationStage="true";
+    stage.dataset.formationMode=mode;
+    stage.dataset.playerFormationCount=String(player.length);
+    stage.dataset.enemyFormationCount=String(enemy.length);
+    projectFormationActivePortrait33000(stage,"player",player.find(row=>row.slot===1)||player[0]||null);
+    projectFormationActivePortrait33000(stage,"enemy",enemy.find(row=>row.slot===1)||enemy[0]||null);
+    projectFormationSupports33000(stage,"player",player);
+    projectFormationSupports33000(stage,"enemy",enemy);
+    for(const node of stage.querySelectorAll(".battle2-formation-participant")){
+      node.classList.remove("battle2-formation-focus","battle2-formation-recessed","battle2-formation-selected-target");
+    }
+    const actorRef=player[0]?{side:"player",participantId:player[0].participantId}:null;
+    const targetRef=selectedFormationTarget33000();
+    const actorNode=formationNodeForRef33000(stage,actorRef),targetNode=formationNodeForRef33000(stage,targetRef);
+    if(actorNode)actorNode.classList.add("battle2-formation-focus");
+    if(targetNode){
+      targetNode.classList.add("battle2-formation-focus");
+      if(targetRef&&targetRef.selected)targetNode.classList.add("battle2-formation-selected-target");
+    }
+    for(const side of ["player","enemy"]){
+      const active=side==="player"?stage.querySelector(".battle-live-active-card-player"):stage.querySelector(".battle-live-active-card-enemy");
+      const focus=side==="player"?actorNode:targetNode;
+      if(active&&focus&&active!==focus)active.classList.add("battle2-formation-recessed");
+    }
+    installFormationDock33000(stage);
+    return{
+      mode,
+      playerCount:player.length,
+      enemyCount:enemy.length,
+      actorRef,
+      targetRef,
+      primaryFamilies:stage.querySelector(".battle-live-action-family-row")?.dataset.primaryFamilies||"",
+      trayMode:stage.dataset.formationTray,
+      semanticWrite:false
+    };
+  }
+  window.installFormationStage33000=installFormationStage33000;
+
   const BATTLE_PRESENTATION_CLASSES_33000=Object.freeze(["PHYSICAL_STRIKE","HEAVY_STRIKE","PROJECTILE","CHAKRA_RANGED","AREA_ATTACK","GUARD","EVADE","SUBSTITUTION","HEAL","BUFF","DEBUFF","RESTRAINT","SUMMON","ENVIRONMENTAL","TRANSFORMATION","DEFEAT"]);
   const playedBattlePerformanceKeys33000=new Set();
 
@@ -504,6 +714,8 @@
     if(host.dataset.actionId!==p.actionId){
       host.dataset.actionId=p.actionId;
       host.innerHTML=battlePerformanceMarkup33000(p);
+      formationTrayMode33000=null;
+      stage.dataset.formationTray="closed";
     }
     const lane=host.querySelector(".battle2-performance-stage");
     if(lane){
@@ -548,6 +760,7 @@
     enhanceBattleSkillCards33000(stage);
     installBattleTicker33000(stage);
     installBattleInteractionHint33000(stage);
+    installFormationStage33000(stage);
     installBattlePerformance33000(stage);
     clearBattleSkillPreview33000();
     return true;
@@ -630,6 +843,71 @@
       @keyframes battle2Evade33000{0%{transform:translateX(0)}55%{transform:translateX(var(--battle2-performance-evade-x,7%))}100%{transform:translateX(0)}}
       @media(prefers-reduced-motion:reduce){.battle2-modern.battle2-performance-active .battle2-performance-role-actor,.battle2-modern.battle2-performance-active .battle2-performance-role-target{animation:none!important}.battle2-modern.battle2-performance-active .battle2-performance-result-chip{animation:battle2ReducedReceipt33000 .16s ease both}.battle2-performance-stage.is-playing .battle2-performance-center{animation:battle2ReducedReceipt33000 .16s ease both}@keyframes battle2ReducedReceipt33000{from{opacity:.72}to{opacity:1}}}
       @media(max-width:1100px){.battle2-modern .battle-live-skill-deck,.battle2-modern .battle-live-pouch{width:61%!important}.battle2-modern .battle-live-skill-details{left:65.5%!important;width:31%!important}.battle2-live-ticker{left:37%!important;width:26%!important}.battle2-action-hint{display:none}}
+
+      /* Formation Stage — environment + people dominate; controls stay subordinate. */
+      .battle2-modern[data-formation-stage="true"]{background-size:cover!important;background-position:center!important}
+      .battle2-modern[data-formation-stage="true"]::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 40%,transparent 18%,rgba(1,6,10,.10) 60%,rgba(1,5,8,.38) 100%),linear-gradient(180deg,rgba(1,5,9,.04),rgba(1,5,9,.02) 55%,rgba(1,5,9,.52) 100%)}
+      .battle2-modern[data-formation-stage="true"] .battle-live-location,.battle2-modern[data-formation-stage="true"] .battle-live-status,.battle2-modern[data-formation-stage="true"] .battle-live-active-card,.battle2-modern[data-formation-stage="true"] .battle-live-roster,.battle2-modern[data-formation-stage="true"] .battle-live-power,.battle2-modern[data-formation-stage="true"] .battle-live-action-family-row,.battle2-modern[data-formation-stage="true"] .battle-live-skill-deck,.battle2-modern[data-formation-stage="true"] .battle-live-skill-details,.battle2-modern[data-formation-stage="true"] .battle-live-pouch,.battle2-modern[data-formation-stage="true"] .battle-live-summon,.battle2-modern[data-formation-stage="true"] .battle2-live-ticker,.battle2-modern[data-formation-stage="true"] .battle2-performance-host,.battle2-modern[data-formation-stage="true"] .battle2-formation-withdraw{z-index:12!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-status{top:7.1%!important;width:22%!important;opacity:.78}
+      .battle2-modern[data-formation-stage="true"] .battle-live-status strong{font-size:clamp(7px,.66vw,10px)!important}.battle2-modern[data-formation-stage="true"] .battle-live-status span{font-size:clamp(6px,.5vw,8px)!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important;transition:left .32s cubic-bezier(.2,.75,.25,1),top .32s cubic-bezier(.2,.75,.25,1),width .32s ease,height .32s ease,filter .18s ease,opacity .18s ease,transform .32s ease!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card::before,.battle2-modern[data-formation-stage="true"] .battle-live-active-card::after{display:none!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card-image{width:100%!important;height:100%!important;object-fit:contain!important;object-position:center bottom!important;filter:drop-shadow(0 24px 24px rgba(0,0,0,.62))!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card-heading{top:2%!important;left:6%!important;right:auto!important;padding:4px 7px!important;border-radius:999px!important;background:rgba(2,10,15,.70)!important;color:#78dfe7!important;font-size:clamp(6px,.46vw,8px)!important;letter-spacing:.11em!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card-enemy .battle-live-active-card-heading{color:#efb099!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-nameplate{left:8%!important;right:8%!important;bottom:1%!important;padding:6px 9px!important;border:1px solid rgba(205,168,76,.34)!important;border-radius:9px!important;background:rgba(2,8,12,.82)!important;font-size:clamp(9px,.78vw,13px)!important;text-align:center!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster{z-index:11!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-slot[data-formation-hidden="true"]{display:none!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.battle2-formation-support{display:block!important;width:12.5%!important;height:20%!important;left:auto!important;top:auto!important;border:0!important;border-radius:10px!important;background:linear-gradient(180deg,rgba(2,10,15,.12),rgba(2,8,12,.70))!important;overflow:visible!important;opacity:.66!important;filter:saturate(.72) brightness(.78);transition:left .32s ease,right .32s ease,top .32s ease,width .32s ease,height .32s ease,opacity .18s ease,filter .18s ease,transform .32s ease!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.battle2-formation-support .battle-live-queue-label{display:none!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.battle2-formation-support .battle-live-roster-portrait{left:0!important;top:0!important;width:100%!important;height:76%!important;object-fit:contain!important;object-position:center bottom!important;background:transparent!important;filter:drop-shadow(0 14px 15px rgba(0,0,0,.52))!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.battle2-formation-support .battle-live-roster-copy{left:3%!important;right:3%!important;top:auto!important;bottom:0!important;height:26%!important;padding:4px!important;border-radius:7px!important;background:rgba(2,8,12,.82)!important;text-align:center!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.battle2-formation-support .battle-live-roster-name{font-size:clamp(6px,.5vw,8px)!important}.battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.battle2-formation-support .battle-live-roster-power{margin-top:2px!important;font-size:clamp(5px,.42vw,7px)!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-formation-focus{opacity:1!important;filter:saturate(1.03) brightness(1.03) drop-shadow(0 22px 28px rgba(0,0,0,.42))!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-formation-recessed{opacity:.48!important;filter:saturate(.55) brightness(.64)!important;transform:scale(.88)!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-formation-selected-target{outline:1px solid rgba(96,221,230,.82)!important;outline-offset:4px!important;box-shadow:0 0 26px rgba(73,213,225,.18)!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.is-skill-target,.battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.is-item-target{pointer-events:auto!important;cursor:pointer!important}
+
+      /* Duel: two combatants own the battlefield. */
+      .battle2-modern[data-formation-mode="duel"] .battle-live-active-card{top:12%!important;width:31%!important;height:52%!important}
+      .battle2-modern[data-formation-mode="duel"] .battle-live-active-card-player{left:6.5%!important}.battle2-modern[data-formation-mode="duel"] .battle-live-active-card-enemy{left:62.5%!important}
+      .battle2-modern[data-formation-mode="duel"] .battle-live-power{top:58%!important}.battle2-modern[data-formation-mode="duel"] .battle-live-power-player{left:26%!important}.battle2-modern[data-formation-mode="duel"] .battle-live-power-enemy{left:74%!important;right:auto!important}
+
+      /* Squad wedge: support stays visibly behind/outward from the confrontation lane. */
+      .battle2-modern[data-formation-mode="wedge"] .battle-live-active-card{top:13%!important;width:24%!important;height:45%!important}
+      .battle2-modern[data-formation-mode="wedge"] .battle-live-active-card-player{left:24%!important}.battle2-modern[data-formation-mode="wedge"] .battle-live-active-card-enemy{left:52%!important}
+      .battle2-modern[data-formation-mode="wedge"] .battle-live-roster-player [data-formation-slot="2"]{left:3%!important;top:16%!important}.battle2-modern[data-formation-mode="wedge"] .battle-live-roster-player [data-formation-slot="3"]{left:8%!important;top:32%!important}.battle2-modern[data-formation-mode="wedge"] .battle-live-roster-player [data-formation-slot="4"]{left:14%!important;top:45%!important}
+      .battle2-modern[data-formation-mode="wedge"] .battle-live-roster-enemy [data-formation-slot="2"]{right:3%!important;top:16%!important}.battle2-modern[data-formation-mode="wedge"] .battle-live-roster-enemy [data-formation-slot="3"]{right:8%!important;top:32%!important}.battle2-modern[data-formation-mode="wedge"] .battle-live-roster-enemy [data-formation-slot="4"]{right:14%!important;top:45%!important}
+      .battle2-modern[data-formation-mode="wedge"] .battle-live-power{top:53%!important}.battle2-modern[data-formation-mode="wedge"] .battle-live-power-player{left:37%!important}.battle2-modern[data-formation-mode="wedge"] .battle-live-power-enemy{left:63%!important;right:auto!important}
+
+      /* Wide arc: crowded fallback keeps exact focus central without stacking everybody there. */
+      .battle2-modern[data-formation-mode="arc"] .battle-live-active-card{top:14%!important;width:21%!important;height:42%!important}
+      .battle2-modern[data-formation-mode="arc"] .battle-live-active-card-player{left:27%!important}.battle2-modern[data-formation-mode="arc"] .battle-live-active-card-enemy{left:52%!important}
+      .battle2-modern[data-formation-mode="arc"] .battle-live-roster-player [data-formation-slot="2"]{left:2%!important;top:14%!important}.battle2-modern[data-formation-mode="arc"] .battle-live-roster-player [data-formation-slot="3"]{left:5%!important;top:34%!important}.battle2-modern[data-formation-mode="arc"] .battle-live-roster-player [data-formation-slot="4"]{left:13%!important;top:49%!important}
+      .battle2-modern[data-formation-mode="arc"] .battle-live-roster-enemy [data-formation-slot="2"]{right:2%!important;top:14%!important}.battle2-modern[data-formation-mode="arc"] .battle-live-roster-enemy [data-formation-slot="3"]{right:5%!important;top:34%!important}.battle2-modern[data-formation-mode="arc"] .battle-live-roster-enemy [data-formation-slot="4"]{right:13%!important;top:49%!important}
+
+      /* Any exact off-slot target can advance into confrontation focus without changing legality. */
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-player .battle2-formation-focus{left:24%!important;right:auto!important;top:13%!important;width:24%!important;height:45%!important;z-index:26!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-enemy .battle2-formation-focus{left:52%!important;right:auto!important;top:13%!important;width:24%!important;height:45%!important;z-index:26!important}
+
+      /* Locked primary dock + bounded secondary tray. */
+      .battle2-modern[data-formation-stage="true"] .battle-live-action-family-row{left:50%!important;right:auto!important;top:auto!important;bottom:1.8%!important;width:min(44%,620px)!important;height:5.7%!important;transform:translateX(-50%)!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important;padding:5px!important;border:1px solid rgba(204,168,78,.28)!important;border-radius:13px!important;background:rgba(3,10,15,.88)!important;backdrop-filter:blur(9px)!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-action-family-row button{min-width:0!important;max-width:none!important;height:100%!important;border-radius:9px!important;background:rgba(7,22,29,.88)!important;border:1px solid rgba(91,134,146,.30)!important;color:#cad7d9!important;font-size:clamp(7px,.56vw,9px)!important;font-weight:900!important;letter-spacing:.1em!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-action-family-row button.is-selected{border-color:rgba(88,216,226,.72)!important;color:#76dfe7!important;background:rgba(11,49,57,.92)!important;box-shadow:0 0 18px rgba(70,210,221,.10)!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-formation-withdraw{position:absolute;right:3%!important;top:3%!important;z-index:30!important;padding:5px 9px;border:1px solid rgba(197,158,71,.27);border-radius:8px;background:rgba(4,11,15,.66);color:#bba56e;font-size:7px;font-weight:900;letter-spacing:.09em;cursor:pointer}
+      .battle2-modern[data-formation-stage="true"] .battle2-formation-withdraw:disabled{opacity:.28;cursor:not-allowed}
+      .battle2-modern[data-formation-stage="true"][data-formation-tray="closed"] .battle-live-skill-deck,.battle2-modern[data-formation-stage="true"][data-formation-tray="closed"] .battle-live-skill-details,.battle2-modern[data-formation-stage="true"][data-formation-tray="closed"] .battle-live-pouch,.battle2-modern[data-formation-stage="true"][data-formation-tray="closed"] .battle-live-summon{display:none!important}
+      .battle2-modern[data-formation-stage="true"]:not([data-formation-tray="closed"]) .battle-live-skill-deck,.battle2-modern[data-formation-stage="true"]:not([data-formation-tray="closed"]) .battle-live-pouch,.battle2-modern[data-formation-stage="true"]:not([data-formation-tray="closed"]) .battle-live-summon{left:10%!important;top:auto!important;bottom:8.7%!important;width:61%!important;height:22%!important;padding:10px!important;border:1px solid rgba(91,132,144,.32)!important;border-radius:14px!important;background:linear-gradient(160deg,rgba(3,13,18,.96),rgba(2,8,12,.98))!important;box-shadow:0 20px 50px rgba(0,0,0,.46)!important;overflow:auto!important}
+      .battle2-modern[data-formation-stage="true"]:not([data-formation-tray="closed"]) .battle-live-skill-details{left:72%!important;top:auto!important;bottom:8.7%!important;width:18%!important;height:22%!important;border-radius:14px!important;padding:10px 11px!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-live-ticker{left:38%!important;top:8.4%!important;width:24%!important;min-height:5.5%!important;padding:6px 9px!important;background:rgba(3,10,15,.72)!important;border-color:rgba(97,125,137,.18)!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-action-hint{right:3%!important;top:auto!important;bottom:2.4%!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-host{top:2.1%!important}
+
+      @media(max-width:1100px){
+        .battle2-modern[data-formation-stage="true"] .battle-live-action-family-row{width:54%!important}
+        .battle2-modern[data-formation-stage="true"]:not([data-formation-tray="closed"]) .battle-live-skill-deck,.battle2-modern[data-formation-stage="true"]:not([data-formation-tray="closed"]) .battle-live-pouch,.battle2-modern[data-formation-stage="true"]:not([data-formation-tray="closed"]) .battle-live-summon{left:5%!important;width:67%!important}
+        .battle2-modern[data-formation-stage="true"]:not([data-formation-tray="closed"]) .battle-live-skill-details{left:73%!important;width:22%!important}
+      }
     `;
     document.head.appendChild(style);
   }
@@ -638,7 +916,13 @@
     const source=enhanceBattle2DOM33000.toString();
     const summary=getBattleSkillYouthSummary33000.toString();
     const checks={
-      patchId:PATCH_ID==="alpha_battle_modern_33000_2026_09_22_performance",
+      patchId:PATCH_ID==="alpha_battle_modern_33000_2026_09_23_formation_stage",
+      formationUsesDeploymentTruth:String(deployedFormation33000).includes("getBattleDeploymentParticipant")&&String(deployedFormation33000).includes("slot<=4"),
+      adaptiveFormationModes:String(formationMode33000).includes('"duel"')&&String(formationMode33000).includes('"wedge"')&&String(formationMode33000).includes('"arc"'),
+      exactThreePrimaryFamilies:String(installFormationDock33000).includes('"SKILLS"')&&String(installFormationDock33000).includes('"ITEMS"')&&String(installFormationDock33000).includes('"SUMMONS"')&&String(installFormationDock33000).includes("primary.length===3"),
+      withdrawPreservedOutsidePrimaryDock:String(installFormationDock33000).includes("battle2-formation-withdraw")&&typeof invokeBattleWithdrawAction==="function",
+      contextualTargetFocus:String(selectedFormationTarget33000).includes("selectedTargetRef")&&String(formationNodeForRef33000).includes("participantId"),
+      formationDoesNotWriteSemantics:String(installFormationStage33000).includes("semanticWrite:false"),
       hoverLearns:source.includes("enhanceBattleSkillCards33000")&&previewBattlePreparedSkill33000.toString().includes("battle-live-skill-details"),
       clickStillUsesExistingCommitPath:typeof activateBattlePreparedSkillCard==="function",
       youthReadingContract:YOUTH_READING_TARGET==="12-13"&&summary.includes("Hit one enemy")&&summary.includes("This does not deal damage"),
