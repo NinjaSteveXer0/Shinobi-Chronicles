@@ -106,6 +106,8 @@ jobs:
           node tools/qa_browser_runtime_error_gate_311.js
           node --check tools/qa_release_candidate_evidence_311.js
           node tools/qa_release_candidate_evidence_311.js
+          node --check tools/qa_issue_312_story_battle_benchmark.js
+          node tools/qa_issue_312_story_battle_benchmark.js
           python tools/qa_issue_141_pre_alpha_runtime_closure.py
 
       - name: Story and Origin runtime closure
