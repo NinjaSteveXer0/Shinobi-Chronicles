@@ -10,6 +10,9 @@ beginAlphaChronicleOriginPrologue=function alpha329BeginOriginPrologue(){
   if(acquisition.chronicleOrigin&&acquisition.chronicleOrigin.prologueCompleted===true)return{success:true,idempotent:true,reason:"origin_prologue_already_completed",originId};
   const sceneId=A.sceneByVariant[originId]||null;
   if(!sceneId)return{success:false,reason:"origin_story_scene_mapping_missing",originId};
+  // Academy Kakashi legacy runtime is intentionally demolished while V2 is rebuilt clean-room.
+  // Preserve the stable identity/mapping, but make the temporary absence explicit and fail-closed.
+  if(originId==="academy_kakashi"&&(typeof getStorySceneDefinition!=="function"||!getStorySceneDefinition(sceneId)))return{success:false,reason:"academy_kakashi_v2_pending",originId,sceneId};
   if(typeof getStorySceneDefinition!=="function"||!getStorySceneDefinition(sceneId))return{success:false,reason:"origin_story_scene_not_registered",originId,sceneId};
   const active=typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;
   if(active){
@@ -39,7 +42,7 @@ if(typeof runAlphaJourneySurface32800Diagnostics==="function"){
     const result=PRE328_DIAG();
     if(result&&result.checks){
       result.checks.missingNineFailClosed=true;
-      result.checks.nineOriginPackagesNowIntegrated=Object.keys(A.sceneByVariant).length===10&&A.registrations.length===9;
+      result.checks.nonKakashiOriginPackagesIntegrated=Object.keys(A.sceneByVariant).length===10&&A.registrations.length===8;
       result.failed=Object.entries(result.checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
       result.pass=result.failed.length===0;
       result.coordinationIssue=135;
@@ -53,7 +56,7 @@ function getAlphaOriginScene32900Status(){
   return Object.entries(A.sceneByVariant).map(([originId,sceneId])=>({
     originId,sceneId,
     registered:typeof getStorySceneDefinition==="function"&&!!getStorySceneDefinition(sceneId),
-    writingAuthority:originId==="academy_menma"?"existing production Menma":originId==="academy_kakashi"||originId==="academy_obito"?"#135/#136 final production Writing":"#135 CE-recovered final Writing lock"
+    writingAuthority:originId==="academy_menma"?"existing production Menma":originId==="academy_kakashi"?"Academy Kakashi V2 clean-room pending; durable Writing remains authoritative":originId==="academy_obito"?"#135/#136 final production Writing":"#135 CE-recovered final Writing lock"
   }));
 }
 function runAlphaOriginScene32900Diagnostics(){
@@ -61,9 +64,11 @@ function runAlphaOriginScene32900Diagnostics(){
   const checks={
     patchId:A.patchId==="alpha_origin_scenes_32900_2026_09_12",
     tenMappings:Object.keys(A.sceneByVariant).length===10,
-    nineNewScenesRegistered:status.filter(r=>r.originId!=="academy_menma").every(r=>r.registered),
+    nonKakashiNewScenesRegistered:status.filter(r=>r.originId!=="academy_menma"&&r.originId!=="academy_kakashi").every(r=>r.registered),
+    kakashiV2IntentionallyUnregistered:status.find(r=>r.originId==="academy_kakashi")?.registered===false,
+    kakashiV2DispatcherFailClosed:src.includes("academy_kakashi_v2_pending"),
     menmaPreserved:status.find(r=>r.originId==="academy_menma")?.registered===true,
-    allNineRegistrationAttemptsGreen:A.registrations.length===9&&A.registrations.every(r=>r&&r.success===true),
+    allEightNonKakashiRegistrationAttemptsGreen:A.registrations.length===8&&A.registrations.every(r=>r&&r.success===true),
     dispatcherNo135FailClosed:!src.includes("origin_story_scene_package_not_projected")&&!src.includes("coordinationIssue:135"),
     exactKakashiPackage:A.sceneByVariant.academy_kakashi==="origin_academy_kakashi_anbu_retrieval",
     exactObitoPackage:A.sceneByVariant.academy_obito==="origin_academy_obito_journey_to_training",
