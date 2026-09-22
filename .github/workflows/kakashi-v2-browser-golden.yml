@@ -10,6 +10,8 @@ on:
       - 'tools/qa_issue_303_runtime_build_fingerprint.js'
       - 'runtime/academy-kakashi-v2-content-36000.js'
       - 'runtime/alpha-kakashi-v2-*.js'
+      - 'runtime/alpha-story-scene-board-33900.js'
+      - 'runtime/alpha-battle-modern-33000.js'
       - 'runtime/alpha-origin-scenes-32900-integrator.js'
       - 'runtime/alpha-traversal-bridge-33200.js'
       - 'tools/qa_kakashi_v2_browser.js'
