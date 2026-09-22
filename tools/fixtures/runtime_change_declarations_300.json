@@ -127,6 +127,33 @@
         "tools/qa_kakashi_v2_browser.js"
       ],
       "replaces": []
+    },
+    {
+      "changeId": "issue-312-story-battle-performance-2026-09-22",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "story.scene.presentation.shared",
+        "battle.presentation.shared",
+        "origin.academy_kakashi.v2.story_dom",
+        "origin.academy_kakashi.v2.semantic_advance"
+      ],
+      "owner": "runtime/alpha-story-scene-board-33900.js + runtime/alpha-battle-modern-33000.js",
+      "directCallers": [
+        "runtime/alpha-kakashi-v2-renderer-36030.js",
+        "runtime/alpha-kakashi-v2-transition-36040.js",
+        "index.html"
+      ],
+      "stateTouched": [
+        "activeStorySceneRuntime.localContext.__storyPerformanceCursor33900",
+        "currentBattle.runtime.evidence (read-only presentation projection)"
+      ],
+      "productionLoader": "runtime/alpha-traversal-bridge-33200.js + index.html",
+      "qaRefs": [
+        "tools/qa_issue_312_story_battle_benchmark.js",
+        "tools/qa_issue_312_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": []
     }
   ]
 }
