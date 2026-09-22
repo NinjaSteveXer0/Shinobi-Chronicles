@@ -20,6 +20,7 @@ INDEX = ROOT / "index.html"
 GAME = ROOT / "game.js"
 
 EXPECTED_RUNTIME_ORDER = [
+    "runtime/alpha-runtime-build-fingerprint-303.js",
     "game.js",
     "runtime/alpha-menma-tutorial-111.js",
     "runtime/alpha-world-konoha-112-core.js",
@@ -64,6 +65,7 @@ NODE_GATES = [
     "tools/qa_issue_151_arc1_reward_exact_head.js",
     "tools/qa_runtime_ownership_safety_300.js",
     "tools/qa_issue_278_post_battle_agency.js",
+    "tools/qa_issue_303_runtime_build_fingerprint.js",
 ]
 
 EXTERNAL_ASSET_GATES = [
