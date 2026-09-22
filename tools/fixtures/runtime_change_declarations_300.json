@@ -79,6 +79,25 @@
         "tools/qa_runtime_ownership_safety_300.js"
       ],
       "replaces": []
+    },
+    {
+      "changeId": "issue-305-always-run-merge-safety-gate-2026-09-22",
+      "classification": "NEW",
+      "responsibilityIds": [
+        "runtime.safety.merge_gate"
+      ],
+      "owner": ".github/workflows/merge-safety-gate.yml",
+      "directCallers": [
+        "GitHub pull_request",
+        "GitHub merge_group"
+      ],
+      "stateTouched": [],
+      "productionLoader": null,
+      "qaRefs": [
+        "tools/merge_safety_gate_305.js",
+        "tools/qa_merge_safety_gate_305.js"
+      ],
+      "replaces": []
     }
   ]
 }
