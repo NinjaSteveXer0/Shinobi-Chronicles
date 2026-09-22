@@ -61,7 +61,7 @@ assert(kv2Renderer.includes("CLICK ANYWHERE TO CONTINUE")&&!kv2Renderer.includes
 assert(kv2Renderer.includes('root.dataset.hasChoices==="true"')&&kv2Renderer.includes("Date.now()-revealed<360"),"#312 choice reveal must block click-through / accidental commitment");
 assert(kv2Renderer.includes("repeat(3,minmax(0,1fr))")&&kv2Renderer.includes("max-height:none;overflow:visible"),"#312 five-choice desktop layout must not require an internal scrollbar");
 assert(kv2Renderer.includes('p.id!=="v2_watch_exchange"')&&kv2Renderer.includes("SURPRISE_ENTRY")&&kv2Renderer.includes("FAR_ENTRY_LEFT"),"#312 WATCH exchange cue choreography missing");
-assert(kv2Renderer.includes('if(idx<10)mi.dataset.scChoreographyPendingEntry="true"'),"#312 Masked Interceptor must remain visually withheld until her authored reveal cue");
+assert(kv2Renderer.includes('if(idx<10)mi.dataset.kv2CueWithheld="true"'),"#312 Masked Interceptor must remain visually withheld until her authored reveal cue");
 assert(kv2Renderer.includes("border-radius:16px")&&kv2Renderer.includes("backdrop-filter:blur(8px)"),"#312 modern compact narration/speech styling missing");
 
 assert(kv2Rewards.includes("ensureKakashiV2BattleRewardProjection36015"),"#312 Kakashi reward projection self-heal missing");
