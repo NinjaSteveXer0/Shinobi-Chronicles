@@ -747,8 +747,8 @@ async function shot(page,name,selector=null){
     assert.strictEqual(duelComposition.visibleSupports,0,"#312 sparse duel rendered fake/empty support furniture: "+JSON.stringify(duelComposition));
     assert(duelComposition.playerPowerCenterRatio>=0.40&&duelComposition.playerPowerCenterRatio<=0.43,"#312 player PL ring is not flanking the confrontation lane: "+JSON.stringify(duelComposition));
     assert(duelComposition.enemyPowerCenterRatio>=0.57&&duelComposition.enemyPowerCenterRatio<=0.60,"#312 enemy PL ring is not flanking the confrontation lane: "+JSON.stringify(duelComposition));
-    assert(duelComposition.playerPowerCenterYRatio>=0.44&&duelComposition.playerPowerCenterYRatio<=0.49,"#312 player PL ring still sits at the portrait bottom: "+JSON.stringify(duelComposition));
-    assert(duelComposition.enemyPowerCenterYRatio>=0.44&&duelComposition.enemyPowerCenterYRatio<=0.49,"#312 enemy PL ring still sits at the portrait bottom: "+JSON.stringify(duelComposition));
+    assert(duelComposition.playerPowerCenterYRatio>=0.46&&duelComposition.playerPowerCenterYRatio<=0.49,"#312 player PL ring still sits at the portrait bottom: "+JSON.stringify(duelComposition));
+    assert(duelComposition.enemyPowerCenterYRatio>=0.46&&duelComposition.enemyPowerCenterYRatio<=0.49,"#312 enemy PL ring still sits at the portrait bottom: "+JSON.stringify(duelComposition));
     assert(duelComposition.vsOpacity>=0.5,"#312 sparse duel confrontation marker is too visually weak: "+JSON.stringify(duelComposition));
 
     const amtSkillsButton=page.locator('.battle-live-action-family-row button[data-formation-family="skills"]');
