@@ -86,6 +86,49 @@ Unknown fields must remain unknown rather than being filled with invented biogra
 
 ---
 
+## 3A. 2026-09-22 mandatory anchor refresh reinforcement
+
+Before rewriting **substantial dialogue**, Writing must refresh or build a personality / voice anchor for every materially speaking recurring character in scope.
+
+For canon-derived characters:
+
+1. research the correct canon **age / era / life stage** first;
+2. research temperament, values, speech behaviour, emotional defences, pressure behaviour and relationship-specific behaviour;
+3. identify what later-life traits must **not** be back-ported into the current younger/earlier representation;
+4. apply current Shinobi Chronicles Recorded History and relationship state after the canon baseline;
+5. record intentional Chronicle divergence explicitly.
+
+For original NPCs:
+
+- author a deliberate personality appropriate to role, motive, history and current pressure;
+- do not default to generic shinobi, generic ANBU, generic villain, generic police, or the project's familiar dry/sarcastic house voice;
+- if the NPC recurs materially, preserve the anchor durably before treating later dialogue as Writing-complete.
+
+Anchors are **behavioural models, not dialogue templates**.
+
+Before finalising important dialogue, perform both tests:
+
+> **Speaker fingerprint:** remove speaker names. Could the speaker still reasonably be identified from how they think and talk?
+
+> **Plot-puppet test:** is this person reacting according to their personality, Knowledge, relationship and pressure — or merely saying what the plot needs next?
+
+If either test fails, rewrite.
+
+Current Academy Kakashi cast-specific successor:
+
+`Documentation/Story/Academy_Kakashi_Active_Cast_Character_Voice_and_Personality_Anchors_2026-09-22.md`
+
+That file is the current detailed anchor for:
+- Academy Kakashi;
+- Pakkun;
+- Minato;
+- Kakashi Origin ANBU Operative;
+- ANBU Marked Target;
+- Package Smuggler;
+- Masked Interceptor;
+- Uchiha Police receiving-officer role.
+
+
 # 5. ACTIVE ACADEMY KAKASHI ORIGIN PROFILES
 
 ## 5.1 Academy Kakashi Hatake
