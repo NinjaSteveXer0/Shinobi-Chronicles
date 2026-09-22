@@ -73,7 +73,7 @@ assert(transitionSource.includes("kv2-actor-ghost"),"one-shot actor exit animati
   const immediate=context.generateBattleRewards({rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]}},{name:"Kakashi"});
   assert.strictEqual(immediate.ryo,50);
   assert.strictEqual(immediate.exp,0);
-  assert.deepStrictEqual(immediate.items.map(x=>x.id),["field_recovery_pill"]);
+  assert.strictEqual(JSON.stringify(Array.from(immediate.items).map(x=>x.id)),JSON.stringify(["field_recovery_pill"]));
   assert.strictEqual(context.claimCurrentBattleRewards(),true);
   assert.strictEqual(context.playerData.ryo,50);
   assert.strictEqual(context.playerData.inventory.find(x=>x.id==="field_recovery_pill").quantity,1);
@@ -175,9 +175,22 @@ assert(transitionSource.includes("kv2-actor-ghost"),"one-shot actor exit animati
     }
   }
   const root=def.beatMap.get("v2_scene02_tail");
-  assert.deepStrictEqual(root.choices.map(c=>c.label),["WATCH THE EXCHANGE","MOVE IN CLOSER","STRIKE BEFORE THE HANDOFF","SLIP IN FOR THE PACKAGE"]);
+  assert.strictEqual(JSON.stringify(Array.from(root.choices).map(c=>c.label)),JSON.stringify(["WATCH THE EXCHANGE","MOVE IN CLOSER","STRIKE BEFORE THE HANDOFF","SLIP IN FOR THE PACKAGE"]));
   const watch=def.beatMap.get("v2_watch_exchange");
-  assert.deepStrictEqual(watch.choices.map(c=>c.label),["STOP THE ASSASSIN","SECURE THE PACKAGE","SECURE THE PACKAGE BEFORE THE ASSASSIN","DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE","GO AFTER THE ORIGINAL TARGET"]);
+  assert.strictEqual(JSON.stringify(Array.from(watch.choices).map(c=>c.label)),JSON.stringify(["STOP THE ASSASSIN","SECURE THE PACKAGE","SECURE THE PACKAGE BEFORE THE ASSASSIN","DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE","GO AFTER THE ORIGINAL TARGET"]));
+  const stopBattle=def.beatMap.get("v2_battle_mi_stop");
+  assert(stopBattle&&stopBattle.battle,"Stop Assassin Battle beat missing");
+  assert.strictEqual(stopBattle.battle.encounterId,"academy_kakashi_origin_battle_mi_1v1","Stop Assassin incorrectly reused sequential MI config");
+  const stopWin=def.beatMap.get("v2_mi_stop_win");
+  assert(stopWin,"Stop Assassin win beat missing");
+  assert(stopWin.choices.some(c=>c.label==="GO AFTER PACKAGE SMUGGLER"),"Stop Assassin lost Package Smuggler catch-up");
+  assert(!stopWin.choices.some(c=>c.label==="GO AFTER ANBU MARKED TARGET"),"Stop Assassin illegally exposes direct AMT pursuit");
+  const psCatchup=stopWin.choices.find(c=>c.label==="GO AFTER PACKAGE SMUGGLER");
+  const availSource=String(psCatchup&&psCatchup.availability||"");
+  assert(availSource.includes("<=3"),"Stop Assassin Package Smuggler catch-up is not the current <=3 controller-action gate");
+  const restrainedStop=def.beatMap.get("v2_mi_restrained_next");
+  assert(restrainedStop&&restrainedStop.choices.length===1&&restrainedStop.choices[0].label==="GO AFTER PACKAGE SMUGGLER","restrain-and-continue reopened illegal direct AMT pursuit");
+
   const packageSecond=def.beatMap.get("v2_mi_package_second_win");
   assert(packageSecond.choices.some(c=>c.label==="CHASE THE PACKAGE SMUGGLER"));
   assert(!packageSecond.choices.some(c=>c.label==="GO AFTER ANBU MARKED TARGET"),"package-second branch collapsed into STOP THE ASSASSIN");
