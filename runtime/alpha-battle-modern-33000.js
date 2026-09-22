@@ -830,7 +830,7 @@
       .battle2-modern.battle2-performance-active .battle-live-status{opacity:0!important}
       .battle2-performance-stage.is-playing .battle2-performance-center{animation:battle2ActionLabel33000 .30s ease both}
       .battle2-performance-stage.is-settled{opacity:0;transform:translateY(-4px)}
-      .battle2-modern.battle2-performance-active .battle-live-active-card{transition:filter .14s ease,opacity .14s ease,transform .14s ease!important}
+      .battle2-modern.battle2-performance-active .battle-live-active-card{transition:filter .14s ease,opacity .14s ease!important;will-change:transform,filter,opacity}
       .battle2-modern.battle2-performance-active .battle-live-active-card:not(.battle2-performance-role-actor):not(.battle2-performance-role-target){opacity:.48!important;filter:saturate(.55) brightness(.68)!important}
       .battle2-modern.battle2-performance-active .battle2-performance-role-actor{z-index:28!important;filter:saturate(1.08) brightness(1.08) drop-shadow(0 22px 34px rgba(0,0,0,.56))!important}
       .battle2-modern.battle2-performance-active .battle2-performance-role-target{z-index:27!important;filter:saturate(.92) brightness(.94) drop-shadow(0 20px 30px rgba(0,0,0,.52))!important}
@@ -855,12 +855,12 @@
       .battle2-modern.battle2-performance-active[data-battle2-performance-result="EVADE"] .battle2-performance-role-target,.battle2-modern.battle2-performance-active[data-battle2-performance-result="MISS"] .battle2-performance-role-target{animation:battle2Evade33000 .38s .26s ease both}
       @keyframes battle2ActionLabel33000{0%{opacity:0;transform:translateY(-5px)}100%{opacity:1;transform:translateY(0)}}
       @keyframes battle2ResultReceipt33000{0%{opacity:0;transform:translateY(-5px)}100%{opacity:1;transform:translateY(0)}}
-      @keyframes battle2ActorStrike33000{0%{transform:translateX(0) scale(1);filter:none}58%{transform:translateX(var(--battle2-performance-strike-x,12%)) scale(1.045);filter:brightness(1.12)}100%{transform:translateX(0) scale(1);filter:none}}
-      @keyframes battle2ActorCast33000{0%{transform:scale(1);filter:none}45%{transform:scale(1.055);filter:brightness(1.28) saturate(1.08)}100%{transform:scale(1);filter:none}}
-      @keyframes battle2TargetImpact33000{0%{transform:translateX(0) rotate(0);filter:none}42%{transform:translateX(var(--battle2-performance-impact-x,7%)) rotate(1.8deg);filter:brightness(1.16)}100%{transform:translateX(0) rotate(0);filter:none}}
-      @keyframes battle2Substitution33000{0%{opacity:1;transform:translateX(0)}42%{opacity:.12;filter:brightness(1.45) blur(1.4px);transform:translateX(var(--battle2-performance-evade-x,10%)) scale(.97)}100%{opacity:1;filter:none;transform:translateX(0) scale(1)}}
-      @keyframes battle2Defeat33000{0%{opacity:1;transform:translateY(0) rotate(0)}68%{opacity:.42;transform:translateY(13%) rotate(2deg);filter:saturate(.4) brightness(.58)}100%{opacity:.68;transform:translateY(9%) rotate(1deg);filter:saturate(.58) brightness(.68)}}
-      @keyframes battle2Evade33000{0%{transform:translateX(0)}52%{transform:translateX(var(--battle2-performance-evade-x,10%)) scale(.985)}100%{transform:translateX(0) scale(1)}}
+      @keyframes battle2ActorStrike33000{0%{transform:translate3d(0,0,0);filter:none}48%{transform:translate3d(var(--battle2-performance-strike-x,12%),0,0);filter:brightness(1.08)}68%{transform:translate3d(calc(var(--battle2-performance-strike-x,12%) * .72),0,0);filter:brightness(1.04)}100%{transform:translate3d(0,0,0);filter:none}}
+      @keyframes battle2ActorCast33000{0%{transform:translate3d(0,0,0) scale(1);filter:none}48%{transform:translate3d(0,-1.4%,0) scale(1.025);filter:brightness(1.18)}100%{transform:translate3d(0,0,0) scale(1);filter:none}}
+      @keyframes battle2TargetImpact33000{0%{transform:translate3d(0,0,0);filter:none}38%{transform:translate3d(var(--battle2-performance-impact-x,7%),0,0);filter:brightness(1.1)}66%{transform:translate3d(calc(var(--battle2-performance-impact-x,7%) * -.18),0,0);filter:brightness(1.02)}100%{transform:translate3d(0,0,0);filter:none}}
+      @keyframes battle2Substitution33000{0%{opacity:1;transform:translate3d(0,0,0)}42%{opacity:.16;filter:brightness(1.28);transform:translate3d(var(--battle2-performance-evade-x,10%),0,0)}100%{opacity:1;filter:none;transform:translate3d(0,0,0)}}
+      @keyframes battle2Defeat33000{0%{opacity:1;transform:translate3d(0,0,0)}72%{opacity:.42;transform:translate3d(0,13%,0);filter:saturate(.4) brightness(.58)}100%{opacity:.68;transform:translate3d(0,9%,0);filter:saturate(.58) brightness(.68)}}
+      @keyframes battle2Evade33000{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(var(--battle2-performance-evade-x,10%),0,0)}100%{transform:translate3d(0,0,0)}}
       @media(prefers-reduced-motion:reduce){.battle2-modern.battle2-performance-active .battle2-performance-role-actor,.battle2-modern.battle2-performance-active .battle2-performance-role-target{animation:none!important}.battle2-modern.battle2-performance-active .battle2-performance-result-chip{animation:battle2ReducedReceipt33000 .16s ease both}.battle2-performance-stage.is-playing .battle2-performance-center{animation:battle2ReducedReceipt33000 .16s ease both}@keyframes battle2ReducedReceipt33000{from{opacity:.72}to{opacity:1}}}
       @media(max-width:1100px){.battle2-modern .battle-live-skill-deck,.battle2-modern .battle-live-pouch{width:61%!important}.battle2-modern .battle-live-skill-details{left:65.5%!important;width:31%!important}.battle2-live-ticker{left:37%!important;width:26%!important}.battle2-action-hint{display:none}}
 
@@ -891,7 +891,7 @@
       /* Duel: two combatants own the battlefield. No fake support furniture. */
       .battle2-modern[data-formation-mode="duel"] .battle-live-active-card{top:9.5%!important;width:33.5%!important;height:56%!important}
       .battle2-modern[data-formation-mode="duel"] .battle-live-active-card-player{left:8.5%!important}.battle2-modern[data-formation-mode="duel"] .battle-live-active-card-enemy{left:58%!important}
-      .battle2-modern[data-formation-mode="duel"] .battle-live-power{top:61%!important}.battle2-modern[data-formation-mode="duel"] .battle-live-power-player{left:33%!important}.battle2-modern[data-formation-mode="duel"] .battle-live-power-enemy{left:67%!important;right:auto!important}
+      .battle2-modern[data-formation-mode="duel"] .battle-live-power{top:45.5%!important}.battle2-modern[data-formation-mode="duel"] .battle-live-power-player{left:41.5%!important}.battle2-modern[data-formation-mode="duel"] .battle-live-power-enemy{left:58.5%!important;right:auto!important}
       .battle2-modern[data-formation-mode="duel"] .battle-code-vs{top:28.5%!important;opacity:.55!important;font-size:clamp(22px,2.8vw,42px)!important;letter-spacing:.1em!important;filter:drop-shadow(0 8px 14px rgba(0,0,0,.55))}
 
       /* Squad wedge: support stays visibly behind/outward from the confrontation lane. */
