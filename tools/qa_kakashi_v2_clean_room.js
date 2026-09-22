@@ -28,6 +28,10 @@ assert(rendererSource.includes('>*:not(#${ROOT_ID}){display:none!important}'),"r
 assert(rendererSource.includes("kv2-dialogue")&&rendererSource.includes("chronicle_receipt"),"renderer missing singular dialogue/Receipt modes");
 assert(transitionSource.includes("kakashi_v2_transition_locked"),"transition lock missing");
 assert(transitionSource.includes("kv2-actor-ghost"),"one-shot actor exit animation missing");
+assert(!rendererSource.split("function ensureRoot")[0].includes("root.innerHTML"),"renderer source unexpectedly rebuilds root before mount");
+assert(!rendererSource.slice(rendererSource.indexOf("function syncActors"),rendererSource.indexOf("function bind")).includes("root.innerHTML"),"cue render remounts Scene Board root");
+assert(rendererSource.includes("kv2-ghost-layer"),"persistent actor ghost layer missing");
+assert(transitionSource.includes("is-falling")&&transitionSource.includes("is-fleeing")&&transitionSource.includes("is-fading"),"distinct actor exit modes missing");
 
 // Reward authority uses the existing Currency / Inventory / Battle claim surfaces
 // while proving exact source values and idempotence.
@@ -126,6 +130,8 @@ assert(transitionSource.includes("kv2-actor-ghost"),"one-shot actor exit animati
   assert.strictEqual(context.enemyDatabase.academy_kakashi_origin_amt.calibratedBasePL,18);
   assert.strictEqual(context.enemyDatabase.academy_kakashi_origin_package_smuggler.calibratedBasePL,10);
   assert.strictEqual(context.enemyDatabase.academy_kakashi_origin_masked_interceptor.calibratedBasePL,14);
+  assert(!battleSource.includes("basePLAtEntry:15"),"Kakashi Battle-entry PL is hard-coded instead of read from live authority");
+  assert(battleSource.includes("authoritativePlayerBasePLAtEntry"),"live Kakashi Battle-entry PL resolver missing");
 }
 
 // Core scene graph executes against neutral Story/Factual mocks.
