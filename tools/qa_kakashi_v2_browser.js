@@ -531,27 +531,36 @@ async function visualAndBattle(browser){
   await pause(90);
   const killStart=await page.evaluate(()=>{
     const root=document.getElementById("kakashi-v2-scene-board");
-    const ghost=root?.querySelector(".kv2-actor-ghost");
+    const ghost=root?.querySelector(".kv2-departure-ghost.is-falling");
+    const hold=root?.querySelector('.kv2-outgoing-hold-ghost[data-original-actor-id="academy_kakashi"]');
+    const liveActors=root?.querySelector(".kv2-actors");
     const rect=ghost?.getBoundingClientRect(),style=ghost?getComputedStyle(ghost):null;
+    const holdStyle=hold?getComputedStyle(hold):null,liveStyle=liveActors?getComputedStyle(liveActors):null;
     const memory=root?.querySelector(".kv2-transition-memory");
     return{
       exists:!!ghost,falling:!!ghost&&ghost.classList.contains("is-falling"),
       top:rect?.top||0,opacity:style?Number(style.opacity):0,
       animationName:style?.animationName||null,
       active:ghost?.dataset.scChoreographyActive||null,
-      outgoingBackdropHeld:!!memory&&!memory.hidden
+      outgoingBackdropHeld:!!memory&&!memory.hidden,
+      kakashiHoldExists:!!hold,
+      kakashiHoldOpacity:holdStyle?Number(holdStyle.opacity):0,
+      liveActorLayerOpacity:liveStyle?Number(liveStyle.opacity):1
     };
   });
   await pause(300);
   const kill=await page.evaluate(()=>{
     const root=document.getElementById("kakashi-v2-scene-board");
-    const ghost=root?.querySelector(".kv2-actor-ghost");
+    const ghost=root?.querySelector(".kv2-departure-ghost.is-falling");
+    const hold=root?.querySelector('.kv2-outgoing-hold-ghost[data-original-actor-id="academy_kakashi"]');
     const rect=ghost?.getBoundingClientRect(),style=ghost?getComputedStyle(ghost):null;
     return{
       exists:!!ghost,falling:!!ghost&&ghost.classList.contains("is-falling"),
       top:rect?.top||0,opacity:style?Number(style.opacity):0,
       animationName:style?.animationName||null,
-      active:ghost?.dataset.scChoreographyActive||null
+      active:ghost?.dataset.scChoreographyActive||null,
+      kakashiHoldExists:!!hold,
+      kakashiHoldOpacity:hold?Number(getComputedStyle(hold).opacity):0
     };
   });
   assert(killStart.exists&&killStart.falling&&kill.exists&&kill.falling,"kill fall animation missing: "+JSON.stringify({killStart,kill}));
@@ -560,10 +569,24 @@ async function visualAndBattle(browser){
   assert(kill.top>killStart.top+24,"kill card did not visibly fall before the scene wipe: "+JSON.stringify({killStart,kill}));
   assert(kill.opacity<killStart.opacity,"kill card did not fade while falling: "+JSON.stringify({killStart,kill}));
   assert.strictEqual(killStart.outgoingBackdropHeld,true,"outgoing fight environment was not preserved behind the kill fall");
+  assert.strictEqual(killStart.kakashiHoldExists,true,"outgoing Kakashi was not frozen beside the kill animation");
+  assert(killStart.kakashiHoldOpacity>=0.8&&kill.kakashiHoldExists&&kill.kakashiHoldOpacity>=0.8,"outgoing Kakashi did not remain visually stable during the kill fall: "+JSON.stringify({killStart,kill}));
+  assert(killStart.liveActorLayerOpacity<=0.01,"next-scene live actors were visible behind the outgoing kill tableau");
   await shot(page,"09-kill-fall-animation.png",{skipReady:true});
   const killResult=await killPromise;
   assert(killResult&&killResult.success===true,JSON.stringify(killResult));
   await waitUnlocked(page,"v2_report");
+  const killCleanup=await page.evaluate(()=>{
+    const root=document.getElementById("kakashi-v2-scene-board");
+    return{
+      holdGhosts:root?.querySelectorAll(".kv2-outgoing-hold-ghost").length||0,
+      transitionActive:root?.dataset.transitionActive||null,
+      liveActorLayerOpacity:root?Number(getComputedStyle(root.querySelector(".kv2-actors")).opacity):0
+    };
+  });
+  assert.strictEqual(killCleanup.holdGhosts,0,"outgoing kill tableau survived after the hard transition");
+  assert.strictEqual(killCleanup.transitionActive,null,"hard transition flag survived into report");
+  assert(killCleanup.liveActorLayerOpacity>=0.99,"report actor layer did not recover after kill transition: "+JSON.stringify(killCleanup));
 
   await page.evaluate(()=>{
     const rt=getActiveStorySceneRuntime();
