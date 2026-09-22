@@ -9,7 +9,7 @@
 if(globalThis.SC_ACADEMY_KAKASHI_V2_TRANSITION_36040)return;
 
 const PATCH_ID="academy_kakashi_v2_transition_36040_2026_09_22";
-const SCENE_ID="origin_academy_kakashi_prologue";
+const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const CURSOR_KEY="__kakashiV2Presentation36040";
 let locked=false,wipeCovering=false,lastTransition=null,timerIds=[];
 
