@@ -222,6 +222,24 @@ function receiptCues(){
   for(const ref of ["MI","PS","AMT"]){const row=s.participants[ref];if(!row||row.state==="UNSEEN")continue;const suffix=row.state==="DEAD"?"Killed by Kakashi after Battle.":row.state==="FIELD_SECURED_PENDING_COLLECTION"?"Field-secured alive.":row.state==="ANBU_CUSTODY"?"Transferred to ANBU custody.":row.state==="POLICE_CUSTODY"?"Transferred to Uchiha Police custody.":row.state==="RELEASED"?"Deliberately released.":row.state==="ESCAPED"?"Escaped.":row.state==="BATTLE_DEFEATED"?"Defeated; left alive and unrestrained.":row.state;lines.push(`${label[ref]} — ${suffix}`);}
   if(s.knowledge.getCloserContingency)lines.push("Knowledge — Handoff contingency observed before intervention.");
   if(s.knowledge.askWhere)lines.push("Knowledge — Carrier role ended at handoff; receiver intended onward; downstream destination not learned.");
+  const result=s.rewards&&s.rewards.terminalResult||null;
+  const receipts=result&&Array.isArray(result.sourceReceipts)?result.sourceReceipts:[];
+  const why={
+    kak_origin_ryo_terminal_debrief:"terminal factual ANBU debrief and Chronicle Receipt completed",
+    kak_origin_ryo_package_recovered:"package returned to the authorised Konoha side",
+    kak_origin_ryo_actionable_intelligence:"new verified package-route intelligence reported",
+    kak_origin_ryo_live_custody:"at least one relevant participant delivered alive to legitimate authority",
+    kak_origin_ryo_exceptional_field_execution:"authorised exceptional field-execution benchmark met",
+    kak_origin_battle_mi_victory_ryo_01:"solo Masked Interceptor Battle victory",
+    kak_origin_battle_ps_victory_ryo_01:"solo Package Smuggler Battle victory",
+    kak_origin_battle_amt_victory_ryo_01:"solo ANBU Marked Target Battle victory"
+  };
+  for(const receipt of receipts){
+    if(receipt.rewardClass==="battle_cash"||receipt.rewardClass==="terminal_cash")lines.push(`Reward — ${receipt.ryo} Ryō · ${why[receipt.sourceId]||receipt.sourceId}.`);
+    if(receipt.itemId==="field_recovery_pill")lines.push(`Reward — Field Recovery Pill ×1 · ${receipt.metadata&&receipt.metadata.timing==="immediate_solo_mi_victory"?"solo Masked Interceptor victory resupply":"PL Battle participation resupply at terminal debrief"}.`);
+    if(receipt.itemId==="academy_training_tanto")lines.push("Reward — Academy Training Tantō ×1 · exceptional field-evaluation award.");
+  }
+  lines.push("Development — discipline/Stamina development is derived from committed actions used in Battle; no generic Character EXP or direct PL is granted here.");
   return[RECORD(lines.join("\n"))];
 }
 
@@ -567,14 +585,27 @@ addBeat("v2_pickpocket_3v1_win",{mode:"choice",backdrop:B.fight,location:"SAKURA
 // TERMINAL — factual report -> private evaluation -> Receipt -> Origin complete.
 // ---------------------------------------------------------------------------
 addBeat("v2_report",{backdrop:B.rooftop,location:"ANBU REPORT · KONOHA ROOFTOP · NIGHT",objective:"Report to ANBU.",actors:["kakashi","anbu"],preset:"anbu_report",transition:"wipe",onEnter:()=>mutate(s=>{if(s.package.holder==="KAKASHI"){s.package.holder="ANBU";s.package.returned=true;}s.terminal.reportReached=true;}),cues:()=>dynamicTerminalCues(),nextBeatId:"v2_minato"});
-addBeat("v2_minato",{backdrop:B.hokage,location:"HOKAGE ADMINISTRATION · NIGHT",objective:null,actors:["anbu","minato"],preset:"hokage_report",transition:"wipe",onEnter:()=>mutate(s=>{s.terminal.minatoReached=true;}),cues:()=>minatoCues(),nextBeatId:"v2_receipt"});
-addBeat("v2_receipt",{backdrop:B.hokage,location:"CHRONICLE RECEIPT",objective:null,actors:[],preset:"chronicle_receipt",transition:"wipe",receipt:true,onEnter:()=>mutate(s=>{s.terminal.receiptReached=true;}),cues:()=>receiptCues(),nextBeatId:"v2_complete"});
-addBeat("v2_complete",{backdrop:B.hokage,location:"CHRONICLE CLOSED",objective:null,actors:[],preset:"chronicle_receipt",cues:[RECORD("Origin occurrence sealed. Continue to Academy Team Formation.")],onAdvance:()=>{
-  const s=state();if(!s)return{success:false,reason:"kakashi_v2_state_missing"};
-  if(!s.rewards.terminalCommitted){s.rewards.terminalCommitted=true;save();}
-  const result=typeof completeChronicleOriginPrologue==="function"?completeChronicleOriginPrologue(ORIGIN_ID,[`kakashi_v2:${active().instanceId}`]):{success:false,reason:"origin_completion_api_missing"};
+function commitTerminalRewardsAtReceipt(){
+  const s=state(),rt=active();if(!s||!rt)return{success:false,reason:"kakashi_v2_state_missing"};
+  s.terminal.receiptReached=true;save();
+  if(typeof globalThis.commitAcademyKakashiV2TerminalRewards36015!=="function")return{success:false,reason:"kakashi_v2_reward_adapter_missing"};
+  const result=globalThis.commitAcademyKakashiV2TerminalRewards36015(s,rt.instanceId);
+  if(!result||result.success!==true)return result||{success:false,reason:"kakashi_v2_terminal_reward_commit_failed"};
+  s.rewards.terminalCommitted=true;
+  s.rewards.sources=(result.sourceReceipts||[]).map(row=>row.sourceId);
+  s.rewards.terminalResult=result;
+  save();
+  return{success:true,rewardResult:result};
+}
+function completeAcademyKakashiV2Origin(){
+  const s=state(),rt=active();if(!s||!rt)return{success:false,reason:"kakashi_v2_state_missing"};
+  if(s.rewards.terminalCommitted!==true)return{success:false,reason:"kakashi_v2_terminal_rewards_not_committed"};
+  const result=typeof completeChronicleOriginPrologue==="function"?completeChronicleOriginPrologue(ORIGIN_ID,[`kakashi_v2:${rt.instanceId}`]):{success:false,reason:"origin_completion_api_missing"};
   return result&&result.success?{success:true,originCompletion:result}:result;
-},exitScene:true});
+}
+addBeat("v2_minato",{backdrop:B.hokage,location:"HOKAGE ADMINISTRATION · NIGHT",objective:null,actors:["anbu","minato"],preset:"hokage_report",transition:"wipe",onEnter:()=>mutate(s=>{s.terminal.minatoReached=true;}),cues:()=>minatoCues(),nextBeatId:"v2_receipt"});
+addBeat("v2_receipt",{backdrop:B.hokage,location:"CHRONICLE RECEIPT",objective:null,actors:[],preset:"chronicle_receipt",transition:"wipe",receipt:true,onEnter:()=>commitTerminalRewardsAtReceipt(),cues:()=>receiptCues(),nextBeatId:"v2_complete"});
+addBeat("v2_complete",{backdrop:B.hokage,location:"CHRONICLE CLOSED",objective:null,actors:[],preset:"chronicle_receipt",cues:[RECORD("Origin occurrence sealed. Continue to Academy Team Formation.")],onAdvance:()=>completeAcademyKakashiV2Origin(),exitScene:true});
 
 // Register production scene.
 try{unregisterStoryScene(SCENE_ID);}catch(_e){}
@@ -605,7 +636,8 @@ function diagnostics(){
   currentLethalLabels:JSON.stringify(beats).includes("KILL HER")&&JSON.stringify(beats).includes("KILL HIM")&&JSON.stringify(beats).includes("KILL THEM")&&!JSON.stringify(beats).includes("ATTEMPT TO KILL"),
   stableFactualResolver:Object.keys(factualDefs).length>=7,
   noDomOwnership:!String(addBeat).includes("document.")&&!String(resolveFactual).includes("querySelector"),
-  terminalCompleteCallsOrigin:manifest.v2_complete&&String(beats.find(b=>b.beatId==="v2_complete").onAdvanceConsequences[0].resolve).includes("completeChronicleOriginPrologue"),
+  terminalRewardsCommittedAtReceipt:String(commitTerminalRewardsAtReceipt).includes("commitAcademyKakashiV2TerminalRewards36015"),
+  terminalCompleteCallsOrigin:String(completeAcademyKakashiV2Origin).includes("completeChronicleOriginPrologue"),
   browserGoldenClaimed:false
  };
  const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
