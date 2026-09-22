@@ -175,15 +175,25 @@ function setBackdrop(root,path){
   const value=`linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.42)),url("${safe}")`;
   if(node.style.backgroundImage!==value)node.style.backgroundImage=value;
 }
-function actorAnchor(actor){
-  const slot=actorSlot(actor);
+function actorAnchor(actor,p=null){
+  const slot=actorSlot(actor),preset=String(p&&p.preset||"standard"),slots=(p&&p.actors||[]).map(actorSlot);
+  if(["rooftop_2_person","tail","battle_pair"].includes(preset))return slot==="kakashi"?"PLAYER_LEFT":"OPPONENT_RIGHT";
+  if(preset==="sakura_3_person")return slot==="amt"?"INNER_LEFT":slot==="ps"?"CENTER":"OPPONENT_RIGHT";
+  if(preset==="sakura_group"){
+    if(slot==="kakashi")return"PLAYER_LEFT";
+    if(slot==="pakkun")return"INNER_LEFT";
+    if(slot==="mi")return"OPPONENT_RIGHT";
+    if(slot==="amt")return slots.includes("pakkun")?"INNER_RIGHT":"INNER_LEFT";
+    if(slot==="ps")return slots.includes("pakkun")?"CENTER":"INNER_RIGHT";
+  }
+  if(preset==="escort")return slot==="kakashi"?"PLAYER_LEFT":slot==="mi"?"INNER_LEFT":slot==="ps"?"CENTER":slot==="amt"?"INNER_RIGHT":"OPPONENT_RIGHT";
+  if(preset==="anbu_report")return slot==="anbu"?"PLAYER_LEFT":slot==="pakkun"?"CENTER":"OPPONENT_RIGHT";
+  if(preset==="hokage_report")return slot==="anbu"?"PLAYER_LEFT":"OPPONENT_RIGHT";
   if(slot==="kakashi")return"PLAYER_LEFT";
+  if(slot==="minato"||slot==="anbu"||slot==="mi")return"OPPONENT_RIGHT";
   if(slot==="amt")return"INNER_LEFT";
-  if(slot==="ps")return"CENTER";
-  if(slot==="mi")return"OPPONENT_RIGHT";
-  if(slot==="pakkun")return"INNER_LEFT";
-  if(slot==="anbu")return"PLAYER_LEFT";
-  if(slot==="minato")return"OPPONENT_RIGHT";
+  if(slot==="ps")return"INNER_RIGHT";
+  if(slot==="pakkun")return"CENTER";
   return"CENTER";
 }
 function participantStateForActor(p,actor){
@@ -226,7 +236,7 @@ function snapshotProjection(p){
   return{
     id:String(p.id||""),
     preset:String(p.preset||"standard"),
-    actors:(p.actors||[]).map(a=>({id:String(a.id||""),slot:actorSlot(a),anchor:actorAnchor(a)})),
+    actors:(p.actors||[]).map(a=>({id:String(a.id||""),slot:actorSlot(a),anchor:actorAnchor(a,p)})),
     packageHolder:p.state&&p.state.package&&p.state.package.holder||null,
     participantStates:{MI:participants.MI&&participants.MI.state||null,PS:participants.PS&&participants.PS.state||null,AMT:participants.AMT&&participants.AMT.state||null}
   };
@@ -266,7 +276,7 @@ function syncPackageToken(root,p){
   const actor=holderActor(p,holder);
   if(!holder||!actor){token.hidden=true;return;}
   token.hidden=false;token.dataset.packageHolder=String(holder);
-  const finalAnchor=actorAnchor(actor);
+  const finalAnchor=actorAnchor(actor,p);
   if(typeof applyStoryStageAnchor33900==="function")applyStoryStageAnchor33900(token,finalAnchor);
   else token.style.setProperty("--sc-stage-anchor-x","50%");
   token.dataset.packageAnchor=finalAnchor;
@@ -321,7 +331,7 @@ function syncActors(root,actors,p){
     const stateText=readableActorState(p,actor);
     if(stateNode){stateNode.hidden=!stateText;if(stateNode.textContent!==String(stateText||""))stateNode.textContent=String(stateText||"");}
     const slot=actorSlot(actor);if(node.dataset.slot!==slot)node.dataset.slot=slot;
-    if(typeof applyStoryStageAnchor33900==="function")applyStoryStageAnchor33900(node,actorAnchor(actor));
+    if(typeof applyStoryStageAnchor33900==="function")applyStoryStageAnchor33900(node,actorAnchor(actor,p));
     box.appendChild(node);
   }
 }
