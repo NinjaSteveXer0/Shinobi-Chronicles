@@ -351,7 +351,10 @@ function playProjectionTransition(root,previous,next,p,departures=[]){
   const cues=deriveProjectionChoreography(root,previous,next,p,departures);
   const rt=active();
   const actorSignature=(next.actors||[]).map(a=>a.id+"@"+a.anchor).join("|");
-  const scopeKey=(rt&&rt.instanceId||"kakashi")+":"+previous.id+"->"+next.id+":"+String(next.packageHolder||"")+":"+actorSignature;
+  // Actor choreography belongs to the Story occurrence/participant layout.
+  // Same-beat factual object updates (for example AMT -> PS package handoff)
+  // must not cancel or replay actor entry/exit choreography already in flight.
+  const scopeKey=(rt&&rt.instanceId||"kakashi")+":"+previous.id+"->"+next.id+":"+actorSignature;
   return playStoryChoreography33900({root,scopeKey,cues});
 }
 
@@ -506,6 +509,7 @@ function diagnostics(){
     sharedChoreographyConsumer:String(playProjectionTransition).includes("playStoryChoreography33900"),
     departuresPrecedeNewEntries:String(deriveProjectionChoreography).indexOf("for(const row of departures)")<String(deriveProjectionChoreography).indexOf("const prevIds"),
     departureGhostCleanupOwnedByCue:String(deriveProjectionChoreography).includes("removeOnComplete:true"),
+    actorScopeIgnoresObjectState:String(playProjectionTransition).includes("actorSignature")&&!String(playProjectionTransition).includes("next.packageHolder"),
     semanticDiffIgnoresHarmlessParticipantRefresh:!String(render).includes('JSON.stringify(previous.participantStates)!==JSON.stringify(next.participantStates)'),
     packageTokenConsumesHolderTruth:String(syncPackageToken).includes("state.package")&&String(syncPackageToken).includes("packageHolder"),
     speakerFocusUsesCurrentCue:String(syncStandard).includes("speakerActorId"),
