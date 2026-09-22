@@ -12,7 +12,7 @@ const PATCH_ID="academy_kakashi_v2_renderer_36030_2026_09_22";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const STYLE_ID="kakashi-v2-renderer-36030-style";
 const ROOT_ID="kakashi-v2-scene-board";
-let rendering=false,lastProjectionSnapshot=null,pendingVisualSnapshot=null;
+let rendering=false,lastProjectionSnapshot=null,pendingVisualSnapshot=null,transitionMemoryReleaseTimer=null;
 
 function esc(v){return String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
 function active(){try{return typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;}catch(_e){return null;}}
@@ -120,13 +120,18 @@ function installStyle(){
 #${ROOT_ID}[data-battle-action-only="true"] .kv2-dialogue{display:grid!important;width:min(56%,720px);padding:10px 14px;grid-template-rows:1fr}
 #${ROOT_ID}[data-battle-action-only="true"] .kv2-actions{grid-row:1;margin-top:0;grid-template-columns:1fr}
 #${ROOT_ID} .kv2-receipt button{margin-top:24px;width:100%;min-height:40px;border:1px solid rgba(95,215,225,.42);border-radius:10px;background:rgba(7,33,39,.72);color:#78dfe7;font-weight:900;letter-spacing:.1em;cursor:pointer}
-#${ROOT_ID} .kv2-transition-memory{position:absolute;inset:0;z-index:11;background-position:center;background-size:cover;background-repeat:no-repeat;opacity:1;pointer-events:none}
+#${ROOT_ID} .kv2-transition-memory{position:absolute;inset:0;z-index:11;background-position:center;background-size:cover;background-repeat:no-repeat;opacity:1;pointer-events:none;transition:opacity .34s cubic-bezier(.22,.72,.24,1),filter .38s ease,transform .42s ease}
+#${ROOT_ID} .kv2-transition-memory.is-releasing{opacity:0;filter:brightness(.82) blur(1.6px);transform:scale(1.012)}
 #${ROOT_ID} .kv2-transition-memory[hidden]{display:none!important}
+#${ROOT_ID} .kv2-top,#${ROOT_ID} .kv2-dialogue,#${ROOT_ID} .kv2-speech,#${ROOT_ID} .kv2-object-layer,#${ROOT_ID} .kv2-actors{transition:opacity .24s ease}
+#${ROOT_ID}[data-transition-active="true"] .kv2-top,#${ROOT_ID}[data-transition-active="true"] .kv2-dialogue,#${ROOT_ID}[data-transition-active="true"] .kv2-speech,#${ROOT_ID}[data-transition-active="true"] .kv2-object-layer,#${ROOT_ID}[data-transition-active="true"] .kv2-actors{opacity:0!important;pointer-events:none!important}
 #${ROOT_ID}[data-transition-active="true"] .kv2-actions,#${ROOT_ID}[data-transition-active="true"] .kv2-receipt button{pointer-events:none!important}
-#${ROOT_ID} .kv2-wipe{position:absolute;inset:-3%;z-index:999;opacity:0;pointer-events:none;transition:opacity .32s cubic-bezier(.2,.65,.2,1),transform .46s cubic-bezier(.2,.65,.2,1),filter .32s ease;transform:scale(1.02);filter:blur(0)}
-#${ROOT_ID} .kv2-wipe.is-hard{background:radial-gradient(circle at 50% 45%,rgba(4,9,13,.72),#000 68%);backdrop-filter:blur(5px)}
-#${ROOT_ID} .kv2-wipe.is-soft{background:linear-gradient(90deg,rgba(4,15,20,.05),rgba(4,15,20,.76) 45%,rgba(4,15,20,.76) 55%,rgba(4,15,20,.05));backdrop-filter:blur(2px)}
-#${ROOT_ID} .kv2-wipe.is-covering{opacity:1;pointer-events:auto;transform:scale(1);filter:blur(.2px)}
+#${ROOT_ID} .kv2-wipe{position:absolute;inset:-3%;z-index:999;opacity:0;pointer-events:none;transition:opacity .30s cubic-bezier(.22,.72,.24,1),transform .42s cubic-bezier(.22,.72,.24,1),filter .30s ease;transform:scale(1.012);filter:blur(0)}
+#${ROOT_ID} .kv2-wipe.is-hard{background:radial-gradient(ellipse at 50% 44%,rgba(3,11,16,.16) 0%,rgba(2,8,12,.38) 48%,rgba(0,3,6,.62) 100%);backdrop-filter:blur(2.2px)}
+#${ROOT_ID} .kv2-wipe.is-soft{background:linear-gradient(90deg,rgba(4,15,20,.02),rgba(4,15,20,.30) 42%,rgba(4,15,20,.30) 58%,rgba(4,15,20,.02));backdrop-filter:blur(1px)}
+#${ROOT_ID} .kv2-wipe.is-covering{pointer-events:auto;transform:scale(1);filter:none}
+#${ROOT_ID} .kv2-wipe.is-hard.is-covering{opacity:.58}
+#${ROOT_ID} .kv2-wipe.is-soft.is-covering{opacity:.30}
 #${ROOT_ID}[data-can-advance="true"]{cursor:pointer}
 #${ROOT_ID}[data-has-choices="true"]{cursor:default}
 #${ROOT_ID} .kv2-actor.kv2-cue-departed{opacity:0!important;pointer-events:none!important}
@@ -633,7 +638,14 @@ function render(){
     const hardTransition=semanticChanged&&isHardProjectionTransition(previous,next);
     const departures=capture?materializeDepartureGhosts(root,capture,next):[];
     const heldActors=hardTransition&&capture?materializeRetainedHoldGhosts(root,capture,next):[];
-    if(hardTransition&&heldActors.length)root.dataset.outgoingTableau="true";else if(!hardTransition)delete root.dataset.outgoingTableau;
+    if(hardTransition){
+      if(heldActors.length)root.dataset.outgoingTableau="true";
+      // Suppress the newly committed scene immediately; the outgoing visual
+      // snapshot remains on top until the crossfade releases it.
+      root.dataset.transitionActive="true";
+    }else{
+      delete root.dataset.outgoingTableau;
+    }
     pendingVisualSnapshot=null;
     const t=cueState();
     if(p.preset==="chronicle_receipt")syncReceipt(root,p,t);else syncStandard(root,p,t);
@@ -672,12 +684,25 @@ function setWipe(mode){
 }
 function setTransitionMemory(backdropPath,visible){
   const root=document.getElementById(ROOT_ID),memory=root&&root.querySelector(".kv2-transition-memory");if(!root||!memory)return false;
+  if(transitionMemoryReleaseTimer){clearTimeout(transitionMemoryReleaseTimer);transitionMemoryReleaseTimer=null;}
   if(visible===true&&backdropPath){
     const safe=String(backdropPath).replace(/\\/g,"\\\\").replace(/"/g,'\\"');
-    memory.style.backgroundImage=`linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.42)),url("${safe}")`;
+    memory.style.backgroundImage=`linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,0,0,.20)),url("${safe}")`;
+    memory.classList.remove("is-releasing");
     memory.hidden=false;root.dataset.transitionActive="true";
+  }else if(!memory.hidden){
+    // Reveal the already-committed scene by dissolving the preserved outgoing
+    // environment instead of cutting to black and then popping the next scene.
+    memory.classList.add("is-releasing");
+    transitionMemoryReleaseTimer=setTimeout(()=>{
+      transitionMemoryReleaseTimer=null;
+      if(!root.isConnected)return;
+      memory.hidden=true;memory.classList.remove("is-releasing");memory.style.backgroundImage="";
+      delete root.dataset.transitionActive;delete root.dataset.outgoingTableau;
+      for(const ghost of [...root.querySelectorAll(".kv2-outgoing-hold-ghost")])ghost.remove();
+    },340);
   }else{
-    memory.hidden=true;memory.style.backgroundImage="";delete root.dataset.transitionActive;delete root.dataset.outgoingTableau;
+    delete root.dataset.transitionActive;delete root.dataset.outgoingTableau;
     for(const ghost of [...root.querySelectorAll(".kv2-outgoing-hold-ghost")])ghost.remove();
   }
   return true;
@@ -725,6 +750,7 @@ function diagnostics(){
     departuresPrecedeNewEntries:String(deriveProjectionChoreography).indexOf("for(const row of departures)")<String(deriveProjectionChoreography).indexOf("const prevIds"),
     departureGhostCleanupOwnedByCue:String(deriveProjectionChoreography).includes("removeOnComplete:true"),
     hardTransitionFreezesOutgoingTableau:String(materializeRetainedHoldGhosts).includes("kv2-outgoing-hold-ghost")&&installStyle.toString().includes('data-transition-active="true"] .kv2-actors')&&String(setTransitionMemory).includes("kv2-outgoing-hold-ghost"),
+    hardTransitionCrossfadesInsteadOfBlackCut:installStyle.toString().includes("kv2-transition-memory.is-releasing")&&installStyle.toString().includes("is-hard.is-covering{opacity:.58}")&&String(setTransitionMemory).includes("dissolving the preserved outgoing"),
     departureGhostsSanitizeLiveAnimationState:String(appendDepartureGhost).includes('ghost.className="kv2-departure-ghost kv2-actor-ghost'),
     actorScopeIgnoresObjectState:String(playProjectionTransition).includes("actorSignature")&&!String(playProjectionTransition).includes("next.packageHolder"),
     semanticDiffIgnoresHarmlessParticipantRefresh:!String(render).includes('JSON.stringify(previous.participantStates)!==JSON.stringify(next.participantStates)'),
