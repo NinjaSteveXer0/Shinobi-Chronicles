@@ -528,12 +528,38 @@ async function visualAndBattle(browser){
   await waitVisualReady(page,"mi_stop_win");
   await drain(page);
   const killPromise=page.evaluate(()=>globalThis.advanceAcademyKakashiV236040("mi_kill"));
-  await pause(260);
-  const kill=await page.evaluate(()=>{
-    const ghost=document.querySelector("#kakashi-v2-scene-board .kv2-actor-ghost");
-    return{exists:!!ghost,falling:!!ghost&&ghost.classList.contains("is-falling"),classes:ghost?.className||null};
+  await pause(90);
+  const killStart=await page.evaluate(()=>{
+    const root=document.getElementById("kakashi-v2-scene-board");
+    const ghost=root?.querySelector(".kv2-actor-ghost");
+    const rect=ghost?.getBoundingClientRect(),style=ghost?getComputedStyle(ghost):null;
+    const memory=root?.querySelector(".kv2-transition-memory");
+    return{
+      exists:!!ghost,falling:!!ghost&&ghost.classList.contains("is-falling"),
+      top:rect?.top||0,opacity:style?Number(style.opacity):0,
+      animationName:style?.animationName||null,
+      active:ghost?.dataset.scChoreographyActive||null,
+      outgoingBackdropHeld:!!memory&&!memory.hidden
+    };
   });
-  assert(kill.exists&&kill.falling,"kill fall animation missing: "+JSON.stringify(kill));
+  await pause(300);
+  const kill=await page.evaluate(()=>{
+    const root=document.getElementById("kakashi-v2-scene-board");
+    const ghost=root?.querySelector(".kv2-actor-ghost");
+    const rect=ghost?.getBoundingClientRect(),style=ghost?getComputedStyle(ghost):null;
+    return{
+      exists:!!ghost,falling:!!ghost&&ghost.classList.contains("is-falling"),
+      top:rect?.top||0,opacity:style?Number(style.opacity):0,
+      animationName:style?.animationName||null,
+      active:ghost?.dataset.scChoreographyActive||null
+    };
+  });
+  assert(killStart.exists&&killStart.falling&&kill.exists&&kill.falling,"kill fall animation missing: "+JSON.stringify({killStart,kill}));
+  assert(String(kill.animationName||"").includes("kv2ActorFall36030"),"kill ghost is not running the visible fall keyframe: "+JSON.stringify(kill));
+  assert.strictEqual(kill.active,"COLLAPSE","kill ghost is not bound to the semantic COLLAPSE choreography");
+  assert(kill.top>killStart.top+24,"kill card did not visibly fall before the scene wipe: "+JSON.stringify({killStart,kill}));
+  assert(kill.opacity<killStart.opacity,"kill card did not fade while falling: "+JSON.stringify({killStart,kill}));
+  assert.strictEqual(killStart.outgoingBackdropHeld,true,"outgoing fight environment was not preserved behind the kill fall");
   await shot(page,"09-kill-fall-animation.png",{skipReady:true});
   const killResult=await killPromise;
   assert(killResult&&killResult.success===true,JSON.stringify(killResult));
