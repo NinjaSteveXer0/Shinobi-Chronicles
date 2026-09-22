@@ -576,6 +576,10 @@ async function visualAndBattle(browser){
   const killResult=await killPromise;
   assert(killResult&&killResult.success===true,JSON.stringify(killResult));
   await waitUnlocked(page,"v2_report");
+  await page.waitForFunction(()=>{
+    const root=document.getElementById("kakashi-v2-scene-board");
+    return !!root&&!root.dataset.transitionActive&&root.querySelectorAll(".kv2-outgoing-hold-ghost").length===0;
+  },null,{timeout:3000});
   const killCleanup=await page.evaluate(()=>{
     const root=document.getElementById("kakashi-v2-scene-board");
     return{
