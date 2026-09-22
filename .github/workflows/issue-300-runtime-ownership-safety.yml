@@ -1,0 +1,58 @@
+name: Issue 300 Runtime Ownership Safety
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'runtime/alpha-traversal-bridge-33200.js'
+      - 'runtime/alpha-story-scene-board-33900.js'
+      - 'runtime/alpha-story-decision-realisation-34000.js'
+      - 'runtime/alpha-story-factual-resolver-34600.js'
+      - 'runtime/academy-kakashi-v2-content-36000.js'
+      - 'runtime/alpha-kakashi-v2-*.js'
+      - 'tools/fixtures/runtime_*_300.json'
+      - 'tools/qa_runtime_ownership_safety_300.js'
+      - 'tools/qa_kakashi_v2_legacy_exclusion.js'
+      - 'tools/qa_kakashi_v2_browser.js'
+      - '.github/workflows/issue-300-runtime-ownership-safety.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - 'runtime/alpha-traversal-bridge-33200.js'
+      - 'runtime/alpha-story-scene-board-33900.js'
+      - 'runtime/alpha-story-decision-realisation-34000.js'
+      - 'runtime/alpha-story-factual-resolver-34600.js'
+      - 'runtime/academy-kakashi-v2-content-36000.js'
+      - 'runtime/alpha-kakashi-v2-*.js'
+      - 'tools/fixtures/runtime_*_300.json'
+      - 'tools/qa_runtime_ownership_safety_300.js'
+      - 'tools/qa_kakashi_v2_legacy_exclusion.js'
+      - '.github/workflows/issue-300-runtime-ownership-safety.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  runtime-ownership-safety:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Runtime ownership safety gate
+        run: |
+          node --check tools/qa_runtime_ownership_safety_300.js
+          node tools/qa_runtime_ownership_safety_300.js
+
+      - name: Kakashi V2 negative legacy gate remains GREEN
+        run: |
+          node --check tools/qa_kakashi_v2_legacy_exclusion.js
+          node tools/qa_kakashi_v2_legacy_exclusion.js
+
+      - name: Kakashi V2 clean-room ownership remains GREEN
+        run: |
+          node --check tools/qa_kakashi_v2_clean_room.js
+          node tools/qa_kakashi_v2_clean_room.js
