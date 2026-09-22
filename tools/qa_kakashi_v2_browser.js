@@ -75,182 +75,14 @@ async function go(page,expected,choice){
 }
 
 async function waitVisualReady(page,label="scene"){
-  const result=await page.evaluate
-async function browserRouteMatrix(browser){
-  const results=[];
-
-  async function scenario(name,run){
-    const {context,page}=await boot(browser);
-    try{
-      await toScene02Root(page);
-      const detail=await run(page);
-      results.push({name,success:true,...(detail||{})});
-    }finally{
-      await context.close();
-    }
-  }
-
-  await scenario("failed_pickpocket_3v1_release",async page=>{
-    await seedResolver(page,"directPickpocket","PICKPOCKET_DIRECT_FAILURE");
-    await chooseLabel(page,"SLIP IN FOR THE PACKAGE","v2_direct_pickpocket_resolver");
-    await advanceTo(page,"v2_battle_pickpocket_3v1");
-    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_pickpocket_3v1_win"});
-    await chooseLabel(page,"TAKE THE PACKAGE AND LET THEM GO","v2_report");
-    const s=await stateSnapshot(page);
-    for(const ref of ["AMT","PS","MI"])assert.strictEqual(s.participants[ref].state,"RELEASED");
-    assert.strictEqual(s.package.holder,"ANBU");
-    return{terminal:await finishTerminalBrowser(page,"failed_pickpocket_3v1_release")};
-  });
-
-  await scenario("direct_strike_double_victory_kill_all",async page=>{
-    await chooseLabel(page,"STRIKE BEFORE THE HANDOFF","v2_direct_strike_setup");
-    await advanceTo(page,"v2_battle_direct_strike_2v1");
-    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_direct_strike_2v1_win"});
-    await advanceTo(page,"v2_battle_direct_mi");
-    await launchAndReturnBattle(page,{outcome:"victory",actions:2,expectedBeat:"v2_direct_mi_win"});
-    await chooseLabel(page,"KILL THEM","v2_report");
-    const s=await stateSnapshot(page);
-    for(const ref of ["AMT","PS","MI"])assert.strictEqual(s.participants[ref].state,"DEAD");
-    return{terminal:await finishTerminalBrowser(page,"direct_strike_double_victory_kill_all")};
-  });
-
-  await scenario("closer_failure_ask_where_take_down_loss",async page=>{
-    await seedResolver(page,"getCloser","GET_CLOSER_FAILURE");
-    await seedResolver(page,"stayPackagePursuit","STAY_PACKAGE_PURSUIT_SUCCESS");
-    await chooseLabel(page,"MOVE IN CLOSER","v2_get_closer_resolver");
-    await advanceTo(page,"v2_get_closer_failure");
-    await chooseLabel(page,"STAY ON THE PACKAGE","v2_stay_package_pursuit_resolver");
-    await advanceTo(page,"v2_stay_package_intercept");
-    await chooseLabel(page,"ASK WHERE THE PACKAGE WAS GOING");
-    await chooseLabel(page,"TAKE HIM DOWN","v2_take_down_setup");
-    await advanceTo(page,"v2_battle_take_down_amt");
-    await launchAndReturnBattle(page,{outcome:"defeat",actions:4,expectedBeat:"v2_take_down_loss"});
-    const s=await stateSnapshot(page);
-    assert.strictEqual(s.package.holder,"KAKASHI");
-    assert.strictEqual(s.package.recovered,true);
-    assert.strictEqual(s.participants.AMT.state,"ESCAPED");
-    assert.strictEqual(s.knowledge.askWhere,true);
-    assert.strictEqual(s.knowledge.downstreamDestinationKnown,false);
-    return{terminal:await finishTerminalBrowser(page,"closer_failure_ask_where_take_down_loss")};
-  });
-
-  await scenario("stop_assassin_fast_restrain_then_ps_loss",async page=>{
-    await seedResolver(page,"psPursuit","PS_PURSUIT_SUCCESS");
-    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
-    await chooseLabel(page,"STOP THE ASSASSIN","v2_stop_assassin_setup");
-    await advanceTo(page,"v2_battle_mi_stop");
-    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_mi_stop_win"});
-    const labels=await page.evaluate(()=>getCurrentStorySceneBeat().choices.filter(c=>!c.availability||c.availability().available).map(c=>c.label));
-    assert(labels.includes("GO AFTER PACKAGE SMUGGLER"),JSON.stringify(labels));
-    assert(!labels.includes("GO AFTER ANBU MARKED TARGET"),JSON.stringify(labels));
-    await chooseLabel(page,"RESTRAIN HER AND CONTINUE","v2_mi_restrained_next");
-    await chooseLabel(page,"GO AFTER PACKAGE SMUGGLER","v2_ps_pursuit_resolver");
-    await advanceTo(page,"v2_battle_ps_seq");
-    await launchAndReturnBattle(page,{outcome:"defeat",actions:2,expectedBeat:"v2_ps_seq_loss"});
-    const s=await stateSnapshot(page);
-    assert.strictEqual(s.participants.MI.state,"FIELD_SECURED_PENDING_COLLECTION");
-    assert.strictEqual(s.participants.PS.state,"ESCAPED");
-    return{terminal:await finishTerminalBrowser(page,"stop_assassin_fast_restrain_then_ps_loss")};
-  });
-
-  await scenario("stop_assassin_slow_anbu_custody",async page=>{
-    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
-    await chooseLabel(page,"STOP THE ASSASSIN","v2_stop_assassin_setup");
-    await advanceTo(page,"v2_battle_mi_stop");
-    await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_mi_stop_win"});
-    const labels=await page.evaluate(()=>getCurrentStorySceneBeat().choices.filter(c=>!c.availability||c.availability().available).map(c=>c.label));
-    assert(!labels.includes("GO AFTER PACKAGE SMUGGLER"),JSON.stringify(labels));
-    assert(!labels.includes("GO AFTER ANBU MARKED TARGET"),JSON.stringify(labels));
-    assert(!labels.includes("RESTRAIN HER AND CONTINUE"),JSON.stringify(labels));
-    await chooseLabel(page,"TAKE HER BACK TO ANBU","v2_report");
-    const s=await stateSnapshot(page);
-    assert.strictEqual(s.participants.MI.state,"ANBU_CUSTODY");
-    return{terminal:await finishTerminalBrowser(page,"stop_assassin_slow_anbu_custody")};
-  });
-
-  await scenario("assassin_then_package_full_sequence",async page=>{
-    await seedResolver(page,"psPursuit","PS_PURSUIT_SUCCESS");
-    await seedResolver(page,"secureAmtPursuit","SECURE_AMT_PURSUIT_SUCCESS");
-    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
-    await chooseLabel(page,"DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE","v2_assassin_then_package_setup");
-    await advanceTo(page,"v2_battle_mi_package_second");
-    await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_mi_package_second_win"});
-    await chooseLabel(page,"CHASE THE PACKAGE SMUGGLER","v2_package_second_ps_pursuit");
-    await advanceTo(page,"v2_battle_ps_package_second");
-    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_ps_package_second_win"});
-    await chooseLabel(page,"STAY ON THE FIRST MAN","v2_package_second_amt_pursuit");
-    await advanceTo(page,"v2_battle_amt_package_second");
-    await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_amt_package_second_win"});
-    await chooseLabel(page,"TAKE HIM BACK TO THE ANBU","v2_report");
-    const s=await stateSnapshot(page);
-    assert.strictEqual(s.package.holder,"ANBU");
-    assert.strictEqual(s.participants.AMT.state,"ANBU_CUSTODY");
-    return{terminal:await finishTerminalBrowser(page,"assassin_then_package_full_sequence")};
-  });
-
-  await scenario("secure_package_return_report",async page=>{
-    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
-    await chooseLabel(page,"SECURE THE PACKAGE","v2_secure_package_setup");
-    await advanceTo(page,"v2_battle_ps_mi");
-    await launchAndReturnBattle(page,{outcome:"victory",actions:5,expectedBeat:"v2_ps_mi_win"});
-    await chooseLabel(page,"RETURN AND REPORT","v2_report");
-    const s=await stateSnapshot(page);
-    assert.strictEqual(s.package.holder,"ANBU");
-    assert.strictEqual(s.participants.PS.state,"BATTLE_DEFEATED");
-    assert.strictEqual(s.participants.MI.state,"BATTLE_DEFEATED");
-    return{terminal:await finishTerminalBrowser(page,"secure_package_return_report")};
-  });
-
-  await scenario("go_original_target_pursuit_failure",async page=>{
-    await seedResolver(page,"amtPursuitRoot","AMT_PURSUIT_FAILURE");
-    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
-    await chooseLabel(page,"GO AFTER THE ORIGINAL TARGET","v2_go_amt_pursuit_resolver");
-    await advanceTo(page,"v2_amt_direct_pursuit_fail");
-    const s=await stateSnapshot(page);
-    assert.strictEqual(s.package.holder,"PS");
-    return{terminal:await finishTerminalBrowser(page,"go_original_target_pursuit_failure")};
-  });
-
-  await scenario("closer_success_improved_pickpocket",async page=>{
-    await seedResolver(page,"getCloser","GET_CLOSER_SUCCESS");
-    await seedResolver(page,"improvedPickpocket","PICKPOCKET_IMPROVED_SUCCESS");
-    await chooseLabel(page,"MOVE IN CLOSER","v2_get_closer_resolver");
-    await advanceTo(page,"v2_get_closer_success");
-    await chooseLabel(page,"ATTEMPT THE PICKPOCKET","v2_improved_pickpocket_resolver");
-    await advanceTo(page,"v2_pickpocket_clean_success");
-    const s=await stateSnapshot(page);
-    assert.strictEqual(s.knowledge.getCloserContingency,true);
-    assert.strictEqual(s.package.holder,"KAKASHI");
-    return{terminal:await finishTerminalBrowser(page,"closer_success_improved_pickpocket")};
-  });
-
-  await scenario("closer_failure_cutoff_police",async page=>{
-    await seedResolver(page,"getCloser","GET_CLOSER_FAILURE");
-    await chooseLabel(page,"MOVE IN CLOSER","v2_get_closer_resolver");
-    await advanceTo(page,"v2_get_closer_failure");
-    await chooseLabel(page,"CUT THEM OFF AT THE SAKURA TREE","v2_cutoff_setup");
-    await advanceTo(page,"v2_battle_cutoff");
-    await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_cutoff_win"});
-    await chooseLabel(page,"TAKE THEM TO THE UCHIHA POLICE FORCE","v2_report");
-    const s=await stateSnapshot(page);
-    assert.strictEqual(s.package.holder,"ANBU");
-    assert.strictEqual(s.participants.AMT.state,"POLICE_CUSTODY");
-    assert.strictEqual(s.participants.PS.state,"POLICE_CUSTODY");
-    assert.strictEqual(s.participants.MI.state,"UNSEEN");
-    return{terminal:await finishTerminalBrowser(page,"closer_failure_cutoff_police")};
-  });
-
-  assert.strictEqual(results.length,10);
-  return{pass:true,scenarioFamiliesValidated:results.length,results};
-}
-
-(async()=>{
+  const result=await page.evaluate(async()=>{
     const p=globalThis.getAcademyKakashiV2Presentation36020&&globalThis.getAcademyKakashiV2Presentation36020(getActiveStorySceneRuntime()?.beatId);
     if(!p)return{success:false,reason:"projection_missing"};
     const sources=[p.backdrop,...(p.actors||[]).map(a=>a&&a.image)].filter(Boolean);
     const rows=await Promise.all(sources.map(src=>new Promise(resolve=>{
       const img=new Image();
-      const done=ok=>resolve({src,ok,naturalWidth:img.naturalWidth,naturalHeight:img.naturalHeight});
+      let settled=false;
+      const done=ok=>{if(settled)return;settled=true;resolve({src,ok,naturalWidth:img.naturalWidth,naturalHeight:img.naturalHeight});};
       img.onload=()=>done(true);img.onerror=()=>done(false);img.src=src;
       if(img.complete)setTimeout(()=>done(img.naturalWidth>0),0);
     })));
@@ -633,6 +465,174 @@ async function visualAndBattle(browser){
   await shot(page,"11-story-return-after-battle.png");
   await context.close();
   return{watch,kill,battle,post};
+}
+
+async function browserRouteMatrix(browser){
+  const results=[];
+
+  async function scenario(name,run){
+    const {context,page}=await boot(browser);
+    try{
+      await toScene02Root(page);
+      const detail=await run(page);
+      results.push({name,success:true,...(detail||{})});
+    }finally{
+      await context.close();
+    }
+  }
+
+  await scenario("failed_pickpocket_3v1_release",async page=>{
+    await seedResolver(page,"directPickpocket","PICKPOCKET_DIRECT_FAILURE");
+    await chooseLabel(page,"SLIP IN FOR THE PACKAGE","v2_direct_pickpocket_resolver");
+    await advanceTo(page,"v2_battle_pickpocket_3v1");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_pickpocket_3v1_win"});
+    await chooseLabel(page,"TAKE THE PACKAGE AND LET THEM GO","v2_report");
+    const s=await stateSnapshot(page);
+    for(const ref of ["AMT","PS","MI"])assert.strictEqual(s.participants[ref].state,"RELEASED");
+    assert.strictEqual(s.package.holder,"ANBU");
+    return{terminal:await finishTerminalBrowser(page,"failed_pickpocket_3v1_release")};
+  });
+
+  await scenario("direct_strike_double_victory_kill_all",async page=>{
+    await chooseLabel(page,"STRIKE BEFORE THE HANDOFF","v2_direct_strike_setup");
+    await advanceTo(page,"v2_battle_direct_strike_2v1");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_direct_strike_2v1_win"});
+    await advanceTo(page,"v2_battle_direct_mi");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:2,expectedBeat:"v2_direct_mi_win"});
+    await chooseLabel(page,"KILL THEM","v2_report");
+    const s=await stateSnapshot(page);
+    for(const ref of ["AMT","PS","MI"])assert.strictEqual(s.participants[ref].state,"DEAD");
+    return{terminal:await finishTerminalBrowser(page,"direct_strike_double_victory_kill_all")};
+  });
+
+  await scenario("closer_failure_ask_where_take_down_loss",async page=>{
+    await seedResolver(page,"getCloser","GET_CLOSER_FAILURE");
+    await seedResolver(page,"stayPackagePursuit","STAY_PACKAGE_PURSUIT_SUCCESS");
+    await chooseLabel(page,"MOVE IN CLOSER","v2_get_closer_resolver");
+    await advanceTo(page,"v2_get_closer_failure");
+    await chooseLabel(page,"STAY ON THE PACKAGE","v2_stay_package_pursuit_resolver");
+    await advanceTo(page,"v2_stay_package_intercept");
+    await chooseLabel(page,"ASK WHERE THE PACKAGE WAS GOING");
+    await chooseLabel(page,"TAKE HIM DOWN","v2_take_down_setup");
+    await advanceTo(page,"v2_battle_take_down_amt");
+    await launchAndReturnBattle(page,{outcome:"defeat",actions:4,expectedBeat:"v2_take_down_loss"});
+    const s=await stateSnapshot(page);
+    assert.strictEqual(s.package.holder,"KAKASHI");
+    assert.strictEqual(s.package.recovered,true);
+    assert.strictEqual(s.participants.AMT.state,"ESCAPED");
+    assert.strictEqual(s.knowledge.askWhere,true);
+    assert.strictEqual(s.knowledge.downstreamDestinationKnown,false);
+    return{terminal:await finishTerminalBrowser(page,"closer_failure_ask_where_take_down_loss")};
+  });
+
+  await scenario("stop_assassin_fast_restrain_then_ps_loss",async page=>{
+    await seedResolver(page,"psPursuit","PS_PURSUIT_SUCCESS");
+    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
+    await chooseLabel(page,"STOP THE ASSASSIN","v2_stop_assassin_setup");
+    await advanceTo(page,"v2_battle_mi_stop");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_mi_stop_win"});
+    const labels=await page.evaluate(()=>getCurrentStorySceneBeat().choices.filter(c=>!c.availability||c.availability().available).map(c=>c.label));
+    assert(labels.includes("GO AFTER PACKAGE SMUGGLER"),JSON.stringify(labels));
+    assert(!labels.includes("GO AFTER ANBU MARKED TARGET"),JSON.stringify(labels));
+    await chooseLabel(page,"RESTRAIN HER AND CONTINUE","v2_mi_restrained_next");
+    await chooseLabel(page,"GO AFTER PACKAGE SMUGGLER","v2_ps_pursuit_resolver");
+    await advanceTo(page,"v2_battle_ps_seq");
+    await launchAndReturnBattle(page,{outcome:"defeat",actions:2,expectedBeat:"v2_ps_seq_loss"});
+    const s=await stateSnapshot(page);
+    assert.strictEqual(s.participants.MI.state,"FIELD_SECURED_PENDING_COLLECTION");
+    assert.strictEqual(s.participants.PS.state,"ESCAPED");
+    return{terminal:await finishTerminalBrowser(page,"stop_assassin_fast_restrain_then_ps_loss")};
+  });
+
+  await scenario("stop_assassin_slow_anbu_custody",async page=>{
+    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
+    await chooseLabel(page,"STOP THE ASSASSIN","v2_stop_assassin_setup");
+    await advanceTo(page,"v2_battle_mi_stop");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_mi_stop_win"});
+    const labels=await page.evaluate(()=>getCurrentStorySceneBeat().choices.filter(c=>!c.availability||c.availability().available).map(c=>c.label));
+    assert(!labels.includes("GO AFTER PACKAGE SMUGGLER"),JSON.stringify(labels));
+    assert(!labels.includes("GO AFTER ANBU MARKED TARGET"),JSON.stringify(labels));
+    assert(!labels.includes("RESTRAIN HER AND CONTINUE"),JSON.stringify(labels));
+    await chooseLabel(page,"TAKE HER BACK TO ANBU","v2_report");
+    const s=await stateSnapshot(page);
+    assert.strictEqual(s.participants.MI.state,"ANBU_CUSTODY");
+    return{terminal:await finishTerminalBrowser(page,"stop_assassin_slow_anbu_custody")};
+  });
+
+  await scenario("assassin_then_package_full_sequence",async page=>{
+    await seedResolver(page,"psPursuit","PS_PURSUIT_SUCCESS");
+    await seedResolver(page,"secureAmtPursuit","SECURE_AMT_PURSUIT_SUCCESS");
+    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
+    await chooseLabel(page,"DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE","v2_assassin_then_package_setup");
+    await advanceTo(page,"v2_battle_mi_package_second");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_mi_package_second_win"});
+    await chooseLabel(page,"CHASE THE PACKAGE SMUGGLER","v2_package_second_ps_pursuit");
+    await advanceTo(page,"v2_battle_ps_package_second");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_ps_package_second_win"});
+    await chooseLabel(page,"STAY ON THE FIRST MAN","v2_package_second_amt_pursuit");
+    await advanceTo(page,"v2_battle_amt_package_second");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_amt_package_second_win"});
+    await chooseLabel(page,"TAKE HIM BACK TO THE ANBU","v2_report");
+    const s=await stateSnapshot(page);
+    assert.strictEqual(s.package.holder,"ANBU");
+    assert.strictEqual(s.participants.AMT.state,"ANBU_CUSTODY");
+    return{terminal:await finishTerminalBrowser(page,"assassin_then_package_full_sequence")};
+  });
+
+  await scenario("secure_package_return_report",async page=>{
+    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
+    await chooseLabel(page,"SECURE THE PACKAGE","v2_secure_package_setup");
+    await advanceTo(page,"v2_battle_ps_mi");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:5,expectedBeat:"v2_ps_mi_win"});
+    await chooseLabel(page,"RETURN AND REPORT","v2_report");
+    const s=await stateSnapshot(page);
+    assert.strictEqual(s.package.holder,"ANBU");
+    assert.strictEqual(s.participants.PS.state,"BATTLE_DEFEATED");
+    assert.strictEqual(s.participants.MI.state,"BATTLE_DEFEATED");
+    return{terminal:await finishTerminalBrowser(page,"secure_package_return_report")};
+  });
+
+  await scenario("go_original_target_pursuit_failure",async page=>{
+    await seedResolver(page,"amtPursuitRoot","AMT_PURSUIT_FAILURE");
+    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
+    await chooseLabel(page,"GO AFTER THE ORIGINAL TARGET","v2_go_amt_pursuit_resolver");
+    await advanceTo(page,"v2_amt_direct_pursuit_fail");
+    const s=await stateSnapshot(page);
+    assert.strictEqual(s.package.holder,"PS");
+    return{terminal:await finishTerminalBrowser(page,"go_original_target_pursuit_failure")};
+  });
+
+  await scenario("closer_success_improved_pickpocket",async page=>{
+    await seedResolver(page,"getCloser","GET_CLOSER_SUCCESS");
+    await seedResolver(page,"improvedPickpocket","PICKPOCKET_IMPROVED_SUCCESS");
+    await chooseLabel(page,"MOVE IN CLOSER","v2_get_closer_resolver");
+    await advanceTo(page,"v2_get_closer_success");
+    await chooseLabel(page,"ATTEMPT THE PICKPOCKET","v2_improved_pickpocket_resolver");
+    await advanceTo(page,"v2_pickpocket_clean_success");
+    const s=await stateSnapshot(page);
+    assert.strictEqual(s.knowledge.getCloserContingency,true);
+    assert.strictEqual(s.package.holder,"KAKASHI");
+    return{terminal:await finishTerminalBrowser(page,"closer_success_improved_pickpocket")};
+  });
+
+  await scenario("closer_failure_cutoff_police",async page=>{
+    await seedResolver(page,"getCloser","GET_CLOSER_FAILURE");
+    await chooseLabel(page,"MOVE IN CLOSER","v2_get_closer_resolver");
+    await advanceTo(page,"v2_get_closer_failure");
+    await chooseLabel(page,"CUT THEM OFF AT THE SAKURA TREE","v2_cutoff_setup");
+    await advanceTo(page,"v2_battle_cutoff");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_cutoff_win"});
+    await chooseLabel(page,"TAKE THEM TO THE UCHIHA POLICE FORCE","v2_report");
+    const s=await stateSnapshot(page);
+    assert.strictEqual(s.package.holder,"ANBU");
+    assert.strictEqual(s.participants.AMT.state,"POLICE_CUSTODY");
+    assert.strictEqual(s.participants.PS.state,"POLICE_CUSTODY");
+    assert.strictEqual(s.participants.MI.state,"UNSEEN");
+    return{terminal:await finishTerminalBrowser(page,"closer_failure_cutoff_police")};
+  });
+
+  assert.strictEqual(results.length,10);
+  return{pass:true,scenarioFamiliesValidated:results.length,results};
 }
 
 (async()=>{
