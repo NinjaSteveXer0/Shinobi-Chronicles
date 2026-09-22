@@ -429,20 +429,45 @@
     if(!p)return"";
     const delta=p.finalDamage>0?`-${p.finalDamage} PL`:p.result==="SUBSTITUTION"?"NO DIRECT HIT":"STATE CHANGE";
     const state=p.beforePL!==null&&p.afterPL!==null?`${p.beforePL} → ${p.afterPL} PL`:"AUTHORITATIVE STATE UPDATED";
-    const substitution=p.result==="SUBSTITUTION"&&p.targetPortrait
-      ?`<img class="battle2-performance-afterimage" src="${esc(p.targetPortrait)}" alt="" aria-hidden="true">`:"";
     return `<section class="battle2-performance-stage" data-action-id="${esc(p.actionId)}" data-performance-class="${esc(p.presentationClass)}" data-result="${esc(p.result)}" aria-label="Latest committed Battle action">
-      <div class="battle2-performance-actor" data-performance-role="actor">${p.actorPortrait?`<img src="${esc(p.actorPortrait)}" alt="">`:""}<span>${esc(p.actorName)}</span></div>
-      <div class="battle2-performance-center"><small>ACTION</small><strong>${esc(p.actionLabel)}</strong><b>${esc(p.result)}</b><em>${esc(delta)}</em><span>${esc(state)}</span></div>
-      <div class="battle2-performance-target" data-performance-role="target">${p.targetPortrait?`<img src="${esc(p.targetPortrait)}" alt="">`:""}${substitution}<span>${esc(p.targetName)}</span></div>
+      <div class="battle2-performance-center"><small>${esc(p.actorName)} → ${esc(p.targetName)}</small><strong>${esc(p.actionLabel)}</strong><b>${esc(p.result)}</b><em>${esc(delta)}</em><span>${esc(state)}</span></div>
     </section>`;
+  }
+  function battlePerformanceRoleNode33000(stage,side){
+    if(!stage)return null;
+    return side==="player"?stage.querySelector(".battle-live-active-card-player"):side==="enemy"?stage.querySelector(".battle-live-active-card-enemy"):null;
+  }
+  function clearBattlePerformanceRoles33000(stage,actionId=null){
+    if(!stage)return false;
+    if(actionId&&stage.dataset.battle2PerformanceActionId&&stage.dataset.battle2PerformanceActionId!==String(actionId))return false;
+    stage.classList.remove("battle2-performance-active");
+    for(const node of stage.querySelectorAll(".battle2-performance-role-actor,.battle2-performance-role-target")){
+      node.classList.remove("battle2-performance-role-actor","battle2-performance-role-target");
+    }
+    delete stage.dataset.battle2PerformanceActionId;
+    delete stage.dataset.battle2PerformanceClass;
+    delete stage.dataset.battle2PerformanceResult;
+    return true;
+  }
+  function applyBattlePerformanceRoles33000(stage,p){
+    clearBattlePerformanceRoles33000(stage);
+    if(!stage||!p)return{actorNode:null,targetNode:null};
+    const actorNode=battlePerformanceRoleNode33000(stage,p.actorRef&&p.actorRef.side);
+    const targetNode=battlePerformanceRoleNode33000(stage,p.targetRef&&p.targetRef.side);
+    stage.classList.add("battle2-performance-active");
+    stage.dataset.battle2PerformanceActionId=String(p.actionId||"");
+    stage.dataset.battle2PerformanceClass=String(p.presentationClass||"BATTLE_ACTION");
+    stage.dataset.battle2PerformanceResult=String(p.result||"RESOLVED");
+    if(actorNode)actorNode.classList.add("battle2-performance-role-actor");
+    if(targetNode)targetNode.classList.add("battle2-performance-role-target");
+    return{actorNode,targetNode};
   }
   function installBattlePerformance33000(stage){
     if(!stage)return null;
     const p=resolveBattlePerformanceProjection33000();
     let host=stage.querySelector(".battle2-performance-host");
     if(!host){host=document.createElement("div");host.className="battle2-performance-host";stage.appendChild(host);}
-    if(!p){host.replaceChildren();delete host.dataset.actionId;return null;}
+    if(!p){host.replaceChildren();delete host.dataset.actionId;clearBattlePerformanceRoles33000(stage);return null;}
     const key=p.battleId+":"+p.actionId;
     if(host.dataset.actionId!==p.actionId){
       host.dataset.actionId=p.actionId;
@@ -455,8 +480,14 @@
       lane.classList.toggle("is-settled",played);
       if(!played){
         playedBattlePerformanceKeys33000.add(key);
-        setTimeout(()=>{if(lane.isConnected){lane.classList.remove("is-playing");lane.classList.add("is-settled");}},620);
-      }
+        applyBattlePerformanceRoles33000(stage,p);
+        setTimeout(()=>{
+          if(lane.isConnected&&host.dataset.actionId===p.actionId){
+            lane.classList.remove("is-playing");lane.classList.add("is-settled");
+            clearBattlePerformanceRoles33000(stage,p.actionId);
+          }
+        },620);
+      }else clearBattlePerformanceRoles33000(stage);
     }
     return p;
   }
