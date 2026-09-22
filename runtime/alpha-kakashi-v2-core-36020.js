@@ -10,7 +10,7 @@
 if(globalThis.SC_ACADEMY_KAKASHI_V2_CORE_36020)return;
 
 const PATCH_ID="academy_kakashi_v2_core_36020_2026_09_22";
-const SCENE_ID="origin_academy_kakashi_prologue";
+const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const ORIGIN_ID="academy_kakashi";
 const AMT="academy_kakashi_origin_amt",PS="academy_kakashi_origin_package_smuggler",MI="academy_kakashi_origin_masked_interceptor",PAKKUN="pakkun_origin_unfamiliar_ninken";
 const D=globalThis.SC_STORY_DECISION_REALISATION_34000;
