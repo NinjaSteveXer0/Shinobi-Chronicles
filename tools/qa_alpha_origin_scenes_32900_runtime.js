@@ -11,7 +11,6 @@ const expectedSource={
 'KUS-01':'occ_origin_kushina_residual_seal_work_resolution','KUS-02':'occ_origin_kushina_gerotora_identity_disclosure','KUS-03':'occ_origin_kushina_gerotora_causal_explanation','KUS-04':'occ_origin_kushina_joint_residual_seal_closure','KUS-05':'occ_origin_kushina_gerotora_first_contact',
 'KUR-01':'occ_origin_kurenai_bell_test_resolution','KUR-02':'occ_origin_kurenai_bell_test_resolution','IWA-01':'occ_origin_iwabee_training_ground_reshape_resolution','IWA-02':'occ_origin_iwabee_rogue_genin_response_resolution',
 'MET-01':'occ_origin_metal_private_training_resolution','MET-02':'occ_origin_metal_pressured_performance_resolution','MET-03':'occ_origin_metal_protective_response_resolution','MET-04':'occ_origin_metal_inviting_genin_prior_contact',
-'KAK-01':'occ_origin_kakashi_anbu_retrieval_resolution','KAK-02':'occ_origin_kakashi_anbu_retrieval_resolution','KAK-03':'occ_origin_kakashi_anbu_retrieval_resolution',
 'OBI-01':null,'OBI-02':'occ_origin_obito_formal_training_entitlement_resolution','OBI-03':'occ_origin_obito_formal_training_entitlement_resolution','OBI-04':'occ_origin_obito_formal_training_entitlement_resolution','OBI-05':'occ_origin_obito_formal_training_entitlement_resolution'};
 const obitoSources=new Set(['occ_origin_obito_furniture_assistance_resolution','occ_origin_obito_scattered_vegetables_resolution','occ_origin_obito_lost_academy_equipment_resolution','occ_origin_obito_overturned_delivery_resolution','occ_origin_obito_runaway_cart_resolution']);
 function qualifies(row,f){switch(row){
@@ -22,7 +21,6 @@ case'KUS-01':return f.qualifyingFuinjutsuWorkCompleted===true;case'KUS-02':retur
 case'KUR-01':return f.bellTestOutcomeClass==='complete_loss';case'KUR-02':return['partial_loss','partial_win','complete_win'].includes(f.bellTestOutcomeClass);
 case'IWA-01':return f.trainingGroundReshapeObjectiveCompletedByIwabee===true;case'IWA-02':return f.earthReleaseUsedToConstrainRogueGenin===true;
 case'MET-01':return f.qualifyingPrivateTaijutsuOrConditioningWorkCompleted===true&&f.observerDiscoveryOccurredAfterQualifyingPrivateWork===true;case'MET-02':return['strong','mixed','rough'].includes(f.pressuredPerformanceClass);case'MET-03':return f.protectiveResponseAttempted===true;case'MET-04':return f.invitingGeninEncounterOccurred===true;
-case'KAK-01':return['secured','lost','unresolved'].includes(f.packageDisposition);case'KAK-02':return['low','mixed','high'].includes(f.retrievalIntelligenceClass);case'KAK-03':return f.qualifyingParticipantOrCustodyInteractionOccurred===true;
 case'OBI-01':return f.obitoCausalContributionEstablished===true;case'OBI-02':return f.formalTrainingEntitlement==='FULL';case'OBI-03':return f.formalTrainingEntitlement==='SUBSTANTIAL';case'OBI-04':return f.formalTrainingEntitlement==='REDUCED';case'OBI-05':return f.formalTrainingEntitlement==='MINIMAL';default:return false;}}
 const ctx={console,Date,JSON,Object,Array,String,Number,Boolean,Set,Map,Math,globalThis:null,document:undefined,
 playerData:{activityHistory:[],acquisition:{chronicleOriginVariantId:'academy_hinata',chronicleOrigin:{prologueCompleted:false}}},activityHistory:[],
@@ -44,10 +42,12 @@ run('academy_kushina',['correct_formula','ask_who']);
 run('academy_kurenai',['fake_clumsy','rush_bell','let_him_think_caught']);
 run('academy_iwabee',['build_path','call_instructor','better_rest']);
 run('academy_metal_lee',['demonstrate','redirect_dummy']);
-run('academy_kakashi',['shadow_the_clerk','secure_package','proof']);
 run('academy_obito',['furniture_continue','vegetables_continue','equipment_continue','delivery_continue','cart_continue','accept_full_training','hokage_still']);
 const diag=ctx.runAlphaOriginScene32900Diagnostics();
-const checks={diagPass:diag.pass,allNineCompleted:['academy_hinata','academy_izuno','academy_mirai','academy_kushina','academy_kurenai','academy_iwabee','academy_metal_lee','academy_kakashi','academy_obito'].every(id=>completions.some(c=>c.id===id)),
-expectedCoreReceipts:['HIN-01','HIN-02','IZU-02','MIR-01','KUS-01','KUS-02','KUS-05','KUR-02','IWA-01','MET-01','MET-02','MET-03','MET-04','KAK-01','KAK-02','KAK-03','OBI-02'].every(id=>receipts.some(r=>r.rowId===id)),
-obitoNoFakeDiversionReceipt:!receipts.some(r=>r.rowId==='OBI-01'),kakashiThreeIndependentMeanings:['KAK-01','KAK-02','KAK-03'].every(id=>receipts.some(r=>r.rowId===id)),browserGoldenClaimed:false};
+ctx.playerData.acquisition={chronicleOriginVariantId:'academy_kakashi',chronicleOrigin:{prologueCompleted:false}};
+active=null;
+const kakashiPending=ctx.beginAlphaChronicleOriginPrologue();
+const checks={diagPass:diag.pass,allEightImplementedOriginsCompleted:['academy_hinata','academy_izuno','academy_mirai','academy_kushina','academy_kurenai','academy_iwabee','academy_metal_lee','academy_obito'].every(id=>completions.some(c=>c.id===id)),
+expectedCoreReceipts:['HIN-01','HIN-02','IZU-02','MIR-01','KUS-01','KUS-02','KUS-05','KUR-02','IWA-01','MET-01','MET-02','MET-03','MET-04','OBI-02'].every(id=>receipts.some(r=>r.rowId===id)),
+obitoNoFakeDiversionReceipt:!receipts.some(r=>r.rowId==='OBI-01'),kakashiV2FailsClosed:kakashiPending&&kakashiPending.success===false&&kakashiPending.reason==='academy_kakashi_v2_pending',browserGoldenClaimed:false};
 const pass=Object.entries(checks).filter(([k])=>k!=='browserGoldenClaimed').every(([,v])=>v===true);console.log(JSON.stringify({pass,checks,receiptCount:receipts.length,completionCount:completions.length},null,2));if(!pass)process.exit(1);
