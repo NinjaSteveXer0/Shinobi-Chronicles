@@ -98,6 +98,35 @@
         "tools/qa_merge_safety_gate_305.js"
       ],
       "replaces": []
+    },
+    {
+      "changeId": "issue-311-alpha-integrity-safeguards-2026-09-22",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "runtime.safety.contract_integrity",
+        "runtime.safety.route_reachability",
+        "runtime.safety.browser_error_gate",
+        "runtime.safety.save_compatibility",
+        "runtime.safety.reference_integrity",
+        "runtime.safety.release_evidence"
+      ],
+      "owner": "tools/qa_contract_integrity_311.js + bounded #311 QA suite",
+      "directCallers": [
+        ".github/workflows/merge-safety-gate.yml",
+        "tools/qa_issue_141_pre_alpha_runtime_closure.py"
+      ],
+      "stateTouched": [],
+      "productionLoader": null,
+      "qaRefs": [
+        "tools/qa_contract_integrity_311.js",
+        "tools/qa_story_reachability_311.js",
+        "tools/qa_save_compatibility_311.js",
+        "tools/qa_reference_integrity_311.js",
+        "tools/qa_browser_runtime_error_gate_311.js",
+        "tools/qa_release_candidate_evidence_311.js",
+        "tools/qa_kakashi_v2_browser.js"
+      ],
+      "replaces": []
     }
   ]
 }
