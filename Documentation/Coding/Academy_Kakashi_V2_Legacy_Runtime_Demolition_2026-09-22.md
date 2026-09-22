@@ -55,6 +55,9 @@ The corresponding architecture-specific Kakashi QA files and dedicated Kakashi w
 
 ## 4. Shared-owner cleanup
 
+The exact retired Kakashi runtime family currently contains **39 production runtime modules**. No `runtime/alpha-kakashi-*.js` production module remains in the branch.
+
+
 Shared systems remain in production, but Kakashi-specific ownership embedded inside them is removed.
 
 Changes include:
@@ -67,6 +70,21 @@ Changes include:
 - `runtime/alpha-traversal-bridge-33200.js` loads the generic Scene Board directly rather than routing through the retired 33800 Kakashi layer;
 - the ANBU/ROOT Knowledge hardening module no longer contains a terminal Kakashi loader;
 - unrelated workflows no longer trigger on retired Kakashi files.
+
+## 4A. Stale presentation-content cleanup
+
+A follow-up source sweep found legacy Kakashi route text still embedded in the shared localisation runtime. Those strings belonged to the superseded logistics-clerk / information-broker / decoy-assassin implementation and were not current Kakashi V2 authority.
+
+The branch therefore also removes:
+
+- Kakashi route-specific `story.kakashi.*` localisation keys from `alpha-localisation-35500.js`;
+- the obsolete Kakashi Origin phrase family from `alpha-localisation-content-35510.js`;
+- the obsolete Kakashi final-writing/evaluator phrase family from `alpha-localisation-final-writing-35520.js`;
+- localisation QA assertions whose only purpose was preserving those retired phrases.
+
+Generic Kakashi terminology, the stable `academy_kakashi` identity, the Academy Kakashi selection label and durable current Writing documents remain preserved.
+
+The #190 localisation workflow is also enabled for pull requests so this cleanup is validated before merge.
 
 ## 5. Temporary player-facing state
 
