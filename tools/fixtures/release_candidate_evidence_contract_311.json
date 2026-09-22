@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "issue": 311,
+  "authorityRef": "Documentation/Coordination/Alpha_Second_Wave_Regression_and_Integrity_Safeguards_2026-09-22.md",
+  "manifestVersion": "alpha-release-candidate-evidence-311-v1",
+  "requiredFields": [
+    "candidateHead",
+    "runtimeFingerprint",
+    "productionLoadManifestVersion",
+    "requiredQASuite",
+    "knownNonBlockingIssues",
+    "knownBlockingIssues",
+    "saveCompatibilityResult",
+    "browserErrorResult",
+    "localSyncRequirement",
+    "expectedLocalHead"
+  ],
+  "localSyncValues": [
+    "REQUIRED",
+    "NOT_REQUIRED"
+  ]
+}
