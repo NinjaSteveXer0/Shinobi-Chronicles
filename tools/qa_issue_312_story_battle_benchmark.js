@@ -74,6 +74,7 @@ assert(!kv2Rewards.includes("const battle=globalThis.currentBattle;"),"#312 rewa
 assert(battleSource.includes("installFormationStage33000"),"#312 shared Battle owner is missing Formation Stage composition");
 assert(battleSource.includes("getBattleDeploymentParticipant")&&battleSource.includes("deployedFormation33000"),"#312 Formation Stage must consume deployed participant truth");
 assert(battleSource.includes('return peak<=1?"duel":peak>=4?"arc":"wedge"'),"#312 adaptive duel / wedge / arc formation modes missing");
+assert(battleSource.includes('data-formation-mode="duel"] .battle-live-active-card{top:9.5%!important;width:33.5%!important;height:56%!important')&&battleSource.includes('data-formation-mode="duel"] .battle-code-vs{top:28.5%!important;opacity:.55!important'),"#312 sparse duel must use the battlefield confidently without fake support furniture");
 assert(battleSource.includes('"SKILLS"')&&battleSource.includes('"ITEMS"')&&battleSource.includes('"SUMMONS"')&&battleSource.includes("primary.length===3"),"#312 primary action dock must be exactly Skills / Items / Summons");
 assert(battleSource.includes("battle2-formation-withdraw")&&battleSource.includes("invokeBattleWithdrawAction"),"#312 Withdraw semantic action must remain available outside the primary dock");
 assert(battleSource.includes("selectedTargetRef")&&battleSource.includes("formationNodeForRef33000"),"#312 contextual exact-target formation focus missing");
