@@ -503,7 +503,8 @@
     {
       "surfaceId": "academy_kakashi_v2_story_surface",
       "owners": [
-        "runtime/alpha-kakashi-v2-renderer-36030.js"
+        "runtime/alpha-kakashi-v2-renderer-36030.js",
+        "runtime/alpha-story-scene-board-33900.js"
       ],
       "rootSelector": "#kakashi-v2-scene-board",
       "visibleTextSelector": ".kv2-dialogue",
