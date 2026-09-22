@@ -1,7 +1,7 @@
 # Academy Kakashi — Runtime Static Cue Authority Snapshot
 
 Date: 2026-09-22
-Source baseline: `859e75fb18d617e2c95c192a41b4fc9ee090435c`
+Source baseline: `9dcfd72efe741bf23ea81bef2bcd1b50ffe070bd`
 Runtime source: `runtime/alpha-kakashi-v2-core-36020.js`
 
 ## Purpose
@@ -282,1944 +282,2012 @@ And the package?
 
 ### Cue 068
 
-Minato nods once.
+Recovered and returned.
 
 ### Cue 069
 
-Keep that separate from the deaths.
+Minato nods once.
 
 ### Cue 070
 
-Minato looks back at the report.
+Keep that separate from the deaths.
 
 ### Cue 071
 
-Then don't let the body count make the objective look successful.
+Minato looks back at the report.
 
 ### Cue 072
 
-He brought the package back.
+Then don't let the body count make the objective look successful.
 
 ### Cue 073
 
-What did he give up to do it?
+He brought the package back.
 
 ### Cue 074
 
-He lost the package.
+It came back with him.
 
 ### Cue 075
 
-What did he come back with?
+What did he give up to do it?
 
 ### Cue 076
 
-The ANBU operative finishes the report. Minato stays quiet long enough to make sure there is nothing else coming.
+He lost the package.
 
 ### Cue 077
 
-Three deaths. None of them in the fight itself.
+It never returned to our side.
 
 ### Cue 078
 
-Correct.
+What did he come back with?
 
 ### Cue 079
 
-Minato looks down at the report.
+The ANBU operative finishes the report. Minato stays quiet long enough to make sure there is nothing else coming.
 
 ### Cue 080
 
-So he knew when each fight was over.
+Three deaths. None of them in the fight itself.
 
 ### Cue 081
 
-And still made the same decision three times.
+All three were alive when their fights ended.
 
 ### Cue 082
 
-Minato closes the file halfway.
+Minato looks down at the report.
 
 ### Cue 083
 
-Then that's the part I care about. Not the number.
+So he knew when each fight was over.
 
 ### Cue 084
 
-Two deliberate deaths.
+There is no sign he mistook their condition.
 
 ### Cue 085
 
-And he let the third person walk.
+And still made the same decision three times.
 
 ### Cue 086
 
-But he kept the third person alive.
+Three times.
 
 ### Cue 087
 
-The third outcome wasn't his to finish.
+Minato closes the file halfway.
 
 ### Cue 088
 
-Minato lets the difference sit before moving on.
+Then that's the part I care about. Not the number.
 
 ### Cue 089
 
-The masked shinobi is the one he chose to kill.
+Two deliberate deaths.
 
 ### Cue 090
 
-Minato reads what came before and after it.
+The third person was released alive.
 
 ### Cue 091
 
-One death only matters if we understand when he decided on it.
+So the third result was a different choice.
 
 ### Cue 092
 
-The receiver is dead.
+The third person remained alive under control.
 
 ### Cue 093
 
-Minato's finger stops on the package line.
+Then he did not treat every defeat the same.
 
 ### Cue 094
 
-Don't merge that with whether he recovered the objective.
+The third outcome was no longer his to finish.
 
 ### Cue 095
 
-The original target is the one who died.
+Then keep it separate.
 
 ### Cue 096
 
-Minato looks back to the first line of the assignment.
+Minato lets the difference sit before moving on.
 
 ### Cue 097
 
-He began the night following that man and ended it deciding whether he lived.
+The masked shinobi is the one he chose to kill.
 
 ### Cue 098
 
-The ANBU operative finishes the report.
+After her fight was already over.
 
 ### Cue 099
 
-He brought someone back alive.
+Minato reads what came before and after it.
 
 ### Cue 100
 
-Because he couldn't finish the fight?
+Then one death only matters if we understand when he decided on it.
 
 ### Cue 101
 
-Then custody was part of the decision.
+The receiver is dead.
 
 ### Cue 102
 
-He chose the Police instead of bringing them here.
+Killed after defeat.
 
 ### Cue 103
 
-Minato considers that.
+Minato's finger stops on the package line.
 
 ### Cue 104
 
-He wanted the handoff outside ANBU. Record it that way.
+Don't merge that with whether he recovered the objective.
 
 ### Cue 105
 
-He restrained them and kept moving.
+The original target is the one who died.
 
 ### Cue 106
 
-Then he treated custody as something to manage, not something that ended the mission.
+After Kakashi had already beaten him.
 
 ### Cue 107
 
-He had them under control and let them go.
+Minato looks back to the first line of the assignment.
 
 ### Cue 108
 
-Then that wasn't an escape. It was his decision.
+He began the night following that man and ended it deciding whether he lived.
 
 ### Cue 109
 
-He had control and chose release.
+The ANBU operative finishes the report.
 
 ### Cue 110
 
-No fight?
+Then don't write that as a fight he failed to finish.
 
 ### Cue 111
 
-And the package still came back.
+Understood.
 
 ### Cue 112
 
-A faint approval reaches Minato's expression.
+He chose the Police instead of bringing them here.
 
 ### Cue 113
 
-Good. Not every successful mission needs to become a battle.
+Minato considers that.
 
 ### Cue 114
 
-He stayed long enough to hear the contingency.
+Then record the institution he chose. That matters.
 
 ### Cue 115
 
-And reported the part they never said as unknown.
+He restrained them and kept moving.
 
 ### Cue 116
 
-Good.
+Then he treated custody as something to manage, not something that ended the mission.
 
 ### Cue 117
 
-He questioned the carrier before committing to the fight.
+He had them under control and let them go.
 
 ### Cue 118
 
-And learned where the carrier's knowledge ended.
+The releases were deliberate.
 
 ### Cue 119
 
-At the handoff.
+Then that wasn't an escape. It was his decision.
 
 ### Cue 120
 
-Minato nods.
+He had control and chose release.
 
 ### Cue 121
 
-That's useful even without a destination.
+Deliberately.
 
 ### Cue 122
 
-Kakashi Hatake vs Masked Interceptor.
+No fight?
 
 ### Cue 123
 
-Masked Interceptor hits the stone beneath the Sakura tree. Kakashi lands a few steps away and immediately looks past her.
+None. He took the package without exposing himself.
 
 ### Cue 124
 
-Package Smuggler is crossing the far end of the street with the package still tucked against him.
+And it still came back.
 
 ### Cue 125
 
-Higher up, ANBU Marked Target flashes across a distant roofline—farther away, but not gone yet.
+It did.
 
 ### Cue 126
 
-Kakashi has beaten the threat in front of him and bought himself one decision. He cannot take every trail at once.
+A faint approval reaches Minato's expression.
 
 ### Cue 127
 
-Kakashi searches the rooftops, the alleys and the next junction.
+Good. Not every successful mission needs to become a battle.
 
 ### Cue 128
 
-Nothing moves.
+He stayed long enough to hear the contingency.
 
 ### Cue 129
 
-Package Smuggler had too much time; he and the package are gone, and ANBU Marked Target is gone as well.
+Long enough to learn it. He still reported the downstream destination as unknown.
 
 ### Cue 130
 
-There is no pursuit left to take. Only Masked Interceptor remains in front of Kakashi.
+Good. He separated what he heard from what he guessed.
 
 ### Cue 131
 
-Kakashi looks once toward the route the package took, then back to Masked Interceptor.
+He questioned the carrier before committing to the fight.
 
 ### Cue 132
 
-If he follows, he has to leave her here. Leaving her free is not an option.
+The carrier only knew his part ended at the handoff.
 
 ### Cue 133
 
-He draws ninja wire.
+So Kakashi found the edge of the man's knowledge.
 
 ### Cue 134
 
-So you're still going after them.
+Minato nods.
 
 ### Cue 135
 
-Kakashi binds her wrists and fixes the restraint to the Sakura tree.
+That's useful even without a destination.
 
 ### Cue 136
 
-She tests the wire once, then stops.
+Kakashi Hatake vs Masked Interceptor.
 
 ### Cue 137
 
-You're leaving me tied to a tree.
+Masked Interceptor hits the stone beneath the Sakura tree. Kakashi lands a few steps away and immediately looks past her.
 
 ### Cue 138
 
-Until I come back.
+Package Smuggler is crossing the far end of the street with the package still tucked against him.
 
 ### Cue 139
 
-Confident.
+Higher up, ANBU Marked Target flashes across a distant roofline—farther away, but not gone yet.
 
 ### Cue 140
 
-Kakashi is already looking toward the rooftops.
+Kakashi has beaten the threat in front of him and bought himself one decision. He cannot take every trail at once.
 
 ### Cue 141
 
-Wait and see.
+Kakashi searches the rooftops, the alleys and the next junction.
 
 ### Cue 142
 
-He leaves her beneath the Sakura tree.
+Nothing moves.
 
 ### Cue 143
 
-Kakashi moves before Package Smuggler can disappear completely.
+Package Smuggler had too much time; he and the package are gone, and ANBU Marked Target is gone as well.
 
 ### Cue 144
 
-The Sakura tree drops behind him as the chase cuts through a narrow street and up across the roofs.
+There is no pursuit left to take. Only Masked Interceptor remains in front of Kakashi.
 
 ### Cue 145
 
-The receiver already has a lead, but Kakashi can still see the package tucked tight against his side.
+Kakashi looks once toward the route the package took, then back to Masked Interceptor.
 
 ### Cue 146
 
-Package Smuggler is not searching for a hiding place. He is trying to build enough distance that he will never need one.
+If he follows, he has to leave her here. Leaving her free is not an option.
 
 ### Cue 147
 
-Kakashi increases his pace.
+He draws ninja wire.
 
 ### Cue 148
 
-Kakashi reaches the next junction and finds an empty street.
+So you're still going after them.
 
 ### Cue 149
 
-He takes the roofline instead. Nothing.
+Kakashi binds her wrists and fixes the restraint to the Sakura tree.
 
 ### Cue 150
 
-The trail has stretched too far.
+She tests the wire once, then stops.
 
 ### Cue 151
 
-Package Smuggler is gone with the package, and the time spent chasing him has erased whatever lead Kakashi still had on ANBU Marked Target.
+You're leaving me tied to a tree.
 
 ### Cue 152
 
-There is nothing left to pursue honestly.
+Until I come back.
 
 ### Cue 153
 
-Package Smuggler turns into the next street and finds Kakashi landing ahead of him.
+Confident.
 
 ### Cue 154
 
-He stops hard and checks the road behind him.
+Kakashi is already looking toward the rooftops.
 
 ### Cue 155
 
-You should've stayed with the woman you put down.
+Wait and see.
 
 ### Cue 156
 
-You were counting on that.
+He leaves her beneath the Sakura tree.
 
 ### Cue 157
 
-Package Smuggler's grip tightens around the package.
+Kakashi moves before Package Smuggler can disappear completely.
 
 ### Cue 158
 
-You don't even know what you're carrying.
+The Sakura tree drops behind him as the chase cuts through a narrow street and up across the roofs.
 
 ### Cue 159
 
-No. I know who handed it over, and who ANBU sent me to follow.
+The receiver already has a lead, but Kakashi can still see the package tucked tight against his side.
 
 ### Cue 160
 
-You think taking it back fixes this?
+Package Smuggler is not searching for a hiding place. He is trying to build enough distance that he will never need one.
 
 ### Cue 161
 
-It fixes the part in your hands.
+Kakashi increases his pace.
 
 ### Cue 162
 
-Package Smuggler's free hand drops toward his weapon. Kakashi shifts with him.
+Kakashi reaches the next junction and finds an empty street.
 
 ### Cue 163
 
-Kakashi Hatake vs Package Smuggler.
+He takes the roofline instead. Nothing.
 
 ### Cue 164
 
-Package Smuggler finds the opening first and breaks past Kakashi.
+The trail has stretched too far.
 
 ### Cue 165
 
-Kakashi turns after him too late.
+Package Smuggler is gone with the package, and the time spent chasing him has erased whatever lead Kakashi still had on ANBU Marked Target.
 
 ### Cue 166
 
-The package goes with the receiver.
+There is nothing left to pursue honestly.
 
 ### Cue 167
 
-By the time Kakashi can move again, the street ahead is empty.
+Package Smuggler turns into the next street and finds Kakashi landing ahead of him.
 
 ### Cue 168
 
-Package Smuggler goes down.
+He stops hard and checks the road behind him.
 
 ### Cue 169
 
-Kakashi stays on him long enough to make sure the fight is finished, then reaches for the package.
+You should've stayed with the woman you put down.
 
 ### Cue 170
 
-He checks the seal and secures it against himself.
+You were counting on that.
 
 ### Cue 171
 
-Only then does he look toward the route ANBU Marked Target took.
+Package Smuggler's grip tightens around the package.
 
 ### Cue 172
 
-Kakashi leaves Package Smuggler behind with the recovered package secured against him.
+You don't even know what you're carrying.
 
 ### Cue 173
 
-The other trail is thin, but not gone.
+No. I know who handed it over, and who ANBU sent me to follow.
 
 ### Cue 174
 
-He cuts across the roofs, drops through a side street, and catches movement ahead.
+You think taking it back fixes this?
 
 ### Cue 175
 
-ANBU Marked Target is still running.
+It gets the package back.
 
 ### Cue 176
 
-The man reaches the next street and stops short. A small ninken is already standing in the route ahead.
+Package Smuggler's free hand drops toward his weapon. Kakashi shifts with him.
 
 ### Cue 177
 
-This yours?
+Kakashi Hatake vs Package Smuggler.
 
 ### Cue 178
 
-Kakashi lands on the far side of the street.
+Package Smuggler finds the opening first and breaks past Kakashi.
 
 ### Cue 179
 
-Apparently.
+Kakashi turns after him too late.
 
 ### Cue 180
 
-ANBU Marked Target notices the recovered package.
+The package goes with the receiver.
 
 ### Cue 181
 
-You got it back.
+By the time Kakashi can move again, the street ahead is empty.
 
 ### Cue 182
 
-I did.
+Package Smuggler goes down.
 
 ### Cue 183
 
-You're still coming back with me.
+Kakashi stays on him long enough to make sure the fight is finished, then reaches for the package.
 
 ### Cue 184
 
-You think carrying that means you understand what happened?
+He checks the seal and secures it against himself.
 
 ### Cue 185
 
-Pakkun shifts off the centreline without being asked.
+Only then does he look toward the route ANBU Marked Target took.
 
 ### Cue 186
 
-Then what exactly are you planning to do with me?
+Kakashi leaves Package Smuggler behind with the recovered package secured against him.
 
 ### Cue 187
 
-Depends what you do next.
+The other trail is thin, but not gone.
 
 ### Cue 188
 
-Kakashi Hatake and the ninken face ANBU Marked Target.
+He cuts across the roofs, drops through a side street, and catches movement ahead.
 
 ### Cue 189
 
-ANBU Marked Target finds the opening first and wins the fight.
+ANBU Marked Target is still running.
 
 ### Cue 190
 
-The package stays secured against Kakashi, so the man looks at it once and chooses the open route instead.
+The man reaches the next street and stops short. A small ninken is already standing in the route ahead.
 
 ### Cue 191
 
-By the time Kakashi can move again, he is gone.
+This yours?
 
 ### Cue 192
 
-You kept the package.
+Kakashi lands on the far side of the street.
 
 ### Cue 193
 
-I lost him.
+Apparently.
 
 ### Cue 194
 
-Pakkun looks down the empty street.
+ANBU Marked Target notices the recovered package.
 
 ### Cue 195
 
-Both things can be true.
+You got it back.
 
 ### Cue 196
 
-ANBU Marked Target hits the ground and stays there.
+I did.
 
 ### Cue 197
 
-Kakashi remains close enough to stop another escape attempt.
+You're still coming back with me.
 
 ### Cue 198
 
-Pakkun watches the alley mouth.
+You think carrying that means you understand what happened?
 
 ### Cue 199
 
-The package is secure. The man is beaten.
+Pakkun shifts off the centreline without being asked.
 
 ### Cue 200
 
-What happens to him now is a separate decision.
+Then what exactly are you planning to do with me?
 
 ### Cue 201
 
-ANBU Marked Target remains on the ground.
+Stop you first. Decide after.
 
 ### Cue 202
 
-Kakashi looks back the way they came.
+Kakashi Hatake and the ninken face ANBU Marked Target.
 
 ### Cue 203
 
-There are still people waiting behind him.
+ANBU Marked Target finds the opening first and wins the fight.
 
 ### Cue 204
 
-Pakkun follows his eye.
+The package stays secured against Kakashi, so the man looks at it once and chooses the open route instead.
 
 ### Cue 205
 
-We're going back.
+By the time Kakashi can move again, he is gone.
 
 ### Cue 206
 
-I left prisoners behind.
+You kept the package.
 
 ### Cue 207
 
-I noticed.
+I lost him.
 
 ### Cue 208
 
-Kakashi draws out the ninja wire.
+Pakkun looks down the empty street.
 
 ### Cue 209
 
-ANBU Marked Target sees it.
+Then remember both.
 
 ### Cue 210
 
-You've been doing this all night?
+ANBU Marked Target hits the ground and stays there.
 
 ### Cue 211
 
-Kakashi secures his wrists.
+Kakashi remains close enough to stop another escape attempt.
 
 ### Cue 212
 
-More than I expected.
+Pakkun watches the alley mouth.
 
 ### Cue 213
 
-Pakkun gives the wire a look.
+The package is secure. The man is beaten.
 
 ### Cue 214
 
-You're going to need more of that.
+What happens to him now is a separate decision.
 
 ### Cue 215
 
-Kakashi checks what remains.
+ANBU Marked Target remains on the ground.
 
 ### Cue 216
 
-I know.
+Kakashi looks back the way they came.
 
 ### Cue 217
 
-Pakkun starts down the street.
+There are still people waiting behind him.
 
 ### Cue 218
 
-Good. I wasn't offering mine.
+Pakkun follows his eye.
 
 ### Cue 219
 
-Kakashi looks at him.
+We're going back.
 
 ### Cue 220
 
-Pakkun keeps walking.
+I left prisoners behind.
 
 ### Cue 221
 
-Package Smuggler is exactly where Kakashi left him.
+I noticed.
 
 ### Cue 222
 
-His eyes move first to Kakashi.
+Kakashi draws out the ninja wire.
 
 ### Cue 223
 
-Then to ANBU Marked Target under restraint.
+ANBU Marked Target sees it.
 
 ### Cue 224
 
-Then to Pakkun.
+You've been doing this all night?
 
 ### Cue 225
 
-You actually came back.
+Kakashi secures his wrists.
 
 ### Cue 226
 
-I said I would.
+More than I expected.
 
 ### Cue 227
 
-Package Smuggler looks at ANBU Marked Target.
+Pakkun gives the wire a look.
 
 ### Cue 228
 
-And you brought company.
+You're going to need more of that.
 
 ### Cue 229
 
-Don't.
+Kakashi checks what remains.
 
 ### Cue 230
 
-I haven't said anything yet.
+I know.
 
 ### Cue 231
 
-That was the warning.
+Pakkun starts down the street.
 
 ### Cue 232
 
-Pakkun looks between them.
+Good. I wasn't offering mine.
 
 ### Cue 233
 
-This is going well.
+Kakashi looks at him.
 
 ### Cue 234
 
-Kakashi releases Package Smuggler from the fixed anchor without removing his restraints.
+Pakkun keeps walking.
 
 ### Cue 235
 
-He brings him into the escort.
+Package Smuggler is exactly where Kakashi left him.
 
 ### Cue 236
 
-I'm starting to miss the tree.
+His eyes move first to Kakashi.
 
 ### Cue 237
 
-You weren't at the tree.
+Then to ANBU Marked Target under restraint.
 
 ### Cue 238
 
-Package Smuggler looks at him.
+Then to Pakkun.
 
 ### Cue 239
 
-You know what I mean.
+You actually came back.
 
 ### Cue 240
 
-Masked Interceptor is still beneath the Sakura tree.
+I said I would.
 
 ### Cue 241
 
-Her attention settles on Kakashi first.
+Package Smuggler looks at ANBU Marked Target.
 
 ### Cue 242
 
-Then the restrained people with him.
+And you brought company.
 
 ### Cue 243
 
-Package Smuggler, if present, notices the look.
+Don't.
 
 ### Cue 244
 
-Masked Interceptor says nothing.
+I haven't said anything yet.
 
 ### Cue 245
 
-You were going to say something.
+That was the warning.
 
 ### Cue 246
 
-I didn't need to.
+Pakkun watches the two men without joining in. Kakashi releases Package Smuggler from the fixed anchor without removing his restraints.
 
 ### Cue 247
 
-Pakkun gives Package Smuggler a brief look.
+He brings him into the escort.
 
 ### Cue 248
 
-She really didn't.
+I'm starting to miss the tree.
 
 ### Cue 249
 
-Kakashi removes the line fixing Masked Interceptor to the tree.
+You weren't at the tree.
 
 ### Cue 250
 
-The restraint around her remains.
+Package Smuggler looks at him.
 
 ### Cue 251
 
-She joins the escort.
+You know what I mean.
 
 ### Cue 252
 
-Her eyes move to Kakashi.
+Masked Interceptor is still beneath the Sakura tree.
 
 ### Cue 253
 
-You got all the way back.
+Her attention settles on Kakashi first.
 
 ### Cue 254
 
-She looks over the group.
+Then the restrained people with him.
 
 ### Cue 255
 
-You said you'd finish what you started.
+Package Smuggler notices the look.
 
 ### Cue 256
 
-A moment.
+Masked Interceptor says nothing.
 
 ### Cue 257
 
-This is certainly one interpretation.
+You were going to say something.
 
 ### Cue 258
 
-Kakashi starts walking.
+I didn't need to.
 
 ### Cue 259
 
-Keep moving.
+Kakashi removes the line fixing Masked Interceptor to the tree.
 
 ### Cue 260
 
-This time the faint amusement behind her mask is obvious.
+The restraint around her remains.
 
 ### Cue 261
 
-Kakashi Hatake vs Package Smuggler + Masked Interceptor.
+She joins the escort.
 
 ### Cue 262
 
-Kakashi leaves the two defeated shinobi behind.
+Her eyes move to Kakashi.
 
 ### Cue 263
 
-Not because they no longer matter.
+You got all the way back.
 
 ### Cue 264
 
-Because the first man is still moving.
+She looks over the group.
 
 ### Cue 265
 
-The package is secure now.
+You said you'd finish what you started.
 
 ### Cue 266
 
-That changes the calculation.
+A moment.
 
 ### Cue 267
 
-Kakashi can chase without wondering whether every step is taking him farther from the objective.
+This is certainly one interpretation.
 
 ### Cue 268
 
-He takes the rooftops.
+Kakashi starts walking.
 
 ### Cue 269
 
-The trail is thinner than it was before the fight.
+Keep moving.
 
 ### Cue 270
 
-Still there.
+This time the faint amusement behind her mask is obvious.
 
 ### Cue 271
 
-For now.
+Kakashi Hatake vs Package Smuggler + Masked Interceptor.
 
 ### Cue 272
 
-Kakashi clears another rooftop.
+Kakashi leaves the two defeated shinobi behind.
 
 ### Cue 273
 
-Nothing.
+Not because they no longer matter.
 
 ### Cue 274
 
-He drops to street level.
+Because the first man is still moving.
 
 ### Cue 275
 
-Checks the crossing.
+The package is secure now.
 
 ### Cue 276
 
-The route has split too many times.
+That changes the calculation.
 
 ### Cue 277
 
-Whatever lead remained after the fight is gone.
+Kakashi can chase without wondering whether every step is taking him farther from the objective.
 
 ### Cue 278
 
-He stops chasing before guesswork becomes a substitute for a trail.
+He takes the rooftops.
 
 ### Cue 279
 
-The package is still secured against him.
+The trail is thinner than it was before the fight.
 
 ### Cue 280
 
-The first man is gone.
+Still there.
 
 ### Cue 281
 
-Those facts can both be true.
+For now.
 
 ### Cue 282
 
-ANBU Marked Target cuts into the next alley.
+Kakashi clears another rooftop.
 
 ### Cue 283
 
-Then stops.
+Nothing.
 
 ### Cue 284
 
-A small ninken is sitting in the route ahead of him.
+He drops to street level.
 
 ### Cue 285
 
-Kakashi lands behind.
+Checks the crossing.
 
 ### Cue 286
 
-Then why are you still following me?
+The route has split too many times.
 
 ### Cue 287
 
-You're the part I haven't finished.
+Whatever lead remained after the fight is gone.
 
 ### Cue 288
 
-He's thinking about running.
+He stops chasing before guesswork becomes a substitute for a trail.
 
 ### Cue 289
 
-You two always this irritating?
+The package is still secured against him.
 
 ### Cue 290
 
-We just met.
+The first man is gone.
 
 ### Cue 291
 
-ANBU Marked Target finds the opening first.
+Those facts can both be true.
 
 ### Cue 292
 
-Kakashi loses the fight.
+ANBU Marked Target cuts into the next alley.
 
 ### Cue 293
 
-He does not lose the package with it.
+Then stops.
 
 ### Cue 294
 
-You kept the important part.
+A small ninken is sitting in the route ahead of him.
 
 ### Cue 295
 
-ANBU Marked Target goes down.
+Kakashi lands behind.
 
 ### Cue 296
 
-Kakashi stays on him until the fight is unquestionably over.
+Then why are you still following me?
 
 ### Cue 297
 
-Pakkun stays where he can see both of them.
+You were still part of it.
 
 ### Cue 298
 
-The package remains secure.
+He'll run if you let him.
 
 ### Cue 299
 
-The man does not.
+You don't even know each other.
 
 ### Cue 300
 
-Not yet.
+Doesn't matter.
 
 ### Cue 301
 
-Masked Interceptor goes down quickly enough that the next problem is still audible.
+ANBU Marked Target finds the opening first.
 
 ### Cue 302
 
-Footsteps.
+Kakashi loses the fight.
 
 ### Cue 303
 
-Fading.
+He does not lose the package with it.
 
 ### Cue 304
 
-Not gone.
+Then report both.
 
 ### Cue 305
 
-Kakashi looks once at the masked woman.
+ANBU Marked Target goes down.
 
 ### Cue 306
 
-His attention snaps back to the package route.
+Kakashi stays on him until the fight is unquestionably over.
 
 ### Cue 307
 
-Package Smuggler has a lead.
+Pakkun stays where he can see both of them.
 
 ### Cue 308
 
-Not an insurmountable one.
+The package remains secure.
 
 ### Cue 309
 
-Masked Interceptor goes down.
+The man does not.
 
 ### Cue 310
 
-Too late.
+Not yet.
 
 ### Cue 311
 
-Kakashi listens toward the route Package Smuggler took.
+Masked Interceptor goes down quickly enough that the next problem is still audible.
 
 ### Cue 312
 
-Package Smuggler has had too much time.
+Footsteps.
 
 ### Cue 313
 
-Winning here does not pull him back into reach.
+Fading.
 
 ### Cue 314
 
-Kakashi moves.
+Not gone.
 
 ### Cue 315
 
-Package Smuggler gets through him.
+Kakashi looks once at the masked woman.
 
 ### Cue 316
 
-The package stays with him.
+His attention snaps back to the package route.
 
 ### Cue 317
 
-Kakashi has fought twice for the same objective tonight.
+Package Smuggler has a lead.
 
 ### Cue 318
 
-The second loss closes what little trail remained.
+Not an insurmountable one.
 
 ### Cue 319
 
-Kakashi stays on him long enough to know the fight is finished.
+Masked Interceptor goes down.
 
 ### Cue 320
 
-Then his attention moves to the objective.
+Too late.
 
 ### Cue 321
 
-He takes the package from the defeated man's reach.
+Kakashi listens toward the route Package Smuggler took.
 
 ### Cue 322
 
-Checks the seal.
+Package Smuggler has had too much time.
 
 ### Cue 323
 
-Secures it against himself.
+Winning here does not pull him back into reach.
 
 ### Cue 324
 
-Only then does he look farther down the route.
+Kakashi moves.
 
 ### Cue 325
 
-Kakashi leaves Package Smuggler behind.
+Package Smuggler gets through him.
 
 ### Cue 326
 
-The package is secured.
+The package stays with him.
 
 ### Cue 327
 
-The first man's trail is thin.
+Kakashi has fought twice for the same objective tonight.
 
 ### Cue 328
 
-Still usable.
+The second loss closes what little trail remained.
 
 ### Cue 329
 
-Kakashi takes it.
+Kakashi stays on him long enough to know the fight is finished.
 
 ### Cue 330
 
-The man looks at it.
+Then his attention moves to the objective.
 
 ### Cue 331
 
-The ninken looks past him.
+He takes the package from the defeated man's reach.
 
 ### Cue 332
 
-Pakkun's ears lift.
+Checks the seal.
 
 ### Cue 333
 
-Kakashi keeps his eye on the man between them.
+Secures it against himself.
 
 ### Cue 334
 
-ANBU Marked Target notices the package secured against Kakashi.
+Only then does he look farther down the route.
 
 ### Cue 335
 
-Kakashi shifts his stance.
+Kakashi leaves Package Smuggler behind.
 
 ### Cue 336
 
-You were the first man in the exchange.
+The package is secured.
 
 ### Cue 337
 
-And that matters more than finishing the assignment?
+The first man's trail is thin.
 
 ### Cue 338
 
-The assignment is here.
+Still usable.
 
 ### Cue 339
 
-Kakashi touches the package once.
+Kakashi takes it.
 
 ### Cue 340
 
-Then looks back at him.
+The man looks at it.
 
 ### Cue 341
 
-Pakkun rises.
+The ninken looks past him.
 
 ### Cue 342
 
-ANBU Marked Target glances toward the alley mouth.
+Pakkun's ears lift.
 
 ### Cue 343
 
-Pakkun notices.
+Kakashi keeps his eye on the man between them.
 
 ### Cue 344
 
-Pakkun gives him a flat look.
+ANBU Marked Target notices the package secured against Kakashi.
 
 ### Cue 345
 
-The recovered objective was secured before this confrontation began.
+Kakashi shifts his stance.
 
 ### Cue 346
 
-ANBU Marked Target looks once toward it.
+You were the first man in the exchange.
 
 ### Cue 347
 
-Then toward the route out.
+And that matters more than finishing the assignment?
 
 ### Cue 348
 
-He chooses distance.
+The assignment is here.
 
 ### Cue 349
 
-By the time Kakashi can force himself back into the pursuit, the man is gone.
+Kakashi touches the package once.
 
 ### Cue 350
 
-Pakkun remains nearby.
+Then looks back at him.
 
 ### Cue 351
 
-Quiet for once.
+You're the part I haven't finished.
 
 ### Cue 352
 
-Kakashi looks down at the package.
+Pakkun rises.
 
 ### Cue 353
 
-A beat.
+ANBU Marked Target glances toward the alley mouth.
 
 ### Cue 354
 
-Pakkun's voice is drier when he continues.
+Pakkun notices.
 
 ### Cue 355
 
-From deeper in the alley, Kakashi can see the meeting but cannot hear enough of it.
+He's thinking about running.
 
 ### Cue 356
 
-He leaves the safer distance behind and moves along the darker wall, avoiding the strips of lantern light on the wet stone.
+You two always this irritating?
 
 ### Cue 357
 
-One doorway gives him the next. Then another.
+Pakkun gives him a flat look.
 
 ### Cue 358
 
-The Sakura tree grows larger beyond the alley mouth.
+We just met.
 
 ### Cue 359
 
-So do the voices.
+The recovered objective was secured before this confrontation began.
 
 ### Cue 360
 
-Neither man looks toward Kakashi.
+ANBU Marked Target looks once toward it.
 
 ### Cue 361
 
-He settles into the shadow near the end of the alley, close enough to hear them clearly.
+Then toward the route out.
 
 ### Cue 362
 
-You said once I hand it over, I'm done.
+He chooses distance.
 
 ### Cue 363
 
-You are.
+By the time Kakashi can force himself back into the pursuit, the man is gone.
 
 ### Cue 364
 
-And if somebody followed me?
+Pakkun remains nearby.
 
 ### Cue 365
 
-Package Smuggler glances along the main street.
+Quiet for once.
 
 ### Cue 366
 
-Then you keep walking.
+You kept the important part.
 
 ### Cue 367
 
-With it?
+Kakashi looks down at the package.
 
 ### Cue 368
 
-Now Package Smuggler looks at him.
+A beat.
 
 ### Cue 369
 
-Until I say otherwise.
+Pakkun's voice is drier when he continues.
 
 ### Cue 370
 
-That wasn't the plan.
+Both things can be true.
 
 ### Cue 371
 
-Plans are for empty streets.
+From deeper in the alley, Kakashi can see the meeting but cannot hear enough of it.
 
 ### Cue 372
 
-And if the street is empty?
+He leaves the safer distance behind and moves along the darker wall, avoiding the strips of lantern light on the wet stone.
 
 ### Cue 373
 
-Package Smuggler holds out his hand.
+One doorway gives him the next. Then another.
 
 ### Cue 374
 
-Then I take it, and you disappear.
+The Sakura tree grows larger beyond the alley mouth.
 
 ### Cue 375
 
-Where does it go after you?
+So do the voices.
 
 ### Cue 376
 
-The hint of a smile reaches Package Smuggler.
+Neither man looks toward Kakashi.
 
 ### Cue 377
 
-Away from you.
+He settles into the shadow near the end of the alley, close enough to hear them clearly.
 
 ### Cue 378
 
-Kakashi has what he came closer for: the carrier's role ends at the handoff, unless the street stops being safe.
+You said once I hand it over, I'm done.
 
 ### Cue 379
 
-What happens after Package Smuggler takes the package is still unknown.
+You are.
 
 ### Cue 380
 
-The waiting hand remains between the two men. Kakashi has only a few seconds to decide whether to let it happen.
+And if somebody followed me?
 
 ### Cue 381
 
-Kakashi moves closer along the darker side of the alley until the voices begin to carry.
+Package Smuggler glances along the main street.
 
 ### Cue 382
 
-Package Smuggler does not answer. His eyes drop to a thin pool of rainwater along the street.
+Then you keep walking.
 
 ### Cue 383
 
-Lantern light trembles across the reflection—and so does Kakashi's movement in the alley.
+With it?
 
 ### Cue 384
 
-Hold it.
+Now Package Smuggler looks at him.
 
 ### Cue 385
 
-ANBU Marked Target freezes with one hand still over the package.
+Until I say otherwise.
 
 ### Cue 386
 
-What?
+That wasn't the plan.
 
 ### Cue 387
 
-Someone's close.
+Plans are for empty streets.
 
 ### Cue 388
 
-The target starts to turn.
+And if the street is empty?
 
 ### Cue 389
 
-Don't. Keep it.
+Package Smuggler holds out his hand.
 
 ### Cue 390
 
-Main street. Go.
+Then I take it, and you disappear.
 
 ### Cue 391
 
-ANBU Marked Target moves immediately, taking the package toward the Sakura tree.
+Where does it go after you?
 
 ### Cue 392
 
-Package Smuggler stays behind and turns toward the alley.
+The hint of a smile reaches Package Smuggler.
 
 ### Cue 393
 
-He has not found Kakashi's exact position yet, but he is walking toward it.
+Away from you.
 
 ### Cue 394
 
-Kakashi wanted more information. Instead, he changed the handoff.
+Kakashi has what he came closer for: the carrier's role ends at the handoff, unless the street stops being safe.
 
 ### Cue 395
 
-Now he has to choose which consequence to chase.
+What happens after Package Smuggler takes the package is still unknown.
 
 ### Cue 396
 
-ANBU Marked Target is already moving away with the package. Kakashi goes after him.
+The waiting hand remains between the two men. Kakashi has only a few seconds to decide whether to let it happen.
 
 ### Cue 397
 
-Package Smuggler catches the movement at the alley mouth.
+Kakashi moves closer along the darker side of the alley until the voices begin to carry.
 
 ### Cue 398
 
-There!
+Package Smuggler does not answer. His eyes drop to a thin pool of rainwater along the street.
 
 ### Cue 399
 
-The carrier looks back and sees Kakashi for the first time.
+Lantern light trembles across the reflection—and so does Kakashi's movement in the alley.
 
 ### Cue 400
 
-A kid?
+Hold it.
 
 ### Cue 401
 
-Kakashi runs straight past Package Smuggler's reach.
+ANBU Marked Target freezes with one hand still over the package.
 
 ### Cue 402
 
-Don't stop!
+What?
 
 ### Cue 403
 
-You said I was done!
+Someone's close.
 
 ### Cue 404
 
-Not while you're holding it!
+The target starts to turn.
 
 ### Cue 405
 
-That gives Kakashi one more useful fact: the carrier was never meant to keep the package.
+Don't. Keep it.
 
 ### Cue 406
 
-The chase breaks into the open around the Sakura tree.
+Main street. Go.
 
 ### Cue 407
 
-What do you want?
+ANBU Marked Target moves immediately, taking the package toward the Sakura tree.
 
 ### Cue 408
 
-The package.
+Package Smuggler stays behind and turns toward the alley.
 
 ### Cue 409
 
-The man gives a short, breathless laugh and changes direction around the tree.
+He has not found Kakashi's exact position yet, but he is walking toward it.
 
 ### Cue 410
 
-Kakashi stops trying to match his speed and starts reading the exits instead.
+Kakashi wanted more information. Instead, he changed the handoff.
 
 ### Cue 411
 
-Kakashi cuts inside the target's route, using the Sakura tree to shorten the distance.
+Now he has to choose which consequence to chase.
 
 ### Cue 412
 
-For several seconds they lose sight of each other.
+ANBU Marked Target is already moving away with the package. Kakashi goes after him.
 
 ### Cue 413
 
-Kakashi hears footsteps change direction and moves to intercept.
+Package Smuggler catches the movement at the alley mouth.
 
 ### Cue 414
 
-Wrong exit.
+There!
 
 ### Cue 415
 
-By the time he reaches the far side, ANBU Marked Target is already at the edge of the square with the package still under his arm.
+The carrier looks back and sees Kakashi for the first time.
 
 ### Cue 416
 
-Two late-night pedestrians step between them.
+A kid?
 
 ### Cue 417
 
-Kakashi changes line. The target uses the interruption and disappears between the buildings.
+Kakashi runs straight past Package Smuggler's reach.
 
 ### Cue 418
 
-Kakashi reaches the corner seconds later to find three empty routes and nothing he can separate from the ordinary sounds of Konoha.
+Don't stop!
 
 ### Cue 419
 
-Package Smuggler is gone too.
+You said I was done!
 
 ### Cue 420
 
-Kakashi stays still long enough to fix the mistake in his memory, then turns back toward ANBU.
+Not while you're holding it!
 
 ### Cue 421
 
-Kakashi cuts inside the target's route.
+That gives Kakashi one more useful fact: the carrier was never meant to keep the package.
 
 ### Cue 422
 
-ANBU Marked Target reaches the far side of the alley and stops.
+The chase breaks into the open around the Sakura tree.
 
 ### Cue 423
 
-A small ninken is standing in the exit.
+What do you want?
 
 ### Cue 424
 
-Seriously?
+The package.
 
 ### Cue 425
 
-Kakashi arrives behind him.
+The man gives a short, breathless laugh and changes direction around the tree.
 
 ### Cue 426
 
-You've been chasing this thing all night.
+Kakashi stops trying to match his speed and starts reading the exits instead.
 
 ### Cue 427
 
-You've been running with it.
+Kakashi cuts inside the target's route, using the Sakura tree to shorten the distance.
 
 ### Cue 428
 
-The target glances between Kakashi and the ninken.
+For several seconds they lose sight of each other.
 
 ### Cue 429
 
-And now?
+Kakashi hears footsteps change direction and moves to intercept.
 
 ### Cue 430
 
-Kakashi's eye settles on the package.
+Wrong exit.
 
 ### Cue 431
 
-Now you stop.
+By the time he reaches the far side, ANBU Marked Target is already at the edge of the square with the package still under his arm.
 
 ### Cue 432
 
-ANBU Marked Target keeps one hand close to the package while Pakkun holds the escape line.
+Two late-night pedestrians step between them.
 
 ### Cue 433
 
-He is waiting for Kakashi to demand it.
+Kakashi changes line. The target uses the interruption and disappears between the buildings.
 
 ### Cue 434
 
-Where was it going?
+Kakashi reaches the corner seconds later to find three empty routes and nothing he can separate from the ordinary sounds of Konoha.
 
 ### Cue 435
 
-The question catches him off guard.
+Package Smuggler is gone too.
 
 ### Cue 436
 
-You think they told me?
+Kakashi stays still long enough to fix the mistake in his memory, then turns back toward ANBU.
 
 ### Cue 437
 
-You asked.
+Kakashi cuts inside the target's route.
 
 ### Cue 438
 
-The man gives him a tired look.
+ANBU Marked Target reaches the far side of the alley and stops.
 
 ### Cue 439
 
-I carry it to him. He carries it somewhere else.
+A small ninken is standing in the exit.
 
 ### Cue 440
 
-Where?
+Seriously?
 
 ### Cue 441
 
-I asked the same thing.
+Kakashi arrives behind him.
 
 ### Cue 442
 
-Kakashi remembers Package Smuggler's answer: away from you.
+You've been chasing this thing all night.
 
 ### Cue 443
 
-He didn't tell you.
+You've been running with it.
 
 ### Cue 444
 
-Now you're caught up.
+The target glances between Kakashi and the ninken.
 
 ### Cue 445
 
-Efficient.
+And now?
 
 ### Cue 446
 
-Neither man laughs.
+Kakashi's eye settles on the package.
 
 ### Cue 447
 
-The alley comes back into focus with Kakashi on one knee and ANBU Marked Target still standing.
+Now you stop.
 
 ### Cue 448
 
-The man is breathing hard, but the package is still secured against him.
+ANBU Marked Target keeps one hand close to the package while Pakkun holds the escape line.
 
 ### Cue 449
 
-Pakkun recovers a few paces away.
+He is waiting for Kakashi to demand it.
 
 ### Cue 450
 
-He adjusts the package beneath his clothing.
+Where was it going?
 
 ### Cue 451
 
-I answered.
+The question catches him off guard.
 
 ### Cue 452
 
-He starts backing toward the far end of the alley.
+You think they told me?
 
 ### Cue 453
 
-Pakkun rises, but stays with Kakashi rather than chasing on his own.
+You asked.
 
 ### Cue 454
 
-ANBU Marked Target reaches the corner and looks back once.
+The man gives him a tired look.
 
 ### Cue 455
 
-Then he is gone with the package.
+I carry it to him. He carries it somewhere else.
 
 ### Cue 456
 
-Persistent.
+Where?
 
 ### Cue 457
 
-So was I.
+I asked the same thing.
 
 ### Cue 458
 
-Was?
+Kakashi remembers Package Smuggler's answer: away from you.
 
 ### Cue 459
 
-Kakashi listens down the empty street.
+He didn't tell you.
 
 ### Cue 460
 
-Tonight.
+Now you're caught up.
 
 ### Cue 461
 
-There is no trail left worth pretending is one. Kakashi turns back toward the ANBU meeting point, and Pakkun follows.
+Pakkun looks between them.
 
 ### Cue 462
 
-ANBU Marked Target ends the fight on one knee.
+Efficient.
 
 ### Cue 463
 
-The package came loose during the exchange and lies several feet away.
+Neither man laughs.
 
 ### Cue 464
 
-Both men see it.
+The alley comes back into focus with Kakashi on one knee and ANBU Marked Target still standing.
 
 ### Cue 465
 
-ANBU Marked Target moves first. Pakkun steps into his path.
+The man is breathing hard, but the package is still secured against him.
 
 ### Cue 466
 
-Kakashi reaches the package, checks the seal, and secures it.
+Pakkun recovers a few paces away.
 
 ### Cue 467
 
-So that's it.
+He adjusts the package beneath his clothing.
 
 ### Cue 468
 
-That part is.
+I answered.
 
 ### Cue 469
 
-The man's eyes move toward the open end of the alley.
+He starts backing toward the far end of the alley.
 
 ### Cue 470
 
-Pakkun shifts half a step and closes it again.
+Pakkun rises, but stays with Kakashi rather than chasing on his own.
 
 ### Cue 471
 
-You really like running.
+ANBU Marked Target reaches the corner and looks back once.
 
 ### Cue 472
 
-You really like getting in the way.
+Then he is gone with the package.
 
 ### Cue 473
 
-It's working.
+Persistent.
 
 ### Cue 474
 
-Kakashi approaches.
+So was I.
 
 ### Cue 475
 
-You got what you wanted.
+Was?
 
 ### Cue 476
 
-Kakashi does not leave.
+Kakashi listens down the empty street.
 
 ### Cue 477
 
-Recognition reaches the man's face.
+Tonight.
 
 ### Cue 478
 
-Ah.
+There is no trail left worth pretending is one. Kakashi turns back toward the ANBU meeting point, and Pakkun follows.
 
 ### Cue 479
 
-The package is secure and the target is beaten.
+ANBU Marked Target ends the fight on one knee.
 
 ### Cue 480
 
-What happens to him now is Kakashi's choice.
+The package came loose during the exchange and lies several feet away.
 
 ### Cue 481
 
-ANBU Marked Target keeps one hand over the package.
+Both men see it.
 
 ### Cue 482
 
-Kakashi stops watching the package and starts watching the man's balance instead.
+ANBU Marked Target moves first. Pakkun steps into his path.
 
 ### Cue 483
 
-The target notices too late.
+Kakashi reaches the package, checks the seal, and secures it.
 
 ### Cue 484
 
-Kakashi attacks his footing without warning.
+So that's it.
 
 ### Cue 485
 
-ANBU Marked Target twists away and reaches instinctively for the package.
+That part is.
 
 ### Cue 486
 
-Pakkun reacts on his own, lunging across that hand.
+The man's eyes move toward the open end of the alley.
 
 ### Cue 487
 
-The target jerks aside to save his leg and the package tears loose, skidding across the wet stone.
+Pakkun shifts half a step and closes it again.
 
 ### Cue 488
 
-All three turn toward it.
+You really like running.
 
 ### Cue 489
 
-You've got to be kidding me.
+You really like getting in the way.
 
 ### Cue 490
 
-Nope.
+It's working.
 
 ### Cue 491
 
-Kakashi cuts him off from one side while Pakkun blocks the nearest route to the package.
+Kakashi approaches.
 
 ### Cue 492
 
-For the first time all night, nobody has it.
+You got what you wanted.
 
 ### Cue 493
 
-ANBU Marked Target stops looking for an exit. Now he has to fight his way back to the package.
+Kakashi does not leave.
 
 ### Cue 494
 
-ANBU Marked Target wins the fight and uses the opening to escape.
+Recognition reaches the man's face.
 
 ### Cue 495
 
-The package is still on the ground when he leaves.
+Ah.
 
 ### Cue 496
 
-Pakkun gets between the target and the objective long enough for Kakashi to recover it.
+The package is secure and the target is beaten.
 
 ### Cue 497
 
-By the time Kakashi is back on his feet with the package secured, the man is gone.
+What happens to him now is Kakashi's choice.
 
 ### Cue 498
 
-Pakkun remains between him and the loose package while Kakashi retrieves it.
+ANBU Marked Target keeps one hand over the package.
 
 ### Cue 499
 
-The seal is intact.
+Kakashi stops watching the package and starts watching the man's balance instead.
 
 ### Cue 500
 
-Kakashi secures the package and turns back to the defeated man.
+The target notices too late.
 
 ### Cue 501
 
-The objective is recovered. What happens to the target is still a choice.
+Kakashi attacks his footing without warning.
 
 ### Cue 502
 
-ANBU Marked Target is already leaving with the package.
+ANBU Marked Target twists away and reaches instinctively for the package.
 
 ### Cue 503
 
-Package Smuggler is moving toward the alley instead.
+Pakkun reacts on his own, lunging across that hand.
 
 ### Cue 504
 
-Kakashi gives the disappearing package one look, then steps out to meet the man in front of him.
+The target jerks aside to save his leg and the package tears loose, skidding across the wet stone.
 
 ### Cue 505
 
-Wrong one.
+All three turn toward it.
 
 ### Cue 506
 
-You were waiting for it.
+You've got to be kidding me.
 
 ### Cue 507
 
-Package Smuggler glances toward the street the carrier used.
+Nope.
 
 ### Cue 508
 
-Was.
+Kakashi cuts him off from one side while Pakkun blocks the nearest route to the package.
 
 ### Cue 509
 
-Then you know where it was going.
+For the first time all night, nobody has it.
 
 ### Cue 510
 
-A faint smile reaches the man's face.
+ANBU Marked Target stops looking for an exit. Now he has to fight his way back to the package.
 
 ### Cue 511
 
-And you chose me instead of following it.
+ANBU Marked Target wins the fight and uses the opening to escape.
 
 ### Cue 512
 
-I chose to stop you.
+The package is still on the ground when he leaves.
 
 ### Cue 513
 
-The smile disappears. Package Smuggler reaches for his weapon.
+Pakkun gets between the target and the objective long enough for Kakashi to recover it.
 
 ### Cue 514
 
-Then stop me.
+By the time Kakashi is back on his feet with the package secured, the man is gone.
 
 ### Cue 515
 
-Package Smuggler wins the fight and disappears before Kakashi can recover.
+Pakkun remains between him and the loose package while Kakashi retrieves it.
 
 ### Cue 516
 
-ANBU Marked Target is already gone with the package.
+The seal is intact.
 
 ### Cue 517
 
-Kakashi is left with neither the objective nor a prisoner.
+Kakashi secures the package and turns back to the defeated man.
 
 ### Cue 518
 
-The package is still gone with ANBU Marked Target.
+The objective is recovered. What happens to the target is still a choice.
 
 ### Cue 519
 
-The man Kakashi chose to stop is beaten and still within reach.
+ANBU Marked Target is already leaving with the package.
 
 ### Cue 520
 
-What happens to him now will not recover the package.
+Package Smuggler is moving toward the alley instead.
 
 ### Cue 521
 
-Kakashi does not follow either man. He cuts across both routes toward the Sakura tree.
+Kakashi gives the disappearing package one look, then steps out to meet the man in front of him.
 
 ### Cue 522
 
-ANBU Marked Target sees what he is doing first.
+Wrong one.
 
 ### Cue 523
 
-Don't let him get in front of you!
+You were waiting for it.
 
 ### Cue 524
 
-Kakashi reaches the remaining exit line.
+Package Smuggler glances toward the street the carrier used.
 
 ### Cue 525
 
-ANBU Marked Target turns and finds a small ninken already standing in the street ahead.
+Was.
 
 ### Cue 526
 
-Oh, come on.
+Then you know where it was going.
 
 ### Cue 527
 
-Pakkun looks past him toward Kakashi.
+A faint smile reaches the man's face.
 
 ### Cue 528
 
-Package Smuggler reaches the choke point behind them.
+And you chose me instead of following it.
 
 ### Cue 529
 
-No one has a clean way out.
+I chose to stop you.
 
 ### Cue 530
 
-Kakashi Hatake vs ANBU Marked Target + Package Smuggler.
+The smile disappears. Package Smuggler reaches for his weapon.
 
 ### Cue 531
 
-The two men break through the choke point.
+Then stop me.
 
 ### Cue 532
 
-ANBU Marked Target escapes with the package. Package Smuggler disappears with him.
+Package Smuggler wins the fight and disappears before Kakashi can recover.
 
 ### Cue 533
 
-Pakkun stays beside Kakashi as the street clears.
+ANBU Marked Target is already gone with the package.
 
 ### Cue 534
 
-Kakashi has already shortened the distance and heard the contingency.
+Kakashi is left with neither the objective nor a prisoner.
 
 ### Cue 535
 
-ANBU Marked Target's hand is still over the package. Package Smuggler is waiting.
+The package is still gone with ANBU Marked Target.
 
 ### Cue 536
 
-Kakashi uses the closer position to try to remove the package before the handoff can finish.
+The man Kakashi chose to stop is beaten and still within reach.
 
 ### Cue 537
 
-Kakashi reaches the package, but ANBU Marked Target catches the movement.
+What happens to him now will not recover the package.
 
 ### Cue 538
 
-Package Smuggler reacts immediately.
+Kakashi does not follow either man. He cuts across both routes toward the Sakura tree.
 
 ### Cue 539
 
-The theft fails and the quiet handoff fails with it.
+ANBU Marked Target sees what he is doing first.
 
 ### Cue 540
 
-Masked Interceptor never enters this version of the exchange.
+Don't let him get in front of you!
 
 ### Cue 541
 
-You should've stayed in the alley.
+Kakashi reaches the remaining exit line.
 
 ### Cue 542
 
-You noticed me there too.
+ANBU Marked Target turns and finds a small ninken already standing in the street ahead.
 
 ### Cue 543
 
-Eventually.
+Oh, come on.
 
 ### Cue 544
 
-Both men turn on Kakashi.
+Pakkun looks past him toward Kakashi.
 
 ### Cue 545
 
-ANBU Marked Target and Package Smuggler break away after the fight.
+Package Smuggler reaches the choke point behind them.
 
 ### Cue 546
 
-The original carrier keeps the package.
+No one has a clean way out.
 
 ### Cue 547
 
-The handoff never happens, and the masked shinobi never appears.
+Kakashi Hatake vs ANBU Marked Target + Package Smuggler.
 
 ### Cue 548
 
-Both men go down.
+The two men break through the choke point.
 
 ### Cue 549
 
-Kakashi goes to ANBU Marked Target first and recovers the package.
+ANBU Marked Target escapes with the package. Package Smuggler disappears with him.
 
 ### Cue 550
 
-He secures it, then turns back to the two defeated men.
+Pakkun stays beside Kakashi as the street clears.
 
 ### Cue 551
 
-No masked shinobi appears.
+Kakashi has already shortened the distance and heard the contingency.
 
 ### Cue 552
 
-The package is safe. The two men are still Kakashi's decision.
+ANBU Marked Target's hand is still over the package. Package Smuggler is waiting.
 
 ### Cue 553
+
+Kakashi uses the closer position to try to remove the package before the handoff can finish.
+
+### Cue 554
+
+Kakashi reaches the package, but ANBU Marked Target catches the movement.
+
+### Cue 555
+
+Package Smuggler reacts immediately.
+
+### Cue 556
+
+The theft fails and the quiet handoff fails with it.
+
+### Cue 557
+
+Masked Interceptor never enters this version of the exchange.
+
+### Cue 558
+
+You should've stayed in the alley.
+
+### Cue 559
+
+You noticed me there too.
+
+### Cue 560
+
+Eventually.
+
+### Cue 561
+
+Both men turn on Kakashi.
+
+### Cue 562
+
+ANBU Marked Target and Package Smuggler break away after the fight.
+
+### Cue 563
+
+The original carrier keeps the package.
+
+### Cue 564
+
+The handoff never happens, and the masked shinobi never appears.
+
+### Cue 565
+
+Both men go down.
+
+### Cue 566
+
+Kakashi goes to ANBU Marked Target first and recovers the package.
+
+### Cue 567
+
+He secures it, then turns back to the two defeated men.
+
+### Cue 568
+
+No masked shinobi appears.
+
+### Cue 569
+
+The package is safe. The two men are still Kakashi's decision.
+
+### Cue 570
 
 Kakashi Hatake vs ANBU Marked Target + Package Smuggler + Masked Interceptor.
