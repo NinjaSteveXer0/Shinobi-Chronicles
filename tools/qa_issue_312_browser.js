@@ -722,8 +722,8 @@ async function shot(page,name,selector=null){
     assert.strictEqual(amtLifecycleAfterFirst.enemyTurnDelta,1,"#312 browser enemy-turn bridge did not schedule exactly one AMT opportunity");
     assert.strictEqual(amtLifecycleAfterFirst.playerOpportunity,amtLifecycleLaunch.playerOpportunityBefore+1,"#312 player opportunity did not advance exactly once");
     assert.strictEqual(amtLifecycleAfterFirst.enemyOpportunity,amtLifecycleLaunch.enemyOpportunityBefore+1,"#312 enemy opportunity did not advance exactly once");
-    assert.strictEqual(amtLifecycleAfterFirst.selectedSkillId,null,"#312 successful Skill selection survived semantic resolution");
-    assert.strictEqual(amtLifecycleAfterFirst.selectedTargetRef,null,"#312 successful Skill target survived semantic resolution");
+    assert.strictEqual(amtLifecycleAfterFirst.selectedSkillId,"academy_kakashi_clone_feint","#312 repeat-Skill presentation did not reselect the successfully used Skill");
+    assert(amtLifecycleAfterFirst.selectedTargetRef&&amtLifecycleAfterFirst.selectedTargetRef.participantId==="academy_kakashi_origin_amt","#312 repeat-Skill presentation lost the current legal target: "+JSON.stringify(amtLifecycleAfterFirst.selectedTargetRef));
 
     await amtSkillsButton.click();
     await page.waitForFunction(()=>{
@@ -742,10 +742,10 @@ async function shot(page,name,selector=null){
       };
     });
     assert.strictEqual(amtReopened.tray,"skills","#312 SKILLS tray did not reopen after AMT response");
-    assert.strictEqual(amtReopened.selectedSkillId,null,"#312 stale selected Skill blocks the returned player opportunity");
+    assert.strictEqual(amtReopened.selectedSkillId,"academy_kakashi_clone_feint","#312 repeat-Skill presentation drifted after AMT response");
     assert(amtReopened.readySkillIds.length>0,"#312 no legal Skill remains selectable after AMT response: "+JSON.stringify(amtReopened));
 
-    const nextReadyId=amtReopened.readySkillIds[0];
+    const nextReadyId=amtReopened.readySkillIds.find(id=>id!==amtReopened.selectedSkillId)||amtReopened.readySkillIds[0];
     await page.locator('.battle-live-skill-deck .battle-dev-skill-card[data-skill-id="'+nextReadyId+'"]').click();
     await page.waitForFunction(()=>{
       const battleId=currentBattle?.battleId;
