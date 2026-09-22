@@ -326,7 +326,7 @@ function deriveProjectionChoreography(root,previous,next,p,departures=[]){
   // Depart committed outgoing actors before revealing newly mounted actors.
   // The shared owner pre-stages ENTER subjects as invisible until their cue starts,
   // preventing a semantic commit from painting an accidental four-card tableau.
-  for(const row of departures)cues.push({kind:row.kind,actorId:row.ghostId});
+  for(const row of departures)cues.push({kind:row.kind,actorId:row.ghostId,removeOnComplete:true});
   const prevIds=new Set((previous.actors||[]).map(a=>a.id));
   for(const actor of next.actors||[]){
     if(!prevIds.has(actor.id))cues.push({kind:actor.slot==="mi"?"SURPRISE_ENTRY":"ENTER",actorId:actor.id,fromAnchor:actor.slot==="mi"?"FAR_ENTRY_RIGHT":null});
@@ -505,6 +505,7 @@ function diagnostics(){
     adaptiveActorProminence:installStyle.toString().includes('data-count="1"')&&installStyle.toString().includes('data-count="2"'),
     sharedChoreographyConsumer:String(playProjectionTransition).includes("playStoryChoreography33900"),
     departuresPrecedeNewEntries:String(deriveProjectionChoreography).indexOf("for(const row of departures)")<String(deriveProjectionChoreography).indexOf("const prevIds"),
+    departureGhostCleanupOwnedByCue:String(deriveProjectionChoreography).includes("removeOnComplete:true"),
     semanticDiffIgnoresHarmlessParticipantRefresh:!String(render).includes('JSON.stringify(previous.participantStates)!==JSON.stringify(next.participantStates)'),
     packageTokenConsumesHolderTruth:String(syncPackageToken).includes("state.package")&&String(syncPackageToken).includes("packageHolder"),
     speakerFocusUsesCurrentCue:String(syncStandard).includes("speakerActorId"),
