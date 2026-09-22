@@ -308,17 +308,121 @@ Do not satisfy this benchmark by layering motion/effects over an otherwise uncha
 
 Create a clear performance lane in whatever canonical composition best communicates the resolved action.
 
-### Battle composition
+### Battle composition — opposing Formation Stage
 
-- player/active actor zone on the left;
-- exact target zone on the right;
-- non-active participants remain visible but reduced in prominence;
-- action/technique label appears near the top-center performance lane;
-- Battle PL/state remains adjacent to each participant, not floating as the only central event;
-- result delta appears near the affected target before/while the authoritative PL readout updates;
-- next-actor focus occurs only after the result is visually settled.
+Stephen's 2026-09-22 product direction closes the benchmark around an **opposing Formation Stage**, not two equal active portraits plus HUD.
 
-Recommended active participant portrait scale: 1.0. Non-active participants: approximately 0.78–0.86 scale/brightness treatment without hiding them.
+The intended player read is:
+
+`two deployed formations -> current actor enters confrontation focus -> exact target(s) enter opposing focus -> action resolves in the battlefield -> factual result/state updates -> formation settles -> next authoritative actor enters focus`
+
+This is a presentation model only. Formation positions are **not Combat positions** and do not create range, front/back-row rules, aggro, cover, flanking, line-of-sight, deployment legality or target legality.
+
+#### Battlefield hierarchy
+
+1. **Environment plane** — reusable Battle background remains continuously readable and should occupy the dominant visual field.
+2. **Player formation plane** — only currently deployed/authorised Battle participants for the player side.
+3. **Enemy formation plane** — only currently deployed/authorised Battle participants for the opposing side.
+4. **Confrontation lane** — temporary presentation focus for the current actor and exact selected/resolved target ref(s).
+5. **Participant-local state** — Battle PL and statuses remain visually tethered to the relevant participant.
+6. **Action/control dock** — Skills/actions/targeting information remain accessible without becoming the dominant screen mass.
+7. **Minimal turn/result layer** — action label, factual result/delta and next-actor indication appear only as needed.
+
+The battlefield and participants must remain the dominant visual read. HUD furniture must not visually replace the battlefield.
+
+#### Adaptive formations
+
+Do not use one fixed row of equal portraits.
+
+- one-on-one Battle should enlarge both participants and use the battlefield confidently rather than preserving empty teammate slots;
+- two-to-four deployed participants per side should form a shallow depth stack/wedge/arc behind that side's current confrontation focus;
+- supporting deployed participants remain readable but smaller, slightly recessed and lower-emphasis than the current actor/target;
+- source portrait pixel dimensions such as 1024×1024 are asset resolution only; runtime display scale is composition-driven;
+- reserves, undeployed roster members and merely-owned Characters are not rendered into the Battle formation;
+- summons/companions appear only when current Battle authority says they are Battle participants.
+
+Exact responsive coordinates remain Coding/UI implementation detail. The semantic requirement is **side association + depth + active confrontation**, not a literal copied formation diagram.
+
+#### Confrontation focus
+
+The current actor and exact target must become visually obvious through **movement into the confrontation lane**, not merely a border/highlight changing on static portraits.
+
+When the authoritative active actor changes:
+
+- the prior focus actor settles toward that side's formation presentation;
+- the new actor advances from their existing formation anchor into the confrontation lane;
+- those transitions may overlap so Battle feels continuous rather than turn-card swapping;
+- screen direction remains stable across the sequence.
+
+The actor does **not** automatically return merely because one visual action finishes. If Combat permits additional actions/chained actions before `nextActorRef` changes, the actor may remain in focus. Presentation follows authoritative turn/action state rather than inventing a turn boundary.
+
+#### Exact-target behaviour
+
+The phrase "opposing active participant" must not become a hidden target rule.
+
+- a single exact target may advance from its formation into opposing confrontation focus;
+- a legal off-slot target may become the focus even when another participant was previously foregrounded;
+- multiple exact targets may fan/step forward together or receive coordinated response emphasis;
+- area actions may preserve formation while all exact affected refs respond;
+- target focus never changes Combat legality and never substitutes for `targetRefs[]`.
+
+Before commit, a selected legal target may receive **selection focus** supplied by current Battle targeting state. After commit, impact/reaction uses only the exact resolver result.
+
+#### HUD placement
+
+Do not reserve the center of the battlefield for a persistent opaque performance card.
+
+- action/technique identity may use a compact top-center or near-action label;
+- factual damage/result feedback appears adjacent to the affected participant(s);
+- Battle PL/state stays attached to the participant whose state changed;
+- Skills/actions live primarily in a compact lower dock that can expand for inspection/targeting and contract when Battle playback is occurring;
+- Skill explanation/hover-to-learn remains available, but a large permanent inspector must not erase formation/battlefield presence;
+- turn information should identify the current authoritative actor without inventing future turn order not supplied by Combat.
+
+#### Visual settle
+
+After result projection:
+
+- actor/target remain in focus only as long as current authoritative Battle state requires;
+- when focus changes, they settle toward their side formation;
+- defeated/withdrawn participants only collapse/leave/recede when the committed Battle state supplies that fact;
+- formation reflow is presentation-only and must not imply a new deployment or battlefield position;
+- Story return remains caller-owned and does not inherit invented Battle formation truth.
+
+Recommended emphasis relationship is **active confrontation > deployed formation > participant-local PL/status > controls > secondary HUD**. Numeric scale ratios are guidance only and may adapt by participant count/viewport.
+
+## 11A. Coherent responsive layout interpretations
+
+The Formation Stage is one system with adaptive compositions rather than three separate Battle UIs.
+
+### A. Duel composition — 1v1 / sparse Battle
+
+The two authorised participants occupy large opposing confrontation positions over the environment. With no supporting deployment, the renderer removes empty formation furniture and gives both combatants substantially more presence.
+
+### B. Squad wedge — default multi-participant Battle
+
+This is the primary Alpha interpretation. Each side forms a shallow diagonal/depth wedge: current actor/target forward toward centre, deployed teammates visibly behind and outward on their own side. When focus changes, the incoming participant travels from their actual formation anchor into the confrontation lane while the previous focus settles back.
+
+This should feel closest to **two shinobi teams confronting one another**, while remaining readable with portrait-based assets.
+
+### C. Wide arc — crowded / multi-target fallback
+
+When participant count or viewport makes wedges too compressed, supporting participants spread into a shallow side arc/perimeter. The active confrontation remains central; exact multi-target refs can advance/focus together without overlapping the entire formation.
+
+The renderer may switch between these compositions responsively. That switch is presentation only and must not change Battle state.
+
+### Why this improves on a literal classic-JRPG copy
+
+The useful reference principle is the **formation -> confrontation -> resolution -> formation** rhythm. Shinobi Chronicles should not inherit a rigid sprite row, fixed front/back mechanics or empty turn-theatre.
+
+SC's version should exploit:
+
+- premium portrait readability;
+- depth through scale/overlap rather than equal rows;
+- environmental Battle backdrops;
+- exact target refs, including off-slot and multi-target actions;
+- fast, cancellable choreography;
+- minimal HUD during the action itself.
 
 ## 12. Battle playback timing
 
@@ -618,6 +722,23 @@ Do not propagate the choreography/performance pattern across all Origins/Story/B
 **NONE for the representative benchmark.**
 
 If runtime discovers that `academy_kakashi` lacks an approved Battle portrait mapping, that is a separate exact asset-mapping blocker and must return to UI / Assets. Do not substitute the Story card.
+
+## 25. Formation-stage product lock — Stephen 2026-09-22
+
+The Battle benchmark must now prove the following experiential model:
+
+> **Two opposing deployed formations visibly share a battlefield. The authoritative actor advances into confrontation focus, exact target ref(s) become the opposing focus, the action/result plays between them, factual state updates, and presentation settles toward formation as Battle authority advances.**
+
+Binding boundaries:
+
+- formation slots are presentation-only and are not Combat positions;
+- only deployed/authorised Battle participants appear in formation;
+- source-image resolution does not determine runtime display size;
+- action completion does not by itself imply turn completion; `nextActorRef` / current Battle authority controls focus succession;
+- exact off-slot and multi-target refs override any visual notion of a single "front enemy";
+- reusable environmental Battle backgrounds should remain visually dominant;
+- the current PR #318 two-active-card presentation is implementation evidence, not automatic experiential acceptance if it still reads as portraits plus PL/effects;
+- update the **same canonical Battle presentation owner** rather than adding another renderer/overlay.
 
 ## 25. #316 hardening lock
 
