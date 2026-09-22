@@ -130,8 +130,9 @@ assert(transitionSource.includes("is-falling")&&transitionSource.includes("is-fl
   assert.strictEqual(context.enemyDatabase.academy_kakashi_origin_amt.calibratedBasePL,18);
   assert.strictEqual(context.enemyDatabase.academy_kakashi_origin_package_smuggler.calibratedBasePL,10);
   assert.strictEqual(context.enemyDatabase.academy_kakashi_origin_masked_interceptor.calibratedBasePL,14);
-  assert(!battleSource.includes("basePLAtEntry:15"),"Kakashi Battle-entry PL is hard-coded instead of read from live authority");
-  assert(battleSource.includes("authoritativePlayerBasePLAtEntry"),"live Kakashi Battle-entry PL resolver missing");
+  const battleOperationalSource=battleSource.split("function diagnostics()")[0];
+  assert(!battleOperationalSource.includes("basePLAtEntry:15"),"Kakashi Battle-entry PL is hard-coded instead of read from live authority");
+  assert(battleOperationalSource.includes("authoritativePlayerBasePLAtEntry"),"live Kakashi Battle-entry PL resolver missing");
 }
 
 // Core scene graph executes against neutral Story/Factual mocks.
