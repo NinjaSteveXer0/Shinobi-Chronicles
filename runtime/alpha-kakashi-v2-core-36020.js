@@ -727,16 +727,16 @@ addBeat("v2_package_second_amt_intercept",{backdrop:B.intercept,location:"KONOHA
  N("ANBU Marked Target notices the package secured against Kakashi."),Q("ANBU MARKED TARGET","You got it back."),Q("KAKASHI","I did."),
  Q("ANBU MARKED TARGET","Then why are you still following me?"),N("Kakashi shifts his stance."),Q("KAKASHI","You were the first man in the exchange."),
  Q("ANBU MARKED TARGET","And that matters more than finishing the assignment?"),Q("KAKASHI","The assignment is here."),N("Kakashi touches the package once."),N("Then looks back at him."),
- Q("KAKASHI","You're the part I haven't finished."),N("Pakkun rises."),N("ANBU Marked Target glances toward the alley mouth."),N("Pakkun notices."),
- Q("PAKKUN","He's thinking about running."),Q("KAKASHI","I know."),Q("ANBU MARKED TARGET","You two always this irritating?"),N("Pakkun gives him a flat look."),Q("PAKKUN","We just met.")
+  Q("KAKASHI","You were still part of it."),N("Pakkun rises as ANBU Marked Target glances toward the alley mouth."),
+  Q("PAKKUN","He'll run if you let him."),Q("KAKASHI","I know."),Q("ANBU MARKED TARGET","You don't even know each other."),Q("PAKKUN","Doesn't matter.")
 ],nextBeatId:"v2_battle_amt_package_second"});
 addBeat("v2_battle_amt_package_second",{mode:"battle_transition",backdrop:B.intercept,location:"KONOHA ALLEYWAY · PL BATTLE",objective:"Catch the first man.",actors:["kakashi","amt","pakkun"],preset:"battle_trio",cues:[N("Kakashi Hatake and the ninken face ANBU Marked Target.")],battle:battle("academy_kakashi_origin_battle_seq_amt_pakkun","amt_package_second","v2_amt_package_second_win","v2_amt_package_second_loss","AK_SA_015")});
 addBeat("v2_amt_package_second_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("amt_package_second",ctx,s=>{s.participants.AMT.state="ESCAPED";}),cues:[
  N("ANBU Marked Target finds the opening first."),N("Kakashi loses the fight."),N("He does not lose the package with it."),
  N("The recovered objective was secured before this confrontation began."),N("ANBU Marked Target looks once toward it."),N("Then toward the route out."),N("He chooses distance."),
  N("By the time Kakashi can force himself back into the pursuit, the man is gone."),N("Pakkun remains nearby."),N("Quiet for once."),
- Q("PAKKUN","You kept the important part."),N("Kakashi looks down at the package."),Q("KAKASHI","I lost him."),Q("PAKKUN","I noticed."),
- N("A beat."),N("Pakkun's voice is drier when he continues."),Q("PAKKUN","Both things can be true.")
+  Q("PAKKUN","You kept the package."),N("Kakashi looks down at it."),Q("KAKASHI","I lost him."),
+  Q("PAKKUN","Then report both.")
 ],nextBeatId:"v2_report"});
 addBeat("v2_amt_package_second_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:null,actors:["kakashi","amt","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("amt_package_second",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";}),cues:[
  N("ANBU Marked Target goes down."),N("Kakashi stays on him until the fight is unquestionably over."),N("Pakkun stays where he can see both of them."),
