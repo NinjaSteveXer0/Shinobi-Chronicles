@@ -375,9 +375,69 @@ Do not reserve the center of the battlefield for a persistent opaque performance
 - action/technique identity may use a compact top-center or near-action label;
 - factual damage/result feedback appears adjacent to the affected participant(s);
 - Battle PL/state stays attached to the participant whose state changed;
-- Skills/actions live primarily in a compact lower dock that can expand for inspection/targeting and contract when Battle playback is occurring;
-- Skill explanation/hover-to-learn remains available, but a large permanent inspector must not erase formation/battlefield presence;
+- the compact lower dock exposes only the three primary player-facing families **SKILLS | ITEMS | SUMMONS**;
+- selecting a family opens a compact secondary tray above/immediately adjacent to the dock, preserving the confrontation lane and participant visibility;
+- Skill explanation/hover-to-learn remains available inside that compact tray/inspection treatment, but a large permanent inspector must not erase formation/battlefield presence;
 - turn information should identify the current authoritative actor without inventing future turn order not supplied by Combat.
+
+#### Primary action dock — Skills / Items / Summons
+
+The Formation Stage primary dock is now locked to exactly three top-level families:
+
+`SKILLS | ITEMS | SUMMONS`
+
+This is a presentation taxonomy, not permission to change Combat action economy.
+
+**Do not** show permanent peer buttons such as generic `ATTACK`, `DEFEND` or `TARGET` merely because earlier concept art did. If current Combat authority exposes a distinct standalone basic attack or defend command outside authored Skills/actions, its player-facing entry point must be reconciled with Combat authority rather than invented by UI. The concept layer does not remove or create those mechanics.
+
+##### Skills tray
+
+Selecting `SKILLS` expands a compact secondary tray upward from the lower dock.
+
+Each visible Skill entry should prioritise:
+
+- authoritative Skill/Technique name;
+- availability / unavailable state;
+- current authoritative cost/resource state where applicable;
+- compact type/category/element/family glyph only where metadata supports it;
+- optional existing technique icon/art when one already exists.
+
+Do **not** require bespoke generated attack art for every Skill. Alpha is valid with a small reusable glyph/icon vocabulary plus text and current state.
+
+The tray should use compact technique tiles/cards rather than a full-screen list. Longer lists may scroll/page within a bounded tray without covering the battlefield.
+
+##### Items tray
+
+Selecting `ITEMS` opens the same bounded interaction pattern populated only by currently authoritative usable Battle items.
+
+UI does not invent item actions, eligibility or effects.
+
+##### Summons tray
+
+Selecting `SUMMONS` opens the same bounded interaction pattern populated only by Summons currently legal/available to the active actor under Combat authority.
+
+Owned != currently summonable. Attached != manifested. Collection membership alone must not create an actionable Summon tile.
+
+##### Contextual targeting
+
+`TARGET` is not a permanent top-level family.
+
+When a chosen Skill/Item/Summon action requires target selection:
+
+- enter contextual target-selection state after the action is chosen, or use direct legal participant selection where current Battle runtime supports it;
+- visually promote/select only Combat-authorised target refs;
+- cancel returns cleanly to the originating tray/dock state;
+- exact target legality remains Combat-owned.
+
+##### Tray lifecycle / accessibility
+
+- tray expands upward or immediately adjacent to the lower dock;
+- central confrontation lane remains visible;
+- tray contracts after committed action selection or cancellation;
+- keyboard/focus order follows family -> tile -> target where applicable;
+- reduced-motion may open/close instantly without changing information;
+- action playback may contract the tray so battlefield/participants regain visual priority;
+- no tray state may commit Combat truth by itself.
 
 #### Visual settle
 
@@ -654,6 +714,9 @@ Coding / Runtime should implement one canonical shared presentation slice with t
 ### Battle
 
 - one coherent canonical Battle composition; `UI/battle.png` is reference-only and may be reorganised rather than preserved literally;
+- primary action dock = **SKILLS | ITEMS | SUMMONS** only, with compact bounded secondary trays populated from current authoritative availability;
+- targeting is contextual after action selection/direct legal participant selection, not a permanent top-level TARGET family;
+- no per-Skill generated-art dependency; existing icons or reusable metadata-derived/generic glyphs + text/state are sufficient for Alpha;
 - performance lane/hierarchy that makes actor/action/target/result causality the dominant read;
 - actor/action/target/result sequencing;
 - hit/miss/evade/guard/substitution truthfulness;
@@ -740,7 +803,7 @@ Binding boundaries:
 - the current PR #318 two-active-card presentation is implementation evidence, not automatic experiential acceptance if it still reads as portraits plus PL/effects;
 - update the **same canonical Battle presentation owner** rather than adding another renderer/overlay.
 
-## 25. #316 hardening lock
+## 26. #316 hardening lock
 
 These clarifications are binding for #312 implementation:
 
@@ -752,6 +815,18 @@ These clarifications are binding for #312 implementation:
 6. **Text and motion should complement, not redundantly narrate each other.** Accessibility text stays complete; ordinary visible prose should not re-describe simple choreography already shown.
 
 No new image assets, Story outcomes, Combat mechanics or renderer owners are authorised by this hardening.
+
+## 27. #319 action-dock product lock — Stephen 2026-09-23
+
+The asset-faithful Formation Stage proof retains its Squad Wedge spatial composition, but the illustrated `ATTACK / SKILLS / ITEMS / DEFEND / TARGET` dock is **not runtime authority**.
+
+Binding player-facing dock:
+
+> **SKILLS | ITEMS | SUMMONS**
+
+Selecting a family opens a compact secondary tray. Skill tiles must work without bespoke generated artwork per attack. Targeting is contextual and Combat-authoritative. Generic Attack/Defend commands are not UI assumptions; if current/future Combat authority requires a distinct semantic command, reconcile that exact command through the same canonical Battle presentation owner.
+
+No new renderer, Battle portrait family, target rule, action economy or per-technique art requirement is authorised by this lock.
 
 ## Final lock
 
