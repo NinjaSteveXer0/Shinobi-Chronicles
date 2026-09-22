@@ -531,12 +531,116 @@ async function shot(page,name,selector=null){
     assert(!JSON.stringify(defeat).toLowerCase().includes("death"),"#312 defeat presentation leaked death semantics");
     await shot(page,"06-battle-defeat-performance.png",".alpha-code-battle-stage");
 
+    // FORMATION-STAGE SQUAD PROOF — consume a real authorised Kakashi 2v1
+    // deployment rather than fabricating production roster truth. This proves
+    // the same 33000 owner adapts from duel -> wedge with an actual supporting
+    // deployed opponent. The off-slot action receipt below is deliberately a
+    // QA-only presentation fixture: it supplies exact canonical participant refs
+    // to the read-only performance projector and does not resolve damage or
+    // mutate Battle PL/Story truth.
+    const squadLaunch=await page.evaluate(()=>{
+      const rt=getActiveStorySceneRuntime();
+      const returnContext={
+        type:"story_scene",sceneId:rt.sceneId,sceneInstanceId:rt.instanceId,
+        sourceBeatId:"v2_battle_mi_package_second",
+        victoryBeatId:"v2_mi_package_second_win",defeatBeatId:"v2_mi_package_second_loss",
+        postBattleBeatId:null,exposeFinisher:false
+      };
+      const out=launchAcademyKakashiV2Battle36010({
+        battleConfigId:"academy_kakashi_origin_battle_ps_mi_2v1",
+        storyOccurrenceId:"issue312_browser_formation_2v1",
+        sourceAnchorRef:"ISSUE312_FORMATION_STAGE",
+        bindingRef:"ps_mi_2v1",
+        returnContext
+      });
+      return{
+        out,
+        playerIds:[1,2,3,4].map(slot=>getBattleDeploymentParticipant("player",slot)?.id||null).filter(Boolean),
+        enemyIds:[1,2,3,4].map(slot=>getBattleDeploymentParticipant("enemy",slot)?.id||null).filter(Boolean)
+      };
+    });
+    assert(squadLaunch.out?.success===true,JSON.stringify(squadLaunch));
+    assert.deepStrictEqual(squadLaunch.playerIds,["academy_kakashi"]);
+    assert.deepStrictEqual(squadLaunch.enemyIds,["academy_kakashi_origin_package_smuggler","academy_kakashi_origin_masked_interceptor"]);
+    await page.waitForFunction(()=>{
+      const stage=document.querySelector(".alpha-code-battle-stage");
+      return stage?.dataset.formationMode==="wedge"&&stage?.dataset.enemyFormationCount==="2";
+    },null,{timeout:8000});
+
+    const squadOpening=await page.evaluate(()=>{
+      const stage=document.querySelector(".alpha-code-battle-stage");
+      const support=[...stage.querySelectorAll('.battle2-formation-support:not([data-formation-hidden="true"])')];
+      const dock=stage.querySelector(".battle-live-action-family-row");
+      const rect=node=>{const r=node?.getBoundingClientRect();return r?{left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}:null;};
+      const overlaps=(a,b)=>!!a&&!!b&&!(a.right<=b.left||a.left>=b.right||a.bottom<=b.top||a.top>=b.bottom);
+      const dockRect=rect(dock);
+      return{
+        mode:stage.dataset.formationMode,
+        playerCount:stage.dataset.playerFormationCount,
+        enemyCount:stage.dataset.enemyFormationCount,
+        support:support.map(node=>({
+          id:node.dataset.participantId,
+          side:node.dataset.formationSide,
+          slot:node.dataset.formationSlot,
+          image:node.querySelector("img")?.getAttribute("src")||"",
+          rect:rect(node),
+          overlapsDock:overlaps(rect(node),dockRect)
+        })),
+        primaryFamilies:[...dock.querySelectorAll("button[data-formation-family]")].map(b=>b.textContent.trim())
+      };
+    });
+    assert.strictEqual(squadOpening.mode,"wedge","#312 real 2v1 deployment did not select wedge formation");
+    assert.strictEqual(squadOpening.playerCount,"1");
+    assert.strictEqual(squadOpening.enemyCount,"2");
+    assert.strictEqual(squadOpening.support.length,1,"#312 2v1 wedge must show exactly one deployed supporting opponent: "+JSON.stringify(squadOpening));
+    assert.strictEqual(squadOpening.support[0].id,"academy_kakashi_origin_masked_interceptor");
+    assert.strictEqual(squadOpening.support[0].side,"enemy");
+    assert.strictEqual(squadOpening.support[0].slot,"2");
+    assert(squadOpening.support[0].image,"#312 deployed support is missing portrait authority");
+    assert.strictEqual(squadOpening.support[0].overlapsDock,false,"#312 deployed support collides with primary action dock");
+    assert.deepStrictEqual(squadOpening.primaryFamilies,["SKILLS","ITEMS","SUMMONS"]);
+    await shot(page,"07-battle-formation-wedge-2v1.png",".alpha-code-battle-stage");
+
+    const offSlotFixture=await page.evaluate(()=>{
+      const actorRef={side:"player",participantId:"academy_kakashi"};
+      const targetRef={side:"enemy",participantId:"academy_kakashi_origin_masked_interceptor"};
+      const actionId="issue312_qa_offslot_target";
+      recordBattleEvidence({eventType:"action_attempted",actionId,actorRef,targetRef,skillId:"issue312_qa_exact_target",data:{actionClass:"qa_presentation_fixture"}});
+      recordBattleEvidence({eventType:"damage_resolved",actionId,actorRef,targetRef,skillId:"issue312_qa_exact_target",data:{primaryDiscipline:"Taijutsu",finalDamage:1,remainingBattlePLBefore:14,remainingBattlePLAfter:13,flatGuards:[],ratioGuards:[],qaPresentationFixture:true}});
+      recordBattleEvidence({eventType:"skill_action_completed",committedOccurrence:true,actionId,actorRef,targetRef,skillId:"issue312_qa_exact_target",data:{resolved:true,damageApplied:true,finalDamage:1,qaPresentationFixture:true}});
+      openOverlay("combat");
+      return resolveBattlePerformanceProjection33000();
+    });
+    assert.strictEqual(offSlotFixture.targetRef.participantId,"academy_kakashi_origin_masked_interceptor");
+    await page.waitForFunction(()=>{
+      const stage=document.querySelector(".alpha-code-battle-stage");
+      const support=[...stage.querySelectorAll(".battle2-formation-support")].find(n=>n.dataset.participantId==="academy_kakashi_origin_masked_interceptor");
+      return !!support&&support.classList.contains("battle2-performance-role-target");
+    },null,{timeout:3000});
+    const offSlotFocus=await page.evaluate(()=>{
+      const stage=document.querySelector(".alpha-code-battle-stage");
+      const activeEnemy=stage.querySelector(".battle-live-active-card-enemy");
+      const target=[...stage.querySelectorAll(".battle2-formation-support")].find(n=>n.dataset.participantId==="academy_kakashi_origin_masked_interceptor");
+      const chip=target?.querySelector(".battle2-performance-result-chip");
+      return{
+        activeEnemyId:activeEnemy?.dataset.participantId||null,
+        targetId:target?.dataset.participantId||null,
+        targetRole:target?.classList.contains("battle2-performance-role-target")||false,
+        chipLocal:!!chip&&chip.parentElement===target
+      };
+    });
+    assert.strictEqual(offSlotFocus.activeEnemyId,"academy_kakashi_origin_package_smuggler","#312 2v1 front opposition identity drift");
+    assert.strictEqual(offSlotFocus.targetId,"academy_kakashi_origin_masked_interceptor");
+    assert.strictEqual(offSlotFocus.targetRole,true,"#312 exact off-slot target did not enter confrontation focus");
+    assert.strictEqual(offSlotFocus.chipLocal,true,"#312 off-slot result feedback did not stay participant-local");
+    await shot(page,"08-battle-formation-offslot-target.png",".alpha-code-battle-stage");
+
     const errors=await runtimeErrorGate.assertClean("issue312_story_battle_benchmark");
     const result={
       pass:true,
       issue:312,
       story:{rooftop,watch,stopEntryPhase,stop,semanticChoiceElapsedMs:elapsed},
-      battle:{config:launched.config,substitution:substitution.p,settledBattle,hit,defeat},
+      battle:{config:launched.config,substitution:substitution.p,settledBattle,hit,defeat,squadOpening,offSlotFixture,offSlotFocus},
       browserErrors:errors,
       sourceHeadlessGreenClaimed:false,
       automatedBrowserGreen:true,
