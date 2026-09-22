@@ -520,6 +520,55 @@ But Stephen should validate a release candidate, not discover basic duplicate-ow
 
 ---
 
+## 22A. Local workspace synchronization notification gate
+
+Stephen's installed browser runs from his local working copy.
+
+Therefore a GitHub merge/commit does **not** imply Stephen's local runtime has changed.
+
+Every Coding / Runtime completion, merge, branch switch, release-candidate handoff, or browser-retest request must explicitly state one of:
+
+`LOCAL SYNC: NOT REQUIRED`
+
+or:
+
+`LOCAL SYNC: REQUIRED`
+
+If local sync is required, Coding must provide the exact safe terminal commands needed for Stephen's current situation.
+
+At minimum, when production changes have merged to `main` and Stephen should test current `main`, the handoff must include a safe sequence equivalent to:
+
+```bash
+git status --short
+git switch main
+git pull --ff-only origin main
+```
+
+Do not blindly instruct `git reset --hard`, `git clean`, force checkout, or destructive stash operations.
+
+If Stephen's working tree is not clean, Coding must stop and tell him what is locally modified before suggesting any destructive reconciliation.
+
+After synchronization, Coding must state the expected local HEAD, for example:
+
+`EXPECTED LOCAL HEAD: <sha>`
+
+Before interpreting new browser screenshots as evidence against a newly merged fix, Coding should first confirm Stephen's local HEAD matches the candidate being discussed.
+
+Canonical rule:
+
+> **No browser retest request is complete without an explicit local-sync status and expected HEAD.**
+
+And:
+
+> **A browser complaint against an older local checkout must not be mistaken for evidence that the current GitHub candidate failed.**
+
+This gate applies whether changes were:
+- merged automatically by GitHub;
+- merged manually;
+- committed on a remote branch;
+- rebased;
+- delivered through a clean-room replacement.
+
 ## 23. Periodic debt checkpoint
 
 At these milestones:
