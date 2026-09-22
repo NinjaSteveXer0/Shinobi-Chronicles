@@ -462,11 +462,26 @@
   }
   window.installBattlePerformance33000=installBattlePerformance33000;
 
+  function suspendCallerStoryPresentation33000(){
+    try{
+      const battle=typeof currentBattle!=="undefined"?currentBattle:null;
+      const rc=battle&&battle.returnContext||null;
+      if(!battle||!rc||rc.type!=="story_scene")return{success:true,suspended:false};
+      if(typeof globalThis.markStoryPresentationHidden33900!=="function")return{success:false,suspended:false,reason:"story_presentation_hide_hook_missing"};
+      const hidden=globalThis.markStoryPresentationHidden33900("caller_owned_battle");
+      return{success:hidden===true,suspended:hidden===true};
+    }catch(error){
+      return{success:false,suspended:false,reason:"story_presentation_suspend_exception",error:String(error&&error.message||error)};
+    }
+  }
+  window.suspendCallerStoryPresentation33000=suspendCallerStoryPresentation33000;
+
   function enhanceBattle2DOM33000(container){
     if(typeof document==="undefined")return false;
     const stage=(container&&container.querySelector&&container.querySelector(".alpha-code-battle-stage"))||document.querySelector(".alpha-code-battle-stage");
     if(!stage)return false;
     stage.classList.add("battle2-modern");
+    suspendCallerStoryPresentation33000();
     enhanceBattleSkillCards33000(stage);
     installBattleTicker33000(stage);
     installBattleInteractionHint33000(stage);
@@ -479,6 +494,7 @@
   const priorRenderCombatOverlay33000=renderCombatOverlay;
   renderCombatOverlay=function renderCombatOverlayModern33000(container){
     const result=priorRenderCombatOverlay33000.apply(this,arguments);
+    suspendCallerStoryPresentation33000();
     enhanceBattle2DOM33000(container);
     return result;
   };
@@ -556,6 +572,7 @@
       performanceClassVocabulary:BATTLE_PRESENTATION_CLASSES_33000.length===16,
       noResolverSemanticsInPerformance:!String(resolveBattlePerformanceProjection33000).includes("resolveBattle"+"DamagePacket")&&!String(installBattlePerformance33000).includes("recordBattle"+"Evidence"),
       battlePortraitProjection:String(portrait33000).includes("resolveUIPortraitProjection")&&String(portrait33000).includes("resolveBattleEnemyPortraitProjection"),
+      storyCallerPresentationSuspension:String(suspendCallerStoryPresentation33000).includes("markStoryPresentationHidden33900")&&String(renderCombatOverlay).includes("suspendCallerStoryPresentation33000"),
       branchModesRemainExplicit:renderInspector33000.toString().includes("setSelectedBattleSkillMode"),
       browserGoldenClaimed:false
     };
