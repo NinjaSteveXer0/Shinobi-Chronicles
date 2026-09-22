@@ -329,7 +329,7 @@ function minatoPackageCues(s,{lethal=false}={}){
   if(lethal){
     if(recovered)return[
       Q("MINATO","And the package?"),
-      Q("ANBU OPERATIVE","Recovered."),
+      Q("ANBU OPERATIVE","Recovered and returned."),
       N("Minato nods once."),
       Q("MINATO","Keep that separate from the deaths.")
     ];
@@ -342,12 +342,12 @@ function minatoPackageCues(s,{lethal=false}={}){
   }
   if(recovered)return[
     Q("MINATO","He brought the package back."),
-    Q("ANBU OPERATIVE","Yes."),
+    Q("ANBU OPERATIVE","It came back with him."),
     Q("MINATO","What did he give up to do it?")
   ];
   return[
     Q("MINATO","He lost the package."),
-    Q("ANBU OPERATIVE","Yes."),
+    Q("ANBU OPERATIVE","It never returned to our side."),
     Q("MINATO","What did he come back with?")
   ];
 }
@@ -356,30 +356,28 @@ function lethalMinatoCues(s){
   const out=[N("The ANBU operative finishes the report. Minato stays quiet long enough to make sure there is nothing else coming.")];
   if(dead.length===3)out.push(
     Q("MINATO","Three deaths. None of them in the fight itself."),
-    Q("ANBU OPERATIVE","Correct."),
+    Q("ANBU OPERATIVE","All three were alive when their fights ended."),
     N("Minato looks down at the report."),
     Q("MINATO","So he knew when each fight was over."),
-    Q("ANBU OPERATIVE","Yes."),
+    Q("ANBU OPERATIVE","There is no sign he mistook their condition."),
     Q("MINATO","And still made the same decision three times."),
-    Q("ANBU OPERATIVE","Yes."),
+    Q("ANBU OPERATIVE","Three times."),
     N("Minato closes the file halfway."),
     Q("MINATO","Then that's the part I care about. Not the number.")
   );
   else if(dead.length===2){
     const survivor=["MI","PS","AMT"].find(ref=>!dead.includes(ref));
     const survivorState=s.participants[survivor]&&s.participants[survivor].state;
-
     out.push(Q("MINATO","Two deliberate deaths."));
-    if(survivorState==="RELEASED")out.push(Q("MINATO","And he let the third person walk."));
-    else if(["ANBU_CUSTODY","POLICE_CUSTODY","FIELD_SECURED_PENDING_COLLECTION"].includes(survivorState))out.push(Q("MINATO","But he kept the third person alive."));
-    else out.push(Q("MINATO","The third outcome wasn't his to finish."));
-
+    if(survivorState==="RELEASED")out.push(Q("ANBU OPERATIVE","The third person was released alive."),Q("MINATO","So the third result was a different choice."));
+    else if(["ANBU_CUSTODY","POLICE_CUSTODY","FIELD_SECURED_PENDING_COLLECTION"].includes(survivorState))out.push(Q("ANBU OPERATIVE","The third person remained alive under control."),Q("MINATO","Then he did not treat every defeat the same."));
+    else out.push(Q("ANBU OPERATIVE","The third outcome was no longer his to finish."),Q("MINATO","Then keep it separate."));
     out.push(N("Minato lets the difference sit before moving on."));
   }else if(dead.length===1){
     const ref=dead[0];
-    if(ref==="MI")out.push(Q("MINATO","The masked shinobi is the one he chose to kill."),N("Minato reads what came before and after it."),Q("MINATO","One death only matters if we understand when he decided on it."));
-    else if(ref==="PS")out.push(Q("MINATO","The receiver is dead."),N("Minato's finger stops on the package line."),Q("MINATO","Don't merge that with whether he recovered the objective."));
-    else out.push(Q("MINATO","The original target is the one who died."),N("Minato looks back to the first line of the assignment."),Q("MINATO","He began the night following that man and ended it deciding whether he lived."));
+    if(ref==="MI")out.push(Q("MINATO","The masked shinobi is the one he chose to kill."),Q("ANBU OPERATIVE","After her fight was already over."),N("Minato reads what came before and after it."),Q("MINATO","Then one death only matters if we understand when he decided on it."));
+    else if(ref==="PS")out.push(Q("MINATO","The receiver is dead."),Q("ANBU OPERATIVE","Killed after defeat."),N("Minato's finger stops on the package line."),Q("MINATO","Don't merge that with whether he recovered the objective."));
+    else out.push(Q("MINATO","The original target is the one who died."),Q("ANBU OPERATIVE","After Kakashi had already beaten him."),N("Minato looks back to the first line of the assignment."),Q("MINATO","He began the night following that man and ended it deciding whether he lived."));
   }
   out.push(...minatoPackageCues(s,{lethal:true}));
   return out;
@@ -387,58 +385,60 @@ function lethalMinatoCues(s){
 function nonlethalMinatoCues(s){
   const out=[N("The ANBU operative finishes the report."),...minatoPackageCues(s)];
   const states=Object.values(s.participants||{}).map(r=>r&&r.state);
-  if(states.includes("ANBU_CUSTODY"))out.push(
-    Q("MINATO","He brought someone back alive."),
-    Q("ANBU OPERATIVE","Yes."),
-    Q("MINATO","Because he couldn't finish the fight?"),
-    Q("ANBU OPERATIVE","No."),
-    Q("MINATO","Then custody was part of the decision.")
+  const anbuCount=states.filter(x=>x==="ANBU_CUSTODY").length;
+  const policeCount=states.filter(x=>x==="POLICE_CUSTODY").length;
+  const fieldCount=states.filter(x=>x==="FIELD_SECURED_PENDING_COLLECTION").length;
+  const released=states.filter(x=>x==="RELEASED").length;
+
+  if(anbuCount)out.push(
+    Q("MINATO",anbuCount>1?"He brought them back alive.":"He brought one of them back alive."),
+    Q("ANBU OPERATIVE",anbuCount>1?`${anbuCount} were transferred into ANBU custody.`:"The transfer was deliberate; Kakashi had control."),
+    Q("MINATO","Then don't write that as a fight he failed to finish."),
+    Q("ANBU OPERATIVE","Understood.")
   );
-  else if(states.includes("POLICE_CUSTODY"))out.push(
+  else if(policeCount)out.push(
     Q("MINATO","He chose the Police instead of bringing them here."),
-    Q("ANBU OPERATIVE","Yes."),
+    Q("ANBU OPERATIVE",policeCount>1?`${policeCount} were transferred alive.`:"The transfer was alive and deliberate."),
     N("Minato considers that."),
-    Q("MINATO","He wanted the handoff outside ANBU. Record it that way.")
+    Q("MINATO","Then record the institution he chose. That matters.")
   );
-  else if(states.includes("FIELD_SECURED_PENDING_COLLECTION"))out.push(
+  else if(fieldCount)out.push(
     Q("MINATO","He restrained them and kept moving."),
-    Q("ANBU OPERATIVE","Yes."),
+    Q("ANBU OPERATIVE",fieldCount>1?"He left exact locations for collection.":"He left an exact location for collection."),
     Q("MINATO","Then he treated custody as something to manage, not something that ended the mission.")
   );
-  else if(states.includes("RELEASED")){
-    const released=states.filter(x=>x==="RELEASED").length;
+  else if(released){
     if(released>1)out.push(
       Q("MINATO","He had them under control and let them go."),
-      Q("ANBU OPERATIVE","Yes."),
+      Q("ANBU OPERATIVE","The releases were deliberate."),
       Q("MINATO","Then that wasn't an escape. It was his decision.")
     );
     else out.push(
       Q("MINATO","He had control and chose release."),
-      Q("ANBU OPERATIVE","Yes."),
+      Q("ANBU OPERATIVE","Deliberately."),
       Q("MINATO",s.package.recovered||s.package.returned?"The objective was already secure.":"And the mission wasn't.")
     );
   }
+
   const clean=(s.resolvers.directPickpocket&&s.resolvers.directPickpocket.selectedOutcomeRef==="PICKPOCKET_DIRECT_SUCCESS")||(s.resolvers.improvedPickpocket&&s.resolvers.improvedPickpocket.selectedOutcomeRef==="PICKPOCKET_IMPROVED_SUCCESS");
   if(clean)out.push(
     Q("MINATO","No fight?"),
-    Q("ANBU OPERATIVE","No."),
-    Q("MINATO","And the package still came back."),
-    Q("ANBU OPERATIVE","Yes."),
+    Q("ANBU OPERATIVE","None. He took the package without exposing himself."),
+    Q("MINATO","And it still came back."),
+    Q("ANBU OPERATIVE","It did."),
     N("A faint approval reaches Minato's expression."),
     Q("MINATO","Good. Not every successful mission needs to become a battle.")
   );
   if(s.knowledge.getCloserContingency)out.push(
     Q("MINATO","He stayed long enough to hear the contingency."),
-    Q("ANBU OPERATIVE","Yes."),
-    Q("MINATO","And reported the part they never said as unknown."),
-    Q("ANBU OPERATIVE","Yes."),
-    Q("MINATO","Good.")
+    Q("ANBU OPERATIVE","Long enough to learn it. He still reported the downstream destination as unknown."),
+    Q("MINATO","Good. He separated what he heard from what he guessed.")
   );
   if(s.knowledge.askWhere)out.push(
     Q("MINATO","He questioned the carrier before committing to the fight."),
+    Q("ANBU OPERATIVE","The carrier only knew his part ended at the handoff."),
+    Q("MINATO","So Kakashi found the edge of the man's knowledge."),
     Q("ANBU OPERATIVE","Yes."),
-    Q("MINATO","And learned where the carrier's knowledge ended."),
-    Q("ANBU OPERATIVE","At the handoff."),
     N("Minato nods."),
     Q("MINATO","That's useful even without a destination.")
   );
@@ -579,7 +579,7 @@ addBeat("v2_ps_pursuit_resolver",{mode:"choice",backdrop:B.sakura,location:"KONO
  C("ps_pursuit_failure","CONTINUE","v2_ps_pursuit_failure",{available:()=>getOutcome("psPursuit")==="PS_PURSUIT_FAILURE"})
 ]});
 addBeat("v2_ps_pursuit_failure",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"pursuit",onEnter:()=>mutate(s=>{s.participants.PS.state="ESCAPED";s.participants.AMT.state="ESCAPED";s.package.holder="PS";}),cues:[N("Kakashi reaches the next junction and finds an empty street."),N("He takes the roofline instead. Nothing."),N("The trail has stretched too far."),N("Package Smuggler is gone with the package, and the time spent chasing him has erased whatever lead Kakashi still had on ANBU Marked Target."),N("There is nothing left to pursue honestly.")],nextBeatId:"v2_report"});
-addBeat("v2_ps_pursuit_success",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Recover the package.",actors:["kakashi","ps"],preset:"battle_pair",cues:[N("Package Smuggler turns into the next street and finds Kakashi landing ahead of him."),N("He stops hard and checks the road behind him."),Q("PACKAGE SMUGGLER","You should've stayed with the woman you put down."),Q("KAKASHI","You were counting on that."),N("Package Smuggler's grip tightens around the package."),Q("PACKAGE SMUGGLER","You don't even know what you're carrying."),Q("KAKASHI","No. I know who handed it over, and who ANBU sent me to follow."),Q("PACKAGE SMUGGLER","You think taking it back fixes this?"),Q("KAKASHI","It fixes the part in your hands."),N("Package Smuggler's free hand drops toward his weapon. Kakashi shifts with him.")],nextBeatId:"v2_battle_ps_seq"});
+addBeat("v2_ps_pursuit_success",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Recover the package.",actors:["kakashi","ps"],preset:"battle_pair",cues:[N("Package Smuggler turns into the next street and finds Kakashi landing ahead of him."),N("He stops hard and checks the road behind him."),Q("PACKAGE SMUGGLER","You should've stayed with the woman you put down."),Q("KAKASHI","You were counting on that."),N("Package Smuggler's grip tightens around the package."),Q("PACKAGE SMUGGLER","You don't even know what you're carrying."),Q("KAKASHI","No. I know who handed it over, and who ANBU sent me to follow."),Q("PACKAGE SMUGGLER","You think taking it back fixes this?"),Q("KAKASHI","It gets the package back."),N("Package Smuggler's free hand drops toward his weapon. Kakashi shifts with him.")],nextBeatId:"v2_battle_ps_seq"});
 addBeat("v2_battle_ps_seq",{mode:"battle_transition",backdrop:B.fight,location:"KONOHA · PL BATTLE",objective:"Recover the package.",actors:["kakashi","ps"],preset:"battle_pair",cues:[N("Kakashi Hatake vs Package Smuggler.")],battle:battle("academy_kakashi_origin_battle_seq_ps","ps_seq","v2_ps_seq_win","v2_ps_seq_loss","AK_SA_022")});
 addBeat("v2_ps_seq_loss",{backdrop:B.fight,location:"KONOHA · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_seq",ctx,s=>{s.participants.PS.state="ESCAPED";s.participants.AMT.state="ESCAPED";s.package.holder="PS";}),cues:[N("Package Smuggler finds the opening first and breaks past Kakashi."),N("Kakashi turns after him too late."),N("The package goes with the receiver."),N("By the time Kakashi can move again, the street ahead is empty.")],nextBeatId:"v2_report"});
 addBeat("v2_ps_seq_win",{mode:"choice",backdrop:B.fight,location:"KONOHA · NIGHT",objective:null,actors:["kakashi","ps"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_seq",ctx,s=>{s.participants.PS.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;}),cues:[N("Package Smuggler goes down."),N("Kakashi stays on him long enough to make sure the fight is finished, then reaches for the package."),N("He checks the seal and secures it against himself."),N("Only then does he look toward the route ANBU Marked Target took.")],choices:[
@@ -590,9 +590,9 @@ addBeat("v2_ps_seq_win",{mode:"choice",backdrop:B.fight,location:"KONOHA · NIGH
  C("ps_police","TAKE HIM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>{dispose("PS","POLICE");history("PS_TO_POLICE");}}),
  C("ps_report","RETURN TO ANBU","v2_report",{patch:()=>history("RETURN_AFTER_PS")})
 ]});
-addBeat("v2_amt_after_ps",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Secure ANBU Marked Target.",actors:["kakashi","amt","pakkun"],preset:"intercept",onEnter:()=>{participant("AMT",{state:"AVAILABLE"});setPakkun(true);return history("PAKKUN_INTERCEPT_AFTER_PS");},cues:[N("Kakashi leaves Package Smuggler behind with the recovered package secured against him."),N("The other trail is thin, but not gone."),N("He cuts across the roofs, drops through a side street, and catches movement ahead."),N("ANBU Marked Target is still running."),N("The man reaches the next street and stops short. A small ninken is already standing in the route ahead."),Q("PAKKUN","This yours?"),N("Kakashi lands on the far side of the street."),Q("KAKASHI","Apparently."),N("ANBU Marked Target notices the recovered package."),Q("ANBU MARKED TARGET","You got it back."),Q("KAKASHI","I did."),Q("KAKASHI","You're still coming back with me."),Q("ANBU MARKED TARGET","You think carrying that means you understand what happened?"),Q("KAKASHI","No."),N("Pakkun shifts off the centreline without being asked."),Q("ANBU MARKED TARGET","Then what exactly are you planning to do with me?"),Q("KAKASHI","Depends what you do next.")],nextBeatId:"v2_battle_amt_seq_pakkun"});
+addBeat("v2_amt_after_ps",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Secure ANBU Marked Target.",actors:["kakashi","amt","pakkun"],preset:"intercept",onEnter:()=>{participant("AMT",{state:"AVAILABLE"});setPakkun(true);return history("PAKKUN_INTERCEPT_AFTER_PS");},cues:[N("Kakashi leaves Package Smuggler behind with the recovered package secured against him."),N("The other trail is thin, but not gone."),N("He cuts across the roofs, drops through a side street, and catches movement ahead."),N("ANBU Marked Target is still running."),N("The man reaches the next street and stops short. A small ninken is already standing in the route ahead."),Q("PAKKUN","This yours?"),N("Kakashi lands on the far side of the street."),Q("KAKASHI","Apparently."),N("ANBU Marked Target notices the recovered package."),Q("ANBU MARKED TARGET","You got it back."),Q("KAKASHI","I did."),Q("KAKASHI","You're still coming back with me."),Q("ANBU MARKED TARGET","You think carrying that means you understand what happened?"),Q("KAKASHI","No."),N("Pakkun shifts off the centreline without being asked."),Q("ANBU MARKED TARGET","Then what exactly are you planning to do with me?"),Q("KAKASHI","Stop you first. Decide after.")],nextBeatId:"v2_battle_amt_seq_pakkun"});
 addBeat("v2_battle_amt_seq_pakkun",{mode:"battle_transition",backdrop:B.intercept,location:"KONOHA ALLEYWAY · PL BATTLE",objective:"Secure ANBU Marked Target.",actors:["kakashi","amt","pakkun"],preset:"battle_trio",cues:[N("Kakashi Hatake and the ninken face ANBU Marked Target.")],battle:battle("academy_kakashi_origin_battle_seq_amt_pakkun","amt_seq","v2_amt_seq_win","v2_amt_seq_loss","AK_SA_022")});
-addBeat("v2_amt_seq_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("amt_seq",ctx,s=>{s.participants.AMT.state="ESCAPED";}),cues:[N("ANBU Marked Target finds the opening first and wins the fight."),N("The package stays secured against Kakashi, so the man looks at it once and chooses the open route instead."),N("By the time Kakashi can move again, he is gone."),Q("PAKKUN","You kept the package."),Q("KAKASHI","I lost him."),N("Pakkun looks down the empty street."),Q("PAKKUN","Both things can be true.")],nextBeatId:"v2_report"});
+addBeat("v2_amt_seq_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("amt_seq",ctx,s=>{s.participants.AMT.state="ESCAPED";}),cues:[N("ANBU Marked Target finds the opening first and wins the fight."),N("The package stays secured against Kakashi, so the man looks at it once and chooses the open route instead."),N("By the time Kakashi can move again, he is gone."),Q("PAKKUN","You kept the package."),Q("KAKASHI","I lost him."),N("Pakkun looks down the empty street."),Q("PAKKUN","Then remember both.")],nextBeatId:"v2_report"});
 addBeat("v2_amt_seq_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:null,actors:["kakashi","amt","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("amt_seq",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";}),cues:[N("ANBU Marked Target hits the ground and stays there."),N("Kakashi remains close enough to stop another escape attempt."),N("Pakkun watches the alley mouth."),N("The package is secure. The man is beaten."),N("What happens to him now is a separate decision.")],choices:[
  C("amt_seq_police","BRING HIM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>{dispose("AMT","POLICE");history("AMT_TO_POLICE");}}),
  C("amt_seq_release","LET HIM GO","v2_report",{patch:()=>{dispose("AMT","RELEASE");history("RELEASE_AMT");}}),
@@ -620,13 +620,13 @@ function groupCollectCues(){
   N("Package Smuggler is exactly where Kakashi left him."),N("His eyes move first to Kakashi."),N("Then to ANBU Marked Target under restraint."),N("Then to Pakkun."),
   Q("PACKAGE SMUGGLER","You actually came back."),Q("KAKASHI","I said I would."),N("Package Smuggler looks at ANBU Marked Target."),Q("PACKAGE SMUGGLER","And you brought company."),
   Q("ANBU MARKED TARGET","Don't."),Q("PACKAGE SMUGGLER","I haven't said anything yet."),Q("ANBU MARKED TARGET","That was the warning."),
-  N("Pakkun looks between them."),Q("PAKKUN","This is going well."),N("Kakashi releases Package Smuggler from the fixed anchor without removing his restraints."),
+  N("Pakkun watches the two men without joining in. Kakashi releases Package Smuggler from the fixed anchor without removing his restraints."),
   N("He brings him into the escort."),Q("PACKAGE SMUGGLER","I'm starting to miss the tree."),Q("KAKASHI","You weren't at the tree."),
   N("Package Smuggler looks at him."),Q("PACKAGE SMUGGLER","You know what I mean.")
  );
  if(s&&s.fieldSecured.includes("MI"))out.push(
   N("Masked Interceptor is still beneath the Sakura tree."),N("Her attention settles on Kakashi first."),N("Then the restrained people with him."),
-  ...(s.fieldSecured.includes("PS")?[N("Package Smuggler, if present, notices the look."),Q("PACKAGE SMUGGLER","Don't."),N("Masked Interceptor says nothing."),Q("PACKAGE SMUGGLER","You were going to say something."),Q("MASKED INTERCEPTOR","I didn't need to."),N("Pakkun gives Package Smuggler a brief look."),Q("PAKKUN","She really didn't.")]:[]),
+  ...(s.fieldSecured.includes("PS")?[N("Package Smuggler notices the look."),Q("PACKAGE SMUGGLER","Don't."),N("Masked Interceptor says nothing."),Q("PACKAGE SMUGGLER","You were going to say something."),Q("MASKED INTERCEPTOR","I didn't need to.")]:[]),
   N("Kakashi removes the line fixing Masked Interceptor to the tree."),N("The restraint around her remains."),N("She joins the escort."),N("Her eyes move to Kakashi."),
   Q("MASKED INTERCEPTOR","You got all the way back."),Q("KAKASHI","I said I would."),Q("MASKED INTERCEPTOR","No."),N("She looks over the group."),
   Q("MASKED INTERCEPTOR","You said you'd finish what you started."),N("A moment."),Q("MASKED INTERCEPTOR","This is certainly one interpretation."),
@@ -674,9 +674,9 @@ addBeat("v2_secure_amt_fail",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",obj
  N("Whatever lead remained after the fight is gone."),N("He stops chasing before guesswork becomes a substitute for a trail."),
  N("The package is still secured against him."),N("The first man is gone."),N("Those facts can both be true.")
 ],nextBeatId:"v2_report"});
-addBeat("v2_secure_amt_intercept",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Catch the first man.",actors:["kakashi","amt","pakkun"],preset:"intercept",onEnter:()=>setPakkun(true),cues:[N("ANBU Marked Target cuts into the next alley."),N("Then stops."),N("A small ninken is sitting in the route ahead of him."),N("Kakashi lands behind."),Q("PAKKUN","This yours?"),Q("KAKASHI","Apparently."),Q("ANBU MARKED TARGET","You got it back."),Q("KAKASHI","I did."),Q("ANBU MARKED TARGET","Then why are you still following me?"),Q("KAKASHI","You're the part I haven't finished."),Q("PAKKUN","He's thinking about running."),Q("KAKASHI","I know."),Q("ANBU MARKED TARGET","You two always this irritating?"),Q("PAKKUN","We just met.")],nextBeatId:"v2_battle_secure_amt"});
+addBeat("v2_secure_amt_intercept",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Catch the first man.",actors:["kakashi","amt","pakkun"],preset:"intercept",onEnter:()=>setPakkun(true),cues:[N("ANBU Marked Target cuts into the next alley."),N("Then stops."),N("A small ninken is sitting in the route ahead of him."),N("Kakashi lands behind."),Q("PAKKUN","This yours?"),Q("KAKASHI","Apparently."),Q("ANBU MARKED TARGET","You got it back."),Q("KAKASHI","I did."),Q("ANBU MARKED TARGET","Then why are you still following me?"),Q("KAKASHI","You were still part of it."),Q("PAKKUN","He'll run if you let him."),Q("KAKASHI","I know."),Q("ANBU MARKED TARGET","You don't even know each other."),Q("PAKKUN","Doesn't matter.")],nextBeatId:"v2_battle_secure_amt"});
 addBeat("v2_battle_secure_amt",{mode:"battle_transition",backdrop:B.intercept,location:"KONOHA ALLEYWAY · PL BATTLE",objective:"Catch the first man.",actors:["kakashi","amt","pakkun"],preset:"battle_trio",cues:[N("Kakashi Hatake and the ninken face ANBU Marked Target.")],battle:battle("academy_kakashi_origin_battle_kakashi_pakkun_vs_amt","secure_amt","v2_secure_amt_win","v2_secure_amt_loss","AK_SA_025")});
-addBeat("v2_secure_amt_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("secure_amt",ctx,s=>{s.participants.AMT.state="ESCAPED";}),cues:[N("ANBU Marked Target finds the opening first."),N("Kakashi loses the fight."),N("He does not lose the package with it."),Q("PAKKUN","You kept the important part."),Q("KAKASHI","I lost him."),Q("PAKKUN","I noticed."),Q("PAKKUN","Both things can be true.")],nextBeatId:"v2_report"});
+addBeat("v2_secure_amt_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("secure_amt",ctx,s=>{s.participants.AMT.state="ESCAPED";}),cues:[N("ANBU Marked Target finds the opening first."),N("Kakashi loses the fight."),N("He does not lose the package with it."),Q("PAKKUN","You kept the package."),Q("KAKASHI","I lost him."),Q("PAKKUN","Then report both.")],nextBeatId:"v2_report"});
 addBeat("v2_secure_amt_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:null,actors:["kakashi","amt","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("secure_amt",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";}),cues:[
  N("ANBU Marked Target goes down."),N("Kakashi stays on him until the fight is unquestionably over."),N("Pakkun stays where he can see both of them."),
  N("The package remains secure."),N("The man does not."),N("Not yet.")
