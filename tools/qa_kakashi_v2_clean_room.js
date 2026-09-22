@@ -116,6 +116,7 @@ assert(transitionSource.includes("is-falling")&&transitionSource.includes("is-fl
     makeEnemyRatioGuardAction:(id)=>({id,skillId:id,actionClass:"guard",traits:[],resolve:()=>({resolved:true})}),
     makeEnemyFixedDamageAction:(id,pl)=>({id,skillId:id,actionClass:"damage",traits:[],resolve:()=>({resolved:true,attackPL:pl})}),
     renderCombatOverlay:undefined,
+    chooseEnemyAuthoredBattleAction:()=>({success:false,reason:"qa_generic_scheduler"}),
     playerData:{},
     savePlayerData:()=>true,saveTestState:()=>true
   };
@@ -130,6 +131,20 @@ assert(transitionSource.includes("is-falling")&&transitionSource.includes("is-fl
   assert.strictEqual(context.enemyDatabase.academy_kakashi_origin_amt.calibratedBasePL,18);
   assert.strictEqual(context.enemyDatabase.academy_kakashi_origin_package_smuggler.calibratedBasePL,10);
   assert.strictEqual(context.enemyDatabase.academy_kakashi_origin_masked_interceptor.calibratedBasePL,14);
+  const amtActions=context.enemyDatabase.academy_kakashi_origin_amt.authoredBattleActions;
+  const psActions=context.enemyDatabase.academy_kakashi_origin_package_smuggler.authoredBattleActions;
+  const miActions=context.enemyDatabase.academy_kakashi_origin_masked_interceptor.authoredBattleActions;
+  const tanto=amtActions.find(a=>a.id==="enemy_anbu_style_operative_tanto_flash");
+  const wire=amtActions.find(a=>a.id==="enemy_anbu_style_operative_wire_capture");
+  const burst=psActions.find(a=>a.id==="enemy_fuinjutsu_smuggler_contraband_seal_burst");
+  const blade=miActions.find(a=>a.id==="enemy_decoy_assassin_concealed_blade");
+  assert.strictEqual(tanto.authoredAttackPL,6,"AMT Tantō Flash regressed to superseded PL26");
+  assert.strictEqual(tanto.conditionalBoostAttackPL,2,"AMT Body Flicker boost must be +2");
+  assert(wire.traits.includes("once_per_battle"),"AMT Wire Capture must be once per Battle");
+  assert.strictEqual(burst.authoredAttackPL,5,"Package Smuggler Seal Burst must be PL5");
+  assert.strictEqual(blade.authoredAttackPL,5,"Masked Interceptor Concealed Blade must be PL5");
+  assert.strictEqual(blade.conditionalBoostAttackPL,2,"Masked Interceptor False Retreat boost must be +2");
+  assert(String(context.chooseEnemyAuthoredBattleAction).includes("deterministicKakashiOriginAI"),"Kakashi V2 opponent AI must consume semantic priority before randomness");
   const battleOperationalSource=battleSource.split("function diagnostics()")[0];
   assert(!battleOperationalSource.includes("basePLAtEntry:15"),"Kakashi Battle-entry PL is hard-coded instead of read from live authority");
   assert(battleOperationalSource.includes("authoritativePlayerBasePLAtEntry"),"live Kakashi Battle-entry PL resolver missing");
