@@ -620,7 +620,266 @@ Prefer the proven shared runtime plus clear Origin content/adapters.
 
 ---
 
-## 25. Rollout order
+### 24A. Presentation visual-property and lifecycle ownership clarification — 2026-09-23
+
+This section clarifies the existing one-owner rule for player-facing presentation. It does **not** create a second architecture and does not re-enable animation.
+
+Canonical presentation rule:
+
+> **A player-facing element may have multiple readers/consumers, but only one active presentation owner for each visual-property or lifecycle responsibility at a time.**
+
+“One responsibility -> one owner” does **not** mean “one file -> one responsibility.” A single shared module may legitimately own several separately registered responsibilities when the boundaries are explicit.
+
+For presentation, distinguish at minimum:
+
+- canonical DOM mount / unmount lifecycle;
+- base layout / semantic stage anchor projection;
+- temporary choreography transform / motion;
+- temporary presentation-only visibility / focus state;
+- hard-scene transition playback;
+- Battle performance playback / result projection.
+
+A semantic owner and a presentation owner are different responsibilities. Presentation may consume committed truth; presentation may not decide truth.
+
+### 24A.1 Story Scene Board
+
+`story.scene.presentation.shared` remains owned by:
+
+`runtime/alpha-story-scene-board-33900.js`
+
+Its presentation responsibilities include the shared Story surface, canonical shared layout/stage-anchor vocabulary and Scene Board lifecycle.
+
+Origin-specific content/renderers may consume the shared Scene Board contract. They may not become second shared presentation owners by adding competing motion/lifecycle systems.
+
+### 24A.2 Story choreography
+
+Register:
+
+`story.choreography.presentation.shared`
+
+Canonical owner:
+
+`runtime/alpha-story-scene-board-33900.js`
+
+This is a distinct responsibility even though it shares the same module as `story.scene.presentation.shared`.
+
+Current source already exposes the canonical choreography interface:
+
+- `playStoryChoreography33900`;
+- `cancelStoryChoreography33900`;
+- `getStoryChoreographyState33900`.
+
+The choreography responsibility owns presentation-only temporary actor/object motion, choreography-scoped transform, bounded opacity/filter emphasis where required, animation timing, cancellation, cleanup, reduced-motion projection and settle-to-current-anchor behavior.
+
+It does **not** own:
+
+- Story factual presence;
+- Story outcome;
+- participant death/escape/restraint/custody;
+- package/object ownership;
+- Knowledge;
+- semantic beat advance;
+- Battle result;
+- reward.
+
+CSS animation is allowed as an implementation mechanism **inside the canonical choreography responsibility**.
+
+The prohibition is:
+
+> **No CSS, renderer, transition adapter, timeout helper or Origin-specific module outside the canonical choreography owner may independently animate choreography-owned visual properties.**
+
+A renderer may establish the canonical anchor/layout. The choreography owner may temporarily project motion relative to that canonical layout. On cancellation/completion it settles to the **current** canonical projection rather than a stale remembered coordinate.
+
+### 24A.3 Semantic presence vs visual presentation
+
+Preserve:
+
+```text
+semantic state -> canonical renderer projection -> optional presentation choreography
+```
+
+Example:
+
+```text
+semantic owner commits participant escaped
+-> renderer's canonical settled projection no longer contains participant
+-> choreography may present a bounded FLEE transition
+```
+
+The FLEE playback does not make the participant escape.
+
+No semantic commit may wait for animation completion.
+
+Refresh/save/load/re-entry may restore the settled current presentation without replaying or rerolling the fact.
+
+### 24A.4 Shared Story hard-scene transition ownership — audit result
+
+The 2026-09-23 source audit found that current Kakashi V2 hard-scene transition playback is **split**:
+
+- `runtime/alpha-kakashi-v2-transition-36040.js` decides/steps Kakashi-specific transition timing/state through `playPostCommitTransition`;
+- `runtime/alpha-kakashi-v2-renderer-36030.js` owns the Kakashi-specific document curtain DOM/CSS through `ensureGlobalCurtain`, `setGlobalCurtain` and `setWipe`.
+
+That is acceptable only as current Kakashi-specific stabilisation history. It is **not** the project-wide shared transition ownership model and must not be promoted by inertia.
+
+Design decision is now CLOSED:
+
+`story.transition.presentation.shared`
+
+**target canonical owner:**
+
+`runtime/alpha-story-scene-board-33900.js`
+
+Reason:
+
+- 33900 is already the shared Story presentation infrastructure;
+- hard-scene presentation is a Story presentation lifecycle responsibility;
+- the shared module can own a document-level transition surface that survives individual Origin renderer teardown;
+- keeping this responsibility in 33900 avoids inventing a new module solely for granularity;
+- it prevents Kakashi-specific 36030/36040 behavior becoming accidental global architecture.
+
+Implementation status:
+
+**DESIGN CLOSED / RUNTIME MIGRATION PENDING.**
+
+Until migration is complete, do **not** add `story.transition.presentation.shared` to the production responsibility list as though 33900 already owns live transition playback.
+
+Required eventual migration:
+
+- 33900 owns the one shared hard-scene transition surface/playback API;
+- Origin-specific runtime supplies transition intent/context only;
+- 36040 remains Kakashi-specific cue/semantic-advance adaptation and does not own shared transition playback;
+- 36030 remains Kakashi Story DOM/layout projection and does not own a project-wide curtain;
+- old Kakashi-specific competing transition playback is de-loaded/retired as a transition owner;
+- negative QA proves no second hard-scene transition owner can execute.
+
+This migration is an ownership consolidation. It is **not** permission to re-enable actor/card animation.
+
+### 24A.5 Battle performance ownership
+
+Current registry responsibility:
+
+`battle.presentation.shared`
+
+owned by:
+
+`runtime/alpha-battle-modern-33000.js`
+
+is already sufficiently specific for Alpha.
+
+Its current source owns Formation Stage composition and exposes Battle performance projection/playback hooks including:
+
+- `resolveBattlePerformanceProjection33000`;
+- `installBattlePerformance33000`.
+
+Therefore **do not create** `battle.performance.presentation.shared` merely for naming granularity.
+
+For Alpha, `battle.presentation.shared` includes:
+
+- Battle participant presentation layout;
+- confrontation/performance focus;
+- temporary Battle presentation motion when/if re-enabled;
+- impact/result visual projection;
+- participant-local result/PL/status presentation;
+- settle to authoritative next Battle state.
+
+Combat remains the semantic owner of legality, target, result, PL/runtime effects and next actor.
+
+Future Battle motion is an `EXTENDS battle.presentation.shared` change unless evidence proves 33000 itself must be replaced.
+
+### 24A.6 Alpha clone / ghost rule
+
+Default for Alpha:
+
+> **No presentation clone / ghost actor.**
+
+A clone/ghost is permitted only after explicit approval that the required visual result cannot reasonably be achieved through the canonical actor/object node.
+
+Any approved exception must be:
+
+- owned by the same canonical presentation responsibility;
+- presentation-only and non-semantic;
+- unable to receive player input;
+- unable to become the authoritative actor representation;
+- occurrence/beat/turn scoped;
+- bounded in lifetime;
+- deterministically cleaned on completion/cancel;
+- absent after save/load/re-entry;
+- covered by negative stale-owner/cardinality QA.
+
+Given the Kakashi layering incident, “temporary convenience ghost” is not sufficient justification.
+
+### 24A.7 Mandatory negative QA before motion returns
+
+Before Story actor/object motion is re-enabled in production, PASS must prove:
+
+- exactly one choreography controller owns temporary actor/object motion;
+- renderer owns canonical DOM/layout/anchors and does not independently animate choreography transform;
+- shared transition owner does not animate actor choreography transform;
+- Origin-specific adapters do not animate actors;
+- CSS outside the canonical choreography responsibility does not independently animate choreography-owned properties;
+- cancellation leaves actors/objects at the current canonical settled state;
+- scene re-entry cannot resume stale motion;
+- save/load cannot resume stale motion;
+- reduced-motion path preserves identical semantic outcome;
+- motion settles to the **current** canonical anchor;
+- retired/stale choreography controller is unreachable;
+- no semantic state waits for animation completion;
+- no competing clone/ghost representation survives;
+- duplicate ownership of transform / choreography opacity / temporary visibility / mount-unmount / hard-scene curtain fails deterministically where technically testable.
+
+Before shared hard-scene transition migration is considered complete, PASS must additionally prove:
+
+- exactly one production hard-scene transition owner;
+- no Kakashi-specific curtain/transition engine can execute as a competing shared owner;
+- same-environment presentation updates do not accidentally invoke hard-scene playback;
+- Story -> Battle -> Story transition playback does not mutate Story/Battle truth;
+- cancellation/re-entry leaves no stale document-level transition surface active.
+
+### 24A.8 Future animation change classification
+
+Re-enabling/improving Story card motion is normally:
+
+```text
+EXTENDS
+story.choreography.presentation.shared
+owner: runtime/alpha-story-scene-board-33900.js
+```
+
+If 33900's choreography implementation is proven structurally unsuitable:
+
+```text
+REPLACES
+story.choreography.presentation.shared
+```
+
+The responsibility ID remains stable.
+
+The old implementation must be de-loaded/retired and negatively proven unreachable.
+
+Do not create a helper/fallback/final-v2 stack beside it.
+
+Battle motion follows the same rule under `battle.presentation.shared`.
+
+### 24A.9 Current status
+
+This clarification changes ownership authority and registry description only.
+
+It does **not**:
+
+- re-enable Story animation;
+- re-enable Battle animation;
+- alter Story text/choices;
+- alter Battle semantics;
+- alter PL/rewards;
+- alter Origin routes;
+- promote Kakashi 36040 to shared transition owner;
+- author a new transition effect.
+
+Current static/stabilised presentation remains current runtime behavior until a separately authorised Coding change implements the clarified ownership safely.
+
+---
+
+# 25. Rollout order
 
 1. Keep Kakashi V2 stable.
 2. Implement automated safeguards from this contract.
