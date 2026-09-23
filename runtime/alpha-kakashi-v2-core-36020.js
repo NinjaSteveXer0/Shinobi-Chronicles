@@ -360,10 +360,24 @@ function resolveGroupKill(refs,causalKey){
   const targetKeys=[...new Set((refs||[]).map(participantKey).filter(key=>["MI","PS","AMT"].includes(key)))];
   if(!targetKeys.length)return{success:false,reason:"kakashi_v2_group_kill_targets_missing"};
   const shared=dispositionIntentReceipt("KILL",causalKey,targetKeys);if(!shared.success)return shared;
+  const parent=commitKakashiOccurrence("group_disposition",causalKey,{intent:"KILL",targetParticipantRefs:targetKeys,childSourceOccurrenceIds:[],outcomes:{},resolutionStatus:"resolving"});
+  if(!parent||parent.success!==true)return parent||{success:false,reason:"kakashi_v2_group_kill_parent_commit_failed"};
+  const parentOccurrenceId=parent.record&&String(parent.record.sourceOccurrenceId||parent.record.occurrenceId||"");
   const results=targetKeys.map(key=>resolveDispositionTarget("KILL",key,{causalKey,sharedIntent:shared}));
-  if(results.some(r=>!r.success))return{success:false,reason:"kakashi_v2_group_kill_child_failed",results};
-  const parent=commitKakashiOccurrence("group_disposition",causalKey,{intent:"KILL",targetParticipantRefs:targetKeys,childSourceOccurrenceIds:results.map(r=>r.sourceOccurrenceId),outcomes:Object.fromEntries(results.map((r,i)=>[targetKeys[i],r.outcome]))});
-  return{success:true,causalKey,results,parentOccurrenceId:parent&&parent.record&&(parent.record.sourceOccurrenceId||parent.record.occurrenceId)||null};
+  if(results.some(r=>!r.success))return{success:false,reason:"kakashi_v2_group_kill_child_failed",parentOccurrenceId,results};
+  parent.record.data={
+    ...(parent.record.data||{}),
+    intent:"KILL",targetParticipantRefs:targetKeys,
+    childSourceOccurrenceIds:results.map(r=>r.sourceOccurrenceId),
+    outcomes:Object.fromEntries(results.map((r,i)=>[targetKeys[i],r.outcome])),
+    resolutionStatus:"resolved"
+  };
+  for(const result of results){
+    const child=playerData.activityHistory.find(row=>row&&String(row.sourceOccurrenceId||row.occurrenceId||"")===String(result.sourceOccurrenceId||""));
+    if(child){child.causalParentOccurrenceId=parentOccurrenceId;child.data={...(child.data||{}),causalParentOccurrenceId:parentOccurrenceId};}
+  }
+  save();
+  return{success:true,causalKey,results,parentOccurrenceId};
 }
 function dispositionOutcome(ref){const key=participantKey(ref),s=state(),row=s&&s.participants&&s.participants[key];return row&&row.dispositionResolution&&row.dispositionResolution.outcome||row&&row.state||null;}
 function packageRecoveredForDisposition(){const s=state();return !!(s&&s.package&&(s.package.recovered===true||["KAKASHI","ANBU"].includes(s.package.holder)));}
@@ -1277,7 +1291,7 @@ addBeat("v2_battle_ps_direct",{mode:"battle_transition",backdrop:B.fight,locatio
 addBeat("v2_ps_missing_loss",{backdrop:B.fight,location:"KONOHA · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_direct",ctx,s=>{s.participants.PS.state="ESCAPED";}),cues:[N("Package Smuggler wins the fight and does not waste the opening."),N("He disappears into the side street before Kakashi can get back to his feet."),N("Kakashi listens for pursuit cues and finds none worth trusting."),N("The package is not with the man who just escaped him. ANBU Marked Target carried it away before this fight ever started."),N("Kakashi chose to stop the receiver instead of following the objective."),N("Now he has neither."),N("There is nothing left to do honestly except return and report the choice with the result.")],nextBeatId:"v2_report"});
 addBeat("v2_ps_missing_win",{mode:"choice",backdrop:B.fight,location:"KONOHA · NIGHT",objective:null,actors:["kakashi","ps"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_direct",ctx,s=>{s.participants.PS.state="BATTLE_DEFEATED";}),cues:[N("Package Smuggler goes down."),N("The package is still gone with ANBU Marked Target."),N("The man Kakashi chose to stop is beaten and still within reach."),N("What happens to him now will not recover the package.")],choices:[
  C("ps_missing_kill","KILL HIM","v2_ps_kill_result",{patch:()=>resolveDisposition("KILL","PS","ps_missing_kill")}),
- C("ps_missing_restrain","RESTRAIN HIM","v2_ps_restrain_report_result",{patch:()=>resolveDisposition("RESTRAIN","PS","ps_missing_restrain")}),
+ C("ps_missing_restrain","RESTRAIN HIM","v2_ps_restrain_report_result",{patch:()=>{const r=resolveDisposition("RESTRAIN","PS","ps_missing_restrain");if(!r.success)return r;projectExtractionPlanning("PS",r,"ps_missing_restrain");return r;}}),
  C("ps_missing_anbu","BRING HIM TO THE ANBU","v2_report",{patch:()=>dispose("PS","ANBU")}),
  C("ps_missing_police","TAKE HIM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>dispose("PS","POLICE")})
 ]});
