@@ -228,8 +228,9 @@ async function shot(page,name,selector=null){
       };
     });
     assert.strictEqual(breakawayMid.active,"FLEE","#312 AMT breakaway is not using the shared FLEE choreography");
-    assert(breakawayMid.left<watch.amtLeft-8,"#312 AMT card did not move left while running away: "+JSON.stringify({before:watch.amtLeft,mid:breakawayMid}));
-    assert(String(breakawayMid.animationName||"").includes("scChoreoFlee33900"),"#312 AMT FLEE keyframe is not active: "+JSON.stringify(breakawayMid));
+    assert(Math.abs(breakawayMid.left-watch.amtLeft)<3,"#312 AMT breakaway translated the card during the stabilization fade: "+JSON.stringify({before:watch.amtLeft,mid:breakawayMid}));
+    assert(breakawayMid.opacity<0.75,"#312 AMT breakaway did not visibly fade: "+JSON.stringify(breakawayMid));
+    assert(String(breakawayMid.animationName||"").includes("kv2CueExit36030"),"#312 AMT FLEE must use the stable opacity-only exit cue: "+JSON.stringify(breakawayMid));
 
     await page.waitForTimeout(550);
     const breakaway=await page.evaluate(()=>{
@@ -321,7 +322,7 @@ async function shot(page,name,selector=null){
     assert(stop.anchors.every(a=>a.width>=245),"#312 battle-pair Story prominence too small");
     assert.strictEqual(stop.ghostCount,0,"#312 committed departures survived after choreography settled");
     assert.strictEqual(stop.pendingEntryCount,0,"#312 entrant remained hidden after choreography settled");
-    assert(stop.choreography.lastKinds.includes("FOCUS")&&stop.choreography.lastKinds.includes("STRIKE")&&!stop.choreography.lastKinds.includes("LUNGE"),"#312 Kakashi sudden strike must use one transform-owning STRIKE cue after FOCUS: "+JSON.stringify(stop.choreography));
+    assert(stop.choreography.lastKinds.includes("FOCUS")&&stop.choreography.lastKinds.includes("STRIKE")&&!stop.choreography.lastKinds.includes("LUNGE"),"#312 Kakashi sudden strike must retain one semantic STRIKE cue after FOCUS: "+JSON.stringify(stop.choreography));
     assert(stop.anchors.every(a=>a.transform==="none"||a.transform==="matrix(1, 0, 0, 1, 0, 0)"||a.transform==="matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)"),"#312 Story actors retained residual transform after choreography settled: "+JSON.stringify(stop.anchors));
     assert(stop.choreography.completedKinds.includes("ENTER"),"#312 Kakashi entry completion receipt missing: "+JSON.stringify(stop.choreography));
     assert(stop.transition.pass,JSON.stringify(stop.transition));
