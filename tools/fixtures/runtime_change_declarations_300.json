@@ -382,6 +382,43 @@
       ],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Issue #334 consolidates all shared Story hard-scene and Kakashi Story/Battle curtain playback into the existing 33900 shared Scene Board owner. Kakashi 36040 retains only semantic/cue advance adaptation and transition intent classification; 36030 retains Kakashi DOM/layout plus handoff intent. No actor/card animation is re-enabled and no semantic state depends on transition completion."
+    },
+    {
+      "changeId": "issue-322-kakashi-final-dispositions-rewards-evidence",
+      "classification": "REPLACES",
+      "responsibilityIds": [
+        "origin.academy_kakashi.v2.story_state",
+        "origin.academy_kakashi.v2.reward_commit",
+        "story.factual.resolver.shared",
+        "progression.special_jonin.contextual_evidence_producer.shared"
+      ],
+      "owner": "runtime/alpha-kakashi-v2-core-36020.js + runtime/alpha-kakashi-v2-rewards-36015.js + runtime/alpha-special-jonin-evidence-producer-34700.js",
+      "directCallers": [
+        "runtime/alpha-traversal-bridge-33200.js"
+      ],
+      "stateTouched": [
+        "activeStorySceneRuntime.localContext.kakashiV2 participant disposition facts",
+        "playerData.storyFactualResolver.receipts",
+        "playerData.activityHistory Kakashi V2 disposition/evidence occurrence facts",
+        "playerData.specialJoninContextualEvidence",
+        "Kakashi V2 reward receipt store"
+      ],
+      "productionLoader": "runtime/alpha-traversal-bridge-33200.js",
+      "qaRefs": [
+        "tools/qa_issue_322_kakashi_dispositions.js",
+        "tools/qa_kakashi_v2_clean_room.js",
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [
+        "runtime/alpha-kakashi-v2-core-36020.js::direct KILL to DEAD mutation",
+        "runtime/alpha-kakashi-v2-core-36020.js::group KILL all-DEAD mutation",
+        "runtime/alpha-kakashi-v2-core-36020.js::fieldSecured/FIELD_SECURED_PENDING_COLLECTION active semantics",
+        "runtime/alpha-kakashi-v2-rewards-36015.js::flat one-or-more live custody 25 Ryo tier",
+        "runtime/alpha-kakashi-v2-rewards-36015.js::silent Math.min(250,total) terminal clipping"
+      ],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Issue #322 replaces Academy Kakashi V2 lethal/restraint truth with exact KILLED|ESCAPED and RESTRAINED|ESCAPED factual resolver outcomes per participant, re-keys collection to RESTRAINED facts, applies noncumulative 25/50/100 living-delivery reward tiers, exposes rather than guesses the unresolved legacy terminal cap, and activates the previously missing shared #23 contextual Special Jonin evidence producer for exact catalogue-valid authored evidence. Legacy disposition terms remain read-only inside bounded Alpha save migration only."
     }
   ]
 }

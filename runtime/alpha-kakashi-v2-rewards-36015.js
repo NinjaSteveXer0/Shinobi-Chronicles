@@ -278,20 +278,25 @@ function exceptionalState(s){
 function previewTerminal(s,storyOccurrenceId){
   const participants=s&&s.participants||{};
   const packageRecovered=!!(s&&s.package&&(s.package.returned===true||s.package.holder==="ANBU"));
-  const actionableIntel=!!(s&&s.knowledge&&s.knowledge.askWhere===true);
-  const liveCustody=Object.values(participants).some(row=>row&&["ANBU_CUSTODY","POLICE_CUSTODY"].includes(row.state));
+  const actionableIntel=!!(s&&s.knowledge&&(s.knowledge.askWhere===true||s.knowledge.getCloserContingency===true));
+  const deliveredParticipantKeys=Object.entries(participants).filter(([,row])=>row&&["ANBU_CUSTODY","POLICE_CUSTODY"].includes(row.state)).map(([key])=>key);
+  const deliveredLivingCount=deliveredParticipantKeys.length;
+  const captureRyo=deliveredLivingCount>=3?100:deliveredLivingCount===2?50:deliveredLivingCount===1?25:0;
+  const liveCustody=deliveredLivingCount>0;
   const exceptional=exceptionalState(s);
   const battleParticipation=!!(s&&s.battles&&Object.keys(s.battles).length);
   const sources=[
     {sourceId:SOURCE.terminal,ryo:100,qualified:true},
     {sourceId:SOURCE.packageRecovered,ryo:75,qualified:packageRecovered},
     {sourceId:SOURCE.actionableIntel,ryo:25,qualified:actionableIntel},
-    {sourceId:SOURCE.liveCustody,ryo:25,qualified:liveCustody},
+    {sourceId:SOURCE.liveCustody,ryo:captureRyo,qualified:liveCustody,metadata:{deliveredLivingCount,deliveredParticipantKeys}},
     {sourceId:SOURCE.exceptional,ryo:25,qualified:exceptional}
   ];
-  const total=sources.filter(x=>x.qualified).reduce((n,x)=>n+x.ryo,0);
+  const rawTotalRyo=sources.filter(x=>x.qualified).reduce((n,x)=>n+x.ryo,0);
   return{
-    storyOccurrenceId:String(storyOccurrenceId||""),sources,totalRyo:Math.min(250,total),packageRecovered,actionableIntel,liveCustody,exceptional,battleParticipation,
+    storyOccurrenceId:String(storyOccurrenceId||""),sources,totalRyo:rawTotalRyo,rawTotalRyo,
+    legacyTerminalCapRyo:250,terminalCapPolicyUnresolved:rawTotalRyo>250,
+    packageRecovered,actionableIntel,liveCustody,deliveredLivingCount,deliveredParticipantKeys,captureRyo,exceptional,battleParticipation,
     fieldRecoveryFallback:battleParticipation&&!committed(storyOccurrenceId,SOURCE.fieldPill,"origin"),
     trainingTanto:exceptional&&!committed(storyOccurrenceId,SOURCE.trainingTanto,"origin")
   };
@@ -301,7 +306,7 @@ function commitCurrencySource(storyOccurrenceId,row){
   const existing=receiptAt(storyOccurrenceId,row.sourceId,"origin");
   if(existing&&existing.committed===true)return{success:true,idempotent:true,qualified:true,granted:0,receipt:clone(existing)};
   playerData.ryo=(Number(playerData.ryo)||0)+Number(row.ryo||0);
-  const receipt=writeReceipt({storyOccurrenceId,sourceId:row.sourceId,scopeRef:"origin",rewardClass:"terminal_cash",ryo:row.ryo});
+  const receipt=writeReceipt({storyOccurrenceId,sourceId:row.sourceId,scopeRef:"origin",rewardClass:"terminal_cash",ryo:row.ryo,metadata:row.metadata||{}});
   return{...receipt,qualified:true,granted:Number(row.ryo)||0};
 }
 function commitItemSource(storyOccurrenceId,sourceId,itemId,metadata={}){
@@ -317,7 +322,9 @@ function commitTerminal(s,storyOccurrenceId){
   ensurePlayer();
   if(!storyOccurrenceId)return{success:false,reason:"kakashi_v2_story_occurrence_required"};
   if(!s||!s.terminal||s.terminal.reportReached!==true||s.terminal.minatoReached!==true||s.terminal.receiptReached!==true)return{success:false,reason:"kakashi_v2_terminal_sequence_incomplete"};
-  const plan=previewTerminal(s,storyOccurrenceId),snap=snapshotRewardMutation();
+  const plan=previewTerminal(s,storyOccurrenceId);
+  if(plan.terminalCapPolicyUnresolved===true)return{success:false,reason:"kakashi_v2_terminal_cap_policy_unresolved",plan:clone(plan)};
+  const snap=snapshotRewardMutation();
   try{
     const cash=plan.sources.map(row=>commitCurrencySource(storyOccurrenceId,row));
     if(cash.some(r=>!r.success))throw new Error("terminal_cash_commit_failed");
@@ -346,10 +353,11 @@ function diagnostics(){
   const tanto=typeof itemDatabase==="object"&&itemDatabase&&itemDatabase.academy_training_tanto;
   const checks={
     exactTerminalSources:[SOURCE.terminal,SOURCE.packageRecovered,SOURCE.actionableIntel,SOURCE.liveCustody,SOURCE.exceptional].every(Boolean),
-    terminalCap250:previewTerminal({package:{returned:true},knowledge:{askWhere:true},participants:{MI:{state:"ANBU_CUSTODY"}},battles:{pickpocket_3v1:{outcome:"victory"}},routeHistory:[],resolvers:{},terminal:{}}, "diag").totalRyo===250,
+    captureTierExact:[0,25,50,100].join("|")===[previewTerminal({participants:{},package:{},knowledge:{},battles:{},routeHistory:[],resolvers:{},terminal:{}},"d0").captureRyo,previewTerminal({participants:{MI:{state:"ANBU_CUSTODY"}},package:{},knowledge:{},battles:{},routeHistory:[],resolvers:{},terminal:{}},"d1").captureRyo,previewTerminal({participants:{MI:{state:"ANBU_CUSTODY"},PS:{state:"POLICE_CUSTODY"}},package:{},knowledge:{},battles:{},routeHistory:[],resolvers:{},terminal:{}},"d2").captureRyo,previewTerminal({participants:{MI:{state:"ANBU_CUSTODY"},PS:{state:"POLICE_CUSTODY"},AMT:{state:"ANBU_CUSTODY"}},package:{},knowledge:{},battles:{},routeHistory:[],resolvers:{},terminal:{}},"d3").captureRyo].join("|"),
+    terminalCapBoundaryExposed:previewTerminal({package:{returned:true},knowledge:{askWhere:true},participants:{MI:{state:"ANBU_CUSTODY"},PS:{state:"ANBU_CUSTODY"},AMT:{state:"ANBU_CUSTODY"}},battles:{pickpocket_3v1:{outcome:"victory"}},routeHistory:[],resolvers:{directPickpocket:{selectedOutcomeRef:"PICKPOCKET_DIRECT_SUCCESS"}},terminal:{}},"diag").terminalCapPolicyUnresolved===true&&!String(previewTerminal).includes("Math.min(250"),
     exactImmediateCash:String(battlePlan).includes("count===1")&&String(battlePlan).includes("ryo:100")&&String(battlePlan).includes("ryo:exactSet?200:0")&&String(battleOppositionIds36015).includes("oppositionParticipantIds"),
     exactTanto:!!tanto&&tanto.type==="weapon"&&tanto.weaponClass==="Tanto"&&tanto.stackable===false&&Number(tanto.statModifiers&&tanto.statModifiers.buki)===1,
-    noKillRewardPredicate:!String(previewTerminal).includes('state==="DEAD"')&&!String(exceptionalState).includes("DEAD"),
+    noKillRewardPredicate:!String(previewTerminal).includes("KILLED")&&!String(exceptionalState).includes("KILLED")&&!String(previewTerminal).includes('disposition==="KILL"'),
     noParallelInventory:!String(commitItemSource).includes("inventory.push")&&String(commitItemSource).includes("addItemToInventory"),
     victoryProjectionSelfHeals:String(ensureKakashiV2BattleRewardProjection36015).includes("authoritativeProjectionRepaired")&&String(renderVictoryOverlay36015).includes("ensureKakashiV2BattleRewardProjection36015"),
     victoryOpenProjectsBeforeGenericRender:String(openOverlay36015).includes('"victory"')&&String(openOverlay36015).indexOf("ensureKakashiV2BattleRewardProjection36015")<String(openOverlay36015).indexOf("PRE_OPEN_OVERLAY"),
