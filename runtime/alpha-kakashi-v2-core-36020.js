@@ -341,6 +341,44 @@ function participantReportCues(s,ref){
   }else out.push(Q("KAKASHI",String(row.state||"Unknown.")));
   return out;
 }
+function nonlethalParticipantReportCues(s){
+  const refs=["MI","PS","AMT"].filter(ref=>s.participants&&s.participants[ref]&&s.participants[ref].state!=="UNSEEN"&&s.participants[ref].state!=="DEAD");
+  if(!refs.length)return[];
+  const states=refs.map(ref=>s.participants[ref].state);
+  const same=states.every(x=>x===states[0]);
+  if(same&&refs.length>1&&states[0]==="ANBU_CUSTODY")return[
+    Q("ANBU OPERATIVE",refs.length===3?"And the three you brought back?":"And the prisoners you brought back?"),
+    Q("KAKASHI","Alive. Your people have them."),
+    N("The operative glances toward the access point where the custody transfer disappeared from view."),
+    Q("ANBU OPERATIVE","All accounted for?"),
+    Q("KAKASHI","Yes.")
+  ];
+  if(same&&refs.length>1&&states[0]==="POLICE_CUSTODY")return[
+    Q("ANBU OPERATIVE","The others?"),
+    Q("KAKASHI",refs.length===3?"I took all three to the Uchiha Police. Alive.":"I took them to the Uchiha Police. Alive."),
+    Q("ANBU OPERATIVE","Your decision?"),
+    Q("KAKASHI","Yes."),
+    N("The operative records the destination. Police custody is not rewritten as ANBU custody simply because the report ends here.")
+  ];
+  if(same&&refs.length>1&&states[0]==="RELEASED")return[
+    Q("ANBU OPERATIVE","The others?"),
+    Q("KAKASHI",refs.length===3?"I let all three go.":"I let them go."),
+    N("The operative stops writing."),
+    Q("ANBU OPERATIVE","Deliberately."),
+    Q("KAKASHI","Yes."),
+    N("The pen starts moving again. Release goes into the report as a choice, not an escape.")
+  ];
+  if(same&&refs.length>1&&restrainedState(s.participants[refs[0]]))return[
+    Q("ANBU OPERATIVE","The people you restrained?"),
+    Q("KAKASHI",refs.length===3?"All three are alive and restrained.":"They're alive and restrained."),
+    Q("ANBU OPERATIVE","Locations are in the report?"),
+    Q("KAKASHI","Yes."),
+    Q("ANBU OPERATIVE","We'll recover them.")
+  ];
+  const out=[];
+  for(const ref of refs)out.push(...participantReportCues(s,ref));
+  return out;
+}
 function knowledgeReportCues(s){
   const out=[];
   if(s.knowledge.getCloserContingency)out.push(
@@ -435,7 +473,7 @@ function dynamicTerminalCues(){
   cues.push(Q("ANBU OPERATIVE","Report."));
   cues.push(...routeReportCues(s),...packageReportCues(s));
   if(lethalIntentRefs(s).length)cues.push(...lethalReportCues(s));
-  else for(const ref of ["MI","PS","AMT"])cues.push(...participantReportCues(s,ref));
+  else cues.push(...nonlethalParticipantReportCues(s));
   cues.push(...knowledgeReportCues(s),...pakkunReportAndDepartureCues(s),...reportClosingCues(s));
   return cues;
 }
