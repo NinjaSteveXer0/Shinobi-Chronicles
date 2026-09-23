@@ -199,6 +199,30 @@ const PAIRS=Object.freeze([
   ["Private capability, pressured performance, protective response and observer interpretation remain separate facts.","La capacidad privada, el rendimiento bajo presión, la respuesta protectora y la interpretación del observador siguen siendo hechos separados."],
 
 
+  // Academy Obito final #331 binary-journey authority.
+  ["Obito reaches the Academy training ground. The training opportunity remaining is determined only by the committed journey-time facts.","Obito llega al campo de entrenamiento de la Academia. La oportunidad de entrenamiento que queda se determina únicamente por los hechos confirmados del tiempo de viaje."],
+  ["Obito performs only the formal training blocks still available when he arrives.","Obito realiza únicamente los bloques de entrenamiento formal que siguen disponibles cuando llega."],
+  ["At home, Obito finally has time to decide what he thinks the day meant.","En casa, Obito por fin tiene tiempo para decidir qué cree que significó el día."],
+  ["What does Obito take from today?","¿Qué se lleva Obito de lo ocurrido hoy?"],
+  ["No formal training remains available when Obito arrives.","Cuando Obito llega, ya no queda entrenamiento formal disponible."],
+  ["GET TO TRAINING","LLEGA AL ENTRENAMIENTO"],
+  ["HELP HER","AYUDARLA"],
+  ["KEEP GOING","SEGUIR ADELANTE"],
+  ["HELP SEARCH","AYUDAR A BUSCAR"],
+  ["HELP WITH THE DELIVERY","AYUDAR CON EL REPARTO"],
+  ["KEEP MOVING","SEGUIR AVANZANDO"],
+  ["STOP AND HELP","DETENERSE Y AYUDAR"],
+  ["GO TO TRAINING","IR AL ENTRENAMIENTO"],
+  ["The wardrobe is still wedged in the doorway.","El armario sigue atascado en la puerta."],
+  ["The vendor is already reaching for another rolling vegetable.","La vendedora ya está intentando alcanzar otra verdura que rueda por la calle."],
+  ["The missing Academy bundle is somewhere along the route.","El paquete de equipo de la Academia que falta está en algún punto de la ruta."],
+  ["Training is still happening without him.","El entrenamiento sigue avanzando sin él."],
+  ["His training is right there. The cart is already moving.","Su entrenamiento está justo ahí. El carro ya está en movimiento."],
+  ["I'm not going to stop helping people.","No voy a dejar de ayudar a la gente."],
+  ["I need to take training more seriously.","Necesito tomarme el entrenamiento más en serio."],
+  ["I need to get better at both.","Necesito mejorar en ambas cosas."],
+  ["Maybe I'm looking at this wrong. I need to figure out what matters most to me.","Tal vez lo estoy viendo mal. Necesito descubrir qué es lo que más me importa."],
+
   // Obito.
   ["Obito leaves for an Academy/Uchiha fundamentals session that matters to him. The training follows a real schedule and will not wait for him. Direct travel can legitimately reach the FULL window.","Obito parte hacia una sesión de fundamentos de la Academia/Uchiha que le importa. El entrenamiento sigue un horario real y no lo esperará. El viaje directo puede llegar legítimamente a la ventana FULL."],
   ["A civilian is struggling to move bulky furniture through an awkward doorway.","Un civil tiene dificultades para mover muebles voluminosos por una puerta estrecha."],
