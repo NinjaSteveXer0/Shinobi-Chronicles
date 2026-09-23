@@ -195,7 +195,7 @@ Kakashi leaves the alley shadow.
 
 ---
 
-# SUCCESS — STRIKE BEFORE THE HANDOFF
+# SUCCESS — INTERRUPT THE HANDOFF
 
 ANBU Marked Target starts to extend the package.
 
@@ -239,7 +239,7 @@ The quiet meeting is over.
 
 ---
 
-# SUCCESS — ATTEMPT THE PICKPOCKET
+# SUCCESS — SLIP IN AND TAKE IT
 
 The package starts toward Package Smuggler's hand.
 
@@ -297,7 +297,6 @@ Package Smuggler's hand drops toward his weapon.
 
 **Kakashi Hatake vs ANBU Marked Target + Package Smuggler**
 
-Masked Interceptor remains unseen.
 
 ---
 
@@ -371,7 +370,7 @@ The package is getting farther away.
 
 ---
 
-# FAILURE — STAY ON THE PACKAGE
+# FAILURE — CHASE THE PACKAGE
 
 Kakashi moves before Package Smuggler reaches the alley.
 
@@ -531,7 +530,7 @@ Then turns back.
 
 ---
 
-# FAILURE — STOP PACKAGE SMUGGLER
+# FAILURE — CONFRONT THE RECEIVER
 
 ANBU Marked Target disappears toward the main street.
 
@@ -569,7 +568,7 @@ Kakashi shifts his footing.
 
 ---
 
-# FAILURE — CUT THEM OFF AT THE SAKURA TREE
+# FAILURE — CUT THEM OFF
 
 Kakashi leaves the alley another way.
 
