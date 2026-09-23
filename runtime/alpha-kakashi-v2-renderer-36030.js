@@ -12,7 +12,8 @@ const PATCH_ID="academy_kakashi_v2_renderer_36030_2026_09_22";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const STYLE_ID="kakashi-v2-renderer-36030-style";
 const ROOT_ID="kakashi-v2-scene-board";
-let rendering=false,lastProjectionSnapshot=null,pendingVisualSnapshot=null,transitionMemoryReleaseTimer=null;
+const GLOBAL_CURTAIN_ID="kakashi-v2-global-curtain";
+let rendering=false,lastProjectionSnapshot=null,pendingVisualSnapshot=null,transitionMemoryReleaseTimer=null,globalCurtainReleaseTimer=null,lastBattleSuspended=false;
 
 function esc(v){return String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
 function active(){try{return typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;}catch(_e){return null;}}
@@ -40,7 +41,7 @@ function installStyle(){
   const s=document.createElement("style");s.id=STYLE_ID;s.textContent=`
 #story-scene-presentation-layer[data-kakashi-v2="true"]{display:block!important;background:#020508!important;overflow:hidden!important;align-items:stretch!important;justify-content:stretch!important}
 #story-scene-presentation-layer[data-kakashi-v2="true"]>*:not(#${ROOT_ID}){display:none!important}
-#${ROOT_ID}{position:absolute;inset:0;z-index:1;overflow:hidden;background:#020508;color:#e9dfca;font-family:inherit;isolation:isolate}
+#${GLOBAL_CURTAIN_ID}{position:fixed;inset:0;z-index:2147483000;background:#020508;opacity:0;visibility:hidden;pointer-events:none}\n#${GLOBAL_CURTAIN_ID}.is-covered{opacity:1;visibility:visible;pointer-events:auto;transition:none!important}\n#${GLOBAL_CURTAIN_ID}.is-releasing{opacity:0;visibility:visible;pointer-events:auto;transition:opacity .18s ease-out}\n#${ROOT_ID}{position:absolute;inset:0;z-index:1;overflow:hidden;background:#020508;color:#e9dfca;font-family:inherit;isolation:isolate}
 #${ROOT_ID} .kv2-backdrop{position:absolute;inset:0;z-index:-3;background-position:center;background-size:cover;background-repeat:no-repeat;transform:scale(1.001)}
 #${ROOT_ID} .kv2-scrim{position:absolute;inset:0;z-index:-2;background:linear-gradient(180deg,rgba(0,4,8,.10),rgba(0,4,8,.05) 47%,rgba(0,4,8,.42) 72%,rgba(0,4,8,.82))}
 #${ROOT_ID} .kv2-frame{position:absolute;inset:1.4%;border:1px solid rgba(197,158,70,.16);pointer-events:none}
@@ -49,7 +50,7 @@ function installStyle(){
 #${ROOT_ID} .kv2-objective{justify-self:end;box-sizing:border-box;width:min(100%,390px);padding:8px 11px;border:1px solid rgba(75,209,220,.46);background:rgba(2,12,16,.82);box-shadow:0 10px 30px rgba(0,0,0,.32);font-size:clamp(9px,.68vw,12px);line-height:1.35;color:#e9eeeb}
 #${ROOT_ID} .kv2-objective b{display:block;margin-bottom:3px;color:#67dce5;font-size:7px;letter-spacing:.14em}
 #${ROOT_ID} .kv2-actors{position:absolute;left:3.5%;right:3.5%;top:13.2%;bottom:29%;z-index:4;pointer-events:none}
-#${ROOT_ID} .kv2-actor{position:absolute;left:var(--sc-stage-anchor-x,var(--kv2-x,5%));bottom:var(--kv2-y,0);width:var(--kv2-w,min(20vw,220px));height:var(--kv2-h,min(52vh,380px));max-height:100%;display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.96) brightness(.96) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0);transition:filter .14s ease,opacity .14s ease!important}\n#${ROOT_ID} .kv2-actors[data-count="1"] .kv2-actor{--kv2-w:min(29vw,330px);--kv2-h:min(62vh,465px)}\n#${ROOT_ID} .kv2-actors[data-count="2"] .kv2-actor{--kv2-w:min(25vw,292px);--kv2-h:min(59vh,435px)}\n#${ROOT_ID} .kv2-actors[data-count="3"] .kv2-actor{--kv2-w:min(21vw,235px);--kv2-h:min(53vh,390px)}\n#${ROOT_ID} .kv2-actors[data-count="4"] .kv2-actor,#${ROOT_ID} .kv2-actors[data-count="5"] .kv2-actor{--kv2-w:min(18vw,195px);--kv2-h:min(48vh,350px)}\n#${ROOT_ID} .kv2-actor.is-focus{opacity:1;filter:saturate(1.05) brightness(1.08) drop-shadow(0 22px 30px rgba(0,0,0,.55));z-index:4}
+#${ROOT_ID} .kv2-actor{position:absolute;left:var(--sc-stage-anchor-x,var(--kv2-x,5%));bottom:var(--kv2-y,0);width:var(--kv2-w,min(20vw,220px));height:var(--kv2-h,min(52vh,380px));max-height:100%;display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.96) brightness(.96) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:none!important;transition:none!important;will-change:auto!important}\n#${ROOT_ID} .kv2-actors[data-count="1"] .kv2-actor{--kv2-w:min(29vw,330px);--kv2-h:min(62vh,465px)}\n#${ROOT_ID} .kv2-actors[data-count="2"] .kv2-actor{--kv2-w:min(25vw,292px);--kv2-h:min(59vh,435px)}\n#${ROOT_ID} .kv2-actors[data-count="3"] .kv2-actor{--kv2-w:min(21vw,235px);--kv2-h:min(53vh,390px)}\n#${ROOT_ID} .kv2-actors[data-count="4"] .kv2-actor,#${ROOT_ID} .kv2-actors[data-count="5"] .kv2-actor{--kv2-w:min(18vw,195px);--kv2-h:min(48vh,350px)}\n#${ROOT_ID} .kv2-actor.is-focus{opacity:1;filter:saturate(1.05) brightness(1.08) drop-shadow(0 22px 30px rgba(0,0,0,.55));z-index:4}
 #${ROOT_ID} .kv2-actor[data-slot="kakashi"]{--kv2-x:4%;--kv2-w:min(20vw,220px)}
 #${ROOT_ID} .kv2-actor[data-slot="mi"]{--kv2-x:29%;--kv2-w:min(19vw,210px)}
 #${ROOT_ID} .kv2-actor[data-slot="ps"]{--kv2-x:52%;--kv2-w:min(19vw,210px)}
@@ -73,27 +74,20 @@ function installStyle(){
 #${ROOT_ID}[data-preset="hokage_report"] .kv2-actor[data-slot="anbu"]{--kv2-x:13%;--kv2-y:0}
 #${ROOT_ID}[data-preset="hokage_report"] .kv2-actor[data-slot="minato"]{--kv2-x:67%;--kv2-y:12%}
 #${ROOT_ID} .kv2-actor img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}
-#${ROOT_ID} .kv2-actor.is-entering{animation:kv2ActorEnter36030 .20s ease-out both}
-#${ROOT_ID} .kv2-ghost-layer{position:absolute;inset:0;z-index:12;pointer-events:none;overflow:hidden}\n#${ROOT_ID}[data-transition-active="true"] .kv2-ghost-layer{z-index:46}\n#${ROOT_ID} .kv2-actor-ghost{position:absolute!important;z-index:1!important;margin:0!important;pointer-events:none!important}
-#${ROOT_ID} .kv2-actor-ghost.is-falling,#${ROOT_ID} .kv2-actor-ghost.is-fleeing,#${ROOT_ID} .kv2-actor-ghost.is-fading{will-change:opacity}
-#${ROOT_ID} .kv2-departure-ghost.is-falling[data-sc-choreography-active="COLLAPSE"]{animation-name:kv2ActorFall36030!important;animation-timing-function:ease-out!important}
-#${ROOT_ID} .kv2-departure-ghost.is-fleeing[data-sc-choreography-active="FLEE"]{animation-name:kv2ActorFlee36030!important;animation-timing-function:ease-out!important}
-#${ROOT_ID} .kv2-departure-ghost.is-fading[data-sc-choreography-active="EXIT"]{animation-name:kv2ActorFade36030!important}
-@keyframes kv2ActorEnter36030{from{opacity:0;filter:brightness(.78)}to{opacity:1;filter:drop-shadow(0 18px 24px rgba(0,0,0,.48))}}
-@keyframes kv2ActorFall36030{0%{opacity:1;filter:saturate(.9) brightness(.92)}100%{opacity:0;filter:saturate(.42) brightness(.55)}}
-@keyframes kv2ActorFlee36030{from{opacity:1}to{opacity:0}}
-@keyframes kv2ActorFade36030{from{opacity:1}to{opacity:0}}
-/* Kakashi V2 stabilization: shared choreography keeps timing/receipts, but cards never translate/scale. */
-#${ROOT_ID} [data-sc-choreography-active]{will-change:opacity,filter!important;animation-name:kv2CueEmphasis36030!important}
-#${ROOT_ID} .sc-choreo-enter,#${ROOT_ID} .sc-choreo-surprise-entry{animation-name:kv2CueEnter36030!important}
-#${ROOT_ID} .sc-choreo-collapse,#${ROOT_ID} .sc-choreo-flee,#${ROOT_ID} .sc-choreo-exit{animation-name:kv2CueExit36030!important}
-#${ROOT_ID} .sc-choreo-reposition,#${ROOT_ID} .sc-choreo-handoff,#${ROOT_ID} .sc-choreo-object-transfer{animation:none!important}
-@keyframes kv2CueEmphasis36030{from{opacity:.82;filter:brightness(.9)}to{opacity:1;filter:none}}
-@keyframes kv2CueEnter36030{from{opacity:0}to{opacity:1}}
-@keyframes kv2CueExit36030{from{opacity:1}to{opacity:0}}
+/* Final Kakashi Golden motion policy: actor/card choreography is static.
+   Story truth and cue-local staging still advance, but no actor animation owns frames. */
+#${ROOT_ID} .kv2-actor.is-entering{animation:none!important}
+#${ROOT_ID} .kv2-ghost-layer{display:none!important}
+#${ROOT_ID} .kv2-actor-ghost,#${ROOT_ID} .kv2-departure-ghost,#${ROOT_ID} .kv2-outgoing-hold-ghost{display:none!important;animation:none!important;transition:none!important}
+#${ROOT_ID} [data-sc-choreography-active],
+#${ROOT_ID} .sc-choreo-enter,#${ROOT_ID} .sc-choreo-surprise-entry,#${ROOT_ID} .sc-choreo-collapse,#${ROOT_ID} .sc-choreo-flee,#${ROOT_ID} .sc-choreo-exit,
+#${ROOT_ID} .sc-choreo-reposition,#${ROOT_ID} .sc-choreo-handoff,#${ROOT_ID} .sc-choreo-object-transfer,
+#${ROOT_ID} .sc-choreo-focus,#${ROOT_ID} .sc-choreo-strike,#${ROOT_ID} .sc-choreo-recoil,#${ROOT_ID} .sc-choreo-lunge{
+  animation:none!important;transition:none!important;transform:none!important;will-change:auto!important
+}
 #${ROOT_ID} .kv2-card-frame{position:absolute;inset:0;border:1px solid rgba(210,172,80,.28);background:linear-gradient(180deg,transparent 50%,rgba(1,6,9,.68));box-shadow:inset 0 0 0 1px rgba(255,255,255,.018)}
-#${ROOT_ID} .kv2-actor-label{position:absolute;left:6%;right:6%;bottom:3%;padding:6px 8px;border:1px solid rgba(208,168,75,.4);background:rgba(2,7,11,.88);text-align:center;font-size:8px;font-weight:900;letter-spacing:.11em;color:#eee2c7;text-shadow:0 1px 2px #000}\n#${ROOT_ID} .kv2-actor-state{display:table;margin:4px auto 0;padding:2px 6px;border:1px solid rgba(92,215,225,.35);background:rgba(4,23,28,.82);color:#7fe1e8;font-size:7px;font-weight:900;letter-spacing:.08em}\n#${ROOT_ID} .kv2-object-layer{position:absolute;inset:0;z-index:16;pointer-events:none}\n#${ROOT_ID} .kv2-package-token{position:absolute;top:42%;left:var(--sc-stage-anchor-x,50%);width:64px;height:45px;transform:translate(-8%,-50%);display:grid;place-items:center;border:1px solid rgba(221,178,73,.75);background:linear-gradient(145deg,rgba(42,30,12,.95),rgba(12,14,13,.96));box-shadow:0 12px 28px rgba(0,0,0,.48),0 0 18px rgba(221,178,73,.12);color:#e4c66e;font-size:7px;font-weight:900;letter-spacing:.12em}\n#${ROOT_ID} .kv2-package-token::before{content:"";position:absolute;width:32px;height:21px;border:1px solid rgba(226,190,100,.64);background:linear-gradient(135deg,#4a3a21,#21190f);transform:rotate(-4deg)}\n#${ROOT_ID} .kv2-package-token span{position:absolute;top:calc(100% + 5px);white-space:nowrap;padding:3px 5px;background:rgba(2,8,11,.82);border:1px solid rgba(215,174,76,.32)}\n#${ROOT_ID} .kv2-package-token[hidden]{display:none!important}\n#${ROOT_ID} .kv2-departure-ghost,#${ROOT_ID} .kv2-outgoing-hold-ghost{position:absolute!important;z-index:13!important;pointer-events:none!important}\n#${ROOT_ID} .kv2-departure-ghost{display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.9) brightness(.94) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0)}\n#${ROOT_ID} .kv2-outgoing-hold-ghost{display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.96) brightness(.96) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0)}\n#${ROOT_ID} .kv2-departure-ghost img,#${ROOT_ID} .kv2-outgoing-hold-ghost img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}\n#${ROOT_ID} .kv2-actors{transition:opacity .16s ease-out}
-#${ROOT_ID}[data-transition-active="true"] .kv2-actors{opacity:0!important;pointer-events:none!important}\n#${ROOT_ID} .kv2-dialogue{position:absolute;left:50%;bottom:3%;width:min(72%,980px);min-height:0;max-height:none;z-index:30;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto;column-gap:14px;padding:11px 15px 12px;transform:translateX(-50%);border:1px solid rgba(93,215,225,.32);border-radius:16px;background:linear-gradient(180deg,rgba(5,16,22,.88),rgba(2,9,14,.95));box-shadow:0 18px 48px rgba(0,0,0,.46),inset 0 0 0 1px rgba(255,255,255,.025);backdrop-filter:blur(8px)}
+#${ROOT_ID} .kv2-actor-label{position:absolute;left:6%;right:6%;bottom:3%;padding:6px 8px;border:1px solid rgba(208,168,75,.4);background:rgba(2,7,11,.88);text-align:center;font-size:8px;font-weight:900;letter-spacing:.11em;color:#eee2c7;text-shadow:0 1px 2px #000}\n#${ROOT_ID} .kv2-actor-state{display:table;margin:4px auto 0;padding:2px 6px;border:1px solid rgba(92,215,225,.35);background:rgba(4,23,28,.82);color:#7fe1e8;font-size:7px;font-weight:900;letter-spacing:.08em}\n#${ROOT_ID} .kv2-object-layer{position:absolute;inset:0;z-index:16;pointer-events:none}\n#${ROOT_ID} .kv2-package-token{position:absolute;top:42%;left:var(--sc-stage-anchor-x,50%);width:64px;height:45px;transform:translate(-8%,-50%);display:grid;place-items:center;border:1px solid rgba(221,178,73,.75);background:linear-gradient(145deg,rgba(42,30,12,.95),rgba(12,14,13,.96));box-shadow:0 12px 28px rgba(0,0,0,.48),0 0 18px rgba(221,178,73,.12);color:#e4c66e;font-size:7px;font-weight:900;letter-spacing:.12em}\n#${ROOT_ID} .kv2-package-token::before{content:"";position:absolute;width:32px;height:21px;border:1px solid rgba(226,190,100,.64);background:linear-gradient(135deg,#4a3a21,#21190f);transform:rotate(-4deg)}\n#${ROOT_ID} .kv2-package-token span{position:absolute;top:calc(100% + 5px);white-space:nowrap;padding:3px 5px;background:rgba(2,8,11,.82);border:1px solid rgba(215,174,76,.32)}\n#${ROOT_ID} .kv2-package-token[hidden]{display:none!important}\n#${ROOT_ID} .kv2-departure-ghost,#${ROOT_ID} .kv2-outgoing-hold-ghost{position:absolute!important;z-index:13!important;pointer-events:none!important}\n#${ROOT_ID} .kv2-departure-ghost{display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.9) brightness(.94) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0)}\n#${ROOT_ID} .kv2-outgoing-hold-ghost{display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.96) brightness(.96) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0)}\n#${ROOT_ID} .kv2-departure-ghost img,#${ROOT_ID} .kv2-outgoing-hold-ghost img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}\n#${ROOT_ID} .kv2-actors{transition:none!important}
+#${ROOT_ID}[data-transition-active="true"] .kv2-actors{pointer-events:none!important}\n#${ROOT_ID} .kv2-dialogue{position:absolute;left:50%;bottom:3%;width:min(72%,980px);min-height:0;max-height:none;z-index:30;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto;column-gap:14px;padding:11px 15px 12px;transform:translateX(-50%);border:1px solid rgba(93,215,225,.32);border-radius:16px;background:linear-gradient(180deg,rgba(5,16,22,.88),rgba(2,9,14,.95));box-shadow:0 18px 48px rgba(0,0,0,.46),inset 0 0 0 1px rgba(255,255,255,.025);backdrop-filter:blur(8px)}
 #${ROOT_ID} .kv2-speaker{grid-column:1;grid-row:1;color:#e3bd5f;font-size:8px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;min-height:11px}
 #${ROOT_ID} .kv2-text{grid-column:1/-1;grid-row:2;margin-top:4px;max-height:8.5vh;overflow:auto;white-space:pre-wrap;color:#eef3f1;font-size:clamp(12px,.94vw,15px);line-height:1.42;text-shadow:0 1px 2px #000}
 #${ROOT_ID} .kv2-progress{grid-column:2;grid-row:1;color:#71858c;font-size:8px;font-weight:900;letter-spacing:.08em}
@@ -126,23 +120,16 @@ function installStyle(){
 #${ROOT_ID}[data-battle-action-only="true"] .kv2-dialogue{display:grid!important;width:min(56%,720px);padding:10px 14px;grid-template-rows:1fr}
 #${ROOT_ID}[data-battle-action-only="true"] .kv2-actions{grid-row:1;margin-top:0;grid-template-columns:1fr}
 #${ROOT_ID} .kv2-receipt button{margin-top:24px;width:100%;min-height:40px;border:1px solid rgba(95,215,225,.42);border-radius:10px;background:rgba(7,33,39,.72);color:#78dfe7;font-weight:900;letter-spacing:.1em;cursor:pointer}
-#${ROOT_ID} .kv2-transition-memory{position:absolute;inset:0;z-index:45;background-position:center;background-size:cover;background-repeat:no-repeat;opacity:1;pointer-events:none;transition:opacity .46s cubic-bezier(.22,.61,.36,1)}
-#${ROOT_ID} .kv2-transition-memory.is-releasing{opacity:0}
-#${ROOT_ID} .kv2-transition-memory[hidden]{display:none!important}
+#${ROOT_ID} .kv2-transition-memory{display:none!important}
 #${ROOT_ID}[data-transition-active="true"] .kv2-actions,#${ROOT_ID}[data-transition-active="true"] .kv2-receipt button{pointer-events:none!important}
-#${ROOT_ID} .kv2-wipe{position:absolute;inset:0;z-index:999;opacity:0;pointer-events:none;transition:opacity .14s ease-out}
-#${ROOT_ID} .kv2-wipe.is-hard{background:transparent;backdrop-filter:none}
-#${ROOT_ID} .kv2-wipe.is-soft{background:rgba(3,10,14,.14);backdrop-filter:none}
-#${ROOT_ID} .kv2-wipe.is-covering{pointer-events:auto}
-#${ROOT_ID} .kv2-wipe.is-hard.is-covering{opacity:0}
-#${ROOT_ID} .kv2-wipe.is-soft.is-covering{opacity:.14}
+#${ROOT_ID} .kv2-wipe{display:none!important}
 #${ROOT_ID}[data-can-advance="true"]{cursor:pointer}
 #${ROOT_ID}[data-has-choices="true"]{cursor:default}
 #${ROOT_ID} .kv2-actor.kv2-cue-departed{opacity:0!important;pointer-events:none!important}
 #${ROOT_ID} .kv2-actor[hidden]{display:none!important}
 #${ROOT_ID} [data-sc-choreography-pending-entry="true"],#${ROOT_ID} [data-kv2-cue-withheld="true"]{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
 @media(max-width:900px){#${ROOT_ID} .kv2-actors{left:1.5%;right:1.5%;bottom:31%}#${ROOT_ID} .kv2-actor{--kv2-w:min(19vw,170px);--kv2-h:min(44vh,290px)}#${ROOT_ID} .kv2-actor[data-slot="pakkun"]{--kv2-w:min(13vw,120px);--kv2-h:min(30vh,210px)}#${ROOT_ID} .kv2-dialogue{width:94%;bottom:2.5%}#${ROOT_ID} .kv2-speech{width:min(70vw,480px);bottom:26%}#${ROOT_ID} .kv2-actions{grid-template-columns:repeat(2,minmax(0,1fr))}#${ROOT_ID} .kv2-top{left:2.5%;right:2.5%;grid-template-columns:1fr minmax(190px,42%)}}
-@media(prefers-reduced-motion:reduce){#${ROOT_ID} .kv2-wipe{transition:none!important}#${ROOT_ID} .kv2-actor.is-entering,#${ROOT_ID} .kv2-actor-ghost{animation:none!important}}
+@media(prefers-reduced-motion:reduce){#${GLOBAL_CURTAIN_ID}.is-releasing{transition:none!important}#${ROOT_ID} *{animation:none!important;transition:none!important}}
 `;
   document.head.appendChild(s);
 }
@@ -367,12 +354,10 @@ function materializeRetainedHoldGhosts(root,capture,next){
   return out;
 }
 function preparePreCommitVisualSnapshot(){
-  if(typeof document==="undefined")return{success:true,headless:true};
-  const root=document.getElementById(ROOT_ID),p=projection();
-  const previous=lastProjectionSnapshot||snapshotProjection(p);
-  if(!root||!previous)return{success:false,reason:"kakashi_v2_visual_snapshot_unavailable"};
-  pendingVisualSnapshot={previous,actorVisuals:captureDepartureVisuals(root,previous)};
-  return{success:true,actorCount:pendingVisualSnapshot.actorVisuals.length,beatId:previous.id,presentationOnly:true};
+  const p=projection(),previous=lastProjectionSnapshot||snapshotProjection(p);
+  if(!previous)return{success:false,reason:"kakashi_v2_visual_snapshot_unavailable"};
+  pendingVisualSnapshot={previous,actorVisuals:[]};
+  return{success:true,actorCount:0,beatId:previous.id,presentationOnly:true,staticPresentation:true};
 }
 function cancelPreparedVisualSnapshot(reason="cancelled"){
   const existed=!!pendingVisualSnapshot;pendingVisualSnapshot=null;
@@ -433,15 +418,8 @@ function deriveProjectionChoreography(root,previous,next,p,departures=[]){
   return cues;
 }
 function playProjectionTransition(root,previous,next,p,departures=[]){
-  if(typeof playStoryChoreography33900!=="function"||!previous||!next)return{success:true,skipped:true};
-  const cues=deriveProjectionChoreography(root,previous,next,p,departures);
-  const rt=active();
-  const actorSignature=(next.actors||[]).map(a=>a.id+"@"+a.anchor).join("|");
-  // Actor choreography belongs to the Story occurrence/participant layout.
-  // Same-beat factual object updates (for example AMT -> PS package handoff)
-  // must not cancel or replay actor entry/exit choreography already in flight.
-  const scopeKey=(rt&&rt.instanceId||"kakashi")+":"+previous.id+"->"+next.id+":"+actorSignature;
-  return playStoryChoreography33900({root,scopeKey,cues});
+  if(root&&typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(root,"kakashi_golden_static_motion");
+  return{success:true,skipped:true,staticPresentation:true};
 }
 
 function syncActors(root,actors,p){
@@ -553,33 +531,12 @@ function syncSpeech(root,p,cue,focused){
   }
 }
 function playCuePresentation(cueIndex){
-  const root=typeof document!=="undefined"?document.getElementById(ROOT_ID):null,p=projection();
-  if(!root||!p||p.id!=="v2_watch_exchange"||typeof playStoryChoreography33900!=="function")return{success:true,skipped:true};
-  const idx=Number(cueIndex)||0,amt=(p.actors||[]).find(a=>actorSlot(a)==="amt"),ps=(p.actors||[]).find(a=>actorSlot(a)==="ps"),mi=(p.actors||[]).find(a=>actorSlot(a)==="mi");
-  let cues=[];
-  if(idx===5&&amt)cues=[{kind:"REPOSITION",actorId:amt.id,fromAnchor:"INNER_LEFT",toAnchor:"PLAYER_LEFT",durationMs:360}];
-  else if(idx===6&&ps)cues=[{kind:"REPOSITION",actorId:ps.id,fromAnchor:"INNER_RIGHT",toAnchor:"OPPONENT_RIGHT",durationMs:360}];
-  else if(idx===9&&ps)cues=[{kind:"FOCUS",actorId:ps.id,durationMs:210}];
-  else if(idx===10&&mi&&ps){
-    const node=actorNodeBySlot(root,"mi");
-    if(node){node.hidden=false;delete node.dataset.kv2CueWithheld;node.removeAttribute("aria-hidden");}
-    if(node&&typeof applyStoryStageAnchor33900==="function")applyStoryStageAnchor33900(node,"CENTER");
-    cues=[{kind:"SURPRISE_ENTRY",actorId:mi.id,fromAnchor:"FAR_ENTRY_RIGHT",durationMs:330},{kind:"LUNGE",actorId:mi.id,targetId:ps.id,durationMs:240}];
-  }else if(idx===11&&amt){
-    const node=actorNodeBySlot(root,"amt");if(node)node.style.setProperty("--sc-choreo-flee-x","-30vw");
-    cues=[{kind:"FLEE",actorId:amt.id,durationMs:360}];
-  }
-  if(!cues.length)return{success:true,skipped:true};
-  const scopeKey=(active()&&active().instanceId||"kakashi")+":cue:"+p.id+":"+idx;
-  root.dataset.kv2CueMotion=p.id+":"+idx;
-  const result=playStoryChoreography33900({root,scopeKey,cues});
-  const total=cues.reduce((n,row)=>n+Number(row.durationMs||0),0)+40;
-  setTimeout(()=>{
-    if(!root.isConnected)return;
-    if(idx===11){const node=actorNodeBySlot(root,"amt");if(node)node.classList.add("kv2-cue-departed");}
-    if(root.dataset.kv2CueMotion===p.id+":"+idx)delete root.dataset.kv2CueMotion;
-  },Math.max(120,total));
-  return result;
+  // Cue-local actor presence and anchor changes are synchronously projected by
+  // applyWatchExchangeStaticState() during render(). No actor animation owns
+  // frames in the final Kakashi Golden presentation.
+  const root=typeof document!=="undefined"?document.getElementById(ROOT_ID):null;
+  if(root&&typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(root,"kakashi_cue_static_projection");
+  return{success:true,skipped:true,staticPresentation:true,cueIndex:Number(cueIndex)||0};
 }
 function syncStandard(root,p,t){
   const cue=currentCue(p,t),speaker=cue.kind==="dialogue"?cue.speakerName:(cue.kind==="record"?"CHRONICLE RECEIPT":"NARRATION");
@@ -620,45 +577,32 @@ function syncReceipt(root,p,t){
 }
 function render(){
   if(rendering||typeof document==="undefined")return false;
-  const layer=document.getElementById("story-scene-presentation-layer");
+  const layer=document.getElementById("story-scene-presentation-layer"),rt=active(),suspended=storySuspendedForBattle();
   if(!isActive()){
     pendingVisualSnapshot=null;
-    const rt=active();
+    if(rt&&rt.sceneId===SCENE_ID&&suspended&&!lastBattleSuspended){
+      lastBattleSuspended=true;setGlobalCurtain(true);setTimeout(()=>setGlobalCurtain(false),70);
+    }
     if(layer){
       delete layer.dataset.kakashiV2;
       const stale=document.getElementById(ROOT_ID);
       if(stale){if(typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(stale,"story_suspended_or_exited");stale.remove();}
     }
-    if(!rt||rt.sceneId!==SCENE_ID)lastProjectionSnapshot=null;
+    if(!rt||rt.sceneId!==SCENE_ID){lastProjectionSnapshot=null;lastBattleSuspended=false;}
     return false;
   }
   if(!layer)return false;
+  if(lastBattleSuspended){setGlobalCurtain(true);setTimeout(()=>setGlobalCurtain(false),70);lastBattleSuspended=false;}
   const p=projection();if(!p)return false;
   rendering=true;
   try{
     installStyle();layer.dataset.kakashiV2="true";const root=ensureRoot(layer);root.dataset.preset=p.preset||"standard";
     const prepared=pendingVisualSnapshot,previous=prepared&&prepared.previous||lastProjectionSnapshot,next=snapshotProjection(p),semanticChanged=!!previous&&!!next&&(previous.id!==next.id||previous.packageHolder!==next.packageHolder||JSON.stringify(previous.actors)!==JSON.stringify(next.actors));
-    const capture=semanticChanged?(prepared||{previous,actorVisuals:captureDepartureVisuals(root,previous)}):null;
-    // A cinematic hard transition is valid only when semanticAdvance prepared
-    // the outgoing visual snapshot before committing Story truth. Plain rerenders
-    // or diagnostic beat restoration must never create a transition lock by
-    // themselves.
-    const hardTransition=semanticChanged&&!!prepared&&isHardProjectionTransition(previous,next);
-    const departures=capture?materializeDepartureGhosts(root,capture,next):[];
-    if(hardTransition){
-      // One owner, one visual transition: stage the outgoing environment before
-      // syncing the committed next scene. No retained actor clone stack or
-      // transform-based wipe is allowed to compete with the new layout.
-      setTransitionMemory(previous&&previous.backdrop||null,true);
-      root.dataset.transitionActive="true";
-      delete root.dataset.outgoingTableau;
-    }else{
-      delete root.dataset.outgoingTableau;
-    }
     pendingVisualSnapshot=null;
+    delete root.dataset.outgoingTableau;delete root.dataset.transitionActive;
     const t=cueState();
     if(p.preset==="chronicle_receipt")syncReceipt(root,p,t);else syncStandard(root,p,t);
-    if(semanticChanged)playProjectionTransition(root,previous,next,p,departures);
+    if(semanticChanged)playProjectionTransition(root,previous,next,p,[]);
     lastProjectionSnapshot=next;
     bind(root);return true;
   }finally{rendering=false;}
@@ -683,13 +627,29 @@ function bind(root){
     globalThis.advanceAcademyKakashiV236040?globalThis.advanceAcademyKakashiV236040():advanceStoryScene();
   };
 }
-function setWipe(mode){
-  const root=document.getElementById(ROOT_ID),wipe=root&&root.querySelector(".kv2-wipe");if(!wipe)return false;
-  const kind=mode===true?"hard":String(mode||"");
-  wipe.classList.toggle("is-hard",kind==="hard");
-  wipe.classList.toggle("is-soft",kind==="soft");
-  wipe.classList.toggle("is-covering",kind==="hard"||kind==="soft");
+function ensureGlobalCurtain(){
+  if(typeof document==="undefined"||!document.body)return null;
+  let curtain=document.getElementById(GLOBAL_CURTAIN_ID);
+  if(!curtain){curtain=document.createElement("div");curtain.id=GLOBAL_CURTAIN_ID;curtain.setAttribute("aria-hidden","true");document.body.appendChild(curtain);}
+  return curtain;
+}
+function setGlobalCurtain(covered){
+  const curtain=ensureGlobalCurtain();if(!curtain)return false;
+  if(globalCurtainReleaseTimer){clearTimeout(globalCurtainReleaseTimer);globalCurtainReleaseTimer=null;}
+  if(covered===true){
+    curtain.classList.remove("is-releasing");curtain.classList.add("is-covered");
+  }else if(curtain.classList.contains("is-covered")||curtain.classList.contains("is-releasing")){
+    curtain.classList.remove("is-covered");curtain.classList.add("is-releasing");
+    globalCurtainReleaseTimer=setTimeout(()=>{
+      globalCurtainReleaseTimer=null;if(!curtain.isConnected)return;
+      curtain.classList.remove("is-releasing");
+    },190);
+  }
   return true;
+}
+function setWipe(mode){
+  const kind=mode===true?"hard":String(mode||"");
+  return setGlobalCurtain(kind==="hard");
 }
 function setTransitionMemory(backdropPath,visible){
   const root=document.getElementById(ROOT_ID),memory=root&&root.querySelector(".kv2-transition-memory");if(!root||!memory)return false;
@@ -742,7 +702,7 @@ function geometryDiagnostics(){
   return{pass:(!ob||actorBounds.every(b=>!intersects(ob,b)))&&(!db||actorBounds.every(b=>!intersects(db,b))),objectiveActorOverlap:ob?actorBounds.filter(b=>intersects(ob,b)).length:0,dialogueActorOverlap:db?actorBounds.filter(b=>intersects(db,b)).length:0,visibleDialogueSurfaces:root.querySelectorAll(".kv2-dialogue").length};
 }
 function diagnostics(){
-  const source=render.toString(),checks={
+  const checks={
     soleKakashiRoot:ROOT_ID==="kakashi-v2-scene-board",
     hidesNativeStorySurface:installStyle.toString().includes('>*:not(#')&&installStyle.toString().includes('{display:none!important}'),
     protectedObjectiveRegion:installStyle.toString().includes("grid-template-columns:minmax(0,1fr) minmax(240px,34%)"),
@@ -750,32 +710,23 @@ function diagnostics(){
     receiptReplacesScene:installStyle.toString().includes('[data-preset="chronicle_receipt"] .kv2-top')&&String(syncReceipt).includes("kv2-receipt"),
     projectionComesFromCore:String(projection).includes("getAcademyKakashiV2Presentation36020"),
     stableKeyedActorDom:!String(syncStandard).includes("innerHTML")&&!String(syncActors).includes("innerHTML")&&String(syncActors).includes("appendChild(node)"),
-    persistentGhostLayer:String(ensureRoot).includes("kv2-ghost-layer"),
-    preCommitVisualSnapshotIsPresentationOnly:String(preparePreCommitVisualSnapshot).includes("presentationOnly:true")&&String(preparePreCommitVisualSnapshot).includes("captureDepartureVisuals"),
-    hardTransitionRequiresPreparedSnapshot:String(render).includes("semanticChanged&&!!prepared&&isHardProjectionTransition"),
+    actorAnimationRetired:installStyle.toString().includes("Final Kakashi Golden motion policy")&&installStyle.toString().includes("animation:none!important;transition:none!important;transform:none!important;will-change:auto!important"),
+    ghostPresentationRetired:installStyle.toString().includes(".kv2-ghost-layer{display:none!important}")&&!String(render).includes("materializeDepartureGhosts(root"),
+    cueStateStillProjectsSynchronously:String(syncStandard).includes("applyWatchExchangeStaticState(root,p,t)")&&String(playCuePresentation).includes("staticPresentation:true"),
+    preCommitSnapshotHasNoActorClones:String(preparePreCommitVisualSnapshot).includes("actorVisuals:[]"),
+    globalCurtainSurvivesStoryBattleHandoff:String(ensureGlobalCurtain).includes("document.body.appendChild")&&String(render).includes("lastBattleSuspended"),
+    hardTransitionVisualIsGlobalCurtain:String(setWipe).includes('kind==="hard"')&&String(setGlobalCurtain).includes("is-covered"),
+    rootTransitionLayersRetired:installStyle.toString().includes(".kv2-transition-memory{display:none!important}")&&installStyle.toString().includes(".kv2-wipe{display:none!important}"),
+    projectionChoreographyRetired:String(playProjectionTransition).includes("kakashi_golden_static_motion")&&!String(playProjectionTransition).includes("playStoryChoreography33900({"),
     deterministicActorSlots:String(actorSlot).includes("academy_kakashi_origin_masked_interceptor")&&installStyle.toString().includes('data-slot="minato"'),
     sharedSemanticAnchors:String(syncActors).includes("applyStoryStageAnchor33900")&&String(actorAnchor).includes("PLAYER_LEFT")&&String(actorAnchor).includes("OPPONENT_RIGHT"),
-    adaptiveActorProminence:installStyle.toString().includes('data-count="1"')&&installStyle.toString().includes('data-count="2"'),
-    sharedChoreographyConsumer:String(playProjectionTransition).includes("playStoryChoreography33900"),
-    departuresPrecedeNewEntries:String(deriveProjectionChoreography).indexOf("for(const row of departures)")<String(deriveProjectionChoreography).indexOf("const prevIds"),
-    departureGhostCleanupOwnedByCue:String(deriveProjectionChoreography).includes("removeOnComplete:true"),
-    hardTransitionUsesSingleVisualOwner:String(render).includes("setTransitionMemory(previous&&previous.backdrop||null,true)")&&!String(render).includes("materializeRetainedHoldGhosts(root,capture,next)")&&installStyle.toString().includes('data-transition-active="true"] .kv2-actors{opacity:0'),
-    hardTransitionCrossfadesInsteadOfBlackCut:installStyle.toString().includes("kv2-transition-memory.is-releasing{opacity:0}")&&installStyle.toString().includes("is-hard.is-covering{opacity:0}")&&String(setTransitionMemory).includes("dissolving the preserved outgoing"),
-    transformMotionRetired:installStyle.toString().includes("shared choreography keeps timing/receipts, but cards never translate/scale")&&installStyle.toString().includes(".sc-choreo-reposition")&&installStyle.toString().includes("animation:none!important"),
-    departureGhostsSanitizeLiveAnimationState:String(appendDepartureGhost).includes('ghost.className="kv2-departure-ghost kv2-actor-ghost'),
-    actorScopeIgnoresObjectState:String(playProjectionTransition).includes("actorSignature")&&!String(playProjectionTransition).includes("next.packageHolder"),
-    semanticDiffIgnoresHarmlessParticipantRefresh:!String(render).includes('JSON.stringify(previous.participantStates)!==JSON.stringify(next.participantStates)'),
     packageTokenConsumesHolderTruth:String(syncPackageToken).includes("state.package")&&String(syncPackageToken).includes("packageHolder"),
     speakerFocusUsesCurrentCue:String(syncStandard).includes("speakerActorId"),
     stageWideAdvanceGuard:String(bind).includes('root.dataset.hasChoices==="true"')&&String(bind).includes("Date.now()-revealed<360"),
     actorLinkedSpeech:String(syncSpeech).includes("--kv2-speech-x")&&installStyle.toString().includes(".kv2-speech"),
-    watchCuePerformance:String(playCuePresentation).includes("v2_watch_exchange")&&String(playCuePresentation).includes("SURPRISE_ENTRY")&&String(playCuePresentation).includes('"FLEE"')&&String(playCuePresentation).includes("-30vw"),
-    cueLocalStateCannotLeakAcrossBeats:String(normalizeCueLocalActorState).includes('p.id==="v2_watch_exchange"')&&String(normalizeCueLocalActorState).includes("kv2-cue-departed")&&String(normalizeCueLocalActorState).includes("node.hidden=false"),
-    hardTransitionPreservesOutgoingEnvironment:String(setTransitionMemory).includes("kv2-transition-memory")&&installStyle.toString().includes("data-transition-active"),
     fiveChoiceLayoutNoScroll:installStyle.toString().includes("repeat(3,minmax(0,1fr))")&&installStyle.toString().includes("overflow:visible"),
     noMutationObserver:!String(render).includes("MutationObserver"),
     battleSuspendsStoryProjection:String(storySuspendedForBattle).includes("pendingBattle")&&String(storySuspendedForBattle).includes('rc.type==="story_scene"'),
-    sharedLayerVisibilityOwner:!String(render).includes("layer.style.display")&&!installStyle.toString().includes("kakashi-v2-battle-suspended"),
     wrapperRunsSuspensionCleanup:String(globalThis.renderStoryScenePresentationLayer).includes("rt&&rt.sceneId===SCENE_ID")&&String(globalThis.renderStoryScenePresentationLayer).includes("render()"),
     browserGoldenClaimed:false
   };
@@ -784,6 +735,7 @@ function diagnostics(){
 }
 globalThis.renderAcademyKakashiV236030=render;
 globalThis.setAcademyKakashiV2Wipe36030=setWipe;
+globalThis.setAcademyKakashiV2GlobalCurtain36030=setGlobalCurtain;
 globalThis.setAcademyKakashiV2TransitionMemory36030=setTransitionMemory;
 globalThis.playAcademyKakashiV2CuePresentation36030=playCuePresentation;
 globalThis.prepareAcademyKakashiV2VisualSnapshot36030=preparePreCommitVisualSnapshot;
