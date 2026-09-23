@@ -35,6 +35,12 @@ Implementation/resolver conditions in this section are not player-facing narrati
 
 # PLAYER-FACING STORY
 
+## Render boundary
+
+Only narration and character dialogue beneath this point are player-facing.
+
+Markdown branch headings such as `IF KAKASHI WINS`, `SUCCESS`, `FAILURE`, scene labels, `CHOICE` headings, `PL BATTLE` markers, and any explicit reuse/reconvergence instruction are **author/runtime scaffolding only** and must not render as Story prose.
+
 # SCENE 03B — MOVE IN CLOSER
 
 The two men are talking now.
