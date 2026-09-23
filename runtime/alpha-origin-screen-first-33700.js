@@ -269,31 +269,7 @@ function patchMetal(){
 }
 
 // Academy Kakashi legacy screen-first patch retired for clean-room V2.
-// Shared screen-first behavior remains active for every other Origin.
-
-function patchObito(){
-  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const d=editable(A.sceneByVariant.academy_obito);if(!d)return false;
-  setText(d,"obi_depart","Obito nearly trips over his own sandal tying it too fast.\n\nFrom the street, a distant Academy bell rings once.\n\n\"Plenty of time.\"\n\nHe says it while already running.\n\nThe fundamentals session matters. If he gets there cleanly, he gets all of it.\n\nThen somebody calls for help from the next street.\n\nObito squeezes his eyes shut for half a second. \"Of course.\"");
-  const prompts={obi_furniture:"An older civilian is losing a fight with a cabinet wedged diagonally in a doorway.",obi_vegetables:"A basket bursts across a busy lane. Tomatoes roll toward cart wheels.",obi_equipment:"The Academy custodian is muttering while searching under benches for missing practice gear.",obi_delivery:"Crates have spilled across the road beside an overturned delivery cart.",obi_cart:"Wheels hammer against stone. Somebody screams. A runaway cart is already coming down the lane."};
-  for(const [id,t] of Object.entries(prompts))setText(d,id,t);
-  setLabel(d,"obi_furniture","furniture_carry_full","\"Move. I've got the heavy end.\"");setLabel(d,"obi_furniture","furniture_stabilize","Brace it, free the corner and get moving again.");setLabel(d,"obi_furniture","furniture_continue","Look at the Academy clocktower and keep running.");
-  setLabel(d,"obi_vegetables","vegetables_collect_all","Drop down and gather everything.");setLabel(d,"obi_vegetables","vegetables_clear_lane","Kick the nearest produce out of traffic and clear the lane.");setLabel(d,"obi_vegetables","vegetables_continue","Jump the spill and keep going.");
-  setLabel(d,"obi_equipment","equipment_search_full","Join the search until the missing gear turns up.");setLabel(d,"obi_equipment","equipment_check_likely_route","Check the likely drop points on his route and call back what he finds.");setLabel(d,"obi_equipment","equipment_continue","Leave it to Academy staff. Training is the other direction.");
-  setLabel(d,"obi_delivery","delivery_right_and_reload","Help lift the cart and reload it.");setLabel(d,"obi_delivery","delivery_clear_passage","Drag the dangerous obstruction clear so traffic can move.");setLabel(d,"obi_delivery","delivery_continue","Vault the mess and take the side lane.");
-  setLabel(d,"obi_cart","cart_intercept","Plant himself in its path and stop it.");setLabel(d,"obi_cart","cart_warn_and_redirect","Shout people clear and redirect the lane.");setLabel(d,"obi_cart","cart_continue","Keep running. Someone closer is already moving.");
-  const keys=["furniture","vegetables","equipment","delivery","cart"];
-  function response(key,value){const all={furniture:{furniture_carry_full:"Obito gets the cabinet through the doorway and bolts before the civilian can thank him twice.",furniture_stabilize:"Obito braces the cabinet, frees the corner and is running again before it settles.",furniture_continue:"Obito keeps running. The voice behind him fades with the street."},vegetables:{vegetables_collect_all:"Obito drops to both knees, gathers the last rolling tomato and shoves the basket back into the vendor's hands.",vegetables_clear_lane:"Obito kicks the nearest produce clear of the wheels and darts through the gap.",vegetables_continue:"Obito jumps the spill without breaking stride."},equipment:{equipment_search_full:"Obito joins the search until the missing practice gear turns up under a bench.",equipment_check_likely_route:"Obito checks the drop points along his route, shouts what he finds and keeps moving.",equipment_continue:"Obito leaves the custodian muttering and keeps running."},delivery:{delivery_right_and_reload:"Obito gets his shoulder under the cart, rights it and helps stack the last crate.",delivery_clear_passage:"Obito drags the dangerous obstruction out of the lane and runs on.",delivery_continue:"Obito vaults the crates and disappears down the side lane."},cart:{cart_intercept:"Obito plants himself in the lane. The cart slams into his grip, wheels shrieking before it stops.",cart_warn_and_redirect:"Obito's shout turns heads in time. People scatter and the cart tears through an empty path.",cart_continue:"Obito keeps running while somebody closer moves for the cart."}};return all[key]&&all[key][value]||"";}
-  const flow=[["obi_vegetables","furniture"],["obi_equipment","vegetables"],["obi_delivery","equipment"],["obi_cart","delivery"],["obi_arrival","cart"]];
-  for(const [bid,prev] of flow){const b=beat(d,bid);if(!b)continue;const base=b.text;const prior=b.presentationResolver;b.presentationResolver=()=>{const reaction=response(prev,local()[`obito_${prev}`]);let current=base;if(bid==="obi_arrival"){const direct=keys.every(k=>String(local()[`obito_${k}`]||"").endsWith("continue"));current=direct?"Obito hits the training gate hard enough that one sandal skids sideways.\n\nThe instructor checks the sun, then Obito. \"You're early.\"\n\nObito straightens so fast it almost becomes a salute. \"Obviously.\"\n\nEvery training block is still ahead of him.":"Obito reaches the training approach breathing hard. Training is already underway beyond the wall.\n\nWhat remains cannot be guessed from how many people he helped; the journey time has to be real.";}else if(typeof prior==="function"){const p=prior();if(p&&p.text&&!String(p.text).includes("authority"))current=p.text;}return{text:reaction?`${reaction}\n\n${current}`:current};};}
-  setResolver(d,"obi_entitlement",()=>{const direct=keys.every(k=>String(local()[`obito_${k}`]||"").endsWith("continue"));return{text:direct?"The opening conditioning block has not closed yet. Obito can still make the whole session.":"Training is already in progress. This route is waiting on exact arrival-time resolution before the game can say what training remains."};});
-  const full=choice(d,"obi_entitlement","accept_full_training");if(full)full.label="Get inside. The whole session is still open.";
-  const pending=choice(d,"obi_entitlement","timing_pending");if(pending){pending.label="Training timing unresolved.";conciseUnavailable(pending,"Arrival-time resolution required.");}
-  setText(d,"obi_training","The conditioning lap burns first.\n\nThen wooden weapons knock against Obito's forearms until he stops over-gripping.\n\nAt the fire-practice line, he wipes sweat from his upper lip, makes the sign again and watches the Academy-scale flame finally hold its shape.\n\nBy the taijutsu closing drill, his legs are shaking.\n\nHe grins anyway. \"Again.\"");
-  setText(d,"obi_reflect","After training, Obito sits on the outer rail with the Hokage Monument visible between rooftops.");
-  setLabel(d,"obi_reflect","hokage_still","\"I'm still going to be Hokage.\"");setLabel(d,"obi_reflect","faster_next","\"Next time I'm getting here faster.\"");setLabel(d,"obi_reflect","people_mattered","\"Those people mattered too.\"");setLabel(d,"obi_reflect","prove_it","\"Fine. I'll prove it next time.\"");
-  setText(d,"obi_end","A passing student hears enough to snort. \"You say that every time.\"\n\nObito pushes his goggles up and points at the Monument.\n\n\"Good. Means you'll remember who called it first.\"\n\nHe hops off the rail and starts home before the student can answer.","narration");
-  return commit(d);
-}
+// Academy Obito screen-first patch retired by #331; final Obito Story is owned by 32900-c + shared Scene Board.
 
 function patchMenma(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const d=editable(A.sceneByVariant.academy_menma);if(!d)return false;
@@ -308,7 +284,7 @@ function patchMenma(){
 }
 
 ensureStyle();
-const result={hinata:patchHinata(),izuno:patchIzuno(),mirai:patchMirai(),kushina:patchKushina(),kurenai:patchKurenai(),iwabee:patchIwabee(),metal:patchMetal(),obito:patchObito(),menma:patchMenma()};
+const result={hinata:patchHinata(),izuno:patchIzuno(),mirai:patchMirai(),kushina:patchKushina(),kurenai:patchKurenai(),iwabee:patchIwabee(),metal:patchMetal(),menma:patchMenma()};
 
 function runAlphaOriginScreenFirst33700Diagnostics(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;
@@ -316,8 +292,9 @@ function runAlphaOriginScreenFirst33700Diagnostics(){
   const checks={
     patchId:PATCH_ID==="alpha_origin_screen_first_33700_2026_09_13",
     writingAuthorityPinned:AUTHORITY_ORIGINS==="a08dcf50f67d264497944af761475865dff8dc81"&&AUTHORITY_DOCTRINE==="7b646d8697879506f0421af01d6083f8482b828c",
-    nonKakashiOriginsPatched:Object.keys(result).length===9&&Object.values(result).every(Boolean),
+    legacyOriginsPatched:Object.keys(result).length===8&&Object.values(result).every(Boolean),
     kakashiLegacyScreenPatchRetired:!Object.prototype.hasOwnProperty.call(result,"kakashi"),
+    obitoLegacyScreenPatchRetired:!Object.prototype.hasOwnProperty.call(result,"obito"),
     hinataPhysicalScene:!!hin&&String(hin.beatMap.get("hin_practice")?.text||"").includes("Morning mist"),
     metalAddsPerformedPressureBeats:!!met&&met.beatMap.has("met_private_choice")&&met.beatMap.has("met_pressure_choice"),
     menmaSceneStillRegisteredAndProjected:!!men&&String(men.beatMap.get(men.entryBeatId)?.text||"").includes("Iruka"),

@@ -44,7 +44,8 @@
         "applyStoryStageAnchor33900",
         "playStoryChoreography33900",
         "cancelStoryChoreography33900",
-        "getStoryChoreographyState33900"
+        "getStoryChoreographyState33900",
+        "drainPendingStorySceneBoardRegistrations33900"
       ],
       "permittedAdapters": [],
       "retiredOwners": [],
@@ -512,6 +513,45 @@
         "tools/qa_issue_312_browser.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
+    },
+    {
+      "responsibilityId": "origin.academy_obito.final_story_state",
+      "canonicalOwner": "runtime/alpha-origin-scenes-32900-c.js",
+      "ownerType": "origin_semantic_owner",
+      "directCallers": [
+        "runtime/alpha-origin-scenes-32900-integrator.js",
+        "runtime/alpha-story-scene-board-33900.js"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime.localContext",
+        "playerData.activityHistory Academy Obito source occurrences",
+        "playerData acquisition / Origin completion state"
+      ],
+      "stateWrites": [
+        "activeStorySceneRuntime.localContext Obito binary choice intents",
+        "playerData.activityHistory Academy Obito journey-time facts",
+        "playerData.activityHistory Academy Obito self-interpretation fact"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-origin-scenes-32900-c.js"
+      ],
+      "extensionHooks": [
+        "getAcademyObitoFinalJourneyFacts331",
+        "getAcademyObitoFinalEntitlement331",
+        "registerAcademyObitoFinalSceneBoard331"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "playerData.activityHistory occ_origin_obito_*",
+        "activeStorySceneRuntime.localContext.obito*"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_331_obito_final_runtime.js",
+        "tools/qa_alpha_origin_scenes_32900_runtime.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
     }
   ],
   "adapters": [
@@ -599,6 +639,11 @@
       "semanticId": "origin.complete",
       "owner": "game.js",
       "responsibilityId": "origin.completion.shared"
+    },
+    {
+      "semanticId": "academy_obito.final.journey",
+      "owner": "runtime/alpha-origin-scenes-32900-c.js",
+      "responsibilityId": "origin.academy_obito.final_story_state"
     }
   ],
   "globalWrapperChains": [
@@ -654,6 +699,11 @@
       "stateRef": "chronicleOrigin.prologueCompleted",
       "owner": "game.js",
       "responsibilityId": "origin.completion.shared"
+    },
+    {
+      "stateRef": "playerData.activityHistory academy_obito final journey facts",
+      "owner": "runtime/alpha-origin-scenes-32900-c.js",
+      "responsibilityId": "origin.academy_obito.final_story_state"
     }
   ]
 }

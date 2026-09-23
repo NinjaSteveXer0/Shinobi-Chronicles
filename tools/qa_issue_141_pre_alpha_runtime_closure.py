@@ -60,6 +60,7 @@ NODE_GATES = [
     "tools/qa_issue_112_story_locator_runtime.js",
     "tools/qa_issue_63_genin_v2_runtime.js",
     "tools/qa_alpha_origin_scenes_32900_runtime.js",
+    "tools/qa_issue_331_obito_final_runtime.js",
     "tools/qa_issue_155_anbu_root_runtime.js",
     "tools/qa_issue_141_traversal_runtime.js",
     "tools/qa_issue_151_arc1_reward_exact_head.js",

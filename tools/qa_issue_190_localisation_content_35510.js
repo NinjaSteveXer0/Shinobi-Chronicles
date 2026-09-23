@@ -86,7 +86,15 @@ assert.deepEqual(missingOrigins,[],`missing es-419 Origin catalogue phrases:\n${
 // Gate those final static lines directly from 33600 so base-scene coverage
 // cannot create a false-positive localisation claim.
 const finalStatic=collectFinalWritingStatic(writingSource);
-assert(finalStatic.size>=80,`expected broad 33600 final-writing extraction, got ${finalStatic.size}`);
+// #331 retires Academy Obito's old 33600 patch owner. Do not preserve dead
+// Obito expressions merely to satisfy the historical aggregate phrase count.
+assert(!writingSource.includes("function patchObito("),"superseded Obito 33600 expression owner returned");
+assert(finalStatic.size>=70,`expected broad non-Obito 33600 final-writing extraction after #331 retirement, got ${finalStatic.size}`);
+for(const phrase of [
+  "HELP HER","KEEP GOING","HELP SEARCH","HELP WITH THE DELIVERY","KEEP MOVING","STOP AND HELP","GO TO TRAINING",
+  "I'm not going to stop helping people.","I need to take training more seriously.","I need to get better at both.",
+  "Maybe I'm looking at this wrong. I need to figure out what matters most to me."
+])assert(sourceTexts.has(phrase),`final #331 Obito phrase missing from es-419 catalogue: ${phrase}`);
 const missingFinalStatic=[...finalStatic].filter(phrase=>!finalTexts.has(phrase));
 assert.deepEqual(missingFinalStatic,[],`missing es-419 final-Writing phrases:\n${missingFinalStatic.join('\n')}`);
 
