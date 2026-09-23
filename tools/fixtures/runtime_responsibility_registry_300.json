@@ -298,7 +298,7 @@
     {
       "responsibilityId": "origin.academy_kakashi.v2.semantic_advance",
       "canonicalOwner": "runtime/alpha-kakashi-v2-transition-36040.js",
-      "ownerType": "origin_transition_owner",
+      "ownerType": "origin_semantic_advance_adapter",
       "directCallers": [
         "runtime/alpha-kakashi-v2-renderer-36030.js"
       ],
@@ -328,7 +328,8 @@
       "qaRefs": [
         "tools/qa_kakashi_v2_browser.js",
         "tools/qa_kakashi_v2_clean_room.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_334_story_transition_owner.js"
       ]
     },
     {
@@ -581,6 +582,49 @@
       "qaRefs": [
         "tools/qa_issue_331_obito_final_runtime.js",
         "tools/qa_alpha_origin_scenes_32900_runtime.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "story.transition.presentation.shared",
+      "canonicalOwner": "runtime/alpha-story-scene-board-33900.js",
+      "ownerType": "shared_presentation_transition",
+      "directCallers": [
+        "runtime/alpha-story-scene-board-33900.js",
+        "runtime/alpha-kakashi-v2-transition-36040.js",
+        "runtime/alpha-kakashi-v2-renderer-36030.js"
+      ],
+      "stateReads": [
+        "caller-supplied Story scene/beat transition context",
+        "prefers-reduced-motion"
+      ],
+      "stateWrites": [
+        "presentation-only #sc-story-hard-transition-33900 DOM class/lifecycle state"
+      ],
+      "productionLoadPath": [
+        "runtime/alpha-traversal-bridge-33200.js",
+        "runtime/alpha-story-scene-board-33900.js"
+      ],
+      "extensionHooks": [
+        "playStoryHardSceneTransition33900",
+        "cancelStoryHardSceneTransition33900",
+        "getStoryHardSceneTransitionState33900"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [
+        "runtime/alpha-story-scene-board-33900.js::legacy root-local performSceneCut wipe playback",
+        "runtime/alpha-kakashi-v2-renderer-36030.js::ensureGlobalCurtain",
+        "runtime/alpha-kakashi-v2-renderer-36030.js::setGlobalCurtain",
+        "runtime/alpha-kakashi-v2-renderer-36030.js::setWipe",
+        "runtime/alpha-kakashi-v2-renderer-36030.js::setTransitionMemory",
+        "runtime/alpha-kakashi-v2-transition-36040.js::local hard-scene playback/timers"
+      ],
+      "saveSchemaRefs": [],
+      "qaRefs": [
+        "tools/qa_issue_334_story_transition_owner.js",
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_issue_312_story_battle_benchmark.js",
+        "tools/qa_issue_312_browser.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
     }
