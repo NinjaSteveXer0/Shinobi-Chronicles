@@ -198,7 +198,11 @@ returnBattle("v2_direct_strike_2v1_win",{encounterId:"academy_kakashi_origin_bat
 returnBattle("v2_direct_mi_win",{encounterId:"academy_kakashi_origin_battle_mi_1v1",actions:2});
 choose("KILL THEM");
 for(const ref of ["AMT","PS","MI"])assert.strictEqual(state().participants[ref].state,"KILLED");
-assert.strictEqual(state().package.holder,"ANBU");
+assert.strictEqual(activeRuntime.beatId,"v2_group3_kill_result");
+assert.strictEqual(state().package.holder,"KAKASHI","resolver result scene must preserve route-owned package truth before report");
+next();
+assert.strictEqual(activeRuntime.beatId,"v2_report");
+assert.strictEqual(state().package.holder,"ANBU","ANBU custody commits only on exact report handoff");
 
 // MOVE IN CLOSER failure -> Stay on Package -> Ask Where -> Take Him Down loss.
 // Package recovery survives the Battle defeat and Knowledge remains exact.
