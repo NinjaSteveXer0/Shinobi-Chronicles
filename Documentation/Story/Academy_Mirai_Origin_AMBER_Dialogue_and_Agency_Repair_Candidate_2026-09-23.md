@@ -1,3 +1,6 @@
+> **2026-09-23 #333 QUALITY-GATE HOLD — CANDIDATE NOT APPROVED PLAYER-FACING AUTHORITY**  
+> This candidate predates full consumption of `Documentation/Story/Universal_Player_Facing_Story_Narration_Dialogue_and_Conversation_Quality_Gate_2026-09-23.md` (commit `b7b3ba5ce092a4c119818f2a8495510b0bbce8f2`). Stephen has rejected recurring parts of this expression for over-explaining inference/system safeguards and for returning to a repeated dry conversation algorithm. Treat the Story/semantic rails in this file as review material only. Do **not** promote, wire, paraphrase or bulk-fix this prose. The next Mirai rewrite must be delivered as a smaller coherent scene family under #333 and reviewed by Stephen before durable production approval.
+
 # Academy Mirai Origin — AMBER Dialogue / Agency Repair Candidate
 
 **Date:** 2026-09-23  
