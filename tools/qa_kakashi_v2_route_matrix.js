@@ -197,7 +197,7 @@ enter("v2_scene02_tail");choose("STRIKE BEFORE THE HANDOFF");next();
 returnBattle("v2_direct_strike_2v1_win",{encounterId:"academy_kakashi_origin_battle_amt_ps_2v1",actions:3});next();
 returnBattle("v2_direct_mi_win",{encounterId:"academy_kakashi_origin_battle_mi_1v1",actions:2});
 choose("KILL THEM");
-for(const ref of ["AMT","PS","MI"])assert.strictEqual(state().participants[ref].state,"DEAD");
+for(const ref of ["AMT","PS","MI"])assert.strictEqual(state().participants[ref].state,"KILLED");
 assert.strictEqual(state().package.holder,"ANBU");
 
 // MOVE IN CLOSER failure -> Stay on Package -> Ask Where -> Take Him Down loss.
