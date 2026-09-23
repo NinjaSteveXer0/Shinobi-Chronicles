@@ -3,14 +3,14 @@
 
 **Date:** 2026-09-24  
 **Owner:** Writing / Story — Konoha  
-**Status:** **WRITING AMBER — STEPHEN REVIEW CANDIDATE / NOT PRODUCTION AUTHORITY**  
+**Status:** **WRITING AMBER — STEPHEN REVIEW CANDIDATE / CHOICE LABELS MODERNIZED UNDER b575576**  
 **Production Origin:** `academy_kakashi`
 
 ## AUTHOR-ONLY LOCKS
 
 This family begins from the Family 01 GOLDEN Scene 02 choice:
 
-**MOVE IN CLOSER**
+**GET CLOSER**
 
 Preserve:
 - Get Closer resolver SUCCESS / FAILURE;
@@ -18,13 +18,13 @@ Preserve:
 - exact package holder at every split;
 - MI unseen until a completed handoff gives her a legitimate visible entrance;
 - SUCCESS choices:
-  - **LET THE HANDOFF HAPPEN**
-  - **STRIKE BEFORE THE HANDOFF**
-  - **ATTEMPT THE PICKPOCKET**
+  - **WAIT FOR THE HANDOFF**
+  - **INTERRUPT THE HANDOFF**
+  - **SLIP IN AND TAKE IT**
 - FAILURE choices:
-  - **STAY ON THE PACKAGE**
-  - **STOP PACKAGE SMUGGLER**
-  - **CUT THEM OFF AT THE SAKURA TREE**
+  - **CHASE THE PACKAGE**
+  - **CONFRONT THE RECEIVER**
+  - **CUT THEM OFF**
 - Pakkun appears only on legitimate authorised interception routes;
 - no Kakashi/Pakkun name Knowledge;
 - no new Battle or custody semantics.
@@ -141,11 +141,11 @@ The package begins to move.
 
 ### CHOICE
 
-**LET THE HANDOFF HAPPEN**
+**WAIT FOR THE HANDOFF**
 
-**STRIKE BEFORE THE HANDOFF**
+**INTERRUPT THE HANDOFF**
 
-**ATTEMPT THE PICKPOCKET**
+**SLIP IN AND TAKE IT**
 
 ---
 
@@ -177,15 +177,15 @@ Kakashi leaves the alley shadow.
 
 ### CHOICE
 
-**STOP THE ASSASSIN**
+**INTERCEPT THE MASKED ATTACKER**
 
-**SECURE THE PACKAGE**
+**GO FOR THE PACKAGE**
 
-**SECURE THE PACKAGE BEFORE THE ASSASSIN**
+**BEAT HER TO THE PACKAGE**
 
-**DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE**
+**DEAL WITH HER FIRST**
 
-**GO AFTER THE ORIGINAL TARGET**
+**CHASE THE MAN FROM THE PHOTO**
 
 ---
 
@@ -357,11 +357,11 @@ The package is getting farther away.
 
 ### CHOICE
 
-**STAY ON THE PACKAGE**
+**CHASE THE PACKAGE**
 
-**STOP PACKAGE SMUGGLER**
+**CONFRONT THE RECEIVER**
 
-**CUT THEM OFF AT THE SAKURA TREE**
+**CUT THEM OFF**
 
 ---
 
@@ -489,7 +489,7 @@ His fingers tighten over the package.
 
 **TAKE HIM DOWN**
 
-**ASK WHERE THE PACKAGE WAS GOING**
+**ASK WHERE IT WAS GOING**
 
 ---
 
