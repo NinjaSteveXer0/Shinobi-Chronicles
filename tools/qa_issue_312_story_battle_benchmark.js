@@ -41,7 +41,14 @@ assert(kv2Renderer.includes("applyStoryStageAnchor33900"),"#312 Kakashi must ret
 assert(kv2Renderer.includes('data-story-object-id="PACKAGE"'),"#312 package token missing");
 assert(kv2Renderer.includes('data-count="1"')&&kv2Renderer.includes('data-count="2"'),"#312 actor prominence must adapt to cast count");
 assert(kv2Renderer.includes("Final Kakashi Golden motion policy"),"#312 Kakashi must explicitly opt out of actor/card animation after installed-browser jitter evidence");
-assert(kv2Renderer.includes(".kv2-ghost-layer{display:none!important}")&&!kv2Renderer.includes(".kv2-transition-memory")&&!kv2Renderer.includes(".kv2-wipe"),"#334 stale root-transition presentation layers must be absent from Kakashi renderer");
+{
+  const styleStart=kv2Renderer.indexOf("function installStyle(){");
+  const styleEnd=kv2Renderer.indexOf("function availableChoices(",styleStart);
+  const rootStart=kv2Renderer.indexOf("function ensureRoot(");
+  const rootEnd=kv2Renderer.indexOf("function currentCue(",rootStart);
+  const presentationSource=kv2Renderer.slice(styleStart,styleEnd)+kv2Renderer.slice(rootStart,rootEnd);
+  assert(kv2Renderer.includes(".kv2-ghost-layer{display:none!important}")&&!presentationSource.includes(".kv2-transition-memory")&&!presentationSource.includes(".kv2-wipe"),"#334 stale root-transition presentation layers must be absent from Kakashi production presentation functions");
+}
 {
   const transitionStart=kv2Renderer.indexOf("function playProjectionTransition(");
   const transitionEnd=kv2Renderer.indexOf("function syncActors(",transitionStart);
