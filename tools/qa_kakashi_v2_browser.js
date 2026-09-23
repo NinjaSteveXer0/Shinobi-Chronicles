@@ -578,7 +578,8 @@ async function visualAndBattle(browser){
   await waitUnlocked(page,"v2_report");
   await page.waitForFunction(()=>{
     const root=document.getElementById("kakashi-v2-scene-board");
-    return !!root&&!root.dataset.transitionActive&&root.querySelectorAll(".kv2-outgoing-hold-ghost").length===0;
+    const actors=root&&root.querySelector(".kv2-actors");
+    return !!root&&!root.dataset.transitionActive&&root.querySelectorAll(".kv2-outgoing-hold-ghost").length===0&&!!actors&&Number(getComputedStyle(actors).opacity)>=0.99;
   },null,{timeout:3000});
   const killCleanup=await page.evaluate(()=>{
     const root=document.getElementById("kakashi-v2-scene-board");
