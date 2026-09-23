@@ -16,8 +16,8 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-23-R",
-    sourceBaselineCommit:"2c49249ee22cd087fe1693fa222d7e5ab374dc5a",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-23-S",
+    sourceBaselineCommit:"0ac8db5d467fcd50498ad70ff4825758a7fd5177",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
     runtimeGeneration:"alpha-story-battle-formation-stage-312",
     majorRuntimeFeatures:Object.freeze([
@@ -31,7 +31,8 @@
       "kakashi-ps-route-reward-scene-crossfade",
       "kakashi-battle-golden-consolidation",
       "kakashi-final-static-motion-curtain",
-      "academy-obito-final-binary-journey-331"
+      "academy-obito-final-binary-journey-331",
+      "shared-story-hard-transition-owner-334"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -64,7 +65,7 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-23-R",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-23-S",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
       generationPresent:first.runtimeGeneration==="alpha-story-battle-formation-stage-312",
