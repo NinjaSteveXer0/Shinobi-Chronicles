@@ -12,8 +12,7 @@ const PATCH_ID="academy_kakashi_v2_renderer_36030_2026_09_22";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const STYLE_ID="kakashi-v2-renderer-36030-style";
 const ROOT_ID="kakashi-v2-scene-board";
-const GLOBAL_CURTAIN_ID="kakashi-v2-global-curtain";
-let rendering=false,lastProjectionSnapshot=null,pendingVisualSnapshot=null,transitionMemoryReleaseTimer=null,globalCurtainReleaseTimer=null,lastBattleSuspended=false;
+let rendering=false,lastProjectionSnapshot=null,pendingVisualSnapshot=null,lastBattleSuspended=false;
 
 function esc(v){return String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
 function active(){try{return typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;}catch(_e){return null;}}
@@ -41,7 +40,7 @@ function installStyle(){
   const s=document.createElement("style");s.id=STYLE_ID;s.textContent=`
 #story-scene-presentation-layer[data-kakashi-v2="true"]{display:block!important;background:#020508!important;overflow:hidden!important;align-items:stretch!important;justify-content:stretch!important}
 #story-scene-presentation-layer[data-kakashi-v2="true"]>*:not(#${ROOT_ID}){display:none!important}
-#${GLOBAL_CURTAIN_ID}{position:fixed;inset:0;z-index:2147483000;background:#020508;opacity:0;visibility:hidden;pointer-events:none}\n#${GLOBAL_CURTAIN_ID}.is-covered{opacity:1;visibility:visible;pointer-events:auto;transition:none!important}\n#${GLOBAL_CURTAIN_ID}.is-releasing{opacity:0;visibility:visible;pointer-events:auto;transition:opacity .18s ease-out}\n#${ROOT_ID}{position:absolute;inset:0;z-index:1;overflow:hidden;background:#020508;color:#e9dfca;font-family:inherit;isolation:isolate}
+#${ROOT_ID}{position:absolute;inset:0;z-index:1;overflow:hidden;background:#020508;color:#e9dfca;font-family:inherit;isolation:isolate}
 #${ROOT_ID} .kv2-backdrop{position:absolute;inset:0;z-index:-3;background-position:center;background-size:cover;background-repeat:no-repeat;transform:scale(1.001)}
 #${ROOT_ID} .kv2-scrim{position:absolute;inset:0;z-index:-2;background:linear-gradient(180deg,rgba(0,4,8,.10),rgba(0,4,8,.05) 47%,rgba(0,4,8,.42) 72%,rgba(0,4,8,.82))}
 #${ROOT_ID} .kv2-frame{position:absolute;inset:1.4%;border:1px solid rgba(197,158,70,.16);pointer-events:none}
@@ -120,16 +119,13 @@ function installStyle(){
 #${ROOT_ID}[data-battle-action-only="true"] .kv2-dialogue{display:grid!important;width:min(56%,720px);padding:10px 14px;grid-template-rows:1fr}
 #${ROOT_ID}[data-battle-action-only="true"] .kv2-actions{grid-row:1;margin-top:0;grid-template-columns:1fr}
 #${ROOT_ID} .kv2-receipt button{margin-top:24px;width:100%;min-height:40px;border:1px solid rgba(95,215,225,.42);border-radius:10px;background:rgba(7,33,39,.72);color:#78dfe7;font-weight:900;letter-spacing:.1em;cursor:pointer}
-#${ROOT_ID} .kv2-transition-memory{display:none!important}
-#${ROOT_ID}[data-transition-active="true"] .kv2-actions,#${ROOT_ID}[data-transition-active="true"] .kv2-receipt button{pointer-events:none!important}
-#${ROOT_ID} .kv2-wipe{display:none!important}
 #${ROOT_ID}[data-can-advance="true"]{cursor:pointer}
 #${ROOT_ID}[data-has-choices="true"]{cursor:default}
 #${ROOT_ID} .kv2-actor.kv2-cue-departed{opacity:0!important;pointer-events:none!important}
 #${ROOT_ID} .kv2-actor[hidden]{display:none!important}
 #${ROOT_ID} [data-sc-choreography-pending-entry="true"],#${ROOT_ID} [data-kv2-cue-withheld="true"]{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
 @media(max-width:900px){#${ROOT_ID} .kv2-actors{left:1.5%;right:1.5%;bottom:31%}#${ROOT_ID} .kv2-actor{--kv2-w:min(19vw,170px);--kv2-h:min(44vh,290px)}#${ROOT_ID} .kv2-actor[data-slot="pakkun"]{--kv2-w:min(13vw,120px);--kv2-h:min(30vh,210px)}#${ROOT_ID} .kv2-dialogue{width:94%;bottom:2.5%}#${ROOT_ID} .kv2-speech{width:min(70vw,480px);bottom:26%}#${ROOT_ID} .kv2-actions{grid-template-columns:repeat(2,minmax(0,1fr))}#${ROOT_ID} .kv2-top{left:2.5%;right:2.5%;grid-template-columns:1fr minmax(190px,42%)}}
-@media(prefers-reduced-motion:reduce){#${GLOBAL_CURTAIN_ID}.is-releasing{transition:none!important}#${ROOT_ID} *{animation:none!important;transition:none!important}}
+@media(prefers-reduced-motion:reduce){#${ROOT_ID} *{animation:none!important;transition:none!important}}
 `;
   document.head.appendChild(s);
 }
@@ -185,9 +181,7 @@ function ensureRoot(layer){
     <aside class="kv2-speech" aria-live="polite" hidden><div class="kv2-speech-name"></div><div class="kv2-speech-text"></div></aside>
     <article class="kv2-receipt"><span>SHINOBI CHRONICLES · RECORD</span><h1>CHRONICLE RECEIPT</h1><pre></pre><button type="button" data-kv2-advance="true">CONTINUE</button></article>
     <div class="kv2-object-layer" aria-hidden="true"><div class="kv2-package-token" data-story-object-id="PACKAGE" hidden><span>PACKAGE</span></div></div>
-    <div class="kv2-transition-memory" aria-hidden="true" hidden></div>
-    <div class="kv2-ghost-layer" aria-hidden="true"></div>
-    <div class="kv2-wipe"></div>`;
+    <div class="kv2-ghost-layer" aria-hidden="true"></div>`;
   layer.appendChild(root);
   return root;
 }
@@ -575,13 +569,22 @@ function syncReceipt(root,p,t){
   const cue=currentCue(p,t),pre=root.querySelector(".kv2-receipt pre");
   if(pre&&pre.textContent!==String(cue.text||""))pre.textContent=String(cue.text||"");
 }
+function playSharedStoryHardTransition36030(direction,rt){
+  if(typeof playStoryHardSceneTransition33900!=="function")return{success:false,reason:"shared_story_transition_owner_missing"};
+  return playStoryHardSceneTransition33900({
+    scopeKey:"academy_kakashi_v2:"+String(direction||"handoff")+":"+String(rt&&rt.instanceId||"none")+":"+String(rt&&rt.beatId||"none")+":"+String(Date.now()),
+    fromSceneId:SCENE_ID,toSceneId:SCENE_ID,
+    fromBeatId:rt&&rt.beatId||null,toBeatId:rt&&rt.beatId||null,
+    reason:"academy_kakashi_v2_"+String(direction||"handoff")
+  });
+}
 function render(){
   if(rendering||typeof document==="undefined")return false;
   const layer=document.getElementById("story-scene-presentation-layer"),rt=active(),suspended=storySuspendedForBattle();
   if(!isActive()){
     pendingVisualSnapshot=null;
     if(rt&&rt.sceneId===SCENE_ID&&suspended&&!lastBattleSuspended){
-      lastBattleSuspended=true;setGlobalCurtain(true);setTimeout(()=>setGlobalCurtain(false),70);
+      lastBattleSuspended=true;playSharedStoryHardTransition36030("story_to_battle",rt);
     }
     if(layer){
       delete layer.dataset.kakashiV2;
@@ -592,7 +595,7 @@ function render(){
     return false;
   }
   if(!layer)return false;
-  if(lastBattleSuspended){setGlobalCurtain(true);setTimeout(()=>setGlobalCurtain(false),70);lastBattleSuspended=false;}
+  if(lastBattleSuspended){playSharedStoryHardTransition36030("battle_to_story",rt);lastBattleSuspended=false;}
   const p=projection();if(!p)return false;
   rendering=true;
   try{
@@ -622,59 +625,9 @@ function bind(root){
   root.onclick=e=>{
     if(e.defaultPrevented)return;
     if(e.target&&e.target.closest&&e.target.closest("button,.kv2-actions,.kv2-receipt"))return;
-    if(root.dataset.hasChoices==="true"||root.dataset.canAdvance!=="true"||root.dataset.transitionActive==="true")return;
-    const wipe=root.querySelector(".kv2-wipe");if(wipe&&wipe.classList.contains("is-covering"))return;
+    if(root.dataset.hasChoices==="true"||root.dataset.canAdvance!=="true")return;
     globalThis.advanceAcademyKakashiV236040?globalThis.advanceAcademyKakashiV236040():advanceStoryScene();
   };
-}
-function ensureGlobalCurtain(){
-  if(typeof document==="undefined"||!document.body)return null;
-  let curtain=document.getElementById(GLOBAL_CURTAIN_ID);
-  if(!curtain){curtain=document.createElement("div");curtain.id=GLOBAL_CURTAIN_ID;curtain.setAttribute("aria-hidden","true");document.body.appendChild(curtain);}
-  return curtain;
-}
-function setGlobalCurtain(covered){
-  const curtain=ensureGlobalCurtain();if(!curtain)return false;
-  if(globalCurtainReleaseTimer){clearTimeout(globalCurtainReleaseTimer);globalCurtainReleaseTimer=null;}
-  if(covered===true){
-    curtain.classList.remove("is-releasing");curtain.classList.add("is-covered");
-  }else if(curtain.classList.contains("is-covered")||curtain.classList.contains("is-releasing")){
-    curtain.classList.remove("is-covered");curtain.classList.add("is-releasing");
-    globalCurtainReleaseTimer=setTimeout(()=>{
-      globalCurtainReleaseTimer=null;if(!curtain.isConnected)return;
-      curtain.classList.remove("is-releasing");
-    },190);
-  }
-  return true;
-}
-function setWipe(mode){
-  const kind=mode===true?"hard":String(mode||"");
-  return setGlobalCurtain(kind==="hard");
-}
-function setTransitionMemory(backdropPath,visible){
-  const root=document.getElementById(ROOT_ID),memory=root&&root.querySelector(".kv2-transition-memory");if(!root||!memory)return false;
-  if(transitionMemoryReleaseTimer){clearTimeout(transitionMemoryReleaseTimer);transitionMemoryReleaseTimer=null;}
-  if(visible===true&&backdropPath){
-    const safe=String(backdropPath).replace(/\\/g,"\\\\").replace(/"/g,'\\"');
-    memory.style.backgroundImage=`linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,0,0,.20)),url("${safe}")`;
-    memory.classList.remove("is-releasing");
-    memory.hidden=false;root.dataset.transitionActive="true";
-  }else if(!memory.hidden){
-    // Reveal the already-committed scene by dissolving the preserved outgoing
-    // environment instead of cutting to black and then popping the next scene.
-    memory.classList.add("is-releasing");
-    transitionMemoryReleaseTimer=setTimeout(()=>{
-      transitionMemoryReleaseTimer=null;
-      if(!root.isConnected)return;
-      memory.hidden=true;memory.classList.remove("is-releasing");memory.style.backgroundImage="";
-      delete root.dataset.transitionActive;delete root.dataset.outgoingTableau;
-      for(const ghost of [...root.querySelectorAll(".kv2-outgoing-hold-ghost")])ghost.remove();
-    },460);
-  }else{
-    delete root.dataset.transitionActive;delete root.dataset.outgoingTableau;
-    for(const ghost of [...root.querySelectorAll(".kv2-outgoing-hold-ghost")])ghost.remove();
-  }
-  return true;
 }
 const PRE_RENDER=typeof renderStoryScenePresentationLayer==="function"?renderStoryScenePresentationLayer:null;
 if(PRE_RENDER){
@@ -714,9 +667,9 @@ function diagnostics(){
     ghostPresentationRetired:installStyle.toString().includes(".kv2-ghost-layer{display:none!important}")&&!String(render).includes("materializeDepartureGhosts(root"),
     cueStateStillProjectsSynchronously:String(syncStandard).includes("applyWatchExchangeStaticState(root,p,t)")&&String(playCuePresentation).includes("staticPresentation:true"),
     preCommitSnapshotHasNoActorClones:String(preparePreCommitVisualSnapshot).includes("actorVisuals:[]"),
-    globalCurtainSurvivesStoryBattleHandoff:String(ensureGlobalCurtain).includes("document.body.appendChild")&&String(render).includes("lastBattleSuspended"),
-    hardTransitionVisualIsGlobalCurtain:String(setWipe).includes('kind==="hard"')&&String(setGlobalCurtain).includes("is-covered"),
-    rootTransitionLayersRetired:installStyle.toString().includes(".kv2-transition-memory{display:none!important}")&&installStyle.toString().includes(".kv2-wipe{display:none!important}"),
+    sharedTransitionHandoff:String(playSharedStoryHardTransition36030).includes("playStoryHardSceneTransition33900")&&String(render).includes('playSharedStoryHardTransition36030("story_to_battle"')&&String(render).includes('playSharedStoryHardTransition36030("battle_to_story"'),
+    noDocumentCurtainOwnership:!installStyle.toString().includes("position:fixed;inset:0;z-index:2147483000")&&!String(render).includes("setGlobalCurtain"),
+    rootTransitionLayersRetired:!installStyle.toString().includes(".kv2-transition-memory")&&!installStyle.toString().includes(".kv2-wipe")&&!String(ensureRoot).includes("kv2-transition-memory")&&!String(ensureRoot).includes("kv2-wipe"),
     projectionChoreographyRetired:String(playProjectionTransition).includes("kakashi_golden_static_motion")&&!String(playProjectionTransition).includes("playStoryChoreography33900({"),
     deterministicActorSlots:String(actorSlot).includes("academy_kakashi_origin_masked_interceptor")&&installStyle.toString().includes('data-slot="minato"'),
     sharedSemanticAnchors:String(syncActors).includes("applyStoryStageAnchor33900")&&String(actorAnchor).includes("PLAYER_LEFT")&&String(actorAnchor).includes("OPPONENT_RIGHT"),
@@ -734,9 +687,6 @@ function diagnostics(){
   return{pass:failed.length===0,checks,failed,browserGoldenClaimed:false};
 }
 globalThis.renderAcademyKakashiV236030=render;
-globalThis.setAcademyKakashiV2Wipe36030=setWipe;
-globalThis.setAcademyKakashiV2GlobalCurtain36030=setGlobalCurtain;
-globalThis.setAcademyKakashiV2TransitionMemory36030=setTransitionMemory;
 globalThis.playAcademyKakashiV2CuePresentation36030=playCuePresentation;
 globalThis.prepareAcademyKakashiV2VisualSnapshot36030=preparePreCommitVisualSnapshot;
 globalThis.cancelAcademyKakashiV2VisualSnapshot36030=cancelPreparedVisualSnapshot;

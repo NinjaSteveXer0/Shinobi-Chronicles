@@ -12,10 +12,11 @@ if(globalThis.SC_ACADEMY_KAKASHI_V2_TRANSITION_36040)return;
 const PATCH_ID="academy_kakashi_v2_transition_36040_2026_09_22_shared_choreography";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const CURSOR_KEY="__kakashiV2Presentation36040";
-let wipeCovering=false,wipeMode=null,lastTransition=null,timerIds=[];
+let lastTransition=null;
 
 const PRE_ADVANCE=typeof advanceStoryScene==="function"?advanceStoryScene:null;
 if(!PRE_ADVANCE)throw new Error("kakashi_v2_transition_requires_story_advance");
+if(typeof playStoryHardSceneTransition33900!=="function"||typeof cancelStoryHardSceneTransition33900!=="function"||typeof getStoryHardSceneTransitionState33900!=="function")throw new Error("kakashi_v2_transition_requires_shared_story_transition_owner_33900");
 
 function runtime(){try{return typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;}catch(_e){return null;}}
 function active(){const rt=runtime();return !!rt&&rt.sceneId===SCENE_ID;}
@@ -24,8 +25,6 @@ function projection(beatId=null){
   return getAcademyKakashiV2Presentation36020(beatId||rt.beatId);
 }
 function cues(beatId=null){const p=projection(beatId);return p&&Array.isArray(p.cues)?p.cues:[];}
-function clearTimers(){for(const id of timerIds){try{clearTimeout(id);}catch(_e){}}timerIds=[];}
-function later(fn,ms){const id=setTimeout(()=>{timerIds=timerIds.filter(x=>x!==id);fn();},ms);timerIds.push(id);return id;}
 function save(){try{if(typeof savePlayerData==="function")savePlayerData();}catch(_e){}}
 function cursor(){
   const rt=runtime();if(!rt||rt.sceneId!==SCENE_ID)return null;
@@ -47,7 +46,6 @@ function resetForBeat(){
 }
 function render(){
   try{if(typeof renderAcademyKakashiV236030==="function")renderAcademyKakashiV236030();}catch(_e){}
-  try{if(typeof setAcademyKakashiV2Wipe36030==="function")setAcademyKakashiV2Wipe36030(wipeCovering?wipeMode:null);}catch(_e){}
 }
 function transitionKind(prev,next){
   if(!prev||!next)return null;
@@ -55,34 +53,24 @@ function transitionKind(prev,next){
   if(String(prev.id||"")!==String(next.id||""))return"soft";
   return null;
 }
-function hasLethalConsequenceInFlight(){
-  try{
-    const root=document.getElementById("kakashi-v2-scene-board");
-    const kinds=String(root&&root.dataset&&root.dataset.scChoreographyLastKinds||"").split(",").filter(Boolean);
-    return kinds.includes("COLLAPSE");
-  }catch(_e){return false;}
-}
 function playPostCommitTransition(prev,next){
   const kind=transitionKind(prev,next);if(!kind)return{played:false};
   const startedAt=Date.now();
   if(kind==="soft"){
-    // Same-environment beat changes should feel like one continuous scene.
-    // Do not animate or dim the whole screen between ordinary Story beats.
-    wipeMode=null;wipeCovering=false;
-    lastTransition={type:"continuous_scene_update",fromBeatId:prev&&prev.id||null,toBeatId:next&&next.id||null,semanticAlreadyCommitted:true,visualTransition:"none",startedAt,completedAt:startedAt};
+    cancelStoryHardSceneTransition33900("kakashi_continuous_scene_update");
+    lastTransition={type:"continuous_scene_update",fromBeatId:prev&&prev.id||null,toBeatId:next&&next.id||null,semanticAlreadyCommitted:true,visualTransition:"none",startedAt,completedAt:startedAt,sharedTransitionOwner:"story.transition.presentation.shared"};
     render();
     return{played:true,kind,visualTransition:"none",lethalDelayMs:0};
   }
-  // Hard environment changes use one global opaque curtain that survives Story
-  // root teardown and Story <-> Battle handoffs. Cover is immediate; only the
-  // reveal fades, avoiding crossfade/ghost/wipe competition.
-  wipeMode="hard";wipeCovering=true;render();
-  lastTransition={type:"cinematic_hard_cut",fromBeatId:prev&&prev.id||null,toBeatId:next&&next.id||null,semanticAlreadyCommitted:true,visualTransition:"global_black_reveal",startedAt};
-  later(()=>{
-    wipeCovering=false;render();
-    later(()=>{wipeMode=null;lastTransition={...lastTransition,completedAt:Date.now()};},190);
-  },70);
-  return{played:true,kind,visualTransition:"global_black_reveal",lethalDelayMs:0};
+  render();
+  const shared=playStoryHardSceneTransition33900({
+    scopeKey:"academy_kakashi_v2:"+String(prev&&prev.id||"none")+":"+String(next&&next.id||"none")+":"+String(startedAt),
+    fromSceneId:SCENE_ID,toSceneId:SCENE_ID,
+    fromBeatId:prev&&prev.id||null,toBeatId:next&&next.id||null,
+    reason:"academy_kakashi_v2_hard_environment_change"
+  });
+  lastTransition={type:"cinematic_hard_cut",fromBeatId:prev&&prev.id||null,toBeatId:next&&next.id||null,semanticAlreadyCommitted:true,visualTransition:"shared_story_hard_transition_33900",startedAt,sharedTransitionOwner:"story.transition.presentation.shared",sharedGeneration:shared&&shared.state&&shared.state.generation||null};
+  return{played:true,kind,visualTransition:"shared_story_hard_transition_33900",lethalDelayMs:0,shared};
 }
 function semanticAdvance(choiceId=null){
   const previous=projection();
@@ -123,6 +111,7 @@ function advance(choiceId=null){
 }
 function getState(){
   const rt=runtime(),row=cursor(),count=rt?cues(rt.beatId).length:0;
+  const shared=getStoryHardSceneTransitionState33900();
   return{
     active:!!rt&&rt.sceneId===SCENE_ID,
     beatId:rt&&rt.sceneId===SCENE_ID?rt.beatId:null,
@@ -130,8 +119,9 @@ function getState(){
     cueCount:count,
     atEnd:count<=1||!!row&&row.cueIndex>=count-1,
     locked:false,
-    wipeCovering,
-    wipeMode,
+    wipeCovering:shared&&shared.covered===true,
+    wipeMode:shared&&shared.active?"hard":null,
+    sharedTransition:shared||null,
     lastTransition:lastTransition?{...lastTransition}:null
   };
 }
@@ -139,8 +129,8 @@ function getState(){
 globalThis.advanceAcademyKakashiV236040=advance;
 globalThis.getAcademyKakashiV2TransitionState36040=getState;
 globalThis.resetAcademyKakashiV2Transition36040=()=>{
-  clearTimers();wipeCovering=false;wipeMode=null;lastTransition=null;
-  try{if(typeof setAcademyKakashiV2TransitionMemory36030==="function")setAcademyKakashiV2TransitionMemory36030(null,false);}catch(_e){}
+  lastTransition=null;
+  try{cancelStoryHardSceneTransition33900("kakashi_transition_reset");}catch(_e){}
   const root=typeof document!=="undefined"?document.getElementById("kakashi-v2-scene-board"):null;
   if(root&&typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(root,"kakashi_transition_reset");
   resetForBeat();render();return{success:true};
@@ -159,9 +149,10 @@ function diagnostics(){
     semanticAdvanceDelegates:String(semanticAdvance).includes("PRE_ADVANCE"),
     semanticCommitPrecedesPresentation:String(semanticAdvance).indexOf("PRE_ADVANCE")<String(semanticAdvance).indexOf("render()"),
     animationCannotBlockStoryTruth:!String(semanticAdvance).includes("locked")&&!String(semanticAdvance).includes("await")&&!String(playPostCommitTransition).includes("PRE_ADVANCE"),
-    hardSceneUsesSingleGlobalReveal:String(playPostCommitTransition).includes('wipeMode="hard"')&&String(playPostCommitTransition).includes('visualTransition:"global_black_reveal"'),
+    hardSceneDelegatesToSharedOwner:String(playPostCommitTransition).includes("playStoryHardSceneTransition33900")&&String(playPostCommitTransition).includes('sharedTransitionOwner:"story.transition.presentation.shared"'),
+    noLocalCurtainPlayback:!String(playPostCommitTransition).includes("setTimeout")&&!String(playPostCommitTransition).includes("classList")&&!String(playPostCommitTransition).includes("setAcademyKakashiV2Wipe36030"),
     softSceneHasNoScreenAnimation:String(playPostCommitTransition).includes('type:"continuous_scene_update"')&&String(playPostCommitTransition).includes('visualTransition:"none"'),
-    noLethalAnimationDelay:!String(playPostCommitTransition).includes("hasLethalConsequenceInFlight()")&&String(playPostCommitTransition).includes("lethalDelayMs:0"),
+    noLethalAnimationDelay:String(playPostCommitTransition).includes("lethalDelayMs:0"),
     cuePresentationDoesNotCommitTruth:String(advance).includes("playAcademyKakashiV2CuePresentation36030")&&String(advance).includes("semanticBeatUnchanged:true"),
     noActorDomAnimationOwnership:!String(semanticAdvance).includes("querySelector")&&!String(advance).includes("clone"+"Node"),
     noStoryTruthMutation:!String(advance).includes("participants.")&&!String(semanticAdvance).includes("package."),

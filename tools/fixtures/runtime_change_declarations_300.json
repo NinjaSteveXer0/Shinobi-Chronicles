@@ -347,6 +347,41 @@
       ],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Final #329/#331 authority replaces Academy Obito's old material/brief/none diversion ontology, delayed timing_pending route and old reflection set with five binary HELP/CONTINUE occurrences, exact route-relative authored time, one deterministic training entitlement and four independent self-interpretations. Obito-specific later patch owners are retired rather than allowed to overwrite the canonical final graph."
+    },
+    {
+      "changeId": "issue-334-shared-story-hard-transition-owner",
+      "classification": "REPLACES",
+      "responsibilityIds": [
+        "story.transition.presentation.shared",
+        "story.scene.presentation.shared",
+        "origin.academy_kakashi.v2.semantic_advance",
+        "origin.academy_kakashi.v2.story_dom"
+      ],
+      "owner": "runtime/alpha-story-scene-board-33900.js",
+      "directCallers": [
+        "runtime/alpha-story-scene-board-33900.js",
+        "runtime/alpha-kakashi-v2-transition-36040.js",
+        "runtime/alpha-kakashi-v2-renderer-36030.js"
+      ],
+      "stateTouched": [
+        "presentation-only shared Story hard-transition curtain/lifecycle state"
+      ],
+      "productionLoader": "runtime/alpha-traversal-bridge-33200.js",
+      "qaRefs": [
+        "tools/qa_issue_334_story_transition_owner.js",
+        "tools/qa_kakashi_v2_clean_room.js",
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_issue_312_story_battle_benchmark.js",
+        "tools/qa_issue_312_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [
+        "runtime/alpha-story-scene-board-33900.js::legacy root-local performSceneCut wipe playback",
+        "runtime/alpha-kakashi-v2-renderer-36030.js::ensureGlobalCurtain/setGlobalCurtain/setWipe/setTransitionMemory",
+        "runtime/alpha-kakashi-v2-transition-36040.js::local hard-scene curtain timing/playback"
+      ],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Issue #334 consolidates all shared Story hard-scene and Kakashi Story/Battle curtain playback into the existing 33900 shared Scene Board owner. Kakashi 36040 retains only semantic/cue advance adaptation and transition intent classification; 36030 retains Kakashi DOM/layout plus handoff intent. No actor/card animation is re-enabled and no semantic state depends on transition completion."
     }
   ]
 }

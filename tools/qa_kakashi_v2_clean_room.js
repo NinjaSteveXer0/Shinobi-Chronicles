@@ -8,9 +8,10 @@ const BATTLE_PATH="runtime/alpha-kakashi-v2-battle-36010.js";
 const REWARD_PATH="runtime/alpha-kakashi-v2-rewards-36015.js";
 const RENDER_PATH="runtime/alpha-kakashi-v2-renderer-36030.js";
 const TRANSITION_PATH="runtime/alpha-kakashi-v2-transition-36040.js";
+const STORY_PATH="runtime/alpha-story-scene-board-33900.js";
 const TRAVERSAL_PATH="runtime/alpha-traversal-bridge-33200.js";
 
-for(const p of [CONTENT_PATH,CORE_PATH,BATTLE_PATH,REWARD_PATH,RENDER_PATH,TRANSITION_PATH])assert(fs.existsSync(p),`missing V2 file: ${p}`);
+for(const p of [CONTENT_PATH,CORE_PATH,BATTLE_PATH,REWARD_PATH,RENDER_PATH,TRANSITION_PATH,STORY_PATH])assert(fs.existsSync(p),`missing V2/shared file: ${p}`);
 
 const contentSource=fs.readFileSync(CONTENT_PATH,"utf8");
 const battleSource=fs.readFileSync(BATTLE_PATH,"utf8");
@@ -18,6 +19,7 @@ const rewardSource=fs.readFileSync(REWARD_PATH,"utf8");
 const coreSource=fs.readFileSync(CORE_PATH,"utf8");
 const rendererSource=fs.readFileSync(RENDER_PATH,"utf8");
 const transitionSource=fs.readFileSync(TRANSITION_PATH,"utf8");
+const storySource=fs.readFileSync(STORY_PATH,"utf8");
 const traversalSource=fs.readFileSync(TRAVERSAL_PATH,"utf8");
 
 // Architecture gates.
@@ -32,10 +34,11 @@ assert(rendererSource.includes("kv2-dialogue")&&rendererSource.includes("chronic
 assert(!transitionSource.includes("kakashi_v2_transition_locked")&&transitionSource.includes("semanticAlreadyCommitted:true"),"#312 transition must not gate Story truth behind animation");
 assert(rendererSource.includes("Final Kakashi Golden motion policy")&&rendererSource.includes(".kv2-ghost-layer{display:none!important}"),"#312 Kakashi static-motion retirement missing");
 assert(rendererSource.includes('cancelStoryChoreography33900(root,"kakashi_golden_static_motion")'),"#312 Kakashi must cancel shared choreography rather than replay jitter-prone actor motion");
-assert(rendererSource.includes('GLOBAL_CURTAIN_ID="kakashi-v2-global-curtain"')&&rendererSource.includes("document.body.appendChild(curtain)"),"#312 global Story/Battle transition curtain missing");
+assert(storySource.includes('HARD_TRANSITION_CURTAIN_ID="sc-story-hard-transition-33900"')&&storySource.includes("function playStoryHardSceneTransition33900")&&storySource.includes("document.body.appendChild(curtain)"),"#334 shared Story hard-transition owner missing from 33900");
+assert(!rendererSource.includes("kakashi-v2-global-curtain")&&!rendererSource.includes("function ensureGlobalCurtain(")&&!rendererSource.includes("function setGlobalCurtain(")&&!rendererSource.includes("function setWipe("),"#334 Kakashi renderer retained hard-transition ownership");
 assert(!rendererSource.split("function ensureRoot")[0].includes("root.innerHTML"),"renderer source unexpectedly rebuilds root before mount");
 assert(!rendererSource.slice(rendererSource.indexOf("function syncActors"),rendererSource.indexOf("function bind")).includes("root.innerHTML"),"cue render remounts Scene Board root");
-assert(transitionSource.includes('visualTransition:"global_black_reveal"')&&transitionSource.includes('visualTransition:"none"'),"#312 final hard/soft transition policy missing");
+assert(transitionSource.includes('visualTransition:"shared_story_hard_transition_33900"')&&transitionSource.includes('visualTransition:"none"')&&transitionSource.includes("playStoryHardSceneTransition33900"),"#334 final hard/soft transition delegation missing");
 assert(coreSource.includes('addBeat("v2_battle_ps_seq",{mode:"battle_transition",backdrop:B.alleyAlt')&&coreSource.includes('addBeat("v2_ps_seq_win",{mode:"choice",backdrop:B.alleyAlt')&&coreSource.includes('addBeat("v2_ps_seq_loss",{backdrop:B.alleyAlt'),"PS pursuit Battle/post-Battle must remain in the authorised side-street backdrop");
 
 // Reward authority uses the existing Currency / Inventory / Battle claim surfaces

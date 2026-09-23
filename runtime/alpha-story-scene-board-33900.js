@@ -12,8 +12,11 @@ if(globalThis.SC_STORY_SCENE_BOARD_33900)return;
 const PATCH_ID="story_scene_board_33900_2026_09_22_shared_choreography";
 const STYLE_ID="sc-story-scene-board-33900-style";
 const PERFORMANCE_KEY="__storyPerformanceCursor33900";
+const HARD_TRANSITION_CURTAIN_ID="sc-story-hard-transition-33900";
 const registry=new Map();
-let rendering=false,transitioning=false;
+let rendering=false;
+let hardTransitionGeneration=0,hardTransitionTimers=[];
+let hardTransitionState={active:false,phase:"settled",scopeKey:null,generation:0,covered:false,startedAt:null,completedAt:null,cancelReason:null,presentationOnly:true,reducedMotion:false};
 const OBSERVER_DRIVEN_RENDERING=false;
 const choreographyControllers=new WeakMap();
 const SEMANTIC_STAGE_ANCHORS=Object.freeze({PLAYER_LEFT:8,INNER_LEFT:27,CENTER:46,CENTER_OBJECT:50,INNER_RIGHT:61,OPPONENT_RIGHT:78,FAR_ENTRY_LEFT:-18,FAR_ENTRY_RIGHT:108});
@@ -313,8 +316,10 @@ function installStyle(){
 @keyframes scChoreoObjectTransfer33900{0%{left:var(--sc-choreo-from-x);transform:translate(-50%,0) scale(.92)}65%{transform:translate(-50%,-12px) scale(1.08)}100%{left:var(--sc-choreo-to-x);transform:translate(-50%,0) scale(1)}}
 [data-sc-choreography-target="true"]{filter:brightness(1.08)}
 @media(prefers-reduced-motion:reduce){[data-sc-choreography-active]{animation-duration:80ms!important}.sc-choreo-approach,.sc-choreo-lunge,.sc-choreo-retreat,.sc-choreo-reposition,.sc-choreo-evade,.sc-choreo-recoil,.sc-choreo-flee,.sc-choreo-exit,.sc-choreo-handoff,.sc-choreo-object-transfer{animation-name:scChoreoReduced33900!important}@keyframes scChoreoReduced33900{from{opacity:.72}to{opacity:1}}}
-.sc-scene-board-wipe-33900{position:absolute;inset:0;z-index:9999;background:#000;transform:translateX(100%);pointer-events:auto;transition:transform .28s cubic-bezier(.7,0,.3,1)}.sc-scene-board-wipe-33900.is-covering{transform:translateX(0)}.sc-scene-board-wipe-33900.is-revealing{transform:translateX(-100%)}
-@media(prefers-reduced-motion:reduce){.sc-scene-board-33900__actor.is-entering{animation:none!important}.sc-scene-board-wipe-33900{transition:none!important}}
+#${HARD_TRANSITION_CURTAIN_ID}{position:fixed;inset:0;z-index:2147483000;background:#020508;opacity:0;visibility:hidden;pointer-events:none;transition:none}
+#${HARD_TRANSITION_CURTAIN_ID}.is-covered{opacity:1;visibility:visible;pointer-events:auto;transition:none!important}
+#${HARD_TRANSITION_CURTAIN_ID}.is-releasing{opacity:0;visibility:visible;pointer-events:auto;transition:opacity .18s ease-out}
+@media(prefers-reduced-motion:reduce){.sc-scene-board-33900__actor.is-entering{animation:none!important}#${HARD_TRANSITION_CURTAIN_ID}.is-releasing{transition:none!important}}
 @media(max-width:820px){.sc-scene-board-33900__actors{left:1.5%;right:1.5%;gap:1%;bottom:31%}.sc-scene-board-33900__actors[data-count="2"]{column-gap:20px}.sc-scene-board-33900__actor{width:90%;max-height:290px}.sc-scene-board-33900__objective{max-width:58%;font-size:8px}#story-scene-presentation-layer[data-sc-scene-mode="encounter"] .sc-chronicle-actions{grid-template-columns:1fr}}
 `;
   document.head.appendChild(style);return true;
@@ -397,15 +402,84 @@ if(PRE_RENDER){
 }
 
 function reducedMotion(){return storyChoreographyReducedMotion33900();}
+function clearStoryHardTransitionTimers33900(){
+  for(const id of hardTransitionTimers)try{clearTimeout(id);}catch(_error){}
+  hardTransitionTimers=[];
+}
+function scheduleStoryHardTransition33900(fn,ms,generation){
+  const id=setTimeout(()=>{
+    hardTransitionTimers=hardTransitionTimers.filter(x=>x!==id);
+    if(generation===hardTransitionGeneration)fn();
+  },ms);
+  hardTransitionTimers.push(id);return id;
+}
+function ensureStoryHardTransitionCurtain33900(){
+  if(typeof document==="undefined"||!document.body)return null;
+  installStyle();
+  let curtain=document.getElementById(HARD_TRANSITION_CURTAIN_ID);
+  if(!curtain){
+    curtain=document.createElement("div");
+    curtain.id=HARD_TRANSITION_CURTAIN_ID;
+    curtain.setAttribute("aria-hidden","true");
+    curtain.dataset.scStoryTransitionOwner="story.transition.presentation.shared";
+    document.body.appendChild(curtain);
+  }
+  return curtain;
+}
+function retireLegacyStoryTransitionDom33900(){
+  if(typeof document==="undefined")return;
+  const legacy=document.getElementById("kakashi-v2-global-curtain");
+  if(legacy)try{legacy.remove();}catch(_error){}
+  for(const node of document.querySelectorAll?document.querySelectorAll(".sc-scene-board-wipe-33900"):[])try{node.remove();}catch(_error){}
+}
+function getStoryHardSceneTransitionState33900(){return{...hardTransitionState};}
+function cancelStoryHardSceneTransition33900(reason="cancelled"){
+  hardTransitionGeneration+=1;
+  clearStoryHardTransitionTimers33900();
+  retireLegacyStoryTransitionDom33900();
+  const curtain=typeof document!=="undefined"?document.getElementById(HARD_TRANSITION_CURTAIN_ID):null;
+  if(curtain)curtain.classList.remove("is-covered","is-releasing");
+  hardTransitionState={...hardTransitionState,active:false,phase:"settled",covered:false,generation:hardTransitionGeneration,completedAt:Date.now(),cancelReason:String(reason||"cancelled")};
+  return{success:true,reason:String(reason||"cancelled"),state:getStoryHardSceneTransitionState33900()};
+}
+function playStoryHardSceneTransition33900({scopeKey="story_hard_scene",fromSceneId=null,toSceneId=null,fromBeatId=null,toBeatId=null,reason="hard_scene"}={}){
+  const scope=String(scopeKey||"story_hard_scene");
+  const current=getStoryHardSceneTransitionState33900();
+  if(current.active&&current.scopeKey===scope)return{success:true,reused:true,pending:true,presentationOnly:true,state:current};
+  cancelStoryHardSceneTransition33900("superseded");
+  const generation=++hardTransitionGeneration,startedAt=Date.now(),isReduced=reducedMotion();
+  hardTransitionState={active:!isReduced,phase:isReduced?"settled":"covered",scopeKey:scope,generation,covered:!isReduced,startedAt,completedAt:isReduced?startedAt:null,cancelReason:null,presentationOnly:true,reducedMotion:isReduced,fromSceneId,toSceneId,fromBeatId,toBeatId,reason:String(reason||"hard_scene")};
+  if(typeof document==="undefined"||isReduced){
+    hardTransitionState={...hardTransitionState,active:false,phase:"settled",covered:false,completedAt:startedAt};
+    retireLegacyStoryTransitionDom33900();
+    return{success:true,pending:false,presentationOnly:true,skippedMotion:true,state:getStoryHardSceneTransitionState33900()};
+  }
+  const curtain=ensureStoryHardTransitionCurtain33900();
+  if(!curtain){
+    hardTransitionState={...hardTransitionState,active:false,phase:"settled",covered:false,completedAt:Date.now()};
+    return{success:true,pending:false,presentationOnly:true,skippedMotion:true,state:getStoryHardSceneTransitionState33900()};
+  }
+  curtain.classList.remove("is-releasing");curtain.classList.add("is-covered");
+  scheduleStoryHardTransition33900(()=>{
+    curtain.classList.remove("is-covered");curtain.classList.add("is-releasing");
+    hardTransitionState={...hardTransitionState,phase:"releasing",covered:false};
+    scheduleStoryHardTransition33900(()=>{
+      curtain.classList.remove("is-releasing","is-covered");
+      hardTransitionState={...hardTransitionState,active:false,phase:"settled",covered:false,completedAt:Date.now()};
+    },190,generation);
+  },70,generation);
+  return{success:true,pending:true,presentationOnly:true,state:getStoryHardSceneTransitionState33900()};
+}
 function performSceneCut(){
-  if(typeof document==="undefined"||reducedMotion())return{success:true,type:"story_scene_cinematic_cut",skippedMotion:true};
-  const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return{success:true,type:"story_scene_cinematic_cut",skippedMotion:true};
-  if(transitioning)return{success:false,reason:"story_scene_transition_in_progress"};
-  transitioning=true;
-  const wipe=document.createElement("div");wipe.className="sc-scene-board-wipe-33900";layer.appendChild(wipe);
-  requestAnimationFrame(()=>wipe.classList.add("is-covering"));
-  setTimeout(()=>{wipe.classList.remove("is-covering");wipe.classList.add("is-revealing");setTimeout(()=>{wipe.remove();transitioning=false;},320);},120);
-  return{success:true,type:"story_scene_cinematic_cut",pending:true,presentationOnly:true};
+  const rt=currentRuntime(),beat=currentBeat(rt);
+  return playStoryHardSceneTransition33900({
+    scopeKey:"story_scene_board:"+String(rt&&rt.sceneId||"none")+":"+String(beat&&beat.beatId||"none")+":"+String(Date.now()),
+    fromSceneId:rt&&rt.sceneId||null,
+    toSceneId:rt&&rt.sceneId||null,
+    fromBeatId:beat&&beat.beatId||null,
+    toBeatId:beat&&beat.beatId||null,
+    reason:"scene_board_authored_hard_cut"
+  });
 }
 const PRE_ADVANCE=typeof advanceStoryScene==="function"?advanceStoryScene:null;
 function advanceStoryScene33900(choiceId=null){
@@ -413,7 +487,7 @@ function advanceStoryScene33900(choiceId=null){
   if(choiceId!==null&&choiceId!==undefined)return PRE_ADVANCE.apply(this,arguments);
   const runtime=currentRuntime(),beat=currentBeat(runtime),p=performanceCursor(runtime,beat);
   if(!runtime||!beat||!p)return PRE_ADVANCE.apply(this,arguments);
-  if(transitioning)return{success:false,reason:"story_scene_transition_in_progress"};
+  if(getStoryHardSceneTransitionState33900().active)return{success:false,reason:"story_scene_transition_in_progress"};
   if(!p.atEnd){persistPerformanceCursor(runtime,beat,p.index+1);renderStorySceneBoard33900();return{success:true,type:"story_performance_cue_advanced",beatId:beat.beatId,cueIndex:p.index+1,semanticBeatUnchanged:true};}
   clearPerformanceCursor(runtime);
   const def=boardDefinition(runtime.sceneId),transition=def&&def.performanceTransitions&&def.performanceTransitions[beat.beatId];
@@ -440,6 +514,11 @@ function runStorySceneBoard33900Diagnostics(){
     reusableRegistry:typeof registerStorySceneBoardDefinition==="function"&&typeof unregisterStorySceneBoardDefinition==="function"&&typeof resolveStorySceneBoardProjection==="function",
     pendingRegistrationDrain:typeof drainPendingStorySceneBoardRegistrations33900==="function"&&pendingRegistrationDrain&&pendingRegistrationDrain.success===true,
     genericPerformanceLifecycle:typeof performanceSequenceFor==="function"&&typeof advanceStoryScene33900==="function"&&typeof performSceneCut==="function",
+    sharedHardTransitionOwner:typeof playStoryHardSceneTransition33900==="function"&&typeof cancelStoryHardSceneTransition33900==="function"&&typeof getStoryHardSceneTransitionState33900==="function",
+    documentCurtainOwnedHere:HARD_TRANSITION_CURTAIN_ID==="sc-story-hard-transition-33900"&&String(ensureStoryHardTransitionCurtain33900).includes("document.body.appendChild")&&installStyle.toString().includes("HARD_TRANSITION_CURTAIN_ID"),
+    staleTransitionInvalidation:String(playStoryHardSceneTransition33900).includes('cancelStoryHardSceneTransition33900("superseded")')&&String(scheduleStoryHardTransition33900).includes("generation===hardTransitionGeneration"),
+    reducedMotionPreservesSemanticIndependence:String(playStoryHardSceneTransition33900).includes("isReduced")&&!String(playStoryHardSceneTransition33900).includes("PRE_ADVANCE"),
+    legacyRootWipeRetired:!installStyle.toString().includes("transform:translateX(100%)")&&!String(performSceneCut).includes("createElement"),
     performanceAdvanceCommitsNoOccurrence:advanceStoryScene33900.toString().includes("performanceCursor")&&!advanceStoryScene33900.toString().includes("commitOccurrence"),
     semanticAdvancePrecedesWipe:advanceStoryScene33900.toString().indexOf("PRE_ADVANCE.apply")<advanceStoryScene33900.toString().indexOf("performSceneCut"),
     semanticAnchorVocabulary:["PLAYER_LEFT","INNER_LEFT","CENTER","CENTER_OBJECT","INNER_RIGHT","OPPONENT_RIGHT","FAR_ENTRY_LEFT","FAR_ENTRY_RIGHT"].every(key=>Object.prototype.hasOwnProperty.call(SEMANTIC_STAGE_ANCHORS,key)),
@@ -478,11 +557,14 @@ globalThis.playStoryChoreography33900=playStoryChoreography33900;
 globalThis.cancelStoryChoreography33900=cancelStoryChoreography33900;
 globalThis.getStoryChoreographyState33900=getStoryChoreographyState33900;
 globalThis.normalizeStoryChoreographyCue33900=normalizeStoryChoreographyCue33900;
+globalThis.playStoryHardSceneTransition33900=playStoryHardSceneTransition33900;
+globalThis.cancelStoryHardSceneTransition33900=cancelStoryHardSceneTransition33900;
+globalThis.getStoryHardSceneTransitionState33900=getStoryHardSceneTransitionState33900;
 globalThis.markStoryPresentationHidden33900=markStoryPresentationHidden33900;
 globalThis.clearStoryPresentationHidden33900=clearStoryPresentationHidden33900;
 globalThis.storyPresentationBattleSuspended33900=storyPresentationBattleSuspended33900;
 globalThis.runStorySceneBoard33900Diagnostics=runStorySceneBoard33900Diagnostics;
-globalThis.SC_STORY_SCENE_BOARD_33900=Object.freeze({patchId:PATCH_ID,semanticStageAnchors:SEMANTIC_STAGE_ANCHORS,choreographyClasses:CHOREOGRAPHY_CLASSES,browserGoldenClaimed:false});
+globalThis.SC_STORY_SCENE_BOARD_33900=Object.freeze({patchId:PATCH_ID,semanticStageAnchors:SEMANTIC_STAGE_ANCHORS,choreographyClasses:CHOREOGRAPHY_CLASSES,hardTransitionCurtainId:HARD_TRANSITION_CURTAIN_ID,browserGoldenClaimed:false});
 
 function drainPendingStorySceneBoardRegistrations33900(){
   const queue=Array.isArray(globalThis.SC_STORY_SCENE_BOARD_PENDING_REGISTRATIONS)?globalThis.SC_STORY_SCENE_BOARD_PENDING_REGISTRATIONS:[];
@@ -502,5 +584,6 @@ function drainPendingStorySceneBoardRegistrations33900(){
 }
 globalThis.drainPendingStorySceneBoardRegistrations33900=drainPendingStorySceneBoardRegistrations33900;
 const pendingRegistrationDrain=drainPendingStorySceneBoardRegistrations33900();
+try{cancelStoryHardSceneTransition33900("33900_install_cleanup");}catch(_error){}
 try{renderStorySceneBoard33900();}catch(_error){}
 })();
