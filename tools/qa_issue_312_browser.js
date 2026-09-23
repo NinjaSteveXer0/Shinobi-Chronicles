@@ -290,7 +290,7 @@ async function shot(page,name,selector=null){
     assert(stop.transition.pass,JSON.stringify(stop.transition));
     assert(stop.renderer.pass,JSON.stringify(stop.renderer));
     await page.waitForFunction(()=>{
-      const curtain=document.getElementById("kakashi-v2-global-curtain");
+      const curtain=document.getElementById("sc-story-hard-transition-33900");
       return !curtain||(!curtain.classList.contains("is-covered")&&!curtain.classList.contains("is-releasing"));
     },null,{timeout:3000});
     await shot(page,"03-story-stop-assassin-static.png","#kakashi-v2-scene-board");
