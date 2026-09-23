@@ -163,38 +163,9 @@ function patchMetal(){
 // Academy Kakashi legacy expression patch retired for clean-room V2.
 // 33600 continues to modernize the other Origins only.
 
-function patchObito(){
-  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const def=editable(A.sceneByVariant.academy_obito);if(!def)return false;
-  text(def,"obi_depart","Obito leaves early. Deliberately early. Today is one of the sessions that matters—the kind where nobody can say he only talks about becoming Hokage. He makes it three streets before somebody needs something.");
-  label(def,"obi_furniture","furniture_carry_full","“Hang on. I'll get the other end.”");
-  label(def,"obi_furniture","furniture_stabilize","Brace it, free the doorway, keep moving.");
-  label(def,"obi_furniture","furniture_continue","Keep going. Training starts whether he's there or not.");
-  label(def,"obi_vegetables","vegetables_collect_all","Get every last one before the carts crush them.");
-  label(def,"obi_vegetables","vegetables_clear_lane","Clear the lane fast, then run.");
-  label(def,"obi_vegetables","vegetables_continue","Keep moving. Somebody else can stop.");
-  label(def,"obi_equipment","equipment_search_full","Help search until it's found.");
-  label(def,"obi_equipment","equipment_check_likely_route","Check the obvious drop points on his route.");
-  label(def,"obi_equipment","equipment_continue","Academy staff can handle Academy equipment. Keep going.");
-  label(def,"obi_delivery","delivery_right_and_reload","Right the cart and rebuild the load.");
-  label(def,"obi_delivery","delivery_clear_passage","Clear the dangerous obstruction and move.");
-  label(def,"obi_delivery","delivery_continue","Go around.");
-  label(def,"obi_cart","cart_intercept","Stop it.");
-  label(def,"obi_cart","cart_warn_and_redirect","Get everyone out of its path.");
-  label(def,"obi_cart","cart_continue","Keep moving.");
-  const arrival=beat(def,"obi_arrival");if(arrival){const previous=arrival.presentationResolver;arrival.presentationResolver=()=>{const ctx=local();const direct=["furniture","vegetables","equipment","delivery","cart"].every(k=>String(ctx[`obito_${k}`]||"").endsWith("continue"));if(direct)return{text:"Obito hits the training approach breathing hard but on time. For once, there is nobody to blame, nobody to wait for and no excuse to make. The whole session is still ahead of him."};const base=typeof previous==="function"?(previous()||{}).text:"";return{text:"Obito reaches the training approach later than he planned. The session is already underway; what remains must be resolved from the journey time he actually spent, not from whether helping was ‘good’ or ‘bad’."+(base&&base.includes("exact")?"":"")};};}
-  const entitlement=beat(def,"obi_entitlement");if(entitlement)entitlement.presentationResolver=()=>{const ctx=local();const direct=["furniture","vegetables","equipment","delivery","cart"].every(k=>String(ctx[`obito_${k}`]||"").endsWith("continue"));return{text:direct?"The opening conditioning block has not closed yet. Obito can still make the whole session.":"Training is already in progress. The exact remaining blocks must follow the authoritative arrival-time result for this journey."};};
-  text(def,"obi_training","Obito joins the session: conditioning until his legs burn, weapon fundamentals until his grip stops slipping, Academy-scale Fire work and the Taijutsu closing drill.");
-  label(def,"obi_reflect","hokage_still","I'm still becoming Hokage.");
-  label(def,"obi_reflect","faster_next","Next time I get here faster.");
-  label(def,"obi_reflect","people_mattered","They mattered too.");
-  label(def,"obi_reflect","prove_it","Fine. I'll prove it again.");
-  const end=beat(def,"obi_end");if(end)end.presentationResolver=()=>({text:"Obito looks toward the Hokage Monument for another second, then turns back toward the village. Whatever the journey cost him, the answer in his head is still his."});
-  return commit(def);
-}
-
 const originResults={
   hinata:patchHinata(),izuno:patchIzuno(),mirai:patchMirai(),menmaReviewedNotRestructured:true,
-  kushina:patchKushina(),kurenai:patchKurenai(),iwabee:patchIwabee(),metal:patchMetal(),obito:patchObito()
+  kushina:patchKushina(),kurenai:patchKurenai(),iwabee:patchIwabee(),metal:patchMetal()
 };
 
 // #121 early-Arc production consumer. 33600 is already a terminal browser
@@ -218,16 +189,16 @@ const earlyArcActivationInstalled=activateEarlyArc121();
 
 function runAlphaEarlyStoryModernization33600Diagnostics(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;
-  const kush=A&&definition(A.sceneByVariant.academy_kushina),kur=A&&definition(A.sceneByVariant.academy_kurenai),metal=A&&definition(A.sceneByVariant.academy_metal_lee),obi=A&&definition(A.sceneByVariant.academy_obito);
+  const kush=A&&definition(A.sceneByVariant.academy_kushina),kur=A&&definition(A.sceneByVariant.academy_kurenai),metal=A&&definition(A.sceneByVariant.academy_metal_lee);
   const checks={
     patchId:PATCH_ID==="alpha_early_story_modernization_33600_2026_09_13",
     writingAuthorityPinned:WRITING_AUTHORITY_COMMIT==="57697fb9dfd7920a2466c64cf7813d99f424f24e",
-    nonKakashiOriginsReviewed:Object.keys(originResults).length===9&&Object.values(originResults).every(Boolean),
+    legacyOriginsReviewed:Object.keys(originResults).length===8&&Object.values(originResults).every(Boolean),
     kakashiLegacyExpressionRetired:!Object.prototype.hasOwnProperty.call(originResults,"kakashi"),
     kushinaOpeningModernized:!!(kush&&kush.beatMap&&String(kush.beatMap.get("kus_crisis")?.text||"").includes("three strokes ago")),
     kurenaiSystemGuardrailRemoved:!!(kur&&kur.beatMap&&!String(kur.beatMap.get("kur_result")?.text||"").includes("personality")),
     metalSystemGuardrailRemoved:!!(metal&&metal.beatMap&&!String(metal.beatMap.get("met_private")?.text||"").includes("legitimately demonstrates")),
-    obitoAuthorityNarrationRemoved:!!(obi&&obi.beatMap&&!String(obi.beatMap.get("obi_training")?.text||"").includes("Progression authority")),
+    obitoLegacyExpressionRetired:!Object.prototype.hasOwnProperty.call(originResults,"obito"),
     earlyArc121ActivationInstalled,
     browserGoldenClaimed:false
   };
