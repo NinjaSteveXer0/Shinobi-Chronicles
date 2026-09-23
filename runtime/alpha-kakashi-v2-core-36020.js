@@ -1104,7 +1104,7 @@ addBeat("v2_battle_amt_direct_pakkun",{mode:"battle_transition",backdrop:B.inter
 addBeat("v2_amt_missing_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("amt_direct",ctx,s=>{s.participants.AMT.state="ESCAPED";}),cues:W("originalTarget","5_amt_defeats_kakashi_pakkun"),nextBeatId:"v2_report"});
 addBeat("v2_amt_missing_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:null,actors:["kakashi","amt","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("amt_direct",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";}),cues:W("originalTarget","6_kakashi_pakkun_defeat_amt"),choices:[
  C("amt_missing_kill","KILL HIM","v2_amt_kill_result",{patch:()=>resolveDisposition("KILL","AMT","amt_missing_kill")}),
- C("amt_missing_restrain","RESTRAIN HIM","v2_amt_restrain_report_result",{patch:()=>resolveDisposition("RESTRAIN","AMT","amt_missing_restrain")}),
+ C("amt_missing_restrain","RESTRAIN HIM","v2_amt_restrain_report_result",{patch:()=>{const r=resolveDisposition("RESTRAIN","AMT","amt_missing_restrain");if(!r.success)return r;projectExtractionPlanning("AMT",r,"amt_missing_restrain");return r;}}),
  C("amt_missing_anbu","BRING HIM TO THE ANBU","v2_report",{patch:()=>dispose("AMT","ANBU")}),
  C("amt_missing_police","TAKE HIM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>dispose("AMT","POLICE")})
 ]});
