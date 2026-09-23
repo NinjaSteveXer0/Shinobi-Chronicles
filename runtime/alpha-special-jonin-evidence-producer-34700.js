@@ -67,12 +67,14 @@ function normalizePacket(packet){
   const def=getSpecialJoninQualificationDefinition(qualificationId);
   if(!def)return{success:false,reason:"contextual_evidence_qualification_unknown",qualificationId};
   const allowed=definitionTags(def);
-  const tags=[...new Set((Array.isArray(packet.tags)?packet.tags:[]).map(String).filter(Boolean))];
-  if(!tags.length)return{success:false,reason:"contextual_evidence_tags_required"};
-  const invalid=tags.filter(tag=>!allowed.has(tag));
+  const authoredTags=[...new Set((Array.isArray(packet.tags)?packet.tags:[]).map(String).filter(Boolean))];
+  if(!authoredTags.length)return{success:false,reason:"contextual_evidence_tags_required"};
+  const invalid=authoredTags.filter(tag=>!allowed.has(tag));
   if(invalid.length)return{success:false,reason:"contextual_evidence_tag_not_authorised",invalid};
   const capstoneTags=new Set(def&&def.capstoneRequirement&&def.capstoneRequirement.requiredTags||[]);
-  if(tags.some(tag=>capstoneTags.has(tag))&&packet.capstoneAuthorized!==true)return{success:false,reason:"contextual_evidence_capstone_not_authorised"};
+  if(authoredTags.some(tag=>capstoneTags.has(tag))&&packet.capstoneAuthorized!==true)return{success:false,reason:"contextual_evidence_capstone_not_authorised"};
+  const requiredEvidenceTags=[...new Set((def&&def.requiredEvidenceTags||[]).map(String).filter(Boolean))];
+  const tags=[...new Set([...requiredEvidenceTags,...authoredTags])];
   const significance=Math.max(1,Math.min(4,Math.floor(Number(packet.significance)||0)));
   if(!Number.isFinite(Number(packet.significance))||Number(packet.significance)<1||Number(packet.significance)>4)return{success:false,reason:"contextual_evidence_significance_invalid"};
   const category=String(packet.category||"chronicle_origin");
@@ -82,7 +84,7 @@ function normalizePacket(packet){
     subjectVariantId,sourceOccurrenceId,qualificationId,causalRootOccurrenceId,
     significance,category,activityFamilyId,tags,
     competencyGroupIds:competencyGroups(def,tags),
-    verified:packet.verified!==false,
+    verified:packet.verified===true,
     specialistLevel:packet.specialistLevel===true,
     targetRefs:[...new Set((packet.targetRefs||[]).map(String).filter(Boolean))],
     context:packet.context&&typeof packet.context==="object"?clone(packet.context):{},
@@ -161,6 +163,7 @@ function runAlphaSpecialJoninEvidenceProducer34700Diagnostics(){
     committedSourceRequired:String(normalizePacket).includes("committedSourceRecord"),
     exactQualificationRequired:String(normalizePacket).includes("getSpecialJoninQualificationDefinition"),
     tagWhitelist:String(normalizePacket).includes("definitionTags")&&String(normalizePacket).includes("contextual_evidence_tag_not_authorised"),
+    requiredEvidenceTagProjection:String(normalizePacket).includes("requiredEvidenceTags")&&String(normalizePacket).includes("authoredTags"),
     idempotentUpsert:String(projectSpecialJoninContextualEvidence34700).includes("Math.max")&&String(projectSpecialJoninContextualEvidence34700).includes("snapshotBySource")&&String(projectSpecialJoninContextualEvidence34700).includes("stableComparable"),
     sameCausalRootOneRecord:String(evidenceIdFor).includes("qualificationId")&&!String(evidenceIdFor).includes("sourceOccurrenceId"),
     noRankMutation:!String(projectSpecialJoninContextualEvidence34700).includes("formalRank")&&!String(projectSpecialJoninContextualEvidence34700).includes("earnSpecialJoninQualification"),
