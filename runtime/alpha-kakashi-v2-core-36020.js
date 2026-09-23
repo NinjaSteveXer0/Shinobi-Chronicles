@@ -497,6 +497,11 @@ function finalRestraintCues(ref){
   const key=participantKey(ref);
   return W("custodyGolden06B",key==="MI"?"final_restrained_mi":key==="PS"?"final_restrained_ps":"final_restrained_amt");
 }
+function reportRestraintCues(ref){
+  const out=[...singleDispositionCues(ref,"RESTRAIN")];
+  if(dispositionOutcome(ref)==="RESTRAINED")out.push(...finalRestraintCues(ref));
+  return out;
+}
 function projectExtractionPlanning(ref,result,causalKey){
   if(!result||result.success!==true)return result;
   const sourceId=result.sourceOccurrenceId,source=playerData.activityHistory.find(r=>r&&String(r.sourceOccurrenceId||r.occurrenceId||"")===String(sourceId));
@@ -1468,9 +1473,9 @@ addBeat("v2_collected_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE
 addBeat("v2_mi_kill_result",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi","mi"],preset:"post_battle",cues:()=>singleDispositionCues("MI","KILL"),nextBeatId:"v2_report"});
 addBeat("v2_ps_kill_result",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Return to ANBU.",actors:["kakashi","ps"],preset:"post_battle",cues:()=>singleDispositionCues("PS","KILL"),nextBeatId:"v2_report"});
 addBeat("v2_ps_restrain_continue_result",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Continue the pursuit.",actors:["kakashi","ps"],preset:"post_battle",cues:()=>singleDispositionCues("PS","RESTRAIN"),nextBeatId:"v2_amt_after_ps"});
-addBeat("v2_ps_restrain_report_result",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Return to ANBU.",actors:["kakashi","ps"],preset:"post_battle",cues:()=>singleDispositionCues("PS","RESTRAIN"),nextBeatId:"v2_report"});
+addBeat("v2_ps_restrain_report_result",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Return to ANBU.",actors:["kakashi","ps"],preset:"post_battle",cues:()=>reportRestraintCues("PS"),nextBeatId:"v2_report"});
 addBeat("v2_amt_kill_result",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:()=>state()&&state().pakkun.present?["kakashi","amt","pakkun"]:["kakashi","amt"],preset:"post_battle",cues:()=>singleDispositionCues("AMT","KILL"),nextBeatId:"v2_report"});
-addBeat("v2_amt_restrain_report_result",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:()=>state()&&state().pakkun.present?["kakashi","amt","pakkun"]:["kakashi","amt"],preset:"post_battle",cues:()=>singleDispositionCues("AMT","RESTRAIN"),nextBeatId:"v2_report"});
+addBeat("v2_amt_restrain_report_result",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:()=>state()&&state().pakkun.present?["kakashi","amt","pakkun"]:["kakashi","amt"],preset:"post_battle",cues:()=>reportRestraintCues("AMT"),nextBeatId:"v2_report"});
 addBeat("v2_amt_restrain_collect_result",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Collect the restrained participants.",actors:()=>state()&&state().pakkun.present?["kakashi","amt","pakkun"]:["kakashi","amt"],preset:"post_battle",cues:()=>singleDispositionCues("AMT","RESTRAIN"),nextBeatId:"v2_group_collect"});
 addBeat("v2_group2_kill_result",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi","amt","ps"],preset:"post_battle",cues:()=>groupKillCues([AMT,PS]),nextBeatId:"v2_report"});
 addBeat("v2_group3_kill_result",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi","amt","ps","mi"],preset:"post_battle",cues:()=>groupKillCues([AMT,PS,MI]),nextBeatId:"v2_report"});
