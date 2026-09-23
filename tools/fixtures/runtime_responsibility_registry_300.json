@@ -44,7 +44,8 @@
         "applyStoryStageAnchor33900",
         "playStoryChoreography33900",
         "cancelStoryChoreography33900",
-        "getStoryChoreographyState33900"
+        "getStoryChoreographyState33900",
+        "drainPendingStorySceneBoardRegistrations33900"
       ],
       "permittedAdapters": [],
       "retiredOwners": [],
