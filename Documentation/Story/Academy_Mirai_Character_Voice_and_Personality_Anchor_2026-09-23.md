@@ -123,3 +123,87 @@ If she detects changed chakra, she knows only that the chakra reference changed 
 Her development is not “be more suspicious.”
 
 It is learning that protection may require preserving continuity, context and identity—not only preventing physical harm.
+
+
+## 2026-09-23 canon-performance refinement after Stephen dialogue review
+
+Stephen rejected the first Mirai draft's conversational performance as too dry / under-characterised. The following canon-first refinements are now binding for the next candidate expression pass.
+
+Official BORUTO / NARUTO material reinforces that later Mirai:
+- takes escort responsibility extremely seriously;
+- can overestimate the danger/importance of an assignment because she is eager to prove herself;
+- investigates strange circumstances rather than passively accepting them;
+- can sense that something is wrong without already knowing the explanation.
+
+Useful official source pages:
+- https://naruto-official.com/en/anime/boruto/list/01_1050
+- https://naruto-official.com/en/anime/boruto/list/01_1052
+- https://naruto-official.com/en/anime/boruto/list/01_1055
+
+Secondary Konoha Shinden / character summaries additionally reinforce later Mirai as:
+- unusually serious about responsibility;
+- capable of overthinking;
+- impatient or frustrated when reality does not match the mission she prepared for;
+- embarrassed when her intensity is exposed;
+- still socially capable and not an emotionless mission machine.
+
+Academy projection must remain younger than those later portrayals.
+
+### Dialogue correction
+
+Academy Mirai should therefore not default to:
+- clipped `question -> yes -> question -> yes`;
+- neutral tactical database speech;
+- endless calm precision;
+- already-mature investigator cadence.
+
+She can:
+- prepare too seriously for a simple escort;
+- misunderstand a joke for half a beat;
+- become mildly defensive when someone notices how intensely she is treating the exercise;
+- ask a question because she is curious and then pretend it was mission-relevant;
+- overthink a small detail;
+- have ordinary teenage/Academy awkwardness in silence;
+- become noticeably firmer when she chooses to investigate.
+
+Her protected civilian must also behave like a person with their own social rhythm, not a clue dispenser.
+
+### Agency correction
+
+Mirai does **not** automatically become suspicious after the substitution.
+
+Writing must not narrate:
+- `something feels wrong`;
+- `Mirai knows the chakra changed`;
+- `the answer catches in her mind`;
+
+unless the player's prior Knowledge/attention and current action legitimately establish that observation.
+
+The player may:
+- miss a contradiction;
+- hear it and ignore it;
+- follow the civilian's suggested route;
+- investigate;
+- verify through available evidence;
+- do nothing and complete the escort.
+
+CE records the resulting Knowledge/inference history.
+
+### Interrogation correction
+
+When Mirai tests a possible contradiction, she does **not** volunteer the original correct answer to the suspect.
+
+Example shape:
+
+`MIRAI: You said someone was meeting you after the checkpoint. What was the plan again?`
+
+If the current escort answers incorrectly, Mirai keeps the mismatch to herself unless the **player** chooses to reveal/challenge it.
+
+The player then decides whether to:
+- press;
+- test again;
+- use another available evidence channel;
+- follow/alter the route;
+- or do nothing.
+
+**Writing does not spend the player's inference for them.**
