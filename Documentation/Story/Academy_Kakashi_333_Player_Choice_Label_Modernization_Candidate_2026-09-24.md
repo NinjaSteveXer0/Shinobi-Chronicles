@@ -1,3 +1,6 @@
+> **SUPERSEDED — EXACT WORDING APPROVED**  
+> Stephen approved this candidate's successor wording on 2026-09-24. Binding authority: `Documentation/Story/Academy_Kakashi_333_Player_Choice_Label_Modernization_GOLDEN_2026-09-24.md` @ `c29fe01dc79f09b755361c371d439c043aae2209`.
+
 # Academy Kakashi — #333 Player Choice Label Modernization
 
 **Date:** 2026-09-24  
