@@ -1,5 +1,5 @@
-> **2026-09-24 CHOICE-LABEL REOPEN NOTICE**  
-> Stephen has retained this family as GOLDEN for player-facing prose/story performance but explicitly reopened Kakashi's player-facing option/decision names for modernization. Until the successor labels are approved, treat the choices in this file as semantic-route placeholders rather than final display wording. Candidate authority: `Documentation/Story/Academy_Kakashi_333_Player_Choice_Label_Modernization_Candidate_2026-09-24.md`.
+> **2026-09-24 CHOICE-LABEL GOLDEN NOTICE**  
+> Stephen approved the successor Kakashi player-facing choice-label system. This family's Story/prose remains GOLDEN and its player-facing options now consume `Documentation/Story/Academy_Kakashi_333_Player_Choice_Label_Modernization_GOLDEN_2026-09-24.md` @ `c29fe01dc79f09b755361c371d439c043aae2209`. Stable semantic IDs and route truth remain unchanged.
 
 # Academy Kakashi Origin — #333 Repair Family 01
 ## Rooftop -> Tail -> Watch the Exchange -> Stop the Assassin -> Immediate Aftermath
@@ -58,10 +58,10 @@ Current Scene 02 also remains structurally/player-facing sound.
 
 Preserve the four exact root choices:
 
-1. **WATCH THE EXCHANGE**
-2. **MOVE IN CLOSER**
-3. **STRIKE BEFORE THE HANDOFF**
-4. **SLIP IN FOR THE PACKAGE**
+1. **WATCH THE HANDOFF**
+2. **GET CLOSER**
+3. **INTERRUPT THE HANDOFF**
+4. **SLIP IN AND TAKE IT**
 
 No new pre-choice explanation is added.
 
@@ -115,12 +115,12 @@ Current authored gate:
 Use current simplified authority, not historical control-state wording.
 
 Where factually eligible, player-facing options include:
-- **GO AFTER PACKAGE SMUGGLER**
-- **GO AFTER ANBU MARKED TARGET**
+- **CHASE THE PACKAGE**
+- **CHASE THE MAN FROM THE PHOTO**
 - **KILL HER**
-- **TAKE HER BACK TO ANBU**
-- **TAKE HER TO THE UCHIHA POLICE FORCE**
-- **RESTRAIN HER AND CONTINUE**
+- **BRING HER TO ANBU**
+- **TAKE HER TO THE UCHIHA POLICE**
+- **RESTRAIN HER AND KEEP MOVING**
 
 Do not narrate:
 - “three problems”;
@@ -196,13 +196,13 @@ Kakashi settles into the shadow above the street.
 
 ### CHOICE
 
-**WATCH THE EXCHANGE**
+**WATCH THE HANDOFF**
 
-**MOVE IN CLOSER**
+**GET CLOSER**
 
-**STRIKE BEFORE THE HANDOFF**
+**INTERRUPT THE HANDOFF**
 
-**SLIP IN FOR THE PACKAGE**
+**SLIP IN AND TAKE IT**
 
 ---
 
@@ -240,15 +240,15 @@ Kakashi rises from his crouch.
 
 ### CHOICE
 
-**STOP THE ASSASSIN**
+**INTERCEPT THE MASKED ATTACKER**
 
-**SECURE THE PACKAGE**
+**GO FOR THE PACKAGE**
 
-**SECURE THE PACKAGE BEFORE THE ASSASSIN**
+**BEAT HER TO THE PACKAGE**
 
-**DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE**
+**DEAL WITH HER FIRST**
 
-**GO AFTER THE ORIGINAL TARGET**
+**CHASE THE MAN FROM THE PHOTO**
 
 ---
 
@@ -308,17 +308,17 @@ Then back at her.
 
 ### CHOICE
 
-**GO AFTER PACKAGE SMUGGLER**
+**CHASE THE PACKAGE**
 
-**GO AFTER ANBU MARKED TARGET**
+**CHASE THE MAN FROM THE PHOTO**
 
 **KILL HER**
 
-**TAKE HER BACK TO ANBU**
+**BRING HER TO ANBU**
 
-**TAKE HER TO THE UCHIHA POLICE FORCE**
+**TAKE HER TO THE UCHIHA POLICE**
 
-**RESTRAIN HER AND CONTINUE**
+**RESTRAIN HER AND KEEP MOVING**
 
 ---
 
@@ -364,9 +364,9 @@ She watches him come back.
 
 **KILL HER**
 
-**TAKE HER BACK TO ANBU**
+**BRING HER TO ANBU**
 
-**TAKE HER TO THE UCHIHA POLICE FORCE**
+**TAKE HER TO THE UCHIHA POLICE**
 
 ---
 
