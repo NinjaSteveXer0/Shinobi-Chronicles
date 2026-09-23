@@ -936,7 +936,7 @@
       .battle2-modern[data-formation-stage="true"] .battle2-performance-stage.is-playing .battle2-performance-center{animation:none!important}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-stage{transition:opacity .12s ease!important;transform:none!important}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-stage.is-settled{transform:none!important}
-      .battle2-modern[data-formation-stage="true"] .battle2-performance-host{left:36%!important;right:36%!important;top:1.5%!important;height:4.8%!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-host{left:43%!important;right:43%!important;top:1.5%!important;height:4.8%!important}
       .battle2-modern[data-formation-stage="true"] .battle2-live-ticker{left:35%!important;top:7.2%!important;width:30%!important;min-height:4.6%!important;padding:6px 10px!important}
       .battle2-modern[data-formation-stage="true"] .battle-live-active-card-heading{top:1%!important}
       .battle2-modern[data-formation-mode="duel"] .battle-live-active-card{top:12.5%!important;width:33.5%!important;height:53.5%!important}
@@ -991,7 +991,7 @@
       stableFormationMotion:installStyle.toString().includes("Golden stabilization")&&installStyle.toString().includes("animation:none!important;transform:none!important;will-change:auto!important"),
       playerCardNamesSuppressed:installStyle.toString().includes(".battle-live-active-card-player .battle-live-active-nameplate{display:none!important}")&&installStyle.toString().includes(".battle-live-roster-player .battle-live-roster-name{display:none!important}"),
       confrontationPLLaneAligned:installStyle.toString().includes('data-formation-mode="duel"] .battle-live-power-player')&&installStyle.toString().includes("left:43.5%!important")&&installStyle.toString().includes("left:56.5%!important"),
-      topHudStackSeparated:installStyle.toString().includes(".battle2-performance-host{left:36%!important;right:36%!important;top:1.5%!important;height:4.8%!important}")&&installStyle.toString().includes(".battle2-live-ticker{left:35%!important;top:7.2%!important;width:30%!important"),
+      topHudStackSeparated:installStyle.toString().includes(".battle2-performance-host{left:43%!important;right:43%!important;top:1.5%!important;height:4.8%!important}")&&installStyle.toString().includes(".battle2-live-ticker{left:35%!important;top:7.2%!important;width:30%!important"),
       storyCallerPresentationSuspension:String(suspendCallerStoryPresentation33000).includes("markStoryPresentationHidden33900")&&String(renderCombatOverlay).includes("suspendCallerStoryPresentation33000"),
       branchModesRemainExplicit:renderInspector33000.toString().includes("setSelectedBattleSkillMode"),
       browserGoldenClaimed:false
