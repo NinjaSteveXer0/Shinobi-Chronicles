@@ -611,14 +611,7 @@
         "getStoryHardSceneTransitionState33900"
       ],
       "permittedAdapters": [],
-      "retiredOwners": [
-        "runtime/alpha-story-scene-board-33900.js::legacy root-local performSceneCut wipe playback",
-        "runtime/alpha-kakashi-v2-renderer-36030.js::ensureGlobalCurtain",
-        "runtime/alpha-kakashi-v2-renderer-36030.js::setGlobalCurtain",
-        "runtime/alpha-kakashi-v2-renderer-36030.js::setWipe",
-        "runtime/alpha-kakashi-v2-renderer-36030.js::setTransitionMemory",
-        "runtime/alpha-kakashi-v2-transition-36040.js::local hard-scene playback/timers"
-      ],
+      "retiredOwners": [],
       "saveSchemaRefs": [],
       "qaRefs": [
         "tools/qa_issue_334_story_transition_owner.js",
@@ -626,6 +619,14 @@
         "tools/qa_issue_312_story_battle_benchmark.js",
         "tools/qa_issue_312_browser.js",
         "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "retiredImplementations": [
+        "runtime/alpha-story-scene-board-33900.js::legacy root-local performSceneCut wipe playback",
+        "runtime/alpha-kakashi-v2-renderer-36030.js::ensureGlobalCurtain",
+        "runtime/alpha-kakashi-v2-renderer-36030.js::setGlobalCurtain",
+        "runtime/alpha-kakashi-v2-renderer-36030.js::setWipe",
+        "runtime/alpha-kakashi-v2-renderer-36030.js::setTransitionMemory",
+        "runtime/alpha-kakashi-v2-transition-36040.js::local hard-scene playback/timers"
       ]
     }
   ],
