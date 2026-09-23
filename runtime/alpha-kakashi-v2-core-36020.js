@@ -661,12 +661,15 @@ function participantReceiptLine(s,ref){
   const row=s.participants[ref];if(!row||row.state==="UNSEEN")return null;
   const name=ref==="MI"?"Masked Interceptor":ref==="PS"?"Package Smuggler":"ANBU Marked Target";
   if(row.state==="DEAD")return`${name} — Killed by Kakashi after defeat.`;
-  if(row.state==="FIELD_SECURED_PENDING_COLLECTION")return`${name} — Field-secured alive.`;
+  if(row.state==="RESTRAINED"||row.state==="FIELD_SECURED_PENDING_COLLECTION")return`${name} — Restrained alive.`;
   if(row.state==="ANBU_CUSTODY")return`${name} — Transferred to ANBU custody.`;
   if(row.state==="POLICE_CUSTODY")return`${name} — Transferred to Uchiha Police custody.`;
   if(row.state==="RELEASED")return`${name} — Deliberately released.`;
-  if(row.state==="BATTLE_DEFEATED")return`${name} — Defeated; left alive and unrestrained.`;
+  if(row.state==="BATTLE_DEFEATED")return`${name} — Defeated; left alive without completed custody.`;
+  if(row.state==="AVAILABLE")return`${name} — No direct confrontation or custody outcome recorded.`;
   if(row.state==="ESCAPED"){
+    if(row.disposition==="KILL"||row.lethalIntent===true)return`${name} — Escaped after Kakashi chose a lethal action.`;
+    if(row.disposition==="RESTRAIN"||row.restrainIntent===true)return`${name} — Escaped during Kakashi\'s restraint attempt.`;
     if(ref==="PS")return`${name} — Escaped ${s.package.holder==="PS"?"with":"without"} package.`;
     if(ref==="AMT"){
       const lostBattle=Object.values(s.battles||{}).some(b=>b&&b.outcome==="defeat"&&String(b.encounterId||"").includes("amt"));
