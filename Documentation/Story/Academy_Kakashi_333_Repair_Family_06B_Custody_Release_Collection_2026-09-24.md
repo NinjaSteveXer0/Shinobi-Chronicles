@@ -647,8 +647,6 @@ Kakashi turns back along the route.
 
 Pakkun follows if he is still with him.
 
-Nobody needs to explain why.
-
 ---
 
 ## IF PACKAGE SMUGGLER IS STILL RESTRAINED
@@ -727,11 +725,17 @@ That is answer enough.
 
 # AFTER COLLECTION
 
-The exact restrained survivors are now physically with Kakashi.
+[AUTHOR PROJECTION: the Scene Board shows only the exact participants Kakashi physically collected.]
 
-Nobody else appears.
+### IF ONE RESTRAINED PARTICIPANT IS WITH KAKASHI
 
-Nobody comes back because the group would look neater.
+Present that participant's existing singular institutional choices:
+
+**BRING HIM/HER TO ANBU**
+
+**TAKE HIM/HER TO THE UCHIHA POLICE**
+
+### IF TWO OR MORE RESTRAINED PARTICIPANTS ARE WITH KAKASHI
 
 ### CHOICE
 
@@ -739,9 +743,50 @@ Nobody comes back because the group would look neater.
 
 **TAKE THEM TO THE UCHIHA POLICE**
 
-Project the matching two-target or three-target institutional handoff above using the exact participants actually present.
+[AUTHOR REUSE: project the matching institutional handoff using only the exact participants actually present.]
 
 ---
+
+
+# FINAL RESTRAINT — NO EARLIER RESTRAINED PARTICIPANTS
+
+When a final participant is successfully RESTRAINED and there is nobody earlier on the route to collect, Kakashi checks the restraint once.
+
+The restrained participant watches him turn away.
+
+### IF ANBU MARKED TARGET
+
+**ANBU MARKED TARGET:** “You're leaving me here.”
+
+**KAKASHI:** “Someone's coming.”
+
+Pakkun looks toward the route back.
+
+Kakashi starts walking.
+
+### IF PACKAGE SMUGGLER
+
+Package Smuggler looks down at the wire.
+
+**PACKAGE SMUGGLER:** “This is the part where you leave me tied to a wall.”
+
+**KAKASHI:** “Yes.”
+
+**PACKAGE SMUGGLER:** “Just checking.”
+
+Kakashi turns toward ANBU.
+
+### IF MASKED INTERCEPTOR
+
+Masked Interceptor tests the restraint once.
+
+It holds.
+
+Kakashi turns toward ANBU.
+
+She says nothing.
+
+[AUTHOR CONTINUATION: terminal ANBU report receives the exact restrained participant and authored location. RESTRAINED does not become institutional custody until a later authored transfer commits.]
 
 # #333 SELF-AUDIT
 
