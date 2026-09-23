@@ -1730,7 +1730,7 @@ function commitInterpretationRequest(){
   }};
 }
 
-function beat(beatId,key,nextBeatId,extra={}){
+function storyBeat(beatId,key,nextBeatId,extra={}){
   return{beatId,mode:"narration",text:cueFallback(key),nextBeatId,...extra};
 }
 function choiceBeat(beatId,text,choices,environmentRef=ENV.street){
@@ -1741,51 +1741,51 @@ const interpretationRequest=commitInterpretationRequest();
 
 const definition={
   sceneId:SCENE_ID,eventId:SCENE_ID,title:"ACADEMY OBITO",entryBeatId:"obi_depart",participants:[],beats:[
-    beat("obi_depart","obi_depart","obi_furniture_intro",{environmentRef:ENV.street,onEnterConsequences:[{requestId:"obito_final_migration_331",kind:"domain",resolve:migrateLegacyObitoState}]}),
+    storyBeat("obi_depart","obi_depart","obi_furniture_intro",{environmentRef:ENV.street,onEnterConsequences:[{requestId:"obito_final_migration_331",kind:"domain",resolve:migrateLegacyObitoState}]}),
 
-    beat("obi_furniture_intro","obi_furniture_intro","obi_furniture_choice",{environmentRef:ENV.street}),
+    storyBeat("obi_furniture_intro","obi_furniture_intro","obi_furniture_choice",{environmentRef:ENV.street}),
     choiceBeat("obi_furniture_choice","The wardrobe is still wedged in the doorway.",[
       C("furniture_help","HELP HER","obi_furniture_help",{[intentKey(furniture)]:"HELP"}),
       C("furniture_continue_final","KEEP GOING","obi_furniture_continue",{[intentKey(furniture)]:"CONTINUE"})
     ]),
-    beat("obi_furniture_help","obi_furniture_help","obi_vegetables_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(furniture)]}),
-    beat("obi_furniture_continue","obi_furniture_continue","obi_vegetables_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(furniture)]}),
+    storyBeat("obi_furniture_help","obi_furniture_help","obi_vegetables_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(furniture)]}),
+    storyBeat("obi_furniture_continue","obi_furniture_continue","obi_vegetables_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(furniture)]}),
 
-    beat("obi_vegetables_intro","obi_vegetables_intro","obi_vegetables_choice",{environmentRef:ENV.street}),
+    storyBeat("obi_vegetables_intro","obi_vegetables_intro","obi_vegetables_choice",{environmentRef:ENV.street}),
     choiceBeat("obi_vegetables_choice","The vendor is already reaching for another rolling vegetable.",[
       C("vegetables_help","HELP HER","obi_vegetables_help",{[intentKey(vegetables)]:"HELP"}),
       C("vegetables_continue_final","KEEP GOING","obi_vegetables_continue",{[intentKey(vegetables)]:"CONTINUE"})
     ]),
-    beat("obi_vegetables_help","obi_vegetables_help","obi_equipment_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(vegetables)]}),
-    beat("obi_vegetables_continue","obi_vegetables_continue","obi_equipment_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(vegetables)]}),
+    storyBeat("obi_vegetables_help","obi_vegetables_help","obi_equipment_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(vegetables)]}),
+    storyBeat("obi_vegetables_continue","obi_vegetables_continue","obi_equipment_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(vegetables)]}),
 
-    beat("obi_equipment_intro","obi_equipment_intro","obi_equipment_choice",{environmentRef:ENV.street}),
+    storyBeat("obi_equipment_intro","obi_equipment_intro","obi_equipment_choice",{environmentRef:ENV.street}),
     choiceBeat("obi_equipment_choice","The missing Academy bundle is somewhere along the route.",[
       C("equipment_help","HELP SEARCH","obi_equipment_help",{[intentKey(equipment)]:"HELP"}),
       C("equipment_continue_final","KEEP GOING","obi_equipment_continue",{[intentKey(equipment)]:"CONTINUE"})
     ]),
-    beat("obi_equipment_help","obi_equipment_help","obi_delivery_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(equipment)]}),
-    beat("obi_equipment_continue","obi_equipment_continue","obi_delivery_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(equipment)]}),
+    storyBeat("obi_equipment_help","obi_equipment_help","obi_delivery_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(equipment)]}),
+    storyBeat("obi_equipment_continue","obi_equipment_continue","obi_delivery_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(equipment)]}),
 
-    beat("obi_delivery_intro","obi_delivery_intro","obi_delivery_choice",{environmentRef:ENV.street}),
+    storyBeat("obi_delivery_intro","obi_delivery_intro","obi_delivery_choice",{environmentRef:ENV.street}),
     choiceBeat("obi_delivery_choice","Training is still happening without him.",[
       C("delivery_help","HELP WITH THE DELIVERY","obi_delivery_help",{[intentKey(delivery)]:"HELP"}),
       C("delivery_continue_final","KEEP MOVING","obi_delivery_continue",{[intentKey(delivery)]:"CONTINUE"})
     ]),
-    beat("obi_delivery_help","obi_delivery_help","obi_cart_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(delivery)]}),
-    beat("obi_delivery_continue","obi_delivery_continue","obi_cart_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(delivery)]}),
+    storyBeat("obi_delivery_help","obi_delivery_help","obi_cart_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(delivery)]}),
+    storyBeat("obi_delivery_continue","obi_delivery_continue","obi_cart_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(delivery)]}),
 
-    beat("obi_cart_intro","obi_cart_intro","obi_cart_choice",{environmentRef:ENV.street}),
+    storyBeat("obi_cart_intro","obi_cart_intro","obi_cart_choice",{environmentRef:ENV.street}),
     choiceBeat("obi_cart_choice","His training is right there. The cart is already moving.",[
       C("cart_help","STOP AND HELP","obi_cart_help",{[intentKey(cart)]:"HELP"}),
       C("cart_continue_final","GO TO TRAINING","obi_cart_continue",{[intentKey(cart)]:"CONTINUE"})
     ]),
-    beat("obi_cart_help","obi_cart_help","obi_arrival",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(cart)]}),
-    beat("obi_cart_continue","obi_cart_continue","obi_arrival",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(cart)]}),
+    storyBeat("obi_cart_help","obi_cart_help","obi_arrival",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(cart)]}),
+    storyBeat("obi_cart_continue","obi_cart_continue","obi_arrival",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(cart)]}),
 
     {beatId:"obi_arrival",mode:"narration",text:"Obito reaches the Academy training ground. The training opportunity remaining is determined only by the committed journey-time facts.",environmentRef:ENV.trainingDay,onEnterConsequences:[entitlementRequest],nextBeatId:"obi_training"},
     {beatId:"obi_training",mode:"narration",text:"Obito performs only the formal training blocks still available when he arrives.",environmentRef:ENV.trainingDay,nextBeatId:"obi_end_day"},
-    beat("obi_end_day","obi_end_day","obi_home",{environmentRef:ENV.trainingLate}),
+    storyBeat("obi_end_day","obi_end_day","obi_home",{environmentRef:ENV.trainingLate}),
     {beatId:"obi_home",mode:"narration",text:"At home, Obito finally has time to decide what he thinks the day meant.",environmentRef:ENV.home,nextBeatId:"obi_reflect"},
     {beatId:"obi_reflect",mode:"choice",text:"What does Obito take from today?",environmentRef:ENV.home,choices:[
       C("reflection_keep_helping",interpretationText.KEEP_HELPING,"obi_ending_helping",{obitoFinalInterpretation:"KEEP_HELPING"}),
@@ -1793,10 +1793,10 @@ const definition={
       C("reflection_find_balance",interpretationText.FIND_BALANCE,"obi_ending_balance",{obitoFinalInterpretation:"FIND_BALANCE"}),
       C("reflection_question_frame",interpretationText.QUESTION_FRAME,"obi_ending_question",{obitoFinalInterpretation:"QUESTION_FRAME"})
     ]},
-    beat("obi_ending_helping","ending_helping","obi_close",{environmentRef:ENV.home,onEnterConsequences:[interpretationRequest]}),
-    beat("obi_ending_training","ending_training","obi_close",{environmentRef:ENV.home,onEnterConsequences:[interpretationRequest]}),
-    beat("obi_ending_balance","ending_balance","obi_close",{environmentRef:ENV.home,onEnterConsequences:[interpretationRequest]}),
-    beat("obi_ending_question","ending_question","obi_close",{environmentRef:ENV.home,onEnterConsequences:[interpretationRequest]}),
+    storyBeat("obi_ending_helping","ending_helping","obi_close",{environmentRef:ENV.home,onEnterConsequences:[interpretationRequest]}),
+    storyBeat("obi_ending_training","ending_training","obi_close",{environmentRef:ENV.home,onEnterConsequences:[interpretationRequest]}),
+    storyBeat("obi_ending_balance","ending_balance","obi_close",{environmentRef:ENV.home,onEnterConsequences:[interpretationRequest]}),
+    storyBeat("obi_ending_question","ending_question","obi_close",{environmentRef:ENV.home,onEnterConsequences:[interpretationRequest]}),
     {beatId:"obi_close",mode:"narration",text:cueFallback("obi_close"),environmentRef:ENV.dusk,exitScene:true}
   ],
   onCompleteConsequences:[X(ORIGIN_ID,[...diversions.map(x=>x.occurrenceId),entitlementOccurrenceId])]
@@ -1853,7 +1853,12 @@ function registerFinalSceneBoard(){
   return result;
 }
 globalThis.registerAcademyObitoFinalSceneBoard331=registerFinalSceneBoard;
-if(globalThis.SC_STORY_SCENE_BOARD_33900)registerFinalSceneBoard();
+if(globalThis.SC_STORY_SCENE_BOARD_33900){
+  registerFinalSceneBoard();
+}else{
+  const queue=globalThis.SC_STORY_SCENE_BOARD_PENDING_REGISTRATIONS||(globalThis.SC_STORY_SCENE_BOARD_PENDING_REGISTRATIONS=[]);
+  if(!queue.some(row=>row&&row.id==="academy_obito_final_331"))queue.push({id:"academy_obito_final_331",register:registerFinalSceneBoard});
+}
 
 function diagnostics(){
   const live=typeof getStorySceneDefinition==="function"?getStorySceneDefinition(SCENE_ID):null;
