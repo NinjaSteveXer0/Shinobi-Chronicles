@@ -42,7 +42,7 @@ run('academy_kushina',['correct_formula','ask_who']);
 run('academy_kurenai',['fake_clumsy','rush_bell','let_him_think_caught']);
 run('academy_iwabee',['build_path','call_instructor','better_rest']);
 run('academy_metal_lee',['demonstrate','redirect_dummy']);
-run('academy_obito',['furniture_continue','vegetables_continue','equipment_continue','delivery_continue','cart_continue','accept_full_training','hokage_still']);
+run('academy_obito',['furniture_continue_final','vegetables_continue_final','equipment_continue_final','delivery_continue_final','cart_continue_final','reflection_keep_helping']);
 const diag=ctx.runAlphaOriginScene32900Diagnostics();
 ctx.playerData.acquisition={chronicleOriginVariantId:'academy_kakashi',chronicleOrigin:{prologueCompleted:false}};
 active=null;
