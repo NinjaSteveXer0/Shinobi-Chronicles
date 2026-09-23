@@ -287,18 +287,18 @@ function packageReportCues(s){
   ];
 }
 function participantReportCues(s,ref){
-  const row=s.participants&&s.participants[ref];if(!row||row.state==="UNSEEN"||row.state==="DEAD")return[];
+  const row=s.participants&&s.participants[ref];if(!row||["UNSEEN","DEAD","AVAILABLE"].includes(row.state))return[];
   const out=[],subject=ref==="MI"?"The masked shinobi":ref==="PS"?"The receiver":"The original target";
   out.push(Q("ANBU OPERATIVE",subject+"?"));
   if(row.state==="ESCAPED"){
     const lethal=row.disposition==="KILL"||row.lethalIntent===true;
     if(lethal)out.push(
       Q("KAKASHI",ref==="MI"?"I tried to kill her. She got away.":"I tried to kill him. He got away."),
-      N("The operative lets the distinction stand: lethal intent, no confirmed death.")
+      N("The operative marks the failed attempt beside the escape and does not confuse one for the other.")
     );
     else if(ref==="AMT"&&Object.values(s.battles||{}).some(b=>b&&b.outcome==="defeat"&&String(b.encounterId||"").includes("amt")))out.push(
       Q("KAKASHI","He beat me and got away."),
-      Q("ANBU OPERATIVE","Alive, mobile, and no longer contained."),
+      Q("ANBU OPERATIVE","So he left under his own power."),
       Q("KAKASHI","Yes.")
     );
     else out.push(
@@ -323,14 +323,14 @@ function participantReportCues(s,ref){
       Q("KAKASHI",ref==="MI"?"I handed her to the Uchiha Police. Alive.":"I handed him to the Uchiha Police. Alive."),
       Q("ANBU OPERATIVE","You chose the Police after you had custody."),
       Q("KAKASHI","Yes."),
-      N("The operative records the destination without treating it as the same thing as an escape.")
+      N("The operative writes Uchiha Police beside the name and underlines it once.")
     );
   }else if(row.state==="RELEASED"){
     out.push(
       Q("KAKASHI",ref==="MI"?"I let her go.":"I let him go."),
       Q("ANBU OPERATIVE","After you had the choice to keep "+participantPronoun(ref)+"?"),
       Q("KAKASHI","Yes."),
-      N("The operative holds Kakashi's gaze for a second, then continues. Deliberate release goes into the report as exactly that.")
+      N("The operative holds Kakashi's gaze for a second. His pen pauses before it starts moving again.")
     );
   }else if(row.state==="BATTLE_DEFEATED"){
     out.push(
@@ -342,7 +342,7 @@ function participantReportCues(s,ref){
   return out;
 }
 function nonlethalParticipantReportCues(s){
-  const refs=["MI","PS","AMT"].filter(ref=>s.participants&&s.participants[ref]&&s.participants[ref].state!=="UNSEEN"&&s.participants[ref].state!=="DEAD");
+  const refs=["MI","PS","AMT"].filter(ref=>s.participants&&s.participants[ref]&&!["UNSEEN","DEAD","AVAILABLE"].includes(s.participants[ref].state));
   if(!refs.length)return[];
   const states=refs.map(ref=>s.participants[ref].state);
   const same=states.every(x=>x===states[0]);
@@ -358,7 +358,7 @@ function nonlethalParticipantReportCues(s){
     Q("KAKASHI",refs.length===3?"I took all three to the Uchiha Police. Alive.":"I took them to the Uchiha Police. Alive."),
     Q("ANBU OPERATIVE","Your decision?"),
     Q("KAKASHI","Yes."),
-    N("The operative records the destination. Police custody is not rewritten as ANBU custody simply because the report ends here.")
+    N("The operative writes the Police transfer beside each name before moving on.")
   ];
   if(same&&refs.length>1&&states[0]==="RELEASED")return[
     Q("ANBU OPERATIVE","The others?"),
@@ -366,7 +366,7 @@ function nonlethalParticipantReportCues(s){
     N("The operative stops writing."),
     Q("ANBU OPERATIVE","Deliberately."),
     Q("KAKASHI","Yes."),
-    N("The pen starts moving again. Release goes into the report as a choice, not an escape.")
+    N("The pen starts moving again, one separate note beside each name.")
   ];
   if(same&&refs.length>1&&restrainedState(s.participants[refs[0]]))return[
     Q("ANBU OPERATIVE","The people you restrained?"),
@@ -374,6 +374,13 @@ function nonlethalParticipantReportCues(s){
     Q("ANBU OPERATIVE","Locations are in the report?"),
     Q("KAKASHI","Yes."),
     Q("ANBU OPERATIVE","We'll recover them.")
+  ];
+  if(same&&refs.length>1&&states[0]==="BATTLE_DEFEATED")return[
+    Q("ANBU OPERATIVE","The others from the fight?"),
+    Q("KAKASHI","Alive when I left. I hadn't taken custody."),
+    Q("ANBU OPERATIVE","Both of them?"),
+    Q("KAKASHI","Yes."),
+    N("The operative adds that to the chronology before asking anything else.")
   ];
   const out=[];
   for(const ref of refs)out.push(...participantReportCues(s,ref));
@@ -437,7 +444,7 @@ function lethalReportCues(s){
     N("That answer remains separate from the victories themselves.")
   );
   else out.push(
-    N("The report now carries both facts: what Kakashi intended, and what actually happened.")
+    N("The operative writes the result beside the attempt before continuing.")
   );
   return out;
 }
@@ -521,7 +528,7 @@ function minatoPackageCues(s,{lethal=false}={}){
       Q("ANBU OPERATIVE","The package was recovered and returned."),
       N("Minato looks at that line, then past it to everything that followed."),
       Q("MINATO",lethal?"Good. Now keep the recovered objective separate from the deaths.":"Good. Now tell me what it cost him to bring it back."),
-      Q("ANBU OPERATIVE",count?String(count)+" Battle"+(count===1?"":"s")+" occurred before the report closed.":"No Battle was required."),
+      Q("ANBU OPERATIVE",count?String(count)+" fight"+(count===1?"":"s")+" occurred before the report closed.":"No fight was required."),
       Q("MINATO","Then keep both facts. Success is not a reason to erase the cost.")
     ];
   }
@@ -540,7 +547,7 @@ function minatoDispositionCues(s,{lethal=false}={}){
   if(lethal){
     const attempted=lethalIntentRefs(s),dead=attempted.filter(ref=>s.participants[ref]&&s.participants[ref].state==="DEAD"),escaped=attempted.filter(ref=>s.participants[ref]&&s.participants[ref].state==="ESCAPED");
     out.push(
-      Q("MINATO",attempted.length>1?"Those lethal decisions were made after the Battles?":"The lethal decision was made after the Battle?"),
+      Q("MINATO",attempted.length>1?"Those lethal decisions were made after the fights?":"The lethal decision was made after the fight?"),
       Q("ANBU OPERATIVE","Yes. The fight results and later dispositions are separate in the report.")
     );
     if(dead.length)out.push(Q("MINATO",dead.length===1?"One confirmed death.":String(dead.length)+" confirmed deaths."));
@@ -581,7 +588,7 @@ function minatoDispositionCues(s,{lethal=false}={}){
   );
   if(restrained)out.push(
     Q("ANBU OPERATIVE",restrained>1?String(restrained)+" remained restrained alive when Kakashi moved on.":"One remained restrained alive when Kakashi moved on."),
-    Q("MINATO","Then restraint bought him continuation without pretending the person had vanished from the night.")
+    Q("MINATO","Then he chose to secure them and keep moving. Keep both parts of that decision.")
   );
   if(released)out.push(
     Q("MINATO",released>1?"He had control and released them.":"He had control and chose release."),
