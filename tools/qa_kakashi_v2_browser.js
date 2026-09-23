@@ -548,7 +548,7 @@ async function visualAndBattle(browser){
       liveActorLayerOpacity:liveStyle?Number(liveStyle.opacity):1
     };
   });
-  await pause(300);
+  await pause(120);
   const kill=await page.evaluate(()=>{
     const root=document.getElementById("kakashi-v2-scene-board");
     const ghost=root?.querySelector(".kv2-departure-ghost.is-falling");
@@ -563,16 +563,16 @@ async function visualAndBattle(browser){
       kakashiHoldOpacity:hold?Number(getComputedStyle(hold).opacity):0
     };
   });
-  assert(killStart.exists&&killStart.falling&&kill.exists&&kill.falling,"kill fall animation missing: "+JSON.stringify({killStart,kill}));
-  assert(String(kill.animationName||"").includes("kv2ActorFall36030"),"kill ghost is not running the visible fall keyframe: "+JSON.stringify(kill));
+  assert(killStart.exists&&killStart.falling&&kill.exists&&kill.falling,"kill consequence fade missing: "+JSON.stringify({killStart,kill}));
+  assert(String(kill.animationName||"").includes("kv2ActorFall36030"),"kill ghost is not running the stable consequence fade: "+JSON.stringify(kill));
   assert.strictEqual(kill.active,"COLLAPSE","kill ghost is not bound to the semantic COLLAPSE choreography");
-  assert(kill.top>killStart.top+24,"kill card did not visibly fall before the scene wipe: "+JSON.stringify({killStart,kill}));
-  assert(kill.opacity<killStart.opacity,"kill card did not fade while falling: "+JSON.stringify({killStart,kill}));
-  assert.strictEqual(killStart.outgoingBackdropHeld,true,"outgoing fight environment was not preserved behind the kill fall");
-  assert.strictEqual(killStart.kakashiHoldExists,true,"outgoing Kakashi was not frozen beside the kill animation");
-  assert(killStart.kakashiHoldOpacity>=0.8&&kill.kakashiHoldExists&&kill.kakashiHoldOpacity>=0.8,"outgoing Kakashi did not remain visually stable during the kill fall: "+JSON.stringify({killStart,kill}));
-  assert(killStart.liveActorLayerOpacity<=0.01,"next-scene live actors were visible behind the outgoing kill tableau");
-  await shot(page,"09-kill-fall-animation.png",{skipReady:true});
+  assert(Math.abs(kill.top-killStart.top)<3,"kill consequence card translated during the stabilization fade: "+JSON.stringify({killStart,kill}));
+  assert(kill.opacity<killStart.opacity,"kill consequence card did not fade before the scene crossfade: "+JSON.stringify({killStart,kill}));
+  assert.strictEqual(killStart.outgoingBackdropHeld,true,"outgoing fight environment was not preserved behind the consequence fade");
+  assert.strictEqual(killStart.kakashiHoldExists,false,"hard transition resurrected the retained-card clone stack");
+  assert.strictEqual(kill.kakashiHoldExists,false,"retained-card clone appeared during the single-layer crossfade");
+  assert(killStart.liveActorLayerOpacity<=0.01,"next-scene live actors were visible behind the outgoing environment");
+  await shot(page,"09-kill-consequence-crossfade.png",{skipReady:true});
   const killResult=await killPromise;
   assert(killResult&&killResult.success===true,JSON.stringify(killResult));
   await waitUnlocked(page,"v2_report");
