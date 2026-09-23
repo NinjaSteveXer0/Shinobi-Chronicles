@@ -138,6 +138,8 @@ function makeCoreHarness(){
   assert(group2ChildCalls.every(args=>String(args.bindingRef).endsWith("."+String(args.context.targetParticipantRef).toLowerCase())),"2-target child binding is not participant-specific");
   let parents=h.playerData.activityHistory.filter(r=>r.type==="academy_kakashi_v2_group_disposition");
   assert.strictEqual(parents.length,1,"2-target group KILL did not retain one causal parent");
+  const group2Children=h.playerData.activityHistory.filter(r=>r.type==="academy_kakashi_v2_disposition"&&["AMT","PS"].includes(r.data&&r.data.targetParticipantRef));
+  assert(group2Children.length===2&&group2Children.every(r=>r.causalParentOccurrenceId===parents[0].sourceOccurrenceId),"2-target disposition children do not point to exact causal parent");
   h.getActive().beatId="v2_group2_kill_result";
   const group2=h.ctx.getAcademyKakashiV2Cues36020("v2_group2_kill_result");
   assert(group2.length>0&&JSON.stringify(group2).includes("Package Smuggler"),"2-target mixed resolver scene not bound");
@@ -152,6 +154,8 @@ function makeCoreHarness(){
   assert.strictEqual(new Set(group3ChildCalls.map(args=>args.bindingRef)).size,3,"3-target group KILL reused a stable-draw binding across children");
   parents=h.playerData.activityHistory.filter(r=>r.type==="academy_kakashi_v2_group_disposition");
   assert.strictEqual(parents.length,1,"3-target group KILL did not retain one causal parent");
+  const group3Children=h.playerData.activityHistory.filter(r=>r.type==="academy_kakashi_v2_disposition"&&["AMT","PS","MI"].includes(r.data&&r.data.targetParticipantRef));
+  assert(group3Children.length===3&&group3Children.every(r=>r.causalParentOccurrenceId===parents[0].sourceOccurrenceId),"3-target disposition children do not point to exact causal parent");
   h.getActive().beatId="v2_group3_kill_result";
   assert(h.ctx.getAcademyKakashiV2Cues36020("v2_group3_kill_result").length>0,"3-target mixed resolver scene not bound");
 }
@@ -217,6 +221,16 @@ restrainThreeAndDeliver("POLICE");
   const interrogation=rows.find(e=>e.qualificationId==="intelligence.interrogator");
   assert(interrogation&&interrogation.significance===1&&interrogation.tags.length===1&&interrogation.tags[0]==="intelligence.interrogator:information_extraction","ASK WHERE evidence must stay limited/incomplete without invented credibility tag");
   assert(rows.every(e=>e.significance<=3&&e.specialistLevel===false&&e.capstoneAuthorized===false),"Kakashi emitted forbidden significance/capstone state");
+
+  h.reset("restraint_evidence_ps");
+  h.choice("v2_ps_missing_win","ps_missing_restrain",{PS:"ESCAPED"});
+  let extraction=h.getEvidence().find(e=>e.qualificationId==="covert_operations.extraction_specialist");
+  assert(extraction&&extraction.significance===1&&extraction.tags.includes("covert_operations.extraction_specialist:extraction_planning"),"PS failed restraint did not project significance-1 extraction planning");
+
+  h.reset("restraint_evidence_amt");
+  h.choice("v2_amt_missing_win","amt_missing_restrain",{AMT:"RESTRAINED"});
+  extraction=h.getEvidence().find(e=>e.qualificationId==="covert_operations.extraction_specialist");
+  assert(extraction&&extraction.significance===2&&extraction.tags.includes("covert_operations.extraction_specialist:extraction_planning"),"AMT successful restraint did not project significance-2 extraction planning");
 }
 
 // Shared producer: committed-source gate + same-causal-root upsert instead of fake breadth.
