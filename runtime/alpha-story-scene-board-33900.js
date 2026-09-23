@@ -438,6 +438,7 @@ function runStorySceneBoard33900Diagnostics(){
     patchId:PATCH_ID==="story_scene_board_33900_2026_09_22_shared_choreography",
     compactLiveStateCallout:installStyle.toString().includes("width:max-content")&&installStyle.toString().includes("height:auto!important")&&installStyle.toString().includes("align-items:flex-start")&&installStyle.toString().includes("left:3.2%;right:auto"),
     reusableRegistry:typeof registerStorySceneBoardDefinition==="function"&&typeof unregisterStorySceneBoardDefinition==="function"&&typeof resolveStorySceneBoardProjection==="function",
+    pendingRegistrationDrain:typeof drainPendingStorySceneBoardRegistrations33900==="function"&&pendingRegistrationDrain&&pendingRegistrationDrain.success===true,
     genericPerformanceLifecycle:typeof performanceSequenceFor==="function"&&typeof advanceStoryScene33900==="function"&&typeof performSceneCut==="function",
     performanceAdvanceCommitsNoOccurrence:advanceStoryScene33900.toString().includes("performanceCursor")&&!advanceStoryScene33900.toString().includes("commitOccurrence"),
     semanticAdvancePrecedesWipe:advanceStoryScene33900.toString().indexOf("PRE_ADVANCE.apply")<advanceStoryScene33900.toString().indexOf("performSceneCut"),
@@ -482,5 +483,24 @@ globalThis.clearStoryPresentationHidden33900=clearStoryPresentationHidden33900;
 globalThis.storyPresentationBattleSuspended33900=storyPresentationBattleSuspended33900;
 globalThis.runStorySceneBoard33900Diagnostics=runStorySceneBoard33900Diagnostics;
 globalThis.SC_STORY_SCENE_BOARD_33900=Object.freeze({patchId:PATCH_ID,semanticStageAnchors:SEMANTIC_STAGE_ANCHORS,choreographyClasses:CHOREOGRAPHY_CLASSES,browserGoldenClaimed:false});
+
+function drainPendingStorySceneBoardRegistrations33900(){
+  const queue=Array.isArray(globalThis.SC_STORY_SCENE_BOARD_PENDING_REGISTRATIONS)?globalThis.SC_STORY_SCENE_BOARD_PENDING_REGISTRATIONS:[];
+  const rows=queue.splice(0,queue.length),results=[];
+  for(const row of rows){
+    if(!row||typeof row.register!=="function"){results.push({success:false,reason:"story_scene_board_pending_registration_invalid",id:row&&row.id||null});continue;}
+    try{
+      const result=row.register();
+      results.push({id:String(row.id||"anonymous"),...(result||{success:false,reason:"story_scene_board_pending_registration_no_result"})});
+    }catch(error){
+      results.push({success:false,id:String(row.id||"anonymous"),reason:"story_scene_board_pending_registration_threw",error:String(error&&error.message||error)});
+    }
+  }
+  const failed=results.filter(row=>row.success!==true);
+  if(failed.length)throw new Error("story_scene_board_pending_registration_failed:"+JSON.stringify(failed));
+  return{success:true,drained:results.length,results};
+}
+globalThis.drainPendingStorySceneBoardRegistrations33900=drainPendingStorySceneBoardRegistrations33900;
+const pendingRegistrationDrain=drainPendingStorySceneBoardRegistrations33900();
 try{renderStorySceneBoard33900();}catch(_error){}
 })();
