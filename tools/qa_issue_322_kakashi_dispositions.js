@@ -77,8 +77,13 @@ function makeCoreHarness(){
     for(const req of beat.onEnterConsequences||[]){const r=req.resolve();assert(r&&r.success===true,JSON.stringify(r));}
     return beat;
   }
+  function advance(beatId){
+    active.beatId=beatId;const beat=def.beatMap.get(beatId);assert(beat,"missing beat "+beatId);
+    for(const req of beat.onAdvanceConsequences||[]){const r=req.resolve();assert(r&&r.success===true,JSON.stringify(r));}
+    return beat;
+  }
   return{
-    ctx,def,reset,state,choice,enter,playerData,
+    ctx,def,reset,state,choice,enter,advance,playerData,
     setActive:v=>{active=v;},
     getActive:()=>active,
     getFactualCalls:()=>factualCalls,
@@ -167,8 +172,13 @@ function restrainThreeAndDeliver(institution){
   h.choice("v2_ps_seq_win","ps_restrain_continue",{PS:"RESTRAINED"});
   h.choice("v2_amt_seq_win","amt_seq_collect",{AMT:"RESTRAINED"});
   h.enter("v2_group_collect");
-  const id=institution==="ANBU"?"group_all_anbu":"group_all_police";
-  h.choice("v2_group_collect",id,{});
+  h.advance("v2_group_collect");
+  assert(["MI","PS","AMT"].every(key=>h.state().participants[key].state==="RESTRAINED"&&h.state().participants[key].collected===true),"collection mutated institutional custody before physical handoff");
+  const id=institution==="ANBU"?"collect_group_anbu":"collect_group_police";
+  h.choice("v2_group_collect_choice",id,{});
+  const handoff=institution==="ANBU"?"v2_collected_anbu_handoff":"v2_collected_police_handoff";
+  assert(["MI","PS","AMT"].every(key=>h.state().participants[key].state==="RESTRAINED"),"choice intent committed custody before handoff");
+  h.advance(handoff);
   for(const key of ["MI","PS","AMT"])assert.strictEqual(h.state().participants[key].state,institution+"_CUSTODY");
   const extraction=h.getEvidence().filter(e=>e.qualificationId==="covert_operations.extraction_specialist");
   assert(extraction.some(e=>e.significance===3&&e.tags.includes("covert_operations.extraction_specialist:subject_recovery")&&e.tags.includes("covert_operations.extraction_specialist:extraction_planning")),"all-three extraction did not reach authorised significance 3");
@@ -180,10 +190,36 @@ restrainThreeAndDeliver("POLICE");
   const h=makeCoreHarness();h.reset("partial_collect");
   h.choice("v2_mi_stop_win","mi_restrain",{MI:"RESTRAINED"});
   h.enter("v2_group_collect");
-  h.choice("v2_group_collect","group_all_anbu",{});
+  h.advance("v2_group_collect");
+  h.choice("v2_group_collect_choice","collect_one_mi_anbu",{});
+  assert.strictEqual(h.state().participants.MI.state,"RESTRAINED","single collection intent committed custody before handoff");
+  h.advance("v2_collected_anbu_handoff");
   assert.strictEqual(h.state().participants.MI.state,"ANBU_CUSTODY");
   assert.notStrictEqual(h.state().participants.PS.state,"ANBU_CUSTODY");
   assert.notStrictEqual(h.state().participants.AMT.state,"ANBU_CUSTODY");
+}
+
+// Institutional custody commits at physical handoff, not at button intent.
+{
+  const h=makeCoreHarness();h.reset("direct_transfer_boundary");
+  h.state().participants.MI.state="BATTLE_DEFEATED";
+  const intent=h.choice("v2_mi_stop_win","mi_anbu",{});
+  assert.strictEqual(intent.row.nextBeatId,"v2_mi_anbu_depart");
+  assert.strictEqual(h.state().participants.MI.state,"BATTLE_DEFEATED","ANBU custody committed at choice intent");
+  assert(h.ctx.getAcademyKakashiV2Cues36020("v2_mi_anbu_depart").length>0,"#333 MI ANBU departure scene missing");
+  assert(h.ctx.getAcademyKakashiV2Cues36020("v2_mi_anbu_handoff").length>0,"#333 MI ANBU handoff scene missing");
+  h.advance("v2_mi_anbu_handoff");
+  assert.strictEqual(h.state().participants.MI.state,"ANBU_CUSTODY");
+  const delivery=h.playerData.activityHistory.find(r=>r.type==="academy_kakashi_v2_delivery"&&r.data&&r.data.institution==="ANBU");
+  assert(delivery&&delivery.data.deliveredLivingCount===1,"direct institutional delivery occurrence missing");
+}
+{
+  const h=makeCoreHarness();h.reset("escaped_not_release");
+  h.state().participants.AMT.state="ESCAPED";
+  const releaseResult=h.ctx.getAcademyKakashiV2State36020();
+  assert.strictEqual(releaseResult.participants.AMT.state,"ESCAPED");
+  const operational=coreSource.slice(coreSource.indexOf("function canDirectDisposition("),coreSource.indexOf("function occurrenceId("));
+  assert(operational.includes('kind==="RELEASE"')&&operational.includes('row.state==="BATTLE_DEFEATED"'),"release guard does not exclude ESCAPED");
 }
 
 // Pursuit timing/topology stays authored after RESTRAIN result.
