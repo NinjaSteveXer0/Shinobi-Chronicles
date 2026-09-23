@@ -552,8 +552,6 @@ Older.
 
 Bigger.
 
-Not part of the exercise.
-
 The student sees Wasabi.
 
 **ACADEMY STUDENT:** “Wasabi!”
