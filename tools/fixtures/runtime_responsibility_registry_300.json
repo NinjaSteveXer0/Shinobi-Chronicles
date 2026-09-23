@@ -11,6 +11,7 @@
     "runtime/alpha-story-scene-board-33900.js",
     "runtime/alpha-story-decision-realisation-34000.js",
     "runtime/alpha-story-factual-resolver-34600.js",
+    "runtime/alpha-special-jonin-evidence-producer-34700.js",
     "runtime/academy-kakashi-v2-content-36000.js",
     "runtime/alpha-kakashi-v2-battle-36010.js",
     "runtime/alpha-kakashi-v2-rewards-36015.js",
