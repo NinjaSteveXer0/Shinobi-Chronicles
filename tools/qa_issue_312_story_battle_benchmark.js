@@ -32,55 +32,47 @@ assert(storySource.includes('function playStoryChoreography33900')&&storySource.
 assert(storySource.includes('data-sc-choreography-pending-entry'),"#312 shared Story owner must pre-stage entrants before their ENTER cue");
 assert(storySource.includes("reused:true"),"#312 same-scope Story choreography must not replay on harmless rerender");
 assert(storySource.includes("scChoreographyCompletedKinds")&&storySource.includes("completedKinds"),"#312 shared Story choreography must expose presentation-only completion receipts");
-assert(storySource.includes("removeOnComplete")&&kv2Renderer.includes("removeOnComplete:true"),"#312 departure ghost lifetime must be owned by shared cue completion");
-assert(storySource.includes("var(--sc-choreo-flee-x,22vw)"),"#312 shared FLEE primitive must allow the consuming scene to choose the correct escape direction");
-assert(storySource.includes("@keyframes scChoreoLunge33900")&&storySource.includes("100%{transform:translate3d(0,0,0)}"),"#312 transient Story movement must return to its semantic anchor instead of snapping after cue cleanup");
-assert(storySource.includes("@keyframes scChoreoFocus33900")&&!storySource.includes("@keyframes scChoreoFocus33900{0%{transform:"),"#312 FOCUS must not translate the actor before a strike");
+assert(storySource.includes("removeOnComplete"),"#312 shared Story choreography must retain reusable cleanup semantics for Origins that consume motion");
+assert(storySource.includes("var(--sc-choreo-flee-x,22vw)"),"#312 shared FLEE primitive must remain available to other Story consumers");
+assert(storySource.includes("@keyframes scChoreoLunge33900")&&storySource.includes("100%{transform:translate3d(0,0,0)}"),"#312 shared transient Story movement must remain bounded for consumers that opt in");
+assert(storySource.includes("@keyframes scChoreoFocus33900")&&!storySource.includes("@keyframes scChoreoFocus33900{0%{transform:"),"#312 shared FOCUS primitive must remain anchor-safe");
 
-assert(kv2Renderer.includes("playStoryChoreography33900"),"#312 Kakashi must consume shared Story choreography");
-assert(kv2Renderer.includes("applyStoryStageAnchor33900"),"#312 Kakashi must consume shared semantic anchors");
+assert(kv2Renderer.includes("applyStoryStageAnchor33900"),"#312 Kakashi must retain shared semantic anchors");
 assert(kv2Renderer.includes('data-story-object-id="PACKAGE"'),"#312 package token missing");
 assert(kv2Renderer.includes('data-count="1"')&&kv2Renderer.includes('data-count="2"'),"#312 actor prominence must adapt to cast count");
-assert(kv2Renderer.indexOf("for(const row of departures)")<kv2Renderer.indexOf("const prevIds"),"#312 committed departures must stage before newly entered actors");
+assert(kv2Renderer.includes("Final Kakashi Golden motion policy"),"#312 Kakashi must explicitly opt out of actor/card animation after installed-browser jitter evidence");
+assert(kv2Renderer.includes(".kv2-ghost-layer{display:none!important}")&&kv2Renderer.includes(".kv2-transition-memory{display:none!important}")&&kv2Renderer.includes(".kv2-wipe{display:none!important}"),"#312 stale ghost/root-transition presentation layers must be retired");
 {
   const transitionStart=kv2Renderer.indexOf("function playProjectionTransition(");
   const transitionEnd=kv2Renderer.indexOf("function syncActors(",transitionStart);
   const transitionSource=kv2Renderer.slice(transitionStart,transitionEnd);
-  assert(transitionStart>=0&&transitionEnd>transitionStart&&transitionSource.includes("actorSignature")&&!transitionSource.includes("next.packageHolder"),"#312 actor choreography scope must not restart for same-beat package truth updates");
+  assert(transitionStart>=0&&transitionEnd>transitionStart&&transitionSource.includes('cancelStoryChoreography33900(root,"kakashi_golden_static_motion")')&&!transitionSource.includes("playStoryChoreography33900({"),"#312 Kakashi projection transition must cancel shared motion rather than play it");
 }
+assert(kv2Renderer.includes("applyWatchExchangeStaticState(root,p,t)")&&kv2Renderer.includes("staticPresentation:true"),"#312 WATCH exchange must retain factual actor staging without animation ownership");
+assert(kv2Renderer.includes("mi.hidden=true")&&kv2Renderer.includes("mi.hidden=false")&&kv2Renderer.includes("kv2-cue-departed"),"#312 WATCH cue-local presence/exit state must remain deterministic");
 {
   const renderStart=kv2Renderer.indexOf("function render(){");
   const renderEnd=kv2Renderer.indexOf("function bind(",renderStart);
   const renderSource=kv2Renderer.slice(renderStart,renderEnd);
-  assert(renderStart>=0&&renderEnd>renderStart&&!renderSource.includes('JSON.stringify(previous.participantStates)!==JSON.stringify(next.participantStates)'),"#312 harmless participant-state refresh must not replay actor choreography");
+  assert(renderStart>=0&&renderEnd>renderStart&&!renderSource.includes("materializeDepartureGhosts(root"),"#312 Kakashi render must not materialize actor departure ghosts");
+  assert(!renderSource.includes("setTransitionMemory(previous&&previous.backdrop"),"#312 Kakashi render must not crossfade outgoing backdrops");
 }
-assert(kv2Transition.includes("semanticAlreadyCommitted:true"),"#312 transition must be post-commit presentation");
-assert(kv2Transition.includes('"hard"')&&kv2Transition.includes('"soft"')&&kv2Transition.includes("same_environment_beat_shift"),"#312 hard/soft cinematic transition hierarchy missing");
-assert(kv2Transition.includes("playAcademyKakashiV2CuePresentation36030"),"#312 cue-level card performance must run during narration stepping");
+assert(kv2Transition.includes("semanticAlreadyCommitted:true"),"#312 transition must remain post-commit presentation");
+assert(kv2Transition.includes('"hard"')&&kv2Transition.includes('"soft"'),"#312 hard/soft semantic transition classification missing");
+assert(kv2Transition.includes('type:"continuous_scene_update"')&&kv2Transition.includes('visualTransition:"none"'),"#312 same-environment Story beats must not animate the whole screen");
+assert(kv2Transition.includes('type:"cinematic_hard_cut"')&&kv2Transition.includes('visualTransition:"global_black_reveal"'),"#312 hard environment changes must use the single global curtain reveal");
+assert(kv2Transition.includes("lethalDelayMs:0")&&!kv2Transition.includes("hasLethalConsequenceInFlight()?"),"#312 lethal choices must not wait on removed card animation");
+assert(kv2Renderer.includes('GLOBAL_CURTAIN_ID="kakashi-v2-global-curtain"')&&kv2Renderer.includes("document.body.appendChild(curtain)")&&kv2Renderer.includes(".is-releasing{opacity:0"),"#312 global curtain must survive Story-root teardown and own only the reveal fade");
+assert(kv2Renderer.includes("lastBattleSuspended")&&kv2Renderer.includes("setGlobalCurtain(true)")&&kv2Renderer.includes("setTimeout(()=>setGlobalCurtain(false),70)"),"#312 Story/Battle handoff must use the same global curtain owner");
 assert(!kv2Transition.includes("cloneNode"),"#312 transition adapter must not own actor animation DOM");
 assert(!kv2Transition.includes("locked=true"),"#312 Story truth must not wait on animation lock");
 
 assert(kv2Renderer.includes(".kv2-speech")&&kv2Renderer.includes("syncSpeech"),"#312 actor-linked speech surface missing");
 assert(kv2Renderer.includes("top:-8px")&&kv2Renderer.includes("border-top:1px solid")&&kv2Renderer.includes("tailPct=sr.width>0"),"#312 speech tail must point upward toward and horizontally track the speaking actor");
 assert(kv2Renderer.includes("CLICK ANYWHERE TO CONTINUE")&&!kv2Renderer.includes('class="kv2-next"'),"#312 arrow-only continuation must be retired");
-assert(kv2Renderer.includes('root.dataset.hasChoices==="true"')&&kv2Renderer.includes('root.dataset.transitionActive==="true"')&&kv2Renderer.includes("Date.now()-revealed<360"),"#312 choice reveal / cinematic transition must block click-through / accidental commitment");
+assert(kv2Renderer.includes('root.dataset.hasChoices==="true"')&&kv2Renderer.includes("Date.now()-revealed<360"),"#312 choice reveal must block click-through / accidental commitment");
 assert(kv2Renderer.includes("repeat(3,minmax(0,1fr))")&&kv2Renderer.includes("max-height:none;overflow:visible"),"#312 five-choice desktop layout must not require an internal scrollbar");
-assert(kv2Renderer.includes('p.id!=="v2_watch_exchange"')&&kv2Renderer.includes("SURPRISE_ENTRY")&&kv2Renderer.includes('kind:"FLEE"'),"#312 WATCH exchange surprise-entry / true-flee choreography missing");
-assert(kv2Renderer.includes("mi.hidden=true")&&kv2Renderer.includes("mi.hidden=false"),"#312 Masked Interceptor must remain hard-withheld until her authored reveal cue");
-assert(kv2Renderer.includes("normalizeCueLocalActorState")&&kv2Renderer.includes("kv2-cue-departed")&&kv2Renderer.includes("node.hidden=false"),"#312 WATCH-only hidden/departed presentation state must not leak into later beats");
-assert(kv2Renderer.includes('next.id==="v2_direct_strike_setup"')&&kv2Renderer.includes('kind:"STRIKE"'),"#312 STRIKE BEFORE THE HANDOFF must visibly drive Kakashi into the authored attack");
-assert(kv2Renderer.includes("kv2ActorFall36030")&&kv2Renderer.includes('data-sc-choreography-active="COLLAPSE"')&&kv2Renderer.includes('state==="KILLED"')&&kv2Renderer.includes("cards never translate/scale"),"#312 lethal Story consequence must remain visible without transform-driven card jitter");
-assert(kv2Renderer.includes(".kv2-transition-memory{position:absolute;inset:0;z-index:45")&&kv2Renderer.includes("setTransitionMemory(previous&&previous.backdrop||null,true)")&&!kv2Renderer.slice(kv2Renderer.indexOf("function render(){"),kv2Renderer.indexOf("function bind(",kv2Renderer.indexOf("function render(){"))).includes("materializeRetainedHoldGhosts(root,capture,next)"),"#312 hard Story transitions must use one outgoing-environment visual owner without retained-card clone stacking");
-assert(kv2Renderer.includes("kv2-transition-memory.is-releasing{opacity:0}")&&kv2Renderer.includes("is-hard.is-covering{opacity:0}")&&kv2Renderer.includes("transition:opacity .46s")&&kv2Renderer.includes("transitionMemoryReleaseTimer"),"#312 hard Story scene changes must use one clean opacity crossfade without an opaque/blur/scale wipe");
-{
-  const renderStart=kv2Renderer.indexOf("function render(){");
-  const renderEnd=kv2Renderer.indexOf("function bind(",renderStart);
-  const renderSource=kv2Renderer.slice(renderStart,renderEnd);
-  assert(renderStart>=0&&renderEnd>renderStart&&renderSource.includes('root.dataset.transitionActive="true"')&&renderSource.includes("One owner, one visual transition"),"#312 hard transition must mark the handoff while one outgoing visual memory covers the committed next scene");
-}
-assert(kv2Renderer.includes('data-transition-active="true"] .kv2-ghost-layer{z-index:46}')&&kv2Renderer.includes(".kv2-transition-memory{position:absolute;inset:0;z-index:45")&&kv2Renderer.includes(".kv2-actors{transition:opacity .16s ease-out}"),"#312 crossfade layering must keep the committed next scene stable under the outgoing environment");
-assert(kv2Renderer.includes('ghost.className="kv2-departure-ghost kv2-actor-ghost'),"#312 outgoing actor ghosts must not inherit stale live choreography classes");
-assert(kv2Transition.includes("?320:0")&&kv2Transition.includes('singleLayerCrossfade:kind==="hard"'),"#312 lethal consequence must get a short stable fade before the single-layer hard crossfade");
+assert(kv2Renderer.includes("normalizeCueLocalActorState")&&kv2Renderer.includes("node.hidden=false"),"#312 WATCH-only hidden/departed presentation state must not leak into later beats");
 assert(kv2Renderer.includes("border-radius:16px")&&kv2Renderer.includes("backdrop-filter:blur(8px)"),"#312 modern compact narration/speech styling missing");
 
 assert(kv2Rewards.includes("ensureKakashiV2BattleRewardProjection36015"),"#312 Kakashi reward projection self-heal missing");
@@ -123,8 +115,8 @@ assert(battleSource.includes("applyBattlePerformanceRoles33000")&&battleSource.i
 assert(battleSource.includes("function battlePerformanceResultChip33000")&&battleSource.includes('targetNode.appendChild(chip)'),"#312 factual Battle result must attach to the exact target presentation");
 assert(battleSource.includes("function battlePerformanceRoleNode33000")&&battleSource.includes("participantId")&&battleSource.includes("getBattleDeploymentParticipant")&&battleSource.includes("data-slot"),"#312 Battle performance role lookup must resolve exact participant identity, including deployed off-slot targets");
 assert(battleSource.includes(".battle2-performance-stage.is-settled{opacity:0"),"#312 compact action identity must clear after playback");
-assert(battleSource.includes("Golden stabilization")&&battleSource.includes("transition:opacity .12s ease,filter .12s ease!important;will-change:auto!important"),"#312 Formation Stage participant layout must not tween transform/position between authoritative states");
-assert(battleSource.includes('data-formation-stage="true"].battle2-performance-active .battle2-performance-role-actor')&&battleSource.includes("animation:none!important;transform:none!important;will-change:auto!important"),"#312 installed-browser jitter evidence requires transform-driven Battle card motion to be disabled");
+assert(battleSource.includes("Final Kakashi Golden / Formation Stage motion policy")&&battleSource.includes("transition:none!important;animation:none!important;will-change:auto!important"),"#312 Formation Stage participant cards must not tween or animate");
+assert(battleSource.includes('data-formation-stage="true"].battle2-performance-active .battle2-performance-role-actor')&&battleSource.includes("animation:none!important;transition:none!important;transform:none!important;will-change:auto!important"),"#312 installed-browser jitter evidence requires Battle card animation/tween/transform motion to be disabled");
 assert(battleSource.includes("},920);"),"#312 Battle formation-stage playback must settle within the authorised short playback window");
 assert(!battleSource.includes(".battle2-modern.battle2-performance-active .battle-live-active-card-player{left:5.5%"),"#312 Battle playback must not shove the duel formation outward to make room for a center panel");
 assert(battleSource.includes("host.dataset.actionId===p.actionId"),"#312 stale Battle performance settle must not clear a newer action");
@@ -219,7 +211,7 @@ console.log(JSON.stringify({
   storyOwner:"runtime/alpha-story-scene-board-33900.js",
   battleOwner:"runtime/alpha-battle-modern-33000.js",
   storySemanticCommitBeforeMotion:true,
-  kakashiConsumesSharedChoreography:true,
+  kakashiUsesStaticGoldenMotion:true,
   battleEvidenceProjection:{
     hit:true,
     substitution:true,
