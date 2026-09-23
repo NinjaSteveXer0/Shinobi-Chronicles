@@ -365,9 +365,7 @@ The operative reaches the disposition and stops writing.
 
 Kakashi gives the names/roles one at a time.
 
-The operative does not fold them into the Battle result.
-
-He records them.
+The operative records each one.
 
 Then continues.
 
@@ -583,7 +581,6 @@ Minato looks at the Battle entry.
 
 **MINATO:** “Did he get the package?”
 
-The answer takes them naturally into the objective result.
 
 ---
 
@@ -593,7 +590,7 @@ The answer takes them naturally into the objective result.
 
 ### CLEAN SUCCESS
 
-Minato's eyes pause on the result.
+Minato's eyes pause on the line.
 
 **MINATO:** “And left before they could stop him.”
 
