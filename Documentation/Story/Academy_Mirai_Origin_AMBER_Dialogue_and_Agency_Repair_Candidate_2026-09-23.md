@@ -684,3 +684,478 @@ Until Stephen explicitly resolves the combined Battle structure and Combat/World
 - alternate route / possible Battle: AMBER — enemy and exact seam TBD
 - dialogue / character performance: RED in old draft; candidate repair above awaiting Stephen review
 - overall Academy Mirai Writing: **AMBER**
+
+
+---
+
+## SCENE 7 — IF MIRAI DECIDES TO ACT ON THE EVIDENCE
+
+This scene is reached only if the player actually chooses to stop treating the escort as routine.
+
+Mirai stops walking.
+
+The civilian gets two steps ahead before noticing.
+
+**CIVILIAN:** "What?"
+
+**MIRAI:** "Stop."
+
+They look back toward the checkpoint.
+
+**CIVILIAN:** "We're almost there."
+
+**MIRAI:** "I know."
+
+**CIVILIAN:** "Then what's the problem?"
+
+Mirai does not have one universal answer.
+
+What she says depends on what she actually established.
+
+### If Mirai has conversational contradiction
+
+**MIRAI:** "Your answers changed."
+
+The civilian's expression hardens.
+
+**CIVILIAN:** "People forget things."
+
+**MIRAI:** "They do."
+
+That answer seems to surprise them.
+
+Mirai does not overclaim.
+
+**MIRAI:** "I'm still not ignoring it."
+
+### If Mirai has changed-chakra evidence
+
+**MIRAI:** "Your chakra isn't the same as it was before the market."
+
+The civilian stares at her.
+
+**CIVILIAN:** "You were checking my chakra?"
+
+Mirai's ears warm slightly.
+
+**MIRAI:** "I was escorting you."
+
+**CIVILIAN:** "That wasn't a no."
+
+**MIRAI:** "It wasn't supposed to be."
+
+### If Mirai has multiple evidence channels
+
+Mirai keeps enough distance to move if the situation changes.
+
+**MIRAI:** "I lost sight of you at the market."
+
+The civilian says nothing.
+
+**MIRAI:** "After that, things stopped matching."
+
+**CIVILIAN:** "Things?"
+
+**MIRAI:** "Enough of them."
+
+She does not list every answer.
+
+Does not hand over the information required to repair the disguise.
+
+**MIRAI:** "I'm not continuing until I know who I'm taking to that checkpoint."
+
+The civilian studies her for a long moment.
+
+What follows depends on the factual evidence and confrontation authority actually earned by the route.
+
+### Existing confrontation Battle seam
+
+The older durable Mirai authority preserves a possible confrontation PL Battle when direct challenge / changed-chakra exposure escalates into confrontation.
+
+That Battle remains available in principle and is **not removed by this candidate**.
+
+Its exact opponent package remains unresolved.
+
+If Battle is called:
+- use the existing Mirai confrontation seam;
+- do not fabricate the instructor's Registry/Combat package;
+- return to the post-confrontation resolution after the actual Battle result.
+
+### Non-Battle verification resolution
+
+Where Mirai has established enough grounds and the exercise resolves without Battle, the civilian finally drops the act.
+
+A hand rises.
+
+Release.
+
+Smoke breaks across the lane.
+
+Mirai shifts back on instinct.
+
+The Academy instructor stands where the civilian had been.
+
+Mirai's face goes completely still.
+
+Then:
+
+**MIRAI:** "Seriously?"
+
+The instructor almost smiles.
+
+Almost.
+
+**ACADEMY INSTRUCTOR:** "Good stop."
+
+Mirai looks straight past him.
+
+**MIRAI:** "Where are they?"
+
+No satisfaction.
+
+No `I knew it`.
+
+The original civilian is still the assignment.
+
+**ACADEMY INSTRUCTOR:** "Checkpoint Three. Safe."
+
+Only then does some of the tension leave Mirai's shoulders.
+
+**MIRAI:** "You could've started with that."
+
+**ACADEMY INSTRUCTOR:** "You could've started by asking who I was."
+
+Mirai gives him a look.
+
+**MIRAI:** "I did."
+
+The instructor lets that one go.
+
+They head for the checkpoint together.
+
+---
+
+## SCENE 8 — IF MIRAI DOES NOT VERIFY BEFORE THE CHECKPOINT
+
+Checkpoint Three comes into view.
+
+Mirai gets the civilian across the marker without injury.
+
+The checkpoint instructor looks up from the desk.
+
+**CHECKPOINT INSTRUCTOR:** "Everything quiet?"
+
+Mirai thinks about the shortcut suggestion.
+
+Any questions she asked.
+
+Anything she chose not to ask.
+
+Then answers only what she can honestly say.
+
+**MIRAI:** "No attack. No injuries."
+
+The civilian sets their bag down.
+
+**CIVILIAN:** "She takes this very seriously."
+
+Mirai glances sideways.
+
+**MIRAI:** "You noticed."
+
+**CIVILIAN:** "Everyone noticed."
+
+The checkpoint instructor's mouth twitches.
+
+Mirai sees it.
+
+**MIRAI:** "What?"
+
+The civilian raises one hand.
+
+Release.
+
+Smoke fills the space beside her.
+
+Mirai moves before she understands why she is moving.
+
+The Academy instructor appears through the smoke.
+
+Mirai stops dead.
+
+A full second passes.
+
+**MIRAI:** "Oh, come on."
+
+The instructor folds his arms.
+
+**ACADEMY INSTRUCTOR:** "Language."
+
+**MIRAI:** "That was not bad language."
+
+**ACADEMY INSTRUCTOR:** "For you, it was close."
+
+Mirai looks toward the road behind them.
+
+Then back at him.
+
+**MIRAI:** "Where's the civilian?"
+
+The irritation disappears from her voice.
+
+**ACADEMY INSTRUCTOR:** "Here. Safe."
+
+The original civilian steps out from the checkpoint building.
+
+Mirai's whole posture changes.
+
+Relief first.
+
+Embarrassment immediately after.
+
+The civilian lifts one hand.
+
+**CIVILIAN:** "Hi."
+
+Mirai stares at them.
+
+**MIRAI:** "You knew?"
+
+**CIVILIAN:** "It was an Academy exercise."
+
+**MIRAI:** "That isn't an answer."
+
+**CIVILIAN:** "Then yes."
+
+Mirai closes her eyes for half a second.
+
+That answer was probably deserved.
+
+---
+
+## SCENE 9 — CHECKPOINT DEBRIEF
+
+The route sheet ends up on the checkpoint table between Mirai and the instructor.
+
+Nobody calls the exercise a complete success.
+
+Nobody calls it a complete failure either.
+
+### If Mirai exposed the substitution
+
+The instructor taps the market section of the route.
+
+**ACADEMY INSTRUCTOR:** "You stopped here."
+
+**MIRAI:** "Not exactly there."
+
+**ACADEMY INSTRUCTOR:** "Close enough."
+
+Mirai leans over the sheet.
+
+**MIRAI:** "I lost sight of them there."
+
+**ACADEMY INSTRUCTOR:** "And?"
+
+Mirai catches the shape of the question.
+
+Not `what was the answer`.
+
+What did she actually use?
+
+If conversation mattered, she explains the contradiction she tested.
+
+If chakra mattered, she explains the comparison she deliberately made.
+
+If both mattered, she keeps them separate.
+
+The instructor listens until she finishes.
+
+**ACADEMY INSTRUCTOR:** "So you knew it was me?"
+
+Mirai frowns.
+
+**MIRAI:** "No."
+
+That answer lands cleanly.
+
+**MIRAI:** "I knew I couldn't prove it was still them."
+
+The instructor looks at her for a moment.
+
+**ACADEMY INSTRUCTOR:** "Better answer."
+
+Mirai's expression says she dislikes being graded mid-sentence.
+
+The original civilian, sitting nearby, notices.
+
+**CIVILIAN:** "You do make that face."
+
+Mirai turns.
+
+**MIRAI:** "What face?"
+
+The civilian starts laughing.
+
+Mirai realises too late that she has walked into the same trap twice today.
+
+### If Mirai did not expose the substitution
+
+Mirai keeps looking at the route sheet.
+
+**MIRAI:** "I got you to the checkpoint."
+
+**ACADEMY INSTRUCTOR:** "You did."
+
+**MIRAI:** "Without letting anything happen to you."
+
+**ACADEMY INSTRUCTOR:** "Also true."
+
+Mirai looks up.
+
+**MIRAI:** "You're saying that like there's a 'but.'"
+
+**ACADEMY INSTRUCTOR:** "There is."
+
+Mirai waits.
+
+The instructor points to the covered market.
+
+**ACADEMY INSTRUCTOR:** "You were assigned that civilian."
+
+His finger moves from the market to the checkpoint.
+
+**ACADEMY INSTRUCTOR:** "You brought me the rest of the way."
+
+Mirai's jaw tightens.
+
+**MIRAI:** "I know."
+
+**ACADEMY INSTRUCTOR:** "I'm not saying the escort work after the switch was worthless."
+
+That makes Mirai look at him again.
+
+**ACADEMY INSTRUCTOR:** "If this were only a protection drill, you did your job."
+
+Mirai looks toward the original civilian.
+
+Safe.
+
+Unhurt.
+
+Waiting.
+
+**MIRAI:** "But it wasn't only a protection drill."
+
+The instructor does not answer immediately.
+
+He does not need to.
+
+Mirai looks back at the market section herself.
+
+### Civilian callback if Mirai talked earlier
+
+The original civilian gets up to leave.
+
+Then pauses beside Mirai.
+
+**CIVILIAN:** "For the record, my sister is still making plum tea."
+
+Mirai looks at them.
+
+Then very deliberately looks at the instructor.
+
+**MIRAI:** "Don't tell him anything else."
+
+The instructor raises both hands.
+
+**ACADEMY INSTRUCTOR:** "Exercise is over."
+
+**CIVILIAN:** "Lunch would've been better."
+
+Mirai tries not to smile.
+
+Fails.
+
+### Civilian callback if Mirai stayed professional
+
+The civilian adjusts the travel bag.
+
+**CIVILIAN:** "You know, you barely asked me anything."
+
+Mirai folds her arms.
+
+**MIRAI:** "I knew where you were."
+
+The civilian glances at the market mark on the route sheet.
+
+Mirai follows the glance.
+
+**MIRAI:** "...Until I didn't."
+
+The civilian gives her a sympathetic look rather than a victory lap.
+
+**CIVILIAN:** "Next time."
+
+Mirai exhales.
+
+**MIRAI:** "Next time."
+
+---
+
+## SCENE 10 — FINAL CE REFLECTION
+
+The final reflection remains independent from the factual result.
+
+Mirai may have:
+- verified the substitution;
+- suspected but never proved it;
+- completed the physical escort only;
+- used conversational Knowledge;
+- used chakra evidence;
+- used both;
+- followed the alternate route;
+- encountered a Battle;
+- or reached the checkpoint having never treated the escort as suspicious at all.
+
+None of those automatically chooses what she thinks the assignment meant.
+
+Present the existing four reflection meanings:
+
+1. **"Getting them there safely was still part of the job."**
+2. **"If I don't know who I'm protecting, I don't know whether I finished the job."**
+3. **"Suspicion isn't enough. I need to know what my evidence actually proves."**
+4. **"I should've been paying attention to the person, not only the route."**
+
+The selected reflection records Mirai's current interpretation only.
+
+It does not rewrite:
+- who she escorted;
+- what she learned;
+- what she observed;
+- what she inferred;
+- whether she verified;
+- Battle results;
+- checkpoint protection history.
+
+## Candidate Origin close
+
+The exercise began with a simple instruction:
+
+protect one person and get them to a checkpoint.
+
+By the end, Mirai may have learned that the difficult word was not `checkpoint`.
+
+It was `person`.
+
+Or she may decide the physical escort still mattered more than the instructor thinks.
+
+Or that evidence matters more than suspicion.
+
+Or that she simply was not ready to catch what changed this time.
+
+All of those are legitimate Chronicle history.
+
+The Origin does not decide which one makes Mirai a better shinobi.
+
+It records what she did, what she knew, what she noticed, what she concluded—and what she didn't.
