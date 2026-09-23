@@ -100,7 +100,7 @@ It must use:
 
 Only narration/dialogue in the ANBU and Minato scene sections is player-facing Story.
 
-Projection labels, conditional headers and Chronicle Receipt schema are author/UI scaffolding.
+Projection labels, conditional headers, any bracketed `[AUTHOR ...]` instruction, and Chronicle Receipt schema are author/UI scaffolding and must not render.
 
 ---
 
@@ -142,9 +142,6 @@ He does not react before he knows which of those things matters.
 
 Kakashi tells him what he chose when the street split.
 
-No summary of branches.
-
-The actual thing he did.
 
 ---
 
@@ -186,11 +183,8 @@ The operative glances at the wet edge of the roof.
 
 **KAKASHI:** “Both men fought.”
 
-If Kakashi won, he continues with what happened after.
+[AUTHOR: project the actual 2-v-1 result in the next spoken line; do not render this instruction.]
 
-If he lost, he says so.
-
-The operative does not ask him to make it sound better.
 
 ---
 
@@ -202,7 +196,7 @@ The operative does not ask him to make it sound better.
 
 **KAKASHI:** “I did.”
 
-The operative looks toward the package, if it is already in his hands.
+[AUTHOR: if Kakashi visibly returned with the package, the operative's attention may move to it; do not render this instruction.]
 
 ### IF DETECTED
 
@@ -266,17 +260,29 @@ Moves on.
 
 **KAKASHI:** “She took it from me.”
 
-No qualification.
-
-No excuse.
 
 ---
+
+
+## PACKAGE FINAL HOLDER UNKNOWN
+
+**ANBU OPERATIVE:** “Package?”
+
+**KAKASHI:** “I lost it.”
+
+The operative waits.
+
+**ANBU OPERATIVE:** “Last person you saw with it?”
+
+Kakashi answers only if he knows.
+
+If he does not, he says so.
 
 # PEOPLE — VISIBLE / ACTIONABLE OUTCOMES
 
 ## LIVE ANBU CUSTODY
 
-If Kakashi arrived with prisoners, their restraint lines have already changed hands.
+[AUTHOR: use this block only when Kakashi delivered one or more participants alive to ANBU; do not render this instruction.]
 
 The operative looks toward where they were taken.
 
@@ -300,10 +306,6 @@ If there is more than one:
 
 The operative pauses.
 
-Not disapproval.
-
-Calculation.
-
 **ANBU OPERATIVE:** “I'll notify them what they can be told.”
 
 ---
@@ -314,7 +316,6 @@ Calculation.
 
 Kakashi gives the exact person and place.
 
-Examples:
 
 **KAKASHI:** “The masked woman. Restrained beneath the Sakura tree.”
 
@@ -428,7 +429,7 @@ The operative writes it down.
 
 ## GET CLOSER CONTINGENCY KNOWN
 
-Only if Kakashi actually heard it:
+[AUTHOR: use only if Kakashi actually heard the contingency.]
 
 **ANBU OPERATIVE:** “What did they say before the handoff?”
 
@@ -446,7 +447,7 @@ A beat.
 
 ## ASK WHERE IT WAS GOING
 
-Only if Kakashi actually asked and received the answer:
+[AUTHOR: use only if Kakashi actually asked and received the answer.]
 
 **KAKASHI:** “The first man's part ended at the handoff.”
 
@@ -464,7 +465,7 @@ The operative writes that down.
 
 # PAKKUN
 
-Only if Pakkun is still present after the connected route.
+[AUTHOR: use only if Pakkun is still present after the connected route.]
 
 The operative finally looks toward the ninken.
 
@@ -628,9 +629,7 @@ Minato is quiet for a moment.
 
 Minato nods once.
 
-If the route was otherwise clean, that may be all he needs.
-
-If the route was costly, he looks at what followed.
+[AUTHOR: on a clean low-consequence route this may end the package discussion; on a costly route continue into the relevant consequence block.]
 
 ---
 
@@ -652,13 +651,12 @@ Opens them.
 
 Not approval.
 
-Acceptance of the fact.
 
 ---
 
 # MINATO — CONSEQUENCE
 
-Use only the consequential material actually present.
+[AUTHOR: project only consequential material actually present in this route.]
 
 ## MULTIPLE BATTLES
 
@@ -690,7 +688,7 @@ Minato looks at the custody line.
 
 The operative answers from the actual route.
 
-If Police custody:
+[AUTHOR: if Police custody occurred:]
 
 **MINATO:** “Make sure the Police get what they need and nothing from the operation they don't.”
 
@@ -756,7 +754,7 @@ Minato nods toward the report.
 
 # MINATO — INTELLIGENCE
 
-Only if the route produced it.
+[AUTHOR: use only if the route produced actionable intelligence.]
 
 **ANBU OPERATIVE:** “He also brought back one useful piece from the handoff.”
 
@@ -862,8 +860,6 @@ Permanent ownership — none.
 REWARDS
 [read current committed reward receipts; do not invent]
 
-FINAL REFLECTION / HISTORY
-[only if an exact current Kakashi authority supplies one]
 ```
 
 Do not display:
