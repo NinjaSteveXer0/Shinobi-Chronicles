@@ -219,7 +219,7 @@ restrainThreeAndDeliver("POLICE");
   h.enter("v2_ask_where");
   rows=h.getEvidence();
   const interrogation=rows.find(e=>e.qualificationId==="intelligence.interrogator");
-  assert(interrogation&&interrogation.significance===1&&interrogation.tags.length===1&&interrogation.tags[0]==="intelligence.interrogator:information_extraction","ASK WHERE evidence must stay limited/incomplete without invented credibility tag");
+  assert(interrogation&&interrogation.significance===1&&interrogation.tags.includes("intelligence.interrogator:information_extraction")&&!interrogation.tags.includes("intelligence.interrogator:credibility_assessment"),"ASK WHERE evidence must stay limited/incomplete without invented credibility tag");
   assert(rows.every(e=>e.significance<=3&&e.specialistLevel===false&&e.capstoneAuthorized===false),"Kakashi emitted forbidden significance/capstone state");
 
   h.reset("restraint_evidence_ps");
@@ -271,6 +271,7 @@ restrainThreeAndDeliver("POLICE");
   assert.strictEqual(rows[0].significance,3);
   assert(rows[0].tags.includes("covert_operations.extraction_specialist:extraction_planning")&&rows[0].tags.includes("covert_operations.extraction_specialist:subject_recovery"));
   assert.strictEqual(rows[0].specialistLevel,false);
+  assert(rows[0].tags.includes("covert_operations.extraction_specialist:specialist_work"),"shared producer omitted evaluator-required specialist_work tag");
 }
 
 // Capture tiers and unresolved legacy cap boundary.
