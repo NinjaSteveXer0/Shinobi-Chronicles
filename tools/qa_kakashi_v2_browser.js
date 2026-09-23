@@ -332,6 +332,243 @@ async function stateSnapshot(page){
   return page.evaluate(()=>JSON.parse(JSON.stringify(getAcademyKakashiV2State36020())));
 }
 
+
+function percentile(values,p){
+  if(!values.length)return 0;
+  const sorted=[...values].sort((a,b)=>a-b);
+  return sorted[Math.min(sorted.length-1,Math.max(0,Math.ceil(sorted.length*p)-1))];
+}
+
+async function clickThroughTerminalBeat(page,{label,expectedBeat,nextBeat,expectedCueCount=null,minCueCount=15}){
+  assert.strictEqual(await currentBeat(page),expectedBeat,label+" terminal beat mismatch");
+  await waitVisualReady(page,label);
+  const initial=await page.evaluate(()=>{
+    const root=document.getElementById("kakashi-v2-scene-board");
+    const state=getAcademyKakashiV2TransitionState36040();
+    const visible=node=>!!node&&node.getClientRects().length>0&&getComputedStyle(node).display!=="none"&&getComputedStyle(node).visibility!=="hidden"&&Number(getComputedStyle(node).opacity)>0;
+    const textNode=[root?.querySelector(".kv2-speech"),root?.querySelector(".kv2-dialogue")].find(visible)||null;
+    globalThis.__kv2TerminalCadenceRoot=root;
+    return{
+      cueIndex:state?.cueIndex??null,
+      cueCount:state?.cueCount??0,
+      text:textNode?.textContent?.trim()||"",
+      rootMounted:!!root
+    };
+  });
+  assert.strictEqual(initial.rootMounted,true,label+" Scene Board missing");
+  assert(initial.cueCount>=minCueCount,label+" terminal beat is underwritten: "+JSON.stringify(initial));
+  if(expectedCueCount!==null)assert.strictEqual(initial.cueCount,expectedCueCount,label+" cue count drifted from current Writing authority");
+  assert(initial.text.length>0,label+" initial terminal cue is blank");
+
+  const texts=[initial.text],timings=[];
+  let previousIndex=initial.cueIndex;
+  while(previousIndex<initial.cueCount-1){
+    const started=Date.now();
+    await page.locator("#kakashi-v2-scene-board").click({position:{x:720,y:180}});
+    await page.waitForFunction(({beat,index})=>{
+      const rt=getActiveStorySceneRuntime(),state=getAcademyKakashiV2TransitionState36040();
+      return !!rt&&rt.beatId===beat&&!!state&&state.cueIndex===index+1;
+    },{beat:expectedBeat,index:previousIndex},{timeout:3000});
+    timings.push(Date.now()-started);
+    const frame=await page.evaluate(()=>{
+      const root=document.getElementById("kakashi-v2-scene-board");
+      const state=getAcademyKakashiV2TransitionState36040();
+      const visible=node=>!!node&&node.getClientRects().length>0&&getComputedStyle(node).display!=="none"&&getComputedStyle(node).visibility!=="hidden"&&Number(getComputedStyle(node).opacity)>0;
+      const textNode=[root?.querySelector(".kv2-speech"),root?.querySelector(".kv2-dialogue")].find(visible)||null;
+      return{
+        cueIndex:state?.cueIndex??null,
+        text:textNode?.textContent?.trim()||"",
+        sameRoot:globalThis.__kv2TerminalCadenceRoot===root,
+        canonicalRoots:[...document.querySelectorAll("#kakashi-v2-scene-board")].filter(visible).length,
+        legacyVisible:[...document.querySelectorAll("#story-scene-presentation-layer .sc-story-panel,#story-scene-presentation-layer .sc-chronicle-layout,.sc-dialogue-panel-33910,.sc-narration-panel-33910")].filter(visible).length
+      };
+    });
+    assert.strictEqual(frame.sameRoot,true,label+" cue advance remounted the Scene Board");
+    assert.strictEqual(frame.canonicalRoots,1,label+" cue advance duplicated the canonical Scene Board");
+    assert.strictEqual(frame.legacyVisible,0,label+" cue advance exposed a legacy Story surface");
+    assert(frame.text.length>0,label+" cue "+frame.cueIndex+" is blank");
+    texts.push(frame.text);
+    previousIndex=frame.cueIndex;
+  }
+
+  for(let i=1;i<texts.length;i++){
+    assert.notStrictEqual(texts[i],texts[i-1],label+" repeats the exact same adjacent player-facing cue");
+  }
+
+  const oldBeat=await currentBeat(page);
+  await page.locator("#kakashi-v2-scene-board").click({position:{x:720,y:180}});
+  await waitBeatChange(page,oldBeat,nextBeat);
+  return{
+    beatId:expectedBeat,
+    cueCount:initial.cueCount,
+    displayedCueCount:texts.length,
+    p50CueAdvanceMs:percentile(timings,.50),
+    p95CueAdvanceMs:percentile(timings,.95),
+    maxCueAdvanceMs:timings.length?Math.max(...timings):0,
+    rootPreservedAcrossCues:true,
+    adjacentExactDuplicates:0,
+    nextBeat
+  };
+}
+
+async function validateTerminalCadence(page,label,{expectedReportCount=null,expectedMinatoCount=null}={}){
+  assert.strictEqual(await currentBeat(page),"v2_report",label+" must enter at ANBU report");
+  const stateAtReport=await stateSnapshot(page);
+  await shot(page,"terminal-"+label+"-report.png");
+  const report=await clickThroughTerminalBeat(page,{
+    label:label+":report",
+    expectedBeat:"v2_report",
+    nextBeat:"v2_minato",
+    expectedCueCount:expectedReportCount,
+    minCueCount:15
+  });
+  await shot(page,"terminal-"+label+"-minato.png");
+  const minato=await clickThroughTerminalBeat(page,{
+    label:label+":minato",
+    expectedBeat:"v2_minato",
+    nextBeat:"v2_receipt",
+    expectedCueCount:expectedMinatoCount,
+    minCueCount:15
+  });
+  const receipt=await inspect(page,label+":receipt");
+  return{stateAtReport,report,minato,receipt};
+}
+
+async function terminalStoryBrowserValidation(browser){
+  const results=[];
+
+  async function scenario(name,run,expectations={}){
+    const {context,page,runtimeErrorGate}=await boot(browser);
+    try{
+      await toScene02Root(page);
+      await run(page);
+      assert.strictEqual(await currentBeat(page),"v2_report",name+" did not reach ANBU report");
+      const cadence=await validateTerminalCadence(page,name,expectations);
+      const browserErrors=await runtimeErrorGate.assertClean("terminal-story:"+name);
+      results.push({name,success:true,cadence,browserErrors});
+    }finally{
+      await context.close();
+    }
+  }
+
+  await scenario("clean-pickpocket-success",async page=>{
+    await seedResolver(page,"directPickpocket","PICKPOCKET_DIRECT_SUCCESS");
+    await chooseLabel(page,"SLIP IN FOR THE PACKAGE","v2_direct_pickpocket_resolver");
+    await advanceTo(page,"v2_pickpocket_clean_success");
+    await nextSemantic(page,"v2_report");
+    const st=await stateSnapshot(page);
+    assert.strictEqual(st.package.holder,"ANBU");
+    assert.strictEqual(st.package.returned,true);
+    assert.strictEqual(st.participants.MI.state,"UNSEEN");
+  },{expectedReportCount:21,expectedMinatoCount:20});
+
+  await scenario("direct-strike-2v1-loss",async page=>{
+    await chooseLabel(page,"STRIKE BEFORE THE HANDOFF","v2_direct_strike_setup");
+    await advanceTo(page,"v2_battle_direct_strike_2v1");
+    await launchAndReturnBattle(page,{outcome:"defeat",actions:4,expectedBeat:"v2_direct_strike_2v1_loss"});
+    await nextSemantic(page,"v2_report");
+    const st=await stateSnapshot(page);
+    assert.strictEqual(st.package.holder,"AMT");
+    assert.strictEqual(st.participants.AMT.state,"ESCAPED");
+    assert.strictEqual(st.participants.PS.state,"ESCAPED");
+  },{expectedReportCount:30,expectedMinatoCount:23});
+
+  await scenario("direct-strike-win-then-mi-loss",async page=>{
+    await chooseLabel(page,"STRIKE BEFORE THE HANDOFF","v2_direct_strike_setup");
+    await advanceTo(page,"v2_battle_direct_strike_2v1");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_direct_strike_2v1_win"});
+    await nextSemantic(page,"v2_battle_direct_mi");
+    await launchAndReturnBattle(page,{outcome:"defeat",actions:4,expectedBeat:"v2_direct_mi_loss"});
+    await nextSemantic(page,"v2_report");
+    const st=await stateSnapshot(page);
+    assert.strictEqual(st.package.holder,"MI");
+    assert.strictEqual(st.package.recovered,false);
+    assert.strictEqual(st.participants.MI.state,"ESCAPED");
+  });
+
+  await scenario("direct-strike-double-win-live-anbu-custody",async page=>{
+    await chooseLabel(page,"STRIKE BEFORE THE HANDOFF","v2_direct_strike_setup");
+    await advanceTo(page,"v2_battle_direct_strike_2v1");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_direct_strike_2v1_win"});
+    await nextSemantic(page,"v2_battle_direct_mi");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:2,expectedBeat:"v2_direct_mi_win"});
+    await chooseLabel(page,"TAKE THEM TO THE ANBU","v2_report");
+    const st=await stateSnapshot(page);
+    for(const ref of ["AMT","PS","MI"])assert.strictEqual(st.participants[ref].state,"ANBU_CUSTODY");
+  },{expectedReportCount:30,expectedMinatoCount:22});
+
+  await scenario("police-ending",async page=>{
+    await seedResolver(page,"getCloser","GET_CLOSER_SUCCESS");
+    await seedResolver(page,"improvedPickpocket","PICKPOCKET_IMPROVED_FAILURE");
+    await chooseLabel(page,"MOVE IN CLOSER","v2_get_closer_resolver");
+    await advanceTo(page,"v2_get_closer_success");
+    await chooseLabel(page,"ATTEMPT THE PICKPOCKET","v2_improved_pickpocket_resolver");
+    await advanceTo(page,"v2_battle_improved_2v1");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_improved_2v1_win"});
+    await chooseLabel(page,"TAKE THEM TO THE UCHIHA POLICE FORCE","v2_report");
+    const st=await stateSnapshot(page);
+    assert.strictEqual(st.participants.AMT.state,"POLICE_CUSTODY");
+    assert.strictEqual(st.participants.PS.state,"POLICE_CUSTODY");
+    assert.strictEqual(st.participants.MI.state,"UNSEEN");
+  });
+
+  await scenario("deliberate-release-ending",async page=>{
+    await seedResolver(page,"directPickpocket","PICKPOCKET_DIRECT_FAILURE");
+    await chooseLabel(page,"SLIP IN FOR THE PACKAGE","v2_direct_pickpocket_resolver");
+    await advanceTo(page,"v2_battle_pickpocket_3v1");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_pickpocket_3v1_win"});
+    await chooseLabel(page,"TAKE THE PACKAGE AND LET THEM GO","v2_report");
+    const st=await stateSnapshot(page);
+    for(const ref of ["AMT","PS","MI"])assert.strictEqual(st.participants[ref].state,"RELEASED");
+  });
+
+  await scenario("package-loss-ending",async page=>{
+    await seedResolver(page,"amtPursuitRoot","AMT_PURSUIT_FAILURE");
+    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
+    await chooseLabel(page,"GO AFTER THE ORIGINAL TARGET","v2_go_amt_pursuit_resolver");
+    await advanceTo(page,"v2_amt_direct_pursuit_fail");
+    await nextSemantic(page,"v2_report");
+    const st=await stateSnapshot(page);
+    assert.strictEqual(st.package.returned,false);
+    assert.notStrictEqual(st.package.holder,"ANBU");
+  });
+
+  await scenario("pakkun-amt-ending",async page=>{
+    await seedResolver(page,"psPursuit","PS_PURSUIT_SUCCESS");
+    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
+    await chooseLabel(page,"STOP THE ASSASSIN","v2_stop_assassin_setup");
+    await advanceTo(page,"v2_battle_mi_stop");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_mi_stop_win"});
+    await chooseLabel(page,"GO AFTER PACKAGE SMUGGLER","v2_ps_pursuit_resolver");
+    await advanceTo(page,"v2_battle_ps_seq");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_ps_seq_win"});
+    await chooseLabel(page,"GO AFTER ANBU MARKED TARGET","v2_amt_after_ps");
+    await advanceTo(page,"v2_battle_amt_seq_pakkun");
+    await launchAndReturnBattle(page,{outcome:"defeat",actions:4,expectedBeat:"v2_amt_seq_loss"});
+    await nextSemantic(page,"v2_report");
+    const st=await stateSnapshot(page);
+    assert.strictEqual(st.pakkun.present,true);
+    assert.strictEqual(st.participants.AMT.state,"ESCAPED");
+    assert.strictEqual(st.package.returned,true);
+  });
+
+  assert.strictEqual(results.length,8);
+  return{
+    pass:true,
+    issue:105,
+    authority:"Academy_Kakashi_Ending_Cohesion_AMBER_Repair_2026-09-23",
+    routesValidated:results.length,
+    post322DispositionRoutesPending:[
+      "KILL -> KILLED",
+      "KILL -> ESCAPED",
+      "RESTRAIN -> RESTRAINED",
+      "RESTRAIN -> ESCAPED"
+    ],
+    post322Reason:"Issue #322 is still open on this validation baseline; do not certify replacement disposition outcomes before implementation.",
+    results
+  };
+}
+
 async function finishTerminalBrowser(page,label){
   await advanceTo(page,"v2_report",{max:20});
   const report=await inspect(page,label+":report");
@@ -835,12 +1072,13 @@ async function browserRouteMatrix(browser){
     const clean=await cleanRoute(browser);
     const visualBattle=await visualAndBattle(browser);
     const browserMatrix=await browserRouteMatrix(browser);
+    const terminalStory=await terminalStoryBrowserValidation(browser);
     const pngs=fs.readdirSync(OUT).filter(name=>name.endsWith(".png")).sort();
     const hashes=pngs.map(name=>crypto.createHash("sha256").update(fs.readFileSync(path.join(OUT,name))).digest("hex"));
     const uniqueScreenshots=new Set(hashes).size;
     assert(pngs.length>=11,"installed-browser evidence screenshots missing");
     assert(uniqueScreenshots>=8,"browser evidence is visually static/occluded: "+JSON.stringify({pngs,uniqueScreenshots}));
-    const result={pass:true,clean,visualBattle,browserMatrix,pngCount:pngs.length,uniqueScreenshots,browserRuntimeErrorGate:"GREEN",browserGoldenClaimed:false};
+    const result={pass:true,clean,visualBattle,browserMatrix,terminalStory,pngCount:pngs.length,uniqueScreenshots,browserRuntimeErrorGate:"GREEN",browserGoldenClaimed:false};
     fs.writeFileSync(path.join(OUT,"results.json"),JSON.stringify(result,null,2));
     console.log(JSON.stringify(result,null,2));
   }finally{
