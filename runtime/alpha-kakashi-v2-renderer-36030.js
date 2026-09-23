@@ -272,7 +272,7 @@ function departureMode(previous,next,id){
   const key=prev&&prev.slot==="mi"?"MI":prev&&prev.slot==="ps"?"PS":prev&&prev.slot==="amt"?"AMT":null;
   const state=key&&next&&next.participantStates&&next.participantStates[key]||null;
   if(state==="ESCAPED"||state==="RELEASED")return"FLEE";
-  if(state==="DEAD"||state==="KILLED"||state==="BATTLE_DEFEATED")return"COLLAPSE";
+  if(state==="KILLED"||state==="BATTLE_DEFEATED")return"COLLAPSE";
   return"EXIT";
 }
 function departureGhostClass(kind){return kind==="COLLAPSE"?"is-falling":kind==="FLEE"?"is-fleeing":"is-fading";}
