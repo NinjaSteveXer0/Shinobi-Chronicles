@@ -1,3 +1,6 @@
+> **2026-09-23 ACADEMY OBITO STORY SUPERSESSION**  
+> Stephen has approved a complete replacement player-facing Academy Obito Origin Story. For `academy_obito`, the Obito Story/choreography/reflection material in this 2026-09-12 package is superseded by `Documentation/Story/Academy_Obito_Origin_Final_Cohesive_Story_Authority_2026-09-23.md` @ `328578e7d5f238422627b338b21eb091709a2630`. The new authority uses five binary HELP / CONTINUE diversions, the same five independent factual source occurrences, the existing formal-training development packages, a full end-of-day/home reflection, and four final interpretations including the approved "find what matters most" branch. This notice does not alter the Kakashi portion of this file.
+
 # Shinobi Chronicles — Academy Kakashi + Academy Obito Origin Final Production Writing Packages
 
 **Date:** 2026-09-12  
