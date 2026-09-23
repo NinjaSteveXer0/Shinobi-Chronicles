@@ -353,7 +353,7 @@ function diagnostics(){
     noParallelInventory:!String(commitItemSource).includes("inventory.push")&&String(commitItemSource).includes("addItemToInventory"),
     victoryProjectionSelfHeals:String(ensureKakashiV2BattleRewardProjection36015).includes("authoritativeProjectionRepaired")&&String(renderVictoryOverlay36015).includes("ensureKakashiV2BattleRewardProjection36015"),
     victoryOpenProjectsBeforeGenericRender:String(openOverlay36015).includes('"victory"')&&String(openOverlay36015).indexOf("ensureKakashiV2BattleRewardProjection36015")<String(openOverlay36015).indexOf("PRE_OPEN_OVERLAY"),
-    exactMIBattleProjection:String(ensureKakashiV2BattleRewardProjection36015).includes("Field Recovery Pill")&&String(battlePlan).includes("ryo:50"),
+    exactMIBattleProjection:String(ensureKakashiV2BattleRewardProjection36015).includes("Field Recovery Pill")&&String(battlePlan).includes("participantId===MI")&&String(battlePlan).includes("ryo:cashSourceId?50:0")&&String(soloCashSource36015).includes("participantId===MI"),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
