@@ -1807,7 +1807,7 @@ function trainingSequence(){
 }
 function arrivalSequence(){
   const entitlement=currentEntitlement();
-  return clone(PERFORMANCE["arrival_"+entitlement]||[N("No formal training remains available when Obito arrives.")]);
+  return clone(PERFORMANCE["arrival_"+entitlement]||[{kind:"narration",text:"No formal training remains available when Obito arrives."}]);
 }
 function homeSequence(){
   const count=countHelpFromFacts(),tail=count===5?PERFORMANCE.home_all_help:count===0?PERFORMANCE.home_no_help:PERFORMANCE.home_mixed;
