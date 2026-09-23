@@ -274,9 +274,7 @@ The operative waits.
 
 **ANBU OPERATIVE:** “Last person you saw with it?”
 
-Kakashi answers only if he knows.
-
-If he does not, he says so.
+[AUTHOR: project Kakashi's last-known-holder answer only from actual Knowledge; if unknown, he says he does not know.]
 
 # PEOPLE — VISIBLE / ACTIONABLE OUTCOMES
 
@@ -686,7 +684,7 @@ Minato looks at the custody line.
 
 **MINATO:** “All of them?”
 
-The operative answers from the actual route.
+[AUTHOR: the operative answers with the exact custody count/destination from the current route.]
 
 [AUTHOR: if Police custody occurred:]
 
