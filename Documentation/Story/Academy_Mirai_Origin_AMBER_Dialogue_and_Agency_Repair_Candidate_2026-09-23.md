@@ -662,15 +662,17 @@ The existing GREEN structure remains:
 
 ## Battle correction candidate
 
-The old Mirai lock placed confrontation Battles directly on challenge/chakra-exposure branches.
+The existing durable Mirai lock already preserves confrontation-Battle seams where Mirai exposes the substitution through direct challenge / changed-chakra investigation, although the exact instructor Battle package remains unresolved.
 
-Stephen's current correction instead introduces a **possible PL Battle on the optional alternate-route branch with enemy TBD**.
+Stephen's current correction **also** introduces a possible PL Battle on the optional alternate-route branch with enemy TBD.
 
-Until Stephen approves the full revised Story and Combat/World identifies the enemy/encounter truth:
-- do not delete the old Battle authority from durable production implementation merely from this candidate file;
-- do not add a new enemy;
-- do not fabricate Battle consequences;
-- treat the new route-Battle placement as **AMBER design direction awaiting closure**.
+This candidate does **not** retire or replace the older confrontation-Battle authority.
+
+Until Stephen explicitly resolves the combined Battle structure and Combat/World identifies the new route encounter:
+- preserve the existing confrontation-Battle possibility;
+- add no new enemy identity by inference;
+- do not fabricate route-Battle win/loss consequences;
+- treat the **additional alternate-route Battle seam** as AMBER design direction awaiting closure.
 
 ## Status
 
