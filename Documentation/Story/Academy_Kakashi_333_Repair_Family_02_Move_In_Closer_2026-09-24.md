@@ -3,7 +3,7 @@
 
 **Date:** 2026-09-24  
 **Owner:** Writing / Story — Konoha  
-**Status:** **WRITING AMBER — STEPHEN REVIEW CANDIDATE / CHOICE LABELS MODERNIZED UNDER b575576**  
+**Status:** **WRITING AMBER — STEPHEN REVIEW CANDIDATE / CHOICE LABELS GOLDEN UNDER c29fe01d**  
 **Production Origin:** `academy_kakashi`
 
 ## AUTHOR-ONLY LOCKS
@@ -646,6 +646,6 @@ Pakkun is present in Story but has no selectable Combat action in this Battle co
 
 ## Status
 
-Stephen-review candidate only.
+Player-facing choice labels in this family are Stephen-approved under the GOLDEN choice-label authority. The Family 02 prose itself remains a Stephen-review candidate and is not yet promoted to GOLDEN.
 
-Do not propagate into runtime until approved.
+Do not propagate Family 02 prose into runtime until separately approved.
