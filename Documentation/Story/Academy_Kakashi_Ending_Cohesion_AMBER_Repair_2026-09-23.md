@@ -292,3 +292,99 @@ Academy Kakashi Writing returns to GREEN only when:
 The terminal scenes must make the player's path matter emotionally and conversationally without bloating routine logistics.
 
 **Writing status: AMBER.**
+
+
+## 11. Thin pre-report field-beat repair
+
+The whole-terminal audit also found short field consequences immediately before `v2_report`, not only a short report/Hokage layer.
+
+Live repair:
+
+`dc9f6da7adbbfdbdf900de5ee60891ce10e06b8e` — **Expand thin Kakashi terminal field beats**
+
+Expanded current consumed endings include:
+
+- Package Smuggler pursuit failure;
+- Package Smuggler Battle loss on the sequential route;
+- second Package Smuggler Battle loss after earlier MI sequence;
+- Take Him Down loss while Pakkun preserves package recovery;
+- direct Package Smuggler loss while the package is already elsewhere;
+- Sakura cutoff 2v1 loss;
+- improved-position 2v1 loss.
+
+The repair adds:
+- spatial closure;
+- the moment pursuit stops being legitimate;
+- package visibility where relevant;
+- Pakkun's own reaction where he is actually present;
+- Kakashi recognising the difference between a trail and guesswork;
+- a motivated turn back toward ANBU.
+
+One staging correction was also made in the cutoff-loss aftermath: Pakkun is now present in the actor projection because the Story already says he remains beside Kakashi.
+
+## 12. Terminal prose / Receipt polish
+
+Further live commits:
+
+- `c174ca661348f307ce4e52f121fc6e88001c05c2` — **Polish Kakashi terminal prose**
+- `b1ec44b46546b1c572af2d54e48b96514fc48bd6` — **Align Kakashi receipt with ending rewrite**
+
+These remove remaining player-facing semantic exposition such as explaining that Police custody is "not escape", replace it with character/physical behaviour, and prevent clean non-combat routes from exposing the internal participant state `AVAILABLE`.
+
+Receipt projection now also understands the newer simple `RESTRAINED` fact and can distinguish future:
+- lethal action -> ESCAPED;
+- restraint attempt -> ESCAPED.
+
+## 13. Representative projection depth evidence
+
+The current live terminal builders were exercised with representative mock factual states after the rewrite.
+
+This is source projection validation, not Browser Golden.
+
+### Clean direct Pickpocket success
+
+- ANBU report: **21 cues**
+- report dialogue: **11**
+- Minato/Hokage: **20 cues**
+- Minato/Hokage dialogue: **14**
+
+### Direct Strike -> win AMT+PS 2v1 -> win MI 1v1 -> all three ANBU custody
+
+- ANBU report: **30 cues**
+- report dialogue: **19**
+- Minato/Hokage: **22 cues**
+- Minato/Hokage dialogue: **15**
+
+### Direct Strike -> lose AMT+PS 2v1
+
+- ANBU report: **30 cues**
+- report dialogue: **22**
+- Minato/Hokage: **23 cues**
+- Minato/Hokage dialogue: **16**
+
+### Future KILL -> ESCAPED projection shape
+
+Using the approved future lethal-intent state shape:
+
+- ANBU report: **26 cues**
+- Minato/Hokage: **26 cues**
+
+### Future RESTRAINED mixed-outcome projection shape
+
+Using the approved future simple restraint state:
+
+- ANBU report: **34 cues**
+- Minato/Hokage: **26 cues**
+
+These counts prove only that the previous terminal under-writing has been removed.
+
+They do **not** establish that more boxes are automatically better.
+
+Browser acceptance must still ask:
+- does the conversation breathe naturally?
+- is any route now repetitive?
+- does click cadence make a 20–30 cue ending feel cinematic rather than slow?
+- do high-consequence endings earn more space than clean low-conflict routes?
+- can any line be removed without losing character, consequence or continuity?
+
+Writing therefore remains **AMBER**.
