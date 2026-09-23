@@ -42,9 +42,6 @@
         "registerStorySceneBoardDefinition",
         "unregisterStorySceneBoardDefinition",
         "applyStoryStageAnchor33900",
-        "playStoryChoreography33900",
-        "cancelStoryChoreography33900",
-        "getStoryChoreographyState33900",
         "drainPendingStorySceneBoardRegistrations33900"
       ],
       "permittedAdapters": [],
@@ -57,6 +54,40 @@
         "tools/qa_runtime_ownership_safety_300.js",
         "tools/qa_issue_312_story_battle_benchmark.js",
         "tools/qa_issue_312_browser.js"
+      ]
+    },
+    {
+      "responsibilityId": "story.choreography.presentation.shared",
+      "canonicalOwner": "runtime/alpha-story-scene-board-33900.js",
+      "ownerType": "shared_presentation_choreography",
+      "directCallers": [
+        "runtime/alpha-kakashi-v2-renderer-36030.js"
+      ],
+      "stateReads": [
+        "canonical Story actor/object DOM projected by story.scene.presentation.shared",
+        "semantic stage anchors already supplied to presentation",
+        "prefers-reduced-motion"
+      ],
+      "stateWrites": [
+        "presentation-only data-sc-choreography-* DOM state",
+        "presentation-only choreography-scoped CSS classes/custom properties"
+      ],
+      "productionLoadPath": [
+        "runtime/alpha-traversal-bridge-33200.js",
+        "runtime/alpha-story-scene-board-33900.js"
+      ],
+      "extensionHooks": [
+        "playStoryChoreography33900",
+        "cancelStoryChoreography33900",
+        "getStoryChoreographyState33900"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [],
+      "saveSchemaRefs": [],
+      "qaRefs": [
+        "tools/qa_issue_312_story_battle_benchmark.js",
+        "tools/qa_issue_312_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
       ]
     },
     {
