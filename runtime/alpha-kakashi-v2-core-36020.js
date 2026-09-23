@@ -1091,8 +1091,8 @@ addBeat("v2_mi_stop_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE �
 },choices:[
  C("mi_pursue_ps","GO AFTER PACKAGE SMUGGLER","v2_ps_pursuit_resolver",{available:()=>battleActions("mi_stop")<=STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS,patch:()=>history("PURSUE_PS_AFTER_MI")}),
  C("mi_kill","KILL HER","v2_mi_kill_result",{patch:()=>{const r=resolveDisposition("KILL","MI","mi_kill");if(!r.success)return r;history("KILL_MI",{outcome:r.outcome});return r;}}),
- C("mi_anbu","TAKE HER BACK TO ANBU","v2_report",{patch:()=>{dispose("MI","ANBU");history("MI_TO_ANBU");}}),
- C("mi_police","TAKE HER TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>{dispose("MI","POLICE");history("MI_TO_POLICE");}}),
+ C("mi_anbu","BRING HER TO ANBU","v2_mi_anbu_depart",{patch:()=>transferIntent("MI","ANBU","mi_anbu")}),
+ C("mi_police","TAKE HER TO THE UCHIHA POLICE","v2_mi_police_depart",{patch:()=>transferIntent("MI","POLICE","mi_police")}),
  C("mi_restrain","RESTRAIN HER AND CONTINUE","v2_mi_restrained_next",{available:()=>battleActions("mi_stop")<=STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS,patch:()=>{const r=resolveDisposition("RESTRAIN","MI","mi_restrain");if(!r.success)return r;projectExtractionPlanning("MI",r,"mi_restrain");history("RESTRAIN_MI_CONTINUE",{outcome:r.outcome});return r;}})
 ]});
 addBeat("v2_mi_restrained_next",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Retrieve the package.",actors:["kakashi","mi"],preset:"post_battle",cues:()=>singleDispositionCues("MI","RESTRAIN"),onAdvance:()=>history("PURSUE_PS_AFTER_RESTRAIN_MI",{miOutcome:dispositionOutcome("MI")}),nextBeatId:"v2_ps_pursuit_resolver"});
@@ -1110,18 +1110,18 @@ addBeat("v2_ps_seq_win",{mode:"choice",backdrop:B.alleyAlt,location:"KONOHA · N
  C("ps_go_amt","GO AFTER ANBU MARKED TARGET","v2_amt_after_ps",{available:()=>battleActions("ps_seq")<=3,patch:()=>history("PS_FAST_CONTINUE_AMT")}),
  C("ps_kill","KILL HIM","v2_ps_kill_result",{patch:()=>{const r=resolveDisposition("KILL","PS","ps_kill");if(!r.success)return r;history("KILL_PS",{outcome:r.outcome});return r;}}),
  C("ps_restrain_continue","RESTRAIN HIM AND CONTINUE","v2_ps_restrain_continue_result",{available:()=>battleActions("ps_seq")<=3,patch:()=>{const r=resolveDisposition("RESTRAIN","PS","ps_restrain_continue");if(!r.success)return r;projectExtractionPlanning("PS",r,"ps_restrain_continue");history("RESTRAIN_PS_CONTINUE",{outcome:r.outcome});return r;}}),
- C("ps_anbu","TAKE HIM BACK TO ANBU","v2_report",{patch:()=>{dispose("PS","ANBU");history("PS_TO_ANBU");}}),
- C("ps_police","TAKE HIM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>{dispose("PS","POLICE");history("PS_TO_POLICE");}}),
+ C("ps_anbu","BRING HIM TO ANBU","v2_ps_anbu_depart",{patch:()=>transferIntent("PS","ANBU","ps_anbu")}),
+ C("ps_police","TAKE HIM TO THE UCHIHA POLICE","v2_ps_police_depart",{patch:()=>transferIntent("PS","POLICE","ps_police")}),
  C("ps_report","RETURN TO ANBU","v2_report",{patch:()=>history("RETURN_AFTER_PS")})
 ]});
 addBeat("v2_amt_after_ps",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Secure ANBU Marked Target.",actors:["kakashi","amt","pakkun"],preset:"intercept",onEnter:()=>{participant("AMT",{state:"AVAILABLE"});setPakkun(true);return history("PAKKUN_INTERCEPT_AFTER_PS");},cues:[N("Kakashi leaves Package Smuggler behind with the recovered package secured against him."),N("The other trail is thin, but not gone."),N("He cuts across the roofs, drops through a side street, and catches movement ahead."),N("ANBU Marked Target is still running."),N("The man reaches the next street and stops short. A small ninken is already standing in the route ahead."),Q("PAKKUN","This the one?"),N("Kakashi lands on the far side of the street."),Q("KAKASHI","Yes."),N("ANBU Marked Target notices the recovered package."),Q("ANBU MARKED TARGET","You got it back."),Q("KAKASHI","I did."),Q("KAKASHI","You're still coming back with me."),Q("ANBU MARKED TARGET","You think carrying that means you understand what happened?"),Q("KAKASHI","No."),N("Pakkun shifts off the centreline without being asked."),Q("ANBU MARKED TARGET","Then what exactly are you planning to do with me?"),Q("KAKASHI","Stop you first. Decide after.")],nextBeatId:"v2_battle_amt_seq_pakkun"});
 addBeat("v2_battle_amt_seq_pakkun",{mode:"battle_transition",backdrop:B.intercept,location:"KONOHA ALLEYWAY · PL BATTLE",objective:"Secure ANBU Marked Target.",actors:["kakashi","amt","pakkun"],preset:"battle_trio",cues:[N("Kakashi Hatake and the ninken face ANBU Marked Target.")],battle:battle("academy_kakashi_origin_battle_seq_amt_pakkun","amt_seq","v2_amt_seq_win","v2_amt_seq_loss","AK_SA_022")});
 addBeat("v2_amt_seq_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("amt_seq",ctx,s=>{s.participants.AMT.state="ESCAPED";}),cues:[N("ANBU Marked Target finds the opening first and wins the fight."),N("The package stays secured against Kakashi, so the man looks at it once and chooses the open route instead."),N("By the time Kakashi can move again, he is gone."),Q("PAKKUN","You kept the package."),Q("KAKASHI","I lost him."),N("Pakkun looks down the empty street."),Q("PAKKUN","Then report him lost.")],nextBeatId:"v2_report"});
 addBeat("v2_amt_seq_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:null,actors:["kakashi","amt","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("amt_seq",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";}),cues:[N("ANBU Marked Target hits the ground and stays there."),N("Kakashi remains close enough to stop another escape attempt."),N("Pakkun watches the alley mouth."),N("The package is secure. The man is beaten."),N("What happens to him now is a separate decision.")],choices:[
- C("amt_seq_police","BRING HIM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>{dispose("AMT","POLICE");history("AMT_TO_POLICE");}}),
- C("amt_seq_release","LET HIM GO","v2_report",{patch:()=>{dispose("AMT","RELEASE");history("RELEASE_AMT");}}),
+ C("amt_seq_police","TAKE HIM TO THE UCHIHA POLICE","v2_amt_police_depart",{patch:()=>transferIntent("AMT","POLICE","amt_seq_police")}),
+ C("amt_seq_release","LET HIM GO","v2_amt_release_result",{patch:()=>{const r=dispose("AMT","RELEASE");if(!r.success)return r;return history("RELEASE_AMT");}}),
  C("amt_seq_kill","KILL HIM","v2_amt_kill_result",{patch:()=>{const r=resolveDisposition("KILL","AMT","amt_seq_kill");if(!r.success)return r;history("KILL_AMT",{outcome:r.outcome});return r;}}),
- C("amt_seq_anbu","TAKE HIM BACK TO THE ANBU","v2_report",{patch:()=>{dispose("AMT","ANBU");history("AMT_TO_ANBU");}}),
+ C("amt_seq_anbu","BRING HIM TO ANBU","v2_amt_anbu_depart",{patch:()=>transferIntent("AMT","ANBU","amt_seq_anbu")}),
  C("amt_seq_collect","RESTRAIN HIM AND COLLECT THE OTHERS","v2_amt_restrain_collect_result",{available:()=>restrainedParticipantKeys().length>0,patch:()=>{const r=resolveDisposition("RESTRAIN","AMT","amt_seq_collect");if(!r.success)return r;projectExtractionPlanning("AMT",r,"amt_seq_collect");history("COLLECT_ALL_RESTRAINED",{outcome:r.outcome});return r;}})
 ]});
 function groupCollectActorKeys(){
@@ -1194,8 +1194,8 @@ addBeat("v2_amt_missing_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY ·
 addBeat("v2_amt_missing_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:null,actors:["kakashi","amt","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("amt_direct",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";}),cues:W("originalTarget","6_kakashi_pakkun_defeat_amt"),choices:[
  C("amt_missing_kill","KILL HIM","v2_amt_kill_result",{patch:()=>resolveDisposition("KILL","AMT","amt_missing_kill")}),
  C("amt_missing_restrain","RESTRAIN HIM","v2_amt_restrain_report_result",{patch:()=>{const r=resolveDisposition("RESTRAIN","AMT","amt_missing_restrain");if(!r.success)return r;projectExtractionPlanning("AMT",r,"amt_missing_restrain");return r;}}),
- C("amt_missing_anbu","BRING HIM TO THE ANBU","v2_report",{patch:()=>dispose("AMT","ANBU")}),
- C("amt_missing_police","TAKE HIM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>dispose("AMT","POLICE")})
+ C("amt_missing_anbu","BRING HIM TO ANBU","v2_amt_anbu_depart",{patch:()=>transferIntent("AMT","ANBU","amt_missing_anbu")}),
+ C("amt_missing_police","TAKE HIM TO THE UCHIHA POLICE","v2_amt_police_depart",{patch:()=>transferIntent("AMT","POLICE","amt_missing_police")})
 ]});
 
 // ---------------------------------------------------------------------------
@@ -1228,10 +1228,10 @@ addBeat("v2_secure_amt_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA
  N("ANBU Marked Target goes down."),N("Kakashi stays on him until the fight is unquestionably over."),N("Pakkun stays where he can see both of them."),
  N("The package remains secure."),N("The man does not."),N("Not yet.")
 ],choices:[
- C("secure_amt_police","BRING HIM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>dispose("AMT","POLICE")}),
- C("secure_amt_release","LET HIM GO","v2_report",{patch:()=>dispose("AMT","RELEASE")}),
+ C("secure_amt_police","TAKE HIM TO THE UCHIHA POLICE","v2_amt_police_depart",{patch:()=>transferIntent("AMT","POLICE","secure_amt_police")}),
+ C("secure_amt_release","LET HIM GO","v2_amt_release_result",{patch:()=>{const r=dispose("AMT","RELEASE");if(!r.success)return r;return history("RELEASE_AMT");}}),
  C("secure_amt_kill","KILL HIM","v2_amt_kill_result",{patch:()=>resolveDisposition("KILL","AMT","secure_amt_kill")}),
- C("secure_amt_anbu","TAKE HIM BACK TO THE ANBU","v2_report",{patch:()=>dispose("AMT","ANBU")})
+ C("secure_amt_anbu","BRING HIM TO ANBU","v2_amt_anbu_depart",{patch:()=>transferIntent("AMT","ANBU","secure_amt_anbu")})
 ]});
 
 // Secure before assassin resolver.
@@ -1289,10 +1289,10 @@ addBeat("v2_amt_package_second_win",{mode:"choice",backdrop:B.intercept,location
  N("ANBU Marked Target goes down."),N("Kakashi stays on him until the fight is unquestionably over."),N("Pakkun stays where he can see both of them."),
  N("The package remains secure."),N("The man does not."),N("Not yet.")
 ],choices:[
- C("package_second_amt_police","BRING HIM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>dispose("AMT","POLICE")}),
- C("package_second_amt_release","LET HIM GO","v2_report",{patch:()=>dispose("AMT","RELEASE")}),
+ C("package_second_amt_police","TAKE HIM TO THE UCHIHA POLICE","v2_amt_police_depart",{patch:()=>transferIntent("AMT","POLICE","package_second_amt_police")}),
+ C("package_second_amt_release","LET HIM GO","v2_amt_release_result",{patch:()=>{const r=dispose("AMT","RELEASE");if(!r.success)return r;return history("RELEASE_AMT");}}),
  C("package_second_amt_kill","KILL HIM","v2_amt_kill_result",{patch:()=>resolveDisposition("KILL","AMT","package_second_amt_kill")}),
- C("package_second_amt_anbu","TAKE HIM BACK TO THE ANBU","v2_report",{patch:()=>dispose("AMT","ANBU")})
+ C("package_second_amt_anbu","BRING HIM TO ANBU","v2_amt_anbu_depart",{patch:()=>transferIntent("AMT","ANBU","package_second_amt_anbu")})
 ]});
 
 // ---------------------------------------------------------------------------
@@ -1346,19 +1346,19 @@ addBeat("v2_ask_where",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLE
 addBeat("v2_battle_demand_amt",{mode:"battle_transition",backdrop:B.intercept,location:"KONOHA ALLEYWAY · PL BATTLE",objective:"Recover the package.",actors:["kakashi","amt","pakkun"],preset:"battle_trio",cues:[N("Kakashi Hatake and the ninken face ANBU Marked Target.")],battle:battle("academy_kakashi_origin_battle_kakashi_pakkun_vs_amt","demand_amt","v2_demand_win","v2_demand_loss","AK_SA_008")});
 addBeat("v2_demand_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("demand_amt",ctx,s=>{s.participants.AMT.state="ESCAPED";s.package.holder="AMT";}),cues:[N("The alley comes back into focus with Kakashi on one knee and ANBU Marked Target still standing."),N("The man is breathing hard, but the package is still secured against him."),N("Pakkun recovers a few paces away."),Q("ANBU MARKED TARGET","You asked."),N("He adjusts the package beneath his clothing."),Q("ANBU MARKED TARGET","I answered."),N("He starts backing toward the far end of the alley."),N("Pakkun rises, but stays with Kakashi rather than chasing on his own."),N("ANBU Marked Target reaches the corner and looks back once."),N("Then he is gone with the package."),Q("PAKKUN","He's gone."),Q("KAKASHI","I know."),N("Kakashi listens down the empty street anyway."),Q("PAKKUN","You've lost the trail."),Q("PAKKUN","Then report it."),N("Kakashi waits one more second, then turns back toward the ANBU meeting point. Pakkun follows.")],nextBeatId:"v2_report"});
 addBeat("v2_demand_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:null,actors:["kakashi","amt","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("demand_amt",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;}),cues:[N("ANBU Marked Target ends the fight on one knee."),N("The package came loose during the exchange and lies several feet away."),N("Both men see it."),N("ANBU Marked Target moves first. Pakkun steps into his path."),N("Kakashi reaches the package, checks the seal, and secures it."),Q("ANBU MARKED TARGET","So that's it."),Q("KAKASHI","That part is."),N("The man's eyes move toward the open end of the alley."),N("Pakkun shifts half a step and closes the exit again. ANBU Marked Target checks the other side, finds Kakashi there, and stops looking for a clean way out."),N("Kakashi approaches."),Q("ANBU MARKED TARGET","You got what you wanted."),Q("KAKASHI","The package."),N("Kakashi does not leave."),N("Recognition reaches the man's face."),Q("ANBU MARKED TARGET","Ah."),N("The package is secure and the target is beaten."),N("What happens to him now is Kakashi's choice.")],choices:[
- C("demand_police","BRING HIM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>dispose("AMT","POLICE")}),
- C("demand_release","LET HIM GO","v2_report",{patch:()=>dispose("AMT","RELEASE")}),
+ C("demand_police","TAKE HIM TO THE UCHIHA POLICE","v2_amt_police_depart",{patch:()=>transferIntent("AMT","POLICE","demand_police")}),
+ C("demand_release","LET HIM GO","v2_amt_release_result",{patch:()=>{const r=dispose("AMT","RELEASE");if(!r.success)return r;return history("RELEASE_AMT");}}),
  C("demand_kill","KILL HIM","v2_amt_kill_result",{patch:()=>resolveDisposition("KILL","AMT","demand_kill")}),
- C("demand_anbu","TAKE HIM BACK TO THE ANBU","v2_report",{patch:()=>dispose("AMT","ANBU")})
+ C("demand_anbu","BRING HIM TO ANBU","v2_amt_anbu_depart",{patch:()=>transferIntent("AMT","ANBU","demand_anbu")})
 ]});
 addBeat("v2_take_down_setup",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Recover the package.",actors:["kakashi","amt","pakkun"],preset:"intercept",onEnter:()=>packageState("NEUTRAL",{neutral:true}),cues:[N("ANBU Marked Target keeps one hand over the package."),N("Kakashi stops watching the package and starts watching the man's balance instead."),N("The target notices too late."),N("Kakashi attacks his footing without warning."),N("ANBU Marked Target twists away and reaches instinctively for the package."),N("Pakkun reacts on his own, lunging across that hand."),N("The target jerks aside to save his leg and the package tears loose, skidding across the wet stone."),N("All three turn toward it."),Q("ANBU MARKED TARGET","You've got to be kidding me."),N("Kakashi cuts him off from one side while Pakkun blocks the nearest route to the package."),N("For the first time all night, nobody has it."),N("ANBU Marked Target stops looking for an exit. Now he has to fight his way back to the package.")],nextBeatId:"v2_battle_take_down_amt"});
 addBeat("v2_battle_take_down_amt",{mode:"battle_transition",backdrop:B.intercept,location:"KONOHA ALLEYWAY · PL BATTLE",objective:"Control the target and the neutral package.",actors:["kakashi","amt","pakkun"],preset:"battle_trio",cues:[N("Kakashi Hatake and the ninken face ANBU Marked Target.")],battle:battle("academy_kakashi_origin_battle_kakashi_pakkun_vs_amt","take_down_amt","v2_take_down_win","v2_take_down_loss","AK_SA_008")});
 addBeat("v2_take_down_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("take_down_amt",ctx,s=>{s.participants.AMT.state="ESCAPED";s.package.holder="KAKASHI";s.package.recovered=true;s.package.neutral=false;}),cues:[N("ANBU Marked Target wins the fight and moves for the loose package before Kakashi can recover his footing."),N("Pakkun gets there first."),N("The ninken snaps across the man's route, forcing him to choose between the objective and the open end of the alley."),N("He chooses the exit."),N("By the time Kakashi reaches the package, ANBU Marked Target is already on the wall and climbing."),N("Kakashi checks the seal, secures the package and looks up at an empty roofline."),N("Pakkun comes back to his side."),Q("PAKKUN","You kept it."),Q("KAKASHI","Not him."),N("Pakkun looks toward the route the man used."),Q("PAKKUN","No."),N("Kakashi holds the recovered package a little tighter and turns back toward ANBU.")],nextBeatId:"v2_report"});
 addBeat("v2_take_down_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:null,actors:["kakashi","amt","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("take_down_amt",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;s.package.neutral=false;}),cues:[N("ANBU Marked Target goes down."),N("Pakkun remains between him and the loose package while Kakashi retrieves it."),N("The seal is intact."),N("Kakashi secures the package and turns back to the defeated man."),N("The objective is recovered. What happens to the target is still a choice.")],choices:[
- C("take_police","BRING HIM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>dispose("AMT","POLICE")}),
- C("take_release","LET HIM GO","v2_report",{patch:()=>dispose("AMT","RELEASE")}),
+ C("take_police","TAKE HIM TO THE UCHIHA POLICE","v2_amt_police_depart",{patch:()=>transferIntent("AMT","POLICE","take_police")}),
+ C("take_release","LET HIM GO","v2_amt_release_result",{patch:()=>{const r=dispose("AMT","RELEASE");if(!r.success)return r;return history("RELEASE_AMT");}}),
  C("take_kill","KILL HIM","v2_amt_kill_result",{patch:()=>resolveDisposition("KILL","AMT","take_kill")}),
- C("take_anbu","TAKE HIM BACK TO THE ANBU","v2_report",{patch:()=>dispose("AMT","ANBU")})
+ C("take_anbu","BRING HIM TO ANBU","v2_amt_anbu_depart",{patch:()=>transferIntent("AMT","ANBU","take_anbu")})
 ]});
 
 addBeat("v2_stop_ps_setup",{backdrop:B.alleyAlt,location:"KONOHA ALLEYWAY · NIGHT",objective:"Stop Package Smuggler.",actors:["kakashi","ps"],preset:"battle_pair",onEnter:()=>mutate(s=>{s.participants.AMT.state="ESCAPED";s.package.holder="AMT";}),cues:[N("ANBU Marked Target is already leaving with the package."),N("Package Smuggler is moving toward the alley instead."),N("Kakashi gives the disappearing package one look, then steps out to meet the man in front of him."),Q("PACKAGE SMUGGLER","Wrong one."),Q("KAKASHI","You were waiting for it."),N("Package Smuggler glances toward the street the carrier used."),Q("PACKAGE SMUGGLER","Was."),Q("KAKASHI","Then you know where it was going."),N("A faint smile reaches the man's face."),Q("PACKAGE SMUGGLER","And you chose me instead of following it."),Q("KAKASHI","I chose to stop you."),N("The smile disappears. Package Smuggler reaches for his weapon."),Q("PACKAGE SMUGGLER","Then stop me.")],nextBeatId:"v2_battle_ps_direct"});
@@ -1367,17 +1367,17 @@ addBeat("v2_ps_missing_loss",{backdrop:B.fight,location:"KONOHA · NIGHT",object
 addBeat("v2_ps_missing_win",{mode:"choice",backdrop:B.fight,location:"KONOHA · NIGHT",objective:null,actors:["kakashi","ps"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_direct",ctx,s=>{s.participants.PS.state="BATTLE_DEFEATED";}),cues:[N("Package Smuggler goes down."),N("The package is still gone with ANBU Marked Target."),N("The man Kakashi chose to stop is beaten and still within reach."),N("What happens to him now will not recover the package.")],choices:[
  C("ps_missing_kill","KILL HIM","v2_ps_kill_result",{patch:()=>resolveDisposition("KILL","PS","ps_missing_kill")}),
  C("ps_missing_restrain","RESTRAIN HIM","v2_ps_restrain_report_result",{patch:()=>{const r=resolveDisposition("RESTRAIN","PS","ps_missing_restrain");if(!r.success)return r;projectExtractionPlanning("PS",r,"ps_missing_restrain");return r;}}),
- C("ps_missing_anbu","BRING HIM TO THE ANBU","v2_report",{patch:()=>dispose("PS","ANBU")}),
- C("ps_missing_police","TAKE HIM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>dispose("PS","POLICE")})
+ C("ps_missing_anbu","BRING HIM TO ANBU","v2_ps_anbu_depart",{patch:()=>transferIntent("PS","ANBU","ps_missing_anbu")}),
+ C("ps_missing_police","TAKE HIM TO THE UCHIHA POLICE","v2_ps_police_depart",{patch:()=>transferIntent("PS","POLICE","ps_missing_police")})
 ]});
 addBeat("v2_cutoff_setup",{backdrop:B.sakura,location:"SAKURA TREE · NIGHT",objective:"Stop the package.",actors:["kakashi","amt","ps","pakkun"],preset:"sakura_group",onEnter:()=>{const p=setPakkun(true);if(!p.success)return p;const e=commitRouteInterceptEvidence();return e&&e.success===false?e:{success:true};},cues:[N("Kakashi does not follow either man. He cuts across both routes toward the Sakura tree."),N("ANBU Marked Target sees what he is doing first."),Q("PACKAGE SMUGGLER","Don't let him get in front of you!"),N("Too late."),N("Kakashi reaches the remaining exit line."),N("ANBU Marked Target turns and finds a small ninken already standing in the street ahead."),Q("ANBU MARKED TARGET","You cut off both routes."),N("Pakkun looks past him toward Kakashi."),Q("PAKKUN","This the one?"),Q("KAKASHI","Yes."),N("Package Smuggler reaches the choke point behind them."),N("No one has a clean way out.")],nextBeatId:"v2_battle_cutoff"});
 addBeat("v2_battle_cutoff",{mode:"battle_transition",backdrop:B.fight,location:"SAKURA TREE · PL BATTLE",objective:"Stop the package.",actors:["kakashi","amt","ps"],preset:"battle_trio",cues:[N("Kakashi Hatake vs ANBU Marked Target + Package Smuggler.")],battle:battle("academy_kakashi_origin_battle_amt_ps_2v1","cutoff","v2_cutoff_win","v2_cutoff_loss","AK_SA_017")});
 addBeat("v2_cutoff_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("cutoff",ctx,s=>{s.participants.AMT.state="ESCAPED";s.participants.PS.state="ESCAPED";s.package.holder="AMT";}),cues:[N("The choke point lasts until it doesn't."),N("ANBU Marked Target breaks through first with the package still secured against him."),N("Package Smuggler tears free in the opposite direction a heartbeat later."),N("Kakashi turns toward the package route."),N("Too late. The first man already has the roofline."),N("Pakkun starts after the other escape, checks himself and comes back instead of splitting the pursuit on his own."),N("Two routes empty at once."),Q("PAKKUN","Which one?"),N("Kakashi listens, searches the roofs and finds that the decision has already been made for him by distance."),Q("KAKASHI","Neither."),N("Pakkun says nothing else. They turn back toward ANBU with the package gone.")],nextBeatId:"v2_report"});
 addBeat("v2_cutoff_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:null,actors:["kakashi","amt","ps"],preset:"post_battle",onEnter:ctx=>captureBattle("cutoff",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";s.participants.PS.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;s.groupParticipants=["AMT","PS"];}),cues:W("getCloserDownstream","9_failure_cut_them_off_at_the_sakura_tree"),choices:[
- C("cutoff_police","TAKE THEM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>disposeGroup("POLICE",[AMT,PS])}),
- C("cutoff_anbu","TAKE THEM TO THE ANBU","v2_report",{patch:()=>disposeGroup("ANBU",[AMT,PS])}),
+ C("cutoff_police","TAKE THEM TO THE UCHIHA POLICE","v2_group2_police_depart",{patch:()=>transferIntent([AMT,PS],"POLICE","cutoff_police")}),
+ C("cutoff_anbu","BRING THEM TO ANBU","v2_group2_anbu_depart",{patch:()=>transferIntent([AMT,PS],"ANBU","cutoff_anbu")}),
  C("cutoff_kill","KILL THEM","v2_group2_kill_result",{patch:()=>resolveGroupKill([AMT,PS],"cutoff_kill")}),
- C("cutoff_release","TAKE THE PACKAGE AND LET THEM GO","v2_report",{patch:()=>disposeGroup("RELEASE",[AMT,PS])})
+ C("cutoff_release","LET THEM GO","v2_group2_release",{patch:()=>{const r=disposeGroup("RELEASE",[AMT,PS]);if(!r.success)return r;return history("RELEASE_GROUP",{participantKeys:["AMT","PS"]});}})
 ]});
 
 // Improved-position Pickpocket.
@@ -1389,10 +1389,10 @@ addBeat("v2_improved_pick_fail_setup",{backdrop:B.sakura,location:"SAKURA TREE �
 addBeat("v2_battle_improved_2v1",{mode:"battle_transition",backdrop:B.fight,location:"SAKURA TREE · PL BATTLE",objective:"Recover the package.",actors:["kakashi","amt","ps"],preset:"battle_trio",cues:[N("Kakashi Hatake vs ANBU Marked Target + Package Smuggler.")],battle:battle("academy_kakashi_origin_battle_amt_ps_2v1","improved_2v1","v2_improved_2v1_win","v2_improved_2v1_loss","AK_SA_030")});
 addBeat("v2_improved_2v1_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("improved_2v1",ctx,s=>{s.participants.AMT.state="ESCAPED";s.participants.PS.state="ESCAPED";s.package.holder="AMT";}),cues:[N("The closer position gets Kakashi into the fight. It does not get him out of it."),N("ANBU Marked Target and Package Smuggler force the opening together."),N("The original carrier keeps the package as they break away."),N("Kakashi reaches the Sakura-tree edge in time to see them separate into the next stretch of Konoha."),N("He follows far enough to confirm the truth, not far enough to pretend he still has them."),N("The handoff never happened. Masked Interceptor never appeared. The package is still gone."),N("Kakashi turns back through the quiet left behind by the failed interception and heads for ANBU.")],nextBeatId:"v2_report"});
 addBeat("v2_improved_2v1_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:null,actors:["kakashi","amt","ps"],preset:"post_battle",onEnter:ctx=>captureBattle("improved_2v1",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";s.participants.PS.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;}),cues:[N("Both men go down."),N("Kakashi goes to ANBU Marked Target first and recovers the package."),N("He secures it, then turns back to the two defeated men."),N("No masked shinobi appears."),N("The package is safe. The two men are still Kakashi's decision.")],choices:[
- C("improved_police","TAKE THEM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>disposeGroup("POLICE",[AMT,PS])}),
- C("improved_anbu","TAKE THEM TO THE ANBU","v2_report",{patch:()=>disposeGroup("ANBU",[AMT,PS])}),
+ C("improved_police","TAKE THEM TO THE UCHIHA POLICE","v2_group2_police_depart",{patch:()=>transferIntent([AMT,PS],"POLICE","improved_police")}),
+ C("improved_anbu","BRING THEM TO ANBU","v2_group2_anbu_depart",{patch:()=>transferIntent([AMT,PS],"ANBU","improved_anbu")}),
  C("improved_kill","KILL THEM","v2_group2_kill_result",{patch:()=>resolveGroupKill([AMT,PS],"improved_kill")}),
- C("improved_release","TAKE THE PACKAGE AND LET THEM GO","v2_report",{patch:()=>disposeGroup("RELEASE",[AMT,PS])})
+ C("improved_release","LET THEM GO","v2_group2_release",{patch:()=>{const r=disposeGroup("RELEASE",[AMT,PS]);if(!r.success)return r;return history("RELEASE_GROUP",{participantKeys:["AMT","PS"]});}})
 ]});
 
 // ---------------------------------------------------------------------------
@@ -1405,10 +1405,10 @@ addBeat("v2_direct_strike_2v1_win",{backdrop:B.fight,location:"SAKURA TREE · NI
 addBeat("v2_battle_direct_mi",{mode:"battle_transition",backdrop:B.fight,location:"SAKURA TREE · PL BATTLE",objective:"Keep the package.",actors:["kakashi","mi"],preset:"battle_pair",cues:[N("Kakashi Hatake vs Masked Interceptor.")],battle:battle("academy_kakashi_origin_battle_mi_1v1","direct_mi","v2_direct_mi_win","v2_direct_mi_loss","AK_SA_003")});
 addBeat("v2_direct_mi_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("direct_mi",ctx,s=>{s.participants.MI.state="ESCAPED";s.package.holder="MI";s.package.recovered=false;}),cues:W("directStrike","7_mi_defeats_kakashi"),nextBeatId:"v2_report"});
 addBeat("v2_direct_mi_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:null,actors:["kakashi","amt","ps","mi"],preset:"sakura_group",onEnter:ctx=>captureBattle("direct_mi",ctx,s=>{s.participants.MI.state="BATTLE_DEFEATED";}),cues:W("directStrike","8_kakashi_defeats_mi"),choices:[
- C("direct_group_police","TAKE THEM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>disposeGroup("POLICE")}),
- C("direct_group_anbu","TAKE THEM TO THE ANBU","v2_report",{patch:()=>disposeGroup("ANBU")}),
+ C("direct_group_police","TAKE THEM TO THE UCHIHA POLICE","v2_group3_police_depart",{patch:()=>transferIntent([AMT,PS,MI],"POLICE","direct_group_police")}),
+ C("direct_group_anbu","BRING THEM TO ANBU","v2_group3_anbu_depart",{patch:()=>transferIntent([AMT,PS,MI],"ANBU","direct_group_anbu")}),
  C("direct_group_kill","KILL THEM","v2_group3_kill_result",{patch:()=>resolveGroupKill([AMT,PS,MI],"direct_group_kill")}),
- C("direct_group_release","TAKE THE PACKAGE AND LET THEM GO","v2_report",{patch:()=>disposeGroup("RELEASE")})
+ C("direct_group_release","LET THEM GO","v2_group3_release",{patch:()=>{const r=disposeGroup("RELEASE",[AMT,PS,MI]);if(!r.success)return r;return history("RELEASE_GROUP",{participantKeys:["AMT","PS","MI"]});}})
 ]});
 
 // ---------------------------------------------------------------------------
@@ -1423,10 +1423,10 @@ addBeat("v2_pickpocket_failure_setup",{backdrop:B.sakura,location:"SAKURA TREE �
 addBeat("v2_battle_pickpocket_3v1",{mode:"battle_transition",backdrop:B.fight,location:"SAKURA TREE · PL BATTLE",objective:"Recover the package.",actors:["kakashi","amt","ps","mi"],preset:"sakura_group",cues:[N("Kakashi Hatake vs ANBU Marked Target + Package Smuggler + Masked Interceptor.")],battle:battle("academy_kakashi_origin_battle_amt_ps_mi_3v1","pickpocket_3v1","v2_pickpocket_3v1_win","v2_pickpocket_3v1_loss","AK_SA_028")});
 addBeat("v2_pickpocket_3v1_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("pickpocket_3v1",ctx,s=>{s.participants.AMT.state="ESCAPED";s.participants.PS.state="ESCAPED";s.participants.MI.state="ESCAPED";s.package.holder="AMT";}),cues:W("directPickpocket","6_kakashi_loses_the_3_v_1"),nextBeatId:"v2_report"});
 addBeat("v2_pickpocket_3v1_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:null,actors:["kakashi","amt","ps","mi"],preset:"sakura_group",onEnter:ctx=>captureBattle("pickpocket_3v1",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";s.participants.PS.state="BATTLE_DEFEATED";s.participants.MI.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;}),cues:W("directPickpocket","7_kakashi_wins_the_3_v_1"),choices:[
- C("pick_group_police","TAKE THEM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>disposeGroup("POLICE")}),
- C("pick_group_anbu","TAKE THEM TO THE ANBU","v2_report",{patch:()=>disposeGroup("ANBU")}),
+ C("pick_group_police","TAKE THEM TO THE UCHIHA POLICE","v2_group3_police_depart",{patch:()=>transferIntent([AMT,PS,MI],"POLICE","pick_group_police")}),
+ C("pick_group_anbu","BRING THEM TO ANBU","v2_group3_anbu_depart",{patch:()=>transferIntent([AMT,PS,MI],"ANBU","pick_group_anbu")}),
  C("pick_group_kill","KILL THEM","v2_group3_kill_result",{patch:()=>resolveGroupKill([AMT,PS,MI],"pick_group_kill")}),
- C("pick_group_release","TAKE THE PACKAGE AND LET THEM GO","v2_report",{patch:()=>disposeGroup("RELEASE")})
+ C("pick_group_release","LET THEM GO","v2_group3_release",{patch:()=>{const r=disposeGroup("RELEASE",[AMT,PS,MI]);if(!r.success)return r;return history("RELEASE_GROUP",{participantKeys:["AMT","PS","MI"]});}})
 ]});
 
 // ---------------------------------------------------------------------------
