@@ -1634,6 +1634,11 @@ function migrateLegacyObitoState(){
     };
     if(["obi_reflect","obi_reflection_result","obi_end"].includes(rt.beatId))return restartAmbiguousLegacyProgress("superseded_pre_final_reflection");
     if(map[rt.beatId]){rt.beatId=map[rt.beatId];migrated++;}
+    let contiguous=0;
+    for(const spec of diversions){if(A.findOccurrence(spec.occurrenceId))contiguous++;else break;}
+    const resume=["obi_furniture_intro","obi_vegetables_intro","obi_equipment_intro","obi_delivery_intro","obi_cart_intro","obi_arrival"][contiguous];
+    const legacyOrEntry=new Set(["obi_depart","obi_furniture_choice","obi_vegetables_choice","obi_equipment_choice","obi_delivery_choice","obi_cart_choice"]);
+    if(contiguous>0&&resume&&legacyOrEntry.has(rt.beatId)){rt.beatId=resume;migrated++;}
   }
   if(migrated)try{if(typeof savePlayerData==="function")savePlayerData();}catch(_error){}
   return{success:true,migrated,restarted:false};
@@ -1652,11 +1657,13 @@ function diversionFact(spec,intent){
   };
 }
 function diversionRequest(spec){
-  return R("obito_final_"+spec.key+"_331",ORIGIN_ID,spec.occurrenceId,ctx=>{
-    const intent=ctx[intentKey(spec)];
-    if(intent!=="HELP"&&intent!=="CONTINUE")throw new Error("obito_final_intent_missing:"+spec.key);
-    return diversionFact(spec,intent);
-  },ctx=>ctx[intentKey(spec)]==="HELP"?["OBI-01"]:[],{participantRefs:[spec.beneficiaryRef]});
+  return{requestId:"obito_final_"+spec.key+"_331",kind:"domain",resolve:()=>{
+    const ctx=local(),intent=ctx[intentKey(spec)];
+    if(intent!=="HELP"&&intent!=="CONTINUE")return{success:false,reason:"obito_final_intent_missing",key:spec.key};
+    const existing=A.findOccurrence(spec.occurrenceId);
+    if(existing&&existing.fact&&existing.fact.selectedIntent&&existing.fact.selectedIntent!==intent)return{success:false,reason:"obito_final_committed_intent_mismatch",key:spec.key,committed:existing.fact.selectedIntent,requested:intent};
+    return A.commitOccurrence(ORIGIN_ID,spec.occurrenceId,diversionFact(spec,intent),intent==="HELP"?["OBI-01"]:[],{participantRefs:[spec.beneficiaryRef]});
+  }};
 }
 function committedJourneyFacts(){
   const rows=[];
