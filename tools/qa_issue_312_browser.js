@@ -721,8 +721,10 @@ async function shot(page,name,selector=null){
       const enemy=stage?.querySelector(".battle-live-active-card-enemy");
       const vs=stage?.querySelector(".battle-code-vs");
       const playerPower=stage?.querySelector(".battle-live-power-player"),enemyPower=stage?.querySelector(".battle-live-power-enemy");
+      const playerName=player?.querySelector(".battle-live-active-nameplate"),enemyName=enemy?.querySelector(".battle-live-active-nameplate");
+      const ticker=stage?.querySelector(".battle2-live-ticker"),status=stage?.querySelector(".battle-live-status");
       const sr=stage?.getBoundingClientRect(),pr=player?.getBoundingClientRect(),er=enemy?.getBoundingClientRect();
-      const ppr=playerPower?.getBoundingClientRect(),epr=enemyPower?.getBoundingClientRect();
+      const ppr=playerPower?.getBoundingClientRect(),epr=enemyPower?.getBoundingClientRect(),tr=ticker?.getBoundingClientRect();
       const visibleSupports=[...stage.querySelectorAll(".battle2-formation-support")].filter(node=>{
         const style=getComputedStyle(node),rect=node.getBoundingClientRect();
         return style.display!=="none"&&style.visibility!=="hidden"&&rect.width>0&&rect.height>0;
@@ -737,6 +739,12 @@ async function shot(page,name,selector=null){
         enemyPowerCenterRatio:sr&&epr?(epr.left+epr.width/2-sr.left)/sr.width:1,
         playerPowerCenterYRatio:sr&&ppr?(ppr.top+ppr.height/2-sr.top)/sr.height:1,
         enemyPowerCenterYRatio:sr&&epr?(epr.top+epr.height/2-sr.top)/sr.height:1,
+        playerNameDisplay:playerName?getComputedStyle(playerName).display:null,
+        enemyNameDisplay:enemyName?getComputedStyle(enemyName).display:null,
+        statusDisplay:status?getComputedStyle(status).display:null,
+        tickerBottomRatio:sr&&tr?(tr.bottom-sr.top)/sr.height:1,
+        playerTopRatio:sr&&pr?(pr.top-sr.top)/sr.height:0,
+        playerTransition:getComputedStyle(player).transitionProperty,
         visibleSupports,
         vsOpacity:vs?Number(getComputedStyle(vs).opacity):0
       };
@@ -745,10 +753,15 @@ async function shot(page,name,selector=null){
     assert(duelComposition.playerWidthRatio>=0.33&&duelComposition.enemyWidthRatio>=0.33,"#312 sparse duel combatants are still undersized: "+JSON.stringify(duelComposition));
     assert(duelComposition.confrontationGapRatio<=0.17,"#312 sparse duel leaves an excessive empty confrontation gap: "+JSON.stringify(duelComposition));
     assert.strictEqual(duelComposition.visibleSupports,0,"#312 sparse duel rendered fake/empty support furniture: "+JSON.stringify(duelComposition));
-    assert(duelComposition.playerPowerCenterRatio>=0.40&&duelComposition.playerPowerCenterRatio<=0.43,"#312 player PL ring is not flanking the confrontation lane: "+JSON.stringify(duelComposition));
-    assert(duelComposition.enemyPowerCenterRatio>=0.57&&duelComposition.enemyPowerCenterRatio<=0.60,"#312 enemy PL ring is not flanking the confrontation lane: "+JSON.stringify(duelComposition));
-    assert(duelComposition.playerPowerCenterYRatio>=0.46&&duelComposition.playerPowerCenterYRatio<=0.49,"#312 player PL ring still sits at the portrait bottom: "+JSON.stringify(duelComposition));
-    assert(duelComposition.enemyPowerCenterYRatio>=0.46&&duelComposition.enemyPowerCenterYRatio<=0.49,"#312 enemy PL ring still sits at the portrait bottom: "+JSON.stringify(duelComposition));
+    assert(duelComposition.playerPowerCenterRatio>=0.425&&duelComposition.playerPowerCenterRatio<=0.445,"#312 player PL ring is not in the aligned confrontation lane: "+JSON.stringify(duelComposition));
+    assert(duelComposition.enemyPowerCenterRatio>=0.555&&duelComposition.enemyPowerCenterRatio<=0.575,"#312 enemy PL ring is not in the aligned confrontation lane: "+JSON.stringify(duelComposition));
+    assert(duelComposition.playerPowerCenterYRatio>=0.46&&duelComposition.playerPowerCenterYRatio<=0.50,"#312 player PL ring vertical alignment drift: "+JSON.stringify(duelComposition));
+    assert(duelComposition.enemyPowerCenterYRatio>=0.46&&duelComposition.enemyPowerCenterYRatio<=0.50,"#312 enemy PL ring vertical alignment drift: "+JSON.stringify(duelComposition));
+    assert.strictEqual(duelComposition.playerNameDisplay,"none","#312 player card must not repeat the player character name");
+    assert.notStrictEqual(duelComposition.enemyNameDisplay,"none","#312 generic Kakashi opposition must retain its readable role name");
+    assert.strictEqual(duelComposition.statusDisplay,"none","#312 redundant PLAYER ACTION status strip must not compete with the top action/ticker lane");
+    assert(duelComposition.tickerBottomRatio<=duelComposition.playerTopRatio+0.01,"#312 LAST ACTION ticker overlaps the participant stage: "+JSON.stringify(duelComposition));
+    assert(!String(duelComposition.playerTransition||"").includes("transform")&&!String(duelComposition.playerTransition||"").includes("left")&&!String(duelComposition.playerTransition||"").includes("top"),"#312 participant layout still tweening transform/position: "+JSON.stringify(duelComposition));
     assert(duelComposition.vsOpacity>=0.5,"#312 sparse duel confrontation marker is too visually weak: "+JSON.stringify(duelComposition));
 
     const amtSkillsButton=page.locator('.battle-live-action-family-row button[data-formation-family="skills"]');
