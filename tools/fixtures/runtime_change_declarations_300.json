@@ -283,6 +283,35 @@
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Installed-browser evidence showed repeated player card naming, top-HUD and PL alignment drift, incomplete immediate Battle reward coverage, transform-driven card jitter, and multi-layer hard transitions. This consolidation wires all ten Kakashi Battle configs to the approved 1v1/2v1/failed-pickpocket-3v1 reward schedule and retires transform-heavy Kakashi presentation motion in favor of stable opacity-only consequence cues and a single outgoing-environment crossfade, without changing Battle resolution, PL, Story truth, or disposition semantics."
+    },
+    {
+      "changeId": "kakashi-final-static-motion-curtain-2026-09-23",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "origin.academy_kakashi.v2.story_dom",
+        "origin.academy_kakashi.v2.semantic_advance",
+        "battle.presentation.shared"
+      ],
+      "owner": "runtime/alpha-kakashi-v2-renderer-36030.js + runtime/alpha-kakashi-v2-transition-36040.js + runtime/alpha-battle-modern-33000.js",
+      "directCallers": [
+        "runtime/alpha-traversal-bridge-33200.js",
+        "index.html"
+      ],
+      "stateTouched": [
+        "presentation-only Kakashi Story transition cursor",
+        "presentation-only Formation Stage actor/card styling"
+      ],
+      "productionLoader": "runtime/alpha-traversal-bridge-33200.js + index.html",
+      "qaRefs": [
+        "tools/qa_kakashi_v2_clean_room.js",
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_issue_312_story_battle_benchmark.js",
+        "tools/qa_issue_312_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Final installed-browser Kakashi Golden evidence from Stephen still rejected actor/card animations and layered screen transitions as visibly jittery and non-cinematic. This presentation-only stabilization removes Kakashi actor/card motion entirely, preserves authored cue-local presence/anchor changes synchronously, disables remaining Formation Stage participant/feedback animation, retires ghost/outgoing-memory/root-wipe layers, and makes a single document-level opaque curtain the only hard environment and Story/Battle handoff transition. Same-environment Story changes have no whole-screen transition. Story truth, Battle semantics, rewards, PL, route topology and authored text are unchanged."
     }
   ]
 }
