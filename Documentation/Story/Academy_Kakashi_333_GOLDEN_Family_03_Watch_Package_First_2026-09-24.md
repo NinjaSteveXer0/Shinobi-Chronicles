@@ -42,6 +42,12 @@ Resolver rules, participant-state legality, Battle configuration and turn gates 
 
 # PLAYER-FACING STORY
 
+## Render boundary
+
+Only narration and character dialogue beneath this point are player-facing.
+
+Markdown branch headings such as `IF KAKASHI WINS`, `SUCCESS`, `FAILURE`, scene labels, `CHOICE` headings, `PL BATTLE` markers, and any explicit reuse/reconvergence instruction are **author/runtime scaffolding only** and must not render as Story prose.
+
 # GO FOR THE PACKAGE
 
 Package Smuggler is already moving.
@@ -388,11 +394,11 @@ All three move.
 
 ### IF KAKASHI LOSES
 
-Consume the **GO FOR THE PACKAGE — Kakashi loses** scene above.
+[AUTHOR REUSE: project the already-approved GO FOR THE PACKAGE loss scene.]
 
 ### IF KAKASHI WINS
 
-Consume the **GO FOR THE PACKAGE — Kakashi wins** scene above.
+[AUTHOR REUSE: project the already-approved GO FOR THE PACKAGE victory scene.]
 
 ---
 
