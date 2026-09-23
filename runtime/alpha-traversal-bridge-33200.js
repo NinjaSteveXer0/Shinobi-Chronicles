@@ -273,7 +273,14 @@
   function load36000(){loadOne("sc-kakashi-v2-content-36000-script","runtime/academy-kakashi-v2-content-36000.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_CONTENT_36000,load36010);}
   function load34600(){loadOne("sc-story-factual-resolver-34600-script","runtime/alpha-story-factual-resolver-34600.js",()=>!!globalThis.SC_STORY_FACTUAL_RESOLVER_34600,load36000);}
   function load34000(){loadOne("sc-story-decision-realisation-34000-script","runtime/alpha-story-decision-realisation-34000.js",()=>!!globalThis.SC_STORY_DECISION_REALISATION_34000,load34600);}
-  function load33900(){loadOne("sc-story-scene-board-33900-script","runtime/alpha-story-scene-board-33900.js",()=>!!globalThis.SC_STORY_SCENE_BOARD_33900,load34000);}
+  function after33900(){
+    if(typeof globalThis.registerAcademyObitoFinalSceneBoard331==="function"){
+      const result=globalThis.registerAcademyObitoFinalSceneBoard331();
+      if(result&&result.success===false&&result.reason!=="story_scene_board_not_loaded")throw new Error("academy_obito_final_scene_board_registration_failed:"+String(result.reason||"unknown"));
+    }
+    load34000();
+  }
+  function load33900(){loadOne("sc-story-scene-board-33900-script","runtime/alpha-story-scene-board-33900.js",()=>!!globalThis.SC_STORY_SCENE_BOARD_33900,after33900);}
   function load33700(){loadOne("sc-alpha-origin-screen-first-33700-script","runtime/alpha-origin-screen-first-33700.js",()=>!!globalThis.SC_ALPHA_ORIGIN_SCREEN_FIRST_33700,load33900);}
 
   function after33600(){
