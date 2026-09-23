@@ -1,3 +1,6 @@
+> **2026-09-24 SUPERSEDED — ACADEMY KAKASHI WRITING GOLDEN**  
+> The terminal AMBER repair documented here is historical repair evidence only. Current whole-Origin player-facing Writing authority: `Documentation/Story/Academy_Kakashi_Origin_WRITING_GOLDEN_2026-09-24.md` @ `4b0565a789515b5425b2aadd3a4259337ca49385`. Do not restore this file's superseded ANBU/Minato expression over the #333 GOLDEN terminal family.
+
 # Academy Kakashi Origin — Ending Cohesion AMBER Repair
 
 **Date:** 2026-09-23  
