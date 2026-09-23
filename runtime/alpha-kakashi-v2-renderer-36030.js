@@ -397,7 +397,7 @@ function deriveProjectionChoreography(root,previous,next,p,departures=[]){
   // preventing a semantic commit from painting an accidental four-card tableau.
   for(const row of departures)cues.push({
     kind:row.kind,actorId:row.ghostId,removeOnComplete:true,
-    ...(row.kind==="COLLAPSE"?{durationMs:620}:row.kind==="FLEE"?{durationMs:520}:{})
+    ...(row.kind==="COLLAPSE"?{durationMs:300}:row.kind==="FLEE"?{durationMs:240}:{})
   });
   const prevIds=new Set((previous.actors||[]).map(a=>a.id));
   for(const actor of next.actors||[]){
