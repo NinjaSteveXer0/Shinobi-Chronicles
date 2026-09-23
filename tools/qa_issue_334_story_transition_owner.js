@@ -33,7 +33,10 @@ function fn(source,name){
   throw new Error("unterminated function "+name);
 }
 
-const sharedPlay=fn(story,"playStoryHardSceneTransition33900");
+const sharedPlayStart=story.indexOf("function playStoryHardSceneTransition33900(");
+const sharedPlayEnd=story.indexOf("function performSceneCut(",sharedPlayStart);
+assert(sharedPlayStart>=0&&sharedPlayEnd>sharedPlayStart,"shared hard-transition playback function bounds missing");
+const sharedPlay=story.slice(sharedPlayStart,sharedPlayEnd);
 const sharedCancel=fn(story,"cancelStoryHardSceneTransition33900");
 const sharedCurtain=fn(story,"ensureStoryHardTransitionCurtain33900");
 const genericCut=fn(story,"performSceneCut");
