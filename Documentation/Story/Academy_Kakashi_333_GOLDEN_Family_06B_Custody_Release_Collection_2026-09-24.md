@@ -729,7 +729,7 @@ That is answer enough.
 
 ### IF ONE RESTRAINED PARTICIPANT IS WITH KAKASHI
 
-Present that participant's existing singular institutional choices:
+[AUTHOR: present that participant's existing singular institutional choices.]
 
 **BRING HIM/HER TO ANBU**
 
@@ -750,7 +750,9 @@ Present that participant's existing singular institutional choices:
 
 # FINAL RESTRAINT — NO EARLIER RESTRAINED PARTICIPANTS
 
-When a final participant is successfully RESTRAINED and there is nobody earlier on the route to collect, Kakashi checks the restraint once.
+[AUTHOR: use this scene only when the final participant is successfully RESTRAINED and there is nobody earlier on the route to collect.]
+
+Kakashi checks the restraint once.
 
 The restrained participant watches him turn away.
 
