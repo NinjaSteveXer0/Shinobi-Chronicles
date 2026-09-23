@@ -72,7 +72,7 @@ function state(){
   const rt=active();if(!rt)return null;
   if(!rt.localContext||typeof rt.localContext!=="object")rt.localContext={};
   if(!rt.localContext.kakashiV2)rt.localContext.kakashiV2={
-    version:2,sceneInstanceId:rt.instanceId||null,routeHistory:[],
+    version:3,sceneInstanceId:rt.instanceId||null,routeHistory:[],
     package:{holder:"AMT",recovered:false,returned:false,neutral:false},
     participants:{MI:{state:"UNSEEN"},PS:{state:"AVAILABLE"},AMT:{state:"AVAILABLE"}},
     pakkun:{present:false,departed:false,knownByKakashiAsName:false},
