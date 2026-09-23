@@ -282,6 +282,54 @@ Kakashi sets his feet.
 
 ---
 
+# SCENE 05A-L — KAKASHI LOSES
+
+The opening is small.
+
+Masked Interceptor takes it.
+
+Kakashi hits the stone beneath the Sakura tree.
+
+Before he can recover, she is on him.
+
+One arm forced behind his back.
+
+His shoulder pinned.
+
+Kakashi twists.
+
+The hold tightens.
+
+Then she looks down the street.
+
+Toward the route Package Smuggler took.
+
+The pressure vanishes.
+
+Kakashi turns in time to see her run.
+
+After the package.
+
+He forces himself to his feet.
+
+Reaches the street.
+
+Empty.
+
+Package Smuggler is gone.
+
+The package with him.
+
+The man from the photograph disappeared even earlier.
+
+Kakashi listens.
+
+Nothing he can follow.
+
+He turns back toward ANBU.
+
+---
+
 # SCENE 05A-W — FAST VICTORY
 
 Masked Interceptor hits the stone beneath the Sakura tree.
