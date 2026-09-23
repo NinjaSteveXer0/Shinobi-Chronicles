@@ -382,8 +382,11 @@ function resolveGroupKill(refs,causalKey){
 function dispositionOutcome(ref){const key=participantKey(ref),s=state(),row=s&&s.participants&&s.participants[key];return row&&row.dispositionResolution&&row.dispositionResolution.outcome||row&&row.state||null;}
 function packageRecoveredForDisposition(){const s=state();return !!(s&&s.package&&(s.package.recovered===true||["KAKASHI","ANBU"].includes(s.package.holder)));}
 function killedCues(ref){
-  const key=participantKey(ref),label=key==="MI"?"Masked Interceptor":key==="PS"?"Package Smuggler":"ANBU Marked Target";
-  return[N("Kakashi commits."),N(`${label} does not get back up.`)];
+  const key=participantKey(ref);
+  if(key==="MI")return W("dispositionResolvers","mi_killed");
+  if(key==="PS")return W("dispositionResolvers","ps_killed");
+  if(key==="AMT")return W("dispositionResolvers","amt_killed");
+  return[N("The lethal disposition resolves.")];
 }
 function singleDispositionCues(ref,intent){
   const key=participantKey(ref),outcome=dispositionOutcome(key);
