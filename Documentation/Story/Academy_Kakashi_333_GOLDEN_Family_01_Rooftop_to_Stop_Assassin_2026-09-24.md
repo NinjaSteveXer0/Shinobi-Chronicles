@@ -96,16 +96,16 @@ Semantic facts preserved:
 
 ### Fast win
 Current authored gate:
-- MI Battle victory within 1–4 turns;
+- MI Battle victory within 1–3 turns;
 - PS remains immediately reachable;
 - AMT remains immediately reachable;
-- Kakashi may pursue one;
-- PS route may preserve later AMT reach only through separately authorised PS continuation timing;
+- Package Receiver is the only direct pursuit continuation at this decision point;
+- later AMT reach can occur only after the separately authorised PS continuation chain.
 - MI remains available for current lawful post-Battle dispositions.
 
 ### Slow win
 Current authored gate:
-- MI Battle victory turn 5+;
+- MI Battle victory turn 4+;
 - PS no longer reachable;
 - AMT no longer reachable;
 - only lawful MI post-Battle dispositions remain.
@@ -116,7 +116,6 @@ Use current simplified authority, not historical control-state wording.
 
 Where factually eligible, player-facing options include:
 - **CHASE THE PACKAGE**
-- **CHASE THE MAN FROM THE PHOTO**
 - **KILL HER**
 - **BRING HER TO ANBU**
 - **TAKE HER TO THE UCHIHA POLICE**
@@ -254,7 +253,6 @@ Kakashi rises from his crouch.
 
 **DEAL WITH HER FIRST**
 
-**CHASE THE MAN FROM THE PHOTO**
 
 ---
 
@@ -296,9 +294,7 @@ He looks up.
 
 Package Smuggler is crossing the far junction with the package tight against his side.
 
-Higher up, ANBU Marked Target flashes across a roofline and disappears behind a chimney.
-
-Still close enough to see.
+Farther away, the man from the photograph disappears across the roofs.
 
 Masked Interceptor moves behind Kakashi.
 
@@ -316,7 +312,6 @@ Then back at her.
 
 **CHASE THE PACKAGE**
 
-**CHASE THE MAN FROM THE PHOTO**
 
 **KILL HER**
 
