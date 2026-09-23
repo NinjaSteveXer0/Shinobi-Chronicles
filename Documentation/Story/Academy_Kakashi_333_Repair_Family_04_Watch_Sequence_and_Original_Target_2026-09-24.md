@@ -38,6 +38,12 @@ All timing gates, resolver outcomes and participant state are author-only.
 
 # PLAYER-FACING STORY
 
+## Render boundary
+
+Only narration and character dialogue beneath this point are player-facing.
+
+Markdown branch headings such as `IF KAKASHI WINS`, `SUCCESS`, `FAILURE`, scene labels, `CHOICE` headings, `PL BATTLE` markers, and any explicit reuse/reconvergence instruction are **author/runtime scaffolding only** and must not render as Story prose.
+
 # DEAL WITH HER FIRST
 
 Package Smuggler is already running with the package.
@@ -240,7 +246,6 @@ But there.
 
 **RETURN TO ANBU**
 
-If Kakashi chooses **CHASE THE MAN FROM THE PHOTO**, consume the recovered-package AMT pursuit from Family 03 GOLDEN.
 
 ---
 
@@ -386,7 +391,6 @@ He isn't.
 
 **TAKE HIM TO THE UCHIHA POLICE**
 
-The exact disposition scene is owned by the common post-Battle disposition family.
 
 ---
 
