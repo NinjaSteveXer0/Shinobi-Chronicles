@@ -252,7 +252,8 @@
         "tools/qa_kakashi_v2_clean_room.js",
         "tools/qa_kakashi_v2_route_matrix.js",
         "tools/qa_kakashi_v2_legacy_exclusion.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_322_kakashi_dispositions.js"
       ]
     },
     {
@@ -411,7 +412,8 @@
         "tools/qa_kakashi_v2_clean_room.js",
         "tools/qa_kakashi_v2_route_matrix.js",
         "tools/qa_kakashi_v2_legacy_exclusion.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_322_kakashi_dispositions.js"
       ]
     },
     {
@@ -628,6 +630,40 @@
         "runtime/alpha-kakashi-v2-renderer-36030.js::setTransitionMemory",
         "runtime/alpha-kakashi-v2-transition-36040.js::local hard-scene playback/timers"
       ]
+    },
+    {
+      "responsibilityId": "progression.special_jonin.contextual_evidence_producer.shared",
+      "canonicalOwner": "runtime/alpha-special-jonin-evidence-producer-34700.js",
+      "ownerType": "shared_progression_evidence_producer",
+      "directCallers": [
+        "runtime/alpha-kakashi-v2-core-36020.js"
+      ],
+      "stateReads": [
+        "playerData.activityHistory committed factual source occurrences",
+        "game.js Special Jonin qualification catalogue/evaluator"
+      ],
+      "stateWrites": [
+        "playerData.specialJoninContextualEvidence"
+      ],
+      "productionLoadPath": [
+        "runtime/alpha-traversal-bridge-33200.js",
+        "runtime/alpha-special-jonin-evidence-producer-34700.js"
+      ],
+      "extensionHooks": [
+        "projectSpecialJoninContextualEvidence34700",
+        "getSpecialJoninContextualEvidence34700",
+        "evaluateSpecialJoninContextualEvidence34700"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "playerData.specialJoninContextualEvidence"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_322_kakashi_dispositions.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_save_compatibility_311.js"
+      ]
     }
   ],
   "adapters": [
@@ -720,6 +756,11 @@
       "semanticId": "academy_obito.final.journey",
       "owner": "runtime/alpha-origin-scenes-32900-c.js",
       "responsibilityId": "origin.academy_obito.final_story_state"
+    },
+    {
+      "semanticId": "special_jonin.contextual_evidence.project",
+      "owner": "runtime/alpha-special-jonin-evidence-producer-34700.js",
+      "responsibilityId": "progression.special_jonin.contextual_evidence_producer.shared"
     }
   ],
   "globalWrapperChains": [
@@ -780,6 +821,11 @@
       "stateRef": "playerData.activityHistory academy_obito final journey facts",
       "owner": "runtime/alpha-origin-scenes-32900-c.js",
       "responsibilityId": "origin.academy_obito.final_story_state"
+    },
+    {
+      "stateRef": "playerData.specialJoninContextualEvidence",
+      "owner": "runtime/alpha-special-jonin-evidence-producer-34700.js",
+      "responsibilityId": "progression.special_jonin.contextual_evidence_producer.shared"
     }
   ]
 }
