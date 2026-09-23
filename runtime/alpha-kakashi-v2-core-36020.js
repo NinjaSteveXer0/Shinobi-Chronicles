@@ -1133,21 +1133,10 @@ function groupCollectActorKeys(){
  return keys;
 }
 function groupCollectCues(){
- const s=state(),restrained=new Set(restrainedParticipantKeys(s)),out=[
-  N("Kakashi looks back the way they came."),N("There are still people waiting behind him."),N("Pakkun follows his eye."),
-  Q("PAKKUN","We're going back."),Q("KAKASHI","I left people restrained behind me."),Q("PAKKUN","Then don't keep them waiting.")
- ];
- if(restrained.has("AMT"))out.push(N("Kakashi keeps ANBU Marked Target under restraint and starts back through the alley."));
- if(restrained.has("PS"))out.push(
-  N("Package Smuggler is exactly where Kakashi left him."),N("His eyes move first to Kakashi, then to the restrained people with him."),
-  Q("PACKAGE SMUGGLER","You actually came back."),Q("KAKASHI","I said I would."),N("Kakashi releases Package Smuggler from the fixed anchor without removing his restraints."),N("He brings him into the escort.")
- );
- if(restrained.has("MI"))out.push(
-  N("Masked Interceptor is still beneath the Sakura tree."),N("Her attention settles on Kakashi first, then on the restrained people with him."),
-  N("Kakashi removes the line fixing Masked Interceptor to the tree. The restraint around her remains."),N("She joins the escort."),
-  Q("MASKED INTERCEPTOR","You came back."),Q("KAKASHI","I said I would."),Q("MASKED INTERCEPTOR","You weren't finished."),Q("KAKASHI","Keep moving.")
- );
- if(restrained.size===0)out.push(N("There is nobody left under restraint to collect."));
+ const s=state(),restrained=new Set(restrainedParticipantKeys(s)),out=[...W("custodyGolden06B","collection_open")];
+ if(restrained.has("AMT"))out.push(...W("custodyGolden06B","collection_amt"));
+ if(restrained.has("PS"))out.push(...W("custodyGolden06B","collection_ps"));
+ if(restrained.has("MI"))out.push(...W("custodyGolden06B","collection_mi"));
  return out;
 }
 function collectRestrainedParticipants(){
@@ -1181,9 +1170,16 @@ function deliverRestrainedGroup(kind){
  history(kind==="ANBU"?"GROUP_TO_ANBU":"GROUP_TO_POLICE",{participantKeys:keys});
  return{success:true,participantKeys:keys,institution:kind};
 }
-addBeat("v2_group_collect",{mode:"choice",backdrop:B.alleyAlt,location:"KONOHA · COLLECTION",objective:"Transfer the restrained participants.",actors:()=>groupCollectActorKeys(),preset:"escort",onEnter:()=>collectRestrainedParticipants(),cues:()=>groupCollectCues(),choices:[
- C("group_all_anbu","TAKE THEM ALL BACK TO ANBU","v2_report",{available:()=>restrainedParticipantKeys().some(key=>state().participants[key].collected===true),patch:()=>deliverRestrainedGroup("ANBU")}),
- C("group_all_police","TAKE THEM ALL TO THE UCHIHA POLICE FORCE","v2_report",{available:()=>restrainedParticipantKeys().some(key=>state().participants[key].collected===true),patch:()=>deliverRestrainedGroup("POLICE")})
+addBeat("v2_group_collect",{backdrop:B.alleyAlt,location:"KONOHA · COLLECTION",objective:"Collect the restrained participants.",actors:()=>groupCollectActorKeys(),preset:"escort",onAdvance:()=>collectRestrainedParticipants(),cues:()=>groupCollectCues(),nextBeatId:"v2_group_collect_choice"});
+addBeat("v2_group_collect_choice",{mode:"choice",backdrop:B.alleyAlt,location:"KONOHA · COLLECTION",objective:"Transfer the restrained participants.",actors:()=>groupCollectActorKeys(),preset:"escort",cues:[],choices:[
+ C("collect_one_mi_anbu","BRING HER TO ANBU","v2_collected_anbu_handoff",{available:()=>{const k=collectedParticipantKeys();return k.length===1&&k[0]==="MI";},patch:()=>transferIntent("MI","ANBU","collect_one_mi_anbu")}),
+ C("collect_one_mi_police","TAKE HER TO THE UCHIHA POLICE","v2_collected_police_handoff",{available:()=>{const k=collectedParticipantKeys();return k.length===1&&k[0]==="MI";},patch:()=>transferIntent("MI","POLICE","collect_one_mi_police")}),
+ C("collect_one_ps_anbu","BRING HIM TO ANBU","v2_collected_anbu_handoff",{available:()=>{const k=collectedParticipantKeys();return k.length===1&&k[0]==="PS";},patch:()=>transferIntent("PS","ANBU","collect_one_ps_anbu")}),
+ C("collect_one_ps_police","TAKE HIM TO THE UCHIHA POLICE","v2_collected_police_handoff",{available:()=>{const k=collectedParticipantKeys();return k.length===1&&k[0]==="PS";},patch:()=>transferIntent("PS","POLICE","collect_one_ps_police")}),
+ C("collect_one_amt_anbu","BRING HIM TO ANBU","v2_collected_anbu_handoff",{available:()=>{const k=collectedParticipantKeys();return k.length===1&&k[0]==="AMT";},patch:()=>transferIntent("AMT","ANBU","collect_one_amt_anbu")}),
+ C("collect_one_amt_police","TAKE HIM TO THE UCHIHA POLICE","v2_collected_police_handoff",{available:()=>{const k=collectedParticipantKeys();return k.length===1&&k[0]==="AMT";},patch:()=>transferIntent("AMT","POLICE","collect_one_amt_police")}),
+ C("collect_group_anbu","BRING THEM TO ANBU","v2_collected_anbu_handoff",{available:()=>collectedParticipantKeys().length>=2,patch:()=>transferIntent(collectedParticipantKeys(),"ANBU","collect_group_anbu")}),
+ C("collect_group_police","TAKE THEM TO THE UCHIHA POLICE","v2_collected_police_handoff",{available:()=>collectedParticipantKeys().length>=2,patch:()=>transferIntent(collectedParticipantKeys(),"POLICE","collect_group_police")})
 ]});
 
 // Direct AMT pursuit after MI.
@@ -1428,6 +1424,42 @@ addBeat("v2_pickpocket_3v1_win",{mode:"choice",backdrop:B.fight,location:"SAKURA
  C("pick_group_kill","KILL THEM","v2_group3_kill_result",{patch:()=>resolveGroupKill([AMT,PS,MI],"pick_group_kill")}),
  C("pick_group_release","LET THEM GO","v2_group3_release",{patch:()=>{const r=disposeGroup("RELEASE",[AMT,PS,MI]);if(!r.success)return r;return history("RELEASE_GROUP",{participantKeys:["AMT","PS","MI"]});}})
 ]});
+
+// ---------------------------------------------------------------------------
+// #333 GOLDEN FAMILY 06B — PHYSICAL CUSTODY / RELEASE / COLLECTION HANDOFFS.
+// Choice selects intent; institutional custody commits only when the receiver
+// physically takes control at the handoff beat.
+// ---------------------------------------------------------------------------
+addBeat("v2_mi_anbu_depart",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Bring Masked Interceptor to ANBU.",actors:()=>directTransferActors("MI","ANBU",false),preset:"escort",cues:()=>directTransferFieldCues("MI","ANBU"),nextBeatId:"v2_mi_anbu_handoff"});
+addBeat("v2_mi_anbu_handoff",{backdrop:B.rooftop,location:"ANBU ROOFTOP · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("MI","ANBU",true),preset:"anbu_report",cues:()=>directTransferHandoffCues("MI","ANBU"),onAdvance:()=>completeDirectTransfer("MI","ANBU","mi"),nextBeatId:"v2_report"});
+addBeat("v2_mi_police_depart",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Take Masked Interceptor to the Uchiha Police.",actors:()=>directTransferActors("MI","POLICE",false),preset:"escort",cues:()=>directTransferFieldCues("MI","POLICE"),nextBeatId:"v2_mi_police_handoff"});
+addBeat("v2_mi_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("MI","POLICE",true),preset:"escort",cues:()=>directTransferHandoffCues("MI","POLICE"),onAdvance:()=>completeDirectTransfer("MI","POLICE","mi"),nextBeatId:"v2_report"});
+
+addBeat("v2_ps_anbu_depart",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Bring Package Smuggler to ANBU.",actors:()=>directTransferActors("PS","ANBU",false),preset:"escort",cues:()=>directTransferFieldCues("PS","ANBU"),nextBeatId:"v2_ps_anbu_handoff"});
+addBeat("v2_ps_anbu_handoff",{backdrop:B.rooftop,location:"ANBU ROOFTOP · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("PS","ANBU",true),preset:"anbu_report",cues:()=>directTransferHandoffCues("PS","ANBU"),onAdvance:()=>completeDirectTransfer("PS","ANBU","ps"),nextBeatId:"v2_report"});
+addBeat("v2_ps_police_depart",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Take Package Smuggler to the Uchiha Police.",actors:()=>directTransferActors("PS","POLICE",false),preset:"escort",cues:()=>directTransferFieldCues("PS","POLICE"),nextBeatId:"v2_ps_police_handoff"});
+addBeat("v2_ps_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("PS","POLICE",true),preset:"escort",cues:()=>directTransferHandoffCues("PS","POLICE"),onAdvance:()=>completeDirectTransfer("PS","POLICE","ps"),nextBeatId:"v2_report"});
+
+addBeat("v2_amt_anbu_depart",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Bring ANBU Marked Target to ANBU.",actors:()=>directTransferActors("AMT","ANBU",false),preset:"escort",cues:()=>directTransferFieldCues("AMT","ANBU"),nextBeatId:"v2_amt_anbu_handoff"});
+addBeat("v2_amt_anbu_handoff",{backdrop:B.rooftop,location:"ANBU ROOFTOP · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("AMT","ANBU",true),preset:"anbu_report",cues:()=>directTransferHandoffCues("AMT","ANBU"),onAdvance:()=>completeDirectTransfer("AMT","ANBU","amt"),nextBeatId:"v2_report"});
+addBeat("v2_amt_police_depart",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Take ANBU Marked Target to the Uchiha Police.",actors:()=>directTransferActors("AMT","POLICE",false),preset:"escort",cues:()=>directTransferFieldCues("AMT","POLICE"),nextBeatId:"v2_amt_police_handoff"});
+addBeat("v2_amt_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("AMT","POLICE",true),preset:"escort",cues:()=>directTransferHandoffCues("AMT","POLICE"),onAdvance:()=>completeDirectTransfer("AMT","POLICE","amt"),nextBeatId:"v2_report"});
+addBeat("v2_amt_release_result",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:()=>state()&&state().pakkun.present?["kakashi","amt","pakkun"]:["kakashi","amt"],preset:"post_battle",cues:W("custodyGolden06B","amt_release"),nextBeatId:"v2_report"});
+
+addBeat("v2_group2_anbu_depart",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Bring them to ANBU.",actors:()=>groupTransferActors([AMT,PS],"ANBU",false),preset:"escort",cues:W("custodyGolden06B","group2_anbu_depart"),nextBeatId:"v2_group2_anbu_handoff"});
+addBeat("v2_group2_anbu_handoff",{backdrop:B.rooftop,location:"ANBU ROOFTOP · NIGHT",objective:"Transfer custody.",actors:()=>groupTransferActors([AMT,PS],"ANBU",true),preset:"anbu_report",cues:W("custodyGolden06B","group2_anbu_handoff"),onAdvance:()=>completeDirectGroupTransfer([AMT,PS],"ANBU","group2"),nextBeatId:"v2_report"});
+addBeat("v2_group2_police_depart",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Take them to the Uchiha Police.",actors:()=>groupTransferActors([AMT,PS],"POLICE",false),preset:"escort",cues:W("custodyGolden06B","group2_police_depart"),nextBeatId:"v2_group2_police_handoff"});
+addBeat("v2_group2_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>groupTransferActors([AMT,PS],"POLICE",true),preset:"escort",cues:W("custodyGolden06B","group2_police_handoff"),onAdvance:()=>completeDirectGroupTransfer([AMT,PS],"POLICE","group2"),nextBeatId:"v2_report"});
+addBeat("v2_group2_release",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi","amt","ps"],preset:"post_battle",cues:W("custodyGolden06B","group2_release"),nextBeatId:"v2_report"});
+
+addBeat("v2_group3_anbu_depart",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Bring them to ANBU.",actors:()=>groupTransferActors([AMT,PS,MI],"ANBU",false),preset:"escort",cues:W("custodyGolden06B","group3_anbu_depart"),nextBeatId:"v2_group3_anbu_handoff"});
+addBeat("v2_group3_anbu_handoff",{backdrop:B.rooftop,location:"ANBU ROOFTOP · NIGHT",objective:"Transfer custody.",actors:()=>groupTransferActors([AMT,PS,MI],"ANBU",true),preset:"anbu_report",cues:W("custodyGolden06B","group3_anbu_handoff"),onAdvance:()=>completeDirectGroupTransfer([AMT,PS,MI],"ANBU","group3"),nextBeatId:"v2_report"});
+addBeat("v2_group3_police_depart",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Take them to the Uchiha Police.",actors:()=>groupTransferActors([AMT,PS,MI],"POLICE",false),preset:"escort",cues:W("custodyGolden06B","group3_police_depart"),nextBeatId:"v2_group3_police_handoff"});
+addBeat("v2_group3_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>groupTransferActors([AMT,PS,MI],"POLICE",true),preset:"escort",cues:W("custodyGolden06B","group3_police_handoff"),onAdvance:()=>completeDirectGroupTransfer([AMT,PS,MI],"POLICE","group3"),nextBeatId:"v2_report"});
+addBeat("v2_group3_release",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi","amt","ps","mi"],preset:"post_battle",cues:W("custodyGolden06B","group3_release"),nextBeatId:"v2_report"});
+
+addBeat("v2_collected_anbu_handoff",{backdrop:B.rooftop,location:"ANBU ROOFTOP · NIGHT",objective:"Transfer custody.",actors:()=>collectedHandoffActors("ANBU"),preset:"anbu_report",cues:()=>collectedHandoffCues("ANBU"),onAdvance:()=>deliverRestrainedGroup("ANBU"),nextBeatId:"v2_report"});
+addBeat("v2_collected_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>collectedHandoffActors("POLICE"),preset:"escort",cues:()=>collectedHandoffCues("POLICE"),onAdvance:()=>deliverRestrainedGroup("POLICE"),nextBeatId:"v2_report"});
 
 // ---------------------------------------------------------------------------
 // FINAL TWO-OUTCOME DISPOSITION RESULT PRESENTATION.
