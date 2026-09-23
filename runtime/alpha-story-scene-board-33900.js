@@ -515,7 +515,7 @@ function runStorySceneBoard33900Diagnostics(){
     pendingRegistrationDrain:typeof drainPendingStorySceneBoardRegistrations33900==="function"&&pendingRegistrationDrain&&pendingRegistrationDrain.success===true,
     genericPerformanceLifecycle:typeof performanceSequenceFor==="function"&&typeof advanceStoryScene33900==="function"&&typeof performSceneCut==="function",
     sharedHardTransitionOwner:typeof playStoryHardSceneTransition33900==="function"&&typeof cancelStoryHardSceneTransition33900==="function"&&typeof getStoryHardSceneTransitionState33900==="function",
-    documentCurtainOwnedHere:String(ensureStoryHardTransitionCurtain33900).includes("document.body.appendChild")&&installStyle.toString().includes(HARD_TRANSITION_CURTAIN_ID),
+    documentCurtainOwnedHere:HARD_TRANSITION_CURTAIN_ID==="sc-story-hard-transition-33900"&&String(ensureStoryHardTransitionCurtain33900).includes("document.body.appendChild")&&installStyle.toString().includes("HARD_TRANSITION_CURTAIN_ID"),
     staleTransitionInvalidation:String(playStoryHardSceneTransition33900).includes('cancelStoryHardSceneTransition33900("superseded")')&&String(scheduleStoryHardTransition33900).includes("generation===hardTransitionGeneration"),
     reducedMotionPreservesSemanticIndependence:String(playStoryHardSceneTransition33900).includes("isReduced")&&!String(playStoryHardSceneTransition33900).includes("PRE_ADVANCE"),
     legacyRootWipeRetired:!installStyle.toString().includes("transform:translateX(100%)")&&!String(performSceneCut).includes("createElement"),
