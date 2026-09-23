@@ -105,16 +105,16 @@ function projectSpecialJoninContextualEvidence34700(input){
   }
   const mergedTags=[...new Set([...(existing&&existing.tags||[]),...p.tags])];
   const def=getSpecialJoninQualificationDefinition(p.qualificationId);
+  const existingSnapshots=Array.isArray(existing&&existing.context&&existing.context.capabilitySnapshots)?existing.context.capabilitySnapshots:[];
+  const snapshotBySource=new Map(existingSnapshots.filter(row=>row&&row.sourceOccurrenceId).map(row=>[String(row.sourceOccurrenceId),clone(row)]));
+  if(Object.keys(p.capabilitySnapshot).length)snapshotBySource.set(p.sourceOccurrenceId,{sourceOccurrenceId:p.sourceOccurrenceId,snapshot:clone(p.capabilitySnapshot)});
   const mergedContext={
     ...(existing&&existing.context||{}),
     ...p.context,
     causalRootOccurrenceId:p.causalRootOccurrenceId,
     sourceOccurrenceIds:[...new Set([...(existing&&existing.context&&existing.context.sourceOccurrenceIds||[]),p.sourceOccurrenceId])],
     targetRefs:[...new Set([...(existing&&existing.context&&existing.context.targetRefs||[]),...p.targetRefs])],
-    capabilitySnapshots:[
-      ...(existing&&existing.context&&existing.context.capabilitySnapshots||[]),
-      ...(Object.keys(p.capabilitySnapshot).length?[{sourceOccurrenceId:p.sourceOccurrenceId,snapshot:p.capabilitySnapshot}]:[])
-    ]
+    capabilitySnapshots:[...snapshotBySource.values()].sort((a,b)=>String(a.sourceOccurrenceId).localeCompare(String(b.sourceOccurrenceId)))
   };
   const record={
     evidenceId,
@@ -134,8 +134,14 @@ function projectSpecialJoninContextualEvidence34700(input){
   };
   const evaluatorRecord=normalizeSpecialistEvidenceRecord(record);
   if(!evaluatorRecord)return{success:false,reason:"contextual_evidence_normalization_failed"};
+  const stableComparable=row=>JSON.stringify({...row,createdAt:0,updatedAt:0});
+  const idempotent=!!existing&&stableComparable(existing)===stableComparable(record);
+  if(idempotent){
+    bucket[evidenceId]=existing;
+    return{success:true,idempotent:true,upserted:true,record:clone(existing),evaluatorRecord:clone(normalizeSpecialistEvidenceRecord(existing))};
+  }
   bucket[evidenceId]=record;save();
-  return{success:true,idempotent:!!existing&&JSON.stringify({...existing,updatedAt:0})===JSON.stringify({...record,updatedAt:0}),upserted:!!existing,record:clone(record),evaluatorRecord:clone(evaluatorRecord)};
+  return{success:true,idempotent:false,upserted:!!existing,record:clone(record),evaluatorRecord:clone(evaluatorRecord)};
 }
 function getSpecialJoninContextualEvidence34700(subjectVariantId,qualificationId=null){
   const store=ensureStore();if(!store)return[];
@@ -155,7 +161,7 @@ function runAlphaSpecialJoninEvidenceProducer34700Diagnostics(){
     committedSourceRequired:String(normalizePacket).includes("committedSourceRecord"),
     exactQualificationRequired:String(normalizePacket).includes("getSpecialJoninQualificationDefinition"),
     tagWhitelist:String(normalizePacket).includes("definitionTags")&&String(normalizePacket).includes("contextual_evidence_tag_not_authorised"),
-    idempotentUpsert:String(projectSpecialJoninContextualEvidence34700).includes("Math.max")&&String(projectSpecialJoninContextualEvidence34700).includes("mergedTags"),
+    idempotentUpsert:String(projectSpecialJoninContextualEvidence34700).includes("Math.max")&&String(projectSpecialJoninContextualEvidence34700).includes("snapshotBySource")&&String(projectSpecialJoninContextualEvidence34700).includes("stableComparable"),
     sameCausalRootOneRecord:String(evidenceIdFor).includes("qualificationId")&&!String(evidenceIdFor).includes("sourceOccurrenceId"),
     noRankMutation:!String(projectSpecialJoninContextualEvidence34700).includes("formalRank")&&!String(projectSpecialJoninContextualEvidence34700).includes("earnSpecialJoninQualification"),
     noStatOrPLMutation:!String(projectSpecialJoninContextualEvidence34700).includes("baseStats")&&!String(projectSpecialJoninContextualEvidence34700).includes("basePL"),
