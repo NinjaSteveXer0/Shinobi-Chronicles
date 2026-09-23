@@ -64,22 +64,25 @@ function hasLethalConsequenceInFlight(){
 }
 function playPostCommitTransition(prev,next){
   const kind=transitionKind(prev,next);if(!kind)return{played:false};
-  // Transform-heavy wipes and retained-card tableaux caused visible hitching.
-  // Renderer 36030 now stages the outgoing environment synchronously; this
-  // adapter only times a clean opacity crossfade after Story truth commits.
-  const lethalDelay=kind==="hard"&&hasLethalConsequenceInFlight()?320:0;
-  const coverFor=kind==="hard"?80:110;
-  const start=()=>{
-    wipeMode=kind;wipeCovering=true;render();
-    lastTransition={type:kind==="hard"?"cinematic_scene_change":"same_environment_beat_shift",fromBeatId:prev&&prev.id||null,toBeatId:next&&next.id||null,semanticAlreadyCommitted:true,outgoingEnvironmentPreserved:kind==="hard",singleLayerCrossfade:kind==="hard",lethalConsequenceDelayMs:lethalDelay,startedAt:Date.now()};
-    later(()=>{
-      if(kind==="hard"){try{if(typeof setAcademyKakashiV2TransitionMemory36030==="function")setAcademyKakashiV2TransitionMemory36030(null,false);}catch(_e){}}
-      wipeCovering=false;render();
-      later(()=>{wipeMode=null;render();lastTransition={...lastTransition,completedAt:Date.now()};},kind==="hard"?480:160);
-    },coverFor);
-  };
-  if(lethalDelay)later(start,lethalDelay);else start();
-  return{played:true,kind,lethalDelayMs:lethalDelay};
+  const startedAt=Date.now();
+  if(kind==="soft"){
+    // Same-environment beat changes should feel like one continuous scene.
+    // Do not animate or dim the whole screen between ordinary Story beats.
+    wipeMode=null;wipeCovering=false;
+    lastTransition={type:"continuous_scene_update",fromBeatId:prev&&prev.id||null,toBeatId:next&&next.id||null,semanticAlreadyCommitted:true,visualTransition:"none",startedAt,completedAt:startedAt};
+    render();
+    return{played:true,kind,visualTransition:"none",lethalDelayMs:0};
+  }
+  // Hard environment changes use one global opaque curtain that survives Story
+  // root teardown and Story <-> Battle handoffs. Cover is immediate; only the
+  // reveal fades, avoiding crossfade/ghost/wipe competition.
+  wipeMode="hard";wipeCovering=true;render();
+  lastTransition={type:"cinematic_hard_cut",fromBeatId:prev&&prev.id||null,toBeatId:next&&next.id||null,semanticAlreadyCommitted:true,visualTransition:"global_black_reveal",startedAt};
+  later(()=>{
+    wipeCovering=false;render();
+    later(()=>{wipeMode=null;lastTransition={...lastTransition,completedAt:Date.now()};},190);
+  },70);
+  return{played:true,kind,visualTransition:"global_black_reveal",lethalDelayMs:0};
 }
 function semanticAdvance(choiceId=null){
   const previous=projection();
@@ -154,13 +157,12 @@ function diagnostics(){
     wrapsStoryAdvance:globalThis.advanceStoryScene!==PRE_ADVANCE,
     cueAdvanceDoesNotCommitStory:String(advance).includes("semanticBeatUnchanged:true"),
     semanticAdvanceDelegates:String(semanticAdvance).includes("PRE_ADVANCE"),
-    outgoingSnapshotCapturedBeforeCommit:String(semanticAdvance).indexOf("prepareAcademyKakashiV2VisualSnapshot36030")<String(semanticAdvance).indexOf("PRE_ADVANCE"),
     semanticCommitPrecedesPresentation:String(semanticAdvance).indexOf("PRE_ADVANCE")<String(semanticAdvance).indexOf("render()"),
     animationCannotBlockStoryTruth:!String(semanticAdvance).includes("locked")&&!String(semanticAdvance).includes("await")&&!String(playPostCommitTransition).includes("PRE_ADVANCE"),
-    transitionHierarchyIsPostCommitPresentation:String(playPostCommitTransition).includes("semanticAlreadyCommitted:true")&&String(transitionKind).includes('"hard"')&&String(transitionKind).includes('"soft"'),
-    hardTransitionPreservesOutgoingScene:String(playPostCommitTransition).includes("outgoingEnvironmentPreserved")&&String(playPostCommitTransition).includes("singleLayerCrossfade")&&String(playPostCommitTransition).includes("setAcademyKakashiV2TransitionMemory36030(null,false)"),
+    hardSceneUsesSingleGlobalReveal:String(playPostCommitTransition).includes('wipeMode="hard"')&&String(playPostCommitTransition).includes('visualTransition:"global_black_reveal"'),
+    softSceneHasNoScreenAnimation:String(playPostCommitTransition).includes('type:"continuous_scene_update"')&&String(playPostCommitTransition).includes('visualTransition:"none"'),
+    noLethalAnimationDelay:!String(playPostCommitTransition).includes("hasLethalConsequenceInFlight()")&&String(playPostCommitTransition).includes("lethalDelayMs:0"),
     cuePresentationDoesNotCommitTruth:String(advance).includes("playAcademyKakashiV2CuePresentation36030")&&String(advance).includes("semanticBeatUnchanged:true"),
-    sharedChoreographyReset:String(globalThis.resetAcademyKakashiV2Transition36040).includes("cancelStoryChoreography33900"),
     noActorDomAnimationOwnership:!String(semanticAdvance).includes("querySelector")&&!String(advance).includes("clone"+"Node"),
     noStoryTruthMutation:!String(advance).includes("participants.")&&!String(semanticAdvance).includes("package."),
     browserGoldenClaimed:false

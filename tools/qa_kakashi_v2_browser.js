@@ -81,6 +81,19 @@ async function go(page,expected,choice){
   return r;
 }
 
+async function waitCurtainClear(page,label="transition"){
+  await page.waitForFunction(()=>{
+    const curtain=document.getElementById("kakashi-v2-global-curtain");
+    return !curtain||(!curtain.classList.contains("is-covered")&&!curtain.classList.contains("is-releasing")&&getComputedStyle(curtain).visibility==="hidden");
+  },null,{timeout:3000});
+  const row=await page.evaluate(()=>{
+    const curtain=document.getElementById("kakashi-v2-global-curtain");
+    return{exists:!!curtain,classes:curtain?.className||"",opacity:curtain?Number(getComputedStyle(curtain).opacity):0,visibility:curtain?getComputedStyle(curtain).visibility:"hidden"};
+  });
+  assert(row.visibility==="hidden"||row.opacity<=0.01,label+" curtain remained visibly opaque: "+JSON.stringify(row));
+  return row;
+}
+
 async function waitVisualReady(page,label="scene"){
   const result=await page.evaluate(async()=>{
     const p=globalThis.getAcademyKakashiV2Presentation36020&&globalThis.getAcademyKakashiV2Presentation36020(getActiveStorySceneRuntime()?.beatId);
@@ -605,17 +618,26 @@ async function cleanRoute(browser){
   assert.strictEqual(await page.evaluate(()=>globalThis.__kv2RootRef===document.getElementById("kakashi-v2-scene-board")),true,"cue advance remounted renderer root");
 
   await drain(page);
-  const promise=page.evaluate(()=>globalThis.advanceAcademyKakashiV236040());
-  await pause(90);
-  const animation=await page.evaluate(()=>{
-    const ghosts=[...document.querySelectorAll("#kakashi-v2-scene-board .kv2-actor-ghost")];
-    return{count:ghosts.length,classes:ghosts.map(n=>n.className)};
-  });
-  assert(animation.count>=1,"rooftop actor exit ghost missing: "+JSON.stringify(animation));
-  await shot(page,"02-rooftop-exit-animation.png");
-  const transitionResult=await promise;
+  const transitionResult=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040());
   assert(transitionResult&&transitionResult.success===true,JSON.stringify(transitionResult));
+  const transitionProbe=await page.evaluate(()=>{
+    const root=document.getElementById("kakashi-v2-scene-board"),curtain=document.getElementById("kakashi-v2-global-curtain");
+    const actorRows=[...(root?.querySelectorAll(".kv2-actor")||[])].map(node=>({
+      animationName:getComputedStyle(node).animationName,
+      transitionDuration:getComputedStyle(node).transitionDuration,
+      transform:getComputedStyle(node).transform
+    }));
+    return{
+      ghostCount:root?.querySelectorAll(".kv2-actor-ghost").length||0,
+      curtainCovered:!!curtain&&curtain.classList.contains("is-covered"),
+      actorRows
+    };
+  });
+  assert.strictEqual(transitionProbe.ghostCount,0,"rooftop transition created actor ghosts: "+JSON.stringify(transitionProbe));
+  assert.strictEqual(transitionProbe.curtainCovered,true,"hard scene change did not use the global curtain: "+JSON.stringify(transitionProbe));
+  assert(transitionProbe.actorRows.every(row=>row.animationName==="none"&&row.transitionDuration==="0s"),"actor animation/tween survived Golden motion kill-switch: "+JSON.stringify(transitionProbe));
   await waitUnlocked(page,"v2_scene02_tail");
+  checkpoints.push(await waitCurtainClear(page,"rooftop-to-alley"));
   checkpoints.push(await inspect(page,"tail"));
   await shot(page,"03-alley-tail.png");
   checkpoints.push(await assertSingleChoiceSurface(page,"tail choices"));
@@ -672,7 +694,7 @@ async function cleanRoute(browser){
   assert(completion.rewards.length>=2,"material reward receipts missing: "+JSON.stringify(completion));
   const browserErrors=await runtimeErrorGate.assertClean("cleanRoute");
   await context.close();
-  return{checkpoints,animation,completion,browserErrors};
+  return{checkpoints,transitionProbe,completion,browserErrors};
 }
 
 async function assertRepeatedBattleReentry(page){
@@ -697,6 +719,7 @@ async function assertRepeatedBattleReentry(page){
   });
   assert(resumed&&resumed.success===true,JSON.stringify(resumed));
   await page.waitForSelector("#kakashi-v2-scene-board",{state:"visible",timeout:12000});
+  await waitCurtainClear(page,"battle-to-story");
   await page.evaluate(()=>resetAcademyKakashiV2Transition36040());
   await waitUnlocked(page,"v2_mi_stop_win");
 
@@ -764,71 +787,40 @@ async function visualAndBattle(browser){
   });
   await waitVisualReady(page,"mi_stop_win");
   await drain(page);
-  const killPromise=page.evaluate(()=>globalThis.advanceAcademyKakashiV236040("mi_kill"));
-  await pause(90);
-  const killStart=await page.evaluate(()=>{
-    const root=document.getElementById("kakashi-v2-scene-board");
-    const ghost=root?.querySelector(".kv2-departure-ghost.is-falling");
-    const hold=root?.querySelector('.kv2-outgoing-hold-ghost[data-original-actor-id="academy_kakashi"]');
-    const liveActors=root?.querySelector(".kv2-actors");
-    const rect=ghost?.getBoundingClientRect(),style=ghost?getComputedStyle(ghost):null;
-    const holdStyle=hold?getComputedStyle(hold):null,liveStyle=liveActors?getComputedStyle(liveActors):null;
-    const memory=root?.querySelector(".kv2-transition-memory");
-    return{
-      exists:!!ghost,falling:!!ghost&&ghost.classList.contains("is-falling"),
-      top:rect?.top||0,opacity:style?Number(style.opacity):0,
-      animationName:style?.animationName||null,
-      active:ghost?.dataset.scChoreographyActive||null,
-      outgoingBackdropHeld:!!memory&&!memory.hidden,
-      kakashiHoldExists:!!hold,
-      kakashiHoldOpacity:holdStyle?Number(holdStyle.opacity):0,
-      liveActorLayerOpacity:liveStyle?Number(liveStyle.opacity):1
-    };
-  });
-  await pause(120);
-  const kill=await page.evaluate(()=>{
-    const root=document.getElementById("kakashi-v2-scene-board");
-    const ghost=root?.querySelector(".kv2-departure-ghost.is-falling");
-    const hold=root?.querySelector('.kv2-outgoing-hold-ghost[data-original-actor-id="academy_kakashi"]');
-    const rect=ghost?.getBoundingClientRect(),style=ghost?getComputedStyle(ghost):null;
-    return{
-      exists:!!ghost,falling:!!ghost&&ghost.classList.contains("is-falling"),
-      top:rect?.top||0,opacity:style?Number(style.opacity):0,
-      animationName:style?.animationName||null,
-      active:ghost?.dataset.scChoreographyActive||null,
-      kakashiHoldExists:!!hold,
-      kakashiHoldOpacity:hold?Number(getComputedStyle(hold).opacity):0
-    };
-  });
-  assert(killStart.exists&&killStart.falling&&kill.exists&&kill.falling,"kill consequence fade missing: "+JSON.stringify({killStart,kill}));
-  assert(String(kill.animationName||"").includes("kv2ActorFall36030"),"kill ghost is not running the stable consequence fade: "+JSON.stringify(kill));
-  assert.strictEqual(kill.active,"COLLAPSE","kill ghost is not bound to the semantic COLLAPSE choreography");
-  assert(Math.abs(kill.top-killStart.top)<3,"kill consequence card translated during the stabilization fade: "+JSON.stringify({killStart,kill}));
-  assert(kill.opacity<killStart.opacity,"kill consequence card did not fade before the scene crossfade: "+JSON.stringify({killStart,kill}));
-  assert.strictEqual(killStart.outgoingBackdropHeld,true,"outgoing fight environment was not preserved behind the consequence fade");
-  assert.strictEqual(killStart.kakashiHoldExists,false,"hard transition resurrected the retained-card clone stack");
-  assert.strictEqual(kill.kakashiHoldExists,false,"retained-card clone appeared during the single-layer crossfade");
-  assert(killStart.liveActorLayerOpacity<=0.01,"next-scene live actors were visible behind the outgoing environment");
-  await shot(page,"09-kill-consequence-crossfade.png",{skipReady:true});
-  const killResult=await killPromise;
+  const killResult=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040("mi_kill"));
   assert(killResult&&killResult.success===true,JSON.stringify(killResult));
-  await waitUnlocked(page,"v2_report");
-  await page.waitForFunction(()=>{
-    const root=document.getElementById("kakashi-v2-scene-board");
-    const actors=root&&root.querySelector(".kv2-actors");
-    return !!root&&!root.dataset.transitionActive&&root.querySelectorAll(".kv2-outgoing-hold-ghost").length===0&&!!actors&&Number(getComputedStyle(actors).opacity)>=0.99;
-  },null,{timeout:3000});
-  const killCleanup=await page.evaluate(()=>{
-    const root=document.getElementById("kakashi-v2-scene-board");
+  const killTransition=await page.evaluate(()=>{
+    const root=document.getElementById("kakashi-v2-scene-board"),curtain=document.getElementById("kakashi-v2-global-curtain");
+    const actorRows=[...(root?.querySelectorAll(".kv2-actor")||[])].map(node=>({
+      animationName:getComputedStyle(node).animationName,
+      transitionDuration:getComputedStyle(node).transitionDuration,
+      transform:getComputedStyle(node).transform
+    }));
     return{
-      holdGhosts:root?.querySelectorAll(".kv2-outgoing-hold-ghost").length||0,
-      transitionActive:root?.dataset.transitionActive||null,
-      liveActorLayerOpacity:root?Number(getComputedStyle(root.querySelector(".kv2-actors")).opacity):0
+      beatId:getActiveStorySceneRuntime()?.beatId||null,
+      ghostCount:root?.querySelectorAll(".kv2-actor-ghost,.kv2-departure-ghost,.kv2-outgoing-hold-ghost").length||0,
+      curtainCovered:!!curtain&&curtain.classList.contains("is-covered"),
+      actorRows
     };
   });
-  assert.strictEqual(killCleanup.holdGhosts,0,"outgoing kill tableau survived after the hard transition");
-  assert.strictEqual(killCleanup.transitionActive,null,"hard transition flag survived into report");
-  assert(killCleanup.liveActorLayerOpacity>=0.99,"report actor layer did not recover after kill transition: "+JSON.stringify(killCleanup));
+  assert.strictEqual(killTransition.beatId,"v2_report","kill semantic result did not reach report");
+  assert.strictEqual(killTransition.ghostCount,0,"kill transition created actor/hold ghosts: "+JSON.stringify(killTransition));
+  assert.strictEqual(killTransition.curtainCovered,true,"kill hard cut did not use the global curtain: "+JSON.stringify(killTransition));
+  assert(killTransition.actorRows.every(row=>row.animationName==="none"&&row.transitionDuration==="0s"),"kill/report actor animation survived: "+JSON.stringify(killTransition));
+  await waitUnlocked(page,"v2_report");
+  await waitCurtainClear(page,"kill-to-report");
+  await shot(page,"09-kill-report-after-curtain.png");
+  const killCleanup=await page.evaluate(()=>{
+    const root=document.getElementById("kakashi-v2-scene-board"),curtain=document.getElementById("kakashi-v2-global-curtain");
+    return{
+      ghostCount:root?.querySelectorAll(".kv2-actor-ghost,.kv2-departure-ghost,.kv2-outgoing-hold-ghost").length||0,
+      transitionActive:root?.dataset.transitionActive||null,
+      curtainClasses:curtain?.className||""
+    };
+  });
+  assert.strictEqual(killCleanup.ghostCount,0,"ghost presentation survived after hard transition");
+  assert.strictEqual(killCleanup.transitionActive,null,"root transition flag survived into report");
+  assert.strictEqual(killCleanup.curtainClasses,"","global curtain failed to settle after report reveal");
 
   await page.evaluate(()=>{
     const rt=getActiveStorySceneRuntime();
@@ -847,6 +839,7 @@ async function visualAndBattle(browser){
     const visible=node=>!!node&&node.getClientRects().length>0&&getComputedStyle(node).display!=="none"&&getComputedStyle(node).visibility!=="hidden";
     return visible(stage)&&!visible(root);
   },null,{timeout:12000});
+  await waitCurtainClear(page,"story-to-battle");
   const battle=await page.evaluate(()=>{
     const visible=node=>!!node&&node.getClientRects().length>0&&getComputedStyle(node).display!=="none"&&getComputedStyle(node).visibility!=="hidden";
     return{
@@ -888,7 +881,7 @@ async function visualAndBattle(browser){
   const lifecycleReentry=await assertRepeatedBattleReentry(page);
   const browserErrors=await runtimeErrorGate.assertClean("visualAndBattle");
   await context.close();
-  return{watch,kill,battle,post,lifecycleReentry,browserErrors};
+  return{watch,killTransition,killCleanup,battle,post,lifecycleReentry,browserErrors};
 }
 
 async function browserRouteMatrix(browser){

@@ -180,19 +180,16 @@ async function shot(page,name,selector=null){
       return{
         cue:getAcademyKakashiV2TransitionState36040()?.cueIndex,
         miWithheld:root.querySelector('.kv2-actor[data-slot="mi"]')?.dataset.kv2CueWithheld==="true",
-        lastKinds:getStoryChoreographyState33900(root).lastKinds
+        animations:[...root.querySelectorAll(".kv2-actor")].map(n=>getComputedStyle(n).animationName),
+        transitions:[...root.querySelectorAll(".kv2-actor")].map(n=>getComputedStyle(n).transitionDuration)
       };
     });
     assert.strictEqual(anticipation.cue,9);
     assert.strictEqual(anticipation.miWithheld,true);
-    assert(anticipation.lastKinds.includes("FOCUS"),"#312 'movement snaps' anticipation focus missing");
+    assert(anticipation.animations.every(x=>x==="none"),"#312 Kakashi actor animation survived at WATCH cue 9: "+JSON.stringify(anticipation));
+    assert(anticipation.transitions.every(x=>x==="0s"),"#312 Kakashi actor tween survived at WATCH cue 9: "+JSON.stringify(anticipation));
 
     await advanceWatchCue(10);
-    await page.waitForFunction(()=>{
-      const root=document.getElementById("kakashi-v2-scene-board");
-      const state=root&&getStoryChoreographyState33900(root);
-      return !!state&&state.state==="settled"&&state.completedKinds.includes("SURPRISE_ENTRY")&&state.completedKinds.includes("LUNGE");
-    },null,{timeout:2600});
     watch=await page.evaluate(()=>{
       const root=document.getElementById("kakashi-v2-scene-board");
       const mi=root.querySelector('.kv2-actor[data-slot="mi"]');
@@ -203,36 +200,17 @@ async function shot(page,name,selector=null){
         miHidden:mi?.hidden===true,
         miOpacity:mi?Number(getComputedStyle(mi).opacity):0,
         amtLeft:amt?.getBoundingClientRect().left||0,
-        choreography:getStoryChoreographyState33900(root)
+        ghostCount:root.querySelectorAll(".kv2-actor-ghost,.kv2-departure-ghost,.kv2-outgoing-hold-ghost").length
       };
     });
     assert.strictEqual(watch.miAnchor,"CENTER");
-    assert.strictEqual(watch.miWithheld,false,"#312 Masked Interceptor remained withheld after authored SURPRISE_ENTRY");
-    assert.strictEqual(watch.miHidden,false,"#312 Masked Interceptor remained hard-hidden after authored SURPRISE_ENTRY");
-    assert(watch.miOpacity>=0.75,"#312 Masked Interceptor did not become visible after authored entrance: "+watch.miOpacity);
-    assert(watch.choreography.completedKinds.includes("LUNGE"),"#312 MI entrance did not visibly drive toward Package Smuggler");
-    await shot(page,"02-story-handoff-surprise-entry.png","#kakashi-v2-scene-board");
+    assert.strictEqual(watch.miWithheld,false,"#312 Masked Interceptor remained withheld after authored reveal cue");
+    assert.strictEqual(watch.miHidden,false,"#312 Masked Interceptor remained hard-hidden after authored reveal cue");
+    assert(watch.miOpacity>=0.75,"#312 Masked Interceptor did not become visible after authored reveal: "+watch.miOpacity);
+    assert.strictEqual(watch.ghostCount,0,"#312 WATCH reveal created ghost animation furniture");
+    await shot(page,"02-story-handoff-static-reveal.png","#kakashi-v2-scene-board");
 
     await advanceWatchCue(11);
-    await page.waitForTimeout(170);
-    const breakawayMid=await page.evaluate(()=>{
-      const root=document.getElementById("kakashi-v2-scene-board");
-      const amt=root.querySelector('.kv2-actor[data-slot="amt"]');
-      const state=getStoryChoreographyState33900(root);
-      return{
-        active:amt?.dataset.scChoreographyActive||null,
-        left:amt?.getBoundingClientRect().left||0,
-        opacity:amt?Number(getComputedStyle(amt).opacity):1,
-        animationName:amt?getComputedStyle(amt).animationName:null,
-        choreography:state
-      };
-    });
-    assert.strictEqual(breakawayMid.active,"FLEE","#312 AMT breakaway is not using the shared FLEE choreography");
-    assert(Math.abs(breakawayMid.left-watch.amtLeft)<3,"#312 AMT breakaway translated the card during the stabilization fade: "+JSON.stringify({before:watch.amtLeft,mid:breakawayMid}));
-    assert(breakawayMid.opacity<0.75,"#312 AMT breakaway did not visibly fade: "+JSON.stringify(breakawayMid));
-    assert(String(breakawayMid.animationName||"").includes("kv2CueExit36030"),"#312 AMT FLEE must use the stable opacity-only exit cue: "+JSON.stringify(breakawayMid));
-
-    await page.waitForTimeout(550);
     const breakaway=await page.evaluate(()=>{
       const root=document.getElementById("kakashi-v2-scene-board");
       const amt=root.querySelector('.kv2-actor[data-slot="amt"]');
@@ -240,13 +218,17 @@ async function shot(page,name,selector=null){
       return{
         amtDeparted:amt?.classList.contains("kv2-cue-departed")===true,
         amtOpacity:amt?Number(getComputedStyle(amt).opacity):1,
+        amtAnimation:amt?getComputedStyle(amt).animationName:null,
+        amtTransition:amt?getComputedStyle(amt).transitionDuration:null,
         psAnchor:ps?.dataset.scStageAnchor,
-        choreography:getStoryChoreographyState33900(root)
+        ghostCount:root.querySelectorAll(".kv2-actor-ghost,.kv2-departure-ghost,.kv2-outgoing-hold-ghost").length
       };
     });
-    assert.strictEqual(breakaway.amtDeparted,true,"#312 ANBU Marked Target did not visibly break away");
-    assert(breakaway.amtOpacity<=0.01,"#312 AMT lingered after breakaway");
-    assert(breakaway.choreography.completedKinds.includes("FLEE"),"#312 AMT FLEE did not complete: "+JSON.stringify(breakaway.choreography));
+    assert.strictEqual(breakaway.amtDeparted,true,"#312 ANBU Marked Target did not leave at the authored breakaway cue");
+    assert(breakaway.amtOpacity<=0.01,"#312 AMT remained visible after static breakaway");
+    assert.strictEqual(breakaway.amtAnimation,"none","#312 AMT breakaway still owns an animation");
+    assert.strictEqual(breakaway.amtTransition,"0s","#312 AMT breakaway still owns a tween");
+    assert.strictEqual(breakaway.ghostCount,0,"#312 AMT breakaway created a departure ghost");
     assert.strictEqual(breakaway.psAnchor,"OPPONENT_RIGHT");
 
     for(let i=12;i<=17;i++)await advanceWatchCue(i);
@@ -274,64 +256,44 @@ async function shot(page,name,selector=null){
     assert.strictEqual(choiceLayout.canAdvance,"false");
     assert(parseFloat(choiceLayout.narrationRadius)>=10,"#312 narration/choice surface is not modern rounded presentation");
 
-    // Choice is not trapped by the running animation: semantic transition is immediate.
+    // Installed-browser jitter evidence supersedes authored card motion:
+    // semantic choice is immediate and the resulting actor composition is static.
     const start=Date.now();
     await choose(page,"STOP THE ASSASSIN","v2_stop_assassin_setup");
     const elapsed=Date.now()-start;
-    assert(elapsed<900,"#312 Story semantic choice waited for presentation animation: "+elapsed+"ms");
-    const stopEntryPhase=await page.evaluate(()=>{
-      const root=document.getElementById("kakashi-v2-scene-board");
-      const real=[...root.querySelectorAll(".kv2-actors > .kv2-actor")].map(n=>({slot:n.dataset.slot,id:n.dataset.actorId,pending:n.dataset.scChoreographyPendingEntry==="true"}));
-      const ghosts=[...root.querySelectorAll(".kv2-departure-ghost")].map(n=>({id:n.dataset.actorId,active:n.dataset.scChoreographyActive||null}));
-      const before=getStoryChoreographyState33900(root);
-      renderAcademyKakashiV236030();renderAcademyKakashiV236030();
-      const after=getStoryChoreographyState33900(root);
-      return{real,ghosts,before,after,ghostCountAfter:root.querySelectorAll(".kv2-departure-ghost").length};
-    });
-    assert.deepStrictEqual(stopEntryPhase.real.map(x=>x.slot),["kakashi","mi"],"#312 committed STOP state must contain only Kakashi + MI real actors");
-    assert(stopEntryPhase.real.find(x=>x.slot==="kakashi")?.pending===true,"#312 Kakashi must remain staged until intentional ENTER begins");
-    assert(stopEntryPhase.ghosts.length===2&&stopEntryPhase.ghosts.some(x=>x.active==="EXIT"),"#312 AMT/PS departures must begin before Kakashi entry: "+JSON.stringify(stopEntryPhase));
-    assert.strictEqual(stopEntryPhase.ghostCountAfter,2,"#312 repeated same-beat render duplicated/removed departure ghosts");
-    assert.strictEqual(stopEntryPhase.before.scopeKey,stopEntryPhase.after.scopeKey,"#312 repeated same-beat render changed choreography scope");
-    assert.strictEqual(stopEntryPhase.before.cueIndex,stopEntryPhase.after.cueIndex,"#312 repeated same-beat render replayed choreography");
-
-    await page.waitForFunction(()=>{
-      const root=document.getElementById("kakashi-v2-scene-board");
-      const state=root&&getStoryChoreographyState33900(root);
-      const kakashi=root&&root.querySelector('.kv2-actor[data-slot="kakashi"]');
-      return !!state&&state.completedKinds.includes("ENTER")&&!!kakashi&&!kakashi.hasAttribute("data-sc-choreography-pending-entry");
-    },null,{timeout:2600});
-    await page.waitForFunction(()=>{
-      const root=document.getElementById("kakashi-v2-scene-board");
-      const state=root&&getStoryChoreographyState33900(root);
-      return !!state&&state.state==="settled";
-    },null,{timeout:2600});
+    assert(elapsed<900,"#312 Story semantic choice waited for presentation: "+elapsed+"ms");
     const stop=await page.evaluate(()=>{
       const root=document.getElementById("kakashi-v2-scene-board");
       return{
         beat:getActiveStorySceneRuntime()?.beatId,
-        anchors:[...root.querySelectorAll(".kv2-actors > .kv2-actor")].map(n=>({slot:n.dataset.slot,anchor:n.dataset.scStageAnchor,width:n.getBoundingClientRect().width,transform:getComputedStyle(n).transform})),
-        ghostCount:root.querySelectorAll(".kv2-departure-ghost").length,
-        pendingEntryCount:root.querySelectorAll("[data-sc-choreography-pending-entry]").length,
-        choreography:getStoryChoreographyState33900(root),
-        transition:runAcademyKakashiV2Transition36040Diagnostics()
+        anchors:[...root.querySelectorAll(".kv2-actors > .kv2-actor")].map(n=>({
+          slot:n.dataset.slot,
+          anchor:n.dataset.scStageAnchor,
+          width:n.getBoundingClientRect().width,
+          transform:getComputedStyle(n).transform,
+          animation:getComputedStyle(n).animationName,
+          transition:getComputedStyle(n).transitionDuration,
+          pending:n.dataset.scChoreographyPendingEntry==="true"
+        })),
+        ghostCount:root.querySelectorAll(".kv2-actor-ghost,.kv2-departure-ghost,.kv2-outgoing-hold-ghost").length,
+        transition:runAcademyKakashiV2Transition36040Diagnostics(),
+        renderer:runAcademyKakashiV2Renderer36030Diagnostics()
       };
     });
     assert.strictEqual(stop.beat,"v2_stop_assassin_setup");
     assert.deepStrictEqual(stop.anchors.map(x=>x.anchor),["PLAYER_LEFT","OPPONENT_RIGHT"]);
     assert(stop.anchors.every(a=>a.width>=245),"#312 battle-pair Story prominence too small");
-    assert.strictEqual(stop.ghostCount,0,"#312 committed departures survived after choreography settled");
-    assert.strictEqual(stop.pendingEntryCount,0,"#312 entrant remained hidden after choreography settled");
-    assert(stop.choreography.lastKinds.includes("FOCUS")&&stop.choreography.lastKinds.includes("STRIKE")&&!stop.choreography.lastKinds.includes("LUNGE"),"#312 Kakashi sudden strike must retain one semantic STRIKE cue after FOCUS: "+JSON.stringify(stop.choreography));
-    assert(stop.anchors.every(a=>a.transform==="none"||a.transform==="matrix(1, 0, 0, 1, 0, 0)"||a.transform==="matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)"),"#312 Story actors retained residual transform after choreography settled: "+JSON.stringify(stop.anchors));
-    assert(stop.choreography.completedKinds.includes("ENTER"),"#312 Kakashi entry completion receipt missing: "+JSON.stringify(stop.choreography));
+    assert.strictEqual(stop.ghostCount,0,"#312 STOP transition created actor ghosts");
+    assert(stop.anchors.every(a=>a.pending===false),"#312 static actor remained choreography-pending");
+    assert(stop.anchors.every(a=>a.animation==="none"&&a.transition==="0s"),"#312 STOP actor animation/tween survived: "+JSON.stringify(stop.anchors));
+    assert(stop.anchors.every(a=>a.transform==="none"||a.transform==="matrix(1, 0, 0, 1, 0, 0)"||a.transform==="matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)"),"#312 Story actors retained residual transform: "+JSON.stringify(stop.anchors));
     assert(stop.transition.pass,JSON.stringify(stop.transition));
+    assert(stop.renderer.pass,JSON.stringify(stop.renderer));
     await page.waitForFunction(()=>{
-      const root=document.getElementById("kakashi-v2-scene-board");
-      return !!root&&!root.classList.contains("is-wipe-covering");
+      const curtain=document.getElementById("kakashi-v2-global-curtain");
+      return !curtain||(!curtain.classList.contains("is-covered")&&!curtain.classList.contains("is-releasing"));
     },null,{timeout:3000});
-    await page.waitForTimeout(260);
-    await shot(page,"03-story-stop-assassin-lunge.png","#kakashi-v2-scene-board");
+    await shot(page,"03-story-stop-assassin-static.png","#kakashi-v2-scene-board");
 
     // BATTLE BENCHMARK — use the authorised sequential MI package against the
     // same current Story instance. This is a QA launcher only; Battle truth and
@@ -916,7 +878,7 @@ async function shot(page,name,selector=null){
     const result={
       pass:true,
       issue:312,
-      story:{rooftop,watch,stopEntryPhase,stop,semanticChoiceElapsedMs:elapsed},
+      story:{rooftop,watch,stop,semanticChoiceElapsedMs:elapsed,staticGoldenMotion:true},
       battle:{config:launched.config,substitution:substitution.p,settledBattle,hit,defeat,squadOpening,offSlotFixture,offSlotFocus},
       browserErrors:errors,
       sourceHeadlessGreenClaimed:false,

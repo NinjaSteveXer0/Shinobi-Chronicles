@@ -30,11 +30,12 @@ assert(!/querySelector|document\.|createElement/.test(battleSource.split("functi
 assert(rendererSource.includes('>*:not(#${ROOT_ID}){display:none!important}'),"renderer does not suppress native Story layer");
 assert(rendererSource.includes("kv2-dialogue")&&rendererSource.includes("chronicle_receipt"),"renderer missing singular dialogue/Receipt modes");
 assert(!transitionSource.includes("kakashi_v2_transition_locked")&&transitionSource.includes("semanticAlreadyCommitted:true"),"#312 transition must not gate Story truth behind animation");
-assert(rendererSource.includes("kv2-actor-ghost")&&rendererSource.includes("playStoryChoreography33900"),"#312 actor exits must use renderer + shared choreography");
+assert(rendererSource.includes("Final Kakashi Golden motion policy")&&rendererSource.includes(".kv2-ghost-layer{display:none!important}"),"#312 Kakashi static-motion retirement missing");
+assert(rendererSource.includes('cancelStoryChoreography33900(root,"kakashi_golden_static_motion")'),"#312 Kakashi must cancel shared choreography rather than replay jitter-prone actor motion");
+assert(rendererSource.includes('GLOBAL_CURTAIN_ID="kakashi-v2-global-curtain"')&&rendererSource.includes("document.body.appendChild(curtain)"),"#312 global Story/Battle transition curtain missing");
 assert(!rendererSource.split("function ensureRoot")[0].includes("root.innerHTML"),"renderer source unexpectedly rebuilds root before mount");
 assert(!rendererSource.slice(rendererSource.indexOf("function syncActors"),rendererSource.indexOf("function bind")).includes("root.innerHTML"),"cue render remounts Scene Board root");
-assert(rendererSource.includes("kv2-ghost-layer"),"persistent actor ghost layer missing");
-assert(rendererSource.includes("is-falling")&&rendererSource.includes("is-fleeing")&&rendererSource.includes("is-fading"),"distinct actor exit regression markers missing");
+assert(transitionSource.includes('visualTransition:"global_black_reveal"')&&transitionSource.includes('visualTransition:"none"'),"#312 final hard/soft transition policy missing");
 assert(coreSource.includes('addBeat("v2_battle_ps_seq",{mode:"battle_transition",backdrop:B.alleyAlt')&&coreSource.includes('addBeat("v2_ps_seq_win",{mode:"choice",backdrop:B.alleyAlt')&&coreSource.includes('addBeat("v2_ps_seq_loss",{backdrop:B.alleyAlt'),"PS pursuit Battle/post-Battle must remain in the authorised side-street backdrop");
 
 // Reward authority uses the existing Currency / Inventory / Battle claim surfaces

@@ -928,13 +928,20 @@
       .battle2-modern[data-formation-stage="true"] .battle-live-status{display:none!important}
       .battle2-modern[data-formation-stage="true"] .battle-live-active-card-player .battle-live-active-nameplate{display:none!important}
       .battle2-modern[data-formation-stage="true"] .battle-live-roster-player .battle-live-roster-name{display:none!important}
-      .battle2-modern[data-formation-stage="true"] .battle-live-active-card{transition:opacity .12s ease,filter .12s ease!important;will-change:auto!important}
-      .battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.battle2-formation-support{transition:opacity .12s ease,filter .12s ease!important;will-change:auto!important}
+      /* Final Kakashi Golden / Formation Stage motion policy:
+         participant cards and combat feedback never tween, lunge, recoil or fade. */
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card,
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.battle2-formation-support{
+        transition:none!important;animation:none!important;will-change:auto!important
+      }
       .battle2-modern[data-formation-stage="true"] .battle2-formation-recessed{transform:none!important}
       .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-actor,
-      .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-target{animation:none!important;transform:none!important;will-change:auto!important}
-      .battle2-modern[data-formation-stage="true"] .battle2-performance-stage.is-playing .battle2-performance-center{animation:none!important}
-      .battle2-modern[data-formation-stage="true"] .battle2-performance-stage{transition:opacity .12s ease!important;transform:none!important}
+      .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-target,
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-stage.is-playing .battle2-performance-center,
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-result-chip{
+        animation:none!important;transition:none!important;transform:none!important;will-change:auto!important
+      }
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-stage{transition:none!important;transform:none!important}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-stage.is-settled{transform:none!important}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-host{left:43%!important;right:43%!important;top:1.5%!important;height:4.8%!important}
       .battle2-modern[data-formation-stage="true"] .battle2-live-ticker{left:35%!important;top:7.2%!important;width:30%!important;min-height:4.6%!important;padding:6px 10px!important}
@@ -988,7 +995,7 @@
       performanceDoesNotDuplicatePortraits:!String(battlePerformanceMarkup33000).includes("actorPortrait")&&!String(battlePerformanceMarkup33000).includes("targetPortrait")&&!String(battlePerformanceMarkup33000).includes("<img"),
       resultFeedbackAttachedToExactTarget:String(applyBattlePerformanceRoles33000).includes("targetNode.appendChild(chip)")&&String(battlePerformanceResultChip33000).includes("AUTHORITATIVE STATE UPDATED"),
       performanceSettleIsActionScoped:String(installBattlePerformance33000).includes("host.dataset.actionId===p.actionId")&&String(clearBattlePerformanceRoles33000).includes("battle2-performance-active")&&String(installBattlePerformance33000).includes("920"),
-      stableFormationMotion:installStyle.toString().includes("Golden stabilization")&&installStyle.toString().includes("animation:none!important;transform:none!important;will-change:auto!important"),
+      stableFormationMotion:installStyle.toString().includes("Final Kakashi Golden / Formation Stage motion policy")&&installStyle.toString().includes("transition:none!important;animation:none!important;will-change:auto!important")&&installStyle.toString().includes(".battle2-performance-result-chip"),
       playerCardNamesSuppressed:installStyle.toString().includes(".battle-live-active-card-player .battle-live-active-nameplate{display:none!important}")&&installStyle.toString().includes(".battle-live-roster-player .battle-live-roster-name{display:none!important}"),
       confrontationPLLaneAligned:installStyle.toString().includes('data-formation-mode="duel"] .battle-live-power-player')&&installStyle.toString().includes("left:43.5%!important")&&installStyle.toString().includes("left:56.5%!important"),
       topHudStackSeparated:installStyle.toString().includes(".battle2-performance-host{left:43%!important;right:43%!important;top:1.5%!important;height:4.8%!important}")&&installStyle.toString().includes(".battle2-live-ticker{left:35%!important;top:7.2%!important;width:30%!important"),
