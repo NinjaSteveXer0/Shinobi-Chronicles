@@ -308,3 +308,44 @@ Coding / Runtime issue #312 / PR #318 had already reconciled an earlier Writing 
 Before #312 is merged, its branch must reconcile the current `36000` / `36020` expression heads above so superseded dialogue is not restored.
 
 That reconciliation must not alter the already-owned #312 choreography / Battle presentation semantics.
+
+
+## Ending-cohesion status supersession — 2026-09-23
+
+Stephen has reopened Academy Kakashi player-facing Writing quality specifically at the terminal-story layer and set the Origin to **WRITING AMBER** until the ending reads as one cohesive Story.
+
+Durable audit / current acceptance authority:
+
+`Documentation/Story/Academy_Kakashi_Ending_Cohesion_AMBER_Repair_2026-09-23.md`
+
+authority commit:
+
+`e63099a3c4112a2cfafb0377c1246bd8d96f4e6c`
+
+Live terminal-expression repair commits:
+
+- `cd62803e061215398594a9345ea757a4eef8c996` — rewrite ANBU report + private Minato/Hokage evaluation;
+- `1afa2f1ea7e2e080c1a78b80146659fa0d693441` — make repeated group dispositions conversational rather than form-like.
+
+This supersedes the prior implication that Academy Kakashi player-facing Writing was fully accepted merely because the 2026-09-23 character-performance pass was source-GREEN.
+
+Current distinction:
+
+- character voice / source expression pass: previously source-GREEN;
+- terminal Story cohesion: **AMBER**;
+- installed-browser ending acceptance: **NOT PROVEN**;
+- Browser Golden: **NOT CLAIMED**.
+
+The active failure was not semantic correctness. It was terminal compression: route consequences could collapse into a handful of report boxes followed by a similarly short Minato scene.
+
+Current live source now expands:
+- route-relative first decision;
+- package success/failure;
+- participant consequences;
+- group custody/release;
+- Knowledge;
+- Pakkun where present;
+- report closure;
+- Minato's private judgement and command responsibility.
+
+No route topology or Story facts were intentionally changed by this expression pass.
