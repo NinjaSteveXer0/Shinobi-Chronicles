@@ -211,7 +211,7 @@ Kakashi settles into the shadow above the street.
 
 ---
 
-# SCENE 03A — WATCH THE EXCHANGE
+# SCENE 03A — WATCH THE HANDOFF
 
 Kakashi stays where he is.
 
@@ -256,7 +256,7 @@ Kakashi rises from his crouch.
 
 ---
 
-# SCENE 04A — STOP THE ASSASSIN
+# SCENE 04A — INTERCEPT THE MASKED ATTACKER
 
 Kakashi drops from the roof.
 
