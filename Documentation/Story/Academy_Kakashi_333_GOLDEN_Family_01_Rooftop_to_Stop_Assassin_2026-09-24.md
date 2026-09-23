@@ -1,3 +1,6 @@
+> **2026-09-24 CHOICE-LABEL REOPEN NOTICE**  
+> Stephen has retained this family as GOLDEN for player-facing prose/story performance but explicitly reopened Kakashi's player-facing option/decision names for modernization. Until the successor labels are approved, treat the choices in this file as semantic-route placeholders rather than final display wording. Candidate authority: `Documentation/Story/Academy_Kakashi_333_Player_Choice_Label_Modernization_Candidate_2026-09-24.md`.
+
 # Academy Kakashi Origin — #333 Repair Family 01
 ## Rooftop -> Tail -> Watch the Exchange -> Stop the Assassin -> Immediate Aftermath
 
