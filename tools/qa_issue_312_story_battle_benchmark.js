@@ -41,7 +41,7 @@ assert(kv2Renderer.includes("applyStoryStageAnchor33900"),"#312 Kakashi must ret
 assert(kv2Renderer.includes('data-story-object-id="PACKAGE"'),"#312 package token missing");
 assert(kv2Renderer.includes('data-count="1"')&&kv2Renderer.includes('data-count="2"'),"#312 actor prominence must adapt to cast count");
 assert(kv2Renderer.includes("Final Kakashi Golden motion policy"),"#312 Kakashi must explicitly opt out of actor/card animation after installed-browser jitter evidence");
-assert(kv2Renderer.includes(".kv2-ghost-layer{display:none!important}")&&kv2Renderer.includes(".kv2-transition-memory{display:none!important}")&&kv2Renderer.includes(".kv2-wipe{display:none!important}"),"#312 stale ghost/root-transition presentation layers must be retired");
+assert(kv2Renderer.includes(".kv2-ghost-layer{display:none!important}")&&!kv2Renderer.includes(".kv2-transition-memory")&&!kv2Renderer.includes(".kv2-wipe"),"#334 stale root-transition presentation layers must be absent from Kakashi renderer");
 {
   const transitionStart=kv2Renderer.indexOf("function playProjectionTransition(");
   const transitionEnd=kv2Renderer.indexOf("function syncActors(",transitionStart);
@@ -60,10 +60,11 @@ assert(kv2Renderer.includes("mi.hidden=true")&&kv2Renderer.includes("mi.hidden=f
 assert(kv2Transition.includes("semanticAlreadyCommitted:true"),"#312 transition must remain post-commit presentation");
 assert(kv2Transition.includes('"hard"')&&kv2Transition.includes('"soft"'),"#312 hard/soft semantic transition classification missing");
 assert(kv2Transition.includes('type:"continuous_scene_update"')&&kv2Transition.includes('visualTransition:"none"'),"#312 same-environment Story beats must not animate the whole screen");
-assert(kv2Transition.includes('type:"cinematic_hard_cut"')&&kv2Transition.includes('visualTransition:"global_black_reveal"'),"#312 hard environment changes must use the single global curtain reveal");
+assert(kv2Transition.includes('type:"cinematic_hard_cut"')&&kv2Transition.includes('visualTransition:"shared_story_hard_transition_33900"'),"#334 Kakashi hard environment changes must delegate to shared 33900 transition playback");
 assert(kv2Transition.includes("lethalDelayMs:0")&&!kv2Transition.includes("hasLethalConsequenceInFlight()?"),"#312 lethal choices must not wait on removed card animation");
-assert(kv2Renderer.includes('GLOBAL_CURTAIN_ID="kakashi-v2-global-curtain"')&&kv2Renderer.includes("document.body.appendChild(curtain)")&&kv2Renderer.includes(".is-releasing{opacity:0"),"#312 global curtain must survive Story-root teardown and own only the reveal fade");
-assert(kv2Renderer.includes("lastBattleSuspended")&&kv2Renderer.includes("setGlobalCurtain(true)")&&kv2Renderer.includes("setTimeout(()=>setGlobalCurtain(false),70)"),"#312 Story/Battle handoff must use the same global curtain owner");
+assert(storySource.includes('HARD_TRANSITION_CURTAIN_ID="sc-story-hard-transition-33900"')&&storySource.includes("document.body.appendChild(curtain)")&&storySource.includes(".is-releasing{opacity:0"),"#334 shared 33900 curtain must survive Story-root teardown and own reveal playback");
+assert(kv2Renderer.includes("lastBattleSuspended")&&kv2Renderer.includes('playSharedStoryHardTransition36030("story_to_battle"')&&kv2Renderer.includes('playSharedStoryHardTransition36030("battle_to_story"')&&kv2Renderer.includes("playStoryHardSceneTransition33900"),"#334 Story/Battle handoff must delegate to shared 33900 transition owner");
+assert(!kv2Renderer.includes("function ensureGlobalCurtain(")&&!kv2Renderer.includes("function setGlobalCurtain(")&&!kv2Renderer.includes("function setWipe(")&&!kv2Renderer.includes("function setTransitionMemory("),"#334 Kakashi renderer retained retired transition playback");
 assert(!kv2Transition.includes("cloneNode"),"#312 transition adapter must not own actor animation DOM");
 assert(!kv2Transition.includes("locked=true"),"#312 Story truth must not wait on animation lock");
 
