@@ -924,6 +924,32 @@
       .battle2-modern[data-formation-stage="true"] .battle2-action-hint{right:3%!important;top:auto!important;bottom:2.4%!important}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-host{top:2.1%!important}
 
+      /* Golden stabilization — stable cards, clean identity hierarchy, one aligned confrontation lane. */
+      .battle2-modern[data-formation-stage="true"] .battle-live-status{display:none!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card-player .battle-live-active-nameplate{display:none!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-player .battle-live-roster-name{display:none!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card{transition:opacity .12s ease,filter .12s ease!important;will-change:auto!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.battle2-formation-support{transition:opacity .12s ease,filter .12s ease!important;will-change:auto!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-formation-recessed{transform:none!important}
+      .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-actor,
+      .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-target{animation:none!important;transform:none!important;will-change:auto!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-stage.is-playing .battle2-performance-center{animation:none!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-stage{transition:opacity .12s ease!important;transform:none!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-stage.is-settled{transform:none!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-host{left:36%!important;right:36%!important;top:1.5%!important;height:4.8%!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-live-ticker{left:35%!important;top:7.2%!important;width:30%!important;min-height:4.6%!important;padding:6px 10px!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card-heading{top:1%!important}
+      .battle2-modern[data-formation-mode="duel"] .battle-live-active-card{top:12.5%!important;width:33.5%!important;height:53.5%!important}
+      .battle2-modern[data-formation-mode="duel"] .battle-live-power,
+      .battle2-modern[data-formation-mode="wedge"] .battle-live-power,
+      .battle2-modern[data-formation-mode="arc"] .battle-live-power{top:43.5%!important}
+      .battle2-modern[data-formation-mode="duel"] .battle-live-power-player,
+      .battle2-modern[data-formation-mode="wedge"] .battle-live-power-player,
+      .battle2-modern[data-formation-mode="arc"] .battle-live-power-player{left:43.5%!important;right:auto!important}
+      .battle2-modern[data-formation-mode="duel"] .battle-live-power-enemy,
+      .battle2-modern[data-formation-mode="wedge"] .battle-live-power-enemy,
+      .battle2-modern[data-formation-mode="arc"] .battle-live-power-enemy{left:56.5%!important;right:auto!important}
+
       @media(max-width:1100px){
         .battle2-modern[data-formation-stage="true"] .battle-live-action-family-row{width:54%!important}
         .battle2-modern[data-formation-stage="true"]:not([data-formation-tray="closed"]) .battle-live-skill-deck,.battle2-modern[data-formation-stage="true"]:not([data-formation-tray="closed"]) .battle-live-pouch,.battle2-modern[data-formation-stage="true"]:not([data-formation-tray="closed"]) .battle-live-summon{left:5%!important;width:67%!important}
@@ -962,6 +988,10 @@
       performanceDoesNotDuplicatePortraits:!String(battlePerformanceMarkup33000).includes("actorPortrait")&&!String(battlePerformanceMarkup33000).includes("targetPortrait")&&!String(battlePerformanceMarkup33000).includes("<img"),
       resultFeedbackAttachedToExactTarget:String(applyBattlePerformanceRoles33000).includes("targetNode.appendChild(chip)")&&String(battlePerformanceResultChip33000).includes("AUTHORITATIVE STATE UPDATED"),
       performanceSettleIsActionScoped:String(installBattlePerformance33000).includes("host.dataset.actionId===p.actionId")&&String(clearBattlePerformanceRoles33000).includes("battle2-performance-active")&&String(installBattlePerformance33000).includes("920"),
+      stableFormationMotion:installStyle.toString().includes("Golden stabilization")&&installStyle.toString().includes("animation:none!important;transform:none!important;will-change:auto!important"),
+      playerCardNamesSuppressed:installStyle.toString().includes(".battle-live-active-card-player .battle-live-active-nameplate{display:none!important}")&&installStyle.toString().includes(".battle-live-roster-player .battle-live-roster-name{display:none!important}"),
+      confrontationPLLaneAligned:installStyle.toString().includes('data-formation-mode="duel"] .battle-live-power-player')&&installStyle.toString().includes("left:43.5%!important")&&installStyle.toString().includes("left:56.5%!important"),
+      topHudStackSeparated:installStyle.toString().includes(".battle2-performance-host{left:36%!important;right:36%!important;top:1.5%!important;height:4.8%!important}")&&installStyle.toString().includes(".battle2-live-ticker{left:35%!important;top:7.2%!important;width:30%!important"),
       storyCallerPresentationSuspension:String(suspendCallerStoryPresentation33000).includes("markStoryPresentationHidden33900")&&String(renderCombatOverlay).includes("suspendCallerStoryPresentation33000"),
       branchModesRemainExplicit:renderInspector33000.toString().includes("setSelectedBattleSkillMode"),
       browserGoldenClaimed:false
