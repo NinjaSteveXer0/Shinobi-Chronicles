@@ -572,13 +572,13 @@ async function terminalStoryBrowserValidation(browser){
     issue:105,
     authority:"Academy_Kakashi_Ending_Cohesion_AMBER_Repair_2026-09-23",
     routesValidated:results.length,
-    post322DispositionRoutesPending:[
+    post322DispositionManualRoutesPending:[
       "KILL -> KILLED",
       "KILL -> ESCAPED",
       "RESTRAIN -> RESTRAINED",
       "RESTRAIN -> ESCAPED"
     ],
-    post322Reason:"Issue #322 is still open on this validation baseline; do not certify replacement disposition outcomes before implementation.",
+    post322Reason:"Replacement semantics are implemented and source-regressed; exact installed-browser acceptance for all four factual outcomes remains a separate manual/browser subgate.",
     results
   };
 }
@@ -797,18 +797,21 @@ async function visualAndBattle(browser){
       transitionDuration:getComputedStyle(node).transitionDuration,
       transform:getComputedStyle(node).transform
     }));
+    const state=getAcademyKakashiV2State36020();
     return{
       beatId:getActiveStorySceneRuntime()?.beatId||null,
+      dispositionOutcome:state?.participants?.MI?.state||null,
       ghostCount:root?.querySelectorAll(".kv2-actor-ghost,.kv2-departure-ghost,.kv2-outgoing-hold-ghost").length||0,
       curtainCovered:!!curtain&&curtain.classList.contains("is-covered"),
       actorRows
     };
   });
-  assert.strictEqual(killTransition.beatId,"v2_report","kill semantic result did not reach report");
-  assert.strictEqual(killTransition.ghostCount,0,"kill transition created actor/hold ghosts: "+JSON.stringify(killTransition));
-  assert.strictEqual(killTransition.curtainCovered,true,"kill hard cut did not use the global curtain: "+JSON.stringify(killTransition));
-  assert(killTransition.actorRows.every(row=>row.animationName==="none"&&row.transitionDuration==="0s"),"kill/report actor animation survived: "+JSON.stringify(killTransition));
-  await waitUnlocked(page,"v2_report");
+  assert.strictEqual(killTransition.beatId,"v2_mi_kill_result","kill semantic result did not enter exact resolver-result beat");
+  assert(["KILLED","ESCAPED"].includes(killTransition.dispositionOutcome),"kill resolver produced invalid final outcome: "+JSON.stringify(killTransition));
+  assert.strictEqual(killTransition.ghostCount,0,"kill result created actor/hold ghosts: "+JSON.stringify(killTransition));
+  assert.strictEqual(killTransition.curtainCovered,false,"same-environment kill result incorrectly invoked hard curtain: "+JSON.stringify(killTransition));
+  assert(killTransition.actorRows.every(row=>row.animationName==="none"&&row.transitionDuration==="0s"),"kill-result actor animation survived static Golden policy: "+JSON.stringify(killTransition));
+  await nextSemantic(page,"v2_report");
   await waitCurtainClear(page,"kill-to-report");
   await shot(page,"09-kill-report-after-curtain.png");
   const killCleanup=await page.evaluate(()=>{

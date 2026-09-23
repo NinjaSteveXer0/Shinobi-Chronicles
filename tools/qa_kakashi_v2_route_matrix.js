@@ -39,9 +39,12 @@ const tenConfigs={
 };
 const context={
   console,JSON,Object,Array,String,Number,Boolean,Set,Map,Math,Date,globalThis:null,
-  playerData:{},savePlayerData:()=>true,
+  playerData:{activityHistory:[]},activityHistory:[],
+  savePlayerData:()=>true,
   SC_STORY_DECISION_REALISATION_34000:D,
   SC_STORY_FACTUAL_RESOLVER_34600:F,
+  SC_ALPHA_SPECIAL_JONIN_EVIDENCE_PRODUCER_34700:{patchId:"qa"},
+  projectSpecialJoninContextualEvidence34700:()=>({success:true}),
   SC_ACADEMY_KAKASHI_V2_BATTLE_36010:{configs:tenConfigs},
   commitAcademyKakashiV2TerminalRewards36015:()=>({success:true,sourceReceipts:[],plan:{totalRyo:100}}),
   unregisterStoryScene:id=>scenes.delete(id),
@@ -107,7 +110,7 @@ assert.strictEqual(cycle,null,`unexpected Kakashi V2 route cycle: ${cycle&&cycle
 
 assert.strictEqual(def.beats.filter(b=>b.exitScene===true).length,1,"Kakashi V2 must have one semantic exit");
 assert.strictEqual(def.beats.find(b=>b.exitScene===true).beatId,"v2_complete");
-assert.strictEqual(def.beats.length,97,"unexpected Kakashi V2 beat count after retiring the illegal direct post-STOP AMT fork and unauthorised Demand setup prose");
+assert.strictEqual(def.beats.length,106,"unexpected Kakashi V2 beat count after final two-outcome disposition result scenes");
 
 // ---------------------------------------------------------------------------
 // Scenario driver: execute authored state consequences rather than merely parse
@@ -115,6 +118,7 @@ assert.strictEqual(def.beats.length,97,"unexpected Kakashi V2 beat count after r
 // ---------------------------------------------------------------------------
 function reset(forced={}){
   factualOutcomes={...forced};
+  context.playerData.activityHistory=[];context.activityHistory=context.playerData.activityHistory;
   activeRuntime={
     sceneId:SCENE_ID,instanceId:`qa_origin_${++scenarioSequence}`,
     beatId:def.entryBeatId,localContext:{},battleResume:null
@@ -193,8 +197,12 @@ enter("v2_scene02_tail");choose("STRIKE BEFORE THE HANDOFF");next();
 returnBattle("v2_direct_strike_2v1_win",{encounterId:"academy_kakashi_origin_battle_amt_ps_2v1",actions:3});next();
 returnBattle("v2_direct_mi_win",{encounterId:"academy_kakashi_origin_battle_mi_1v1",actions:2});
 choose("KILL THEM");
-for(const ref of ["AMT","PS","MI"])assert.strictEqual(state().participants[ref].state,"DEAD");
-assert.strictEqual(state().package.holder,"ANBU");
+for(const ref of ["AMT","PS","MI"])assert.strictEqual(state().participants[ref].state,"KILLED");
+assert.strictEqual(activeRuntime.beatId,"v2_group3_kill_result");
+assert.strictEqual(state().package.holder,"KAKASHI","resolver result scene must preserve route-owned package truth before report");
+next();
+assert.strictEqual(activeRuntime.beatId,"v2_report");
+assert.strictEqual(state().package.holder,"ANBU","ANBU custody commits only on exact report handoff");
 
 // MOVE IN CLOSER failure -> Stay on Package -> Ask Where -> Take Him Down loss.
 // Package recovery survives the Battle defeat and Knowledge remains exact.
@@ -225,8 +233,10 @@ returnBattle("v2_mi_stop_win",{encounterId:"academy_kakashi_origin_battle_mi_1v1
 assert((beat().choices||[]).some(c=>c.label==="GO AFTER PACKAGE SMUGGLER"&&c.availability().available===true));
 assert(!(beat().choices||[]).some(c=>c.label==="GO AFTER ANBU MARKED TARGET"));
 choose("RESTRAIN HER AND CONTINUE");
-assert.strictEqual(state().participants.MI.state,"FIELD_SECURED_PENDING_COLLECTION");
-assert.deepStrictEqual(Array.from(beat().choices).map(c=>c.label),["GO AFTER PACKAGE SMUGGLER"]);
+assert.strictEqual(state().participants.MI.state,"RESTRAINED");
+assert.strictEqual(activeRuntime.beatId,"v2_mi_restrained_next");
+next();
+assert.strictEqual(activeRuntime.beatId,"v2_ps_pursuit_resolver","RESTRAIN result did not preserve Package Smuggler pursuit timing");
 
 // Four controller actions is already too slow on STOP THE ASSASSIN.
 reset();
