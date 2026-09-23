@@ -1867,8 +1867,12 @@ function diagnostics(){
   const labels=choices.map(c=>c.label);
   const checks={
     exactFiveBinaryChoiceFamilies:[
-      ["furniture_help","furniture_continue_final"],["vegetables_help","vegetables_continue_final"],["equipment_help","equipment_continue_final"],["delivery_help","delivery_continue_final"],["cart_help","cart_continue_final"]
-    ].every(pair=>pair.every(id=>choiceIds.includes(id))),
+      {help:"furniture_help",proceed:"furniture_continue_final"},
+      {help:"vegetables_help",proceed:"vegetables_continue_final"},
+      {help:"equipment_help",proceed:"equipment_continue_final"},
+      {help:"delivery_help",proceed:"delivery_continue_final"},
+      {help:"cart_help",proceed:"cart_continue_final"}
+    ].every(pair=>[pair.help,pair.proceed].every(id=>choiceIds.includes(id))),
     oldChoiceIdsRetired:LEGACY_IDS.every(id=>!choiceIds.includes(id)),
     noTimingPending:!choiceIds.includes("timing_pending"),
     finalReflectionExact:Object.values(interpretationText).every(label=>labels.includes(label)),
