@@ -1,3 +1,6 @@
+> **2026-09-24 SUCCESSOR NOTICE — #333 WRITING GOLDEN**  
+> This quality pass remains useful historical/character-performance evidence, but its player-facing expression is superseded where different by `Documentation/Story/Academy_Kakashi_Origin_WRITING_GOLDEN_2026-09-24.md` @ `4b0565a789515b5425b2aadd3a4259337ca49385`. Preserve its semantic facts/voice research only where consistent with the current GOLDEN package.
+
 # Academy Kakashi Origin — Player-Facing Story / Dialogue Quality Pass
 
 **Date:** 2026-09-22  
