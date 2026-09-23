@@ -72,33 +72,37 @@ assert(coreSource.includes('addBeat("v2_battle_ps_seq",{mode:"battle_transition"
   assert.strictEqual(context.itemDatabase.academy_training_tanto.statModifiers.buki,1);
   assert.strictEqual(context.itemDatabase.academy_training_tanto.sourceActivation,"kakashi_origin_exceptional_reward_only");
 
-  context.currentBattle={
-    battleId:"qa_mi_battle",encounterId:"academy_kakashi_origin_battle_seq_mi",
-    outcome:{type:"victory"},
-    rewards:{generated:false,claimed:false},
-    kakashiV2:{battleConfigId:"academy_kakashi_origin_battle_seq_mi",battleOccurrenceId:"qa_mi_battle",storyOccurrenceId:"qa_origin"}
-  };
-  const immediate=context.generateBattleRewards({rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]}},{name:"Kakashi"});
-  assert.strictEqual(immediate.ryo,50);
-  assert.strictEqual(immediate.exp,0);
-  assert.strictEqual(JSON.stringify(Array.from(immediate.items).map(x=>x.id)),JSON.stringify(["field_recovery_pill"]));
-  assert.strictEqual(context.claimCurrentBattleRewards(),true);
-  assert.strictEqual(context.playerData.ryo,50);
-  assert.strictEqual(context.playerData.inventory.find(x=>x.id==="field_recovery_pill").quantity,1);
-
-  context.currentBattle={
-    battleId:"qa_ps_battle",encounterId:"academy_kakashi_origin_battle_seq_ps",
-    outcome:{type:"victory"},
-    rewards:{generated:false,claimed:false},
-    kakashiV2:{battleConfigId:"academy_kakashi_origin_battle_seq_ps",battleOccurrenceId:"qa_ps_battle",storyOccurrenceId:"qa_origin"}
-  };
-  const psImmediate=context.generateBattleRewards({rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]}},{name:"Kakashi"});
-  assert.strictEqual(psImmediate.ryo,50,"PS exact solo victory must project 50 Ryō");
-  assert.strictEqual(psImmediate.exp,0);
-  assert.deepStrictEqual(Array.from(psImmediate.items),[],"PS exact solo victory must remain cash-only");
-  assert.strictEqual(context.claimCurrentBattleRewards(),true);
-  assert.strictEqual(context.playerData.ryo,100,"PS Battle claim did not add exactly 50 Ryō");
-  assert.strictEqual(context.playerData.inventory.filter(x=>x.id==="field_recovery_pill").reduce((n,x)=>n+(x.quantity||1),0),1,"PS Battle must not grant another Field Recovery Pill");
+  const AMT="academy_kakashi_origin_amt",PS="academy_kakashi_origin_package_smuggler",MI="academy_kakashi_origin_masked_interceptor";
+  const battleRewardMatrix=[
+    ["academy_kakashi_origin_battle_seq_mi",[MI],50,true],
+    ["academy_kakashi_origin_battle_amt_1v1",[AMT],50,false],
+    ["academy_kakashi_origin_battle_amt_ps_2v1",[AMT,PS],100,false],
+    ["academy_kakashi_origin_battle_amt_ps_mi_3v1",[AMT,PS,MI],200,false],
+    ["academy_kakashi_origin_battle_kakashi_pakkun_vs_amt",[AMT],50,false],
+    ["academy_kakashi_origin_battle_ps_mi_2v1",[PS,MI],100,false],
+    ["academy_kakashi_origin_battle_mi_1v1",[MI],50,false],
+    ["academy_kakashi_origin_battle_ps_1v1",[PS],50,false],
+    ["academy_kakashi_origin_battle_seq_ps",[PS],50,false],
+    ["academy_kakashi_origin_battle_seq_amt_pakkun",[AMT],50,false]
+  ];
+  let expectedBattleRyo=0;
+  for(const [configId,oppositionParticipantIds,expectedRyo,expectedPill] of battleRewardMatrix){
+    const battleId="qa_"+configId;
+    context.currentBattle={
+      battleId,encounterId:configId,outcome:{type:"victory"},rewards:{generated:false,claimed:false},
+      kakashiV2:{battleConfigId:configId,battleOccurrenceId:battleId,storyOccurrenceId:"qa_origin",oppositionParticipantIds:[...oppositionParticipantIds]}
+    };
+    const immediate=context.generateBattleRewards({rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]}},{name:"Kakashi"});
+    assert.strictEqual(immediate.ryo,expectedRyo,configId+" immediate Battle Ryō mismatch");
+    assert.strictEqual(immediate.exp,0,configId+" must not fabricate generic Character EXP");
+    const itemIds=Array.from(immediate.items||[]).map(x=>x.id);
+    assert.deepStrictEqual(itemIds,expectedPill?["field_recovery_pill"]:[],configId+" Item projection mismatch");
+    assert.strictEqual(context.claimCurrentBattleRewards(),true,configId+" claim failed");
+    expectedBattleRyo+=expectedRyo;
+    assert.strictEqual(context.playerData.ryo,expectedBattleRyo,configId+" cash claim did not commit exactly once");
+  }
+  assert.strictEqual(expectedBattleRyo,750,"all ten Kakashi Battle configs must total their independently authorised immediate cash");
+  assert.strictEqual(context.playerData.inventory.filter(x=>x.id==="field_recovery_pill").reduce((n,x)=>n+(x.quantity||1),0),1,"MI Field Recovery Pill must remain once-per-Origin across repeated qualifying MI Battles");
 
   const state={
     package:{holder:"ANBU",returned:true,recovered:true},
@@ -114,7 +118,7 @@ assert(coreSource.includes('addBeat("v2_battle_ps_seq",{mode:"battle_transition"
   assert.strictEqual(terminal.grantedRyo,250);
   assert.strictEqual(terminal.pillGranted,0,"immediate MI pill must suppress terminal fallback");
   assert.strictEqual(terminal.trainingTantoGranted,1);
-  assert.strictEqual(context.playerData.ryo,350);
+  assert.strictEqual(context.playerData.ryo,1000);
   assert.strictEqual(context.playerData.inventory.filter(x=>x.id==="field_recovery_pill").reduce((n,x)=>n+(x.quantity||1),0),1);
   assert.strictEqual(context.playerData.inventory.filter(x=>x.id==="academy_training_tanto").length,1);
   const before=JSON.stringify({ryo:context.playerData.ryo,inventory:context.playerData.inventory});
