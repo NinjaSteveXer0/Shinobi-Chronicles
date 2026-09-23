@@ -64,18 +64,18 @@ function hasLethalConsequenceInFlight(){
 }
 function playPostCommitTransition(prev,next){
   const kind=transitionKind(prev,next);if(!kind)return{played:false};
-  const lethalDelay=kind==="hard"&&hasLethalConsequenceInFlight()?650:0;
-  const coverFor=kind==="hard"?360:150;
-  if(kind==="hard"){
-    try{if(typeof setAcademyKakashiV2TransitionMemory36030==="function")setAcademyKakashiV2TransitionMemory36030(prev&&prev.backdrop||null,true);}catch(_e){}
-  }
+  // Transform-heavy wipes and retained-card tableaux caused visible hitching.
+  // Renderer 36030 now stages the outgoing environment synchronously; this
+  // adapter only times a clean opacity crossfade after Story truth commits.
+  const lethalDelay=kind==="hard"&&hasLethalConsequenceInFlight()?320:0;
+  const coverFor=kind==="hard"?80:110;
   const start=()=>{
     wipeMode=kind;wipeCovering=true;render();
-    lastTransition={type:kind==="hard"?"cinematic_scene_change":"same_environment_beat_shift",fromBeatId:prev&&prev.id||null,toBeatId:next&&next.id||null,semanticAlreadyCommitted:true,outgoingEnvironmentPreserved:kind==="hard",lethalConsequenceDelayMs:lethalDelay,startedAt:Date.now()};
+    lastTransition={type:kind==="hard"?"cinematic_scene_change":"same_environment_beat_shift",fromBeatId:prev&&prev.id||null,toBeatId:next&&next.id||null,semanticAlreadyCommitted:true,outgoingEnvironmentPreserved:kind==="hard",singleLayerCrossfade:kind==="hard",lethalConsequenceDelayMs:lethalDelay,startedAt:Date.now()};
     later(()=>{
       if(kind==="hard"){try{if(typeof setAcademyKakashiV2TransitionMemory36030==="function")setAcademyKakashiV2TransitionMemory36030(null,false);}catch(_e){}}
       wipeCovering=false;render();
-      later(()=>{wipeMode=null;render();lastTransition={...lastTransition,completedAt:Date.now()};},kind==="hard"?320:180);
+      later(()=>{wipeMode=null;render();lastTransition={...lastTransition,completedAt:Date.now()};},kind==="hard"?480:160);
     },coverFor);
   };
   if(lethalDelay)later(start,lethalDelay);else start();
@@ -158,7 +158,7 @@ function diagnostics(){
     semanticCommitPrecedesPresentation:String(semanticAdvance).indexOf("PRE_ADVANCE")<String(semanticAdvance).indexOf("render()"),
     animationCannotBlockStoryTruth:!String(semanticAdvance).includes("locked")&&!String(semanticAdvance).includes("await")&&!String(playPostCommitTransition).includes("PRE_ADVANCE"),
     transitionHierarchyIsPostCommitPresentation:String(playPostCommitTransition).includes("semanticAlreadyCommitted:true")&&String(transitionKind).includes('"hard"')&&String(transitionKind).includes('"soft"'),
-    hardTransitionPreservesOutgoingScene:String(playPostCommitTransition).includes("setAcademyKakashiV2TransitionMemory36030")&&String(playPostCommitTransition).includes("outgoingEnvironmentPreserved"),
+    hardTransitionPreservesOutgoingScene:String(playPostCommitTransition).includes("outgoingEnvironmentPreserved")&&String(playPostCommitTransition).includes("singleLayerCrossfade")&&String(playPostCommitTransition).includes("setAcademyKakashiV2TransitionMemory36030(null,false)"),
     cuePresentationDoesNotCommitTruth:String(advance).includes("playAcademyKakashiV2CuePresentation36030")&&String(advance).includes("semanticBeatUnchanged:true"),
     sharedChoreographyReset:String(globalThis.resetAcademyKakashiV2Transition36040).includes("cancelStoryChoreography33900"),
     noActorDomAnimationOwnership:!String(semanticAdvance).includes("querySelector")&&!String(advance).includes("clone"+"Node"),
