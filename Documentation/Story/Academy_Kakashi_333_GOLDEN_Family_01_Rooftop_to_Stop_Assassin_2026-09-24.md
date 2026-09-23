@@ -136,6 +136,12 @@ The staging must make the available situation legible.
 
 # PLAYER-FACING STORY
 
+## Render boundary
+
+Only narration and character dialogue beneath this point are player-facing.
+
+Markdown branch headings such as `IF KAKASHI WINS`, `SUCCESS`, `FAILURE`, scene labels, `CHOICE` headings, `PL BATTLE` markers, and any explicit reuse/reconvergence instruction are **author/runtime scaffolding only** and must not render as Story prose.
+
 # SCENE 01 — KONOHA ROOFTOP, NIGHT
 
 Kakashi stands alone on a Konoha rooftop, the village lights spread out below him.
