@@ -450,6 +450,7 @@ function playStoryHardSceneTransition33900({scopeKey="story_hard_scene",fromScen
   const generation=++hardTransitionGeneration,startedAt=Date.now(),isReduced=reducedMotion();
   hardTransitionState={active:!isReduced,phase:isReduced?"settled":"covered",scopeKey:scope,generation,covered:!isReduced,startedAt,completedAt:isReduced?startedAt:null,cancelReason:null,presentationOnly:true,reducedMotion:isReduced,fromSceneId,toSceneId,fromBeatId,toBeatId,reason:String(reason||"hard_scene")};
   if(typeof document==="undefined"||isReduced){
+    hardTransitionState={...hardTransitionState,active:false,phase:"settled",covered:false,completedAt:startedAt};
     retireLegacyStoryTransitionDom33900();
     return{success:true,pending:false,presentationOnly:true,skippedMotion:true,state:getStoryHardSceneTransitionState33900()};
   }
