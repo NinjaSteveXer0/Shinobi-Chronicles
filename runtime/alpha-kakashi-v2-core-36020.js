@@ -115,22 +115,31 @@ function migrateLegacyDispositionState(s){
   return changed;
 }
 function restrainedParticipantKeys(s=state()){return ["MI","PS","AMT"].filter(key=>s&&s.participants&&s.participants[key]&&s.participants[key].state==="RESTRAINED");}
+function canDirectDisposition(row,kind){
+  if(!row)return false;
+  if(kind==="RELEASE")return row.state==="BATTLE_DEFEATED";
+  return row.state==="BATTLE_DEFEATED"||row.state==="RESTRAINED";
+}
 function dispose(ref,kind){
   if(!["ANBU","POLICE","RELEASE"].includes(kind))return{success:false,reason:"kakashi_v2_direct_disposition_kind_forbidden",kind};
-  const key=participantKey(ref);
-  return mutate(s=>{
-    const row=s.participants[key]||(s.participants[key]={});
-    row.state=kind==="ANBU"?"ANBU_CUSTODY":kind==="POLICE"?"POLICE_CUSTODY":"RELEASED";
-    row.disposition=kind;
-    if(kind==="ANBU"||kind==="POLICE"){row.deliveredAlive=true;row.deliveredInstitution=kind;row.collected=true;}
+  const key=participantKey(ref),s=state(),row=s&&s.participants&&s.participants[key];
+  if(!canDirectDisposition(row,kind))return{success:false,reason:"kakashi_v2_direct_disposition_state_forbidden",participant:key,state:row&&row.state||null,kind};
+  return mutate(stateRow=>{
+    const target=stateRow.participants[key]||(stateRow.participants[key]={});
+    target.state=kind==="ANBU"?"ANBU_CUSTODY":kind==="POLICE"?"POLICE_CUSTODY":"RELEASED";
+    target.disposition=kind;
+    if(kind==="ANBU"||kind==="POLICE"){target.deliveredAlive=true;target.deliveredInstitution=kind;target.collected=true;}
   });
 }
 function disposeGroup(kind,refs=[AMT,PS,MI]){
   if(!["ANBU","POLICE","RELEASE"].includes(kind))return{success:false,reason:"kakashi_v2_direct_group_disposition_kind_forbidden",kind};
-  return mutate(s=>refs.forEach(ref=>{
-    const key=participantKey(ref),row=s.participants[key]||(s.participants[key]={});
-    row.disposition=kind;row.state=kind==="ANBU"?"ANBU_CUSTODY":kind==="POLICE"?"POLICE_CUSTODY":"RELEASED";
-    if(kind==="ANBU"||kind==="POLICE"){row.deliveredAlive=true;row.deliveredInstitution=kind;row.collected=true;}
+  const keys=[...new Set((refs||[]).map(participantKey))],s=state();
+  const invalid=keys.find(key=>!canDirectDisposition(s&&s.participants&&s.participants[key],kind));
+  if(invalid)return{success:false,reason:"kakashi_v2_direct_group_disposition_state_forbidden",participant:invalid,state:s&&s.participants&&s.participants[invalid]&&s.participants[invalid].state||null,kind};
+  return mutate(stateRow=>keys.forEach(key=>{
+    const target=stateRow.participants[key]||(stateRow.participants[key]={});
+    target.disposition=kind;target.state=kind==="ANBU"?"ANBU_CUSTODY":kind==="POLICE"?"POLICE_CUSTODY":"RELEASED";
+    if(kind==="ANBU"||kind==="POLICE"){target.deliveredAlive=true;target.deliveredInstitution=kind;target.collected=true;}
   }));
 }
 function occurrenceId(kind,key){const rt=active();return `occ_academy_kakashi_v2_${String(rt&&rt.instanceId||"unknown")}_${String(kind)}_${String(key)}`;}
@@ -425,6 +434,69 @@ function groupKillSection(refs){
   return"group3_all_escaped";
 }
 function groupKillCues(refs){return W("dispositionResolvers",groupKillSection(refs));}
+function transferIntent(refs,institution,key){
+  const keys=[...new Set((Array.isArray(refs)?refs:[refs]).map(participantKey))];
+  return history("INSTITUTIONAL_TRANSFER_INTENT",{participantKeys:keys,institution,key});
+}
+function completeDirectTransfer(ref,institution,key){
+  const participant=participantKey(ref),result=dispose(participant,institution);
+  if(!result.success)return result;
+  const occ=commitKakashiOccurrence("delivery",`${String(institution).toLowerCase()}_${key}_${participant.toLowerCase()}`,{participantRefs:[participant],institution,deliveredLivingCount:1,directTransfer:true});
+  if(!occ.success)return occ;
+  history(institution==="ANBU"?"DIRECT_TO_ANBU":"DIRECT_TO_POLICE",{participantKey:participant,sourceOccurrenceId:occ.record&&occ.record.sourceOccurrenceId||null});
+  return{success:true,participantKey:participant,institution,sourceOccurrenceId:occ.record&&occ.record.sourceOccurrenceId||null};
+}
+function completeDirectGroupTransfer(refs,institution,key){
+  const keys=[...new Set((refs||[]).map(participantKey))],result=disposeGroup(institution,keys);
+  if(!result.success)return result;
+  const occ=commitKakashiOccurrence("delivery",`${String(institution).toLowerCase()}_${key}_group`,{participantRefs:keys,institution,deliveredLivingCount:keys.length,directTransfer:true});
+  if(!occ.success)return occ;
+  history(institution==="ANBU"?"GROUP_TO_ANBU":"GROUP_TO_POLICE",{participantKeys:keys,sourceOccurrenceId:occ.record&&occ.record.sourceOccurrenceId||null});
+  return{success:true,participantKeys:keys,institution,sourceOccurrenceId:occ.record&&occ.record.sourceOccurrenceId||null};
+}
+function directTransferFieldCues(ref,institution){
+  const key=participantKey(ref),recovered=packageRecoveredForDisposition(),prefix=key==="MI"?"mi":key==="PS"?"ps":"amt",suffix=String(institution).toLowerCase();
+  if(key==="PS"&&institution==="ANBU")return W("custodyGolden06B",`ps_anbu_depart_${recovered?"recovered":"missing"}`);
+  if(key==="AMT"&&institution==="ANBU")return W("custodyGolden06B",`amt_anbu_depart_${recovered?"recovered":"missing"}`);
+  return W("custodyGolden06B",`${prefix}_${suffix}_depart`);
+}
+function directTransferHandoffCues(ref,institution){
+  const key=participantKey(ref),recovered=packageRecoveredForDisposition(),prefix=key==="MI"?"mi":key==="PS"?"ps":"amt",suffix=String(institution).toLowerCase();
+  if(institution==="POLICE"&&key==="PS")return W("custodyGolden06B",`ps_police_handoff_${recovered?"recovered":"missing"}`);
+  if(institution==="POLICE"&&key==="AMT")return W("custodyGolden06B",`amt_police_handoff_${recovered?"recovered":"missing"}`);
+  return W("custodyGolden06B",`${prefix}_${suffix}_handoff`);
+}
+function directTransferActors(ref,institution,handoff=false){
+  const key=participantKey(ref),actors=["kakashi",key==="MI"?"mi":key==="PS"?"ps":"amt"],s=state();
+  if(s&&s.pakkun.present&&key==="AMT")actors.push("pakkun");
+  if(handoff&&institution==="ANBU")actors.push("anbu");
+  return actors;
+}
+function groupTransferActors(refs,institution,handoff=false){
+  const actors=["kakashi",...(refs||[]).map(ref=>participantKey(ref)==="MI"?"mi":participantKey(ref)==="PS"?"ps":"amt")],s=state();
+  if(s&&s.pakkun.present)actors.push("pakkun");
+  if(handoff&&institution==="ANBU")actors.push("anbu");
+  return [...new Set(actors)];
+}
+function groupTransferCues(size,institution,stage){
+  return W("custodyGolden06B",`group${Number(size)}_${String(institution).toLowerCase()}_${stage}`);
+}
+function collectedParticipantKeys(s=state()){return restrainedParticipantKeys(s).filter(key=>s&&s.participants[key]&&s.participants[key].collected===true);}
+function collectedHandoffCues(institution){
+  const keys=collectedParticipantKeys(),kind=String(institution).toLowerCase();
+  if(keys.length===1)return directTransferHandoffCues(keys[0],institution);
+  return groupTransferCues(keys.length>=3?3:2,institution,"handoff");
+}
+function collectedHandoffActors(institution){
+  const keys=collectedParticipantKeys().map(key=>key==="MI"?"mi":key==="PS"?"ps":"amt"),actors=["kakashi",...keys],s=state();
+  if(s&&s.pakkun.present)actors.push("pakkun");
+  if(institution==="ANBU")actors.push("anbu");
+  return [...new Set(actors)];
+}
+function finalRestraintCues(ref){
+  const key=participantKey(ref);
+  return W("custodyGolden06B",key==="MI"?"final_restrained_mi":key==="PS"?"final_restrained_ps":"final_restrained_amt");
+}
 function projectExtractionPlanning(ref,result,causalKey){
   if(!result||result.success!==true)return result;
   const sourceId=result.sourceOccurrenceId,source=playerData.activityHistory.find(r=>r&&String(r.sourceOccurrenceId||r.occurrenceId||"")===String(sourceId));
