@@ -83,14 +83,15 @@ async function go(page,expected,choice){
 
 async function waitCurtainClear(page,label="transition"){
   await page.waitForFunction(()=>{
-    const curtain=document.getElementById("kakashi-v2-global-curtain");
+    const curtain=document.getElementById("sc-story-hard-transition-33900");
     return !curtain||(!curtain.classList.contains("is-covered")&&!curtain.classList.contains("is-releasing")&&getComputedStyle(curtain).visibility==="hidden");
   },null,{timeout:3000});
   const row=await page.evaluate(()=>{
-    const curtain=document.getElementById("kakashi-v2-global-curtain");
-    return{exists:!!curtain,classes:curtain?.className||"",opacity:curtain?Number(getComputedStyle(curtain).opacity):0,visibility:curtain?getComputedStyle(curtain).visibility:"hidden"};
+    const curtain=document.getElementById("sc-story-hard-transition-33900");
+    return{exists:!!curtain,classes:curtain?.className||"",owner:curtain?.dataset?.scStoryTransitionOwner||null,opacity:curtain?Number(getComputedStyle(curtain).opacity):0,visibility:curtain?getComputedStyle(curtain).visibility:"hidden"};
   });
   assert(row.visibility==="hidden"||row.opacity<=0.01,label+" curtain remained visibly opaque: "+JSON.stringify(row));
+  if(row.exists)assert.strictEqual(row.owner,"story.transition.presentation.shared",label+" curtain owner drifted");
   return row;
 }
 
@@ -621,7 +622,7 @@ async function cleanRoute(browser){
   const transitionResult=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040());
   assert(transitionResult&&transitionResult.success===true,JSON.stringify(transitionResult));
   const transitionProbe=await page.evaluate(()=>{
-    const root=document.getElementById("kakashi-v2-scene-board"),curtain=document.getElementById("kakashi-v2-global-curtain");
+    const root=document.getElementById("kakashi-v2-scene-board"),curtain=document.getElementById("sc-story-hard-transition-33900");
     const actorRows=[...(root?.querySelectorAll(".kv2-actor")||[])].map(node=>({
       animationName:getComputedStyle(node).animationName,
       transitionDuration:getComputedStyle(node).transitionDuration,
@@ -790,7 +791,7 @@ async function visualAndBattle(browser){
   const killResult=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040("mi_kill"));
   assert(killResult&&killResult.success===true,JSON.stringify(killResult));
   const killTransition=await page.evaluate(()=>{
-    const root=document.getElementById("kakashi-v2-scene-board"),curtain=document.getElementById("kakashi-v2-global-curtain");
+    const root=document.getElementById("kakashi-v2-scene-board"),curtain=document.getElementById("sc-story-hard-transition-33900");
     const actorRows=[...(root?.querySelectorAll(".kv2-actor")||[])].map(node=>({
       animationName:getComputedStyle(node).animationName,
       transitionDuration:getComputedStyle(node).transitionDuration,
@@ -811,7 +812,7 @@ async function visualAndBattle(browser){
   await waitCurtainClear(page,"kill-to-report");
   await shot(page,"09-kill-report-after-curtain.png");
   const killCleanup=await page.evaluate(()=>{
-    const root=document.getElementById("kakashi-v2-scene-board"),curtain=document.getElementById("kakashi-v2-global-curtain");
+    const root=document.getElementById("kakashi-v2-scene-board"),curtain=document.getElementById("sc-story-hard-transition-33900");
     return{
       ghostCount:root?.querySelectorAll(".kv2-actor-ghost,.kv2-departure-ghost,.kv2-outgoing-hold-ghost").length||0,
       transitionActive:root?.dataset.transitionActive||null,
