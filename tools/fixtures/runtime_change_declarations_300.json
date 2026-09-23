@@ -312,6 +312,41 @@
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Final installed-browser Kakashi Golden evidence from Stephen still rejected actor/card animations and layered screen transitions as visibly jittery and non-cinematic. This presentation-only stabilization removes Kakashi actor/card motion entirely, preserves authored cue-local presence/anchor changes synchronously, disables remaining Formation Stage participant/feedback animation, retires ghost/outgoing-memory/root-wipe layers, and makes a single document-level opaque curtain the only hard environment and Story/Battle handoff transition. Same-environment Story changes have no whole-screen transition. Story truth, Battle semantics, rewards, PL, route topology and authored text are unchanged."
+    },
+    {
+      "changeId": "academy-obito-final-binary-journey-331",
+      "classification": "REPLACES",
+      "responsibilityIds": [
+        "origin.academy_obito.final_story_state",
+        "story.scene.presentation.shared",
+        "origin.completion.shared"
+      ],
+      "owner": "runtime/alpha-origin-scenes-32900-c.js",
+      "directCallers": [
+        "runtime/alpha-origin-scenes-32900-integrator.js",
+        "runtime/alpha-traversal-bridge-33200.js"
+      ],
+      "stateTouched": [
+        "activeStorySceneRuntime.localContext Obito choice intents",
+        "playerData.activityHistory exact Obito journey-time source facts",
+        "Academy Obito formal-training entitlement occurrence",
+        "Academy Obito final self-interpretation history"
+      ],
+      "productionLoader": "index.html + runtime/alpha-traversal-bridge-33200.js",
+      "qaRefs": [
+        "tools/qa_issue_331_obito_final_runtime.js",
+        "tools/qa_alpha_origin_scenes_32900_runtime.js",
+        "tools/qa_issue_105_origin_screen_first_activation.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [
+        "runtime/alpha-origin-scenes-32900-c.js::pre331_obito_three_choice_runtime",
+        "runtime/alpha-origin-choice-reaction-33510.js::patchObito",
+        "runtime/alpha-early-story-modernization-33600.js::patchObito",
+        "runtime/alpha-origin-screen-first-33700.js::patchObito"
+      ],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Final #329/#331 authority replaces Academy Obito's old material/brief/none diversion ontology, delayed timing_pending route and old reflection set with five binary HELP/CONTINUE occurrences, exact route-relative authored time, one deterministic training entitlement and four independent self-interpretations. Obito-specific later patch owners are retired rather than allowed to overwrite the canonical final graph."
     }
   ]
 }
