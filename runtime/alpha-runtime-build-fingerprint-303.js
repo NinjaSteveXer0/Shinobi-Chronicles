@@ -17,7 +17,7 @@
   const MANIFEST=Object.freeze({
     schemaVersion:1,
     buildId:"SC-ALPHA-RUNTIME-R303-2026-09-23-P",
-    sourceBaselineCommit:"dc9f6da7adbbfdbdf900de5ee60891ce10e06b8e",
+    sourceBaselineCommit:"d69f53de69b4ebd45caa7e2050d7656f9cb4658d",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
     runtimeGeneration:"alpha-story-battle-formation-stage-312",
     majorRuntimeFeatures:Object.freeze([
