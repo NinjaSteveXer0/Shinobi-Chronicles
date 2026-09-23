@@ -1,5 +1,5 @@
 # Academy Kakashi Origin — #333 Repair Family 02
-## MOVE IN CLOSER
+## GET CLOSER
 
 **Date:** 2026-09-24  
 **Owner:** Writing / Story — Konoha  
@@ -41,7 +41,7 @@ Only narration and character dialogue beneath this point are player-facing.
 
 Markdown branch headings such as `IF KAKASHI WINS`, `SUCCESS`, `FAILURE`, scene labels, `CHOICE` headings, `PL BATTLE` markers, and any explicit reuse/reconvergence instruction are **author/runtime scaffolding only** and must not render as Story prose.
 
-# SCENE 03B — MOVE IN CLOSER
+# SCENE 03B — GET CLOSER
 
 The two men are talking now.
 
