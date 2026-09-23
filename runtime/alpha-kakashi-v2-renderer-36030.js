@@ -73,20 +73,27 @@ function installStyle(){
 #${ROOT_ID}[data-preset="hokage_report"] .kv2-actor[data-slot="anbu"]{--kv2-x:13%;--kv2-y:0}
 #${ROOT_ID}[data-preset="hokage_report"] .kv2-actor[data-slot="minato"]{--kv2-x:67%;--kv2-y:12%}
 #${ROOT_ID} .kv2-actor img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}
-#${ROOT_ID} .kv2-actor.is-entering{animation:kv2ActorEnter36030 .48s cubic-bezier(.2,.75,.24,1) both}
+#${ROOT_ID} .kv2-actor.is-entering{animation:kv2ActorEnter36030 .20s ease-out both}
 #${ROOT_ID} .kv2-ghost-layer{position:absolute;inset:0;z-index:12;pointer-events:none;overflow:hidden}\n#${ROOT_ID}[data-transition-active="true"] .kv2-ghost-layer{z-index:46}\n#${ROOT_ID} .kv2-actor-ghost{position:absolute!important;z-index:1!important;margin:0!important;pointer-events:none!important}
-#${ROOT_ID} .kv2-actor-ghost.is-falling{will-change:transform,opacity}
-#${ROOT_ID} .kv2-actor-ghost.is-fleeing{will-change:transform,opacity}
-#${ROOT_ID} .kv2-actor-ghost.is-fading{will-change:transform,opacity}
-#${ROOT_ID} .kv2-departure-ghost.is-falling[data-sc-choreography-active="COLLAPSE"]{animation-name:kv2ActorFall36030!important;animation-timing-function:cubic-bezier(.2,.72,.2,1)!important}
-#${ROOT_ID} .kv2-departure-ghost.is-fleeing[data-sc-choreography-active="FLEE"]{animation-name:kv2ActorFlee36030!important;animation-timing-function:cubic-bezier(.18,.74,.18,1)!important}
+#${ROOT_ID} .kv2-actor-ghost.is-falling,#${ROOT_ID} .kv2-actor-ghost.is-fleeing,#${ROOT_ID} .kv2-actor-ghost.is-fading{will-change:opacity}
+#${ROOT_ID} .kv2-departure-ghost.is-falling[data-sc-choreography-active="COLLAPSE"]{animation-name:kv2ActorFall36030!important;animation-timing-function:ease-out!important}
+#${ROOT_ID} .kv2-departure-ghost.is-fleeing[data-sc-choreography-active="FLEE"]{animation-name:kv2ActorFlee36030!important;animation-timing-function:ease-out!important}
 #${ROOT_ID} .kv2-departure-ghost.is-fading[data-sc-choreography-active="EXIT"]{animation-name:kv2ActorFade36030!important}
-@keyframes kv2ActorEnter36030{from{opacity:0;transform:translate3d(56px,0,0) scale(.96);filter:brightness(.45) blur(1px)}to{opacity:1;transform:translate3d(0,0,0) scale(1);filter:drop-shadow(0 18px 24px rgba(0,0,0,.48))}}
-@keyframes kv2ActorFall36030{0%{opacity:1;transform:translate3d(0,0,0) rotate(0);filter:saturate(.9) brightness(.92)}28%{opacity:1;transform:translate3d(1.5%,7%,0) rotate(2deg);filter:saturate(.78) brightness(.82)}100%{opacity:0;transform:translate3d(3%,148%,0) rotate(8deg);filter:saturate(.28) brightness(.38)}}
-@keyframes kv2ActorFlee36030{0%{opacity:1;transform:translate3d(0,0,0) scale(1)}22%{opacity:1;transform:translate3d(0,-1%,0) scale(1.015)}100%{opacity:0;transform:translate3d(var(--kv2-departure-x,70vw),-4%,0) scale(.88)}}
+@keyframes kv2ActorEnter36030{from{opacity:0;filter:brightness(.78)}to{opacity:1;filter:drop-shadow(0 18px 24px rgba(0,0,0,.48))}}
+@keyframes kv2ActorFall36030{0%{opacity:1;filter:saturate(.9) brightness(.92)}100%{opacity:0;filter:saturate(.42) brightness(.55)}}
+@keyframes kv2ActorFlee36030{from{opacity:1}to{opacity:0}}
 @keyframes kv2ActorFade36030{from{opacity:1}to{opacity:0}}
+/* Kakashi V2 stabilization: shared choreography keeps timing/receipts, but cards never translate/scale. */
+#${ROOT_ID} [data-sc-choreography-active]{will-change:opacity,filter!important;animation-name:kv2CueEmphasis36030!important}
+#${ROOT_ID} .sc-choreo-enter,#${ROOT_ID} .sc-choreo-surprise-entry{animation-name:kv2CueEnter36030!important}
+#${ROOT_ID} .sc-choreo-collapse,#${ROOT_ID} .sc-choreo-flee,#${ROOT_ID} .sc-choreo-exit{animation-name:kv2CueExit36030!important}
+#${ROOT_ID} .sc-choreo-reposition,#${ROOT_ID} .sc-choreo-handoff,#${ROOT_ID} .sc-choreo-object-transfer{animation:none!important}
+@keyframes kv2CueEmphasis36030{from{opacity:.82;filter:brightness(.9)}to{opacity:1;filter:none}}
+@keyframes kv2CueEnter36030{from{opacity:0}to{opacity:1}}
+@keyframes kv2CueExit36030{from{opacity:1}to{opacity:0}}
 #${ROOT_ID} .kv2-card-frame{position:absolute;inset:0;border:1px solid rgba(210,172,80,.28);background:linear-gradient(180deg,transparent 50%,rgba(1,6,9,.68));box-shadow:inset 0 0 0 1px rgba(255,255,255,.018)}
-#${ROOT_ID} .kv2-actor-label{position:absolute;left:6%;right:6%;bottom:3%;padding:6px 8px;border:1px solid rgba(208,168,75,.4);background:rgba(2,7,11,.88);text-align:center;font-size:8px;font-weight:900;letter-spacing:.11em;color:#eee2c7;text-shadow:0 1px 2px #000}\n#${ROOT_ID} .kv2-actor-state{display:table;margin:4px auto 0;padding:2px 6px;border:1px solid rgba(92,215,225,.35);background:rgba(4,23,28,.82);color:#7fe1e8;font-size:7px;font-weight:900;letter-spacing:.08em}\n#${ROOT_ID} .kv2-object-layer{position:absolute;inset:0;z-index:16;pointer-events:none}\n#${ROOT_ID} .kv2-package-token{position:absolute;top:42%;left:var(--sc-stage-anchor-x,50%);width:64px;height:45px;transform:translate(-8%,-50%);display:grid;place-items:center;border:1px solid rgba(221,178,73,.75);background:linear-gradient(145deg,rgba(42,30,12,.95),rgba(12,14,13,.96));box-shadow:0 12px 28px rgba(0,0,0,.48),0 0 18px rgba(221,178,73,.12);color:#e4c66e;font-size:7px;font-weight:900;letter-spacing:.12em}\n#${ROOT_ID} .kv2-package-token::before{content:"";position:absolute;width:32px;height:21px;border:1px solid rgba(226,190,100,.64);background:linear-gradient(135deg,#4a3a21,#21190f);transform:rotate(-4deg)}\n#${ROOT_ID} .kv2-package-token span{position:absolute;top:calc(100% + 5px);white-space:nowrap;padding:3px 5px;background:rgba(2,8,11,.82);border:1px solid rgba(215,174,76,.32)}\n#${ROOT_ID} .kv2-package-token[hidden]{display:none!important}\n#${ROOT_ID} .kv2-departure-ghost,#${ROOT_ID} .kv2-outgoing-hold-ghost{position:absolute!important;z-index:13!important;pointer-events:none!important}\n#${ROOT_ID} .kv2-departure-ghost{display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.9) brightness(.94) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0)}\n#${ROOT_ID} .kv2-outgoing-hold-ghost{display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.96) brightness(.96) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0)}\n#${ROOT_ID} .kv2-departure-ghost img,#${ROOT_ID} .kv2-outgoing-hold-ghost img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}\n#${ROOT_ID}[data-transition-active="true"] .kv2-actors{opacity:0!important;pointer-events:none!important}\n#${ROOT_ID} .kv2-dialogue{position:absolute;left:50%;bottom:3%;width:min(72%,980px);min-height:0;max-height:none;z-index:30;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto;column-gap:14px;padding:11px 15px 12px;transform:translateX(-50%);border:1px solid rgba(93,215,225,.32);border-radius:16px;background:linear-gradient(180deg,rgba(5,16,22,.88),rgba(2,9,14,.95));box-shadow:0 18px 48px rgba(0,0,0,.46),inset 0 0 0 1px rgba(255,255,255,.025);backdrop-filter:blur(8px)}
+#${ROOT_ID} .kv2-actor-label{position:absolute;left:6%;right:6%;bottom:3%;padding:6px 8px;border:1px solid rgba(208,168,75,.4);background:rgba(2,7,11,.88);text-align:center;font-size:8px;font-weight:900;letter-spacing:.11em;color:#eee2c7;text-shadow:0 1px 2px #000}\n#${ROOT_ID} .kv2-actor-state{display:table;margin:4px auto 0;padding:2px 6px;border:1px solid rgba(92,215,225,.35);background:rgba(4,23,28,.82);color:#7fe1e8;font-size:7px;font-weight:900;letter-spacing:.08em}\n#${ROOT_ID} .kv2-object-layer{position:absolute;inset:0;z-index:16;pointer-events:none}\n#${ROOT_ID} .kv2-package-token{position:absolute;top:42%;left:var(--sc-stage-anchor-x,50%);width:64px;height:45px;transform:translate(-8%,-50%);display:grid;place-items:center;border:1px solid rgba(221,178,73,.75);background:linear-gradient(145deg,rgba(42,30,12,.95),rgba(12,14,13,.96));box-shadow:0 12px 28px rgba(0,0,0,.48),0 0 18px rgba(221,178,73,.12);color:#e4c66e;font-size:7px;font-weight:900;letter-spacing:.12em}\n#${ROOT_ID} .kv2-package-token::before{content:"";position:absolute;width:32px;height:21px;border:1px solid rgba(226,190,100,.64);background:linear-gradient(135deg,#4a3a21,#21190f);transform:rotate(-4deg)}\n#${ROOT_ID} .kv2-package-token span{position:absolute;top:calc(100% + 5px);white-space:nowrap;padding:3px 5px;background:rgba(2,8,11,.82);border:1px solid rgba(215,174,76,.32)}\n#${ROOT_ID} .kv2-package-token[hidden]{display:none!important}\n#${ROOT_ID} .kv2-departure-ghost,#${ROOT_ID} .kv2-outgoing-hold-ghost{position:absolute!important;z-index:13!important;pointer-events:none!important}\n#${ROOT_ID} .kv2-departure-ghost{display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.9) brightness(.94) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0)}\n#${ROOT_ID} .kv2-outgoing-hold-ghost{display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.96) brightness(.96) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0)}\n#${ROOT_ID} .kv2-departure-ghost img,#${ROOT_ID} .kv2-outgoing-hold-ghost img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}\n#${ROOT_ID} .kv2-actors{transition:opacity .16s ease-out}
+#${ROOT_ID}[data-transition-active="true"] .kv2-actors{opacity:0!important;pointer-events:none!important}\n#${ROOT_ID} .kv2-dialogue{position:absolute;left:50%;bottom:3%;width:min(72%,980px);min-height:0;max-height:none;z-index:30;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto;column-gap:14px;padding:11px 15px 12px;transform:translateX(-50%);border:1px solid rgba(93,215,225,.32);border-radius:16px;background:linear-gradient(180deg,rgba(5,16,22,.88),rgba(2,9,14,.95));box-shadow:0 18px 48px rgba(0,0,0,.46),inset 0 0 0 1px rgba(255,255,255,.025);backdrop-filter:blur(8px)}
 #${ROOT_ID} .kv2-speaker{grid-column:1;grid-row:1;color:#e3bd5f;font-size:8px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;min-height:11px}
 #${ROOT_ID} .kv2-text{grid-column:1/-1;grid-row:2;margin-top:4px;max-height:8.5vh;overflow:auto;white-space:pre-wrap;color:#eef3f1;font-size:clamp(12px,.94vw,15px);line-height:1.42;text-shadow:0 1px 2px #000}
 #${ROOT_ID} .kv2-progress{grid-column:2;grid-row:1;color:#71858c;font-size:8px;font-weight:900;letter-spacing:.08em}
@@ -119,16 +126,16 @@ function installStyle(){
 #${ROOT_ID}[data-battle-action-only="true"] .kv2-dialogue{display:grid!important;width:min(56%,720px);padding:10px 14px;grid-template-rows:1fr}
 #${ROOT_ID}[data-battle-action-only="true"] .kv2-actions{grid-row:1;margin-top:0;grid-template-columns:1fr}
 #${ROOT_ID} .kv2-receipt button{margin-top:24px;width:100%;min-height:40px;border:1px solid rgba(95,215,225,.42);border-radius:10px;background:rgba(7,33,39,.72);color:#78dfe7;font-weight:900;letter-spacing:.1em;cursor:pointer}
-#${ROOT_ID} .kv2-transition-memory{position:absolute;inset:0;z-index:45;background-position:center;background-size:cover;background-repeat:no-repeat;opacity:1;pointer-events:none;transition:opacity .34s cubic-bezier(.22,.72,.24,1),filter .38s ease,transform .42s ease}
-#${ROOT_ID} .kv2-transition-memory.is-releasing{opacity:0;filter:brightness(.88) blur(1.2px);transform:scale(1.008)}
+#${ROOT_ID} .kv2-transition-memory{position:absolute;inset:0;z-index:45;background-position:center;background-size:cover;background-repeat:no-repeat;opacity:1;pointer-events:none;transition:opacity .46s cubic-bezier(.22,.61,.36,1)}
+#${ROOT_ID} .kv2-transition-memory.is-releasing{opacity:0}
 #${ROOT_ID} .kv2-transition-memory[hidden]{display:none!important}
 #${ROOT_ID}[data-transition-active="true"] .kv2-actions,#${ROOT_ID}[data-transition-active="true"] .kv2-receipt button{pointer-events:none!important}
-#${ROOT_ID} .kv2-wipe{position:absolute;inset:-3%;z-index:999;opacity:0;pointer-events:none;transition:opacity .30s cubic-bezier(.22,.72,.24,1),transform .42s cubic-bezier(.22,.72,.24,1),filter .30s ease;transform:scale(1.012);filter:blur(0)}
-#${ROOT_ID} .kv2-wipe.is-hard{background:radial-gradient(ellipse at 50% 44%,rgba(3,11,16,.16) 0%,rgba(2,8,12,.38) 48%,rgba(0,3,6,.62) 100%);backdrop-filter:blur(2.2px)}
-#${ROOT_ID} .kv2-wipe.is-soft{background:linear-gradient(90deg,rgba(4,15,20,.02),rgba(4,15,20,.30) 42%,rgba(4,15,20,.30) 58%,rgba(4,15,20,.02));backdrop-filter:blur(1px)}
-#${ROOT_ID} .kv2-wipe.is-covering{pointer-events:auto;transform:scale(1);filter:none}
-#${ROOT_ID} .kv2-wipe.is-hard.is-covering{opacity:.58}
-#${ROOT_ID} .kv2-wipe.is-soft.is-covering{opacity:.30}
+#${ROOT_ID} .kv2-wipe{position:absolute;inset:0;z-index:999;opacity:0;pointer-events:none;transition:opacity .14s ease-out}
+#${ROOT_ID} .kv2-wipe.is-hard{background:transparent;backdrop-filter:none}
+#${ROOT_ID} .kv2-wipe.is-soft{background:rgba(3,10,14,.14);backdrop-filter:none}
+#${ROOT_ID} .kv2-wipe.is-covering{pointer-events:auto}
+#${ROOT_ID} .kv2-wipe.is-hard.is-covering{opacity:0}
+#${ROOT_ID} .kv2-wipe.is-soft.is-covering{opacity:.14}
 #${ROOT_ID}[data-can-advance="true"]{cursor:pointer}
 #${ROOT_ID}[data-has-choices="true"]{cursor:default}
 #${ROOT_ID} .kv2-actor.kv2-cue-departed{opacity:0!important;pointer-events:none!important}
@@ -390,7 +397,7 @@ function deriveProjectionChoreography(root,previous,next,p,departures=[]){
   // preventing a semantic commit from painting an accidental four-card tableau.
   for(const row of departures)cues.push({
     kind:row.kind,actorId:row.ghostId,removeOnComplete:true,
-    ...(row.kind==="COLLAPSE"?{durationMs:620}:row.kind==="FLEE"?{durationMs:520}:{})
+    ...(row.kind==="COLLAPSE"?{durationMs:300}:row.kind==="FLEE"?{durationMs:240}:{})
   });
   const prevIds=new Set((previous.actors||[]).map(a=>a.id));
   for(const actor of next.actors||[]){
@@ -638,14 +645,13 @@ function render(){
     // themselves.
     const hardTransition=semanticChanged&&!!prepared&&isHardProjectionTransition(previous,next);
     const departures=capture?materializeDepartureGhosts(root,capture,next):[];
-    const heldActors=hardTransition&&capture?materializeRetainedHoldGhosts(root,capture,next):[];
     if(hardTransition){
-      if(heldActors.length)root.dataset.outgoingTableau="true";
-      // Mark the handoff immediately. The newly committed scene is already
-      // rendered underneath the preserved outgoing environment; z-order keeps
-      // it visually covered until the outgoing scene dissolves. This avoids a
-      // blank frame while preserving synchronous Story truth.
+      // One owner, one visual transition: stage the outgoing environment before
+      // syncing the committed next scene. No retained actor clone stack or
+      // transform-based wipe is allowed to compete with the new layout.
+      setTransitionMemory(previous&&previous.backdrop||null,true);
       root.dataset.transitionActive="true";
+      delete root.dataset.outgoingTableau;
     }else{
       delete root.dataset.outgoingTableau;
     }
@@ -703,7 +709,7 @@ function setTransitionMemory(backdropPath,visible){
       memory.hidden=true;memory.classList.remove("is-releasing");memory.style.backgroundImage="";
       delete root.dataset.transitionActive;delete root.dataset.outgoingTableau;
       for(const ghost of [...root.querySelectorAll(".kv2-outgoing-hold-ghost")])ghost.remove();
-    },340);
+    },460);
   }else{
     delete root.dataset.transitionActive;delete root.dataset.outgoingTableau;
     for(const ghost of [...root.querySelectorAll(".kv2-outgoing-hold-ghost")])ghost.remove();
@@ -753,8 +759,9 @@ function diagnostics(){
     sharedChoreographyConsumer:String(playProjectionTransition).includes("playStoryChoreography33900"),
     departuresPrecedeNewEntries:String(deriveProjectionChoreography).indexOf("for(const row of departures)")<String(deriveProjectionChoreography).indexOf("const prevIds"),
     departureGhostCleanupOwnedByCue:String(deriveProjectionChoreography).includes("removeOnComplete:true"),
-    hardTransitionFreezesOutgoingTableau:String(materializeRetainedHoldGhosts).includes("kv2-outgoing-hold-ghost")&&installStyle.toString().includes('data-transition-active="true"] .kv2-actors{opacity:0')&&installStyle.toString().includes('data-transition-active="true"] .kv2-ghost-layer{z-index:46}')&&installStyle.toString().includes(".kv2-transition-memory{position:absolute;inset:0;z-index:45")&&String(setTransitionMemory).includes("kv2-outgoing-hold-ghost"),
-    hardTransitionCrossfadesInsteadOfBlackCut:installStyle.toString().includes("kv2-transition-memory.is-releasing")&&installStyle.toString().includes("is-hard.is-covering{opacity:.58}")&&String(setTransitionMemory).includes("dissolving the preserved outgoing"),
+    hardTransitionUsesSingleVisualOwner:String(render).includes("setTransitionMemory(previous&&previous.backdrop||null,true)")&&!String(render).includes("materializeRetainedHoldGhosts(root,capture,next)")&&installStyle.toString().includes('data-transition-active="true"] .kv2-actors{opacity:0'),
+    hardTransitionCrossfadesInsteadOfBlackCut:installStyle.toString().includes("kv2-transition-memory.is-releasing{opacity:0}")&&installStyle.toString().includes("is-hard.is-covering{opacity:0}")&&String(setTransitionMemory).includes("dissolving the preserved outgoing"),
+    transformMotionRetired:installStyle.toString().includes("shared choreography keeps timing/receipts, but cards never translate/scale")&&installStyle.toString().includes(".sc-choreo-reposition")&&installStyle.toString().includes("animation:none!important"),
     departureGhostsSanitizeLiveAnimationState:String(appendDepartureGhost).includes('ghost.className="kv2-departure-ghost kv2-actor-ghost'),
     actorScopeIgnoresObjectState:String(playProjectionTransition).includes("actorSignature")&&!String(playProjectionTransition).includes("next.packageHolder"),
     semanticDiffIgnoresHarmlessParticipantRefresh:!String(render).includes('JSON.stringify(previous.participantStates)!==JSON.stringify(next.participantStates)'),

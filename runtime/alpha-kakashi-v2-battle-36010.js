@@ -309,7 +309,7 @@ function installPakkunBattleButtons(container){
   let root=stage.querySelector(".kakashi-v2-pakkun-actions");if(!root){root=document.createElement("div");root.className="kakashi-v2-pakkun-actions";stage.appendChild(root);}
   root.innerHTML='<span>PAKKUN · TEMPORARY ACTION SOURCE</span><button type="button" data-pakkun-action="pakkun_nipping_bite">NIPPING BITE</button><button type="button" data-pakkun-action="pakkun_tracking_scent">TRACKING SCENT</button><button type="button" data-pakkun-action="pakkun_field_guide">FIELD GUIDE</button>';
   for(const b of root.querySelectorAll("button"))b.onclick=()=>pakkunAction(b.dataset.pakkunAction);
-  if(!document.getElementById("kakashi-v2-pakkun-style")){const s=document.createElement("style");s.id="kakashi-v2-pakkun-style";s.textContent='.kakashi-v2-pakkun-actions{position:absolute;right:3.4%;top:57%;z-index:36;width:32.6%;padding:8px;border:1px solid rgba(197,160,75,.35);background:rgba(3,10,15,.92);display:flex;flex-wrap:wrap;gap:6px}.kakashi-v2-pakkun-actions span{width:100%;font-size:7px;font-weight:900;letter-spacing:.12em;color:#d7b55a}.kakashi-v2-pakkun-actions button{border:1px solid rgba(86,207,218,.35);background:rgba(9,40,47,.5);color:#75dce4;padding:6px 7px;font-size:7px;font-weight:800;cursor:pointer}';document.head.appendChild(s);}
+  if(!document.getElementById("kakashi-v2-pakkun-style")){const s=document.createElement("style");s.id="kakashi-v2-pakkun-style";s.textContent='.kakashi-v2-pakkun-actions{position:absolute;right:3.4%;top:auto;bottom:31.5%;z-index:36;width:30%;max-width:420px;padding:8px;border:1px solid rgba(197,160,75,.35);border-radius:10px;background:rgba(3,10,15,.92);display:flex;flex-wrap:wrap;gap:6px}.kakashi-v2-pakkun-actions span{width:100%;font-size:7px;font-weight:900;letter-spacing:.12em;color:#d7b55a}.kakashi-v2-pakkun-actions button{border:1px solid rgba(86,207,218,.35);border-radius:7px;background:rgba(9,40,47,.5);color:#75dce4;padding:6px 7px;font-size:7px;font-weight:800;cursor:pointer}';document.head.appendChild(s);}
   return true;
 }
 const PRE_RENDER=typeof renderCombatOverlay==="function"?renderCombatOverlay:null;
@@ -327,6 +327,7 @@ function diagnostics(){
     noAutoScaling:Object.values(PROFILE).every(p=>enemyDatabase[p.id].provenance.noAutoScaling===true),
     timingGatesExact:CONFIGS.academy_kakashi_origin_battle_seq_mi.timingGate.maximumControllerActions===4&&CONFIGS.academy_kakashi_origin_battle_seq_ps.timingGate.maximumControllerActions===3,
     pakkunTemporaryOnly:!String(pakkunAction).includes("grantEntityOwnership")&&!String(pakkunAction).includes("attachEntitySummonToCharacter"),
+    pakkunPanelClearsActionTray:String(installPakkunBattleButtons).includes("bottom:31.5%")&&String(installPakkunBattleButtons).includes("top:auto"),
     playerEntryPLNotHardcoded:!String(projectResult).includes("basePLAtEntry:15")&&String(projectResult).includes("authoritativePlayerBasePLAtEntry"),
     noStoryDom:!String(launch).includes("querySelector")&&!String(projectResult).includes("document."),
     browserGoldenClaimed:false

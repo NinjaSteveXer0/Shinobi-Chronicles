@@ -12,12 +12,10 @@ if(globalThis.SC_ACADEMY_KAKASHI_V2_REWARDS_36015)return;
 const PATCH_ID="academy_kakashi_v2_rewards_36015_2026_09_22";
 const STORE_KEY="kakashiV2RewardReceipts36015";
 const KAKASHI="academy_kakashi";
-const MI_SOLO_CONFIGS=new Set([
-  "academy_kakashi_origin_battle_seq_mi",
-  "academy_kakashi_origin_battle_mi_1v1"
-]);
-const PS_SOLO_CONFIG="academy_kakashi_origin_battle_seq_ps";
-const AMT_SOLO_CONFIG="academy_kakashi_origin_battle_seq_amt_pakkun";
+const AMT="academy_kakashi_origin_amt";
+const PS="academy_kakashi_origin_package_smuggler";
+const MI="academy_kakashi_origin_masked_interceptor";
+const FAILED_PICKPOCKET_3V1_CONFIG="academy_kakashi_origin_battle_amt_ps_mi_3v1";
 
 const SOURCE=Object.freeze({
   terminal:"kak_origin_ryo_terminal_debrief",
@@ -28,6 +26,8 @@ const SOURCE=Object.freeze({
   miCash:"kak_origin_battle_mi_victory_ryo_01",
   psCash:"kak_origin_battle_ps_victory_ryo_01",
   amtCash:"kak_origin_battle_amt_victory_ryo_01",
+  twoVsOneCash:"kak_origin_battle_2v1_victory_ryo_01",
+  failedPickpocket3v1Cash:"kak_origin_battle_failed_pickpocket_3v1_victory_ryo_01",
   fieldPill:"kak_origin_item_field_recovery_resupply",
   trainingTanto:"kak_origin_weapon_exceptional_training_tanto"
 });
@@ -102,6 +102,19 @@ function storyOccurrenceFromBattle(){
   const dep=battle&&battle.kakashiV2;
   return dep&&dep.storyOccurrenceId?String(dep.storyOccurrenceId):null;
 }
+function battleOppositionIds36015(battle,dep,configId){
+  const direct=dep&&Array.isArray(dep.oppositionParticipantIds)?dep.oppositionParticipantIds.map(String).filter(Boolean):[];
+  if(direct.length)return direct;
+  const catalogue=globalThis.SC_ACADEMY_KAKASHI_V2_BATTLE_36010&&globalThis.SC_ACADEMY_KAKASHI_V2_BATTLE_36010.configs;
+  const config=catalogue&&catalogue[configId];
+  return config&&Array.isArray(config.opposition)?config.opposition.map(String).filter(Boolean):[];
+}
+function soloCashSource36015(participantId){
+  if(participantId===MI)return SOURCE.miCash;
+  if(participantId===PS)return SOURCE.psCash;
+  if(participantId===AMT)return SOURCE.amtCash;
+  return null;
+}
 function battlePlan(){
   const battle=currentBattleState36015();
   const dep=battle&&battle.kakashiV2;
@@ -110,13 +123,21 @@ function battlePlan(){
   const storyOccurrenceId=storyOccurrenceFromBattle();
   const battleOccurrenceId=String(dep.battleOccurrenceId||battle.battleId||"");
   if(!storyOccurrenceId||!battleOccurrenceId)return null;
-  if(MI_SOLO_CONFIGS.has(configId)){
-    const pill=!committed(storyOccurrenceId,SOURCE.fieldPill,"origin");
-    return{configId,storyOccurrenceId,battleOccurrenceId,cashSourceId:SOURCE.miCash,ryo:50,pill,parentSourceId:"kak_origin_battle_mi_victory_reward_v1"};
+  const oppositionParticipantIds=battleOppositionIds36015(battle,dep,configId);
+  const count=oppositionParticipantIds.length;
+  const exactKnownOpposition=oppositionParticipantIds.every(id=>id===MI||id===PS||id===AMT);
+  if(!exactKnownOpposition||count<1)return{configId,storyOccurrenceId,battleOccurrenceId,oppositionParticipantIds,cashSourceId:null,ryo:0,pill:false};
+  if(count===1){
+    const participantId=oppositionParticipantIds[0],cashSourceId=soloCashSource36015(participantId);
+    const pill=participantId===MI&&!committed(storyOccurrenceId,SOURCE.fieldPill,"origin");
+    return{configId,storyOccurrenceId,battleOccurrenceId,oppositionParticipantIds,cashSourceId,ryo:cashSourceId?50:0,pill,parentSourceId:participantId===MI?"kak_origin_battle_mi_victory_reward_v1":null};
   }
-  if(configId===PS_SOLO_CONFIG)return{configId,storyOccurrenceId,battleOccurrenceId,cashSourceId:SOURCE.psCash,ryo:50,pill:false};
-  if(configId===AMT_SOLO_CONFIG)return{configId,storyOccurrenceId,battleOccurrenceId,cashSourceId:SOURCE.amtCash,ryo:50,pill:false};
-  return{configId,storyOccurrenceId,battleOccurrenceId,cashSourceId:null,ryo:0,pill:false};
+  if(count===2)return{configId,storyOccurrenceId,battleOccurrenceId,oppositionParticipantIds,cashSourceId:SOURCE.twoVsOneCash,ryo:100,pill:false};
+  if(count===3&&configId===FAILED_PICKPOCKET_3V1_CONFIG){
+    const exactSet=[AMT,PS,MI].every(id=>oppositionParticipantIds.includes(id));
+    return{configId,storyOccurrenceId,battleOccurrenceId,oppositionParticipantIds,cashSourceId:exactSet?SOURCE.failedPickpocket3v1Cash:null,ryo:exactSet?200:0,pill:false};
+  }
+  return{configId,storyOccurrenceId,battleOccurrenceId,oppositionParticipantIds,cashSourceId:null,ryo:0,pill:false};
 }
 
 function ensureKakashiV2BattleRewardProjection36015(finishingShinobi=null){
@@ -326,13 +347,13 @@ function diagnostics(){
   const checks={
     exactTerminalSources:[SOURCE.terminal,SOURCE.packageRecovered,SOURCE.actionableIntel,SOURCE.liveCustody,SOURCE.exceptional].every(Boolean),
     terminalCap250:previewTerminal({package:{returned:true},knowledge:{askWhere:true},participants:{MI:{state:"ANBU_CUSTODY"}},battles:{pickpocket_3v1:{outcome:"victory"}},routeHistory:[],resolvers:{},terminal:{}}, "diag").totalRyo===250,
-    exactImmediateCash:MI_SOLO_CONFIGS.size===2&&PS_SOLO_CONFIG==="academy_kakashi_origin_battle_seq_ps"&&AMT_SOLO_CONFIG==="academy_kakashi_origin_battle_seq_amt_pakkun",
+    exactImmediateCash:String(battlePlan).includes("count===1")&&String(battlePlan).includes("ryo:100")&&String(battlePlan).includes("ryo:exactSet?200:0")&&String(battleOppositionIds36015).includes("oppositionParticipantIds"),
     exactTanto:!!tanto&&tanto.type==="weapon"&&tanto.weaponClass==="Tanto"&&tanto.stackable===false&&Number(tanto.statModifiers&&tanto.statModifiers.buki)===1,
     noKillRewardPredicate:!String(previewTerminal).includes('state==="DEAD"')&&!String(exceptionalState).includes("DEAD"),
     noParallelInventory:!String(commitItemSource).includes("inventory.push")&&String(commitItemSource).includes("addItemToInventory"),
     victoryProjectionSelfHeals:String(ensureKakashiV2BattleRewardProjection36015).includes("authoritativeProjectionRepaired")&&String(renderVictoryOverlay36015).includes("ensureKakashiV2BattleRewardProjection36015"),
     victoryOpenProjectsBeforeGenericRender:String(openOverlay36015).includes('"victory"')&&String(openOverlay36015).indexOf("ensureKakashiV2BattleRewardProjection36015")<String(openOverlay36015).indexOf("PRE_OPEN_OVERLAY"),
-    exactMIBattleProjection:String(ensureKakashiV2BattleRewardProjection36015).includes("Field Recovery Pill")&&String(battlePlan).includes("ryo:50"),
+    exactMIBattleProjection:String(ensureKakashiV2BattleRewardProjection36015).includes("Field Recovery Pill")&&String(battlePlan).includes("participantId===MI")&&String(battlePlan).includes("ryo:cashSourceId?50:0")&&String(soloCashSource36015).includes("participantId===MI"),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
