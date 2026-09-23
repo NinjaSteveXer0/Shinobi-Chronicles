@@ -254,6 +254,35 @@
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Installed-browser evidence showed the Package Smuggler pursuit Battle regressed to the Sakura-tree environment, the already-authorised 50 Ryō PS reward was not reaching the actual Victory surface, and the opaque hard scene cut was rejected. This restores the existing PS route/reward authority and recalibrates transition presentation without changing Battle, reward-value, Story-result or progression semantics."
+    },
+    {
+      "changeId": "kakashi-battle-golden-consolidation-2026-09-23",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "battle.presentation.shared",
+        "origin.academy_kakashi.v2.reward_commit",
+        "origin.academy_kakashi.v2.story_dom"
+      ],
+      "owner": "runtime/alpha-battle-modern-33000.js + runtime/alpha-kakashi-v2-rewards-36015.js + runtime/alpha-kakashi-v2-renderer-36030.js + runtime/alpha-kakashi-v2-transition-36040.js",
+      "directCallers": [
+        "index.html",
+        "runtime/alpha-traversal-bridge-33200.js"
+      ],
+      "stateTouched": [
+        "currentBattle.rewards (authoritative Kakashi V2 immediate Battle reward projection)",
+        "presentation-only Formation Stage and Kakashi V2 transition state"
+      ],
+      "productionLoader": "index.html + runtime/alpha-traversal-bridge-33200.js",
+      "qaRefs": [
+        "tools/qa_kakashi_v2_clean_room.js",
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_issue_312_story_battle_benchmark.js",
+        "tools/qa_issue_312_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Installed-browser evidence showed repeated player card naming, top-HUD and PL alignment drift, incomplete immediate Battle reward coverage, transform-driven card jitter, and multi-layer hard transitions. This consolidation wires all ten Kakashi Battle configs to the approved 1v1/2v1/failed-pickpocket-3v1 reward schedule and retires transform-heavy Kakashi presentation motion in favor of stable opacity-only consequence cues and a single outgoing-environment crossfade, without changing Battle resolution, PL, Story truth, or disposition semantics."
     }
   ]
 }
