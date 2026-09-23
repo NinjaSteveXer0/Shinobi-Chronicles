@@ -1,6 +1,6 @@
 // ALPHA ORIGIN CHOICE REACTION 33510
 // Completes the player-visible choice-response pass begun by 33500 for the
-// remaining non-Kakashi 32900 Origins: Kushina and Obito.
+// remaining legacy 32900 expression consumer: Kushina. Academy Obito is owned by final #331 runtime.
 (function installAlphaOriginChoiceReaction33510(){
 "use strict";
 if(globalThis.SC_ALPHA_ORIGIN_CHOICE_REACTION_33510)return;
@@ -33,54 +33,8 @@ function patchKushina(){
 
 // Academy Kakashi legacy choice-reaction patch retired for clean-room V2.
 
-function obitoResponse(key,value){
-  const rows={
-    furniture:{
-      furniture_carry_full:"Obito stops and carries the furniture through properly before running on. He materially resolves the problem and the stop costs real journey time.",
-      furniture_stabilize:"Obito braces the furniture, gets it unstuck and keeps moving. His contribution is bounded and the delay is brief.",
-      furniture_continue:"Obito keeps moving toward training and leaves the furniture problem behind."
-    },
-    vegetables:{
-      vegetables_collect_all:"Obito stops to gather the scattered vegetables before they are crushed. He materially resolves the immediate problem and spends real journey time doing it.",
-      vegetables_clear_lane:"Obito clears the nearest vegetables out of the busy lane and keeps moving. The contribution is bounded and the delay is brief.",
-      vegetables_continue:"Obito keeps running and leaves the scattered vegetables behind."
-    },
-    equipment:{
-      equipment_search_full:"Obito joins the search until the missing practice equipment is found, materially contributing and spending real journey time.",
-      equipment_check_likely_route:"Obito checks the likely drop points on his way and reports what he can establish before moving on.",
-      equipment_continue:"Obito leaves the equipment search to Academy staff and keeps moving."
-    },
-    delivery:{
-      delivery_right_and_reload:"Obito helps right the handcart and rebuild the overturned load before moving on. The contribution is material and so is the delay.",
-      delivery_clear_passage:"Obito clears the dangerous obstruction from the route and leaves the rest of the delivery to the worker.",
-      delivery_continue:"Obito takes another way around and keeps moving toward training."
-    },
-    cart:{
-      cart_intercept:"Obito stops the runaway cart himself. The intervention is a real causal contribution and it costs real journey time.",
-      cart_warn_and_redirect:"Obito clears people from the cart's path and redirects the danger before moving on.",
-      cart_continue:"Obito keeps moving toward training while the runaway-cart occurrence continues without his participation."
-    }
-  };
-  return rows[key]&&rows[key][value]||null;
-}
-
-function patchObito(){
-  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
-  const def=editable(A.sceneByVariant.academy_obito);if(!def)return false;
-  const mapping=[
-    ["obi_vegetables","furniture","A dropped basket has scattered vegetables into a busy lane."],
-    ["obi_equipment","vegetables","An Academy equipment custodian searches for missing practice equipment along the route."],
-    ["obi_delivery","equipment","A delivery handcart has overturned and blocked part of the route."],
-    ["obi_cart","delivery","A runaway cart creates a real danger in the lane."]
-  ];
-  for(const [beatId,previous,currentText] of mapping){const row=beat(def,beatId);if(!row)continue;row.presentationResolver=()=>{const prior=obitoResponse(previous,A.local()[`obito_${previous}`]);return{text:prior?`${prior} ${currentText}`:currentText};};}
-  const arrival=beat(def,"obi_arrival");if(arrival){const priorResolver=arrival.presentationResolver;arrival.presentationResolver=()=>{const prior=obitoResponse("cart",A.local().obito_cart);const base=typeof priorResolver==="function"?(priorResolver()||{}).text:arrival.text;return{text:prior?`${prior} ${base}`:base};};}
-  const reflect=beat(def,"obi_reflect"),end=beat(def,"obi_end");if(reflect&&end){for(const c of reflect.choices||[])c.nextBeatId="obi_reflection_result";add(def,{beatId:"obi_reflection_result",mode:"dialogue",speakerName:"OBITO",presentationResolver:()=>{const value=A.local().obitoReflection;return{text:{hokage_still:"I'm still going to be Hokage.",faster_next:"Next time I'll get there faster.",people_mattered:"Those people mattered too.",prove_it:"I'll prove it next time."}[value]||"Obito looks back over the journey he actually had."};},nextBeatId:"obi_end"});end.text="Training ends with the journey's actual stops, delays and training entitlement preserved as part of Obito's Chronicle.";}
-  return commit(def);
-}
-
-const result={kushina:patchKushina(),obito:patchObito()};
-function runAlphaOriginChoiceReaction33510Diagnostics(){const A=globalThis.SC_ALPHA_ORIGIN_32900;const kush=A&&definition(A.sceneByVariant.academy_kushina),obi=A&&definition(A.sceneByVariant.academy_obito);const checks={patchId:PATCH_ID==="alpha_origin_choice_reaction_33510_2026_09_13",bothNonKakashiOriginsPatched:Object.values(result).every(Boolean),kakashiLegacyPatchRetired:!Object.prototype.hasOwnProperty.call(result,"kakashi"),kushinaChoiceResult:!!(kush&&kush.beatMap&&kush.beatMap.has("kus_contact_result")),obitoChoiceReaction:!!(obi&&obi.beatMap&&typeof obi.beatMap.get("obi_vegetables")?.presentationResolver==="function"),browserGoldenClaimed:false};const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);return{patchId:PATCH_ID,pass:failed.length===0,checks,failed,patched:[...patched],browserGoldenClaimed:false};}
+const result={kushina:patchKushina()};
+function runAlphaOriginChoiceReaction33510Diagnostics(){const A=globalThis.SC_ALPHA_ORIGIN_32900;const kush=A&&definition(A.sceneByVariant.academy_kushina);const checks={patchId:PATCH_ID==="alpha_origin_choice_reaction_33510_2026_09_13",kushinaPatchGreen:result.kushina===true,kakashiLegacyPatchRetired:!Object.prototype.hasOwnProperty.call(result,"kakashi"),obitoLegacyPatchRetired:!Object.prototype.hasOwnProperty.call(result,"obito")&&!String(globalThis.SC_ALPHA_ORIGIN_CHOICE_REACTION_33510||"").includes("patchObito"),kushinaChoiceResult:!!(kush&&kush.beatMap&&kush.beatMap.has("kus_contact_result")),browserGoldenClaimed:false};const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);return{patchId:PATCH_ID,pass:failed.length===0,checks,failed,patched:[...patched],browserGoldenClaimed:false};}
 globalThis.SC_ALPHA_ORIGIN_CHOICE_REACTION_33510=Object.freeze({patchId:PATCH_ID,result:{...result},browserGoldenClaimed:false});
 globalThis.runAlphaOriginChoiceReaction33510Diagnostics=runAlphaOriginChoiceReaction33510Diagnostics;
 })();
