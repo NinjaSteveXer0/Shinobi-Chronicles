@@ -514,6 +514,33 @@
       ],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Current #333 GOLDEN Writing authority is now consumed directly by the live Academy Kakashi V2 runtime. This replacement aligns all reachable player-facing choice labels with the GOLDEN family documents, restores the corrected mission-giver ANBU -> hidden Hokage-office test reveal -> Chronicle Receipt -> YOUR CHRONICLE BEGINS terminal, projects the intended Uchiha Police cards without overlap, and removes the Family 04 deterministic fast/slow result from the player choice surface. Existing disposition, custody, reward, PL, Battle and Chronicle fact semantics remain unchanged."
+    },
+    {
+      "changeId": "issue-354-kakashi-uncapped-terminal-reward-aggregation",
+      "classification": "REPLACES",
+      "responsibilityIds": [
+        "origin.academy_kakashi.v2.reward_commit"
+      ],
+      "owner": "runtime/alpha-kakashi-v2-rewards-36015.js",
+      "directCallers": [
+        "runtime/alpha-kakashi-v2-core-36020.js"
+      ],
+      "stateTouched": [
+        "playerData.ryo",
+        "Kakashi V2 reward receipt store"
+      ],
+      "productionLoader": "runtime/alpha-traversal-bridge-33200.js",
+      "qaRefs": [
+        "tools/qa_issue_322_kakashi_dispositions.js",
+        "tools/qa_kakashi_v2_clean_room.js",
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [
+        "runtime/alpha-kakashi-v2-rewards-36015.js::legacy >250 terminal fail-closed boundary"
+      ],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "World #348 closed the legacy 250 Ryō terminal/debrief cap. Academy Kakashi terminal reward total now equals the exact sum of every independently qualified authorised one-shot terminal source with no total clamp. The existing source predicates, 25/50/100 live-delivery tier, immediate Battle cash separation, item rewards and receipt idempotence remain unchanged. Exact 275 and 300 terminal plans must commit and replay idempotently."
     }
   ]
 }
