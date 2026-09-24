@@ -153,7 +153,7 @@ function installStyle(){
 function availableChoices(){
   try{
     const beat=typeof getCurrentStorySceneBeat==="function"?getCurrentStorySceneBeat():null;
-    if(!beat||!Array.isArray(beat.choices))return[];
+    if(!beat||beat.machineResolved===true||!Array.isArray(beat.choices))return[];
     return beat.choices.map(choice=>{
       const availability=typeof evaluateStorySceneChoiceAvailability==="function"?evaluateStorySceneChoiceAvailability(choice):{available:true};
       return{choiceId:choice.choiceId,label:choice.label,available:availability.available===true,knownBlocker:availability.knownBlocker||null};
@@ -760,6 +760,7 @@ function diagnostics(){
     packageTokenConsumesHolderTruth:String(syncPackageToken).includes("state.package")&&String(syncPackageToken).includes("packageHolder"),
     speakerFocusUsesCurrentCue:String(syncStandard).includes("speakerActorId"),
     stageWideAdvanceGuard:String(bind).includes('root.dataset.hasChoices==="true"')&&String(bind).includes("Date.now()-revealed<360"),
+    resolverChoicesNeverRendered:String(availableChoices).includes("beat.machineResolved===true"),
     actorLinkedSpeech:String(syncSpeech).includes("--kv2-speech-x")&&installStyle.toString().includes(".kv2-speech"),
     fiveChoiceLayoutNoScroll:installStyle.toString().includes("repeat(3,minmax(0,1fr))")&&installStyle.toString().includes("overflow:visible"),
     noMutationObserver:!String(render).includes("MutationObserver"),
