@@ -395,7 +395,7 @@ function killedCues(ref){
   if(key==="MI")return W("dispositionResolvers","mi_killed");
   if(key==="PS")return W("dispositionResolvers","ps_killed");
   if(key==="AMT")return W("dispositionResolvers","amt_killed");
-  return[N("The lethal disposition resolves.")];
+  throw new Error("kakashi_v2_killed_cue_participant_unmapped:"+String(key));
 }
 function singleDispositionCues(ref,intent){
   const key=participantKey(ref),outcome=dispositionOutcome(key);
@@ -413,7 +413,7 @@ function singleDispositionCues(ref,intent){
     }
     if(key==="AMT")return W("dispositionResolvers",outcome==="RESTRAINED"?"amt_restrained":"amt_restrain_escaped");
   }
-  return[N("The attempted disposition resolves.")];
+  throw new Error("kakashi_v2_disposition_cue_unmapped:"+String(intent)+":"+String(key)+":"+String(outcome));
 }
 function groupKillSection(refs){
   const keys=(refs||[]).map(participantKey),out=Object.fromEntries(keys.map(key=>[key,dispositionOutcome(key)]));
