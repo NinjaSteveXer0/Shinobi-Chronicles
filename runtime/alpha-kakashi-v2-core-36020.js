@@ -69,7 +69,7 @@ const manifest={};
 const beats=[];
 function addBeat(id,{mode="narration",cues=[],backdrop=B.sakura,location="KONOHA · NIGHT",objective=null,actors=[],preset="standard",choices=[],battle=null,nextBeatId=null,onEnter=null,onAdvance=null,transition=null,receipt=false,exitScene=false,presentationPackageHolder=null,machineResolved=false}={}){
   manifest[id]=Object.freeze({id,cues,backdrop,location,objective,actors,preset,transition,receipt,presentationPackageHolder,machineResolved});
-  const row={beatId:id,mode,text:"",choices,nextBeatId,exitScene,machineResolved:machineResolved===true};
+  const row={beatId:id,mode,text:"",choices,nextBeatId,exitScene,machineResolved:machineResolved===true,uiHints:machineResolved===true?{kakashiMachineResolved:true}:{}};
   if(onEnter)row.onEnterConsequences=[{requestId:`kakashi_v2_enter_${id}`,kind:"domain",resolve:ctx=>onEnter(ctx)}];
   if(onAdvance)row.onAdvanceConsequences=[{requestId:`kakashi_v2_advance_${id}`,kind:"domain",resolve:ctx=>onAdvance(ctx)}];
   if(battle)row.battle=battle;
@@ -1640,7 +1640,7 @@ function diagnostics(){
   correctedHiddenTestTerminal:!!def&&def.beatMap.has("v2_hidden_review")&&!def.beatMap.has("v2_complete")&&String(hiddenReviewCues).includes("f07c.hidden_base_all_alive"),
   receiptExitsDirectly:!!def&&def.beatMap.get("v2_receipt")?.exitScene===true&&String(completeAndContinueAcademyKakashiV2Origin).includes("showChronicleBegins:true"),
   policeCardsProjected:String(policePairForParticipantKeys).includes("policeMiMale")&&String(policePairForParticipantKeys).includes("policePsFemale")&&String(groupTransferActors).includes('institution==="POLICE"'),
-  resolverPseudoChoicesRetired:!JSON.stringify(beats).includes('"CONTINUE"')&&beats.filter(b=>b.machineResolved===true).length===11&&beats.filter(b=>b.machineResolved===true).every(b=>b.mode==="choice"&&b.choices.length===2&&b.choices.every(ch=>ch.label==="RESOLVE RESULT")),
+  resolverPseudoChoicesRetired:!JSON.stringify(beats).includes('"CONTINUE"')&&beats.filter(b=>b.machineResolved===true).length===11&&beats.filter(b=>b.machineResolved===true).every(b=>b.mode==="choice"&&b.uiHints&&b.uiHints.kakashiMachineResolved===true&&b.choices.length===2&&b.choices.every(ch=>ch.label==="RESOLVE RESULT")),
   browserGoldenClaimed:false
  };
  const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
