@@ -290,7 +290,7 @@ async function advanceTo(page,target,{max=18}={}){
       const beat=globalThis.getCurrentStorySceneBeat&&globalThis.getCurrentStorySceneBeat();
       if(!beat)return null;
       const available=(beat.choices||[]).filter(c=>typeof c.availability!=="function"||c.availability().available===true).map(c=>({choiceId:c.choiceId,label:c.label}));
-      return{beatId:beat.beatId,mode:beat.mode||null,machineResolved:beat.machineResolved===true,available,nextBeatId:beat.nextBeatId||null,
+      return{beatId:beat.beatId,mode:beat.mode||null,machineResolved:beat.machineResolved===true||!!(beat.uiHints&&beat.uiHints.kakashiMachineResolved===true),available,nextBeatId:beat.nextBeatId||null,
         visibleChoiceButtons:[...document.querySelectorAll("#kakashi-v2-scene-board [data-kv2-choice]")].filter(n=>n.getClientRects().length>0).map(n=>n.textContent.trim())};
     });
     assert(meta,"story beat metadata missing while advancing to "+target);
