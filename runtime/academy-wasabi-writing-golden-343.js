@@ -2061,40 +2061,20 @@ const SECTIONS=Object.freeze({
     ]
   },
   "eval_rogue_call_help": {
-    "sourceRange": [
-      1055,
-      1059
-    ],
+    "sourceRange": [1051,1055],
     "cues": [
-      {
-        "kind": "dialogue",
-        "speakerName": "WASABI",
-        "text": "Someone else was closer than the target was."
-      },
-      {
-        "kind": "narration",
-        "text": "The instructor doesn't mention the Rogue Genin first."
-      }
+      {"kind":"dialogue","speakerName":"ACADEMY INSTRUCTOR","text":"You handed it off."},
+      {"kind":"dialogue","speakerName":"WASABI","text":"Someone else was closer than the target was."}
     ]
   },
   "eval_rogue_keep_pursuing": {
-    "sourceRange": [
-      1063,
-      1070
-    ],
+    "sourceRange": [1057,1067],
     "cues": [
-      {
-        "kind": "narration",
-        "text": "Or doesn't."
-      },
-      {
-        "kind": "narration",
-        "text": "Nothing is forced out of her."
-      },
-      {
-        "kind": "narration",
-        "text": "The result stays on the page either way."
-      }
+      {"kind":"narration","text":"The instructor doesn't mention the Rogue Genin first."},
+      {"kind":"narration","text":"Wasabi does."},
+      {"kind":"narration","text":"Or doesn't."},
+      {"kind":"narration","text":"Nothing is forced out of her."},
+      {"kind":"narration","text":"The result stays on the page either way."}
     ]
   },
   "after_base": {
