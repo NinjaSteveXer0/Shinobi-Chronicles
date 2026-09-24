@@ -12,8 +12,6 @@
     "runtime/alpha-story-decision-realisation-34000.js",
     "runtime/alpha-story-factual-resolver-34600.js",
     "runtime/alpha-special-jonin-evidence-producer-34700.js",
-    "runtime/academy-wasabi-writing-golden-34300.js",
-    "runtime/alpha-wasabi-origin-battle-34300.js",
     "runtime/academy-kakashi-v2-content-36000.js",
     "runtime/academy-kakashi-v2-writing-golden-36100.js",
     "runtime/alpha-kakashi-v2-battle-36010.js",
@@ -819,6 +817,18 @@
       "retirementCondition": "Review when shared Origin reward consumption natively supports the exact source-scoped Kakashi V2 contract.",
       "milestone": "shared Origin runtime propagation review",
       "qaRef": "tools/qa_kakashi_v2_clean_room.js",
+      "temporary": false
+    },
+    {
+      "adapterId": "academy_wasabi_rogue_genin_battle_adapter_34300",
+      "reason": "Translate the Academy Wasabi STEP IN Story request and closed Rogue Genin 1v1 package into the existing shared Battle runtime without creating a second Battle or scheduler authority.",
+      "owner": "runtime/alpha-wasabi-origin-battle-34300.js",
+      "sourceOwner": "runtime/alpha-origin-scenes-32900-a.js",
+      "targetOwner": "runtime/alpha-alpha-sprint-33100.js",
+      "exactBehaviorBridged": "Strict 1v1 deployment, shared enemy scheduler eligible-action consumption, deterministic Battle occurrence receipt, observer-safe Story result projection and exact story_scene return.",
+      "retirementCondition": "Review when the shared Origin Story-to-Battle adapter can natively consume the Wasabi strict-1v1 authored package and exactly-once occurrence receipt without adapter-specific glue.",
+      "milestone": "shared Origin runtime propagation review",
+      "qaRef": "tools/qa_issue_343_wasabi_writing_golden.js",
       "temporary": false
     }
   ],
