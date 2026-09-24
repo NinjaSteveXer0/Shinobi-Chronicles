@@ -2026,10 +2026,10 @@ const SECTIONS=Object.freeze({
       }
     ]
   },
-  "eval_rogue": {
+  "eval_rogue_base": {
     "sourceRange": [
       1039,
-      1070
+      1044
     ],
     "cues": [
       {
@@ -2039,7 +2039,15 @@ const SECTIONS=Object.freeze({
       {
         "kind": "narration",
         "text": "Then at Wasabi."
-      },
+      }
+    ]
+  },
+  "eval_rogue_intervene": {
+    "sourceRange": [
+      1047,
+      1051
+    ],
+    "cues": [
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY INSTRUCTOR",
@@ -2049,12 +2057,15 @@ const SECTIONS=Object.freeze({
         "kind": "dialogue",
         "speakerName": "WASABI",
         "text": "Yeah."
-      },
-      {
-        "kind": "dialogue",
-        "speakerName": "ACADEMY INSTRUCTOR",
-        "text": "You handed it off."
-      },
+      }
+    ]
+  },
+  "eval_rogue_call_help": {
+    "sourceRange": [
+      1055,
+      1059
+    ],
+    "cues": [
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
@@ -2063,11 +2074,15 @@ const SECTIONS=Object.freeze({
       {
         "kind": "narration",
         "text": "The instructor doesn't mention the Rogue Genin first."
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi does."
-      },
+      }
+    ]
+  },
+  "eval_rogue_keep_pursuing": {
+    "sourceRange": [
+      1063,
+      1070
+    ],
+    "cues": [
       {
         "kind": "narration",
         "text": "Or doesn't."
@@ -2082,10 +2097,10 @@ const SECTIONS=Object.freeze({
       }
     ]
   },
-  "after": {
+  "after_base": {
     "sourceRange": [
       1071,
-      1106
+      1094
     ],
     "cues": [
       {
@@ -2134,23 +2149,63 @@ const SECTIONS=Object.freeze({
       {
         "kind": "narration",
         "text": "Wasabi looks back at the board."
-      },
+      }
+    ]
+  },
+  "after_direct": {
+    "sourceRange": [
+      1095,
+      1096
+    ],
+    "cues": [
       {
         "kind": "narration",
         "text": "If she caught the target, she finds her time again."
-      },
+      }
+    ]
+  },
+  "after_river": {
+    "sourceRange": [
+      1097,
+      1098
+    ],
+    "cues": [
       {
         "kind": "narration",
         "text": "If she missed them by seconds, she finds that time instead."
-      },
+      }
+    ]
+  },
+  "after_secondary": {
+    "sourceRange": [
+      1099,
+      1100
+    ],
+    "cues": [
       {
         "kind": "narration",
         "text": "If the Rogue Genin cost her the pursuit, the number is worse."
-      },
+      }
+    ]
+  },
+  "after_false": {
+    "sourceRange": [
+      1101,
+      1102
+    ],
+    "cues": [
       {
         "kind": "narration",
         "text": "If she followed the false trail, worse again."
-      },
+      }
+    ]
+  },
+  "after_end": {
+    "sourceRange": [
+      1103,
+      1106
+    ],
+    "cues": [
       {
         "kind": "narration",
         "text": "Wasabi stares at it."
@@ -2236,23 +2291,20 @@ const SECTIONS=Object.freeze({
   }
 });
 function cloneCue(cue){return cue?Object.freeze({...cue}):null;}
-function get(key){
-  const row=SECTIONS[String(key||"")];
-  return row&&Array.isArray(row.cues)?row.cues.map(cloneCue):[];
-}
+function get(key){const row=SECTIONS[String(key||"")];return row&&Array.isArray(row.cues)?row.cues.map(cloneCue):[];}
 function diagnostics(){
-  const checks={
-    sourceExact:SOURCE.endsWith("Academy_Wasabi_Izuno_Origin_WRITING_GOLDEN_2026-09-24.md"),
-    openingExact:get("scene1").some(c=>c.text==="Thirty minutes."),
-    choicesExcluded:!JSON.stringify(SECTIONS).includes("TAKE THE OBVIOUS TRAIL")&&!JSON.stringify(SECTIONS).includes("STEP IN"),
-    battleScaffoldingExcluded:!JSON.stringify(SECTIONS).includes("PL BATTLE"),
-    rogueDialoguePresent:get("rogue_step_in").some(c=>c.speakerName==="ROGUE GENIN"&&c.text==="Keep moving."),
-    directCatchPresent:get("finish_direct").some(c=>c.text==="The target looks down at the hand around their wrist."),
-    instructorPresent:get("eval_base").some(c=>c.text==="Wasabi waits until he reaches her."),
-    originCloseExact:get("origin_close").some(c=>c.speakerName==="WASABI"&&c.text==="I know.")
-  };
-  const failed=Object.entries(checks).filter(([,v])=>v!==true).map(([k])=>k);
-  return{pass:failed.length===0,checks,failed,sectionCount:Object.keys(SECTIONS).length,browserGoldenClaimed:false};
+ const checks={
+  sourceExact:SOURCE.endsWith("Academy_Wasabi_Izuno_Origin_WRITING_GOLDEN_2026-09-24.md"),
+  openingExact:get("scene1").some(c=>c.text==="Thirty minutes."),
+  choicesExcluded:!JSON.stringify(SECTIONS).includes("TAKE THE OBVIOUS TRAIL")&&!JSON.stringify(SECTIONS).includes("STEP IN"),
+  battleScaffoldingExcluded:!JSON.stringify(SECTIONS).includes("PL BATTLE"),
+  rogueDialoguePresent:get("rogue_step_in").some(c=>c.speakerName==="ROGUE GENIN"&&c.text==="Keep moving."),
+  conditionalRogueSplit:get("eval_rogue_intervene").some(c=>c.text==="You knew the target was still moving.")&&get("eval_rogue_call_help").some(c=>c.text==="You handed it off."),
+  conditionalAfterSplit:get("after_direct").some(c=>c.text==="If she caught the target, she finds her time again.")&&get("after_false").some(c=>c.text==="If she followed the false trail, worse again."),
+  originCloseExact:get("origin_close").some(c=>c.speakerName==="WASABI"&&c.text==="I know.")
+ };
+ const failed=Object.entries(checks).filter(([,v])=>v!==true).map(([k])=>k);
+ return{pass:failed.length===0,checks,failed,sectionCount:Object.keys(SECTIONS).length,browserGoldenClaimed:false};
 }
 globalThis.getAcademyWasabiWritingGoldenCues343=get;
 globalThis.runAcademyWasabiWritingGolden343Diagnostics=diagnostics;
