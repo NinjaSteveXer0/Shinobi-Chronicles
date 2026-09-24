@@ -229,20 +229,25 @@ restrainThreeAndDeliver("POLICE");
   assert.strictEqual(h.def.beatMap.get("v2_ps_restrain_continue_result").nextBeatId,"v2_amt_after_ps");
 }
 
-// Bounded migration reads old Alpha save fields once and writes only final semantics.
+// Bounded migration must fail closed on ambiguous retired Kakashi disposition truth.
 {
   const h=makeCoreHarness();h.reset("migration");
+  h.getActive().beatId="v2_mi_stop_win";
   h.getActive().localContext.kakashiV2={
-    version:2,routeHistory:[],package:{holder:"KAKASHI",recovered:true,returned:false,neutral:false},
+    version:2,routeHistory:[{label:"LEGACY"}],package:{holder:"KAKASHI",recovered:true,returned:false,neutral:false},
     participants:{MI:{state:"DEAD"},PS:{state:"FIELD_SECURED_PENDING_COLLECTION"},AMT:{state:"COLLECTED_ACTIVE_ESCORT"}},
     pakkun:{present:false,departed:false,knownByKakashiAsName:false},knowledge:{},resolvers:{},battles:{},fieldSecured:["PS"],rewards:{},terminal:{}
   };
   const st=h.state();
-  assert.strictEqual(st.participants.MI.state,"KILLED");
-  assert.strictEqual(st.participants.PS.state,"RESTRAINED");
-  assert.strictEqual(st.participants.AMT.state,"RESTRAINED");
-  assert.strictEqual(st.participants.AMT.collected,true);
-  assert(!Object.prototype.hasOwnProperty.call(st,"fieldSecured"),"legacy fieldSecured survived migration");
+  assert.strictEqual(h.getActive().beatId,"v2_scene01_rooftop","ambiguous legacy occurrence did not restart at Kakashi entry");
+  assert.strictEqual(st.participants.MI.state,"UNSEEN");
+  assert.strictEqual(st.participants.PS.state,"AVAILABLE");
+  assert.strictEqual(st.participants.AMT.state,"AVAILABLE");
+  assert.strictEqual(st.migration&&st.migration.restartedAffectedOccurrence,true);
+  assert.strictEqual(st.migration&&st.migration.reason,"legacy_disposition_ambiguous");
+  assert((st.migration.retiredFacts||[]).some(x=>String(x).includes("DEAD")),"legacy DEAD ambiguity not recorded");
+  assert((st.migration.retiredFacts||[]).some(x=>String(x).includes("fieldSecured")),"legacy fieldSecured ambiguity not recorded");
+  assert(!Object.prototype.hasOwnProperty.call(st,"fieldSecured"),"legacy fieldSecured survived fail-closed restart");
 }
 
 // Tracker and Interrogator exact catalogue-valid producer packets.
