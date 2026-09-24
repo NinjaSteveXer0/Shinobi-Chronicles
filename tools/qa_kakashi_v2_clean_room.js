@@ -319,6 +319,7 @@ assert(coreSource.includes('addBeat("v2_battle_ps_seq",{mode:"battle_transition"
   assert(!def.beatMap.has("v2_complete"),"forbidden Origin occurrence sealed pseudo-receipt retained");
   const receipt=def.beatMap.get("v2_receipt");
   assert(receipt&&receipt.exitScene===true&&Array.isArray(receipt.onAdvanceConsequences),"Receipt must complete Origin directly on CONTINUE");
+  assert(coreSource.includes("return completeAcademyKakashiV2Origin();")&&!coreSource.includes("openAcademyTeamFormationUI"),"Receipt invented a second Team Formation UI API instead of reusing shared Origin completion/returnContext");
   assert(!coreSource.includes('RECORD("Origin occurrence sealed.'),"raw Origin occurrence sealed player-facing close returned");
   assert(coreSource.includes('presentationPackageHolder:"MINATO"'),"hidden review package presentation seam missing");
 
