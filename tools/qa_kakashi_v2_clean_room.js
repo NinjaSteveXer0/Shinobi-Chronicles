@@ -264,6 +264,16 @@ assert(coreSource.includes('addBeat("v2_battle_ps_seq",{mode:"battle_transition"
   ];
   for(const phrase of forbiddenPlayerFacingPhrases)assert(!coreSource.includes(`N("${phrase}`)&&!coreSource.includes(`Q("${phrase}`),`player-facing implementation prose leaked: ${phrase}`);
 
+  const retiredPlayerChoices=[
+    "WATCH THE EXCHANGE","MOVE IN CLOSER","STRIKE BEFORE THE HANDOFF","SLIP IN FOR THE PACKAGE",
+    "STOP THE ASSASSIN","SECURE THE PACKAGE","SECURE THE PACKAGE BEFORE THE ASSASSIN",
+    "DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE","GO AFTER THE ORIGINAL TARGET",
+    "GO AFTER PACKAGE SMUGGLER","CHASE THE PACKAGE SMUGGLER","STAY ON THE FIRST MAN",
+    "RETURN AND REPORT","ASK WHERE THE PACKAGE WAS GOING","RESTRAIN HER AND CONTINUE"
+  ];
+  const livePlayerChoiceLabels=new Set(def.beats.flatMap(beat=>(beat.choices||[]).filter(choice=>choice.label!=="RESOLVE RESULT").map(choice=>choice.label)));
+  for(const label of retiredPlayerChoices)assert(!livePlayerChoiceLabels.has(label),"retired Kakashi player-facing choice returned: "+label);
+
   const root=def.beatMap.get("v2_scene02_tail");
   assert.strictEqual(JSON.stringify(Array.from(root.choices).map(c=>c.label)),JSON.stringify(["WATCH THE HANDOFF","GET CLOSER","INTERRUPT THE HANDOFF","SLIP IN AND TAKE IT"]));
   const watch=def.beatMap.get("v2_watch_exchange");
