@@ -318,7 +318,7 @@ restrainThreeAndDeliver("POLICE");
   assert(rows[0].tags.includes("covert_operations.extraction_specialist:specialist_work"),"shared producer omitted evaluator-required specialist_work tag");
 }
 
-// Capture tiers and unresolved legacy cap boundary.
+// Capture tiers and #348 uncapped authorised-source aggregation.
 {
   const itemDatabase={field_recovery_pill:{id:"field_recovery_pill",name:"Field Recovery Pill",type:"consumable",rarity:"Common",stackable:true}};
   const playerData={ryo:0,inventory:[]};
@@ -335,11 +335,37 @@ restrainThreeAndDeliver("POLICE");
   const kill=ctx.previewAcademyKakashiV2TerminalRewards36015({...base,participants:{MI:{state:"KILLED",disposition:"KILL"}}},"kill");
   const release=ctx.previewAcademyKakashiV2TerminalRewards36015({...base,participants:{MI:{state:"RELEASED",disposition:"RELEASE"}}},"release");
   assert.strictEqual(kill.captureRyo,0);assert.strictEqual(release.captureRyo,0);
-  const rich={...base,package:{returned:true},knowledge:{askWhere:true},participants:{MI:{state:"ANBU_CUSTODY"},PS:{state:"ANBU_CUSTODY"},AMT:{state:"ANBU_CUSTODY"}},resolvers:{directPickpocket:{selectedOutcomeRef:"PICKPOCKET_DIRECT_SUCCESS"}}};
-  const before=playerData.ryo,result=ctx.commitAcademyKakashiV2TerminalRewards36015(rich,"overcap");
-  assert.strictEqual(result.success,false);assert.strictEqual(result.reason,"kakashi_v2_terminal_cap_policy_unresolved");
-  assert.strictEqual(playerData.ryo,before,"unresolved cap mutated Currency before failure");
-  assert(result.plan.rawTotalRyo>250,"cap boundary fixture did not actually exceed legacy cap");
+
+  const fullDelivery={...base,package:{returned:true},participants:{MI:{state:"ANBU_CUSTODY"},PS:{state:"ANBU_CUSTODY"},AMT:{state:"ANBU_CUSTODY"}}};
+  const p275=ctx.previewAcademyKakashiV2TerminalRewards36015(fullDelivery,"uncapped275");
+  assert.strictEqual(p275.totalRyo,275);
+  assert.strictEqual(p275.aggregationPolicy,"AUTHORISED_SOURCE_SUM");
+  assert.strictEqual(p275.terminalTotalClamp,null);
+  const c275=ctx.commitAcademyKakashiV2TerminalRewards36015(fullDelivery,"uncapped275");
+  assert.strictEqual(c275.success,true,JSON.stringify(c275));
+  assert.strictEqual(c275.grantedRyo,275);
+  assert.strictEqual(playerData.ryo,275);
+  const c275Replay=ctx.commitAcademyKakashiV2TerminalRewards36015(fullDelivery,"uncapped275");
+  assert.strictEqual(c275Replay.success,true);
+  assert.strictEqual(c275Replay.grantedRyo,0);
+  assert.strictEqual(playerData.ryo,275,"275 Ryō terminal replay double-paid Currency");
+
+  const exceptional={...fullDelivery,battles:{pickpocket_3v1:{outcome:"victory",playerActionOpportunityCount:3}}};
+  const p300=ctx.previewAcademyKakashiV2TerminalRewards36015(exceptional,"uncapped300");
+  assert.strictEqual(p300.totalRyo,300);
+  assert.strictEqual(p300.aggregationPolicy,"AUTHORISED_SOURCE_SUM");
+  assert.strictEqual(p300.terminalTotalClamp,null);
+  const c300=ctx.commitAcademyKakashiV2TerminalRewards36015(exceptional,"uncapped300");
+  assert.strictEqual(c300.success,true,JSON.stringify(c300));
+  assert.strictEqual(c300.grantedRyo,300);
+  assert.strictEqual(playerData.ryo,575);
+  const c300Replay=ctx.commitAcademyKakashiV2TerminalRewards36015(exceptional,"uncapped300");
+  assert.strictEqual(c300Replay.success,true);
+  assert.strictEqual(c300Replay.grantedRyo,0);
+  assert.strictEqual(playerData.ryo,575,"300 Ryō terminal replay double-paid Currency");
+
+  assert(!rewardSource.includes("kakashi_v2_terminal_cap_policy_unresolved"),"retired terminal-cap blocker returned");
+  assert(!rewardSource.includes("legacyTerminalCapRyo"),"retired legacy terminal cap field returned");
 }
 
 // Old semantics may appear only in bounded migration, never in active writers/readers.
@@ -360,7 +386,7 @@ console.log(JSON.stringify({
   saveLoadIdempotence:"GREEN",
   collection:"exact RESTRAINED facts",
   captureTiers:"25/50/100 noncumulative",
-  terminalCap:"explicit unresolved boundary; no silent clipping",
+  terminalCap:"REMOVED — exact authorised one-shot source sum; 275/300 GREEN",
   specialistEvidence:"shared producer + Tracker/Interrogator/Extraction",
   assassinInference:"NONE without qualifying method fact",
   browserGoldenClaimed:false

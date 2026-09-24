@@ -295,7 +295,7 @@ function previewTerminal(s,storyOccurrenceId){
   const rawTotalRyo=sources.filter(x=>x.qualified).reduce((n,x)=>n+x.ryo,0);
   return{
     storyOccurrenceId:String(storyOccurrenceId||""),sources,totalRyo:rawTotalRyo,rawTotalRyo,
-    legacyTerminalCapRyo:250,terminalCapPolicyUnresolved:rawTotalRyo>250,
+    aggregationPolicy:"AUTHORISED_SOURCE_SUM",terminalTotalClamp:null,
     packageRecovered,actionableIntel,liveCustody,deliveredLivingCount,deliveredParticipantKeys,captureRyo,exceptional,battleParticipation,
     fieldRecoveryFallback:battleParticipation&&!committed(storyOccurrenceId,SOURCE.fieldPill,"origin"),
     trainingTanto:exceptional&&!committed(storyOccurrenceId,SOURCE.trainingTanto,"origin")
@@ -323,7 +323,6 @@ function commitTerminal(s,storyOccurrenceId){
   if(!storyOccurrenceId)return{success:false,reason:"kakashi_v2_story_occurrence_required"};
   if(!s||!s.terminal||s.terminal.reportReached!==true||s.terminal.minatoReached!==true||s.terminal.receiptReached!==true)return{success:false,reason:"kakashi_v2_terminal_sequence_incomplete"};
   const plan=previewTerminal(s,storyOccurrenceId);
-  if(plan.terminalCapPolicyUnresolved===true)return{success:false,reason:"kakashi_v2_terminal_cap_policy_unresolved",plan:clone(plan)};
   const snap=snapshotRewardMutation();
   try{
     const cash=plan.sources.map(row=>commitCurrencySource(storyOccurrenceId,row));
@@ -354,7 +353,13 @@ function diagnostics(){
   const checks={
     exactTerminalSources:[SOURCE.terminal,SOURCE.packageRecovered,SOURCE.actionableIntel,SOURCE.liveCustody,SOURCE.exceptional].every(Boolean),
     captureTierExact:[0,25,50,100].join("|")===[previewTerminal({participants:{},package:{},knowledge:{},battles:{},routeHistory:[],resolvers:{},terminal:{}},"d0").captureRyo,previewTerminal({participants:{MI:{state:"ANBU_CUSTODY"}},package:{},knowledge:{},battles:{},routeHistory:[],resolvers:{},terminal:{}},"d1").captureRyo,previewTerminal({participants:{MI:{state:"ANBU_CUSTODY"},PS:{state:"POLICE_CUSTODY"}},package:{},knowledge:{},battles:{},routeHistory:[],resolvers:{},terminal:{}},"d2").captureRyo,previewTerminal({participants:{MI:{state:"ANBU_CUSTODY"},PS:{state:"POLICE_CUSTODY"},AMT:{state:"ANBU_CUSTODY"}},package:{},knowledge:{},battles:{},routeHistory:[],resolvers:{},terminal:{}},"d3").captureRyo].join("|"),
-    terminalCapBoundaryExposed:previewTerminal({package:{returned:true},knowledge:{askWhere:true},participants:{MI:{state:"ANBU_CUSTODY"},PS:{state:"ANBU_CUSTODY"},AMT:{state:"ANBU_CUSTODY"}},battles:{pickpocket_3v1:{outcome:"victory"}},routeHistory:[],resolvers:{directPickpocket:{selectedOutcomeRef:"PICKPOCKET_DIRECT_SUCCESS"}},terminal:{}},"diag").terminalCapPolicyUnresolved===true&&!String(previewTerminal).includes("Math.min(250"),
+    uncappedTerminalAggregation:(()=>{
+      const base={knowledge:{},routeHistory:[],terminal:{},resolvers:{}};
+      const fullDelivery={...base,package:{returned:true},participants:{MI:{state:"ANBU_CUSTODY"},PS:{state:"ANBU_CUSTODY"},AMT:{state:"ANBU_CUSTODY"}},battles:{}};
+      const exceptional={...fullDelivery,battles:{pickpocket_3v1:{outcome:"victory"}}};
+      const p275=previewTerminal(fullDelivery,"diag275"),p300=previewTerminal(exceptional,"diag300");
+      return p275.totalRyo===275&&p300.totalRyo===300&&p275.terminalTotalClamp===null&&p300.terminalTotalClamp===null&&p275.aggregationPolicy==="AUTHORISED_SOURCE_SUM"&&p300.aggregationPolicy==="AUTHORISED_SOURCE_SUM"&&!String(previewTerminal).includes("Math.min(")&&!String(commitTerminal).includes("terminal_cap_policy_unresolved");
+    })(),
     exactImmediateCash:String(battlePlan).includes("count===1")&&String(battlePlan).includes("ryo:100")&&String(battlePlan).includes("ryo:exactSet?200:0")&&String(battleOppositionIds36015).includes("oppositionParticipantIds"),
     exactTanto:!!tanto&&tanto.type==="weapon"&&tanto.weaponClass==="Tanto"&&tanto.stackable===false&&Number(tanto.statModifiers&&tanto.statModifiers.buki)===1,
     noKillRewardPredicate:!String(previewTerminal).includes("KILLED")&&!String(exceptionalState).includes("KILLED")&&!String(previewTerminal).includes('disposition==="KILL"'),
