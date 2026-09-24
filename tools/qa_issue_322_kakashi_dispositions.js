@@ -3,10 +3,12 @@
 const fs=require("fs"),vm=require("vm"),assert=require("assert");
 const ROOT=process.cwd();
 const CONTENT="runtime/academy-kakashi-v2-content-36000.js";
+const WRITING_GOLDEN="runtime/academy-kakashi-v2-writing-golden-36100.js";
 const CORE="runtime/alpha-kakashi-v2-core-36020.js";
 const REWARDS="runtime/alpha-kakashi-v2-rewards-36015.js";
 const PRODUCER="runtime/alpha-special-jonin-evidence-producer-34700.js";
 const contentSource=fs.readFileSync(CONTENT,"utf8");
+const writingGoldenSource=fs.readFileSync(WRITING_GOLDEN,"utf8");
 const coreSource=fs.readFileSync(CORE,"utf8");
 const rewardSource=fs.readFileSync(REWARDS,"utf8");
 const producerSource=fs.readFileSync(PRODUCER,"utf8");
@@ -54,6 +56,7 @@ function makeCoreHarness(){
   };
   ctx.globalThis=ctx;vm.createContext(ctx);
   vm.runInContext(contentSource,ctx,{filename:CONTENT});
+  vm.runInContext(writingGoldenSource,ctx,{filename:WRITING_GOLDEN});
   vm.runInContext(coreSource,ctx,{filename:CORE});
   const def=scenes.get("origin_academy_kakashi_anbu_retrieval");
   assert(def,"Kakashi scene not registered");
