@@ -145,7 +145,11 @@ async function inspect(page,label){
       visibleNarrationSurfaces:visible(dialogue)?1:0,
       visibleSpeechSurfaces:visible(speech)?1:0,
       receiptVisible:visible(receipt),
-      phantomCardHolderCount:root?root.querySelectorAll(".kv2-card-frame").length:0
+      receiptText:receipt?.querySelector("pre")?.textContent||"",
+      phantomCardHolderCount:root?root.querySelectorAll(".kv2-card-frame").length:0,
+      actorIds:root?[...root.querySelectorAll(".kv2-actor")].filter(visible).map(n=>n.dataset.actorId):[],
+      actorSlots:root?[...root.querySelectorAll(".kv2-actor")].filter(visible).map(n=>n.dataset.slot):[],
+      actorImages:root?[...root.querySelectorAll(".kv2-actor img")].filter(visible).map(n=>n.getAttribute("src")):[]
     };
   });
   assert(row.renderer.pass,label+" renderer: "+JSON.stringify(row.renderer));
@@ -427,27 +431,31 @@ async function clickThroughTerminalBeat(page,{label,expectedBeat,nextBeat,expect
   };
 }
 
-async function validateTerminalCadence(page,label,{expectedReportCount=null,expectedMinatoCount=null}={}){
-  assert.strictEqual(await currentBeat(page),"v2_report",label+" must enter at ANBU report");
+async function validateTerminalCadence(page,label){
+  assert.strictEqual(await currentBeat(page),"v2_report",label+" must enter at mission-giver ANBU report");
   const stateAtReport=await stateSnapshot(page);
   await shot(page,"terminal-"+label+"-report.png");
   const report=await clickThroughTerminalBeat(page,{
     label:label+":report",
     expectedBeat:"v2_report",
-    nextBeat:"v2_minato",
-    expectedCueCount:expectedReportCount,
-    minCueCount:15
+    nextBeat:"v2_hidden_review",
+    minCueCount:8
   });
-  await shot(page,"terminal-"+label+"-minato.png");
-  const minato=await clickThroughTerminalBeat(page,{
-    label:label+":minato",
-    expectedBeat:"v2_minato",
+  await shot(page,"terminal-"+label+"-hidden-review.png");
+  const hiddenInitial=await inspect(page,label+":hidden-review");
+  assert.strictEqual(hiddenInitial.preset,"hokage_test_review",label+" missing corrected hidden-test review");
+  assert(!hiddenInitial.actorIds.includes("academy_kakashi"),label+" Kakashi leaked into hidden test reveal");
+  assert(hiddenInitial.actorIds.includes("konoha_anbu_operational_contact")&&hiddenInitial.actorIds.includes("kage_minato"),label+" hidden review missing mission-giver ANBU/Minato");
+  const hidden=await clickThroughTerminalBeat(page,{
+    label:label+":hidden-review",
+    expectedBeat:"v2_hidden_review",
     nextBeat:"v2_receipt",
-    expectedCueCount:expectedMinatoCount,
-    minCueCount:15
+    minCueCount:3
   });
   const receipt=await inspect(page,label+":receipt");
-  return{stateAtReport,report,minato,receipt};
+  assert(receipt.receiptText.includes("FIRST ACTION"),label+" Chronicle Receipt facts missing");
+  assert(!receipt.receiptText.includes("Origin occurrence sealed"),label+" stale raw Origin close leaked into Receipt");
+  return{stateAtReport,report,hiddenInitial,hidden,receipt};
 }
 
 async function terminalStoryBrowserValidation(browser){
@@ -459,7 +467,7 @@ async function terminalStoryBrowserValidation(browser){
       await toScene02Root(page);
       const detail=await run(page)||{};
       assert.strictEqual(await currentBeat(page),"v2_report",name+" did not reach ANBU report");
-      const cadence=detail.skipTerminalCadence?null:await validateTerminalCadence(page,name,expectations);
+      const cadence=detail.skipTerminalCadence?null:await validateTerminalCadence(page,name);
       const browserErrors=await runtimeErrorGate.assertClean("terminal-story:"+name);
       results.push({name,success:true,cadence,...detail,browserErrors});
     }finally{
@@ -469,7 +477,7 @@ async function terminalStoryBrowserValidation(browser){
 
   await scenario("clean-pickpocket-success",async page=>{
     await seedResolver(page,"directPickpocket","PICKPOCKET_DIRECT_SUCCESS");
-    await chooseLabel(page,"SLIP IN FOR THE PACKAGE","v2_direct_pickpocket_resolver");
+    await chooseLabel(page,"SLIP IN AND TAKE IT","v2_direct_pickpocket_resolver");
     await advanceTo(page,"v2_pickpocket_clean_success");
     await nextSemantic(page,"v2_report");
     const st=await stateSnapshot(page);
@@ -479,7 +487,10 @@ async function terminalStoryBrowserValidation(browser){
   },{expectedReportCount:21,expectedMinatoCount:20});
 
   await scenario("direct-strike-2v1-loss",async page=>{
-    await chooseLabel(page,"STRIKE BEFORE THE HANDOFF","v2_direct_strike_setup");
+    await chooseLabel(page,"INTERRUPT THE HANDOFF","v2_direct_strike_setup");
+    const directStrikeText=await page.evaluate(()=>getAcademyKakashiV2Cues36020("v2_direct_strike_setup").map(c=>c.text));
+    for(const line of ["You could've kept watching.","I saw enough.","You're alone."])assert(directStrikeText.includes(line),"Writing-GOLDEN direct handoff line missing: "+line);
+    assert(!directStrikeText.includes("For now."),"superseded direct-handoff reply returned");
     await advanceTo(page,"v2_battle_direct_strike_2v1");
     await launchAndReturnBattle(page,{outcome:"defeat",actions:4,expectedBeat:"v2_direct_strike_2v1_loss"});
     await nextSemantic(page,"v2_report");
@@ -490,7 +501,7 @@ async function terminalStoryBrowserValidation(browser){
   },{expectedReportCount:30,expectedMinatoCount:23});
 
   await scenario("direct-strike-win-then-mi-loss",async page=>{
-    await chooseLabel(page,"STRIKE BEFORE THE HANDOFF","v2_direct_strike_setup");
+    await chooseLabel(page,"INTERRUPT THE HANDOFF","v2_direct_strike_setup");
     await advanceTo(page,"v2_battle_direct_strike_2v1");
     await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_direct_strike_2v1_win"});
     await nextSemantic(page,"v2_battle_direct_mi");
@@ -503,7 +514,7 @@ async function terminalStoryBrowserValidation(browser){
   });
 
   await scenario("direct-strike-double-win-live-anbu-custody",async page=>{
-    await chooseLabel(page,"STRIKE BEFORE THE HANDOFF","v2_direct_strike_setup");
+    await chooseLabel(page,"INTERRUPT THE HANDOFF","v2_direct_strike_setup");
     await advanceTo(page,"v2_battle_direct_strike_2v1");
     await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_direct_strike_2v1_win"});
     await nextSemantic(page,"v2_battle_direct_mi");
@@ -512,16 +523,18 @@ async function terminalStoryBrowserValidation(browser){
     let st=await stateSnapshot(page);
     for(const ref of ["AMT","PS","MI"])assert.strictEqual(st.participants[ref].state,"BATTLE_DEFEATED","custody committed before group handoff");
     await advanceTo(page,"v2_group3_anbu_handoff");
+    const anbuHandoff=await inspect(page,"all-three-anbu-handoff");
+    assert(anbuHandoff.actorIds.includes("konoha_anbu_operational_contact"),"all-three ANBU handoff did not return to the mission-giving operative");
     await nextSemantic(page,"v2_report");
     st=await stateSnapshot(page);
     for(const ref of ["AMT","PS","MI"])assert.strictEqual(st.participants[ref].state,"ANBU_CUSTODY");
-    return{skipTerminalCadence:true,knownTerminalBlocker:"kakashi_v2_terminal_cap_policy_unresolved"};
+    return{};
   },{expectedReportCount:30,expectedMinatoCount:22});
 
   await scenario("police-ending",async page=>{
     await seedResolver(page,"getCloser","GET_CLOSER_SUCCESS");
     await seedResolver(page,"improvedPickpocket","PICKPOCKET_IMPROVED_FAILURE");
-    await chooseLabel(page,"MOVE IN CLOSER","v2_get_closer_resolver");
+    await chooseLabel(page,"GET CLOSER","v2_get_closer_resolver");
     await advanceTo(page,"v2_get_closer_success");
     await chooseLabel(page,"ATTEMPT THE PICKPOCKET","v2_improved_pickpocket_resolver");
     await advanceTo(page,"v2_battle_improved_2v1");
@@ -538,9 +551,27 @@ async function terminalStoryBrowserValidation(browser){
     assert.strictEqual(st.participants.MI.state,"UNSEEN");
   });
 
+  await scenario("all-three-police-cards",async page=>{
+    await seedResolver(page,"directPickpocket","PICKPOCKET_DIRECT_FAILURE");
+    await chooseLabel(page,"SLIP IN AND TAKE IT","v2_direct_pickpocket_resolver");
+    await advanceTo(page,"v2_battle_pickpocket_3v1");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_pickpocket_3v1_win"});
+    await chooseLabel(page,"TAKE THEM TO THE UCHIHA POLICE","v2_group3_police_depart");
+    await advanceTo(page,"v2_group3_police_handoff");
+    const police=await inspect(page,"all-three-police-handoff");
+    assert.strictEqual(police.preset,"police_handoff");
+    assert.strictEqual(police.actorIds.length,6,"all-three Police handoff must show Kakashi + three participants + two officers");
+    for(const id of ["academy_kakashi","academy_kakashi_origin_amt","academy_kakashi_origin_package_smuggler","academy_kakashi_origin_masked_interceptor","kakashi_upf_amt_male","kakashi_upf_mi_female"])assert(police.actorIds.includes(id),"all-three Police handoff missing actor "+id);
+    assert(police.actorImages.some(src=>/uchiha_police_force_male_alt_2\.png$/.test(src||""))&&police.actorImages.some(src=>/uchiha_police_force_member_female\.png$/.test(src||"")),"all-three Police handoff did not use the required mixed officer pairing");
+    await shot(page,"terminal-all-three-police-handoff.png");
+    await nextSemantic(page,"v2_report");
+    const st=await stateSnapshot(page);
+    for(const ref of ["AMT","PS","MI"])assert.strictEqual(st.participants[ref].state,"POLICE_CUSTODY");
+  });
+
   await scenario("deliberate-release-ending",async page=>{
     await seedResolver(page,"directPickpocket","PICKPOCKET_DIRECT_FAILURE");
-    await chooseLabel(page,"SLIP IN FOR THE PACKAGE","v2_direct_pickpocket_resolver");
+    await chooseLabel(page,"SLIP IN AND TAKE IT","v2_direct_pickpocket_resolver");
     await advanceTo(page,"v2_battle_pickpocket_3v1");
     await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_pickpocket_3v1_win"});
     await chooseLabel(page,"LET THEM GO","v2_group3_release");
@@ -553,8 +584,8 @@ async function terminalStoryBrowserValidation(browser){
 
   await scenario("package-loss-ending",async page=>{
     await seedResolver(page,"amtPursuitRoot","AMT_PURSUIT_FAILURE");
-    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
-    await chooseLabel(page,"GO AFTER THE ORIGINAL TARGET","v2_go_amt_pursuit_resolver");
+    await chooseLabel(page,"WATCH THE HANDOFF","v2_watch_exchange");
+    await chooseLabel(page,"CHASE THE MAN FROM THE PHOTO","v2_go_amt_pursuit_resolver");
     await advanceTo(page,"v2_amt_direct_pursuit_fail");
     await nextSemantic(page,"v2_report");
     const st=await stateSnapshot(page);
@@ -564,11 +595,11 @@ async function terminalStoryBrowserValidation(browser){
 
   await scenario("pakkun-amt-ending",async page=>{
     await seedResolver(page,"psPursuit","PS_PURSUIT_SUCCESS");
-    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
-    await chooseLabel(page,"STOP THE ASSASSIN","v2_stop_assassin_setup");
+    await chooseLabel(page,"WATCH THE HANDOFF","v2_watch_exchange");
+    await chooseLabel(page,"INTERCEPT THE MASKED ATTACKER","v2_stop_assassin_setup");
     await advanceTo(page,"v2_battle_mi_stop");
     await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_mi_stop_win"});
-    await chooseLabel(page,"GO AFTER PACKAGE SMUGGLER","v2_ps_pursuit_resolver");
+    await chooseLabel(page,"CHASE THE PACKAGE","v2_ps_pursuit_resolver");
     await advanceTo(page,"v2_battle_ps_seq");
     await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_ps_seq_win"});
     await chooseLabel(page,"GO AFTER ANBU MARKED TARGET","v2_amt_after_ps");
@@ -581,11 +612,11 @@ async function terminalStoryBrowserValidation(browser){
     assert.strictEqual(st.package.returned,true);
   });
 
-  assert.strictEqual(results.length,8);
+  assert.strictEqual(results.length,9);
   return{
     pass:true,
     issue:105,
-    authority:"Academy_Kakashi_Ending_Cohesion_AMBER_Repair_2026-09-23",
+    authority:"Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24",
     routesValidated:results.length,
     post322DispositionManualRoutesPending:[],
     post322Reason:"Replacement semantics are source-regressed here and exact four-outcome installed-browser acceptance runs in post322DispositionBrowserValidation within this same browser suite.",
@@ -596,23 +627,28 @@ async function terminalStoryBrowserValidation(browser){
 async function finishTerminalBrowser(page,label){
   await advanceTo(page,"v2_report",{max:20});
   const report=await inspect(page,label+":report");
-  await nextSemantic(page,"v2_minato");
+  await nextSemantic(page,"v2_hidden_review");
+  const hidden=await inspect(page,label+":hidden-review");
+  assert(!hidden.actorIds.includes("academy_kakashi"),label+" hidden review exposed Kakashi to test truth");
+  assert(hidden.actorIds.includes("konoha_anbu_operational_contact")&&hidden.actorIds.includes("kage_minato"),label+" hidden review cast incomplete");
   await nextSemantic(page,"v2_receipt");
   const receipt=await inspect(page,label+":receipt");
-  await nextSemantic(page,"v2_complete");
+  assert(!receipt.receiptText.includes("Origin occurrence sealed"),label+" stale sealed-occurrence text returned");
   await fastDrain(page);
-  const final=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040());
-  assert(final&&final.success===true,label+" completion: "+JSON.stringify(final));
+  const completion=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040());
+  assert(completion&&completion.success===true,label+" receipt CONTINUE failed: "+JSON.stringify(completion));
   await page.waitForFunction(()=>ensurePlayerAcquisitionState().chronicleOrigin?.prologueCompleted===true,null,{timeout:12000});
   const completed=await page.evaluate(()=>({
     originComplete:ensurePlayerAcquisitionState().chronicleOrigin?.prologueCompleted===true,
     teamFormationRequired:ensurePlayerAcquisitionState().academyTeamFormation?.required===true,
-    activeStory:getActiveStorySceneRuntime()
+    activeStory:getActiveStorySceneRuntime(),
+    bodyText:document.body.innerText||""
   }));
   assert.strictEqual(completed.originComplete,true);
   assert.strictEqual(completed.teamFormationRequired,true);
   assert.strictEqual(completed.activeStory,null);
-  return{report,receipt,completed};
+  assert(/YOUR CHRONICLE BEGINS/i.test(completed.bodyText),"shared YOUR CHRONICLE BEGINS continuity was not projected after Receipt CONTINUE");
+  return{report,hidden,receipt,completed:{...completed,bodyText:"YOUR CHRONICLE BEGINS visible"}};
 }
 
 async function cleanRoute(browser){
@@ -843,7 +879,7 @@ async function visualAndBattle(browser){
   await waitVisualReady(page,"watch_exchange");
   const watch=await inspect(page,"watch_exchange");
   const actorCount=await page.locator("#kakashi-v2-scene-board .kv2-actor").count();
-  assert.strictEqual(actorCount,3,"WATCH THE EXCHANGE actor count");
+  assert.strictEqual(actorCount,3,"WATCH THE HANDOFF actor count");
   await shot(page,"08-watch-exchange.png");
   const motionBenchmark=await assertSafeStoryMotion(page);
 
@@ -982,7 +1018,7 @@ async function browserRouteMatrix(browser){
 
   await scenario("failed_pickpocket_3v1_release",async page=>{
     await seedResolver(page,"directPickpocket","PICKPOCKET_DIRECT_FAILURE");
-    await chooseLabel(page,"SLIP IN FOR THE PACKAGE","v2_direct_pickpocket_resolver");
+    await chooseLabel(page,"SLIP IN AND TAKE IT","v2_direct_pickpocket_resolver");
     await advanceTo(page,"v2_battle_pickpocket_3v1");
     await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_pickpocket_3v1_win"});
     await chooseLabel(page,"LET THEM GO","v2_group3_release");
@@ -996,7 +1032,7 @@ async function browserRouteMatrix(browser){
   });
 
   await scenario("direct_strike_double_victory_kill_them_two_outcome",async page=>{
-    await chooseLabel(page,"STRIKE BEFORE THE HANDOFF","v2_direct_strike_setup");
+    await chooseLabel(page,"INTERRUPT THE HANDOFF","v2_direct_strike_setup");
     await advanceTo(page,"v2_battle_direct_strike_2v1");
     await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_direct_strike_2v1_win"});
     await advanceTo(page,"v2_battle_direct_mi");
@@ -1013,7 +1049,7 @@ async function browserRouteMatrix(browser){
   await scenario("closer_failure_ask_where_take_down_loss",async page=>{
     await seedResolver(page,"getCloser","GET_CLOSER_FAILURE");
     await seedResolver(page,"stayPackagePursuit","STAY_PACKAGE_PURSUIT_SUCCESS");
-    await chooseLabel(page,"MOVE IN CLOSER","v2_get_closer_resolver");
+    await chooseLabel(page,"GET CLOSER","v2_get_closer_resolver");
     await advanceTo(page,"v2_get_closer_failure");
     await chooseLabel(page,"STAY ON THE PACKAGE","v2_stay_package_pursuit_resolver");
     await advanceTo(page,"v2_stay_package_intercept");
@@ -1032,16 +1068,16 @@ async function browserRouteMatrix(browser){
 
   await scenario("stop_assassin_fast_restrain_then_ps_loss",async page=>{
     await seedResolver(page,"psPursuit","PS_PURSUIT_SUCCESS");
-    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
-    await chooseLabel(page,"STOP THE ASSASSIN","v2_stop_assassin_setup");
+    await chooseLabel(page,"WATCH THE HANDOFF","v2_watch_exchange");
+    await chooseLabel(page,"INTERCEPT THE MASKED ATTACKER","v2_stop_assassin_setup");
     await advanceTo(page,"v2_battle_mi_stop");
     await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_mi_stop_win"});
     const labels=await page.evaluate(()=>getCurrentStorySceneBeat().choices.filter(c=>!c.availability||c.availability().available).map(c=>c.label));
-    assert(labels.includes("GO AFTER PACKAGE SMUGGLER"),JSON.stringify(labels));
+    assert(labels.includes("CHASE THE PACKAGE"),JSON.stringify(labels));
     assert(!labels.includes("GO AFTER ANBU MARKED TARGET"),JSON.stringify(labels));
-    await chooseLabel(page,"RESTRAIN HER AND CONTINUE","v2_mi_restrained_next");
+    await chooseLabel(page,"RESTRAIN HER AND KEEP MOVING","v2_mi_restrained_next");
     const restrainedResolution=await stateSnapshot(page);
-    assert(["RESTRAINED","ESCAPED"].includes(restrainedResolution.participants.MI.state),"RESTRAIN HER AND CONTINUE produced invalid final state: "+JSON.stringify(restrainedResolution.participants.MI));
+    assert(["RESTRAINED","ESCAPED"].includes(restrainedResolution.participants.MI.state),"RESTRAIN HER AND KEEP MOVING produced invalid final state: "+JSON.stringify(restrainedResolution.participants.MI));
     await nextSemantic(page,"v2_ps_pursuit_resolver");
     await advanceTo(page,"v2_battle_ps_seq");
     const psBattleScene=await page.evaluate(()=>{
@@ -1058,14 +1094,14 @@ async function browserRouteMatrix(browser){
   });
 
   await scenario("stop_assassin_slow_anbu_custody",async page=>{
-    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
-    await chooseLabel(page,"STOP THE ASSASSIN","v2_stop_assassin_setup");
+    await chooseLabel(page,"WATCH THE HANDOFF","v2_watch_exchange");
+    await chooseLabel(page,"INTERCEPT THE MASKED ATTACKER","v2_stop_assassin_setup");
     await advanceTo(page,"v2_battle_mi_stop");
     await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_mi_stop_win"});
     const labels=await page.evaluate(()=>getCurrentStorySceneBeat().choices.filter(c=>!c.availability||c.availability().available).map(c=>c.label));
-    assert(!labels.includes("GO AFTER PACKAGE SMUGGLER"),JSON.stringify(labels));
+    assert(!labels.includes("CHASE THE PACKAGE"),JSON.stringify(labels));
     assert(!labels.includes("GO AFTER ANBU MARKED TARGET"),JSON.stringify(labels));
-    assert(!labels.includes("RESTRAIN HER AND CONTINUE"),JSON.stringify(labels));
+    assert(!labels.includes("RESTRAIN HER AND KEEP MOVING"),JSON.stringify(labels));
     await chooseLabel(page,"BRING HER TO ANBU","v2_mi_anbu_depart");
     let s=await stateSnapshot(page);
     assert.strictEqual(s.participants.MI.state,"BATTLE_DEFEATED","MI custody committed before ANBU handoff");
@@ -1079,7 +1115,7 @@ async function browserRouteMatrix(browser){
   await scenario("assassin_then_package_full_sequence",async page=>{
     await seedResolver(page,"psPursuit","PS_PURSUIT_SUCCESS");
     await seedResolver(page,"secureAmtPursuit","SECURE_AMT_PURSUIT_SUCCESS");
-    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
+    await chooseLabel(page,"WATCH THE HANDOFF","v2_watch_exchange");
     await chooseLabel(page,"DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE","v2_assassin_then_package_setup");
     await advanceTo(page,"v2_battle_mi_package_second");
     await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_mi_package_second_win"});
@@ -1101,7 +1137,7 @@ async function browserRouteMatrix(browser){
   });
 
   await scenario("secure_package_return_report",async page=>{
-    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
+    await chooseLabel(page,"WATCH THE HANDOFF","v2_watch_exchange");
     await chooseLabel(page,"SECURE THE PACKAGE","v2_secure_package_setup");
     await advanceTo(page,"v2_battle_ps_mi");
     await launchAndReturnBattle(page,{outcome:"victory",actions:5,expectedBeat:"v2_ps_mi_win"});
@@ -1115,8 +1151,8 @@ async function browserRouteMatrix(browser){
 
   await scenario("go_original_target_pursuit_failure",async page=>{
     await seedResolver(page,"amtPursuitRoot","AMT_PURSUIT_FAILURE");
-    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
-    await chooseLabel(page,"GO AFTER THE ORIGINAL TARGET","v2_go_amt_pursuit_resolver");
+    await chooseLabel(page,"WATCH THE HANDOFF","v2_watch_exchange");
+    await chooseLabel(page,"CHASE THE MAN FROM THE PHOTO","v2_go_amt_pursuit_resolver");
     await advanceTo(page,"v2_amt_direct_pursuit_fail");
     const s=await stateSnapshot(page);
     assert.strictEqual(s.package.holder,"PS");
@@ -1126,7 +1162,7 @@ async function browserRouteMatrix(browser){
   await scenario("closer_success_improved_pickpocket",async page=>{
     await seedResolver(page,"getCloser","GET_CLOSER_SUCCESS");
     await seedResolver(page,"improvedPickpocket","PICKPOCKET_IMPROVED_SUCCESS");
-    await chooseLabel(page,"MOVE IN CLOSER","v2_get_closer_resolver");
+    await chooseLabel(page,"GET CLOSER","v2_get_closer_resolver");
     await advanceTo(page,"v2_get_closer_success");
     await chooseLabel(page,"ATTEMPT THE PICKPOCKET","v2_improved_pickpocket_resolver");
     await advanceTo(page,"v2_pickpocket_clean_success");
@@ -1138,7 +1174,7 @@ async function browserRouteMatrix(browser){
 
   await scenario("closer_failure_cutoff_police",async page=>{
     await seedResolver(page,"getCloser","GET_CLOSER_FAILURE");
-    await chooseLabel(page,"MOVE IN CLOSER","v2_get_closer_resolver");
+    await chooseLabel(page,"GET CLOSER","v2_get_closer_resolver");
     await advanceTo(page,"v2_get_closer_failure");
     await chooseLabel(page,"CUT THEM OFF AT THE SAKURA TREE","v2_cutoff_setup");
     await advanceTo(page,"v2_battle_cutoff");
@@ -1165,15 +1201,15 @@ async function browserRouteMatrix(browser){
 async function post322DispositionBrowserValidation(browser){
   const exactOutcomes=[];
   async function runExact(intent,desired){
-    const label=intent==="KILL"?"KILL HER":"RESTRAIN HER AND CONTINUE";
+    const label=intent==="KILL"?"KILL HER":"RESTRAIN HER AND KEEP MOVING";
     const expectedBeat=intent==="KILL"?"v2_mi_kill_result":"v2_mi_restrained_next";
     for(let attempt=1;attempt<=24;attempt++){
       const {context,page,runtimeErrorGate}=await boot(browser);
       try{
         await toScene02Root(page);
         await seedResolver(page,"psPursuit","PS_PURSUIT_SUCCESS");
-        await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
-        await chooseLabel(page,"STOP THE ASSASSIN","v2_stop_assassin_setup");
+        await chooseLabel(page,"WATCH THE HANDOFF","v2_watch_exchange");
+        await chooseLabel(page,"INTERCEPT THE MASKED ATTACKER","v2_stop_assassin_setup");
         await advanceTo(page,"v2_battle_mi_stop");
         await launchAndReturnBattle(page,{outcome:"victory",actions:2,expectedBeat:"v2_mi_stop_win"});
         await chooseLabel(page,label,expectedBeat);
@@ -1213,11 +1249,11 @@ async function post322DispositionBrowserValidation(browser){
       try{
         await toScene02Root(page);
         await seedResolver(page,"psPursuit","PS_PURSUIT_SUCCESS");
-        await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
-        await chooseLabel(page,"STOP THE ASSASSIN","v2_stop_assassin_setup");
+        await chooseLabel(page,"WATCH THE HANDOFF","v2_watch_exchange");
+        await chooseLabel(page,"INTERCEPT THE MASKED ATTACKER","v2_stop_assassin_setup");
         await advanceTo(page,"v2_battle_mi_stop");
         await launchAndReturnBattle(page,{outcome:"victory",actions:2,expectedBeat:"v2_mi_stop_win"});
-        await chooseLabel(page,"RESTRAIN HER AND CONTINUE","v2_mi_restrained_next");
+        await chooseLabel(page,"RESTRAIN HER AND KEEP MOVING","v2_mi_restrained_next");
         let st=await stateSnapshot(page);
         if(st.participants.MI.state!=="RESTRAINED")continue;
         await advanceTo(page,"v2_battle_ps_seq");
