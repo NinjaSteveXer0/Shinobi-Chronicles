@@ -469,10 +469,12 @@
         "tools/qa_runtime_ownership_safety_300.js"
       ],
       "replaces": [
-        "runtime/alpha-origin-scenes-32900-a.js::pre340_compressed_academy_hinata"
+        "runtime/alpha-origin-scenes-32900-a.js::pre340_compressed_academy_hinata",
+        "runtime/alpha-origin-browser-realisation-33500.js::pre340 Hinata hin_eval presentationResolver",
+        "runtime/alpha-origin-browser-realisation-33500.js::pre340 Hinata hin_young_result insertion"
       ],
       "contractChangeReason": "AUTHORITY_CHANGED",
-      "rationale": "Issue #340 consumes the approved Academy Hinata Writing-Golden story as the sole production expression, replacing the compressed independent-quiz branch with three connected authored spar exchanges, opponent adaptation, history-sensitive instructor prompting/evaluation and the authored younger-Hyuga close while preserving existing source occurrences and the no-PL-Battle boundary."
+      "rationale": "Issue #340 consumes the approved Academy Hinata Writing-Golden story as the sole production expression, replacing the compressed independent-quiz branch with three connected authored spar exchanges, opponent adaptation, history-sensitive instructor prompting/evaluation and the authored younger-Hyuga close while preserving existing source occurrences and the no-PL-Battle boundary. The shared 33500 browser-realisation module now explicitly stands down when the native GOLDEN Hinata graph is present; it retains only bounded compatibility for pre-#340 Alpha graphs and cannot overwrite the GOLDEN Story."
     }
   ]
 }
