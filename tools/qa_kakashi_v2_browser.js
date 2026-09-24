@@ -585,13 +585,8 @@ async function terminalStoryBrowserValidation(browser){
     issue:105,
     authority:"Academy_Kakashi_Ending_Cohesion_AMBER_Repair_2026-09-23",
     routesValidated:results.length,
-    post322DispositionManualRoutesPending:[
-      "KILL -> KILLED",
-      "KILL -> ESCAPED",
-      "RESTRAIN -> RESTRAINED",
-      "RESTRAIN -> ESCAPED"
-    ],
-    post322Reason:"Replacement semantics are implemented and source-regressed; exact installed-browser acceptance for all four factual outcomes remains a separate manual/browser subgate.",
+    post322DispositionManualRoutesPending:[],
+    post322Reason:"Replacement semantics are source-regressed here and exact four-outcome installed-browser acceptance runs in post322DispositionBrowserValidation within this same browser suite.",
     results
   };
 }
@@ -1097,6 +1092,109 @@ async function browserRouteMatrix(browser){
   return{pass:true,scenarioFamiliesValidated:results.length,results};
 }
 
+
+async function post322DispositionBrowserValidation(browser){
+  const exactOutcomes=[];
+  async function runExact(intent,desired){
+    const label=intent==="KILL"?"KILL HER":"RESTRAIN HER AND CONTINUE";
+    const expectedBeat=intent==="KILL"?"v2_mi_kill_result":"v2_mi_restrained_next";
+    for(let attempt=1;attempt<=24;attempt++){
+      const {context,page,runtimeErrorGate}=await boot(browser);
+      try{
+        await toScene02Root(page);
+        await seedResolver(page,"psPursuit","PS_PURSUIT_SUCCESS");
+        await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
+        await chooseLabel(page,"STOP THE ASSASSIN","v2_stop_assassin_setup");
+        await advanceTo(page,"v2_battle_mi_stop");
+        await launchAndReturnBattle(page,{outcome:"victory",actions:2,expectedBeat:"v2_mi_stop_win"});
+        await chooseLabel(page,label,expectedBeat);
+        const st=await stateSnapshot(page);
+        const actual=st.participants.MI.state;
+        assert(intent==="KILL"?["KILLED","ESCAPED"].includes(actual):["RESTRAINED","ESCAPED"].includes(actual),intent+" produced invalid installed-browser outcome: "+JSON.stringify(st.participants.MI));
+        if(actual!==desired)continue;
+        await waitVisualReady(page,intent.toLowerCase()+"-"+desired.toLowerCase());
+        const persisted=await page.evaluate(()=>{
+          if(typeof savePlayerData==="function")savePlayerData();
+          const loaded=typeof loadPlayerData==="function"?loadPlayerData():null;
+          const receipts=loaded&&loaded.storyFactualResolver34600&&loaded.storyFactualResolver34600.receipts||{};
+          const current=getAcademyKakashiV2State36020();
+          const row=current&&current.participants&&current.participants.MI||null;
+          const dispositionReceipts=Object.values(receipts).filter(r=>r&&String(r.bindingRef||"").includes("academy_kakashi.v2.disposition."));
+          return{row:row?JSON.parse(JSON.stringify(row)):null,persistedDispositionReceiptCount:dispositionReceipts.length,persistedSelectedOutcomes:dispositionReceipts.map(r=>r.selectedOutcomeRef)};
+        });
+        assert(persisted.row&&persisted.row.state===desired,"save snapshot lost exact disposition");
+        assert(persisted.persistedDispositionReceiptCount>=1,"factual disposition receipt did not survive save/load readback");
+        const browserErrors=await runtimeErrorGate.assertClean("post322:"+intent+":"+desired);
+        exactOutcomes.push({intent,desired,attempt,beatId:await currentBeat(page),persisted,browserErrors});
+        return;
+      }finally{await context.close();}
+    }
+    throw new Error("could not realise exact installed-browser disposition after bounded retries: "+intent+" -> "+desired);
+  }
+
+  await runExact("KILL","KILLED");
+  await runExact("KILL","ESCAPED");
+  await runExact("RESTRAIN","RESTRAINED");
+  await runExact("RESTRAIN","ESCAPED");
+
+  const collectedTransfers=[];
+  async function runAllThree(destination){
+    for(let attempt=1;attempt<=48;attempt++){
+      const {context,page,runtimeErrorGate}=await boot(browser);
+      try{
+        await toScene02Root(page);
+        await seedResolver(page,"psPursuit","PS_PURSUIT_SUCCESS");
+        await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
+        await chooseLabel(page,"STOP THE ASSASSIN","v2_stop_assassin_setup");
+        await advanceTo(page,"v2_battle_mi_stop");
+        await launchAndReturnBattle(page,{outcome:"victory",actions:2,expectedBeat:"v2_mi_stop_win"});
+        await chooseLabel(page,"RESTRAIN HER AND CONTINUE","v2_mi_restrained_next");
+        let st=await stateSnapshot(page);
+        if(st.participants.MI.state!=="RESTRAINED")continue;
+        await advanceTo(page,"v2_battle_ps_seq");
+        await launchAndReturnBattle(page,{outcome:"victory",actions:2,expectedBeat:"v2_ps_seq_win"});
+        await chooseLabel(page,"RESTRAIN HIM AND CONTINUE","v2_ps_restrain_continue_result");
+        st=await stateSnapshot(page);
+        if(st.participants.PS.state!=="RESTRAINED")continue;
+        await advanceTo(page,"v2_battle_amt_seq_pakkun");
+        await launchAndReturnBattle(page,{outcome:"victory",actions:2,expectedBeat:"v2_amt_seq_win"});
+        await chooseLabel(page,"RESTRAIN HIM AND COLLECT THE OTHERS","v2_amt_restrain_collect_result");
+        st=await stateSnapshot(page);
+        if(st.participants.AMT.state!=="RESTRAINED")continue;
+        assert(["MI","PS","AMT"].every(ref=>st.participants[ref].state==="RESTRAINED"),"all-three restraint state drift");
+        await advanceTo(page,"v2_group_collect");
+        await nextSemantic(page,"v2_group_collect_choice");
+        st=await stateSnapshot(page);
+        assert(["MI","PS","AMT"].every(ref=>st.participants[ref].state==="RESTRAINED"&&st.participants[ref].collected===true),"collection did not preserve exact RESTRAINED facts");
+        const choice=destination==="ANBU"?"BRING THEM TO ANBU":"TAKE THEM TO THE UCHIHA POLICE";
+        const handoff=destination==="ANBU"?"v2_collected_anbu_handoff":"v2_collected_police_handoff";
+        await chooseLabel(page,choice,handoff);
+        await nextSemantic(page,"v2_report");
+        st=await stateSnapshot(page);
+        const expected=destination==="ANBU"?"ANBU_CUSTODY":"POLICE_CUSTODY";
+        assert(["MI","PS","AMT"].every(ref=>st.participants[ref].state===expected),"all-three institutional handoff failed: "+destination);
+        const browserErrors=await runtimeErrorGate.assertClean("post322:all-three:"+destination);
+        collectedTransfers.push({destination,attempt,participantStates:Object.fromEntries(["MI","PS","AMT"].map(ref=>[ref,st.participants[ref].state])),browserErrors});
+        return;
+      }finally{await context.close();}
+    }
+    throw new Error("could not realise all-three RESTRAINED installed-browser route after bounded retries: "+destination);
+  }
+  await runAllThree("ANBU");
+  await runAllThree("POLICE");
+
+  return{
+    pass:true,
+    exactOutcomes,
+    collectedTransfers,
+    mixedMultiTargetCoveredBy:"browserRouteMatrix.direct_strike_double_victory_kill_them_two_outcome",
+    releaseCoveredBy:"browserRouteMatrix.failed_pickpocket_3v1_release",
+    rewardReceiptCoveredBy:"terminal Story browser routes plus #322 reward source gate",
+    saveLoadReplayIdempotence:"installed-browser save/load readback plus #322 resolver replay regression",
+    browserGoldenClaimed:false
+  };
+}
+
 (async()=>{
   const browser=await chromium.launch({headless:false});
   try{
@@ -1104,12 +1202,13 @@ async function browserRouteMatrix(browser){
     const visualBattle=await visualAndBattle(browser);
     const browserMatrix=await browserRouteMatrix(browser);
     const terminalStory=await terminalStoryBrowserValidation(browser);
+    const post322Disposition=await post322DispositionBrowserValidation(browser);
     const pngs=fs.readdirSync(OUT).filter(name=>name.endsWith(".png")).sort();
     const hashes=pngs.map(name=>crypto.createHash("sha256").update(fs.readFileSync(path.join(OUT,name))).digest("hex"));
     const uniqueScreenshots=new Set(hashes).size;
     assert(pngs.length>=11,"installed-browser evidence screenshots missing");
     assert(uniqueScreenshots>=8,"browser evidence is visually static/occluded: "+JSON.stringify({pngs,uniqueScreenshots}));
-    const result={pass:true,clean,visualBattle,browserMatrix,terminalStory,pngCount:pngs.length,uniqueScreenshots,browserRuntimeErrorGate:"GREEN",browserGoldenClaimed:false};
+    const result={pass:true,clean,visualBattle,browserMatrix,terminalStory,post322Disposition,pngCount:pngs.length,uniqueScreenshots,browserRuntimeErrorGate:"GREEN",browserGoldenClaimed:false};
     fs.writeFileSync(path.join(OUT,"results.json"),JSON.stringify(result,null,2));
     console.log(JSON.stringify(result,null,2));
   }finally{
