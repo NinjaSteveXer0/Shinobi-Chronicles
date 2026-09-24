@@ -41,7 +41,12 @@ assert(kv2Renderer.includes("applyStoryStageAnchor33900"),"#312 Kakashi must ret
 assert(kv2Renderer.includes('data-story-object-id="PACKAGE"'),"#312 package token missing");
 assert(kv2Renderer.includes('data-count="1"')&&kv2Renderer.includes('data-count="2"'),"#312 actor prominence must adapt to cast count");
 assert(kv2Renderer.includes("Final Kakashi Browser-Golden motion benchmark")&&kv2Renderer.includes("translate:4vw 0")&&kv2Renderer.includes("transform:none!important"),"#312 Kakashi motion must use longhand compositor primitives rather than the retired transform chain");
-assert(kv2Renderer.includes(".kv2-card-frame{display:none!important}")&&!kv2Renderer.includes('frame.className="kv2-card-frame"'),"#312 Kakashi phantom card-holder chrome must stay retired");
+{
+  const actorMarkupStart=kv2Renderer.indexOf("function actorMarkup(");
+  const actorMarkupEnd=kv2Renderer.indexOf("function availableChoices(",actorMarkupStart);
+  const actorMarkupSource=kv2Renderer.slice(actorMarkupStart,actorMarkupEnd);
+  assert(kv2Renderer.includes(".kv2-card-frame{display:none!important}")&&actorMarkupStart>=0&&actorMarkupEnd>actorMarkupStart&&!actorMarkupSource.includes('frame.className="kv2-card-frame"')&&actorMarkupSource.includes("figure.append(img,label)"),"#312 Kakashi phantom card-holder chrome must stay retired");
+}
 {
   const styleStart=kv2Renderer.indexOf("function installStyle(){");
   const styleEnd=kv2Renderer.indexOf("function availableChoices(",styleStart);
