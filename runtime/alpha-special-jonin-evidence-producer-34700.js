@@ -15,7 +15,7 @@ function ensurePrerequisites(){
   return missing.length?{success:false,reason:"special_jonin_evaluator_api_missing",missing}:{success:true};
 }
 function ensureStore(){
-  if(!globalThis.playerData||typeof playerData!=="object")return null;
+  if(typeof playerData==="undefined"||!playerData||typeof playerData!=="object")return null;
   let store=playerData[STORE_KEY];
   if(!store||typeof store!=="object"||Number(store.version)!==STORE_VERSION){
     const legacy=store&&typeof store==="object"?store:null;
@@ -31,7 +31,7 @@ function ensureStore(){
 function save(){try{if(typeof savePlayerData==="function")savePlayerData();}catch(_error){}}
 function committedSourceRecord(sourceOccurrenceId){
   const id=String(sourceOccurrenceId||"");
-  if(!id||!globalThis.playerData||!Array.isArray(playerData.activityHistory))return null;
+  if(!id||typeof playerData==="undefined"||!playerData||!Array.isArray(playerData.activityHistory))return null;
   return playerData.activityHistory.find(row=>{
     if(!row||row.committed!==true)return false;
     return [row.sourceOccurrenceId,row.occurrenceId,row.id].some(value=>String(value||"")===id);
