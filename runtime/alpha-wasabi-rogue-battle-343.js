@@ -113,6 +113,20 @@ if(PRE_CHOOSE){
   try{chooseEnemyAuthoredBattleAction=globalThis.chooseEnemyAuthoredBattleAction;}catch(_error){}
 }
 
+const PRE_GENERATE_REWARDS=typeof generateBattleRewards==="function"?generateBattleRewards:null;
+if(PRE_GENERATE_REWARDS){
+  globalThis.generateBattleRewards=function generateWasabi343ZeroBattleRewards(){
+    const result=PRE_GENERATE_REWARDS.apply(this,arguments);
+    if(!(currentBattle&&currentBattle.wasabi343))return result;
+    const rewards=result&&typeof result==="object"?result:{};
+    rewards.ryo=0;rewards.exp=0;rewards.items=[];rewards.rareDrops=[];
+    rewards.requiresExplicitPostClaimContinue=true;
+    rewards.wasabi343ZeroEntitlement=true;
+    return rewards;
+  };
+  try{generateBattleRewards=globalThis.generateBattleRewards;}catch(_error){}
+}
+
 function strictWasabiDeployment(){
   if(!currentBattle||currentBattle.active!==true)return{success:false,reason:"wasabi_battle_not_active"};
   const wasabi=typeof getPlayerCharacter==="function"?getPlayerCharacter(WASABI):null;
@@ -192,6 +206,8 @@ function launch(spec={}){
   };
   if(currentBattle.rewards){
     currentBattle.rewards.ryo=0;currentBattle.rewards.exp=0;currentBattle.rewards.items=[];currentBattle.rewards.rareDrops=[];
+    currentBattle.rewards.requiresExplicitPostClaimContinue=true;
+    currentBattle.rewards.wasabi343ZeroEntitlement=true;
   }
   savePlayerData();saveTestState();openOverlay("combat");
   return{success:true,battleId:exactId,encounterId:ENCOUNTER,battleConfigId:CONFIG,playerParticipantIds:[WASABI],oppositionParticipantIds:[ROGUE],launchEvidenceId:evidence.evidenceId};
@@ -222,6 +238,7 @@ function diagnostics(){
     withdrawNaturallyUnavailable:String(strictWasabiDeployment).includes("player={slots:createBattleDeploymentSlots([WASABI])}"),
     exactOccurrenceId:exactBattleOccurrenceId("qa")==="battle_occ_origin_izuno_rogue_genin_step_in:qa"&&String(launch).includes("wasabi_battle_occurrence_already_committed_without_runtime"),
     zeroRewards:enemy.rewards.ryo.min===0&&enemy.rewards.ryo.max===0&&enemy.rewards.exp.min===0&&enemy.rewards.exp.max===0&&enemy.rewards.commonDrops.length===0&&enemy.rewards.rareDrops.length===0,
+    claimSeparateFromContinue:!!PRE_GENERATE_REWARDS&&String(globalThis.generateBattleRewards).includes("requiresExplicitPostClaimContinue=true")&&String(launch).includes("requiresExplicitPostClaimContinue=true"),
     observerSafeResult:Object.keys(projectResult.call({})||{}).length===0?true:String(projectResult).includes("rogueGeninBattlePLDepleted")&&!String(projectResult).includes("stats"),
     noStoryTruth:String(launch).includes("sourceOccurrenceId")&&!String(launch).includes("consumeStaticOriginSourceOccurrence")
   };
