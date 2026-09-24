@@ -1235,7 +1235,7 @@ beats.push({beatId:"izu_rogue_choice",mode:"choice",text:"",choices:[
   C("keep_pursuing","KEEP PURSUING","izu_rogue_keep_pursuing_1",{rogueGeninResponse:"keep_pursuing",rogueResponse:"keep_pursuing",rogueGeninInterruptionResolvedByWasabiAction:false,rogueResolved:false,battleOccurrenceIds:[],outcome:"secondary_occurrence_costs_pursuit"})
 ]});
 seq("izu_rogue_step_in",G("rogue_step_in"),"izu_rogue_step_in_battle");
-beats.push({beatId:"izu_rogue_step_in_battle",mode:"battle_transition",text:"Wasabi Izuno vs Rogue Genin.",battle:battleSpec()});
+beats.push({beatId:"izu_rogue_step_in_battle",mode:"battle_transition",text:"",battle:battleSpec()});
 seq("izu_rogue_step_in_return",G("finish_secondary"),"izu_eval_base_1",{first:{onEnterConsequences:[captureBattleReturn]}});
 seq("izu_rogue_call_help",G("rogue_call_help"),"izu_rogue_call_help_finish_1");
 seq("izu_rogue_call_help_finish",G("finish_secondary"),"izu_eval_base_1");
