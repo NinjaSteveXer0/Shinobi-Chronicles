@@ -23,6 +23,26 @@ beginAlphaChronicleOriginPrologue=function alpha329BeginOriginPrologue(){
   return startStoryScene(sceneId,{sourceEventId:sceneId,context:{protagonistParticipantId:originId,physicallyPresentTeamParticipantIds:[originId],chronicleOriginVariantId:originId},returnContext:{type:"alpha_arc1_mission_command",stage:"origin_prologue"}});
 };
 
+function restoreActiveOriginStoryPresentation32900(){
+  const acquisition=typeof ensurePlayerAcquisitionState==="function"?ensurePlayerAcquisitionState():null;
+  const originId=acquisition&&acquisition.chronicleOriginVariantId||null;
+  if(!originId)return{success:false,reason:"chronicle_origin_required"};
+  if(acquisition.chronicleOrigin&&acquisition.chronicleOrigin.prologueCompleted===true)return{success:false,reason:"origin_prologue_already_completed",originId};
+  const sceneId=A.sceneByVariant[originId]||null;
+  if(!sceneId)return{success:false,reason:"origin_story_scene_mapping_missing",originId};
+  const active=typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;
+  if(!active)return{success:false,reason:"origin_story_scene_not_active",originId,sceneId};
+  if(active.sceneId!==sceneId)return{success:false,reason:"different_story_scene_already_active",originId,sceneId,activeSceneId:active.sceneId};
+  if(typeof getStorySceneDefinition!=="function"||!getStorySceneDefinition(sceneId))return{success:false,reason:"origin_story_scene_not_registered",originId,sceneId};
+  if(typeof openOverlay!=="function")return{success:false,reason:"story_overlay_api_missing",originId,sceneId};
+  openOverlay("story_scene");
+  return{success:true,rehydrated:true,originId,sceneId,beatId:active.beatId};
+}
+
+// Rehydrate presentation only. Story truth/beat/localContext were already
+// restored by the persisted Story runtime and are not rewritten here.
+const startupOriginPresentationRestore32900=restoreActiveOriginStoryPresentation32900();
+
 // 32800 had one presentation typo before #135 returned. Fix only the label.
 if(typeof renderAlphaTailedBeastMissionCommand==="function"){
   const PRE_RENDER=renderAlphaTailedBeastMissionCommand;
@@ -74,6 +94,7 @@ function runAlphaOriginScene32900Diagnostics(){
     exactObitoPackage:A.sceneByVariant.academy_obito==="origin_academy_obito_journey_to_training",
     sourceFirstConsumer:A.commitOccurrence.toString().includes("this.history().push(record)")&&A.commitOccurrence.toString().includes("consumeStaticOriginSourceOccurrence"),
     continuityReused:A.completionRequest.toString().includes("completeChronicleOriginPrologue"),
+    activeOriginReloadPresentationRehydrated:String(restoreActiveOriginStoryPresentation32900).includes('active.sceneId!==sceneId')&&String(restoreActiveOriginStoryPresentation32900).includes('openOverlay("story_scene")')&&String(restoreActiveOriginStoryPresentation32900).includes("origin_prologue_already_completed"),
     noDirectPLGrant:!A.commitOccurrence.toString().includes("currentPL")&&!A.commitOccurrence.toString().includes("BasePL"),
     nonKakashiOptionalBattleScenesExplicitlyFailClosed:A.battleFailClosedScenes.size>=4,
     browserGoldenClaimed:false
@@ -84,6 +105,7 @@ globalThis.SC_ALPHA_ORIGIN_SCENE_IDS=Object.freeze({...A.sceneByVariant});
 globalThis.ALPHA_ORIGIN_SCENE_BY_VARIANT_32900=A.sceneByVariant;
 globalThis.getAlphaOriginScene32900Status=getAlphaOriginScene32900Status;
 globalThis.runAlphaOriginScene32900Diagnostics=runAlphaOriginScene32900Diagnostics;
+globalThis.restoreActiveOriginStoryPresentation32900=restoreActiveOriginStoryPresentation32900;
 
 // #188 neutral Story Decision Realisation loads after the existing Origin
 // packages. It is a semantic coordinator only; it does not turn Origins into
