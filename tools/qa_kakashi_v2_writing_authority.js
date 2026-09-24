@@ -7,10 +7,12 @@ const assert=require("assert");
 
 const CORE="runtime/alpha-kakashi-v2-core-36020.js";
 const CONTENT="runtime/academy-kakashi-v2-content-36000.js";
+const WRITING_GOLDEN="runtime/academy-kakashi-v2-writing-golden-36100.js";
 const STORY_DIR="Documentation/Story";
 const core=fs.readFileSync(CORE,"utf8");
 const content=fs.readFileSync(CONTENT,"utf8");
-const implementation=core+"\n"+content;
+const writingGolden=fs.readFileSync(WRITING_GOLDEN,"utf8");
+const implementation=core+"\n"+content+"\n"+writingGolden;
 const storyFiles=fs.readdirSync(STORY_DIR)
   .filter(name=>/^Academy_Kakashi_.*\.md$/i.test(name))
   .map(name=>path.join(STORY_DIR,name));
@@ -50,18 +52,23 @@ for(const required of [
   "You have orders. Stop this package from falling into the wrong hands.",
   "Why are you coming to me with this?",
   "Hokage's orders.",
-  "WATCH THE EXCHANGE",
-  "MOVE IN CLOSER",
-  "STRIKE BEFORE THE HANDOFF",
-  "SLIP IN FOR THE PACKAGE",
-  "STOP THE ASSASSIN",
-  "SECURE THE PACKAGE BEFORE THE ASSASSIN",
-  "DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE",
-  "GO AFTER THE ORIGINAL TARGET"
+  "WATCH THE HANDOFF",
+  "GET CLOSER",
+  "INTERRUPT THE HANDOFF",
+  "SLIP IN AND TAKE IT",
+  "INTERCEPT THE MASKED ATTACKER",
+  "GO FOR THE PACKAGE",
+  "BEAT HER TO THE PACKAGE",
+  "DEAL WITH HER FIRST",
+  "CHASE THE MAN FROM THE PHOTO",
+  "RESTRAIN HIM AND KEEP MOVING",
+  "RESTRAIN HIM AND GO BACK FOR THE OTHERS"
 ])assert(implementation.includes(required),`required current Writing token missing: ${required}`);
 
 assert(!core.includes('"ATTEMPT TO KILL HER"'));
 assert(!core.includes('"ATTEMPT TO KILL HIM"'));
+assert(!/C\([^,\n]+,"CONTINUE"/.test(core),"Writing-Golden resolver CONTINUE pseudo-choice returned");
+assert(core.includes('"v2_hidden_review"')&&!core.includes('RECORD("Origin occurrence sealed.'),"corrected terminal authority not consumed");
 
 console.log(JSON.stringify({
   pass:true,

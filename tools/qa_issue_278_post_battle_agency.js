@@ -128,7 +128,7 @@ assert(kakashiBattle.includes("participantCustodyCommitted:false"),"#278: Kakash
 assert(kakashiBattle.includes('custodyState:"unresolved"'),"#278: Kakashi Battle participant custody must remain unresolved at Battle boundary");
 
 const kakashiCore=read(path.join(ROOT,"runtime/alpha-kakashi-v2-core-36020.js"));
-for(const label of ["KILL HER","KILL HIM","KILL THEM","RESTRAIN HER AND CONTINUE","RESTRAIN HIM AND CONTINUE"]){
+for(const label of ["KILL HER","KILL HIM","KILL THEM","RESTRAIN HER AND KEEP MOVING","RESTRAIN HIM AND KEEP MOVING","RESTRAIN HIM AND GO BACK FOR THE OTHERS"]){
   assert(kakashiCore.includes(label),`#278: Kakashi direct post-Battle label missing: ${label}`);
 }
 assert(!FORBIDDEN_LABEL.test(kakashiCore),"#278: Kakashi V2 regressed to ATTEMPT TO labels");

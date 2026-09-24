@@ -17,8 +17,10 @@ const STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS=3;
 const D=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const F=globalThis.SC_STORY_FACTUAL_RESOLVER_34600;
 const WCAT=globalThis.SC_ACADEMY_KAKASHI_V2_CONTENT_36000;
+const WG=globalThis.SC_ACADEMY_KAKASHI_WRITING_GOLDEN_36100;
 const E=globalThis.SC_ALPHA_SPECIAL_JONIN_EVIDENCE_PRODUCER_34700;
-if(!D||!F||!WCAT||!E)throw new Error("kakashi_v2_requires_story_decision_factual_evidence_and_authoritative_content");
+if(!D||!F||!WCAT||!WG||!E)throw new Error("kakashi_v2_requires_story_decision_factual_evidence_and_authoritative_content");
+function G(sectionKey){return Object.freeze(WG.get(sectionKey).map(cleanWrittenCue));}
 function cleanWrittenCue(row){
   const next={...(row||{})};
   if(next.kind==="dialogue"&&typeof next.text==="string")next.text=next.text.replace(/^“/,"").replace(/”$/,"");
@@ -45,7 +47,13 @@ const A=Object.freeze({
  ps:Object.freeze({id:PS,label:"PACKAGE SMUGGLER",image:"NPC/package_smuggler.png"}),
  mi:Object.freeze({id:MI,label:"MASKED INTERCEPTOR",image:"NPC/masked_interceptor.png"}),
  pakkun:Object.freeze({id:PAKKUN,label:"PAKKUN",image:"Assets/Summons/pakkun.png"}),
- minato:Object.freeze({id:"kage_minato",label:"MINATO",image:"Assets/Kage/kage_minato.png"})
+ minato:Object.freeze({id:"kage_minato",label:"MINATO",image:"Assets/Kage/kage_minato.png"}),
+ policeMiMale:Object.freeze({id:"kakashi_upf_mi_male",label:"UCHIHA POLICE OFFICER",image:"NPC/uchiha_police_force_member_male.png"}),
+ policeMiFemale:Object.freeze({id:"kakashi_upf_mi_female",label:"UCHIHA POLICE OFFICER",image:"NPC/uchiha_police_force_member_female.png"}),
+ policePsMale:Object.freeze({id:"kakashi_upf_ps_male",label:"UCHIHA POLICE OFFICER",image:"NPC/uchiha_police_force_male_alt_1.png"}),
+ policePsFemale:Object.freeze({id:"kakashi_upf_ps_female",label:"UCHIHA POLICE OFFICER",image:"NPC/uchiha_police_force_female_alt_1.png"}),
+ policeAmtMale:Object.freeze({id:"kakashi_upf_amt_male",label:"UCHIHA POLICE OFFICER",image:"NPC/uchiha_police_force_male_alt_2.png"}),
+ policeAmtFemale:Object.freeze({id:"kakashi_upf_amt_female",label:"UCHIHA POLICE OFFICER",image:"NPC/uchiha_police_force_female_alt_2.png"})
 });
 const N=text=>Object.freeze({kind:"narration",text:String(text)});
 const Q=(speaker,text)=>Object.freeze({kind:"dialogue",speakerName:String(speaker),text:String(text)});
@@ -59,9 +67,9 @@ const C=(choiceId,label,nextBeatId,{available=null,patch=null}={})=>{
 
 const manifest={};
 const beats=[];
-function addBeat(id,{mode="narration",cues=[],backdrop=B.sakura,location="KONOHA · NIGHT",objective=null,actors=[],preset="standard",choices=[],battle=null,nextBeatId=null,onEnter=null,onAdvance=null,transition=null,receipt=false,exitScene=false}={}){
-  manifest[id]=Object.freeze({id,cues,backdrop,location,objective,actors,preset,transition,receipt});
-  const row={beatId:id,mode,text:"",choices,nextBeatId,exitScene};
+function addBeat(id,{mode="narration",cues=[],backdrop=B.sakura,location="KONOHA · NIGHT",objective=null,actors=[],preset="standard",choices=[],battle=null,nextBeatId=null,onEnter=null,onAdvance=null,transition=null,receipt=false,exitScene=false,presentationPackageHolder=null,machineResolved=false}={}){
+  manifest[id]=Object.freeze({id,cues,backdrop,location,objective,actors,preset,transition,receipt,presentationPackageHolder,machineResolved});
+  const row={beatId:id,mode,text:"",choices,nextBeatId,exitScene,machineResolved:machineResolved===true,uiHints:machineResolved===true?{kakashiMachineResolved:true}:{}};
   if(onEnter)row.onEnterConsequences=[{requestId:`kakashi_v2_enter_${id}`,kind:"domain",resolve:ctx=>onEnter(ctx)}];
   if(onAdvance)row.onAdvanceConsequences=[{requestId:`kakashi_v2_advance_${id}`,kind:"domain",resolve:ctx=>onAdvance(ctx)}];
   if(battle)row.battle=battle;
@@ -481,16 +489,30 @@ function directTransferHandoffCues(ref,institution){
   if(institution==="POLICE"&&key==="AMT")return W("custodyGolden06B",`amt_police_handoff_${recovered?"recovered":"missing"}`);
   return W("custodyGolden06B",`${prefix}_${suffix}_handoff`);
 }
+function policePairForParticipantKeys(refs=[]){
+  const keys=[...new Set((refs||[]).map(participantKey))].sort();
+  if(keys.length===1){
+    if(keys[0]==="MI")return["policeMiMale","policeMiFemale"];
+    if(keys[0]==="PS")return["policePsMale","policePsFemale"];
+    return["policeAmtMale","policeAmtFemale"];
+  }
+  // Multi-captive handoffs deliberately mix cards so the receiving pair is not
+  // a duplicate of any of the three dedicated single-target officer pairings.
+  if(keys.length>=3)return["policeAmtMale","policeMiFemale"];
+  return["policePsMale","policeAmtFemale"];
+}
 function directTransferActors(ref,institution,handoff=false){
   const key=participantKey(ref),actors=["kakashi",key==="MI"?"mi":key==="PS"?"ps":"amt"],s=state();
   if(s&&s.pakkun.present&&key==="AMT")actors.push("pakkun");
   if(handoff&&institution==="ANBU")actors.push("anbu");
-  return actors;
+  if(handoff&&institution==="POLICE")actors.push(...policePairForParticipantKeys([key]));
+  return [...new Set(actors)];
 }
 function groupTransferActors(refs,institution,handoff=false){
-  const actors=["kakashi",...(refs||[]).map(ref=>participantKey(ref)==="MI"?"mi":participantKey(ref)==="PS"?"ps":"amt")],s=state();
+  const keys=(refs||[]).map(participantKey),actors=["kakashi",...keys.map(key=>key==="MI"?"mi":key==="PS"?"ps":"amt")],s=state();
   if(s&&s.pakkun.present)actors.push("pakkun");
   if(handoff&&institution==="ANBU")actors.push("anbu");
+  if(handoff&&institution==="POLICE")actors.push(...policePairForParticipantKeys(keys));
   return [...new Set(actors)];
 }
 function groupTransferCues(size,institution,stage){
@@ -503,9 +525,10 @@ function collectedHandoffCues(institution){
   return groupTransferCues(keys.length>=3?3:2,institution,"handoff");
 }
 function collectedHandoffActors(institution){
-  const keys=collectedParticipantKeys().map(key=>key==="MI"?"mi":key==="PS"?"ps":"amt"),actors=["kakashi",...keys],s=state();
+  const participantKeys=collectedParticipantKeys(),keys=participantKeys.map(key=>key==="MI"?"mi":key==="PS"?"ps":"amt"),actors=["kakashi",...keys],s=state();
   if(s&&s.pakkun.present)actors.push("pakkun");
   if(institution==="ANBU")actors.push("anbu");
+  if(institution==="POLICE")actors.push(...policePairForParticipantKeys(participantKeys));
   return [...new Set(actors)];
 }
 function finalRestraintCues(ref){
@@ -991,7 +1014,7 @@ function minatoCues(){
   ];
 }
 function firstActionReceipt(s){
-  const labels={WATCH_THE_EXCHANGE:"WATCH THE EXCHANGE",MOVE_IN_CLOSER:"MOVE IN CLOSER",STRIKE_BEFORE_THE_HANDOFF:"STRIKE BEFORE THE HANDOFF",SLIP_IN_FOR_THE_PACKAGE:"SLIP IN FOR THE PACKAGE"};
+  const labels={WATCH_THE_EXCHANGE:"WATCH THE HANDOFF",MOVE_IN_CLOSER:"GET CLOSER",STRIKE_BEFORE_THE_HANDOFF:"INTERRUPT THE HANDOFF",SLIP_IN_FOR_THE_PACKAGE:"SLIP IN AND TAKE IT"};
   const row=(s.routeHistory||[]).find(r=>r&&labels[r.label]);return row?labels[row.label]:"Not recorded";
 }
 function packageReceiptLine(s){
@@ -1078,58 +1101,54 @@ function receiptCues(){
 // ---------------------------------------------------------------------------
 // OPENING — exact current verbatim locks.
 // ---------------------------------------------------------------------------
-addBeat("v2_scene01_rooftop",{backdrop:B.rooftop,location:"KONOHA ROOFTOP · NIGHT",objective:"Stop the package from falling into the wrong hands.",actors:["kakashi","anbu"],preset:"rooftop_2_person",transition:"wipe",onEnter:()=>mutate(()=>{}),cues:W("scene01","scene_01_exact"),nextBeatId:"v2_scene02_tail"});
+addBeat("v2_scene01_rooftop",{backdrop:B.rooftop,location:"KONOHA ROOFTOP · NIGHT",objective:"Stop the package from falling into the wrong hands.",actors:["kakashi","anbu"],preset:"rooftop_2_person",transition:"wipe",onEnter:()=>mutate(()=>{}),cues:G("f01.rooftop"),nextBeatId:"v2_scene02_tail"});
 
-addBeat("v2_scene02_tail",{mode:"choice",backdrop:B.alley,location:"KONOHA ALLEYWAY · NIGHT",objective:"Follow the target without being seen.",actors:["kakashi","amt"],preset:"tail",cues:W("scene02","scene_02_exact"),choices:[
- C("watch_exchange","WATCH THE EXCHANGE","v2_watch_exchange",{patch:()=>history("WATCH_THE_EXCHANGE")}),
- C("move_in_closer","MOVE IN CLOSER","v2_get_closer_resolver",{patch:()=>history("MOVE_IN_CLOSER")}),
- C("strike_before_handoff","STRIKE BEFORE THE HANDOFF","v2_direct_strike_setup",{patch:()=>history("STRIKE_BEFORE_THE_HANDOFF")}),
- C("slip_for_package","SLIP IN FOR THE PACKAGE","v2_direct_pickpocket_resolver",{patch:()=>history("SLIP_IN_FOR_THE_PACKAGE")})
+addBeat("v2_scene02_tail",{mode:"choice",backdrop:B.alley,location:"KONOHA ALLEYWAY · NIGHT",objective:"Follow the target without being seen.",actors:["kakashi","amt"],preset:"tail",cues:G("f01.tail"),choices:[
+ C("watch_exchange","WATCH THE HANDOFF","v2_watch_exchange",{patch:()=>history("WATCH_THE_EXCHANGE")}),
+ C("move_in_closer","GET CLOSER","v2_get_closer_resolver",{patch:()=>history("MOVE_IN_CLOSER")}),
+ C("strike_before_handoff","INTERRUPT THE HANDOFF","v2_direct_strike_setup",{patch:()=>history("STRIKE_BEFORE_THE_HANDOFF")}),
+ C("slip_for_package","SLIP IN AND TAKE IT","v2_direct_pickpocket_resolver",{patch:()=>history("SLIP_IN_FOR_THE_PACKAGE")})
 ]});
 
-addBeat("v2_watch_exchange",{mode:"choice",backdrop:B.sakura,location:"SAKURA TREE · MAIN STREET · NIGHT",objective:"Retrieve the package.",actors:["amt","ps","mi"],preset:"sakura_3_person",onEnter:()=>{packageState("PS");participant("MI",{state:"AVAILABLE"});return history("HANDOFF_COMPLETED");},cues:W("watch","scene_03a_exact"),choices:[
- C("stop_assassin","STOP THE ASSASSIN","v2_stop_assassin_setup",{patch:()=>history("STOP_THE_ASSASSIN")}),
- C("secure_package","SECURE THE PACKAGE","v2_secure_package_setup",{patch:()=>history("SECURE_THE_PACKAGE")}),
- C("secure_before_assassin","SECURE THE PACKAGE BEFORE THE ASSASSIN","v2_secure_before_resolver",{patch:()=>history("SECURE_PACKAGE_BEFORE_ASSASSIN")}),
- C("assassin_then_package","DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE","v2_assassin_then_package_setup",{patch:()=>history("DEFEAT_ASSASSIN_THEN_SECURE")}),
- C("go_original_target","GO AFTER THE ORIGINAL TARGET","v2_go_amt_pursuit_resolver",{patch:()=>history("GO_AFTER_ORIGINAL_TARGET")})
+addBeat("v2_watch_exchange",{mode:"choice",backdrop:B.sakura,location:"SAKURA TREE · MAIN STREET · NIGHT",objective:"Retrieve the package.",actors:["amt","ps","mi"],preset:"sakura_3_person",onEnter:()=>{packageState("PS");participant("MI",{state:"AVAILABLE"});return history("HANDOFF_COMPLETED");},cues:G("f01.watch_handoff"),choices:[
+ C("stop_assassin","INTERCEPT THE MASKED ATTACKER","v2_stop_assassin_setup",{patch:()=>history("STOP_THE_ASSASSIN")}),
+ C("secure_package","GO FOR THE PACKAGE","v2_secure_package_setup",{patch:()=>history("SECURE_THE_PACKAGE")}),
+ C("secure_before_assassin","BEAT HER TO THE PACKAGE","v2_secure_before_resolver",{patch:()=>history("SECURE_PACKAGE_BEFORE_ASSASSIN")}),
+ C("assassin_then_package","DEAL WITH HER FIRST","v2_assassin_then_package_setup",{patch:()=>history("DEFEAT_ASSASSIN_THEN_SECURE")}),
+ C("go_original_target","CHASE THE MAN FROM THE PHOTO","v2_go_amt_pursuit_resolver",{patch:()=>history("GO_AFTER_ORIGINAL_TARGET")})
 ]});
 
 // ---------------------------------------------------------------------------
-// STOP THE ASSASSIN.
+// INTERCEPT THE MASKED ATTACKER.
 // ---------------------------------------------------------------------------
-addBeat("v2_stop_assassin_setup",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Retrieve the package.",actors:["kakashi","mi"],preset:"battle_pair",cues:W("stopAssassin","scene_04a_exact"),nextBeatId:"v2_battle_mi_stop"});
+addBeat("v2_stop_assassin_setup",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Retrieve the package.",actors:["kakashi","mi"],preset:"battle_pair",cues:G("f01.intercept_masked"),nextBeatId:"v2_battle_mi_stop"});
 
 addBeat("v2_battle_mi_stop",{mode:"battle_transition",backdrop:B.fight,location:"SAKURA TREE · PL BATTLE",objective:"Defeat Masked Interceptor.",actors:["kakashi","mi"],preset:"battle_pair",cues:[N("Kakashi Hatake vs Masked Interceptor.")],battle:battle("academy_kakashi_origin_battle_mi_1v1","mi_stop","v2_mi_stop_win","v2_mi_stop_loss","AK_SA_009")});
 
-addBeat("v2_mi_stop_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"sakura_kakashi_only",onEnter:ctx=>captureBattle("mi_stop",ctx,s=>{s.participants.MI.state="ESCAPED";s.participants.PS.state="ESCAPED";s.participants.AMT.state="ESCAPED";s.package.holder="PS";}),cues:W("stopLoss","scene_05a_l_exact"),nextBeatId:"v2_report"});
+addBeat("v2_mi_stop_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"sakura_kakashi_only",onEnter:ctx=>captureBattle("mi_stop",ctx,s=>{s.participants.MI.state="ESCAPED";s.participants.PS.state="ESCAPED";s.participants.AMT.state="ESCAPED";s.package.holder="PS";}),cues:G("f01.mi_loss"),nextBeatId:"v2_report"});
 
-addBeat("v2_mi_stop_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Retrieve the package.",actors:["kakashi","mi"],preset:"post_battle",onEnter:ctx=>captureBattle("mi_stop",ctx,s=>{s.participants.MI.state="BATTLE_DEFEATED";}),cues:({state:s})=>{
- const fast=battleActions("mi_stop")<=STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS;
- return fast?[N("Masked Interceptor hits the stone beneath the Sakura tree. Kakashi lands a few steps away and immediately looks past her."),N("Package Smuggler is crossing the far end of the street with the package still tucked against him."),N("Higher up, ANBU Marked Target flashes across a distant roofline—farther away, but not gone yet."),N("Kakashi has beaten the threat in front of him and bought himself one decision. He cannot take every trail at once.")]:
- [N("Kakashi searches the rooftops, the alleys and the next junction."),N("Nothing moves."),N("Package Smuggler had too much time; he and the package are gone, and ANBU Marked Target is gone as well."),N("There is no pursuit left to take. Only Masked Interceptor remains in front of Kakashi.")];
-},choices:[
- C("mi_pursue_ps","GO AFTER PACKAGE SMUGGLER","v2_ps_pursuit_resolver",{available:()=>battleActions("mi_stop")<=STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS,patch:()=>history("PURSUE_PS_AFTER_MI")}),
+addBeat("v2_mi_stop_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Retrieve the package.",actors:["kakashi","mi"],preset:"post_battle",onEnter:ctx=>captureBattle("mi_stop",ctx,s=>{s.participants.MI.state="BATTLE_DEFEATED";}),cues:()=>battleActions("mi_stop")<=STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS?G("f01.mi_fast_win"):G("f01.mi_slow_win"),choices:[
+ C("mi_pursue_ps","CHASE THE PACKAGE","v2_ps_pursuit_resolver",{available:()=>battleActions("mi_stop")<=STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS,patch:()=>history("PURSUE_PS_AFTER_MI")}),
  C("mi_kill","KILL HER","v2_mi_kill_result",{patch:()=>{const r=resolveDisposition("KILL","MI","mi_kill");if(!r.success)return r;history("KILL_MI",{outcome:r.outcome});return r;}}),
  C("mi_anbu","BRING HER TO ANBU","v2_mi_anbu_depart",{patch:()=>transferIntent("MI","ANBU","mi_anbu")}),
  C("mi_police","TAKE HER TO THE UCHIHA POLICE","v2_mi_police_depart",{patch:()=>transferIntent("MI","POLICE","mi_police")}),
- C("mi_restrain","RESTRAIN HER AND CONTINUE","v2_mi_restrained_next",{available:()=>battleActions("mi_stop")<=STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS,patch:()=>{const r=resolveDisposition("RESTRAIN","MI","mi_restrain");if(!r.success)return r;projectExtractionPlanning("MI",r,"mi_restrain");history("RESTRAIN_MI_CONTINUE",{outcome:r.outcome});return r;}})
+ C("mi_restrain","RESTRAIN HER AND KEEP MOVING","v2_mi_restrained_next",{available:()=>battleActions("mi_stop")<=STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS,patch:()=>{const r=resolveDisposition("RESTRAIN","MI","mi_restrain");if(!r.success)return r;projectExtractionPlanning("MI",r,"mi_restrain");history("RESTRAIN_MI_CONTINUE",{outcome:r.outcome});return r;}})
 ]});
 addBeat("v2_mi_restrained_next",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Retrieve the package.",actors:["kakashi","mi"],preset:"post_battle",cues:()=>singleDispositionCues("MI","RESTRAIN"),onAdvance:()=>history("PURSUE_PS_AFTER_RESTRAIN_MI",{miOutcome:dispositionOutcome("MI")}),nextBeatId:"v2_ps_pursuit_resolver"});
 
 // PS pursuit after MI.
-addBeat("v2_ps_pursuit_resolver",{mode:"choice",backdrop:B.alleyAlt,location:"KONOHA · PURSUIT",objective:"Recover the package.",actors:["kakashi","ps"],preset:"pursuit",onEnter:()=>resolverEnter("psPursuit"),cues:[N("Kakashi moves before Package Smuggler can disappear completely."),N("The Sakura tree drops behind him as the chase cuts through a narrow street and up across the roofs."),N("The receiver already has a lead, but Kakashi can still see the package tucked tight against his side."),N("Package Smuggler is not searching for a hiding place. He is trying to build enough distance that he will never need one."),N("Kakashi increases his pace.")],choices:[
- C("ps_pursuit_success","CONTINUE","v2_ps_pursuit_success",{available:()=>getOutcome("psPursuit")==="PS_PURSUIT_SUCCESS"}),
- C("ps_pursuit_failure","CONTINUE","v2_ps_pursuit_failure",{available:()=>getOutcome("psPursuit")==="PS_PURSUIT_FAILURE"})
+addBeat("v2_ps_pursuit_resolver",{mode:"choice",machineResolved:true,backdrop:B.alleyAlt,location:"KONOHA · PURSUIT",objective:"Recover the package.",actors:["kakashi","ps"],preset:"pursuit",onEnter:()=>resolverEnter("psPursuit"),cues:[N("Kakashi moves before Package Smuggler can disappear completely."),N("The Sakura tree drops behind him as the chase cuts through a narrow street and up across the roofs."),N("The receiver already has a lead, but Kakashi can still see the package tucked tight against his side."),N("Package Smuggler is not searching for a hiding place. He is trying to build enough distance that he will never need one."),N("Kakashi increases his pace.")],choices:[
+ C("ps_pursuit_success","RESOLVE RESULT","v2_ps_pursuit_success",{available:()=>getOutcome("psPursuit")==="PS_PURSUIT_SUCCESS"}),
+ C("ps_pursuit_failure","RESOLVE RESULT","v2_ps_pursuit_failure",{available:()=>getOutcome("psPursuit")==="PS_PURSUIT_FAILURE"})
 ]});
 addBeat("v2_ps_pursuit_failure",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"pursuit",onEnter:()=>mutate(s=>{s.participants.PS.state="ESCAPED";s.participants.AMT.state="ESCAPED";s.package.holder="PS";}),cues:[N("Kakashi reaches the next junction and finds three ways forward."),N("He takes the roofline first. Nothing."),N("Drops back to the street. Still nothing."),N("The ordinary night sounds begin filling the space where Package Smuggler should have been: shutters, distant voices, sandals somewhere too far away to separate from the rest."),N("Kakashi checks one last roof edge and finds no movement carrying the package."),N("The receiver has enough distance now that pursuit would be choosing a direction and hoping."),N("ANBU Marked Target has had even longer."),N("Kakashi stays at the junction for one more second, fixing the failure in his memory instead of pretending the trail is still there."),N("Then he turns back toward ANBU.")],nextBeatId:"v2_report"});
 addBeat("v2_ps_pursuit_success",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Recover the package.",actors:["kakashi","ps"],preset:"battle_pair",cues:[N("Package Smuggler turns into the next street and finds Kakashi landing ahead of him."),N("He stops hard and checks the road behind him."),Q("PACKAGE SMUGGLER","You should've stayed with the woman you put down."),Q("KAKASHI","You were counting on that."),N("Package Smuggler's grip tightens around the package."),Q("PACKAGE SMUGGLER","You don't even know what you're carrying."),Q("KAKASHI","No. I know who handed it over, and who ANBU sent me to follow."),Q("PACKAGE SMUGGLER","You think taking it back fixes this?"),Q("KAKASHI","It gets the package back."),N("Package Smuggler's free hand drops toward his weapon. Kakashi shifts with him.")],nextBeatId:"v2_battle_ps_seq"});
 addBeat("v2_battle_ps_seq",{mode:"battle_transition",backdrop:B.alleyAlt,location:"KONOHA · PL BATTLE",objective:"Recover the package.",actors:["kakashi","ps"],preset:"battle_pair",cues:[N("Kakashi Hatake vs Package Smuggler.")],battle:battle("academy_kakashi_origin_battle_seq_ps","ps_seq","v2_ps_seq_win","v2_ps_seq_loss","AK_SA_022")});
 addBeat("v2_ps_seq_loss",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_seq",ctx,s=>{s.participants.PS.state="ESCAPED";s.participants.AMT.state="ESCAPED";s.package.holder="PS";}),cues:[N("Package Smuggler finds the opening first."),N("Kakashi reaches for the arm protecting the package and misses by inches."),N("The receiver drives past him instead of staying to finish the fight."),N("Kakashi turns and gives chase, but the first corner costs him sight of the package and the second costs him the man."),N("He reaches the crossing with his breathing still too high and listens."),N("Nothing separates itself from the village around him."),N("Package Smuggler is gone with the objective. ANBU Marked Target has had the whole fight to disappear as well."),N("Kakashi looks once down each empty route, then heads back to report exactly that.")],nextBeatId:"v2_report"});
 addBeat("v2_ps_seq_win",{mode:"choice",backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:null,actors:["kakashi","ps"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_seq",ctx,s=>{s.participants.PS.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;}),cues:[N("Package Smuggler goes down."),N("Kakashi stays on him long enough to make sure the fight is finished, then reaches for the package."),N("He checks the seal and secures it against himself."),N("Only then does he look toward the route ANBU Marked Target took.")],choices:[
- C("ps_go_amt","GO AFTER ANBU MARKED TARGET","v2_amt_after_ps",{available:()=>battleActions("ps_seq")<=3,patch:()=>history("PS_FAST_CONTINUE_AMT")}),
+ C("ps_go_amt","CHASE THE MAN FROM THE PHOTO","v2_amt_after_ps",{available:()=>battleActions("ps_seq")<=3,patch:()=>history("PS_FAST_CONTINUE_AMT")}),
  C("ps_kill","KILL HIM","v2_ps_kill_result",{patch:()=>{const r=resolveDisposition("KILL","PS","ps_kill");if(!r.success)return r;history("KILL_PS",{outcome:r.outcome});return r;}}),
- C("ps_restrain_continue","RESTRAIN HIM AND CONTINUE","v2_ps_restrain_continue_result",{available:()=>battleActions("ps_seq")<=3,patch:()=>{const r=resolveDisposition("RESTRAIN","PS","ps_restrain_continue");if(!r.success)return r;projectExtractionPlanning("PS",r,"ps_restrain_continue");history("RESTRAIN_PS_CONTINUE",{outcome:r.outcome});return r;}}),
+ C("ps_restrain_continue","RESTRAIN HIM AND KEEP MOVING","v2_ps_restrain_continue_result",{available:()=>battleActions("ps_seq")<=3,patch:()=>{const r=resolveDisposition("RESTRAIN","PS","ps_restrain_continue");if(!r.success)return r;projectExtractionPlanning("PS",r,"ps_restrain_continue");history("RESTRAIN_PS_CONTINUE",{outcome:r.outcome});return r;}}),
  C("ps_anbu","BRING HIM TO ANBU","v2_ps_anbu_depart",{patch:()=>transferIntent("PS","ANBU","ps_anbu")}),
  C("ps_police","TAKE HIM TO THE UCHIHA POLICE","v2_ps_police_depart",{patch:()=>transferIntent("PS","POLICE","ps_police")}),
  C("ps_report","RETURN TO ANBU","v2_report",{patch:()=>history("RETURN_AFTER_PS")})
@@ -1142,7 +1161,7 @@ addBeat("v2_amt_seq_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA AL
  C("amt_seq_release","LET HIM GO","v2_amt_release_result",{patch:()=>{const r=dispose("AMT","RELEASE");if(!r.success)return r;return history("RELEASE_AMT");}}),
  C("amt_seq_kill","KILL HIM","v2_amt_kill_result",{patch:()=>{const r=resolveDisposition("KILL","AMT","amt_seq_kill");if(!r.success)return r;history("KILL_AMT",{outcome:r.outcome});return r;}}),
  C("amt_seq_anbu","BRING HIM TO ANBU","v2_amt_anbu_depart",{patch:()=>transferIntent("AMT","ANBU","amt_seq_anbu")}),
- C("amt_seq_collect","RESTRAIN HIM AND COLLECT THE OTHERS","v2_amt_restrain_collect_result",{available:()=>restrainedParticipantKeys().length>0,patch:()=>{const r=resolveDisposition("RESTRAIN","AMT","amt_seq_collect");if(!r.success)return r;projectExtractionPlanning("AMT",r,"amt_seq_collect");history("COLLECT_ALL_RESTRAINED",{outcome:r.outcome});return r;}})
+ C("amt_seq_collect","RESTRAIN HIM AND GO BACK FOR THE OTHERS","v2_amt_restrain_collect_result",{available:()=>restrainedParticipantKeys().length>0,patch:()=>{const r=resolveDisposition("RESTRAIN","AMT","amt_seq_collect");if(!r.success)return r;projectExtractionPlanning("AMT",r,"amt_seq_collect");history("COLLECT_ALL_RESTRAINED",{outcome:r.outcome});return r;}})
 ]});
 function groupCollectActorKeys(){
  const s=state(),keys=["kakashi"];
@@ -1221,16 +1240,16 @@ addBeat("v2_secure_package_setup",{backdrop:B.sakura,location:"SAKURA TREE · NI
 addBeat("v2_battle_ps_mi",{mode:"battle_transition",backdrop:B.fight,location:"SAKURA TREE · PL BATTLE",objective:"Retrieve the package.",actors:["kakashi","ps","mi"],preset:"battle_trio",cues:[N("Kakashi Hatake vs Package Smuggler + Masked Interceptor.")],battle:battle("academy_kakashi_origin_battle_ps_mi_2v1","ps_mi","v2_ps_mi_win","v2_ps_mi_loss","AK_SA_014")});
 addBeat("v2_ps_mi_loss",{backdrop:B.sakura,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"sakura_kakashi_only",onEnter:ctx=>captureBattle("ps_mi",ctx,s=>{s.participants.PS.state="ESCAPED";s.participants.MI.state="ESCAPED";s.participants.AMT.state="ESCAPED";s.package.holder="PS";}),cues:W("securePackage","3_kakashi_loses_the_2_v_1"),nextBeatId:"v2_report"});
 addBeat("v2_ps_mi_win",{mode:"choice",backdrop:B.sakura,location:"SAKURA TREE · NIGHT",objective:null,actors:["kakashi","ps","mi"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_mi",ctx,s=>{s.participants.PS.state="BATTLE_DEFEATED";s.participants.MI.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;}),cues:W("securePackage","4_kakashi_wins_the_2_v_1"),choices:[
- C("secure_stay_first","STAY ON THE FIRST MAN","v2_secure_amt_pursuit_resolver",{patch:()=>history("SECURE_PACKAGE_STAY_FIRST")}),
- C("secure_return","RETURN AND REPORT","v2_report",{patch:()=>history("SECURE_PACKAGE_RETURN_REPORT")})
+ C("secure_stay_first","CHASE THE MAN FROM THE PHOTO","v2_secure_amt_pursuit_resolver",{patch:()=>history("SECURE_PACKAGE_STAY_FIRST")}),
+ C("secure_return","RETURN TO ANBU","v2_report",{patch:()=>history("SECURE_PACKAGE_RETURN_REPORT")})
 ]});
-addBeat("v2_secure_amt_pursuit_resolver",{mode:"choice",backdrop:B.alleyAlt,location:"KONOHA · PURSUIT",objective:"Catch the first man.",actors:["kakashi","amt"],preset:"pursuit",onEnter:()=>resolverEnter("secureAmtPursuit"),cues:[
+addBeat("v2_secure_amt_pursuit_resolver",{mode:"choice",machineResolved:true,backdrop:B.alleyAlt,location:"KONOHA · PURSUIT",objective:"Catch the first man.",actors:["kakashi","amt"],preset:"pursuit",onEnter:()=>resolverEnter("secureAmtPursuit"),cues:[
  N("Kakashi leaves the two defeated shinobi behind."),N("Not because they no longer matter."),N("Because the first man is still moving."),N("The package is secure now."),
  N("That changes the calculation."),N("Kakashi can chase without wondering whether every step is taking him farther from the objective."),
  N("He takes the rooftops."),N("The trail is thinner than it was before the fight."),N("Still there."),N("For now.")
 ],choices:[
- C("secure_amt_success","CONTINUE","v2_secure_amt_intercept",{available:()=>getOutcome("secureAmtPursuit")==="SECURE_AMT_PURSUIT_SUCCESS"}),
- C("secure_amt_fail","CONTINUE","v2_secure_amt_fail",{available:()=>getOutcome("secureAmtPursuit")==="SECURE_AMT_PURSUIT_FAILURE"})
+ C("secure_amt_success","RESOLVE RESULT","v2_secure_amt_intercept",{available:()=>getOutcome("secureAmtPursuit")==="SECURE_AMT_PURSUIT_SUCCESS"}),
+ C("secure_amt_fail","RESOLVE RESULT","v2_secure_amt_fail",{available:()=>getOutcome("secureAmtPursuit")==="SECURE_AMT_PURSUIT_FAILURE"})
 ]});
 addBeat("v2_secure_amt_fail",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"pursuit",onEnter:()=>participant("AMT",{state:"ESCAPED"}),cues:[
  N("Kakashi clears another rooftop."),N("Nothing."),N("He drops to street level."),N("Checks the crossing."),N("The route has split too many times."),
@@ -1251,9 +1270,9 @@ addBeat("v2_secure_amt_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA
 ]});
 
 // Secure before assassin resolver.
-addBeat("v2_secure_before_resolver",{mode:"choice",backdrop:B.sakura,location:"SAKURA TREE · NIGHT",objective:"Retrieve the package.",actors:["kakashi","ps","mi"],preset:"sakura_3_person",onEnter:()=>resolverEnter("secureBefore"),cues:W("secureBeforeAssassin","1_secure_the_package_before_the_assassin"),choices:[
- C("secure_before_success","CONTINUE","v2_secure_before_success",{available:()=>getOutcome("secureBefore")==="SECURE_BEFORE_SUCCESS"}),
- C("secure_before_failure","CONTINUE","v2_secure_package_setup",{available:()=>getOutcome("secureBefore")==="SECURE_BEFORE_FAILURE"})
+addBeat("v2_secure_before_resolver",{mode:"choice",machineResolved:true,backdrop:B.sakura,location:"SAKURA TREE · NIGHT",objective:"Retrieve the package.",actors:["kakashi","ps","mi"],preset:"sakura_3_person",onEnter:()=>resolverEnter("secureBefore"),cues:W("secureBeforeAssassin","1_secure_the_package_before_the_assassin"),choices:[
+ C("secure_before_success","RESOLVE RESULT","v2_secure_before_success",{available:()=>getOutcome("secureBefore")==="SECURE_BEFORE_SUCCESS"}),
+ C("secure_before_failure","RESOLVE RESULT","v2_secure_package_setup",{available:()=>getOutcome("secureBefore")==="SECURE_BEFORE_FAILURE"})
 ]});
 addBeat("v2_secure_before_success",{backdrop:B.sakura,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"sakura_kakashi_only",onEnter:()=>mutate(s=>{s.package.holder="KAKASHI";s.package.recovered=true;s.participants.AMT.state="ESCAPED";s.participants.PS.state="AVAILABLE";s.participants.MI.state="AVAILABLE";}),cues:W("secureBeforeAssassin","2_resolver_success_clean_extraction"),nextBeatId:"v2_report"});
 
@@ -1261,13 +1280,13 @@ addBeat("v2_secure_before_success",{backdrop:B.sakura,location:"SAKURA TREE · N
 addBeat("v2_assassin_then_package_setup",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Retrieve the package.",actors:["kakashi","mi"],preset:"battle_pair",onEnter:()=>history("ASSASSIN_THEN_PACKAGE_SEQUENCE"),cues:W("assassinThenPackage","1_entry_deal_with_her_first"),nextBeatId:"v2_battle_mi_package_second"});
 addBeat("v2_battle_mi_package_second",{mode:"battle_transition",backdrop:B.fight,location:"SAKURA TREE · PL BATTLE",objective:"Defeat Masked Interceptor.",actors:["kakashi","mi"],preset:"battle_pair",cues:[N("Kakashi Hatake vs Masked Interceptor.")],battle:battle("academy_kakashi_origin_battle_seq_mi","mi_package_second","v2_mi_package_second_win","v2_mi_package_second_loss","AK_SA_015")});
 addBeat("v2_mi_package_second_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("mi_package_second",ctx,s=>{s.participants.MI.state="AVAILABLE";s.participants.PS.state="ESCAPED";s.participants.AMT.state="ESCAPED";s.package.holder="PS";}),cues:W("assassinThenPackage","2_mi_battle_defeat"),nextBeatId:"v2_report"});
-addBeat("v2_mi_package_second_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Catch the package.",actors:["kakashi","mi"],preset:"post_battle",onEnter:ctx=>captureBattle("mi_package_second",ctx,s=>{s.participants.MI.state="BATTLE_DEFEATED";}),cues:()=>battleActions("mi_package_second")<=4?[N("Masked Interceptor goes down quickly enough that the next problem is still audible."),N("Footsteps."),N("Fading."),N("Not gone."),N("Kakashi looks once at the masked woman."),N("His attention snaps back to the package route."),N("Package Smuggler has a lead."),N("Not an insurmountable one.")]:[N("Masked Interceptor goes down."),N("Too late."),N("Kakashi listens toward the route Package Smuggler took."),N("Nothing."),N("Package Smuggler has had too much time."),N("Winning here does not pull him back into reach.")],choices:[
- C("package_second_chase_ps","CHASE THE PACKAGE SMUGGLER","v2_package_second_ps_pursuit",{available:()=>battleActions("mi_package_second")<=4,patch:()=>history("PACKAGE_SECOND_CHASE_PS")}),
- C("package_second_report","RETURN TO ANBU","v2_report",{available:()=>battleActions("mi_package_second")>4,patch:()=>{participant("PS",{state:"ESCAPED"});participant("AMT",{state:"ESCAPED"});history("PACKAGE_SECOND_TOO_SLOW");}})
+addBeat("v2_mi_package_second_win",{mode:"choice",machineResolved:true,backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Catch the package.",actors:["kakashi","mi"],preset:"post_battle",onEnter:ctx=>captureBattle("mi_package_second",ctx,s=>{s.participants.MI.state="BATTLE_DEFEATED";}),cues:()=>battleActions("mi_package_second")<=4?[N("Masked Interceptor goes down."),N("Footsteps are still carrying through the next street."),N("Kakashi looks once at her."),N("Then runs."),N("The package is moving ahead of him.")]:[N("Masked Interceptor goes down."),N("Kakashi turns immediately."),N("Listens."),N("Nothing."),N("He takes the roof anyway."),N("One building."),N("Then another."),N("No package."),N("No running footsteps."),N("No line worth following."),N("Kakashi stops."),N("Looks back once toward the Sakura tree."),N("Then turns toward ANBU.")],choices:[
+ C("package_second_fast_resolve","RESOLVE RESULT","v2_package_second_ps_pursuit",{available:()=>battleActions("mi_package_second")<=4,patch:()=>history("PACKAGE_SECOND_CHASE_PS")}),
+ C("package_second_slow_resolve","RESOLVE RESULT","v2_report",{available:()=>battleActions("mi_package_second")>4,patch:()=>{participant("PS",{state:"ESCAPED"});participant("AMT",{state:"ESCAPED"});history("PACKAGE_SECOND_TOO_SLOW");}})
 ]});
-addBeat("v2_package_second_ps_pursuit",{mode:"choice",backdrop:B.alleyAlt,location:"KONOHA · PURSUIT",objective:"Catch the package.",actors:["kakashi","ps"],preset:"pursuit",onEnter:()=>resolverEnter("psPursuit"),cues:[N("Masked Interceptor goes down quickly enough that the next problem is still audible."),N("Footsteps."),N("Fading."),N("Not gone."),N("Kakashi looks once at the masked woman."),N("His attention snaps back to the package route."),N("Package Smuggler has a lead."),N("Not an insurmountable one."),N("Kakashi moves.")],choices:[
- C("package_second_ps_reached","CONTINUE","v2_package_second_ps_reached",{available:()=>getOutcome("psPursuit")==="PS_PURSUIT_SUCCESS"}),
- C("package_second_ps_lost","CONTINUE","v2_package_second_ps_lost",{available:()=>getOutcome("psPursuit")==="PS_PURSUIT_FAILURE"})
+addBeat("v2_package_second_ps_pursuit",{mode:"choice",machineResolved:true,backdrop:B.alleyAlt,location:"KONOHA · PURSUIT",objective:"Catch the package.",actors:["kakashi","ps"],preset:"pursuit",onEnter:()=>resolverEnter("psPursuit"),cues:[N("Masked Interceptor goes down quickly enough that the next problem is still audible."),N("Footsteps."),N("Fading."),N("Not gone."),N("Kakashi looks once at the masked woman."),N("His attention snaps back to the package route."),N("Package Smuggler has a lead."),N("Not an insurmountable one."),N("Kakashi moves.")],choices:[
+ C("package_second_ps_reached","RESOLVE RESULT","v2_package_second_ps_reached",{available:()=>getOutcome("psPursuit")==="PS_PURSUIT_SUCCESS"}),
+ C("package_second_ps_lost","RESOLVE RESULT","v2_package_second_ps_lost",{available:()=>getOutcome("psPursuit")==="PS_PURSUIT_FAILURE"})
 ]});
 addBeat("v2_package_second_ps_lost",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"pursuit",onEnter:()=>mutate(s=>{s.participants.PS.state="ESCAPED";s.participants.AMT.state="ESCAPED";s.package.holder="PS";}),cues:W("assassinThenPackage","5_ps_catch_up_failure"),nextBeatId:"v2_report"});
 addBeat("v2_package_second_ps_reached",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Recover the package.",actors:["kakashi","ps"],preset:"battle_pair",cues:W("assassinThenPackage","6_ps_catch_up_success"),nextBeatId:"v2_battle_ps_package_second"});
@@ -1277,12 +1296,12 @@ addBeat("v2_ps_package_second_win",{mode:"choice",backdrop:B.alleyAlt,location:"
  N("Package Smuggler goes down."),N("Kakashi stays on him long enough to know the fight is finished."),N("Then his attention moves to the objective."),
  N("He takes the package from the defeated man's reach."),N("Checks the seal."),N("Secures it against himself."),N("Only then does he look farther down the route.")
 ],choices:[
- C("package_second_stay_amt","STAY ON THE FIRST MAN","v2_package_second_amt_pursuit",{available:()=>battleActions("ps_package_second")<=3,patch:()=>history("PACKAGE_SECOND_STAY_AMT")}),
- C("package_second_return","RETURN AND REPORT","v2_report",{patch:()=>history("PACKAGE_SECOND_RETURN_REPORT")})
+ C("package_second_stay_amt","CHASE THE MAN FROM THE PHOTO","v2_package_second_amt_pursuit",{available:()=>battleActions("ps_package_second")<=3,patch:()=>history("PACKAGE_SECOND_STAY_AMT")}),
+ C("package_second_return","RETURN TO ANBU","v2_report",{patch:()=>history("PACKAGE_SECOND_RETURN_REPORT")})
 ]});
-addBeat("v2_package_second_amt_pursuit",{mode:"choice",backdrop:B.alleyAlt,location:"KONOHA · PURSUIT",objective:"Catch the first man.",actors:["kakashi","amt"],preset:"pursuit",onEnter:()=>resolverEnter("secureAmtPursuit"),cues:[N("Kakashi leaves Package Smuggler behind."),N("The package is secured."),N("The first man's trail is thin."),N("Still usable."),N("Kakashi takes it.")],choices:[
- C("package_second_amt_success","CONTINUE","v2_package_second_amt_intercept",{available:()=>getOutcome("secureAmtPursuit")==="SECURE_AMT_PURSUIT_SUCCESS"}),
- C("package_second_amt_failure","CONTINUE","v2_secure_amt_fail",{available:()=>getOutcome("secureAmtPursuit")==="SECURE_AMT_PURSUIT_FAILURE"})
+addBeat("v2_package_second_amt_pursuit",{mode:"choice",machineResolved:true,backdrop:B.alleyAlt,location:"KONOHA · PURSUIT",objective:"Catch the first man.",actors:["kakashi","amt"],preset:"pursuit",onEnter:()=>resolverEnter("secureAmtPursuit"),cues:[N("Kakashi leaves Package Smuggler behind."),N("The package is secured."),N("The first man's trail is thin."),N("Still usable."),N("Kakashi takes it.")],choices:[
+ C("package_second_amt_success","RESOLVE RESULT","v2_package_second_amt_intercept",{available:()=>getOutcome("secureAmtPursuit")==="SECURE_AMT_PURSUIT_SUCCESS"}),
+ C("package_second_amt_failure","RESOLVE RESULT","v2_secure_amt_fail",{available:()=>getOutcome("secureAmtPursuit")==="SECURE_AMT_PURSUIT_FAILURE"})
 ]});
 addBeat("v2_package_second_amt_intercept",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Catch the first man.",actors:["kakashi","amt","pakkun"],preset:"intercept",onEnter:()=>setPakkun(true),cues:[
  N("ANBU Marked Target cuts into the next alley."),N("Then stops."),N("A small ninken is sitting in the route ahead of him."),N("The man looks at it."),N("The ninken looks past him."),
@@ -1314,46 +1333,46 @@ addBeat("v2_amt_package_second_win",{mode:"choice",backdrop:B.intercept,location
 // ---------------------------------------------------------------------------
 // GO AFTER ORIGINAL TARGET from WATCH.
 // ---------------------------------------------------------------------------
-addBeat("v2_go_amt_pursuit_resolver",{mode:"choice",backdrop:B.alleyAlt,location:"KONOHA · PURSUIT",objective:"Catch ANBU Marked Target.",actors:["kakashi","amt"],preset:"pursuit",onEnter:()=>{participant("PS",{state:"ESCAPED"});return resolverEnter("amtPursuitRoot");},cues:W("originalTarget","1_go_after_the_original_target"),choices:[
- C("go_amt_success","CONTINUE","v2_amt_direct_intercept",{available:()=>getOutcome("amtPursuitRoot")==="AMT_PURSUIT_SUCCESS"}),
- C("go_amt_failure","CONTINUE","v2_amt_direct_pursuit_fail",{available:()=>getOutcome("amtPursuitRoot")==="AMT_PURSUIT_FAILURE"})
+addBeat("v2_go_amt_pursuit_resolver",{mode:"choice",machineResolved:true,backdrop:B.alleyAlt,location:"KONOHA · PURSUIT",objective:"Catch ANBU Marked Target.",actors:["kakashi","amt"],preset:"pursuit",onEnter:()=>{participant("PS",{state:"ESCAPED"});return resolverEnter("amtPursuitRoot");},cues:W("originalTarget","1_go_after_the_original_target"),choices:[
+ C("go_amt_success","RESOLVE RESULT","v2_amt_direct_intercept",{available:()=>getOutcome("amtPursuitRoot")==="AMT_PURSUIT_SUCCESS"}),
+ C("go_amt_failure","RESOLVE RESULT","v2_amt_direct_pursuit_fail",{available:()=>getOutcome("amtPursuitRoot")==="AMT_PURSUIT_FAILURE"})
 ]});
 
 // ---------------------------------------------------------------------------
 // MOVE IN CLOSER.
 // ---------------------------------------------------------------------------
-addBeat("v2_get_closer_resolver",{mode:"choice",backdrop:B.endAlley,location:"END OF ALLEYWAY · NIGHT",objective:"Learn more without exposing yourself.",actors:["kakashi","amt","ps"],preset:"observe",onEnter:()=>resolverEnter("getCloser"),cues:[N("From deeper in the alley, Kakashi can see the meeting but cannot hear enough of it."),N("He leaves the safer distance behind and moves along the darker wall, avoiding the strips of lantern light on the wet stone."),N("One doorway gives him the next. Then another."),N("The Sakura tree grows larger beyond the alley mouth."),N("So do the voices.")],choices:[
- C("closer_success","CONTINUE","v2_get_closer_success",{available:()=>getOutcome("getCloser")==="GET_CLOSER_SUCCESS"}),
- C("closer_failure","CONTINUE","v2_get_closer_failure",{available:()=>getOutcome("getCloser")==="GET_CLOSER_FAILURE"})
+addBeat("v2_get_closer_resolver",{mode:"choice",machineResolved:true,backdrop:B.endAlley,location:"END OF ALLEYWAY · NIGHT",objective:"Learn more without exposing yourself.",actors:["kakashi","amt","ps"],preset:"observe",onEnter:()=>resolverEnter("getCloser"),cues:[N("From deeper in the alley, Kakashi can see the meeting but cannot hear enough of it."),N("He leaves the safer distance behind and moves along the darker wall, avoiding the strips of lantern light on the wet stone."),N("One doorway gives him the next. Then another."),N("The Sakura tree grows larger beyond the alley mouth."),N("So do the voices.")],choices:[
+ C("closer_success","RESOLVE RESULT","v2_get_closer_success",{available:()=>getOutcome("getCloser")==="GET_CLOSER_SUCCESS"}),
+ C("closer_failure","RESOLVE RESULT","v2_get_closer_failure",{available:()=>getOutcome("getCloser")==="GET_CLOSER_FAILURE"})
 ]});
 addBeat("v2_get_closer_success",{mode:"choice",backdrop:B.endAlley,location:"END OF ALLEYWAY · NIGHT",objective:"Choose what to do with the handoff.",actors:["kakashi","amt","ps"],preset:"observe",onEnter:()=>mutate(s=>{s.knowledge.getCloserContingency=true;}),cues:[N("Neither man looks toward Kakashi."),N("He settles into the shadow near the end of the alley, close enough to hear them clearly."),Q("ANBU MARKED TARGET","You said once I hand it over, I'm done."),Q("PACKAGE SMUGGLER","You are."),Q("ANBU MARKED TARGET","And if somebody followed me?"),N("Package Smuggler glances along the main street."),Q("PACKAGE SMUGGLER","Then you keep walking."),Q("ANBU MARKED TARGET","With it?"),N("Now Package Smuggler looks at him."),Q("PACKAGE SMUGGLER","Until I say otherwise."),Q("ANBU MARKED TARGET","That wasn't the plan."),Q("PACKAGE SMUGGLER","Plans are for empty streets."),Q("ANBU MARKED TARGET","And if the street is empty?"),N("Package Smuggler holds out his hand."),Q("PACKAGE SMUGGLER","Then I take it, and you disappear."),Q("ANBU MARKED TARGET","Where does it go after you?"),N("The hint of a smile reaches Package Smuggler."),Q("PACKAGE SMUGGLER","Away from you."),N("Kakashi has what he came closer for: the carrier's role ends at the handoff, unless the street stops being safe."),N("What happens after Package Smuggler takes the package is still unknown."),N("The waiting hand remains between the two men. Kakashi has only a few seconds to decide whether to let it happen.")],choices:[
- C("closer_handoff","LET THE HANDOFF HAPPEN","v2_closer_handoff",{patch:()=>history("CLOSER_LET_HANDOFF")}),
- C("closer_strike","STRIKE BEFORE THE HANDOFF","v2_direct_strike_setup",{patch:()=>history("CLOSER_STRIKE")}),
- C("closer_pick","ATTEMPT THE PICKPOCKET","v2_improved_pickpocket_resolver",{patch:()=>history("CLOSER_PICKPOCKET")})
+ C("closer_handoff","WAIT FOR THE HANDOFF","v2_closer_handoff",{patch:()=>history("CLOSER_LET_HANDOFF")}),
+ C("closer_strike","INTERRUPT THE HANDOFF","v2_direct_strike_setup",{patch:()=>history("CLOSER_STRIKE")}),
+ C("closer_pick","SLIP IN AND TAKE IT","v2_improved_pickpocket_resolver",{patch:()=>history("CLOSER_PICKPOCKET")})
 ]});
 addBeat("v2_closer_handoff",{mode:"choice",backdrop:B.sakura,location:"SAKURA TREE · MAIN STREET · NIGHT",objective:"Retrieve the package.",actors:["amt","ps","mi"],preset:"sakura_3_person",onEnter:()=>{packageState("PS");participant("MI",{state:"AVAILABLE"});return history("CLOSER_HANDOFF_COMPLETED");},cues:W("getCloserDownstream","3_success_let_the_handoff_happen"),choices:[
- C("closer_watch_stop","STOP THE ASSASSIN","v2_stop_assassin_setup",{patch:()=>history("STOP_THE_ASSASSIN_AFTER_CLOSER")}),
- C("closer_watch_secure","SECURE THE PACKAGE","v2_secure_package_setup",{patch:()=>history("SECURE_PACKAGE_AFTER_CLOSER")}),
- C("closer_watch_before","SECURE THE PACKAGE BEFORE THE ASSASSIN","v2_secure_before_resolver",{patch:()=>history("SECURE_BEFORE_AFTER_CLOSER")}),
- C("closer_watch_sequence","DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE","v2_assassin_then_package_setup",{patch:()=>history("ASSASSIN_THEN_PACKAGE_AFTER_CLOSER")}),
- C("closer_watch_amt","GO AFTER THE ORIGINAL TARGET","v2_go_amt_pursuit_resolver",{patch:()=>history("GO_ORIGINAL_AFTER_CLOSER")})
+ C("closer_watch_stop","INTERCEPT THE MASKED ATTACKER","v2_stop_assassin_setup",{patch:()=>history("STOP_THE_ASSASSIN_AFTER_CLOSER")}),
+ C("closer_watch_secure","GO FOR THE PACKAGE","v2_secure_package_setup",{patch:()=>history("SECURE_PACKAGE_AFTER_CLOSER")}),
+ C("closer_watch_before","BEAT HER TO THE PACKAGE","v2_secure_before_resolver",{patch:()=>history("SECURE_BEFORE_AFTER_CLOSER")}),
+ C("closer_watch_sequence","DEAL WITH HER FIRST","v2_assassin_then_package_setup",{patch:()=>history("ASSASSIN_THEN_PACKAGE_AFTER_CLOSER")}),
+ C("closer_watch_amt","CHASE THE MAN FROM THE PHOTO","v2_go_amt_pursuit_resolver",{patch:()=>history("GO_ORIGINAL_AFTER_CLOSER")})
 ]});
 
 addBeat("v2_get_closer_failure",{mode:"choice",backdrop:B.endAlley,location:"END OF ALLEYWAY · NIGHT",objective:"Stop the package from escaping.",actors:["kakashi","amt","ps"],preset:"observe",onEnter:()=>mutate(s=>{s.package.holder="AMT";s.participants.MI.state="UNSEEN";}),cues:[N("Kakashi moves closer along the darker side of the alley until the voices begin to carry."),Q("ANBU MARKED TARGET","You said once I hand it over, I'm done."),Q("PACKAGE SMUGGLER","You are."),Q("ANBU MARKED TARGET","And if somebody followed me?"),Q("PACKAGE SMUGGLER","Then you keep walking."),Q("ANBU MARKED TARGET","With it?"),N("Package Smuggler does not answer. His eyes drop to a thin pool of rainwater along the street."),N("Lantern light trembles across the reflection—and so does Kakashi's movement in the alley."),Q("PACKAGE SMUGGLER","Hold it."),N("ANBU Marked Target freezes with one hand still over the package."),Q("ANBU MARKED TARGET","What?"),Q("PACKAGE SMUGGLER","Someone's close."),N("The target starts to turn."),Q("PACKAGE SMUGGLER","Don't. Keep it."),Q("PACKAGE SMUGGLER","Main street. Go."),N("ANBU Marked Target moves immediately, taking the package toward the Sakura tree."),N("Package Smuggler stays behind and turns toward the alley."),N("He has not found Kakashi's exact position yet, but he is walking toward it."),N("Kakashi wanted more information. Instead, he changed the handoff."),N("Now he has to choose which consequence to chase.")],choices:[
- C("failure_stay","STAY ON THE PACKAGE","v2_stay_package_pursuit_resolver",{patch:()=>history("STAY_ON_PACKAGE")}),
- C("failure_stop_ps","STOP PACKAGE SMUGGLER","v2_stop_ps_setup",{patch:()=>history("STOP_PACKAGE_SMUGGLER")}),
- C("failure_cutoff","CUT THEM OFF AT THE SAKURA TREE","v2_cutoff_setup",{patch:()=>history("CUT_OFF_SAKURA")})
+ C("failure_stay","CHASE THE PACKAGE","v2_stay_package_pursuit_resolver",{patch:()=>history("STAY_ON_PACKAGE")}),
+ C("failure_stop_ps","CONFRONT THE RECEIVER","v2_stop_ps_setup",{patch:()=>history("STOP_PACKAGE_SMUGGLER")}),
+ C("failure_cutoff","CUT THEM OFF","v2_cutoff_setup",{patch:()=>history("CUT_OFF_SAKURA")})
 ]});
 
-addBeat("v2_stay_package_pursuit_resolver",{mode:"choice",backdrop:B.sakura,location:"SAKURA TREE · PURSUIT",objective:"Catch ANBU Marked Target.",actors:["kakashi","amt"],preset:"pursuit",onEnter:()=>resolverEnter("stayPackagePursuit"),cues:[N("ANBU Marked Target is already moving away with the package. Kakashi goes after him."),N("Package Smuggler catches the movement at the alley mouth."),Q("PACKAGE SMUGGLER","There!"),N("The carrier looks back and sees Kakashi for the first time."),Q("ANBU MARKED TARGET","A kid?"),N("Kakashi runs straight past Package Smuggler's reach."),Q("PACKAGE SMUGGLER","Don't stop!"),Q("ANBU MARKED TARGET","You said I was done!"),Q("PACKAGE SMUGGLER","Not while you're holding it!"),N("That gives Kakashi one more useful fact: the carrier was never meant to keep the package."),N("The chase breaks into the open around the Sakura tree."),Q("ANBU MARKED TARGET","What do you want?"),Q("KAKASHI","The package."),N("The man gives a short, breathless laugh and changes direction around the tree."),N("Kakashi stops trying to match his speed and starts reading the exits instead.")],choices:[
- C("stay_success","CONTINUE","v2_stay_package_intercept",{available:()=>getOutcome("stayPackagePursuit")==="STAY_PACKAGE_PURSUIT_SUCCESS"}),
- C("stay_failure","CONTINUE","v2_stay_package_failure",{available:()=>getOutcome("stayPackagePursuit")==="STAY_PACKAGE_PURSUIT_FAILURE"})
+addBeat("v2_stay_package_pursuit_resolver",{mode:"choice",machineResolved:true,backdrop:B.sakura,location:"SAKURA TREE · PURSUIT",objective:"Catch ANBU Marked Target.",actors:["kakashi","amt"],preset:"pursuit",onEnter:()=>resolverEnter("stayPackagePursuit"),cues:[N("ANBU Marked Target is already moving away with the package. Kakashi goes after him."),N("Package Smuggler catches the movement at the alley mouth."),Q("PACKAGE SMUGGLER","There!"),N("The carrier looks back and sees Kakashi for the first time."),Q("ANBU MARKED TARGET","A kid?"),N("Kakashi runs straight past Package Smuggler's reach."),Q("PACKAGE SMUGGLER","Don't stop!"),Q("ANBU MARKED TARGET","You said I was done!"),Q("PACKAGE SMUGGLER","Not while you're holding it!"),N("That gives Kakashi one more useful fact: the carrier was never meant to keep the package."),N("The chase breaks into the open around the Sakura tree."),Q("ANBU MARKED TARGET","What do you want?"),Q("KAKASHI","The package."),N("The man gives a short, breathless laugh and changes direction around the tree."),N("Kakashi stops trying to match his speed and starts reading the exits instead.")],choices:[
+ C("stay_success","RESOLVE RESULT","v2_stay_package_intercept",{available:()=>getOutcome("stayPackagePursuit")==="STAY_PACKAGE_PURSUIT_SUCCESS"}),
+ C("stay_failure","RESOLVE RESULT","v2_stay_package_failure",{available:()=>getOutcome("stayPackagePursuit")==="STAY_PACKAGE_PURSUIT_FAILURE"})
 ]});
 addBeat("v2_stay_package_failure",{backdrop:B.sakura,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"sakura_kakashi_only",onEnter:()=>mutate(s=>{s.participants.AMT.state="ESCAPED";s.participants.PS.state="ESCAPED";s.package.holder="AMT";}),cues:[N("Kakashi cuts inside the target's route, using the Sakura tree to shorten the distance."),N("For several seconds they lose sight of each other."),N("Kakashi hears footsteps change direction and moves to intercept."),N("Wrong exit."),N("By the time he reaches the far side, ANBU Marked Target is already at the edge of the square with the package still under his arm."),N("Two late-night pedestrians step between them."),N("Kakashi changes line. The target uses the interruption and disappears between the buildings."),N("Kakashi reaches the corner seconds later to find three empty routes and nothing he can separate from the ordinary sounds of Konoha."),N("Package Smuggler is gone too."),N("Kakashi stays still long enough to fix the mistake in his memory, then turns back toward ANBU.")],nextBeatId:"v2_report"});
 addBeat("v2_stay_package_intercept",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Recover the package.",actors:["kakashi","amt","pakkun"],preset:"intercept",onEnter:()=>setPakkun(true),cues:[N("Kakashi cuts inside the target's route."),N("ANBU Marked Target reaches the far side of the alley and stops."),N("A small ninken is standing in the exit."),Q("ANBU MARKED TARGET","You blocked both exits."),N("Kakashi arrives behind him."),Q("PAKKUN","This the one?"),Q("KAKASHI","Yes."),Q("KAKASHI","Thanks."),Q("ANBU MARKED TARGET","You've been chasing this thing all night."),Q("KAKASHI","You've been running with it."),N("The target glances between Kakashi and the ninken."),Q("ANBU MARKED TARGET","And now?"),N("Kakashi's eye settles on the package."),Q("KAKASHI","Now you stop.")],choices:[
  C("demand_package","DEMAND THE PACKAGE","v2_battle_demand_amt",{patch:()=>history("DEMAND_PACKAGE")}),
  C("take_him_down","TAKE HIM DOWN","v2_take_down_setup",{patch:()=>history("TAKE_HIM_DOWN")}),
- C("ask_where","ASK WHERE THE PACKAGE WAS GOING","v2_ask_where",{patch:()=>history("ASK_WHERE_PACKAGE_GOING")})
+ C("ask_where","ASK WHERE IT WAS GOING","v2_ask_where",{patch:()=>history("ASK_WHERE_PACKAGE_GOING")})
 ]});
 addBeat("v2_ask_where",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Recover the package.",actors:["kakashi","amt","pakkun"],preset:"intercept",onEnter:()=>{const m=mutate(s=>{s.knowledge.askWhere=true;s.knowledge.downstreamDestinationKnown=false;});if(!m.success)return m;const e=commitAskWhereEvidence();return e&&e.success===false?e:{success:true};},cues:[N("ANBU Marked Target keeps one hand close to the package while Pakkun holds the escape line."),N("He is waiting for Kakashi to demand it."),Q("KAKASHI","Where was it going?"),N("The question catches him off guard."),Q("ANBU MARKED TARGET","You think they told me?"),Q("KAKASHI","You asked."),N("The man gives him a tired look."),Q("ANBU MARKED TARGET","I carry it to him. He carries it somewhere else."),Q("KAKASHI","Where?"),Q("ANBU MARKED TARGET","I asked the same thing."),N("Kakashi remembers Package Smuggler's answer: away from you."),Q("KAKASHI","He didn't tell you."),Q("ANBU MARKED TARGET","Now you're caught up."),N("Pakkun keeps his attention on the blocked exit. He has the answer he needed.")],choices:[
  C("ask_then_demand","DEMAND THE PACKAGE","v2_battle_demand_amt"),
@@ -1397,9 +1416,9 @@ addBeat("v2_cutoff_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE ·
 ]});
 
 // Improved-position Pickpocket.
-addBeat("v2_improved_pickpocket_resolver",{mode:"choice",backdrop:B.endAlley,location:"END OF ALLEYWAY · NIGHT",objective:"Take the package cleanly.",actors:["kakashi","amt","ps"],preset:"observe",onEnter:()=>resolverEnter("improvedPickpocket"),cues:[N("Kakashi has already shortened the distance and heard the contingency."),N("ANBU Marked Target's hand is still over the package. Package Smuggler is waiting."),N("Kakashi uses the closer position to try to remove the package before the handoff can finish.")],choices:[
- C("improved_pick_success","CONTINUE","v2_pickpocket_clean_success",{available:()=>getOutcome("improvedPickpocket")==="PICKPOCKET_IMPROVED_SUCCESS"}),
- C("improved_pick_fail","CONTINUE","v2_improved_pick_fail_setup",{available:()=>getOutcome("improvedPickpocket")==="PICKPOCKET_IMPROVED_FAILURE"})
+addBeat("v2_improved_pickpocket_resolver",{mode:"choice",machineResolved:true,backdrop:B.endAlley,location:"END OF ALLEYWAY · NIGHT",objective:"Take the package cleanly.",actors:["kakashi","amt","ps"],preset:"observe",onEnter:()=>resolverEnter("improvedPickpocket"),cues:[N("Kakashi has already shortened the distance and heard the contingency."),N("ANBU Marked Target's hand is still over the package. Package Smuggler is waiting."),N("Kakashi uses the closer position to try to remove the package before the handoff can finish.")],choices:[
+ C("improved_pick_success","RESOLVE RESULT","v2_pickpocket_clean_success",{available:()=>getOutcome("improvedPickpocket")==="PICKPOCKET_IMPROVED_SUCCESS"}),
+ C("improved_pick_fail","RESOLVE RESULT","v2_improved_pick_fail_setup",{available:()=>getOutcome("improvedPickpocket")==="PICKPOCKET_IMPROVED_FAILURE"})
 ]});
 addBeat("v2_improved_pick_fail_setup",{backdrop:B.sakura,location:"SAKURA TREE · NIGHT",objective:"Recover the package.",actors:["kakashi","amt","ps"],preset:"battle_trio",onEnter:()=>mutate(s=>{s.package.holder="AMT";s.participants.MI.state="UNSEEN";}),cues:[N("Kakashi reaches the package, but ANBU Marked Target catches the movement."),N("Package Smuggler reacts immediately."),N("The theft fails and the quiet handoff fails with it."),N("Masked Interceptor never enters this version of the exchange."),Q("PACKAGE SMUGGLER","You should've stayed in the alley."),Q("KAKASHI","You noticed me there too."),Q("PACKAGE SMUGGLER","Eventually."),N("Both men turn on Kakashi.")],nextBeatId:"v2_battle_improved_2v1"});
 addBeat("v2_battle_improved_2v1",{mode:"battle_transition",backdrop:B.fight,location:"SAKURA TREE · PL BATTLE",objective:"Recover the package.",actors:["kakashi","amt","ps"],preset:"battle_trio",cues:[N("Kakashi Hatake vs ANBU Marked Target + Package Smuggler.")],battle:battle("academy_kakashi_origin_battle_amt_ps_2v1","improved_2v1","v2_improved_2v1_win","v2_improved_2v1_loss","AK_SA_030")});
@@ -1414,13 +1433,13 @@ addBeat("v2_improved_2v1_win",{mode:"choice",backdrop:B.fight,location:"SAKURA T
 // ---------------------------------------------------------------------------
 // DIRECT STRIKE BEFORE THE HANDOFF.
 // ---------------------------------------------------------------------------
-addBeat("v2_direct_strike_setup",{backdrop:B.endAlley,location:"END OF ALLEYWAY · NIGHT",objective:"Stop the handoff.",actors:["kakashi","amt","ps"],preset:"battle_trio",onEnter:()=>mutate(s=>{s.package.holder="AMT";s.participants.MI.state="UNSEEN";}),cues:W("directStrike","1_strike_before_the_handoff"),nextBeatId:"v2_battle_direct_strike_2v1"});
+addBeat("v2_direct_strike_setup",{backdrop:B.endAlley,location:"END OF ALLEYWAY · NIGHT",objective:"Stop the handoff.",actors:["kakashi","amt","ps"],preset:"battle_trio",onEnter:()=>mutate(s=>{s.package.holder="AMT";s.participants.MI.state="UNSEEN";}),cues:G("f05.interrupt"),nextBeatId:"v2_battle_direct_strike_2v1"});
 addBeat("v2_battle_direct_strike_2v1",{mode:"battle_transition",backdrop:B.fight,location:"SAKURA TREE · PL BATTLE",objective:"Stop the handoff.",actors:["kakashi","amt","ps"],preset:"battle_trio",cues:[N("Kakashi Hatake vs ANBU Marked Target + Package Smuggler.")],battle:battle("academy_kakashi_origin_battle_amt_ps_2v1","direct_strike_2v1","v2_direct_strike_2v1_win","v2_direct_strike_2v1_loss","AK_SA_003")});
-addBeat("v2_direct_strike_2v1_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("direct_strike_2v1",ctx,s=>{s.participants.AMT.state="ESCAPED";s.participants.PS.state="ESCAPED";s.package.holder="AMT";s.participants.MI.state="UNSEEN";}),cues:W("directStrike","3_kakashi_loses_the_2_v_1"),nextBeatId:"v2_report"});
-addBeat("v2_direct_strike_2v1_win",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Keep the recovered package.",actors:["kakashi","amt","ps"],preset:"post_battle",onEnter:ctx=>captureBattle("direct_strike_2v1",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";s.participants.PS.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;}),cues:WC(["directStrike","4_kakashi_wins_the_2_v_1"],["directStrike","5_masked_interceptor_arrives"]),nextBeatId:"v2_battle_direct_mi"});
+addBeat("v2_direct_strike_2v1_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("direct_strike_2v1",ctx,s=>{s.participants.AMT.state="ESCAPED";s.participants.PS.state="ESCAPED";s.package.holder="AMT";s.participants.MI.state="UNSEEN";}),cues:G("f05.interrupt_loss"),nextBeatId:"v2_report"});
+addBeat("v2_direct_strike_2v1_win",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Keep the recovered package.",actors:["kakashi","amt","ps"],preset:"post_battle",onEnter:ctx=>captureBattle("direct_strike_2v1",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";s.participants.PS.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;}),cues:G("f05.interrupt_win"),nextBeatId:"v2_battle_direct_mi"});
 addBeat("v2_battle_direct_mi",{mode:"battle_transition",backdrop:B.fight,location:"SAKURA TREE · PL BATTLE",objective:"Keep the package.",actors:["kakashi","mi"],preset:"battle_pair",cues:[N("Kakashi Hatake vs Masked Interceptor.")],battle:battle("academy_kakashi_origin_battle_mi_1v1","direct_mi","v2_direct_mi_win","v2_direct_mi_loss","AK_SA_003")});
-addBeat("v2_direct_mi_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("direct_mi",ctx,s=>{s.participants.MI.state="ESCAPED";s.package.holder="MI";s.package.recovered=false;}),cues:W("directStrike","7_mi_defeats_kakashi"),nextBeatId:"v2_report"});
-addBeat("v2_direct_mi_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:null,actors:["kakashi","amt","ps","mi"],preset:"sakura_group",onEnter:ctx=>captureBattle("direct_mi",ctx,s=>{s.participants.MI.state="BATTLE_DEFEATED";}),cues:W("directStrike","8_kakashi_defeats_mi"),choices:[
+addBeat("v2_direct_mi_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("direct_mi",ctx,s=>{s.participants.MI.state="ESCAPED";s.package.holder="MI";s.package.recovered=false;}),cues:G("f05.mi_loss"),nextBeatId:"v2_report"});
+addBeat("v2_direct_mi_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:null,actors:["kakashi","amt","ps","mi"],preset:"sakura_group",onEnter:ctx=>captureBattle("direct_mi",ctx,s=>{s.participants.MI.state="BATTLE_DEFEATED";}),cues:G("f05.double_win"),choices:[
  C("direct_group_police","TAKE THEM TO THE UCHIHA POLICE","v2_group3_police_depart",{patch:()=>transferIntent([AMT,PS,MI],"POLICE","direct_group_police")}),
  C("direct_group_anbu","BRING THEM TO ANBU","v2_group3_anbu_depart",{patch:()=>transferIntent([AMT,PS,MI],"ANBU","direct_group_anbu")}),
  C("direct_group_kill","KILL THEM","v2_group3_kill_result",{patch:()=>resolveGroupKill([AMT,PS,MI],"direct_group_kill")}),
@@ -1430,15 +1449,15 @@ addBeat("v2_direct_mi_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE
 // ---------------------------------------------------------------------------
 // DIRECT PICKPOCKET.
 // ---------------------------------------------------------------------------
-addBeat("v2_direct_pickpocket_resolver",{mode:"choice",backdrop:B.sakura,location:"SAKURA TREE · NIGHT",objective:"Take the package cleanly.",actors:["kakashi","amt","ps"],preset:"observe",onEnter:()=>resolverEnter("directPickpocket"),cues:W("directPickpocket","1_slip_in_for_the_package"),choices:[
- C("direct_pick_success","CONTINUE","v2_pickpocket_clean_success",{available:()=>getOutcome("directPickpocket")==="PICKPOCKET_DIRECT_SUCCESS"}),
- C("direct_pick_failure","CONTINUE","v2_pickpocket_failure_setup",{available:()=>getOutcome("directPickpocket")==="PICKPOCKET_DIRECT_FAILURE"})
+addBeat("v2_direct_pickpocket_resolver",{mode:"choice",machineResolved:true,backdrop:B.sakura,location:"SAKURA TREE · NIGHT",objective:"Take the package cleanly.",actors:["kakashi","amt","ps"],preset:"observe",onEnter:()=>resolverEnter("directPickpocket"),cues:G("f05.slip"),choices:[
+ C("direct_pick_success","RESOLVE RESULT","v2_pickpocket_clean_success",{available:()=>getOutcome("directPickpocket")==="PICKPOCKET_DIRECT_SUCCESS"}),
+ C("direct_pick_failure","RESOLVE RESULT","v2_pickpocket_failure_setup",{available:()=>getOutcome("directPickpocket")==="PICKPOCKET_DIRECT_FAILURE"})
 ]});
-addBeat("v2_pickpocket_clean_success",{backdrop:B.sakura,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"sakura_kakashi_only",onEnter:()=>mutate(s=>{s.package.holder="KAKASHI";s.package.recovered=true;s.participants.MI.state="UNSEEN";}),cues:W("directPickpocket","2_resolver_success_the_package_disappears"),nextBeatId:"v2_report"});
-addBeat("v2_pickpocket_failure_setup",{backdrop:B.sakura,location:"SAKURA TREE · NIGHT",objective:"Recover the package.",actors:["kakashi","amt","ps","mi"],preset:"sakura_group",onEnter:()=>{participant("MI",{state:"AVAILABLE"});packageState("AMT");return history("PICKPOCKET_DETECTED_3V1");},cues:W("directPickpocket","4_resolver_failure_caught_in_the_exchange"),nextBeatId:"v2_battle_pickpocket_3v1"});
+addBeat("v2_pickpocket_clean_success",{backdrop:B.sakura,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"sakura_kakashi_only",onEnter:()=>mutate(s=>{s.package.holder="KAKASHI";s.package.recovered=true;s.participants.MI.state="UNSEEN";}),cues:G("f05.slip_success"),nextBeatId:"v2_report"});
+addBeat("v2_pickpocket_failure_setup",{backdrop:B.sakura,location:"SAKURA TREE · NIGHT",objective:"Recover the package.",actors:["kakashi","amt","ps","mi"],preset:"sakura_group",onEnter:()=>{participant("MI",{state:"AVAILABLE"});packageState("AMT");return history("PICKPOCKET_DETECTED_3V1");},cues:G("f05.slip_caught"),nextBeatId:"v2_battle_pickpocket_3v1"});
 addBeat("v2_battle_pickpocket_3v1",{mode:"battle_transition",backdrop:B.fight,location:"SAKURA TREE · PL BATTLE",objective:"Recover the package.",actors:["kakashi","amt","ps","mi"],preset:"sakura_group",cues:[N("Kakashi Hatake vs ANBU Marked Target + Package Smuggler + Masked Interceptor.")],battle:battle("academy_kakashi_origin_battle_amt_ps_mi_3v1","pickpocket_3v1","v2_pickpocket_3v1_win","v2_pickpocket_3v1_loss","AK_SA_028")});
-addBeat("v2_pickpocket_3v1_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("pickpocket_3v1",ctx,s=>{s.participants.AMT.state="ESCAPED";s.participants.PS.state="ESCAPED";s.participants.MI.state="ESCAPED";s.package.holder="AMT";}),cues:W("directPickpocket","6_kakashi_loses_the_3_v_1"),nextBeatId:"v2_report"});
-addBeat("v2_pickpocket_3v1_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:null,actors:["kakashi","amt","ps","mi"],preset:"sakura_group",onEnter:ctx=>captureBattle("pickpocket_3v1",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";s.participants.PS.state="BATTLE_DEFEATED";s.participants.MI.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;}),cues:W("directPickpocket","7_kakashi_wins_the_3_v_1"),choices:[
+addBeat("v2_pickpocket_3v1_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("pickpocket_3v1",ctx,s=>{s.participants.AMT.state="ESCAPED";s.participants.PS.state="ESCAPED";s.participants.MI.state="ESCAPED";s.package.holder="AMT";}),cues:G("f05.slip_loss"),nextBeatId:"v2_report"});
+addBeat("v2_pickpocket_3v1_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:null,actors:["kakashi","amt","ps","mi"],preset:"sakura_group",onEnter:ctx=>captureBattle("pickpocket_3v1",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";s.participants.PS.state="BATTLE_DEFEATED";s.participants.MI.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;}),cues:G("f05.slip_win"),choices:[
  C("pick_group_police","TAKE THEM TO THE UCHIHA POLICE","v2_group3_police_depart",{patch:()=>transferIntent([AMT,PS,MI],"POLICE","pick_group_police")}),
  C("pick_group_anbu","BRING THEM TO ANBU","v2_group3_anbu_depart",{patch:()=>transferIntent([AMT,PS,MI],"ANBU","pick_group_anbu")}),
  C("pick_group_kill","KILL THEM","v2_group3_kill_result",{patch:()=>resolveGroupKill([AMT,PS,MI],"pick_group_kill")}),
@@ -1453,33 +1472,33 @@ addBeat("v2_pickpocket_3v1_win",{mode:"choice",backdrop:B.fight,location:"SAKURA
 addBeat("v2_mi_anbu_depart",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Bring Masked Interceptor to ANBU.",actors:()=>directTransferActors("MI","ANBU",false),preset:"escort",cues:()=>directTransferFieldCues("MI","ANBU"),nextBeatId:"v2_mi_anbu_handoff"});
 addBeat("v2_mi_anbu_handoff",{backdrop:B.rooftop,location:"ANBU ROOFTOP · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("MI","ANBU",true),preset:"anbu_report",cues:()=>directTransferHandoffCues("MI","ANBU"),onAdvance:()=>completeDirectTransfer("MI","ANBU","mi"),nextBeatId:"v2_report"});
 addBeat("v2_mi_police_depart",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Take Masked Interceptor to the Uchiha Police.",actors:()=>directTransferActors("MI","POLICE",false),preset:"escort",cues:()=>directTransferFieldCues("MI","POLICE"),nextBeatId:"v2_mi_police_handoff"});
-addBeat("v2_mi_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("MI","POLICE",true),preset:"escort",cues:()=>directTransferHandoffCues("MI","POLICE"),onAdvance:()=>completeDirectTransfer("MI","POLICE","mi"),nextBeatId:"v2_report"});
+addBeat("v2_mi_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("MI","POLICE",true),preset:"police_handoff",cues:()=>directTransferHandoffCues("MI","POLICE"),onAdvance:()=>completeDirectTransfer("MI","POLICE","mi"),nextBeatId:"v2_report"});
 
 addBeat("v2_ps_anbu_depart",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Bring Package Smuggler to ANBU.",actors:()=>directTransferActors("PS","ANBU",false),preset:"escort",cues:()=>directTransferFieldCues("PS","ANBU"),nextBeatId:"v2_ps_anbu_handoff"});
 addBeat("v2_ps_anbu_handoff",{backdrop:B.rooftop,location:"ANBU ROOFTOP · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("PS","ANBU",true),preset:"anbu_report",cues:()=>directTransferHandoffCues("PS","ANBU"),onAdvance:()=>completeDirectTransfer("PS","ANBU","ps"),nextBeatId:"v2_report"});
 addBeat("v2_ps_police_depart",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Take Package Smuggler to the Uchiha Police.",actors:()=>directTransferActors("PS","POLICE",false),preset:"escort",cues:()=>directTransferFieldCues("PS","POLICE"),nextBeatId:"v2_ps_police_handoff"});
-addBeat("v2_ps_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("PS","POLICE",true),preset:"escort",cues:()=>directTransferHandoffCues("PS","POLICE"),onAdvance:()=>completeDirectTransfer("PS","POLICE","ps"),nextBeatId:"v2_report"});
+addBeat("v2_ps_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("PS","POLICE",true),preset:"police_handoff",cues:()=>directTransferHandoffCues("PS","POLICE"),onAdvance:()=>completeDirectTransfer("PS","POLICE","ps"),nextBeatId:"v2_report"});
 
 addBeat("v2_amt_anbu_depart",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Bring ANBU Marked Target to ANBU.",actors:()=>directTransferActors("AMT","ANBU",false),preset:"escort",cues:()=>directTransferFieldCues("AMT","ANBU"),nextBeatId:"v2_amt_anbu_handoff"});
 addBeat("v2_amt_anbu_handoff",{backdrop:B.rooftop,location:"ANBU ROOFTOP · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("AMT","ANBU",true),preset:"anbu_report",cues:()=>directTransferHandoffCues("AMT","ANBU"),onAdvance:()=>completeDirectTransfer("AMT","ANBU","amt"),nextBeatId:"v2_report"});
 addBeat("v2_amt_police_depart",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Take ANBU Marked Target to the Uchiha Police.",actors:()=>directTransferActors("AMT","POLICE",false),preset:"escort",cues:()=>directTransferFieldCues("AMT","POLICE"),nextBeatId:"v2_amt_police_handoff"});
-addBeat("v2_amt_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("AMT","POLICE",true),preset:"escort",cues:()=>directTransferHandoffCues("AMT","POLICE"),onAdvance:()=>completeDirectTransfer("AMT","POLICE","amt"),nextBeatId:"v2_report"});
+addBeat("v2_amt_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("AMT","POLICE",true),preset:"police_handoff",cues:()=>directTransferHandoffCues("AMT","POLICE"),onAdvance:()=>completeDirectTransfer("AMT","POLICE","amt"),nextBeatId:"v2_report"});
 addBeat("v2_amt_release_result",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:()=>state()&&state().pakkun.present?["kakashi","amt","pakkun"]:["kakashi","amt"],preset:"post_battle",cues:W("custodyGolden06B","amt_release"),nextBeatId:"v2_report"});
 
 addBeat("v2_group2_anbu_depart",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Bring them to ANBU.",actors:()=>groupTransferActors([AMT,PS],"ANBU",false),preset:"escort",cues:W("custodyGolden06B","group2_anbu_depart"),nextBeatId:"v2_group2_anbu_handoff"});
 addBeat("v2_group2_anbu_handoff",{backdrop:B.rooftop,location:"ANBU ROOFTOP · NIGHT",objective:"Transfer custody.",actors:()=>groupTransferActors([AMT,PS],"ANBU",true),preset:"anbu_report",cues:W("custodyGolden06B","group2_anbu_handoff"),onAdvance:()=>completeDirectGroupTransfer([AMT,PS],"ANBU","group2"),nextBeatId:"v2_report"});
 addBeat("v2_group2_police_depart",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Take them to the Uchiha Police.",actors:()=>groupTransferActors([AMT,PS],"POLICE",false),preset:"escort",cues:W("custodyGolden06B","group2_police_depart"),nextBeatId:"v2_group2_police_handoff"});
-addBeat("v2_group2_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>groupTransferActors([AMT,PS],"POLICE",true),preset:"escort",cues:W("custodyGolden06B","group2_police_handoff"),onAdvance:()=>completeDirectGroupTransfer([AMT,PS],"POLICE","group2"),nextBeatId:"v2_report"});
+addBeat("v2_group2_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>groupTransferActors([AMT,PS],"POLICE",true),preset:"police_handoff",cues:W("custodyGolden06B","group2_police_handoff"),onAdvance:()=>completeDirectGroupTransfer([AMT,PS],"POLICE","group2"),nextBeatId:"v2_report"});
 addBeat("v2_group2_release",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi","amt","ps"],preset:"post_battle",cues:W("custodyGolden06B","group2_release"),nextBeatId:"v2_report"});
 
 addBeat("v2_group3_anbu_depart",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Bring them to ANBU.",actors:()=>groupTransferActors([AMT,PS,MI],"ANBU",false),preset:"escort",cues:W("custodyGolden06B","group3_anbu_depart"),nextBeatId:"v2_group3_anbu_handoff"});
 addBeat("v2_group3_anbu_handoff",{backdrop:B.rooftop,location:"ANBU ROOFTOP · NIGHT",objective:"Transfer custody.",actors:()=>groupTransferActors([AMT,PS,MI],"ANBU",true),preset:"anbu_report",cues:W("custodyGolden06B","group3_anbu_handoff"),onAdvance:()=>completeDirectGroupTransfer([AMT,PS,MI],"ANBU","group3"),nextBeatId:"v2_report"});
 addBeat("v2_group3_police_depart",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Take them to the Uchiha Police.",actors:()=>groupTransferActors([AMT,PS,MI],"POLICE",false),preset:"escort",cues:W("custodyGolden06B","group3_police_depart"),nextBeatId:"v2_group3_police_handoff"});
-addBeat("v2_group3_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>groupTransferActors([AMT,PS,MI],"POLICE",true),preset:"escort",cues:W("custodyGolden06B","group3_police_handoff"),onAdvance:()=>completeDirectGroupTransfer([AMT,PS,MI],"POLICE","group3"),nextBeatId:"v2_report"});
+addBeat("v2_group3_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>groupTransferActors([AMT,PS,MI],"POLICE",true),preset:"police_handoff",cues:W("custodyGolden06B","group3_police_handoff"),onAdvance:()=>completeDirectGroupTransfer([AMT,PS,MI],"POLICE","group3"),nextBeatId:"v2_report"});
 addBeat("v2_group3_release",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi","amt","ps","mi"],preset:"post_battle",cues:W("custodyGolden06B","group3_release"),nextBeatId:"v2_report"});
 
 addBeat("v2_collected_anbu_handoff",{backdrop:B.rooftop,location:"ANBU ROOFTOP · NIGHT",objective:"Transfer custody.",actors:()=>collectedHandoffActors("ANBU"),preset:"anbu_report",cues:()=>collectedHandoffCues("ANBU"),onAdvance:()=>deliverRestrainedGroup("ANBU"),nextBeatId:"v2_report"});
-addBeat("v2_collected_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>collectedHandoffActors("POLICE"),preset:"escort",cues:()=>collectedHandoffCues("POLICE"),onAdvance:()=>deliverRestrainedGroup("POLICE"),nextBeatId:"v2_report"});
+addBeat("v2_collected_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>collectedHandoffActors("POLICE"),preset:"police_handoff",cues:()=>collectedHandoffCues("POLICE"),onAdvance:()=>deliverRestrainedGroup("POLICE"),nextBeatId:"v2_report"});
 
 // ---------------------------------------------------------------------------
 // FINAL TWO-OUTCOME DISPOSITION RESULT PRESENTATION.
@@ -1495,10 +1514,66 @@ addBeat("v2_amt_restrain_collect_result",{backdrop:B.intercept,location:"KONOHA 
 addBeat("v2_group2_kill_result",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi","amt","ps"],preset:"post_battle",cues:()=>groupKillCues([AMT,PS]),nextBeatId:"v2_report"});
 addBeat("v2_group3_kill_result",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi","amt","ps","mi"],preset:"post_battle",cues:()=>groupKillCues([AMT,PS,MI]),nextBeatId:"v2_report"});
 
+
+function hasTerminalTransferHistory(s,label){
+  return !!(s&&Array.isArray(s.routeHistory)&&s.routeHistory.some(row=>row&&row.label===label));
+}
+function correctedTerminalReportCues(){
+  const s=state();if(!s)return[];
+  const cues=[];
+  const alreadyAtMissionGiver=hasTerminalTransferHistory(s,"DIRECT_TO_ANBU")||hasTerminalTransferHistory(s,"GROUP_TO_ANBU")||hasTerminalTransferHistory(s,"COLLECTED_TO_ANBU");
+  if(!alreadyAtMissionGiver)cues.push(...G("f07c.return_open"));
+  else cues.push(Q("ANBU OPERATIVE","Report."));
+  cues.push(...routeReportCues(s),...packageReportCues(s));
+  if(lethalIntentRefs(s).length)cues.push(...lethalReportCues(s));
+  else cues.push(...nonlethalParticipantReportCues(s));
+  cues.push(...knowledgeReportCues(s),...pakkunReportAndDepartureCues(s),...G("f07c.report_close"));
+  return cues;
+}
+function hiddenReviewSurvivorKeys(s=state()){
+  return ["MI","PS","AMT"].filter(key=>s&&s.participants&&s.participants[key]&&s.participants[key].state!=="KILLED");
+}
+function hiddenReviewActors(){
+  const map={MI:"mi",PS:"ps",AMT:"amt"};
+  return["anbu","minato",...hiddenReviewSurvivorKeys().map(key=>map[key])];
+}
+function hiddenReviewCues(){
+  const s=state();if(!s)return[];
+  const alive=hiddenReviewSurvivorKeys(s),killed=["MI","PS","AMT"].filter(key=>!alive.includes(key)),out=[...G("f07c.hidden_open")];
+  if(killed.length===0)out.push(...G("f07c.hidden_base_all_alive"));
+  if(alive.length===3&&["MI","PS","AMT"].every(key=>s.participants[key]&&s.participants[key].state==="ANBU_CUSTODY"))out.push(...G("f07c.hidden_all3_anbu"));
+  if(alive.some(key=>s.participants[key]&&s.participants[key].state==="POLICE_CUSTODY"))out.push(...G("f07c.hidden_police"));
+  if(alive.some(key=>s.participants[key]&&s.participants[key].state==="RELEASED"))out.push(...G("f07c.hidden_release"));
+  for(const key of alive){
+    const row=s.participants[key]||{};
+    if(row.state==="RESTRAINED")out.push(...G("f07c.hidden_restrained_"+key.toLowerCase()));
+    if(row.state==="ESCAPED"&&(row.disposition==="RESTRAIN"||row.restrainIntent===true))out.push(...G("f07c.hidden_restrain_escape_"+key.toLowerCase()));
+    if(row.state==="ESCAPED"&&(row.disposition==="KILL"||row.lethalIntent===true))out.push(...G("f07c.hidden_lethal_escape_"+key.toLowerCase()));
+  }
+  if(killed.includes("MI"))out.push(...G("f07c.hidden_mi_killed"));
+  if(killed.includes("PS"))out.push(...G("f07c.hidden_ps_killed"));
+  if(killed.includes("AMT"))out.push(...G("f07c.hidden_amt_killed"));
+  if(killed.length===3)out.push(...G("f07c.hidden_all3_killed"));
+  if(killed.length>0){
+    if(alive.includes("AMT"))out.push(...G("f07c.reveal_question_amt"));
+    else if(alive.includes("PS"))out.push(Q("PACKAGE SMUGGLER","Does Kakashi know?"),Q("MINATO","No."));
+    else if(alive.includes("MI"))out.push(Q("MASKED INTERCEPTOR","Does Kakashi know?"),Q("MINATO","No."));
+    else out.push(Q("ANBU OPERATIVE","Does Kakashi know?"),Q("MINATO","No."));
+  }
+  out.push(...(killed.length?G("f07c.close_high"):G("f07c.close_low")));
+  return out;
+}
+function completeAndContinueAcademyKakashiV2Origin(){
+  // Completion truth belongs to the shared Origin authority. The Story engine
+  // owns exitScene + returnContext projection into the existing Journey /
+  // Academy Team Formation continuity surface. Do not invent a second UI API.
+  return completeAcademyKakashiV2Origin();
+}
+
 // ---------------------------------------------------------------------------
 // TERMINAL — factual report -> private evaluation -> Receipt -> Origin complete.
 // ---------------------------------------------------------------------------
-addBeat("v2_report",{backdrop:B.rooftop,location:"ANBU REPORT · KONOHA ROOFTOP · NIGHT",objective:"Report to ANBU.",actors:()=>{const s=state();return s&&s.pakkun.present?["kakashi","pakkun","anbu"]:["kakashi","anbu"];},preset:"anbu_report",transition:"wipe",onEnter:()=>mutate(s=>{if(s.package.holder==="KAKASHI"){s.package.holder="ANBU";s.package.returned=true;}s.terminal.reportReached=true;}),onAdvance:()=>mutate(s=>{if(s.pakkun.present){s.pakkun.present=false;s.pakkun.departed=true;}}),cues:()=>dynamicTerminalCues(),nextBeatId:"v2_minato"});
+addBeat("v2_report",{backdrop:B.rooftop,location:"ANBU REPORT · KONOHA ROOFTOP · NIGHT",objective:"Report to ANBU.",actors:()=>{const s=state();return s&&s.pakkun.present?["kakashi","pakkun","anbu"]:["kakashi","anbu"];},preset:"anbu_report",transition:"wipe",onEnter:()=>mutate(s=>{if(s.package.holder==="KAKASHI"){s.package.holder="ANBU";s.package.returned=true;}s.terminal.reportReached=true;}),onAdvance:()=>mutate(s=>{if(s.pakkun.present){s.pakkun.present=false;s.pakkun.departed=true;}s.terminal.kakashiDismissed=true;}),cues:()=>correctedTerminalReportCues(),nextBeatId:"v2_hidden_review"});
 function commitTerminalRewardsAtReceipt(){
   const s=state(),rt=active();if(!s||!rt)return{success:false,reason:"kakashi_v2_state_missing"};
   s.terminal.receiptReached=true;save();
@@ -1517,9 +1592,8 @@ function completeAcademyKakashiV2Origin(){
   const result=typeof completeChronicleOriginPrologue==="function"?completeChronicleOriginPrologue(ORIGIN_ID,[`kakashi_v2:${rt.instanceId}`]):{success:false,reason:"origin_completion_api_missing"};
   return result&&result.success?{success:true,originCompletion:result}:result;
 }
-addBeat("v2_minato",{backdrop:B.hokage,location:"HOKAGE ADMINISTRATION · NIGHT",objective:null,actors:["anbu","minato"],preset:"hokage_report",transition:"wipe",onEnter:()=>mutate(s=>{s.terminal.minatoReached=true;}),cues:()=>minatoCues(),nextBeatId:"v2_receipt"});
-addBeat("v2_receipt",{backdrop:B.hokage,location:"CHRONICLE RECEIPT",objective:null,actors:[],preset:"chronicle_receipt",transition:"wipe",receipt:true,onEnter:()=>commitTerminalRewardsAtReceipt(),cues:()=>receiptCues(),nextBeatId:"v2_complete"});
-addBeat("v2_complete",{backdrop:B.hokage,location:"CHRONICLE CLOSED",objective:null,actors:[],preset:"chronicle_receipt",cues:[RECORD("Origin occurrence sealed. Continue to Academy Team Formation.")],onAdvance:()=>completeAcademyKakashiV2Origin(),exitScene:true});
+addBeat("v2_hidden_review",{backdrop:B.hokage,location:"HOKAGE ADMINISTRATION · NIGHT",objective:null,actors:()=>hiddenReviewActors(),preset:"hokage_test_review",transition:"wipe",presentationPackageHolder:"MINATO",onEnter:()=>mutate(s=>{s.terminal.minatoReached=true;s.terminal.hiddenTestReviewReached=true;}),cues:()=>hiddenReviewCues(),nextBeatId:"v2_receipt"});
+addBeat("v2_receipt",{backdrop:B.hokage,location:"CHRONICLE RECEIPT",objective:null,actors:[],preset:"chronicle_receipt",transition:"wipe",receipt:true,onEnter:()=>commitTerminalRewardsAtReceipt(),cues:()=>receiptCues(),onAdvance:()=>completeAndContinueAcademyKakashiV2Origin(),exitScene:true});
 
 // Register production scene.
 try{unregisterStoryScene(SCENE_ID);}catch(_e){}
@@ -1545,17 +1619,21 @@ function diagnostics(){
  const root=def&&def.beatMap.get("v2_scene02_tail"),watch=def&&def.beatMap.get("v2_watch_exchange");
  const checks={
   sceneRegistered:!!def,
-  exactRootChoices:!!root&&root.choices.map(c=>c.label).join("|")==="WATCH THE EXCHANGE|MOVE IN CLOSER|STRIKE BEFORE THE HANDOFF|SLIP IN FOR THE PACKAGE",
-  exactWatchChoices:!!watch&&watch.choices.map(c=>c.label).join("|")==="STOP THE ASSASSIN|SECURE THE PACKAGE|SECURE THE PACKAGE BEFORE THE ASSASSIN|DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE|GO AFTER THE ORIGINAL TARGET",
+  exactRootChoices:!!root&&root.choices.map(c=>c.label).join("|")==="WATCH THE HANDOFF|GET CLOSER|INTERRUPT THE HANDOFF|SLIP IN AND TAKE IT",
+  exactWatchChoices:!!watch&&watch.choices.map(c=>c.label).join("|")==="INTERCEPT THE MASKED ATTACKER|GO FOR THE PACKAGE|BEAT HER TO THE PACKAGE|DEAL WITH HER FIRST|CHASE THE MAN FROM THE PHOTO",
   tenBattleConfigsAvailable:!!globalThis.SC_ACADEMY_KAKASHI_V2_BATTLE_36010&&Object.keys(globalThis.SC_ACADEMY_KAKASHI_V2_BATTLE_36010.configs||{}).length===10,
   currentLethalLabels:JSON.stringify(beats).includes("KILL HER")&&JSON.stringify(beats).includes("KILL HIM")&&JSON.stringify(beats).includes("KILL THEM")&&!JSON.stringify(beats).includes("ATTEMPT"+" TO KILL"),
   stopAssassinUsesDirectMiConfig:!!def&&def.beatMap.get("v2_battle_mi_stop")?.battle?.encounterId==="academy_kakashi_origin_battle_mi_1v1",
-  stopAssassinPackageOnlyCatchup:!!def&&def.beatMap.get("v2_mi_stop_win")?.choices?.some(c=>c.label==="GO AFTER PACKAGE SMUGGLER")&&!def.beatMap.get("v2_mi_stop_win")?.choices?.some(c=>c.label==="GO AFTER ANBU MARKED TARGET"),
+  stopAssassinPackageOnlyCatchup:!!def&&def.beatMap.get("v2_mi_stop_win")?.choices?.some(c=>c.label==="CHASE THE PACKAGE")&&!def.beatMap.get("v2_mi_stop_win")?.choices?.some(c=>c.label==="CHASE THE MAN FROM THE PHOTO"),
   stopAssassinThreeActionGate:STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS===3,
   stableFactualResolver:Object.keys(factualDefs).length>=7,
   noDomOwnership:!String(addBeat).includes("document.")&&!String(resolveFactual).includes("querySelector"),
   terminalRewardsCommittedAtReceipt:String(commitTerminalRewardsAtReceipt).includes("commitAcademyKakashiV2TerminalRewards36015"),
   terminalCompleteCallsOrigin:String(completeAcademyKakashiV2Origin).includes("completeChronicleOriginPrologue"),
+  correctedHiddenTestTerminal:!!def&&def.beatMap.has("v2_hidden_review")&&!def.beatMap.has("v2_complete")&&String(hiddenReviewCues).includes("f07c.hidden_base_all_alive"),
+  receiptExitsDirectly:!!def&&def.beatMap.get("v2_receipt")?.exitScene===true&&String(completeAndContinueAcademyKakashiV2Origin).includes("completeAcademyKakashiV2Origin"),
+  policeCardsProjected:String(policePairForParticipantKeys).includes("policeMiMale")&&String(policePairForParticipantKeys).includes("policePsFemale")&&String(groupTransferActors).includes('institution==="POLICE"'),
+  resolverPseudoChoicesRetired:!JSON.stringify(beats).includes('"CONTINUE"')&&beats.filter(b=>b.machineResolved===true).length===11&&beats.filter(b=>b.machineResolved===true).every(b=>b.mode==="choice"&&b.uiHints&&b.uiHints.kakashiMachineResolved===true&&b.choices.length===2&&b.choices.every(ch=>ch.label==="RESOLVE RESULT")),
   browserGoldenClaimed:false
  };
  const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);

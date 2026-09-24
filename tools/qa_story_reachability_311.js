@@ -91,7 +91,7 @@ function loadKakashiV2Scene(){
   };
   ctx.globalThis=ctx;
   vm.createContext(ctx);
-  for(const rel of ["runtime/academy-kakashi-v2-content-36000.js","runtime/alpha-kakashi-v2-core-36020.js"]){
+  for(const rel of ["runtime/academy-kakashi-v2-content-36000.js","runtime/academy-kakashi-v2-writing-golden-36100.js","runtime/alpha-kakashi-v2-core-36020.js"]){
     const file=path.join(ROOT,rel);
     vm.runInContext(fs.readFileSync(file,"utf8"),ctx,{filename:file});
   }
