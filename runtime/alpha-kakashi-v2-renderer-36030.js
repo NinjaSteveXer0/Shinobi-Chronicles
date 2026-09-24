@@ -73,19 +73,36 @@ function installStyle(){
 #${ROOT_ID}[data-preset="hokage_report"] .kv2-actor[data-slot="anbu"]{--kv2-x:13%;--kv2-y:0}
 #${ROOT_ID}[data-preset="hokage_report"] .kv2-actor[data-slot="minato"]{--kv2-x:67%;--kv2-y:12%}
 #${ROOT_ID} .kv2-actor img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}
-/* Final Kakashi Golden motion policy: actor/card choreography is static.
-   Story truth and cue-local staging still advance, but no actor animation owns frames. */
-#${ROOT_ID} .kv2-actor.is-entering{animation:none!important}
-#${ROOT_ID} .kv2-ghost-layer{display:none!important}
-#${ROOT_ID} .kv2-actor-ghost,#${ROOT_ID} .kv2-departure-ghost,#${ROOT_ID} .kv2-outgoing-hold-ghost{display:none!important;animation:none!important;transition:none!important}
-#${ROOT_ID} [data-sc-choreography-active],
-#${ROOT_ID} .sc-choreo-enter,#${ROOT_ID} .sc-choreo-surprise-entry,#${ROOT_ID} .sc-choreo-collapse,#${ROOT_ID} .sc-choreo-flee,#${ROOT_ID} .sc-choreo-exit,
-#${ROOT_ID} .sc-choreo-reposition,#${ROOT_ID} .sc-choreo-handoff,#${ROOT_ID} .sc-choreo-object-transfer,
-#${ROOT_ID} .sc-choreo-focus,#${ROOT_ID} .sc-choreo-strike,#${ROOT_ID} .sc-choreo-recoil,#${ROOT_ID} .sc-choreo-lunge{
-  animation:none!important;transition:none!important;transform:none!important;will-change:auto!important
+/* Final Kakashi Browser-Golden motion benchmark:
+   shared choreography still owns sequencing/timing, while this renderer uses
+   compositor-friendly CSS longhands so animation never fights stage-anchor transform. */
+#${ROOT_ID} .kv2-actor.is-entering{animation:kv2SafeEnter36030 .24s cubic-bezier(.2,.8,.2,1) both}
+#${ROOT_ID} .kv2-ghost-layer{position:absolute;inset:0;z-index:12;pointer-events:none;overflow:hidden}
+#${ROOT_ID} .kv2-actor-ghost{position:absolute!important;z-index:1!important;margin:0!important;pointer-events:none!important;transform:none!important}
+#${ROOT_ID} [data-sc-choreography-active]{will-change:translate,scale,rotate,opacity,filter!important;transform:none!important}
+#${ROOT_ID} .sc-choreo-focus{animation-name:kv2SafeFocus36030!important}
+#${ROOT_ID} .sc-choreo-enter{animation-name:kv2SafeEnter36030!important}
+#${ROOT_ID} .sc-choreo-surprise-entry{animation-name:kv2SafeSurprise36030!important}
+#${ROOT_ID} .sc-choreo-lunge,#${ROOT_ID} .sc-choreo-strike{animation-name:kv2SafeStrike36030!important}
+#${ROOT_ID} .sc-choreo-recoil{animation-name:kv2SafeRecoil36030!important}
+#${ROOT_ID} .sc-choreo-collapse{animation-name:kv2SafeCollapse36030!important}
+#${ROOT_ID} .sc-choreo-flee{animation-name:kv2SafeFlee36030!important}
+#${ROOT_ID} .sc-choreo-exit{animation-name:kv2SafeExit36030!important}
+#${ROOT_ID} .sc-choreo-reposition,#${ROOT_ID} .sc-choreo-handoff,#${ROOT_ID} .sc-choreo-object-transfer{animation:none!important}
+@keyframes kv2SafeFocus36030{0%{filter:brightness(.96)}55%{filter:brightness(1.09)}100%{filter:brightness(1)}}
+@keyframes kv2SafeEnter36030{from{opacity:0;translate:4vw 0;scale:.985}to{opacity:1;translate:0 0;scale:1}}
+@keyframes kv2SafeSurprise36030{from{opacity:0;translate:8vw 0;scale:.98;filter:brightness(.7)}to{opacity:1;translate:0 0;scale:1;filter:brightness(1)}}
+@keyframes kv2SafeStrike36030{0%{translate:0 0}52%{translate:5vw 0}100%{translate:0 0}}
+@keyframes kv2SafeRecoil36030{0%{translate:0 0}46%{translate:1.25vw 0}100%{translate:0 0}}
+@keyframes kv2SafeCollapse36030{from{opacity:1;translate:0 0;rotate:0deg;scale:1}to{opacity:0;translate:0 10%;rotate:2deg;scale:.98;filter:saturate(.4) brightness(.58)}}
+@keyframes kv2SafeFlee36030{from{opacity:1;translate:0 0;scale:1}to{opacity:0;translate:var(--sc-choreo-flee-x,22vw) 0;scale:.96}}
+@keyframes kv2SafeExit36030{from{opacity:1;translate:0 0}to{opacity:0;translate:4vw 0}}
+@media(prefers-reduced-motion:reduce){
+  #${ROOT_ID} [data-sc-choreography-active]{animation-name:kv2SafeReduced36030!important}
+  @keyframes kv2SafeReduced36030{from{opacity:.74}to{opacity:1}}
 }
-#${ROOT_ID} .kv2-card-frame{position:absolute;inset:0;border:1px solid rgba(210,172,80,.28);background:linear-gradient(180deg,transparent 50%,rgba(1,6,9,.68));box-shadow:inset 0 0 0 1px rgba(255,255,255,.018)}
-#${ROOT_ID} .kv2-actor-label{position:absolute;left:6%;right:6%;bottom:3%;padding:6px 8px;border:1px solid rgba(208,168,75,.4);background:rgba(2,7,11,.88);text-align:center;font-size:8px;font-weight:900;letter-spacing:.11em;color:#eee2c7;text-shadow:0 1px 2px #000}\n#${ROOT_ID} .kv2-actor-state{display:table;margin:4px auto 0;padding:2px 6px;border:1px solid rgba(92,215,225,.35);background:rgba(4,23,28,.82);color:#7fe1e8;font-size:7px;font-weight:900;letter-spacing:.08em}\n#${ROOT_ID} .kv2-object-layer{position:absolute;inset:0;z-index:16;pointer-events:none}\n#${ROOT_ID} .kv2-package-token{position:absolute;top:42%;left:var(--sc-stage-anchor-x,50%);width:64px;height:45px;transform:translate(-8%,-50%);display:grid;place-items:center;border:1px solid rgba(221,178,73,.75);background:linear-gradient(145deg,rgba(42,30,12,.95),rgba(12,14,13,.96));box-shadow:0 12px 28px rgba(0,0,0,.48),0 0 18px rgba(221,178,73,.12);color:#e4c66e;font-size:7px;font-weight:900;letter-spacing:.12em}\n#${ROOT_ID} .kv2-package-token::before{content:"";position:absolute;width:32px;height:21px;border:1px solid rgba(226,190,100,.64);background:linear-gradient(135deg,#4a3a21,#21190f);transform:rotate(-4deg)}\n#${ROOT_ID} .kv2-package-token span{position:absolute;top:calc(100% + 5px);white-space:nowrap;padding:3px 5px;background:rgba(2,8,11,.82);border:1px solid rgba(215,174,76,.32)}\n#${ROOT_ID} .kv2-package-token[hidden]{display:none!important}\n#${ROOT_ID} .kv2-departure-ghost,#${ROOT_ID} .kv2-outgoing-hold-ghost{position:absolute!important;z-index:13!important;pointer-events:none!important}\n#${ROOT_ID} .kv2-departure-ghost{display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.9) brightness(.94) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0)}\n#${ROOT_ID} .kv2-outgoing-hold-ghost{display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.96) brightness(.96) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0)}\n#${ROOT_ID} .kv2-departure-ghost img,#${ROOT_ID} .kv2-outgoing-hold-ghost img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}\n#${ROOT_ID} .kv2-actors{transition:none!important}
+#${ROOT_ID} .kv2-card-frame{display:none!important}
+#${ROOT_ID} .kv2-actor-label{position:absolute;left:6%;right:6%;bottom:3%;padding:6px 8px;border:1px solid rgba(208,168,75,.4);background:rgba(2,7,11,.88);text-align:center;font-size:8px;font-weight:900;letter-spacing:.11em;color:#eee2c7;text-shadow:0 1px 2px #000}\n#${ROOT_ID} .kv2-actor-state{display:table;margin:4px auto 0;padding:2px 6px;border:1px solid rgba(92,215,225,.35);background:rgba(4,23,28,.82);color:#7fe1e8;font-size:7px;font-weight:900;letter-spacing:.08em}\n#${ROOT_ID} .kv2-object-layer{position:absolute;inset:0;z-index:16;pointer-events:none}\n#${ROOT_ID} .kv2-package-token{position:absolute;top:42%;left:var(--sc-stage-anchor-x,50%);width:64px;height:45px;transform:translate(-8%,-50%);display:grid;place-items:center;border:1px solid rgba(221,178,73,.75);background:linear-gradient(145deg,rgba(42,30,12,.95),rgba(12,14,13,.96));box-shadow:0 12px 28px rgba(0,0,0,.48),0 0 18px rgba(221,178,73,.12);color:#e4c66e;font-size:7px;font-weight:900;letter-spacing:.12em}\n#${ROOT_ID} .kv2-package-token::before{content:"";position:absolute;width:32px;height:21px;border:1px solid rgba(226,190,100,.64);background:linear-gradient(135deg,#4a3a21,#21190f);transform:rotate(-4deg)}\n#${ROOT_ID} .kv2-package-token span{position:absolute;top:calc(100% + 5px);white-space:nowrap;padding:3px 5px;background:rgba(2,8,11,.82);border:1px solid rgba(215,174,76,.32)}\n#${ROOT_ID} .kv2-package-token[hidden]{display:none!important}\n#${ROOT_ID} .kv2-departure-ghost,#${ROOT_ID} .kv2-outgoing-hold-ghost{position:absolute!important;z-index:13!important;pointer-events:none!important;transform:none!important}\n#${ROOT_ID} .kv2-departure-ghost{display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.9) brightness(.94) drop-shadow(0 18px 24px rgba(0,0,0,.48))}\n#${ROOT_ID} .kv2-outgoing-hold-ghost{display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.96) brightness(.96) drop-shadow(0 18px 24px rgba(0,0,0,.48))}\n#${ROOT_ID} .kv2-departure-ghost img,#${ROOT_ID} .kv2-outgoing-hold-ghost img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}\n#${ROOT_ID} .kv2-actors{transition:none!important}
 #${ROOT_ID}[data-transition-active="true"] .kv2-actors{pointer-events:none!important}\n#${ROOT_ID} .kv2-dialogue{position:absolute;left:50%;bottom:3%;width:min(72%,980px);min-height:0;max-height:none;z-index:30;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto;column-gap:14px;padding:11px 15px 12px;transform:translateX(-50%);border:1px solid rgba(93,215,225,.32);border-radius:16px;background:linear-gradient(180deg,rgba(5,16,22,.88),rgba(2,9,14,.95));box-shadow:0 18px 48px rgba(0,0,0,.46),inset 0 0 0 1px rgba(255,255,255,.025);backdrop-filter:blur(8px)}
 #${ROOT_ID} .kv2-speaker{grid-column:1;grid-row:1;color:#e3bd5f;font-size:8px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;min-height:11px}
 #${ROOT_ID} .kv2-text{grid-column:1/-1;grid-row:2;margin-top:4px;max-height:8.5vh;overflow:auto;white-space:pre-wrap;color:#eef3f1;font-size:clamp(12px,.94vw,15px);line-height:1.42;text-shadow:0 1px 2px #000}
@@ -155,13 +172,12 @@ function actorMarkup(actor){
   figure.className="kv2-actor";
   figure.dataset.actorId=String(actor.id||"");
   figure.dataset.slot=actorSlot(actor);
-  const frame=document.createElement("div");frame.className="kv2-card-frame";
   const img=document.createElement("img");img.alt="";img.src=String(actor.image||"");
   const label=document.createElement("figcaption");label.className="kv2-actor-label";
   const name=document.createElement("strong");name.textContent=String(actor.label||"");
   const state=document.createElement("small");state.className="kv2-actor-state";state.hidden=true;
   label.append(name,state);
-  figure.append(frame,img,label);
+  figure.append(img,label);
   return figure;
 }
 function ensureRoot(layer){
@@ -348,10 +364,12 @@ function materializeRetainedHoldGhosts(root,capture,next){
   return out;
 }
 function preparePreCommitVisualSnapshot(){
-  const p=projection(),previous=lastProjectionSnapshot||snapshotProjection(p);
-  if(!previous)return{success:false,reason:"kakashi_v2_visual_snapshot_unavailable"};
-  pendingVisualSnapshot={previous,actorVisuals:[]};
-  return{success:true,actorCount:0,beatId:previous.id,presentationOnly:true,staticPresentation:true};
+  if(typeof document==="undefined")return{success:true,headless:true,presentationOnly:true};
+  const root=document.getElementById(ROOT_ID),p=projection();
+  const previous=lastProjectionSnapshot||snapshotProjection(p);
+  if(!root||!previous)return{success:false,reason:"kakashi_v2_visual_snapshot_unavailable"};
+  pendingVisualSnapshot={previous,actorVisuals:captureDepartureVisuals(root,previous)};
+  return{success:true,actorCount:pendingVisualSnapshot.actorVisuals.length,beatId:previous.id,presentationOnly:true};
 }
 function cancelPreparedVisualSnapshot(reason="cancelled"){
   const existed=!!pendingVisualSnapshot;pendingVisualSnapshot=null;
@@ -412,8 +430,17 @@ function deriveProjectionChoreography(root,previous,next,p,departures=[]){
   return cues;
 }
 function playProjectionTransition(root,previous,next,p,departures=[]){
-  if(root&&typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(root,"kakashi_golden_static_motion");
-  return{success:true,skipped:true,staticPresentation:true};
+  if(typeof playStoryChoreography33900!=="function"||!root||!previous||!next)return{success:true,skipped:true};
+  if(isHardProjectionTransition(previous,next)){
+    if(typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(root,"kakashi_hard_transition_owned_by_33900");
+    return{success:true,skipped:true,reason:"hard_transition_owned_by_33900"};
+  }
+  const supported=new Set(["ENTER","SURPRISE_ENTRY","FOCUS","STRIKE","LUNGE","RECOIL","COLLAPSE","FLEE","EXIT"]);
+  const cues=deriveProjectionChoreography(root,previous,next,p,departures).filter(row=>supported.has(row.kind));
+  if(!cues.length)return{success:true,skipped:true};
+  const rt=active(),actorSignature=(next.actors||[]).map(a=>a.id+"@"+a.anchor).join("|");
+  const scopeKey=(rt&&rt.instanceId||"kakashi")+":"+previous.id+"->"+next.id+":"+actorSignature;
+  return playStoryChoreography33900({root,scopeKey,cues});
 }
 
 function syncActors(root,actors,p){
@@ -525,12 +552,31 @@ function syncSpeech(root,p,cue,focused){
   }
 }
 function playCuePresentation(cueIndex){
-  // Cue-local actor presence and anchor changes are synchronously projected by
-  // applyWatchExchangeStaticState() during render(). No actor animation owns
-  // frames in the final Kakashi Golden presentation.
-  const root=typeof document!=="undefined"?document.getElementById(ROOT_ID):null;
-  if(root&&typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(root,"kakashi_cue_static_projection");
-  return{success:true,skipped:true,staticPresentation:true,cueIndex:Number(cueIndex)||0};
+  const root=typeof document!=="undefined"?document.getElementById(ROOT_ID):null,p=projection();
+  if(!root||!p||p.id!=="v2_watch_exchange"||typeof playStoryChoreography33900!=="function")return{success:true,skipped:true};
+  const idx=Number(cueIndex)||0,ps=(p.actors||[]).find(a=>actorSlot(a)==="ps"),mi=(p.actors||[]).find(a=>actorSlot(a)==="mi"),amt=(p.actors||[]).find(a=>actorSlot(a)==="amt");
+  let cues=[];
+  if(idx===9&&ps)cues=[{kind:"FOCUS",actorId:ps.id,durationMs:180}];
+  else if(idx===10&&mi&&ps){
+    const node=actorNodeBySlot(root,"mi");
+    if(node){node.hidden=false;delete node.dataset.kv2CueWithheld;node.removeAttribute("aria-hidden");}
+    if(node&&typeof applyStoryStageAnchor33900==="function")applyStoryStageAnchor33900(node,"CENTER");
+    cues=[{kind:"SURPRISE_ENTRY",actorId:mi.id,fromAnchor:"FAR_ENTRY_RIGHT",durationMs:300},{kind:"LUNGE",actorId:mi.id,targetId:ps.id,durationMs:220}];
+  }else if(idx===11&&amt){
+    const node=actorNodeBySlot(root,"amt");if(node)node.style.setProperty("--sc-choreo-flee-x","-24vw");
+    cues=[{kind:"FLEE",actorId:amt.id,durationMs:320}];
+  }
+  if(!cues.length)return{success:true,skipped:true};
+  const scopeKey=(active()&&active().instanceId||"kakashi")+":cue:"+p.id+":"+idx;
+  root.dataset.kv2CueMotion=p.id+":"+idx;
+  const result=playStoryChoreography33900({root,scopeKey,cues});
+  const total=cues.reduce((n,row)=>n+Number(row.durationMs||0),0)+40;
+  setTimeout(()=>{
+    if(!root.isConnected)return;
+    if(idx===11){const node=actorNodeBySlot(root,"amt");if(node)node.classList.add("kv2-cue-departed");}
+    if(root.dataset.kv2CueMotion===p.id+":"+idx)delete root.dataset.kv2CueMotion;
+  },Math.max(120,total));
+  return result;
 }
 function syncStandard(root,p,t){
   const cue=currentCue(p,t),speaker=cue.kind==="dialogue"?cue.speakerName:(cue.kind==="record"?"CHRONICLE RECEIPT":"NARRATION");
@@ -601,11 +647,13 @@ function render(){
   try{
     installStyle();layer.dataset.kakashiV2="true";const root=ensureRoot(layer);root.dataset.preset=p.preset||"standard";
     const prepared=pendingVisualSnapshot,previous=prepared&&prepared.previous||lastProjectionSnapshot,next=snapshotProjection(p),semanticChanged=!!previous&&!!next&&(previous.id!==next.id||previous.packageHolder!==next.packageHolder||JSON.stringify(previous.actors)!==JSON.stringify(next.actors));
+    const hardTransition=semanticChanged&&!!prepared&&isHardProjectionTransition(previous,next);
+    const departures=semanticChanged&&!!prepared&&!hardTransition?materializeDepartureGhosts(root,prepared,next):[];
     pendingVisualSnapshot=null;
     delete root.dataset.outgoingTableau;delete root.dataset.transitionActive;
     const t=cueState();
     if(p.preset==="chronicle_receipt")syncReceipt(root,p,t);else syncStandard(root,p,t);
-    if(semanticChanged)playProjectionTransition(root,previous,next,p,[]);
+    if(semanticChanged)playProjectionTransition(root,previous,next,p,departures);
     lastProjectionSnapshot=next;
     bind(root);return true;
   }finally{rendering=false;}
@@ -663,14 +711,16 @@ function diagnostics(){
     receiptReplacesScene:installStyle.toString().includes('[data-preset="chronicle_receipt"] .kv2-top')&&String(syncReceipt).includes("kv2-receipt"),
     projectionComesFromCore:String(projection).includes("getAcademyKakashiV2Presentation36020"),
     stableKeyedActorDom:!String(syncStandard).includes("innerHTML")&&!String(syncActors).includes("innerHTML")&&String(syncActors).includes("appendChild(node)"),
-    actorAnimationRetired:installStyle.toString().includes("Final Kakashi Golden motion policy")&&installStyle.toString().includes("animation:none!important;transition:none!important;transform:none!important;will-change:auto!important"),
-    ghostPresentationRetired:installStyle.toString().includes(".kv2-ghost-layer{display:none!important}")&&!String(render).includes("materializeDepartureGhosts(root"),
-    cueStateStillProjectsSynchronously:String(syncStandard).includes("applyWatchExchangeStaticState(root,p,t)")&&String(playCuePresentation).includes("staticPresentation:true"),
-    preCommitSnapshotHasNoActorClones:String(preparePreCommitVisualSnapshot).includes("actorVisuals:[]"),
+    phantomCardHolderRetired:installStyle.toString().includes(".kv2-card-frame{display:none!important}")&&!String(actorMarkup).includes('frame.className="kv2-card-frame"'),
+    compositorMotionUsesLonghands:installStyle.toString().includes("CSS longhands")&&installStyle.toString().includes("translate:4vw 0")&&installStyle.toString().includes("transform:none!important"),
+    sharedChoreographyStillOwnsQueue:String(playProjectionTransition).includes("playStoryChoreography33900({root,scopeKey,cues})")&&String(playCuePresentation).includes("playStoryChoreography33900({root,scopeKey,cues})"),
+    hardTransitionsDoNotCompeteWithActorMotion:String(playProjectionTransition).includes("hard_transition_owned_by_33900")&&String(render).includes("!hardTransition?materializeDepartureGhosts"),
+    boundedDepartureGhosts:String(preparePreCommitVisualSnapshot).includes("captureDepartureVisuals(root,previous)")&&String(render).includes("materializeDepartureGhosts(root,prepared,next)"),
+    cueStateStillProjectsSynchronously:String(syncStandard).includes("applyWatchExchangeStaticState(root,p,t)")&&String(playCuePresentation).includes('idx===10')&&String(playCuePresentation).includes('idx===11'),
     sharedTransitionHandoff:String(playSharedStoryHardTransition36030).includes("playStoryHardSceneTransition33900")&&String(render).includes('playSharedStoryHardTransition36030("story_to_battle"')&&String(render).includes('playSharedStoryHardTransition36030("battle_to_story"'),
     noDocumentCurtainOwnership:!installStyle.toString().includes("position:fixed;inset:0;z-index:2147483000")&&!String(render).includes("setGlobalCurtain"),
     rootTransitionLayersRetired:!installStyle.toString().includes(".kv2-transition-memory")&&!installStyle.toString().includes(".kv2-wipe")&&!String(ensureRoot).includes("kv2-transition-memory")&&!String(ensureRoot).includes("kv2-wipe"),
-    projectionChoreographyRetired:String(playProjectionTransition).includes("kakashi_golden_static_motion")&&!String(playProjectionTransition).includes("playStoryChoreography33900({"),
+    projectionChoreographyBounded:String(playProjectionTransition).includes('supported=new Set(["ENTER","SURPRISE_ENTRY","FOCUS","STRIKE","LUNGE","RECOIL","COLLAPSE","FLEE","EXIT"])')&&!String(playProjectionTransition).includes("OBJECT_TRANSFER"),
     deterministicActorSlots:String(actorSlot).includes("academy_kakashi_origin_masked_interceptor")&&installStyle.toString().includes('data-slot="minato"'),
     sharedSemanticAnchors:String(syncActors).includes("applyStoryStageAnchor33900")&&String(actorAnchor).includes("PLAYER_LEFT")&&String(actorAnchor).includes("OPPONENT_RIGHT"),
     packageTokenConsumesHolderTruth:String(syncPackageToken).includes("state.package")&&String(syncPackageToken).includes("packageHolder"),

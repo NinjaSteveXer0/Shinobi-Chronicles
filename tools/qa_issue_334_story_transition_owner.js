@@ -78,7 +78,7 @@ const rootBlock=fn(renderer,"ensureRoot");
 assert(!styleBlock.includes(".kv2-transition-memory")&&!styleBlock.includes(".kv2-wipe")&&!rootBlock.includes("kv2-transition-memory")&&!rootBlock.includes("kv2-wipe"),"36030 retained alternate root transition layer");
 assert(handoff.includes("playStoryHardSceneTransition33900"),"Story/Battle handoff does not use shared owner");
 assert(kakashiRender.includes('playSharedStoryHardTransition36030("story_to_battle"')&&kakashiRender.includes('playSharedStoryHardTransition36030("battle_to_story"'),"Story/Battle transition intents missing");
-assert(renderer.includes("Final Kakashi Golden motion policy"),"static actor/card stabilization was disturbed");
+assert(renderer.includes("Final Kakashi Browser-Golden motion benchmark")&&renderer.includes("hard_transition_owned_by_33900")&&renderer.includes("transform:none!important"),"Kakashi motion benchmark disturbed #334 shared hard-transition ownership");
 assert(!sharedPlay.includes("cloneNode(")&&!kakashiPost.includes("cloneNode(")&&!handoff.includes("cloneNode(")&&!kakashiRender.includes("cloneNode("),"#334 transition paths introduced clone/ghost ownership");
 
 const transitionRow=(registry.responsibilities||[]).find(r=>r.responsibilityId==="story.transition.presentation.shared");

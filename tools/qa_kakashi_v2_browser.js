@@ -144,13 +144,15 @@ async function inspect(page,label){
       visibleLegacyStorySurfaces:legacy.length,
       visibleNarrationSurfaces:visible(dialogue)?1:0,
       visibleSpeechSurfaces:visible(speech)?1:0,
-      receiptVisible:visible(receipt)
+      receiptVisible:visible(receipt),
+      phantomCardHolderCount:root?root.querySelectorAll(".kv2-card-frame").length:0
     };
   });
   assert(row.renderer.pass,label+" renderer: "+JSON.stringify(row.renderer));
   assert(row.transition.pass,label+" transition: "+JSON.stringify(row.transition));
   assert.strictEqual(row.visibleCanonicalRoots,1,label+" canonical Story root cardinality");
   assert.strictEqual(row.visibleLegacyStorySurfaces,0,label+" legacy Story surface visible");
+  assert.strictEqual(row.phantomCardHolderCount,0,label+" phantom Story card-holder chrome returned");
   if(row.preset==="chronicle_receipt"){
     assert.strictEqual(row.visibleNarrationSurfaces+row.visibleSpeechSurfaces,0,label+" receipt must replace Story text surfaces");
     assert.strictEqual(row.receiptVisible,true,label+" receipt not visible");
@@ -642,9 +644,9 @@ async function cleanRoute(browser){
       actorRows
     };
   });
-  assert.strictEqual(transitionProbe.ghostCount,0,"rooftop transition created actor ghosts: "+JSON.stringify(transitionProbe));
+  assert.strictEqual(transitionProbe.ghostCount,0,"hard rooftop transition created actor ghosts: "+JSON.stringify(transitionProbe));
   assert.strictEqual(transitionProbe.curtainCovered,true,"hard scene change did not use the global curtain: "+JSON.stringify(transitionProbe));
-  assert(transitionProbe.actorRows.every(row=>row.animationName==="none"&&row.transitionDuration==="0s"),"actor animation/tween survived Golden motion kill-switch: "+JSON.stringify(transitionProbe));
+  assert(transitionProbe.actorRows.every(row=>row.animationName==="none"&&row.transitionDuration==="0s"&&row.transform==="none"),"hard transition competed with actor motion/transform: "+JSON.stringify(transitionProbe));
   await waitUnlocked(page,"v2_scene02_tail");
   checkpoints.push(await waitCurtainClear(page,"rooftop-to-alley"));
   checkpoints.push(await inspect(page,"tail"));
@@ -773,6 +775,65 @@ async function assertRepeatedBattleReentry(page){
   };
 }
 
+async function assertSafeStoryMotion(page){
+  await page.evaluate(()=>{
+    const rt=getActiveStorySceneRuntime();
+    rt.localContext.__kakashiV2Presentation36040={beatId:"v2_watch_exchange",cueIndex:8,settled:true};
+    renderAcademyKakashiV236030();
+  });
+  const focus=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040());
+  assert(focus&&focus.success===true&&focus.semanticBeatUnchanged===true,JSON.stringify(focus));
+  const focusProbe=await page.evaluate(()=>{
+    const root=document.getElementById("kakashi-v2-scene-board");
+    const ps=[...root.querySelectorAll(".kv2-actor")].find(n=>n.dataset.slot==="ps");
+    const cs=ps&&getComputedStyle(ps);
+    return{transform:cs?.transform||null,animationName:cs?.animationName||null,active:ps?.dataset.scChoreographyActive||null,rootCount:document.querySelectorAll("#kakashi-v2-scene-board").length};
+  });
+  assert.strictEqual(focusProbe.rootCount,1,"focus motion remounted Story root");
+  assert.strictEqual(focusProbe.transform,"none","focus motion revived transform chain: "+JSON.stringify(focusProbe));
+
+  const surprise=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040());
+  assert(surprise&&surprise.success===true&&surprise.semanticBeatUnchanged===true,JSON.stringify(surprise));
+  const surpriseProbe=await page.evaluate(()=>{
+    const root=document.getElementById("kakashi-v2-scene-board");
+    const mi=[...root.querySelectorAll(".kv2-actor")].find(n=>n.dataset.slot==="mi");
+    const cs=mi&&getComputedStyle(mi);
+    return{transform:cs?.transform||null,translate:cs?.translate||null,animationName:cs?.animationName||null,active:mi?.dataset.scChoreographyActive||null,rootCount:document.querySelectorAll("#kakashi-v2-scene-board").length};
+  });
+  assert.strictEqual(surpriseProbe.rootCount,1,"surprise-entry motion remounted Story root");
+  assert.strictEqual(surpriseProbe.transform,"none","surprise-entry revived transform chain: "+JSON.stringify(surpriseProbe));
+  assert(/kv2SafeSurprise36030|kv2SafeStrike36030/.test(String(surpriseProbe.animationName||""))||["SURPRISE_ENTRY","LUNGE"].includes(surpriseProbe.active),"surprise-entry/lunge compositor motion did not start: "+JSON.stringify(surpriseProbe));
+
+  await pause(620);
+  const surpriseSettled=await page.evaluate(()=>{
+    const root=document.getElementById("kakashi-v2-scene-board");
+    return{active:root.querySelectorAll("[data-sc-choreography-active]").length,rootCount:document.querySelectorAll("#kakashi-v2-scene-board").length};
+  });
+  assert.strictEqual(surpriseSettled.active,0,"surprise-entry choreography failed to settle");
+  assert.strictEqual(surpriseSettled.rootCount,1,"surprise-entry settle changed Story root cardinality");
+
+  const flee=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040());
+  assert(flee&&flee.success===true&&flee.semanticBeatUnchanged===true,JSON.stringify(flee));
+  const fleeProbe=await page.evaluate(()=>{
+    const root=document.getElementById("kakashi-v2-scene-board");
+    const amt=[...root.querySelectorAll(".kv2-actor")].find(n=>n.dataset.slot==="amt");
+    const cs=amt&&getComputedStyle(amt);
+    return{transform:cs?.transform||null,translate:cs?.translate||null,animationName:cs?.animationName||null,active:amt?.dataset.scChoreographyActive||null};
+  });
+  assert.strictEqual(fleeProbe.transform,"none","flee motion revived transform chain: "+JSON.stringify(fleeProbe));
+  assert(/kv2SafeFlee36030/.test(String(fleeProbe.animationName||""))||fleeProbe.active==="FLEE","AMT flee compositor motion did not start: "+JSON.stringify(fleeProbe));
+  await pause(420);
+  const fleeSettled=await page.evaluate(()=>{
+    const root=document.getElementById("kakashi-v2-scene-board");
+    const amt=[...root.querySelectorAll(".kv2-actor")].find(n=>n.dataset.slot==="amt");
+    return{active:root.querySelectorAll("[data-sc-choreography-active]").length,departed:!!amt&&amt.classList.contains("kv2-cue-departed"),ghosts:root.querySelectorAll(".kv2-actor-ghost").length};
+  });
+  assert.strictEqual(fleeSettled.active,0,"flee choreography failed to settle");
+  assert.strictEqual(fleeSettled.departed,true,"AMT did not settle into departed cue state");
+  assert.strictEqual(fleeSettled.ghosts,0,"cue-local flee leaked a detached ghost");
+  return{focusProbe,surpriseProbe,surpriseSettled,fleeProbe,fleeSettled};
+}
+
 async function visualAndBattle(browser){
   const {context,page,runtimeErrorGate}=await boot(browser);
   await drain(page);
@@ -784,6 +845,7 @@ async function visualAndBattle(browser){
   const actorCount=await page.locator("#kakashi-v2-scene-board .kv2-actor").count();
   assert.strictEqual(actorCount,3,"WATCH THE EXCHANGE actor count");
   await shot(page,"08-watch-exchange.png");
+  const motionBenchmark=await assertSafeStoryMotion(page);
 
   await page.evaluate(()=>{
     const rt=getActiveStorySceneRuntime();
@@ -816,9 +878,16 @@ async function visualAndBattle(browser){
   });
   assert.strictEqual(killTransition.beatId,"v2_mi_kill_result","kill semantic result did not enter exact resolver-result beat");
   assert(["KILLED","ESCAPED"].includes(killTransition.dispositionOutcome),"kill resolver produced invalid final outcome: "+JSON.stringify(killTransition));
-  assert.strictEqual(killTransition.ghostCount,0,"kill result created actor/hold ghosts: "+JSON.stringify(killTransition));
+  assert(killTransition.ghostCount<=1,"kill result created duplicate actor ghosts: "+JSON.stringify(killTransition));
   assert.strictEqual(killTransition.curtainCovered,false,"same-environment kill result incorrectly invoked hard curtain: "+JSON.stringify(killTransition));
-  assert(killTransition.actorRows.every(row=>row.animationName==="none"&&row.transitionDuration==="0s"),"kill-result actor animation survived static Golden policy: "+JSON.stringify(killTransition));
+  assert(killTransition.actorRows.every(row=>row.transitionDuration==="0s"&&row.transform==="none"),"kill-result motion revived transform/tween chain: "+JSON.stringify(killTransition));
+  await pause(520);
+  const killMotionSettled=await page.evaluate(()=>{
+    const root=document.getElementById("kakashi-v2-scene-board");
+    return{active:root?.querySelectorAll("[data-sc-choreography-active]").length||0,ghostCount:root?.querySelectorAll(".kv2-actor-ghost,.kv2-departure-ghost,.kv2-outgoing-hold-ghost").length||0};
+  });
+  assert.strictEqual(killMotionSettled.active,0,"kill-result choreography failed to settle");
+  assert.strictEqual(killMotionSettled.ghostCount,0,"kill-result departure ghost failed to clean up");
   await nextSemantic(page,"v2_report");
   await waitCurtainClear(page,"kill-to-report");
   await shot(page,"09-kill-report-after-curtain.png");
@@ -893,7 +962,7 @@ async function visualAndBattle(browser){
   const lifecycleReentry=await assertRepeatedBattleReentry(page);
   const browserErrors=await runtimeErrorGate.assertClean("visualAndBattle");
   await context.close();
-  return{watch,killTransition,killCleanup,battle,post,lifecycleReentry,browserErrors};
+  return{watch,motionBenchmark,killTransition,killMotionSettled,killCleanup,battle,post,lifecycleReentry,browserErrors};
 }
 
 async function browserRouteMatrix(browser){

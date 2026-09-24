@@ -190,46 +190,92 @@ async function shot(page,name,selector=null){
     assert(anticipation.transitions.every(x=>x==="0s"),"#312 Kakashi actor tween survived at WATCH cue 9: "+JSON.stringify(anticipation));
 
     await advanceWatchCue(10);
-    watch=await page.evaluate(()=>{
+    const revealMotion=await page.evaluate(()=>{
       const root=document.getElementById("kakashi-v2-scene-board");
       const mi=root.querySelector('.kv2-actor[data-slot="mi"]');
       const amt=root.querySelector('.kv2-actor[data-slot="amt"]');
+      const style=mi?getComputedStyle(mi):null;
       return{
         miAnchor:mi?.dataset.scStageAnchor,
         miWithheld:mi?.dataset.kv2CueWithheld==="true",
         miHidden:mi?.hidden===true,
-        miOpacity:mi?Number(getComputedStyle(mi).opacity):0,
+        miOpacity:style?Number(style.opacity):0,
+        miAnimation:style?.animationName||null,
+        miTransform:style?.transform||null,
+        miActive:mi?.dataset.scChoreographyActive||null,
         amtLeft:amt?.getBoundingClientRect().left||0,
         ghostCount:root.querySelectorAll(".kv2-actor-ghost,.kv2-departure-ghost,.kv2-outgoing-hold-ghost").length
       };
     });
-    assert.strictEqual(watch.miAnchor,"CENTER");
-    assert.strictEqual(watch.miWithheld,false,"#312 Masked Interceptor remained withheld after authored reveal cue");
-    assert.strictEqual(watch.miHidden,false,"#312 Masked Interceptor remained hard-hidden after authored reveal cue");
-    assert(watch.miOpacity>=0.75,"#312 Masked Interceptor did not become visible after authored reveal: "+watch.miOpacity);
-    assert.strictEqual(watch.ghostCount,0,"#312 WATCH reveal created ghost animation furniture");
-    await shot(page,"02-story-handoff-static-reveal.png","#kakashi-v2-scene-board");
+    assert.strictEqual(revealMotion.miAnchor,"CENTER");
+    assert.strictEqual(revealMotion.miWithheld,false,"#312 Masked Interceptor remained withheld after authored reveal cue");
+    assert.strictEqual(revealMotion.miHidden,false,"#312 Masked Interceptor remained hard-hidden after authored reveal cue");
+    assert.strictEqual(revealMotion.miTransform,"none","#312 MI surprise entrance revived the rejected transform chain: "+JSON.stringify(revealMotion));
+    assert(/kv2SafeSurprise36030|kv2SafeStrike36030/.test(String(revealMotion.miAnimation||""))||["SURPRISE_ENTRY","LUNGE"].includes(revealMotion.miActive),"#312 MI reveal did not start bounded shared choreography: "+JSON.stringify(revealMotion));
+    assert.strictEqual(revealMotion.ghostCount,0,"#312 WATCH reveal created ghost animation furniture");
+    await page.waitForTimeout(620);
+    watch=await page.evaluate(()=>{
+      const root=document.getElementById("kakashi-v2-scene-board");
+      const mi=root.querySelector('.kv2-actor[data-slot="mi"]');
+      const ps=root.querySelector('.kv2-actor[data-slot="ps"]');
+      const style=mi?getComputedStyle(mi):null;
+      const peerStyle=ps?getComputedStyle(ps):null;
+      return{
+        miOpacity:style?Number(style.opacity):0,
+        peerOpacity:peerStyle?Number(peerStyle.opacity):0,
+        miTransform:style?.transform||null,
+        active:root.querySelectorAll("[data-sc-choreography-active]").length,
+        rootCount:document.querySelectorAll("#kakashi-v2-scene-board").length
+      };
+    });
+    assert(watch.miOpacity>=0.9&&Math.abs(watch.miOpacity-watch.peerOpacity)<=0.03,"#312 Masked Interceptor did not settle at normal visible actor opacity after authored entrance: "+JSON.stringify(watch));
+    assert.strictEqual(watch.miTransform,"none","#312 MI transform chain survived entrance settle");
+    assert.strictEqual(watch.active,0,"#312 MI reveal choreography failed to settle");
+    assert.strictEqual(watch.rootCount,1,"#312 MI reveal remounted canonical Story root");
+    await shot(page,"02-story-handoff-motion-reveal.png","#kakashi-v2-scene-board");
 
     await advanceWatchCue(11);
-    const breakaway=await page.evaluate(()=>{
+    let breakaway=await page.evaluate(()=>{
       const root=document.getElementById("kakashi-v2-scene-board");
       const amt=root.querySelector('.kv2-actor[data-slot="amt"]');
       const ps=root.querySelector('.kv2-actor[data-slot="ps"]');
+      const style=amt?getComputedStyle(amt):null;
       return{
         amtDeparted:amt?.classList.contains("kv2-cue-departed")===true,
-        amtOpacity:amt?Number(getComputedStyle(amt).opacity):1,
-        amtAnimation:amt?getComputedStyle(amt).animationName:null,
-        amtTransition:amt?getComputedStyle(amt).transitionDuration:null,
+        amtOpacity:style?Number(style.opacity):1,
+        amtAnimation:style?.animationName||null,
+        amtTransform:style?.transform||null,
+        amtActive:amt?.dataset.scChoreographyActive||null,
         psAnchor:ps?.dataset.scStageAnchor,
         ghostCount:root.querySelectorAll(".kv2-actor-ghost,.kv2-departure-ghost,.kv2-outgoing-hold-ghost").length
       };
     });
-    assert.strictEqual(breakaway.amtDeparted,true,"#312 ANBU Marked Target did not leave at the authored breakaway cue");
-    assert(breakaway.amtOpacity<=0.01,"#312 AMT remained visible after static breakaway");
-    assert.strictEqual(breakaway.amtAnimation,"none","#312 AMT breakaway still owns an animation");
-    assert.strictEqual(breakaway.amtTransition,"0s","#312 AMT breakaway still owns a tween");
-    assert.strictEqual(breakaway.ghostCount,0,"#312 AMT breakaway created a departure ghost");
+    assert.strictEqual(breakaway.amtTransform,"none","#312 AMT breakaway revived the rejected transform chain: "+JSON.stringify(breakaway));
+    assert(/kv2SafeFlee36030/.test(String(breakaway.amtAnimation||""))||breakaway.amtActive==="FLEE","#312 AMT authored breakaway motion did not start: "+JSON.stringify(breakaway));
+    assert.strictEqual(breakaway.ghostCount,0,"#312 AMT cue-local breakaway created a departure ghost");
     assert.strictEqual(breakaway.psAnchor,"OPPONENT_RIGHT");
+    await page.waitForTimeout(420);
+    breakaway=await page.evaluate(()=>{
+      const root=document.getElementById("kakashi-v2-scene-board");
+      const amt=root.querySelector('.kv2-actor[data-slot="amt"]');
+      const style=amt?getComputedStyle(amt):null;
+      return{
+        amtDeparted:amt?.classList.contains("kv2-cue-departed")===true,
+        amtOpacity:style?Number(style.opacity):1,
+        amtAnimation:style?.animationName||null,
+        amtTransition:style?.transitionDuration||null,
+        amtTransform:style?.transform||null,
+        active:root.querySelectorAll("[data-sc-choreography-active]").length,
+        ghostCount:root.querySelectorAll(".kv2-actor-ghost,.kv2-departure-ghost,.kv2-outgoing-hold-ghost").length
+      };
+    });
+    assert.strictEqual(breakaway.amtDeparted,true,"#312 ANBU Marked Target did not settle into authored departed state");
+    assert(breakaway.amtOpacity<=0.01,"#312 AMT remained visible after bounded breakaway settle: "+JSON.stringify(breakaway));
+    assert.strictEqual(breakaway.amtAnimation,"none","#312 AMT animation survived bounded breakaway settle");
+    assert.strictEqual(breakaway.amtTransition,"0s","#312 AMT breakaway retained a tween");
+    assert.strictEqual(breakaway.amtTransform,"none","#312 AMT transform chain survived breakaway settle");
+    assert.strictEqual(breakaway.active,0,"#312 AMT breakaway choreography failed to settle");
+    assert.strictEqual(breakaway.ghostCount,0,"#312 AMT breakaway leaked ghost presentation");
 
     for(let i=12;i<=17;i++)await advanceWatchCue(i);
     const choiceLayout=await page.evaluate(()=>{
@@ -256,8 +302,7 @@ async function shot(page,name,selector=null){
     assert.strictEqual(choiceLayout.canAdvance,"false");
     assert(parseFloat(choiceLayout.narrationRadius)>=10,"#312 narration/choice surface is not modern rounded presentation");
 
-    // Installed-browser jitter evidence supersedes authored card motion:
-    // semantic choice is immediate and the resulting actor composition is static.
+    // Semantic choice remains immediate; bounded actor motion must never delay Story truth.
     const start=Date.now();
     await choose(page,"STOP THE ASSASSIN","v2_stop_assassin_setup");
     const elapsed=Date.now()-start;

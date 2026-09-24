@@ -420,6 +420,30 @@
       ],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Issue #322 replaces Academy Kakashi V2 lethal/restraint truth with exact KILLED|ESCAPED and RESTRAINED|ESCAPED factual resolver outcomes per participant, re-keys collection to RESTRAINED facts, applies noncumulative 25/50/100 living-delivery reward tiers, exposes rather than guesses the unresolved legacy terminal cap, and activates the previously missing shared #23 contextual Special Jonin evidence producer for exact catalogue-valid authored evidence. Legacy disposition terms remain read-only inside bounded Alpha save migration only."
+    },
+    {
+      "changeId": "kakashi-final-browser-golden-longhand-motion-2026-09-24",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "origin.academy_kakashi.v2.story_dom"
+      ],
+      "owner": "runtime/alpha-kakashi-v2-renderer-36030.js",
+      "directCallers": [
+        "runtime/alpha-kakashi-v2-transition-36040.js"
+      ],
+      "stateTouched": [],
+      "productionLoader": "runtime/alpha-traversal-bridge-33200.js",
+      "qaRefs": [
+        "tools/qa_kakashi_v2_clean_room.js",
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_issue_312_story_battle_benchmark.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_334_story_transition_owner.js",
+        "tools/qa_issue_312_browser.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Stephen's final Browser-Golden attempt reopens presentation-only motion after the static stabilization checkpoint. This pass removes the phantom Story card-holder overlay and consumes the existing shared 33900 choreography queue through Kakashi-only CSS translate/scale/rotate longhands while transform remains locked to none. Hard scene and Story/Battle transitions remain exclusively owned by the shared 33900 curtain. Story truth, Battle semantics, rewards, PL, route topology and authored text are unchanged."
     }
   ]
 }

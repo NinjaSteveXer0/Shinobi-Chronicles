@@ -40,28 +40,35 @@ assert(storySource.includes("@keyframes scChoreoFocus33900")&&!storySource.inclu
 assert(kv2Renderer.includes("applyStoryStageAnchor33900"),"#312 Kakashi must retain shared semantic anchors");
 assert(kv2Renderer.includes('data-story-object-id="PACKAGE"'),"#312 package token missing");
 assert(kv2Renderer.includes('data-count="1"')&&kv2Renderer.includes('data-count="2"'),"#312 actor prominence must adapt to cast count");
-assert(kv2Renderer.includes("Final Kakashi Golden motion policy"),"#312 Kakashi must explicitly opt out of actor/card animation after installed-browser jitter evidence");
+assert(kv2Renderer.includes("Final Kakashi Browser-Golden motion benchmark")&&kv2Renderer.includes("translate:4vw 0")&&kv2Renderer.includes("transform:none!important"),"#312 Kakashi motion must use longhand compositor primitives rather than the retired transform chain");
+{
+  const actorMarkupStart=kv2Renderer.indexOf("function actorMarkup(");
+  const actorMarkupEnd=kv2Renderer.indexOf("function ensureRoot(",actorMarkupStart);
+  const actorMarkupSource=kv2Renderer.slice(actorMarkupStart,actorMarkupEnd);
+  assert(kv2Renderer.includes(".kv2-card-frame{display:none!important}")&&actorMarkupStart>=0&&actorMarkupEnd>actorMarkupStart&&!actorMarkupSource.includes('frame.className="kv2-card-frame"')&&actorMarkupSource.includes("figure.append(img,label)"),"#312 Kakashi phantom card-holder chrome must stay retired");
+}
 {
   const styleStart=kv2Renderer.indexOf("function installStyle(){");
   const styleEnd=kv2Renderer.indexOf("function availableChoices(",styleStart);
   const rootStart=kv2Renderer.indexOf("function ensureRoot(");
   const rootEnd=kv2Renderer.indexOf("function currentCue(",rootStart);
   const presentationSource=kv2Renderer.slice(styleStart,styleEnd)+kv2Renderer.slice(rootStart,rootEnd);
-  assert(kv2Renderer.includes(".kv2-ghost-layer{display:none!important}")&&!presentationSource.includes(".kv2-transition-memory")&&!presentationSource.includes(".kv2-wipe"),"#334 stale root-transition presentation layers must be absent from Kakashi production presentation functions");
+  assert(!presentationSource.includes(".kv2-transition-memory")&&!presentationSource.includes(".kv2-wipe"),"#334 stale root-transition presentation layers must be absent from Kakashi production presentation functions");
 }
 {
   const transitionStart=kv2Renderer.indexOf("function playProjectionTransition(");
   const transitionEnd=kv2Renderer.indexOf("function syncActors(",transitionStart);
   const transitionSource=kv2Renderer.slice(transitionStart,transitionEnd);
-  assert(transitionStart>=0&&transitionEnd>transitionStart&&transitionSource.includes('cancelStoryChoreography33900(root,"kakashi_golden_static_motion")')&&!transitionSource.includes("playStoryChoreography33900({"),"#312 Kakashi projection transition must cancel shared motion rather than play it");
+  assert(transitionStart>=0&&transitionEnd>transitionStart&&transitionSource.includes("playStoryChoreography33900({root,scopeKey,cues})")&&transitionSource.includes("hard_transition_owned_by_33900"),"#312 Kakashi projection motion must use the shared choreography queue and stand down for hard transitions");
+  assert(transitionSource.includes('supported=new Set(["ENTER","SURPRISE_ENTRY","FOCUS","STRIKE","LUNGE","RECOIL","COLLAPSE","FLEE","EXIT"])')&&!transitionSource.includes('"OBJECT_TRANSFER"'),"#312 Kakashi final motion vocabulary is not bounded");
 }
-assert(kv2Renderer.includes("applyWatchExchangeStaticState(root,p,t)")&&kv2Renderer.includes("staticPresentation:true"),"#312 WATCH exchange must retain factual actor staging without animation ownership");
+assert(kv2Renderer.includes("applyWatchExchangeStaticState(root,p,t)")&&kv2Renderer.includes('idx===10')&&kv2Renderer.includes('idx===11'),"#312 WATCH exchange must preserve factual staging while consuming bounded authored motion");
 assert(kv2Renderer.includes("mi.hidden=true")&&kv2Renderer.includes("mi.hidden=false")&&kv2Renderer.includes("kv2-cue-departed"),"#312 WATCH cue-local presence/exit state must remain deterministic");
 {
   const renderStart=kv2Renderer.indexOf("function render(){");
   const renderEnd=kv2Renderer.indexOf("function bind(",renderStart);
   const renderSource=kv2Renderer.slice(renderStart,renderEnd);
-  assert(renderStart>=0&&renderEnd>renderStart&&!renderSource.includes("materializeDepartureGhosts(root"),"#312 Kakashi render must not materialize actor departure ghosts");
+  assert(renderStart>=0&&renderEnd>renderStart&&renderSource.includes("materializeDepartureGhosts(root,prepared,next)")&&renderSource.includes("!hardTransition"),"#312 bounded departure ghosts must be non-hard-transition only");
   assert(!renderSource.includes("setTransitionMemory(previous&&previous.backdrop"),"#312 Kakashi render must not crossfade outgoing backdrops");
 }
 assert(kv2Transition.includes("semanticAlreadyCommitted:true"),"#312 transition must remain post-commit presentation");
@@ -219,7 +226,7 @@ console.log(JSON.stringify({
   storyOwner:"runtime/alpha-story-scene-board-33900.js",
   battleOwner:"runtime/alpha-battle-modern-33000.js",
   storySemanticCommitBeforeMotion:true,
-  kakashiUsesStaticGoldenMotion:true,
+  kakashiUsesBoundedLonghandMotion:true,
   battleEvidenceProjection:{
     hit:true,
     substitution:true,
