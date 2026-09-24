@@ -438,6 +438,18 @@ async function clickThroughTerminalBeat(page,{label,expectedBeat,nextBeat,expect
   };
 }
 
+async function waitReceiptProjection(page,label){
+  await page.waitForFunction(()=>{
+    const rt=typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;
+    const root=document.getElementById("kakashi-v2-scene-board");
+    const receipt=root&&root.querySelector(".kv2-receipt");
+    const pre=receipt&&receipt.querySelector("pre");
+    const visible=node=>!!node&&node.getClientRects().length>0&&getComputedStyle(node).display!=="none"&&getComputedStyle(node).visibility!=="hidden"&&Number(getComputedStyle(node).opacity)!==0;
+    return !!rt&&rt.beatId==="v2_receipt"&&root&&root.dataset.preset==="chronicle_receipt"&&visible(receipt)&&/FIRST ACTION/.test(pre&&pre.textContent||"");
+  },null,{timeout:5000});
+  return inspect(page,label);
+}
+
 async function validateTerminalCadence(page,label){
   assert.strictEqual(await currentBeat(page),"v2_report",label+" must enter at mission-giver ANBU report");
   const stateAtReport=await stateSnapshot(page);
@@ -459,8 +471,8 @@ async function validateTerminalCadence(page,label){
     nextBeat:"v2_receipt",
     minCueCount:3
   });
-  const receipt=await inspect(page,label+":receipt");
-  assert(receipt.receiptText.includes("FIRST ACTION"),label+" Chronicle Receipt facts missing");
+  const receipt=await waitReceiptProjection(page,label+":receipt");
+  assert(receipt.receiptText.includes("FIRST ACTION"),label+" Chronicle Receipt facts missing after projection settled");
   assert(!receipt.receiptText.includes("Origin occurrence sealed"),label+" stale raw Origin close leaked into Receipt");
   return{stateAtReport,report,hiddenInitial,hidden,receipt};
 }
@@ -723,7 +735,7 @@ async function cleanRoute(browser){
 
   await drain(page);
   await go(page,"v2_receipt");
-  checkpoints.push(await inspect(page,"receipt"));
+  checkpoints.push(await waitReceiptProjection(page,"receipt"));
   const receiptText=await page.locator("#kakashi-v2-scene-board .kv2-receipt pre").innerText();
   assert(receiptText.includes("REWARDS"),"Receipt missing rewards");
   assert(receiptText.toUpperCase().includes("PACKAGE"),"Receipt missing package result");
