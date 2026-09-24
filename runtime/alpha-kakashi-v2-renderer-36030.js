@@ -242,6 +242,13 @@ function actorAnchor(actor,p=null){
 }
 function kakashiLocalStagePercent36030(actor,p=null){
   const slot=actorSlot(actor),preset=String(p&&p.preset||"standard");
+  if(preset==="anbu_handoff"){
+    const hasPakkun=!!(p&&Array.isArray(p.actors)&&p.actors.some(row=>actorSlot(row)==="pakkun"));
+    const map=hasPakkun
+      ?{anbu:3,kakashi:42,amt:62,pakkun:82}
+      :{anbu:6,kakashi:49,mi:75,ps:75,amt:75};
+    return Object.prototype.hasOwnProperty.call(map,slot)?map[slot]:null;
+  }
   if(preset==="police_handoff"){
     const map={kakashi:2,amt:18,ps:34,mi:50,police_left:68,police_right:84,pakkun:46};
     return Object.prototype.hasOwnProperty.call(map,slot)?map[slot]:null;
@@ -757,6 +764,7 @@ function diagnostics(){
     rootTransitionLayersRetired:!installStyle.toString().includes(".kv2-transition-memory")&&!installStyle.toString().includes(".kv2-wipe")&&!String(ensureRoot).includes("kv2-transition-memory")&&!String(ensureRoot).includes("kv2-wipe"),
     projectionChoreographyBounded:String(playProjectionTransition).includes('supported=new Set(["ENTER","SURPRISE_ENTRY","FOCUS","STRIKE","LUNGE","RECOIL","COLLAPSE","FLEE","EXIT"])')&&!String(playProjectionTransition).includes("OBJECT_TRANSFER"),
     deterministicActorSlots:String(actorSlot).includes("academy_kakashi_origin_masked_interceptor")&&installStyle.toString().includes('data-slot="minato"'),
+    individualAnbuHandoffCards:String(kakashiLocalStagePercent36030).includes("anbu_handoff")&&String(kakashiLocalStagePercent36030).includes("hasPakkun"),
     policeHandoffCards:String(actorSlot).includes("kakashi_upf_")&&String(kakashiLocalStagePercent36030).includes("police_handoff")&&installStyle.toString().includes('data-count="6"'),
     hiddenReviewStage:String(kakashiLocalStagePercent36030).includes("hokage_test_review")&&String(readableActorState).includes('hokage_test_review')&&String(syncPackageToken).includes("presentationPackageHolder"),
     sharedSemanticAnchors:String(applyKakashiStageAnchor36030).includes("applyStoryStageAnchor33900")&&String(syncActors).includes("applyKakashiStageAnchor36030")&&String(actorAnchor).includes("PLAYER_LEFT")&&String(actorAnchor).includes("OPPONENT_RIGHT"),
