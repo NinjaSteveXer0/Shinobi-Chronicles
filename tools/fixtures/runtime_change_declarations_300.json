@@ -514,6 +514,38 @@
       ],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Current #333 GOLDEN Writing authority is now consumed directly by the live Academy Kakashi V2 runtime. This replacement aligns all reachable player-facing choice labels with the GOLDEN family documents, restores the corrected mission-giver ANBU -> hidden Hokage-office test reveal -> Chronicle Receipt -> YOUR CHRONICLE BEGINS terminal, projects the intended Uchiha Police cards without overlap, and removes the Family 04 deterministic fast/slow result from the player choice surface. Existing disposition, custody, reward, PL, Battle and Chronicle fact semantics remain unchanged."
+    },
+    {
+      "changeId": "academy-wasabi-writing-golden-rogue-battle-343-2026-09-25",
+      "classification": "REPLACES",
+      "responsibilityIds": [
+        "origin.academy_izuno.final_story_state",
+        "origin.academy_izuno.story_to_battle"
+      ],
+      "owner": "runtime/alpha-origin-scenes-32900-a.js + runtime/alpha-wasabi-origin-battle-34300.js",
+      "directCallers": [
+        "runtime/alpha-origin-scenes-32900-integrator.js",
+        "battle.return.story_scene.shared"
+      ],
+      "stateTouched": [
+        "activeStorySceneRuntime.localContext",
+        "playerData.activityHistory occ_origin_izuno_*",
+        "currentBattle.wasabiOrigin34300",
+        "playerData.wasabiOriginBattle34300"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_343_wasabi_writing_golden.js",
+        "tools/qa_issue_343_wasabi_browser.js",
+        "tools/qa_alpha_origin_scenes_32900_runtime.js",
+        "tools/qa_story_reachability_311.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [
+        "runtime/alpha-origin-scenes-32900-a.js::pre343 compressed Wasabi expression / fail-closed STEP IN"
+      ],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Consume Stephen-approved Academy Wasabi Writing-Golden and closed Combat #342 Rogue Genin 1v1 contract without changing IZU-01..04 addressing or shared Battle/Origin ownership."
     }
   ]
 }
