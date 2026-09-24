@@ -217,15 +217,18 @@ async function shot(page,name,selector=null){
     watch=await page.evaluate(()=>{
       const root=document.getElementById("kakashi-v2-scene-board");
       const mi=root.querySelector('.kv2-actor[data-slot="mi"]');
+      const ps=root.querySelector('.kv2-actor[data-slot="ps"]');
       const style=mi?getComputedStyle(mi):null;
+      const peerStyle=ps?getComputedStyle(ps):null;
       return{
         miOpacity:style?Number(style.opacity):0,
+        peerOpacity:peerStyle?Number(peerStyle.opacity):0,
         miTransform:style?.transform||null,
         active:root.querySelectorAll("[data-sc-choreography-active]").length,
         rootCount:document.querySelectorAll("#kakashi-v2-scene-board").length
       };
     });
-    assert(watch.miOpacity>=0.99,"#312 Masked Interceptor did not settle fully visible after authored entrance: "+JSON.stringify(watch));
+    assert(watch.miOpacity>=0.9&&Math.abs(watch.miOpacity-watch.peerOpacity)<=0.03,"#312 Masked Interceptor did not settle at normal visible actor opacity after authored entrance: "+JSON.stringify(watch));
     assert.strictEqual(watch.miTransform,"none","#312 MI transform chain survived entrance settle");
     assert.strictEqual(watch.active,0,"#312 MI reveal choreography failed to settle");
     assert.strictEqual(watch.rootCount,1,"#312 MI reveal remounted canonical Story root");
