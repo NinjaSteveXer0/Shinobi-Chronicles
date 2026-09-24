@@ -1,7 +1,7 @@
 'use strict';
 const fs=require('fs'),vm=require('vm'),path=require('path');
 const ROOT=path.resolve(__dirname,'..');
-const files=['core','a','b','c','integrator'].map(n=>path.join(ROOT,'runtime',`alpha-origin-scenes-32900-${n}.js`));
+const files=[path.join(ROOT,'runtime','academy-wasabi-writing-golden-34300.js'),...['core','a','b','c','integrator'].map(n=>path.join(ROOT,'runtime',`alpha-origin-scenes-32900-${n}.js`))];
 const scenes=new Map([['origin_academy_menma_prologue',{sceneId:'origin_academy_menma_prologue',beats:[{beatId:'menma'}],beatMap:new Map([['menma',{beatId:'menma'}]])}]]);
 const receipts=[];const completions=[];let active=null;
 const expectedSource={
@@ -27,6 +27,7 @@ playerData:{activityHistory:[],acquisition:{chronicleOriginVariantId:'academy_hi
 cloneProgressionData:v=>v===undefined?undefined:JSON.parse(JSON.stringify(v)),savePlayerData:()=>true,getCurrentChronicleOccurrenceHistoryScope:()=>({kind:'origin_chronicle_occurrence'}),
 unregisterStoryScene:id=>scenes.delete(id),registerStoryScene:def=>{def.beatMap=new Map((def.beats||[]).map(b=>[b.beatId,b]));scenes.set(def.sceneId,def);return{success:true,sceneId:def.sceneId};},getStorySceneDefinition:id=>scenes.get(id)||null,getActiveStorySceneRuntime:()=>active,
 ensurePlayerAcquisitionState:()=>ctx.playerData.acquisition,openOverlay:()=>true,renderAlphaTailedBeastMissionCommand:()=>({success:true}),beginAlphaChronicleOriginPrologue:()=>({success:false,reason:'legacy'}),
+SC_ACADEMY_WASABI_BATTLE_34300:{patchId:'qa'},launchAcademyWasabiRogueGeninBattle34300:()=>({success:true}),projectAcademyWasabiRogueGeninBattleResult34300:()=>({battleResult:'victory',battleOccurrenceId:'qa'}),
 completeChronicleOriginPrologue:(id,evidence)=>{ctx.playerData.acquisition.chronicleOrigin.prologueCompleted=true;completions.push({id,evidence});return{success:true,id,evidence};},
 consumeStaticOriginSourceOccurrence:(row,record)=>{const expected=expectedSource[row];if(row==='OBI-01'){if(!obitoSources.has(record.sourceOccurrenceId))return{success:false,reason:'source_occurrence_id_not_authoritative'};}else if(expected!==record.sourceOccurrenceId)return{success:false,reason:'source_occurrence_id_not_authoritative'};if(!qualifies(row,record.fact||{}))return{success:false,reason:'qualification_predicate_not_satisfied'};const key=`${row}:${record.sourceOccurrenceId}`;const old=receipts.find(r=>r.key===key);if(old)return{success:true,idempotent:true,rowId:row};receipts.push({key,rowId:row,sourceOccurrenceId:record.sourceOccurrenceId,fact:record.fact});return{success:true,rowId:row};},
 startStoryScene:(sceneId,opts)=>{const def=scenes.get(sceneId);if(!def)return{success:false,reason:'story_scene_not_registered'};active={sceneId,instanceId:`inst_${sceneId}`,beatId:def.entryBeatId,localContext:JSON.parse(JSON.stringify(opts.context||{})),processed:new Set()};enter();return{success:true,sceneId,beatId:active.beatId};}
