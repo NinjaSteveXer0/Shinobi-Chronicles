@@ -100,7 +100,8 @@ while(queue.length){
   ].filter(Boolean);
   for(const t of targets)if(!reachable.has(t)){reachable.add(t);queue.push(t);}
 }
-assert.deepStrictEqual(beats.map(b=>b.beatId).filter(id=>!reachable.has(id)),[],"unreachable Wasabi GOLDEN beats");
+const unreachable=Array.from(beats,b=>b.beatId).filter(id=>!reachable.has(id));
+assert.strictEqual(unreachable.length,0,"unreachable Wasabi GOLDEN beats: "+unreachable.join(","));
 
 // Exact factual source addresses.
 for(const id of [
