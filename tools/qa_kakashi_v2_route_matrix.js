@@ -110,7 +110,7 @@ assert.strictEqual(cycle,null,`unexpected Kakashi V2 route cycle: ${cycle&&cycle
 
 assert.strictEqual(def.beats.filter(b=>b.exitScene===true).length,1,"Kakashi V2 must have one semantic exit");
 assert.strictEqual(def.beats.find(b=>b.exitScene===true).beatId,"v2_complete");
-assert.strictEqual(def.beats.length,106,"unexpected Kakashi V2 beat count after final two-outcome disposition result scenes");
+assert.strictEqual(def.beats.length,132,"unexpected Kakashi V2 beat count after final two-outcome disposition + physical custody result scenes");
 
 // ---------------------------------------------------------------------------
 // Scenario driver: execute authored state consequences rather than merely parse
