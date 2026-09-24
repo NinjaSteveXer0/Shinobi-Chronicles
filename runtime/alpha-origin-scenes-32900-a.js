@@ -1127,20 +1127,191 @@ const youngCommit=R("hin_young_32900","academy_hinata",young,c=>({
 seq("hin_close",G.close,null,{first:{onEnterConsequences:[youngCommit]},last:{exitScene:true}});
 
 A.register({sceneId:scene,eventId:scene,title:"ACADEMY HINATA",entryBeatId:id("hin_opening"),participants:[],beats,onCompleteConsequences:[X("academy_hinata",[spar,young])]});})();
-// Wasabi Izuno
+// Wasabi Izuno — #343 WRITING GOLDEN + Rogue Genin Battle.
 (()=>{const tracking="occ_origin_izuno_pursuit_tracking_resolution",intercept="occ_origin_izuno_intercept_prediction_resolution",coop="occ_origin_izuno_pursuit_cooperation_resolution",rogue="occ_origin_izuno_rogue_genin_interruption_resolution",scene=A.sceneByVariant.academy_izuno;
-A.register({sceneId:scene,eventId:scene,title:"ACADEMY WASABI IZUNO",entryBeatId:"izu_start",participants:[],beats:[
-{beatId:"izu_start",mode:"narration",text:"Academy pursuit trial: find the target before they reach the extraction point.",nextBeatId:"izu_initial"},
-{beatId:"izu_initial",mode:"choice",text:"Choose how Wasabi begins.",choices:[C("obvious_trail","Follow the obvious trail","izu_split",{initial:"obvious_trail"}),C("environmental_signs","Search for environmental signs","izu_split",{initial:"environmental_signs",environmental:true}),C("cooperate_students","Cooperate with other students","izu_split",{initial:"cooperate_students",cooperated:true}),C("predict_destination","Ignore the trail and predict the destination","izu_split",{initial:"predict_destination",predicted:true})]},
-{beatId:"izu_split",mode:"choice",text:"The route diverges.",choices:[C("river_route","Take the river route","izu_eval",{route:"river_route",outcome:"arrive_just_after_target"}),C("stronger_trail","Follow the stronger trail","izu_eval",{route:"stronger_trail",falseTrail:true,outcome:"false_trail_discovered"}),C("rogue_interruption","Stop for the Rogue Genin situation","izu_rogue",{route:"rogue_interruption"}),C("intercept_prediction","Continue the Intercept prediction","izu_eval",{route:"intercept_prediction",predicted:true,outcome:"intercept_before_extraction"})]},
-{beatId:"izu_rogue",mode:"choice",text:"A Rogue Genin is interfering with another Academy student. This is a separate occurrence.",choices:[C("intervene","Intervene","izu_rogue",null,{availability:A.unavailableBattle(scene,"Direct Rogue Genin Battle needs the exact current Combat caller; another authored response remains available.")}),C("call_for_help","Call for help","izu_eval",{rogueResponse:"call_for_help",rogueResolved:true,outcome:"secondary_occurrence_resolved_then_pursuit"}),C("keep_pursuing","Keep pursuing","izu_eval",{rogueResponse:"keep_pursuing",rogueResolved:false,outcome:"pursuit_continued"})]},
-{beatId:"izu_eval",mode:"narration",text:"The instructor evaluates route, evidence, target result and any secondary occurrence rather than reducing the Origin to catch/fail.",onEnterConsequences:[
-R("izu_tracking_32900","academy_izuno",tracking,c=>({reliableEnvironmentalTrackingEstablished:c.environmental===true,falseTrailCorrectlyDiscovered:c.falseTrail===true,pursuitOutcome:c.outcome||null}),c=>c.environmental||c.falseTrail?["IZU-01"]:[]),
-R("izu_intercept_32900","academy_izuno",intercept,c=>({interceptReachedByPrediction:c.predicted===true,pursuitOutcome:c.outcome||null}),c=>c.predicted?["IZU-02"]:[]),
-R("izu_coop_32900","academy_izuno",coop,c=>({cooperatedWithAcademyStudents:c.cooperated===true,cooperatingParticipantRefs:[]}),c=>c.cooperated?["IZU-03"]:[]),
-R("izu_rogue_32900","academy_izuno",rogue,c=>({rogueGeninInterruptionResolvedByWasabiAction:c.rogueResolved===true,rogueGeninResponse:c.rogueResponse||null,battleOccurrenceIds:[]}),c=>c.rogueResolved?["IZU-04"]:[],{participantRefs:["wasabi_origin_rogue_genin_01","wasabi_origin_interference_student"]})],nextBeatId:"izu_reflect"},
-{beatId:"izu_reflect",mode:"choice",text:"What does Wasabi carry forward?",choices:[C("trust_trail","Next time I'll trust the trail.","izu_end"),C("trust_notice","Next time I'll trust what I notice.","izu_end"),C("fastest_not_obvious","Sometimes the fastest path isn't the obvious one.","izu_end"),C("catch_not_only","Catching them wasn't the only thing that mattered.","izu_end")]},
-{beatId:"izu_end",mode:"narration",text:"No Speed/Agility stat, morality score or automatic specialization is created.",exitScene:true}],onCompleteConsequences:[X("academy_izuno",[tracking,intercept,coop,rogue])]});})();
+const W=globalThis.SC_ACADEMY_WASABI_WRITING_GOLDEN_34300;
+const BATTLE=globalThis.SC_ACADEMY_WASABI_BATTLE_34300;
+if(!W||typeof W.get!=="function")throw new Error("wasabi_343_writing_golden_required");
+if(!BATTLE||typeof globalThis.launchAcademyWasabiRogueGeninBattle34300!=="function")throw new Error("wasabi_343_battle_adapter_required");
+const G=key=>W.get(key);
+const beats=[],id=prefix=>prefix+"_1";
+function seq(prefix,cues,nextBeatId,{first={},last={}}={}){
+  const rows=Array.isArray(cues)?cues:[];
+  if(!rows.length)throw new Error("wasabi_golden_empty_sequence:"+prefix);
+  rows.forEach((cue,index)=>{
+    const beatId=prefix+"_"+(index+1),lastRow=index===rows.length-1;
+    beats.push({beatId,...cue,nextBeatId:lastRow?(nextBeatId||null):prefix+"_"+(index+2),...(index===0?first:{}),...(lastRow?last:{})});
+  });
+  return id(prefix);
+}
+function conditional(req,predicate){
+  return{requestId:req.requestId,kind:"domain",resolve:()=>predicate(A.local())?req.resolve():{success:true,skipped:true}};
+}
+const trackingCommit=conditional(R("izu_tracking_32900","academy_izuno",tracking,c=>({
+  reliableEnvironmentalTrackingEstablished:c.environmental===true,
+  falseTrailCorrectlyDiscovered:c.falseTrail===true,
+  pursuitOutcome:c.outcome||null
+}),["IZU-01"]),c=>c.environmental===true||c.falseTrail===true);
+const interceptCommit=conditional(R("izu_intercept_32900","academy_izuno",intercept,c=>({
+  interceptReachedByPrediction:c.predicted===true,
+  pursuitOutcome:c.outcome||null
+}),["IZU-02"]),c=>c.predicted===true);
+const coopCommit=conditional(R("izu_coop_32900","academy_izuno",coop,c=>({
+  cooperatedWithAcademyStudents:c.cooperated===true,
+  cooperatingParticipantRefs:[]
+}),["IZU-03"]),c=>c.cooperated===true);
+const evaluationCommits=[trackingCommit,interceptCommit,coopCommit];
+
+function rogueCommit(requestId,response,resolved,battleIdsResolver=()=>[]){
+  return R(requestId,"academy_izuno",rogue,c=>({
+    rogueGeninInterruptionResolvedByWasabiAction:resolved,
+    rogueGeninResponse:response,
+    battleOccurrenceIds:battleIdsResolver(c)
+  }),resolved?["IZU-04"]:[],{participantRefs:["wasabi_origin_rogue_genin_01","wasabi_origin_interference_student"]});
+}
+const rogueHelpCommit=rogueCommit("izu_rogue_help_32900","call_for_help",true);
+const roguePursueCommit=rogueCommit("izu_rogue_pursue_32900","keep_pursuing",false);
+const rogueBattleReturn={
+  requestId:"izu_rogue_battle_return_32900",kind:"domain",
+  resolve:()=>{
+    const active=A.active(),resume=active&&active.battleResume||null,authored=resume&&resume.authored||null;
+    if(!active||!resume||!authored)return{success:false,reason:"wasabi_343_battle_resume_missing"};
+    if(!["victory","defeat"].includes(authored.battleResult))return{success:false,reason:"wasabi_343_battle_result_invalid"};
+    if(!authored.battleOccurrenceId)return{success:false,reason:"wasabi_343_battle_occurrence_missing"};
+    active.localContext.rogueResponse="intervene";
+    active.localContext.rogueResolved=true;
+    active.localContext.rogueBattleResult=authored.battleResult;
+    active.localContext.rogueBattleOccurrenceId=authored.battleOccurrenceId;
+    if(typeof savePlayerData==="function")savePlayerData();
+    return A.commitOccurrence("academy_izuno",rogue,{
+      rogueGeninInterruptionResolvedByWasabiAction:true,
+      rogueGeninResponse:"intervene",
+      battleOccurrenceIds:[authored.battleOccurrenceId]
+    },["IZU-04"],{participantRefs:["wasabi_origin_rogue_genin_01","wasabi_origin_interference_student"]});
+  }
+};
+function battleDef(postBeatId){
+  return{
+    encounterId:"origin_academy_izuno_rogue_genin_step_in",
+    victoryBeatId:postBeatId,defeatBeatId:postBeatId,postBattleBeatId:postBeatId,
+    actionLabel:"BEGIN PL BATTLE",
+    resultProjector:()=>globalThis.projectAcademyWasabiRogueGeninBattleResult34300?globalThis.projectAcademyWasabiRogueGeninBattleResult34300():null,
+    launchResolver:({active,returnContext})=>globalThis.launchAcademyWasabiRogueGeninBattle34300({
+      battleConfigId:"academy_izuno_origin_rogue_genin_step_in_battle",
+      storyOccurrenceId:active.instanceId,
+      returnContext
+    })
+  };
+}
+function evalCues(kind,{cooperated=false,rogueResponse=null}={}){
+  const rows=[...G("eval_intro")];
+  if(kind==="caught")rows.push(...G("eval_caught"));
+  if(kind==="false")rows.push(...G("eval_false"));
+  if(kind==="intercept")rows.push(...G("eval_intercept"));
+  if(cooperated)rows.push(...G("eval_cooperate"));
+  if(rogueResponse){
+    rows.push(...G("eval_rogue_intro"));
+    if(rogueResponse==="intervene")rows.push(...G("eval_rogue_intervene"));
+    else if(rogueResponse==="call_for_help")rows.push(...G("eval_rogue_help"));
+    else rows.push(...G("eval_rogue_pursue"));
+  }
+  return rows;
+}
+function addRoute(tag,routeCues,finishCues,evalKind,{cooperated=false}={}){
+  const suffix=cooperated?"_coop":"";
+  const evalId="izu_eval_"+tag+suffix;
+  seq("izu_"+tag+suffix,routeCues,id("izu_finish_"+tag+suffix));
+  seq("izu_finish_"+tag+suffix,finishCues,id(evalId));
+  seq(evalId,evalCues(evalKind,{cooperated}),id("izu_after"),{first:{onEnterConsequences:evaluationCommits}});
+}
+function addRogueNonBattle(tag,response,branchCues,commit,{cooperated=false}={}){
+  const suffix=cooperated?"_coop":"";
+  const evalId="izu_eval_rogue_"+tag+suffix;
+  seq("izu_rogue_"+tag+suffix,branchCues,id("izu_finish_rogue_"+tag+suffix));
+  seq("izu_finish_rogue_"+tag+suffix,G("finish_secondary"),id(evalId),{first:{onEnterConsequences:[commit]}});
+  seq(evalId,evalCues(null,{cooperated,rogueResponse:response}),id("izu_after"),{first:{onEnterConsequences:evaluationCommits}});
+}
+function addRogueBattle({cooperated=false}={}){
+  const suffix=cooperated?"_coop":"";
+  const battleId="izu_rogue_step_in_battle"+suffix;
+  const returnPrefix="izu_rogue_step_in_return"+suffix;
+  const evalId="izu_eval_rogue_intervene"+suffix;
+  seq("izu_rogue_step_in"+suffix,G("step_in"),battleId);
+  beats.push({beatId:battleId,mode:"battle_transition",text:"",battle:battleDef(id(returnPrefix))});
+  seq(returnPrefix,G("finish_secondary"),id(evalId),{first:{onEnterConsequences:[rogueBattleReturn]}});
+  seq(evalId,evalCues(null,{cooperated,rogueResponse:"intervene"}),id("izu_after"),{first:{onEnterConsequences:evaluationCommits}});
+}
+
+// Opening + first pursuit decision.
+seq("izu_opening",G("opening"),"izu_initial_choice");
+beats.push({beatId:"izu_initial_choice",mode:"choice",text:"",choices:[
+  C("obvious_trail","TAKE THE OBVIOUS TRAIL",id("izu_obvious"),{initial:"obvious_trail"}),
+  C("environmental_signs","LOOK FOR SOMETHING BETTER",id("izu_better"),{initial:"environmental_signs",environmental:true}),
+  C("cooperate_students","WORK WITH THE OTHERS",id("izu_cooperate"),{initial:"cooperate_students",cooperated:true}),
+  C("predict_destination","FORGET THE TRAIL — WHERE ARE THEY GOING?",id("izu_predict"),{initial:"predict_destination",predicted:true})
+]});
+seq("izu_obvious",G("obvious"),id("izu_split_base"));
+seq("izu_better",G("better"),id("izu_split_base"));
+seq("izu_predict",G("predict"),id("izu_split_base"));
+seq("izu_cooperate",G("cooperate"),id("izu_split_coop"));
+seq("izu_split_base",G("split"),"izu_split_choice");
+seq("izu_split_coop",G("split"),"izu_split_choice_coop");
+
+function splitChoices(cooperated){
+  const suffix=cooperated?"_coop":"";
+  return[
+    C("river_route","TAKE THE RIVER",id("izu_river"+suffix),{route:"river_route",outcome:"arrive_just_after_target"}),
+    C("stronger_trail","FOLLOW THE STRONGER TRAIL",id("izu_stronger"+suffix),{route:"stronger_trail",falseTrail:true,outcome:"false_trail_discovered"}),
+    C("rogue_interruption","CHECK THE SHOUTING",id("izu_shouting"+suffix),{route:"rogue_interruption",outcome:"secondary_occurrence_costs_pursuit"}),
+    C("intercept_prediction","CUT FOR THE INTERCEPT",id("izu_intercept"+suffix),{route:"intercept_prediction",predicted:true,outcome:"intercept_before_extraction"})
+  ];
+}
+beats.push({beatId:"izu_split_choice",mode:"choice",text:"",choices:splitChoices(false)});
+beats.push({beatId:"izu_split_choice_coop",mode:"choice",text:"",choices:splitChoices(true)});
+
+// Non-Rogue route families. Existing deterministic consequence authority is
+// preserved; Writing does not author a new random catch resolver.
+addRoute("river",G("river"),G("finish_arrive"),null);
+addRoute("river",G("river"),G("finish_arrive"),null,{cooperated:true});
+addRoute("stronger",G("stronger"),G("finish_false"),"false");
+addRoute("stronger",G("stronger"),G("finish_false"),"false",{cooperated:true});
+addRoute("intercept",G("intercept"),G("finish_intercept"),"intercept");
+addRoute("intercept",G("intercept"),G("finish_intercept"),"intercept",{cooperated:true});
+
+// Rogue Genin occurrence.
+seq("izu_shouting",G("shouting"),"izu_rogue_choice");
+seq("izu_shouting_coop",G("shouting"),"izu_rogue_choice_coop");
+function rogueChoices(cooperated){
+  const suffix=cooperated?"_coop":"";
+  return[
+    C("intervene","STEP IN",id("izu_rogue_step_in"+suffix),{rogueResponse:"intervene"}),
+    C("call_for_help","CALL FOR HELP",id("izu_rogue_help"+suffix),{rogueResponse:"call_for_help",rogueResolved:true}),
+    C("keep_pursuing","KEEP PURSUING",id("izu_rogue_pursue"+suffix),{rogueResponse:"keep_pursuing",rogueResolved:false})
+  ];
+}
+beats.push({beatId:"izu_rogue_choice",mode:"choice",text:"",choices:rogueChoices(false)});
+beats.push({beatId:"izu_rogue_choice_coop",mode:"choice",text:"",choices:rogueChoices(true)});
+addRogueBattle();
+addRogueBattle({cooperated:true});
+addRogueNonBattle("help","call_for_help",G("call_help"),rogueHelpCommit);
+addRogueNonBattle("help","call_for_help",G("call_help"),rogueHelpCommit,{cooperated:true});
+addRogueNonBattle("pursue","keep_pursuing",G("keep_pursuing"),roguePursueCommit);
+addRogueNonBattle("pursue","keep_pursuing",G("keep_pursuing"),roguePursueCommit,{cooperated:true});
+
+// Common reflection + close.
+seq("izu_after",G("after"),"izu_reflect");
+beats.push({beatId:"izu_reflect",mode:"choice",text:"",choices:[
+  C("trust_trail","Next time I'm trusting the trail.",id("izu_close"),{reflection:"trust_trail"}),
+  C("trust_notice","Next time I'm trusting what I notice.",id("izu_close"),{reflection:"trust_notice"}),
+  C("fastest_not_obvious","Sometimes the fastest path isn't the obvious one.",id("izu_close"),{reflection:"fastest_not_obvious"}),
+  C("catch_not_only","Catching them wasn't the only thing that mattered.",id("izu_close"),{reflection:"catch_not_only"})
+]});
+seq("izu_close",G("close"),null,{last:{exitScene:true}});
+
+A.register({
+  sceneId:scene,eventId:scene,title:"ACADEMY WASABI IZUNO",entryBeatId:id("izu_opening"),
+  participants:[],beats,onCompleteConsequences:[X("academy_izuno",[tracking,intercept,coop,rogue])]
+});})();
 // Mirai
 (()=>{const sub="occ_origin_mirai_substitution_verification_resolution",checkpoint="occ_origin_mirai_checkpoint_escort_resolution",scene=A.sceneByVariant.academy_mirai;
 A.register({sceneId:scene,eventId:scene,title:"ACADEMY MIRAI",entryBeatId:"mir_start",participants:[],beats:[
