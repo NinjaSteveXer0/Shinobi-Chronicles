@@ -67,8 +67,8 @@ const C=(choiceId,label,nextBeatId,{available=null,patch=null}={})=>{
 
 const manifest={};
 const beats=[];
-function addBeat(id,{mode="narration",cues=[],backdrop=B.sakura,location="KONOHA · NIGHT",objective=null,actors=[],preset="standard",choices=[],battle=null,nextBeatId=null,onEnter=null,onAdvance=null,transition=null,receipt=false,exitScene=false}={}){
-  manifest[id]=Object.freeze({id,cues,backdrop,location,objective,actors,preset,transition,receipt});
+function addBeat(id,{mode="narration",cues=[],backdrop=B.sakura,location="KONOHA · NIGHT",objective=null,actors=[],preset="standard",choices=[],battle=null,nextBeatId=null,onEnter=null,onAdvance=null,transition=null,receipt=false,exitScene=false,presentationPackageHolder=null}={}){
+  manifest[id]=Object.freeze({id,cues,backdrop,location,objective,actors,preset,transition,receipt,presentationPackageHolder});
   const row={beatId:id,mode,text:"",choices,nextBeatId,exitScene};
   if(onEnter)row.onEnterConsequences=[{requestId:`kakashi_v2_enter_${id}`,kind:"domain",resolve:ctx=>onEnter(ctx)}];
   if(onAdvance)row.onAdvanceConsequences=[{requestId:`kakashi_v2_advance_${id}`,kind:"domain",resolve:ctx=>onAdvance(ctx)}];
@@ -489,16 +489,30 @@ function directTransferHandoffCues(ref,institution){
   if(institution==="POLICE"&&key==="AMT")return W("custodyGolden06B",`amt_police_handoff_${recovered?"recovered":"missing"}`);
   return W("custodyGolden06B",`${prefix}_${suffix}_handoff`);
 }
+function policePairForParticipantKeys(refs=[]){
+  const keys=[...new Set((refs||[]).map(participantKey))].sort();
+  if(keys.length===1){
+    if(keys[0]==="MI")return["policeMiMale","policeMiFemale"];
+    if(keys[0]==="PS")return["policePsMale","policePsFemale"];
+    return["policeAmtMale","policeAmtFemale"];
+  }
+  // Multi-captive handoffs deliberately mix cards so the receiving pair is not
+  // a duplicate of any of the three dedicated single-target officer pairings.
+  if(keys.length>=3)return["policeAmtMale","policeMiFemale"];
+  return["policePsMale","policeAmtFemale"];
+}
 function directTransferActors(ref,institution,handoff=false){
   const key=participantKey(ref),actors=["kakashi",key==="MI"?"mi":key==="PS"?"ps":"amt"],s=state();
   if(s&&s.pakkun.present&&key==="AMT")actors.push("pakkun");
   if(handoff&&institution==="ANBU")actors.push("anbu");
-  return actors;
+  if(handoff&&institution==="POLICE")actors.push(...policePairForParticipantKeys([key]));
+  return [...new Set(actors)];
 }
 function groupTransferActors(refs,institution,handoff=false){
-  const actors=["kakashi",...(refs||[]).map(ref=>participantKey(ref)==="MI"?"mi":participantKey(ref)==="PS"?"ps":"amt")],s=state();
+  const keys=(refs||[]).map(participantKey),actors=["kakashi",...keys.map(key=>key==="MI"?"mi":key==="PS"?"ps":"amt")],s=state();
   if(s&&s.pakkun.present)actors.push("pakkun");
   if(handoff&&institution==="ANBU")actors.push("anbu");
+  if(handoff&&institution==="POLICE")actors.push(...policePairForParticipantKeys(keys));
   return [...new Set(actors)];
 }
 function groupTransferCues(size,institution,stage){
@@ -511,9 +525,10 @@ function collectedHandoffCues(institution){
   return groupTransferCues(keys.length>=3?3:2,institution,"handoff");
 }
 function collectedHandoffActors(institution){
-  const keys=collectedParticipantKeys().map(key=>key==="MI"?"mi":key==="PS"?"ps":"amt"),actors=["kakashi",...keys],s=state();
+  const participantKeys=collectedParticipantKeys(),keys=participantKeys.map(key=>key==="MI"?"mi":key==="PS"?"ps":"amt"),actors=["kakashi",...keys],s=state();
   if(s&&s.pakkun.present)actors.push("pakkun");
   if(institution==="ANBU")actors.push("anbu");
+  if(institution==="POLICE")actors.push(...policePairForParticipantKeys(participantKeys));
   return [...new Set(actors)];
 }
 function finalRestraintCues(ref){
@@ -999,7 +1014,7 @@ function minatoCues(){
   ];
 }
 function firstActionReceipt(s){
-  const labels={WATCH_THE_EXCHANGE:"WATCH THE EXCHANGE",MOVE_IN_CLOSER:"MOVE IN CLOSER",STRIKE_BEFORE_THE_HANDOFF:"STRIKE BEFORE THE HANDOFF",SLIP_IN_FOR_THE_PACKAGE:"SLIP IN FOR THE PACKAGE"};
+  const labels={WATCH_THE_EXCHANGE:"WATCH THE HANDOFF",MOVE_IN_CLOSER:"GET CLOSER",STRIKE_BEFORE_THE_HANDOFF:"INTERRUPT THE HANDOFF",SLIP_IN_FOR_THE_PACKAGE:"SLIP IN AND TAKE IT"};
   const row=(s.routeHistory||[]).find(r=>r&&labels[r.label]);return row?labels[row.label]:"Not recorded";
 }
 function packageReceiptLine(s){
@@ -1457,33 +1472,33 @@ addBeat("v2_pickpocket_3v1_win",{mode:"choice",backdrop:B.fight,location:"SAKURA
 addBeat("v2_mi_anbu_depart",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Bring Masked Interceptor to ANBU.",actors:()=>directTransferActors("MI","ANBU",false),preset:"escort",cues:()=>directTransferFieldCues("MI","ANBU"),nextBeatId:"v2_mi_anbu_handoff"});
 addBeat("v2_mi_anbu_handoff",{backdrop:B.rooftop,location:"ANBU ROOFTOP · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("MI","ANBU",true),preset:"anbu_report",cues:()=>directTransferHandoffCues("MI","ANBU"),onAdvance:()=>completeDirectTransfer("MI","ANBU","mi"),nextBeatId:"v2_report"});
 addBeat("v2_mi_police_depart",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Take Masked Interceptor to the Uchiha Police.",actors:()=>directTransferActors("MI","POLICE",false),preset:"escort",cues:()=>directTransferFieldCues("MI","POLICE"),nextBeatId:"v2_mi_police_handoff"});
-addBeat("v2_mi_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("MI","POLICE",true),preset:"escort",cues:()=>directTransferHandoffCues("MI","POLICE"),onAdvance:()=>completeDirectTransfer("MI","POLICE","mi"),nextBeatId:"v2_report"});
+addBeat("v2_mi_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("MI","POLICE",true),preset:"police_handoff",cues:()=>directTransferHandoffCues("MI","POLICE"),onAdvance:()=>completeDirectTransfer("MI","POLICE","mi"),nextBeatId:"v2_report"});
 
 addBeat("v2_ps_anbu_depart",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Bring Package Smuggler to ANBU.",actors:()=>directTransferActors("PS","ANBU",false),preset:"escort",cues:()=>directTransferFieldCues("PS","ANBU"),nextBeatId:"v2_ps_anbu_handoff"});
 addBeat("v2_ps_anbu_handoff",{backdrop:B.rooftop,location:"ANBU ROOFTOP · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("PS","ANBU",true),preset:"anbu_report",cues:()=>directTransferHandoffCues("PS","ANBU"),onAdvance:()=>completeDirectTransfer("PS","ANBU","ps"),nextBeatId:"v2_report"});
 addBeat("v2_ps_police_depart",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Take Package Smuggler to the Uchiha Police.",actors:()=>directTransferActors("PS","POLICE",false),preset:"escort",cues:()=>directTransferFieldCues("PS","POLICE"),nextBeatId:"v2_ps_police_handoff"});
-addBeat("v2_ps_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("PS","POLICE",true),preset:"escort",cues:()=>directTransferHandoffCues("PS","POLICE"),onAdvance:()=>completeDirectTransfer("PS","POLICE","ps"),nextBeatId:"v2_report"});
+addBeat("v2_ps_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("PS","POLICE",true),preset:"police_handoff",cues:()=>directTransferHandoffCues("PS","POLICE"),onAdvance:()=>completeDirectTransfer("PS","POLICE","ps"),nextBeatId:"v2_report"});
 
 addBeat("v2_amt_anbu_depart",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Bring ANBU Marked Target to ANBU.",actors:()=>directTransferActors("AMT","ANBU",false),preset:"escort",cues:()=>directTransferFieldCues("AMT","ANBU"),nextBeatId:"v2_amt_anbu_handoff"});
 addBeat("v2_amt_anbu_handoff",{backdrop:B.rooftop,location:"ANBU ROOFTOP · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("AMT","ANBU",true),preset:"anbu_report",cues:()=>directTransferHandoffCues("AMT","ANBU"),onAdvance:()=>completeDirectTransfer("AMT","ANBU","amt"),nextBeatId:"v2_report"});
 addBeat("v2_amt_police_depart",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Take ANBU Marked Target to the Uchiha Police.",actors:()=>directTransferActors("AMT","POLICE",false),preset:"escort",cues:()=>directTransferFieldCues("AMT","POLICE"),nextBeatId:"v2_amt_police_handoff"});
-addBeat("v2_amt_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("AMT","POLICE",true),preset:"escort",cues:()=>directTransferHandoffCues("AMT","POLICE"),onAdvance:()=>completeDirectTransfer("AMT","POLICE","amt"),nextBeatId:"v2_report"});
+addBeat("v2_amt_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>directTransferActors("AMT","POLICE",true),preset:"police_handoff",cues:()=>directTransferHandoffCues("AMT","POLICE"),onAdvance:()=>completeDirectTransfer("AMT","POLICE","amt"),nextBeatId:"v2_report"});
 addBeat("v2_amt_release_result",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:()=>state()&&state().pakkun.present?["kakashi","amt","pakkun"]:["kakashi","amt"],preset:"post_battle",cues:W("custodyGolden06B","amt_release"),nextBeatId:"v2_report"});
 
 addBeat("v2_group2_anbu_depart",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Bring them to ANBU.",actors:()=>groupTransferActors([AMT,PS],"ANBU",false),preset:"escort",cues:W("custodyGolden06B","group2_anbu_depart"),nextBeatId:"v2_group2_anbu_handoff"});
 addBeat("v2_group2_anbu_handoff",{backdrop:B.rooftop,location:"ANBU ROOFTOP · NIGHT",objective:"Transfer custody.",actors:()=>groupTransferActors([AMT,PS],"ANBU",true),preset:"anbu_report",cues:W("custodyGolden06B","group2_anbu_handoff"),onAdvance:()=>completeDirectGroupTransfer([AMT,PS],"ANBU","group2"),nextBeatId:"v2_report"});
 addBeat("v2_group2_police_depart",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Take them to the Uchiha Police.",actors:()=>groupTransferActors([AMT,PS],"POLICE",false),preset:"escort",cues:W("custodyGolden06B","group2_police_depart"),nextBeatId:"v2_group2_police_handoff"});
-addBeat("v2_group2_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>groupTransferActors([AMT,PS],"POLICE",true),preset:"escort",cues:W("custodyGolden06B","group2_police_handoff"),onAdvance:()=>completeDirectGroupTransfer([AMT,PS],"POLICE","group2"),nextBeatId:"v2_report"});
+addBeat("v2_group2_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>groupTransferActors([AMT,PS],"POLICE",true),preset:"police_handoff",cues:W("custodyGolden06B","group2_police_handoff"),onAdvance:()=>completeDirectGroupTransfer([AMT,PS],"POLICE","group2"),nextBeatId:"v2_report"});
 addBeat("v2_group2_release",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi","amt","ps"],preset:"post_battle",cues:W("custodyGolden06B","group2_release"),nextBeatId:"v2_report"});
 
 addBeat("v2_group3_anbu_depart",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Bring them to ANBU.",actors:()=>groupTransferActors([AMT,PS,MI],"ANBU",false),preset:"escort",cues:W("custodyGolden06B","group3_anbu_depart"),nextBeatId:"v2_group3_anbu_handoff"});
 addBeat("v2_group3_anbu_handoff",{backdrop:B.rooftop,location:"ANBU ROOFTOP · NIGHT",objective:"Transfer custody.",actors:()=>groupTransferActors([AMT,PS,MI],"ANBU",true),preset:"anbu_report",cues:W("custodyGolden06B","group3_anbu_handoff"),onAdvance:()=>completeDirectGroupTransfer([AMT,PS,MI],"ANBU","group3"),nextBeatId:"v2_report"});
 addBeat("v2_group3_police_depart",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Take them to the Uchiha Police.",actors:()=>groupTransferActors([AMT,PS,MI],"POLICE",false),preset:"escort",cues:W("custodyGolden06B","group3_police_depart"),nextBeatId:"v2_group3_police_handoff"});
-addBeat("v2_group3_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>groupTransferActors([AMT,PS,MI],"POLICE",true),preset:"escort",cues:W("custodyGolden06B","group3_police_handoff"),onAdvance:()=>completeDirectGroupTransfer([AMT,PS,MI],"POLICE","group3"),nextBeatId:"v2_report"});
+addBeat("v2_group3_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>groupTransferActors([AMT,PS,MI],"POLICE",true),preset:"police_handoff",cues:W("custodyGolden06B","group3_police_handoff"),onAdvance:()=>completeDirectGroupTransfer([AMT,PS,MI],"POLICE","group3"),nextBeatId:"v2_report"});
 addBeat("v2_group3_release",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi","amt","ps","mi"],preset:"post_battle",cues:W("custodyGolden06B","group3_release"),nextBeatId:"v2_report"});
 
 addBeat("v2_collected_anbu_handoff",{backdrop:B.rooftop,location:"ANBU ROOFTOP · NIGHT",objective:"Transfer custody.",actors:()=>collectedHandoffActors("ANBU"),preset:"anbu_report",cues:()=>collectedHandoffCues("ANBU"),onAdvance:()=>deliverRestrainedGroup("ANBU"),nextBeatId:"v2_report"});
-addBeat("v2_collected_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>collectedHandoffActors("POLICE"),preset:"escort",cues:()=>collectedHandoffCues("POLICE"),onAdvance:()=>deliverRestrainedGroup("POLICE"),nextBeatId:"v2_report"});
+addBeat("v2_collected_police_handoff",{backdrop:B.police,location:"UCHIHA POLICE EXTERIOR · NIGHT",objective:"Transfer custody.",actors:()=>collectedHandoffActors("POLICE"),preset:"police_handoff",cues:()=>collectedHandoffCues("POLICE"),onAdvance:()=>deliverRestrainedGroup("POLICE"),nextBeatId:"v2_report"});
 
 // ---------------------------------------------------------------------------
 // FINAL TWO-OUTCOME DISPOSITION RESULT PRESENTATION.
@@ -1499,10 +1514,73 @@ addBeat("v2_amt_restrain_collect_result",{backdrop:B.intercept,location:"KONOHA 
 addBeat("v2_group2_kill_result",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi","amt","ps"],preset:"post_battle",cues:()=>groupKillCues([AMT,PS]),nextBeatId:"v2_report"});
 addBeat("v2_group3_kill_result",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi","amt","ps","mi"],preset:"post_battle",cues:()=>groupKillCues([AMT,PS,MI]),nextBeatId:"v2_report"});
 
+
+function hasTerminalTransferHistory(s,label){
+  return !!(s&&Array.isArray(s.routeHistory)&&s.routeHistory.some(row=>row&&row.label===label));
+}
+function correctedTerminalReportCues(){
+  const s=state();if(!s)return[];
+  const cues=[];
+  const alreadyAtMissionGiver=hasTerminalTransferHistory(s,"DIRECT_TO_ANBU")||hasTerminalTransferHistory(s,"GROUP_TO_ANBU")||hasTerminalTransferHistory(s,"COLLECTED_TO_ANBU");
+  if(!alreadyAtMissionGiver)cues.push(...G("f07c.return_open"));
+  else cues.push(Q("ANBU OPERATIVE","Report."));
+  cues.push(...routeReportCues(s),...packageReportCues(s));
+  if(lethalIntentRefs(s).length)cues.push(...lethalReportCues(s));
+  else cues.push(...nonlethalParticipantReportCues(s));
+  cues.push(...knowledgeReportCues(s),...pakkunReportAndDepartureCues(s),...G("f07c.report_close"));
+  return cues;
+}
+function hiddenReviewSurvivorKeys(s=state()){
+  return ["MI","PS","AMT"].filter(key=>s&&s.participants&&s.participants[key]&&s.participants[key].state!=="KILLED");
+}
+function hiddenReviewActors(){
+  const map={MI:"mi",PS:"ps",AMT:"amt"};
+  return["anbu","minato",...hiddenReviewSurvivorKeys().map(key=>map[key])];
+}
+function hiddenReviewCues(){
+  const s=state();if(!s)return[];
+  const alive=hiddenReviewSurvivorKeys(s),killed=["MI","PS","AMT"].filter(key=>!alive.includes(key)),out=[...G("f07c.hidden_open")];
+  if(killed.length===0)out.push(...G("f07c.hidden_base_all_alive"));
+  if(alive.length===3&&["MI","PS","AMT"].every(key=>s.participants[key]&&s.participants[key].state==="ANBU_CUSTODY"))out.push(...G("f07c.hidden_all3_anbu"));
+  if(alive.some(key=>s.participants[key]&&s.participants[key].state==="POLICE_CUSTODY"))out.push(...G("f07c.hidden_police"));
+  if(alive.some(key=>s.participants[key]&&s.participants[key].state==="RELEASED"))out.push(...G("f07c.hidden_release"));
+  for(const key of alive){
+    const row=s.participants[key]||{};
+    if(row.state==="RESTRAINED")out.push(...G("f07c.hidden_restrained_"+key.toLowerCase()));
+    if(row.state==="ESCAPED"&&(row.disposition==="RESTRAIN"||row.restrainIntent===true))out.push(...G("f07c.hidden_restrain_escape_"+key.toLowerCase()));
+    if(row.state==="ESCAPED"&&(row.disposition==="KILL"||row.lethalIntent===true))out.push(...G("f07c.hidden_lethal_escape_"+key.toLowerCase()));
+  }
+  if(killed.includes("MI"))out.push(...G("f07c.hidden_mi_killed"));
+  if(killed.includes("PS"))out.push(...G("f07c.hidden_ps_killed"));
+  if(killed.includes("AMT"))out.push(...G("f07c.hidden_amt_killed"));
+  if(killed.length===3)out.push(...G("f07c.hidden_all3_killed"));
+  if(killed.length>0){
+    if(alive.includes("AMT"))out.push(...G("f07c.reveal_question_amt"));
+    else if(alive.includes("PS"))out.push(Q("PACKAGE SMUGGLER","Does Kakashi know?"),Q("MINATO","No."));
+    else if(alive.includes("MI"))out.push(Q("MASKED INTERCEPTOR","Does Kakashi know?"),Q("MINATO","No."));
+    else out.push(Q("ANBU OPERATIVE","Does Kakashi know?"),Q("MINATO","No."));
+  }
+  out.push(...(killed.length?G("f07c.close_high"):G("f07c.close_low")));
+  return out;
+}
+function completeAndContinueAcademyKakashiV2Origin(){
+  const result=completeAcademyKakashiV2Origin();
+  if(!result||result.success!==true)return result;
+  // The shared Journey/Formation owner remains authoritative. This call only
+  // asks it to project the already-authorised post-Origin continuity surface.
+  try{
+    if(typeof openAcademyTeamFormationUI==="function"){
+      const projected=openAcademyTeamFormationUI({showChronicleBegins:true});
+      return{success:true,originCompletion:result.originCompletion||result,continuityProjection:projected||null};
+    }
+  }catch(_error){}
+  return result;
+}
+
 // ---------------------------------------------------------------------------
 // TERMINAL — factual report -> private evaluation -> Receipt -> Origin complete.
 // ---------------------------------------------------------------------------
-addBeat("v2_report",{backdrop:B.rooftop,location:"ANBU REPORT · KONOHA ROOFTOP · NIGHT",objective:"Report to ANBU.",actors:()=>{const s=state();return s&&s.pakkun.present?["kakashi","pakkun","anbu"]:["kakashi","anbu"];},preset:"anbu_report",transition:"wipe",onEnter:()=>mutate(s=>{if(s.package.holder==="KAKASHI"){s.package.holder="ANBU";s.package.returned=true;}s.terminal.reportReached=true;}),onAdvance:()=>mutate(s=>{if(s.pakkun.present){s.pakkun.present=false;s.pakkun.departed=true;}}),cues:()=>dynamicTerminalCues(),nextBeatId:"v2_minato"});
+addBeat("v2_report",{backdrop:B.rooftop,location:"ANBU REPORT · KONOHA ROOFTOP · NIGHT",objective:"Report to ANBU.",actors:()=>{const s=state();return s&&s.pakkun.present?["kakashi","pakkun","anbu"]:["kakashi","anbu"];},preset:"anbu_report",transition:"wipe",onEnter:()=>mutate(s=>{if(s.package.holder==="KAKASHI"){s.package.holder="ANBU";s.package.returned=true;}s.terminal.reportReached=true;}),onAdvance:()=>mutate(s=>{if(s.pakkun.present){s.pakkun.present=false;s.pakkun.departed=true;}s.terminal.kakashiDismissed=true;}),cues:()=>correctedTerminalReportCues(),nextBeatId:"v2_hidden_review"});
 function commitTerminalRewardsAtReceipt(){
   const s=state(),rt=active();if(!s||!rt)return{success:false,reason:"kakashi_v2_state_missing"};
   s.terminal.receiptReached=true;save();
@@ -1521,9 +1599,8 @@ function completeAcademyKakashiV2Origin(){
   const result=typeof completeChronicleOriginPrologue==="function"?completeChronicleOriginPrologue(ORIGIN_ID,[`kakashi_v2:${rt.instanceId}`]):{success:false,reason:"origin_completion_api_missing"};
   return result&&result.success?{success:true,originCompletion:result}:result;
 }
-addBeat("v2_minato",{backdrop:B.hokage,location:"HOKAGE ADMINISTRATION · NIGHT",objective:null,actors:["anbu","minato"],preset:"hokage_report",transition:"wipe",onEnter:()=>mutate(s=>{s.terminal.minatoReached=true;}),cues:()=>minatoCues(),nextBeatId:"v2_receipt"});
-addBeat("v2_receipt",{backdrop:B.hokage,location:"CHRONICLE RECEIPT",objective:null,actors:[],preset:"chronicle_receipt",transition:"wipe",receipt:true,onEnter:()=>commitTerminalRewardsAtReceipt(),cues:()=>receiptCues(),nextBeatId:"v2_complete"});
-addBeat("v2_complete",{backdrop:B.hokage,location:"CHRONICLE CLOSED",objective:null,actors:[],preset:"chronicle_receipt",cues:[RECORD("Origin occurrence sealed. Continue to Academy Team Formation.")],onAdvance:()=>completeAcademyKakashiV2Origin(),exitScene:true});
+addBeat("v2_hidden_review",{backdrop:B.hokage,location:"HOKAGE ADMINISTRATION · NIGHT",objective:null,actors:()=>hiddenReviewActors(),preset:"hokage_test_review",transition:"wipe",presentationPackageHolder:"MINATO",onEnter:()=>mutate(s=>{s.terminal.minatoReached=true;s.terminal.hiddenTestReviewReached=true;}),cues:()=>hiddenReviewCues(),nextBeatId:"v2_receipt"});
+addBeat("v2_receipt",{backdrop:B.hokage,location:"CHRONICLE RECEIPT",objective:null,actors:[],preset:"chronicle_receipt",transition:"wipe",receipt:true,onEnter:()=>commitTerminalRewardsAtReceipt(),cues:()=>receiptCues(),onAdvance:()=>completeAndContinueAcademyKakashiV2Origin(),exitScene:true});
 
 // Register production scene.
 try{unregisterStoryScene(SCENE_ID);}catch(_e){}
@@ -1549,17 +1626,20 @@ function diagnostics(){
  const root=def&&def.beatMap.get("v2_scene02_tail"),watch=def&&def.beatMap.get("v2_watch_exchange");
  const checks={
   sceneRegistered:!!def,
-  exactRootChoices:!!root&&root.choices.map(c=>c.label).join("|")==="WATCH THE EXCHANGE|MOVE IN CLOSER|STRIKE BEFORE THE HANDOFF|SLIP IN FOR THE PACKAGE",
-  exactWatchChoices:!!watch&&watch.choices.map(c=>c.label).join("|")==="STOP THE ASSASSIN|SECURE THE PACKAGE|SECURE THE PACKAGE BEFORE THE ASSASSIN|DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE|GO AFTER THE ORIGINAL TARGET",
+  exactRootChoices:!!root&&root.choices.map(c=>c.label).join("|")==="WATCH THE HANDOFF|GET CLOSER|INTERRUPT THE HANDOFF|SLIP IN AND TAKE IT",
+  exactWatchChoices:!!watch&&watch.choices.map(c=>c.label).join("|")==="INTERCEPT THE MASKED ATTACKER|GO FOR THE PACKAGE|BEAT HER TO THE PACKAGE|DEAL WITH HER FIRST|CHASE THE MAN FROM THE PHOTO",
   tenBattleConfigsAvailable:!!globalThis.SC_ACADEMY_KAKASHI_V2_BATTLE_36010&&Object.keys(globalThis.SC_ACADEMY_KAKASHI_V2_BATTLE_36010.configs||{}).length===10,
   currentLethalLabels:JSON.stringify(beats).includes("KILL HER")&&JSON.stringify(beats).includes("KILL HIM")&&JSON.stringify(beats).includes("KILL THEM")&&!JSON.stringify(beats).includes("ATTEMPT"+" TO KILL"),
   stopAssassinUsesDirectMiConfig:!!def&&def.beatMap.get("v2_battle_mi_stop")?.battle?.encounterId==="academy_kakashi_origin_battle_mi_1v1",
-  stopAssassinPackageOnlyCatchup:!!def&&def.beatMap.get("v2_mi_stop_win")?.choices?.some(c=>c.label==="GO AFTER PACKAGE SMUGGLER")&&!def.beatMap.get("v2_mi_stop_win")?.choices?.some(c=>c.label==="GO AFTER ANBU MARKED TARGET"),
+  stopAssassinPackageOnlyCatchup:!!def&&def.beatMap.get("v2_mi_stop_win")?.choices?.some(c=>c.label==="CHASE THE PACKAGE")&&!def.beatMap.get("v2_mi_stop_win")?.choices?.some(c=>c.label==="CHASE THE MAN FROM THE PHOTO"),
   stopAssassinThreeActionGate:STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS===3,
   stableFactualResolver:Object.keys(factualDefs).length>=7,
   noDomOwnership:!String(addBeat).includes("document.")&&!String(resolveFactual).includes("querySelector"),
   terminalRewardsCommittedAtReceipt:String(commitTerminalRewardsAtReceipt).includes("commitAcademyKakashiV2TerminalRewards36015"),
   terminalCompleteCallsOrigin:String(completeAcademyKakashiV2Origin).includes("completeChronicleOriginPrologue"),
+  correctedHiddenTestTerminal:!!def&&def.beatMap.has("v2_hidden_review")&&!def.beatMap.has("v2_complete")&&String(hiddenReviewCues).includes("f07c.hidden_base_all_alive"),
+  receiptExitsDirectly:!!def&&def.beatMap.get("v2_receipt")?.exitScene===true&&String(completeAndContinueAcademyKakashiV2Origin).includes("showChronicleBegins:true"),
+  policeCardsProjected:String(policePairForParticipantKeys).includes("policeMiMale")&&String(policePairForParticipantKeys).includes("policePsFemale")&&String(groupTransferActors).includes('institution==="POLICE"'),
   browserGoldenClaimed:false
  };
  const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
