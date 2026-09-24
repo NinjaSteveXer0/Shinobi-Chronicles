@@ -392,13 +392,14 @@
         "story.factual.resolver.shared",
         "progression.special_jonin.contextual_evidence_producer.shared"
       ],
-      "owner": "runtime/alpha-kakashi-v2-core-36020.js + runtime/alpha-kakashi-v2-rewards-36015.js + runtime/alpha-special-jonin-evidence-producer-34700.js",
+      "owner": "runtime/alpha-kakashi-v2-core-36020.js + runtime/alpha-kakashi-v2-rewards-36015.js + runtime/alpha-special-jonin-evidence-producer-34700.js + game.js save compatibility reader",
       "directCallers": [
         "runtime/alpha-traversal-bridge-33200.js"
       ],
       "stateTouched": [
         "activeStorySceneRuntime.localContext.kakashiV2 participant disposition facts",
-        "playerData.storyFactualResolver.receipts",
+        "playerData.storyFactualResolver34600.receipts",
+        "playerData.storyDecisionRealisation34000 decision receipts",
         "playerData.activityHistory Kakashi V2 disposition/evidence occurrence facts",
         "playerData.specialJoninContextualEvidence",
         "Kakashi V2 reward receipt store"
