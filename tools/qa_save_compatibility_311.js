@@ -95,6 +95,25 @@ const {context,store}=makeContext();
 assert.strictEqual(typeof context.loadPlayerData,"function","#311 loadPlayerData not exposed to compatibility harness");
 assert.strictEqual(typeof context.savePlayerData,"function","#311 savePlayerData not exposed to compatibility harness");
 
+const rootFixture=CORPUS.fixtures[0];
+assert(rootFixture&&rootFixture.save,"#322 save-root fixture base missing");
+const durableRoots={
+  storyDecisionRealisation34000:{version:1,storyUnits:{academy_kakashi:{decisionReceipts:{intent_1:{storyDecisionReceiptId:"intent_1",status:"intent_committed"}}}}},
+  storyFactualResolver34600:{version:1,providerId:"ce.neutral_story_factual_resolver.v1",receipts:{"disp_1":{idempotenceKey:"disp_1",bindingRef:"academy_kakashi.v2.disposition.kill.mi",selectedOutcomeRef:"KILLED",status:"resolved"}}},
+  specialJoninContextualEvidence:[{evidenceId:"sjctx:academy_kakashi:reconnaissance.tracker_nin:root_1",subjectVariantId:"academy_kakashi",qualificationId:"reconnaissance.tracker_nin",independentSourceId:"root_1",significance:2}]
+};
+store.clear();
+store.set(SAVE_KEY,JSON.stringify({...rootFixture.save,...durableRoots}));
+const durableLoaded=context.loadPlayerData();
+assert.deepStrictEqual(durableLoaded.storyDecisionRealisation34000,durableRoots.storyDecisionRealisation34000,"#322 Story intent receipts dropped by loadPlayerData");
+assert.deepStrictEqual(durableLoaded.storyFactualResolver34600,durableRoots.storyFactualResolver34600,"#322 factual resolver receipts dropped by loadPlayerData");
+assert.deepStrictEqual(durableLoaded.specialJoninContextualEvidence,durableRoots.specialJoninContextualEvidence,"#322 contextual Special Jonin evidence dropped by loadPlayerData");
+vm.runInContext("playerData=loadPlayerData();savePlayerData();",context);
+const durableReloaded=context.loadPlayerData();
+assert.deepStrictEqual(durableReloaded.storyDecisionRealisation34000,durableRoots.storyDecisionRealisation34000,"#322 Story intent receipts changed after save/reload");
+assert.deepStrictEqual(durableReloaded.storyFactualResolver34600,durableRoots.storyFactualResolver34600,"#322 factual resolver receipts changed after save/reload");
+assert.deepStrictEqual(durableReloaded.specialJoninContextualEvidence,durableRoots.specialJoninContextualEvidence,"#322 contextual Special Jonin evidence changed after save/reload");
+
 const rows=[];
 for(const fixture of CORPUS.fixtures){
   assert(fixture.id&&fixture.lifecycle&&fixture.saveSchemaGeneration,"#311 save fixture metadata incomplete");
@@ -167,7 +186,10 @@ console.log(JSON.stringify({
     noDuplicateGrant:true,
     noOutcomeReroll:true,
     retiredUnknownBehaviorNotResurrected:true,
-    compatibilityReaderNotSecondWriter:true
+    compatibilityReaderNotSecondWriter:true,
+    storyIntentReceiptsPersist:true,
+    factualResolverReceiptsPersist:true,
+    contextualSpecialJoninEvidencePersists:true
   },
   browserGoldenClaimed:false
 },null,2));
