@@ -45,6 +45,20 @@ No specialist should alter current Battle turn semantics, rebuild the Formation 
 
 Current live runtime remains production authority.
 
+### Battle failure-containment authority — LOCKED
+
+Any future implementation of this Battle concept must also consume:
+
+`Documentation/Coordination/Battle_Failure_Containment_Recovery_and_Catastrophe_Safeguards_2026-09-25.md`
+
+That contract locks the Battle-specific exactly-once commit, action-opportunity identity, semantic phase, save/reload, formation normalization, stale-work rejection, presentation-recovery, invariant-validation and no-legacy-engine-fallback safeguards.
+
+Canonical recovery rule:
+
+> **FALLBACK TO AUTHORITATIVE STATE, NOT TO OLD CODE.**
+
+This reference does **not** release the implementation hold.
+
 ## 3. Core Battle identity
 
 Canonical concept:
@@ -637,6 +651,7 @@ The following concept is now locked:
 18. If only Reserves survive after Active + Benched-line withdrawal, the surviving Reserves become the new deployed formation.
 19. Alpha Summons are action selections from the SUMMONS dock, not battlefield participant cards, extra team slots or independent turns.
 20. Ordinary Battle starting positions and relay priority inherit the committed My Clan formation order: START -> NEXT 1 -> NEXT 2 -> NEXT 3 -> RESERVE 1 -> RESERVE 2.
+21. The Battle failure-containment and recovery safeguard contract is mandatory implementation authority: one validated semantic commit, exactly-once opportunity consumption, canonical-state recovery, stale-work rejection, deterministic persistence/reload, presentation fail-soft, semantic fail-closed, and no live legacy semantic fallback.
 
 ## 22. What remains OPEN
 
@@ -661,4 +676,4 @@ If Kakashi is rewritten, shared Battle implementation should wait until that rew
 
 ## 24. Final lock
 
-> **Shinobi Chronicles Battle is intended to become alternating side-turn combat presented through an adaptive six-shinobi Squad Wedge: one Active, three Benched and two Reserve Battle portraits per full team. The Active participant spends the normal side action opportunity; team size does not create six independent normal turns. The committed My Clan formation order determines the initial Active, Benched order, Reserve order and ordinary relay priority; Battle does not create a second replacement-choice system. When the Active reaches withdrawal, the outgoing portrait completes its knock-off/withdrawal animation first; only then does an eligible Benched portrait slide into the Active confrontation position while scaling from roughly 65–75% to 100%, with an available Reserve refilling the vacated Benched slot. Multi-participant withdrawals resolve from one committed action result and the surviving formation is normalized once. For Alpha, SUMMONS supplies authorised Summon actions only; Summons do not enter the Squad Wedge as participant portraits or receive independent turns. Combat owns all factual turn/action/target/result/withdrawal legality; battle.presentation.shared makes those committed facts kinetic and readable. The concept is locked now, but implementation is explicitly on hold until Stephen completes the Academy Kakashi Browser Golden decision.**
+> **Shinobi Chronicles Battle is intended to become alternating side-turn combat presented through an adaptive six-shinobi Squad Wedge: one Active, three Benched and two Reserve Battle portraits per full team. The Active participant spends the normal side action opportunity; team size does not create six independent normal turns. The committed My Clan formation order determines the initial Active, Benched order, Reserve order and ordinary relay priority; Battle does not create a second replacement-choice system. When the Active reaches withdrawal, the outgoing portrait completes its knock-off/withdrawal animation first; only then does an eligible Benched portrait slide into the Active confrontation position while scaling from roughly 65–75% to 100%, with an available Reserve refilling the vacated Benched slot. Multi-participant withdrawals resolve from one committed action result and the surviving formation is normalized once. For Alpha, SUMMONS supplies authorised Summon actions only; Summons do not enter the Squad Wedge as participant portraits or receive independent turns. Combat owns all factual turn/action/target/result/withdrawal legality; battle.presentation.shared makes those committed facts kinetic and readable. Any future implementation must also satisfy the locked Battle failure-containment contract, including exactly-once semantic commits and recovery from authoritative state rather than retired code. The concept is locked now, but implementation is explicitly on hold until Stephen completes the Academy Kakashi Browser Golden decision.**
