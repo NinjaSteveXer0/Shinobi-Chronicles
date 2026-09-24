@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "buildId": "SC-ALPHA-RUNTIME-R303-2026-09-24-U",
+  "buildId": "SC-ALPHA-RUNTIME-R303-2026-09-24-V",
   "sourceBaselineCommit": "0b5a7fd094ab4c22a6813705132c2040d9007ea6",
   "sourceRef": "issue-303-runtime-build-fingerprint-v1",
   "runtimeGeneration": "alpha-story-battle-formation-stage-312",
