@@ -18,7 +18,7 @@ const TEMPLATE="rogue_genin";
 const SOURCE_OCCURRENCE="occ_origin_izuno_rogue_genin_interruption_resolution";
 const CONFIG="academy_izuno_origin_rogue_genin_step_in_battle";
 const ENCOUNTER="origin_academy_izuno_rogue_genin_step_in";
-const SCENE_ID="origin_academy_izuno_pursuit_trial";
+const SCENE_ID="origin_academy_izuno_prologue";
 const FEINT_ID="enemy_rogue_genin_substitution_feint";
 const FEINT_STATE="rogue_genin_substitution_feint_ready";
 
