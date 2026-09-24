@@ -562,7 +562,7 @@
         "tools/qa_runtime_ownership_safety_300.js"
       ],
       "replaces": [],
-      "contractChangeReason": "PRESENTATION_TUNE",
+      "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Issue #302 final Alpha Golden blocker only: the three individual ANBU custody handoffs use a Kakashi-local anbu_handoff preset so the receiving ANBU Operative, Kakashi, the captive, and optional Pakkun occupy distinct stage positions. No dialogue, custody, package, reward, Battle, PL, route, transition, animation, Receipt, Police, or shared Scene Board semantics changed."
     }
   ]
