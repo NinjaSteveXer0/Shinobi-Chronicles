@@ -43,7 +43,7 @@ assert(kv2Renderer.includes('data-count="1"')&&kv2Renderer.includes('data-count=
 assert(kv2Renderer.includes("Final Kakashi Browser-Golden motion benchmark")&&kv2Renderer.includes("translate:4vw 0")&&kv2Renderer.includes("transform:none!important"),"#312 Kakashi motion must use longhand compositor primitives rather than the retired transform chain");
 {
   const actorMarkupStart=kv2Renderer.indexOf("function actorMarkup(");
-  const actorMarkupEnd=kv2Renderer.indexOf("function availableChoices(",actorMarkupStart);
+  const actorMarkupEnd=kv2Renderer.indexOf("function ensureRoot(",actorMarkupStart);
   const actorMarkupSource=kv2Renderer.slice(actorMarkupStart,actorMarkupEnd);
   assert(kv2Renderer.includes(".kv2-card-frame{display:none!important}")&&actorMarkupStart>=0&&actorMarkupEnd>actorMarkupStart&&!actorMarkupSource.includes('frame.className="kv2-card-frame"')&&actorMarkupSource.includes("figure.append(img,label)"),"#312 Kakashi phantom card-holder chrome must stay retired");
 }
