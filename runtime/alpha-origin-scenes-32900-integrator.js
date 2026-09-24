@@ -96,7 +96,12 @@ function runAlphaOriginScene32900Diagnostics(){
     continuityReused:A.completionRequest.toString().includes("completeChronicleOriginPrologue"),
     activeOriginReloadPresentationRehydrated:String(restoreActiveOriginStoryPresentation32900).includes('active.sceneId!==sceneId')&&String(restoreActiveOriginStoryPresentation32900).includes('openOverlay("story_scene")')&&String(restoreActiveOriginStoryPresentation32900).includes("origin_prologue_already_completed"),
     noDirectPLGrant:!A.commitOccurrence.toString().includes("currentPL")&&!A.commitOccurrence.toString().includes("BasePL"),
-    nonKakashiOptionalBattleScenesExplicitlyFailClosed:A.battleFailClosedScenes.size>=4,
+    wasabiRogueBattleSeamImplemented:(()=>{
+      const def=typeof getStorySceneDefinition==="function"?getStorySceneDefinition(A.sceneByVariant.academy_izuno):null;
+      const beat=def&&def.beatMap&&def.beatMap.get("izu_rogue_step_in_battle");
+      return !!beat&&beat.mode==="battle_transition"&&!!beat.battle&&beat.battle.encounterId==="origin_academy_izuno_rogue_genin_step_in";
+    })(),
+    nonKakashiOptionalBattleScenesExplicitlyFailClosed:A.battleFailClosedScenes.size>=3,
     browserGoldenClaimed:false
   };
   return{patchId:A.patchId,pass:Object.entries(checks).filter(([k])=>k!=="browserGoldenClaimed").every(([,v])=>v===true),checks,registrations:A.clone(A.registrations),status,browserGolden:false};
