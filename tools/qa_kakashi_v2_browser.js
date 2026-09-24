@@ -169,6 +169,60 @@ async function inspect(page,label){
   return row;
 }
 
+async function assertIndividualAnbuHandoffGeometry(page,label,{captiveId,expectPakkun=false}){
+  await waitVisualReady(page,label+":geometry");
+  const row=await page.evaluate(()=>{
+    const root=document.getElementById("kakashi-v2-scene-board");
+    const stage=root&&root.querySelector(".kv2-actors");
+    const visible=n=>!!n&&n.getClientRects().length>0&&getComputedStyle(n).display!=="none"&&getComputedStyle(n).visibility!=="hidden"&&Number(getComputedStyle(n).opacity)!==0;
+    const rect=n=>{
+      const r=n.getBoundingClientRect();
+      return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height,centerX:r.left+r.width/2};
+    };
+    const actors=root?[...root.querySelectorAll(".kv2-actor")].filter(visible).map(n=>({id:n.dataset.actorId,slot:n.dataset.slot,...rect(n)})):[];
+    const packageToken=root&&root.querySelector('[data-story-object-id="PACKAGE"]');
+    const packageVisible=visible(packageToken);
+    const state=getAcademyKakashiV2State36020();
+    return{
+      preset:root&&root.dataset.preset||null,
+      stage:stage?rect(stage):null,
+      actors,
+      packageHolder:state&&state.package&&state.package.holder||null,
+      packageToken:packageToken?{visible:packageVisible,holder:packageToken.dataset.packageHolder||null,...(packageVisible?rect(packageToken):{})}:null
+    };
+  });
+  assert.strictEqual(row.preset,"anbu_handoff",label+" did not use the individual ANBU handoff preset");
+  const byId=new Map(row.actors.map(actor=>[actor.id,actor]));
+  const kakashi=byId.get("academy_kakashi");
+  const captive=byId.get(captiveId);
+  const anbu=byId.get("konoha_anbu_operational_contact");
+  const pakkun=byId.get("pakkun_origin_unfamiliar_ninken");
+  assert(kakashi,label+" missing Kakashi");
+  assert(captive,label+" missing captive "+captiveId);
+  assert(anbu,label+" missing receiving ANBU Operative");
+  assert.strictEqual(!!pakkun,expectPakkun,label+" Pakkun presence drifted");
+  assert(anbu.centerX<kakashi.centerX&&kakashi.centerX<captive.centerX,label+" custody tableau order drifted: "+JSON.stringify(row.actors));
+  if(expectPakkun)assert(captive.centerX<pakkun.centerX,label+" AMT/Pakkun order drifted: "+JSON.stringify(row.actors));
+
+  const intersects=(a,b)=>!(a.right<=b.left||a.left>=b.right||a.bottom<=b.top||a.top>=b.bottom);
+  for(let i=0;i<row.actors.length;i++)for(let j=i+1;j<row.actors.length;j++){
+    assert(!intersects(row.actors[i],row.actors[j]),label+" actor cards overlap: "+row.actors[i].id+" / "+row.actors[j].id+" "+JSON.stringify(row.actors));
+  }
+  const tolerance=2;
+  for(const actor of row.actors){
+    assert(actor.left>=row.stage.left-tolerance&&actor.right<=row.stage.right+tolerance&&actor.top>=row.stage.top-tolerance&&actor.bottom<=row.stage.bottom+tolerance,label+" actor clipped outside stage: "+actor.id+" "+JSON.stringify({actor,stage:row.stage}));
+  }
+
+  if(row.packageToken&&row.packageToken.visible){
+    assert.strictEqual(row.packageToken.holder,row.packageHolder,label+" package token holder drifted");
+    const holderId={KAKASHI:"academy_kakashi",MI:"academy_kakashi_origin_masked_interceptor",PS:"academy_kakashi_origin_package_smuggler",AMT:"academy_kakashi_origin_amt",ANBU:"konoha_anbu_operational_contact"}[row.packageHolder]||null;
+    const holder=holderId&&byId.get(holderId);
+    assert(holder,label+" visible package token has no visible holder actor");
+    assert(Math.abs(row.packageToken.left-holder.left)<=16,label+" package token no longer follows holder anchor: "+JSON.stringify({packageToken:row.packageToken,holder}));
+  }
+  return row;
+}
+
 
 async function assertSingleAdvancePaths(page){
   const before=await page.evaluate(()=>({
@@ -1168,10 +1222,36 @@ async function browserRouteMatrix(browser){
     let s=await stateSnapshot(page);
     assert.strictEqual(s.participants.MI.state,"BATTLE_DEFEATED","MI custody committed before ANBU handoff");
     await advanceTo(page,"v2_mi_anbu_handoff");
+    const miHandoff=await inspect(page,"mi-anbu-handoff");
+    const miHandoffGeometry=await assertIndividualAnbuHandoffGeometry(page,"mi-anbu-handoff",{captiveId:"academy_kakashi_origin_masked_interceptor"});
+    await shot(page,"golden-mi-anbu-handoff.png");
     await nextSemantic(page,"v2_report");
     s=await stateSnapshot(page);
     assert.strictEqual(s.participants.MI.state,"ANBU_CUSTODY");
     return{terminal:await finishTerminalBrowser(page,"stop_assassin_slow_anbu_custody")};
+  });
+
+  await scenario("package_smuggler_anbu_handoff",async page=>{
+    await seedResolver(page,"psPursuit","PS_PURSUIT_SUCCESS");
+    await chooseLabel(page,"WATCH THE HANDOFF","v2_watch_exchange");
+    await chooseLabel(page,"INTERCEPT THE MASKED ATTACKER","v2_stop_assassin_setup");
+    await advanceTo(page,"v2_battle_mi_stop");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_mi_stop_win"});
+    await chooseLabel(page,"CHASE THE PACKAGE","v2_ps_pursuit_resolver");
+    await advanceTo(page,"v2_battle_ps_seq");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_ps_seq_win"});
+    await chooseLabel(page,"BRING HIM TO ANBU","v2_ps_anbu_depart");
+    let s=await stateSnapshot(page);
+    assert.strictEqual(s.participants.PS.state,"BATTLE_DEFEATED","PS custody committed before ANBU handoff");
+    await advanceTo(page,"v2_ps_anbu_handoff");
+    const psHandoff=await inspect(page,"ps-anbu-handoff");
+    const psHandoffGeometry=await assertIndividualAnbuHandoffGeometry(page,"ps-anbu-handoff",{captiveId:"academy_kakashi_origin_package_smuggler"});
+    await shot(page,"golden-ps-anbu-handoff.png");
+    await nextSemantic(page,"v2_report");
+    s=await stateSnapshot(page);
+    assert.strictEqual(s.package.holder,"ANBU");
+    assert.strictEqual(s.participants.PS.state,"ANBU_CUSTODY");
+    return{handoff:psHandoff,handoffGeometry:psHandoffGeometry,terminal:await finishTerminalBrowser(page,"package_smuggler_anbu_handoff")};
   });
 
   await scenario("assassin_then_package_full_sequence",async page=>{
@@ -1193,6 +1273,9 @@ async function browserRouteMatrix(browser){
     let s=await stateSnapshot(page);
     assert.strictEqual(s.participants.AMT.state,"BATTLE_DEFEATED","AMT custody committed before ANBU handoff");
     await advanceTo(page,"v2_amt_anbu_handoff");
+    const amtHandoff=await inspect(page,"amt-anbu-handoff-pakkun");
+    const amtHandoffGeometry=await assertIndividualAnbuHandoffGeometry(page,"amt-anbu-handoff-pakkun",{captiveId:"academy_kakashi_origin_amt",expectPakkun:true});
+    await shot(page,"golden-amt-anbu-handoff-pakkun.png");
     await nextSemantic(page,"v2_report");
     s=await stateSnapshot(page);
     assert.strictEqual(s.package.holder,"ANBU");
@@ -1257,7 +1340,7 @@ async function browserRouteMatrix(browser){
     return{terminal:await finishTerminalBrowser(page,"closer_failure_cutoff_police")};
   });
 
-  assert.strictEqual(results.length,10);
+  assert.strictEqual(results.length,11);
   return{pass:true,scenarioFamiliesValidated:results.length,results};
 }
 
