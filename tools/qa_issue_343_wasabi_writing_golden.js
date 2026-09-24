@@ -55,7 +55,8 @@ const A={
   active:()=>({instanceId:"qa_wasabi_scene",battleResume:{outcome:"victory",authored:{battleResult:"victory",battleOccurrenceId:"battle_occ_origin_izuno_rogue_genin_step_in:qa_wasabi_scene"}}}),
   local:()=>({}),
   commitOccurrence:(originId,occurrenceId,fact,rowIds,options)=>({success:true,originId,occurrenceId,fact,rowIds,options}),
-  register:def=>{const copy={...def,beatMap:new Map((def.beats||[]).map(b=>[b.beatId,b]))};scenes.set(def.sceneId,copy);return{success:true,sceneId:def.sceneId};}
+  register:def=>{const copy={...def,beatMap:new Map((def.beats||[]).map(b=>[b.beatId,b]))};scenes.set(def.sceneId,copy);return{success:true,sceneId:def.sceneId};},
+  unavailableBattle:()=>()=>({available:false,knownBlocker:"qa_unavailable_battle"})
 };
 const storyCtx={
   console,JSON,Object,Array,String,Number,Boolean,Set,Map,Math,Date,globalThis:null,
