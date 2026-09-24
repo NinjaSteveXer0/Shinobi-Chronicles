@@ -437,7 +437,8 @@
         "tools/qa_kakashi_v2_clean_room.js",
         "tools/qa_kakashi_v2_browser.js",
         "tools/qa_issue_312_story_battle_benchmark.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_334_story_transition_owner.js"
       ],
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
