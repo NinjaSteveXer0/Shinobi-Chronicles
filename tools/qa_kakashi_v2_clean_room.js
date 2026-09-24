@@ -334,7 +334,7 @@ assert(coreSource.includes('addBeat("v2_battle_ps_seq",{mode:"battle_transition"
   assert(machineResolverBeats.every(b=>b.mode==="choice"&&b.choices.length===2&&b.choices.every(ch=>ch.label==="RESOLVE RESULT")),"machine resolver must use canonical Story choice routing with hidden RESOLVE RESULT branches");
   assert(!/C\([^,\n]+,"CONTINUE"/.test(coreSource),"resolver CONTINUE pseudo-decision returned");
   assert(rendererSource.includes("beat.machineResolved===true"),"renderer no longer hides machine resolver branches");
-  assert(rendererSource.includes('beat.machineResolved===true||(beat.mode!=="choice"&&beat.mode!=="battle_transition")'),"machine resolver no longer exposes stage-wide semantic advance at cue end");
+  assert(rendererSource.includes("isMachineResolvedBeat36030(beat)||(beat.mode!==\"choice\"&&beat.mode!==\"battle_transition\")")&&rendererSource.includes('root.dataset.canAdvance=!actions.length&&(!t.atEnd||semanticNext)?"true":"false"'),"machine resolver no longer exposes stage-wide semantic advance at cue end");
   assert(transitionSource.includes("committedResolverChoice36040")&&transitionSource.includes("available.length!==1"),"transition no longer projects the single committed resolver branch directly");
 }
 
