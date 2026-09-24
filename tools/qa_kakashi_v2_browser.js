@@ -976,7 +976,9 @@ async function browserRouteMatrix(browser){
     assert(labels.includes("GO AFTER PACKAGE SMUGGLER"),JSON.stringify(labels));
     assert(!labels.includes("GO AFTER ANBU MARKED TARGET"),JSON.stringify(labels));
     await chooseLabel(page,"RESTRAIN HER AND CONTINUE","v2_mi_restrained_next");
-    await chooseLabel(page,"GO AFTER PACKAGE SMUGGLER","v2_ps_pursuit_resolver");
+    const restrainedResolution=await stateSnapshot(page);
+    assert(["RESTRAINED","ESCAPED"].includes(restrainedResolution.participants.MI.state),"RESTRAIN HER AND CONTINUE produced invalid final state: "+JSON.stringify(restrainedResolution.participants.MI));
+    await nextSemantic(page,"v2_ps_pursuit_resolver");
     await advanceTo(page,"v2_battle_ps_seq");
     const psBattleScene=await page.evaluate(()=>{
       const beatId=getActiveStorySceneRuntime()?.beatId||null;
@@ -986,7 +988,7 @@ async function browserRouteMatrix(browser){
     assert.strictEqual(psBattleScene.backdrop,"Kakashi Origin Backdrop/konoha_alleyway_alt_night.png","PS pursuit Battle jumped back to the Sakura-tree arena: "+JSON.stringify(psBattleScene));
     await launchAndReturnBattle(page,{outcome:"defeat",actions:2,expectedBeat:"v2_ps_seq_loss"});
     const s=await stateSnapshot(page);
-    assert(["RESTRAINED","ESCAPED"].includes(s.participants.MI.state),"RESTRAIN HER AND CONTINUE produced invalid final state: "+JSON.stringify(s.participants.MI));
+    assert(["RESTRAINED","ESCAPED"].includes(s.participants.MI.state),"MI disposition changed after PS pursuit: "+JSON.stringify(s.participants.MI));
     assert.strictEqual(s.participants.PS.state,"ESCAPED");
     return{terminal:await finishTerminalBrowser(page,"stop_assassin_fast_restrain_then_ps_loss")};
   });
