@@ -285,8 +285,14 @@ assert(coreSource.includes('addBeat("v2_battle_ps_seq",{mode:"battle_transition"
   assert(def.beatMap.get("v2_group2_kill_result")&&def.beatMap.get("v2_group3_kill_result"),"final mixed group KILL result beats missing");
 
   const packageSecond=def.beatMap.get("v2_mi_package_second_win");
-  assert(packageSecond.choices.some(c=>c.label==="CHASE THE PACKAGE SMUGGLER"));
-  assert(!packageSecond.choices.some(c=>c.label==="GO AFTER ANBU MARKED TARGET"),"package-second branch collapsed into STOP THE ASSASSIN");
+  assert(packageSecond&&packageSecond.machineResolved===true&&packageSecond.mode==="resolver","Family 04 fast/slow MI result must be deterministic, not a player choice");
+  assert(packageSecond.choices.length===2&&packageSecond.choices.every(c=>c.label==="RESOLVE RESULT"),"Family 04 MI result leaked a pseudo-choice");
+  const psPackageWin=def.beatMap.get("v2_ps_package_second_win");
+  assert(psPackageWin.choices.some(c=>c.label==="CHASE THE MAN FROM THE PHOTO")&&psPackageWin.choices.some(c=>c.label==="RETURN TO ANBU"),"Family 04 post-PS decision labels drifted");
+  const securePackageWin=def.beatMap.get("v2_ps_mi_win");
+  assert(securePackageWin.choices.some(c=>c.label==="CHASE THE MAN FROM THE PHOTO")&&securePackageWin.choices.some(c=>c.label==="RETURN TO ANBU"),"Family 03 post-package decision labels drifted");
+  const askWhere=def.beatMap.get("v2_stay_package_intercept");
+  assert(askWhere.choices.some(c=>c.label==="ASK WHERE IT WAS GOING"),"Family 02 interrogation label drifted");
   const closer=def.beatMap.get("v2_closer_handoff");
   assert.strictEqual(closer.mode,"choice");
   assert.strictEqual(closer.choices.length,5);
@@ -313,7 +319,7 @@ assert(coreSource.includes('addBeat("v2_battle_ps_seq",{mode:"battle_transition"
   assert(rendererSource.includes("police_handoff")&&rendererSource.includes('data-count="6"')&&rendererSource.includes("kakashi_upf_"),"Police cards are not projected on a six-person handoff stage");
   assert(rendererSource.includes("hokage_test_review")&&rendererSource.includes("presentationPackageHolder"),"hidden test review presentation contract missing");
   const machineResolverBeats=[...def.beatMap.values()].filter(b=>b.machineResolved===true);
-  assert.strictEqual(machineResolverBeats.length,10,"Writing-Golden resolver beat count drifted");
+  assert.strictEqual(machineResolverBeats.length,11,"Writing-Golden resolver beat count drifted");
   assert(machineResolverBeats.every(b=>b.mode==="resolver"&&b.choices.length===2&&b.choices.every(ch=>ch.label==="RESOLVE RESULT")),"resolver-only branch is still a player-facing choice card");
   assert(!/C\([^,\n]+,"CONTINUE"/.test(coreSource),"resolver CONTINUE pseudo-decision returned");
   assert(rendererSource.includes("beat.machineResolved===true"),"renderer no longer hides machine resolver branches");
