@@ -444,6 +444,35 @@
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Stephen's final Browser-Golden attempt reopens presentation-only motion after the static stabilization checkpoint. This pass removes the phantom Story card-holder overlay and consumes the existing shared 33900 choreography queue through Kakashi-only CSS translate/scale/rotate longhands while transform remains locked to none. Hard scene and Story/Battle transitions remain exclusively owned by the shared 33900 curtain. Story truth, Battle semantics, rewards, PL, route topology and authored text are unchanged."
+    },
+    {
+      "changeId": "academy-hinata-writing-golden-340",
+      "classification": "REPLACES",
+      "responsibilityIds": [
+        "origin.academy_hinata.final_story_state"
+      ],
+      "owner": "runtime/alpha-origin-scenes-32900-a.js",
+      "directCallers": [
+        "runtime/alpha-origin-scenes-32900-integrator.js",
+        "runtime/alpha-origin-browser-realisation-33500.js"
+      ],
+      "stateTouched": [
+        "activeStorySceneRuntime.localContext Hinata exchange choices",
+        "playerData.activityHistory occ_origin_hinata_controlled_hyuga_spar_resolution",
+        "playerData.activityHistory occ_origin_hinata_younger_student_practice_resolution"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_340_hinata_writing_golden.js",
+        "tools/qa_alpha_origin_scenes_32900_runtime.js",
+        "tools/qa_issue_105_origin_browser_realisation_runtime.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [
+        "runtime/alpha-origin-scenes-32900-a.js::pre340_compressed_academy_hinata"
+      ],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Issue #340 consumes the approved Academy Hinata Writing-Golden story as the sole production expression, replacing the compressed independent-quiz branch with three connected authored spar exchanges, opponent adaptation, history-sensitive instructor prompting/evaluation and the authored younger-Hyuga close while preserving existing source occurrences and the no-PL-Battle boundary."
     }
   ]
 }
