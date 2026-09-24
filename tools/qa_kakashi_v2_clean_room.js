@@ -3,6 +3,7 @@
 
 const fs=require("fs"),vm=require("vm"),assert=require("assert");
 const CONTENT_PATH="runtime/academy-kakashi-v2-content-36000.js";
+const WRITING_GOLDEN_PATH="runtime/academy-kakashi-v2-writing-golden-36100.js";
 const CORE_PATH="runtime/alpha-kakashi-v2-core-36020.js";
 const BATTLE_PATH="runtime/alpha-kakashi-v2-battle-36010.js";
 const REWARD_PATH="runtime/alpha-kakashi-v2-rewards-36015.js";
@@ -12,9 +13,10 @@ const STORY_PATH="runtime/alpha-story-scene-board-33900.js";
 const EVIDENCE_PATH="runtime/alpha-special-jonin-evidence-producer-34700.js";
 const TRAVERSAL_PATH="runtime/alpha-traversal-bridge-33200.js";
 
-for(const p of [CONTENT_PATH,CORE_PATH,BATTLE_PATH,REWARD_PATH,RENDER_PATH,TRANSITION_PATH,STORY_PATH,EVIDENCE_PATH])assert(fs.existsSync(p),`missing V2/shared file: ${p}`);
+for(const p of [CONTENT_PATH,WRITING_GOLDEN_PATH,CORE_PATH,BATTLE_PATH,REWARD_PATH,RENDER_PATH,TRANSITION_PATH,STORY_PATH,EVIDENCE_PATH])assert(fs.existsSync(p),`missing V2/shared file: ${p}`);
 
 const contentSource=fs.readFileSync(CONTENT_PATH,"utf8");
+const writingGoldenSource=fs.readFileSync(WRITING_GOLDEN_PATH,"utf8");
 const battleSource=fs.readFileSync(BATTLE_PATH,"utf8");
 const rewardSource=fs.readFileSync(REWARD_PATH,"utf8");
 const coreSource=fs.readFileSync(CORE_PATH,"utf8");
@@ -26,7 +28,7 @@ const traversalSource=fs.readFileSync(TRAVERSAL_PATH,"utf8");
 
 // Architecture gates.
 assert(!/runtime\/alpha-kakashi-(?!v2-)/.test(traversalSource),"legacy Kakashi loader leaked back into traversal");
-for(const p of [CONTENT_PATH,BATTLE_PATH,REWARD_PATH,CORE_PATH,RENDER_PATH,TRANSITION_PATH,EVIDENCE_PATH])assert(traversalSource.includes(p),`V2/shared loader missing ${p}`);
+for(const p of [CONTENT_PATH,WRITING_GOLDEN_PATH,BATTLE_PATH,REWARD_PATH,CORE_PATH,RENDER_PATH,TRANSITION_PATH,EVIDENCE_PATH])assert(traversalSource.includes(p),`V2/shared loader missing ${p}`);
 assert(traversalSource.includes("function after33600()")&&traversalSource.includes("sc-alpha-origin-choice-reaction-33510-script")&&traversalSource.includes("function load33700()"),"V2 terminal loader can drop activation before future 33600/33700 scripts exist");
 const coreOperationalSource=coreSource.split("function diagnostics()")[0];
 assert(!/querySelector|document\.|createElement/.test(coreOperationalSource),"Story/state core owns DOM");
@@ -220,6 +222,7 @@ assert(coreSource.includes('addBeat("v2_battle_ps_seq",{mode:"battle_transition"
   };
   context.globalThis=context;vm.createContext(context);
   vm.runInContext(contentSource,context,{filename:CONTENT_PATH});
+  vm.runInContext(writingGoldenSource,context,{filename:WRITING_GOLDEN_PATH});
   vm.runInContext(coreSource,context,{filename:CORE_PATH});
   const diag=context.runAcademyKakashiV2Core36020Diagnostics();
   assert.strictEqual(diag.pass,true,JSON.stringify(diag,null,2));
@@ -262,17 +265,17 @@ assert(coreSource.includes('addBeat("v2_battle_ps_seq",{mode:"battle_transition"
   for(const phrase of forbiddenPlayerFacingPhrases)assert(!coreSource.includes(`N("${phrase}`)&&!coreSource.includes(`Q("${phrase}`),`player-facing implementation prose leaked: ${phrase}`);
 
   const root=def.beatMap.get("v2_scene02_tail");
-  assert.strictEqual(JSON.stringify(Array.from(root.choices).map(c=>c.label)),JSON.stringify(["WATCH THE EXCHANGE","MOVE IN CLOSER","STRIKE BEFORE THE HANDOFF","SLIP IN FOR THE PACKAGE"]));
+  assert.strictEqual(JSON.stringify(Array.from(root.choices).map(c=>c.label)),JSON.stringify(["WATCH THE HANDOFF","GET CLOSER","INTERRUPT THE HANDOFF","SLIP IN AND TAKE IT"]));
   const watch=def.beatMap.get("v2_watch_exchange");
-  assert.strictEqual(JSON.stringify(Array.from(watch.choices).map(c=>c.label)),JSON.stringify(["STOP THE ASSASSIN","SECURE THE PACKAGE","SECURE THE PACKAGE BEFORE THE ASSASSIN","DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE","GO AFTER THE ORIGINAL TARGET"]));
+  assert.strictEqual(JSON.stringify(Array.from(watch.choices).map(c=>c.label)),JSON.stringify(["INTERCEPT THE MASKED ATTACKER","GO FOR THE PACKAGE","BEAT HER TO THE PACKAGE","DEAL WITH HER FIRST","CHASE THE MAN FROM THE PHOTO"]));
   const stopBattle=def.beatMap.get("v2_battle_mi_stop");
-  assert(stopBattle&&stopBattle.battle,"Stop Assassin Battle beat missing");
-  assert.strictEqual(stopBattle.battle.encounterId,"academy_kakashi_origin_battle_mi_1v1","Stop Assassin incorrectly reused sequential MI config");
+  assert(stopBattle&&stopBattle.battle,"Intercept Masked Attacker Battle beat missing");
+  assert.strictEqual(stopBattle.battle.encounterId,"academy_kakashi_origin_battle_mi_1v1","Intercept Masked Attacker incorrectly reused sequential MI config");
   const stopWin=def.beatMap.get("v2_mi_stop_win");
-  assert(stopWin,"Stop Assassin win beat missing");
-  assert(stopWin.choices.some(c=>c.label==="GO AFTER PACKAGE SMUGGLER"),"Stop Assassin lost Package Smuggler catch-up");
-  assert(!stopWin.choices.some(c=>c.label==="GO AFTER ANBU MARKED TARGET"),"Stop Assassin illegally exposes direct AMT pursuit");
-  const psCatchup=stopWin.choices.find(c=>c.label==="GO AFTER PACKAGE SMUGGLER");
+  assert(stopWin,"Intercept Masked Attacker win beat missing");
+  assert(stopWin.choices.some(c=>c.label==="CHASE THE PACKAGE"),"Intercept Masked Attacker lost Package Smuggler catch-up");
+  assert(!stopWin.choices.some(c=>c.label==="CHASE THE MAN FROM THE PHOTO"),"Intercept Masked Attacker illegally exposes direct AMT pursuit");
+  const psCatchup=stopWin.choices.find(c=>c.label==="CHASE THE PACKAGE");
   assert(psCatchup&&typeof psCatchup.availability==="function","Stop Assassin Package Smuggler catch-up availability missing");
   assert(coreSource.includes("const STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS=3;"),"Stop Assassin Package Smuggler catch-up is not locked to the current three-action gate");
   assert(coreSource.includes('battleActions("mi_stop")<=STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS'),"Stop Assassin choice does not consume the named three-action gate");
@@ -288,6 +291,27 @@ assert(coreSource.includes('addBeat("v2_battle_ps_seq",{mode:"battle_transition"
   assert.strictEqual(closer.mode,"choice");
   assert.strictEqual(closer.choices.length,5);
   assert(!closer.nextBeatId,"Get Closer handoff replays far-distance WATCH opening");
+
+  const interruptCues=context.getAcademyKakashiV2Cues36020("v2_direct_strike_setup").map(x=>x.text);
+  assert(interruptCues.includes("You could've kept watching.")&&interruptCues.includes("I saw enough.")&&interruptCues.includes("You're alone."),"Family 05 interrupt dialogue missing");
+  assert(!interruptCues.includes("For now."),"superseded direct-handoff Kakashi reply returned");
+  const interruptWinCues=context.getAcademyKakashiV2Cues36020("v2_direct_strike_2v1_win").map(x=>x.text);
+  for(const line of ["You're after this.","Put it down.","No."])assert(interruptWinCues.includes(line),"Family 05 MI entry missing: "+line);
+
+  assert(def.beatMap.has("v2_hidden_review"),"corrected hidden-test review beat missing");
+  assert(!def.beatMap.has("v2_minato"),"superseded non-reveal Minato beat retained");
+  assert(!def.beatMap.has("v2_complete"),"forbidden Origin occurrence sealed pseudo-receipt retained");
+  const receipt=def.beatMap.get("v2_receipt");
+  assert(receipt&&receipt.exitScene===true&&Array.isArray(receipt.onAdvanceConsequences),"Receipt must complete Origin directly on CONTINUE");
+  assert(!coreSource.includes('RECORD("Origin occurrence sealed.'),"raw Origin occurrence sealed player-facing close returned");
+  assert(coreSource.includes('presentationPackageHolder:"MINATO"'),"hidden review package presentation seam missing");
+
+  const policeGroup=def.beatMap.get("v2_group3_police_handoff");
+  assert(policeGroup&&policeGroup.beatId==="v2_group3_police_handoff","all-three Police handoff missing");
+  assert(coreSource.includes('return["policeAmtMale","policeMiFemale"]'),"all-three Police handoff must use a mixed pair not equal to a dedicated single-target pair");
+  for(const asset of ["uchiha_police_force_member_male.png","uchiha_police_force_member_female.png","uchiha_police_force_male_alt_1.png","uchiha_police_force_female_alt_1.png","uchiha_police_force_male_alt_2.png","uchiha_police_force_female_alt_2.png"])assert(coreSource.includes(asset),"Police card asset missing: "+asset);
+  assert(rendererSource.includes("police_handoff")&&rendererSource.includes('data-count="6"')&&rendererSource.includes("kakashi_upf_"),"Police cards are not projected on a six-person handoff stage");
+  assert(rendererSource.includes("hokage_test_review")&&rendererSource.includes("presentationPackageHolder"),"hidden test review presentation contract missing");
 }
 
 console.log(JSON.stringify({
