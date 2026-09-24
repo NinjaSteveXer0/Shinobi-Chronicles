@@ -226,7 +226,7 @@ console.log(JSON.stringify({
   storyOwner:"runtime/alpha-story-scene-board-33900.js",
   battleOwner:"runtime/alpha-battle-modern-33000.js",
   storySemanticCommitBeforeMotion:true,
-  kakashiUsesStaticGoldenMotion:true,
+  kakashiUsesBoundedLonghandMotion:true,
   battleEvidenceProjection:{
     hit:true,
     substitution:true,
