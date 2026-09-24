@@ -84,7 +84,7 @@ function installStyle(){
 #${ROOT_ID} .sc-choreo-focus,#${ROOT_ID} .sc-choreo-strike,#${ROOT_ID} .sc-choreo-recoil,#${ROOT_ID} .sc-choreo-lunge{
   animation:none!important;transition:none!important;transform:none!important;will-change:auto!important
 }
-#${ROOT_ID} .kv2-card-frame{position:absolute;inset:0;border:1px solid rgba(210,172,80,.28);background:linear-gradient(180deg,transparent 50%,rgba(1,6,9,.68));box-shadow:inset 0 0 0 1px rgba(255,255,255,.018)}
+#${ROOT_ID} .kv2-card-frame{display:none!important}
 #${ROOT_ID} .kv2-actor-label{position:absolute;left:6%;right:6%;bottom:3%;padding:6px 8px;border:1px solid rgba(208,168,75,.4);background:rgba(2,7,11,.88);text-align:center;font-size:8px;font-weight:900;letter-spacing:.11em;color:#eee2c7;text-shadow:0 1px 2px #000}\n#${ROOT_ID} .kv2-actor-state{display:table;margin:4px auto 0;padding:2px 6px;border:1px solid rgba(92,215,225,.35);background:rgba(4,23,28,.82);color:#7fe1e8;font-size:7px;font-weight:900;letter-spacing:.08em}\n#${ROOT_ID} .kv2-object-layer{position:absolute;inset:0;z-index:16;pointer-events:none}\n#${ROOT_ID} .kv2-package-token{position:absolute;top:42%;left:var(--sc-stage-anchor-x,50%);width:64px;height:45px;transform:translate(-8%,-50%);display:grid;place-items:center;border:1px solid rgba(221,178,73,.75);background:linear-gradient(145deg,rgba(42,30,12,.95),rgba(12,14,13,.96));box-shadow:0 12px 28px rgba(0,0,0,.48),0 0 18px rgba(221,178,73,.12);color:#e4c66e;font-size:7px;font-weight:900;letter-spacing:.12em}\n#${ROOT_ID} .kv2-package-token::before{content:"";position:absolute;width:32px;height:21px;border:1px solid rgba(226,190,100,.64);background:linear-gradient(135deg,#4a3a21,#21190f);transform:rotate(-4deg)}\n#${ROOT_ID} .kv2-package-token span{position:absolute;top:calc(100% + 5px);white-space:nowrap;padding:3px 5px;background:rgba(2,8,11,.82);border:1px solid rgba(215,174,76,.32)}\n#${ROOT_ID} .kv2-package-token[hidden]{display:none!important}\n#${ROOT_ID} .kv2-departure-ghost,#${ROOT_ID} .kv2-outgoing-hold-ghost{position:absolute!important;z-index:13!important;pointer-events:none!important}\n#${ROOT_ID} .kv2-departure-ghost{display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.9) brightness(.94) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0)}\n#${ROOT_ID} .kv2-outgoing-hold-ghost{display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.96) brightness(.96) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0)}\n#${ROOT_ID} .kv2-departure-ghost img,#${ROOT_ID} .kv2-outgoing-hold-ghost img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}\n#${ROOT_ID} .kv2-actors{transition:none!important}
 #${ROOT_ID}[data-transition-active="true"] .kv2-actors{pointer-events:none!important}\n#${ROOT_ID} .kv2-dialogue{position:absolute;left:50%;bottom:3%;width:min(72%,980px);min-height:0;max-height:none;z-index:30;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto;column-gap:14px;padding:11px 15px 12px;transform:translateX(-50%);border:1px solid rgba(93,215,225,.32);border-radius:16px;background:linear-gradient(180deg,rgba(5,16,22,.88),rgba(2,9,14,.95));box-shadow:0 18px 48px rgba(0,0,0,.46),inset 0 0 0 1px rgba(255,255,255,.025);backdrop-filter:blur(8px)}
 #${ROOT_ID} .kv2-speaker{grid-column:1;grid-row:1;color:#e3bd5f;font-size:8px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;min-height:11px}
@@ -155,13 +155,12 @@ function actorMarkup(actor){
   figure.className="kv2-actor";
   figure.dataset.actorId=String(actor.id||"");
   figure.dataset.slot=actorSlot(actor);
-  const frame=document.createElement("div");frame.className="kv2-card-frame";
   const img=document.createElement("img");img.alt="";img.src=String(actor.image||"");
   const label=document.createElement("figcaption");label.className="kv2-actor-label";
   const name=document.createElement("strong");name.textContent=String(actor.label||"");
   const state=document.createElement("small");state.className="kv2-actor-state";state.hidden=true;
   label.append(name,state);
-  figure.append(frame,img,label);
+  figure.append(img,label);
   return figure;
 }
 function ensureRoot(layer){
