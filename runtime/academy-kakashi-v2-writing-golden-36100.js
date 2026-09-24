@@ -6074,8 +6074,961 @@ const SECTIONS=Object.freeze({
     ]
   }
 });
+
+const CORRECTED_F07=Object.freeze({
+  "f07c.return_open": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      240,
+      258
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "Kakashi returns to the rooftop."
+      },
+      {
+        "kind": "narration",
+        "text": "The same ANBU operative is waiting."
+      },
+      {
+        "kind": "narration",
+        "text": "His eyes move first to Kakashi."
+      },
+      {
+        "kind": "narration",
+        "text": "Then to what came back with him."
+      },
+      {
+        "kind": "narration",
+        "text": "The package."
+      },
+      {
+        "kind": "narration",
+        "text": "A restraint line."
+      },
+      {
+        "kind": "narration",
+        "text": "One person."
+      },
+      {
+        "kind": "narration",
+        "text": "Several."
+      },
+      {
+        "kind": "narration",
+        "text": "Or nothing."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "Report."
+      }
+    ]
+  },
+  "f07c.anbu_transfer_base": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      264,
+      270
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "The operative does not start writing."
+      },
+      {
+        "kind": "narration",
+        "text": "He steps forward first."
+      },
+      {
+        "kind": "narration",
+        "text": "Kakashi keeps hold of the restraint line until the operative has control."
+      },
+      {
+        "kind": "narration",
+        "text": "Only then does he let go."
+      }
+    ]
+  },
+  "f07c.anbu_ps": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      274,
+      284
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "Package Smuggler looks from Kakashi to the operative."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PACKAGE SMUGGLER",
+        "text": "Back where we started."
+      },
+      {
+        "kind": "narration",
+        "text": "The operative takes the line."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "Not quite."
+      },
+      {
+        "kind": "narration",
+        "text": "Package Smuggler glances at Kakashi."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PACKAGE SMUGGLER",
+        "text": "No. I suppose not."
+      }
+    ]
+  },
+  "f07c.anbu_amt": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      288,
+      298
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "ANBU Marked Target watches the handoff."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU MARKED TARGET",
+        "text": "You could've saved us the walk."
+      },
+      {
+        "kind": "narration",
+        "text": "Kakashi looks at him."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "KAKASHI",
+        "text": "You ran."
+      },
+      {
+        "kind": "narration",
+        "text": "The operative takes the restraint line."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "Report."
+      }
+    ]
+  },
+  "f07c.anbu_mi": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      302,
+      314
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "Masked Interceptor says nothing while the operative takes custody."
+      },
+      {
+        "kind": "narration",
+        "text": "Her eyes remain on Kakashi."
+      },
+      {
+        "kind": "narration",
+        "text": "The operative notices."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "Anything you need to add?"
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "MASKED INTERCEPTOR",
+        "text": "No."
+      },
+      {
+        "kind": "narration",
+        "text": "Kakashi looks between them once."
+      },
+      {
+        "kind": "narration",
+        "text": "Then begins the report."
+      }
+    ]
+  },
+  "f07c.anbu_all3": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      318,
+      338
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "The operative takes the restraint lines one at a time."
+      },
+      {
+        "kind": "narration",
+        "text": "Package Smuggler watches the process."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PACKAGE SMUGGLER",
+        "text": "This feels excessive."
+      },
+      {
+        "kind": "narration",
+        "text": "ANBU Marked Target looks at him."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU MARKED TARGET",
+        "text": "You talked through the entire walk."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PACKAGE SMUGGLER",
+        "text": "It was a long walk."
+      },
+      {
+        "kind": "narration",
+        "text": "Masked Interceptor turns her head."
+      },
+      {
+        "kind": "narration",
+        "text": "Package Smuggler stops."
+      },
+      {
+        "kind": "narration",
+        "text": "Kakashi notices."
+      },
+      {
+        "kind": "narration",
+        "text": "The operative does too."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "Report."
+      }
+    ]
+  },
+  "f07c.report_close": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      368,
+      394
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "The operative reaches the end of the report."
+      },
+      {
+        "kind": "narration",
+        "text": "A beat."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "Anything else?"
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "KAKASHI",
+        "text": "No."
+      },
+      {
+        "kind": "narration",
+        "text": "The operative closes the field notes."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "All right."
+      },
+      {
+        "kind": "narration",
+        "text": "Kakashi waits."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "You can go."
+      },
+      {
+        "kind": "narration",
+        "text": "Kakashi looks once at the operative."
+      },
+      {
+        "kind": "narration",
+        "text": "At any people he brought back."
+      },
+      {
+        "kind": "narration",
+        "text": "At the package, if it is there."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "KAKASHI",
+        "text": "Understood."
+      },
+      {
+        "kind": "narration",
+        "text": "He leaves."
+      }
+    ]
+  },
+  "f07c.hidden_open": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      404,
+      420
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "Minato stands above the room."
+      },
+      {
+        "kind": "narration",
+        "text": "The mission-giving ANBU operative is present."
+      },
+      {
+        "kind": "narration",
+        "text": "The package is on the desk."
+      },
+      {
+        "kind": "narration",
+        "text": "The arrangement itself should tell the player something is wrong before anyone explains it."
+      },
+      {
+        "kind": "narration",
+        "text": "Minato looks over the people who came back."
+      },
+      {
+        "kind": "narration",
+        "text": "And the places where somebody should have."
+      }
+    ]
+  },
+  "f07c.hidden_base_all_alive": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      428,
+      460
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "Package Smuggler looks toward the recovered package."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PACKAGE SMUGGLER",
+        "text": "So that's it?"
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "That's it."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PACKAGE SMUGGLER",
+        "text": "He still thinks this was real."
+      },
+      {
+        "kind": "narration",
+        "text": "ANBU Marked Target looks toward Minato."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU MARKED TARGET",
+        "text": "Does he know any of it?"
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "MINATO",
+        "text": "No."
+      },
+      {
+        "kind": "narration",
+        "text": "Masked Interceptor's expression does not change."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "MASKED INTERCEPTOR",
+        "text": "Good."
+      },
+      {
+        "kind": "narration",
+        "text": "Package Smuggler looks at her."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PACKAGE SMUGGLER",
+        "text": "You say that now."
+      },
+      {
+        "kind": "narration",
+        "text": "She turns her eyes toward him."
+      },
+      {
+        "kind": "narration",
+        "text": "He lifts both hands."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PACKAGE SMUGGLER",
+        "text": "I'm done."
+      },
+      {
+        "kind": "narration",
+        "text": "Minato looks at the report."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "MINATO",
+        "text": "Tell me what he did."
+      },
+      {
+        "kind": "narration",
+        "text": "The room shifts from the fake mission to the real subject."
+      },
+      {
+        "kind": "narration",
+        "text": "Kakashi."
+      }
+    ]
+  },
+  "f07c.hidden_all3_anbu": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      470,
+      490
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "The operative looks at the three of them."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "He brought the entire field back to me."
+      },
+      {
+        "kind": "narration",
+        "text": "Package Smuggler rubs one wrist."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PACKAGE SMUGGLER",
+        "text": "I noticed."
+      },
+      {
+        "kind": "narration",
+        "text": "ANBU Marked Target looks toward Minato."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU MARKED TARGET",
+        "text": "He never stopped once he'd decided we were coming with him."
+      },
+      {
+        "kind": "narration",
+        "text": "Masked Interceptor says nothing."
+      },
+      {
+        "kind": "narration",
+        "text": "Minato looks down at the three custody entries."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "MINATO",
+        "text": "No."
+      },
+      {
+        "kind": "narration",
+        "text": "A beat."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "MINATO",
+        "text": "He didn't."
+      }
+    ]
+  },
+  "f07c.hidden_police": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      496,
+      510
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "Package Smuggler looks irritated."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PACKAGE SMUGGLER",
+        "text": "The Police were thrilled."
+      },
+      {
+        "kind": "narration",
+        "text": "The ANBU operative looks at him."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PACKAGE SMUGGLER",
+        "text": "They were not thrilled."
+      },
+      {
+        "kind": "narration",
+        "text": "Minato looks toward the custody entry."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "MINATO",
+        "text": "Kakashi made the handoff he chose."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU MARKED TARGET",
+        "text": "Without knowing what we were."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "MINATO",
+        "text": "Yes."
+      }
+    ]
+  },
+  "f07c.hidden_release": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      518,
+      528
+    ],
+    "cues": [
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "He had control."
+      },
+      {
+        "kind": "narration",
+        "text": "Package Smuggler looks at him."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PACKAGE SMUGGLER",
+        "text": "And then he didn't."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "He let you leave."
+      },
+      {
+        "kind": "narration",
+        "text": "Package Smuggler considers that."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PACKAGE SMUGGLER",
+        "text": "That's a less dramatic way to say it."
+      }
+    ]
+  },
+  "f07c.hidden_restrained_ps": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      542,
+      542
+    ],
+    "cues": [
+      {
+        "kind": "dialogue",
+        "speakerName": "PACKAGE SMUGGLER",
+        "text": "He ties knots like he expects them to hold forever."
+      }
+    ]
+  },
+  "f07c.hidden_restrained_amt": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      546,
+      546
+    ],
+    "cues": [
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU MARKED TARGET",
+        "text": "They held long enough."
+      }
+    ]
+  },
+  "f07c.hidden_restrained_mi": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      550,
+      552
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "Masked Interceptor looks at her wrist once."
+      },
+      {
+        "kind": "narration",
+        "text": "Says nothing."
+      }
+    ]
+  },
+  "f07c.hidden_restrain_escape_ps": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      560,
+      566
+    ],
+    "cues": [
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "He tried to restrain you."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PACKAGE SMUGGLER",
+        "text": "Tried."
+      }
+    ]
+  },
+  "f07c.hidden_restrain_escape_amt": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      560,
+      570
+    ],
+    "cues": [
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "He tried to restrain you."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU MARKED TARGET",
+        "text": "I wasn't staying."
+      }
+    ]
+  },
+  "f07c.hidden_restrain_escape_mi": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      560,
+      574
+    ],
+    "cues": [
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "He tried to restrain you."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "MASKED INTERCEPTOR",
+        "text": "He was too slow."
+      }
+    ]
+  },
+  "f07c.hidden_lethal_escape_ps": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      582,
+      592
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "The room is quieter."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "He went lethal."
+      },
+      {
+        "kind": "narration",
+        "text": "Package Smuggler's humour disappears."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PACKAGE SMUGGLER",
+        "text": "I know."
+      }
+    ]
+  },
+  "f07c.hidden_lethal_escape_amt": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      582,
+      598
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "The room is quieter."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "He went lethal."
+      },
+      {
+        "kind": "narration",
+        "text": "ANBU Marked Target looks at the report."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU MARKED TARGET",
+        "text": "So did I."
+      }
+    ]
+  },
+  "f07c.hidden_lethal_escape_mi": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      582,
+      606
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "The room is quieter."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "He went lethal."
+      },
+      {
+        "kind": "narration",
+        "text": "Masked Interceptor meets the operative's eyes."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "MASKED INTERCEPTOR",
+        "text": "He meant it."
+      },
+      {
+        "kind": "narration",
+        "text": "Minato does not soften the fact."
+      }
+    ]
+  },
+  "f07c.hidden_mi_killed": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      620,
+      624
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "Package Smuggler's eyes settle on Masked Interceptor's empty place."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PACKAGE SMUGGLER",
+        "text": "She should be standing here."
+      },
+      {
+        "kind": "narration",
+        "text": "No one answers immediately."
+      }
+    ]
+  },
+  "f07c.hidden_ps_killed": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      630,
+      636
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "ANBU Marked Target looks toward the empty place Package Smuggler should occupy."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU MARKED TARGET",
+        "text": "He killed the receiver."
+      },
+      {
+        "kind": "narration",
+        "text": "The operative does not correct the role."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "Yes."
+      }
+    ]
+  },
+  "f07c.hidden_amt_killed": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      642,
+      648
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "Package Smuggler looks toward ANBU Marked Target's absence."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PACKAGE SMUGGLER",
+        "text": "He was supposed to walk away after the handoff."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "He didn't."
+      },
+      {
+        "kind": "narration",
+        "text": "Minato looks at the report."
+      }
+    ]
+  },
+  "f07c.hidden_all3_killed": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      672,
+      682
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "Minato looks at the report for a long time."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "MINATO",
+        "text": "He thought they were real threats."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU OPERATIVE",
+        "text": "Yes."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "MINATO",
+        "text": "And we put all three in front of him."
+      },
+      {
+        "kind": "narration",
+        "text": "The operative does not answer."
+      },
+      {
+        "kind": "narration",
+        "text": "Minato closes the report."
+      }
+    ]
+  },
+  "f07c.reveal_question_amt": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      694,
+      696
+    ],
+    "cues": [
+      {
+        "kind": "dialogue",
+        "speakerName": "ANBU MARKED TARGET",
+        "text": "Does Kakashi know?"
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "MINATO",
+        "text": "No."
+      }
+    ]
+  },
+  "f07c.close_low": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      727,
+      731
+    ],
+    "cues": [
+      {
+        "kind": "dialogue",
+        "speakerName": "MINATO",
+        "text": "He made his decision."
+      },
+      {
+        "kind": "narration",
+        "text": "The operative waits."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "MINATO",
+        "text": "We'll remember it."
+      }
+    ]
+  },
+  "f07c.close_high": {
+    "source": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md",
+    "range": [
+      735,
+      745
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "Minato's attention moves once more to the empty place or places."
+      },
+      {
+        "kind": "narration",
+        "text": "Then back to Kakashi's name."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "MINATO",
+        "text": "This was our test."
+      },
+      {
+        "kind": "narration",
+        "text": "A beat."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "MINATO",
+        "text": "The consequences were his."
+      },
+      {
+        "kind": "narration",
+        "text": "He closes the report."
+      }
+    ]
+  }
+});
 function get(key){
- const row=SECTIONS[String(key||"")];
+ const exact=String(key||"");
+ const row=CORRECTED_F07[exact]||SECTIONS[exact];
  return row&&Array.isArray(row.cues)?row.cues.map(cue=>({...cue})):[];
 }
 function diagnostics(){
@@ -6084,15 +7037,15 @@ function diagnostics(){
    familyCoverage:["f01","f02","f03","f04","f05","f07","f08","f09"].every(key=>SOURCES[key]&&/2026-09-24\.md$/.test(SOURCES[key].path)),
    requiredSections:required.every(key=>SECTIONS[key]&&SECTIONS[key].cues.length>0),
    directHandoffUsesGolden:SECTIONS["f05.interrupt"].cues.some(r=>r.text==="He doesn't answer.")&&SECTIONS["f05.interrupt_win"].cues.some(r=>r.text==="You're after this."),
-   terminalUsesGolden:SECTIONS["f07.report_close"].cues.some(r=>r.text==="You're done. I'll take it from here.")&&SECTIONS["f07.minato_close_costly"].cues.some(r=>r.text==="That doesn't mean we should have put all of it on him."),
+   terminalUsesGolden:CORRECTED_F07["f07c.report_close"].cues.some(r=>r.text==="You can go.")&&CORRECTED_F07["f07c.hidden_base_all_alive"].cues.some(r=>r.text==="He still thinks this was real.")&&CORRECTED_F07["f07c.close_high"].cues.some(r=>r.text==="This was our test."),
    noAuthorScaffolding:Object.values(SECTIONS).every(row=>row.cues.every(cue=>!/^\[AUTHOR/i.test(cue.text||"")&&!/^#{1,6}\s/.test(cue.text||""))),
    presentationOnly:true,
    browserGoldenClaimed:false
  };
  const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
- return{pass:failed.length===0,checks,failed,sectionCount:Object.keys(SECTIONS).length,browserGoldenClaimed:false};
+ return{pass:failed.length===0,checks,failed,sectionCount:Object.keys(SECTIONS).length+Object.keys(CORRECTED_F07).length,browserGoldenClaimed:false};
 }
 globalThis.getAcademyKakashiWritingGolden36100=get;
 globalThis.runAcademyKakashiWritingGolden36100Diagnostics=diagnostics;
-globalThis.SC_ACADEMY_KAKASHI_WRITING_GOLDEN_36100=Object.freeze({version:1,sources:SOURCES,sections:SECTIONS,get,browserGoldenClaimed:false});
+globalThis.SC_ACADEMY_KAKASHI_WRITING_GOLDEN_36100=Object.freeze({version:2,sources:SOURCES,sections:Object.freeze({...SECTIONS,...CORRECTED_F07}),get,browserGoldenClaimed:false});
 })();
