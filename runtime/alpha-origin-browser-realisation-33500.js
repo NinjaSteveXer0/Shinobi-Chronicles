@@ -97,6 +97,22 @@ function patchHinata33500(){
   if(!A)return false;
   const sceneId=A.sceneByVariant.academy_hinata;
   const def=editableScene33500(sceneId);if(!def)return false;
+
+  // #340 Writing-GOLDEN owns its complete visible evaluation/younger-student
+  // expression natively. The pre-#340 33500 Hinata shim must stand down rather
+  // than re-registering compressed prose over the authoritative Story graph.
+  const goldenNative=!!(
+    beat33500(def,"hin_ex1_choice")&&
+    beat33500(def,"hin_ex2_wait_choice")&&
+    beat33500(def,"hin_ex2_press_choice")&&
+    beat33500(def,"hin_ex2_reset_choice")&&
+    beat33500(def,"hin_ex3_changed_choice")&&
+    beat33500(def,"hin_young_choice")&&
+    beat33500(def,"hin_close_5")
+  );
+  if(goldenNative)return true;
+
+  // Bounded compatibility for pre-#340 Alpha branches only.
   const evalBeat=beat33500(def,"hin_eval");
   const youngBeat=beat33500(def,"hin_young");
   const endBeat=beat33500(def,"hin_end");
@@ -330,8 +346,15 @@ function runAlphaOriginBrowserRealisation33500Diagnostics(){
     patchId:PATCH_ID==="alpha_origin_browser_realisation_33500_2026_09_13",
     styleFixInstalled:typeof document==="undefined"?true:!!document.getElementById(STYLE_ID),
     allTargetPatchesApplied:Object.values(originPatches).every(Boolean),
-    hinataDecisionAwareEvaluation:!!(hin&&hin.beatMap&&hin.beatMap.get("hin_eval")&&typeof hin.beatMap.get("hin_eval").presentationResolver==="function"),
-    hinataYoungChoiceGetsVisibleResult:!!(hin&&hin.beatMap&&hin.beatMap.has("hin_young_result")),
+    hinataDecisionAwareEvaluation:!!(hin&&hin.beatMap&&(
+      (hin.beatMap.has("hin_ex3_changed_choice")&&["hin_eval_wait_1","hin_eval_press_1","hin_eval_reset_1","hin_eval_changed_1"].every(id=>hin.beatMap.has(id)))||
+      (hin.beatMap.get("hin_eval")&&typeof hin.beatMap.get("hin_eval").presentationResolver==="function")
+    )),
+    hinataYoungChoiceGetsVisibleResult:!!(hin&&hin.beatMap&&(
+      ["hin_young_show_1","hin_young_tell_1","hin_young_leave_1","hin_young_watch_1"].every(id=>hin.beatMap.has(id))||
+      hin.beatMap.has("hin_young_result")
+    )),
+    hinataGoldenNativeShimRetired:!!(hin&&hin.beatMap&&hin.beatMap.has("hin_ex1_choice"))?originPatches.hinata===true&&!patchedScenes.includes(A.sceneByVariant.academy_hinata):true,
     kurenaiFourOutcomeChoreographies:!!(kur&&kur.beatMap&&["kur_complete_loss_1","kur_partial_loss_result_2","kur_partial_win_result_3","kur_complete_win_result_6"].every(id=>kur.beatMap.has(id))),
     kurenaiResultIsDecisionAware:!!(kur&&kur.beatMap&&kur.beatMap.get("kur_result")&&typeof kur.beatMap.get("kur_result").presentationResolver==="function"),
     noMissionSemanticReuse:typeof globalThis.SC_ALPHA_MISSION_CHOICE_121==="undefined"||!patchedScenes.some(id=>String(id).startsWith("arc1_")),
