@@ -75,6 +75,7 @@ NODE_GATES = [
     "tools/qa_release_candidate_evidence_311.js",
     "tools/qa_issue_312_story_battle_benchmark.js",
     "tools/qa_issue_334_story_transition_owner.js",
+    "tools/qa_issue_322_kakashi_dispositions.js",
 ]
 
 EXTERNAL_ASSET_GATES = [
