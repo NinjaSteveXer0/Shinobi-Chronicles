@@ -221,14 +221,14 @@ next();
 assert.strictEqual(activeRuntime.beatId,"v2_report");
 assert.strictEqual(state().package.holder,"ANBU","ANBU custody commits only on exact report handoff");
 
-// GET CLOSER failure -> Stay on Package -> Ask Where -> Take Him Down loss.
+// GET CLOSER failure -> CHASE THE PACKAGE -> ASK WHERE IT WAS GOING -> TAKE HIM DOWN loss.
 // Package recovery survives the Battle defeat and Knowledge remains exact.
 reset({
   "academy_kakashi.v2.get_closer":"GET_CLOSER_FAILURE",
   "academy_kakashi.v2.stay_package_pursuit":"STAY_PACKAGE_PURSUIT_SUCCESS"
 });
-enter("v2_scene02_tail");choose("GET CLOSER");resolveMachine();choose("STAY ON THE PACKAGE");resolveMachine();
-choose("ASK WHERE THE PACKAGE WAS GOING");choose("TAKE HIM DOWN");next();
+enter("v2_scene02_tail");choose("GET CLOSER");resolveMachine();choose("CHASE THE PACKAGE");resolveMachine();
+choose("ASK WHERE IT WAS GOING");choose("TAKE HIM DOWN");next();
 returnBattle("v2_take_down_loss",{outcome:"defeat",encounterId:"academy_kakashi_origin_battle_kakashi_pakkun_vs_amt",actions:4});
 assert.strictEqual(state().package.holder,"KAKASHI");
 assert.strictEqual(state().package.recovered,true);
@@ -247,9 +247,9 @@ assert.strictEqual(state().pakkun.departed,true);
 reset();
 enter("v2_watch_exchange");choose("INTERCEPT THE MASKED ATTACKER");next();
 returnBattle("v2_mi_stop_win",{encounterId:"academy_kakashi_origin_battle_mi_1v1",actions:3});
-assert((beat().choices||[]).some(c=>c.label==="GO AFTER PACKAGE SMUGGLER"&&c.availability().available===true));
-assert(!(beat().choices||[]).some(c=>c.label==="GO AFTER ANBU MARKED TARGET"));
-choose("RESTRAIN HER AND CONTINUE");
+assert((beat().choices||[]).some(c=>c.label==="CHASE THE PACKAGE"&&c.availability().available===true));
+assert(!(beat().choices||[]).some(c=>c.label==="CHASE THE MAN FROM THE PHOTO"));
+choose("RESTRAIN HER AND KEEP MOVING");
 assert.strictEqual(state().participants.MI.state,"RESTRAINED");
 assert.strictEqual(activeRuntime.beatId,"v2_mi_restrained_next");
 next();
@@ -260,20 +260,20 @@ reset();
 enter("v2_watch_exchange");choose("INTERCEPT THE MASKED ATTACKER");next();
 returnBattle("v2_mi_stop_win",{encounterId:"academy_kakashi_origin_battle_mi_1v1",actions:4});
 const visibleSlow=(beat().choices||[]).filter(c=>!c.availability||c.availability().available).map(c=>c.label);
-assert(!visibleSlow.includes("GO AFTER PACKAGE SMUGGLER"));
-assert(!visibleSlow.includes("RESTRAIN HER AND CONTINUE"));
-assert(!visibleSlow.includes("GO AFTER ANBU MARKED TARGET"));
+assert(!visibleSlow.includes("CHASE THE PACKAGE"));
+assert(!visibleSlow.includes("RESTRAIN HER AND KEEP MOVING"));
+assert(!visibleSlow.includes("CHASE THE MAN FROM THE PHOTO"));
 
-// DEFEAT ASSASSIN THEN SECURE PACKAGE keeps its distinct <=4 / <=3 chain.
+// DEAL WITH HER FIRST keeps its distinct <=4 / <=3 chain.
 reset({
   "academy_kakashi.v2.ps_pursuit":"PS_PURSUIT_SUCCESS",
   "academy_kakashi.v2.secure_amt_pursuit":"SECURE_AMT_PURSUIT_SUCCESS"
 });
 enter("v2_watch_exchange");choose("DEAL WITH HER FIRST");next();
 returnBattle("v2_mi_package_second_win",{encounterId:"academy_kakashi_origin_battle_seq_mi",actions:4});
-choose("CHASE THE PACKAGE SMUGGLER");resolveMachine();next();
+resolveMachine();resolveMachine();next();
 returnBattle("v2_ps_package_second_win",{encounterId:"academy_kakashi_origin_battle_seq_ps",actions:3});
-choose("STAY ON THE FIRST MAN");resolveMachine();next();
+choose("CHASE THE MAN FROM THE PHOTO");resolveMachine();next();
 returnBattle("v2_amt_package_second_win",{encounterId:"academy_kakashi_origin_battle_seq_amt_pakkun",actions:4});
 choose("BRING HIM TO ANBU");
 assert.strictEqual(activeRuntime.beatId,"v2_amt_anbu_depart");
@@ -287,12 +287,12 @@ assert.strictEqual(state().participants.AMT.state,"ANBU_CUSTODY");
 reset();
 enter("v2_watch_exchange");choose("GO FOR THE PACKAGE");next();
 returnBattle("v2_ps_mi_win",{encounterId:"academy_kakashi_origin_battle_ps_mi_2v1",actions:5});
-choose("RETURN AND REPORT");
+choose("RETURN TO ANBU");
 assert.strictEqual(state().package.holder,"ANBU");
 assert.strictEqual(state().participants.PS.state,"BATTLE_DEFEATED");
 assert.strictEqual(state().participants.MI.state,"BATTLE_DEFEATED");
 
-// GO AFTER ORIGINAL TARGET pursuit failure keeps the package with PS.
+// CHASE THE MAN FROM THE PHOTO pursuit failure keeps the package with PS.
 reset({"academy_kakashi.v2.amt_pursuit_root":"AMT_PURSUIT_FAILURE"});
 enter("v2_watch_exchange");choose("CHASE THE MAN FROM THE PHOTO");resolveMachine();
 assert.strictEqual(activeRuntime.beatId,"v2_amt_direct_pursuit_fail");
