@@ -17,15 +17,16 @@ function ensurePrerequisites(){
 function ensureStore(){
   if(typeof playerData==="undefined"||!playerData||typeof playerData!=="object")return null;
   let store=playerData[STORE_KEY];
-  if(!store||typeof store!=="object"||Number(store.version)!==STORE_VERSION){
-    const legacy=store&&typeof store==="object"?store:null;
-    store={version:STORE_VERSION,recordsBySubjectVariantId:{}};
-    if(legacy&&legacy.recordsBySubjectVariantId&&typeof legacy.recordsBySubjectVariantId==="object"){
-      store.recordsBySubjectVariantId=clone(legacy.recordsBySubjectVariantId);
+  if(!Array.isArray(store)){
+    const legacyRows=[];
+    if(store&&typeof store==="object"&&store.recordsBySubjectVariantId&&typeof store.recordsBySubjectVariantId==="object"){
+      for(const bucket of Object.values(store.recordsBySubjectVariantId)){
+        if(bucket&&typeof bucket==="object")legacyRows.push(...Object.values(bucket).filter(row=>row&&typeof row==="object").map(clone));
+      }
     }
+    store=legacyRows;
     playerData[STORE_KEY]=store;
   }
-  if(!store.recordsBySubjectVariantId||typeof store.recordsBySubjectVariantId!=="object")store.recordsBySubjectVariantId={};
   return store;
 }
 function save(){try{if(typeof savePlayerData==="function")savePlayerData();}catch(_error){}}
@@ -98,9 +99,8 @@ function evidenceIdFor(packet){
 function projectSpecialJoninContextualEvidence34700(input){
   const normalized=normalizePacket(input);if(!normalized.success)return normalized;
   const p=normalized.packet,store=ensureStore();if(!store)return{success:false,reason:"contextual_evidence_store_unavailable"};
-  if(!store.recordsBySubjectVariantId[p.subjectVariantId])store.recordsBySubjectVariantId[p.subjectVariantId]={};
-  const bucket=store.recordsBySubjectVariantId[p.subjectVariantId],evidenceId=evidenceIdFor(p);
-  const existing=bucket[evidenceId]&&typeof bucket[evidenceId]==="object"?bucket[evidenceId]:null;
+  const evidenceId=evidenceIdFor(p),index=store.findIndex(row=>row&&row.evidenceId===evidenceId);
+  const existing=index>=0&&store[index]&&typeof store[index]==="object"?store[index]:null;
   if(existing){
     if(existing.qualificationId!==p.qualificationId||existing.independentSourceId!==p.causalRootOccurrenceId)return{success:false,reason:"contextual_evidence_identity_collision",evidenceId};
     if(existing.category!==p.category||existing.activityFamilyId!==p.activityFamilyId)return{success:false,reason:"contextual_evidence_provenance_drift",evidenceId};
@@ -139,17 +139,17 @@ function projectSpecialJoninContextualEvidence34700(input){
   const stableComparable=row=>JSON.stringify({...row,createdAt:0,updatedAt:0});
   const idempotent=!!existing&&stableComparable(existing)===stableComparable(record);
   if(idempotent){
-    bucket[evidenceId]=existing;
     return{success:true,idempotent:true,upserted:true,record:clone(existing),evaluatorRecord:clone(normalizeSpecialistEvidenceRecord(existing))};
   }
-  bucket[evidenceId]=record;save();
+  if(index>=0)store[index]=record;else store.push(record);
+  save();
   return{success:true,idempotent:false,upserted:!!existing,record:clone(record),evaluatorRecord:clone(evaluatorRecord)};
 }
 function getSpecialJoninContextualEvidence34700(subjectVariantId,qualificationId=null){
   const store=ensureStore();if(!store)return[];
-  const bucket=store.recordsBySubjectVariantId[String(subjectVariantId||"")]||{};
-  return Object.values(bucket)
-    .filter(row=>row&&(!qualificationId||row.qualificationId===String(qualificationId)))
+  const subject=String(subjectVariantId||"");
+  return store
+    .filter(row=>row&&row.subjectVariantId===subject&&(!qualificationId||row.qualificationId===String(qualificationId)))
     .map(clone);
 }
 function evaluateSpecialJoninContextualEvidence34700(subjectVariantId,qualificationId,capacityContext={}){
