@@ -450,48 +450,7 @@ async function waitReceiptProjection(page,label){
   return inspect(page,label);
 }
 
-async function validateKnownTerminalCapBlocker(page,label,expectedTotalRyo){
-  assert.strictEqual(await currentBeat(page),"v2_report",label+" must enter at mission-giver ANBU report");
-  const stateAtReport=await stateSnapshot(page);
-  await shot(page,"terminal-"+label+"-report.png");
-
-  const report=await clickThroughTerminalBeat(page,{
-    label:label+":report",
-    expectedBeat:"v2_report",
-    nextBeat:"v2_hidden_review",
-    minCueCount:8
-  });
-
-  await shot(page,"terminal-"+label+"-hidden-review.png");
-  const hiddenInitial=await inspect(page,label+":hidden-review");
-  assert.strictEqual(hiddenInitial.preset,"hokage_test_review",label+" missing corrected hidden-test review");
-  assert(!hiddenInitial.actorIds.includes("academy_kakashi"),label+" Kakashi leaked into hidden test reveal");
-  assert(hiddenInitial.actorIds.includes("konoha_anbu_operational_contact")&&hiddenInitial.actorIds.includes("kage_minato"),label+" hidden review missing mission-giver ANBU/Minato");
-
-  const preview=await page.evaluate(()=>{
-    const rt=getActiveStorySceneRuntime();
-    const s=getAcademyKakashiV2State36020();
-    return previewAcademyKakashiV2TerminalRewards36015(s,rt&&rt.instanceId);
-  });
-  assert.strictEqual(preview.totalRyo,expectedTotalRyo,label+" terminal reward total drifted");
-  assert.strictEqual(preview.terminalCapPolicyUnresolved,true,label+" terminal cap blocker unexpectedly disappeared");
-
-  await fastDrain(page);
-  const blocked=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040());
-  assert(blocked&&blocked.success===false,label+" unresolved >250 terminal unexpectedly advanced: "+JSON.stringify(blocked));
-  assert(JSON.stringify(blocked).includes("kakashi_v2_terminal_cap_policy_unresolved"),label+" wrong terminal blocker: "+JSON.stringify(blocked));
-
-  return{
-    stateAtReport,
-    report,
-    hiddenInitial,
-    knownTerminalBlocker:"kakashi_v2_terminal_cap_policy_unresolved",
-    expectedTotalRyo,
-    preview
-  };
-}
-
-async function validateTerminalCadence(page,label){
+async function validateTerminalCadence(page,label,expectedTotalRyo=null){
   assert.strictEqual(await currentBeat(page),"v2_report",label+" must enter at mission-giver ANBU report");
   const stateAtReport=await stateSnapshot(page);
   await shot(page,"terminal-"+label+"-report.png");
@@ -515,7 +474,43 @@ async function validateTerminalCadence(page,label){
   const receipt=await waitReceiptProjection(page,label+":receipt");
   assert(receipt.receiptText.includes("FIRST ACTION"),label+" Chronicle Receipt facts missing after projection settled");
   assert(!receipt.receiptText.includes("Origin occurrence sealed"),label+" stale raw Origin close leaked into Receipt");
-  return{stateAtReport,report,hiddenInitial,hidden,receipt};
+
+  const rewardProof=await page.evaluate(()=>{
+    const rt=getActiveStorySceneRuntime(),s=getAcademyKakashiV2State36020();
+    const preview=previewAcademyKakashiV2TerminalRewards36015(s,rt&&rt.instanceId);
+    const receipts=getAcademyKakashiV2RewardReceipts36015(rt&&rt.instanceId);
+    const committedTerminalRyo=(receipts||[]).filter(row=>row&&row.rewardClass==="terminal_cash"&&row.committed===true).reduce((n,row)=>n+Number(row.ryo||0),0);
+    return{
+      preview,
+      committedTerminalRyo,
+      retiredCapFieldPresent:Object.prototype.hasOwnProperty.call(preview,"terminalCapPolicyUnresolved")||Object.prototype.hasOwnProperty.call(preview,"legacyTerminalCapRyo"),
+      storyOccurrenceId:rt&&rt.instanceId||null
+    };
+  });
+  const expected=expectedTotalRyo===null?Number(rewardProof.preview.totalRyo):Number(expectedTotalRyo);
+  assert.strictEqual(rewardProof.preview.totalRyo,expected,label+" terminal reward total drifted");
+  assert.strictEqual(rewardProof.preview.aggregationPolicy,"AUTHORISED_SOURCE_SUM",label+" terminal aggregation policy drifted");
+  assert.strictEqual(rewardProof.preview.terminalTotalClamp,null,label+" terminal total clamp returned");
+  assert.strictEqual(rewardProof.retiredCapFieldPresent,false,label+" retired terminal-cap fields returned");
+  assert.strictEqual(rewardProof.committedTerminalRyo,expected,label+" committed terminal cash did not equal authorised source sum");
+
+  await fastDrain(page);
+  const completion=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040());
+  assert(completion&&completion.success===true,label+" Receipt CONTINUE failed: "+JSON.stringify(completion));
+  await page.waitForFunction(()=>ensurePlayerAcquisitionState().chronicleOrigin?.prologueCompleted===true,null,{timeout:12000});
+  await page.waitForFunction(()=>/YOUR CHRONICLE BEGINS/i.test(document.body.innerText||""),null,{timeout:12000});
+  const continuity=await page.evaluate(()=>({
+    originComplete:ensurePlayerAcquisitionState().chronicleOrigin?.prologueCompleted===true,
+    teamFormationRequired:ensurePlayerAcquisitionState().academyTeamFormation?.required===true,
+    activeStory:getActiveStorySceneRuntime(),
+    chronicleBegins:/YOUR CHRONICLE BEGINS/i.test(document.body.innerText||"")
+  }));
+  assert.strictEqual(continuity.originComplete,true,label+" Origin did not complete");
+  assert.strictEqual(continuity.teamFormationRequired,true,label+" Academy team formation was not required");
+  assert.strictEqual(continuity.activeStory,null,label+" Story runtime remained active after Receipt CONTINUE");
+  assert.strictEqual(continuity.chronicleBegins,true,label+" YOUR CHRONICLE BEGINS continuity missing");
+
+  return{stateAtReport,report,hiddenInitial,hidden,receipt,rewardProof,continuity};
 }
 
 async function terminalStoryBrowserValidation(browser){
@@ -527,9 +522,7 @@ async function terminalStoryBrowserValidation(browser){
       await toScene02Root(page);
       const detail=await run(page)||{};
       assert.strictEqual(await currentBeat(page),"v2_report",name+" did not reach ANBU report");
-      const cadence=Number(detail.expectedTerminalCapRyo)>250
-        ?await validateKnownTerminalCapBlocker(page,name,Number(detail.expectedTerminalCapRyo))
-        :detail.skipTerminalCadence?null:await validateTerminalCadence(page,name);
+      const cadence=detail.skipTerminalCadence?null:await validateTerminalCadence(page,name,detail.expectedTerminalRyo??null);
       const browserErrors=await runtimeErrorGate.assertClean("terminal-story:"+name);
       results.push({name,success:true,cadence,...detail,browserErrors});
     }finally{
@@ -590,7 +583,7 @@ async function terminalStoryBrowserValidation(browser){
     await nextSemantic(page,"v2_report");
     st=await stateSnapshot(page);
     for(const ref of ["AMT","PS","MI"])assert.strictEqual(st.participants[ref].state,"ANBU_CUSTODY");
-    return{expectedTerminalCapRyo:275};
+    return{expectedTerminalRyo:275};
   },{expectedReportCount:30,expectedMinatoCount:22});
 
   await scenario("police-ending",async page=>{
@@ -629,7 +622,7 @@ async function terminalStoryBrowserValidation(browser){
     await nextSemantic(page,"v2_report");
     const st=await stateSnapshot(page);
     for(const ref of ["AMT","PS","MI"])assert.strictEqual(st.participants[ref].state,"POLICE_CUSTODY");
-    return{expectedTerminalCapRyo:300};
+    return{expectedTerminalRyo:300};
   });
 
   await scenario("deliberate-release-ending",async page=>{
@@ -683,7 +676,8 @@ async function terminalStoryBrowserValidation(browser){
     routesValidated:results.length,
     post322DispositionManualRoutesPending:[],
     post322Reason:"Replacement semantics are source-regressed here and exact four-outcome installed-browser acceptance runs in post322DispositionBrowserValidation within this same browser suite.",
-    knownTerminalRewardBlocker:"#348 — 250 Ryō cap unresolved for authorised 275/300 terminal plans",
+    terminalRewardAggregation:"#348 CLOSED — uncapped authorised-source sum; 275/300 Receipt continuity required GREEN",
+    retiredTerminalCapBlockerAbsent:!String(validateTerminalCadence).includes("terminal_cap_policy_unresolved"),
     browserGoldenClaimed:false,
     results
   };
