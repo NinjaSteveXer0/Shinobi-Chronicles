@@ -162,7 +162,7 @@ const br=battleReturn.resolve({sceneContext:{battleResume:{authored:{
 assert.strictEqual(br.success,true,JSON.stringify(br));
 assert.strictEqual(activeRt.localContext.rogueGeninResponse,"intervene");
 assert.strictEqual(activeRt.localContext.rogueResolved,true);
-assert.deepStrictEqual(activeRt.localContext.battleOccurrenceIds,["battle_occ_origin_izuno_rogue_genin_step_in:qa-wasabi-scene"]);
+assert.deepStrictEqual(Array.from(activeRt.localContext.battleOccurrenceIds||[]),["battle_occ_origin_izuno_rogue_genin_step_in:qa-wasabi-scene"]);
 assert.strictEqual(activeRt.localContext.outcome,"secondary_occurrence_costs_pursuit","Battle victory rewrote pursuit result");
 
 // No morality/personality/progression invention and no retired fail-closed STEP IN.
