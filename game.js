@@ -9188,6 +9188,22 @@ function loadPlayerData() {
       encounterRuntime: normalizeEncounterRuntimeState(parsedData.encounterRuntime),
       // BRICK 742 — restore current scene continuation state without inventing a story ledger.
       storySceneRuntime: normalizeStorySceneRuntimeState(parsedData.storySceneRuntime),
+      // ISSUE #322 / #23 — preserve shared Story intent/factual receipts and
+      // contextual Special Jonin evidence written by their canonical owners.
+      // loadPlayerData remains a compatibility reader; it must not silently
+      // discard these idempotence roots on reload.
+      storyDecisionRealisation34000:
+        parsedData.storyDecisionRealisation34000 && typeof parsedData.storyDecisionRealisation34000 === "object"
+          ? cloneProgressionData(parsedData.storyDecisionRealisation34000)
+          : undefined,
+      storyFactualResolver34600:
+        parsedData.storyFactualResolver34600 && typeof parsedData.storyFactualResolver34600 === "object"
+          ? cloneProgressionData(parsedData.storyFactualResolver34600)
+          : undefined,
+      specialJoninContextualEvidence:
+        Array.isArray(parsedData.specialJoninContextualEvidence)
+          ? cloneProgressionData(parsedData.specialJoninContextualEvidence)
+          : [],
       originConsequences: normalizeOriginConsequenceState(parsedData.originConsequences),
       progression: normalizeSavedRunProgression(parsedData.progression),
       characters: normalizeSavedCharacterProgression(parsedData.characters),
