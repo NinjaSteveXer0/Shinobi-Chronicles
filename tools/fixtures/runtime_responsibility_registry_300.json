@@ -750,7 +750,8 @@
       "qaRefs": [
         "tools/qa_issue_343_wasabi_writing_golden.js",
         "tools/qa_alpha_origin_scenes_32900_runtime.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_343_wasabi_browser.js"
       ]
     },
     {
@@ -790,7 +791,8 @@
       ],
       "qaRefs": [
         "tools/qa_issue_343_wasabi_writing_golden.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_343_wasabi_browser.js"
       ]
     }
   ],
@@ -828,7 +830,7 @@
       "exactBehaviorBridged": "Strict Wasabi-vs-Rogue deployment, exact Rogue action palette, shared Story caller return and observer-safe Battle result projection.",
       "retirementCondition": "Review when the shared Origin Story-to-Battle adapter natively supports the exact Wasabi historical-opposition and strict-deployment contract.",
       "milestone": "shared Origin runtime propagation review",
-      "qaRef": "tools/qa_issue_343_wasabi_writing_golden.js",
+      "qaRef": "tools/qa_issue_343_wasabi_browser.js",
       "temporary": false
     }
   ],
