@@ -536,7 +536,7 @@ async function terminalStoryBrowserValidation(browser){
     await seedResolver(page,"improvedPickpocket","PICKPOCKET_IMPROVED_FAILURE");
     await chooseLabel(page,"GET CLOSER","v2_get_closer_resolver");
     await advanceTo(page,"v2_get_closer_success");
-    await chooseLabel(page,"ATTEMPT THE PICKPOCKET","v2_improved_pickpocket_resolver");
+    await chooseLabel(page,"SLIP IN AND TAKE IT","v2_improved_pickpocket_resolver");
     await advanceTo(page,"v2_battle_improved_2v1");
     await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_improved_2v1_win"});
     await chooseLabel(page,"TAKE THEM TO THE UCHIHA POLICE","v2_group2_police_depart");
@@ -707,9 +707,13 @@ async function cleanRoute(browser){
   await shot(page,"05-anbu-report.png");
 
   await drain(page);
-  await go(page,"v2_minato");
-  checkpoints.push(await inspect(page,"hokage_report"));
-  await shot(page,"06-hokage-report.png");
+  await go(page,"v2_hidden_review");
+  const hiddenReview=await inspect(page,"hidden_test_review");
+  assert.strictEqual(hiddenReview.preset,"hokage_test_review");
+  assert(!hiddenReview.actorIds.includes("academy_kakashi"),"Kakashi appeared in hidden test reveal");
+  assert(hiddenReview.actorIds.includes("konoha_anbu_operational_contact")&&hiddenReview.actorIds.includes("kage_minato"),"hidden review authority cast missing");
+  checkpoints.push(hiddenReview);
+  await shot(page,"06-hidden-test-review.png");
 
   await drain(page);
   await go(page,"v2_receipt");
@@ -717,14 +721,14 @@ async function cleanRoute(browser){
   const receiptText=await page.locator("#kakashi-v2-scene-board .kv2-receipt pre").innerText();
   assert(receiptText.includes("REWARDS"),"Receipt missing rewards");
   assert(receiptText.toUpperCase().includes("PACKAGE"),"Receipt missing package result");
+  assert(!/Origin occurrence sealed/i.test(receiptText),"forbidden raw Origin close returned");
   await shot(page,"07-chronicle-receipt.png");
 
-  await drain(page);
-  await go(page,"v2_complete");
-  await drain(page);
+  await fastDrain(page);
   const final=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040());
   assert(final&&final.success===true,JSON.stringify(final));
   await page.waitForFunction(()=>ensurePlayerAcquisitionState().chronicleOrigin?.prologueCompleted===true,null,{timeout:12000});
+  await page.waitForFunction(()=>/YOUR CHRONICLE BEGINS/i.test(document.body.innerText||""),null,{timeout:12000});
   const completion=await page.evaluate(()=>{
     const a=ensurePlayerAcquisitionState();
     return{
@@ -1051,7 +1055,7 @@ async function browserRouteMatrix(browser){
     await seedResolver(page,"stayPackagePursuit","STAY_PACKAGE_PURSUIT_SUCCESS");
     await chooseLabel(page,"GET CLOSER","v2_get_closer_resolver");
     await advanceTo(page,"v2_get_closer_failure");
-    await chooseLabel(page,"STAY ON THE PACKAGE","v2_stay_package_pursuit_resolver");
+    await chooseLabel(page,"CHASE THE PACKAGE","v2_stay_package_pursuit_resolver");
     await advanceTo(page,"v2_stay_package_intercept");
     await chooseLabel(page,"ASK WHERE THE PACKAGE WAS GOING");
     await chooseLabel(page,"TAKE HIM DOWN","v2_take_down_setup");
@@ -1164,7 +1168,7 @@ async function browserRouteMatrix(browser){
     await seedResolver(page,"improvedPickpocket","PICKPOCKET_IMPROVED_SUCCESS");
     await chooseLabel(page,"GET CLOSER","v2_get_closer_resolver");
     await advanceTo(page,"v2_get_closer_success");
-    await chooseLabel(page,"ATTEMPT THE PICKPOCKET","v2_improved_pickpocket_resolver");
+    await chooseLabel(page,"SLIP IN AND TAKE IT","v2_improved_pickpocket_resolver");
     await advanceTo(page,"v2_pickpocket_clean_success");
     const s=await stateSnapshot(page);
     assert.strictEqual(s.knowledge.getCloserContingency,true);
@@ -1176,7 +1180,7 @@ async function browserRouteMatrix(browser){
     await seedResolver(page,"getCloser","GET_CLOSER_FAILURE");
     await chooseLabel(page,"GET CLOSER","v2_get_closer_resolver");
     await advanceTo(page,"v2_get_closer_failure");
-    await chooseLabel(page,"CUT THEM OFF AT THE SAKURA TREE","v2_cutoff_setup");
+    await chooseLabel(page,"CUT THEM OFF","v2_cutoff_setup");
     await advanceTo(page,"v2_battle_cutoff");
     await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_cutoff_win"});
     await chooseLabel(page,"TAKE THEM TO THE UCHIHA POLICE","v2_group2_police_depart");
