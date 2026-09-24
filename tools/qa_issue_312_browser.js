@@ -100,7 +100,7 @@ async function shot(page,name,selector=null){
     await shot(page,"01-story-rooftop-two-actor.png","#kakashi-v2-scene-board");
 
     await nextSemantic(page,"v2_scene02_tail");
-    await choose(page,"WATCH THE EXCHANGE","v2_watch_exchange");
+    await choose(page,"WATCH THE HANDOFF","v2_watch_exchange");
 
     // Manual #312 blocker: MI must not be visible before the narration actually
     // reaches her entrance. The scene is mounted with all semantic participants,
@@ -111,6 +111,7 @@ async function shot(page,name,selector=null){
       const actions=root.querySelector(".kv2-actions");
       return{
         cue:getAcademyKakashiV2TransitionState36040()?.cueIndex,
+        cueCount:getAcademyKakashiV2TransitionState36040()?.cueCount||0,
         miWithheld:mi?.dataset.kv2CueWithheld==="true",
         miOpacity:mi?Number(getComputedStyle(mi).opacity):1,
         actionsVisible:actions?getComputedStyle(actions).display!=="none":false,
@@ -119,6 +120,7 @@ async function shot(page,name,selector=null){
       };
     });
     assert.strictEqual(watchOpening.cue,0);
+    assert(watchOpening.cueCount>=12,"#312 WATCH authority no longer reaches required reveal/breakaway checkpoints: "+JSON.stringify(watchOpening));
     assert.strictEqual(watchOpening.miWithheld,true,"#312 MI must be visually withheld until the authored surprise-entry cue");
     assert(watchOpening.miOpacity<=0.01,"#312 MI is visible before her authored entrance: "+watchOpening.miOpacity);
     assert.strictEqual(watchOpening.actionsVisible,false,"#312 choices appeared before WATCH narration completed");
@@ -147,7 +149,7 @@ async function shot(page,name,selector=null){
     assert.strictEqual(watchEarly.cue,1);
     assert.strictEqual(watchEarly.hidden,true,"#312 MI became mounted-visible during early WATCH narration");
     assert.strictEqual(watchEarly.withheld,true,"#312 MI lost authored withholding before surprise entrance");
-    assert(watchEarly.display==="none"||watchEarly.opacity<=0.01,"#312 MI is visible at WATCH 2/10: "+JSON.stringify(watchEarly));
+    assert(watchEarly.display==="none"||watchEarly.opacity<=0.01,"#312 MI is visible during early WATCH narration: "+JSON.stringify(watchEarly));
 
     for(let i=2;i<=5;i++)await advanceWatchCue(i);
     await page.waitForTimeout(430);
@@ -277,7 +279,7 @@ async function shot(page,name,selector=null){
     assert.strictEqual(breakaway.active,0,"#312 AMT breakaway choreography failed to settle");
     assert.strictEqual(breakaway.ghostCount,0,"#312 AMT breakaway leaked ghost presentation");
 
-    for(let i=12;i<=17;i++)await advanceWatchCue(i);
+    for(let i=12;i<watchOpening.cueCount;i++)await advanceWatchCue(i);
     const choiceLayout=await page.evaluate(()=>{
       const root=document.getElementById("kakashi-v2-scene-board");
       const box=root.querySelector(".kv2-actions");
@@ -304,7 +306,7 @@ async function shot(page,name,selector=null){
 
     // Semantic choice remains immediate; bounded actor motion must never delay Story truth.
     const start=Date.now();
-    await choose(page,"STOP THE ASSASSIN","v2_stop_assassin_setup");
+    await choose(page,"INTERCEPT THE MASKED ATTACKER","v2_stop_assassin_setup");
     const elapsed=Date.now()-start;
     assert(elapsed<900,"#312 Story semantic choice waited for presentation: "+elapsed+"ms");
     const stop=await page.evaluate(()=>{
