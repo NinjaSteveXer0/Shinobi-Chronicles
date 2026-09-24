@@ -295,7 +295,7 @@ assert(coreSource.includes('addBeat("v2_battle_ps_seq",{mode:"battle_transition"
   assert(def.beatMap.get("v2_group2_kill_result")&&def.beatMap.get("v2_group3_kill_result"),"final mixed group KILL result beats missing");
 
   const packageSecond=def.beatMap.get("v2_mi_package_second_win");
-  assert(packageSecond&&packageSecond.machineResolved===true&&packageSecond.mode==="resolver","Family 04 fast/slow MI result must be deterministic, not a player choice");
+  assert(packageSecond&&packageSecond.machineResolved===true&&packageSecond.mode==="choice","Family 04 fast/slow MI result must use canonical Story choice routing while remaining machine-resolved");
   assert(packageSecond.choices.length===2&&packageSecond.choices.every(c=>c.label==="RESOLVE RESULT"),"Family 04 MI result leaked a pseudo-choice");
   const psPackageWin=def.beatMap.get("v2_ps_package_second_win");
   assert(psPackageWin.choices.some(c=>c.label==="CHASE THE MAN FROM THE PHOTO")&&psPackageWin.choices.some(c=>c.label==="RETURN TO ANBU"),"Family 04 post-PS decision labels drifted");
@@ -330,9 +330,10 @@ assert(coreSource.includes('addBeat("v2_battle_ps_seq",{mode:"battle_transition"
   assert(rendererSource.includes("hokage_test_review")&&rendererSource.includes("presentationPackageHolder"),"hidden test review presentation contract missing");
   const machineResolverBeats=[...def.beatMap.values()].filter(b=>b.machineResolved===true);
   assert.strictEqual(machineResolverBeats.length,11,"Writing-Golden resolver beat count drifted");
-  assert(machineResolverBeats.every(b=>b.mode==="resolver"&&b.choices.length===2&&b.choices.every(ch=>ch.label==="RESOLVE RESULT")),"resolver-only branch is still a player-facing choice card");
+  assert(machineResolverBeats.every(b=>b.mode==="choice"&&b.choices.length===2&&b.choices.every(ch=>ch.label==="RESOLVE RESULT")),"machine resolver must use canonical Story choice routing with hidden RESOLVE RESULT branches");
   assert(!/C\([^,\n]+,"CONTINUE"/.test(coreSource),"resolver CONTINUE pseudo-decision returned");
   assert(rendererSource.includes("beat.machineResolved===true"),"renderer no longer hides machine resolver branches");
+  assert(rendererSource.includes('beat.machineResolved===true||(beat.mode!=="choice"&&beat.mode!=="battle_transition")'),"machine resolver no longer exposes stage-wide semantic advance at cue end");
   assert(transitionSource.includes("committedResolverChoice36040")&&transitionSource.includes("available.length!==1"),"transition no longer projects the single committed resolver branch directly");
 }
 
