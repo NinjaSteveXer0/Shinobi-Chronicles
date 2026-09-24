@@ -94,6 +94,19 @@ function semanticAdvance(choiceId=null){
   playPostCommitTransition(previous,next);
   return result;
 }
+function committedResolverChoice36040(){
+  const beat=typeof getCurrentStorySceneBeat==="function"?getCurrentStorySceneBeat():null;
+  if(!beat||beat.machineResolved!==true)return null;
+  const choices=Array.isArray(beat.choices)?beat.choices:[];
+  const available=choices.filter(choice=>{
+    try{
+      const result=typeof evaluateStorySceneChoiceAvailability==="function"?evaluateStorySceneChoiceAvailability(choice):{available:true};
+      return result&&result.available===true;
+    }catch(_error){return false;}
+  });
+  if(available.length!==1)return{error:"kakashi_v2_machine_resolver_branch_cardinality",availableCount:available.length,beatId:beat.beatId||null};
+  return{choiceId:available[0].choiceId,beatId:beat.beatId||null};
+}
 function advance(choiceId=null){
   if(!active())return choiceId==null?PRE_ADVANCE():PRE_ADVANCE(choiceId);
   const rt=runtime(),row=cursor(),list=cues(rt.beatId);
@@ -107,6 +120,9 @@ function advance(choiceId=null){
     render();
     return{success:true,type:"kakashi_v2_cue_advanced",beatId:rt.beatId,cueIndex:row.cueIndex,semanticBeatUnchanged:true};
   }
+  const machine=committedResolverChoice36040();
+  if(machine&&machine.error)return{success:false,reason:machine.error,availableCount:machine.availableCount,beatId:machine.beatId};
+  if(machine&&machine.choiceId)return semanticAdvance(machine.choiceId);
   return semanticAdvance(null);
 }
 function getState(){
@@ -154,6 +170,7 @@ function diagnostics(){
     softSceneHasNoScreenAnimation:String(playPostCommitTransition).includes('type:"continuous_scene_update"')&&String(playPostCommitTransition).includes('visualTransition:"none"'),
     noLethalAnimationDelay:String(playPostCommitTransition).includes("lethalDelayMs:0"),
     cuePresentationDoesNotCommitTruth:String(advance).includes("playAcademyKakashiV2CuePresentation36030")&&String(advance).includes("semanticBeatUnchanged:true"),
+    machineResolverCommitsWithoutChoiceCard:String(advance).includes("committedResolverChoice36040")&&String(committedResolverChoice36040).includes("available.length!==1")&&String(semanticAdvance).includes("PRE_ADVANCE"),
     noActorDomAnimationOwnership:!String(semanticAdvance).includes("querySelector")&&!String(advance).includes("clone"+"Node"),
     noStoryTruthMutation:!String(advance).includes("participants.")&&!String(semanticAdvance).includes("package."),
     browserGoldenClaimed:false
