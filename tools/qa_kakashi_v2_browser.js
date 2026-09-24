@@ -260,10 +260,13 @@ async function chooseLabel(page,label,expected=null){
 }
 
 async function nextSemantic(page,expected=null){
-  await fastDrain(page);
+  // Semantic browser proof must reach the end of authored cues through the same
+  // transition adapter a player uses. Direct cursor mutation is reserved for
+  // bounded setup helpers and must not stand in for a semantic commit.
+  await drain(page);
   const before=await currentBeat(page);
   const result=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040());
-  assert(result&&result.success===true,JSON.stringify(result));
+  assert(result&&result.success===true&&!result.semanticBeatUnchanged,"semantic advance did not commit a beat: "+JSON.stringify(result));
   await waitBeatChange(page,before,expected);
   return result;
 }
