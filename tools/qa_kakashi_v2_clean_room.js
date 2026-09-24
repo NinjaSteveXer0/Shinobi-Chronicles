@@ -143,6 +143,46 @@ assert(coreSource.includes('addBeat("v2_battle_ps_seq",{mode:"battle_transition"
   assert.strictEqual(replay.pillGranted,0);
   assert.strictEqual(replay.trainingTantoGranted,0);
   assert.strictEqual(JSON.stringify({ryo:context.playerData.ryo,inventory:context.playerData.inventory}),before,"terminal reward replay duplicated material rewards");
+
+  const fullDeliveryState={
+    package:{holder:"ANBU",returned:true,recovered:true},
+    knowledge:{},
+    participants:{MI:{state:"ANBU_CUSTODY"},PS:{state:"ANBU_CUSTODY"},AMT:{state:"ANBU_CUSTODY"}},
+    resolvers:{},routeHistory:[],battles:{},
+    terminal:{reportReached:true,minatoReached:true,receiptReached:true}
+  };
+  const preview275=context.previewAcademyKakashiV2TerminalRewards36015(fullDeliveryState,"qa_origin_275");
+  assert.strictEqual(preview275.totalRyo,275);
+  assert.strictEqual(preview275.aggregationPolicy,"AUTHORISED_SOURCE_SUM");
+  assert.strictEqual(preview275.terminalTotalClamp,null);
+  const terminal275=context.commitAcademyKakashiV2TerminalRewards36015(fullDeliveryState,"qa_origin_275");
+  assert.strictEqual(terminal275.success,true,JSON.stringify(terminal275,null,2));
+  assert.strictEqual(terminal275.grantedRyo,275);
+  assert.strictEqual(context.playerData.ryo,1275);
+  const replay275=context.commitAcademyKakashiV2TerminalRewards36015(fullDeliveryState,"qa_origin_275");
+  assert.strictEqual(replay275.success,true);
+  assert.strictEqual(replay275.grantedRyo,0);
+  assert.strictEqual(context.playerData.ryo,1275);
+
+  const exceptional300State={
+    ...fullDeliveryState,
+    battles:{pickpocket_3v1:{outcome:"victory",playerActionOpportunityCount:3}}
+  };
+  const preview300=context.previewAcademyKakashiV2TerminalRewards36015(exceptional300State,"qa_origin_300");
+  assert.strictEqual(preview300.totalRyo,300);
+  assert.strictEqual(preview300.aggregationPolicy,"AUTHORISED_SOURCE_SUM");
+  assert.strictEqual(preview300.terminalTotalClamp,null);
+  const terminal300=context.commitAcademyKakashiV2TerminalRewards36015(exceptional300State,"qa_origin_300");
+  assert.strictEqual(terminal300.success,true,JSON.stringify(terminal300,null,2));
+  assert.strictEqual(terminal300.grantedRyo,300);
+  assert.strictEqual(context.playerData.ryo,1575);
+  const replay300=context.commitAcademyKakashiV2TerminalRewards36015(exceptional300State,"qa_origin_300");
+  assert.strictEqual(replay300.success,true);
+  assert.strictEqual(replay300.grantedRyo,0);
+  assert.strictEqual(context.playerData.ryo,1575);
+
+  assert(!rewardSource.includes("kakashi_v2_terminal_cap_policy_unresolved"),"retired terminal cap blocker returned");
+  assert(!rewardSource.includes("legacyTerminalCapRyo"),"retired legacy terminal cap field returned");
 }
 
 // Battle authority executes in a bounded mock to prove exact configuration data.
