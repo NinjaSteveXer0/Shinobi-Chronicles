@@ -152,6 +152,17 @@ function patchHinata33500(){
 function patchIzuno33500(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
   const def=editableScene33500(A.sceneByVariant.academy_izuno);if(!def)return false;
+  // #343 native WRITING GOLDEN owns the full Wasabi graph. The old 33500
+  // compatibility shim must stand down rather than re-register compressed prose.
+  const goldenNative=!!(
+    beat33500(def,"izu_initial_choice")&&
+    beat33500(def,"izu_split_choice")&&
+    beat33500(def,"izu_rogue_choice")&&
+    beat33500(def,"izu_rogue_step_in_battle")&&
+    beat33500(def,"izu_reflect_choice")&&
+    beat33500(def,"izu_close_1")
+  );
+  if(goldenNative)return true;
   const split=beat33500(def,"izu_split"),rogue=beat33500(def,"izu_rogue"),evalBeat=beat33500(def,"izu_eval");
   if(!split||!rogue||!evalBeat)return false;
 
