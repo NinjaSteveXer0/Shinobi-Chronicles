@@ -94,8 +94,21 @@ function registerProfile(){
 const PRE_CHOOSE=typeof chooseEnemyAuthoredBattleAction==="function"?chooseEnemyAuthoredBattleAction:null;
 if(PRE_CHOOSE){
   globalThis.chooseEnemyAuthoredBattleAction=function chooseWasabi343EnemyAction(state=null){
-    if(currentBattle&&currentBattle.wasabi343&&currentBattle.active===true)expireFeintBeforeRogueNextAction();
-    return PRE_CHOOSE.apply(this,arguments);
+    if(!(currentBattle&&currentBattle.wasabi343&&currentBattle.active===true))return PRE_CHOOSE.apply(this,arguments);
+    expireFeintBeforeRogueNextAction();
+    const scheduler=state&&state.ready===true?state:(typeof evaluateEnemyActionScheduler==="function"?evaluateEnemyActionScheduler():null);
+    if(!scheduler||scheduler.ready!==true)return{success:false,reason:scheduler&&scheduler.reason||"wasabi_enemy_scheduler_unavailable"};
+    if(String(scheduler.enemyId||"")!==ROGUE)return{success:false,reason:"wasabi_unexpected_enemy_scheduler_participant"};
+    const eligible=Array.isArray(scheduler.eligibleActions)?scheduler.eligibleActions.filter(Boolean):[];
+    if(!eligible.length)return{success:false,reason:"no_semantically_eligible_enemy_action",eligibleActionIds:[]};
+    const index=eligible.length===1?0:Math.floor(Math.random()*eligible.length);
+    const action=eligible[index]||null;
+    if(!action)return{success:false,reason:"wasabi_equal_weight_selection_failed",eligibleActionIds:eligible.map(a=>a.id)};
+    return{
+      success:true,action,eligibleActionIds:eligible.map(a=>a.id),
+      randomnessAppliedAfterEligibility:eligible.length>1,equalSelectionWeight:true,
+      wasabiRogueGenin343:true
+    };
   };
   try{chooseEnemyAuthoredBattleAction=globalThis.chooseEnemyAuthoredBattleAction;}catch(_error){}
 }
@@ -123,12 +136,19 @@ function strictWasabiDeployment(){
   return{success:JSON.stringify(playerIds)===JSON.stringify([WASABI])&&JSON.stringify(enemyIds)===JSON.stringify([ROGUE]),playerIds,enemyIds};
 }
 function exactBattleOccurrenceId(sceneInstanceId){return "battle_occ_origin_izuno_rogue_genin_step_in:"+String(sceneInstanceId||"");}
+function launchStore(){
+  if(!playerData.wasabi343BattleLaunches||typeof playerData.wasabi343BattleLaunches!=="object")playerData.wasabi343BattleLaunches={};
+  return playerData.wasabi343BattleLaunches;
+}
 function launch(spec={}){
   if(!spec.returnContext||spec.returnContext.type!=="story_scene"||String(spec.returnContext.sceneId)!==SCENE_ID)return{success:false,reason:"wasabi_story_return_context_invalid"};
   const sceneInstanceId=spec.returnContext.sceneInstanceId||spec.storyOccurrenceId||null;
   if(!sceneInstanceId)return{success:false,reason:"wasabi_story_instance_missing"};
-  const exactId=exactBattleOccurrenceId(sceneInstanceId);
-  if(currentBattle&&currentBattle.active===true&&currentBattle.battleId===exactId&&currentBattle.wasabi343)return{success:true,idempotent:true,battleId:exactId,encounterId:ENCOUNTER,battleConfigId:CONFIG};
+  const exactId=exactBattleOccurrenceId(sceneInstanceId),store=launchStore(),prior=store[exactId]||null;
+  if(prior){
+    if(currentBattle&&currentBattle.battleId===exactId&&currentBattle.wasabi343)return{success:true,idempotent:true,battleId:exactId,encounterId:ENCOUNTER,battleConfigId:CONFIG,launchEvidenceId:prior.launchEvidenceId||null};
+    return{success:false,reason:"wasabi_battle_occurrence_already_committed_without_runtime",battleId:exactId,launchEvidenceId:prior.launchEvidenceId||null};
+  }
 
   const launched=launchBattleWithReturnContext(ROGUE,ENCOUNTER,{...clone(spec.returnContext),battleConfigId:CONFIG,sourceOccurrenceId:SOURCE_OCCURRENCE,historicalParticipantRef:ROGUE,affectedParticipantRef:AFFECTED_STUDENT});
   if(!launched||launched.success!==true)return launched||{success:false,reason:"wasabi_battle_launch_failed"};
@@ -165,7 +185,14 @@ function launch(spec={}){
   });
   if(!evidence)return{success:false,reason:"wasabi_battle_launch_evidence_failed"};
   currentBattle.wasabi343.launchEvidenceId=evidence.evidenceId;
-  if(currentBattle.rewards){currentBattle.rewards.ryo=0;currentBattle.rewards.exp=0;currentBattle.rewards.items=[];currentBattle.rewards.rareDrops=[];}
+  store[exactId]={
+    battleOccurrenceId:exactId,launchEvidenceId:evidence.evidenceId||null,
+    sourceOccurrenceId:SOURCE_OCCURRENCE,historicalParticipantRef:ROGUE,
+    battleConfigId:CONFIG,encounterId:ENCOUNTER,createdAt:Date.now()
+  };
+  if(currentBattle.rewards){
+    currentBattle.rewards.ryo=0;currentBattle.rewards.exp=0;currentBattle.rewards.items=[];currentBattle.rewards.rareDrops=[];
+  }
   savePlayerData();saveTestState();openOverlay("combat");
   return{success:true,battleId:exactId,encounterId:ENCOUNTER,battleConfigId:CONFIG,playerParticipantIds:[WASABI],oppositionParticipantIds:[ROGUE],launchEvidenceId:evidence.evidenceId};
 }
@@ -190,10 +217,10 @@ function diagnostics(){
     historicalNotTemplateIdentity:!!enemy&&enemy.id===ROGUE&&enemy.oppositionTemplateId===TEMPLATE&&enemy.provenance.noRegistryAdmission===true,
     exactActions:actions.length===3&&actions.some(a=>a.id==="enemy_rogue_genin_kunai_rush"&&a.authoredAttackPL===9)&&actions.some(a=>a.id==="enemy_rogue_genin_shuriken_spread"&&a.authoredAttackPL===7)&&actions.some(a=>a.id===FEINT_ID),
     exactFeint:String(feintAction).includes("0.40")&&String(feintAction).includes(FEINT_STATE)&&String(expireFeintBeforeRogueNextAction).includes("now>created"),
-    sharedScheduler:!!PRE_CHOOSE&&String(globalThis.chooseEnemyAuthoredBattleAction).includes("PRE_CHOOSE.apply"),
+    sharedScheduler:!!PRE_CHOOSE&&String(globalThis.chooseEnemyAuthoredBattleAction).includes("evaluateEnemyActionScheduler")&&String(globalThis.chooseEnemyAuthoredBattleAction).includes("equalSelectionWeight:true")&&String(globalThis.chooseEnemyAuthoredBattleAction).includes("no_semantically_eligible_enemy_action"),
     strictDeployment:String(strictWasabiDeployment).includes("createBattleDeploymentSlots([WASABI])")&&String(strictWasabiDeployment).includes("createBattleDeploymentSlots([ROGUE])"),
     withdrawNaturallyUnavailable:String(strictWasabiDeployment).includes("player={slots:createBattleDeploymentSlots([WASABI])}"),
-    exactOccurrenceId:exactBattleOccurrenceId("qa")==="battle_occ_origin_izuno_rogue_genin_step_in:qa",
+    exactOccurrenceId:exactBattleOccurrenceId("qa")==="battle_occ_origin_izuno_rogue_genin_step_in:qa"&&String(launch).includes("wasabi_battle_occurrence_already_committed_without_runtime"),
     zeroRewards:enemy.rewards.ryo.min===0&&enemy.rewards.ryo.max===0&&enemy.rewards.exp.min===0&&enemy.rewards.exp.max===0&&enemy.rewards.commonDrops.length===0&&enemy.rewards.rareDrops.length===0,
     observerSafeResult:Object.keys(projectResult.call({})||{}).length===0?true:String(projectResult).includes("rogueGeninBattlePLDepleted")&&!String(projectResult).includes("stats"),
     noStoryTruth:String(launch).includes("sourceOccurrenceId")&&!String(launch).includes("consumeStaticOriginSourceOccurrence")
