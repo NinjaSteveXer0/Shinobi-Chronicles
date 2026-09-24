@@ -150,10 +150,13 @@ function installStyle(){
 `;
   document.head.appendChild(s);
 }
+function isMachineResolvedBeat36030(beat){
+  return !!beat&&(beat.machineResolved===true||!!(beat.uiHints&&beat.uiHints.kakashiMachineResolved===true));
+}
 function availableChoices(){
   try{
     const beat=typeof getCurrentStorySceneBeat==="function"?getCurrentStorySceneBeat():null;
-    if(!beat||beat.machineResolved===true||!Array.isArray(beat.choices))return[];
+    if(!beat||isMachineResolvedBeat36030(beat)||!Array.isArray(beat.choices))return[];
     return beat.choices.map(choice=>{
       const availability=typeof evaluateStorySceneChoiceAvailability==="function"?evaluateStorySceneChoiceAvailability(choice):{available:true};
       return{choiceId:choice.choiceId,label:choice.label,available:availability.available===true,knownBlocker:availability.knownBlocker||null};
@@ -633,7 +636,7 @@ function syncStandard(root,p,t){
   const beat=typeof getCurrentStorySceneBeat==="function"?getCurrentStorySceneBeat():null;
   const battleReady=t.atEnd&&beat&&beat.mode==="battle_transition";
   root.dataset.battleActionOnly=battleReady&&Number(t.cueCount||0)===0?"true":"false";
-  const semanticNext=t.atEnd&&beat&&(beat.machineResolved===true||(beat.mode!=="choice"&&beat.mode!=="battle_transition"));
+  const semanticNext=t.atEnd&&beat&&(isMachineResolvedBeat36030(beat)||(beat.mode!=="choice"&&beat.mode!=="battle_transition"));
   const actions=choices.length?choices.map(row=>({choiceId:row.choiceId,label:row.label})):battleReady?[{label:"BEGIN PL BATTLE",battle:true}]:[];
   syncActions(root,actions);
   const actionBox=root.querySelector(".kv2-actions");if(actionBox)actionBox.style.display=actions.length?"grid":"none";
@@ -760,8 +763,9 @@ function diagnostics(){
     packageTokenConsumesHolderTruth:String(syncPackageToken).includes("state.package")&&String(syncPackageToken).includes("packageHolder"),
     speakerFocusUsesCurrentCue:String(syncStandard).includes("speakerActorId"),
     stageWideAdvanceGuard:String(bind).includes('root.dataset.hasChoices==="true"')&&String(bind).includes("Date.now()-revealed<360"),
-    resolverChoicesNeverRendered:String(availableChoices).includes("beat.machineResolved===true"),
-    machineResolverStageAdvance:String(syncStandard).includes("beat.machineResolved===true")&&String(syncStandard).includes("semanticNext"),
+    resolverChoicesNeverRendered:String(availableChoices).includes("isMachineResolvedBeat36030"),
+    machineResolverStageAdvance:String(syncStandard).includes("isMachineResolvedBeat36030")&&String(syncStandard).includes("semanticNext"),
+    machineResolverFlagSurvivesStoryNormalization:String(isMachineResolvedBeat36030).includes("uiHints.kakashiMachineResolved"),
     actorLinkedSpeech:String(syncSpeech).includes("--kv2-speech-x")&&installStyle.toString().includes(".kv2-speech"),
     fiveChoiceLayoutNoScroll:installStyle.toString().includes("repeat(3,minmax(0,1fr))")&&installStyle.toString().includes("overflow:visible"),
     noMutationObserver:!String(render).includes("MutationObserver"),
