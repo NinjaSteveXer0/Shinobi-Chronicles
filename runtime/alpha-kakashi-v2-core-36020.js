@@ -1564,17 +1564,10 @@ function hiddenReviewCues(){
   return out;
 }
 function completeAndContinueAcademyKakashiV2Origin(){
-  const result=completeAcademyKakashiV2Origin();
-  if(!result||result.success!==true)return result;
-  // The shared Journey/Formation owner remains authoritative. This call only
-  // asks it to project the already-authorised post-Origin continuity surface.
-  try{
-    if(typeof openAcademyTeamFormationUI==="function"){
-      const projected=openAcademyTeamFormationUI({showChronicleBegins:true});
-      return{success:true,originCompletion:result.originCompletion||result,continuityProjection:projected||null};
-    }
-  }catch(_error){}
-  return result;
+  // Completion truth belongs to the shared Origin authority. The Story engine
+  // owns exitScene + returnContext projection into the existing Journey /
+  // Academy Team Formation continuity surface. Do not invent a second UI API.
+  return completeAcademyKakashiV2Origin();
 }
 
 // ---------------------------------------------------------------------------
@@ -1638,7 +1631,7 @@ function diagnostics(){
   terminalRewardsCommittedAtReceipt:String(commitTerminalRewardsAtReceipt).includes("commitAcademyKakashiV2TerminalRewards36015"),
   terminalCompleteCallsOrigin:String(completeAcademyKakashiV2Origin).includes("completeChronicleOriginPrologue"),
   correctedHiddenTestTerminal:!!def&&def.beatMap.has("v2_hidden_review")&&!def.beatMap.has("v2_complete")&&String(hiddenReviewCues).includes("f07c.hidden_base_all_alive"),
-  receiptExitsDirectly:!!def&&def.beatMap.get("v2_receipt")?.exitScene===true&&String(completeAndContinueAcademyKakashiV2Origin).includes("showChronicleBegins:true"),
+  receiptExitsDirectly:!!def&&def.beatMap.get("v2_receipt")?.exitScene===true&&String(completeAndContinueAcademyKakashiV2Origin).includes("completeAcademyKakashiV2Origin"),
   policeCardsProjected:String(policePairForParticipantKeys).includes("policeMiMale")&&String(policePairForParticipantKeys).includes("policePsFemale")&&String(groupTransferActors).includes('institution==="POLICE"'),
   resolverPseudoChoicesRetired:!JSON.stringify(beats).includes('"CONTINUE"')&&beats.filter(b=>b.machineResolved===true).length===11&&beats.filter(b=>b.machineResolved===true).every(b=>b.mode==="choice"&&b.uiHints&&b.uiHints.kakashiMachineResolved===true&&b.choices.length===2&&b.choices.every(ch=>ch.label==="RESOLVE RESULT")),
   browserGoldenClaimed:false
