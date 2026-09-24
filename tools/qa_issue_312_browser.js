@@ -100,7 +100,7 @@ async function shot(page,name,selector=null){
     await shot(page,"01-story-rooftop-two-actor.png","#kakashi-v2-scene-board");
 
     await nextSemantic(page,"v2_scene02_tail");
-    await choose(page,"WATCH THE EXCHANGE","v2_watch_exchange");
+    await choose(page,"WATCH THE HANDOFF","v2_watch_exchange");
 
     // Manual #312 blocker: MI must not be visible before the narration actually
     // reaches her entrance. The scene is mounted with all semantic participants,
@@ -304,7 +304,7 @@ async function shot(page,name,selector=null){
 
     // Semantic choice remains immediate; bounded actor motion must never delay Story truth.
     const start=Date.now();
-    await choose(page,"STOP THE ASSASSIN","v2_stop_assassin_setup");
+    await choose(page,"INTERCEPT THE MASKED ATTACKER","v2_stop_assassin_setup");
     const elapsed=Date.now()-start;
     assert(elapsed<900,"#312 Story semantic choice waited for presentation: "+elapsed+"ms");
     const stop=await page.evaluate(()=>{
