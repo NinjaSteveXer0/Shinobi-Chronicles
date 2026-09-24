@@ -38,8 +38,8 @@
       "kakashi-final-browser-golden-longhand-motion",
       "academy-hinata-writing-golden-340",
       "active-origin-story-reload-presentation-340",
-      "kakashi-canonical-machine-resolver-routing",
-      "kakashi-writing-golden-runtime-consumption"
+      "kakashi-writing-golden-runtime-consumption",
+      "kakashi-canonical-machine-resolver-routing"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
