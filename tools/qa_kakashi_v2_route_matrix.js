@@ -6,8 +6,10 @@ const vm=require("vm");
 const assert=require("assert");
 
 const CONTENT_PATH="runtime/academy-kakashi-v2-content-36000.js";
+const WRITING_GOLDEN_PATH="runtime/academy-kakashi-v2-writing-golden-36100.js";
 const CORE_PATH="runtime/alpha-kakashi-v2-core-36020.js";
 const contentSource=fs.readFileSync(CONTENT_PATH,"utf8");
+const writingGoldenSource=fs.readFileSync(WRITING_GOLDEN_PATH,"utf8");
 const coreSource=fs.readFileSync(CORE_PATH,"utf8");
 const scenes=new Map();
 const factualDefinitions=new Map();
@@ -56,6 +58,7 @@ const context={
 context.globalThis=context;
 vm.createContext(context);
 vm.runInContext(contentSource,context,{filename:CONTENT_PATH});
+vm.runInContext(writingGoldenSource,context,{filename:WRITING_GOLDEN_PATH});
 vm.runInContext(coreSource,context,{filename:CORE_PATH});
 
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
@@ -89,11 +92,12 @@ assert.strictEqual(fromEntry.size,def.beats.length,`unreachable V2 beats: ${def.
 
 const reverse=new Map(def.beats.map(b=>[b.beatId,[]]));
 for(const [id,targets] of adjacency)for(const t of targets)reverse.get(t).push(id);
-const toComplete=reachable("v2_complete",reverse);
-assert.strictEqual(toComplete.size,def.beats.length,`beats cannot reach v2_complete: ${def.beats.filter(b=>!toComplete.has(b.beatId)).map(b=>b.beatId).join(", ")}`);
-assert.deepStrictEqual(reverse.get("v2_minato"),["v2_report"],"terminal path bypasses ANBU report");
-assert.deepStrictEqual(reverse.get("v2_receipt"),["v2_minato"],"terminal path bypasses private Minato evaluation");
-assert.deepStrictEqual(reverse.get("v2_complete"),["v2_receipt"],"terminal path bypasses Chronicle Receipt");
+const toComplete=reachable("v2_receipt",reverse);
+assert.strictEqual(toComplete.size,def.beats.length,`beats cannot reach v2_receipt: ${def.beats.filter(b=>!toComplete.has(b.beatId)).map(b=>b.beatId).join(", ")}`);
+assert.deepStrictEqual(reverse.get("v2_hidden_review"),["v2_report"],"terminal path bypasses mission-giver ANBU report");
+assert.deepStrictEqual(reverse.get("v2_receipt"),["v2_hidden_review"],"terminal path bypasses hidden Hokage test review");
+assert(!def.beatMap.has("v2_minato"),"superseded non-reveal Minato beat returned");
+assert(!def.beatMap.has("v2_complete"),"forbidden Origin occurrence sealed pseudo-receipt returned");
 
 let cycle=null;
 const white=new Set(adjacency.keys()),grey=new Set(),black=new Set();
@@ -109,8 +113,8 @@ visit(def.entryBeatId);
 assert.strictEqual(cycle,null,`unexpected Kakashi V2 route cycle: ${cycle&&cycle.join(" -> ")}`);
 
 assert.strictEqual(def.beats.filter(b=>b.exitScene===true).length,1,"Kakashi V2 must have one semantic exit");
-assert.strictEqual(def.beats.find(b=>b.exitScene===true).beatId,"v2_complete");
-assert.strictEqual(def.beats.length,132,"unexpected Kakashi V2 beat count after final two-outcome disposition + physical custody result scenes");
+assert.strictEqual(def.beats.find(b=>b.exitScene===true).beatId,"v2_receipt");
+assert.strictEqual(def.beats.length,131,"unexpected Kakashi V2 beat count after Writing-Golden terminal replacement");
 
 // ---------------------------------------------------------------------------
 // Scenario driver: execute authored state consequences rather than merely parse
@@ -155,24 +159,33 @@ function next(){
   assert(b.nextBeatId,`beat ${b.beatId} has no nextBeatId`);
   return enter(b.nextBeatId);
 }
+function resolveMachine(){
+  const b=beat();
+  assert.strictEqual(b.machineResolved,true,`beat ${b.beatId} is not machine-resolved`);
+  const rows=(b.choices||[]).filter(candidate=>typeof candidate.availability!=="function"||candidate.availability().available===true);
+  assert.strictEqual(rows.length,1,`machine resolver branch cardinality at ${b.beatId}`);
+  assert.strictEqual(rows[0].label,"RESOLVE RESULT",`machine resolver label leaked at ${b.beatId}`);
+  runRequests(rows[0].consequenceRequests,null);
+  return enter(rows[0].nextBeatId);
+}
 function returnBattle(resultBeat,{outcome="victory",encounterId="qa",actions=1}={}){
   return enter(resultBeat,{outcome,battle_id:`qa_battle_${resultBeat}`,encounter_id:encounterId,authored:{playerActionOpportunityCount:actions}});
 }
 function state(){return context.getAcademyKakashiV2State36020();}
 function finishTerminal(){
   assert.strictEqual(activeRuntime.beatId,"v2_report");
-  next();assert.strictEqual(activeRuntime.beatId,"v2_minato");
+  next();assert.strictEqual(activeRuntime.beatId,"v2_hidden_review");
   next();assert.strictEqual(activeRuntime.beatId,"v2_receipt");
-  next();assert.strictEqual(activeRuntime.beatId,"v2_complete");
   runRequests(beat().onAdvanceConsequences,null);
   assert.strictEqual(state().rewards.terminalCommitted,true);
+  assert.strictEqual(completionCalls>0,true,"Receipt did not invoke Origin completion");
 }
 
 // Clean direct Pickpocket: no Battle, no MI, package returned.
 reset({"academy_kakashi.v2.pickpocket_direct":"PICKPOCKET_DIRECT_SUCCESS"});
 enter("v2_scene02_tail");
-choose("SLIP IN FOR THE PACKAGE");
-choose("CONTINUE");
+choose("SLIP IN AND TAKE IT");
+resolveMachine();
 assert.strictEqual(activeRuntime.beatId,"v2_pickpocket_clean_success");
 assert.strictEqual(state().package.holder,"KAKASHI");
 assert.strictEqual(state().participants.MI.state,"UNSEEN");
@@ -184,7 +197,7 @@ finishTerminal();
 // Failed direct Pickpocket -> exact 3-v-1 -> deliberate group release.
 reset({"academy_kakashi.v2.pickpocket_direct":"PICKPOCKET_DIRECT_FAILURE"});
 enter("v2_scene02_tail");
-choose("SLIP IN FOR THE PACKAGE");choose("CONTINUE");next();
+choose("SLIP IN AND TAKE IT");resolveMachine();next();
 assert.strictEqual(activeRuntime.beatId,"v2_battle_pickpocket_3v1");
 returnBattle("v2_pickpocket_3v1_win",{outcome:"victory",encounterId:"academy_kakashi_origin_battle_amt_ps_mi_3v1",actions:3});
 choose("LET THEM GO");
@@ -197,7 +210,7 @@ for(const ref of ["AMT","PS","MI"])assert.strictEqual(state().participants[ref].
 
 // Direct Strike -> 2-v-1 victory -> MI victory -> three deterministic kills.
 reset();
-enter("v2_scene02_tail");choose("STRIKE BEFORE THE HANDOFF");next();
+enter("v2_scene02_tail");choose("INTERRUPT THE HANDOFF");next();
 returnBattle("v2_direct_strike_2v1_win",{encounterId:"academy_kakashi_origin_battle_amt_ps_2v1",actions:3});next();
 returnBattle("v2_direct_mi_win",{encounterId:"academy_kakashi_origin_battle_mi_1v1",actions:2});
 choose("KILL THEM");
@@ -208,13 +221,13 @@ next();
 assert.strictEqual(activeRuntime.beatId,"v2_report");
 assert.strictEqual(state().package.holder,"ANBU","ANBU custody commits only on exact report handoff");
 
-// MOVE IN CLOSER failure -> Stay on Package -> Ask Where -> Take Him Down loss.
+// GET CLOSER failure -> Stay on Package -> Ask Where -> Take Him Down loss.
 // Package recovery survives the Battle defeat and Knowledge remains exact.
 reset({
   "academy_kakashi.v2.get_closer":"GET_CLOSER_FAILURE",
   "academy_kakashi.v2.stay_package_pursuit":"STAY_PACKAGE_PURSUIT_SUCCESS"
 });
-enter("v2_scene02_tail");choose("MOVE IN CLOSER");choose("CONTINUE");choose("STAY ON THE PACKAGE");choose("CONTINUE");
+enter("v2_scene02_tail");choose("GET CLOSER");resolveMachine();choose("STAY ON THE PACKAGE");resolveMachine();
 choose("ASK WHERE THE PACKAGE WAS GOING");choose("TAKE HIM DOWN");next();
 returnBattle("v2_take_down_loss",{outcome:"defeat",encounterId:"academy_kakashi_origin_battle_kakashi_pakkun_vs_amt",actions:4});
 assert.strictEqual(state().package.holder,"KAKASHI");
@@ -229,10 +242,10 @@ next();
 assert.strictEqual(state().pakkun.present,false);
 assert.strictEqual(state().pakkun.departed,true);
 
-// STOP THE ASSASSIN current correction: exactly <=3 controller actions gives
+// INTERCEPT THE MASKED ATTACKER current correction: exactly <=3 controller actions gives
 // Package Smuggler catch-up only. Direct AMT pursuit must not appear.
 reset();
-enter("v2_watch_exchange");choose("STOP THE ASSASSIN");next();
+enter("v2_watch_exchange");choose("INTERCEPT THE MASKED ATTACKER");next();
 returnBattle("v2_mi_stop_win",{encounterId:"academy_kakashi_origin_battle_mi_1v1",actions:3});
 assert((beat().choices||[]).some(c=>c.label==="GO AFTER PACKAGE SMUGGLER"&&c.availability().available===true));
 assert(!(beat().choices||[]).some(c=>c.label==="GO AFTER ANBU MARKED TARGET"));
@@ -242,9 +255,9 @@ assert.strictEqual(activeRuntime.beatId,"v2_mi_restrained_next");
 next();
 assert.strictEqual(activeRuntime.beatId,"v2_ps_pursuit_resolver","RESTRAIN result did not preserve Package Smuggler pursuit timing");
 
-// Four controller actions is already too slow on STOP THE ASSASSIN.
+// Four controller actions is already too slow on INTERCEPT THE MASKED ATTACKER.
 reset();
-enter("v2_watch_exchange");choose("STOP THE ASSASSIN");next();
+enter("v2_watch_exchange");choose("INTERCEPT THE MASKED ATTACKER");next();
 returnBattle("v2_mi_stop_win",{encounterId:"academy_kakashi_origin_battle_mi_1v1",actions:4});
 const visibleSlow=(beat().choices||[]).filter(c=>!c.availability||c.availability().available).map(c=>c.label);
 assert(!visibleSlow.includes("GO AFTER PACKAGE SMUGGLER"));
@@ -256,11 +269,11 @@ reset({
   "academy_kakashi.v2.ps_pursuit":"PS_PURSUIT_SUCCESS",
   "academy_kakashi.v2.secure_amt_pursuit":"SECURE_AMT_PURSUIT_SUCCESS"
 });
-enter("v2_watch_exchange");choose("DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE");next();
+enter("v2_watch_exchange");choose("DEAL WITH HER FIRST");next();
 returnBattle("v2_mi_package_second_win",{encounterId:"academy_kakashi_origin_battle_seq_mi",actions:4});
-choose("CHASE THE PACKAGE SMUGGLER");choose("CONTINUE");next();
+choose("CHASE THE PACKAGE SMUGGLER");resolveMachine();next();
 returnBattle("v2_ps_package_second_win",{encounterId:"academy_kakashi_origin_battle_seq_ps",actions:3});
-choose("STAY ON THE FIRST MAN");choose("CONTINUE");next();
+choose("STAY ON THE FIRST MAN");resolveMachine();next();
 returnBattle("v2_amt_package_second_win",{encounterId:"academy_kakashi_origin_battle_seq_amt_pakkun",actions:4});
 choose("BRING HIM TO ANBU");
 assert.strictEqual(activeRuntime.beatId,"v2_amt_anbu_depart");
@@ -270,9 +283,9 @@ next();assert.strictEqual(activeRuntime.beatId,"v2_report");
 assert.strictEqual(state().package.holder,"ANBU");
 assert.strictEqual(state().participants.AMT.state,"ANBU_CUSTODY");
 
-// SECURE THE PACKAGE victory preserves defeated participants separately.
+// GO FOR THE PACKAGE victory preserves defeated participants separately.
 reset();
-enter("v2_watch_exchange");choose("SECURE THE PACKAGE");next();
+enter("v2_watch_exchange");choose("GO FOR THE PACKAGE");next();
 returnBattle("v2_ps_mi_win",{encounterId:"academy_kakashi_origin_battle_ps_mi_2v1",actions:5});
 choose("RETURN AND REPORT");
 assert.strictEqual(state().package.holder,"ANBU");
@@ -281,25 +294,25 @@ assert.strictEqual(state().participants.MI.state,"BATTLE_DEFEATED");
 
 // GO AFTER ORIGINAL TARGET pursuit failure keeps the package with PS.
 reset({"academy_kakashi.v2.amt_pursuit_root":"AMT_PURSUIT_FAILURE"});
-enter("v2_watch_exchange");choose("GO AFTER THE ORIGINAL TARGET");choose("CONTINUE");
+enter("v2_watch_exchange");choose("CHASE THE MAN FROM THE PHOTO");resolveMachine();
 assert.strictEqual(activeRuntime.beatId,"v2_amt_direct_pursuit_fail");
 assert.strictEqual(state().package.holder,"PS");
 next();
 assert.strictEqual(state().package.holder,"PS");
 
-// MOVE IN CLOSER success + improved clean Pickpocket preserves extra Knowledge.
+// GET CLOSER success + improved clean Pickpocket preserves extra Knowledge.
 reset({
   "academy_kakashi.v2.get_closer":"GET_CLOSER_SUCCESS",
   "academy_kakashi.v2.pickpocket_improved":"PICKPOCKET_IMPROVED_SUCCESS"
 });
-enter("v2_scene02_tail");choose("MOVE IN CLOSER");choose("CONTINUE");choose("ATTEMPT THE PICKPOCKET");choose("CONTINUE");
+enter("v2_scene02_tail");choose("GET CLOSER");resolveMachine();choose("SLIP IN AND TAKE IT");resolveMachine();
 assert.strictEqual(activeRuntime.beatId,"v2_pickpocket_clean_success");
 assert.strictEqual(state().knowledge.getCloserContingency,true);
 next();assert.strictEqual(state().package.holder,"ANBU");
 
 // Get Closer failure -> Sakura cutoff -> 2-v-1 -> Police custody.
 reset({"academy_kakashi.v2.get_closer":"GET_CLOSER_FAILURE"});
-enter("v2_scene02_tail");choose("MOVE IN CLOSER");choose("CONTINUE");choose("CUT THEM OFF AT THE SAKURA TREE");next();
+enter("v2_scene02_tail");choose("GET CLOSER");resolveMachine();choose("CUT THEM OFF");next();
 returnBattle("v2_cutoff_win",{encounterId:"academy_kakashi_origin_battle_amt_ps_2v1",actions:4});
 choose("TAKE THEM TO THE UCHIHA POLICE");
 assert.strictEqual(activeRuntime.beatId,"v2_group2_police_depart");
@@ -317,7 +330,7 @@ console.log(JSON.stringify({
   beatCount:def.beats.length,
   graphReachableFromEntry:fromEntry.size,
   graphCanReachCompletion:toComplete.size,
-  terminalConvergence:"ANBU_REPORT -> MINATO -> CHRONICLE_RECEIPT -> COMPLETE",
+  terminalConvergence:"MISSION_GIVER_ANBU_REPORT -> HIDDEN_TEST_REVIEW -> CHRONICLE_RECEIPT",
   scenarioFamiliesValidated:10,
   completionCalls,
   browserGoldenClaimed:false
