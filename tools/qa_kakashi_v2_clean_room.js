@@ -51,6 +51,10 @@ assert(!rendererSource.split("function ensureRoot")[0].includes("root.innerHTML"
 assert(!rendererSource.slice(rendererSource.indexOf("function syncActors"),rendererSource.indexOf("function bind")).includes("root.innerHTML"),"cue render remounts Scene Board root");
 assert(transitionSource.includes('visualTransition:"shared_story_hard_transition_33900"')&&transitionSource.includes('visualTransition:"none"')&&transitionSource.includes("playStoryHardSceneTransition33900"),"#334 final hard/soft transition delegation missing");
 assert(coreSource.includes('addBeat("v2_battle_ps_seq",{mode:"battle_transition",backdrop:B.alleyAlt')&&coreSource.includes('addBeat("v2_ps_seq_win",{mode:"choice",backdrop:B.alleyAlt')&&coreSource.includes('addBeat("v2_ps_seq_loss",{backdrop:B.alleyAlt'),"PS pursuit Battle/post-Battle must remain in the authorised side-street backdrop");
+for(const beatId of ["v2_mi_anbu_handoff","v2_ps_anbu_handoff","v2_amt_anbu_handoff"]){
+  assert(new RegExp('addBeat\\("'+beatId+'",\\{[^\\n]*preset:"anbu_handoff"').test(coreSource),beatId+" must use the Kakashi-local individual ANBU handoff preset");
+}
+assert(rendererSource.includes('if(preset==="anbu_handoff")')&&rendererSource.includes("?{anbu:3,kakashi:42,amt:62,pakkun:82}")&&rendererSource.includes(":{anbu:6,kakashi:49,mi:75,ps:75,amt:75}"),"individual ANBU handoff actor separation map missing");
 
 // Reward authority uses the existing Currency / Inventory / Battle claim surfaces
 // while proving exact source values and idempotence.

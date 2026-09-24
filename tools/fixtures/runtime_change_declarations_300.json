@@ -541,6 +541,29 @@
       ],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "World #348 closed the legacy 250 Ryō terminal/debrief cap. Academy Kakashi terminal reward total now equals the exact sum of every independently qualified authorised one-shot terminal source with no total clamp. The existing source predicates, 25/50/100 live-delivery tier, immediate Battle cash separation, item rewards and receipt idempotence remain unchanged. Exact 275 and 300 terminal plans must commit and replay idempotently."
+    },
+    {
+      "changeId": "issue-302-kakashi-individual-anbu-handoff-card-separation",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "origin.academy_kakashi.v2.story_dom"
+      ],
+      "owner": "runtime/alpha-kakashi-v2-renderer-36030.js",
+      "directCallers": [
+        "runtime/alpha-kakashi-v2-core-36020.js"
+      ],
+      "stateTouched": [
+        "presentation-only Kakashi individual ANBU custody handoff actor stage anchors"
+      ],
+      "productionLoader": "runtime/alpha-traversal-bridge-33200.js",
+      "qaRefs": [
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_kakashi_v2_clean_room.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Issue #302 final Alpha Golden blocker only: the three individual ANBU custody handoffs use a Kakashi-local anbu_handoff preset so the receiving ANBU Operative, Kakashi, the captive, and optional Pakkun occupy distinct stage positions. No dialogue, custody, package, reward, Battle, PL, route, transition, animation, Receipt, Police, or shared Scene Board semantics changed."
     }
   ]
 }
