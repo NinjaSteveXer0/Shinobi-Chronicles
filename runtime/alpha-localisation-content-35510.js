@@ -99,6 +99,20 @@ const PAIRS=Object.freeze([
   ["Sometimes the fastest path isn't the obvious one.","A veces el camino más rápido no es el más evidente."],
   ["Catching them wasn't the only thing that mattered.","Atraparlos no era lo único que importaba."],
   ["No Speed/Agility stat, morality score or automatic specialization is created.","No se crea ninguna estadística de Velocidad/Agilidad, puntuación moral ni especialización automática."],
+  // #343 Academy Wasabi Writing-Golden functional choice surfaces.
+  ["TAKE THE OBVIOUS TRAIL","SIGUE EL RASTRO EVIDENTE"],
+  ["LOOK FOR SOMETHING BETTER","BUSCA ALGO MEJOR"],
+  ["WORK WITH THE OTHERS","TRABAJA CON LOS DEMÁS"],
+  ["FORGET THE TRAIL — WHERE ARE THEY GOING?","OLVÍDATE DEL RASTRO — ¿ADÓNDE VAN?"],
+  ["TAKE THE RIVER","VE POR EL RÍO"],
+  ["FOLLOW THE STRONGER TRAIL","SIGUE EL RASTRO MÁS FUERTE"],
+  ["CHECK THE SHOUTING","INVESTIGA LOS GRITOS"],
+  ["CUT FOR THE INTERCEPT","CORTA CAMINO PARA INTERCEPTARLOS"],
+  ["STEP IN","INTERVÉN"],
+  ["CALL FOR HELP","PIDE AYUDA"],
+  ["KEEP PURSUING","SIGUE PERSIGUIENDO"],
+  ["Next time I'm trusting the trail.","La próxima vez confiaré en el rastro."],
+  ["Next time I'm trusting what I notice.","La próxima vez confiaré en lo que note."],
 
   // Mirai.
   ["A controlled Academy escort begins normally. The protected civilian is polite and cooperative; there is no suspicious opening cue.","Una escolta controlada de la Academia comienza con normalidad. El civil protegido es educado y cooperativo; no hay ninguna señal inicial sospechosa."],
@@ -333,7 +347,12 @@ function diagnostics(){
     substantialCoverage:PAIRS.length>=180,
     glossaryClean:glossaryFailures.length===0,
     hinataCovered:sourceTexts.includes("WAIT FOR HIM TO COMMIT")&&sourceTexts.includes("WATCH ONE MORE EXCHANGE"),
-    wasabiCovered:sourceTexts.includes("Academy pursuit trial: find the target before they reach the extraction point."),
+    wasabiCovered:[
+      "TAKE THE OBVIOUS TRAIL","LOOK FOR SOMETHING BETTER","WORK WITH THE OTHERS",
+      "FORGET THE TRAIL — WHERE ARE THEY GOING?","TAKE THE RIVER","FOLLOW THE STRONGER TRAIL",
+      "CHECK THE SHOUTING","CUT FOR THE INTERCEPT","STEP IN","CALL FOR HELP","KEEP PURSUING",
+      "Next time I'm trusting the trail.","Next time I'm trusting what I notice."
+    ].every(text=>sourceTexts.includes(text)),
     miraiCovered:sourceTexts.includes("Mirai makes ordinary conversation."),
     kushinaCovered:sourceTexts.includes("Correct the sealing formula through Fūinjutsu"),
     kurenaiCovered:sourceTexts.includes("Choose the first deception layer."),
