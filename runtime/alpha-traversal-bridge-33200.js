@@ -256,7 +256,7 @@
 (function activateOriginSceneBoardTerminalChain33200(){
   if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
 
-  const BUILD="kakashi-v2-writing-golden-20260924-2";
+  const BUILD="kakashi-v2-writing-golden-20260924-3";
   function loadOne(id,src,ready,next){
     if(ready()){if(next)next();return;}
     let script=document.getElementById(id);
