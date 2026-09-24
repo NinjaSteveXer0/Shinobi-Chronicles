@@ -312,6 +312,12 @@ assert(coreSource.includes('addBeat("v2_battle_ps_seq",{mode:"battle_transition"
   for(const asset of ["uchiha_police_force_member_male.png","uchiha_police_force_member_female.png","uchiha_police_force_male_alt_1.png","uchiha_police_force_female_alt_1.png","uchiha_police_force_male_alt_2.png","uchiha_police_force_female_alt_2.png"])assert(coreSource.includes(asset),"Police card asset missing: "+asset);
   assert(rendererSource.includes("police_handoff")&&rendererSource.includes('data-count="6"')&&rendererSource.includes("kakashi_upf_"),"Police cards are not projected on a six-person handoff stage");
   assert(rendererSource.includes("hokage_test_review")&&rendererSource.includes("presentationPackageHolder"),"hidden test review presentation contract missing");
+  const machineResolverBeats=[...def.beatMap.values()].filter(b=>b.machineResolved===true);
+  assert.strictEqual(machineResolverBeats.length,10,"Writing-Golden resolver beat count drifted");
+  assert(machineResolverBeats.every(b=>b.mode==="resolver"&&b.choices.length===2&&b.choices.every(ch=>ch.label==="RESOLVE RESULT")),"resolver-only branch is still a player-facing choice card");
+  assert(!/C\([^,\n]+,"CONTINUE"/.test(coreSource),"resolver CONTINUE pseudo-decision returned");
+  assert(rendererSource.includes("beat.machineResolved===true"),"renderer no longer hides machine resolver branches");
+  assert(transitionSource.includes("committedResolverChoice36040")&&transitionSource.includes("available.length!==1"),"transition no longer projects the single committed resolver branch directly");
 }
 
 console.log(JSON.stringify({
