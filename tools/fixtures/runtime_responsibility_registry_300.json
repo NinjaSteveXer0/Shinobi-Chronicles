@@ -12,6 +12,8 @@
     "runtime/alpha-story-decision-realisation-34000.js",
     "runtime/alpha-story-factual-resolver-34600.js",
     "runtime/alpha-special-jonin-evidence-producer-34700.js",
+    "runtime/academy-wasabi-writing-golden-34300.js",
+    "runtime/alpha-wasabi-origin-battle-34300.js",
     "runtime/academy-kakashi-v2-content-36000.js",
     "runtime/academy-kakashi-v2-writing-golden-36100.js",
     "runtime/alpha-kakashi-v2-battle-36010.js",
@@ -182,7 +184,8 @@
         "resumeBattleCallerAfterCompletion"
       ],
       "permittedAdapters": [
-        "academy_kakashi_v2_battle_adapter_36010"
+        "academy_kakashi_v2_battle_adapter_36010",
+        "academy_wasabi_rogue_genin_battle_adapter_34300"
       ],
       "retiredOwners": [],
       "saveSchemaRefs": [
@@ -707,6 +710,89 @@
         "tools/qa_issue_105_origin_browser_realisation_runtime.js",
         "tools/qa_runtime_ownership_safety_300.js",
         "tools/qa_issue_340_hinata_browser.js"
+      ]
+    },
+    {
+      "responsibilityId": "origin.academy_izuno.final_story_state",
+      "canonicalOwner": "runtime/alpha-origin-scenes-32900-a.js",
+      "ownerType": "origin_semantic_owner",
+      "directCallers": [
+        "runtime/alpha-origin-scenes-32900-integrator.js",
+        "runtime/alpha-story-scene-board-33900.js"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime.localContext",
+        "playerData.activityHistory Academy Wasabi IZU-01..04 source occurrences",
+        "playerData acquisition / Origin completion state"
+      ],
+      "stateWrites": [
+        "activeStorySceneRuntime.localContext Wasabi pursuit choices and Battle return facts",
+        "playerData.activityHistory exact Academy Wasabi IZU-01..04 source facts"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/academy-wasabi-writing-golden-34300.js",
+        "runtime/alpha-origin-scenes-32900-a.js"
+      ],
+      "extensionHooks": [
+        "SC_ALPHA_ORIGIN_32900.register",
+        "completeChronicleOriginPrologue"
+      ],
+      "permittedAdapters": [
+        "academy_wasabi_rogue_genin_battle_adapter_34300"
+      ],
+      "retiredOwners": [
+        "runtime/alpha-origin-scenes-32900-a.js::pre343 compressed Wasabi expression"
+      ],
+      "saveSchemaRefs": [
+        "activeStorySceneRuntime.localContext Wasabi pursuit/Battle facts",
+        "playerData.activityHistory occ_origin_izuno_*"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_343_wasabi_writing_golden.js",
+        "tools/qa_alpha_origin_scenes_32900_runtime.js",
+        "tools/qa_story_reachability_311.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "origin.academy_izuno.story_to_battle",
+      "canonicalOwner": "runtime/alpha-wasabi-origin-battle-34300.js",
+      "ownerType": "origin_battle_adapter",
+      "directCallers": [
+        "runtime/alpha-origin-scenes-32900-a.js"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime.instanceId",
+        "currentBattle shared Battle deployment/transient/evidence state",
+        "playerData.wasabiOriginBattle34300 receipts"
+      ],
+      "stateWrites": [
+        "currentBattle.wasabiOrigin34300",
+        "playerData.wasabiOriginBattle34300 receipts",
+        "Battle evidence through shared recordBattleEvidence"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-wasabi-origin-battle-34300.js"
+      ],
+      "extensionHooks": [
+        "launchAcademyWasabiRogueGeninBattle34300",
+        "projectAcademyWasabiRogueGeninBattleResult34300",
+        "chooseEnemyAuthoredBattleAction shared scheduler adapter"
+      ],
+      "permittedAdapters": [
+        "academy_wasabi_rogue_genin_battle_adapter_34300"
+      ],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "currentBattle.wasabiOrigin34300",
+        "playerData.wasabiOriginBattle34300"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_343_wasabi_writing_golden.js",
+        "tools/qa_issue_343_wasabi_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
       ]
     }
   ],
