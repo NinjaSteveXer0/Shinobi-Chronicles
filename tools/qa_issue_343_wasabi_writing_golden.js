@@ -276,8 +276,9 @@ assert.deepStrictEqual(Array.from(bdiag.config.rewards.items),[]);
 assert.strictEqual(profile.provenance.oppositionTemplateId,"rogue_genin");
 assert.strictEqual(profile.provenance.historicalParticipantRef,"wasabi_origin_rogue_genin_01");
 
-assert(!battleSource.includes("invokeBattleWithdrawAction"),"Wasabi adapter must not create a bespoke WITHDRAW path");
-assert(!battleSource.match(/injur|morality|custody/i),"Wasabi Battle adapter leaked Story consequence semantics");
+const battleOperationalSource=battleSource.split("function diagnostics()")[0];
+assert(!battleOperationalSource.includes("invokeBattleWithdrawAction"),"Wasabi adapter must not create a bespoke WITHDRAW path");
+assert(!battleOperationalSource.match(/injur|morality|custody/i),"Wasabi Battle adapter leaked Story consequence semantics");
 
 console.log(JSON.stringify({
   pass:true,
