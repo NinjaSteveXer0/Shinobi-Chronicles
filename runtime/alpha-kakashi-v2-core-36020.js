@@ -145,7 +145,8 @@ function disposeGroup(kind,refs=[AMT,PS,MI]){
 function occurrenceId(kind,key){const rt=active();return `occ_academy_kakashi_v2_${String(rt&&rt.instanceId||"unknown")}_${String(kind)}_${String(key)}`;}
 function commitKakashiOccurrence(kind,key,data={}){
   const rt=active(),id=occurrenceId(kind,key);
-  if(!rt||!globalThis.playerData||!Array.isArray(playerData.activityHistory))return{success:false,reason:"kakashi_v2_activity_history_unavailable"};
+  if(!rt||typeof playerData==="undefined"||!playerData||typeof playerData!=="object")return{success:false,reason:"kakashi_v2_activity_history_unavailable"};
+  if(!Array.isArray(playerData.activityHistory))playerData.activityHistory=[];
   const existing=playerData.activityHistory.find(row=>row&&row.committed===true&&String(row.sourceOccurrenceId||row.occurrenceId||row.id||"")===id);
   if(existing)return{success:true,idempotent:true,record:existing};
   const record={id,occurrenceId:id,sourceOccurrenceId:id,type:`academy_kakashi_v2_${kind}`,activity:"origin_chronicle",actorVariantId:ORIGIN_ID,protagonistParticipantId:ORIGIN_ID,sceneId:SCENE_ID,storySceneInstanceId:rt.instanceId,committed:true,completed:true,data:{...data},timestamp:Date.now()};
