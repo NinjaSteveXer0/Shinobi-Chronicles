@@ -602,7 +602,7 @@ async function terminalStoryBrowserValidation(browser){
     await chooseLabel(page,"CHASE THE PACKAGE","v2_ps_pursuit_resolver");
     await advanceTo(page,"v2_battle_ps_seq");
     await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_ps_seq_win"});
-    await chooseLabel(page,"GO AFTER ANBU MARKED TARGET","v2_amt_after_ps");
+    await chooseLabel(page,"CHASE THE MAN FROM THE PHOTO","v2_amt_after_ps");
     await advanceTo(page,"v2_battle_amt_seq_pakkun");
     await launchAndReturnBattle(page,{outcome:"defeat",actions:4,expectedBeat:"v2_amt_seq_loss"});
     await nextSemantic(page,"v2_report");
@@ -1078,7 +1078,7 @@ async function browserRouteMatrix(browser){
     await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_mi_stop_win"});
     const labels=await page.evaluate(()=>getCurrentStorySceneBeat().choices.filter(c=>!c.availability||c.availability().available).map(c=>c.label));
     assert(labels.includes("CHASE THE PACKAGE"),JSON.stringify(labels));
-    assert(!labels.includes("GO AFTER ANBU MARKED TARGET"),JSON.stringify(labels));
+    assert(!labels.includes("CHASE THE MAN FROM THE PHOTO"),JSON.stringify(labels));
     await chooseLabel(page,"RESTRAIN HER AND KEEP MOVING","v2_mi_restrained_next");
     const restrainedResolution=await stateSnapshot(page);
     assert(["RESTRAINED","ESCAPED"].includes(restrainedResolution.participants.MI.state),"RESTRAIN HER AND KEEP MOVING produced invalid final state: "+JSON.stringify(restrainedResolution.participants.MI));
@@ -1104,7 +1104,7 @@ async function browserRouteMatrix(browser){
     await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_mi_stop_win"});
     const labels=await page.evaluate(()=>getCurrentStorySceneBeat().choices.filter(c=>!c.availability||c.availability().available).map(c=>c.label));
     assert(!labels.includes("CHASE THE PACKAGE"),JSON.stringify(labels));
-    assert(!labels.includes("GO AFTER ANBU MARKED TARGET"),JSON.stringify(labels));
+    assert(!labels.includes("CHASE THE MAN FROM THE PHOTO"),JSON.stringify(labels));
     assert(!labels.includes("RESTRAIN HER AND KEEP MOVING"),JSON.stringify(labels));
     await chooseLabel(page,"BRING HER TO ANBU","v2_mi_anbu_depart");
     let s=await stateSnapshot(page);
@@ -1262,12 +1262,12 @@ async function post322DispositionBrowserValidation(browser){
         if(st.participants.MI.state!=="RESTRAINED")continue;
         await advanceTo(page,"v2_battle_ps_seq");
         await launchAndReturnBattle(page,{outcome:"victory",actions:2,expectedBeat:"v2_ps_seq_win"});
-        await chooseLabel(page,"RESTRAIN HIM AND CONTINUE","v2_ps_restrain_continue_result");
+        await chooseLabel(page,"RESTRAIN HIM AND KEEP MOVING","v2_ps_restrain_continue_result");
         st=await stateSnapshot(page);
         if(st.participants.PS.state!=="RESTRAINED")continue;
         await advanceTo(page,"v2_battle_amt_seq_pakkun");
         await launchAndReturnBattle(page,{outcome:"victory",actions:2,expectedBeat:"v2_amt_seq_win"});
-        await chooseLabel(page,"RESTRAIN HIM AND COLLECT THE OTHERS","v2_amt_restrain_collect_result");
+        await chooseLabel(page,"RESTRAIN HIM AND GO BACK FOR THE OTHERS","v2_amt_restrain_collect_result");
         st=await stateSnapshot(page);
         if(st.participants.AMT.state!=="RESTRAINED")continue;
         assert(["MI","PS","AMT"].every(ref=>st.participants[ref].state==="RESTRAINED"),"all-three restraint state drift");
