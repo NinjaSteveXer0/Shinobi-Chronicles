@@ -314,6 +314,16 @@ async function runMixedReload(browser){
 
     await page.reload({waitUntil:"domcontentloaded",timeout:60000});
     await page.waitForFunction(()=>getActiveStorySceneRuntime()?.sceneId==="origin_academy_hinata_prologue"&&getActiveStorySceneRuntime()?.beatId==="hin_ex3_changed_choice",null,{timeout:20000});
+    await page.waitForFunction(()=>!!globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400,null,{timeout:12000});
+    const resumeState=await page.evaluate(()=>SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400.getSavedChronicleSnapshot());
+    assert.strictEqual(resumeState.begun,true,label+" reload was not recognised as a begun Chronicle: "+JSON.stringify(resumeState));
+    const frontDoor=page.locator("#sc-alpha-front-door-33400");
+    if(await frontDoor.count()){
+      const login=frontDoor.getByRole("button",{name:"LOGIN / CONTINUE",exact:true});
+      await login.waitFor({state:"visible",timeout:8000});
+      await login.click();
+      await page.waitForFunction(()=>!document.getElementById("sc-alpha-front-door-33400"),null,{timeout:8000});
+    }
     await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:12000});
     const afterReload=await assertSceneHealthy(page,label+":after-reload");
     assert.strictEqual(afterReload.beatId,"hin_ex3_changed_choice");
