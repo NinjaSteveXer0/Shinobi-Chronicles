@@ -692,7 +692,9 @@
         "completeChronicleOriginPrologue"
       ],
       "permittedAdapters": [],
-      "retiredOwners": [],
+      "retiredOwners": [
+        "runtime/alpha-origin-browser-realisation-33500.js::pre340 Hinata evaluation/younger-result shim"
+      ],
       "saveSchemaRefs": [
         "activeStorySceneRuntime.localContext h1/h2/h3/young",
         "playerData.activityHistory occ_origin_hinata_*"
