@@ -229,7 +229,7 @@ function readableActorState(p,actor){
   const slot=actorSlot(actor),holder=p&&p.state&&p.state.package&&p.state.package.holder||null;
   const key=slot==="mi"?"MI":slot==="ps"?"PS":slot==="amt"?"AMT":slot==="kakashi"?"KAKASHI":slot==="anbu"?"ANBU":null;
   if(key&&holder===key)return"HAS PACKAGE";
-  const map={BATTLE_DEFEATED:"DEFEATED",FIELD_SECURED_PENDING_COLLECTION:"RESTRAINED",ANBU_CUSTODY:"ANBU CUSTODY",POLICE_CUSTODY:"POLICE CUSTODY",ESCAPED:"ESCAPED",RELEASED:"RELEASED",DEAD:"DEAD"};
+  const map={BATTLE_DEFEATED:"DEFEATED",RESTRAINED:"RESTRAINED",ANBU_CUSTODY:"ANBU CUSTODY",POLICE_CUSTODY:"POLICE CUSTODY",ESCAPED:"ESCAPED",RELEASED:"RELEASED",KILLED:"KILLED"};
   return raw&&map[raw]||null;
 }
 function speakerActorId(p,cue){
@@ -272,7 +272,7 @@ function departureMode(previous,next,id){
   const key=prev&&prev.slot==="mi"?"MI":prev&&prev.slot==="ps"?"PS":prev&&prev.slot==="amt"?"AMT":null;
   const state=key&&next&&next.participantStates&&next.participantStates[key]||null;
   if(state==="ESCAPED"||state==="RELEASED")return"FLEE";
-  if(state==="DEAD"||state==="KILLED"||state==="BATTLE_DEFEATED")return"COLLAPSE";
+  if(state==="KILLED"||state==="BATTLE_DEFEATED")return"COLLAPSE";
   return"EXIT";
 }
 function departureGhostClass(kind){return kind==="COLLAPSE"?"is-falling":kind==="FLEE"?"is-fleeing":"is-fading";}

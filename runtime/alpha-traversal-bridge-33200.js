@@ -256,7 +256,7 @@
 (function activateOriginSceneBoardTerminalChain33200(){
   if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
 
-  const BUILD="kakashi-v2-clean-room-20260923-4";
+  const BUILD="kakashi-v2-final-dispositions-20260924-1";
   function loadOne(id,src,ready,next){
     if(ready()){if(next)next();return;}
     let script=document.getElementById(id);
@@ -271,7 +271,8 @@
   function load36015(){loadOne("sc-kakashi-v2-rewards-36015-script","runtime/alpha-kakashi-v2-rewards-36015.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_REWARDS_36015,load36020);}
   function load36010(){loadOne("sc-kakashi-v2-battle-36010-script","runtime/alpha-kakashi-v2-battle-36010.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_BATTLE_36010,load36015);}
   function load36000(){loadOne("sc-kakashi-v2-content-36000-script","runtime/academy-kakashi-v2-content-36000.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_CONTENT_36000,load36010);}
-  function load34600(){loadOne("sc-story-factual-resolver-34600-script","runtime/alpha-story-factual-resolver-34600.js",()=>!!globalThis.SC_STORY_FACTUAL_RESOLVER_34600,load36000);}
+  function load34700(){loadOne("sc-special-jonin-evidence-producer-34700-script","runtime/alpha-special-jonin-evidence-producer-34700.js",()=>!!globalThis.SC_ALPHA_SPECIAL_JONIN_EVIDENCE_PRODUCER_34700,load36000);}
+  function load34600(){loadOne("sc-story-factual-resolver-34600-script","runtime/alpha-story-factual-resolver-34600.js",()=>!!globalThis.SC_STORY_FACTUAL_RESOLVER_34600,load34700);}
   function load34000(){loadOne("sc-story-decision-realisation-34000-script","runtime/alpha-story-decision-realisation-34000.js",()=>!!globalThis.SC_STORY_DECISION_REALISATION_34000,load34600);}
   function load33900(){loadOne("sc-story-scene-board-33900-script","runtime/alpha-story-scene-board-33900.js",()=>!!globalThis.SC_STORY_SCENE_BOARD_33900,load34000);}
   function load33700(){loadOne("sc-alpha-origin-screen-first-33700-script","runtime/alpha-origin-screen-first-33700.js",()=>!!globalThis.SC_ALPHA_ORIGIN_SCREEN_FIRST_33700,load33900);}

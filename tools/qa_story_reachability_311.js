@@ -61,6 +61,11 @@ function loadKakashiV2Scene(){
       return out?{success:true,receipt:{selectedOutcomeRef:out.outcomeRef,storyFactualResolverReceiptId:"qa"}}:{success:false};
     }
   };
+  const E={
+    projectSpecialJoninContextualEvidence34700:()=>({success:true,idempotent:true}),
+    getSpecialJoninContextualEvidence34700:()=>[],
+    evaluateSpecialJoninContextualEvidence34700:()=>({success:true,evaluation:null})
+  };
   const battleConfigs={
     academy_kakashi_origin_battle_amt_1v1:{},academy_kakashi_origin_battle_amt_ps_2v1:{},
     academy_kakashi_origin_battle_amt_ps_mi_3v1:{},academy_kakashi_origin_battle_kakashi_pakkun_vs_amt:{},
@@ -74,6 +79,8 @@ function loadKakashiV2Scene(){
     playerData:{},savePlayerData:()=>true,
     SC_STORY_DECISION_REALISATION_34000:D,
     SC_STORY_FACTUAL_RESOLVER_34600:F,
+    SC_ALPHA_SPECIAL_JONIN_EVIDENCE_PRODUCER_34700:E,
+    projectSpecialJoninContextualEvidence34700:E.projectSpecialJoninContextualEvidence34700,
     SC_ACADEMY_KAKASHI_V2_BATTLE_36010:{configs:battleConfigs},
     commitAcademyKakashiV2TerminalRewards36015:()=>({success:true,sourceReceipts:[],plan:{totalRyo:100}}),
     unregisterStoryScene:id=>scenes.delete(id),

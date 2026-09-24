@@ -5765,896 +5765,2443 @@ const CONTENT={
       ]
     }
   },
-  "dispositionResolvers": {
-    "path": "Documentation/Story/Academy_Kakashi_Kill_and_Restrain_Two_Outcome_Resolver_and_Scene_Authority_2026-09-23.md",
+  "custodyGolden06B": {
+    "path": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_06B_Custody_Release_Collection_2026-09-24.md",
     "sections": {
-      "mi_kill_escaped": [
-        {
-          "kind": "narration",
-          "text": "Kakashi closes the distance before she can recover."
-        },
-        {
-          "kind": "narration",
-          "text": "Masked Interceptor watches him come."
-        },
-        {
-          "kind": "narration",
-          "text": "She reads the decision in his movement."
-        },
-        {
-          "kind": "narration",
-          "text": "At the instant Kakashi commits, she twists off the line he expected and throws everything she has left into distance."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi turns with her."
-        },
-        {
-          "kind": "narration",
-          "text": "Too late."
-        },
-        {
-          "kind": "narration",
-          "text": "She clears the edge of the square, reaches the roofline and disappears beyond it."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi stops."
-        },
-        {
-          "kind": "narration",
-          "text": "Masked Interceptor is alive."
-        },
-        {
-          "kind": "narration",
-          "text": "She is gone."
-        }
-      ],
-      "mi_restrained": [
-        {
-          "kind": "narration",
-          "text": "Kakashi looks once toward the route the package took, then back to Masked Interceptor."
-        },
-        {
-          "kind": "narration",
-          "text": "He draws ninja wire."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "MASKED INTERCEPTOR",
-          "text": "You're still going after them."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "KAKASHI",
-          "text": "Yes."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi binds her wrists and secures the restraint beneath the Sakura tree."
-        },
-        {
-          "kind": "narration",
-          "text": "She tests it once."
-        },
-        {
-          "kind": "narration",
-          "text": "It holds."
-        },
-        {
-          "kind": "narration",
-          "text": "Her eyes lift to him."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "MASKED INTERCEPTOR",
-          "text": "You're leaving me here."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "KAKASHI",
-          "text": "For now."
-        },
-        {
-          "kind": "narration",
-          "text": "She looks toward the route the others took."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "MASKED INTERCEPTOR",
-          "text": "They'll have distance."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi checks the restraint once and turns away."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "KAKASHI",
-          "text": "Then I need to move."
-        }
-      ],
-      "mi_restrain_escaped": [
-        {
-          "kind": "narration",
-          "text": "Kakashi draws the wire and moves in."
-        },
-        {
-          "kind": "narration",
-          "text": "Masked Interceptor stays still until the first loop reaches her wrist."
-        },
-        {
-          "kind": "narration",
-          "text": "Then she moves."
-        },
-        {
-          "kind": "narration",
-          "text": "Her hand turns through the slack before Kakashi can cinch it."
-        },
-        {
-          "kind": "narration",
-          "text": "She drives past his shoulder and breaks for the edge of the square."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi catches the loose wire."
-        },
-        {
-          "kind": "narration",
-          "text": "Not her."
-        },
-        {
-          "kind": "narration",
-          "text": "By the time he reaches the roofline, Masked Interceptor has already disappeared into Konoha."
-        },
-        {
-          "kind": "narration",
-          "text": "The wire hangs from Kakashi's hand for a moment."
-        },
-        {
-          "kind": "narration",
-          "text": "Then he puts it away."
-        }
-      ],
-      "ps_kill_escaped_package_recovered": [
-        {
-          "kind": "narration",
-          "text": "Kakashi secures the package before he turns back."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler sees the change in his stance."
-        },
-        {
-          "kind": "narration",
-          "text": "The humour leaves his face."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi moves to finish it."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler throws himself sideways before the line closes, catches the wall with one hand and forces himself back onto his feet."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi follows."
-        },
-        {
-          "kind": "narration",
-          "text": "The man is already moving."
-        },
-        {
-          "kind": "narration",
-          "text": "He clears the next corner without the package and disappears."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi does not mistake the result."
-        },
-        {
-          "kind": "narration",
-          "text": "The package is still his."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler is not."
-        }
-      ],
-      "ps_kill_escaped_package_missing": [
-        {
-          "kind": "narration",
-          "text": "Kakashi steps toward the defeated man."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler looks once toward the route the package already took."
-        },
-        {
-          "kind": "narration",
-          "text": "Then back to Kakashi."
-        },
-        {
-          "kind": "narration",
-          "text": "He understands."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi commits."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler uses the first opening to break away instead of fighting back."
-        },
-        {
-          "kind": "narration",
-          "text": "He reaches the alley mouth, turns once and is gone."
-        },
-        {
-          "kind": "narration",
-          "text": "The package was already lost."
-        },
-        {
-          "kind": "narration",
-          "text": "Now the man Kakashi stopped is gone too."
-        }
-      ],
-      "ps_restrained_package_recovered": [
-        {
-          "kind": "narration",
-          "text": "Kakashi keeps the recovered package secured against himself and draws the wire."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler watches him bind his wrists."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "PACKAGE SMUGGLER",
-          "text": "You're going after him too."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "KAKASHI",
-          "text": "Yes."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi finishes the restraint and checks it."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler pulls once against the wire."
-        },
-        {
-          "kind": "narration",
-          "text": "It holds."
-        },
-        {
-          "kind": "narration",
-          "text": "He looks toward the route ANBU Marked Target took."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "PACKAGE SMUGGLER",
-          "text": "Of course you are."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi is already moving."
-        }
-      ],
-      "ps_restrained_package_missing": [
-        {
-          "kind": "narration",
-          "text": "Kakashi draws the wire."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler watches him bind his wrists without looking away."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "PACKAGE SMUGGLER",
-          "text": "Package is still gone."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "KAKASHI",
-          "text": "I know."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi tightens the restraint and checks it once."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler tests the wire."
-        },
-        {
-          "kind": "narration",
-          "text": "It holds."
-        },
-        {
-          "kind": "narration",
-          "text": "The street beyond him is empty."
-        },
-        {
-          "kind": "narration",
-          "text": "There is no package trail left to chase."
-        }
-      ],
-      "ps_restrain_escaped_package_recovered": [
-        {
-          "kind": "narration",
-          "text": "Kakashi draws the wire."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler waits until Kakashi is close enough to bind him."
-        },
-        {
-          "kind": "narration",
-          "text": "Then he snaps into motion."
-        },
-        {
-          "kind": "narration",
-          "text": "The loose line catches his wrist for half a second."
-        },
-        {
-          "kind": "narration",
-          "text": "He tears free before Kakashi can close it."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi takes one step after him, then stops."
-        },
-        {
-          "kind": "narration",
-          "text": "The recovered package is still secured against him."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler reaches the next street and disappears without it."
-        }
-      ],
-      "ps_restrain_escaped_package_missing": [
-        {
-          "kind": "narration",
-          "text": "Kakashi brings out the wire."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler looks at it."
-        },
-        {
-          "kind": "narration",
-          "text": "He stops talking."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi reaches for his wrist."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler twists away, forces a gap and runs."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi reaches the corner seconds later."
-        },
-        {
-          "kind": "narration",
-          "text": "Empty street."
-        },
-        {
-          "kind": "narration",
-          "text": "The package is already gone."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler is gone with nothing but himself."
-        }
-      ],
-      "amt_kill_escaped_package_recovered": [
-        {
-          "kind": "narration",
-          "text": "Kakashi steps in."
-        },
-        {
-          "kind": "narration",
-          "text": "ANBU Marked Target sees the intent before the attack comes."
-        },
-        {
-          "kind": "narration",
-          "text": "He does not argue."
-        },
-        {
-          "kind": "narration",
-          "text": "He spends everything he has left on distance."
-        },
-        {
-          "kind": "narration",
-          "text": "Pakkun moves for the open side."
-        },
-        {
-          "kind": "narration",
-          "text": "The man changes direction before the gap closes, gets a foot onto the wall and reaches the roofline."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi follows to the alley mouth."
-        },
-        {
-          "kind": "narration",
-          "text": "The man is gone."
-        },
-        {
-          "kind": "narration",
-          "text": "Pakkun looks up at him."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "PAKKUN",
-          "text": "Gone."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "KAKASHI",
-          "text": "Yes."
-        },
-        {
-          "kind": "narration",
-          "text": "The package remains secured against Kakashi."
-        }
-      ],
-      "amt_kill_escaped_package_missing": [
-        {
-          "kind": "narration",
-          "text": "Kakashi moves to finish it."
-        },
-        {
-          "kind": "narration",
-          "text": "ANBU Marked Target reads the decision and abandons everything except escape."
-        },
-        {
-          "kind": "narration",
-          "text": "He breaks for the alley mouth."
-        },
-        {
-          "kind": "narration",
-          "text": "Pakkun cuts toward him."
-        },
-        {
-          "kind": "narration",
-          "text": "The man changes line at the last instant, reaches the wall and disappears above it."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi reaches the opening a moment later."
-        },
-        {
-          "kind": "narration",
-          "text": "Nothing."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "PAKKUN",
-          "text": "He's gone."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi keeps looking down the empty route."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "KAKASHI",
-          "text": "I know."
-        },
-        {
-          "kind": "narration",
-          "text": "The package is still missing."
-        }
-      ],
-      "amt_restrained": [
-        {
-          "kind": "narration",
-          "text": "Kakashi draws the wire."
-        },
-        {
-          "kind": "narration",
-          "text": "ANBU Marked Target looks at it, then at Pakkun."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "ANBU MARKED TARGET",
-          "text": "So that's your answer."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "KAKASHI",
-          "text": "For now."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi binds his wrists."
-        },
-        {
-          "kind": "narration",
-          "text": "The man pulls once against the restraint."
-        },
-        {
-          "kind": "narration",
-          "text": "It holds."
-        },
-        {
-          "kind": "narration",
-          "text": "Pakkun stays near the open end of the alley."
-        },
-        {
-          "kind": "narration",
-          "text": "ANBU Marked Target stops testing the wire."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "ANBU MARKED TARGET",
-          "text": "What now?"
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi looks back along the route he came."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "KAKASHI",
-          "text": "Depends who is still waiting."
-        }
-      ],
-      "amt_restrain_escaped": [
-        {
-          "kind": "narration",
-          "text": "Kakashi brings the wire around his wrist."
-        },
-        {
-          "kind": "narration",
-          "text": "ANBU Marked Target waits until Kakashi pulls the first loop tight."
-        },
-        {
-          "kind": "narration",
-          "text": "Then he turns with it."
-        },
-        {
-          "kind": "narration",
-          "text": "The sudden movement drags the loose line across Kakashi's arm and gives the man the half-step he needs."
-        },
-        {
-          "kind": "narration",
-          "text": "Pakkun lunges for the exit."
-        },
-        {
-          "kind": "narration",
-          "text": "ANBU Marked Target is already changing direction."
-        },
-        {
-          "kind": "narration",
-          "text": "He reaches the wall, clears it and disappears beyond the roofline."
-        },
-        {
-          "kind": "narration",
-          "text": "Pakkun stops beneath the eaves."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "PAKKUN",
-          "text": "Gone."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi gathers the loose wire."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "KAKASHI",
-          "text": "Yes."
-        }
-      ],
-      "group2_both_killed": [
-        {
-          "kind": "narration",
-          "text": "Kakashi commits before either man can recover."
-        },
-        {
-          "kind": "narration",
-          "text": "He moves from the first target to the second without stopping."
-        },
-        {
-          "kind": "narration",
-          "text": "When it is over, neither ANBU Marked Target nor Package Smuggler moves again."
-        },
-        {
-          "kind": "narration",
-          "text": "The package remains exactly where the route already placed it."
-        }
-      ],
-      "group2_amt_killed_ps_escaped": [
-        {
-          "kind": "narration",
-          "text": "Kakashi commits."
-        },
-        {
-          "kind": "narration",
-          "text": "ANBU Marked Target does not get back up."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler sees what happens and moves before Kakashi can turn the same decision on him."
-        },
-        {
-          "kind": "narration",
-          "text": "He reaches the edge of the street and disappears."
-        },
-        {
-          "kind": "narration",
-          "text": "One man is dead."
-        },
-        {
-          "kind": "narration",
-          "text": "The other is gone."
-        }
-      ],
-      "group2_amt_escaped_ps_killed": [
-        {
-          "kind": "narration",
-          "text": "Kakashi commits."
-        },
-        {
-          "kind": "narration",
-          "text": "ANBU Marked Target uses the movement toward him to force distance and breaks away."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi does not catch him."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler does not find the same opening."
-        },
-        {
-          "kind": "narration",
-          "text": "When the street settles, Package Smuggler is dead and ANBU Marked Target is gone."
-        }
-      ],
-      "group2_both_escaped": [
-        {
-          "kind": "narration",
-          "text": "Kakashi commits."
-        },
-        {
-          "kind": "narration",
-          "text": "The first movement is enough to break the stillness after the fight."
-        },
-        {
-          "kind": "narration",
-          "text": "ANBU Marked Target forces distance in one direction."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler takes the other."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi cannot close both exits."
-        },
-        {
-          "kind": "narration",
-          "text": "Seconds later, both men are gone."
-        }
-      ],
-      "group3_all_killed": [
-        {
-          "kind": "narration",
-          "text": "Kakashi makes the decision once."
-        },
-        {
-          "kind": "narration",
-          "text": "He carries it through target by target."
-        },
-        {
-          "kind": "narration",
-          "text": "When it is finished, Masked Interceptor, Package Smuggler and ANBU Marked Target are dead."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi is the only shinobi still standing."
-        }
-      ],
-      "group3_mi_escaped_ps_amt_killed": [
-        {
-          "kind": "narration",
-          "text": "Kakashi commits."
-        },
-        {
-          "kind": "narration",
-          "text": "Masked Interceptor reads the first movement and breaks away before he can close on her."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler and ANBU Marked Target do not escape the decision."
-        },
-        {
-          "kind": "narration",
-          "text": "When it is over, two are dead."
-        },
-        {
-          "kind": "narration",
-          "text": "Masked Interceptor is gone."
-        }
-      ],
-      "group3_ps_escaped_mi_amt_killed": [
-        {
-          "kind": "narration",
-          "text": "Kakashi commits."
-        },
-        {
-          "kind": "narration",
-          "text": "Masked Interceptor is killed first."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler uses that instant to run."
-        },
-        {
-          "kind": "narration",
-          "text": "ANBU Marked Target does not make the same opening work."
-        },
-        {
-          "kind": "narration",
-          "text": "Two are dead."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler is gone."
-        }
-      ],
-      "group3_amt_escaped_mi_ps_killed": [
-        {
-          "kind": "narration",
-          "text": "Kakashi commits."
-        },
-        {
-          "kind": "narration",
-          "text": "Masked Interceptor and Package Smuggler do not get away."
-        },
-        {
-          "kind": "narration",
-          "text": "ANBU Marked Target uses the sequence to build the distance he needs."
-        },
-        {
-          "kind": "narration",
-          "text": "By the time Kakashi turns, the first man is already gone."
-        },
-        {
-          "kind": "narration",
-          "text": "Two are dead."
-        },
-        {
-          "kind": "narration",
-          "text": "One escaped."
-        }
-      ],
-      "group3_mi_killed_ps_amt_escaped": [
-        {
-          "kind": "narration",
-          "text": "Kakashi commits."
-        },
-        {
-          "kind": "narration",
-          "text": "Masked Interceptor does not get back up."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler and ANBU Marked Target move in opposite directions before Kakashi can carry the same decision to them."
-        },
-        {
-          "kind": "narration",
-          "text": "He cannot close both routes."
-        },
-        {
-          "kind": "narration",
-          "text": "One is dead."
-        },
-        {
-          "kind": "narration",
-          "text": "Two escaped."
-        }
-      ],
-      "group3_ps_killed_mi_amt_escaped": [
-        {
-          "kind": "narration",
-          "text": "Kakashi commits."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler is killed."
-        },
-        {
-          "kind": "narration",
-          "text": "Masked Interceptor and ANBU Marked Target use the opening to separate."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi turns after them."
-        },
-        {
-          "kind": "narration",
-          "text": "Both are already gone."
-        },
-        {
-          "kind": "narration",
-          "text": "One is dead."
-        },
-        {
-          "kind": "narration",
-          "text": "Two escaped."
-        }
-      ],
-      "group3_amt_killed_mi_ps_escaped": [
-        {
-          "kind": "narration",
-          "text": "Kakashi commits."
-        },
-        {
-          "kind": "narration",
-          "text": "ANBU Marked Target is killed."
-        },
-        {
-          "kind": "narration",
-          "text": "Masked Interceptor and Package Smuggler break away before Kakashi can finish the sequence."
-        },
-        {
-          "kind": "narration",
-          "text": "They take different exits."
-        },
-        {
-          "kind": "narration",
-          "text": "One is dead."
-        },
-        {
-          "kind": "narration",
-          "text": "Two escaped."
-        }
-      ],
-      "group3_all_escaped": [
-        {
-          "kind": "narration",
-          "text": "Kakashi commits."
-        },
-        {
-          "kind": "narration",
-          "text": "The defeated group moves the instant the threat becomes clear."
-        },
-        {
-          "kind": "narration",
-          "text": "Three routes open at once."
-        },
-        {
-          "kind": "narration",
-          "text": "Kakashi closes one and loses another."
-        },
-        {
-          "kind": "narration",
-          "text": "By the time he resets, all three have broken away."
-        },
-        {
-          "kind": "narration",
-          "text": "No one is dead."
-        },
-        {
-          "kind": "narration",
-          "text": "All three escaped."
-        }
-      ]
+          "mi_anbu_depart": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi draws the wire."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Masked Interceptor watches his hands."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Says nothing."
+                },
+                {
+                      "kind": "narration",
+                      "text": "He binds her wrists."
+                },
+                {
+                      "kind": "narration",
+                      "text": "She tests the restraint once."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Stops."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi takes the line."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "MASKED INTERCEPTOR",
+                      "text": "You're leaving the package."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi looks toward the route Package Smuggler took."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "I know."
+                },
+                {
+                      "kind": "narration",
+                      "text": "He starts walking."
+                },
+                {
+                      "kind": "narration",
+                      "text": "She follows."
+                }
+          ],
+          "mi_anbu_handoff": [
+                {
+                      "kind": "narration",
+                      "text": "The ANBU operative sees the restrained woman before Kakashi reaches him."
+                },
+                {
+                      "kind": "narration",
+                      "text": "His posture changes."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Only slightly."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU OPERATIVE",
+                      "text": "Report."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi stops."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Holds out the restraint line."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Custody first."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The operative steps in."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Takes control of the wire."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Only then does Kakashi let go."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Masked Interceptor looks from one to the other."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Still silent."
+                }
+          ],
+          "mi_police_depart": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi binds her wrists."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Masked Interceptor looks toward the roofs."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then at the wire."
+                },
+                {
+                      "kind": "narration",
+                      "text": "She does not test it twice."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi takes the restraint line and turns toward the Police district."
+                }
+          ],
+          "mi_police_handoff": [
+                {
+                      "kind": "narration",
+                      "text": "Two officers come down the steps."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The first sees Kakashi."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The second sees the restrained woman."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "UCHIHA POLICE OFFICER",
+                      "text": "Hold there."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi stops."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "UCHIHA POLICE OFFICER",
+                      "text": "What happened?"
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "She attacked a man carrying the package I was sent to recover."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The officer looks at Masked Interceptor."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "UCHIHA POLICE OFFICER",
+                      "text": "Name?"
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi waits."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Masked Interceptor gives him nothing."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Unknown."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The second officer moves in for the restraint line."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi keeps hold until the officer has her."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then releases it."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "UCHIHA POLICE OFFICER",
+                      "text": "We've got her."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi turns back toward the village."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "I need to report."
+                }
+          ],
+          "ps_anbu_depart_missing": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi binds Package Smuggler's wrists."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The man glances down the street."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "You're taking me back without it."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Yes."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "Incomplete."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi takes the restraint line."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "I know."
+                }
+          ],
+          "ps_anbu_depart_recovered": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi binds Package Smuggler's wrists."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The man glances down the street."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler looks at the package against Kakashi's vest."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "At least you're bringing something useful."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi takes the restraint line."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Move."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler does."
+                }
+          ],
+          "ps_anbu_handoff": [
+                {
+                      "kind": "narration",
+                      "text": "The operative looks at Package Smuggler."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then at Kakashi."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU OPERATIVE",
+                      "text": "Report."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi offers the restraint line first."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The operative accepts it."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler watches the transfer."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "Very welcoming."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The operative does not look at him."
+                }
+          ],
+          "ps_police_depart": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi secures his wrists."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "ANBU?"
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Police."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler blinks."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "That is inconvenient."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi starts walking."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Good."
+                }
+          ],
+          "ps_police_handoff_missing": [
+                {
+                      "kind": "narration",
+                      "text": "Two officers meet them outside."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "UCHIHA POLICE OFFICER",
+                      "text": "What happened?"
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "He was waiting to receive a package. The carrier escaped with it."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler looks at him."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "You make everything sound unfriendly."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "It was."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The first officer takes Package Smuggler's arm."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The second takes the restraint line."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi releases it."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "UCHIHA POLICE OFFICER",
+                      "text": "We'll take him."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi nods."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Turns away."
+                }
+          ],
+          "ps_police_handoff_recovered": [
+                {
+                      "kind": "narration",
+                      "text": "Two officers meet them outside."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "UCHIHA POLICE OFFICER",
+                      "text": "What happened?"
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi touches the package beneath his vest."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "He was waiting to receive this."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler looks at him."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "You make everything sound unfriendly."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "It was."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The first officer takes Package Smuggler's arm."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The second takes the restraint line."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi releases it."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "UCHIHA POLICE OFFICER",
+                      "text": "We'll take him."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi nods."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Turns away."
+                }
+          ],
+          "amt_anbu_depart_missing": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi binds his wrists."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target watches the wire tighten."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU MARKED TARGET",
+                      "text": "You're bringing me back instead."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Yes."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU MARKED TARGET",
+                      "text": "That isn't the same assignment."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi takes the restraint line."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "No."
+                }
+          ],
+          "amt_anbu_depart_recovered": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi binds his wrists."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target watches the wire tighten."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target glances at Kakashi's vest."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU MARKED TARGET",
+                      "text": "You already recovered it."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Yes."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU MARKED TARGET",
+                      "text": "And I'm still coming."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Yes."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The man studies him."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then starts walking."
+                }
+          ],
+          "amt_anbu_handoff": [
+                {
+                      "kind": "narration",
+                      "text": "The operative looks at the restrained man."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU OPERATIVE",
+                      "text": "The man from the photograph."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Yes."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi passes him the restraint line."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The operative takes it."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target says nothing."
+                }
+          ],
+          "amt_police_depart": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi draws the wire."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU MARKED TARGET",
+                      "text": "ANBU?"
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "No."
+                },
+                {
+                      "kind": "narration",
+                      "text": "He binds the man's wrists."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU MARKED TARGET",
+                      "text": "Then where?"
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Uchiha Police."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The man studies him."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU MARKED TARGET",
+                      "text": "You're making a covert handoff public."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi takes the restraint line."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "I'm giving them you."
+                },
+                {
+                      "kind": "narration",
+                      "text": "That ends the argument for now."
+                }
+          ],
+          "amt_police_handoff_missing": [
+                {
+                      "kind": "narration",
+                      "text": "Two officers step forward."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "UCHIHA POLICE OFFICER",
+                      "text": "What happened?"
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi answers only with what he knows."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "He carried a package to a handoff. It left with the other man."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The officer looks at ANBU Marked Target."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "UCHIHA POLICE OFFICER",
+                      "text": "Name?"
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Unknown."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU MARKED TARGET",
+                      "text": "Strong start."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi ignores him."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The second officer takes the restraint line."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi waits until both officers have control."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then lets go."
+                }
+          ],
+          "amt_police_handoff_recovered": [
+                {
+                      "kind": "narration",
+                      "text": "Two officers step forward."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "UCHIHA POLICE OFFICER",
+                      "text": "What happened?"
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi answers only with what he knows."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "He carried this to a handoff."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi indicates the recovered package."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The officer looks at ANBU Marked Target."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "UCHIHA POLICE OFFICER",
+                      "text": "Name?"
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Unknown."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU MARKED TARGET",
+                      "text": "Strong start."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi ignores him."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The second officer takes the restraint line."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi waits until both officers have control."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then lets go."
+                }
+          ],
+          "amt_release": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi does not reach for the wire."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target notices."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Slowly, he gets to his feet."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Pakkun stays near the open end of the alley."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The man looks at Kakashi."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU MARKED TARGET",
+                      "text": "That's it?"
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Go."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target waits one second longer."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then leaves."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi does not follow."
+                }
+          ],
+          "group2_anbu_depart": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi restrains the two men separately."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler tests the wire."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "ANBU?"
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Yes."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target looks at him."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU MARKED TARGET",
+                      "text": "Save your energy."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "For what?"
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU MARKED TARGET",
+                      "text": "Walking."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi takes both lines."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Starts them moving."
+                }
+          ],
+          "group2_anbu_handoff": [
+                {
+                      "kind": "narration",
+                      "text": "The operative's eyes go to the package first, if Kakashi has it."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then to the two restrained men."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU OPERATIVE",
+                      "text": "Report."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Custody first."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The operative calls another ANBU forward."
+                },
+                {
+                      "kind": "narration",
+                      "text": "One restraint line changes hands."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then the other."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi releases each only after someone else has control."
+                }
+          ],
+          "group2_police_depart": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi restrains both men."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "Both of us?"
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Yes."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU MARKED TARGET",
+                      "text": "You were hoping he'd run out of wire."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler looks at the restraint."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "I still am."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi starts walking."
+                }
+          ],
+          "group2_police_handoff": [
+                {
+                      "kind": "narration",
+                      "text": "Two officers come out to meet them."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The first looks at Kakashi."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The second looks at the prisoners."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "UCHIHA POLICE OFFICER",
+                      "text": "Explain."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi gives them what he actually saw."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The handoff."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The fight."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The package, if he recovered it."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Nothing he did not learn."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The officers take one prisoner each."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi keeps the restraint lines until both transfers are secure."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then lets go."
+                }
+          ],
+          "group2_release": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi keeps the package secured."
+                },
+                {
+                      "kind": "narration",
+                      "text": "He does not reach for the wire."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler notices first."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "We're leaving?"
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Yes."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target gets to his feet."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU MARKED TARGET",
+                      "text": "Why?"
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi looks at the package."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then back at him."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Go."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler looks disappointed by the lack of explanation."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Neither man waits for Kakashi to reconsider."
+                },
+                {
+                      "kind": "narration",
+                      "text": "They leave."
+                }
+          ],
+          "group3_anbu_depart": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi restrains them one at a time."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target first."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler next."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Masked Interceptor last."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler looks at the three restraint lines."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "This is ambitious."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Masked Interceptor gives him one look."
+                },
+                {
+                      "kind": "narration",
+                      "text": "He stops talking."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi takes the lines."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Move."
+                },
+                {
+                      "kind": "narration",
+                      "text": "They move."
+                }
+          ],
+          "group3_anbu_handoff": [
+                {
+                      "kind": "narration",
+                      "text": "The operative sees Kakashi."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then the three restrained shinobi behind him."
+                },
+                {
+                      "kind": "narration",
+                      "text": "If Kakashi has the package, he sees that too."
+                },
+                {
+                      "kind": "narration",
+                      "text": "A second ANBU lands beside him without being called twice."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU OPERATIVE",
+                      "text": "Report."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Custody first."
+                },
+                {
+                      "kind": "narration",
+                      "text": "They take the prisoners one by one."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi releases each line only after the transfer is secure."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler starts to say something during the second handoff."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Masked Interceptor turns her head."
+                },
+                {
+                      "kind": "narration",
+                      "text": "He decides against it."
+                }
+          ],
+          "group3_police_depart": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi binds the three separately."
+                },
+                {
+                      "kind": "narration",
+                      "text": "No shared line."
+                },
+                {
+                      "kind": "narration",
+                      "text": "No shortcuts."
+                },
+                {
+                      "kind": "narration",
+                      "text": "When he is finished, he starts them toward the Police district."
+                }
+          ],
+          "group3_police_handoff": [
+                {
+                      "kind": "narration",
+                      "text": "Two officers step down from the entrance."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then stop."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The first looks at Kakashi."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The second counts."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "UCHIHA POLICE OFFICER",
+                      "text": "All three?"
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Yes."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler opens his mouth."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The officer raises one hand."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "UCHIHA POLICE OFFICER",
+                      "text": "Not you."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler closes it again."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi gives the facts he actually has."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The officers call for another pair of hands."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The transfer happens one restraint at a time."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi does not release anyone until Police control is established."
+                }
+          ],
+          "group3_release": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi checks the package."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then looks at the three defeated shinobi."
+                },
+                {
+                      "kind": "narration",
+                      "text": "He does not draw the wire."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler notices."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "Really?"
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Leave."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target gets to his feet first."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Masked Interceptor follows."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Her eyes settle on the package."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then on Kakashi."
+                },
+                {
+                      "kind": "narration",
+                      "text": "She says nothing."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler rises last."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "No speech?"
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi looks at him."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "No."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The three leave."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Not together for long."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi keeps the package."
+                }
+          ],
+          "collection_open": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi turns back along the route."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Pakkun follows if he is still with him."
+                }
+          ],
+          "collection_ps": [
+                {
+                      "kind": "narration",
+                      "text": "They find him where Kakashi left him."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler looks up at the approaching footsteps."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then at whoever Kakashi is already escorting."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "You came back."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Yes."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi removes the line fixing him to the location."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The wrist restraint stays."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler looks at the road."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "I was beginning to enjoy the scenery."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi takes the line."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Move."
+                }
+          ],
+          "collection_mi": [
+                {
+                      "kind": "narration",
+                      "text": "The Sakura tree comes back into view."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Masked Interceptor is still there."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Her eyes go to Kakashi."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then to the restrained people with him."
+                },
+                {
+                      "kind": "narration",
+                      "text": "She does not ask whether he caught them."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi removes the line fixing her to the tree."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Leaves the wrist restraint in place."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Masked Interceptor rises."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "MASKED INTERCEPTOR",
+                      "text": "Finished?"
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Here."
+                },
+                {
+                      "kind": "narration",
+                      "text": "She falls into the escort."
+                }
+          ],
+          "collection_amt": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi brings him into the escort before turning back for anyone earlier on the route."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target looks at the direction they are taking."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU MARKED TARGET",
+                      "text": "We're going back."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Yes."
+                },
+                {
+                      "kind": "narration",
+                      "text": "He looks at the restraint line."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then at Kakashi."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU MARKED TARGET",
+                      "text": "There are more."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi starts walking."
+                },
+                {
+                      "kind": "narration",
+                      "text": "That is answer enough."
+                }
+          ],
+          "final_restrained_amt": [
+                {
+                      "kind": "narration",
+                      "text": "When a final participant is successfully RESTRAINED and there is nobody earlier on the route to collect, Kakashi checks the restraint once."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The restrained participant watches him turn away."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU MARKED TARGET",
+                      "text": "You're leaving me here."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Someone's coming."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Pakkun looks toward the route back."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi starts walking."
+                }
+          ],
+          "final_restrained_ps": [
+                {
+                      "kind": "narration",
+                      "text": "When a final participant is successfully RESTRAINED and there is nobody earlier on the route to collect, Kakashi checks the restraint once."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The restrained participant watches him turn away."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler looks down at the wire."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "This is the part where you leave me tied to a wall."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Yes."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "Just checking."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi turns toward ANBU."
+                }
+          ],
+          "final_restrained_mi": [
+                {
+                      "kind": "narration",
+                      "text": "When a final participant is successfully RESTRAINED and there is nobody earlier on the route to collect, Kakashi checks the restraint once."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The restrained participant watches him turn away."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Masked Interceptor tests the restraint once."
+                },
+                {
+                      "kind": "narration",
+                      "text": "It holds."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi turns toward ANBU."
+                },
+                {
+                      "kind": "narration",
+                      "text": "She says nothing."
+                }
+          ]
+    }
+  },
+  "dispositionResolvers": {
+    "path": "Documentation/Story/Academy_Kakashi_333_GOLDEN_Family_06A_Kill_and_Restrain_Resolvers_2026-09-24.md",
+    "sections": {
+          "mi_killed": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi closes the distance before she can rise."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Masked Interceptor moves to meet him."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The exchange is brief."
+                },
+                {
+                      "kind": "narration",
+                      "text": "When it ends, she does not move again."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi looks toward the route ahead."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then moves."
+                }
+          ],
+          "mi_kill_escaped": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi closes the distance."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Masked Interceptor watches him come."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The instant he commits, she twists off the line and drives past him."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi turns."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Too late."
+                },
+                {
+                      "kind": "narration",
+                      "text": "She reaches the wall."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The roofline."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Gone."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi stops at the edge of the square."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then looks back toward the route he still has time to take."
+                }
+          ],
+          "mi_restrained": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi looks toward the route the package took."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then back at Masked Interceptor."
+                },
+                {
+                      "kind": "narration",
+                      "text": "He draws ninja wire."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "MASKED INTERCEPTOR",
+                      "text": "You're still going after them."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Yes."
+                },
+                {
+                      "kind": "narration",
+                      "text": "He binds her wrists and fixes the restraint beneath the Sakura tree."
+                },
+                {
+                      "kind": "narration",
+                      "text": "She pulls once."
+                },
+                {
+                      "kind": "narration",
+                      "text": "It holds."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Her eyes lift to him."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "MASKED INTERCEPTOR",
+                      "text": "You're leaving me here."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "For now."
+                },
+                {
+                      "kind": "narration",
+                      "text": "She glances toward the road."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "MASKED INTERCEPTOR",
+                      "text": "They'll have distance."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi checks the wire."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Turns."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Then I need to move."
+                }
+          ],
+          "mi_restrain_escaped": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi draws the wire and moves in."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Masked Interceptor stays still until the first loop reaches her wrist."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then she turns through the slack."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi catches the wire."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Not her."
+                },
+                {
+                      "kind": "narration",
+                      "text": "She clears the edge of the square and reaches the rooftops."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Gone."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi looks at the loose line in his hand."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Puts it away."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then moves."
+                }
+          ],
+          "ps_killed": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi steps in before Package Smuggler can recover."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The man sees the decision and tries to move."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Not fast enough."
+                },
+                {
+                      "kind": "narration",
+                      "text": "When it is over, Package Smuggler does not get back up."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi turns to whatever remains of the route."
+                }
+          ],
+          "ps_kill_escaped_package_recovered": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi has the package secured before he turns back."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler sees him coming."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The humour leaves his face."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi moves."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler throws himself sideways, catches the wall and forces himself upright."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi follows."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The man reaches the corner first."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Gone."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi stops."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The package is still against his vest."
+                }
+          ],
+          "ps_kill_escaped_package_missing": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi steps toward him."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler looks once toward the road the package already took."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then back at Kakashi."
+                },
+                {
+                      "kind": "narration",
+                      "text": "He moves first."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Not to fight."
+                },
+                {
+                      "kind": "narration",
+                      "text": "To run."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi reaches the alley mouth a moment later."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Empty street."
+                }
+          ],
+          "ps_restrained_package_recovered": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi keeps the package secured and draws the wire."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler watches him bind his wrists."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "You're going after him too."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Yes."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi finishes the restraint."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler pulls once against it."
+                },
+                {
+                      "kind": "narration",
+                      "text": "It holds."
+                },
+                {
+                      "kind": "narration",
+                      "text": "He looks down the route ANBU Marked Target took."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "Of course you are."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi is already moving."
+                }
+          ],
+          "ps_restrained_package_missing": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi draws the wire."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler looks at the empty street beyond him."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PACKAGE SMUGGLER",
+                      "text": "Package is still gone."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "I know."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi binds his wrists."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler tests the restraint."
+                },
+                {
+                      "kind": "narration",
+                      "text": "It holds."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Neither of them looks down the empty road again."
+                }
+          ],
+          "ps_restrain_escaped_package_recovered": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi brings out the wire."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler waits until he comes close."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then moves."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The loose line catches his wrist for half a second."
+                },
+                {
+                      "kind": "narration",
+                      "text": "He tears free."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi starts after him—"
+                },
+                {
+                      "kind": "narration",
+                      "text": "and stops."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The recovered package is still secured against him."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler disappears into the next street without it."
+                }
+          ],
+          "ps_restrain_escaped_package_missing": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi reaches for his wrist."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler twists away."
+                },
+                {
+                      "kind": "narration",
+                      "text": "A gap."
+                },
+                {
+                      "kind": "narration",
+                      "text": "A wall."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then the alley mouth."
+                },
+                {
+                      "kind": "narration",
+                      "text": "By the time Kakashi reaches the corner, the street is empty."
+                }
+          ],
+          "amt_killed": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi moves before the man can get back to his feet."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target sees him coming."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Tries to turn away."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The exchange ends there."
+                },
+                {
+                      "kind": "narration",
+                      "text": "He does not move again."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Pakkun stays near the open end of the alley."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Silent."
+                }
+          ],
+          "amt_kill_escaped_package_recovered": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi steps in."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target reads it immediately."
+                },
+                {
+                      "kind": "narration",
+                      "text": "He abandons everything except distance."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Pakkun cuts toward the open side."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The man changes direction before the gap closes."
+                },
+                {
+                      "kind": "narration",
+                      "text": "One foot hits the wall."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then the roof."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi reaches the alley mouth."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Nothing."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Pakkun stops beneath the eaves."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PAKKUN",
+                      "text": "Gone."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Yes."
+                }
+          ],
+          "amt_kill_escaped_package_missing": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi steps in."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target reads it immediately."
+                },
+                {
+                      "kind": "narration",
+                      "text": "He abandons everything except distance."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Pakkun cuts toward the open side."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The man changes direction before the gap closes."
+                },
+                {
+                      "kind": "narration",
+                      "text": "One foot hits the wall."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then the roof."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi reaches the alley mouth."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Nothing."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Pakkun stops beneath the eaves."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "PAKKUN",
+                      "text": "Gone."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Yes."
+                }
+          ],
+          "amt_restrained": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi draws the wire."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target looks at it."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then at Pakkun."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU MARKED TARGET",
+                      "text": "So that's your answer."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "For now."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi binds his wrists."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The man pulls once against the line."
+                },
+                {
+                      "kind": "narration",
+                      "text": "It holds."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Pakkun remains near the exit."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target stops testing it."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "ANBU MARKED TARGET",
+                      "text": "What now?"
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi looks back along the route he came."
+                },
+                {
+                      "kind": "dialogue",
+                      "speakerName": "KAKASHI",
+                      "text": "Depends who's still there."
+                }
+          ],
+          "amt_restrain_escaped": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi brings the wire around his wrist."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target waits until the first loop starts to close."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then turns with it."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The line drags across Kakashi's arm."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Half a step."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Enough."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Pakkun lunges for the exit."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The man changes direction."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Wall."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Roofline."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Gone."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Pakkun stops beneath the eaves."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi gathers the loose wire."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Neither says anything."
+                }
+          ],
+          "group2_both_killed": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi commits."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target tries to rise first."
+                },
+                {
+                      "kind": "narration",
+                      "text": "He does not make it."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler moves a heartbeat later."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Neither man gets away."
+                },
+                {
+                      "kind": "narration",
+                      "text": "When the street settles, both are dead."
+                }
+          ],
+          "group2_amt_killed_ps_escaped": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi commits."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target does not get back up."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler sees enough."
+                },
+                {
+                      "kind": "narration",
+                      "text": "He runs before Kakashi can turn on him."
+                },
+                {
+                      "kind": "narration",
+                      "text": "By the time Kakashi reaches the street, Package Smuggler is gone."
+                }
+          ],
+          "group2_amt_escaped_ps_killed": [
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target forces distance the instant Kakashi moves."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi turns after him."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler moves too late."
+                },
+                {
+                      "kind": "narration",
+                      "text": "When Kakashi looks back, one man is dead."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The other is already gone."
+                }
+          ],
+          "group2_both_escaped": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi moves."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target breaks one way."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler takes the other."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi closes neither route quickly enough."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Seconds later, the street is empty."
+                }
+          ],
+          "group3_all_killed": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi commits."
+                },
+                {
+                      "kind": "narration",
+                      "text": "One target."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then the next."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then the last."
+                },
+                {
+                      "kind": "narration",
+                      "text": "When it is over, Masked Interceptor, Package Smuggler and ANBU Marked Target do not move again."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi stands alone beneath the Sakura tree."
+                }
+          ],
+          "group3_mi_escaped_ps_amt_killed": [
+                {
+                      "kind": "narration",
+                      "text": "Masked Interceptor reads the first movement and breaks away."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi turns to the two men instead."
+                },
+                {
+                      "kind": "narration",
+                      "text": "They do not escape."
+                },
+                {
+                      "kind": "narration",
+                      "text": "By the time he looks back toward the roofline, she is gone."
+                }
+          ],
+          "group3_ps_escaped_mi_amt_killed": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi reaches Masked Interceptor first."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler runs."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target does not find the same opening."
+                },
+                {
+                      "kind": "narration",
+                      "text": "When it ends, Package Smuggler is gone."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The other two are dead."
+                }
+          ],
+          "group3_amt_escaped_mi_ps_killed": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi commits."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Masked Interceptor and Package Smuggler do not get away."
+                },
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target does."
+                },
+                {
+                      "kind": "narration",
+                      "text": "By the time Kakashi turns, the first man has already reached the rooftops."
+                }
+          ],
+          "group3_mi_killed_ps_amt_escaped": [
+                {
+                      "kind": "narration",
+                      "text": "Masked Interceptor does not get back up."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The two men split the instant Kakashi turns from her."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Two streets."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Two directions."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi reaches neither in time."
+                }
+          ],
+          "group3_ps_killed_mi_amt_escaped": [
+                {
+                      "kind": "narration",
+                      "text": "Package Smuggler dies."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Masked Interceptor and ANBU Marked Target use the same opening differently."
+                },
+                {
+                      "kind": "narration",
+                      "text": "One takes the roofs."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The other the street."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Both disappear."
+                }
+          ],
+          "group3_amt_killed_mi_ps_escaped": [
+                {
+                      "kind": "narration",
+                      "text": "ANBU Marked Target does not get back up."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Masked Interceptor and Package Smuggler move before Kakashi can carry the decision to them."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Different exits."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Both gone."
+                }
+          ],
+          "group3_all_escaped": [
+                {
+                      "kind": "narration",
+                      "text": "Kakashi commits."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The defeated group moves at once."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Three directions open."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Kakashi turns after one."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Then another."
+                },
+                {
+                      "kind": "narration",
+                      "text": "Too late."
+                },
+                {
+                      "kind": "narration",
+                      "text": "The Sakura-tree street empties around him."
+                }
+          ]
     }
   },
   "askWhere": {

@@ -39,9 +39,12 @@ const tenConfigs={
 };
 const context={
   console,JSON,Object,Array,String,Number,Boolean,Set,Map,Math,Date,globalThis:null,
-  playerData:{},savePlayerData:()=>true,
+  playerData:{activityHistory:[]},activityHistory:[],
+  savePlayerData:()=>true,
   SC_STORY_DECISION_REALISATION_34000:D,
   SC_STORY_FACTUAL_RESOLVER_34600:F,
+  SC_ALPHA_SPECIAL_JONIN_EVIDENCE_PRODUCER_34700:{patchId:"qa"},
+  projectSpecialJoninContextualEvidence34700:()=>({success:true}),
   SC_ACADEMY_KAKASHI_V2_BATTLE_36010:{configs:tenConfigs},
   commitAcademyKakashiV2TerminalRewards36015:()=>({success:true,sourceReceipts:[],plan:{totalRyo:100}}),
   unregisterStoryScene:id=>scenes.delete(id),
@@ -107,7 +110,7 @@ assert.strictEqual(cycle,null,`unexpected Kakashi V2 route cycle: ${cycle&&cycle
 
 assert.strictEqual(def.beats.filter(b=>b.exitScene===true).length,1,"Kakashi V2 must have one semantic exit");
 assert.strictEqual(def.beats.find(b=>b.exitScene===true).beatId,"v2_complete");
-assert.strictEqual(def.beats.length,97,"unexpected Kakashi V2 beat count after retiring the illegal direct post-STOP AMT fork and unauthorised Demand setup prose");
+assert.strictEqual(def.beats.length,132,"unexpected Kakashi V2 beat count after final two-outcome disposition + physical custody result scenes");
 
 // ---------------------------------------------------------------------------
 // Scenario driver: execute authored state consequences rather than merely parse
@@ -115,6 +118,7 @@ assert.strictEqual(def.beats.length,97,"unexpected Kakashi V2 beat count after r
 // ---------------------------------------------------------------------------
 function reset(forced={}){
   factualOutcomes={...forced};
+  context.playerData.activityHistory=[];context.activityHistory=context.playerData.activityHistory;
   activeRuntime={
     sceneId:SCENE_ID,instanceId:`qa_origin_${++scenarioSequence}`,
     beatId:def.entryBeatId,localContext:{},battleResume:null
@@ -183,7 +187,11 @@ enter("v2_scene02_tail");
 choose("SLIP IN FOR THE PACKAGE");choose("CONTINUE");next();
 assert.strictEqual(activeRuntime.beatId,"v2_battle_pickpocket_3v1");
 returnBattle("v2_pickpocket_3v1_win",{outcome:"victory",encounterId:"academy_kakashi_origin_battle_amt_ps_mi_3v1",actions:3});
-choose("TAKE THE PACKAGE AND LET THEM GO");
+choose("LET THEM GO");
+assert.strictEqual(activeRuntime.beatId,"v2_group3_release");
+for(const ref of ["AMT","PS","MI"])assert.strictEqual(state().participants[ref].state,"RELEASED");
+assert.strictEqual(state().package.holder,"KAKASHI","release scene must preserve package truth until report");
+next();
 assert.strictEqual(state().package.holder,"ANBU");
 for(const ref of ["AMT","PS","MI"])assert.strictEqual(state().participants[ref].state,"RELEASED");
 
@@ -193,8 +201,12 @@ enter("v2_scene02_tail");choose("STRIKE BEFORE THE HANDOFF");next();
 returnBattle("v2_direct_strike_2v1_win",{encounterId:"academy_kakashi_origin_battle_amt_ps_2v1",actions:3});next();
 returnBattle("v2_direct_mi_win",{encounterId:"academy_kakashi_origin_battle_mi_1v1",actions:2});
 choose("KILL THEM");
-for(const ref of ["AMT","PS","MI"])assert.strictEqual(state().participants[ref].state,"DEAD");
-assert.strictEqual(state().package.holder,"ANBU");
+for(const ref of ["AMT","PS","MI"])assert.strictEqual(state().participants[ref].state,"KILLED");
+assert.strictEqual(activeRuntime.beatId,"v2_group3_kill_result");
+assert.strictEqual(state().package.holder,"KAKASHI","resolver result scene must preserve route-owned package truth before report");
+next();
+assert.strictEqual(activeRuntime.beatId,"v2_report");
+assert.strictEqual(state().package.holder,"ANBU","ANBU custody commits only on exact report handoff");
 
 // MOVE IN CLOSER failure -> Stay on Package -> Ask Where -> Take Him Down loss.
 // Package recovery survives the Battle defeat and Knowledge remains exact.
@@ -225,8 +237,10 @@ returnBattle("v2_mi_stop_win",{encounterId:"academy_kakashi_origin_battle_mi_1v1
 assert((beat().choices||[]).some(c=>c.label==="GO AFTER PACKAGE SMUGGLER"&&c.availability().available===true));
 assert(!(beat().choices||[]).some(c=>c.label==="GO AFTER ANBU MARKED TARGET"));
 choose("RESTRAIN HER AND CONTINUE");
-assert.strictEqual(state().participants.MI.state,"FIELD_SECURED_PENDING_COLLECTION");
-assert.deepStrictEqual(Array.from(beat().choices).map(c=>c.label),["GO AFTER PACKAGE SMUGGLER"]);
+assert.strictEqual(state().participants.MI.state,"RESTRAINED");
+assert.strictEqual(activeRuntime.beatId,"v2_mi_restrained_next");
+next();
+assert.strictEqual(activeRuntime.beatId,"v2_ps_pursuit_resolver","RESTRAIN result did not preserve Package Smuggler pursuit timing");
 
 // Four controller actions is already too slow on STOP THE ASSASSIN.
 reset();
@@ -248,7 +262,11 @@ choose("CHASE THE PACKAGE SMUGGLER");choose("CONTINUE");next();
 returnBattle("v2_ps_package_second_win",{encounterId:"academy_kakashi_origin_battle_seq_ps",actions:3});
 choose("STAY ON THE FIRST MAN");choose("CONTINUE");next();
 returnBattle("v2_amt_package_second_win",{encounterId:"academy_kakashi_origin_battle_seq_amt_pakkun",actions:4});
-choose("TAKE HIM BACK TO THE ANBU");
+choose("BRING HIM TO ANBU");
+assert.strictEqual(activeRuntime.beatId,"v2_amt_anbu_depart");
+assert.strictEqual(state().participants.AMT.state,"BATTLE_DEFEATED","custody committed before handoff");
+next();assert.strictEqual(activeRuntime.beatId,"v2_amt_anbu_handoff");
+next();assert.strictEqual(activeRuntime.beatId,"v2_report");
 assert.strictEqual(state().package.holder,"ANBU");
 assert.strictEqual(state().participants.AMT.state,"ANBU_CUSTODY");
 
@@ -283,7 +301,12 @@ next();assert.strictEqual(state().package.holder,"ANBU");
 reset({"academy_kakashi.v2.get_closer":"GET_CLOSER_FAILURE"});
 enter("v2_scene02_tail");choose("MOVE IN CLOSER");choose("CONTINUE");choose("CUT THEM OFF AT THE SAKURA TREE");next();
 returnBattle("v2_cutoff_win",{encounterId:"academy_kakashi_origin_battle_amt_ps_2v1",actions:4});
-choose("TAKE THEM TO THE UCHIHA POLICE FORCE");
+choose("TAKE THEM TO THE UCHIHA POLICE");
+assert.strictEqual(activeRuntime.beatId,"v2_group2_police_depart");
+assert.strictEqual(state().participants.AMT.state,"BATTLE_DEFEATED");
+assert.strictEqual(state().participants.PS.state,"BATTLE_DEFEATED");
+next();assert.strictEqual(activeRuntime.beatId,"v2_group2_police_handoff");
+next();assert.strictEqual(activeRuntime.beatId,"v2_report");
 assert.strictEqual(state().package.holder,"ANBU");
 assert.strictEqual(state().participants.AMT.state,"POLICE_CUSTODY");
 assert.strictEqual(state().participants.PS.state,"POLICE_CUSTODY");
