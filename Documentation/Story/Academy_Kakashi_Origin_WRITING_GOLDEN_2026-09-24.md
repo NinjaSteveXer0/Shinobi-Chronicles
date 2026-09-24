@@ -87,10 +87,15 @@ Resolver-result `CONTINUE` cards are not genuine decisions and must not render a
    - one-, two- and three-person institutional handoffs.
 
 8. `Academy_Kakashi_333_GOLDEN_Family_07_Terminal_Ending_2026-09-24.md`
-   - `ed60f8651a4579e40870ccd14b1fa5988fbc9d34`;
-   - consequence-weighted ANBU report;
-   - private Minato evaluation;
-   - Chronicle Receipt UI authority;
+   - corrected successor commit `ea0f86575b87e16e484184077a3be1e3a1af7082`;
+   - return to the **same mission-giving ANBU operative**;
+   - physical ANBU custody handoff / route-reactive banter where applicable;
+   - Kakashi factual report and dismissal;
+   - **black wipe to hidden Hokage-office test reveal**;
+   - surviving MI / PS / AMT projected physically; KILLED participants absent;
+   - route-reactive consequences reflected in their dialogue/presence/absence;
+   - Kakashi does **not** learn the operation was staged;
+   - Chronicle Receipt remains factual UI and does not rewrite Kakashi's Chronicle using hidden cleanup;
    - YOUR CHRONICLE BEGINS transition.
 
 9. `Academy_Kakashi_333_GOLDEN_Family_08_Get_Closer_Downstream_Closure_2026-09-24.md`
@@ -294,25 +299,51 @@ Pakkun is not:
 
 Terminal flow:
 
-`field consequence -> ANBU report -> private Minato evaluation -> Chronicle Receipt -> YOUR CHRONICLE BEGINS`
+`field consequence -> return to same mission-giving ANBU operative -> physical custody transfer where applicable -> Kakashi factual report -> Kakashi dismissed -> BLACK WIPE -> hidden Hokage-office test reveal -> BLACK WIPE -> Chronicle Receipt -> YOUR CHRONICLE BEGINS`
 
-ANBU report:
-- begins from what Kakashi physically returned with;
-- scales to route consequence;
-- asks only operationally meaningful questions;
-- never explains CE/state semantics.
+## Mission-giver continuity
 
-Minato:
-- reacts to decisive judgement and consequence;
-- does not recite the route tree;
-- does not grade morality;
-- recognises command responsibility for placing a very young capable shinobi inside an adult operation.
+The ANBU operative receiving Kakashi's report / ANBU deliveries is the **same operative who gave Kakashi the mission at the opening rooftop**.
+
+This continuity is part of the Story payoff.
+
+## Kakashi Knowledge
+
+Kakashi does **not** learn during the Origin that the retrieval operation was staged.
+
+His report remains bounded to what he legitimately knows.
+
+## Hidden Hokage-office reveal
+
+After Kakashi leaves, the player sees the hidden review in the Hokage Administration interior.
+
+The scene must expose that:
+- the retrieval mission was staged as a test of Kakashi;
+- Minato and the mission-giving ANBU operative own/know the operation;
+- MI / PS / AMT were test participants;
+- surviving MI / PS / AMT may appear in the room regardless of Kakashi's prior custody/release/escape route because hidden-operation cleanup happens after Kakashi leaves;
+- KILLED participants are absent and are **not resurrected**;
+- exact mixed outcomes change who is present and what the people in the room say;
+- the recovered package may be present through hidden-operation recovery even where Kakashi failed to recover it;
+- none of this retroactively changes Kakashi's committed Chronicle result.
+
+Examples:
+- PS -> Uchiha Police remains PS -> Uchiha Police in Kakashi's Chronicle even if hidden cleanup later returns PS to Minato's office.
+- MI KILLED remains MI KILLED and MI is absent.
+- lethal attempt -> ESCAPED leaves the participant alive and available to react in the hidden review.
+
+The old 2026-09-18 confirmed-MI-kill ending is historical proof of this intended architecture:
+- PS + AMT present;
+- MI absent;
+- PS reacts to her empty place;
+- AMT asks whether Kakashi knows;
+- Minato confirms he does not.
 
 Chronicle Receipt:
 - read-only factual UI;
 - may be systematic because it is not prose;
 - uses GOLDEN choice wording;
-- reports factual outcomes, not button intent;
+- reports Kakashi's committed outcomes, not hidden cleanup;
 - never exposes raw runtime enums.
 
 ---
@@ -388,7 +419,7 @@ At this lock:
 - current full player-facing Writing: **GOLDEN**;
 - current choice wording: **GOLDEN**;
 - KILL / RESTRAIN Story expression: **GOLDEN**;
-- terminal Writing: **GOLDEN**;
+- terminal Writing: **GOLDEN — corrected hidden-test reveal authority at ea0f86575b87e16e484184077a3be1e3a1af7082**;
 - runtime consumption of this successor package: **NOT YET PROVEN**;
 - removal of fake `CONTINUE` runtime cards: **NOT YET PROVEN**;
 - installed-browser route validation against this package: **NOT YET PROVEN**;
@@ -407,6 +438,10 @@ Do not confuse this Writing lock with implementation evidence.
 > **Choices describe Kakashi's intent. Resolvers own the result.**
 
 > **Characters speak as themselves. Silence is allowed.**
+
+> **The player learns the hidden test truth in the Hokage office. Kakashi does not.**
+
+> **Surviving MI / PS / AMT return for the hidden review; KILLED participants remain absent and shape the scene through that absence.**
 
 > **Author/runtime logic stays outside player-facing prose.**
 
