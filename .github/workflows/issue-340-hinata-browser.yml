@@ -1,0 +1,85 @@
+name: Issue 340 Hinata Installed Browser
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'game.js'
+      - 'runtime/alpha-origin-scenes-32900-core.js'
+      - 'runtime/alpha-origin-scenes-32900-a.js'
+      - 'runtime/alpha-origin-scenes-32900-integrator.js'
+      - 'runtime/alpha-origin-browser-realisation-33500.js'
+      - 'runtime/alpha-origin-screen-first-33700.js'
+      - 'runtime/alpha-browser-onboarding-fixes-33400.js'
+      - 'runtime/alpha-runtime-build-fingerprint-303.js'
+      - 'runtime/alpha-localisation-content-35510.js'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
+      - 'tools/qa_issue_340_hinata_writing_golden.js'
+      - 'tools/qa_issue_340_hinata_browser.js'
+      - 'tools/browser_runtime_error_gate_311.js'
+      - 'tools/qa_runtime_ownership_safety_300.js'
+      - 'tools/fixtures/runtime_*_300.json'
+      - '.github/workflows/issue-340-hinata-browser.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  installed-browser-hinata:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Source and ownership pre-browser gate
+        run: |
+          node --check tools/qa_issue_340_hinata_writing_golden.js
+          node tools/qa_issue_340_hinata_writing_golden.js
+          node tools/qa_runtime_ownership_safety_300.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python3 -m http.server 8080 > /tmp/hinata-340-http.log 2>&1 &
+          echo $! > /tmp/hinata-340-http.pid
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/hinata-340-http.log
+          exit 1
+
+      - name: Run installed-browser Hinata Writing-Golden replay
+        env:
+          ISSUE_340_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_340_BROWSER_OUT: artifacts/issue-340-hinata-browser
+        run: xvfb-run -a node tools/qa_issue_340_hinata_browser.js
+
+      - name: Preserve server log
+        if: always()
+        run: |
+          mkdir -p artifacts/issue-340-hinata-browser
+          cp /tmp/hinata-340-http.log artifacts/issue-340-hinata-browser/http-server.log || true
+
+      - name: Upload installed-browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-340-hinata-installed-browser-evidence
+          path: artifacts/issue-340-hinata-browser
+          if-no-files-found: warn

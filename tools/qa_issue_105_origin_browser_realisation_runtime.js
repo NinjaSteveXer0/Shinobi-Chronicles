@@ -58,6 +58,16 @@ function load(rel){vm.runInContext(fs.readFileSync(path.join(process.cwd(),rel),
 function assert(name,value,details=null){if(!value)throw new Error(`${name}: ${JSON.stringify(details)}`);console.log(`PASS ${name}`);}
 function clickChoice(id){const b=render.buttons.find(x=>x.dataset.choiceId===id);if(!b)throw new Error(`choice button missing ${id} @ ${render.beatId}`);b.click();}
 function clickContinue(){const b=render.buttons.find(x=>!x.dataset.choiceId);if(!b)throw new Error(`continue button missing @ ${render.beatId}`);b.click();}
+function continueUntil(target,max=160){
+  const seen=[];
+  for(let i=0;i<max;i++){
+    if(render.beatId===target)return seen;
+    if(render.buttons.some(x=>x.dataset.choiceId))throw new Error(`unexpected choice before ${target} @ ${render.beatId}`);
+    seen.push({beatId:render.beatId,text:render.text});
+    clickContinue();
+  }
+  throw new Error(`continueUntil guard exceeded ${target} @ ${render.beatId}`);
+}
 function selectOrigin(id){playerData.activityHistory.length=0;playerData.acquisition={chronicleOriginVariantId:id,chronicleOrigin:{prologueCompleted:false}};active=null;render={beatId:null,text:"",buttons:[]};}
 function beginOrigin(id){selectOrigin(id);const r=context.beginAlphaChronicleOriginPrologue();if(!r||r.success!==true)throw new Error(`origin start failed ${id}: ${JSON.stringify(r)}`);return r;}
 
@@ -98,9 +108,19 @@ try{
   assert("kurenai_win_chain_contains_locked_dialogue",winSequence.some(t=>t.includes("Have you?"))&&winSequence.some(t=>t==="Yes.")&&winSequence.some(t=>t.includes("genuinely holding the bell")),winSequence);
   assert("kurenai_choices_do_not_reconverge_to_same_text",lossText!==winSequence[0]);
 
-  // Hinata's rendered evaluation consumes the exact decisions selected through DOM buttons.
-  beginOrigin("academy_hinata");clickContinue();clickChoice("study_movement");clickChoice("redirect_attack");clickChoice("trust_observation");
-  assert("hinata_evaluation_reflects_selected_sequence",render.beatId==="hin_eval"&&render.text.includes("studied the opponent's movement")&&render.text.includes("redirected the attack")&&render.text.includes("trusted what she had observed"),render);
+  // Hinata GOLDEN: connected exchanges alter the opponent and mixed history selects the contextual evaluation.
+  beginOrigin("academy_hinata");
+  continueUntil("hin_ex1_choice");
+  assert("hinata_first_exchange_exact_choices",render.buttons.map(b=>b.textContent).join("|")==="WAIT FOR HIM TO COMMIT|STEP IN FIRST|BREAK AWAY AND RESET",render);
+  clickChoice("attack_immediately");
+  continueUntil("hin_ex2_press_choice");
+  assert("hinata_opponent_adapts_to_first_pressure",render.buttons.map(b=>b.textContent).join("|")==="KEEP THE PRESSURE ON HIM|DRAW OUT HIS COUNTER|BACK OFF BEFORE HE CAN SET THE TRAP",render);
+  clickChoice("press_draw_counter");
+  continueUntil("hin_ex3_changed_choice");
+  assert("hinata_mixed_route_reaches_changed_approach_prompt",render.buttons.map(b=>b.textContent).join("|")==="ANSWER WITH THE FORM YOU PRACTISED|TRUST WHAT YOU'VE SEEN IN THE SPAR|BREAK THE RHYTHM BEFORE HE CAN SET IT",render);
+  clickChoice("trust_spar");
+  const mixedEvaluation=continueUntil("hin_children_intro_1").map(x=>x.text);
+  assert("hinata_contextual_evaluation_consumes_mixed_history",mixedEvaluation.includes("Your second exchange didn't look like your first.")&&mixedEvaluation.includes("Your third didn't look like either.")&&mixedEvaluation.includes("Harder."),mixedEvaluation);
 
   // Mirai's earlier conversation changes the later observer-safe inconsistency projection.
   beginOrigin("academy_mirai");clickContinue();clickChoice("ask_route");

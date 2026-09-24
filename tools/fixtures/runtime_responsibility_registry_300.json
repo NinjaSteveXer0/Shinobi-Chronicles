@@ -665,6 +665,47 @@
         "tools/qa_runtime_ownership_safety_300.js",
         "tools/qa_save_compatibility_311.js"
       ]
+    },
+    {
+      "responsibilityId": "origin.academy_hinata.final_story_state",
+      "canonicalOwner": "runtime/alpha-origin-scenes-32900-a.js",
+      "ownerType": "origin_semantic_owner",
+      "directCallers": [
+        "runtime/alpha-origin-scenes-32900-integrator.js",
+        "runtime/alpha-origin-browser-realisation-33500.js"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime.localContext",
+        "playerData.activityHistory Academy Hinata source occurrences",
+        "playerData acquisition / Origin completion state"
+      ],
+      "stateWrites": [
+        "activeStorySceneRuntime.localContext Hinata exchange choices",
+        "playerData.activityHistory exact Academy Hinata source facts"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-origin-scenes-32900-a.js"
+      ],
+      "extensionHooks": [
+        "SC_ALPHA_ORIGIN_32900.register",
+        "completeChronicleOriginPrologue"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [
+        "runtime/alpha-origin-browser-realisation-33500.js::pre340 Hinata evaluation/younger-result shim"
+      ],
+      "saveSchemaRefs": [
+        "activeStorySceneRuntime.localContext h1/h2/h3/young",
+        "playerData.activityHistory occ_origin_hinata_*"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_340_hinata_writing_golden.js",
+        "tools/qa_alpha_origin_scenes_32900_runtime.js",
+        "tools/qa_issue_105_origin_browser_realisation_runtime.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_340_hinata_browser.js"
+      ]
     }
   ],
   "adapters": [
