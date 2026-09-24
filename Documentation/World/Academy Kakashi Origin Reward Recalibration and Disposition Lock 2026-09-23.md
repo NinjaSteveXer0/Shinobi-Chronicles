@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-23  
 **Owner:** Stephen / World — Missions / Events / Rewards  
-**Status:** **STEPHEN-APPROVED REWARD RECALIBRATION — FULL ROUTE-ANCHOR REWARD MODEL LOCKED; TERMINAL-CAP ARITHMETIC STILL OPEN**
+**Status:** **STEPHEN-APPROVED / WORLD CLOSED — FULL ROUTE-ANCHOR REWARD MODEL + UNCAPPED TERMINAL SOURCE SUM**
 
 ## 1. Purpose
 
@@ -318,20 +318,35 @@ When Kakashi wins a Battle, the game must be able to tell the player exactly wha
 
 For action-derived development, the causal action/evidence must be preserved rather than merely showing a final number.
 
-## 11. Open arithmetic compatibility — terminal cap
+## 11. Terminal reward aggregation — 250 Ryō cap REMOVED
 
-The older terminal/debrief-class **250 Ryō cap** predates the newly approved two-captive / full-extraction tiers.
+**2026-09-25 STEPHEN SIGN-OFF / #348 CLOSURE**
 
-This lock does **not** silently decide whether that cap is:
+The legacy **250 Ryō terminal/debrief cap is removed**.
 
-- retained;
-- raised;
-- removed; or
-- bypassed by the new full-extraction source.
+Terminal/debrief reward aggregation is now:
 
-That treatment remains pending Stephen's explicit decision because a 100-Ryō full-extraction tier can otherwise be partially hidden by the old cap.
+> **sum every independently qualified, authorised, one-shot terminal reward source for the sealed Origin occurrence. Do not clamp the sum to a legacy ceiling.**
 
-Coding must not use the old cap to silently erase an approved reward tier while this point is unresolved.
+Current authorised terminal sources remain individually bounded and idempotent:
+
+- terminal/debrief completion = **100 Ryō**;
+- package recovered = **+75 Ryō**;
+- verified actionable intelligence = **+25 Ryō** where qualified;
+- live-delivery tier = **+25 / +50 / +100 total** for one / two / three delivered participants;
+- exceptional field execution = **+25 Ryō** where qualified.
+
+Therefore legitimate current examples include:
+
+- full three-person live delivery with package, no intelligence/exceptional source = **275 Ryō terminal**;
+- failed-pickpocket 3-v-1 victory + package + full three-person live delivery + exceptional source = **300 Ryō terminal**;
+- any other lawful combination pays the exact sum of its independently qualified authorised sources.
+
+Immediate Battle cash remains outside terminal/debrief aggregation exactly as already locked.
+
+No authorised reward source may be silently clipped, discarded, or converted to zero merely because the terminal total exceeds 250.
+
+This is not permission to invent new reward sources or duplicate existing ones. Source qualification, once-per-occurrence/idempotence, and anti-double-pay rules remain binding.
 
 ## Final lock
 
