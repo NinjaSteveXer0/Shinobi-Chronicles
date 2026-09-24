@@ -106,30 +106,44 @@ Six preserves larger Battles, roster strategy, attrition, tactical reserves, fut
 A full side conceptually contains:
 
 ~~~text
-                 CURRENT ACTOR
+                    ACTIVE
 
-        SUPPORT    SUPPORT    SUPPORT
+        BENCHED    BENCHED    BENCHED
 
              RESERVE    RESERVE
 ~~~
 
 Exact geometry remains UI-owned.
 
-### Current Actor
+### Player-facing formation labels — LOCKED
+
+For the Battle surface, use the simpler labels:
+
+- **1 Active**
+- **3 Benched**
+- **2 Reserve**
+
+These are **Battle portraits**, not collectible-card frames or full card UI.
+
+Internally, Combat/runtime may still use stable semantic identifiers such as current actor / bench slot / reserve slot where useful, but player-facing formation language is Active / Benched / Reserve.
+
+### Active
 
 The one participant currently taking the side's normal action opportunity and receiving confrontation focus.
 
-### Deployed Supports
+The Active Battle portrait is the dominant portrait at approximately full presentation prominence.
 
-Three participants visibly deployed behind/around the Current Actor.
+### Benched
+
+Three smaller Battle portraits visibly deployed behind/around the Active portrait.
 
 They are part of the battlefield and may be legal consumers of support/off-slot mechanics.
 
 They do not automatically receive their own normal turn.
 
-### Reserves
+### Reserve
 
-Two additional Battle-deployed participants positioned further back/recessed.
+Two further-recessed Battle portraits behind the Benched line.
 
 They remain visibly part of the six-person Battle team rather than being invisible roster entries.
 
@@ -157,11 +171,13 @@ Existing Battle law remains:
 When the Current Actor reaches 0 Battle PL:
 
 ~~~text
-Current Actor withdraws
+Active withdraws
         ↓
-one Deployed Support replaces the Current Actor
+withdrawal animation completes
         ↓
-one Reserve advances into the vacated Support position
+next eligible Benched portrait promotes into Active
+        ↓
+one Reserve advances into the vacated Benched position where available
         ↓
 formation settles
 ~~~
@@ -192,12 +208,36 @@ AFTER
 
 The formation should communicate this state change visually without explanatory prose.
 
-### Deployed Support vs Reserve terminology
+### Active withdrawal choreography — LOCKED PRESENTATION ORDER
+
+When the Active participant is forced to withdraw, the presentation order is deliberately sequential:
+
+~~~text
+1. Combat has already committed the withdrawal.
+2. The outgoing Active Battle portrait completes its withdrawal / knock-off animation.
+3. Only after the outgoing portrait has cleared the Active position does the replacement movement begin.
+4. The next eligible Benched Battle portrait slides toward the Active confrontation anchor.
+5. During that same movement, its portrait scales smoothly from Benched prominence (approximately 65–75%) to Active prominence (100%).
+6. An available Reserve may simultaneously slide forward into the newly vacated Benched slot as part of this second-phase formation shift.
+7. The formation settles before the next normal action opportunity is presented.
+~~~
+
+Canonical visual rule:
+
+> **OUTGOING ACTIVE EXITS FIRST. PROMOTION STARTS SECOND.**
+
+Do not overlap the outgoing Active knock-off with the incoming Active promotion in a way that leaves two participants visually occupying the Active confrontation role at once.
+
+The percentages above describe intended relative visual prominence, not semantic power, PL, Rank or targeting priority.
+
+Reduced-motion / interrupted-animation paths must settle directly to the same authoritative final formation. Animation completion never decides whether the withdrawal or promotion occurred.
+
+### Benched vs Reserve terminology
 
 For this contract:
 
-- **Deployed Support** = one of the three cards immediately behind/around the Current Actor;
-- **Reserve** = one of the two deeper backline cards.
+- **Benched** = one of the three smaller Battle portraits immediately behind/around the Active portrait;
+- **Reserve** = one of the two deeper backline Battle portraits.
 
 This distinction exists to avoid using “reserve” for both groups.
 
@@ -205,12 +245,12 @@ This distinction exists to avoid using “reserve” for both groups.
 
 A legal action may withdraw a participant who is not the Current Actor.
 
-If a **Deployed Support** reaches 0 Battle PL:
+If a **Benched** participant reaches 0 Battle PL:
 
 ~~~text
-that Support resolves its withdrawal presentation
--> the Current Actor stays Current Actor
--> a Reserve fills the vacated Support slot where available
+that Benched portrait resolves its withdrawal presentation
+-> the healthy Active remains Active
+-> a Reserve fills the vacated Benched slot where available
 -> formation settles
 ~~~
 
@@ -233,14 +273,14 @@ commit one action result
 
 Examples:
 
-- Current Actor + two Deployed Supports withdraw:
-  - one surviving eligible Deployed Support may promote to Current Actor;
-  - available Reserves fill open Support slots;
+- Active + two Benched participants withdraw:
+  - one surviving eligible Benched participant may promote to Active;
+  - available Reserves fill open Benched slots;
   - exact promotion/reserve ordering remains owner-closed later.
 
-- Current Actor + all three Deployed Supports withdraw:
+- Active + all three Benched participants withdraw:
   - if one or two Reserves survive, the surviving Reserve group becomes the new deployed formation;
-  - one must become Current Actor and the other, if present, becomes a Deployed Support;
+  - one must become Active and the other, if present, becomes Benched;
   - exact selection/order remains open.
 
 - all six team participants withdraw:
@@ -353,8 +393,8 @@ Future shared visual primitives may include:
 - recoil;
 - Summon-action effect / source cue (no Alpha battlefield participant card);
 - withdrawal;
-- Support promotion;
-- Reserve promotion.
+- Benched-to-Active promotion;
+- Reserve-to-Benched promotion.
 
 Do not require bespoke animation art for every Skill.
 
@@ -530,8 +570,8 @@ Canonical owner remains:
 Presentation owns:
 
 - Formation Stage layout;
-- Current Actor visual focus;
-- support/reserve projection;
+- Active visual focus;
+- Benched/Reserve projection;
 - action playback;
 - impact/result feedback;
 - PL drain presentation;
@@ -547,13 +587,13 @@ The following concept is now locked:
 
 1. Squad Wedge remains the Battle formation presentation.
 2. Standard Battle team ceiling is six participants per side.
-3. Full formation is 1 Current Actor + 3 Deployed Supports + 2 Reserves.
+3. Full player-facing formation is 1 Active + 3 Benched + 2 Reserve.
 4. Formation adapts to actual participant count.
 5. Normal PvE uses alternating side action opportunities.
 6. Player side starts first in normal PvE.
 7. Team size does not create one normal turn per participant.
 8. 0 Battle PL remains withdrawal, not injury/death.
-9. Current Actor withdrawal causes a relay: a Support promotes and a Reserve fills the vacated Support position where available.
+9. Active withdrawal uses a two-phase relay: outgoing Active portrait fully exits first; then an eligible Benched portrait slides to center while scaling from roughly 65–75% to 100%, with an available Reserve refilling the vacated Benched slot.
 10. Formation position does not invent Combat range/legality.
 11. Existing off-slot mechanics such as Sicklewind Route can consume the formation model.
 12. Actions follow ACTOR -> ACTION -> TARGET -> IMPACT/RESPONSE -> RESULT -> UPDATED STATE -> SETTLE.
@@ -561,15 +601,15 @@ The following concept is now locked:
 14. Existing 'battle.presentation.shared' ownership remains canonical.
 15. Future PvP should consume the same Battle semantic protocol rather than a second engine.
 16. Multi-participant withdrawals are resolved from one committed action result, then the surviving formation is normalized once.
-17. A withdrawn Deployed Support is refilled by an available Reserve without rotating the healthy Current Actor.
-18. If only Reserves survive after Current Actor + deployed-line withdrawal, the surviving Reserves become the new deployed formation.
+17. A withdrawn Benched participant is refilled by an available Reserve without rotating the healthy Active.
+18. If only Reserves survive after Active + Benched-line withdrawal, the surviving Reserves become the new deployed formation.
 19. Alpha Summons are action selections from the SUMMONS dock, not battlefield participant cards, extra team slots or independent turns.
 
 ## 22. What remains OPEN
 
 Do not silently decide these without owner closure:
 
-- player-choice vs automatic Support promotion;
+- exact next-Benched promotion order when more than one eligible Benched participant survives;
 - reserve ordering;
 - exact formation coordinates/scales;
 - exact animation timing;
@@ -590,4 +630,4 @@ If Kakashi is rewritten, shared Battle implementation should wait until that rew
 
 ## 24. Final lock
 
-> **Shinobi Chronicles Battle is intended to become alternating side-turn combat presented through an adaptive six-shinobi Squad Wedge: one Current Actor, three Deployed Supports and two Reserves per full team. The Current Actor spends the normal side action opportunity; team size does not create six independent normal turns. At 0 Battle PL, withdrawals resolve from the committed action result and the surviving formation is normalized once: healthy Current Actors remain in place, withdrawn Supports may be refilled from Reserve, and surviving Reserves can become the deployed formation if the prior active line is exhausted. For Alpha, SUMMONS supplies authorised Summon actions only; Summons do not enter the Squad Wedge as participant cards or receive independent turns. Combat owns all factual turn/action/target/result/withdrawal legality; battle.presentation.shared makes those committed facts kinetic and readable. The concept is locked now, but implementation is explicitly on hold until Stephen completes the Academy Kakashi Browser Golden decision.**
+> **Shinobi Chronicles Battle is intended to become alternating side-turn combat presented through an adaptive six-shinobi Squad Wedge: one Active, three Benched and two Reserve Battle portraits per full team. The Active participant spends the normal side action opportunity; team size does not create six independent normal turns. When the Active reaches withdrawal, the outgoing portrait completes its knock-off/withdrawal animation first; only then does an eligible Benched portrait slide into the Active confrontation position while scaling from roughly 65–75% to 100%, with an available Reserve refilling the vacated Benched slot. Multi-participant withdrawals resolve from one committed action result and the surviving formation is normalized once. For Alpha, SUMMONS supplies authorised Summon actions only; Summons do not enter the Squad Wedge as participant portraits or receive independent turns. Combat owns all factual turn/action/target/result/withdrawal legality; battle.presentation.shared makes those committed facts kinetic and readable. The concept is locked now, but implementation is explicitly on hold until Stephen completes the Academy Kakashi Browser Golden decision.**
