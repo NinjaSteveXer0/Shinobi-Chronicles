@@ -92,7 +92,12 @@ assert.strictEqual(beats.filter(b=>b.battle).length,1,"Wasabi must have exactly 
 const reachable=new Set([def.entryBeatId]),queue=[def.entryBeatId];
 while(queue.length){
   const id=queue.shift(),b=byId.get(id);if(!b)continue;
-  const targets=[b.nextBeatId,...(b.choices||[]).map(x=>x.nextBeatId)].filter(Boolean);
+  const targets=[
+    b.nextBeatId,
+    ...(b.choices||[]).map(x=>x.nextBeatId),
+    b.battle&&b.battle.victoryBeatId,
+    b.battle&&b.battle.defeatBeatId
+  ].filter(Boolean);
   for(const t of targets)if(!reachable.has(t)){reachable.add(t);queue.push(t);}
 }
 assert.deepStrictEqual(beats.map(b=>b.beatId).filter(id=>!reachable.has(id)),[],"unreachable Wasabi GOLDEN beats");
