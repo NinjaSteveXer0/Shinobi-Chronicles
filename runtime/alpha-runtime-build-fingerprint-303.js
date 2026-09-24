@@ -16,7 +16,7 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-24-X",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-24-Y",
     sourceBaselineCommit:"5c60594134c99e5c97aefce39d9a17d54affef64",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
     runtimeGeneration:"alpha-story-battle-formation-stage-312",
@@ -36,7 +36,8 @@
       "contextual-special-jonin-evidence-producer-23",
       "kakashi-final-dispositions-rewards-evidence-322",
       "kakashi-final-browser-golden-longhand-motion",
-      "kakashi-writing-golden-runtime-consumption"
+      "kakashi-writing-golden-runtime-consumption",
+      "kakashi-canonical-machine-resolver-routing"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -69,7 +70,7 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-24-X",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-24-Y",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
       generationPresent:first.runtimeGeneration==="alpha-story-battle-formation-stage-312",
