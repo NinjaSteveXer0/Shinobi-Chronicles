@@ -444,6 +444,43 @@
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Stephen's final Browser-Golden attempt reopens presentation-only motion after the static stabilization checkpoint. This pass removes the phantom Story card-holder overlay and consumes the existing shared 33900 choreography queue through Kakashi-only CSS translate/scale/rotate longhands while transform remains locked to none. Hard scene and Story/Battle transitions remain exclusively owned by the shared 33900 curtain. Story truth, Battle semantics, rewards, PL, route topology and authored text are unchanged."
+    },
+    {
+      "changeId": "kakashi-writing-golden-runtime-consumption-2026-09-24",
+      "classification": "REPLACES",
+      "responsibilityIds": [
+        "origin.academy_kakashi.v2.story_state",
+        "origin.academy_kakashi.v2.story_dom",
+        "origin.academy_kakashi.v2.semantic_advance",
+        "origin.academy_kakashi.v2.chronicle_receipt",
+        "origin.completion.shared"
+      ],
+      "owner": "runtime/academy-kakashi-v2-writing-golden-36100.js + runtime/alpha-kakashi-v2-core-36020.js + runtime/alpha-kakashi-v2-renderer-36030.js",
+      "directCallers": [
+        "runtime/alpha-traversal-bridge-33200.js",
+        "runtime/alpha-kakashi-v2-transition-36040.js"
+      ],
+      "stateTouched": [
+        "activeStorySceneRuntime.localContext.kakashiV2 terminal presentation markers",
+        "player-facing Kakashi Story choice/cue projection",
+        "presentation-only Kakashi Police/hokage-test-review actor layout",
+        "Origin completion handoff through existing completeChronicleOriginPrologue authority"
+      ],
+      "productionLoader": "runtime/alpha-traversal-bridge-33200.js",
+      "qaRefs": [
+        "tools/qa_kakashi_v2_clean_room.js",
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_334_story_transition_owner.js"
+      ],
+      "replaces": [
+        "runtime/alpha-kakashi-v2-core-36020.js::pre-GOLDEN choice labels and mixed prose",
+        "runtime/alpha-kakashi-v2-core-36020.js::pre-correction v2_minato terminal",
+        "runtime/alpha-kakashi-v2-core-36020.js::v2_complete raw Origin occurrence sealed pseudo-receipt",
+        "runtime/alpha-kakashi-v2-core-36020.js::Family 04 one-option CHASE THE PACKAGE SMUGGLER pseudo-choice"
+      ],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Current #333 GOLDEN Writing authority is now consumed directly by the live Academy Kakashi V2 runtime. This replacement aligns all reachable player-facing choice labels with the GOLDEN family documents, restores the corrected mission-giver ANBU -> hidden Hokage-office test reveal -> Chronicle Receipt -> YOUR CHRONICLE BEGINS terminal, projects the intended Uchiha Police cards without overlap, and removes the Family 04 deterministic fast/slow result from the player choice surface. Existing disposition, custody, reward, PL, Battle and Chronicle fact semantics remain unchanged."
     }
   ]
 }
