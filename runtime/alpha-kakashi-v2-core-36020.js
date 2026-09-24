@@ -96,22 +96,36 @@ function participant(ref,next){const key=participantKey(ref);return mutate(s=>{s
 function packageState(holder,{recovered=null,returned=null,neutral=null}={}){return mutate(s=>{s.package.holder=holder;if(recovered!==null)s.package.recovered=!!recovered;if(returned!==null)s.package.returned=!!returned;if(neutral!==null)s.package.neutral=!!neutral;});}
 function setPakkun(present=true){return mutate(s=>{s.pakkun.present=present;s.pakkun.departed=!present;});}
 function fieldLocationFor(key){return key==="MI"?"beneath the Sakura tree":key==="PS"?"in the side street":key==="AMT"?"in the alley":"at the committed field location";}
+function restartAmbiguousLegacyKakashiOccurrence(s,reasons){
+  const rt=active(),fresh={
+    version:3,sceneInstanceId:rt&&rt.instanceId||s&&s.sceneInstanceId||null,routeHistory:[],
+    package:{holder:"AMT",recovered:false,returned:false,neutral:false},
+    participants:{MI:{state:"UNSEEN"},PS:{state:"AVAILABLE"},AMT:{state:"AVAILABLE"}},
+    pakkun:{present:false,departed:false,knownByKakashiAsName:false},
+    knowledge:{getCloserContingency:false,askWhere:false,downstreamDestinationKnown:false},
+    resolvers:{},battles:{},rewards:{sources:[],terminalCommitted:false},terminal:{},
+    migration:{restartedAffectedOccurrence:true,reason:"legacy_disposition_ambiguous",retiredFacts:[...new Set(reasons)]}
+  };
+  for(const key of Object.keys(s||{}))delete s[key];
+  Object.assign(s,fresh);
+  if(rt){rt.beatId="v2_scene01_rooftop";rt.battleResume=null;}
+  try{savePlayerData();}catch(_error){}
+  return true;
+}
 function migrateLegacyDispositionState(s){
   if(!s||typeof s!=="object")return false;
-  let changed=false;
-  const legacyField=new Set(Array.isArray(s.fieldSecured)?s.fieldSecured.map(participantKey):[]);
+  const legacyField=Array.isArray(s.fieldSecured)?s.fieldSecured.map(participantKey):[];
+  const ambiguous=[];
   for(const key of ["MI","PS","AMT"]){
     const row=s.participants&&s.participants[key];if(!row)continue;
-    if(row.state==="DEAD"){row.state="KILLED";row.disposition="KILL";row.lethalIntent=true;row.migratedFromLegacyDisposition="DEAD";changed=true;}
-    if(row.state==="FIELD_SECURED_PENDING_COLLECTION"||legacyField.has(key)){
-      row.state="RESTRAINED";row.disposition="RESTRAIN";row.restrainIntent=true;
-      row.fieldLocation=row.fieldLocation||fieldLocationFor(key);
-      row.migratedFromLegacyDisposition="FIELD_SECURED_PENDING_COLLECTION";changed=true;
-    }
-    if(row.state==="COLLECTED_ACTIVE_ESCORT"){row.state="RESTRAINED";row.collected=true;row.disposition="RESTRAIN";row.restrainIntent=true;row.migratedFromLegacyDisposition="COLLECTED_ACTIVE_ESCORT";changed=true;}
+    if(["DEAD","FIELD_SECURED_PENDING_COLLECTION","COLLECTED_ACTIVE_ESCORT"].includes(row.state))ambiguous.push(`${key}:${row.state}`);
   }
+  for(const key of legacyField)ambiguous.push(`${key}:fieldSecured`);
+  if(ambiguous.length)return restartAmbiguousLegacyKakashiOccurrence(s,ambiguous);
+  let changed=false;
   if(Object.prototype.hasOwnProperty.call(s,"fieldSecured")){delete s.fieldSecured;changed=true;}
-  if(changed){s.version=Math.max(3,Number(s.version)||0);try{savePlayerData();}catch(_error){}}
+  if(Number(s.version)<3){s.version=3;changed=true;}
+  if(changed)try{savePlayerData();}catch(_error){}
   return changed;
 }
 function restrainedParticipantKeys(s=state()){return ["MI","PS","AMT"].filter(key=>s&&s.participants&&s.participants[key]&&s.participants[key].state==="RESTRAINED");}
