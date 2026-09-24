@@ -182,7 +182,8 @@
         "resumeBattleCallerAfterCompletion"
       ],
       "permittedAdapters": [
-        "academy_kakashi_v2_battle_adapter_36010"
+        "academy_kakashi_v2_battle_adapter_36010",
+        "academy_wasabi_rogue_battle_adapter_343"
       ],
       "retiredOwners": [],
       "saveSchemaRefs": [
@@ -540,7 +541,8 @@
         "installBattlePerformance33000"
       ],
       "permittedAdapters": [
-        "academy_kakashi_v2_battle_adapter_36010"
+        "academy_kakashi_v2_battle_adapter_36010",
+        "academy_wasabi_rogue_battle_adapter_343"
       ],
       "retiredOwners": [],
       "saveSchemaRefs": [],
@@ -708,6 +710,90 @@
         "tools/qa_runtime_ownership_safety_300.js",
         "tools/qa_issue_340_hinata_browser.js"
       ]
+    },
+    {
+      "responsibilityId": "origin.academy_izuno.final_story_state",
+      "canonicalOwner": "runtime/alpha-origin-scenes-32900-a.js",
+      "ownerType": "origin_semantic_owner",
+      "directCallers": [
+        "runtime/alpha-origin-scenes-32900-integrator.js",
+        "runtime/alpha-story-scene-board-33900.js"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime.localContext",
+        "playerData.activityHistory Academy Wasabi source occurrences",
+        "playerData acquisition / Origin completion state"
+      ],
+      "stateWrites": [
+        "activeStorySceneRuntime.localContext Wasabi pursuit/route/Rogue response facts",
+        "playerData.activityHistory exact IZU-01/02/03/04 occurrences"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/academy-wasabi-writing-golden-343.js",
+        "runtime/alpha-origin-scenes-32900-a.js"
+      ],
+      "extensionHooks": [
+        "SC_ALPHA_ORIGIN_32900.register",
+        "completeChronicleOriginPrologue"
+      ],
+      "permittedAdapters": [
+        "academy_wasabi_rogue_battle_adapter_343"
+      ],
+      "retiredOwners": [
+        "runtime/alpha-origin-scenes-32900-a.js::pre343_compressed_academy_izuno"
+      ],
+      "saveSchemaRefs": [
+        "activeStorySceneRuntime.localContext Wasabi pursuit facts",
+        "playerData.activityHistory occ_origin_izuno_*"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_343_wasabi_writing_golden.js",
+        "tools/qa_alpha_origin_scenes_32900_runtime.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_343_wasabi_browser.js"
+      ]
+    },
+    {
+      "responsibilityId": "origin.academy_izuno.rogue_battle",
+      "canonicalOwner": "runtime/alpha-wasabi-rogue-battle-343.js",
+      "ownerType": "origin_battle_adapter",
+      "directCallers": [
+        "runtime/alpha-origin-scenes-32900-a.js"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime.pendingBattle",
+        "currentBattle",
+        "shared enemy action scheduler"
+      ],
+      "stateWrites": [
+        "currentBattle.wasabi343",
+        "playerData.wasabi343BattleLaunches",
+        "currentBattle.runtime.evidence via shared Battle evidence authority"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-battle-modern-33000.js",
+        "runtime/alpha-wasabi-rogue-battle-343.js"
+      ],
+      "extensionHooks": [
+        "launchAcademyWasabiRogueGeninBattle343",
+        "projectAcademyWasabiRogueGeninBattle343"
+      ],
+      "permittedAdapters": [
+        "academy_wasabi_rogue_battle_adapter_343"
+      ],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "currentBattle.wasabi343",
+        "playerData.wasabi343BattleLaunches",
+        "activeStorySceneRuntime.pendingBattle"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_343_wasabi_writing_golden.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_343_wasabi_browser.js"
+      ]
     }
   ],
   "adapters": [
@@ -733,6 +819,18 @@
       "retirementCondition": "Review when shared Origin reward consumption natively supports the exact source-scoped Kakashi V2 contract.",
       "milestone": "shared Origin runtime propagation review",
       "qaRef": "tools/qa_kakashi_v2_clean_room.js",
+      "temporary": false
+    },
+    {
+      "adapterId": "academy_wasabi_rogue_battle_adapter_343",
+      "reason": "Translate the authorised Academy Wasabi STEP IN Story seam and historical Rogue Genin participant into the existing shared Battle runtime without creating a second Battle or World occurrence.",
+      "owner": "runtime/alpha-wasabi-rogue-battle-343.js",
+      "sourceOwner": "runtime/alpha-origin-scenes-32900-a.js",
+      "targetOwner": "runtime/alpha-battle-modern-33000.js",
+      "exactBehaviorBridged": "Strict Wasabi-vs-Rogue deployment, exact Rogue action palette, shared Story caller return and observer-safe Battle result projection.",
+      "retirementCondition": "Review when the shared Origin Story-to-Battle adapter natively supports the exact Wasabi historical-opposition and strict-deployment contract.",
+      "milestone": "shared Origin runtime propagation review",
+      "qaRef": "tools/qa_issue_343_wasabi_browser.js",
       "temporary": false
     }
   ],
@@ -805,6 +903,16 @@
       "semanticId": "special_jonin.contextual_evidence.project",
       "owner": "runtime/alpha-special-jonin-evidence-producer-34700.js",
       "responsibilityId": "progression.special_jonin.contextual_evidence_producer.shared"
+    },
+    {
+      "semanticId": "academy_izuno.final.story",
+      "owner": "runtime/alpha-origin-scenes-32900-a.js",
+      "responsibilityId": "origin.academy_izuno.final_story_state"
+    },
+    {
+      "semanticId": "academy_izuno.rogue_battle.launch",
+      "owner": "runtime/alpha-wasabi-rogue-battle-343.js",
+      "responsibilityId": "origin.academy_izuno.rogue_battle"
     }
   ],
   "globalWrapperChains": [
@@ -870,6 +978,16 @@
       "stateRef": "playerData.specialJoninContextualEvidence",
       "owner": "runtime/alpha-special-jonin-evidence-producer-34700.js",
       "responsibilityId": "progression.special_jonin.contextual_evidence_producer.shared"
+    },
+    {
+      "stateRef": "activeStorySceneRuntime.localContext Academy Wasabi pursuit and Rogue-response facts",
+      "owner": "runtime/alpha-origin-scenes-32900-a.js",
+      "responsibilityId": "origin.academy_izuno.final_story_state"
+    },
+    {
+      "stateRef": "currentBattle.wasabi343 / playerData.wasabi343BattleLaunches",
+      "owner": "runtime/alpha-wasabi-rogue-battle-343.js",
+      "responsibilityId": "origin.academy_izuno.rogue_battle"
     }
   ]
 }
