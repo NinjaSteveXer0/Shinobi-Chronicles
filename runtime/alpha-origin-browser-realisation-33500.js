@@ -160,7 +160,7 @@ function patchIzuno33500(){
     beat33500(def,"izu_split_choice")&&
     beat33500(def,"izu_rogue_choice")&&
     beat33500(def,"izu_rogue_step_in_battle")&&
-    beat33500(def,"izu_reflect_choice")
+    beat33500(def,"izu_reflect")
   );
   if(goldenNative)return true;
   const split=beat33500(def,"izu_split"),rogue=beat33500(def,"izu_rogue"),evalBeat=beat33500(def,"izu_eval");
