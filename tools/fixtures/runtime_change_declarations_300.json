@@ -466,7 +466,8 @@
         "tools/qa_issue_340_hinata_writing_golden.js",
         "tools/qa_alpha_origin_scenes_32900_runtime.js",
         "tools/qa_issue_105_origin_browser_realisation_runtime.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_340_hinata_browser.js"
       ],
       "replaces": [
         "runtime/alpha-origin-scenes-32900-a.js::pre340_compressed_academy_hinata",
