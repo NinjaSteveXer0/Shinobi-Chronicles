@@ -1,7 +1,14 @@
 'use strict';
 const fs=require('fs'),vm=require('vm'),path=require('path');
 const ROOT=path.resolve(__dirname,'..');
-const files=['core','a','b','c','integrator'].map(n=>path.join(ROOT,'runtime',`alpha-origin-scenes-32900-${n}.js`));
+const files=[
+  path.join(ROOT,'runtime','alpha-origin-scenes-32900-core.js'),
+  path.join(ROOT,'runtime','academy-wasabi-writing-golden-343.js'),
+  path.join(ROOT,'runtime','alpha-origin-scenes-32900-a.js'),
+  path.join(ROOT,'runtime','alpha-origin-scenes-32900-b.js'),
+  path.join(ROOT,'runtime','alpha-origin-scenes-32900-c.js'),
+  path.join(ROOT,'runtime','alpha-origin-scenes-32900-integrator.js')
+];
 const scenes=new Map([['origin_academy_menma_prologue',{sceneId:'origin_academy_menma_prologue',beats:[{beatId:'menma'}],beatMap:new Map([['menma',{beatId:'menma'}]])}]]);
 const receipts=[];const completions=[];let active=null;
 const expectedSource={
