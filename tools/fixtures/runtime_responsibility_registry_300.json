@@ -99,7 +99,7 @@
         "runtime/alpha-kakashi-v2-core-36020.js"
       ],
       "stateReads": [
-        "playerData.storyDecisionRealisation"
+        "playerData.storyDecisionRealisation34000"
       ],
       "stateWrites": [
         "playerData.storyDecisionRealisation.intentCommits",
@@ -132,7 +132,7 @@
         "runtime/alpha-kakashi-v2-core-36020.js"
       ],
       "stateReads": [
-        "playerData.storyFactualResolver"
+        "playerData.storyFactualResolver34600"
       ],
       "stateWrites": [
         "playerData.storyFactualResolver.receipts"
