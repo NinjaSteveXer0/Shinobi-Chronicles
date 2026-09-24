@@ -29,7 +29,7 @@ assert(def,"Hinata scene missing");
 const beats=def.beats||[], byId=def.beatMap;
 const hinataSource=source.slice(source.indexOf("// Hinata"),source.indexOf("// Wasabi Izuno"));
 
-function labels(beatId){const b=byId.get(beatId);assert(b,`missing beat ${beatId}`);return (b.choices||[]).map(c=>c.label);}
+function labels(beatId){const b=byId.get(beatId);assert(b,`missing beat ${beatId}`);return Array.from(b.choices||[],c=>String(c.label));}
 function choice(beatId,choiceId){const b=byId.get(beatId);assert(b,`missing beat ${beatId}`);const c=(b.choices||[]).find(x=>x.choiceId===choiceId);assert(c,`missing choice ${beatId}/${choiceId}`);return c;}
 function tail(prefix){
   const rows=beats.filter(b=>b.beatId.startsWith(prefix+"_")).sort((a,b)=>Number(a.beatId.slice(prefix.length+1))-Number(b.beatId.slice(prefix.length+1)));
@@ -123,7 +123,7 @@ while(queue.length){
   const targets=[b.nextBeatId,...(b.choices||[]).map(c=>c.nextBeatId)].filter(Boolean);
   for(const t of targets)if(!reachable.has(t)){reachable.add(t);queue.push(t);}
 }
-assert.deepStrictEqual(beats.map(b=>b.beatId).filter(id=>!reachable.has(id)),[],"unreachable Hinata GOLDEN beats");
+assert.deepStrictEqual(Array.from(beats,b=>String(b.beatId)).filter(id=>!reachable.has(id)),[],"unreachable Hinata GOLDEN beats");
 
 // Stable consequence authority and exact facts.
 const evalReq=byId.get("hin_eval_wait_1").onEnterConsequences?.[0];
