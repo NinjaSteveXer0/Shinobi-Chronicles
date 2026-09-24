@@ -756,7 +756,7 @@ function diagnostics(){
     deterministicActorSlots:String(actorSlot).includes("academy_kakashi_origin_masked_interceptor")&&installStyle.toString().includes('data-slot="minato"'),
     policeHandoffCards:String(actorSlot).includes("kakashi_upf_")&&String(kakashiLocalStagePercent36030).includes("police_handoff")&&installStyle.toString().includes('data-count="6"'),
     hiddenReviewStage:String(kakashiLocalStagePercent36030).includes("hokage_test_review")&&String(readableActorState).includes('hokage_test_review')&&String(syncPackageToken).includes("presentationPackageHolder"),
-    sharedSemanticAnchors:String(syncActors).includes("applyStoryStageAnchor33900")&&String(actorAnchor).includes("PLAYER_LEFT")&&String(actorAnchor).includes("OPPONENT_RIGHT"),
+    sharedSemanticAnchors:String(applyKakashiStageAnchor36030).includes("applyStoryStageAnchor33900")&&String(syncActors).includes("applyKakashiStageAnchor36030")&&String(actorAnchor).includes("PLAYER_LEFT")&&String(actorAnchor).includes("OPPONENT_RIGHT"),
     packageTokenConsumesHolderTruth:String(syncPackageToken).includes("state.package")&&String(syncPackageToken).includes("packageHolder"),
     speakerFocusUsesCurrentCue:String(syncStandard).includes("speakerActorId"),
     stageWideAdvanceGuard:String(bind).includes('root.dataset.hasChoices==="true"')&&String(bind).includes("Date.now()-revealed<360"),
