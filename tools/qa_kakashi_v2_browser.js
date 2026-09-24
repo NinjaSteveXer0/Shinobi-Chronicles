@@ -1060,7 +1060,7 @@ async function browserRouteMatrix(browser){
     await advanceTo(page,"v2_get_closer_failure");
     await chooseLabel(page,"CHASE THE PACKAGE","v2_stay_package_pursuit_resolver");
     await advanceTo(page,"v2_stay_package_intercept");
-    await chooseLabel(page,"ASK WHERE THE PACKAGE WAS GOING");
+    await chooseLabel(page,"ASK WHERE IT WAS GOING");
     await chooseLabel(page,"TAKE HIM DOWN","v2_take_down_setup");
     await advanceTo(page,"v2_battle_take_down_amt");
     await launchAndReturnBattle(page,{outcome:"defeat",actions:4,expectedBeat:"v2_take_down_loss"});
@@ -1123,13 +1123,15 @@ async function browserRouteMatrix(browser){
     await seedResolver(page,"psPursuit","PS_PURSUIT_SUCCESS");
     await seedResolver(page,"secureAmtPursuit","SECURE_AMT_PURSUIT_SUCCESS");
     await chooseLabel(page,"WATCH THE HANDOFF","v2_watch_exchange");
-    await chooseLabel(page,"DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE","v2_assassin_then_package_setup");
+    await chooseLabel(page,"DEAL WITH HER FIRST","v2_assassin_then_package_setup");
     await advanceTo(page,"v2_battle_mi_package_second");
     await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_mi_package_second_win"});
-    await chooseLabel(page,"CHASE THE PACKAGE SMUGGLER","v2_package_second_ps_pursuit");
+    const miResolver=await inspect(page,"family04-fast-mi-resolver");
+    assert.strictEqual(miResolver.visibleNarrationSurfaces+miResolver.visibleSpeechSurfaces,1,"Family 04 fast MI result must remain Story, not a choice card");
+    await nextSemantic(page,"v2_package_second_ps_pursuit");
     await advanceTo(page,"v2_battle_ps_package_second");
     await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_ps_package_second_win"});
-    await chooseLabel(page,"STAY ON THE FIRST MAN","v2_package_second_amt_pursuit");
+    await chooseLabel(page,"CHASE THE MAN FROM THE PHOTO","v2_package_second_amt_pursuit");
     await advanceTo(page,"v2_battle_amt_package_second");
     await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_amt_package_second_win"});
     await chooseLabel(page,"BRING HIM TO ANBU","v2_amt_anbu_depart");
@@ -1145,10 +1147,10 @@ async function browserRouteMatrix(browser){
 
   await scenario("secure_package_return_report",async page=>{
     await chooseLabel(page,"WATCH THE HANDOFF","v2_watch_exchange");
-    await chooseLabel(page,"SECURE THE PACKAGE","v2_secure_package_setup");
+    await chooseLabel(page,"GO FOR THE PACKAGE","v2_secure_package_setup");
     await advanceTo(page,"v2_battle_ps_mi");
     await launchAndReturnBattle(page,{outcome:"victory",actions:5,expectedBeat:"v2_ps_mi_win"});
-    await chooseLabel(page,"RETURN AND REPORT","v2_report");
+    await chooseLabel(page,"RETURN TO ANBU","v2_report");
     const s=await stateSnapshot(page);
     assert.strictEqual(s.package.holder,"ANBU");
     assert.strictEqual(s.participants.PS.state,"BATTLE_DEFEATED");
