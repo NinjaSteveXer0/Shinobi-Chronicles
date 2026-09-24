@@ -87,7 +87,7 @@ Team size does **not** automatically create one ordinary turn per deployed parti
 
 A 6v6 is not a twelve-action initiative round.
 
-The Current Actor normally spends the side's action opportunity. Explicit Skills, reactions or assists may later create exceptional opportunities if Combat separately authorises them.
+The Active normally spends the side's action opportunity. Explicit Skills, reactions or assists may later create exceptional opportunities if Combat separately authorises them.
 
 For **Alpha**, selecting a Summon action does **not** create an additional participant turn or a second action opportunity. The selected Summon action consumes the player's normal side action opportunity, exactly like choosing another authorised Battle action.
 
@@ -154,9 +154,9 @@ Do not render meaningless empty slots.
 The Formation Stage adapts to actual participants:
 
 - 1v1: both participants receive strong confrontation prominence.
-- 1v2: one side faces one Current Actor with the second enemy clearly belonging to that formation.
+- 1v2: one side faces one Active with the second enemy clearly belonging to that formation.
 - 3v3: both formations fill naturally.
-- 6v6: full Current Actor + 3 Supports + 2 Reserves per side.
+- 6v6: full Active + 3 Benched + 2 Reserve per side.
 
 Canonical rule:
 
@@ -168,7 +168,7 @@ Existing Battle law remains:
 
 > **0 Battle PL = withdrawal, not factual injury or death.**
 
-When the Current Actor reaches 0 Battle PL:
+When the Active reaches 0 Battle PL:
 
 ~~~text
 Active withdraws
@@ -243,7 +243,7 @@ This distinction exists to avoid using “reserve” for both groups.
 
 ### Any-slot withdrawal
 
-A legal action may withdraw a participant who is not the Current Actor.
+A legal action may withdraw a participant who is not the Active.
 
 If a **Benched** participant reaches 0 Battle PL:
 
@@ -290,15 +290,47 @@ The important locked rule is:
 
 > **withdrawal is resolved from one committed action result, then the formation is normalized once.**
 
-### Replacement-selection rule remains OPEN
+### My Clan formation order -> Battle relay order — CLOSED
 
-This document does not yet lock whether the replacing Support is:
+Battle does **not** invent a second team-order system and does **not** ask the player to choose an ordinary replacement Active during Battle.
 
-- selected by the player;
-- selected by authored formation order;
-- selected by Combat AI/rules in particular contexts.
+The existing My Clan formation authority already defines the committed six-position order:
 
-Combat must close that before implementation.
+~~~text
+START -> NEXT 1 -> NEXT 2 -> NEXT 3 -> RESERVE 1 -> RESERVE 2
+~~~
+
+Battle consumes that saved order as:
+
+~~~text
+START      = initial Active
+NEXT 1     = first Benched priority
+NEXT 2     = second Benched priority
+NEXT 3     = third Benched priority
+RESERVE 1  = first Reserve priority
+RESERVE 2  = second Reserve priority
+~~~
+
+Related authority:
+
+`Documentation/UI/My Clan Adaptive Presentation Contract.md`
+
+My Clan remains the normal player-facing place where the player assigns and reorders the team, then commits it through **SAVE FORMATION**. Battle consumes that committed formation rather than creating a second Battle-only ordering surface.
+
+Locked relay rule:
+
+- if the Active withdraws, the highest-priority eligible surviving Benched participant according to the committed My Clan order becomes the new Active;
+- if a Benched participant withdraws while the Active remains healthy, an available Reserve may fill that visual Benched vacancy, but that refill does **not** rewrite the participant's original My Clan priority;
+- if no original Benched participant survives and Reserve participants must become the deployed formation, the highest-priority surviving Reserve according to My Clan order becomes Active and the next eligible survivor becomes Benched;
+- one multi-withdrawal result still normalizes the surviving formation once;
+- Battle presentation may move portraits between visual slots, but visual slot movement does not mutate the committed team-order priority;
+- any future Skill or authored Combat mechanic that explicitly rotates/reorders participants must be separately authorised by Combat and must not be confused with ordinary replacement order.
+
+Canonical rule:
+
+> **MY CLAN SETS THE TEAM ORDER. BATTLE CONSUMES IT.**
+
+This preserves the player's tactical team-order decision before Battle without interrupting ordinary Battle flow with replacement-selection prompts.
 
 ## 9. Formation is not hidden range
 
@@ -314,13 +346,13 @@ Combat remains semantic authority.
 
 The formation supports legitimate mechanics that target a non-Current participant.
 
-Approved example: **Sicklewind Route**, which can attack an enemy not occupying the Current Actor slot once per Battle, subject to its authoritative legality.
+Approved example: **Sicklewind Route**, which can attack an enemy not occupying the Active slot once per Battle, subject to its authoritative legality.
 
 Presentation intent:
 
 ~~~text
-AMT = Current Actor
-PS = Deployed Support
+AMT = Active
+PS = Benched
 
 Kakashi selects Sicklewind Route
 -> legal off-slot target highlights
@@ -328,7 +360,7 @@ Kakashi selects Sicklewind Route
 -> action resolves against PS
 -> PS reacts
 -> PS returns to support position
--> AMT remains Current Actor
+-> AMT remains Active
 ~~~
 
 Presentation never creates target legality.
@@ -503,7 +535,7 @@ Therefore Alpha standard Battle does **not** create from Summon use:
 
 - a seventh Character/team slot;
 - a Summon Formation slot;
-- a second Current Actor;
+- a second Active;
 - a second independent side turn;
 - a separately targetable Summon portrait;
 - an additional battlefield participant merely because a Summon action was selected.
@@ -534,7 +566,7 @@ Combat determines legal actions
 -> remote human chooses one
 ~~~
 
-Shared authoritative state should eventually cover turn/action-opportunity ID, side authority, Current Actor, legal action, legal target, committed result, PL/state mutation, withdrawal, promotion and sequence order.
+Shared authoritative state should eventually cover turn/action-opportunity ID, side authority, Active participant, legal action, legal target, committed result, PL/state mutation, withdrawal, promotion and sequence order.
 
 Client presentation must not author damage/result.
 
@@ -604,13 +636,12 @@ The following concept is now locked:
 17. A withdrawn Benched participant is refilled by an available Reserve without rotating the healthy Active.
 18. If only Reserves survive after Active + Benched-line withdrawal, the surviving Reserves become the new deployed formation.
 19. Alpha Summons are action selections from the SUMMONS dock, not battlefield participant cards, extra team slots or independent turns.
+20. Ordinary Battle starting positions and relay priority inherit the committed My Clan formation order: START -> NEXT 1 -> NEXT 2 -> NEXT 3 -> RESERVE 1 -> RESERVE 2.
 
 ## 22. What remains OPEN
 
 Do not silently decide these without owner closure:
 
-- exact next-Benched promotion order when more than one eligible Benched participant survives;
-- reserve ordering;
 - exact formation coordinates/scales;
 - exact animation timing;
 - generic enemy AI strategy;
@@ -630,4 +661,4 @@ If Kakashi is rewritten, shared Battle implementation should wait until that rew
 
 ## 24. Final lock
 
-> **Shinobi Chronicles Battle is intended to become alternating side-turn combat presented through an adaptive six-shinobi Squad Wedge: one Active, three Benched and two Reserve Battle portraits per full team. The Active participant spends the normal side action opportunity; team size does not create six independent normal turns. When the Active reaches withdrawal, the outgoing portrait completes its knock-off/withdrawal animation first; only then does an eligible Benched portrait slide into the Active confrontation position while scaling from roughly 65–75% to 100%, with an available Reserve refilling the vacated Benched slot. Multi-participant withdrawals resolve from one committed action result and the surviving formation is normalized once. For Alpha, SUMMONS supplies authorised Summon actions only; Summons do not enter the Squad Wedge as participant portraits or receive independent turns. Combat owns all factual turn/action/target/result/withdrawal legality; battle.presentation.shared makes those committed facts kinetic and readable. The concept is locked now, but implementation is explicitly on hold until Stephen completes the Academy Kakashi Browser Golden decision.**
+> **Shinobi Chronicles Battle is intended to become alternating side-turn combat presented through an adaptive six-shinobi Squad Wedge: one Active, three Benched and two Reserve Battle portraits per full team. The Active participant spends the normal side action opportunity; team size does not create six independent normal turns. The committed My Clan formation order determines the initial Active, Benched order, Reserve order and ordinary relay priority; Battle does not create a second replacement-choice system. When the Active reaches withdrawal, the outgoing portrait completes its knock-off/withdrawal animation first; only then does an eligible Benched portrait slide into the Active confrontation position while scaling from roughly 65–75% to 100%, with an available Reserve refilling the vacated Benched slot. Multi-participant withdrawals resolve from one committed action result and the surviving formation is normalized once. For Alpha, SUMMONS supplies authorised Summon actions only; Summons do not enter the Squad Wedge as participant portraits or receive independent turns. Combat owns all factual turn/action/target/result/withdrawal legality; battle.presentation.shared makes those committed facts kinetic and readable. The concept is locked now, but implementation is explicitly on hold until Stephen completes the Academy Kakashi Browser Golden decision.**
