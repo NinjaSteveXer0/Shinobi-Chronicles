@@ -173,6 +173,7 @@ const battleCtx={
   makeEnemyFixedDamageAction:(id,pl,opts={})=>({id,skillId:id,actionClass:"enemy_authored_action",traits:opts.traits||[],authoredAttackPL:pl,evaluateAvailability:()=>({available:true}),resolve:()=>({resolved:true})}),
   makeEnemyRatioGuardAction:(id,ratio,opts={})=>{ratioCalls.push({id,ratio,opts});return{id,skillId:id,actionClass:"enemy_ratio_guard",traits:opts.traits||[],evaluateAvailability:()=>({available:true}),resolve:()=>({resolved:true})};},
   chooseEnemyAuthoredBattleAction:()=>({success:false,reason:"qa_generic"}),
+  generateBattleRewards:()=>({generated:true,claimed:false,ryo:88,exp:77,items:[{id:"bad"}],rareDrops:[{id:"bad_rare"}]}),
   evaluateEnemyActionScheduler:()=>({ready:true,enemyId:"wasabi_origin_rogue_genin_01",eligibleActions:[]}),
   findBattleTransientState:()=>null,removeBattleTransientState:()=>true,
   getBattleActionOpportunityIndex:()=>0,
@@ -224,6 +225,12 @@ assert.deepStrictEqual(battleCtx.currentBattle.deployment.player.slots.map(x=>x.
 assert.deepStrictEqual(battleCtx.currentBattle.deployment.enemy.slots.map(x=>x.participantId),["wasabi_origin_rogue_genin_01"]);
 assert.strictEqual(battleCtx.currentBattle.rewards.ryo,0);assert.strictEqual(battleCtx.currentBattle.rewards.exp,0);
 assert.deepStrictEqual(battleCtx.currentBattle.rewards.items,[]);assert.deepStrictEqual(battleCtx.currentBattle.rewards.rareDrops,[]);
+assert.strictEqual(battleCtx.currentBattle.rewards.requiresExplicitPostClaimContinue,true);
+const generatedZero=battleCtx.generateBattleRewards({rewards:{ryo:{min:99,max:99}}},{id:"academy_izuno"});
+assert.strictEqual(generatedZero.ryo,0);assert.strictEqual(generatedZero.exp,0);
+assert.deepStrictEqual(generatedZero.items,[]);assert.deepStrictEqual(generatedZero.rareDrops,[]);
+assert.strictEqual(generatedZero.requiresExplicitPostClaimContinue,true);
+assert.strictEqual(generatedZero.wasabi343ZeroEntitlement,true);
 assert.strictEqual(evidenceRows.length,1);
 const replay=battleCtx.launchAcademyWasabiRogueGeninBattle343(launchSpec);
 assert.strictEqual(replay.success,true);assert.strictEqual(replay.idempotent,true);assert.strictEqual(evidenceRows.length,1,"Battle launch replay duplicated evidence");
