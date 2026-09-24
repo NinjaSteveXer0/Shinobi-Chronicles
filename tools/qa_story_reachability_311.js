@@ -10,7 +10,7 @@ const {analyzeStoryScene}=require("./story_graph_integrity_311.js");
 const ROOT=path.resolve(__dirname,"..");
 
 function loadRegularOriginScenes(){
-  const files=["core","a","b","c","integrator"].map(n=>path.join(ROOT,"runtime","alpha-origin-scenes-32900-"+n+".js"));
+  const files=[path.join(ROOT,"runtime","academy-wasabi-writing-golden-34300.js"),...["core","a","b","c","integrator"].map(n=>path.join(ROOT,"runtime","alpha-origin-scenes-32900-"+n+".js"))];
   const scenes=new Map([
     ["origin_academy_menma_prologue",{
       sceneId:"origin_academy_menma_prologue",
@@ -37,7 +37,10 @@ function loadRegularOriginScenes(){
     beginAlphaChronicleOriginPrologue:()=>({success:false,reason:"qa"}),
     completeChronicleOriginPrologue:()=>({success:true}),
     consumeStaticOriginSourceOccurrence:()=>({success:true}),
-    startStoryScene:()=>({success:true})
+    startStoryScene:()=>({success:true}),
+    SC_ACADEMY_WASABI_BATTLE_34300:{patchId:"qa"},
+    launchAcademyWasabiRogueGeninBattle34300:()=>({success:true}),
+    projectAcademyWasabiRogueGeninBattleResult34300:()=>({battleResult:"victory",battleOccurrenceId:"qa"})
   };
   ctx.globalThis=ctx;
   vm.createContext(ctx);
@@ -91,7 +94,7 @@ function loadKakashiV2Scene(){
   };
   ctx.globalThis=ctx;
   vm.createContext(ctx);
-  for(const rel of ["runtime/academy-kakashi-v2-content-36000.js","runtime/academy-kakashi-v2-writing-golden-36100.js","runtime/alpha-kakashi-v2-core-36020.js"]){
+  for(const rel of ["runtime/academy-kakashi-v2-content-36000.js","runtime/alpha-kakashi-v2-core-36020.js"]){
     const file=path.join(ROOT,rel);
     vm.runInContext(fs.readFileSync(file,"utf8"),ctx,{filename:file});
   }
