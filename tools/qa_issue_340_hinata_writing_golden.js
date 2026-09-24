@@ -4,8 +4,10 @@
 const fs=require("fs"),vm=require("vm"),assert=require("assert");
 
 const RUNTIME="runtime/alpha-origin-scenes-32900-a.js";
+const WASABI_CATALOGUE="runtime/academy-wasabi-writing-golden-343.js";
 const DOC="Documentation/Story/Academy_Hinata_Origin_WRITING_GOLDEN_2026-09-24.md";
 const source=fs.readFileSync(RUNTIME,"utf8");
+const wasabiCatalogue=fs.readFileSync(WASABI_CATALOGUE,"utf8");
 const doc=fs.readFileSync(DOC,"utf8");
 
 const scenes=new Map();
@@ -22,6 +24,10 @@ const A={
 const context={console,JSON,Object,Array,String,Number,Boolean,Set,Map,Math,Date,globalThis:null,SC_ALPHA_ORIGIN_32900:A};
 context.globalThis=context;
 vm.createContext(context);
+// 32900-a now has a production load-order dependency on the closed #343
+// Wasabi Writing-Golden catalogue. Mirror index.html rather than weakening
+// the runtime's fail-closed catalogue requirement in this isolated Hinata QA.
+vm.runInContext(wasabiCatalogue,context,{filename:WASABI_CATALOGUE});
 vm.runInContext(source,context,{filename:RUNTIME});
 
 const def=scenes.get("origin_academy_hinata_prologue");
