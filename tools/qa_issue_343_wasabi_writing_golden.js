@@ -170,6 +170,7 @@ const battleCtx={
     battleCtx.__transient=state;return{resolved:true,stateRefs:[state.stateId],ratio};
   }}),
   chooseEnemyAuthoredBattleAction:()=>({success:false,reason:"qa_prior"}),
+  evaluateEnemyActionScheduler:()=>({ready:true,enemyId:"wasabi_origin_rogue_genin_01",eligibleActions:[]}),
   findBattleTransientState:query=>battleCtx.__transient&&battleCtx.__transient.stateKey===query.stateKey?battleCtx.__transient:null,
   removeBattleTransientState:id=>{if(battleCtx.__transient&&battleCtx.__transient.stateId===id)battleCtx.__transient=null;return true;},
   launchBattleWithReturnContext:(enemyId,encounterId,returnContext)=>{
@@ -209,6 +210,22 @@ assert.strictEqual(spread.mechanicalPacketCount,1);
 assert.strictEqual(sub.guard.preventionRatio,0.40);
 assert.strictEqual(sub.guard.beforeStamina,true);
 assert(sub.traits.includes("once_per_battle")&&sub.traits.includes("no_auto_miss")&&sub.traits.includes("no_counter"));
+
+assert.strictEqual(bdiag.checks.semanticEligibilityBeforeRandom,true,"Wasabi AI stopped consuming shared scheduler eligibility");
+assert(!battleSource.includes("Basic Attack"),"Wasabi adapter invented a Basic Attack fallback");
+battleCtx.currentBattle={wasabiOrigin34300:{historicalParticipantRef:"wasabi_origin_rogue_genin_01",feintReady:false},battleOver:false};
+const schedulerPick=battleCtx.chooseEnemyAuthoredBattleAction({
+  ready:true,
+  enemyId:"wasabi_origin_rogue_genin_01",
+  eligibleActions:[kunai,spread]
+});
+assert.strictEqual(schedulerPick.success,true);
+assert(["enemy_rogue_genin_kunai_rush","enemy_rogue_genin_shuriken_spread"].includes(schedulerPick.action.id));
+assert.deepStrictEqual(Array.from(schedulerPick.eligibleActionIds),["enemy_rogue_genin_kunai_rush","enemy_rogue_genin_shuriken_spread"]);
+assert.strictEqual(schedulerPick.sharedSchedulerEligibility,true);
+assert.strictEqual(schedulerPick.equalSelectionWeight,true);
+assert(!schedulerPick.eligibleActionIds.includes("enemy_rogue_genin_substitution_feint"),"scheduler adapter reintroduced an ineligible Feint");
+battleCtx.currentBattle=null;
 
 const launch=battleCtx.launchAcademyWasabiRogueGeninBattle34300({
   battleConfigId:"academy_izuno_origin_rogue_genin_step_in_battle",
@@ -258,6 +275,9 @@ assert.strictEqual(bdiag.config.rewards.exp,0);
 assert.deepStrictEqual(Array.from(bdiag.config.rewards.items),[]);
 assert.strictEqual(profile.provenance.oppositionTemplateId,"rogue_genin");
 assert.strictEqual(profile.provenance.historicalParticipantRef,"wasabi_origin_rogue_genin_01");
+
+assert(!battleSource.includes("invokeBattleWithdrawAction"),"Wasabi adapter must not create a bespoke WITHDRAW path");
+assert(!battleSource.match(/injur|morality|custody/i),"Wasabi Battle adapter leaked Story consequence semantics");
 
 console.log(JSON.stringify({
   pass:true,
