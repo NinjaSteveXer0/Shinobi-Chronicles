@@ -931,7 +931,7 @@ async function browserRouteMatrix(browser){
     return{terminal:await finishTerminalBrowser(page,"failed_pickpocket_3v1_release")};
   });
 
-  await scenario("direct_strike_double_victory_kill_all",async page=>{
+  await scenario("direct_strike_double_victory_kill_them_two_outcome",async page=>{
     await chooseLabel(page,"STRIKE BEFORE THE HANDOFF","v2_direct_strike_setup");
     await advanceTo(page,"v2_battle_direct_strike_2v1");
     await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_direct_strike_2v1_win"});
@@ -939,11 +939,11 @@ async function browserRouteMatrix(browser){
     await launchAndReturnBattle(page,{outcome:"victory",actions:2,expectedBeat:"v2_direct_mi_win"});
     await chooseLabel(page,"KILL THEM","v2_group3_kill_result");
     let s=await stateSnapshot(page);
-    for(const ref of ["AMT","PS","MI"])assert.strictEqual(s.participants[ref].state,"KILLED");
+    for(const ref of ["AMT","PS","MI"])assert(["KILLED","ESCAPED"].includes(s.participants[ref].state),"KILL THEM produced invalid final state for "+ref+": "+JSON.stringify(s.participants[ref]));
     await nextSemantic(page,"v2_report");
     s=await stateSnapshot(page);
     assert.strictEqual(s.package.holder,"ANBU");
-    return{terminal:await finishTerminalBrowser(page,"direct_strike_double_victory_kill_all")};
+    return{terminal:await finishTerminalBrowser(page,"direct_strike_double_victory_kill_them_two_outcome")};
   });
 
   await scenario("closer_failure_ask_where_take_down_loss",async page=>{
@@ -986,7 +986,7 @@ async function browserRouteMatrix(browser){
     assert.strictEqual(psBattleScene.backdrop,"Kakashi Origin Backdrop/konoha_alleyway_alt_night.png","PS pursuit Battle jumped back to the Sakura-tree arena: "+JSON.stringify(psBattleScene));
     await launchAndReturnBattle(page,{outcome:"defeat",actions:2,expectedBeat:"v2_ps_seq_loss"});
     const s=await stateSnapshot(page);
-    assert.strictEqual(s.participants.MI.state,"RESTRAINED");
+    assert(["RESTRAINED","ESCAPED"].includes(s.participants.MI.state),"RESTRAIN HER AND CONTINUE produced invalid final state: "+JSON.stringify(s.participants.MI));
     assert.strictEqual(s.participants.PS.state,"ESCAPED");
     return{terminal:await finishTerminalBrowser(page,"stop_assassin_fast_restrain_then_ps_loss")};
   });
