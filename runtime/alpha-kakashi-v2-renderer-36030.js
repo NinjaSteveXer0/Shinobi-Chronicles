@@ -8,7 +8,7 @@
 "use strict";
 if(globalThis.SC_ACADEMY_KAKASHI_V2_RENDERER_36030)return;
 
-const PATCH_ID="academy_kakashi_v2_renderer_36030_2026_09_22";
+const PATCH_ID="academy_kakashi_v2_renderer_36030_2026_09_25_anbu_handoff_golden";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const STYLE_ID="kakashi-v2-renderer-36030-style";
 const ROOT_ID="kakashi-v2-scene-board";
