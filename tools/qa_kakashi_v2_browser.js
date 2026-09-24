@@ -287,11 +287,15 @@ async function advanceTo(page,target,{max=18}={}){
       const beat=globalThis.getCurrentStorySceneBeat&&globalThis.getCurrentStorySceneBeat();
       if(!beat)return null;
       const available=(beat.choices||[]).filter(c=>typeof c.availability!=="function"||c.availability().available===true).map(c=>({choiceId:c.choiceId,label:c.label}));
-      return{beatId:beat.beatId,mode:beat.mode||null,available,nextBeatId:beat.nextBeatId||null};
+      return{beatId:beat.beatId,mode:beat.mode||null,machineResolved:beat.machineResolved===true,available,nextBeatId:beat.nextBeatId||null,
+        visibleChoiceButtons:[...document.querySelectorAll("#kakashi-v2-scene-board [data-kv2-choice]")].filter(n=>n.getClientRects().length>0).map(n=>n.textContent.trim())};
     });
     assert(meta,"story beat metadata missing while advancing to "+target);
     if(meta.mode==="battle_transition")throw new Error(`unexpected Battle ${meta.beatId} while advancing to ${target}`);
-    if(meta.mode==="choice"){
+    if(meta.machineResolved===true){
+      assert.strictEqual(meta.visibleChoiceButtons.length,0,`resolver pseudo-choice leaked at ${meta.beatId}: ${JSON.stringify(meta.visibleChoiceButtons)}`);
+      await nextSemantic(page);
+    }else if(meta.mode==="choice"){
       assert.strictEqual(meta.available.length,1,`ambiguous choice at ${meta.beatId} while advancing to ${target}: ${JSON.stringify(meta.available)}`);
       assert.strictEqual(meta.available[0].label,"CONTINUE",`non-CONTINUE choice requires explicit route decision at ${meta.beatId}`);
       await chooseLabel(page,"CONTINUE");
@@ -696,8 +700,7 @@ async function cleanRoute(browser){
   });
   await drain(page);
   await go(page,"v2_direct_pickpocket_resolver","slip_for_package");
-  await drain(page);
-  await go(page,"v2_pickpocket_clean_success","direct_pick_success");
+  await advanceTo(page,"v2_pickpocket_clean_success");
   checkpoints.push(await inspect(page,"clean_pickpocket"));
   await shot(page,"04-clean-pickpocket.png");
 
