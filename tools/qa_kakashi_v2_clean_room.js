@@ -38,7 +38,7 @@ assert(rendererSource.includes("Final Kakashi Browser-Golden motion benchmark")&
 assert(rendererSource.includes("playStoryChoreography33900({root,scopeKey,cues})")&&rendererSource.includes("hard_transition_owned_by_33900"),"#312 Kakashi must consume shared choreography without competing with the shared hard-transition owner");
 {
   const actorMarkupStart=rendererSource.indexOf("function actorMarkup(");
-  const actorMarkupEnd=rendererSource.indexOf("function availableChoices(",actorMarkupStart);
+  const actorMarkupEnd=rendererSource.indexOf("function ensureRoot(",actorMarkupStart);
   const actorMarkupSource=rendererSource.slice(actorMarkupStart,actorMarkupEnd);
   assert(rendererSource.includes(".kv2-card-frame{display:none!important}")&&actorMarkupStart>=0&&actorMarkupEnd>actorMarkupStart&&!actorMarkupSource.includes('frame.className="kv2-card-frame"')&&actorMarkupSource.includes("figure.append(img,label)"),"Kakashi phantom Story card-holder chrome was not retired");
 }
