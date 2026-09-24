@@ -94,9 +94,12 @@ function semanticAdvance(choiceId=null){
   playPostCommitTransition(previous,next);
   return result;
 }
+function isMachineResolvedBeat36040(beat){
+  return !!beat&&(beat.machineResolved===true||!!(beat.uiHints&&beat.uiHints.kakashiMachineResolved===true));
+}
 function committedResolverChoice36040(){
   const beat=typeof getCurrentStorySceneBeat==="function"?getCurrentStorySceneBeat():null;
-  if(!beat||beat.machineResolved!==true)return null;
+  if(!isMachineResolvedBeat36040(beat))return null;
   const choices=Array.isArray(beat.choices)?beat.choices:[];
   const available=choices.filter(choice=>{
     try{
@@ -171,6 +174,7 @@ function diagnostics(){
     noLethalAnimationDelay:String(playPostCommitTransition).includes("lethalDelayMs:0"),
     cuePresentationDoesNotCommitTruth:String(advance).includes("playAcademyKakashiV2CuePresentation36030")&&String(advance).includes("semanticBeatUnchanged:true"),
     machineResolverCommitsWithoutChoiceCard:String(advance).includes("committedResolverChoice36040")&&String(committedResolverChoice36040).includes("available.length!==1")&&String(semanticAdvance).includes("PRE_ADVANCE"),
+    machineResolverFlagSurvivesStoryNormalization:String(isMachineResolvedBeat36040).includes("uiHints.kakashiMachineResolved"),
     noActorDomAnimationOwnership:!String(semanticAdvance).includes("querySelector")&&!String(advance).includes("clone"+"Node"),
     noStoryTruthMutation:!String(advance).includes("participants.")&&!String(semanticAdvance).includes("package."),
     browserGoldenClaimed:false
