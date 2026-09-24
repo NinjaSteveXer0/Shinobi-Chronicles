@@ -49,7 +49,7 @@ function installStyle(){
 #${ROOT_ID} .kv2-objective{justify-self:end;box-sizing:border-box;width:min(100%,390px);padding:8px 11px;border:1px solid rgba(75,209,220,.46);background:rgba(2,12,16,.82);box-shadow:0 10px 30px rgba(0,0,0,.32);font-size:clamp(9px,.68vw,12px);line-height:1.35;color:#e9eeeb}
 #${ROOT_ID} .kv2-objective b{display:block;margin-bottom:3px;color:#67dce5;font-size:7px;letter-spacing:.14em}
 #${ROOT_ID} .kv2-actors{position:absolute;left:3.5%;right:3.5%;top:13.2%;bottom:29%;z-index:4;pointer-events:none}
-#${ROOT_ID} .kv2-actor{position:absolute;left:var(--sc-stage-anchor-x,var(--kv2-x,5%));bottom:var(--kv2-y,0);width:var(--kv2-w,min(20vw,220px));height:var(--kv2-h,min(52vh,380px));max-height:100%;display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.96) brightness(.96) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:none!important;transition:none!important;will-change:auto!important}\n#${ROOT_ID} .kv2-actors[data-count="1"] .kv2-actor{--kv2-w:min(29vw,330px);--kv2-h:min(62vh,465px)}\n#${ROOT_ID} .kv2-actors[data-count="2"] .kv2-actor{--kv2-w:min(25vw,292px);--kv2-h:min(59vh,435px)}\n#${ROOT_ID} .kv2-actors[data-count="3"] .kv2-actor{--kv2-w:min(21vw,235px);--kv2-h:min(53vh,390px)}\n#${ROOT_ID} .kv2-actors[data-count="4"] .kv2-actor,#${ROOT_ID} .kv2-actors[data-count="5"] .kv2-actor{--kv2-w:min(18vw,195px);--kv2-h:min(48vh,350px)}\n#${ROOT_ID} .kv2-actor.is-focus{opacity:1;filter:saturate(1.05) brightness(1.08) drop-shadow(0 22px 30px rgba(0,0,0,.55));z-index:4}
+#${ROOT_ID} .kv2-actor{position:absolute;left:var(--sc-stage-anchor-x,var(--kv2-x,5%));bottom:var(--kv2-y,0);width:var(--kv2-w,min(20vw,220px));height:var(--kv2-h,min(52vh,380px));max-height:100%;display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.96) brightness(.96) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:none!important;transition:none!important;will-change:auto!important}\n#${ROOT_ID} .kv2-actors[data-count="1"] .kv2-actor{--kv2-w:min(29vw,330px);--kv2-h:min(62vh,465px)}\n#${ROOT_ID} .kv2-actors[data-count="2"] .kv2-actor{--kv2-w:min(25vw,292px);--kv2-h:min(59vh,435px)}\n#${ROOT_ID} .kv2-actors[data-count="3"] .kv2-actor{--kv2-w:min(21vw,235px);--kv2-h:min(53vh,390px)}\n#${ROOT_ID} .kv2-actors[data-count="4"] .kv2-actor,#${ROOT_ID} .kv2-actors[data-count="5"] .kv2-actor{--kv2-w:min(18vw,195px);--kv2-h:min(48vh,350px)}\n#${ROOT_ID} .kv2-actors[data-count="6"] .kv2-actor{--kv2-w:min(14vw,152px);--kv2-h:min(43vh,315px)}\n#${ROOT_ID} .kv2-actor.is-focus{opacity:1;filter:saturate(1.05) brightness(1.08) drop-shadow(0 22px 30px rgba(0,0,0,.55));z-index:4}
 #${ROOT_ID} .kv2-actor[data-slot="kakashi"]{--kv2-x:4%;--kv2-w:min(20vw,220px)}
 #${ROOT_ID} .kv2-actor[data-slot="mi"]{--kv2-x:29%;--kv2-w:min(19vw,210px)}
 #${ROOT_ID} .kv2-actor[data-slot="ps"]{--kv2-x:52%;--kv2-w:min(19vw,210px)}
@@ -72,6 +72,10 @@ function installStyle(){
 #${ROOT_ID}[data-preset="anbu_report"] .kv2-actor[data-slot="kakashi"]{--kv2-x:71%;--kv2-y:0}
 #${ROOT_ID}[data-preset="hokage_report"] .kv2-actor[data-slot="anbu"]{--kv2-x:13%;--kv2-y:0}
 #${ROOT_ID}[data-preset="hokage_report"] .kv2-actor[data-slot="minato"]{--kv2-x:67%;--kv2-y:12%}
+#${ROOT_ID}[data-preset="police_handoff"] .kv2-actor{--kv2-w:min(14vw,154px);--kv2-h:min(43vh,315px)}
+#${ROOT_ID}[data-preset="police_handoff"] .kv2-actor[data-slot="police_left"],#${ROOT_ID}[data-preset="police_handoff"] .kv2-actor[data-slot="police_right"]{--kv2-y:2%}
+#${ROOT_ID}[data-preset="hokage_test_review"] .kv2-actor{--kv2-w:min(17vw,186px);--kv2-h:min(48vh,350px)}
+#${ROOT_ID}[data-preset="hokage_test_review"] .kv2-actor[data-slot="minato"]{--kv2-y:11%;--kv2-w:min(20vw,220px);--kv2-h:min(54vh,395px)}
 #${ROOT_ID} .kv2-actor img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}
 /* Final Kakashi Browser-Golden motion benchmark:
    shared choreography still owns sequencing/timing, while this renderer uses
@@ -146,10 +150,13 @@ function installStyle(){
 `;
   document.head.appendChild(s);
 }
+function isMachineResolvedBeat36030(beat){
+  return !!beat&&(beat.machineResolved===true||!!(beat.uiHints&&beat.uiHints.kakashiMachineResolved===true));
+}
 function availableChoices(){
   try{
     const beat=typeof getCurrentStorySceneBeat==="function"?getCurrentStorySceneBeat():null;
-    if(!beat||!Array.isArray(beat.choices))return[];
+    if(!beat||isMachineResolvedBeat36030(beat)||!Array.isArray(beat.choices))return[];
     return beat.choices.map(choice=>{
       const availability=typeof evaluateStorySceneChoiceAvailability==="function"?evaluateStorySceneChoiceAvailability(choice):{available:true};
       return{choiceId:choice.choiceId,label:choice.label,available:availability.available===true,knownBlocker:availability.knownBlocker||null};
@@ -165,6 +172,7 @@ function actorSlot(actor){
   if(id==="pakkun_origin_unfamiliar_ninken")return"pakkun";
   if(id==="konoha_anbu_operational_contact")return"anbu";
   if(id==="kage_minato")return"minato";
+  if(/^kakashi_upf_/.test(id))return /_male$/.test(id)?"police_left":"police_right";
   return"unknown";
 }
 function actorMarkup(actor){
@@ -232,6 +240,30 @@ function actorAnchor(actor,p=null){
   if(slot==="pakkun")return"CENTER";
   return"CENTER";
 }
+function kakashiLocalStagePercent36030(actor,p=null){
+  const slot=actorSlot(actor),preset=String(p&&p.preset||"standard");
+  if(preset==="police_handoff"){
+    const map={kakashi:2,amt:18,ps:34,mi:50,police_left:68,police_right:84,pakkun:46};
+    return Object.prototype.hasOwnProperty.call(map,slot)?map[slot]:null;
+  }
+  if(preset==="hokage_test_review"){
+    const map={anbu:4,mi:22,minato:43,amt:63,ps:80};
+    return Object.prototype.hasOwnProperty.call(map,slot)?map[slot]:null;
+  }
+  return null;
+}
+function applyKakashiStageAnchor36030(node,actor,p){
+  const canonical=actorAnchor(actor,p);
+  if(typeof applyStoryStageAnchor33900==="function")applyStoryStageAnchor33900(node,canonical);
+  const local=kakashiLocalStagePercent36030(actor,p);
+  if(local!==null&&node&&node.style){
+    node.style.setProperty("--sc-stage-anchor-x",local+"%");
+    node.dataset.kv2LocalStage="true";
+  }else if(node){
+    delete node.dataset.kv2LocalStage;
+  }
+  return canonical;
+}
 function participantStateForActor(p,actor){
   const s=p&&p.state||{},slot=actorSlot(actor);
   if(slot==="mi")return s.participants&&s.participants.MI&&s.participants.MI.state||null;
@@ -241,6 +273,7 @@ function participantStateForActor(p,actor){
   return null;
 }
 function readableActorState(p,actor){
+  if(String(p&&p.preset||"")==="hokage_test_review")return null;
   const raw=participantStateForActor(p,actor);
   const slot=actorSlot(actor),holder=p&&p.state&&p.state.package&&p.state.package.holder||null;
   const key=slot==="mi"?"MI":slot==="ps"?"PS":slot==="amt"?"AMT":slot==="kakashi"?"KAKASHI":slot==="anbu"?"ANBU":null;
@@ -252,6 +285,7 @@ function speakerActorId(p,cue){
   const name=String(cue&&cue.speakerName||"").toUpperCase();
   if(!name)return null;
   const aliases=[
+    [/UCHIHA POLICE OFFICER|POLICE OFFICER/,"police_left"],
     [/KAKASHI/,"kakashi"],[/MASKED INTERCEPTOR|INTERCEPTOR/,"mi"],[/PACKAGE SMUGGLER|SMUGGLER/,"ps"],
     [/ANBU MARKED TARGET|MARKED TARGET/,"amt"],[/PAKKUN/,"pakkun"],[/MINATO|HOKAGE/,"minato"],[/ANBU/,"anbu"]
   ];
@@ -260,7 +294,7 @@ function speakerActorId(p,cue){
   return actor&&actor.id||null;
 }
 function holderSlot(holder){
-  return holder==="AMT"?"amt":holder==="PS"?"ps":holder==="MI"?"mi":holder==="KAKASHI"?"kakashi":holder==="ANBU"?"anbu":null;
+  return holder==="AMT"?"amt":holder==="PS"?"ps":holder==="MI"?"mi":holder==="KAKASHI"?"kakashi":holder==="ANBU"?"anbu":holder==="MINATO"?"minato":null;
 }
 function holderActor(p,holder){
   const slot=holderSlot(holder);
@@ -377,13 +411,14 @@ function cancelPreparedVisualSnapshot(reason="cancelled"){
 }
 function syncPackageToken(root,p){
   const token=root.querySelector('[data-story-object-id="PACKAGE"]');if(!token)return;
-  const holder=p&&p.state&&p.state.package&&p.state.package.holder||null;
+  const holder=p&&p.presentationPackageHolder||p&&p.state&&p.state.package&&p.state.package.holder||null;
   const actor=holderActor(p,holder);
-  if(!holder||!actor){token.hidden=true;return;}
+  if(!holder||!actor){token.hidden=true;delete token.dataset.packageHolder;return;}
   token.hidden=false;token.dataset.packageHolder=String(holder);
-  const finalAnchor=actorAnchor(actor,p);
+  const finalAnchor=actorAnchor(actor,p),local=kakashiLocalStagePercent36030(actor,p);
   if(typeof applyStoryStageAnchor33900==="function")applyStoryStageAnchor33900(token,finalAnchor);
   else token.style.setProperty("--sc-stage-anchor-x","50%");
+  if(local!==null)token.style.setProperty("--sc-stage-anchor-x",local+"%");
   token.dataset.packageAnchor=finalAnchor;
 }
 function deriveProjectionChoreography(root,previous,next,p,departures=[]){
@@ -462,7 +497,7 @@ function syncActors(root,actors,p){
     const stateText=readableActorState(p,actor);
     if(stateNode){stateNode.hidden=!stateText;if(stateNode.textContent!==String(stateText||""))stateNode.textContent=String(stateText||"");}
     const slot=actorSlot(actor);if(node.dataset.slot!==slot)node.dataset.slot=slot;
-    if(typeof applyStoryStageAnchor33900==="function")applyStoryStageAnchor33900(node,actorAnchor(actor,p));
+    applyKakashiStageAnchor36030(node,actor,p);
     box.appendChild(node);
   }
 }
@@ -601,7 +636,7 @@ function syncStandard(root,p,t){
   const beat=typeof getCurrentStorySceneBeat==="function"?getCurrentStorySceneBeat():null;
   const battleReady=t.atEnd&&beat&&beat.mode==="battle_transition";
   root.dataset.battleActionOnly=battleReady&&Number(t.cueCount||0)===0?"true":"false";
-  const semanticNext=t.atEnd&&beat&&beat.mode!=="choice"&&beat.mode!=="battle_transition";
+  const semanticNext=t.atEnd&&beat&&(isMachineResolvedBeat36030(beat)||(beat.mode!=="choice"&&beat.mode!=="battle_transition"));
   const actions=choices.length?choices.map(row=>({choiceId:row.choiceId,label:row.label})):battleReady?[{label:"BEGIN PL BATTLE",battle:true}]:[];
   syncActions(root,actions);
   const actionBox=root.querySelector(".kv2-actions");if(actionBox)actionBox.style.display=actions.length?"grid":"none";
@@ -722,10 +757,15 @@ function diagnostics(){
     rootTransitionLayersRetired:!installStyle.toString().includes(".kv2-transition-memory")&&!installStyle.toString().includes(".kv2-wipe")&&!String(ensureRoot).includes("kv2-transition-memory")&&!String(ensureRoot).includes("kv2-wipe"),
     projectionChoreographyBounded:String(playProjectionTransition).includes('supported=new Set(["ENTER","SURPRISE_ENTRY","FOCUS","STRIKE","LUNGE","RECOIL","COLLAPSE","FLEE","EXIT"])')&&!String(playProjectionTransition).includes("OBJECT_TRANSFER"),
     deterministicActorSlots:String(actorSlot).includes("academy_kakashi_origin_masked_interceptor")&&installStyle.toString().includes('data-slot="minato"'),
-    sharedSemanticAnchors:String(syncActors).includes("applyStoryStageAnchor33900")&&String(actorAnchor).includes("PLAYER_LEFT")&&String(actorAnchor).includes("OPPONENT_RIGHT"),
+    policeHandoffCards:String(actorSlot).includes("kakashi_upf_")&&String(kakashiLocalStagePercent36030).includes("police_handoff")&&installStyle.toString().includes('data-count="6"'),
+    hiddenReviewStage:String(kakashiLocalStagePercent36030).includes("hokage_test_review")&&String(readableActorState).includes('hokage_test_review')&&String(syncPackageToken).includes("presentationPackageHolder"),
+    sharedSemanticAnchors:String(applyKakashiStageAnchor36030).includes("applyStoryStageAnchor33900")&&String(syncActors).includes("applyKakashiStageAnchor36030")&&String(actorAnchor).includes("PLAYER_LEFT")&&String(actorAnchor).includes("OPPONENT_RIGHT"),
     packageTokenConsumesHolderTruth:String(syncPackageToken).includes("state.package")&&String(syncPackageToken).includes("packageHolder"),
     speakerFocusUsesCurrentCue:String(syncStandard).includes("speakerActorId"),
     stageWideAdvanceGuard:String(bind).includes('root.dataset.hasChoices==="true"')&&String(bind).includes("Date.now()-revealed<360"),
+    resolverChoicesNeverRendered:String(availableChoices).includes("isMachineResolvedBeat36030"),
+    machineResolverStageAdvance:String(syncStandard).includes("isMachineResolvedBeat36030")&&String(syncStandard).includes("semanticNext"),
+    machineResolverFlagSurvivesStoryNormalization:String(isMachineResolvedBeat36030).includes("uiHints.kakashiMachineResolved"),
     actorLinkedSpeech:String(syncSpeech).includes("--kv2-speech-x")&&installStyle.toString().includes(".kv2-speech"),
     fiveChoiceLayoutNoScroll:installStyle.toString().includes("repeat(3,minmax(0,1fr))")&&installStyle.toString().includes("overflow:visible"),
     noMutationObserver:!String(render).includes("MutationObserver"),
