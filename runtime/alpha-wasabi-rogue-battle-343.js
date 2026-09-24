@@ -232,7 +232,17 @@ function diagnostics(){
     exactProfile:!!enemy&&enemy.calibratedBasePL===23&&JSON.stringify(enemy.baseStats)===JSON.stringify({nin:23,tai:22,buki:21,fuin:10,kin:14,gen:15,stamina:24}),
     historicalNotTemplateIdentity:!!enemy&&enemy.id===ROGUE&&enemy.oppositionTemplateId===TEMPLATE&&enemy.provenance.noRegistryAdmission===true,
     exactActions:actions.length===3&&actions.some(a=>a.id==="enemy_rogue_genin_kunai_rush"&&a.authoredAttackPL===9)&&actions.some(a=>a.id==="enemy_rogue_genin_shuriken_spread"&&a.authoredAttackPL===7)&&actions.some(a=>a.id===FEINT_ID),
-    exactFeint:String(feintAction).includes("0.40")&&String(feintAction).includes(FEINT_STATE)&&String(expireFeintBeforeRogueNextAction).includes("now>created"),
+    exactFeint:(()=>{
+      const feint=actions.find(a=>a&&a.id===FEINT_ID);
+      const requiredTraits=["once_per_battle","single_target_direct_mitigable_attack_pl_packet_only","expires_before_rogue_next_action","ninjutsu_defensive_setup","no_counter_damage","no_forced_miss","no_reposition"];
+      return !!feint&&
+        FEINT_STATE==="rogue_genin_substitution_feint_ready"&&
+        String(feintAction).includes("makeEnemyRatioGuardAction(FEINT_ID,0.40")&&
+        String(feintAction).includes("stateKey:FEINT_STATE")&&
+        requiredTraits.every(t=>(feint.traits||[]).includes(t))&&
+        String(expireFeintBeforeRogueNextAction).includes("now>created")&&
+        String(expireFeintBeforeRogueNextAction).includes("removeBattleTransientState(state.stateId)");
+    })(),
     sharedScheduler:!!PRE_CHOOSE&&String(globalThis.chooseEnemyAuthoredBattleAction).includes("evaluateEnemyActionScheduler")&&String(globalThis.chooseEnemyAuthoredBattleAction).includes("equalSelectionWeight:true")&&String(globalThis.chooseEnemyAuthoredBattleAction).includes("no_semantically_eligible_enemy_action"),
     strictDeployment:String(strictWasabiDeployment).includes("createBattleDeploymentSlots([WASABI])")&&String(strictWasabiDeployment).includes("createBattleDeploymentSlots([ROGUE])"),
     withdrawNaturallyUnavailable:String(strictWasabiDeployment).includes("player={slots:createBattleDeploymentSlots([WASABI])}"),
