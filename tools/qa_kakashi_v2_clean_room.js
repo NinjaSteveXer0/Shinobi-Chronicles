@@ -36,7 +36,12 @@ assert(rendererSource.includes("kv2-dialogue")&&rendererSource.includes("chronic
 assert(!transitionSource.includes("kakashi_v2_transition_locked")&&transitionSource.includes("semanticAlreadyCommitted:true"),"#312 transition must not gate Story truth behind animation");
 assert(rendererSource.includes("Final Kakashi Browser-Golden motion benchmark")&&rendererSource.includes("translate:4vw 0")&&rendererSource.includes("transform:none!important"),"#312 Kakashi longhand motion benchmark missing");
 assert(rendererSource.includes("playStoryChoreography33900({root,scopeKey,cues})")&&rendererSource.includes("hard_transition_owned_by_33900"),"#312 Kakashi must consume shared choreography without competing with the shared hard-transition owner");
-assert(rendererSource.includes(".kv2-card-frame{display:none!important}")&&!rendererSource.includes('frame.className="kv2-card-frame"'),"Kakashi phantom Story card-holder chrome was not retired");
+{
+  const actorMarkupStart=rendererSource.indexOf("function actorMarkup(");
+  const actorMarkupEnd=rendererSource.indexOf("function availableChoices(",actorMarkupStart);
+  const actorMarkupSource=rendererSource.slice(actorMarkupStart,actorMarkupEnd);
+  assert(rendererSource.includes(".kv2-card-frame{display:none!important}")&&actorMarkupStart>=0&&actorMarkupEnd>actorMarkupStart&&!actorMarkupSource.includes('frame.className="kv2-card-frame"')&&actorMarkupSource.includes("figure.append(img,label)"),"Kakashi phantom Story card-holder chrome was not retired");
+}
 assert(rendererSource.includes("captureDepartureVisuals(root,previous)")&&rendererSource.includes("materializeDepartureGhosts(root,prepared,next)")&&rendererSource.includes("!hardTransition"),"#312 bounded non-hard departure presentation missing");
 assert(storySource.includes('HARD_TRANSITION_CURTAIN_ID="sc-story-hard-transition-33900"')&&storySource.includes("function playStoryHardSceneTransition33900")&&storySource.includes("document.body.appendChild(curtain)"),"#334 shared Story hard-transition owner missing from 33900");
 assert(!rendererSource.includes("kakashi-v2-global-curtain")&&!rendererSource.includes("function ensureGlobalCurtain(")&&!rendererSource.includes("function setGlobalCurtain(")&&!rendererSource.includes("function setWipe("),"#334 Kakashi renderer retained hard-transition ownership");
