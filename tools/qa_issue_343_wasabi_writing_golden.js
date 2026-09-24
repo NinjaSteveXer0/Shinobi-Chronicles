@@ -217,7 +217,7 @@ const enemy=battleCtx.enemyDatabase.wasabi_origin_rogue_genin_01;
 assert(enemy&&enemy.calibratedBasePL===23);
 assert.deepStrictEqual(JSON.parse(JSON.stringify(enemy.baseStats)),{nin:23,tai:22,buki:21,fuin:10,kin:14,gen:15,stamina:24});
 assert.strictEqual(enemy.oppositionTemplateId,"rogue_genin");
-assert.deepStrictEqual(enemy.authoredBattleActions.map(a=>[a.id,a.authoredAttackPL??null]),[
+assert.deepStrictEqual(JSON.parse(JSON.stringify(enemy.authoredBattleActions.map(a=>[a.id,a.authoredAttackPL??null]))),[
   ["enemy_rogue_genin_kunai_rush",9],
   ["enemy_rogue_genin_shuriken_spread",7],
   ["enemy_rogue_genin_substitution_feint",null]
@@ -227,14 +227,14 @@ const launchSpec={returnContext:{type:"story_scene",sceneId:"origin_academy_izun
 const launched=battleCtx.launchAcademyWasabiRogueGeninBattle343(launchSpec);
 assert.strictEqual(launched.success,true,JSON.stringify(launched));
 assert.strictEqual(launched.battleId,"battle_occ_origin_izuno_rogue_genin_step_in:qa-wasabi-scene");
-assert.deepStrictEqual(battleCtx.currentBattle.deployment.player.slots.map(x=>x.participantId),["academy_izuno"]);
-assert.deepStrictEqual(battleCtx.currentBattle.deployment.enemy.slots.map(x=>x.participantId),["wasabi_origin_rogue_genin_01"]);
+assert.deepStrictEqual(Array.from(battleCtx.currentBattle.deployment.player.slots||[],x=>x.participantId),["academy_izuno"]);
+assert.deepStrictEqual(Array.from(battleCtx.currentBattle.deployment.enemy.slots||[],x=>x.participantId),["wasabi_origin_rogue_genin_01"]);
 assert.strictEqual(battleCtx.currentBattle.rewards.ryo,0);assert.strictEqual(battleCtx.currentBattle.rewards.exp,0);
-assert.deepStrictEqual(battleCtx.currentBattle.rewards.items,[]);assert.deepStrictEqual(battleCtx.currentBattle.rewards.rareDrops,[]);
+assert.strictEqual(Array.from(battleCtx.currentBattle.rewards.items||[]).length,0);assert.strictEqual(Array.from(battleCtx.currentBattle.rewards.rareDrops||[]).length,0);
 assert.strictEqual(battleCtx.currentBattle.rewards.requiresExplicitPostClaimContinue,true);
 const generatedZero=battleCtx.generateBattleRewards({rewards:{ryo:{min:99,max:99}}},{id:"academy_izuno"});
 assert.strictEqual(generatedZero.ryo,0);assert.strictEqual(generatedZero.exp,0);
-assert.deepStrictEqual(generatedZero.items,[]);assert.deepStrictEqual(generatedZero.rareDrops,[]);
+assert.strictEqual(Array.from(generatedZero.items||[]).length,0);assert.strictEqual(Array.from(generatedZero.rareDrops||[]).length,0);
 assert.strictEqual(generatedZero.requiresExplicitPostClaimContinue,true);
 assert.strictEqual(generatedZero.wasabi343ZeroEntitlement,true);
 assert.strictEqual(evidenceRows.length,1);
