@@ -87,7 +87,9 @@ Team size does **not** automatically create one ordinary turn per deployed parti
 
 A 6v6 is not a twelve-action initiative round.
 
-The Current Actor normally spends the side's action opportunity. Explicit Skills, reactions, assists or Summons may later create exceptional opportunities if Combat separately authorises them.
+The Current Actor normally spends the side's action opportunity. Explicit Skills, reactions or assists may later create exceptional opportunities if Combat separately authorises them.
+
+For **Alpha**, selecting a Summon action does **not** create an additional participant turn or a second action opportunity. The selected Summon action consumes the player's normal side action opportunity, exactly like choosing another authorised Battle action.
 
 ## 5. Team capacity
 
@@ -190,6 +192,64 @@ AFTER
 
 The formation should communicate this state change visually without explanatory prose.
 
+### Deployed Support vs Reserve terminology
+
+For this contract:
+
+- **Deployed Support** = one of the three cards immediately behind/around the Current Actor;
+- **Reserve** = one of the two deeper backline cards.
+
+This distinction exists to avoid using “reserve” for both groups.
+
+### Any-slot withdrawal
+
+A legal action may withdraw a participant who is not the Current Actor.
+
+If a **Deployed Support** reaches 0 Battle PL:
+
+~~~text
+that Support resolves its withdrawal presentation
+-> the Current Actor stays Current Actor
+-> a Reserve fills the vacated Support slot where available
+-> formation settles
+~~~
+
+If a **Reserve** itself is a legal target and reaches 0 Battle PL, that Reserve withdraws and no new participant is invented to refill the now-empty Reserve capacity.
+
+### Multi-participant withdrawal
+
+If one committed action withdraws several participants at once, do **not** run several competing promotion routines.
+
+Canonical sequence:
+
+~~~text
+commit one action result
+-> resolve every affected participant's Battle PL/state
+-> mark all participants that reached withdrawal
+-> present the committed withdrawal consequences
+-> normalize the surviving formation once
+-> settle the next authoritative formation
+~~~
+
+Examples:
+
+- Current Actor + two Deployed Supports withdraw:
+  - one surviving eligible Deployed Support may promote to Current Actor;
+  - available Reserves fill open Support slots;
+  - exact promotion/reserve ordering remains owner-closed later.
+
+- Current Actor + all three Deployed Supports withdraw:
+  - if one or two Reserves survive, the surviving Reserve group becomes the new deployed formation;
+  - one must become Current Actor and the other, if present, becomes a Deployed Support;
+  - exact selection/order remains open.
+
+- all six team participants withdraw:
+  - the side is exhausted and the Battle reaches the appropriate defeat/victory condition.
+
+The important locked rule is:
+
+> **withdrawal is resolved from one committed action result, then the formation is normalized once.**
+
 ### Replacement-selection rule remains OPEN
 
 This document does not yet lock whether the replacing Support is:
@@ -291,7 +351,7 @@ Future shared visual primitives may include:
 - recovery;
 - condition application;
 - recoil;
-- Summon manifestation;
+- Summon-action effect / source cue (no Alpha battlefield participant card);
 - withdrawal;
 - Support promotion;
 - Reserve promotion.
@@ -366,10 +426,57 @@ The formation can support future concepts such as:
 - Forced Rotation;
 - reserve pressure;
 - support assists;
-- off-slot control;
-- Summon participation interactions.
+- off-slot control.
+
+Full participant-style Summon Battles are explicitly post-Alpha and are not authorised by this affordance list.
 
 These are design affordances only. Do not implement them from this document.
+
+## 18A. Alpha Summon Battle rule — CLOSED
+
+For **Alpha standard Battles**, Summons do **not** appear as battlefield participant cards.
+
+The player-facing dock remains:
+
+~~~text
+SKILLS | ITEMS | SUMMONS
+~~~
+
+Selecting **SUMMONS** opens the player's currently authorised Summon-action choices, including Summon Skills that were:
+
+- learned; or
+- granted/set by the exact acquisition/source package.
+
+The player selects one of those authorised Summon actions and uses it as the player's normal side action opportunity.
+
+For Alpha standard Battle:
+
+~~~text
+Summon access
+-> choose authorised Summon action
+-> resolve that action
+-> presentation may show the Summon/source effect
+-> no Summon participant card joins the Squad Wedge
+~~~
+
+Therefore Alpha standard Battle does **not** create from Summon use:
+
+- a seventh Character/team slot;
+- a Summon Formation slot;
+- a second Current Actor;
+- a second independent side turn;
+- a separately targetable Summon portrait;
+- an additional battlefield participant merely because a Summon action was selected.
+
+This is a scoped Alpha Battle decision.
+
+Earlier Combat calibration that describes independently manifested Summons, separate Battle PL ledgers or independent action opportunities remains useful **future-capability / post-Alpha authority**, but those manifestation semantics are **not consumed by the Alpha standard Battle loop** unless Stephen later explicitly reopens that scope.
+
+Possible full Summon Battles / independently manifested Summon combat are deferred to Beta, Early Access or Full Release.
+
+Tailed-Beast / Hosted-Entity semantics remain distinct and are not silently collapsed into ordinary Alpha Summon-action behaviour.
+
+---
 
 ## 19. PvP direction
 
@@ -453,6 +560,10 @@ The following concept is now locked:
 13. Battle presentation remains separate from Combat semantics.
 14. Existing 'battle.presentation.shared' ownership remains canonical.
 15. Future PvP should consume the same Battle semantic protocol rather than a second engine.
+16. Multi-participant withdrawals are resolved from one committed action result, then the surviving formation is normalized once.
+17. A withdrawn Deployed Support is refilled by an available Reserve without rotating the healthy Current Actor.
+18. If only Reserves survive after Current Actor + deployed-line withdrawal, the surviving Reserves become the new deployed formation.
+19. Alpha Summons are action selections from the SUMMONS dock, not battlefield participant cards, extra team slots or independent turns.
 
 ## 22. What remains OPEN
 
@@ -466,7 +577,6 @@ Do not silently decide these without owner closure:
 - PvP first-turn rule;
 - PvP timeout/disconnect handling;
 - voluntary formation reordering;
-- exact Summon interaction with six Character slots;
 - reactions/interrupts/extra action opportunities;
 - any new support/reserve mechanic not already authorised.
 
@@ -480,4 +590,4 @@ If Kakashi is rewritten, shared Battle implementation should wait until that rew
 
 ## 24. Final lock
 
-> **Shinobi Chronicles Battle is intended to become alternating side-turn combat presented through an adaptive six-shinobi Squad Wedge: one Current Actor, three Deployed Supports and two Reserves per full team. The Current Actor spends the normal side action opportunity; team size does not create six independent normal turns. At 0 Battle PL the actor withdraws, a Support promotes, and a Reserve fills the vacated support position where available. Combat owns all factual turn/action/target/result/withdrawal legality; battle.presentation.shared makes those committed facts kinetic and readable. The concept is locked now, but implementation is explicitly on hold until Stephen completes the Academy Kakashi Browser Golden decision.**
+> **Shinobi Chronicles Battle is intended to become alternating side-turn combat presented through an adaptive six-shinobi Squad Wedge: one Current Actor, three Deployed Supports and two Reserves per full team. The Current Actor spends the normal side action opportunity; team size does not create six independent normal turns. At 0 Battle PL, withdrawals resolve from the committed action result and the surviving formation is normalized once: healthy Current Actors remain in place, withdrawn Supports may be refilled from Reserve, and surviving Reserves can become the deployed formation if the prior active line is exhausted. For Alpha, SUMMONS supplies authorised Summon actions only; Summons do not enter the Squad Wedge as participant cards or receive independent turns. Combat owns all factual turn/action/target/result/withdrawal legality; battle.presentation.shared makes those committed facts kinetic and readable. The concept is locked now, but implementation is explicitly on hold until Stephen completes the Academy Kakashi Browser Golden decision.**
