@@ -1,935 +1,835 @@
-# Academy Kakashi Origin — #333 Repair Family 07
-## ANBU Report -> Minato Evaluation -> Chronicle Receipt
+# Academy Kakashi Origin — #333 GOLDEN Family 07
+## Mission-Giver ANBU Return -> Hidden Hokage-Office Test Reveal -> Chronicle Receipt
 
 **Date:** 2026-09-24  
 **Owner:** Writing / Story — Konoha  
-**Status:** **WRITING GOLDEN FAMILY 07 — SELF-REVIEWED UNDER STEPHEN DELEGATION**
+**Status:** **WRITING GOLDEN FAMILY 07 — CORRECTED TERMINAL AUTHORITY**  
+**Production Origin:** `academy_kakashi`
+
+# CORRECTION NOTICE
+
+This file supersedes the earlier 2026-09-24 Family 07 terminal expression that incorrectly collapsed the final Hokage-office sequence into a private ANBU-to-Minato report.
+
+Stephen reconfirmed the intended terminal architecture on 2026-09-24.
+
+Recovered prior authority also proves the design existed earlier:
+
+- `Academy_Kakashi_Origin_Scene_07A_W2C_K_ANBU_Report_Verbatim_Lock_2026-09-18.md`
+- `Academy_Kakashi_Origin_Scene_08A_W2C_K_Hokage_Office_Verbatim_Lock_2026-09-18.md`
+- implementation lineage `28adc4efcb5e2d32f268243afd135df59b87c5b9`
+
+The old confirmed-kill ending explicitly staged:
+- Kakashi reporting to the same ANBU operative who gave him the assignment;
+- Kakashi being dismissed;
+- black wipe;
+- Minato + ANBU operative + surviving PS / AMT in the Hokage office;
+- dead MI absent;
+- PS reacting to MI's empty place;
+- AMT asking whether Kakashi knew the truth;
+- Minato confirming Kakashi did not;
+- hidden operation/package recovery remaining unknown to Kakashi.
+
+That architecture is restored here as the universal terminal contract.
+
+---
 
 # AUTHOR-ONLY TERMINAL CONTRACT
 
-This family replaces the previous terminal expression while preserving all factual route state.
+## 1. Mission-giver / receiver identity
 
-It does not change:
-- route history;
-- package holder/result;
-- Battle results;
-- KILL/RESTRAIN resolver facts;
-- institutional custody;
-- release;
-- Knowledge;
-- Pakkun continuity;
-- rewards;
-- Receipt commit timing;
-- Origin completion.
+The ANBU operative who receives Kakashi's final report is the **same ANBU operative who gave Kakashi the mission on the opening rooftop**.
 
-## Terminal pacing rule
+Do not silently spawn a generic replacement operative.
 
-The ending scales to what actually happened.
+If Kakashi chooses:
+- **BRING HER TO ANBU**
+- **BRING HIM TO ANBU**
+- **BRING THEM TO ANBU**
 
-### Short ending
-Use when:
-- objective recovered cleanly;
-- no Battle / little secondary consequence;
-- no significant custody/lethal/Knowledge complexity.
+the physical delivery is to this same operative at the authorised ANBU rendezvous / rooftop.
 
-### Medium ending
-Use when:
-- one major fight or pursuit;
-- one meaningful participant disposition;
-- limited extra intelligence.
+That is a Story relationship and presentation fact, not merely a shared NPC ref.
 
-### Heavy ending
-Use when:
-- multiple Battles;
-- package loss after significant action;
-- multiple participants;
-- live group custody;
-- release of multiple participants;
-- KILL intent/result;
-- multiple RESTRAIN results;
-- Pakkun + intelligence + custody combinations.
+## 2. Kakashi's knowledge boundary
 
-Do not give every route the same number of dialogue boxes.
+Kakashi does **not** learn during this Origin that the retrieval mission was staged to test him.
 
-Do not enumerate state merely because it exists.
+His final player-character Knowledge remains bounded to what he actually observed / learned during the field route.
 
-## Report ordering
+After his report / handoff:
+- Kakashi is dismissed;
+- Kakashi leaves;
+- black wipe;
+- the hidden Hokage-office review is player-facing but **not Kakashi-facing**.
 
-Natural priority:
-1. what Kakashi physically brought back;
-2. what happened to the package;
-3. the decision/sequence that materially changed the field;
-4. participant outcomes that command needs to act on;
-5. actionable intelligence;
-6. Pakkun only if present;
-7. close.
+Therefore:
 
-## Minato ordering
+`player sees hidden test truth != Kakashi learns hidden test truth`
 
-Minato is not a CE explainer.
+## 3. Hidden-operation truth
 
-He should:
-- identify the decisive field choice;
-- react to objective result;
-- react to exceptional cost/consequence;
-- ask about one or two meaningful judgement points;
-- take command responsibility for the assignment;
-- not recite every participant state.
+The package retrieval operation was a **staged test of Kakashi**.
 
-## Chronicle Receipt
+The mission-giving ANBU operative, Minato, and the three field roles:
+- Masked Interceptor (MI);
+- Package Smuggler / Receiver (PS);
+- ANBU Marked Target (AMT);
 
-The Receipt is a read-only factual UI summary, not Story narration.
+belong to the hidden test structure.
 
-It may be concise/systematic because its purpose is history review.
+The Hokage-office scene is where that truth is exposed to the **player**.
 
-It must use:
-- current GOLDEN choice labels;
-- committed outcomes, not intent labels;
-- KILLED vs lethal ESCAPED;
-- RESTRAINED vs restraint ESCAPED;
-- RELEASED vs ESCAPED;
-- exact institutional custody;
-- exact Battle results;
-- rewards already committed by their owning systems.
+Do not reduce the scene to:
+- a written report;
+- Minato reading a file alone with ANBU;
+- a generic summary;
+- a Chronicle Receipt.
+
+The people who were part of the test are the payoff.
+
+## 4. Hokage-office participant projection
+
+The Hokage-office review must project each of MI / PS / AMT from exact committed factual outcome.
+
+### If alive
+
+The participant may be physically present in the Hokage office even if Kakashi's final factual state was:
+- ANBU custody;
+- Uchiha Police custody;
+- RELEASED;
+- RESTRAINED;
+- ESCAPED;
+- Battle-defeated and left alive.
+
+Their later presence in the hidden review is **hidden-operation aftermath**, not a retroactive rewrite of Kakashi's decision/outcome.
+
+Examples:
+
+- Kakashi took PS to Uchiha Police -> Chronicle remains **PS transferred to Uchiha Police**.
+- After Kakashi is gone, hidden-operation cleanup may return PS to the Hokage office for the test debrief.
+- The player may see PS there.
+- Kakashi still does not know that happened.
+
+### If KILLED
+
+The participant is **absent**.
+
+Do not:
+- resurrect them;
+- show their card;
+- substitute a generic silhouette as if they survived.
+
+The absence itself is Story.
+
+Other participants / Minato / ANBU may react naturally to the empty place.
+
+### If lethal intent -> ESCAPED
+
+The participant is alive and may appear.
+
+The scene may acknowledge:
+- Kakashi tried to kill them;
+- they escaped;
+- they returned to the hidden review alive.
+
+Do not relabel this as mercy or failed morality.
+
+### Group outcomes
+
+Project the exact mixed set.
+
+Examples:
+- MI KILLED / PS ESCAPED / AMT RESTRAINED -> PS + AMT present; MI absent.
+- MI + PS KILLED / AMT ESCAPED -> AMT present; two absences carry the cost.
+- all three KILLED -> no MI / PS / AMT physically present; Minato + ANBU face three absences.
+- all three alive -> all three physically present.
+
+Do not flatten mixed outcomes into “the trio.”
+
+## 5. Hidden package truth
+
+If Kakashi recovered the package:
+- it may be on Minato's desk as the same recovered objective.
+
+If Kakashi did not recover it:
+- hidden-operation staff may have recovered it afterward;
+- the package may still appear on Minato's desk in the hidden review;
+- the scene must not imply Kakashi succeeded.
+
+This was already established by the earlier confirmed-kill ending.
+
+`hidden operation recovered package != Kakashi recovered package`
+
+## 6. Terminal sequence
+
+Current intended sequence:
+
+`field resolution`
+-> `return to mission-giving ANBU operative`
+-> `physical custody transfer where applicable`
+-> `Kakashi factual report`
+-> `ANBU dismisses Kakashi`
+-> **BLACK WIPE**
+-> `Hokage Administration interior — hidden test review`
+-> `route-reactive MI / PS / AMT presence/absence and conversation`
+-> **BLACK WIPE**
+-> `Chronicle Receipt`
+-> `Continue`
+-> **YOUR CHRONICLE BEGINS**
+
+The Chronicle Receipt remains factual UI.
+
+The Hokage-office scene is Story.
+
+## 7. Route-reactive ending requirement
+
+The hidden review must react to what **this Kakashi** did.
+
+It is not enough to vary cards while using generic dialogue.
+
+Material route history that can shape the conversation includes:
+- whether Kakashi watched / got closer / interrupted / stole;
+- whether package was recovered by Kakashi;
+- number / severity of Battles where narratively useful;
+- whom Kakashi pursued;
+- ANBU vs Police delivery;
+- deliberate release;
+- successful restraint;
+- restraint escape;
+- lethal intent;
+- confirmed kills;
+- lethal escape;
+- Pakkun involvement where relevant;
+- information Kakashi learned;
+- whether Kakashi believes he failed.
+
+Do not enumerate all facts.
+
+Select the consequences that the people in the room would actually care about.
+
+## 8. Banter boundary
+
+Yes, the ANBU-return and Hokage-office scenes are legitimate places for additional character interaction / banter because the participants now have shared lived context.
+
+But #333 still applies.
+
+Banter must:
+- come from the exact route;
+- reveal relationship / reaction;
+- not become a joke carousel;
+- not undermine death / lethal intent;
+- not make MI verbose by default;
+- not turn ANBU into a quip machine;
+- not let PS joke through every emotional register;
+- not make Minato a detached evaluator UI.
 
 ---
 
-# PLAYER-FACING STORY
+# PLAYER-FACING STORY FRAMEWORK
 
 ## Render boundary
 
-Only narration/dialogue in the ANBU and Minato scene sections is player-facing Story.
+Only narration / spoken dialogue selected by the route projection renders.
 
-Projection labels, conditional headers, any bracketed `[AUTHOR ...]` instruction, and Chronicle Receipt schema are author/UI scaffolding and must not render.
+Conditional headings, state notes and bracketed AUTHOR instructions do not render.
 
 ---
 
-# ANBU REPORT — OPENING
+# SCENE A — RETURN TO THE MISSION-GIVING ANBU OPERATIVE
 
-By the time Kakashi reaches the rooftop, Konoha has gone quiet below.
+Kakashi returns to the rooftop.
 
-The ANBU operative is waiting.
+The same ANBU operative is waiting.
 
-His eyes move over Kakashi once.
+His eyes move first to Kakashi.
 
-Then to whatever came back with him.
+Then to what came back with him.
 
-A package.
+The package.
 
-A prisoner.
+A restraint line.
 
-Several prisoners.
+One person.
 
-A ninken.
+Several.
 
-Or empty hands.
-
-He does not react before he knows which of those things matters.
+Or nothing.
 
 **ANBU OPERATIVE:** “Report.”
 
 ---
 
-# FIRST ACCOUNT
+## IF KAKASHI BROUGHT ONE OR MORE PARTICIPANTS TO ANBU
 
-## WATCH THE HANDOFF
+The operative does not start writing.
 
-**ANBU OPERATIVE:** “You waited through the transfer.”
+He steps forward first.
 
-**KAKASHI:** “Yes.”
+Kakashi keeps hold of the restraint line until the operative has control.
 
-**ANBU OPERATIVE:** “Then what changed?”
+Only then does he let go.
 
-Kakashi tells him what he chose when the street split.
+### EXAMPLE — PACKAGE SMUGGLER PRESENT
 
+Package Smuggler looks from Kakashi to the operative.
 
----
+**PACKAGE SMUGGLER:** “Back where we started.”
 
-## GET CLOSER — SUCCESS
+The operative takes the line.
 
-**ANBU OPERATIVE:** “You moved closer.”
+**ANBU OPERATIVE:** “Not quite.”
 
-**KAKASHI:** “I needed to hear them.”
+Package Smuggler glances at Kakashi.
 
-**ANBU OPERATIVE:** “Did you?”
+**PACKAGE SMUGGLER:** “No. I suppose not.”
 
-**KAKASHI:** “Enough.”
+### EXAMPLE — AMT PRESENT
 
-The operative waits for the useful part later.
+ANBU Marked Target watches the handoff.
 
----
+**ANBU MARKED TARGET:** “You could've saved us the walk.”
 
-## GET CLOSER — DETECTED
+Kakashi looks at him.
 
-**ANBU OPERATIVE:** “You moved closer.”
+**KAKASHI:** “You ran.”
 
-**KAKASHI:** “They saw the reflection.”
+The operative takes the restraint line.
 
-The operative glances at the wet edge of the roof.
+**ANBU OPERATIVE:** “Report.”
 
-**ANBU OPERATIVE:** “And the handoff?”
+### EXAMPLE — MI PRESENT
 
-**KAKASHI:** “Stopped.”
+Masked Interceptor says nothing while the operative takes custody.
 
----
+Her eyes remain on Kakashi.
 
-## INTERRUPT THE HANDOFF
+The operative notices.
 
-**ANBU OPERATIVE:** “You went in before the transfer.”
+**ANBU OPERATIVE:** “Anything you need to add?”
 
-**KAKASHI:** “Yes.”
+**MASKED INTERCEPTOR:** “No.”
 
-### IF THE 2-V-1 OCCURRED
+Kakashi looks between them once.
 
-**KAKASHI:** “Both men fought.”
+Then begins the report.
 
-[AUTHOR: project the actual 2-v-1 result in the next spoken line; do not render this instruction.]
+### IF ALL THREE ARE PRESENT
 
+The operative takes the restraint lines one at a time.
 
----
+Package Smuggler watches the process.
 
-## SLIP IN AND TAKE IT
+**PACKAGE SMUGGLER:** “This feels excessive.”
 
-**ANBU OPERATIVE:** “You tried to take it clean.”
+ANBU Marked Target looks at him.
 
-### IF CLEAN SUCCESS
+**ANBU MARKED TARGET:** “You talked through the entire walk.”
 
-**KAKASHI:** “I did.”
+**PACKAGE SMUGGLER:** “It was a long walk.”
 
-[AUTHOR: if Kakashi visibly returned with the package, the operative's attention may move to it; do not render this instruction.]
+Masked Interceptor turns her head.
 
-### IF DETECTED
+Package Smuggler stops.
 
-**KAKASHI:** “They caught me.”
+Kakashi notices.
 
-A beat.
+The operative does too.
 
-**ANBU OPERATIVE:** “All of them?”
+**ANBU OPERATIVE:** “Report.”
 
-**KAKASHI:** “All three.”
-
----
-
-# PACKAGE
-
-## RECOVERED
-
-Kakashi takes out the package.
-
-Places it between them.
-
-The operative checks the seal.
-
-Turns it once beneath the rooftop light.
-
-**ANBU OPERATIVE:** “Intact.”
-
-Kakashi lets go.
-
-The package stays with the operative.
+[AUTHOR: route-specific variants may replace this exchange; do not force it onto solemn/lethal-heavy histories.]
 
 ---
 
-## LOST WITH PACKAGE RECEIVER
+# SCENE B — KAKASHI'S FACTUAL REPORT
 
-**ANBU OPERATIVE:** “Package?”
+The report remains concise and route-factual.
 
-**KAKASHI:** “The receiver got away with it.”
+The operative asks for:
+- package result;
+- exact people still requiring action;
+- exceptional lethal / restraint / release facts;
+- useful intelligence Kakashi actually learned.
 
-The operative's eyes stay on Kakashi.
+He does not explain the test.
 
-Kakashi has nothing else to add.
+He does not correct Kakashi's incomplete picture.
 
----
+He does not reveal that PS / AMT / MI are test participants.
 
-## LOST WITH MAN FROM THE PHOTOGRAPH
+Where appropriate, the operative may know more than he lets on.
 
-**ANBU OPERATIVE:** “Package?”
-
-**KAKASHI:** “The man from the photograph still had it when he got away.”
-
-The operative writes once.
-
-Moves on.
-
----
-
-## TAKEN BY MASKED INTERCEPTOR
-
-**ANBU OPERATIVE:** “Package?”
-
-**KAKASHI:** “She took it from me.”
-
-
----
-
-
-## PACKAGE FINAL HOLDER UNKNOWN
-
-**ANBU OPERATIVE:** “Package?”
-
-**KAKASHI:** “I lost it.”
-
-The operative waits.
-
-**ANBU OPERATIVE:** “Last person you saw with it?”
-
-[AUTHOR: project Kakashi's last-known-holder answer only from actual Knowledge; if unknown, he says he does not know.]
-
-# PEOPLE — VISIBLE / ACTIONABLE OUTCOMES
-
-## LIVE ANBU CUSTODY
-
-[AUTHOR: use this block only when Kakashi delivered one or more participants alive to ANBU; do not render this instruction.]
-
-The operative looks toward where they were taken.
-
-**ANBU OPERATIVE:** “Alive?”
-
-**KAKASHI:** “Yes.”
-
-If there is more than one:
-
-**ANBU OPERATIVE:** “All of them?”
-
-**KAKASHI:** “Yes.”
-
----
-
-## UCHIHA POLICE CUSTODY
-
-**ANBU OPERATIVE:** “You took them to the Police.”
-
-**KAKASHI:** “Yes.”
-
-The operative pauses.
-
-**ANBU OPERATIVE:** “I'll notify them what they can be told.”
-
----
-
-## RESTRAINED ELSEWHERE
-
-**ANBU OPERATIVE:** “Who's still in the field?”
-
-Kakashi gives the exact person and place.
-
-
-**KAKASHI:** “The masked woman. Restrained beneath the Sakura tree.”
-
-or
-
-**KAKASHI:** “The receiver. Restrained in the side street.”
-
-or
-
-**KAKASHI:** “The man from the photograph. Restrained in the alley.”
-
-The operative nods toward the village.
-
-**ANBU OPERATIVE:** “I'll send someone.”
-
----
-
-## DELIBERATE RELEASE
-
-**ANBU OPERATIVE:** “The others?”
-
-**KAKASHI:** “I let them go.”
-
-The operative's pen stops.
-
-He looks at Kakashi.
-
-**ANBU OPERATIVE:** “Deliberately.”
-
-**KAKASHI:** “Yes.”
-
-The pen starts again.
-
----
-
-## KILLED
-
-The operative reaches the disposition and stops writing.
-
-**ANBU OPERATIVE:** “After the fight?”
-
-**KAKASHI:** “Yes.”
-
-### ONE KILLED
-
-**KAKASHI:** “Dead.”
-
-### MORE THAN ONE KILLED
-
-Kakashi gives the names/roles one at a time.
-
-The operative records each one.
-
-Then continues.
-
----
-
-## LETHAL INTENT — TARGET ESCAPED
-
-**KAKASHI:** “I went to kill him.”
-
-or
-
-**KAKASHI:** “I went to kill her.”
-
-**KAKASHI:** “They got away.”
-
-The operative looks up.
-
-**ANBU OPERATIVE:** “Alive?”
-
-**KAKASHI:** “Yes.”
-
-That is enough.
-
----
-
-## RESTRAINT INTENT — TARGET ESCAPED
-
-**KAKASHI:** “I tried to restrain him.”
-
-or
-
-**KAKASHI:** “I tried to restrain her.”
-
-**KAKASHI:** “They got away.”
-
-The operative records the escape.
-
-Nothing in the conversation turns it into release.
-
----
-
-## BATTLE-DEFEATED / LEFT WITHOUT CUSTODY
-
-**ANBU OPERATIVE:** “And when you left?”
-
-**KAKASHI:** “Alive.”
-
-**ANBU OPERATIVE:** “Restrained?”
-
-**KAKASHI:** “No.”
-
-The operative writes it down.
-
----
-
-# INTELLIGENCE
-
-## GET CLOSER CONTINGENCY KNOWN
-
-[AUTHOR: use only if Kakashi actually heard the contingency.]
-
-**ANBU OPERATIVE:** “What did they say before the handoff?”
-
-**KAKASHI:** “Clear street, the package changes hands.”
-
-A beat.
-
-**KAKASHI:** “If they think someone followed, the carrier keeps moving.”
-
-**ANBU OPERATIVE:** “Where was the receiver taking it?”
-
-**KAKASHI:** “They never said.”
-
----
-
-## ASK WHERE IT WAS GOING
-
-[AUTHOR: use only if Kakashi actually asked and received the answer.]
-
-**KAKASHI:** “The first man's part ended at the handoff.”
-
-**ANBU OPERATIVE:** “He knew the next destination?”
-
-**KAKASHI:** “No.”
-
-**ANBU OPERATIVE:** “Certain?”
-
-**KAKASHI:** “He'd asked too.”
-
-The operative writes that down.
-
----
-
-# PAKKUN
-
-[AUTHOR: use only if Pakkun is still present after the connected route.]
-
-The operative finally looks toward the ninken.
-
-**ANBU OPERATIVE:** “And him?”
-
-**KAKASHI:** “He helped.”
-
-**PAKKUN:** “Temporarily.”
-
-The operative waits.
-
-Pakkun does not elaborate.
-
-**ANBU OPERATIVE:** “Anything else?”
-
-**PAKKUN:** “No.”
-
-Pakkun gets to his feet.
-
-Kakashi looks down at him.
-
-**KAKASHI:** “Thanks.”
-
-Pakkun gives one short nod.
-
-Then leaves across the roofline.
+Kakashi does not.
 
 ---
 
 # REPORT CLOSE
 
-The operative reads the last line.
-
-Looks once at Kakashi.
-
-**ANBU OPERATIVE:** “Anything you're guessing?”
-
-**KAKASHI:** “No.”
-
-**ANBU OPERATIVE:** “Good.”
-
-He closes the field notes.
-
-**ANBU OPERATIVE:** “You're done. I'll take it from here.”
-
-Kakashi nods.
-
-The operative leaves with the report.
-
----
-
-# HOKAGE ADMINISTRATION — PRIVATE REPORT
-
-Later, the report lies open beneath the office lamplight.
-
-Minato reads it.
-
-The ANBU operative waits across the desk.
-
-Minato reaches the first decision.
-
----
-
-# MINATO — ROUTE OPENING
-
-## WATCH THE HANDOFF
-
-**MINATO:** “He waited for the transfer.”
-
-**ANBU OPERATIVE:** “Yes.”
-
-Minato looks farther down the page.
-
-**MINATO:** “What did he do when they split?”
-
-The operative tells him.
-
-Minato listens to that answer before moving on.
-
----
-
-## GET CLOSER
-
-**MINATO:** “He moved closer before he committed.”
-
-**ANBU OPERATIVE:** “Yes.”
-
-### IF KAKASHI LEARNED THE CONTINGENCY
-
-**ANBU OPERATIVE:** “He heard their fallback plan.”
-
-Minato looks up.
-
-**MINATO:** “Useful?”
-
-**ANBU OPERATIVE:** “Enough to explain who kept the package if the street was compromised.”
-
-Minato nods.
-
-### IF KAKASHI WAS DETECTED
-
-**ANBU OPERATIVE:** “They spotted the movement before the transfer.”
-
-**MINATO:** “So the closer look changed the operation.”
-
-**ANBU OPERATIVE:** “Yes.”
-
-Minato moves to the next line.
-
----
-
-## INTERRUPT THE HANDOFF
-
-**ANBU OPERATIVE:** “He stopped the transfer and took both men on.”
-
-Minato looks at the Battle entry.
-
-**MINATO:** “Did he get the package?”
-
-
----
-
-## SLIP IN AND TAKE IT
-
-**ANBU OPERATIVE:** “He tried to remove it without opening the fight.”
-
-### CLEAN SUCCESS
-
-Minato's eyes pause on the line.
-
-**MINATO:** “And left before they could stop him.”
-
-**ANBU OPERATIVE:** “Yes.”
-
-A faint smile.
-
-Then Minato keeps reading.
-
-### DETECTED / 3-V-1
-
-The operative turns the page.
-
-**ANBU OPERATIVE:** “They caught him. It became three-on-one.”
-
-Minato is quiet for a moment.
-
-**MINATO:** “Keep going.”
-
----
-
-# MINATO — PACKAGE
-
-## RECOVERED
-
-**ANBU OPERATIVE:** “The package is back.”
-
-**MINATO:** “Seal?”
-
-**ANBU OPERATIVE:** “Intact.”
-
-Minato nods once.
-
-[AUTHOR: on a clean low-consequence route this may end the package discussion; on a costly route continue into the relevant consequence block.]
-
----
-
-## LOST
-
-**ANBU OPERATIVE:** “The package was not recovered.”
-
-Minato's attention stays on the line.
-
-**MINATO:** “Who had it last?”
-
-The operative answers from Kakashi's report.
-
-Minato closes his eyes for half a second.
-
-Opens them.
-
-**MINATO:** “All right.”
-
-Not approval.
-
-
----
-
-# MINATO — CONSEQUENCE
-
-[AUTHOR: project only consequential material actually present in this route.]
-
-## MULTIPLE BATTLES
-
-Minato counts the Battle entries.
-
-**MINATO:** “How many?”
-
-The operative answers.
-
-Minato looks back to the assignment heading.
-
-**MINATO:** “He was sent to recover a package.”
-
-**ANBU OPERATIVE:** “Yes.”
-
-**MINATO:** “We gave him an operation.”
-
-The operative does not disagree.
-
----
-
-## LIVE CUSTODY
-
-**ANBU OPERATIVE:** “He brought them back alive.”
-
-Minato looks at the custody line.
-
-**MINATO:** “All of them?”
-
-[AUTHOR: the operative answers with the exact custody count/destination from the current route.]
-
-[AUTHOR: if Police custody occurred:]
-
-**MINATO:** “Make sure the Police get what they need and nothing from the operation they don't.”
-
----
-
-## RESTRAINED IN THE FIELD
-
-**ANBU OPERATIVE:** “He left a restrained participant in the field.”
-
-Minato looks at the location.
-
-**MINATO:** “Recovery team?”
-
-**ANBU OPERATIVE:** “Already moving.”
-
-Minato continues.
-
----
-
-## RELEASE
-
-**ANBU OPERATIVE:** “He had them and let them leave.”
-
-Minato reads the line twice.
-
-**MINATO:** “All of them?”
-
-The operative answers.
-
-Minato does not turn the answer into a speech.
-
----
-
-## KILLED
-
-**ANBU OPERATIVE:** “The lethal decision came after the fight.”
-
-Minato stops reading.
-
-**MINATO:** “Confirmed?”
-
-The operative answers with the exact deaths.
-
-A long beat.
-
-Then Minato turns the page.
-
----
-
-## LETHAL INTENT / ESCAPE
-
-**ANBU OPERATIVE:** “He went lethal. The target escaped.”
-
-**MINATO:** “Alive?”
-
-**ANBU OPERATIVE:** “Yes.”
-
-Minato nods toward the report.
-
-**MINATO:** “Make sure the warning goes out with the description.”
-
----
-
-# MINATO — INTELLIGENCE
-
-[AUTHOR: use only if the route produced actionable intelligence.]
-
-**ANBU OPERATIVE:** “He also brought back one useful piece from the handoff.”
-
-The operative gives the exact contingency / carrier-limit information.
-
-Minato listens.
-
-**MINATO:** “Destination?”
-
-**ANBU OPERATIVE:** “Still unknown.”
-
-**MINATO:** “Then that's where it ends.”
-
-No guess is added.
-
----
-
-# MINATO — CLOSE
-
-## CLEAN / LOW-CONSEQUENCE ROUTE
-
-Minato closes the report.
-
-**MINATO:** “He completed the assignment.”
-
-The operative waits.
-
-Minato looks at Kakashi's name on the cover.
-
-**MINATO:** “And came back.”
+The operative reaches the end of the report.
 
 A beat.
 
-**MINATO:** “Good.”
+**ANBU OPERATIVE:** “Anything else?”
 
-He hands the report back.
+**KAKASHI:** “No.”
+
+The operative closes the field notes.
+
+**ANBU OPERATIVE:** “All right.”
+
+Kakashi waits.
+
+**ANBU OPERATIVE:** “You can go.”
+
+Kakashi looks once at the operative.
+
+At any people he brought back.
+
+At the package, if it is there.
+
+Then:
+
+**KAKASHI:** “Understood.”
+
+He leaves.
 
 ---
 
-## COSTLY / HIGH-CONSEQUENCE ROUTE
+# BLACK WIPE
 
-Minato reaches Kakashi's name at the top of the report again.
+# SCENE C — HOKAGE ADMINISTRATION INTERIOR, NIGHT
 
-**MINATO:** “He stayed functional through all of this.”
+Kakashi is **not present**.
 
-**ANBU OPERATIVE:** “He did.”
+Minato stands above the room.
 
-**MINATO:** “I know.”
+The mission-giving ANBU operative is present.
+
+The package is on the desk if hidden-operation recovery has returned it.
+
+MI / PS / AMT are projected from exact life-state truth.
+
+Survivors stand in the room.
+
+Dead participants do not.
+
+The arrangement itself should tell the player something is wrong before anyone explains it.
+
+Minato looks over the people who came back.
+
+And the places where somebody should have.
+
+---
+
+# BASE REVEAL — ALL THREE ALIVE
+
+[AUTHOR: use as a tonal base, then inject route-reactive lines.]
+
+Package Smuggler looks toward the recovered package.
+
+**PACKAGE SMUGGLER:** “So that's it?”
+
+**ANBU OPERATIVE:** “That's it.”
+
+**PACKAGE SMUGGLER:** “He still thinks this was real.”
+
+ANBU Marked Target looks toward Minato.
+
+**ANBU MARKED TARGET:** “Does he know any of it?”
+
+**MINATO:** “No.”
+
+Masked Interceptor's expression does not change.
+
+**MASKED INTERCEPTOR:** “Good.”
+
+Package Smuggler looks at her.
+
+**PACKAGE SMUGGLER:** “You say that now.”
+
+She turns her eyes toward him.
+
+He lifts both hands.
+
+**PACKAGE SMUGGLER:** “I'm done.”
+
+Minato looks at the report.
+
+**MINATO:** “Tell me what he did.”
+
+The room shifts from the fake mission to the real subject.
+
+Kakashi.
+
+---
+
+# ROUTE REACTION MODULES
+
+## KAKASHI BROUGHT ALL THREE TO ANBU
+
+The operative looks at the three of them.
+
+**ANBU OPERATIVE:** “He brought the entire field back to me.”
+
+Package Smuggler rubs one wrist.
+
+**PACKAGE SMUGGLER:** “I noticed.”
+
+ANBU Marked Target looks toward Minato.
+
+**ANBU MARKED TARGET:** “He never stopped once he'd decided we were coming with him.”
+
+Masked Interceptor says nothing.
+
+Minato looks down at the three custody entries.
+
+**MINATO:** “No.”
+
+A beat.
+
+**MINATO:** “He didn't.”
+
+---
+
+## KAKASHI TOOK PARTICIPANTS TO UCHIHA POLICE
+
+Package Smuggler looks irritated.
+
+**PACKAGE SMUGGLER:** “The Police were thrilled.”
+
+The ANBU operative looks at him.
+
+**PACKAGE SMUGGLER:** “They were not thrilled.”
+
+Minato looks toward the custody entry.
+
+**MINATO:** “Kakashi made the handoff he chose.”
+
+**ANBU MARKED TARGET:** “Without knowing what we were.”
+
+**MINATO:** “Yes.”
+
+[AUTHOR: this hidden cleanup does not change the committed Police custody fact.]
+
+---
+
+## KAKASHI RELEASED THEM
+
+**ANBU OPERATIVE:** “He had control.”
+
+Package Smuggler looks at him.
+
+**PACKAGE SMUGGLER:** “And then he didn't.”
+
+**ANBU OPERATIVE:** “He let you leave.”
+
+Package Smuggler considers that.
+
+**PACKAGE SMUGGLER:** “That's a less dramatic way to say it.”
+
+AMT may answer from his own exact route if present.
+
+Do not assign moral praise/blame.
+
+---
+
+## SUCCESSFUL RESTRAINT
+
+A restrained participant may rub a wrist or look at the old binding mark.
+
+### PS
+
+**PACKAGE SMUGGLER:** “He ties knots like he expects them to hold forever.”
+
+### AMT
+
+**ANBU MARKED TARGET:** “They held long enough.”
+
+### MI
+
+Masked Interceptor looks at her wrist once.
+
+Says nothing.
+
+---
+
+## RESTRAINT ATTEMPT -> ESCAPED
+
+The exact survivor is present.
+
+**ANBU OPERATIVE:** “He tried to restrain you.”
+
+The participant answers from personality.
+
+### PS
+
+**PACKAGE SMUGGLER:** “Tried.”
+
+### AMT
+
+**ANBU MARKED TARGET:** “I wasn't staying.”
+
+### MI
+
+**MASKED INTERCEPTOR:** “He was too slow.”
+
+No one converts this into a moral judgement.
+
+---
+
+## LETHAL INTENT -> ESCAPED
+
+The survivor is present.
+
+The room is quieter.
+
+**ANBU OPERATIVE:** “He went lethal.”
+
+### PS
+
+Package Smuggler's humour disappears.
+
+**PACKAGE SMUGGLER:** “I know.”
+
+### AMT
+
+ANBU Marked Target looks at the report.
+
+**ANBU MARKED TARGET:** “So did I.”
+
+### MI
+
+Masked Interceptor meets the operative's eyes.
+
+**MASKED INTERCEPTOR:** “He meant it.”
+
+Minato does not soften the fact.
+
+---
+
+# DEATH / ABSENCE MODULES
+
+## ONE KILLED
+
+The dead participant's place is empty.
+
+Do not announce the absence before the room has time to show it.
+
+The recovered 2026-09-18 MI-kill benchmark remains valid in spirit:
+
+Package Smuggler's eyes may settle on MI's empty place.
+
+**PACKAGE SMUGGLER:** “She should be standing here.”
+
+No one answers immediately.
+
+The exact surviving cast then reacts to the confirmed death.
+
+## PS KILLED
+
+AMT may look toward the empty place PS should occupy.
+
+**ANBU MARKED TARGET:** “He killed the receiver.”
+
+The operative does not correct the role.
+
+**ANBU OPERATIVE:** “Yes.”
+
+If MI survives, her reaction is physical before verbal.
+
+## AMT KILLED
+
+Package Smuggler may look toward AMT's absence.
+
+**PACKAGE SMUGGLER:** “He was supposed to walk away after the handoff.”
+
+**ANBU OPERATIVE:** “He didn't.”
+
+Minato looks at the report.
+
+## TWO KILLED
+
+Only the surviving field participant stands with Minato and ANBU.
+
+Do not fill the silence with exposition.
+
+The survivor knows exactly who is missing.
+
+Let that shape the scene.
+
+## ALL THREE KILLED
+
+No MI.
+
+No PS.
+
+No AMT.
+
+Only Minato, the mission-giving ANBU operative, the package if hidden recovery returned it, and the report.
+
+The three absent positions are the scene.
+
+Minato looks at the report for a long time.
+
+**MINATO:** “He thought they were real threats.”
+
+**ANBU OPERATIVE:** “Yes.”
+
+**MINATO:** “And we put all three in front of him.”
+
+The operative does not answer.
 
 Minato closes the report.
 
-**MINATO:** “That doesn't mean we should have put all of it on him.”
-
-The operative says nothing.
-
-**MINATO:** “Don't clean this up before morning.”
-
-**ANBU OPERATIVE:** “I wasn't planning to.”
-
-**MINATO:** “Good.”
-
-The report stays on the desk.
+No speech tells the player what to feel.
 
 ---
 
-# CHRONICLE RECEIPT — UI AUTHORITY
+# PLAYER-FACING TEST REVEAL
 
-This is not Story dialogue.
+At an appropriate point after the room has established itself, the hidden truth becomes explicit enough that the player cannot miss it.
 
-Render from committed facts only.
+A surviving participant may ask:
 
-Use current GOLDEN display wording.
+**ANBU MARKED TARGET:** “Does Kakashi know?”
 
-Suggested structure:
+**MINATO:** “No.”
 
-```
-ACADEMY KAKASHI — CHRONICLE RECEIPT
+or, if AMT is dead, another surviving participant may carry the question.
 
-ASSIGNMENT
-Recover the package.
+If nobody survives, ANBU and Minato carry the truth.
 
-FIRST DECISION
-[WATCH THE HANDOFF | GET CLOSER | INTERRUPT THE HANDOFF | SLIP IN AND TAKE IT]
+The scene must establish:
 
-PACKAGE
-[Recovered and returned to ANBU | Lost with the Package Receiver | Lost with the Man from the Photograph | Taken by the Masked Interceptor]
+- the package operation was staged;
+- MI / PS / AMT were participants in the test;
+- the mission-giving ANBU operative was part of the operation;
+- Minato authorised / owns the test;
+- Kakashi does not know;
+- his Chronicle results remain real because his choices and consequences were real.
 
-PEOPLE
-Masked Interceptor — [KILLED | ESCAPED after lethal intent | RESTRAINED | ESCAPED during restraint | ANBU custody | Uchiha Police custody | RELEASED | other exact committed fact]
-Package Receiver — [...]
-Man from the Photograph — [...]
+Do not turn this into a tutorial explanation.
 
-BATTLES
-[exact Battle labels + Victory/Defeat]
-
-INTELLIGENCE
-[only exact knowledge actually acquired]
-
-NINKEN
-Temporary ninken intervention — if factually present.
-Permanent ownership — none.
-
-REWARDS
-[read current committed reward receipts; do not invent]
-
-```
-
-Do not display:
-- `AVAILABLE`;
-- `BATTLE_DEFEATED` as a raw enum;
-- `FIELD_SECURED_PENDING_COLLECTION`;
-- internal participant IDs;
-- old choice labels;
-- resolver names.
+The room itself, the returned test participants and the recovered package should do most of the work.
 
 ---
 
-# ORIGIN TRANSITION
+# HOKAGE-OFFICE CLOSE
 
-After the Receipt:
+Minato looks down at Kakashi's report.
+
+The route-specific conversation has already established what mattered.
+
+He does not summarise it again.
+
+### LOW-CONSEQUENCE EXAMPLE
+
+**MINATO:** “He made his decision.”
+
+The operative waits.
+
+**MINATO:** “We'll remember it.”
+
+### HIGH-CONSEQUENCE / DEATH EXAMPLE
+
+Minato's attention moves once more to the empty place or places.
+
+Then back to Kakashi's name.
+
+**MINATO:** “This was our test.”
+
+A beat.
+
+**MINATO:** “The consequences were his.”
+
+He closes the report.
+
+[AUTHOR: do not use this exact line if it reads as absolving the adults or moralising; route-specific performance may be quieter.]
+
+---
+
+# BLACK WIPE
+
+# CHRONICLE RECEIPT
+
+The Receipt is factual UI, not Story prose.
+
+It records Kakashi's Chronicle truth:
+- his decisions;
+- package result from his perspective/mission outcome;
+- Battle results;
+- KILLED / ESCAPED / RESTRAINED / RELEASED / institutional custody facts;
+- Pakkun involvement;
+- legitimate Knowledge;
+- rewards.
+
+It does **not** rewrite Kakashi's Chronicle using the hidden-test cleanup.
+
+Examples:
+- PS taken to Uchiha Police remains **PS -> Uchiha Police custody** even if the player later sees PS in Minato's office.
+- package lost by Kakashi remains **package not recovered by Kakashi** even if the player sees it on Minato's desk.
+- MI killed remains **MI KILLED**, and she is absent from the hidden review.
+
+Then:
 
 **Continue**
 
 Black wipe.
 
-Then project the shared continuity boundary:
-
 **YOUR CHRONICLE BEGINS**
-
-Do not render:
-- `Origin occurrence sealed`;
-- runtime IDs;
-- save-state confirmation prose;
-- implementation status.
 
 ---
 
-# #333 SELF-AUDIT
+# #333 ACCEPTANCE
 
-## ANBU
-The operative:
-- notices physical return state;
-- asks only questions command needs;
-- does not explain why facts are separate;
-- does not lecture Kakashi about semantics.
+## Player vs protagonist Knowledge
 
-## Minato
-Minato:
-- reacts to actual route cost;
-- does not enumerate state;
-- does not turn into a morality judge;
-- carries command responsibility naturally;
-- is shorter on clean routes and more reflective only when the night earned it.
+The hidden review is intentionally dramatic irony.
 
-## Kakashi
-Kakashi:
-- gives concise factual answers;
-- does not defend himself unprompted;
-- does not narrate his own competence;
-- does not acquire adult-Kakashi philosophical speeches.
+The player learns the test truth.
 
-## Receipt
-The Receipt is explicitly UI/history, not prose.
+Kakashi does not.
 
-## Terminal cohesion
-The ending is:
-field consequence -> human report -> private command reaction -> factual Receipt -> continuity transition.
+## Characters, not state report
 
-No scene explains CE architecture.
+MI / PS / AMT physically react to what happened.
 
-## Status
+Their presence / absence is meaningful.
 
-Source reconciliation completed against:
-- `Academy_Kakashi_Ending_Cohesion_AMBER_Repair_2026-09-23.md`;
-- current live dynamic ANBU / Minato / Receipt builders in `alpha-kakashi-v2-core-36020.js`;
-- current Kakashi KILL / RESTRAIN two-outcome authority;
-- current GOLDEN choice-label authority.
+Minato and ANBU respond to people and consequences, not enum values.
 
-This successor preserves all factual terminal projections while replacing CE/state-model explanation with route-weighted human scenes.
+## Route history
 
-Promoted to **WRITING GOLDEN FAMILY 07**.
+The ending reflects:
+- capture;
+- Police transfer;
+- release;
+- restraint;
+- escape;
+- lethal attempt;
+- confirmed kill;
+- mixed group outcomes.
 
-Whole-Origin GOLDEN still requires the final cross-family coverage/cohesion audit.
+It does not flatten them into one debrief.
+
+## Mission-giver continuity
+
+The operative at the end is the same operative from the opening.
+
+That continuity is part of the payoff.
+
+---
+
+# FINAL LOCK
+
+> **Kakashi returns captives to the same ANBU operative who gave him the mission.**
+
+> **Kakashi leaves without learning the mission was staged.**
+
+> **The player then sees the hidden Hokage-office review.**
+
+> **Surviving MI / PS / AMT appear; killed participants are absent.**
+
+> **Their exact route outcomes shape the conversation.**
+
+> **The hidden cleanup never rewrites Kakashi's committed Chronicle facts.**
