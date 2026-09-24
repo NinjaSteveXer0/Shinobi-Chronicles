@@ -139,31 +139,38 @@ const profileRegistration=registerProfile();
 if(!profileRegistration.success)throw new Error("wasabi_343_rogue_profile_registration_failed:"+profileRegistration.reason);
 
 const PRIOR_CHOOSE=typeof chooseEnemyAuthoredBattleAction==="function"?chooseEnemyAuthoredBattleAction:null;
-function chooseWasabiRogueAction34300(state={}){
-  const enemy=state.enemy||null,target=state.target||null;
-  if(!enemy||enemy.id!==HISTORICAL)return PRIOR_CHOOSE?PRIOR_CHOOSE(state):{success:false,reason:"no_shared_enemy_scheduler"};
-  // The Feint expires at the beginning of the Rogue Genin's next action
-  // opportunity if no qualifying direct packet consumed it first.
+function chooseWasabiRogueAction34300(schedulerState=null){
+  const meta=currentBattle&&currentBattle.wasabiOrigin34300;
+  if(!meta||meta.historicalParticipantRef!==HISTORICAL){
+    return PRIOR_CHOOSE?PRIOR_CHOOSE.apply(this,arguments):{success:false,reason:"enemy_scheduler_authority_missing"};
+  }
+  // If the Feint survived the player's intervening action, its authored window
+  // ends when the Rogue Genin reaches this next action opportunity.
   expireFeintAtNextRogueOpportunity();
-  const actions=Array.isArray(enemy.authoredBattleActions)?enemy.authoredBattleActions:[];
-  const eligible=actions.filter(action=>{
-    if(!action)return false;
-    if(typeof action.evaluateAvailability!=="function")return true;
-    const row=action.evaluateAvailability({enemy,target,currentBattle});
-    return !!(row&&row.available===true);
-  });
-  if(!eligible.length)return{success:false,reason:"no_semantically_eligible_enemy_action",eligibleActionIds:[]};
-  const index=Math.min(eligible.length-1,Math.floor(Math.random()*eligible.length));
+  const state=schedulerState&&schedulerState.ready===true
+    ?schedulerState
+    :(typeof evaluateEnemyActionScheduler==="function"?evaluateEnemyActionScheduler():null);
+  if(!state||state.ready!==true){
+    return PRIOR_CHOOSE?PRIOR_CHOOSE(state):{success:false,reason:state&&state.reason||"enemy_scheduler_unavailable"};
+  }
+  const candidates=Array.isArray(state.eligibleActions)?state.eligibleActions:[];
+  if(!candidates.length)return{success:false,reason:"no_semantically_eligible_enemy_action",eligibleActionIds:[]};
+  // Combat #342: randomness is permitted only after shared semantic eligibility,
+  // with equal weight across the surviving authored actions.
+  const index=Math.min(candidates.length-1,Math.floor(Math.random()*candidates.length));
   return{
-    success:true,action:eligible[index],
-    eligibleActionIds:eligible.map(a=>a.id),
+    success:true,action:candidates[index],
+    eligibleActionIds:candidates.map(a=>a.id),
     randomnessAppliedAfterEligibility:true,
     equalSelectionWeight:true,
+    sharedSchedulerEligibility:true,
     wasabiOrigin34300:true
   };
 }
-globalThis.chooseEnemyAuthoredBattleAction=chooseWasabiRogueAction34300;
-try{chooseEnemyAuthoredBattleAction=globalThis.chooseEnemyAuthoredBattleAction;}catch(_error){}
+if(PRIOR_CHOOSE){
+  globalThis.chooseEnemyAuthoredBattleAction=chooseWasabiRogueAction34300;
+  try{chooseEnemyAuthoredBattleAction=globalThis.chooseEnemyAuthoredBattleAction;}catch(_error){}
+}
 
 function battleOccurrenceId(sceneInstanceId){
   return "battle_occ_origin_izuno_rogue_genin_step_in:"+String(sceneInstanceId||"");
@@ -293,7 +300,7 @@ function diagnostics(){
     spreadOnePacket:!!spread&&spread.authoredAttackPL===7&&spread.mechanicalPacketCount===1&&spread.primaryDiscipline==="Bukijutsu",
     exactFeint:!!substitution&&substitution.guard&&substitution.guard.preventionRatio===0.40&&substitution.guard.oneUse===true&&substitution.guard.beforeStamina===true&&substitution.guard.stateKey===FEINT_STATE,
     feintBounded:String(chooseWasabiRogueAction34300).includes("expireFeintAtNextRogueOpportunity")&&String(feint).includes("feintSpent"),
-    semanticEligibilityBeforeRandom:String(chooseWasabiRogueAction34300).includes("evaluateAvailability")&&String(chooseWasabiRogueAction34300).includes("Math.random")&&String(chooseWasabiRogueAction34300).indexOf("evaluateAvailability")<String(chooseWasabiRogueAction34300).indexOf("Math.random"),
+    semanticEligibilityBeforeRandom:String(chooseWasabiRogueAction34300).includes("evaluateEnemyActionScheduler")&&String(chooseWasabiRogueAction34300).includes("eligibleActions")&&String(chooseWasabiRogueAction34300).includes("Math.random")&&String(chooseWasabiRogueAction34300).indexOf("eligibleActions")<String(chooseWasabiRogueAction34300).indexOf("Math.random"),
     deterministicReceipt:String(battleOccurrenceId("scene")).startsWith("battle_occ_origin_izuno_rogue_genin_step_in:scene"),
     zeroBattleReward:CONFIG.rewards.ryo===0&&CONFIG.rewards.exp===0&&CONFIG.rewards.items.length===0&&CONFIG.rewards.rareDrops.length===0,
     exactResultEnvelope:["battleOccurrenceId","sourceOccurrenceId","historicalParticipantRef","oppositionTemplateId","battleResult","rogueGeninBattlePLDepleted","wasabiBattlePLDepleted"].every(k=>String(projectResult).includes(k)),
