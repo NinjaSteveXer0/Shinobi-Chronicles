@@ -23,6 +23,8 @@ const PATCH_ID="menma_evolved_pl_battle_36900_2026_09_25";
 const BATTLE_CONFIG_ID="academy_menma_origin_three_test_subjects_with_anko";
 const ENCOUNTER_ID="origin_academy_menma_prologue:three_test_subjects";
 const OBJECTIVE_ID="stop_three_test_subjects";
+const OBJECTIVE_DISPLAY="Stop the Test Subjects.";
+const BATTLE_BACKDROP="Scene backdrops/forest_clearing_day.png";
 const ENTITLEMENT_ID="menma_origin_anko_autonomous_assist";
 const STORY_SCENE_ID="origin_academy_menma_prologue";
 const STORY_BATTLE_BEAT_ID="tutorial_battle";
@@ -786,7 +788,10 @@ if(PRE_COMPLETE_VICTORY){
     upstreamBattleReceipt();
     s.terminalResult="victory";
     s.inputLocked=true;
+    const b=battle();
+    b.presentationTerminalPending="victory";
     const result=PRE_COMPLETE_VICTORY.apply(this,arguments);
+    try{openOverlay("combat");}catch(_error){}
     if(battle().outcome){
       battle().outcome.battleConfigId=BATTLE_CONFIG_ID;
       battle().outcome.encounterId=ENCOUNTER_ID;
@@ -812,7 +817,13 @@ if(PRE_COMPLETE_DEFEAT){
     s.terminalResult="defeat";
     s.inputLocked=true;
     commitBattleOccurrenceReceipt("defeat");
+    const b=battle();
+    const caller=b.returnContext||null;
+    b.presentationTerminalPending="defeat";
+    b.returnContext=null;
     const result=PRE_COMPLETE_DEFEAT.call(this,defeatedParticipantId,envelope,reason);
+    b.returnContext=caller;
+    try{openOverlay("combat");}catch(_error){}
     if(battle().outcome){
       battle().outcome.battleConfigId=BATTLE_CONFIG_ID;
       battle().outcome.encounterId=ENCOUNTER_ID;
@@ -912,6 +923,10 @@ if(PRE_RESTORE_TEST){
     const result=PRE_RESTORE_TEST.apply(this,arguments);
     if(isExactBattle()){
       const b=battle();
+      b.presentationQueueEnabled=true;
+      b.evolvedBattlePresentation=true;
+      b.presentationEnvironmentBackdrop=BATTLE_BACKDROP;
+      b.presentationObjectiveLabel=OBJECTIVE_DISPLAY;
       b.menmaEvolvedPLBattle36900=normalizeState(savedState||b.menmaEvolvedPLBattle36900,sceneInstanceId(b));
       b.menma369LocalAllies={ [ANKO_ID]:makeAnkoParticipant() };
       if(savedBattleActive&&b.battleOver!==true)b.active=true;
@@ -966,6 +981,11 @@ function launchMenmaEvolvedPLBattle36900(context={}){
   b.encounterId=ENCOUNTER_ID;
   b.battleConfigId=BATTLE_CONFIG_ID;
   b.objectiveId=OBJECTIVE_ID;
+  b.presentationQueueEnabled=true;
+  b.evolvedBattlePresentation=true;
+  b.presentationEnvironmentBackdrop=BATTLE_BACKDROP;
+  b.presentationObjectiveLabel=OBJECTIVE_DISPLAY;
+  b.presentationTerminalPending=null;
   b.encounterOccurrenceId=null;
   b.oppositionTemplateId=altered.id;
   b.encounterStatePackageId=null;
@@ -1010,6 +1030,7 @@ function launchMenmaEvolvedPLBattle36900(context={}){
   initializeBattleAttachedSummonRuntimeFromDeployment();
   initializeBattleDedicatedVariantRuntimePackages();
   initializeBattleKisoganStartsActiveFromDeployment();
+  try{if(typeof initializeBattlePresentationQueue33000==="function")initializeBattlePresentationQueue33000();}catch(_error){}
 
   recordBattleEvidence({
     eventType:"menma_evolved_pl_battle_started",committedOccurrence:true,
@@ -1031,12 +1052,18 @@ function applyMenmaSuccessorBattleAuthority(scene){
   if(!scene||!scene.beatMap||typeof scene.beatMap.get!=="function")return{success:false,reason:"menma_story_scene_missing"};
   const beat=scene.beatMap.get(STORY_BATTLE_BEAT_ID);
   if(!beat||beat.mode!=="battle_transition"||!beat.battle)return{success:false,reason:"menma_story_battle_beat_missing"};
+  beat.text=OBJECTIVE_DISPLAY;
   beat.battle.enemyId="test_subject_altered_shinobi";
   beat.battle.encounterId=ENCOUNTER_ID;
   beat.battle.battleConfigId=BATTLE_CONFIG_ID;
   beat.battle.objectiveId=OBJECTIVE_ID;
+  beat.battle.objectiveLabel=OBJECTIVE_DISPLAY;
+  beat.battle.actionLabel="STOP THE TEST SUBJECTS";
+  beat.battle.environmentBackdrop=BATTLE_BACKDROP;
   beat.battle.launchResolver=launchMenmaEvolvedPLBattle36900;
-  return{success:true,sceneId:STORY_SCENE_ID,beatId:STORY_BATTLE_BEAT_ID};
+  const defeatBeat=scene.beatMap.get("tutorial_not_completed");
+  if(defeatBeat)defeatBeat.text="Stop the Test Subjects — not completed.";
+  return{success:true,sceneId:STORY_SCENE_ID,beatId:STORY_BATTLE_BEAT_ID,objectiveLabel:OBJECTIVE_DISPLAY};
 }
 const PRE_GET_STORY_SCENE_DEFINITION=typeof getStorySceneDefinition==="function"?getStorySceneDefinition:null;
 if(PRE_GET_STORY_SCENE_DEFINITION){
@@ -1098,6 +1125,10 @@ function diagnostics(){
     semanticLoopNoTimer:!source.includes("set"+"Timeout")&&!source.includes("request"+"AnimationFrame")&&!source.includes("animation"+"end"),
     menmaDefeatImmediate:String(handleBattleParticipantAtZeroPL).includes("academy_menma_withdrawn_before_objective"),
     exactBattleReceipt:String(battleOccurrenceId).includes("BATTLE_OCCURRENCE_PREFIX")&&String(commitBattleOccurrenceReceipt).includes("resolvedHostileIds:victory?[...HOSTILE_IDS]")&&String(completeBattleDefeat).includes('commitBattleOccurrenceReceipt("defeat")'),
+    presentationQueueEnabled:String(launchMenmaEvolvedPLBattle36900).includes("presentationQueueEnabled=true")&&String(launchMenmaEvolvedPLBattle36900).includes("initializeBattlePresentationQueue33000"),
+    presentationEnvironment:BATTLE_BACKDROP==="Scene backdrops/forest_clearing_day.png"&&String(launchMenmaEvolvedPLBattle36900).includes("presentationEnvironmentBackdrop"),
+    successorObjectiveDisplay:OBJECTIVE_DISPLAY==="Stop the Test Subjects."&&String(applyMenmaSuccessorBattleAuthority).includes("STOP THE TEST SUBJECTS"),
+    terminalPresentationDeferred:String(completeBattleVictoryFromDamage).includes('presentationTerminalPending="victory"')&&String(completeBattleDefeat).includes('presentationTerminalPending="defeat"')&&String(completeBattleDefeat).includes("b.returnContext=null"),
     rewardAdapterPresent:!!globalThis.SC_ACADEMY_MENMA_THREE_SUBJECT_REWARD_36200,
     men03StableSource:typeof MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID==="undefined"||MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID==="combat_academy_menma_tutorial_performance_resolved",
     kakashiUntouched:!source.includes("academy_"+"kakashi"),
