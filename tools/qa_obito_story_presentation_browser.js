@@ -91,6 +91,14 @@ async function toBeat(page,target,max=220){
   for(let i=0;i<max;i++){const s=await state(page);if(s.beatId===target)return s;if(s.mode==="choice")throw new Error("unexpected choice "+s.beatId+" before "+target);await advance(page);}
   throw new Error("guard exceeded "+target);
 }
+async function finishActiveStory(page,max=24){
+  for(let i=0;i<max;i++){
+    const active=await page.evaluate(()=>getActiveStorySceneRuntime()?{sceneId:getActiveStorySceneRuntime().sceneId,beatId:getActiveStorySceneRuntime().beatId}:null);
+    if(!active)return true;
+    await advance(page);
+  }
+  throw new Error("active Story did not complete within "+max+" advances");
+}
 async function choose(page,label,next){
   const s=await state(page);assert.strictEqual(s.mode,"choice","expected choice @ "+s.beatId);
   const hit=s.choices.filter(x=>x.label===label);assert.strictEqual(hit.length,1,"missing choice "+label+" @ "+s.beatId+" "+JSON.stringify(s.choices));
@@ -160,7 +168,7 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
     await screenshot(page,label+"-reflection");
     await choose(page,"I need to get better at both.","obi_ending_balance");
     await toBeat(page,"obi_close");await assertBackdrop(page,"obi_close",EXPECTED_BACKDROP.obi_home);
-    await advance(page);
+    await finishActiveStory(page);
     await page.waitForFunction(()=>ensurePlayerAcquisitionState().chronicleOrigin?.prologueCompleted===true,null,{timeout:12000});
     const completion=await page.evaluate(()=>({
       active:getActiveStorySceneRuntime(),complete:ensurePlayerAcquisitionState().chronicleOrigin?.prologueCompleted===true,
