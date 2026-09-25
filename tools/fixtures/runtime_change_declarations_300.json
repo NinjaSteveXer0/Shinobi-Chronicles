@@ -651,6 +651,34 @@
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Issue #369 consumes the CE/Combat-released Menma-first PL Battle evolution. It adds one Menma-scoped semantic owner for alternating player/enemy side opportunities, the Menma/Anko assist entitlement, Active-only enemy relay, exactly-once side-opportunity/RNG persistence, and the exact whole-encounter Battle occurrence receipt required by the existing 100 Ryō adapter. PL remains the health identity; no general Beta command batching or Kakashi migration is included."
+    },
+    {
+      "changeId": "issue-373-evolved-pl-battle-presentation-golden-gate-2026-09-25",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "battle.presentation.shared"
+      ],
+      "owner": "runtime/alpha-battle-modern-33000.js",
+      "directCallers": [
+        "game.js:renderCombatOverlay",
+        "runtime/alpha-menma-evolved-pl-battle-36900.js"
+      ],
+      "stateTouched": [
+        "currentBattle.presentation33000 presentation-only ordered receipt queue",
+        "currentBattle presentationQueueEnabled / presentationTerminalPending presentation gates",
+        "Menma successor Battle environment/objective projection only"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_373_evolved_pl_battle_presentation.js",
+        "tools/qa_issue_373_evolved_pl_battle_presentation_browser.js",
+        "tools/qa_issue_369_menma_evolved_pl_battle.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        ".github/workflows/issue-373-evolved-pl-battle-presentation.yml"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Issue #373 completes the player-facing evolved PL Battle presentation without changing #369 Combat semantics. The canonical shared Battle presentation owner consumes committed evidence into an immutable FIFO playback queue, projects the exact Menma 2-v-3 Squad Wedge and forest-clearing environment, exposes Menma/enemy/Anko actions and relay before settle, and delays terminal navigation until the committed terminal receipt is exposed or safely hard-settled. Presentation cannot rerun Combat resolution or author PL/result truth. Kakashi's frozen Golden presentation remains outside the Menma-scoped motion exception."
     }
   ]
 }
