@@ -998,27 +998,6 @@ function launchMenmaEvolvedPLBattle36900(context={}){
   persistBattleSnapshot();
   try{openOverlay("combat");}catch(_error){}
   return{success:true,battleId:b.battleId,encounterId:ENCOUNTER_ID,battleConfigId:BATTLE_CONFIG_ID,objectiveId:OBJECTIVE_ID,battleOccurrenceId:battleOccurrenceId(b)};
-}){
-  if(typeof launchBattleWithReturnContext!=="function")return{success:false,reason:"battle_launcher_missing"};
-  const launched=launchBattleWithReturnContext("test_subject_altered_shinobi",ENCOUNTER_ID,context.returnContext||null);
-  if(!launched||launched.success!==true)return launched||{success:false,reason:"battle_launch_failed"};
-  const b=battle();
-  b.battleConfigId=BATTLE_CONFIG_ID;
-  b.objectiveId=OBJECTIVE_ID;
-  b.menmaEvolvedPLBattle36900=createState(context.active&&context.active.instanceId||sceneInstanceId(b));
-  b.menma369LocalAllies={ [ANKO_ID]:makeAnkoParticipant() };
-  const deployment=configureExactDeployment();
-  if(!deployment.success)return deployment;
-  recordBattleEvidence({
-    eventType:"menma_evolved_pl_battle_started",committedOccurrence:true,
-    actorRef:createBattleParticipantRef("player",MENMA_ID),
-    targetRef:createBattleParticipantRef("enemy","test_subject_altered_shinobi"),
-    sourceRefs:[{type:"battle_config",id:BATTLE_CONFIG_ID},{type:"story_scene",id:STORY_SCENE_ID}],
-    data:{battleConfigId:BATTLE_CONFIG_ID,encounterId:ENCOUNTER_ID,objectiveId:OBJECTIVE_ID,alliedParticipantIds:[...ALLIED_IDS],hostileParticipantIds:[...HOSTILE_IDS],playerSideStarts:true,plIdentity:"Battle PL",healthReplacement:false}
-  });
-  persistBattleSnapshot();
-  try{openOverlay("combat");}catch(_error){}
-  return{success:true,battleId:b.battleId,encounterId:ENCOUNTER_ID,battleConfigId:BATTLE_CONFIG_ID,objectiveId:OBJECTIVE_ID};
 }
 function patchMenmaStoryBattle(){
   if(typeof getStorySceneDefinition!=="function")return{success:false,reason:"story_definition_api_missing"};
