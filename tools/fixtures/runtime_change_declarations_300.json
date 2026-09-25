@@ -677,6 +677,34 @@
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "AUTHORITY_CHANGED: Issue #379 consumes corrected World authority at d8afde8b7e499bfbb7d6b0716184f00a76f6f0d9. Reward qualification remains exact successor terminal victory plus all-three hostile resolution, but Menma survival is no longer an independent World predicate. The adapter preserves factual menmaWithdrawn truth in the reward receipt, remains cadence-independent, preserves the fixed 100 Ryō amount and idempotent receipt, and does not alter Battle cadence or Combat semantics."
+    },
+    {
+      "changeId": "issue-383-kakashi-menma-skill-lock",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "combat.prepared_skill.definition.shared"
+      ],
+      "owner": "runtime/alpha-kakashi-menma-skill-lock-38300.js",
+      "directCallers": [
+        "index.html",
+        "shared Battle prepared-Skill lookup"
+      ],
+      "stateTouched": [
+        "static authored Skill displayName projection",
+        "Academy Kakashi prepared palette projection",
+        "Precision Strike conditional authored Attack PL"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_383_skill_lock.js",
+        "tools/qa_issue_383_skill_lock_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_issue_312_browser.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Consumes signed-off Combat authority d280f8eff7bef1e946afb87aa05bb03879e781b8: exact Academy Menma/Kakashi display names, Kakashi Precision Strike Clone Switch-enhanced ATK 11, and existing Substitution Jutsu prepared-slot supersession. Stable IDs, Menma raw values, Kakashi normal ATK 5, Battle semantics outside the exact enhancement, PL/Stats, enemy calibration, Story and rewards remain unchanged."
     }
   ]
 }
