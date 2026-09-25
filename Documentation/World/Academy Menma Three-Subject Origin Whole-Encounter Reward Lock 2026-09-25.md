@@ -3,7 +3,7 @@
 **Date:** 2026-09-25  
 **Owner:** World / Missions / Events / Rewards  
 **Source handoff:** GitHub #361  
-**Status:** **WORLD CLOSED — SUCCESSOR REWARD AUTHORITY / CODING REQUIRED**
+**Status:** **WORLD CLOSED — WHOLE-ENCOUNTER VICTORY TRIGGER CORRECTED / CODING REQUIRED**
 
 ## 1. Successor scope
 
@@ -22,7 +22,7 @@ Successor Battle authority:
   - `test_subject_brute`;
   - `test_subject_unstable`.
 
-Victory exists only when all three exact hostile participants are resolved/withdrawn before Menma tutorial failure.
+Victory reward eligibility exists only when the authoritative Battle result commits `victory` for the exact three-subject objective and all three exact hostile participants are resolved/withdrawn. World does not independently add a Menma-survival requirement.
 
 Withdrawing Altered Shinobi alone, or any two hostiles, is **not** a victory reward trigger.
 
@@ -60,6 +60,25 @@ However, this is not calibrated as a solo 3-v-1 because:
 
 Therefore **100 Ryō** is the fixed successor whole-encounter payout.
 
+## 2A. Cadence independence / current authority correction
+
+The reward contract must not encode one temporary Battle cadence as reward law.
+
+Current authority has changed more than once during Menma Scene 7 reconciliation, including:
+
+- the corrected Active/Benched relay ruling where Menma may withdraw and Anko may promote/continue;
+- the newer Story successor direction at commit `d4d296d1a78e404ca7b7a6498d4213b88fd0bacb`, which moves Scene 7 toward a half-scripted Anko-first structure and is still being reconciled by CE/Combat.
+
+World therefore keys the reward only to the stable factual outcome it owns:
+
+> **exact successor encounter + exact objective + authoritative terminal victory + all three exact hostiles resolved**
+
+World does **not** decide whether Menma, Anko, or authored encounter choreography causes each withdrawal.
+
+World does **not** use `menmaWithdrawn=false` as an additional gate.
+
+This keeps reward authority correct across the currently open cadence reconciliation without pre-empting CE/Combat ownership.
+
 ## 3. Trigger predicate
 
 The 100-Ryō entitlement commits only when the exact Battle result proves all of the following:
@@ -68,8 +87,11 @@ The 100-Ryō entitlement commits only when the exact Battle result proves all of
 - encounter is `origin_academy_menma_prologue:three_test_subjects`;
 - objective is `stop_three_test_subjects`;
 - terminal Battle result is `victory`;
-- all three exact hostile IDs are present in the resolved-hostile set;
-- Menma did not already withdraw/finalise tutorial failure.
+- all three exact hostile IDs are present in the resolved-hostile set.
+
+**`menmaWithdrawn` is not a reward-disqualifying field.**
+
+If current/future CE/Combat cadence allows a valid allied whole-encounter victory after Menma has withdrawn, the 100-Ryō reward still qualifies. If a future authoritative Battle contract instead classifies a given Menma withdrawal path as terminal defeat/not-completed, the reward fails because `battleResult != victory`, not because World separately checks Menma survival.
 
 The exact Combat Battle occurrence remains the authoritative ancestry:
 
@@ -81,15 +103,15 @@ There is no fixed material payout from this source when:
 
 - only Altered Shinobi withdraws;
 - exactly two hostiles withdraw;
-- Menma withdraws before objective completion;
-- the Battle ends as tutorial defeat/not-completed;
+- Menma withdrawal by itself is **not** a fixed-reward event and pays nothing at that moment;
+- the Battle later ends as defeat/not-completed;
 - the encounter is abandoned before committed victory.
 
 Do not resurrect the old 50-Ryō source as a mid-Battle claim when Altered Shinobi leaves the field.
 
 ## 5. Anko contribution does not split or remove the reward
 
-The 100 Ryō is awarded for Menma successfully completing the authored tutorial encounter while remaining a valid tutorial participant.
+The 100 Ryō is awarded for a valid committed allied-side completion of the authored whole encounter. Menma survival is not a separate World reward predicate.
 
 Anko may legitimately cause one or more hostile withdrawals.
 
@@ -204,4 +226,4 @@ Preserve:
 
 ## Final lock
 
-> **Academy Menma + Anko defeating the complete three-test-subject Scene 7 encounter grants one immediate 100-Ryō Battle reward. No partial/per-subject payout exists, no fixed loot or generic Character EXP is added, and the old 50-Ryō Altered-only source is retired for new executions.**
+> **A valid committed victory over the complete Academy Menma three-test-subject Scene 7 encounter grants one immediate 100-Ryō Battle reward. The reward is keyed to whole-encounter victory and all-three resolution, not Menma survival. No partial/per-subject payout exists, no fixed loot or generic Character EXP is added, and the old 50-Ryō Altered-only source is retired for new executions.**
