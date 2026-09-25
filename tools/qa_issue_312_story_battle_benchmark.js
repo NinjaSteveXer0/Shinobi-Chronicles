@@ -141,7 +141,11 @@ const storyOwner=ownership.responsibilities.find(x=>x.responsibilityId==="story.
 const battleOwner=ownership.responsibilities.find(x=>x.responsibilityId==="battle.presentation.shared");
 assert(storyOwner&&storyOwner.canonicalOwner==="runtime/alpha-story-scene-board-33900.js","#312 shared Story owner drift");
 assert(battleOwner&&battleOwner.canonicalOwner==="runtime/alpha-battle-modern-33000.js","#312 shared Battle owner drift");
-assert((battleOwner.stateWrites||[]).length===0,"#312 Battle presentation must not write semantic state");
+assert.deepStrictEqual(
+  battleOwner.stateWrites||[],
+  ["currentBattle.presentation33000 presentation-only queue/exposure state"],
+  "#312 Battle presentation may write only its owner-local presentation queue/exposure state"
+);
 
 assert(kv2Core.includes('"v2_watch_exchange"')&&kv2Core.includes('"v2_stop_assassin_setup"'),"#312 Kakashi Sakura benchmark route missing");
 assert(kv2Battle.includes("academy_kakashi_origin_battle_seq_mi"),"#312 MI sequential benchmark Battle config missing");
