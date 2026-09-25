@@ -860,6 +860,18 @@
       "milestone": "shared Origin runtime propagation review",
       "qaRef": "tools/qa_kakashi_v2_clean_room.js",
       "temporary": false
+    },
+    {
+      "adapterId": "academy_kakashi_menma_skill_lock_38300",
+      "reason": "Project the signed-off Academy Kakashi/Menma Combat Skill names, exact Kakashi conditional Attack PL recalibration, and prepared-slot supersession through the existing shared prepared-Skill definition APIs without creating a second Combat resolver.",
+      "owner": "runtime/alpha-kakashi-menma-skill-lock-38300.js",
+      "sourceOwner": "game.js",
+      "targetOwner": "game.js",
+      "exactBehaviorBridged": "Stable-ID Skill definition projection: authored displayName, Kakashi Clone Switch-enhanced Precision Strike ATK 11, and existing Substitution Jutsu prepared-slot replacement.",
+      "retirementCondition": "Review when the canonical shared Skill definitions in game.js directly encode the 2026-09-26 signed-off names and Kakashi enhanced packet without requiring an authority-consumption wrapper.",
+      "milestone": "shared Combat content consolidation",
+      "qaRef": "tools/qa_issue_383_skill_lock.js",
+      "temporary": false
     }
   ],
   "surfaceContracts": [
