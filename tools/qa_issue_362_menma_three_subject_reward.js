@@ -119,7 +119,7 @@ let persisted;
   assert.strictEqual(receipts.length,1,"exact reward receipt missing/duplicated");
   assert.strictEqual(receipts[0].rewards.ryo,100);
   assert.strictEqual(receipts[0].rewards.exp,0);
-  assert.deepStrictEqual(receipts[0].rewards.items,[]);
+  assert.deepStrictEqual(Array.from(receipts[0].rewards.items),[]);
   assert.strictEqual(x.activityHistory.some(r=>r&&r.rewardSourceId===OLD_SOURCE),false,"retired 50-Ryō source was written");
   const after=x.playerData.ryo;
   assert.strictEqual(x.sb.claimCurrentBattleRewards(),false,"repeated claim should fail idempotently");
