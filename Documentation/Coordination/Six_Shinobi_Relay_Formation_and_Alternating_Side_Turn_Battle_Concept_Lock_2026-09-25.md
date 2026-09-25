@@ -2,8 +2,8 @@
 
 **Date:** 2026-09-25  
 **Owner:** CE / Codex / Coordination, preserving Combat and UI ownership boundaries  
-**Status:** **DESIGN LOCKED / IMPLEMENTATION HOLD — DO NOT CODE YET**  
-**Primary priority:** Finish and judge Academy Kakashi Origin Browser Golden before any implementation begins from this concept.
+**Status:** **DESIGN LOCKED / STAGED ALPHA IMPLEMENTATION RELEASED — MENMA FIRST**  
+**Primary proving ground:** Academy Menma Origin 2-v-3. Academy Kakashi remains GOLDEN / frozen until successor PL Battle is proven.
 
 ## 1. Purpose
 
@@ -25,25 +25,32 @@ Target identity:
 
 > **modern + kinetic + tactical turn-based combat**
 
-This document exists to preserve that concept now without authorising implementation.
+This document preserves the concept and now authorises a staged Alpha implementation under the current release conditions below.
 
-## 2. Absolute implementation hold
+## 2. Staged Alpha implementation release
 
-**DO NOT IMPLEMENT THIS CONCEPT YET.**
+The former hold was explicitly gated on Academy Kakashi Browser Golden.
 
-Stephen is currently deciding whether Academy Kakashi Origin can become Browser Golden after the current animation/presentation work. If it does not, Kakashi may receive a major rewrite.
+That gate has been satisfied.
+
+Academy Kakashi is **ALPHA GOLDEN / FROZEN** and must not be used as the first overhaul testbed.
+
+Stephen has explicitly reprioritised and released the PL Battle overhaul with Academy Menma Origin as the first real proving ground.
 
 Therefore:
 
 ~~~text
 Battle concept = DESIGN LOCKED
-Battle runtime implementation = HOLD
-Coding handoff = NONE
+PL Battle identity = LOCKED
+Failure/recovery safeguards = LOCKED
+Staged Alpha Battle implementation = RELEASED
+First real Origin proving ground = Academy Menma 2-v-3
+Kakashi first-pass migration = PROHIBITED UNTIL MENMA PROVES RUNTIME
 ~~~
 
-No specialist should alter current Battle turn semantics, rebuild the Formation Stage, add relay/promotion runtime, add new Battle animation, change PvP architecture or change current Kakashi Battle behaviour because of this document until Stephen explicitly releases the hold.
+Current live runtime remains production authority until each successor implementation tranche is merged and validated.
 
-Current live runtime remains production authority.
+Implementation release does not waive source/headless/browser validation and does not permit unrelated Kakashi refactoring.
 
 ### Battle failure-containment authority — LOCKED
 
@@ -57,9 +64,19 @@ Canonical recovery rule:
 
 > **FALLBACK TO AUTHORITATIVE STATE, NOT TO OLD CODE.**
 
-This reference does **not** release the implementation hold.
+These safeguards remain mandatory after implementation release. Release does **not** weaken or supersede them.
 
 ## 3. Core Battle identity
+
+Canonical product identity:
+
+> **THE NEW BATTLE SYSTEM IS THE EVOLVED PL BATTLE SYSTEM. IT NEVER REPLACES PL.**
+
+PL / Battle PL remains the authoritative combat language. The overhaul changes Battle expression, tactics, formation and presentation; it does not substitute HP, generic health bars or a parallel non-PL combat identity.
+
+Detailed release / Menma reconciliation authority:
+
+`Documentation/Coordination/PL_Battle_Identity_and_Menma_Alpha_Overhaul_Reconciliation_2026-09-25.md`
 
 Canonical concept:
 
@@ -101,7 +118,7 @@ Team size does **not** automatically create one ordinary turn per deployed parti
 
 A 6v6 is not a twelve-action initiative round.
 
-The Active normally spends the side's action opportunity. Explicit Skills, reactions or assists may later create exceptional opportunities if Combat separately authorises them.
+The Active normally spends the side's action opportunity. An explicitly authorised assist may instead consume that same existing side opportunity without creating a second action opportunity, automatic Benched turn or formation promotion. Other reactions / interrupts / extra opportunities still require separate Combat authority.
 
 For **Alpha**, selecting a Summon action does **not** create an additional participant turn or a second action opportunity. The selected Summon action consumes the player's normal side action opportunity, exactly like choosing another authorised Battle action.
 
@@ -143,7 +160,9 @@ Internally, Combat/runtime may still use stable semantic identifiers such as cur
 
 ### Active
 
-The one participant currently taking the side's normal action opportunity and receiving confrontation focus.
+The default participant entitled to the side's normal action opportunity and the formation's confrontation anchor.
+
+An explicitly authorised assist may consume that same side opportunity from another legal participant without semantic promotion or a second action. This exception must be authored; Benched status alone never grants it.
 
 The Active Battle portrait is the dominant portrait at approximately full presentation prominence.
 
@@ -652,6 +671,8 @@ The following concept is now locked:
 19. Alpha Summons are action selections from the SUMMONS dock, not battlefield participant cards, extra team slots or independent turns.
 20. Ordinary Battle starting positions and relay priority inherit the committed My Clan formation order: START -> NEXT 1 -> NEXT 2 -> NEXT 3 -> RESERVE 1 -> RESERVE 2.
 21. The Battle failure-containment and recovery safeguard contract is mandatory implementation authority: one validated semantic commit, exactly-once opportunity consumption, canonical-state recovery, stale-work rejection, deterministic persistence/reload, presentation fail-soft, semantic fail-closed, and no live legacy semantic fallback.
+22. The successor Battle runtime remains the PL Battle System; PL/Battle PL cannot be replaced by HP or a parallel health identity.
+23. An explicitly authored assist may consume the side's existing single action opportunity without creating an extra turn or semantic promotion; the Menma Origin Anko assist is the first Alpha-authorised instance.
 
 ## 22. What remains OPEN
 
@@ -666,14 +687,22 @@ Do not silently decide these without owner closure:
 - reactions/interrupts/extra action opportunities;
 - any new support/reserve mechanic not already authorised.
 
-## 23. Release condition
+The Academy Menma Origin `menma_origin_anko_autonomous_assist` is now one specifically authorised Alpha exception: Anko may consume the existing player-side opportunity on her authored assist entitlement without becoming Active, without a second action dock and without creating an extra opportunity. This does not create a generic Benched-turn rule.
 
-This implementation hold may be released only after Stephen explicitly decides what happens with Academy Kakashi Origin following the current Browser Golden evaluation.
+## 23. Release status
 
-If Kakashi is accepted, this concept may move to Combat semantic closure and later UI/Coding implementation planning.
+The former Kakashi Browser Golden release condition has been satisfied and is now historical genealogy.
 
-If Kakashi is rewritten, shared Battle implementation should wait until that rewrite scope is reconciled.
+Stephen has explicitly released the staged Alpha PL Battle implementation lane.
+
+Implementation proceeds **Menma first** under:
+
+`Documentation/Coordination/PL_Battle_Identity_and_Menma_Alpha_Overhaul_Reconciliation_2026-09-25.md`
+
+Kakashi remains protected until the successor PL Battle runtime is proven on Menma through source/headless and installed-browser validation.
+
+Beta #366 remains queued and must not be imported into this Alpha implementation.
 
 ## 24. Final lock
 
-> **Shinobi Chronicles Battle is intended to become alternating side-turn combat presented through an adaptive six-shinobi Squad Wedge: one Active, three Benched and two Reserve Battle portraits per full team. The Active participant spends the normal side action opportunity; team size does not create six independent normal turns. The committed My Clan formation order determines the initial Active, Benched order, Reserve order and ordinary relay priority; Battle does not create a second replacement-choice system. When the Active reaches withdrawal, the outgoing portrait completes its knock-off/withdrawal animation first; only then does an eligible Benched portrait slide into the Active confrontation position while scaling from roughly 65–75% to 100%, with an available Reserve refilling the vacated Benched slot. Multi-participant withdrawals resolve from one committed action result and the surviving formation is normalized once. For Alpha, SUMMONS supplies authorised Summon actions only; Summons do not enter the Squad Wedge as participant portraits or receive independent turns. Combat owns all factual turn/action/target/result/withdrawal legality; battle.presentation.shared makes those committed facts kinetic and readable. Any future implementation must also satisfy the locked Battle failure-containment contract, including exactly-once semantic commits and recovery from authoritative state rather than retired code. The concept is locked now, but implementation is explicitly on hold until Stephen completes the Academy Kakashi Browser Golden decision.**
+> **Shinobi Chronicles Battle is the evolved PL Battle System: alternating side-turn combat presented through an adaptive six-shinobi Squad Wedge, never a replacement for PL. A full team projects one Active, three Benched and two Reserve Battle portraits. The Active is the default normal action bearer; team size does not create six independent normal turns. An explicitly authorised assist may consume the side's existing single action opportunity without creating an extra action, automatic Benched turn or formation promotion. The committed My Clan formation order determines initial Active, Benched order, Reserve order and ordinary relay priority. When the Active reaches withdrawal, the outgoing portrait clears first, then the eligible relay promotes and the formation settles. Multi-participant withdrawals resolve from one committed action result and normalize once. Alpha Summons remain action selections rather than independent battlefield participants. Combat owns factual turn/action/target/result/withdrawal legality; battle.presentation.shared makes committed facts kinetic and readable. The locked failure-containment contract remains mandatory. Staged Alpha implementation is now released with Academy Menma 2-v-3 as the first real proving ground; Kakashi remains GOLDEN/frozen until that successor runtime is proven. Beta #366 is not Alpha authority.**
