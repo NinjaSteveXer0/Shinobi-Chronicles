@@ -148,40 +148,76 @@ Continue:
 
 ## Scene 7 — PL Battle
 
-Stephen's current intended Battle:
+Stephen's current successor intent is now a **half-scripted 2-v-3 encounter**:
 
-> **Menma + Anko vs three former Orochimaru test subjects.**
+> **Anko defeats the first two former test subjects as authored Battle beats. Menma then receives the final subject as the genuine player-resolved test.**
 
-Story establishes the confrontation.
+This supersedes the earlier intent that Menma and Anko simply participate in an ordinary unscripted 2-v-3 cadence from the start.
 
-Combat resolves it.
+### Intended encounter shape
 
-Story resumes from committed Battle truth.
+1. Anko acts first.
+2. Anko defeats / forces withdrawal of the first hostile.
+3. The next hostile relays in.
+4. Anko defeats / forces withdrawal of the second hostile.
+5. The final hostile relays in.
+6. Menma becomes the player-resolved focus for the last subject.
+7. Menma's success remains dependent on the player's legal skill/action choices.
 
-Do not pre-write specific strikes, injuries, kills, individual takedowns or performance results owned by Combat.
+The first two Anko victories are **authored encounter choreography**, not player performance and not Menma-attributable MEN-03 evidence.
 
-Capability benchmark:
-- Menma is especially strong in **Kinjutsu** and **Fuinjutsu**;
-- legitimate options/observations/approaches may reflect those capabilities when contextually available;
-- Anko retains her own established capability identity;
-- neither becomes a generic combatant at the Story->Battle seam.
+The final Menma phase is the actual performance test.
+
+### PL / lethality boundary
+
+Current Battle law remains:
+
+> **0 Battle PL = withdrawal, not injury/death.**
+
+Therefore this authority uses **defeat / withdrawal** for the final subject unless a later explicit Story/Combat consequence authorises literal killing.
+
+Stephen's colloquial "Menma gets the last one to kill" is currently interpreted as:
+- Menma gets the final subject to personally defeat;
+- not an automatic lethal resolver.
+
+### Performance reactions
+
+The existing three Anko post-Battle reaction bands remain useful, but should consume **Menma's actual final-phase performance**, not Anko's scripted first-two takedowns.
+
+Intended Writing interpretation:
+- **high** — Menma handles the final subject impressively;
+- **middle** — Menma wins solidly;
+- **low** — Menma wins, but the cost/pressure is obvious.
+
+If Menma fails to resolve the final subject, do not fake a low-performance completion bucket merely to reach one of the three reactions.
+
+Exact failure continuation remains Combat/CE-owned until reconciled.
+
+### Capability benchmark
+
+- Menma is especially strong in **Kinjutsu** and **Fūinjutsu** at character-identity level;
+- only currently legal prepared actions may appear in Battle;
+- legitimate Story observation may reflect exact committed actions only;
+- Anko retains her established capability identity;
+- neither character becomes a generic combatant merely because the first two phases are scripted.
 
 ### Backdrop / Battle environment
-Use the same encounter location:
+
+Use:
 `Scene backdrops/forest_clearing_day.png`
 
-Battle presentation must preserve that the Battle occurs in the same clearing unless Combat/UI authority requires a technically separate projection of the same environment.
+The full encounter remains in the same clearing.
 
-### AUTHORITY COLLISION — MUST BE RECONCILED
+### RECONCILIATION STATUS
 
-Older durable authority currently defines:
-- Menma directly fights only `test_subject_altered_shinobi`;
-- Anko remains occupied with `test_subject_brute` + `test_subject_unstable`;
-- tutorial Battle is one-on-one.
+This successor half-scripted cadence supersedes the previously reconciled ordinary 2-v-3 cadence.
 
-Stephen's 2026-09-25 direction supersedes that intended design but requires CE / Combat reconciliation before implementation may claim the 2-v-3 Battle is supported.
+Active CE issue:
+**#376 — Reconcile Menma 2v3 Active/Benched relay with generic Battle law**
 
-Writing must not falsely mark that Combat contract implemented/validated.
+That issue must now consume this newer Stephen-direct intent rather than the earlier generic relay shape.
+
+Writing must not claim runtime implementation/validation until #376 and downstream Coding have consumed the half-scripted structure.
 
 ---
 
