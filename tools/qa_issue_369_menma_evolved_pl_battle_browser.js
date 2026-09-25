@@ -436,14 +436,17 @@ async function defeatReceiptAndReturn(browser){
     assert.strictEqual(terminal.rewards.ryo,0,"defeat exposed successor reward");
     assert.strictEqual(terminal.rewards.generated,false,"defeat generated claimable reward");
 
-    const resumed=await page.evaluate(()=>resumeBattleCallerAfterCompletion("defeat"));
-    assert(resumed&&resumed.success===true,"defeat did not return to Story "+JSON.stringify(resumed));
+    // Generic defeat completion owns the caller return and resumes Story
+    // immediately when returnContext exists. Calling resume a second time would
+    // correctly fail because the consumed return context has already been cleared.
     await page.waitForFunction(scene=>getActiveStorySceneRuntime()?.sceneId===scene&&getActiveStorySceneRuntime()?.beatId==="tutorial_not_completed",SCENE,{timeout:12000});
     const after=await page.evaluate(()=>({
       beat:getActiveStorySceneRuntime()?.beatId||null,
+      returnContextConsumed:!currentBattle.returnContext,
       rewardRows:getActivityHistory().filter(r=>r&&r.type==="origin_battle_reward"&&r.rewardSourceId==="menma_origin_battle_three_test_subjects_victory_ryo_01").length,
       ankoAssistRows:(currentBattle.runtime?.evidence||[]).filter(r=>r&&r.eventType==="menma_origin_anko_assist_completed").length
     }));
+    assert.strictEqual(after.returnContextConsumed,true,"defeat caller return context was not consumed exactly once");
     assert.strictEqual(after.beat,"tutorial_not_completed");
     assert.strictEqual(after.rewardRows,0,"defeat created reward receipt");
     assert.strictEqual(after.ankoAssistRows,0,"Anko continued after immediate Menma tutorial defeat");
