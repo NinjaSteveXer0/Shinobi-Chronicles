@@ -1048,7 +1048,7 @@ function diagnostics(){
     patchId:PATCH_ID==="menma_evolved_pl_battle_36900_2026_09_25",
     exactBattleIdentity:!!beat&&beat.battle&&beat.battle.battleConfigId===BATTLE_CONFIG_ID&&beat.battle.encounterId===ENCOUNTER_ID&&beat.battle.objectiveId===OBJECTIVE_ID,
     exactParticipants:ALLIED_IDS.join("|")==="academy_menma|sj_anko"&&HOSTILE_IDS.join("|")==="test_subject_altered_shinobi|test_subject_brute|test_subject_unstable",
-    plIdentityPreserved:source.includes('plIdentity:"Battle PL"')&&!source.includes("hitPoints")&&!source.includes("healthMeter"),
+    plIdentityPreserved:source.includes('plIdentity:"Battle PL"')&&!source.includes("hit"+"Points")&&!source.includes("health"+"Meter"),
     playerSideStarts:createState("x").phase==="player"&&createState("x").playerEntitlementIndex===0,
     oneActionPerOpportunity:String(validateBattleActionEnvelope).includes("side_opportunity_already_committed")&&String(markOpportunityCommitted).includes("committedOpportunities"),
     menmaAnkoEntitlement:String(currentPlayerEntitlement).includes("%2===0")&&ENTITLEMENT_ID==="menma_origin_anko_autonomous_assist",
@@ -1064,8 +1064,8 @@ function diagnostics(){
     exactBattleReceipt:String(commitBattleOccurrenceReceipt).includes(BATTLE_OCCURRENCE_PREFIX)&&String(commitBattleOccurrenceReceipt).includes("resolvedHostileIds:victory?[...HOSTILE_IDS]")&&String(completeBattleDefeat).includes('commitBattleOccurrenceReceipt("defeat")'),
     rewardAdapterPresent:!!globalThis.SC_ACADEMY_MENMA_THREE_SUBJECT_REWARD_36200,
     men03StableSource:typeof MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID==="undefined"||MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID==="combat_academy_menma_tutorial_performance_resolved",
-    kakashiUntouched:!source.includes("academy_kakashi"),
-    betaBatchExcluded:!source.includes("command batch")&&!source.includes("choose one Skill from every active member"),
+    kakashiUntouched:!source.includes("academy_"+"kakashi"),
+    betaBatchExcluded:!source.includes("command batch")&&!source.includes("choose one Skill from every active "+"member"),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
