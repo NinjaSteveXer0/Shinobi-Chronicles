@@ -323,6 +323,20 @@
   // Presentation-only composition over the existing Battle deployment/action APIs.
   // --------------------------------------------------------------------------
   let formationTrayMode33000=null;
+  const MENMA_EVOLVED_CONFIG_33000="academy_menma_origin_three_test_subjects_with_anko";
+  const MENMA_EVOLVED_ENCOUNTER_33000="origin_academy_menma_prologue:three_test_subjects";
+  const MENMA_EVOLVED_BACKDROP_33000="Scene backdrops/forest_clearing_day.png";
+  const MENMA_EVOLVED_OBJECTIVE_33000="Stop the Test Subjects.";
+
+  function isEvolvedMenmaPresentation33000(){
+    try{
+      return !!currentBattle&&(
+        currentBattle.presentationQueueEnabled===true||
+        String(currentBattle.battleConfigId||"")===MENMA_EVOLVED_CONFIG_33000||
+        String(currentBattle.encounterId||"")===MENMA_EVOLVED_ENCOUNTER_33000
+      );
+    }catch(_error){return false;}
+  }
 
   const PRIOR_OPEN_SKILLS_33000=typeof openBattleSkillsActionFamily==="function"?openBattleSkillsActionFamily:null;
   const PRIOR_OPEN_ITEMS_33000=typeof openBattleItemActionFamily==="function"?openBattleItemActionFamily:null;
@@ -424,42 +438,100 @@
   function projectFormationActivePortrait33000(stage,side,row){
     const node=side==="player"?stage.querySelector(".battle-live-active-card-player"):stage.querySelector(".battle-live-active-card-enemy");
     if(!node||!row)return null;
-    node.dataset.participantId=row.participantId;
+    const participant=row.participant||participant33000({side,participantId:row.participantId})||null;
+    const participantId=String(row.participantId||participant&&participant.id||"");
+    node.classList.remove("is-empty");
+    node.dataset.participantId=participantId;
     node.dataset.formationSide=side;
     node.dataset.formationSlot="1";
+    node.dataset.formationRole="active";
+    node.dataset.presentationAssetKind="frameless_portrait";
     node.classList.add("battle2-formation-participant","battle2-formation-active");
-    const img=node.querySelector(".battle-live-active-card-image");
-    const portrait=formationPortrait33000(side,row.participant);
-    if(img&&portrait&&img.getAttribute("src")!==portrait){
-      img.setAttribute("src",portrait);
+    let img=node.querySelector(".battle-live-active-card-image");
+    const portrait=String(row.portrait||formationPortrait33000(side,participant)||"");
+    if(portrait){
+      if(!img){
+        const missing=node.querySelector(".battle-live-active-card-missing");
+        if(missing)missing.remove();
+        img=document.createElement("img");
+        img.className="battle-live-active-card-image";
+        img.draggable=false;
+        node.insertBefore(img,node.querySelector(".battle-live-active-nameplate")||null);
+      }
+      if(img.getAttribute("src")!==portrait)img.setAttribute("src",portrait);
       img.dataset.formationPortrait="true";
+      img.dataset.presentationAssetKind="frameless_portrait";
+      img.alt=String(participant&&participant.name||row.name||participantId||"Battle portrait");
     }
     const heading=node.querySelector(".battle-live-active-card-heading");
     if(heading)heading.textContent=side==="player"?"ACTIVE SHINOBI":"ACTIVE OPPOSITION";
+    const nameplate=node.querySelector(".battle-live-active-nameplate");
+    if(nameplate)nameplate.textContent=String(participant&&participant.name||row.name||participantId||"");
     return node;
-  }
-  function projectFormationSupports33000(stage,side,rows){
+  }  function projectFormationSupports33000(stage,side,rows){
     const roster=stage.querySelector(".battle-live-roster-"+side);
     if(!roster)return[];
-    const ids=new Map(rows.map(row=>[row.slot,row]));
+    const ids=new Map(rows.map(row=>[Number(row.slot),row]));
     const nodes=[...roster.querySelectorAll(".battle-live-roster-slot")];
     for(const node of nodes){
       const slot=Number(node.dataset.slot)||0,row=ids.get(slot)||null;
       node.classList.remove("battle2-formation-participant","battle2-formation-support","battle2-formation-focus","battle2-formation-recessed");
-      delete node.dataset.participantId;delete node.dataset.formationSide;delete node.dataset.formationSlot;
-      if(slot===1||slot>=5||!row||node.classList.contains("is-empty")){
+      delete node.dataset.participantId;delete node.dataset.formationSide;delete node.dataset.formationSlot;delete node.dataset.formationRole;delete node.dataset.presentationAssetKind;
+      if(slot===1||slot>=5||!row){
         node.dataset.formationHidden="true";
         continue;
       }
+      const participant=row.participant||participant33000({side,participantId:row.participantId})||null;
+      const participantId=String(row.participantId||participant&&participant.id||"");
       delete node.dataset.formationHidden;
-      node.dataset.participantId=row.participantId;
+      node.classList.remove("is-empty");
+      node.dataset.participantId=participantId;
       node.dataset.formationSide=side;
       node.dataset.formationSlot=String(slot);
+      node.dataset.formationRole="benched";
+      node.dataset.presentationAssetKind="frameless_portrait";
       node.classList.add("battle2-formation-participant","battle2-formation-support");
+
+      const portrait=String(row.portrait||formationPortrait33000(side,participant)||"");
+      let portraitNode=node.querySelector(".battle-live-roster-portrait");
+      if(portrait){
+        if(!portraitNode||portraitNode.tagName!=="IMG"){
+          if(portraitNode)portraitNode.remove();
+          portraitNode=document.createElement("img");
+          portraitNode.className="battle-live-roster-portrait";
+          portraitNode.draggable=false;
+          const label=node.querySelector(".battle-live-queue-label");
+          if(label&&label.nextSibling)node.insertBefore(portraitNode,label.nextSibling);else node.appendChild(portraitNode);
+        }
+        if(portraitNode.getAttribute("src")!==portrait)portraitNode.setAttribute("src",portrait);
+        portraitNode.dataset.formationPortrait="true";
+        portraitNode.dataset.presentationAssetKind="frameless_portrait";
+        portraitNode.alt=String(participant&&participant.name||row.name||participantId||"Battle portrait");
+      }
+
+      let copy=node.querySelector(".battle-live-roster-copy");
+      if(!copy){
+        copy=document.createElement("div");copy.className="battle-live-roster-copy";
+        const name=document.createElement("div");name.className="battle-live-roster-name";
+        const power=document.createElement("div");power.className="battle-live-roster-power";
+        copy.append(name,power);node.appendChild(copy);
+      }
+      const nameNode=copy.querySelector(".battle-live-roster-name");
+      if(nameNode)nameNode.textContent=String(participant&&participant.name||row.name||participantId||"UNKNOWN");
+      const powerNode=copy.querySelector(".battle-live-roster-power");
+      if(powerNode){
+        let current=row.remainingPL,max=row.maximumPL;
+        try{
+          if(current===undefined||current===null)current=getBattleRemainingPL(side,participantId);
+          if(max===undefined||max===null)max=getBattleMaximumPL(side,participantId);
+        }catch(_error){}
+        powerNode.textContent="PL "+String(current??0);
+        const span=document.createElement("span");span.textContent="/ "+String(max??0);
+        powerNode.appendChild(span);
+      }
     }
     return nodes;
-  }
-  function installFormationDock33000(stage){
+  }  function installFormationDock33000(stage){
     const row=stage&&stage.querySelector(".battle-live-action-family-row");if(!row)return false;
     const buttons=[...row.querySelectorAll("button")];
     for(const button of buttons){
@@ -487,6 +559,38 @@
     for(const button of primary)button.classList.toggle("is-selected",stage.dataset.formationTray===button.dataset.formationFamily.replace("summons","summon"));
     return primary.length===3;
   }
+  function bindBattleEnvironment33000(stage){
+    if(!stage)return null;
+    let backdrop="";
+    try{backdrop=String(currentBattle&&currentBattle.presentationEnvironmentBackdrop||"");}catch(_error){}
+    if(!backdrop&&isEvolvedMenmaPresentation33000())backdrop=MENMA_EVOLVED_BACKDROP_33000;
+    if(backdrop){
+      stage.dataset.battleEnvironment=backdrop;
+      stage.style.setProperty("background-image",'linear-gradient(180deg,rgba(3,10,15,.18),rgba(2,7,10,.48)),url("'+backdrop.replaceAll('"','%22')+'")',"important");
+      stage.style.setProperty("background-size","cover","important");
+      stage.style.setProperty("background-position","center","important");
+    }else{
+      delete stage.dataset.battleEnvironment;
+      stage.style.removeProperty("background-image");
+    }
+    return backdrop||null;
+  }
+  window.bindBattleEnvironment33000=bindBattleEnvironment33000;
+
+  function installBattleObjective33000(stage){
+    if(!stage)return null;
+    let label="";
+    try{label=String(currentBattle&&currentBattle.presentationObjectiveLabel||"");}catch(_error){}
+    if(!label&&isEvolvedMenmaPresentation33000())label=MENMA_EVOLVED_OBJECTIVE_33000;
+    let node=stage.querySelector(".battle2-objective-label");
+    if(!label){if(node)node.remove();return null;}
+    if(!node){node=document.createElement("div");node.className="battle2-objective-label";stage.appendChild(node);}
+    node.textContent=label;
+    node.dataset.objectiveId=String(currentBattle&&currentBattle.objectiveId||"");
+    return node;
+  }
+  window.installBattleObjective33000=installBattleObjective33000;
+
   function installFormationStage33000(stage){
     if(!stage)return null;
     const player=deployedFormation33000("player"),enemy=deployedFormation33000("enemy"),mode=formationMode33000();
@@ -494,6 +598,9 @@
     stage.dataset.formationMode=mode;
     stage.dataset.playerFormationCount=String(player.length);
     stage.dataset.enemyFormationCount=String(enemy.length);
+    stage.dataset.evolvedBattlePresentation=isEvolvedMenmaPresentation33000()?"true":"false";
+    bindBattleEnvironment33000(stage);
+    installBattleObjective33000(stage);
     projectFormationActivePortrait33000(stage,"player",player.find(row=>row.slot===1)||player[0]||null);
     projectFormationActivePortrait33000(stage,"enemy",enemy.find(row=>row.slot===1)||enemy[0]||null);
     projectFormationSupports33000(stage,"player",player);
@@ -521,17 +628,13 @@
       enemyCount:enemy.length,
       actorRef,
       targetRef,
+      environment:stage.dataset.battleEnvironment||null,
+      objective:stage.querySelector(".battle2-objective-label")?.textContent||null,
       primaryFamilies:stage.querySelector(".battle-live-action-family-row")?.dataset.primaryFamilies||"",
       trayMode:stage.dataset.formationTray,
       semanticWrite:false
     };
-  }
-  window.installFormationStage33000=installFormationStage33000;
-
-  const BATTLE_PRESENTATION_CLASSES_33000=Object.freeze(["PHYSICAL_STRIKE","HEAVY_STRIKE","PROJECTILE","CHAKRA_RANGED","AREA_ATTACK","GUARD","EVADE","SUBSTITUTION","HEAL","BUFF","DEBUFF","RESTRAINT","SUMMON","ENVIRONMENTAL","TRANSFORMATION","DEFEAT"]);
-  const playedBattlePerformanceKeys33000=new Set();
-
-  function battleEvidence33000(){
+  }  function battleEvidence33000(){
     try{
       const runtime=typeof ensureBattleRuntimeState==="function"?ensureBattleRuntimeState():currentBattle&&currentBattle.runtime;
       const rows=runtime&&Array.isArray(runtime.evidence)?runtime.evidence:[];
@@ -559,6 +662,15 @@
       return String(itemId).replaceAll("_"," ").toUpperCase();
     }
     if(skillId){
+      if(actor&&actor.id==="sj_anko"){
+        const ankoLabels={
+          sj_anko_hidden_shadow_snake_hands:"Hidden Shadow Snake Hands",
+          sj_anko_snake_bind:"Snake Bind",
+          sj_anko_fire_style_dragon_flame:"Fire Style: Dragon Flame",
+          sj_anko_serpent_evasion:"Serpent Evasion"
+        };
+        if(ankoLabels[skillId])return ankoLabels[skillId];
+      }
       try{
         if(completion.actorRef&&completion.actorRef.side==="player"&&actor&&typeof getBattlePreparedSkillDefinition==="function"){
           const skill=getBattlePreparedSkillDefinition(actor,skillId);if(skill&&skill.displayName)return skill.displayName;
@@ -612,13 +724,91 @@
     if(actionClass.includes("debuff"))return"DEBUFF";
     return"BATTLE_ACTION";
   }
-  function resolveBattlePerformanceProjection33000(){
+  const BATTLE_PRESENTATION_COMPLETION_TYPES_33000=new Set(["skill_action_completed","enemy_authored_action_completed","item_action_completed","summon_skill_resolved_and_returned","menma_origin_anko_assist_completed"]);
+
+  function cloneBattlePresentationValue33000(value){
+    try{return JSON.parse(JSON.stringify(value));}catch(_error){return value;}
+  }
+
+  function captureFormationSnapshot33000(){
+    const snapshot={player:[],enemy:[]};
+    for(const side of ["player","enemy"]){
+      for(let slot=1;slot<=6;slot+=1){
+        let participant=null;
+        try{participant=typeof getBattleDeploymentParticipant==="function"?getBattleDeploymentParticipant(side,slot):null;}catch(_error){participant=null;}
+        if(!participant)continue;
+        let remainingPL=null,maximumPL=null;
+        try{remainingPL=getBattleRemainingPL(side,participant.id);maximumPL=getBattleMaximumPL(side,participant.id);}catch(_error){}
+        snapshot[side].push({
+          side,slot,participantId:String(participant.id||""),
+          name:String(participant.name||participant.id||""),
+          portrait:formationPortrait33000(side,participant)||portrait33000({side,participantId:participant.id},participant)||"",
+          remainingPL:Number.isFinite(Number(remainingPL))?Number(remainingPL):null,
+          maximumPL:Number.isFinite(Number(maximumPL))?Number(maximumPL):null
+        });
+      }
+    }
+    return snapshot;
+  }
+  window.captureFormationSnapshot33000=captureFormationSnapshot33000;
+
+  function ensureBattlePresentationQueueState33000(){
     if(!currentBattle||!currentBattle.battleId)return null;
+    let state=currentBattle.presentation33000;
+    if(!state||state.battleId!==currentBattle.battleId){
+      state={
+        battleId:currentBattle.battleId,
+        nextSequenceOrdinal:1,
+        queue:[],
+        current:null,
+        queuedKeys:[],
+        playedKeys:[],
+        exposedReceipts:[],
+        staleRejectedKeys:[],
+        initialized:false,
+        lastFormationSnapshot:null,
+        lastTransitionCounter:Number(currentBattle.deployment&&currentBattle.deployment.transitionCounter)||0,
+        playbackToken:0,
+        terminalExposed:false,
+        terminalNavigationConsumed:false
+      };
+      currentBattle.presentation33000=state;
+    }
+    if(!Array.isArray(state.queue))state.queue=[];
+    if(!Array.isArray(state.queuedKeys))state.queuedKeys=[];
+    if(!Array.isArray(state.playedKeys))state.playedKeys=[];
+    if(!Array.isArray(state.exposedReceipts))state.exposedReceipts=[];
+    if(!Array.isArray(state.staleRejectedKeys))state.staleRejectedKeys=[];
+    state.nextSequenceOrdinal=Math.max(1,Number(state.nextSequenceOrdinal)||1);
+    state.lastTransitionCounter=Math.max(0,Number(state.lastTransitionCounter)||0);
+    return state;
+  }
+
+  function initializeBattlePresentationQueue33000(){
+    const state=ensureBattlePresentationQueueState33000();
+    if(!state)return null;
+    state.initialized=true;
+    state.lastFormationSnapshot=captureFormationSnapshot33000();
+    state.lastTransitionCounter=Number(currentBattle.deployment&&currentBattle.deployment.transitionCounter)||0;
+    return cloneBattlePresentationValue33000(state);
+  }
+  window.initializeBattlePresentationQueue33000=initializeBattlePresentationQueue33000;
+
+  function evolvedOpportunityId33000(actorRef){
+    if(!actorRef||!currentBattle)return null;
+    const state=currentBattle.menmaEvolvedPLBattle36900;
+    if(!state)return null;
+    const side=String(actorRef.side||"");
+    const ordinal=side==="player"?Number(state.playerOpportunityOrdinal)||1:Number(state.enemyOpportunityOrdinal)||1;
+    return currentBattle.battleId+":"+side+"_opportunity:"+String(ordinal);
+  }
+
+  function resolveBattlePerformanceProjectionForAction33000(actionId){
+    if(!currentBattle||!currentBattle.battleId||!actionId)return null;
     const evidence=battleEvidence33000();
-    const completionTypes=new Set(["skill_action_completed","enemy_authored_action_completed","item_action_completed","summon_skill_resolved_and_returned"]);
-    const completion=[...evidence].reverse().find(row=>row&&row.actionId&&completionTypes.has(row.eventType));
+    const group=evidence.filter(row=>row&&row.actionId===actionId);
+    const completion=[...group].reverse().find(row=>row&&BATTLE_PRESENTATION_COMPLETION_TYPES_33000.has(row.eventType));
     if(!completion)return null;
-    const group=evidence.filter(row=>row&&row.actionId===completion.actionId);
     const actorRef=completion.actorRef||group.find(row=>row.actorRef)?.actorRef||null;
     const targetRef=completion.targetRef||group.find(row=>row.targetRef)?.targetRef||null;
     const actor=participant33000(actorRef),target=participant33000(targetRef);
@@ -629,63 +819,105 @@
     return{
       battleId:currentBattle.battleId,
       actionId:completion.actionId,
+      actionOpportunityId:evolvedOpportunityId33000(actorRef),
       actorRef,targetRef,
       actorName:actor&&actor.name||actorRef&&actorRef.participantId||"ACTOR",
       targetName:target&&target.name||targetRef&&targetRef.participantId||"TARGET",
       actorPortrait:portrait33000(actorRef,actor),
       targetPortrait:portrait33000(targetRef,target),
       actionLabel:actionLabel33000(completion,group,actor),
+      actionRole:actorRef&&actorRef.participantId==="sj_anko"?"authored_assist":"active",
       result,
       presentationClass:presentationClass33000(completion,group,result),
       finalDamage:totalDamage,
       beforePL:firstDamage&&Number.isFinite(Number(firstDamage.data&&firstDamage.data.remainingBattlePLBefore))?Number(firstDamage.data.remainingBattlePLBefore):null,
       afterPL:lastDamage&&Number.isFinite(Number(lastDamage.data&&lastDamage.data.remainingBattlePLAfter))?Number(lastDamage.data.remainingBattlePLAfter):null,
+      withdrawal:!!(lastDamage&&Number(lastDamage.data&&lastDamage.data.remainingBattlePLAfter)<=0),
       exactTarget:!!(targetRef&&targetRef.side&&targetRef.participantId),
       sourceEvidenceIds:group.map(row=>row.evidenceId).filter(Boolean),
       semanticWrite:false
     };
   }
+  window.resolveBattlePerformanceProjectionForAction33000=resolveBattlePerformanceProjectionForAction33000;
+
+  function resolveBattlePerformanceProjection33000(){
+    if(!currentBattle||!currentBattle.battleId)return null;
+    const evidence=battleEvidence33000();
+    const completion=[...evidence].reverse().find(row=>row&&row.actionId&&BATTLE_PRESENTATION_COMPLETION_TYPES_33000.has(row.eventType));
+    return completion?resolveBattlePerformanceProjectionForAction33000(completion.actionId):null;
+  }
   window.resolveBattlePerformanceProjection33000=resolveBattlePerformanceProjection33000;
+
+  function enqueueBattlePresentationReceipt33000(actionId){
+    if(!currentBattle||currentBattle.presentationQueueEnabled!==true||!actionId)return null;
+    const state=ensureBattlePresentationQueueState33000();
+    if(!state)return null;
+    if(!state.initialized)initializeBattlePresentationQueue33000();
+    const key=currentBattle.battleId+":"+String(actionId);
+    if(state.queuedKeys.includes(key)||state.playedKeys.includes(key)||state.current&&state.current.key===key)return null;
+    const projection=resolveBattlePerformanceProjectionForAction33000(actionId);
+    if(!projection)return null;
+    const transitionCounter=Number(currentBattle.deployment&&currentBattle.deployment.transitionCounter)||0;
+    const transition=transitionCounter!==state.lastTransitionCounter?cloneBattlePresentationValue33000(currentBattle.deployment&&currentBattle.deployment.lastTransition||null):null;
+    const beforeFormation=cloneBattlePresentationValue33000(state.lastFormationSnapshot||captureFormationSnapshot33000());
+    const afterFormation=captureFormationSnapshot33000();
+    const receipt=Object.freeze({
+      ...projection,
+      key,
+      sequenceOrdinal:state.nextSequenceOrdinal++,
+      formationBefore:beforeFormation,
+      formationAfter:cloneBattlePresentationValue33000(afterFormation),
+      formationTransition:transition,
+      terminalAtCommit:currentBattle.battleOver===true,
+      terminalResult:currentBattle.outcome&&currentBattle.outcome.type||null
+    });
+    state.queue.push(receipt);
+    state.queuedKeys.push(key);
+    state.lastFormationSnapshot=cloneBattlePresentationValue33000(afterFormation);
+    state.lastTransitionCounter=transitionCounter;
+    return receipt;
+  }
+  window.enqueueBattlePresentationReceipt33000=enqueueBattlePresentationReceipt33000;
+
+  function projectFormationSnapshot33000(stage,snapshot){
+    if(!stage||!snapshot)return null;
+    const player=(snapshot.player||[]).map(row=>({...row,participant:participant33000({side:"player",participantId:row.participantId})||null}));
+    const enemy=(snapshot.enemy||[]).map(row=>({...row,participant:participant33000({side:"enemy",participantId:row.participantId})||null}));
+    const playerActive=player.find(row=>Number(row.slot)===1)||null,enemyActive=enemy.find(row=>Number(row.slot)===1)||null;
+    if(playerActive)projectFormationActivePortrait33000(stage,"player",playerActive);
+    if(enemyActive)projectFormationActivePortrait33000(stage,"enemy",enemyActive);
+    projectFormationSupports33000(stage,"player",player);
+    projectFormationSupports33000(stage,"enemy",enemy);
+    stage.dataset.playerFormationCount=String(player.length);
+    stage.dataset.enemyFormationCount=String(enemy.length);
+    stage.dataset.formationMode=Math.max(player.length,enemy.length)<=1?"duel":Math.max(player.length,enemy.length)>=4?"arc":"wedge";
+    return{playerCount:player.length,enemyCount:enemy.length};
+  }
+  window.projectFormationSnapshot33000=projectFormationSnapshot33000;
 
   function battlePerformanceMarkup33000(p){
     if(!p)return"";
-    return `<section class="battle2-performance-stage" data-action-id="${esc(p.actionId)}" data-performance-class="${esc(p.presentationClass)}" data-result="${esc(p.result)}" aria-label="Latest committed Battle action">
-      <div class="battle2-performance-center"><small>${esc(p.actorName)} → ${esc(p.targetName)}</small><strong>${esc(p.actionLabel)}</strong></div>
-    </section>`;
+    const role=p.actionRole==="authored_assist"?"ASSIST":"ACTIVE";
+    const delta=p.finalDamage>0?"-"+p.finalDamage+" PL":p.result==="SUBSTITUTION"?"NO DIRECT HIT":"STATE CHANGE";
+    const state=p.beforePL!==null&&p.afterPL!==null?p.beforePL+" → "+p.afterPL+" PL":"AUTHORITATIVE STATE UPDATED";
+    return '<section class="battle2-performance-stage is-playing" data-action-id="'+esc(p.actionId)+'" data-performance-class="'+esc(p.presentationClass)+'" data-result="'+esc(p.result)+'" aria-label="Committed Battle action">'+
+      '<div class="battle2-performance-center"><small>'+esc(role+" · "+p.actorName+" → "+p.targetName)+'</small><strong>'+esc(p.actionLabel)+'</strong><span>'+esc(p.result+" · "+delta+" · "+state)+'</span></div></section>';
   }
+
   function battlePerformanceResultChip33000(p){
     if(typeof document==="undefined"||!p)return null;
     const chip=document.createElement("div");
     chip.className="battle2-performance-result-chip";
     chip.dataset.result=String(p.result||"RESOLVED");
-    const delta=p.finalDamage>0?`-${p.finalDamage} PL`:p.result==="SUBSTITUTION"?"NO DIRECT HIT":"STATE CHANGE";
-    const state=p.beforePL!==null&&p.afterPL!==null?`${p.beforePL} → ${p.afterPL} PL`:"AUTHORITATIVE STATE UPDATED";
+    const delta=p.finalDamage>0?'-'+p.finalDamage+' PL':p.result==="SUBSTITUTION"?"NO DIRECT HIT":"STATE CHANGE";
+    const state=p.beforePL!==null&&p.afterPL!==null?p.beforePL+" → "+p.afterPL+" PL":"AUTHORITATIVE STATE UPDATED";
     const result=document.createElement("b");result.textContent=String(p.result||"RESOLVED");
     const change=document.createElement("em");change.textContent=delta;
     const settled=document.createElement("span");settled.textContent=state;
     chip.append(result,change,settled);
     return chip;
   }
-  function battlePerformanceRoleNode33000(stage,ref){
-    if(!stage||!ref||!ref.side||!ref.participantId)return null;
-    const side=String(ref.side),participantId=String(ref.participantId);
-    let active=null;
-    try{
-      active=side==="player"
-        ?(currentBattle&&currentBattle.activePlayer||getBattleDeploymentParticipant("player",1)||null)
-        :(typeof getActiveBattleEnemy33000==="function"?getActiveBattleEnemy33000():getBattleDeploymentParticipant("enemy",1)||null);
-    }catch(_error){active=null;}
-    if(active&&String(active.id||"")===participantId){
-      return side==="player"?stage.querySelector(".battle-live-active-card-player"):stage.querySelector(".battle-live-active-card-enemy");
-    }
-    for(let slot=1;slot<=6;slot+=1){
-      let deployed=null;
-      try{deployed=typeof getBattleDeploymentParticipant==="function"?getBattleDeploymentParticipant(side,slot):null;}catch(_error){deployed=null;}
-      if(!deployed||String(deployed.id||"")!==participantId)continue;
-      return stage.querySelector('.battle-live-roster-'+side+' [data-slot="'+slot+'"]');
-    }
-    return null;
-  }
+
   function clearBattlePerformanceRoles33000(stage,actionId=null){
     if(!stage)return false;
     if(actionId&&stage.dataset.battle2PerformanceActionId&&stage.dataset.battle2PerformanceActionId!==String(actionId))return false;
@@ -699,6 +931,7 @@
     delete stage.dataset.battle2PerformanceResult;
     return true;
   }
+
   function applyBattlePerformanceRoles33000(stage,p){
     clearBattlePerformanceRoles33000(stage);
     if(!stage||!p)return{actorNode:null,targetNode:null};
@@ -708,6 +941,9 @@
     stage.dataset.battle2PerformanceActionId=String(p.actionId||"");
     stage.dataset.battle2PerformanceClass=String(p.presentationClass||"BATTLE_ACTION");
     stage.dataset.battle2PerformanceResult=String(p.result||"RESOLVED");
+    stage.dataset.lastExposedActor=String(p.actorRef&&p.actorRef.participantId||"");
+    stage.dataset.lastExposedTarget=String(p.targetRef&&p.targetRef.participantId||"");
+    stage.dataset.lastExposedAction=String(p.actionLabel||"");
     if(actorNode)actorNode.classList.add("battle2-performance-role-actor");
     if(targetNode){
       targetNode.classList.add("battle2-performance-role-target");
@@ -716,8 +952,184 @@
     }
     return{actorNode,targetNode,resultChip:targetNode&&targetNode.querySelector(".battle2-performance-result-chip")||null};
   }
+
+  function installRelayBanner33000(stage,p){
+    let banner=stage.querySelector(".battle2-relay-banner");
+    if(!p||!p.formationTransition){
+      if(banner)banner.remove();
+      return null;
+    }
+    const t=p.formationTransition;
+    if(!banner){banner=document.createElement("div");banner.className="battle2-relay-banner";stage.appendChild(banner);}
+    const replacement=String(t.replacementParticipantId||"").replaceAll("_"," ").replace(/\b\w/g,ch=>ch.toUpperCase());
+    banner.textContent=replacement?"WITHDRAWAL · "+replacement+" TAKES ACTIVE":"WITHDRAWAL · FORMATION SETTLES";
+    banner.dataset.transitionType=String(t.type||"withdrawal_queue_advance");
+    banner.dataset.replacementParticipantId=String(t.replacementParticipantId||"");
+    return banner;
+  }
+
+  function finishBattlePresentationReceipt33000(stage,receipt,token){
+    const state=ensureBattlePresentationQueueState33000();
+    if(!state||!receipt||state.playbackToken!==token||!state.current||state.current.key!==receipt.key)return false;
+    projectFormationSnapshot33000(stage,receipt.formationAfter);
+    clearBattlePerformanceRoles33000(stage,receipt.actionId);
+    const relay=stage.querySelector(".battle2-relay-banner");if(relay)relay.remove();
+    const host=stage.querySelector(".battle2-performance-host");
+    const lane=host&&host.querySelector(".battle2-performance-stage");
+    if(lane){lane.classList.remove("is-playing");lane.classList.add("is-settled");}
+    if(!state.playedKeys.includes(receipt.key))state.playedKeys.push(receipt.key);
+    state.exposedReceipts.push({...cloneBattlePresentationValue33000(receipt),exposureStarted:true,exposureFinished:true});
+    state.current=null;
+    stage.dataset.presentationBusy="false";
+    if(state.queue.length>0){
+      setTimeout(()=>startNextBattlePresentationReceipt33000(stage),90);
+    }else{
+      projectFormationSnapshot33000(stage,captureFormationSnapshot33000());
+      maybeCompleteTerminalPresentation33000();
+    }
+    return true;
+  }
+
+  function startNextBattlePresentationReceipt33000(stage){
+    const state=ensureBattlePresentationQueueState33000();
+    if(!stage||!state)return null;
+    if(state.current)return state.current;
+    let receipt=null;
+    while(state.queue.length>0&&!receipt){
+      const candidate=state.queue.shift();
+      if(!candidate)continue;
+      if(candidate.battleId!==currentBattle.battleId){
+        state.staleRejectedKeys.push(candidate.key);continue;
+      }
+      receipt=candidate;
+    }
+    if(!receipt){
+      stage.dataset.presentationBusy="false";
+      maybeCompleteTerminalPresentation33000();
+      return null;
+    }
+    state.current=receipt;
+    state.playbackToken=(Number(state.playbackToken)||0)+1;
+    const token=state.playbackToken;
+    stage.dataset.presentationBusy="true";
+    stage.dataset.presentationSequence=String(receipt.sequenceOrdinal);
+    projectFormationSnapshot33000(stage,receipt.formationBefore);
+    let host=stage.querySelector(".battle2-performance-host");
+    if(!host){host=document.createElement("div");host.className="battle2-performance-host";stage.appendChild(host);}
+    host.dataset.actionId=String(receipt.actionId);
+    host.innerHTML=battlePerformanceMarkup33000(receipt);
+    applyBattlePerformanceRoles33000(stage,receipt);
+    const reduced=typeof matchMedia==="function"&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const settleDelay=reduced?420:1450;
+    const relayDelay=reduced?150:900;
+    setTimeout(()=>{
+      const live=ensureBattlePresentationQueueState33000();
+      if(!live||live.playbackToken!==token||!live.current||live.current.key!==receipt.key)return;
+      if(receipt.formationTransition){
+        installRelayBanner33000(stage,receipt);
+        projectFormationSnapshot33000(stage,receipt.formationAfter);
+      }
+    },relayDelay);
+    setTimeout(()=>finishBattlePresentationReceipt33000(stage,receipt,token),settleDelay);
+    return receipt;
+  }
+  window.startNextBattlePresentationReceipt33000=startNextBattlePresentationReceipt33000;
+
+  function maybeCompleteTerminalPresentation33000(){
+    const state=ensureBattlePresentationQueueState33000();
+    if(!state||state.current||state.queue.length>0||!currentBattle)return false;
+    const pending=String(currentBattle.presentationTerminalPending||"");
+    if(!pending||state.terminalNavigationConsumed)return false;
+    state.terminalExposed=true;
+    state.terminalNavigationConsumed=true;
+    currentBattle.presentationTerminalPending=null;
+    if(pending==="victory"){
+      try{openOverlay("victory");return true;}catch(_error){return false;}
+    }
+    if(pending==="defeat"){
+      try{
+        if(typeof resumeBattleCallerAfterCompletion==="function"){
+          const result=resumeBattleCallerAfterCompletion("defeat");
+          return !!(result&&result.success===true);
+        }
+      }catch(_error){}
+    }
+    return false;
+  }
+  window.maybeCompleteTerminalPresentation33000=maybeCompleteTerminalPresentation33000;
+
+  function hardSettleBattlePresentation33000(reason="presentation_fail_soft"){
+    const state=ensureBattlePresentationQueueState33000();
+    if(!state)return{success:false,reason:"presentation_state_missing"};
+    const receipts=[...(state.current?[state.current]:[]),...state.queue];
+    for(const receipt of receipts){
+      if(receipt&&receipt.key&&!state.playedKeys.includes(receipt.key))state.playedKeys.push(receipt.key);
+      if(receipt)state.exposedReceipts.push({...cloneBattlePresentationValue33000(receipt),exposureStarted:true,exposureFinished:true,hardSettled:true,hardSettleReason:reason});
+    }
+    state.current=null;state.queue=[];state.playbackToken=(Number(state.playbackToken)||0)+1;
+    const stage=typeof document!=="undefined"?document.querySelector(".alpha-code-battle-stage"):null;
+    if(stage){
+      stage.dataset.presentationBusy="false";
+      projectFormationSnapshot33000(stage,captureFormationSnapshot33000());
+      clearBattlePerformanceRoles33000(stage);
+      const relay=stage.querySelector(".battle2-relay-banner");if(relay)relay.remove();
+    }
+    maybeCompleteTerminalPresentation33000();
+    return{success:true,hardSettled:true,semanticWrite:false,reason};
+  }
+  window.hardSettleBattlePresentation33000=hardSettleBattlePresentation33000;
+
+  function getBattlePresentationQueueState33000(){
+    const state=ensureBattlePresentationQueueState33000();
+    if(!state)return null;
+    return cloneBattlePresentationValue33000({
+      battleId:state.battleId,
+      busy:!!state.current||state.queue.length>0,
+      current:state.current,
+      queue:state.queue,
+      queuedKeys:state.queuedKeys,
+      playedKeys:state.playedKeys,
+      exposedReceipts:state.exposedReceipts,
+      staleRejectedKeys:state.staleRejectedKeys,
+      terminalExposed:state.terminalExposed,
+      terminalNavigationConsumed:state.terminalNavigationConsumed
+    });
+  }
+  window.getBattlePresentationQueueState33000=getBattlePresentationQueueState33000;
+
+  const PRE_RECORD_PRESENTATION_33000=typeof recordBattleEvidence==="function"?recordBattleEvidence:null;
+  if(PRE_RECORD_PRESENTATION_33000){
+    const wrapped=function(definition){
+      const record=PRE_RECORD_PRESENTATION_33000.apply(this,arguments);
+      if(currentBattle&&currentBattle.presentationQueueEnabled===true&&definition&&definition.actionId&&definition.committedOccurrence===true&&BATTLE_PRESENTATION_COMPLETION_TYPES_33000.has(definition.eventType)){
+        enqueueBattlePresentationReceipt33000(definition.actionId);
+      }
+      return record;
+    };
+    globalThis.recordBattleEvidence=wrapped;try{recordBattleEvidence=wrapped;}catch(_error){}
+  }
+
   function installBattlePerformance33000(stage){
     if(!stage)return null;
+    if(currentBattle&&currentBattle.presentationQueueEnabled===true){
+      const state=ensureBattlePresentationQueueState33000();
+      if(state&&!state.initialized)initializeBattlePresentationQueue33000();
+      let host=stage.querySelector(".battle2-performance-host");
+      if(!host){host=document.createElement("div");host.className="battle2-performance-host";stage.appendChild(host);}
+      if(state&&state.current){
+        projectFormationSnapshot33000(stage,state.current.formationBefore);
+        host.dataset.actionId=String(state.current.actionId);
+        host.innerHTML=battlePerformanceMarkup33000(state.current);
+        applyBattlePerformanceRoles33000(stage,state.current);
+        return state.current;
+      }
+      if(state&&state.queue.length>0)return startNextBattlePresentationReceipt33000(stage);
+      host.replaceChildren();delete host.dataset.actionId;clearBattlePerformanceRoles33000(stage);
+      stage.dataset.presentationBusy="false";
+      maybeCompleteTerminalPresentation33000();
+      return null;
+    }
+
     const p=resolveBattlePerformanceProjection33000();
     let host=stage.querySelector(".battle2-performance-host");
     if(!host){host=document.createElement("div");host.className="battle2-performance-host";stage.appendChild(host);}
@@ -727,9 +1139,6 @@
     if(host.dataset.actionId!==p.actionId){
       host.dataset.actionId=p.actionId;
       host.innerHTML=battlePerformanceMarkup33000(p);
-      // Fast-battle UX: a player-open Skills tray survives committed Skill and
-      // authored enemy playback so the next technique is immediately available.
-      // Other secondary trays still contract around a newly committed action.
       if(!played){
         const preserveSkills=formationTrayMode33000==="skills"||stage.dataset.formationTray==="skills";
         if(!preserveSkills){
@@ -957,6 +1366,25 @@
       .battle2-modern[data-formation-mode="wedge"] .battle-live-power-enemy,
       .battle2-modern[data-formation-mode="arc"] .battle-live-power-enemy{left:56.5%!important;right:auto!important}
 
+      /* Issue #373 — Menma evolved PL Battle Golden candidate.
+         Scoped exception: Kakashi's frozen no-motion Formation Stage remains unchanged. */
+      .battle2-modern[data-evolved-battle-presentation="true"] .battle2-objective-label{position:absolute;left:50%;top:6.2%;transform:translateX(-50%);z-index:34;padding:6px 12px;border:1px solid rgba(218,179,79,.42);border-radius:999px;background:rgba(2,9,13,.82);color:#ead18a;font-size:clamp(8px,.62vw,10px);font-weight:900;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+      .battle2-modern[data-evolved-battle-presentation="true"][data-presentation-busy="true"] .battle-live-action-family-row{opacity:.22!important;pointer-events:none!important;filter:saturate(.45)!important}
+      .battle2-modern[data-evolved-battle-presentation="true"] .battle2-performance-host{left:34%!important;right:34%!important;top:2%!important;height:5.6%!important}
+      .battle2-modern[data-evolved-battle-presentation="true"] .battle2-performance-stage{opacity:1!important;transform:none!important}
+      .battle2-modern[data-evolved-battle-presentation="true"] .battle2-performance-stage .battle2-performance-center{opacity:1!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:2px!important}
+      .battle2-modern[data-evolved-battle-presentation="true"] .battle2-performance-stage .battle2-performance-center span{display:block!important;color:#e3d29d!important;font-size:clamp(7px,.52vw,9px)!important;font-weight:800!important;letter-spacing:.04em!important}
+      .battle2-modern[data-evolved-battle-presentation="true"] .battle2-performance-result-chip{opacity:1!important;animation:none!important;transition:none!important;transform:none!important}
+      .battle2-modern[data-evolved-battle-presentation="true"] .battle-live-active-card,
+      .battle2-modern[data-evolved-battle-presentation="true"] .battle-live-roster-slot.battle2-formation-support{transition:left .36s cubic-bezier(.2,.75,.25,1),right .36s cubic-bezier(.2,.75,.25,1),top .36s cubic-bezier(.2,.75,.25,1),width .36s ease,height .36s ease,opacity .2s ease,filter .2s ease,transform .36s ease!important;will-change:transform,left,top,width,height!important}
+      .battle2-modern[data-evolved-battle-presentation="true"].battle2-performance-active .battle2-performance-role-actor{filter:saturate(1.08) brightness(1.08) drop-shadow(0 26px 30px rgba(0,0,0,.52))!important;opacity:1!important}
+      .battle2-modern[data-evolved-battle-presentation="true"].battle2-performance-active .battle2-performance-role-target{filter:saturate(.92) brightness(.94) drop-shadow(0 20px 28px rgba(0,0,0,.52))!important;opacity:1!important}
+      .battle2-modern[data-evolved-battle-presentation="true"].battle2-performance-active .battle-live-roster-player .battle2-performance-role-actor{left:24%!important;right:auto!important;top:13%!important;width:24%!important;height:45%!important;z-index:35!important}
+      .battle2-modern[data-evolved-battle-presentation="true"].battle2-performance-active .battle-live-roster-enemy .battle2-performance-role-actor{left:52%!important;right:auto!important;top:13%!important;width:24%!important;height:45%!important;z-index:35!important}
+      .battle2-modern[data-evolved-battle-presentation="true"] .battle2-relay-banner{position:absolute;left:50%;top:13.2%;transform:translateX(-50%);z-index:45;padding:7px 12px;border:1px solid rgba(229,183,75,.54);border-radius:10px;background:rgba(3,9,13,.92);color:#f0cb73;font-size:clamp(8px,.6vw,10px);font-weight:900;letter-spacing:.08em;white-space:nowrap}
+      .battle2-modern[data-evolved-battle-presentation="true"] .battle-live-active-card-image,
+      .battle2-modern[data-evolved-battle-presentation="true"] .battle-live-roster-portrait{background:transparent!important;border:0!important;box-shadow:none!important}
+
       @media(max-width:1100px){
         .battle2-modern[data-formation-stage="true"] .battle-live-action-family-row{width:54%!important}
         .battle2-modern[data-formation-stage="true"]:not([data-formation-tray="closed"]) .battle-live-skill-deck,.battle2-modern[data-formation-stage="true"]:not([data-formation-tray="closed"]) .battle-live-pouch,.battle2-modern[data-formation-stage="true"]:not([data-formation-tray="closed"]) .battle-live-summon{left:5%!important;width:67%!important}
@@ -1001,6 +1429,12 @@
       topHudStackSeparated:installStyle.toString().includes(".battle2-performance-host{left:43%!important;right:43%!important;top:1.5%!important;height:4.8%!important}")&&installStyle.toString().includes(".battle2-live-ticker{left:35%!important;top:7.2%!important;width:30%!important"),
       storyCallerPresentationSuspension:String(suspendCallerStoryPresentation33000).includes("markStoryPresentationHidden33900")&&String(renderCombatOverlay).includes("suspendCallerStoryPresentation33000"),
       branchModesRemainExplicit:renderInspector33000.toString().includes("setSelectedBattleSkillMode"),
+      evolvedQueueInSharedOwner:typeof enqueueBattlePresentationReceipt33000==="function"&&typeof getBattlePresentationQueueState33000==="function"&&String(enqueueBattlePresentationReceipt33000).includes("formationBefore"),
+      evolvedQueueDoesNotResolveCombat:!String(enqueueBattlePresentationReceipt33000).includes("resolveBattleDamage")&&!String(startNextBattlePresentationReceipt33000).includes("beginBattleActionResolution"),
+      evolvedSupportHydration:String(projectFormationSupports33000).includes('classList.remove("is-empty")')&&String(projectFormationSupports33000).includes("presentationAssetKind"),
+      evolvedEnvironmentBinding:String(bindBattleEnvironment33000).includes("background-image")&&MENMA_EVOLVED_BACKDROP_33000==="Scene backdrops/forest_clearing_day.png",
+      evolvedObjectiveBinding:MENMA_EVOLVED_OBJECTIVE_33000==="Stop the Test Subjects."&&String(installBattleObjective33000).includes("presentationObjectiveLabel"),
+      evolvedTerminalPresentationGate:String(maybeCompleteTerminalPresentation33000).includes("presentationTerminalPending")&&String(hardSettleBattlePresentation33000).includes("semanticWrite:false"),
       browserGoldenClaimed:false
     };
     const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
