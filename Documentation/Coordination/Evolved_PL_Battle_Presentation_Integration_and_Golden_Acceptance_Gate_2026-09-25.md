@@ -5,6 +5,8 @@
 **Trigger:** Stephen browser/video review after #369 / PR #372  
 **Status:** **SEMANTIC FOUNDATION VALIDATED / PRESENTATION INTEGRATION RED / PLAYER EXPERIENCE RED / BATTLE GOLDEN NOT CLAIMED**
 
+**Successor note — 2026-09-26:** Academy Menma Scene 7 now consumes `Documentation/Coordination/Academy_Menma_Half_Scripted_Three_Subject_Battle_Successor_2026-09-26.md`. Any older Menma-specific acceptance example in this document that assumes an ordinary unscripted Menma-vs-Altered opening or Menma-withdrawal relay is superseded for this Origin. The shared presentation-queue, environment, sequential-playback, terminal-exposure and QA-separation rules remain fully binding.
+
 ## 1. Classification
 
 #369 / PR #372 proved substantial evolved-PL Battle semantics. It did **not** prove the locked player-facing Battle overhaul.
