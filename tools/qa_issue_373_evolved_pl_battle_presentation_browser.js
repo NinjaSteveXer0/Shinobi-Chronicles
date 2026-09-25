@@ -174,13 +174,71 @@ async function formationAndPlayback(browser){
         lastTarget:stage.dataset.lastExposedTarget||null,
         lastAction:stage.dataset.lastExposedAction||null,
         result:stage.dataset.battle2PerformanceResult||null,
-        resultChip:stage.querySelector(".battle2-performance-result-chip")?.innerText||null
+        resultChip:stage.querySelector(".battle2-performance-result-chip")?.innerText||null,
+        playerRing:Number(stage.querySelector(".battle-live-power-player strong")?.textContent||NaN),
+        enemyRing:Number(stage.querySelector(".battle-live-power-enemy strong")?.textContent||NaN)
       };
     });
     assert.strictEqual(visible.lastActor,MENMA);
     assert.strictEqual(visible.lastTarget,ALTERED);
     assert(visible.lastAction&&visible.result&&visible.resultChip,"Menma visible action grammar incomplete");
+    assert.strictEqual(
+      visible.playerRing,
+      visible.current.formationBefore.player.find(r=>r.slot===1)?.remainingPL,
+      "Menma PL ring jumped ahead of the receipt being presented"
+    );
+    assert.strictEqual(
+      visible.enemyRing,
+      visible.current.formationBefore.enemy.find(r=>r.slot===1)?.remainingPL,
+      "enemy PL ring jumped ahead of the receipt being presented"
+    );
     await page.screenshot({path:path.join(OUT,"02-menma-action-playback.png"),fullPage:false,timeout:12000});
+
+    await page.waitForFunction(()=> {
+      const q=getBattlePresentationQueueState33000();
+      return q?.current?.sequenceOrdinal===2&&q.current.actorRef?.side==="enemy";
+    },null,{timeout:7000});
+    const enemyVisible=await page.evaluate(()=>{
+      const stage=document.querySelector(".alpha-code-battle-stage");
+      const q=getBattlePresentationQueueState33000();
+      return{
+        actor:q.current?.actorRef?.participantId||null,
+        target:q.current?.targetRef?.participantId||null,
+        action:stage.dataset.lastExposedAction||null,
+        result:stage.dataset.battle2PerformanceResult||null,
+        chip:stage.querySelector(".battle2-performance-result-chip")?.innerText||null
+      };
+    });
+    assert.strictEqual(enemyVisible.actor,ALTERED,"enemy action playback actor drift");
+    assert.strictEqual(enemyVisible.target,MENMA,"Altered action target drift");
+    assert(enemyVisible.action&&enemyVisible.result&&enemyVisible.chip,"enemy visible action grammar incomplete");
+    await page.screenshot({path:path.join(OUT,"03-enemy-action-playback.png"),fullPage:false,timeout:12000});
+
+    await page.waitForFunction(()=> {
+      const q=getBattlePresentationQueueState33000();
+      return q?.current?.sequenceOrdinal===3&&q.current.actorRef?.participantId==="sj_anko";
+    },null,{timeout:7000});
+    const ankoVisible=await page.evaluate(()=>{
+      const stage=document.querySelector(".alpha-code-battle-stage");
+      const q=getBattlePresentationQueueState33000();
+      const actor=document.querySelector('.battle2-formation-participant[data-participant-id="sj_anko"]');
+      return{
+        actor:q.current?.actorRef?.participantId||null,
+        target:q.current?.targetRef?.participantId||null,
+        actionRole:q.current?.actionRole||null,
+        action:stage.dataset.lastExposedAction||null,
+        result:stage.dataset.battle2PerformanceResult||null,
+        chip:stage.querySelector(".battle2-performance-result-chip")?.innerText||null,
+        semanticRole:actor?.dataset.formationRole||null,
+        visualFocus:actor?.classList.contains("battle2-performance-role-actor")===true
+      };
+    });
+    assert.strictEqual(ankoVisible.actor,ANKO);
+    assert.strictEqual(ankoVisible.actionRole,"authored_assist");
+    assert.strictEqual(ankoVisible.semanticRole,"benched","Anko assist visually rewrote semantic formation role");
+    assert.strictEqual(ankoVisible.visualFocus,true,"Anko assist never entered temporary action focus");
+    assert(ankoVisible.action&&ankoVisible.result&&ankoVisible.chip,"Anko visible assist grammar incomplete");
+    await page.screenshot({path:path.join(OUT,"04-anko-assist-playback.png"),fullPage:false,timeout:12000});
 
     const q=await waitQueueDrained(page,4);
     const exposed=q.exposedReceipts.slice(0,4);
@@ -200,7 +258,7 @@ async function formationAndPlayback(browser){
     assert.strictEqual(ankoReceipt.actionRole,"authored_assist","Anko assist role drift");
     assert(ankoReceipt.actionLabel&&ankoReceipt.result,"Anko visible assist grammar missing");
 
-    await page.screenshot({path:path.join(OUT,"03-after-full-visible-cadence.png"),fullPage:false,timeout:12000});
+    await page.screenshot({path:path.join(OUT,"05-after-full-visible-cadence.png"),fullPage:false,timeout:12000});
     await gate.assertClean("issue-373-formation-playback");
     return{formation,actors:exposed.map(r=>r.actorRef?.participantId),results:exposed.map(r=>r.result)};
   }finally{await context.close();}
@@ -230,7 +288,7 @@ async function relayAndVictory(browser){
     relay=q.exposedReceipts.find(r=>r.formationTransition?.replacementParticipantId==="test_subject_unstable");
     assert(relay,"Brute -> Unstable relay not exposed");
     assert.strictEqual(relay.formationAfter.enemy.find(r=>r.slot===1)?.participantId,UNSTABLE,"Unstable not Active after relay");
-    await page.screenshot({path:path.join(OUT,"04-relay-to-unstable.png"),fullPage:false,timeout:12000});
+    await page.screenshot({path:path.join(OUT,"06-relay-to-unstable.png"),fullPage:false,timeout:12000});
 
     await page.evaluate(()=>{
       setBattleRemainingPL("enemy","test_subject_unstable",1);
@@ -248,7 +306,7 @@ async function relayAndVictory(browser){
     assert.strictEqual(duringTerminal.overlay,"combat","victory overlay erased finishing Battle before playback");
     assert.strictEqual(duringTerminal.beat,"tutorial_battle","Story advanced before terminal Battle presentation");
     assert(duringTerminal.queue.busy,"terminal receipt not actively exposed");
-    await page.screenshot({path:path.join(OUT,"05-terminal-victory-action-visible.png"),fullPage:false,timeout:12000});
+    await page.screenshot({path:path.join(OUT,"07-terminal-victory-action-visible.png"),fullPage:false,timeout:12000});
 
     await page.waitForFunction(()=>typeof currentOverlayType==="string"&&currentOverlayType==="victory",null,{timeout:12000});
     const terminalState=await page.evaluate(()=>getBattlePresentationQueueState33000());
@@ -364,7 +422,7 @@ async function defeatDelay(browser){
     assert.strictEqual(during.overlay,"combat","defeat returned to Story before final action playback");
     assert.strictEqual(during.beat,"tutorial_battle","defeat Story beat advanced too early");
     assert(during.queue.busy,"defeat terminal queue not busy");
-    await page.screenshot({path:path.join(OUT,"06-terminal-defeat-action-visible.png"),fullPage:false,timeout:12000});
+    await page.screenshot({path:path.join(OUT,"08-terminal-defeat-action-visible.png"),fullPage:false,timeout:12000});
 
     await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="tutorial_not_completed",null,{timeout:12000});
     const after=await page.evaluate(()=>({
