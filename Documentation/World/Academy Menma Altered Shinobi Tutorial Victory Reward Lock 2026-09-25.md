@@ -2,7 +2,9 @@
 
 **Date:** 2026-09-25  
 **Owner:** World / Missions / Events / Rewards  
-**Status:** **WORLD CLOSED — IMPLEMENTATION REQUIRED**
+**Status:** **SUPERSEDED FOR NEW SCENE 7 EXECUTIONS — HISTORICAL/LEGACY RECEIPTS ONLY**
+
+> **2026-09-25 successor notice:** New Academy Menma Scene 7 executions now use the three-subject encounter reward authority in `Documentation/World/Academy Menma Three-Subject Origin Whole-Encounter Reward Lock 2026-09-25.md`. The old 50-Ryō source remains valid only for already-committed historical one-opponent occurrences and must not fire from Altered Shinobi withdrawal inside the successor encounter.
 
 ## 1. Scope
 
