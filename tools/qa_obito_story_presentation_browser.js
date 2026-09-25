@@ -98,7 +98,9 @@ async function choose(page,label,next){
   await page.locator("#story-scene-presentation-layer").click({position:{x:80,y:80}});
   await page.waitForTimeout(80);
   assert.strictEqual((await state(page)).beatId,s.beatId,"click-anywhere activated a choice");
-  await page.getByRole("button",{name:label,exact:true}).click();
+  const choiceNode=page.locator("#story-scene-presentation-layer .sc-story-choice").filter({hasText:label});
+  assert.strictEqual(await choiceNode.count(),1,"choice DOM cardinality drift "+label+" @ "+s.beatId);
+  await choiceNode.first().click();
   if(next)await waitBeat(page,next);
 }
 async function assertBackdrop(page,beat,pathExpected){
