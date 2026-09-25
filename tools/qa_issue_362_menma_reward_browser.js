@@ -9,6 +9,7 @@ const {installBrowserRuntimeErrorGate}=require("./browser_runtime_error_gate_311
 
 const BASE=process.env.ISSUE_362_BASE_URL||"http://127.0.0.1:8080/index.html";
 const OUT=process.env.ISSUE_362_BROWSER_OUT||"artifacts/issue-362-menma-reward";
+const BUILD_MANIFEST=JSON.parse(fs.readFileSync(path.resolve(__dirname,"fixtures/runtime_build_manifest_303.json"),"utf8"));
 const SCENE="origin_academy_menma_prologue";
 const CONFIG="academy_menma_origin_three_test_subjects_with_anko";
 const ENCOUNTER="origin_academy_menma_prologue:three_test_subjects";
@@ -31,7 +32,7 @@ async function boot(page){
   await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});
   await page.waitForFunction(()=>typeof getRuntimeBuildFingerprint==="function"&&typeof selectChronicleOrigin==="function"&&typeof beginAlphaChronicleOriginPrologue==="function"&&typeof ensureAcademyMenmaThreeSubjectRewardProjection36200==="function",null,{timeout:30000});
   const fp=await page.evaluate(()=>getRuntimeBuildFingerprint());
-  assert.strictEqual(fp.buildId,"SC-ALPHA-RUNTIME-R303-2026-09-25-AE","#362 runtime fingerprint not loaded");
+  assert.deepStrictEqual(fp,BUILD_MANIFEST,"#362 runtime fingerprint does not match committed manifest");
   const started=await page.evaluate(()=>({
     selected:selectChronicleOrigin("academy_menma","issue_362_browser"),
     launched:beginAlphaChronicleOriginPrologue()
