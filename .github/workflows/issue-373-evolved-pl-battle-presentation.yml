@@ -1,0 +1,87 @@
+name: Issue 373 Evolved PL Battle Presentation Golden Gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'game.js'
+      - 'runtime/alpha-battle-modern-33000.js'
+      - 'runtime/alpha-menma-evolved-pl-battle-36900.js'
+      - 'runtime/alpha-runtime-build-fingerprint-303.js'
+      - 'tools/qa_issue_373_evolved_pl_battle_presentation.js'
+      - 'tools/qa_issue_373_evolved_pl_battle_presentation_browser.js'
+      - 'tools/qa_issue_369_menma_evolved_pl_battle.js'
+      - 'tools/qa_issue_362_menma_three_subject_reward.js'
+      - 'tools/qa_issue_303_runtime_build_fingerprint.js'
+      - 'tools/qa_runtime_ownership_safety_300.js'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
+      - 'tools/fixtures/runtime_responsibility_registry_300.json'
+      - 'tools/fixtures/runtime_change_declarations_300.json'
+      - 'tools/browser_runtime_error_gate_311.js'
+      - '.github/workflows/issue-373-evolved-pl-battle-presentation.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  evolved-pl-battle-presentation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Source and ownership gates
+        run: |
+          node --check runtime/alpha-battle-modern-33000.js
+          node --check runtime/alpha-menma-evolved-pl-battle-36900.js
+          node --check tools/qa_issue_373_evolved_pl_battle_presentation.js
+          node --check tools/qa_issue_373_evolved_pl_battle_presentation_browser.js
+          node tools/qa_issue_373_evolved_pl_battle_presentation.js
+          node tools/qa_issue_369_menma_evolved_pl_battle.js
+          node tools/qa_issue_362_menma_three_subject_reward.js
+          node tools/qa_issue_303_runtime_build_fingerprint.js
+          node tools/qa_runtime_ownership_safety_300.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python3 -m http.server 8080 > /tmp/issue-373-http.log 2>&1 &
+          echo $! > /tmp/issue-373-http.pid
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/issue-373-http.log
+          exit 1
+
+      - name: Installed-browser evolved PL Battle presentation gate
+        env:
+          ISSUE_373_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_373_BROWSER_OUT: artifacts/issue-373-evolved-pl-battle-presentation
+        run: xvfb-run -a node tools/qa_issue_373_evolved_pl_battle_presentation_browser.js
+
+      - name: Preserve server log
+        if: always()
+        run: |
+          mkdir -p artifacts/issue-373-evolved-pl-battle-presentation
+          cp /tmp/issue-373-http.log artifacts/issue-373-evolved-pl-battle-presentation/http-server.log || true
+
+      - name: Upload assessed installed-browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-373-evolved-pl-battle-presentation-evidence
+          path: artifacts/issue-373-evolved-pl-battle-presentation
+          if-no-files-found: error
