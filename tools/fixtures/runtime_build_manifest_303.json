@@ -33,4 +33,4 @@
   "api": "getRuntimeBuildFingerprint",
   "fingerprintPolicy": "bump_on_runtime_affecting_change",
   "playerFacing": false
-}\n
+}
