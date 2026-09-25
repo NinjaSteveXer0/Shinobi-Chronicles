@@ -644,7 +644,9 @@
       "qaRefs": [
         "tools/qa_issue_369_menma_evolved_pl_battle.js",
         "tools/qa_issue_362_menma_three_subject_reward.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_369_menma_evolved_pl_battle_browser.js",
+        ".github/workflows/issue-369-menma-evolved-pl-battle.yml"
       ],
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
