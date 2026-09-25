@@ -55,8 +55,15 @@ async function state(page){
     const panel=layer?.querySelector(".sc-story-panel"),actor=layer?.querySelector(".sc-scene-board-33900__actor");
     const pr=panel?.getBoundingClientRect(),ar=actor?.getBoundingClientRect();
     const overlap=pr&&ar?Math.max(0,Math.min(pr.right,ar.right)-Math.max(pr.left,ar.left))*Math.max(0,Math.min(pr.bottom,ar.bottom)-Math.max(pr.top,ar.top)):0;
+    const def=rt&&typeof getStorySceneDefinition==="function"?getStorySceneDefinition(rt.sceneId):null;
+    const registryBeat=def&&def.beatMap instanceof Map?def.beatMap.get(rt.beatId)||null:null;
+    const resolvedBackdrop=typeof resolveStorySceneBoardBackdropPath==="function"?resolveStorySceneBoardBackdropPath():null;
     return{
       beatId:rt?.beatId||null,mode:beat?.mode||null,text:layer?.querySelector(".sc-story-text")?.textContent?.trim()||"",
+      liveEnvironmentRef:beat?.environmentRef||null,
+      registryBeatMapIsMap:!!(def&&def.beatMap instanceof Map),
+      registryEnvironmentRef:registryBeat?.environmentRef||null,
+      resolvedBackdrop:resolvedBackdrop||null,
       backdrop:stage?.style.getPropertyValue("--sc-scene-board-backdrop")||"",dedicated:stage?.dataset.scSceneBoardBackdrop||null,
       actors:[...(layer?.querySelectorAll(".sc-scene-board-33900__actor")||[])].map(n=>({id:n.dataset.actorId,img:n.querySelector("img")?.getAttribute("src")||""})),
       objective:layer?.querySelector(".sc-scene-board-33900__objective")?.textContent?.replace(/\s+/g," ").trim()||"",
@@ -95,8 +102,9 @@ async function choose(page,label,next){
   if(next)await waitBeat(page,next);
 }
 async function assertBackdrop(page,beat,pathExpected){
-  const s=await state(page);assert.strictEqual(s.beatId,beat);assert.strictEqual(s.dedicated,"dedicated",beat+" dedicated backdrop flag");
-  assert(s.backdrop.includes(pathExpected),beat+" backdrop mismatch "+s.backdrop);
+  const s=await state(page);assert.strictEqual(s.beatId,beat);
+  assert.strictEqual(s.dedicated,"dedicated",beat+" dedicated backdrop flag "+JSON.stringify({liveEnvironmentRef:s.liveEnvironmentRef,registryBeatMapIsMap:s.registryBeatMapIsMap,registryEnvironmentRef:s.registryEnvironmentRef,resolvedBackdrop:s.resolvedBackdrop,backdrop:s.backdrop}));
+  assert(s.backdrop.includes(pathExpected),beat+" backdrop mismatch "+JSON.stringify({expected:pathExpected,resolvedBackdrop:s.resolvedBackdrop,backdrop:s.backdrop}));
 }
 async function screenshot(page,label){await page.locator("#story-scene-presentation-layer").screenshot({path:path.join(OUT,label+".png"),timeout:12000});}
 
