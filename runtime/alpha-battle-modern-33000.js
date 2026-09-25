@@ -875,6 +875,10 @@
     state.queuedKeys.push(key);
     state.lastFormationSnapshot=cloneBattlePresentationValue33000(afterFormation);
     state.lastTransitionCounter=transitionCounter;
+    if(typeof document!=="undefined"&&!state.current){
+      const stage=document.querySelector(".alpha-code-battle-stage");
+      if(stage)setTimeout(()=>{try{startNextBattlePresentationReceipt33000(stage);}catch(_error){hardSettleBattlePresentation33000("queue_autostart_exception");}},0);
+    }
     return receipt;
   }
   window.enqueueBattlePresentationReceipt33000=enqueueBattlePresentationReceipt33000;
