@@ -55,7 +55,7 @@ function player(){
   return globalThis.playerData&&typeof globalThis.playerData==="object"?globalThis.playerData:null;
 }
 function isExactBattle(value=battle()){
-  return !!value&&String(value.encounterId||"")===ENCOUNTER_ID;
+  return !!value&&String(value.encounterId||"")===ENCOUNTER_ID&&String(value.battleConfigId||"")===BATTLE_CONFIG_ID;
 }
 function sceneInstanceId(value=battle()){
   const context=value&&value.returnContext;
@@ -853,6 +853,8 @@ if(PRE_SAVE_TEST){
       try{
         const raw=sessionStorage.getItem("shinobiTestState");
         const state=raw?JSON.parse(raw):{};
+        state.battleConfigId=BATTLE_CONFIG_ID;
+        state.objectiveId=OBJECTIVE_ID;
         state.menmaEvolvedPLBattle36900=clone(ensureState());
         state.menma369LocalAllies={sj_anko:makeAnkoParticipant()};
         sessionStorage.setItem("shinobiTestState",JSON.stringify(state));
@@ -870,12 +872,14 @@ if(PRE_RESTORE_TEST){
       try{
         const raw=sessionStorage.getItem("shinobiTestState");
         const parsed=raw?JSON.parse(raw):null;
-        if(parsed&&String(parsed.encounterId||"")===ENCOUNTER_ID){
+        if(parsed&&String(parsed.encounterId||"")===ENCOUNTER_ID&&String(parsed.battleConfigId||"")===BATTLE_CONFIG_ID){
           savedState=parsed.menmaEvolvedPLBattle36900||null;
           savedAllies=parsed.menma369LocalAllies||null;
           const b=battle();
           if(b){
             b.encounterId=ENCOUNTER_ID;
+            b.battleConfigId=BATTLE_CONFIG_ID;
+            b.objectiveId=OBJECTIVE_ID;
             b.menmaEvolvedPLBattle36900=normalizeState(savedState,null);
             b.menma369LocalAllies=savedAllies&&savedAllies[ANKO_ID]?{[ANKO_ID]:clone(savedAllies[ANKO_ID])}:{[ANKO_ID]:makeAnkoParticipant()};
           }
@@ -1055,7 +1059,7 @@ function diagnostics(){
     ankoExactPackage:Object.keys(ANKO_DIRECT_ACTIONS).length===2&&ANKO_DIRECT_ACTIONS.sj_anko_hidden_shadow_snake_hands.attackPL===20&&ANKO_DIRECT_ACTIONS.sj_anko_fire_style_dragon_flame.attackPL===24&&String(resolveAnkoAssistOpportunity).includes("sj_anko_snake_bind")&&String(resolveAnkoAssistOpportunity).includes("sj_anko_serpent_evasion")&&!String(resolveAnkoAssistOpportunity).includes("twin_snakes_mutual_death"),
     committedRngPersistence:String(committedChoice).includes("rngChoices")&&String(committedChoice).includes("persistBattleSnapshot"),
     staleTokenRejection:String(validateBattleActionEnvelope).includes("stale_side_opportunity_token")&&String(validateBattleActionEnvelope).includes("stale_battle_semantic_generation"),
-    semanticLoopNoTimer:!source.includes("setTimeout")&&!source.includes("requestAnimationFrame")&&!source.includes("animationend"),
+    semanticLoopNoTimer:!source.includes("set"+"Timeout")&&!source.includes("request"+"AnimationFrame")&&!source.includes("animation"+"end"),
     menmaDefeatImmediate:String(handleBattleParticipantAtZeroPL).includes("academy_menma_withdrawn_before_objective"),
     exactBattleReceipt:String(commitBattleOccurrenceReceipt).includes(BATTLE_OCCURRENCE_PREFIX)&&String(commitBattleOccurrenceReceipt).includes("resolvedHostileIds:victory?[...HOSTILE_IDS]")&&String(completeBattleDefeat).includes('commitBattleOccurrenceReceipt("defeat")'),
     rewardAdapterPresent:!!globalThis.SC_ACADEMY_MENMA_THREE_SUBJECT_REWARD_36200,
