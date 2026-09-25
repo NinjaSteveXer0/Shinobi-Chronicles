@@ -179,8 +179,46 @@ async function cadenceAndReload(browser){
       pl:JSON.parse(JSON.stringify(currentBattle.runtime.remainingPL)),
       evidenceCount:currentBattle.runtime.evidence.length
     }));
+    const savedBeforeReload=await page.evaluate(()=>{
+      const raw=sessionStorage.getItem("shinobiTestState");
+      const saved=raw?JSON.parse(raw):null;
+      return saved?{
+        overlayType:saved.overlayType||null,
+        battleId:saved.battleId||null,
+        encounterId:saved.encounterId||null,
+        battleConfigId:saved.battleConfigId||null,
+        objectiveId:saved.objectiveId||null,
+        battleOver:saved.battleOver===true,
+        menma369BattleActive:saved.menma369BattleActive===true,
+        hasSemanticState:!!saved.menmaEvolvedPLBattle36900,
+        semanticPhase:saved.menmaEvolvedPLBattle36900&&saved.menmaEvolvedPLBattle36900.phase||null,
+        semanticEntitlementIndex:saved.menmaEvolvedPLBattle36900&&saved.menmaEvolvedPLBattle36900.playerEntitlementIndex
+      }:null;
+    });
+    console.log("ISSUE369 PRE-RELOAD",JSON.stringify(savedBeforeReload));
+    assert(savedBeforeReload,"semantic session snapshot missing before reload");
+    assert.strictEqual(savedBeforeReload.encounterId,ENCOUNTER,"saved encounter identity drift");
+    assert.strictEqual(savedBeforeReload.battleConfigId,CONFIG,"saved battle config identity missing");
+    assert.strictEqual(savedBeforeReload.objectiveId,OBJECTIVE,"saved objective identity missing");
+    assert.strictEqual(savedBeforeReload.menma369BattleActive,true,"semantic active-Battle bit was not persisted");
+    assert.strictEqual(savedBeforeReload.hasSemanticState,true,"semantic Battle state was not persisted");
     await page.reload({waitUntil:"domcontentloaded",timeout:60000});
-    await page.waitForFunction(enc=>typeof getMenmaEvolvedPLBattleState36900==="function"&&currentBattle&&currentBattle.active===true&&currentBattle.encounterId===enc,ENCOUNTER,{timeout:30000});
+    await page.waitForFunction(()=>typeof getMenmaEvolvedPLBattleState36900==="function",{timeout:30000});
+    const reloadBootState=await page.evaluate(()=>({
+      readyState:document.readyState,
+      active:!!(currentBattle&&currentBattle.active),
+      battleOver:!!(currentBattle&&currentBattle.battleOver),
+      encounterId:currentBattle&&currentBattle.encounterId||null,
+      battleConfigId:currentBattle&&currentBattle.battleConfigId||null,
+      objectiveId:currentBattle&&currentBattle.objectiveId||null,
+      battleId:currentBattle&&currentBattle.battleId||null,
+      hasRuntime:!!(currentBattle&&currentBattle.runtime),
+      semantic:getMenmaEvolvedPLBattleState36900(),
+      restoreWrapped:typeof restoreTestState==="function"&&restoreTestState.toString().includes("menma369BattleActive"),
+      saved:(()=>{const raw=sessionStorage.getItem("shinobiTestState");if(!raw)return null;const x=JSON.parse(raw);return{encounterId:x.encounterId||null,battleConfigId:x.battleConfigId||null,battleOver:x.battleOver===true,menma369BattleActive:x.menma369BattleActive===true,overlayType:x.overlayType||null};})()
+    }));
+    console.log("ISSUE369 POST-RELOAD BOOT",JSON.stringify(reloadBootState));
+    await page.waitForFunction(enc=>currentBattle&&currentBattle.active===true&&currentBattle.encounterId===enc,ENCOUNTER,{timeout:30000});
     await releaseFrontDoor(page);
     const afterReload=await page.evaluate(()=>({
       state:getMenmaEvolvedPLBattleState36900(),
