@@ -876,6 +876,7 @@ if(PRE_SAVE_TEST){
         const state=raw?JSON.parse(raw):{};
         state.battleConfigId=BATTLE_CONFIG_ID;
         state.objectiveId=OBJECTIVE_ID;
+        state.menma369BattleActive=battle().active===true&&battle().battleOver!==true;
         state.menmaEvolvedPLBattle36900=clone(ensureState());
         state.menma369LocalAllies={sj_anko:makeAnkoParticipant()};
         sessionStorage.setItem("shinobiTestState",JSON.stringify(state));
@@ -888,7 +889,7 @@ if(PRE_SAVE_TEST){
 const PRE_RESTORE_TEST=typeof restoreTestState==="function"?restoreTestState:null;
 if(PRE_RESTORE_TEST){
   const wrapped=function(){
-    let savedState=null,savedAllies=null;
+    let savedState=null,savedAllies=null,savedBattleActive=false;
     if(typeof sessionStorage!=="undefined"){
       try{
         const raw=sessionStorage.getItem("shinobiTestState");
@@ -896,6 +897,7 @@ if(PRE_RESTORE_TEST){
         if(parsed&&String(parsed.encounterId||"")===ENCOUNTER_ID&&String(parsed.battleConfigId||"")===BATTLE_CONFIG_ID){
           savedState=parsed.menmaEvolvedPLBattle36900||null;
           savedAllies=parsed.menma369LocalAllies||null;
+          savedBattleActive=parsed.menma369BattleActive===true&&parsed.battleOver!==true;
           const b=battle();
           if(b){
             b.encounterId=ENCOUNTER_ID;
@@ -912,6 +914,7 @@ if(PRE_RESTORE_TEST){
       const b=battle();
       b.menmaEvolvedPLBattle36900=normalizeState(savedState||b.menmaEvolvedPLBattle36900,sceneInstanceId(b));
       b.menma369LocalAllies={ [ANKO_ID]:makeAnkoParticipant() };
+      if(savedBattleActive&&b.battleOver!==true)b.active=true;
       const ankoPLRecord=typeof getBattleRemainingPLRecord==="function"?getBattleRemainingPLRecord("player",ANKO_ID):null;
       if(!ankoPLRecord&&!b.menmaEvolvedPLBattle36900.ankoWithdrawn)setBattleRemainingPLRecord("player",ANKO_ID,ANKO_BASE_PL,ANKO_BASE_PL);
       if(b.active&&!b.battleOver){
