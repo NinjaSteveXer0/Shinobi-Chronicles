@@ -10,6 +10,8 @@ on:
       - 'runtime/alpha-menma-origin-rewards-36200.js'
       - 'runtime/alpha-runtime-build-fingerprint-303.js'
       - 'tools/fixtures/runtime_build_manifest_303.json'
+      - 'tools/fixtures/runtime_responsibility_registry_300.json'
+      - 'tools/fixtures/runtime_change_declarations_300.json'
       - 'tools/qa_issue_362_menma_three_subject_reward.js'
       - 'tools/qa_issue_362_menma_reward_browser.js'
       - 'tools/browser_runtime_error_gate_311.js'
