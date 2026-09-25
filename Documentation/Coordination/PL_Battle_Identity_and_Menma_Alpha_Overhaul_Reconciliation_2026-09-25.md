@@ -5,7 +5,7 @@
 **Owner:** CE / Codex / Coordination  
 **Incoming handoffs:** #365, #377  
 **Status:** **DESIGN CLOSED / ALPHA IMPLEMENTATION RELEASED / MENMA FIRST PROVING GROUND**  
-**Correction:** the earlier Menma-specific autonomous-Anko-assist cadence is **SUPERSEDED**. The ordinary Active-relay Battle law applies.
+**Successor note (2026-09-26):** Academy Menma Scene 7 is now governed by `Documentation/Coordination/Academy_Menma_Half_Scripted_Three_Subject_Battle_Successor_2026-09-26.md`. The generic Active-relay law in this document remains valid globally, but the Scene 7 ordinary-relay-only application is superseded by the scoped half-scripted Anko → Anko → Menma phase structure.
 
 ---
 
