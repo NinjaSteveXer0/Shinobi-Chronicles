@@ -1507,18 +1507,26 @@ const PERFORMANCE={
 };
 
 const ENV=Object.freeze({
-  street:Object.freeze({environmentId:"obito_origin_konoha_route_day"}),
+  mainStreet:Object.freeze({environmentId:"obito_origin_konoha_main_street_day"}),
+  residential:Object.freeze({environmentId:"obito_origin_quiet_residential_lane_day"}),
+  academyApproach:Object.freeze({environmentId:"obito_origin_academy_approach_day"}),
+  streetLate:Object.freeze({environmentId:"obito_origin_konoha_street_late_afternoon"}),
+  streetEvening:Object.freeze({environmentId:"obito_origin_konoha_street_early_evening"}),
   trainingDay:Object.freeze({environmentId:"obito_origin_training_day"}),
   trainingLate:Object.freeze({environmentId:"obito_origin_training_late_afternoon"}),
-  dusk:Object.freeze({environmentId:"obito_origin_training_dusk"}),
+  trainingDusk:Object.freeze({environmentId:"obito_origin_training_dusk"}),
   home:Object.freeze({environmentId:"obito_origin_home"})
 });
 const BACKDROPS=Object.freeze({
-  obito_origin_konoha_route_day:"Scene backdrops/konoha_main_street.png",
+  obito_origin_konoha_main_street_day:"Obito Origin Backdrop/konoha_main_street.png",
+  obito_origin_quiet_residential_lane_day:"Obito Origin Backdrop/quiet_residential_lane.png",
+  obito_origin_academy_approach_day:"Obito Origin Backdrop/academy_approach_sloped_lane.png",
+  obito_origin_konoha_street_late_afternoon:"Obito Origin Backdrop/konoha_street_late_afternoon.png",
+  obito_origin_konoha_street_early_evening:"Obito Origin Backdrop/konoha_street_early_evening.png",
   obito_origin_training_day:"Obito Origin Backdrop/training_grounds_day.png",
   obito_origin_training_late_afternoon:"Obito Origin Backdrop/training_grounds_late_afternoon.png",
   obito_origin_training_dusk:"Obito Origin Backdrop/training_grounds_dusk.png",
-  obito_origin_home:"Scene backdrops/civilian_common_room.png"
+  obito_origin_home:"Obito Origin Backdrop/obito_home_interior.png"
 });
 try{
   const reg=typeof registerSceneBackdropAssetPath==="function"?registerSceneBackdropAssetPath:globalThis.registerSceneBackdropAssetPath;
@@ -1733,7 +1741,7 @@ function commitInterpretationRequest(){
 function storyBeat(beatId,key,nextBeatId,extra={}){
   return{beatId,mode:"narration",text:cueFallback(key),nextBeatId,...extra};
 }
-function choiceBeat(beatId,text,choices,environmentRef=ENV.street){
+function choiceBeat(beatId,text,choices,environmentRef=ENV.mainStreet){
   return{beatId,mode:"choice",text,choices,environmentRef};
 }
 const [furniture,vegetables,equipment,delivery,cart]=diversions;
@@ -1741,47 +1749,47 @@ const interpretationRequest=commitInterpretationRequest();
 
 const definition={
   sceneId:SCENE_ID,eventId:SCENE_ID,title:"ACADEMY OBITO",entryBeatId:"obi_depart",participants:[],beats:[
-    storyBeat("obi_depart","obi_depart","obi_furniture_intro",{environmentRef:ENV.street,onEnterConsequences:[{requestId:"obito_final_migration_331",kind:"domain",resolve:migrateLegacyObitoState}]}),
+    storyBeat("obi_depart","obi_depart","obi_furniture_intro",{environmentRef:ENV.mainStreet,onEnterConsequences:[{requestId:"obito_final_migration_331",kind:"domain",resolve:migrateLegacyObitoState}]}),
 
-    storyBeat("obi_furniture_intro","obi_furniture_intro","obi_furniture_choice",{environmentRef:ENV.street}),
+    storyBeat("obi_furniture_intro","obi_furniture_intro","obi_furniture_choice",{environmentRef:ENV.residential}),
     choiceBeat("obi_furniture_choice","The wardrobe is still wedged in the doorway.",[
       C("furniture_help","HELP HER","obi_furniture_help",{[intentKey(furniture)]:"HELP"}),
       C("furniture_continue_final","KEEP GOING","obi_furniture_continue",{[intentKey(furniture)]:"CONTINUE"})
-    ]),
-    storyBeat("obi_furniture_help","obi_furniture_help","obi_vegetables_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(furniture)]}),
-    storyBeat("obi_furniture_continue","obi_furniture_continue","obi_vegetables_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(furniture)]}),
+    ],ENV.residential),
+    storyBeat("obi_furniture_help","obi_furniture_help","obi_vegetables_intro",{environmentRef:ENV.residential,onEnterConsequences:[diversionRequest(furniture)]}),
+    storyBeat("obi_furniture_continue","obi_furniture_continue","obi_vegetables_intro",{environmentRef:ENV.residential,onEnterConsequences:[diversionRequest(furniture)]}),
 
-    storyBeat("obi_vegetables_intro","obi_vegetables_intro","obi_vegetables_choice",{environmentRef:ENV.street}),
+    storyBeat("obi_vegetables_intro","obi_vegetables_intro","obi_vegetables_choice",{environmentRef:ENV.mainStreet}),
     choiceBeat("obi_vegetables_choice","The vendor is already reaching for another rolling vegetable.",[
       C("vegetables_help","HELP HER","obi_vegetables_help",{[intentKey(vegetables)]:"HELP"}),
       C("vegetables_continue_final","KEEP GOING","obi_vegetables_continue",{[intentKey(vegetables)]:"CONTINUE"})
-    ]),
-    storyBeat("obi_vegetables_help","obi_vegetables_help","obi_equipment_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(vegetables)]}),
-    storyBeat("obi_vegetables_continue","obi_vegetables_continue","obi_equipment_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(vegetables)]}),
+    ],ENV.mainStreet),
+    storyBeat("obi_vegetables_help","obi_vegetables_help","obi_equipment_intro",{environmentRef:ENV.mainStreet,onEnterConsequences:[diversionRequest(vegetables)]}),
+    storyBeat("obi_vegetables_continue","obi_vegetables_continue","obi_equipment_intro",{environmentRef:ENV.mainStreet,onEnterConsequences:[diversionRequest(vegetables)]}),
 
-    storyBeat("obi_equipment_intro","obi_equipment_intro","obi_equipment_choice",{environmentRef:ENV.street}),
+    storyBeat("obi_equipment_intro","obi_equipment_intro","obi_equipment_choice",{environmentRef:ENV.academyApproach}),
     choiceBeat("obi_equipment_choice","The missing Academy bundle is somewhere along the route.",[
       C("equipment_help","HELP SEARCH","obi_equipment_help",{[intentKey(equipment)]:"HELP"}),
       C("equipment_continue_final","KEEP GOING","obi_equipment_continue",{[intentKey(equipment)]:"CONTINUE"})
-    ]),
-    storyBeat("obi_equipment_help","obi_equipment_help","obi_delivery_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(equipment)]}),
-    storyBeat("obi_equipment_continue","obi_equipment_continue","obi_delivery_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(equipment)]}),
+    ],ENV.academyApproach),
+    storyBeat("obi_equipment_help","obi_equipment_help","obi_delivery_intro",{environmentRef:ENV.academyApproach,onEnterConsequences:[diversionRequest(equipment)]}),
+    storyBeat("obi_equipment_continue","obi_equipment_continue","obi_delivery_intro",{environmentRef:ENV.academyApproach,onEnterConsequences:[diversionRequest(equipment)]}),
 
-    storyBeat("obi_delivery_intro","obi_delivery_intro","obi_delivery_choice",{environmentRef:ENV.street}),
+    storyBeat("obi_delivery_intro","obi_delivery_intro","obi_delivery_choice",{environmentRef:ENV.mainStreet}),
     choiceBeat("obi_delivery_choice","Training is still happening without him.",[
       C("delivery_help","HELP WITH THE DELIVERY","obi_delivery_help",{[intentKey(delivery)]:"HELP"}),
       C("delivery_continue_final","KEEP MOVING","obi_delivery_continue",{[intentKey(delivery)]:"CONTINUE"})
-    ]),
-    storyBeat("obi_delivery_help","obi_delivery_help","obi_cart_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(delivery)]}),
-    storyBeat("obi_delivery_continue","obi_delivery_continue","obi_cart_intro",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(delivery)]}),
+    ],ENV.mainStreet),
+    storyBeat("obi_delivery_help","obi_delivery_help","obi_cart_intro",{environmentRef:ENV.mainStreet,onEnterConsequences:[diversionRequest(delivery)]}),
+    storyBeat("obi_delivery_continue","obi_delivery_continue","obi_cart_intro",{environmentRef:ENV.mainStreet,onEnterConsequences:[diversionRequest(delivery)]}),
 
-    storyBeat("obi_cart_intro","obi_cart_intro","obi_cart_choice",{environmentRef:ENV.street}),
+    storyBeat("obi_cart_intro","obi_cart_intro","obi_cart_choice",{environmentRef:ENV.academyApproach}),
     choiceBeat("obi_cart_choice","His training is right there. The cart is already moving.",[
       C("cart_help","STOP AND HELP","obi_cart_help",{[intentKey(cart)]:"HELP"}),
       C("cart_continue_final","GO TO TRAINING","obi_cart_continue",{[intentKey(cart)]:"CONTINUE"})
-    ]),
-    storyBeat("obi_cart_help","obi_cart_help","obi_arrival",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(cart)]}),
-    storyBeat("obi_cart_continue","obi_cart_continue","obi_arrival",{environmentRef:ENV.street,onEnterConsequences:[diversionRequest(cart)]}),
+    ],ENV.academyApproach),
+    storyBeat("obi_cart_help","obi_cart_help","obi_arrival",{environmentRef:ENV.academyApproach,onEnterConsequences:[diversionRequest(cart)]}),
+    storyBeat("obi_cart_continue","obi_cart_continue","obi_arrival",{environmentRef:ENV.academyApproach,onEnterConsequences:[diversionRequest(cart)]}),
 
     {beatId:"obi_arrival",mode:"narration",text:"Obito reaches the Academy training ground. The training opportunity remaining is determined only by the committed journey-time facts.",environmentRef:ENV.trainingDay,onEnterConsequences:[entitlementRequest],nextBeatId:"obi_training"},
     {beatId:"obi_training",mode:"narration",text:"Obito performs only the formal training blocks still available when he arrives.",environmentRef:ENV.trainingDay,nextBeatId:"obi_end_day"},
@@ -1797,7 +1805,7 @@ const definition={
     storyBeat("obi_ending_training","ending_training","obi_close",{environmentRef:ENV.home,onEnterConsequences:[interpretationRequest]}),
     storyBeat("obi_ending_balance","ending_balance","obi_close",{environmentRef:ENV.home,onEnterConsequences:[interpretationRequest]}),
     storyBeat("obi_ending_question","ending_question","obi_close",{environmentRef:ENV.home,onEnterConsequences:[interpretationRequest]}),
-    {beatId:"obi_close",mode:"narration",text:cueFallback("obi_close"),environmentRef:ENV.dusk,exitScene:true}
+    {beatId:"obi_close",mode:"narration",text:cueFallback("obi_close"),environmentRef:ENV.home,exitScene:true}
   ],
   onCompleteConsequences:[X(ORIGIN_ID,[...diversions.map(x=>x.occurrenceId),entitlementOccurrenceId])]
 };
@@ -1847,7 +1855,12 @@ function registerFinalSceneBoard(){
       objective:["obi_arrival","obi_training","obi_end_day","obi_home","obi_reflect","obi_close"].includes(beatId)||beatId.startsWith("obi_ending_")?null:"GET TO TRAINING",
       actors:boardActors(beatId)
     }),
-    performanceSequences:sequences
+    performanceSequences:sequences,
+    resolveBackdrop:({beatId,performance})=>{
+      if(beatId!=="obi_end_day")return null;
+      const cueIndex=performance&&Number.isInteger(performance.index)?performance.index:0;
+      return cueIndex>=2?ENV.streetLate.environmentId:ENV.trainingLate.environmentId;
+    }
   });
   try{if(result&&result.success===true&&typeof globalThis.renderStorySceneBoard33900==="function")globalThis.renderStorySceneBoard33900();}catch(_error){}
   return result;
@@ -1881,6 +1894,14 @@ function diagnostics(){
     noBattle:!JSON.stringify(definition).includes('"battle"')&&!JSON.stringify(definition).includes("PL BATTLE"),
     noSharinganGrant:!JSON.stringify(definition).includes("sharinganUnlocked")&&!JSON.stringify(definition).includes("grantSharingan"),
     sharedCompletion:definition.onCompleteConsequences.length===1,
+    dedicatedBackdropRegistry:Object.values(BACKDROPS).every(path=>path.startsWith("Obito Origin Backdrop/")),
+    firstPageDedicatedBackdrop:BACKDROPS[ENV.mainStreet.environmentId]==="Obito Origin Backdrop/konoha_main_street.png",
+    furnitureResidentialBackdrop:BACKDROPS[ENV.residential.environmentId]==="Obito Origin Backdrop/quiet_residential_lane.png",
+    academyApproachBackdrop:BACKDROPS[ENV.academyApproach.environmentId]==="Obito Origin Backdrop/academy_approach_sloped_lane.png",
+    homeDedicatedBackdrop:BACKDROPS[ENV.home.environmentId]==="Obito Origin Backdrop/obito_home_interior.png",
+    endDayPresentationMovesYardToStreet:typeof registerFinalSceneBoard==="function"&&registerFinalSceneBoard.toString().includes('cueIndex>=2?ENV.streetLate.environmentId:ENV.trainingLate.environmentId'),
+    closeRemainsHome:definition.beatMap instanceof Map?definition.beatMap.get("obi_close")&&definition.beatMap.get("obi_close").environmentRef===ENV.home:definition.beats.some(b=>b.beatId==="obi_close"&&b.environmentRef===ENV.home),
+    noGenericBackdropFallback:Object.values(BACKDROPS).every(path=>!path.startsWith("Scene backdrops/")),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
