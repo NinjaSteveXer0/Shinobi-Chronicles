@@ -292,6 +292,59 @@ async function skippedRelay(browser){
   }finally{await context.close();}
 }
 
+async function presentationSafeguards(browser){
+  const {context,page,gate}=await bootScenario(browser,"presentation-safeguards");
+  try{
+    const action=await page.evaluate(()=>attemptBattlePreparedSkill("academy_menma_chakra_knuckle"));
+    assert(action&&action.success===true,"safeguard setup action failed");
+    await page.waitForFunction(()=>getBattlePresentationQueueState33000()?.busy===true,null,{timeout:7000});
+    const before=await page.evaluate(()=>({
+      evidence:(currentBattle.runtime?.evidence||[]).length,
+      committed:Object.keys(getMenmaEvolvedPLBattleState36900().committedOpportunities||{}).length
+    }));
+    const settled=await page.evaluate(()=>hardSettleBattlePresentation33000("qa373_forced_playback_failure"));
+    assert(settled&&settled.success===true&&settled.hardSettled===true,"hard-settle fallback failed");
+    const after=await page.evaluate(()=>({
+      evidence:(currentBattle.runtime?.evidence||[]).length,
+      committed:Object.keys(getMenmaEvolvedPLBattleState36900().committedOpportunities||{}).length,
+      queue:getBattlePresentationQueueState33000()
+    }));
+    assert.strictEqual(after.evidence,before.evidence,"hard settle duplicated semantic evidence");
+    assert.strictEqual(after.committed,before.committed,"hard settle consumed semantic opportunity");
+    assert.strictEqual(after.queue.busy,false,"hard settle left queue busy");
+    assert(after.queue.exposedReceipts.some(r=>r.hardSettled===true),"hard-settled receipt not recorded");
+
+    const stale=await page.evaluate(()=>{
+      const state=currentBattle.presentation33000;
+      const fake={
+        battleId:"stale-battle-id",key:"stale-battle-id:fake-action",actionId:"fake-action",
+        sequenceOrdinal:999,formationBefore:{player:[],enemy:[]},formationAfter:{player:[],enemy:[]}
+      };
+      state.queue.push(fake);state.queuedKeys.push(fake.key);
+      const stage=document.querySelector(".alpha-code-battle-stage");
+      startNextBattlePresentationReceipt33000(stage);
+      return getBattlePresentationQueueState33000();
+    });
+    assert(stale.staleRejectedKeys.includes("stale-battle-id:fake-action"),"stale presentation receipt was not rejected");
+
+    const evidenceBeforeReload=await page.evaluate(()=>(currentBattle.runtime?.evidence||[]).length);
+    await page.reload({waitUntil:"domcontentloaded",timeout:60000});
+    await page.waitForFunction(()=>typeof getBattlePresentationQueueState33000==="function"&&currentBattle&&currentBattle.encounterId==="origin_academy_menma_prologue:three_test_subjects",null,{timeout:30000});
+    await releaseFrontDoor(page);
+    const restored=await page.evaluate(()=>({
+      evidence:(currentBattle.runtime?.evidence||[]).length,
+      queue:getBattlePresentationQueueState33000(),
+      state:getMenmaEvolvedPLBattleState36900()
+    }));
+    assert.strictEqual(restored.evidence,evidenceBeforeReload,"reload duplicated committed semantic evidence");
+    assert.strictEqual(restored.queue.busy,false,"reload resurrected stale playback queue");
+    assert.strictEqual(restored.queue.exposedReceipts.length,0,"reload duplicated previously exposed receipts");
+    assert(Object.keys(restored.state.committedOpportunities||{}).length===before.committed,"reload changed committed opportunity cardinality");
+    await gate.assertClean("issue-373-presentation-safeguards");
+    return{hardSettleNoSemanticDuplication:true,staleReceiptRejected:true,reloadNoDuplicateQueue:true};
+  }finally{await context.close();}
+}
+
 async function defeatDelay(browser){
   const {context,page,gate}=await bootScenario(browser,"defeat-delay");
   try{
@@ -334,6 +387,7 @@ async function defeatDelay(browser){
     const formation=await formationAndPlayback(browser);
     const relay=await relayAndVictory(browser);
     const skip=await skippedRelay(browser);
+    const safeguards=await presentationSafeguards(browser);
     const defeat=await defeatDelay(browser);
     const summary={
       pass:true,
@@ -354,9 +408,12 @@ async function defeatDelay(browser){
         terminalVictoryVisibleBeforeOverlay:true,
         terminalDefeatVisibleBeforeStory:true,
         storyCallerResumes:true,
+        playbackFailureHardSettles:true,
+        reloadDoesNotDuplicatePresentation:true,
+        staleReceiptRejected:true,
         browserRuntimeErrorsClean:true
       },
-      formation,relay,skip,defeat,
+      formation,relay,skip,safeguards,defeat,
       semanticGreenFrom369Preserved:true,
       presentationGreenCandidate:true,
       installedBrowserFunctionalGreen:true,
