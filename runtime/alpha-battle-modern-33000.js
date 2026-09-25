@@ -927,6 +927,31 @@
     return chip;
   }
 
+  function battlePerformanceRoleNode33000(stage,ref){
+    if(!stage||!ref||!ref.side||!ref.participantId)return null;
+    const side=String(ref.side),participantId=String(ref.participantId);
+    const projected=[...stage.querySelectorAll(".battle2-formation-participant[data-participant-id]")].find(node=>
+      String(node.dataset.participantId||"")===participantId&&String(node.dataset.formationSide||node.dataset.side||"")===side
+    );
+    if(projected)return projected;
+    let active=null;
+    try{
+      active=side==="player"
+        ?(currentBattle&&currentBattle.activePlayer||getBattleDeploymentParticipant("player",1)||null)
+        :(typeof getActiveBattleEnemy33000==="function"?getActiveBattleEnemy33000():getBattleDeploymentParticipant("enemy",1)||null);
+    }catch(_error){active=null;}
+    if(active&&String(active.id||"")===participantId){
+      return side==="player"?stage.querySelector(".battle-live-active-card-player"):stage.querySelector(".battle-live-active-card-enemy");
+    }
+    for(let slot=1;slot<=6;slot+=1){
+      let deployed=null;
+      try{deployed=typeof getBattleDeploymentParticipant==="function"?getBattleDeploymentParticipant(side,slot):null;}catch(_error){deployed=null;}
+      if(!deployed||String(deployed.id||"")!==participantId)continue;
+      return stage.querySelector('.battle-live-roster-'+side+' [data-slot="'+slot+'"]');
+    }
+    return null;
+  }
+
   function clearBattlePerformanceRoles33000(stage,actionId=null){
     if(!stage)return false;
     if(actionId&&stage.dataset.battle2PerformanceActionId&&stage.dataset.battle2PerformanceActionId!==String(actionId))return false;
