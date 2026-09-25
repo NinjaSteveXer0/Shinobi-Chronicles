@@ -263,9 +263,17 @@ function getStoryChoreographyState33900(root){
 
 function requestedAssetIdFromBeat(beat){const ref=beat&&beat.environmentRef;return typeof ref==="string"?ref:ref&&typeof ref==="object"&&ref.assetId?String(ref.assetId):null;}
 function resolveBoardBackdropPath(runtime=currentRuntime(),beat=currentBeat(runtime)){
-  const def=sceneDefinition(runtime);
-  try{if(typeof resolveStorySceneEnvironmentProjection==="function"){const r=resolveStorySceneEnvironmentProjection({},beat,def,runtime);if(r&&r.mode==="dedicated_backdrop"&&r.asset_path)return String(r.asset_path);}}catch(_error){}
-  const assetId=requestedAssetIdFromBeat(beat);if(!assetId)return null;
+  const def=sceneDefinition(runtime),board=runtime?boardDefinition(runtime.sceneId):null;
+  let assetId=null;
+  try{
+    if(board&&typeof board.resolveBackdrop==="function"){
+      const override=board.resolveBackdrop({runtime,beat,beatId:beat&&beat.beatId||null,performance:performanceCursor(runtime,beat)});
+      assetId=typeof override==="string"?override:override&&typeof override==="object"?(override.assetId||override.environmentId||null):null;
+    }
+  }catch(_error){}
+  try{if(!assetId&&typeof resolveStorySceneEnvironmentProjection==="function"){const r=resolveStorySceneEnvironmentProjection({},beat,def,runtime);if(r&&r.mode==="dedicated_backdrop"&&r.asset_path)return String(r.asset_path);}}catch(_error){}
+  if(!assetId)assetId=requestedAssetIdFromBeat(beat);
+  if(!assetId)return null;
   try{const getPath=typeof getSceneBackdropAssetPath==="function"?getSceneBackdropAssetPath:globalThis.getSceneBackdropAssetPath;const path=typeof getPath==="function"?getPath(assetId):null;return path?String(path):null;}catch(_error){return null;}
 }
 function cssUrlValue(path){return `url("${String(path).replace(/\\/g,"\\\\").replace(/\"/g,'\\\"')}")`;}
@@ -575,6 +583,7 @@ function runStorySceneBoard33900Diagnostics(){
     sharedKakashiBenchmarkPanels:installStyle.toString().includes("border-radius:14px")&&installStyle.toString().includes('data-sc-cue-kind="dialogue"')&&installStyle.toString().includes("data-intent-icon"),
     sharedChoiceIntentClassifier:typeof storyChoiceIntentIcon33900==="function"&&["HELP HER","KEEP GOING","ASK ABOUT THE ROUTE","CONFRONT HIM"].every(label=>storyChoiceIntentIcon33900({label})!=="•"),
     miraiBackdropRegistryReady:Object.keys(SHARED_ORIGIN_BACKDROPS_33900).length===5,
+    cueLevelBackdropOverride:resolveBoardBackdropPath.toString().includes("resolveBackdrop")&&resolveBoardBackdropPath.toString().includes("performanceCursor"),
     compactLiveStateCallout:installStyle.toString().includes("width:max-content")&&installStyle.toString().includes("height:auto!important")&&installStyle.toString().includes("align-items:flex-start")&&installStyle.toString().includes("left:3.2%;right:auto"),
     reusableRegistry:typeof registerStorySceneBoardDefinition==="function"&&typeof unregisterStorySceneBoardDefinition==="function"&&typeof resolveStorySceneBoardProjection==="function",
     pendingRegistrationDrain:typeof drainPendingStorySceneBoardRegistrations33900==="function"&&pendingRegistrationDrain&&pendingRegistrationDrain.success===true,
