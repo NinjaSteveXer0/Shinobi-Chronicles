@@ -354,26 +354,38 @@ The three test subjects close.
 
 **AUTHOR / RUNTIME ONLY — DO NOT RENDER AS STORY PROSE**
 
-Intended Battle authority from Stephen:
+Current successor Battle intent from Stephen:
 
-**Academy Menma + Special Jōnin Anko vs**
-- `test_subject_brute`
-- `test_subject_altered_shinobi`
-- `test_subject_unstable`
+**Half-scripted 2-v-3 encounter**
 
-WAITING ON:
-**#358 — CE / Combat reconciliation**
+1. Anko defeats / forces withdrawal of the first subject.
+2. The next subject relays in.
+3. Anko defeats / forces withdrawal of the second subject.
+4. The final subject relays in.
+5. Menma receives the final subject as the genuine player-resolved test.
+6. Menma's result depends on his legal skill/action choices.
+
+The first two Anko takedowns are authored encounter beats.
+
+They do **not** count as Menma performance.
+
+Current PL rule remains:
+**0 Battle PL = withdrawal, not death.**
+
+Therefore Menma's final subject is currently a defeat/withdrawal outcome unless later explicit lethal authority is added.
+
+ACTIVE RECONCILIATION:
+**#376 — CE / Codex / Coordination**
 
 Story does not pre-author:
-- who lands which attacks;
-- who defeats which enemy;
-- injuries;
-- exact performance;
+- the exact player choices Menma will make;
+- exact Menma damage/performance;
 - exact Technique use;
 - exact Kinjutsu/Fūinjutsu observation;
-- exact Anko performance.
+- a literal kill;
+- a completed MEN-03 bucket if Menma fails the final phase.
 
-Battle returns factual result/evidence.
+Battle returns factual Menma-phase result/evidence.
 
 ---
 
@@ -409,7 +421,9 @@ Barely.
 
 ### AUTHOR — PERFORMANCE PROJECTION
 
-Use the exact Battle return.
+Use the exact Battle return from **Menma's final-subject phase only**.
+
+Anko's scripted first-two takedowns must not inflate Menma's performance evidence.
 
 Do not render the heading.
 
@@ -443,7 +457,7 @@ Anko finishes checking him.
 
 **ANKO:** “Of course you do.”
 
-### IF THE VICTORY COST MENMA HEAVILY
+### IF MENMA WINS BUT THE VICTORY COSTS HIM HEAVILY
 
 Anko looks at the state of him.
 
