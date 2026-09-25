@@ -233,6 +233,11 @@ async function cadenceAndReload(browser){
     assert.strictEqual(savedBeforeReload.objectiveId,OBJECTIVE,"saved objective identity missing");
     assert.strictEqual(savedBeforeReload.menma369BattleActive,true,"semantic active-Battle bit was not persisted");
     assert.strictEqual(savedBeforeReload.hasSemanticState,true,"semantic Battle state was not persisted");
+    // Do not manufacture requestfailed noise by tearing down the document while
+    // the shared portrait preloader still owns in-flight image requests. The
+    // reload remains a real browser reload; it simply starts from a settled
+    // network boundary so #311 can stay strict with no ERR_ABORTED allowlist.
+    await page.waitForLoadState("networkidle",{timeout:15000});
     await page.reload({waitUntil:"domcontentloaded",timeout:60000});
     await page.waitForFunction(()=>typeof getMenmaEvolvedPLBattleState36900==="function",{timeout:30000});
     const reloadBootState=await page.evaluate(()=>({
