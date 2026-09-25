@@ -267,20 +267,38 @@ async function cadenceAndReload(browser){
     assert.strictEqual(afterReload.evidenceCount,beforeReload.evidenceCount,"reload replayed committed action evidence");
     assert.strictEqual(afterReload.readiness.ready,true,"reload did not restore Menma player input boundary");
 
+    // Isolate the Anko-withdrawal entitlement assertion from incidental damage
+    // already accumulated during the reload/RNG proof above. The product rule
+    // being tested here is who owns the next player opportunity; Menma reaching
+    // 0 from the following legitimate enemy action is separately required to
+    // commit tutorial defeat and would make that handoff unobservable.
+    const cadenceFixture=await page.evaluate(()=>{
+      const maximum=getBattleMaximumPL("player","academy_menma");
+      const before=getBattleRemainingPL("player","academy_menma");
+      setBattleRemainingPL("player","academy_menma",maximum);
+      return{before,maximum,after:getBattleRemainingPL("player","academy_menma"),state:getMenmaEvolvedPLBattleState36900()};
+    });
+    assert(cadenceFixture.maximum>0,"Menma maximum Battle PL missing in cadence fixture");
+    assert.strictEqual(cadenceFixture.after,cadenceFixture.maximum,"cadence fixture could not restore Menma Battle PL");
+    assert.strictEqual(cadenceFixture.state.phase,"player","cadence fixture changed semantic phase");
+
     const beforeAnkoOut=await evidenceCounts(page);
     const ankoOut=await page.evaluate(()=>{
+      const menmaBefore=getBattleRemainingPL("player","academy_menma");
       setBattleRemainingPL("player","sj_anko",0);
       const result=handleBattleParticipantAtZeroPL("player","sj_anko",null,{actionId:"qa369_anko_withdrawal"});
       return{
         result,
         state:getMenmaEvolvedPLBattleState36900(),
         playerSlots:currentBattle.deployment.player.slots.map(s=>s.participantId).filter(Boolean),
-        menma:getBattleRemainingPL("player","academy_menma")
+        menmaBefore,
+        menmaAfter:getBattleRemainingPL("player","academy_menma")
       };
     });
     assert.strictEqual(ankoOut.state.ankoWithdrawn,true,"Anko withdrawal state missing");
     assert.deepStrictEqual(ankoOut.playerSlots,[MENMA],"Anko withdrawal promoted/reordered player formation");
-    assert(ankoOut.menma>0,"Anko withdrawal changed Menma Battle PL");
+    assert.strictEqual(ankoOut.menmaAfter,ankoOut.menmaBefore,"Anko withdrawal changed Menma Battle PL");
+    assert(ankoOut.menmaAfter>0,"Anko withdrawal left Menma unable to receive the next player opportunity");
 
     const second=await page.evaluate(()=>attemptBattlePreparedSkill("academy_menma_chakra_knuckle"));
     assert(second&&second.success===true,"post-Anko-withdrawal Menma action failed "+JSON.stringify(second));
