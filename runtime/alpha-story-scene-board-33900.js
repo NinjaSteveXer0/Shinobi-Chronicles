@@ -290,6 +290,7 @@ function installStyle(){
 #story-scene-presentation-layer[data-sc-performance="true"] .sc-performance-continue-hint-33900{grid-column:1/-1;grid-row:3;justify-self:end;margin-top:5px;color:#6fcfd8;font-size:7px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;opacity:.72;}
 #story-scene-presentation-layer[data-sc-performance="true"] .sc-story-kicker{display:none!important;}
 #story-scene-presentation-layer[data-sc-performance="true"] .sc-chronicle-primary{display:none!important;}
+#story-scene-presentation-layer[data-sc-performance="true"][data-sc-has-choices="false"] .sc-chronicle-actions{display:none!important;}
 #story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-story-panel{width:min(52%,650px)!important;max-height:31vh!important;padding:13px 18px 12px!important;border:1px solid rgba(103,221,230,.55)!important;border-radius:16px!important;background:linear-gradient(145deg,rgba(4,18,24,.94),rgba(2,9,14,.97))!important;box-shadow:0 18px 48px rgba(0,0,0,.48),0 0 22px rgba(78,210,220,.08)!important;backdrop-filter:blur(8px);}
 #story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="player"] .sc-chronicle-layout{justify-items:start!important;}
 #story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-chronicle-layout{justify-items:end!important;}
@@ -377,7 +378,7 @@ function clearBoard(layer){if(!layer)return;try{delete layer.dataset.scSceneBoar
 function updatePerformancePanel(layer,runtime=currentRuntime()){
   if(!layer||!runtime)return false;const beat=currentBeat(runtime),p=performanceCursor(runtime,beat);
   if(!p){
-    delete layer.dataset.scPerformance;delete layer.dataset.scCueKind;delete layer.dataset.scCueSpeakerSide;
+    delete layer.dataset.scPerformance;delete layer.dataset.scCueKind;delete layer.dataset.scCueSpeakerSide;delete layer.dataset.scHasChoices;
     const kicker=layer.querySelector&&layer.querySelector(".sc-story-kicker");if(kicker)kicker.style.removeProperty("display");
     for(const node of layer.querySelectorAll?layer.querySelectorAll(".sc-performance-progress-33900,.sc-performance-continue-hint-33900"):[])node.remove();
     const primary=layer.querySelector&&layer.querySelector(".sc-chronicle-primary");if(primary){primary.removeAttribute("aria-hidden");primary.removeAttribute("tabindex");}
@@ -408,6 +409,7 @@ function updatePerformancePanel(layer,runtime=currentRuntime()){
   let hint=panel&&panel.querySelector(".sc-performance-continue-hint-33900");
   if(panel&&!hint){hint=document.createElement("div");hint.className="sc-performance-continue-hint-33900";hint.setAttribute("aria-hidden","true");hint.textContent="CLICK ANYWHERE TO CONTINUE";panel.appendChild(hint);}
   const hasChoices=!!(beat&&(beat.mode==="choice"||(Array.isArray(beat.choices)&&beat.choices.length)));
+  layer.dataset.scHasChoices=hasChoices?"true":"false";
   if(hint)hint.hidden=cue.kind==="dialogue"||hasChoices;
   const primary=layer.querySelector&&layer.querySelector(".sc-chronicle-primary");if(primary){primary.setAttribute("aria-hidden","true");primary.setAttribute("tabindex","-1");}
   return true;
@@ -588,7 +590,7 @@ if(typeof document!=="undefined"){
 function runStorySceneBoard33900Diagnostics(){
   const checks={
     patchId:PATCH_ID==="story_scene_board_33900_2026_09_25_kakashi_exact_narration",
-    sharedKakashiBenchmarkPanels:installStyle.toString().includes("width:min(72%,980px)")&&installStyle.toString().includes("border-radius:16px")&&installStyle.toString().includes("padding:11px 15px 12px")&&installStyle.toString().includes("CLICK ANYWHERE TO CONTINUE")===false&&String(updatePerformancePanel).includes("CLICK ANYWHERE TO CONTINUE")&&String(updatePerformancePanel).includes("sc-performance-progress-33900")&&installStyle.toString().includes(".sc-chronicle-primary{display:none!important}")&&installStyle.toString().includes('data-sc-cue-kind="dialogue"')&&installStyle.toString().includes("data-intent-icon"),
+    sharedKakashiBenchmarkPanels:installStyle.toString().includes("width:min(72%,980px)")&&installStyle.toString().includes("border-radius:16px")&&installStyle.toString().includes("padding:11px 15px 12px")&&installStyle.toString().includes("CLICK ANYWHERE TO CONTINUE")===false&&String(updatePerformancePanel).includes("CLICK ANYWHERE TO CONTINUE")&&String(updatePerformancePanel).includes("sc-performance-progress-33900")&&String(updatePerformancePanel).includes("scHasChoices")&&installStyle.toString().includes(".sc-chronicle-primary{display:none!important}")&&installStyle.toString().includes('data-sc-has-choices="false"')&&installStyle.toString().includes('data-sc-cue-kind="dialogue"')&&installStyle.toString().includes("data-intent-icon"),
     sharedChoiceIntentClassifier:typeof storyChoiceIntentIcon33900==="function"&&["HELP HER","KEEP GOING","ASK ABOUT THE ROUTE","CONFRONT HIM"].every(label=>storyChoiceIntentIcon33900({label})!=="•"),
     cueLevelBackdropOverride:resolveBoardBackdropPath.toString().includes("resolveBackdrop")&&resolveBoardBackdropPath.toString().includes("performanceCursor"),
     compactLiveStateCallout:installStyle.toString().includes("width:max-content")&&installStyle.toString().includes("height:auto!important")&&installStyle.toString().includes("align-items:flex-start")&&installStyle.toString().includes("left:3.2%;right:auto"),
