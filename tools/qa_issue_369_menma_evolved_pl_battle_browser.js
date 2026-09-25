@@ -116,8 +116,14 @@ async function snapshot(page){
     assert.strictEqual(s.opportunity.side,"player");
     assert.strictEqual(s.opportunity.actorId,"academy_menma");
     assert.strictEqual(s.playerIndex,0);
-    const battleText=await page.locator("#overlay-content-container").textContent();
-    assert(/PL/.test(battleText||""),"Battle presentation does not visibly identify PL");
+    await page.waitForSelector(".alpha-code-battle-stage .battle-live-power-player",{state:"visible",timeout:12000});
+    await page.waitForSelector(".alpha-code-battle-stage .battle-live-power-enemy",{state:"visible",timeout:12000});
+    const plPresentation=await page.evaluate(()=>({
+      player:document.querySelector(".alpha-code-battle-stage .battle-live-power-player")?.textContent?.trim()||"",
+      enemy:document.querySelector(".alpha-code-battle-stage .battle-live-power-enemy")?.textContent?.trim()||""
+    }));
+    assert(/BATTLE PL/.test(plPresentation.player),"Player Battle PL widget lost PL language: "+JSON.stringify(plPresentation));
+    assert(/BATTLE PL/.test(plPresentation.enemy),"Enemy Battle PL widget lost PL language: "+JSON.stringify(plPresentation));
     await page.screenshot({path:path.join(OUT,"01-menma-evolved-battle-start.png"),fullPage:false,timeout:12000});
 
     const first=await page.evaluate(()=>attemptBattlePreparedSkill("academy_menma_guard_breaker"));
