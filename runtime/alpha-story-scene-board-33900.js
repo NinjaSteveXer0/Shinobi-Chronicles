@@ -252,6 +252,7 @@ function resolveBoardBackdropPath(runtime=currentRuntime(),beat=currentBeat(runt
   try{
     if(board&&typeof board.resolveBackdrop==="function"){
       const override=board.resolveBackdrop({runtime,beat,beatId:beat&&beat.beatId||null,performance:performanceCursor(runtime,beat)});
+      if(override&&typeof override==="object"&&override.assetPath)return String(override.assetPath);
       assetId=typeof override==="string"?override:override&&typeof override==="object"?(override.assetId||override.environmentId||null):null;
     }
   }catch(_error){}
