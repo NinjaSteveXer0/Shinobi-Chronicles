@@ -41,7 +41,8 @@
       "kakashi-writing-golden-runtime-consumption",
       "kakashi-canonical-machine-resolver-routing",
       "kakashi-uncapped-terminal-reward-aggregation-354",
-      "kakashi-individual-anbu-handoff-card-separation-302",\n      "academy-menma-three-subject-whole-encounter-reward-362"
+      "kakashi-individual-anbu-handoff-card-separation-302",
+      "academy-menma-three-subject-whole-encounter-reward-362"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
