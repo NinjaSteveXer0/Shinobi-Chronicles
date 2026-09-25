@@ -1,3 +1,6 @@
+> **2026-09-25 PRESENTATION SEGMENTATION SUCCESSOR**  
+> Academy Obito's approved wording remains unchanged, but its narration pagination is superseded by `Documentation/Story/Story_Narration_and_Dialogue_Box_Segmentation_Authority_2026-09-25.md` @ `b5ab5d2563027276534cbd0497f813a25225d369`. Blank-line paragraph breaks are sequential Story cue boundaries, not multiple paragraphs inside one scrollable narration box. This is presentation pacing only; do not alter Obito chronology, choices, timing, consequences or wording.
+
 # Shinobi Chronicles — Academy Obito Origin Final Cohesive Story Authority
 
 **Date:** 2026-09-23  
