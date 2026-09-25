@@ -1,0 +1,77 @@
+name: Issue 369 Menma Evolved PL Battle
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'game.js'
+      - 'runtime/alpha-menma-tutorial-111.js'
+      - 'runtime/alpha-menma-origin-rewards-36200.js'
+      - 'runtime/alpha-menma-evolved-pl-battle-36900.js'
+      - 'runtime/alpha-origin-scenes-32900-core.js'
+      - 'runtime/alpha-origin-scenes-32900-integrator.js'
+      - 'runtime/alpha-battle-modern-33000.js'
+      - 'tools/qa_issue_369_menma_evolved_pl_battle.js'
+      - 'tools/qa_issue_369_menma_evolved_pl_battle_browser.js'
+      - 'tools/browser_runtime_error_gate_311.js'
+      - '.github/workflows/issue-369-menma-evolved-pl-battle.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  menma-evolved-pl-battle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Source and headless Menma Battle gate
+        run: |
+          node --check runtime/alpha-menma-evolved-pl-battle-36900.js
+          node --check tools/qa_issue_369_menma_evolved_pl_battle.js
+          node --check tools/qa_issue_369_menma_evolved_pl_battle_browser.js
+          node tools/qa_issue_369_menma_evolved_pl_battle.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python3 -m http.server 8080 > /tmp/issue-369-http.log 2>&1 &
+          echo $! > /tmp/issue-369-http.pid
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/issue-369-http.log
+          exit 1
+
+      - name: Installed-browser Story to Battle to Story proof
+        env:
+          ISSUE_369_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_369_BROWSER_OUT: artifacts/issue-369-menma-battle
+        run: xvfb-run -a node tools/qa_issue_369_menma_evolved_pl_battle_browser.js
+
+      - name: Preserve server log
+        if: always()
+        run: |
+          mkdir -p artifacts/issue-369-menma-battle
+          cp /tmp/issue-369-http.log artifacts/issue-369-menma-battle/http-server.log || true
+
+      - name: Upload installed-browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-369-menma-evolved-pl-battle-evidence
+          path: artifacts/issue-369-menma-battle
+          if-no-files-found: warn
