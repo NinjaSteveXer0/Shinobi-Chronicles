@@ -8,6 +8,10 @@
 // Reward-only adapter. It does not implement the scoped Menma + Anko 2-v-3
 // Combat package. Until Combat commits the exact successor Battle occurrence
 // receipt, this adapter suppresses generic enemy loot and remains fail-closed.
+//
+// #379 correction: World reward eligibility is cadence-independent. A factual
+// Menma withdrawal does not independently disqualify an authoritative terminal
+// victory over all three exact hostile participants.
 // ============================================================================
 (function installAcademyMenmaThreeSubjectReward36200(){
 "use strict";
@@ -123,7 +127,6 @@ function validateUpstreamBattleReceipt(row,battle=battleState()){
   if(String(firstField(row,["objectiveId"])||"")!==OBJECTIVE_ID)return{success:false,reason:"menma_three_subject_objective_mismatch",battleOccurrenceId};
   if(String(firstField(row,["battleResult","terminalBattleResult"])||"")!=="victory")return{success:false,reason:"menma_three_subject_terminal_victory_required",battleOccurrenceId};
   if(firstField(row,["objectiveCompleted"])!==true)return{success:false,reason:"menma_three_subject_objective_incomplete",battleOccurrenceId};
-  if(firstField(row,["menmaWithdrawn"])!==false)return{success:false,reason:"menma_three_subject_menma_withdrawn_or_unknown",battleOccurrenceId};
   const allied=firstField(row,["alliedParticipantIds","allyParticipantIds"]);
   if(!exactSet(allied,ALLIED_IDS))return{success:false,reason:"menma_three_subject_allied_participants_mismatch",battleOccurrenceId};
   const hostile=firstField(row,["hostileParticipantIds","opponentIds"]);
@@ -132,7 +135,6 @@ function validateUpstreamBattleReceipt(row,battle=battleState()){
   if(!exactSet(resolved,HOSTILE_IDS))return{success:false,reason:"menma_three_subject_all_hostiles_required",battleOccurrenceId};
   const outcome=battle&&battle.outcome;
   if(!outcome||outcome.type!=="victory")return{success:false,reason:"menma_three_subject_current_battle_not_victory",battleOccurrenceId};
-  if(outcome.menmaWithdrawn===true)return{success:false,reason:"menma_three_subject_current_outcome_menma_withdrawn",battleOccurrenceId};
   return{
     success:true,
     battleOccurrenceId,
@@ -238,6 +240,7 @@ function writeRewardReceipt(p){
   const rows=history();
   const existing=rewardReceipt(p.battleOccurrenceId);
   if(existing)return{success:true,idempotent:true,receipt:clone(existing)};
+  const upstreamMenmaWithdrawn=firstField(p&&p.upstreamReceipt,["menmaWithdrawn"]);
   const record={
     historyScope:typeof getCurrentChronicleOccurrenceHistoryScope==="function"
       ? getCurrentChronicleOccurrenceHistoryScope("origin_battle_reward")
@@ -264,7 +267,7 @@ function writeRewardReceipt(p){
       resolvedHostileIds:[...HOSTILE_IDS],
       alliedParticipantIds:[...ALLIED_IDS],
       hostileParticipantIds:[...HOSTILE_IDS],
-      menmaWithdrawn:false,
+      menmaWithdrawn:typeof upstreamMenmaWithdrawn==="boolean"?upstreamMenmaWithdrawn:null,
       ankoContributionDoesNotSplitReward:true,
       genericCharacterExp:false,
       actionDerivedDevelopmentSeparate:true
@@ -395,8 +398,10 @@ function diagnostics(){
     resolvedHostileIds:[...HOSTILE_IDS]
   };
   const exact=validateUpstreamBattleReceipt(base,fakeBattle);
+  const withdrawnVictory=validateUpstreamBattleReceipt({...base,menmaWithdrawn:true},{...fakeBattle,outcome:{type:"victory",menmaWithdrawn:true}});
   const one=validateUpstreamBattleReceipt({...base,resolvedHostileIds:[HOSTILE_IDS[0]]},fakeBattle);
   const two=validateUpstreamBattleReceipt({...base,resolvedHostileIds:HOSTILE_IDS.slice(0,2)},fakeBattle);
+  const defeat=validateUpstreamBattleReceipt({...base,battleResult:"defeat",objectiveCompleted:false,menmaWithdrawn:true},{...fakeBattle,outcome:{type:"defeat",menmaWithdrawn:true}});
   const checks={
     exactSource:REWARD_SOURCE_ID==="menma_origin_battle_three_test_subjects_victory_ryo_01",
     exactFixedRyo:FIXED_RYO===100,
@@ -405,6 +410,10 @@ function diagnostics(){
     noPartialOne:one.success===false&&one.reason==="menma_three_subject_all_hostiles_required",
     noPartialTwo:two.success===false&&two.reason==="menma_three_subject_all_hostiles_required",
     exactVictoryAccepted:exact.success===true,
+    menmaWithdrawnVictoryAccepted:withdrawnVictory.success===true,
+    defeatStillRejected:defeat.success===false&&defeat.reason==="menma_three_subject_terminal_victory_required",
+    menmaWithdrawalNotQualificationPredicate:!validateUpstreamBattleReceipt.toString().includes("menma_three_subject_menma_withdrawn_or_unknown")&&!validateUpstreamBattleReceipt.toString().includes("menma_three_subject_current_outcome_menma_withdrawn"),
+    rewardReceiptPreservesWithdrawalTruth:writeRewardReceipt.toString().includes('typeof upstreamMenmaWithdrawn==="boolean"?upstreamMenmaWithdrawn:null'),
     oldSourceNeverWritten:!writeRewardReceipt.toString().includes(RETIRED_SOURCE_ID),
     genericRewardsSuppressed:generateBattleRewards36200.toString().indexOf("successorBattle")<generateBattleRewards36200.toString().indexOf("PRE_GENERATE"),
     noFixedLootOrExp:ensureProjection.toString().includes("exp:0")&&ensureProjection.toString().includes("items:[]")&&ensureProjection.toString().includes("rareDrops:[]"),
