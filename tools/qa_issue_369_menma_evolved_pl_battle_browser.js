@@ -36,7 +36,9 @@ async function bootScenario(browser,label){
   const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1});
   const page=await context.newPage();
   const gate=await installBrowserRuntimeErrorGate(page);
-  await page.addInitScript(()=>{try{localStorage.clear();sessionStorage.clear();}catch(_){}});
+  // A fresh Playwright context already starts with isolated storage. Do not
+  // clear sessionStorage in an init script: init scripts run again on reload
+  // and would erase the Battle snapshot this test is explicitly validating.
   await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});
   await page.waitForFunction(()=>!!(
     typeof getRuntimeBuildFingerprint==="function"&&
