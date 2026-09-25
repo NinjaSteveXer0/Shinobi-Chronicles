@@ -751,6 +751,55 @@
         "tools/qa_issue_362_menma_reward_browser.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
+    },
+    {
+      "responsibilityId": "origin.academy_menma.three_subject.battle_semantics",
+      "canonicalOwner": "runtime/alpha-menma-evolved-pl-battle-36900.js",
+      "ownerType": "origin_scoped_battle_semantic_owner",
+      "directCallers": [
+        "game.js",
+        "runtime/alpha-menma-origin-rewards-36200.js",
+        "index.html"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime Menma tutorial battle transition",
+        "currentBattle deployment / Remaining Battle PL / runtime evidence",
+        "enemyDatabase exact three Test Subject action packages",
+        "Academy Menma prepared five-action package",
+        "Special Jōnin Anko closed Origin action package"
+      ],
+      "stateWrites": [
+        "currentBattle.menmaEvolvedPLBattle36900 side-opportunity / entitlement / committed RNG state",
+        "currentBattle.menma369LocalAllies encounter-local Anko projection",
+        "playerData.activityHistory exact Academy Menma three-subject Battle occurrence receipt",
+        "sessionStorage.shinobiTestState exact Menma Battle semantic resume state"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-menma-evolved-pl-battle-36900.js"
+      ],
+      "extensionHooks": [
+        "launchMenmaEvolvedPLBattle36900",
+        "settleMenmaEvolvedPLBattle36900",
+        "getMenmaEvolvedPLBattleInputReadiness36900",
+        "getMenmaEvolvedPLBattleState36900",
+        "runIssue369MenmaEvolvedPLBattleDiagnostics"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "currentBattle.menmaEvolvedPLBattle36900",
+        "currentBattle.menma369LocalAllies",
+        "sessionStorage.shinobiTestState.menmaEvolvedPLBattle36900",
+        "playerData.activityHistory battle_occ_origin_academy_menma_three_test_subjects:*"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_369_menma_evolved_pl_battle.js",
+        "tools/qa_issue_362_menma_three_subject_reward.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_369_menma_evolved_pl_battle_browser.js",
+        ".github/workflows/issue-369-menma-evolved-pl-battle.yml"
+      ]
     }
   ],
   "adapters": [
@@ -853,6 +902,11 @@
       "semanticId": "academy_menma.three_subject.reward.commit",
       "owner": "runtime/alpha-menma-origin-rewards-36200.js",
       "responsibilityId": "origin.academy_menma.three_subject.reward_commit"
+    },
+    {
+      "semanticId": "academy_menma.three_subject.battle.semantic_loop",
+      "owner": "runtime/alpha-menma-evolved-pl-battle-36900.js",
+      "responsibilityId": "origin.academy_menma.three_subject.battle_semantics"
     }
   ],
   "globalWrapperChains": [
@@ -923,6 +977,16 @@
       "stateRef": "playerData.activityHistory menma three-subject reward receipts",
       "owner": "runtime/alpha-menma-origin-rewards-36200.js",
       "responsibilityId": "origin.academy_menma.three_subject.reward_commit"
+    },
+    {
+      "stateRef": "currentBattle.menmaEvolvedPLBattle36900",
+      "owner": "runtime/alpha-menma-evolved-pl-battle-36900.js",
+      "responsibilityId": "origin.academy_menma.three_subject.battle_semantics"
+    },
+    {
+      "stateRef": "playerData.activityHistory menma three-subject battle occurrence receipt",
+      "owner": "runtime/alpha-menma-evolved-pl-battle-36900.js",
+      "responsibilityId": "origin.academy_menma.three_subject.battle_semantics"
     }
   ]
 }
