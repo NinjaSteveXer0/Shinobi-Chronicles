@@ -143,8 +143,29 @@ function normalizeState(raw,sceneId=null){
 function ensureState(){
   const b=battle();
   if(!b||!isExactBattle(b))return null;
-  b.menmaEvolvedPLBattle36900=normalizeState(b.menmaEvolvedPLBattle36900,sceneInstanceId(b));
-  return b.menmaEvolvedPLBattle36900;
+  let current=b.menmaEvolvedPLBattle36900;
+  if(!current||typeof current!=="object"){
+    current=createState(sceneInstanceId(b));
+    b.menmaEvolvedPLBattle36900=current;
+    return current;
+  }
+  // Keep one stable semantic-state object for the whole live Battle. Replacing
+  // it during nested resolver reads would strand the outer settle loop on a
+  // stale phase/entitlement snapshot and violate exactly-once ownership.
+  current.battleConfigId=BATTLE_CONFIG_ID;
+  current.encounterId=ENCOUNTER_ID;
+  current.objectiveId=OBJECTIVE_ID;
+  current.entitlementId=ENTITLEMENT_ID;
+  current.storySceneInstanceId=sceneInstanceId(b)||current.storySceneInstanceId||null;
+  current.semanticGeneration=Math.max(1,Number(current.semanticGeneration)||1);
+  current.playerOpportunityOrdinal=Math.max(1,Number(current.playerOpportunityOrdinal)||1);
+  current.enemyOpportunityOrdinal=Math.max(0,Number(current.enemyOpportunityOrdinal)||0);
+  current.playerEntitlementIndex=Math.max(0,Number(current.playerEntitlementIndex)||0);
+  if(!current.committedOpportunities||typeof current.committedOpportunities!=="object")current.committedOpportunities={};
+  if(!current.rngChoices||typeof current.rngChoices!=="object")current.rngChoices={};
+  if(!Array.isArray(current.ankoBoundTargetIds))current.ankoBoundTargetIds=[];
+  if(!Array.isArray(current.resolvedHostileIds))current.resolvedHostileIds=[];
+  return current;
 }
 function ankoPresent(){
   const s=ensureState();
