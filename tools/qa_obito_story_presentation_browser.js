@@ -54,7 +54,7 @@ async function state(page){
     const visible=n=>!!n&&n.getClientRects().length>0&&getComputedStyle(n).display!=="none"&&getComputedStyle(n).visibility!=="hidden";
     const panel=layer?.querySelector(".sc-story-panel"),actor=layer?.querySelector(".sc-scene-board-33900__actor");
     const textNode=layer?.querySelector(".sc-story-text"),nameNode=layer?.querySelector(".sc-story-name"),kicker=layer?.querySelector(".sc-story-kicker");
-    const progress=layer?.querySelector(".sc-performance-progress-33900"),hint=layer?.querySelector(".sc-performance-continue-hint-33900"),primary=layer?.querySelector(".sc-chronicle-primary");
+    const progress=layer?.querySelector(".sc-performance-progress-33900"),hint=layer?.querySelector(".sc-performance-continue-hint-33900"),primary=layer?.querySelector(".sc-chronicle-primary"),actions=layer?.querySelector(".sc-chronicle-actions");
     const pr=panel?.getBoundingClientRect(),ar=actor?.getBoundingClientRect();
     const overlap=pr&&ar?Math.max(0,Math.min(pr.right,ar.right)-Math.max(pr.left,ar.left))*Math.max(0,Math.min(pr.bottom,ar.bottom)-Math.max(pr.top,ar.top)):0;
     const ps=panel?getComputedStyle(panel):null,ts=textNode?getComputedStyle(textNode):null;
@@ -89,6 +89,7 @@ async function state(page){
       continueHintVisible:visible(hint),
       primaryText:primary?.textContent?.trim()||"",
       primaryVisible:visible(primary),
+      actionsVisible:visible(actions),
       kickerText:kicker?.textContent?.trim()||"",
       kickerVisible:visible(kicker),
       visibleNarrationLabels:[...(layer?.querySelectorAll(".sc-story-name,.sc-story-kicker")||[])].filter(visible).map(n=>n.textContent.trim()).filter(x=>x==="NARRATION").length,
@@ -161,6 +162,7 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
     assert.strictEqual(s.continueHint,"CLICK ANYWHERE TO CONTINUE",label+" click-anywhere hint drift");
     assert.strictEqual(s.continueHintVisible,true,label+" click-anywhere hint hidden");
     assert.strictEqual(s.primaryVisible,false,label+" legacy arrow advance control still visible");
+    assert.strictEqual(s.actionsVisible,false,label+" legacy action row still consumes narration height");
     assert.strictEqual(s.kickerVisible,false,label+" legacy kicker still visible");
     assert.strictEqual(s.textMarginTop,"4px",label+" narration text margin drift");
     assert(Math.abs(parseFloat(s.textFontSize)-13.536)<0.2,label+" narration font size drift "+s.textFontSize);
