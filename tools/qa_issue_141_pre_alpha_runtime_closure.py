@@ -37,12 +37,12 @@ EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-origin-scenes-32900-c.js",
     "runtime/alpha-origin-scenes-32900-integrator.js",
     "runtime/alpha-battle-modern-33000.js",
-    "runtime/alpha-menma-evolved-pl-battle-36900.js",
     "runtime/alpha-alpha-sprint-33100.js",
     "runtime/alpha-traversal-bridge-33200.js",
     "runtime/alpha-anbu-root-contained-155.js",
     "runtime/alpha-anbu-root-contained-155-knowledge-fix.js",
     "runtime/alpha-arc1-reward-evaluation-35400.js",
+    "runtime/alpha-menma-evolved-pl-battle-36900.js",
 ]
 
 PYTHON_GATES = [
