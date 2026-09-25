@@ -39,6 +39,35 @@ async function bootScenario(browser,label){
   // A fresh Playwright context already starts with isolated storage. Do not
   // clear sessionStorage in an init script: init scripts run again on reload
   // and would erase the Battle snapshot this test is explicitly validating.
+  // Diagnostic only: record every write to the one shared session snapshot so
+  // a startup overwrite can be attributed without changing storage behavior.
+  await page.addInitScript(()=>{
+    const original=Storage.prototype.setItem;
+    globalThis.__ISSUE369_SESSION_WRITE_TRACE__=[];
+    Storage.prototype.setItem=function(key,value){
+      if(this===sessionStorage&&key==="shinobiTestState"){
+        let summary=null;
+        try{
+          const parsed=JSON.parse(String(value));
+          summary={
+            encounterId:parsed&&parsed.encounterId||null,
+            battleConfigId:parsed&&parsed.battleConfigId||null,
+            objectiveId:parsed&&parsed.objectiveId||null,
+            battleId:parsed&&parsed.battleId||null,
+            overlayType:parsed&&parsed.overlayType||null,
+            battleOver:parsed&&parsed.battleOver===true,
+            menma369BattleActive:parsed&&parsed.menma369BattleActive===true,
+            hasSemanticState:!!(parsed&&parsed.menmaEvolvedPLBattle36900)
+          };
+        }catch(_error){}
+        globalThis.__ISSUE369_SESSION_WRITE_TRACE__.push({
+          summary,
+          stack:String(new Error("issue369_session_write").stack||"")
+        });
+      }
+      return original.apply(this,arguments);
+    };
+  });
   await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});
   await page.waitForFunction(()=>!!(
     typeof getRuntimeBuildFingerprint==="function"&&
@@ -220,6 +249,8 @@ async function cadenceAndReload(browser){
       saved:(()=>{const raw=sessionStorage.getItem("shinobiTestState");if(!raw)return null;const x=JSON.parse(raw);return{encounterId:x.encounterId||null,battleConfigId:x.battleConfigId||null,battleOver:x.battleOver===true,menma369BattleActive:x.menma369BattleActive===true,overlayType:x.overlayType||null};})()
     }));
     console.log("ISSUE369 POST-RELOAD BOOT",JSON.stringify(reloadBootState));
+    const reloadWriteTrace=await page.evaluate(()=>globalThis.__ISSUE369_SESSION_WRITE_TRACE__||[]);
+    console.log("ISSUE369 RELOAD SESSION WRITE TRACE",JSON.stringify(reloadWriteTrace));
     await page.waitForFunction(enc=>currentBattle&&currentBattle.active===true&&currentBattle.encounterId===enc,ENCOUNTER,{timeout:30000});
     await releaseFrontDoor(page);
     const afterReload=await page.evaluate(()=>({
