@@ -44,8 +44,8 @@ async function boot(page){
   await page.evaluate(()=>setStorySceneBeat("tutorial_battle"));
   await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="tutorial_battle",null,{timeout:8000});
 }
-async function setupBattle(page,resolved,{terminal=false,menmaWithdrawn=false}={}){
-  return page.evaluate(({resolved,terminal,menmaWithdrawn,CONFIG,ENCOUNTER,OBJECTIVE,SCENE,HOSTILES,ALLIES,SOURCE_ID})=>{
+async function setupBattle(page,resolved,{terminal=false,menmaWithdrawn=false,result=null,completed=null}={}){
+  return page.evaluate(({resolved,terminal,menmaWithdrawn,result,completed,CONFIG,ENCOUNTER,OBJECTIVE,SCENE,HOSTILES,ALLIES,SOURCE_ID})=>{
     const rt=getActiveStorySceneRuntime();
     if(!rt||rt.sceneId!==SCENE)throw new Error("Menma Story runtime missing");
     const occurrenceId="battle_occ_origin_academy_menma_three_test_subjects:"+rt.instanceId;
@@ -58,13 +58,15 @@ async function setupBattle(page,resolved,{terminal=false,menmaWithdrawn=false}={
         (row.type==="origin_battle_reward"&&row.rewardSourceId===SOURCE_ID&&row.battleOccurrenceId===occurrenceId)
       ))rows.splice(i,1);
     }
+    const battleResult=result||(!terminal?"in_progress":(menmaWithdrawn?"defeat":"victory"));
+    const objectiveCompleted=completed===null?battleResult==="victory":!!completed;
     const receipt={
-      type:"battle_occurrence",activity:"battle",committed:true,completed:terminal&&!menmaWithdrawn,
+      type:"battle_occurrence",activity:"battle",committed:true,completed:objectiveCompleted,
       occurrenceId,sourceOccurrenceId:occurrenceId,battleOccurrenceId:occurrenceId,
       battleConfigId:CONFIG,encounterId:ENCOUNTER,objectiveId:OBJECTIVE,
       alliedParticipantIds:[...ALLIES],hostileParticipantIds:[...HOSTILES],
-      battleResult:terminal&&!menmaWithdrawn?"victory":(menmaWithdrawn?"defeat":"in_progress"),
-      objectiveCompleted:terminal&&!menmaWithdrawn,
+      battleResult,
+      objectiveCompleted,
       menmaWithdrawn,ankoWithdrawn:false,resolvedHostileIds:[...resolved],
       timestamp:Date.now()
     };
@@ -83,7 +85,7 @@ async function setupBattle(page,resolved,{terminal=false,menmaWithdrawn=false}={
     currentBattle.claimedAt=null;
     currentBattle.completionRecorded=false;
     currentBattle.outcome=terminal
-      ? {type:menmaWithdrawn?"defeat":"victory",committed:true,completedAt:Date.now(),finishingShinobiId:menmaWithdrawn?null:"academy_menma",menmaWithdrawn}
+      ? {type:battleResult,committed:true,completedAt:Date.now(),finishingShinobiId:battleResult==="victory"?(menmaWithdrawn?"sj_anko":"academy_menma"):null,menmaWithdrawn}
       : null;
     currentBattle.returnContext={
       type:"story_scene",sceneId:SCENE,sceneInstanceId:rt.instanceId,
@@ -94,7 +96,7 @@ async function setupBattle(page,resolved,{terminal=false,menmaWithdrawn=false}={
     currentBattle.contributions={};
     savePlayerData();saveTestState();
     return{occurrenceId,ryo:Number(playerData.ryo)||0};
-  },{resolved,terminal,menmaWithdrawn,CONFIG,ENCOUNTER,OBJECTIVE,SCENE,HOSTILES,ALLIES,SOURCE_ID});
+  },{resolved,terminal,menmaWithdrawn,result,completed,CONFIG,ENCOUNTER,OBJECTIVE,SCENE,HOSTILES,ALLIES,SOURCE_ID});
 }
 async function rewardState(page){
   return page.evaluate(({SOURCE_ID,OLD_SOURCE})=>{
@@ -143,9 +145,25 @@ async function rewardState(page){
     assert.strictEqual(await page.evaluate(()=>claimCurrentBattleRewards()),false);
     assert.strictEqual((await rewardState(page)).ryo,startingRyo);
 
-    // Exact whole-encounter victory.
+    // Defeat/not-completed remains ineligible even with all hostile metadata present.
+    await setupBattle(page,HOSTILES,{terminal:true,menmaWithdrawn:true,result:"defeat",completed:false});
+    projected=await page.evaluate(()=>ensureAcademyMenmaThreeSubjectRewardProjection36200());
+    assert.strictEqual(projected.ready,false,"defeat/not-completed incorrectly qualified for reward");
+    state=await rewardState(page);
+    assert.strictEqual(state.rewards.ryo,0,"defeat/not-completed paid Ryō");
+    assert.strictEqual(await page.evaluate(()=>claimCurrentBattleRewards()),false);
+    assert.strictEqual((await rewardState(page)).ryo,startingRyo);
+
+    // Menma withdrawal does not disqualify an authoritative terminal victory.
+    await setupBattle(page,HOSTILES,{terminal:true,menmaWithdrawn:true,result:"victory",completed:true});
+    let generated=await page.evaluate(()=>generateBattleRewards(currentBattle.enemy,{id:"sj_anko",name:"Anko"}));
+    assert.strictEqual(generated.generated,true,"Menma-withdrawn terminal victory was blocked");
+    assert.strictEqual(generated.ryo,100,"Menma-withdrawn terminal victory did not project 100 Ryō");
+    assert.strictEqual((await rewardState(page)).ryo,startingRyo,"projection alone mutated currency");
+
+    // Exact whole-encounter victory with Menma still present.
     const full=await setupBattle(page,HOSTILES,{terminal:true});
-    const generated=await page.evaluate(()=>generateBattleRewards(currentBattle.enemy,getPlayerCharacter("academy_menma")));
+    generated=await page.evaluate(()=>generateBattleRewards(currentBattle.enemy,getPlayerCharacter("academy_menma")));
     assert.strictEqual(generated.generated,true);
     assert.strictEqual(generated.ryo,100);
     assert.strictEqual(generated.exp,0);
@@ -220,7 +238,7 @@ async function rewardState(page){
     const summary={
       pass:true,issue:362,kind:"installed_browser_menma_three_subject_reward",
       battleOccurrenceId:full.occurrenceId,rewardSourceId:SOURCE_ID,ryoGranted:100,
-      checks:{oneHostileZero:true,twoHostilesZero:true,fullVictoryExact100:true,reopenNoDuplicate:true,refreshNoDuplicate:true,storyReturnExact:true,retired50SourceAbsent:true},
+      checks:{oneHostileZero:true,twoHostilesZero:true,defeatAllMetadataZero:true,menmaWithdrawnVictoryProjects100:true,fullVictoryExact100:true,reopenNoDuplicate:true,refreshNoDuplicate:true,storyReturnExact:true,retired50SourceAbsent:true},
       runtimeErrors:errors,browserGoldenClaimed:false
     };
     fs.writeFileSync(path.join(OUT,"summary.json"),JSON.stringify(summary,null,2)+"\n");

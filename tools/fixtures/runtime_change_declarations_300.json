@@ -651,6 +651,32 @@
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Issue #369 consumes the CE/Combat-released Menma-first PL Battle evolution. It adds one Menma-scoped semantic owner for alternating player/enemy side opportunities, the Menma/Anko assist entitlement, Active-only enemy relay, exactly-once side-opportunity/RNG persistence, and the exact whole-encounter Battle occurrence receipt required by the existing 100 Ryō adapter. PL remains the health identity; no general Beta command batching or Kakashi migration is included."
+    },
+    {
+      "changeId": "issue-379-menma-whole-encounter-reward-victory-trigger",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "origin.academy_menma.three_subject.reward_commit"
+      ],
+      "owner": "runtime/alpha-menma-origin-rewards-36200.js",
+      "directCallers": [
+        "index.html",
+        "game.js Battle reward/claim surfaces"
+      ],
+      "stateTouched": [
+        "currentBattle.rewards exact Academy Menma successor projection",
+        "playerData.ryo",
+        "playerData.activityHistory exact reward-source/battle-occurrence receipt"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_362_menma_three_subject_reward.js",
+        "tools/qa_issue_362_menma_reward_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "AUTHORITY_CHANGED: Issue #379 consumes corrected World authority at d8afde8b7e499bfbb7d6b0716184f00a76f6f0d9. Reward qualification remains exact successor terminal victory plus all-three hostile resolution, but Menma survival is no longer an independent World predicate. The adapter preserves factual menmaWithdrawn truth in the reward receipt, remains cadence-independent, preserves the fixed 100 Ryō amount and idempotent receipt, and does not alter Battle cadence or Combat semantics."
     }
   ]
 }
