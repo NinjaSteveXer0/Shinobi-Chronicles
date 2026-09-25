@@ -1003,9 +1003,7 @@ function launchMenmaEvolvedPLBattle36900(context={}){
   try{openOverlay("combat");}catch(_error){}
   return{success:true,battleId:b.battleId,encounterId:ENCOUNTER_ID,battleConfigId:BATTLE_CONFIG_ID,objectiveId:OBJECTIVE_ID,battleOccurrenceId:battleOccurrenceId(b)};
 }
-function patchMenmaStoryBattle(){
-  if(typeof getStorySceneDefinition!=="function")return{success:false,reason:"story_definition_api_missing"};
-  const scene=getStorySceneDefinition(STORY_SCENE_ID);
+function applyMenmaSuccessorBattleAuthority(scene){
   if(!scene||!scene.beatMap||typeof scene.beatMap.get!=="function")return{success:false,reason:"menma_story_scene_missing"};
   const beat=scene.beatMap.get(STORY_BATTLE_BEAT_ID);
   if(!beat||beat.mode!=="battle_transition"||!beat.battle)return{success:false,reason:"menma_story_battle_beat_missing"};
@@ -1015,6 +1013,20 @@ function patchMenmaStoryBattle(){
   beat.battle.objectiveId=OBJECTIVE_ID;
   beat.battle.launchResolver=launchMenmaEvolvedPLBattle36900;
   return{success:true,sceneId:STORY_SCENE_ID,beatId:STORY_BATTLE_BEAT_ID};
+}
+const PRE_GET_STORY_SCENE_DEFINITION=typeof getStorySceneDefinition==="function"?getStorySceneDefinition:null;
+if(PRE_GET_STORY_SCENE_DEFINITION){
+  const wrapped=function(sceneId){
+    const scene=PRE_GET_STORY_SCENE_DEFINITION.apply(this,arguments);
+    if(String(sceneId||"")===STORY_SCENE_ID&&scene)applyMenmaSuccessorBattleAuthority(scene);
+    return scene;
+  };
+  globalThis.getStorySceneDefinition=wrapped;try{getStorySceneDefinition=wrapped;}catch(_error){}
+}
+function patchMenmaStoryBattle(){
+  if(typeof getStorySceneDefinition!=="function")return{success:false,reason:"story_definition_api_missing"};
+  const scene=getStorySceneDefinition(STORY_SCENE_ID);
+  return applyMenmaSuccessorBattleAuthority(scene);
 }
 
 const PRE_MENMA_PRODUCTION_DIAG=typeof runAlphaMenmaOriginProductionDiagnostics==="function"?runAlphaMenmaOriginProductionDiagnostics:null;
@@ -1061,7 +1073,7 @@ function diagnostics(){
     staleTokenRejection:String(validateBattleActionEnvelope).includes("stale_side_opportunity_token")&&String(validateBattleActionEnvelope).includes("stale_battle_semantic_generation"),
     semanticLoopNoTimer:!source.includes("set"+"Timeout")&&!source.includes("request"+"AnimationFrame")&&!source.includes("animation"+"end"),
     menmaDefeatImmediate:String(handleBattleParticipantAtZeroPL).includes("academy_menma_withdrawn_before_objective"),
-    exactBattleReceipt:String(commitBattleOccurrenceReceipt).includes(BATTLE_OCCURRENCE_PREFIX)&&String(commitBattleOccurrenceReceipt).includes("resolvedHostileIds:victory?[...HOSTILE_IDS]")&&String(completeBattleDefeat).includes('commitBattleOccurrenceReceipt("defeat")'),
+    exactBattleReceipt:String(battleOccurrenceId).includes("BATTLE_OCCURRENCE_PREFIX")&&String(commitBattleOccurrenceReceipt).includes("resolvedHostileIds:victory?[...HOSTILE_IDS]")&&String(completeBattleDefeat).includes('commitBattleOccurrenceReceipt("defeat")'),
     rewardAdapterPresent:!!globalThis.SC_ACADEMY_MENMA_THREE_SUBJECT_REWARD_36200,
     men03StableSource:typeof MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID==="undefined"||MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID==="combat_academy_menma_tutorial_performance_resolved",
     kakashiUntouched:!source.includes("academy_"+"kakashi"),
