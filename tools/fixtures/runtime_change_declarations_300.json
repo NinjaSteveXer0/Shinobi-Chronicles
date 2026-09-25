@@ -621,6 +621,34 @@
       ],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Stephen promoted the accepted Academy Kakashi dialogue/narration/choice visual language to the benchmark for other Origins and Story Arcs. Academy Obito keeps its already-final #331 Story semantics while binding dedicated Obito backdrop assets, safe cue-level environment changes, rounded speaker-side dialogue/narration panels, semantic choice icons and click-anywhere cue advancement through the existing shared Story Scene Board owner. No Obito route, timing, consequence, PL/Battle, reward or Origin-completion semantics change."
+    },
+    {
+      "changeId": "issue-369-menma-evolved-pl-battle-alpha-2026-09-25",
+      "classification": "NEW",
+      "responsibilityIds": [
+        "origin.academy_menma.three_subject.battle_semantics"
+      ],
+      "owner": "runtime/alpha-menma-evolved-pl-battle-36900.js",
+      "directCallers": [
+        "game.js",
+        "runtime/alpha-menma-origin-rewards-36200.js",
+        "index.html"
+      ],
+      "stateTouched": [
+        "currentBattle.menmaEvolvedPLBattle36900",
+        "currentBattle.menma369LocalAllies",
+        "sessionStorage.shinobiTestState Menma successor Battle resume payload",
+        "playerData.activityHistory exact Menma three-subject Battle occurrence receipt"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_369_menma_evolved_pl_battle.js",
+        "tools/qa_issue_362_menma_three_subject_reward.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Issue #369 consumes the CE/Combat-released Menma-first PL Battle evolution. It adds one Menma-scoped semantic owner for alternating player/enemy side opportunities, the Menma/Anko assist entitlement, Active-only enemy relay, exactly-once side-opportunity/RNG persistence, and the exact whole-encounter Battle occurrence receipt required by the existing 100 Ryō adapter. PL remains the health identity; no general Beta command batching or Kakashi migration is included."
     }
   ]
 }
