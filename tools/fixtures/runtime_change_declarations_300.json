@@ -590,6 +590,37 @@
       "replaces": [],
       "contractChangeReason": "WORLD_SUCCESSOR_REWARD_AUTHORITY",
       "rationale": "Issue #362 introduces the exact World-closed fixed 100 Ryō whole-encounter reward for the successor Academy Menma + Anko versus three-test-subject Story Battle. The owner consumes only the exact committed Combat occurrence receipt, suppresses generic loot while that receipt is absent, persists one reward-source/battle-occurrence receipt in Activity History, and never reactivates the superseded Altered-only 50 Ryō source."
+    },
+    {
+      "changeId": "academy-obito-golden-presentation-backdrops-2026-09-25",
+      "classification": "REPLACES",
+      "responsibilityIds": [
+        "origin.academy_obito.final_story_state",
+        "story.scene.presentation.shared"
+      ],
+      "owner": "runtime/alpha-origin-scenes-32900-c.js + runtime/alpha-story-scene-board-33900.js",
+      "directCallers": [
+        "runtime/alpha-origin-scenes-32900-integrator.js",
+        "runtime/alpha-traversal-bridge-33200.js"
+      ],
+      "stateTouched": [
+        "presentation-only Obito Story environment/backdrop projection",
+        "presentation-only Story cue speaker-side and choice intent-icon attributes",
+        "activeStorySceneRuntime.localContext.__storyPerformanceCursor33900 existing cue cursor"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_331_obito_final_runtime.js",
+        "tools/qa_obito_story_presentation_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_303_runtime_build_fingerprint.js"
+      ],
+      "replaces": [
+        "runtime/alpha-origin-scenes-32900-c.js::generic Konoha street/civilian room Obito backdrop fallback",
+        "runtime/alpha-story-scene-board-33900.js::panel-only click advancement and square legacy Origin panel projection"
+      ],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Stephen promoted the accepted Academy Kakashi dialogue/narration/choice visual language to the benchmark for other Origins and Story Arcs. Academy Obito keeps its already-final #331 Story semantics while binding dedicated Obito backdrop assets, safe cue-level environment changes, rounded speaker-side dialogue/narration panels, semantic choice icons and click-anywhere cue advancement through the existing shared Story Scene Board owner. No Obito route, timing, consequence, PL/Battle, reward or Origin-completion semantics change."
     }
   ]
 }

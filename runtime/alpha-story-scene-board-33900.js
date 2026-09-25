@@ -9,7 +9,7 @@
 "use strict";
 if(globalThis.SC_STORY_SCENE_BOARD_33900)return;
 
-const PATCH_ID="story_scene_board_33900_2026_09_22_shared_choreography";
+const PATCH_ID="story_scene_board_33900_2026_09_25_origin_benchmark";
 const STYLE_ID="sc-story-scene-board-33900-style";
 const PERFORMANCE_KEY="__storyPerformanceCursor33900";
 const HARD_TRANSITION_CURTAIN_ID="sc-story-hard-transition-33900";
@@ -22,6 +22,19 @@ const choreographyControllers=new WeakMap();
 const SEMANTIC_STAGE_ANCHORS=Object.freeze({PLAYER_LEFT:8,INNER_LEFT:27,CENTER:46,CENTER_OBJECT:50,INNER_RIGHT:61,OPPONENT_RIGHT:78,FAR_ENTRY_LEFT:-18,FAR_ENTRY_RIGHT:108});
 const CHOREOGRAPHY_CLASSES=Object.freeze(["ENTER","EXIT","FOCUS","REPOSITION","APPROACH","RETREAT","LUNGE","STRIKE","EVADE","RECOIL","COLLAPSE","FLEE","RESTRAIN","RELEASE","HANDOFF","OBJECT_TRANSFER","SURPRISE_ENTRY"]);
 const CHOREOGRAPHY_DURATION_MS=Object.freeze({ENTER:310,EXIT:260,FOCUS:150,REPOSITION:300,APPROACH:320,RETREAT:300,LUNGE:190,STRIKE:130,EVADE:220,RECOIL:180,COLLAPSE:390,FLEE:360,RESTRAIN:330,RELEASE:260,HANDOFF:370,OBJECT_TRANSFER:370,SURPRISE_ENTRY:285});
+
+function storyChoiceIntentIcon33900(choice){
+  const source=(String(choice&&choice.choiceId||"")+" "+String(choice&&choice.label||"")).toUpperCase();
+  if(/\b(HELP|ASSIST|AID|SAVE|PROTECT)\b/.test(source))return"✦";
+  if(/\b(CONTINUE|KEEP GOING|KEEP MOVING|GO TO|LEAVE|MOVE|FOLLOW|PURSUE|CHANGE ROUTE)\b/.test(source))return"➜";
+  if(/\b(TALK|ASK|QUESTION|SAY|ANSWER)\b/.test(source))return"◌";
+  if(/\b(INVESTIGATE|SEARCH|SCAN|CHECK|OBSERVE|WATCH|WAIT|NOTICE)\b/.test(source))return"◉";
+  if(/\b(TRAIN|PRACTICE|SPAR)\b/.test(source))return"◇";
+  if(/\b(CONFRONT|ATTACK|STRIKE|STOP|DEFEAT|KILL|FIGHT)\b/.test(source))return"⚔";
+  if(/\b(RESTRAIN|ANBU|POLICE|CUSTODY|SECURE)\b/.test(source))return"⬡";
+  if(/\b(PACKAGE|PICK|TAKE|OBJECT|EQUIPMENT)\b/.test(source))return"◆";
+  return"•";
+}
 
 function escapeHTML(value){
   if(typeof escapeStorySceneHTML==="function")return escapeStorySceneHTML(String(value??""));
@@ -232,11 +245,20 @@ function getStoryChoreographyState33900(root){
   return{active:!!controller,scopeKey:controller&&controller.scopeKey||root&&root.dataset&&root.dataset.scChoreographyScope||null,cueIndex:controller?controller.cueIndex:null,state:root&&root.dataset&&root.dataset.scChoreographyState||"settled",lastKinds,completedKinds};
 }
 
-function requestedAssetIdFromBeat(beat){const ref=beat&&beat.environmentRef;return typeof ref==="string"?ref:ref&&typeof ref==="object"&&ref.assetId?String(ref.assetId):null;}
+function requestedAssetIdFromBeat(beat){const ref=beat&&beat.environmentRef;return typeof ref==="string"?ref:ref&&typeof ref==="object"?(ref.assetId?String(ref.assetId):ref.environmentId?String(ref.environmentId):null):null;}
 function resolveBoardBackdropPath(runtime=currentRuntime(),beat=currentBeat(runtime)){
-  const def=sceneDefinition(runtime);
-  try{if(typeof resolveStorySceneEnvironmentProjection==="function"){const r=resolveStorySceneEnvironmentProjection({},beat,def,runtime);if(r&&r.mode==="dedicated_backdrop"&&r.asset_path)return String(r.asset_path);}}catch(_error){}
-  const assetId=requestedAssetIdFromBeat(beat);if(!assetId)return null;
+  const def=sceneDefinition(runtime),board=runtime?boardDefinition(runtime.sceneId):null;
+  let assetId=null;
+  try{
+    if(board&&typeof board.resolveBackdrop==="function"){
+      const override=board.resolveBackdrop({runtime,beat,beatId:beat&&beat.beatId||null,performance:performanceCursor(runtime,beat)});
+      if(override&&typeof override==="object"&&override.assetPath)return String(override.assetPath);
+      assetId=typeof override==="string"?override:override&&typeof override==="object"?(override.assetId||override.environmentId||null):null;
+    }
+  }catch(_error){}
+  try{if(!assetId&&typeof resolveStorySceneEnvironmentProjection==="function"){const r=resolveStorySceneEnvironmentProjection({},beat,def,runtime);if(r&&r.mode==="dedicated_backdrop"&&r.asset_path)return String(r.asset_path);}}catch(_error){}
+  if(!assetId)assetId=requestedAssetIdFromBeat(beat);
+  if(!assetId)return null;
   try{const getPath=typeof getSceneBackdropAssetPath==="function"?getSceneBackdropAssetPath:globalThis.getSceneBackdropAssetPath;const path=typeof getPath==="function"?getPath(assetId):null;return path?String(path):null;}catch(_error){return null;}
 }
 function cssUrlValue(path){return `url("${String(path).replace(/\\/g,"\\\\").replace(/\"/g,'\\\"')}")`;}
@@ -249,23 +271,32 @@ function applyBoardBackdrop(stage,runtime=currentRuntime()){
 function installStyle(){
   if(typeof document==="undefined"||!document.head||document.getElementById(STYLE_ID))return false;
   const style=document.createElement("style");style.id=STYLE_ID;style.textContent=`
-#story-scene-presentation-layer[data-sc-presentation-hidden="true"]{display:none!important;pointer-events:none!important;}\n#story-scene-presentation-layer[data-sc-scene-board="true"]{background:transparent!important;}
+#story-scene-presentation-layer[data-sc-presentation-hidden="true"]{display:none!important;pointer-events:none!important;}\n#story-scene-presentation-layer[data-sc-scene-board="true"]{background:#030b10!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-environment{z-index:0!important;filter:saturate(1.04) brightness(.94);}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-environment-scrim{z-index:1!important;background:linear-gradient(180deg,rgba(2,5,8,.02),rgba(2,5,8,.06) 48%,rgba(2,5,8,.50) 84%,rgba(2,5,8,.76))!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-stage{width:min(100vw,calc(100vh * 1.7777778))!important;max-width:none!important;aspect-ratio:16/9!important;overflow:hidden;z-index:2!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-stage.is-master-art-off{background:transparent!important;box-shadow:none!important;}
-#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-stage[data-sc-scene-board-backdrop="dedicated"]{background-image:linear-gradient(180deg,rgba(2,5,8,.02),rgba(2,5,8,.05) 50%,rgba(2,5,8,.42) 82%,rgba(2,5,8,.70)),var(--sc-scene-board-backdrop)!important;background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-stage[data-sc-scene-board-backdrop="dedicated"]{background-color:#03080c!important;background-image:linear-gradient(180deg,rgba(2,5,8,.02),rgba(2,5,8,.05) 50%,rgba(2,5,8,.42) 82%,rgba(2,5,8,.70)),var(--sc-scene-board-backdrop)!important;background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-master-frame{display:none!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-layout{position:relative;z-index:5;width:min(94%,1180px)!important;min-height:0!important;margin:0 0 1.2%!important;display:grid!important;grid-template-columns:1fr!important;gap:8px!important;padding:0!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-context{display:none!important;}
-#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-panel{min-height:0!important;max-height:31vh;padding:13px 18px 12px!important;border:1px solid rgba(205,169,83,.62)!important;background:linear-gradient(180deg,rgba(3,9,14,.76),rgba(2,7,11,.91))!important;backdrop-filter:blur(4px);box-shadow:0 18px 45px rgba(0,0,0,.42)!important;overflow:auto!important;cursor:pointer;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-panel{position:relative;min-height:0!important;max-height:31vh;padding:13px 18px 12px!important;border:1px solid rgba(205,169,83,.62)!important;border-radius:14px!important;background:linear-gradient(180deg,rgba(3,9,14,.82),rgba(2,7,11,.94))!important;backdrop-filter:blur(8px);box-shadow:0 18px 45px rgba(0,0,0,.42)!important;overflow:visible!important;cursor:pointer;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-story-panel{width:min(52%,650px)!important;border-color:rgba(103,221,230,.55)!important;background:linear-gradient(145deg,rgba(4,18,24,.94),rgba(2,9,14,.97))!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="player"] .sc-chronicle-layout{justify-items:start!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-chronicle-layout{justify-items:end!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-panel{border-color:rgba(218,176,77,.58)!important;background:linear-gradient(145deg,rgba(25,18,6,.93),rgba(8,10,12,.97))!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-story-panel::after{content:"";position:absolute;top:-8px;left:22%;width:14px;height:14px;transform:translateX(-50%) rotate(45deg);border-left:1px solid rgba(103,221,230,.5);border-top:1px solid rgba(103,221,230,.5);background:rgba(2,9,14,.97);}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-panel::after{left:78%;border-color:rgba(218,176,77,.52);background:rgba(8,10,12,.97);}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-portrait{display:none!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-text{margin-top:6px!important;font-size:clamp(13px,1.05vw,17px)!important;line-height:1.42!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-name{font-size:11px!important;margin:0 0 2px!important;color:#e8c86e!important;font-weight:900!important;letter-spacing:.12em!important;text-transform:uppercase!important;line-height:1.15!important;}
 #story-scene-presentation-layer[data-sc-performance="true"] .sc-chronicle-primary{width:34px!important;height:30px!important;min-height:0!important;padding:0!important;font-size:20px!important;line-height:1!important;float:right;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-actions{margin-top:9px!important;gap:7px!important;}
 #story-scene-presentation-layer[data-sc-scene-mode="encounter"] .sc-chronicle-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));}
-#story-scene-presentation-layer[data-sc-scene-mode="encounter"] .sc-story-choice{min-height:42px;align-items:center;background:linear-gradient(180deg,rgba(14,24,30,.91),rgba(7,14,19,.94))!important;border-color:rgba(207,169,76,.68)!important;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-choice{position:relative;min-height:42px;align-items:center;border-radius:10px!important;padding-left:38px!important;background:linear-gradient(180deg,rgba(14,24,30,.93),rgba(7,14,19,.96))!important;border-color:rgba(207,169,76,.68)!important;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-choice::before{content:attr(data-intent-icon);position:absolute;left:12px;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:17px;height:17px;border:1px solid rgba(112,215,224,.3);border-radius:50%;color:#74dce4;font-size:10px;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-choice:hover,#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-choice:focus-visible{border-color:#68dce6!important;color:#8ce5ec!important;outline:none!important;transform:translateY(-1px);}
+#story-scene-presentation-layer[data-sc-scene-mode="encounter"] .sc-story-choice{min-height:42px;align-items:center;}
 .sc-scene-board-33900{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;}
 .sc-scene-board-33900__top{position:absolute;left:3.2%;right:3.2%;top:3.8%;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
 .sc-scene-board-33900__location,.sc-scene-board-33900__objective,.sc-scene-board-33900__receipt{padding:7px 10px;border:1px solid rgba(199,164,77,.52);background:rgba(3,9,14,.68);box-shadow:0 8px 22px rgba(0,0,0,.28);text-shadow:0 1px 2px #000;backdrop-filter:blur(3px);}
@@ -335,9 +366,17 @@ function boardMarkup(projection){
 }
 function clearBoard(layer){if(!layer)return;try{delete layer.dataset.scSceneBoard;delete layer.dataset.scSceneMode;delete layer.dataset.scPerformance;}catch(_error){};for(const node of layer.querySelectorAll?layer.querySelectorAll(".sc-scene-board-33900"):[]){if(typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(node,"scene_board_teardown");if(node&&typeof node.remove==="function")node.remove();}}
 function updatePerformancePanel(layer,runtime=currentRuntime()){
-  if(!layer||!runtime)return false;const p=performanceCursor(runtime,currentBeat(runtime));
-  if(!p){delete layer.dataset.scPerformance;return false;}
+  if(!layer||!runtime)return false;const beat=currentBeat(runtime),p=performanceCursor(runtime,beat);
+  if(!p){delete layer.dataset.scPerformance;delete layer.dataset.scCueKind;delete layer.dataset.scCueSpeakerSide;return false;}
   layer.dataset.scPerformance="true";const cue=p.cue||{};
+  layer.dataset.scCueKind=String(cue.kind||"narration");
+  if(cue.kind==="dialogue"){
+    const projection=resolveStorySceneBoardProjection(runtime.sceneId,beat&&beat.beatId,runtime);
+    const actors=projection&&Array.isArray(projection.actors)?projection.actors:[];
+    const speaker=String(cue.speakerName||cue.speaker||"").toUpperCase();
+    const first=String(actors[0]&&actors[0].label||"").toUpperCase();
+    layer.dataset.scCueSpeakerSide=speaker&&first&&speaker===first?"player":"opposition";
+  }else delete layer.dataset.scCueSpeakerSide;
   const text=layer.querySelector&&layer.querySelector(".sc-story-text");const cueText=String(cue.text||"");if(text&&text.textContent!==cueText)text.textContent=cueText;
   const panel=layer.querySelector&&layer.querySelector(".sc-story-panel");
   let name=layer.querySelector&&layer.querySelector(".sc-story-name");
@@ -350,11 +389,21 @@ function updatePerformancePanel(layer,runtime=currentRuntime()){
   const primary=layer.querySelector&&layer.querySelector(".sc-chronicle-primary");if(primary){if(primary.textContent!=="›")primary.textContent="›";primary.setAttribute("aria-label","Advance scene");primary.title="Advance scene";}
   return true;
 }
+function decorateStoryChoices33900(layer,runtime=currentRuntime()){
+  if(!layer||!runtime)return false;
+  const beat=currentBeat(runtime),choices=beat&&Array.isArray(beat.choices)?beat.choices:[];
+  const nodes=[...(layer.querySelectorAll?layer.querySelectorAll(".sc-story-choice"):[])];
+  nodes.forEach((node,index)=>{
+    const choice=choices[index]||{choiceId:node.dataset&&node.dataset.choiceId||"",label:node.textContent||""};
+    node.setAttribute("data-intent-icon",storyChoiceIntentIcon33900(choice));
+  });
+  return nodes.length>0;
+}
 function renderStorySceneBoard33900(){
   if(rendering||typeof document==="undefined")return false;const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;
   const runtime=currentRuntime(),projection=runtime?resolveStorySceneBoardProjection(runtime.sceneId,runtime.beatId,runtime):null;if(!projection){clearBoard(layer);return false;}
   const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||(layer.querySelector&&layer.querySelector(".sc-story-stage"))||layer;if(!stage)return false;
-  rendering=true;try{installStyle();layer.dataset.scSceneBoard="true";layer.dataset.scSceneMode=projection.mode||"conversation";applyBoardBackdrop(stage,runtime);let board=stage.querySelector?stage.querySelector(".sc-scene-board-33900"):null;if(!board){board=document.createElement("section");board.className="sc-scene-board-33900";board.setAttribute("aria-hidden","true");stage.appendChild(board);}const signature=JSON.stringify(projection);if(board.dataset&&board.dataset.signature!==signature){board.innerHTML=boardMarkup(projection);board.dataset.signature=signature;}updatePerformancePanel(layer,runtime);return true;}finally{rendering=false;}
+  rendering=true;try{installStyle();layer.dataset.scSceneBoard="true";layer.dataset.scSceneMode=projection.mode||"conversation";applyBoardBackdrop(stage,runtime);let board=stage.querySelector?stage.querySelector(".sc-scene-board-33900"):null;if(!board){board=document.createElement("section");board.className="sc-scene-board-33900";board.setAttribute("aria-hidden","true");stage.appendChild(board);}const signature=JSON.stringify(projection);if(board.dataset&&board.dataset.signature!==signature){board.innerHTML=boardMarkup(projection);board.dataset.signature=signature;}updatePerformancePanel(layer,runtime);decorateStoryChoices33900(layer,runtime);return true;}finally{rendering=false;}
 }
 function scheduleBoardRender(){if(typeof queueMicrotask==="function")queueMicrotask(renderStorySceneBoard33900);else if(typeof setTimeout==="function")setTimeout(renderStorySceneBoard33900,0);}
 
@@ -500,7 +549,13 @@ function advanceStoryScene33900(choiceId=null){
 if(PRE_ADVANCE){globalThis.advanceStoryScene=advanceStoryScene33900;try{advanceStoryScene=advanceStoryScene33900;}catch(_error){}}
 
 if(typeof document!=="undefined"){
-  document.addEventListener("click",event=>{const panel=event.target&&event.target.closest?event.target.closest("#story-scene-presentation-layer[data-sc-performance='true'] .sc-story-panel"):null;if(!panel||event.target.closest("button,a,input,select,textarea"))return;event.preventDefault();advanceStoryScene33900();});
+  document.addEventListener("click",event=>{
+    const layer=event.target&&event.target.closest?event.target.closest("#story-scene-presentation-layer[data-sc-performance='true']"):null;
+    if(!layer||event.target.closest("button,a,input,select,textarea,.sc-story-choice"))return;
+    const runtime=currentRuntime(),beat=currentBeat(runtime),p=performanceCursor(runtime,beat);
+    if(!p||!beat||beat.mode==="choice"||(Array.isArray(beat.choices)&&beat.choices.length))return;
+    event.preventDefault();advanceStoryScene33900();
+  });
   document.addEventListener("keydown",event=>{if(event.defaultPrevented||!(event.key==="Enter"||event.key===" "))return;const tag=String(event.target&&event.target.tagName||"").toLowerCase();if(["input","textarea","select","button","a"].includes(tag))return;const runtime=currentRuntime(),p=performanceCursor(runtime,currentBeat(runtime));if(!p)return;event.preventDefault();advanceStoryScene33900();});
 }
 
@@ -509,7 +564,10 @@ if(typeof document!=="undefined"){
 
 function runStorySceneBoard33900Diagnostics(){
   const checks={
-    patchId:PATCH_ID==="story_scene_board_33900_2026_09_22_shared_choreography",
+    patchId:PATCH_ID==="story_scene_board_33900_2026_09_25_origin_benchmark",
+    sharedKakashiBenchmarkPanels:installStyle.toString().includes("border-radius:14px")&&installStyle.toString().includes('data-sc-cue-kind="dialogue"')&&installStyle.toString().includes("data-intent-icon"),
+    sharedChoiceIntentClassifier:typeof storyChoiceIntentIcon33900==="function"&&["HELP HER","KEEP GOING","ASK ABOUT THE ROUTE","CONFRONT HIM"].every(label=>storyChoiceIntentIcon33900({label})!=="•"),
+    cueLevelBackdropOverride:resolveBoardBackdropPath.toString().includes("resolveBackdrop")&&resolveBoardBackdropPath.toString().includes("performanceCursor"),
     compactLiveStateCallout:installStyle.toString().includes("width:max-content")&&installStyle.toString().includes("height:auto!important")&&installStyle.toString().includes("align-items:flex-start")&&installStyle.toString().includes("left:3.2%;right:auto"),
     reusableRegistry:typeof registerStorySceneBoardDefinition==="function"&&typeof unregisterStorySceneBoardDefinition==="function"&&typeof resolveStorySceneBoardProjection==="function",
     pendingRegistrationDrain:typeof drainPendingStorySceneBoardRegistrations33900==="function"&&pendingRegistrationDrain&&pendingRegistrationDrain.success===true,
@@ -550,6 +608,7 @@ globalThis.unregisterStorySceneBoardDefinition=unregisterStorySceneBoardDefiniti
 globalThis.resolveStorySceneBoardProjection=resolveStorySceneBoardProjection;
 globalThis.getActiveStorySceneBoardProjection=getActiveStorySceneBoardProjection;
 globalThis.resolveStorySceneBoardBackdropPath=resolveBoardBackdropPath;
+globalThis.storyChoiceIntentIcon33900=storyChoiceIntentIcon33900;
 globalThis.renderStorySceneBoard33900=renderStorySceneBoard33900;
 globalThis.getStoryScenePerformance33900=()=>performanceCursor(currentRuntime(),currentBeat(currentRuntime()));
 globalThis.applyStoryStageAnchor33900=applyStoryStageAnchor33900;
