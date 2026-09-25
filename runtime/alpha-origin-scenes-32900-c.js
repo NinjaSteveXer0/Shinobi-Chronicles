@@ -1793,7 +1793,7 @@ const definition={
 
     {beatId:"obi_arrival",mode:"narration",text:"Obito reaches the Academy training ground. The training opportunity remaining is determined only by the committed journey-time facts.",environmentRef:ENV.trainingDay,onEnterConsequences:[entitlementRequest],nextBeatId:"obi_training"},
     {beatId:"obi_training",mode:"narration",text:"Obito performs only the formal training blocks still available when he arrives.",environmentRef:ENV.trainingDay,nextBeatId:"obi_end_day"},
-    storyBeat("obi_end_day","obi_end_day","obi_home",{environmentRef:ENV.streetLate}),
+    storyBeat("obi_end_day","obi_end_day","obi_home",{environmentRef:ENV.trainingLate}),
     {beatId:"obi_home",mode:"narration",text:"At home, Obito finally has time to decide what he thinks the day meant.",environmentRef:ENV.home,nextBeatId:"obi_reflect"},
     {beatId:"obi_reflect",mode:"choice",text:"What does Obito take from today?",environmentRef:ENV.home,choices:[
       C("reflection_keep_helping",interpretationText.KEEP_HELPING,"obi_ending_helping",{obitoFinalInterpretation:"KEEP_HELPING"}),
@@ -1805,7 +1805,7 @@ const definition={
     storyBeat("obi_ending_training","ending_training","obi_close",{environmentRef:ENV.home,onEnterConsequences:[interpretationRequest]}),
     storyBeat("obi_ending_balance","ending_balance","obi_close",{environmentRef:ENV.home,onEnterConsequences:[interpretationRequest]}),
     storyBeat("obi_ending_question","ending_question","obi_close",{environmentRef:ENV.home,onEnterConsequences:[interpretationRequest]}),
-    {beatId:"obi_close",mode:"narration",text:cueFallback("obi_close"),environmentRef:ENV.streetEvening,exitScene:true}
+    {beatId:"obi_close",mode:"narration",text:cueFallback("obi_close"),environmentRef:ENV.home,exitScene:true}
   ],
   onCompleteConsequences:[X(ORIGIN_ID,[...diversions.map(x=>x.occurrenceId),entitlementOccurrenceId])]
 };
@@ -1855,7 +1855,12 @@ function registerFinalSceneBoard(){
       objective:["obi_arrival","obi_training","obi_end_day","obi_home","obi_reflect","obi_close"].includes(beatId)||beatId.startsWith("obi_ending_")?null:"GET TO TRAINING",
       actors:boardActors(beatId)
     }),
-    performanceSequences:sequences
+    performanceSequences:sequences,
+    resolveBackdrop:({beatId,performance})=>{
+      if(beatId!=="obi_end_day")return null;
+      const cueIndex=performance&&Number.isInteger(performance.index)?performance.index:0;
+      return cueIndex>=2?ENV.streetLate.environmentId:ENV.trainingLate.environmentId;
+    }
   });
   try{if(result&&result.success===true&&typeof globalThis.renderStorySceneBoard33900==="function")globalThis.renderStorySceneBoard33900();}catch(_error){}
   return result;
@@ -1894,6 +1899,8 @@ function diagnostics(){
     furnitureResidentialBackdrop:BACKDROPS[ENV.residential.environmentId]==="Obito Origin Backdrop/quiet_residential_lane.png",
     academyApproachBackdrop:BACKDROPS[ENV.academyApproach.environmentId]==="Obito Origin Backdrop/academy_approach_sloped_lane.png",
     homeDedicatedBackdrop:BACKDROPS[ENV.home.environmentId]==="Obito Origin Backdrop/obito_home_interior.png",
+    endDayPresentationMovesYardToStreet:typeof registerFinalSceneBoard==="function"&&registerFinalSceneBoard.toString().includes('cueIndex>=2?ENV.streetLate.environmentId:ENV.trainingLate.environmentId'),
+    closeRemainsHome:definition.beatMap instanceof Map?definition.beatMap.get("obi_close")&&definition.beatMap.get("obi_close").environmentRef===ENV.home:definition.beats.some(b=>b.beatId==="obi_close"&&b.environmentRef===ENV.home),
     noGenericBackdropFallback:Object.values(BACKDROPS).every(path=>!path.startsWith("Scene backdrops/")),
     browserGoldenClaimed:false
   };
