@@ -23,6 +23,31 @@ beginAlphaChronicleOriginPrologue=function alpha329BeginOriginPrologue(){
   return startStoryScene(sceneId,{sourceEventId:sceneId,context:{protagonistParticipantId:originId,physicallyPresentTeamParticipantIds:[originId],chronicleOriginVariantId:originId},returnContext:{type:"alpha_arc1_mission_command",stage:"origin_prologue"}});
 };
 
+function getPendingBattleSessionForOriginPresentation32900(){
+  if(typeof sessionStorage==="undefined")return null;
+  let parsed=null;
+  try{
+    const raw=sessionStorage.getItem("shinobiTestState");
+    if(!raw)return null;
+    if(typeof parseAlphaSessionState==="function"){
+      const result=parseAlphaSessionState(raw);
+      parsed=result&&result.success===true?result.state:null;
+    }else parsed=JSON.parse(raw);
+  }catch(_error){return null;}
+  if(!parsed||typeof parsed!=="object")return null;
+  const unresolved=!!String(parsed.battleId||"").trim()
+    &&!!String(parsed.encounterId||"").trim()
+    &&parsed.battleOver!==true
+    &&(parsed.overlayType==="combat"||parsed.menma369BattleActive===true);
+  if(!unresolved)return null;
+  return{
+    battleId:String(parsed.battleId),
+    encounterId:String(parsed.encounterId),
+    overlayType:parsed.overlayType||null,
+    semanticBattlePending:true
+  };
+}
+
 function restoreActiveOriginStoryPresentation32900(){
   const acquisition=typeof ensurePlayerAcquisitionState==="function"?ensurePlayerAcquisitionState():null;
   const originId=acquisition&&acquisition.chronicleOriginVariantId||null;
@@ -34,6 +59,18 @@ function restoreActiveOriginStoryPresentation32900(){
   if(!active)return{success:false,reason:"origin_story_scene_not_active",originId,sceneId};
   if(active.sceneId!==sceneId)return{success:false,reason:"different_story_scene_already_active",originId,sceneId,activeSceneId:active.sceneId};
   if(typeof getStorySceneDefinition!=="function"||!getStorySceneDefinition(sceneId))return{success:false,reason:"origin_story_scene_not_registered",originId,sceneId};
+  // Presentation rehydration must never overwrite an unresolved semantic Battle
+  // snapshot before core Battle restore runs on window.load. In that case the
+  // Battle owner restores first; Story resumes through the existing caller
+  // envelope only after the Battle reaches its authored terminal boundary.
+  const pendingBattle=getPendingBattleSessionForOriginPresentation32900();
+  if(pendingBattle)return{
+    success:false,
+    reason:"origin_story_presentation_deferred_for_pending_battle_restore",
+    originId,sceneId,beatId:active.beatId,
+    pendingBattleRestore:true,
+    pendingBattle
+  };
   if(typeof openOverlay!=="function")return{success:false,reason:"story_overlay_api_missing",originId,sceneId};
   openOverlay("story_scene");
   return{success:true,rehydrated:true,originId,sceneId,beatId:active.beatId};
@@ -95,6 +132,7 @@ function runAlphaOriginScene32900Diagnostics(){
     sourceFirstConsumer:A.commitOccurrence.toString().includes("this.history().push(record)")&&A.commitOccurrence.toString().includes("consumeStaticOriginSourceOccurrence"),
     continuityReused:A.completionRequest.toString().includes("completeChronicleOriginPrologue"),
     activeOriginReloadPresentationRehydrated:String(restoreActiveOriginStoryPresentation32900).includes('active.sceneId!==sceneId')&&String(restoreActiveOriginStoryPresentation32900).includes('openOverlay("story_scene")')&&String(restoreActiveOriginStoryPresentation32900).includes("origin_prologue_already_completed"),
+    pendingBattleRestoreOutranksStoryPresentation:String(restoreActiveOriginStoryPresentation32900).includes("origin_story_presentation_deferred_for_pending_battle_restore")&&String(getPendingBattleSessionForOriginPresentation32900).includes('parsed.overlayType==="combat"')&&String(getPendingBattleSessionForOriginPresentation32900).includes("parsed.battleOver!==true"),
     noDirectPLGrant:!A.commitOccurrence.toString().includes("currentPL")&&!A.commitOccurrence.toString().includes("BasePL"),
     nonKakashiOptionalBattleScenesExplicitlyFailClosed:A.battleFailClosedScenes.size>=4,
     browserGoldenClaimed:false
@@ -106,6 +144,7 @@ globalThis.ALPHA_ORIGIN_SCENE_BY_VARIANT_32900=A.sceneByVariant;
 globalThis.getAlphaOriginScene32900Status=getAlphaOriginScene32900Status;
 globalThis.runAlphaOriginScene32900Diagnostics=runAlphaOriginScene32900Diagnostics;
 globalThis.restoreActiveOriginStoryPresentation32900=restoreActiveOriginStoryPresentation32900;
+globalThis.getPendingBattleSessionForOriginPresentation32900=getPendingBattleSessionForOriginPresentation32900;
 
 // #188 neutral Story Decision Realisation loads after the existing Origin
 // packages. It is a semantic coordinator only; it does not turn Origins into
