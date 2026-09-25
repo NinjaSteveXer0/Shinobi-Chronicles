@@ -102,6 +102,26 @@ assert.strictEqual(diagnostics.pass,true,JSON.stringify(diagnostics));
   assert.strictEqual(x.sb.claimCurrentBattleRewards(),false,"two-hostile claim was accepted");
   assert.strictEqual(x.playerData.ryo,250);
 }
+// Exact whole-encounter victory remains reward-eligible even when Menma
+// factually withdrew before the authoritative allied-side victory.
+{
+  const x=sandbox({rows:[battleReceipt(HOSTILES,{result:"victory",completed:true,menmaWithdrawn:true})]});
+  x.current.outcome={...x.current.outcome,type:"victory",menmaWithdrawn:true,finishingShinobiId:"sj_anko"};
+  const reward=x.sb.generateBattleRewards(x.current.enemy,{id:"sj_anko",name:"Anko"});
+  assert.strictEqual(reward.generated,true,"Menma-withdrawn terminal victory was incorrectly blocked");
+  assert.strictEqual(reward.ryo,100,"Menma-withdrawn terminal victory did not expose exact 100 Ryō");
+  const before=x.playerData.ryo;
+  assert.strictEqual(x.sb.claimCurrentBattleRewards(),true,"Menma-withdrawn terminal victory claim failed");
+  assert.strictEqual(x.playerData.ryo,before+100,"Menma-withdrawn terminal victory did not grant exactly 100 Ryō");
+  const receipts=x.activityHistory.filter(r=>r&&r.type==="origin_battle_reward"&&r.rewardSourceId===SOURCE_ID&&r.battleOccurrenceId===BATTLE_OCC);
+  assert.strictEqual(receipts.length,1,"Menma-withdrawn victory reward receipt missing/duplicated");
+  assert.strictEqual(receipts[0].fact.menmaWithdrawn,true,"reward receipt fabricated Menma survival instead of preserving withdrawal truth");
+  const after=x.playerData.ryo;
+  assert.strictEqual(x.sb.claimCurrentBattleRewards(),false,"Menma-withdrawn victory repeated claim should fail idempotently");
+  assert.strictEqual(x.playerData.ryo,after,"Menma-withdrawn victory repeated claim duplicated Ryō");
+  assert.strictEqual(x.activityHistory.some(r=>r&&r.rewardSourceId===OLD_SOURCE),false,"retired 50-Ryō source was written");
+}
+
 let persisted;
 {
   const x=sandbox({rows:[battleReceipt(HOSTILES)]});
@@ -159,6 +179,8 @@ console.log(JSON.stringify({
     alteredWithdrawalPaysZero:true,
     twoHostilesPayZero:true,
     fullVictoryPaysExactly100Once:true,
+    menmaWithdrawnVictoryPaysExactly100Once:true,
+    rewardReceiptPreservesMenmaWithdrawalTruth:true,
     retired50SourceNeverWritten:true,
     noGenericExpLootOrDrops:true,
     activityHistoryReceiptSurvivesReload:true,
