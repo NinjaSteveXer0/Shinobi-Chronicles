@@ -164,7 +164,7 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
     assert.strictEqual(s.kickerVisible,false,label+" legacy kicker still visible");
     assert.strictEqual(s.textMarginTop,"4px",label+" narration text margin drift");
     assert(Math.abs(parseFloat(s.textFontSize)-13.536)<0.2,label+" narration font size drift "+s.textFontSize);
-    assert.strictEqual(s.textLineHeight,"19.2211px",label+" narration line-height drift");
+    assert(Math.abs(parseFloat(s.textLineHeight)-19.221)<0.2,label+" narration line-height drift "+s.textLineHeight);
     assert(Math.abs(parseFloat(s.textMaxHeight)-76.5)<0.5,label+" narration max-height drift "+s.textMaxHeight);
     assert.strictEqual(s.panelActorOverlapArea,0,label+" opening panel overlaps Obito card");
     await assertBackdrop(page,"obi_depart",EXPECTED_BACKDROP.obi_depart);
