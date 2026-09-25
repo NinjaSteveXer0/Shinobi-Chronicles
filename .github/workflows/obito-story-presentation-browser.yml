@@ -36,6 +36,8 @@ jobs:
           node --check runtime/alpha-origin-scenes-32900-c.js
           node --check runtime/alpha-story-scene-board-33900.js
           node --check tools/qa_obito_story_presentation_browser.js
+      - name: Run Obito 32-route semantic matrix
+        run: node tools/qa_issue_331_obito_final_runtime.js
       - name: Install Playwright Chromium
         run: |
           npm install --no-save playwright@1.55.0
