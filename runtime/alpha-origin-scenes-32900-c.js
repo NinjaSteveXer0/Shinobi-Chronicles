@@ -1840,6 +1840,19 @@ function boardLocation(beatId){
   if(beatId==="obi_close")return"KONOHA · DUSK";
   return"KONOHA · MORNING";
 }
+function boardBackdropEnvironment331(beatId,performance){
+  const id=String(beatId||"");
+  if(id==="obi_end_day"){
+    const cueIndex=performance&&Number.isInteger(performance.index)?performance.index:0;
+    return cueIndex>=2?ENV.streetLate.environmentId:ENV.trainingLate.environmentId;
+  }
+  if(id==="obi_arrival"||id==="obi_training")return ENV.trainingDay.environmentId;
+  if(id==="obi_home"||id==="obi_reflect"||id==="obi_close"||id.startsWith("obi_ending_"))return ENV.home.environmentId;
+  if(id.includes("furniture"))return ENV.residential.environmentId;
+  if(id.includes("equipment")||id.includes("cart"))return ENV.academyApproach.environmentId;
+  if(id==="obi_depart"||id.includes("vegetables")||id.includes("delivery"))return ENV.mainStreet.environmentId;
+  return null;
+}
 function registerFinalSceneBoard(){
   if(typeof globalThis.registerStorySceneBoardDefinition!=="function")return{success:false,reason:"story_scene_board_not_loaded"};
   const sequences={...PERFORMANCE,obi_arrival:arrivalSequence,obi_training:trainingSequence,obi_home:homeSequence};
@@ -1851,12 +1864,8 @@ function registerFinalSceneBoard(){
       actors:boardActors(beatId)
     }),
     performanceSequences:sequences,
-    resolveBackdrop:({beatId,beat,performance})=>{
-      let environmentId=beat&&beat.environmentRef&&beat.environmentRef.environmentId||null;
-      if(beatId==="obi_end_day"){
-        const cueIndex=performance&&Number.isInteger(performance.index)?performance.index:0;
-        environmentId=cueIndex>=2?ENV.streetLate.environmentId:ENV.trainingLate.environmentId;
-      }
+    resolveBackdrop:({beatId,performance})=>{
+      const environmentId=boardBackdropEnvironment331(beatId,performance);
       const assetPath=environmentId?BACKDROPS[environmentId]||null:null;
       return assetPath?{assetPath,environmentId}:null;
     }
@@ -1898,8 +1907,9 @@ function diagnostics(){
     furnitureResidentialBackdrop:BACKDROPS[ENV.residential.environmentId]==="Obito Origin Backdrop/quiet_residential_lane.png",
     academyApproachBackdrop:BACKDROPS[ENV.academyApproach.environmentId]==="Obito Origin Backdrop/academy_approach_sloped_lane.png",
     homeDedicatedBackdrop:BACKDROPS[ENV.home.environmentId]==="Obito Origin Backdrop/obito_home_interior.png",
-    endDayPresentationMovesYardToStreet:typeof registerFinalSceneBoard==="function"&&registerFinalSceneBoard.toString().includes('cueIndex>=2?ENV.streetLate.environmentId:ENV.trainingLate.environmentId'),
+    endDayPresentationMovesYardToStreet:typeof boardBackdropEnvironment331==="function"&&boardBackdropEnvironment331("obi_end_day",{index:0})===ENV.trainingLate.environmentId&&boardBackdropEnvironment331("obi_end_day",{index:2})===ENV.streetLate.environmentId,
     directBackdropPathProjection:typeof registerFinalSceneBoard==="function"&&registerFinalSceneBoard.toString().includes("return assetPath?{assetPath,environmentId}:null"),
+    stableBeatBackdropProjection:boardBackdropEnvironment331("obi_depart")===ENV.mainStreet.environmentId&&boardBackdropEnvironment331("obi_furniture_choice")===ENV.residential.environmentId&&boardBackdropEnvironment331("obi_equipment_choice")===ENV.academyApproach.environmentId&&boardBackdropEnvironment331("obi_arrival")===ENV.trainingDay.environmentId&&boardBackdropEnvironment331("obi_home")===ENV.home.environmentId,
     closeRemainsHome:definition.beatMap instanceof Map?definition.beatMap.get("obi_close")&&definition.beatMap.get("obi_close").environmentRef===ENV.home:definition.beats.some(b=>b.beatId==="obi_close"&&b.environmentRef===ENV.home),
     noGenericBackdropFallback:Object.values(BACKDROPS).every(path=>!path.startsWith("Scene backdrops/")),
     browserGoldenClaimed:false
