@@ -89,7 +89,6 @@ async function snapshot(page){
     const diag=await page.evaluate(()=>runMenmaEvolvedBattle369Diagnostics());
     assert.strictEqual(diag.pass,true,JSON.stringify(diag));
 
-    const ownershipBefore=await page.evaluate(()=>JSON.stringify(playerData.characterOwnership||{}));
     const started=await page.evaluate(()=>({
       selected:selectChronicleOrigin("academy_menma","issue_369_browser"),
       launched:beginAlphaChronicleOriginPrologue()
@@ -99,6 +98,7 @@ async function snapshot(page){
     await page.waitForFunction(scene=>getActiveStorySceneRuntime()?.sceneId===scene,SCENE,{timeout:12000});
     await page.evaluate(()=>setStorySceneBeat("tutorial_battle"));
     await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="tutorial_battle",null,{timeout:8000});
+    const ownershipBefore=await page.evaluate(()=>JSON.stringify(playerData.characterOwnership||{}));
 
     const launched=await page.evaluate(()=>launchStorySceneBattle());
     assert.strictEqual(launched.success,true,JSON.stringify(launched));
