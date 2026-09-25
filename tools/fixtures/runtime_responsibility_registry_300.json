@@ -531,27 +531,42 @@
         "currentBattle.battleId",
         "currentBattle.runtime.evidence",
         "currentBattle.deployment",
-        "currentBattle active participant and target refs"
+        "currentBattle active participant and target refs",
+        "currentBattle.presentationQueueEnabled / presentationTerminalPending",
+        "currentBattle.presentation33000 ordered immutable presentation receipt state",
+        "currentBattle presentationEnvironmentBackdrop / presentationObjectiveLabel"
       ],
-      "stateWrites": [],
+      "stateWrites": [
+        "currentBattle.presentation33000 presentation-only queue/exposure state"
+      ],
       "productionLoadPath": [
         "index.html",
         "runtime/alpha-battle-modern-33000.js"
       ],
       "extensionHooks": [
         "resolveBattlePerformanceProjection33000",
-        "installBattlePerformance33000"
+        "installBattlePerformance33000",
+        "initializeBattlePresentationQueue33000",
+        "enqueueBattlePresentationReceipt33000",
+        "startNextBattlePresentationReceipt33000",
+        "hardSettleBattlePresentation33000",
+        "getBattlePresentationQueueState33000"
       ],
       "permittedAdapters": [
         "academy_kakashi_v2_battle_adapter_36010"
       ],
       "retiredOwners": [],
-      "saveSchemaRefs": [],
+      "saveSchemaRefs": [
+        "currentBattle.presentation33000 (presentation-only; recoverable from semantic truth)"
+      ],
       "qaRefs": [
         "tools/qa_alpha_battle_browser_32600.py",
         "tools/qa_issue_312_story_battle_benchmark.js",
         "tools/qa_issue_312_browser.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_373_evolved_pl_battle_presentation.js",
+        "tools/qa_issue_373_evolved_pl_battle_presentation_browser.js",
+        ".github/workflows/issue-373-evolved-pl-battle-presentation.yml"
       ]
     },
     {
@@ -987,6 +1002,11 @@
       "stateRef": "playerData.activityHistory menma three-subject battle occurrence receipt",
       "owner": "runtime/alpha-menma-evolved-pl-battle-36900.js",
       "responsibilityId": "origin.academy_menma.three_subject.battle_semantics"
+    },
+    {
+      "stateRef": "currentBattle.presentation33000",
+      "owner": "runtime/alpha-battle-modern-33000.js",
+      "responsibilityId": "battle.presentation.shared"
     }
   ]
 }
