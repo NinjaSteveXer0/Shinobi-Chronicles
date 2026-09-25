@@ -61,21 +61,21 @@ assert(!/\bHP\b/.test(runtime),"#369 introduced HP terminology");
 assert(!runtime.includes("healthMeter")&&!runtime.includes("genericHealth"),"#369 introduced parallel health semantics");
 assert(runtime.includes("battlePLWithdrawalNotDeath:true"),"#369 0 Battle PL withdrawal semantics missing");
 
-assert(runtime.includes("combat_academy_menma_tutorial_performance_resolved")===false,"#369 must not replace MEN-03 stable source constant");
+assert(!runtime.includes("const MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID="),"#369 must not redeclare/replace MEN-03 stable source authority");
 assert(game.includes('const MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID="combat_academy_menma_tutorial_performance_resolved"'),"#369 baseline MEN-03 source identity changed");
 assert(runtime.includes("menma_origin_anko_action_observed"),"#369 same-Battle Anko observation evidence missing");
 assert(runtime.includes('discipline==="Kinjutsu"'),"#369 MEN-02 Kinjutsu-only qualification missing");
 assert(!runtime.includes("invented Kinjutsu")&&!runtime.includes("new Kinjutsu"),"#369 must not invent a Menma Kinjutsu button");
 
 assert(runtime.includes('BATTLE_OCCURRENCE_PREFIX="battle_occ_origin_academy_menma_three_test_subjects:"'),"#369 authoritative Battle occurrence prefix missing");
-assert(runtime.includes("resolvedHostileIds:[...HOSTILE_IDS]"),"#369 whole-encounter receipt missing exact hostile resolution");
+assert(runtime.includes("function commitBattleOccurrenceReceipt")&&runtime.includes("resolvedHostileIds:victory?[...HOSTILE_IDS]"),"#369 terminal Battle occurrence receipt missing exact victory hostile resolution");\nassert(runtime.includes('commitBattleOccurrenceReceipt("defeat")'),"#369 defeat must commit the exact terminal Battle occurrence receipt");
 assert(reward.includes("const FIXED_RYO=100"),"#362 exact 100 Ryō adapter drifted");
 assert(reward.includes("menma_three_subject_battle_receipt_missing"),"#362 adapter no longer fail-closed");
-assert(runtime.includes("upstreamBattleReceipt()"),"#369 exact upstream receipt producer missing");
+assert(runtime.includes("upstreamBattleReceipt()"),"#369 exact upstream victory receipt producer missing");\nassert(!runtime.includes('launchBattleWithReturnContext("test_subject_altered_shinobi",ENCOUNTER_ID'),"#369 Origin launch must not inherit My Clan START authority");\nassert(runtime.includes("myClanStartBypassedForExactOriginOccurrence:true")&&runtime.includes("myClanMutated:false"),"#369 exact Origin launch/My Clan boundary missing");
 
 assert(runtime.includes("manual_withdraw_rejected"),"#369 manual WITHDRAW fail-closed evidence missing");
 assert(runtime.includes("canWithdrawActiveBattleFighter")&&runtime.includes("return false"),"#369 manual WITHDRAW UI boundary missing");
-assert(runtime.includes("saveTestState")&&runtime.includes("restoreTestState"),"#369 save/reload semantic state persistence missing");
+assert(runtime.includes("saveTestState")&&runtime.includes("restoreTestState"),"#369 save/reload semantic state persistence missing");\nassert(runtime.includes('getBattleRemainingPLRecord("player",ANKO_ID)'),"#369 reload must distinguish missing Anko PL record from legitimate 0 Battle PL");\nassert(runtime.includes('consumeBattleActionOpportunity("enemy",failedEnemy.id,failId,"enemy_opportunity_failed_visible")'),"#369 failed enemy autonomous opportunity must still settle its lifecycle");
 assert(runtime.includes("menmaEvolvedPLBattle36900"),"#369 exact semantic owner state missing");
 
 assert(!runtime.includes("academy_kakashi"),"#369 must not touch frozen Kakashi");
