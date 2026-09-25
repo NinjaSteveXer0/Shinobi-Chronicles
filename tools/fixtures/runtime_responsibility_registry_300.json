@@ -800,6 +800,40 @@
         "tools/qa_issue_369_menma_evolved_pl_battle_browser.js",
         ".github/workflows/issue-369-menma-evolved-pl-battle.yml"
       ]
+    },
+    {
+      "responsibilityId": "combat.prepared_skill.definition.shared",
+      "canonicalOwner": "game.js",
+      "ownerType": "shared_combat_content_runtime",
+      "directCallers": [
+        "Battle prepared-Skill lookup and resolver surfaces"
+      ],
+      "stateReads": [
+        "authored prepared-Skill definitions",
+        "prepared palette identity"
+      ],
+      "stateWrites": [
+        "static runtime prepared-Skill content projection only"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "game.js",
+        "runtime/alpha-kakashi-menma-skill-lock-38300.js"
+      ],
+      "extensionHooks": [
+        "getClosureWaveBattleSkillDefinition",
+        "getBattlePreparedSkillDefinition"
+      ],
+      "permittedAdapters": [
+        "academy_kakashi_menma_skill_lock_38300"
+      ],
+      "retiredOwners": [],
+      "saveSchemaRefs": [],
+      "qaRefs": [
+        "tools/qa_issue_383_skill_lock.js",
+        "tools/qa_issue_383_skill_lock_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
     }
   ],
   "adapters": [
