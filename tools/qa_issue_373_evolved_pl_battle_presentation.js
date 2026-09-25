@@ -36,7 +36,8 @@ const checks={
   ]),
   immutableReceipt:battle.includes("const receipt=Object.freeze({")&&battle.includes("sequenceOrdinal:state.nextSequenceOrdinal++"),
   queueConsumesEvidence:hasAll(battle,[
-    "currentBattle.runtime.evidence",
+    "function battleEvidence33000()",
+    "const evidence=battleEvidence33000();",
     "BATTLE_PRESENTATION_COMPLETION_TYPES_33000",
     "recordBattleEvidence",
     "enqueueBattlePresentationReceipt33000(definition.actionId)"
