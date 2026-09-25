@@ -38592,7 +38592,7 @@ const enemyDatabase = {
     calibratedBasePL:11,
     baseStats:{nin:12,tai:11,buki:10,fuin:5,kin:5,gen:6,stamina:11},
     stats:{nin:12,tai:11,buki:10,fuin:5,kin:5,gen:6,stamina:11},
-    image:null,
+    image:"Enemies Portraits/test_subject_altered_shinobi.png",
     rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},
     provenance:{origin:"abandoned_or_escaped_orochimaru_operation",tutorialRole:"menma_direct_opponent",female:true},
     noSummon:true,noTransformation:true,noBossScaling:true
@@ -38605,7 +38605,7 @@ const enemyDatabase = {
     calibratedBasePL:13,
     baseStats:{nin:6,tai:14,buki:8,fuin:4,kin:5,gen:4,stamina:14},
     stats:{nin:6,tai:14,buki:8,fuin:4,kin:5,gen:4,stamina:14},
-    image:null,
+    image:"Enemies Portraits/test_subject_brute.png",
     rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},
     provenance:{origin:"abandoned_or_escaped_orochimaru_operation",tutorialRole:"wider_clearing_anko_pressure"},
     noSummon:true,noTransformation:true,noBossScaling:true
@@ -38618,7 +38618,7 @@ const enemyDatabase = {
     calibratedBasePL:12,
     baseStats:{nin:13,tai:10,buki:6,fuin:4,kin:6,gen:4,stamina:12},
     stats:{nin:13,tai:10,buki:6,fuin:4,kin:6,gen:4,stamina:12},
-    image:null,
+    image:"Enemies Portraits/test_subject_unstable.png",
     rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},
     provenance:{origin:"abandoned_or_escaped_orochimaru_operation",tutorialRole:"wider_clearing_danger"},
     noSummon:true,noTransformation:true,noBossScaling:true
