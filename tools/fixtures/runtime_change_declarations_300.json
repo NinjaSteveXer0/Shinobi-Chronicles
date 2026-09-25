@@ -593,7 +593,7 @@
     },
     {
       "changeId": "academy-obito-golden-presentation-backdrops-2026-09-25",
-      "classification": "EXTENDS",
+      "classification": "REPLACES",
       "responsibilityIds": [
         "origin.academy_obito.final_story_state",
         "story.scene.presentation.shared"
