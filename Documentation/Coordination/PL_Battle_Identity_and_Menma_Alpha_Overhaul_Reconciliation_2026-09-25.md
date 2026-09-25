@@ -1,10 +1,11 @@
 # Shinobi Chronicles — PL Battle Identity + Menma Alpha Overhaul Reconciliation
 
 **Date:** 2026-09-25  
+**Corrected:** 2026-09-26  
 **Owner:** CE / Codex / Coordination  
-**Incoming handoff:** #365  
+**Incoming handoffs:** #365, #377  
 **Status:** **DESIGN CLOSED / ALPHA IMPLEMENTATION RELEASED / MENMA FIRST PROVING GROUND**  
-**Beta exclusion:** #366 remains queued and is not Alpha authority.
+**Correction:** the earlier Menma-specific autonomous-Anko-assist cadence is **SUPERSEDED**. The ordinary Active-relay Battle law applies.
 
 ---
 
@@ -12,71 +13,30 @@
 
 The Shinobi Chronicles **PL System is the combat identity of the game**.
 
-Canonical product rule:
-
 > **THE NEW BATTLE SYSTEM IS THE EVOLVED PL BATTLE SYSTEM. IT NEVER REPLACES PL.**
 
-The overhaul exists to make PL Battle more kinetic, tactical, readable and expressive.
+The overhaul improves formation, tactics, readability, choreography and Battle expression while preserving participant PL / Battle PL as the authoritative combat language.
 
-It does not replace:
-
-- participant PL;
-- Battle PL;
-- PL depletion;
-- PL withdrawal;
-- PL/Registry semantics;
-- Skills / Items / Summons resolving into the PL-based Combat model.
-
-Do not introduce HP, generic health bars or a parallel non-PL combat identity as the successor Battle language.
-
-PL/Registry remains the authority for identity / Stats / PL semantics.
-
-Combat consumes those facts at Battle runtime.
+Do not substitute HP, generic health bars or a parallel health identity.
 
 ---
 
-## 2. Implementation hold supersession
+## 2. First Alpha proving ground
 
-The old general Battle implementation hold was:
-
-> wait for Academy Kakashi Browser Golden.
-
-That condition has now been satisfied.
-
-Academy Kakashi is **ALPHA GOLDEN and FROZEN**.
-
-Stephen has explicitly reprioritised:
-
-1. Obito Origin -> Browser Golden;
-2. PL Battle System overhaul.
-
-Therefore:
-
-> **THE OLD KAKASHI-GATED BATTLE IMPLEMENTATION HOLD IS RELEASED.**
-
-The previously locked Battle safeguards remain mandatory.
-
-Release of the implementation lane does not reopen Kakashi.
-
-Kakashi must **not** be the first Battle-overhaul proving ground.
-
-Kakashi receives controlled Battle migration only after the successor PL Battle runtime is proven elsewhere.
-
----
-
-## 3. First real Alpha proving ground
-
-The first real Origin proving ground is:
+Academy Menma Scene 7 remains:
 
 > **Academy Menma + Special Jōnin Anko vs Altered Shinobi + Brute + Unstable.**
 
-Consume the existing exact identities and Combat package:
+Exact identities:
 
-- `academy_menma`;
-- `sj_anko`;
-- `test_subject_altered_shinobi` — PL11;
-- `test_subject_brute` — PL13;
-- `test_subject_unstable` — PL12.
+Player side:
+1. `academy_menma`
+2. `sj_anko`
+
+Enemy side:
+1. `test_subject_altered_shinobi` — PL11
+2. `test_subject_brute` — PL13
+3. `test_subject_unstable` — PL12
 
 Battle config:
 
@@ -94,480 +54,379 @@ Environment:
 
 `Scene backdrops/forest_clearing_day.png`
 
-Reward authority remains the already-implemented exact whole-encounter reward:
-
-> **100 Ryō once on valid complete three-subject victory.**
-
-No payout after one hostile.
-
-No payout after two.
-
-No 50 Ryō per hostile.
-
-No generic Character EXP/items are inferred.
-
 ---
 
-## 4. Alpha side-action law remains intact
+## 3. Canonical Alpha turn law
 
-Normal Alpha PvE remains:
+Normal Alpha PvE uses alternating **side action opportunities**.
+
+Player side starts first.
 
 ~~~text
-PLAYER SIDE ACTION OPPORTUNITY
--> authoritative result
--> presentation / settle
+PLAYER ACTIVE acts
+-> result / settle
 
-ENEMY SIDE ACTION OPPORTUNITY
--> authoritative result
--> presentation / settle
+ENEMY ACTIVE acts
+-> result / settle
 
-repeat
+PLAYER ACTIVE acts
+-> result / settle
+
+ENEMY ACTIVE acts
+-> ...
 ~~~
 
-Only **one normal action is committed per side action opportunity**.
+Only the current **Active** participant spends that side's normal action opportunity.
 
-Team size does not automatically create one ordinary action per deployed participant.
+Benched and Reserve participants do **not** receive ordinary turns merely because they are present.
 
-There is no twelve-action 6v6 initiative round.
+Team size does not create one action per participant.
 
-There is no Beta command batch in Alpha.
-
----
-
-## 5. Active remains the default action bearer
-
-The **Active** participant remains the formation's default normal action bearer and confrontation anchor.
-
-Benched participants do not automatically receive turns merely because they are deployed.
-
-However, an explicitly authored Combat assist may consume the side's **existing single action opportunity** instead of the Active.
-
-This creates:
-
-- no second action opportunity;
-- no extra turn;
-- no automatic entitlement for every Benched participant;
-- no semantic promotion;
-- no formation reorder;
-- no second player action dock.
-
-Canonical distinction:
-
-> **ASSIST CONSUMPTION OF THE EXISTING SIDE OPPORTUNITY != AN EXTRA TURN.**
-
-This is an explicit authorised exception to the default Active action-bearer rule.
-
-Generic Benched/Reserve assist mechanics remain closed unless separately authorised.
+There is no Beta #366 team-command batch in Alpha.
 
 ---
 
-## 6. Menma / Anko exact Alpha allied-side cadence
+## 4. Menma Origin opening cadence
 
-Menma remains:
-
-- Active;
-- sole player-controlled actor;
-- tutorial-performance subject.
-
-Anko remains:
-
-- Benched allied participant;
-- autonomous NPC;
-- targetable where Combat legality permits;
-- non-owned;
-- not My Clan assignment;
-- not acquisition;
-- not player-controlled.
-
-This encounter grants Anko one exact authored semantic entitlement:
-
-`menma_origin_anko_autonomous_assist`
-
-### Player-side opportunity sequence
-
-While both Menma and Anko remain active/present:
+Initial formation:
 
 ~~~text
-PLAYER OPPORTUNITY 1 -> MENMA
-PLAYER OPPORTUNITY 2 -> ANKO AUTONOMOUS ASSIST
-PLAYER OPPORTUNITY 3 -> MENMA
-PLAYER OPPORTUNITY 4 -> ANKO AUTONOMOUS ASSIST
-...repeat
+PLAYER
+Active  = Menma
+Benched = Anko
+
+ENEMY
+Active  = Altered Shinobi
+Benched = Brute
+Benched = Unstable
 ~~~
 
-Therefore:
-
-- Menma always receives the first player-side action opportunity;
-- Menma opportunities expose the player action dock;
-- Anko opportunities resolve autonomously from her exact Combat package;
-- one player-side opportunity produces at most one committed ordinary/assist action;
-- an Anko assist opportunity does not also permit a Menma action;
-- a Menma opportunity does not also grant a free Anko action.
-
-This is deterministic.
-
-Persist the exact allied-side opportunity index/entitlement so reload cannot change who owns the next player-side opportunity.
-
-### If Anko withdraws
-
-Menma receives every later player-side opportunity.
-
-No empty Anko turn remains.
-
-### If Menma withdraws
-
-The tutorial commits defeat immediately under existing Menma authority.
-
-Anko does not promote to Active and does not continue to manufacture Menma tutorial success.
-
----
-
-## 7. Anko action semantics remain the existing Combat package
-
-No action values are changed by this CE cadence reconciliation.
-
-Consume the Combat-closed package:
-
-### Hidden Shadow Snake Hands
-`sj_anko_hidden_shadow_snake_hands`
-- direct Ninjutsu;
-- authored Attack PL 20.
-
-### Snake Bind
-`sj_anko_snake_bind`
-- Ninjutsu control;
-- no Attack PL;
-- physical restraint;
-- not Stun.
-
-### Fire Style: Dragon Flame
-`sj_anko_fire_style_dragon_flame`
-- direct ranged Ninjutsu;
-- authored Attack PL 24.
-
-### Serpent Evasion
-`sj_anko_serpent_evasion`
-- defensive reposition;
-- once per Battle;
-- deterministic next qualifying direct-attack avoidance.
-
-### Twin Snakes Mutual Death
-`sj_anko_twin_snakes_mutual_death`
-- **NOT LEGAL** in this Origin;
-- no death/self-consequence authority exists here.
-
-The existing autonomous selection/eligibility rules remain Combat authority.
-
-If no exact Anko action is semantically legal for an Anko assist opportunity:
-
-- do not invent Basic Attack;
-- do not substitute a Menma action;
-- fail/skip that assist opportunity visibly under Combat evidence;
-- continue to the enemy-side opportunity.
-
----
-
-## 8. Anko target legality
-
-Preserve Combat's authored Anko target priority:
+Therefore the opening cadence is exactly:
 
 ~~~text
-1. test_subject_brute
-2. test_subject_unstable
-3. test_subject_altered_shinobi
+Menma
+-> Altered Shinobi
+-> Menma
+-> Altered Shinobi
+-> Menma
+-> Altered Shinobi
+...
 ~~~
 
-Anko's authored assist actions may legally address her exact eligible target even when that hostile is not the enemy Active.
+until one current Active reaches 0 Battle PL and withdraws.
 
-This is an explicit encounter-authored off-slot target permission.
+There is **no alternating Menma -> Anko -> Menma -> Anko allied entitlement**.
 
-It does not create generic off-slot targeting for all Skills.
+There is **no autonomous Anko assist turn while Menma remains Active**.
 
-Menma's ordinary current package remains Active-hostile focused unless an exact Menma action separately authorises off-slot targeting.
-
-Formation position does not by itself decide target legality.
-
-Combat does.
+The earlier CE exception `menma_origin_anko_autonomous_assist` is superseded and must not survive in the evolved Alpha Battle runtime.
 
 ---
 
-## 9. Enemy-side Alpha cadence
+## 5. Withdrawal and relay — canonical rule
 
-The old current-runtime participant cadence:
+0 Battle PL means **withdrawal**, not injury or death.
+
+When an Active withdraws:
+
+1. the committed action/result remains authoritative;
+2. the outgoing Active clears the center;
+3. the next eligible Benched participant promotes into Active;
+4. an available Reserve may refill the Benched line where applicable;
+5. formation settles;
+6. the ordinary alternating side sequence continues.
+
+Promotion does **not** create or erase an action opportunity.
+
+The next side to act is determined by ordinary side alternation from the **last committed action**, not by who just promoted.
+
+Canonical rule:
+
+> **RELAY CHANGES WHO REPRESENTS THE SIDE. IT DOES NOT RESET THE TURN ORDER.**
+
+---
+
+## 6. Exact Menma-withdrawal example
+
+If Altered Shinobi lands the hit that reduces Menma to 0 Battle PL:
 
 ~~~text
-Menma -> Altered -> Anko -> Brute -> Unstable
+Menma withdraws
+-> Menma clears the Active position
+-> Anko promotes from Benched to Active
+-> formation settles
+-> PLAYER side is next because ENEMY just acted
+-> Anko acts
+-> Altered Shinobi acts
+-> Anko acts
+-> Altered Shinobi acts
+...
 ~~~
 
-is **superseded for the new PL Battle overhaul**.
+Menma's withdrawal does **not** end the Battle while Anko remains eligible.
 
-It remains valid historical/current-runtime design genealogy only.
+Anko is no longer Benched after this relay. She is the new semantic Active.
 
-Under the Alpha overhaul:
+Her normal Battle action package is then available because she is Active.
 
-- the enemy side receives exactly one action opportunity after each player-side opportunity;
-- the enemy **Active** spends that opportunity;
-- the currently Benched hostiles do not automatically receive separate enemy turns;
-- when the enemy Active withdraws, normal withdrawal / relay normalization promotes the next eligible hostile;
-- encounter opposition priority is:
-  1. Altered Shinobi;
-  2. Brute;
-  3. Unstable.
+---
 
-Thus the enemy action bearer is:
+## 7. Exact enemy-withdrawal example
+
+If Menma lands the hit that reduces Altered Shinobi to 0 Battle PL:
 
 ~~~text
-ALTERED while active
--> BRUTE after Altered withdrawal
--> UNSTABLE after Brute withdrawal
+Altered Shinobi withdraws
+-> Altered clears the enemy Active position
+-> Brute promotes from Benched to Active
+-> formation settles
+-> ENEMY side is next because PLAYER just acted
+-> Brute acts
+-> Menma acts
+-> Brute acts
+-> Menma acts
+...
 ~~~
 
-Each promoted enemy consumes its already-closed exact authored action package.
+When Brute later withdraws, Unstable promotes by the same rule.
 
-No package numerics are changed.
-
-No pooled enemy PL is created.
-
-Anko's off-slot assist may damage/control Brute or Unstable before their promotion.
-
-If a Benched hostile is already withdrawn before its promotion point, formation normalization skips it and promotes the next surviving eligible hostile.
+If a future relay candidate has already been legitimately withdrawn by an authorised off-slot mechanic, normalization skips that participant and promotes the next eligible survivor.
 
 ---
 
-## 10. Existing hostile target law
+## 8. Side exhaustion / Battle completion
 
-When Active, preserve the Combat-closed target laws:
+A side loses the Battle when it has **no eligible surviving participant left to relay into Active**.
 
-### Altered Shinobi
-Primary:
-`academy_menma`
+For the Menma Origin allied side:
 
-### Brute
-Primary while Anko remains present:
-`sj_anko`
+- Menma withdrawal alone != defeat;
+- Anko may promote and continue;
+- defeat occurs when the allied side is exhausted.
 
-Fallback:
-`academy_menma`
+For the enemy side:
 
-### Unstable
-Primary while Anko remains present:
-`sj_anko`
+- Altered withdrawal alone != victory;
+- Brute promotes if eligible;
+- then Unstable promotes if eligible;
+- victory requires all three exact hostiles to be resolved/withdrawn.
 
-Fallback:
-`academy_menma`
+No pooled PL exists.
 
-These are authored encounter target rules, not a generic threat/aggro system.
+Each participant retains an independent Battle PL ledger.
 
 ---
 
-## 11. Withdrawal and victory
+## 9. Anko semantics
 
-0 Battle PL remains **withdrawal**, not injury/death.
+Before Menma withdraws:
 
-All three exact hostiles must be resolved for victory.
+- Anko is Benched;
+- she does not take normal turns;
+- she does not receive a special autonomous assist entitlement;
+- she does not step into confrontation focus merely to act;
+- she remains a visible part of the formation.
 
-Withdrawing one or two hostiles never ends the encounter.
+After Menma withdraws:
 
-Menma withdrawal before whole-encounter completion means tutorial defeat.
+- Anko promotes to Active;
+- she becomes the allied side's normal action bearer;
+- she acts under her existing Combat-authored Anko package;
+- she remains autonomous NPC-controlled for this Origin unless separate authority says otherwise;
+- promotion does not grant ownership / My Clan acquisition.
 
-Anko withdrawal does not itself invalidate later Menma victory.
-
-No death, injury, custody or morality is inferred from Battle PL depletion.
-
----
-
-## 12. MEN-03 remains Menma-only
-
-Preserve:
-
-`combat_academy_menma_tutorial_performance_resolved`
-
-and:
-
-`academy_menma_tutorial_performance_evidence`
-
-MEN-03 remains strictly attributable to Menma.
-
-Do not count:
-
-- Anko actions;
-- Anko assist opportunities;
-- Anko damage;
-- Anko control;
-- Anko defensive actions;
-- damage received by Anko;
-- enemies withdrawn by Anko.
-
-Preserve the existing Menma-only metrics and Alpha thresholds.
-
-Completed MEN-03 requires:
-
-- the whole three-subject objective completed;
-- all three exact hostiles resolved;
-- Menma not withdrawn before completion.
-
-The already-implemented 100-Ryō reward is independent of MEN-03 bucket.
+Registry identity != ownership != My Clan assignment != temporary Story Battle participation.
 
 ---
 
-## 13. Observation / MEN-02
+## 10. Menma control / Anko control
 
-Anko remains a legitimate same-Battle observer while present and not withdrawn.
+Menma is player-controlled while Menma is Active.
 
-Exact committed Menma actions may create observer evidence where:
+Anko is an autonomous allied NPC participant.
 
-- perceptible;
-- not blocked;
-- exact action ancestry exists.
+When Anko promotes after Menma withdrawal, the Battle continues using autonomous Anko actions rather than converting Anko into a newly owned/player-controlled Character.
 
-MEN-02 remains **Kinjutsu-specific**.
+No second player action dock is created.
 
-Observed Fūinjutsu is legitimate observed Fūinjutsu evidence.
-
-It does not silently become MEN-02.
-
-No Kinjutsu/Fūinjutsu button is invented merely to satisfy Story wording.
+This is a Story Battle NPC-control rule, not a generic statement that every promoted ally is always AI-controlled.
 
 ---
 
-## 14. Presentation behaviour
+## 11. Enemy targeting
 
-Semantic formation remains:
+Preserve current authored hostile target law only while legally meaningful.
+
+Altered Shinobi begins against Menma.
+
+After Menma withdraws and Anko becomes Active, Altered's normal legal target becomes the surviving allied Active unless an exact action authorises otherwise.
+
+Brute and Unstable likewise act against the current legal allied Battle target under their authored action legality once promoted.
+
+Do not retain stale target locks to a withdrawn participant.
+
+No hidden threat/aggro system is invented.
+
+---
+
+## 12. Menma performance / MEN-03
+
+MEN-03 remains strictly **Menma-attributable**.
+
+Count only Menma's own:
+
+- action opportunities;
+- resolved actions;
+- PL damage received;
+- pressure ratio;
+- critical exposure;
+- exact supporting evidence.
+
+Do not count Anko's later actions/damage/control as Menma performance.
+
+Menma withdrawal does **not** erase Menma's performance evidence.
+
+If the allied side later completes the whole encounter, MEN-03 may resolve from Menma's own contribution.
+
+A Menma withdrawal is critical exposure for the Menma performance read and therefore naturally satisfies the existing **low**-bucket condition under the current threshold contract.
+
+This preserves the three performance reactions without pretending Menma personally completed every hostile.
+
+MEN-03 remains distinct from the whole-side Battle result.
+
+---
+
+## 13. Whole-encounter victory / reward collision
+
+The current World reward amount remains:
+
+> **100 Ryō once for the complete three-subject encounter victory.**
+
+However, the current implemented reward guard also requires `menmaWithdrawn = false`.
+
+That guard was inherited from the now-superseded assumption that Menma withdrawal immediately ended the tutorial Battle.
+
+Under the corrected relay law, a valid whole-encounter victory may occur after:
 
 ~~~text
-MENMA = Active
-ANKO = Benched
+Menma withdraws
+-> Anko promotes
+-> Anko finishes the remaining opposition
+-> enemy side exhausted
+-> Battle victory
 ~~~
 
-during normal play.
+Therefore the **reward amount/source remain closed**, but the `Menma must not have withdrawn` trigger condition is now a confirmed downstream World/Coding collision and must be reconciled before Battle Golden.
 
-When Anko consumes an authored assist opportunity:
-
-- her Benched portrait may step/slide into temporary confrontation playback focus;
-- action resolves;
-- target responds;
-- result / PL change presents;
-- Anko returns to her Benched projection;
-- semantic formation is unchanged.
-
-This is **action choreography**, not formation promotion.
-
-Do not visually leave two Active portraits.
-
-Do not rewrite My Clan order.
-
-Do not turn Anko into the player actor.
+CE does not silently rewrite World-owned reward authority in this document.
 
 ---
 
-## 15. Save/load and safeguard requirements
+## 14. Save/load
 
-The locked catastrophe-containment contract remains mandatory.
+Persistence must preserve:
 
-At minimum persist:
-
-- Battle ID;
-- side action-opportunity ID;
+- Battle/session ID;
 - current side;
-- allied entitlement index / Menma-vs-Anko next actor entitlement;
-- enemy Active;
-- exact participant PL;
+- current Active per side;
+- Benched/Reserve survivors;
+- participant PL;
 - withdrawals;
-- Anko one-use state;
-- committed target/action/RNG results;
-- Battle occurrence receipt;
-- MEN-03 ancestry;
-- reward receipt.
+- exact next side action opportunity;
+- committed action/RNG results;
+- formation relay state.
 
-Reload must never:
+Reload must not:
 
-- grant a free Menma action;
-- duplicate an Anko assist;
-- reroll Anko target/action;
-- repeat enemy action;
-- resurrect a withdrawn participant;
-- reactivate the old round-robin cadence;
-- duplicate the 100-Ryō reward.
-
-Canonical recovery remains:
-
-> **FALLBACK TO AUTHORITATIVE STATE, NOT TO OLD CODE.**
+- restore Menma after withdrawal;
+- give Anko a pre-withdrawal assist turn;
+- reset side alternation after relay;
+- repeat the action that caused withdrawal;
+- skip the newly promoted Active's rightful next side opportunity;
+- resurrect a withdrawn hostile;
+- duplicate reward/history.
 
 ---
 
-## 16. Beta #366 exclusion
+## 15. Presentation law
 
-Beta #366 is intentionally separate.
+The semantic relay and presentation relay are separate.
 
-Do **not** implement this for Alpha:
+If Menma withdraws:
 
 ~~~text
-select one Skill from every active team member
--> execute the whole player-side batch
--> enemy side batch
+Combat commits Menma withdrawal
+-> presentation shows Menma exit
+-> only then Anko slides/scales from Benched into Active
+-> formation settles
+-> next side opportunity is shown
 ~~~
 
-The Alpha Menma proving ground has:
+If Altered withdraws:
 
-> **ONE ACTION PER SIDE OPPORTUNITY.**
+~~~text
+Combat commits Altered withdrawal
+-> presentation shows Altered exit
+-> only then Brute slides/scales into enemy Active
+-> formation settles
+-> next side opportunity is shown
+~~~
 
-On player-side opportunities, the existing single opportunity belongs either to:
+Canonical visual rule remains:
 
-- Menma; or
-- the exact authorised Anko autonomous assist.
+> **OUTGOING ACTIVE EXITS FIRST. PROMOTION STARTS SECOND.**
 
-Never both.
+No dual-Active overlap.
 
-Beta may later supersede this cadence when Beta Battle design is deliberately opened.
-
----
-
-## 17. Kakashi protection
-
-Academy Kakashi is GOLDEN and frozen.
-
-Do not use Kakashi as the first implementation target.
-
-Do not refactor Kakashi while proving Menma.
-
-After the evolved PL Battle runtime is:
-
-- implemented on Menma;
-- source/headless GREEN;
-- installed-browser validated;
-- regression-stable;
-
-then Kakashi may receive a controlled Battle migration separately.
-
-Golden Kakashi Story/presentation outside the migration seam remains protected.
+Animation never decides semantic truth.
 
 ---
 
-## 18. Implementation order
+## 16. Superseded authority
 
-The released Alpha Battle implementation lane should proceed:
+The following Menma-specific statements introduced by the earlier CE reconciliation are now explicitly **SUPERSEDED**:
 
-1. preserve PL identity and current PL semantics;
-2. establish exactly-once alternating side action opportunities;
-3. prove one-action-per-side loop and save/load phase;
-4. establish Active / Benched / Reserve semantic formation;
-5. implement explicit authored assist consumption of the existing side opportunity;
-6. implement Menma/Anko exact entitlement pattern;
-7. consume existing Anko package and off-slot target permission;
-8. consume enemy Active relay Altered -> Brute -> Unstable;
-9. preserve MEN-03 exact attribution;
-10. emit the exact whole-encounter receipt required by the already-live 100-Ryō reward adapter;
-11. prove installed-browser Menma Story -> Battle -> Story;
-12. only then consider later Origin/Kakashi migration.
+- `menma_origin_anko_autonomous_assist`;
+- player-side Menma / Anko / Menma / Anko entitlement alternation;
+- Anko receiving normal side opportunities while Menma remains Active;
+- Anko off-slot attack cadence as a built-in Origin entitlement;
+- Menma withdrawal = immediate tutorial defeat;
+- Anko never promoting to Active;
+- Battle ending before Anko can continue.
 
-Do not start with animation.
+The general six-shinobi Active/Benched/Reserve relay architecture was not wrong and is not reopened.
 
-Semantic loop and containment must be GREEN before choreography polish.
+---
+
+## 17. Beta exclusion
+
+Beta #366 remains queued.
+
+Do not import:
+
+~~~text
+choose one Skill from each active member
+-> execute team batch
+~~~
+
+Alpha remains:
+
+> **ONE ACTIVE ACTION PER SIDE OPPORTUNITY.**
+
+---
+
+## 18. Kakashi protection
+
+Academy Kakashi remains GOLDEN / frozen.
+
+Menma remains the evolved PL Battle proving ground.
+
+Do not use this correction to reopen Kakashi.
 
 ---
 
 ## 19. Final lock
 
-> **Shinobi Chronicles' successor Battle runtime is an evolution of the PL Battle System, never a replacement for PL. Alpha PvE keeps exactly one action per alternating side action opportunity. The Active remains the default action bearer, but an explicitly authorised assist may consume that same single side opportunity without creating an extra turn or changing formation. Academy Menma Scene 7 is the first real proving ground: Menma remains Active and player-controlled; Anko remains Benched and autonomous. Player-side opportunities deterministically alternate Menma, Anko assist, Menma, Anko assist while Anko remains present; if Anko withdraws, Menma receives all later player-side opportunities; if Menma withdraws, the tutorial ends in defeat. Anko's assist uses her already-closed Combat action package and may target her authorised off-slot opposition priority without becoming Active. Enemy-side opportunities belong only to the enemy Active; Altered, then Brute, then Unstable relay through Active as prior Active opponents withdraw. The old five-participant round-robin cadence is not carried into the overhaul. MEN-03 stays strictly Menma-attributable, the exact 100-Ryō whole-encounter reward remains unchanged, Beta #366 is excluded from Alpha, and Kakashi remains GOLDEN/frozen until Menma proves the evolved PL Battle runtime.**
+> **Academy Menma Scene 7 follows the ordinary evolved PL Battle relay law. Menma begins as allied Active and Altered Shinobi begins as enemy Active. They alternate normal actions — Menma, Altered, Menma, Altered — until one Active reaches 0 Battle PL and withdraws. If Altered knocks Menma out, Menma exits, Anko promotes from Benched into the allied Active slot, and because the enemy side just acted the next action belongs to the player side represented by Anko; Battle continues Anko, Altered, Anko, Altered until another withdrawal. If Menma knocks Altered out, Altered exits, Brute promotes into enemy Active, and because the player side just acted Brute acts next; Brute and later Unstable relay by the same rule. Benched participants do not receive normal turns before promotion. Menma withdrawal alone is not Battle defeat while Anko remains. Relay changes the side's Active participant; it never resets side alternation. The earlier Menma/Anko autonomous-assist cadence is superseded.**
 
-**DESIGN CLOSED != IMPLEMENTED != RUNTIME VALIDATED != BROWSER GOLDEN.**
+**DESIGN CLOSED != IMPLEMENTED != RUNTIME VALIDATED != BATTLE GOLDEN.**
