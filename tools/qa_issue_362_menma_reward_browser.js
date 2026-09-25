@@ -158,7 +158,7 @@ async function rewardState(page){
     assert(/No generic Character EXP/.test(disclosure),"Victory did not separate generic EXP");
     await page.screenshot({path:path.join(OUT,"menma-three-subject-victory-before-claim.png"),fullPage:false,timeout:12000});
 
-    const claim=page.getByRole("button",{name:"CLAIM",exact:true});
+    const claim=page.getByRole("button",{name:"CLAIM REWARDS",exact:true});
     await claim.waitFor({state:"visible",timeout:8000});
     await claim.click();
     await page.waitForFunction(start=>Number(playerData.ryo)===start+100,startingRyo,{timeout:8000});
