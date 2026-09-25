@@ -79,6 +79,7 @@ NODE_GATES = [
     "tools/qa_issue_312_story_battle_benchmark.js",
     "tools/qa_issue_334_story_transition_owner.js",
     "tools/qa_issue_322_kakashi_dispositions.js",
+    "tools/qa_issue_369_menma_evolved_pl_battle.js",
 ]
 
 EXTERNAL_ASSET_GATES = [
