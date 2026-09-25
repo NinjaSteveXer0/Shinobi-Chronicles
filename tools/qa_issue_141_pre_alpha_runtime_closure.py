@@ -42,6 +42,7 @@ EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-anbu-root-contained-155.js",
     "runtime/alpha-anbu-root-contained-155-knowledge-fix.js",
     "runtime/alpha-arc1-reward-evaluation-35400.js",
+    "runtime/alpha-menma-evolved-pl-battle-36900.js",
 ]
 
 PYTHON_GATES = [
@@ -78,6 +79,7 @@ NODE_GATES = [
     "tools/qa_issue_312_story_battle_benchmark.js",
     "tools/qa_issue_334_story_transition_owner.js",
     "tools/qa_issue_322_kakashi_dispositions.js",
+    "tools/qa_issue_369_menma_evolved_pl_battle.js",
 ]
 
 EXTERNAL_ASSET_GATES = [
