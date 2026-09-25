@@ -63,7 +63,8 @@ async function state(page){
       choices:[...(layer?.querySelectorAll(".sc-story-choice")||[])].filter(visible).map(n=>({label:n.textContent.trim(),icon:n.getAttribute("data-intent-icon")||""})),
       panelRadius:panel?parseFloat(getComputedStyle(panel).borderRadius):0,
       panelActorOverlapArea:overlap,
-      worldMapVisible:[...document.querySelectorAll("[class*='world-map'],[id*='world-map']")].some(visible)
+      storyLayerBackground:layer?getComputedStyle(layer).backgroundColor:"",
+      storyLayerCoversViewport:!!layer&&(()=>{const r=layer.getBoundingClientRect();return r.left<=0&&r.top<=0&&r.right>=innerWidth&&r.bottom>=innerHeight;})()
     };
   });
 }
@@ -104,7 +105,8 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
   try{
     let s=await state(page);
     assert.strictEqual(s.beatId,"obi_depart");assert(s.text.includes("The first thing Obito notices is the time."));
-    assert.strictEqual(s.worldMapVisible,false,label+" World map visibly owns active Story");
+    assert.strictEqual(s.storyLayerCoversViewport,true,label+" Story layer does not own full viewport");
+    assert(!["transparent","rgba(0, 0, 0, 0)"].includes(s.storyLayerBackground),label+" Story layer exposes World Map through transparent letterbox");
     assert(s.actors.some(a=>a.id==="academy_obito"&&/academy_obito\.png/.test(a.img)),label+" Obito card missing");
     assert(/GET TO TRAINING/.test(s.objective),label+" objective missing");
     assert(s.panelRadius>=10,label+" narration panel is not benchmark-rounded");
