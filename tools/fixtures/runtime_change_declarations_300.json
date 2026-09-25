@@ -564,6 +564,32 @@
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Issue #302 final Alpha Golden blocker only: the three individual ANBU custody handoffs use a Kakashi-local anbu_handoff preset so the receiving ANBU Operative, Kakashi, the captive, and optional Pakkun occupy distinct stage positions. No dialogue, custody, package, reward, Battle, PL, route, transition, animation, Receipt, Police, or shared Scene Board semantics changed."
+    },
+    {
+      "changeId": "issue-362-menma-three-subject-whole-encounter-reward",
+      "classification": "NEW",
+      "responsibilityIds": [
+        "origin.academy_menma.three_subject.reward_commit"
+      ],
+      "owner": "runtime/alpha-menma-origin-rewards-36200.js",
+      "directCallers": [
+        "index.html",
+        "game.js Battle reward/claim surfaces"
+      ],
+      "stateTouched": [
+        "currentBattle.rewards exact Academy Menma successor projection",
+        "playerData.ryo",
+        "playerData.activityHistory exact reward-source/battle-occurrence receipt"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_362_menma_three_subject_reward.js",
+        "tools/qa_issue_362_menma_reward_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "WORLD_SUCCESSOR_REWARD_AUTHORITY",
+      "rationale": "Issue #362 introduces the exact World-closed fixed 100 Ryō whole-encounter reward for the successor Academy Menma + Anko versus three-test-subject Story Battle. The owner consumes only the exact committed Combat occurrence receipt, suppresses generic loot while that receipt is absent, persists one reward-source/battle-occurrence receipt in Activity History, and never reactivates the superseded Altered-only 50 Ryō source."
     }
   ]
 }

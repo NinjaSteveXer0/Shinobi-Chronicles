@@ -23,6 +23,7 @@ EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-runtime-build-fingerprint-303.js",
     "game.js",
     "runtime/alpha-menma-tutorial-111.js",
+    "runtime/alpha-menma-origin-rewards-36200.js",
     "runtime/alpha-world-konoha-112-core.js",
     "runtime/alpha-world-konoha-112-fix.js",
     "runtime/alpha-browser-playability-32500.js",

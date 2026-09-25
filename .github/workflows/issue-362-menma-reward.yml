@@ -1,0 +1,78 @@
+name: Issue 362 Menma Three-Subject Reward
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'game.js'
+      - 'runtime/alpha-menma-tutorial-111.js'
+      - 'runtime/alpha-menma-origin-rewards-36200.js'
+      - 'runtime/alpha-runtime-build-fingerprint-303.js'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
+      - 'tools/fixtures/runtime_responsibility_registry_300.json'
+      - 'tools/fixtures/runtime_change_declarations_300.json'
+      - 'tools/qa_issue_362_menma_three_subject_reward.js'
+      - 'tools/qa_issue_362_menma_reward_browser.js'
+      - 'tools/browser_runtime_error_gate_311.js'
+      - '.github/workflows/issue-362-menma-reward.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  menma-three-subject-reward:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Source and headless reward contract
+        run: |
+          node --check runtime/alpha-menma-origin-rewards-36200.js
+          node --check tools/qa_issue_362_menma_three_subject_reward.js
+          node --check tools/qa_issue_362_menma_reward_browser.js
+          node tools/qa_issue_362_menma_three_subject_reward.js
+          node tools/qa_issue_303_runtime_build_fingerprint.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python3 -m http.server 8080 > /tmp/issue-362-http.log 2>&1 &
+          echo $! > /tmp/issue-362-http.pid
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/issue-362-http.log
+          exit 1
+
+      - name: Installed-browser Menma reward proof
+        env:
+          ISSUE_362_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_362_BROWSER_OUT: artifacts/issue-362-menma-reward
+        run: xvfb-run -a node tools/qa_issue_362_menma_reward_browser.js
+
+      - name: Preserve server log
+        if: always()
+        run: |
+          mkdir -p artifacts/issue-362-menma-reward
+          cp /tmp/issue-362-http.log artifacts/issue-362-menma-reward/http-server.log || true
+
+      - name: Upload installed-browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-362-menma-three-subject-reward-evidence
+          path: artifacts/issue-362-menma-reward
+          if-no-files-found: warn

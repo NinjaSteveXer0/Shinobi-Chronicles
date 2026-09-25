@@ -708,6 +708,45 @@
         "tools/qa_runtime_ownership_safety_300.js",
         "tools/qa_issue_340_hinata_browser.js"
       ]
+    },
+    {
+      "responsibilityId": "origin.academy_menma.three_subject.reward_commit",
+      "canonicalOwner": "runtime/alpha-menma-origin-rewards-36200.js",
+      "ownerType": "origin_reward_adapter",
+      "directCallers": [
+        "generateBattleRewards",
+        "claimCurrentBattleRewards",
+        "renderVictoryOverlay",
+        "openOverlay"
+      ],
+      "stateReads": [
+        "currentBattle encounter/outcome/story return provenance",
+        "playerData.activityHistory exact Menma three-subject Battle occurrence receipt"
+      ],
+      "stateWrites": [
+        "currentBattle.rewards exact Academy Menma whole-encounter projection",
+        "playerData.ryo through existing currency authority",
+        "playerData.activityHistory Academy Menma three-subject reward receipt"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-menma-origin-rewards-36200.js"
+      ],
+      "extensionHooks": [
+        "ensureAcademyMenmaThreeSubjectRewardProjection36200",
+        "claimAcademyMenmaThreeSubjectReward36200",
+        "validateAcademyMenmaThreeSubjectBattleReceipt36200"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "playerData.activityHistory origin_battle_reward / menma_origin_battle_three_test_subjects_victory_ryo_01"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_362_menma_three_subject_reward.js",
+        "tools/qa_issue_362_menma_reward_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
     }
   ],
   "adapters": [
@@ -805,6 +844,11 @@
       "semanticId": "special_jonin.contextual_evidence.project",
       "owner": "runtime/alpha-special-jonin-evidence-producer-34700.js",
       "responsibilityId": "progression.special_jonin.contextual_evidence_producer.shared"
+    },
+    {
+      "semanticId": "academy_menma.three_subject.reward.commit",
+      "owner": "runtime/alpha-menma-origin-rewards-36200.js",
+      "responsibilityId": "origin.academy_menma.three_subject.reward_commit"
     }
   ],
   "globalWrapperChains": [
@@ -870,6 +914,11 @@
       "stateRef": "playerData.specialJoninContextualEvidence",
       "owner": "runtime/alpha-special-jonin-evidence-producer-34700.js",
       "responsibilityId": "progression.special_jonin.contextual_evidence_producer.shared"
+    },
+    {
+      "stateRef": "playerData.activityHistory menma three-subject reward receipts",
+      "owner": "runtime/alpha-menma-origin-rewards-36200.js",
+      "responsibilityId": "origin.academy_menma.three_subject.reward_commit"
     }
   ]
 }
