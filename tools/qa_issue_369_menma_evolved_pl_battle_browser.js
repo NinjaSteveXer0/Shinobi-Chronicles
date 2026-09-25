@@ -286,8 +286,12 @@ async function cadenceAndReload(browser){
     assert(second&&second.success===true,"post-Anko-withdrawal Menma action failed "+JSON.stringify(second));
     const afterAnkoOut=await page.evaluate(()=>({
       state:getMenmaEvolvedPLBattleState36900(),
-      readiness:getMenmaEvolvedPLBattleInputReadiness36900()
+      readiness:getMenmaEvolvedPLBattleInputReadiness36900(),
+      battle:{active:currentBattle.active===true,battleOver:currentBattle.battleOver===true,outcome:currentBattle.outcome?JSON.parse(JSON.stringify(currentBattle.outcome)):null},
+      pl:{menma:getBattleRemainingPL("player","academy_menma"),anko:getBattleRemainingPL("player","sj_anko"),altered:getBattleRemainingPL("enemy","test_subject_altered_shinobi")},
+      activeEnemy:getBattleDeploymentParticipant("enemy",1)?.id||null
     }));
+    console.log("ISSUE369 AFTER ANKO WITHDRAWAL HANDOFF",JSON.stringify({second,afterAnkoOut}));
     const counts2=await evidenceCounts(page);
     assert.strictEqual(counts2.ankoAssists,beforeAnkoOut.ankoAssists,"withdrawn Anko received another assist opportunity");
     assert.strictEqual(counts2.enemyActions+counts2.enemySkips,(beforeAnkoOut.enemyActions+beforeAnkoOut.enemySkips)+1,"Anko withdrawal did not hand every later player opportunity to Menma");
