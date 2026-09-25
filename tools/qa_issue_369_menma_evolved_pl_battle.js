@@ -43,7 +43,7 @@ const checks={
     &&runtime.includes('objectiveId:O')&&runtime.includes('resolvedHostileIds:(s.resolved||[]).slice()')
     &&!runtime.includes('ryo:100')&&!runtime.includes('FIXED_RYO'),
   noDeathInjuryCustodyInference:runtime.includes('inferredDeath:false')&&runtime.includes('inferredInjury:false')&&runtime.includes('inferredCustody:false'),
-  betaExcluded:!runtime.includes('command batch')&&!runtime.includes('player-side command batch'),
+  betaExcluded:!runtime.includes('command_batch')&&!runtime.includes('choose one Skill from every active member')&&!runtime.includes('all_active_members'),
   kakashiUntouched:!runtime.includes('academy_kakashi'),
   browserGoldenNotSelfClaimed:runtime.includes('browserGoldenClaimed:false')
 };
