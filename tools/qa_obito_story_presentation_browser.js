@@ -53,8 +53,11 @@ async function state(page){
     const stage=layer?.querySelector(".sc-chronicle-stage")||layer?.querySelector(".sc-story-stage");
     const visible=n=>!!n&&n.getClientRects().length>0&&getComputedStyle(n).display!=="none"&&getComputedStyle(n).visibility!=="hidden";
     const panel=layer?.querySelector(".sc-story-panel"),actor=layer?.querySelector(".sc-scene-board-33900__actor");
+    const textNode=layer?.querySelector(".sc-story-text"),nameNode=layer?.querySelector(".sc-story-name"),kicker=layer?.querySelector(".sc-story-kicker");
+    const progress=layer?.querySelector(".sc-performance-progress-33900"),hint=layer?.querySelector(".sc-performance-continue-hint-33900"),primary=layer?.querySelector(".sc-chronicle-primary");
     const pr=panel?.getBoundingClientRect(),ar=actor?.getBoundingClientRect();
     const overlap=pr&&ar?Math.max(0,Math.min(pr.right,ar.right)-Math.max(pr.left,ar.left))*Math.max(0,Math.min(pr.bottom,ar.bottom)-Math.max(pr.top,ar.top)):0;
+    const ps=panel?getComputedStyle(panel):null,ts=textNode?getComputedStyle(textNode):null;
     const def=rt&&typeof getStorySceneDefinition==="function"?getStorySceneDefinition(rt.sceneId):null;
     const registryBeat=def&&def.beatMap instanceof Map?def.beatMap.get(rt.beatId)||null:null;
     const resolvedBackdrop=typeof resolveStorySceneBoardBackdropPath==="function"?resolveStorySceneBoardBackdropPath():null;
@@ -68,7 +71,27 @@ async function state(page){
       actors:[...(layer?.querySelectorAll(".sc-scene-board-33900__actor")||[])].map(n=>({id:n.dataset.actorId,img:n.querySelector("img")?.getAttribute("src")||""})),
       objective:layer?.querySelector(".sc-scene-board-33900__objective")?.textContent?.replace(/\s+/g," ").trim()||"",
       choices:[...(layer?.querySelectorAll(".sc-story-choice")||[])].filter(visible).map(n=>({label:n.textContent.trim(),icon:n.getAttribute("data-intent-icon")||""})),
-      panelRadius:panel?parseFloat(getComputedStyle(panel).borderRadius):0,
+      panelRadius:panel?parseFloat(ps.borderRadius):0,
+      panelWidth:pr?.width||0,
+      panelPadding:ps?[ps.paddingTop,ps.paddingRight,ps.paddingBottom,ps.paddingLeft]:[],
+      panelBorderColor:ps?.borderTopColor||"",
+      panelBackgroundImage:ps?.backgroundImage||"",
+      panelGridColumns:ps?.gridTemplateColumns||"",
+      panelGridRows:ps?.gridTemplateRows||"",
+      textFontSize:ts?.fontSize||"",
+      textLineHeight:ts?.lineHeight||"",
+      textMarginTop:ts?.marginTop||"",
+      textMaxHeight:ts?.maxHeight||"",
+      speakerLabel:nameNode?.textContent?.trim()||"",
+      progressText:progress?.textContent?.trim()||"",
+      progressVisible:visible(progress),
+      continueHint:hint?.textContent?.trim()||"",
+      continueHintVisible:visible(hint),
+      primaryText:primary?.textContent?.trim()||"",
+      primaryVisible:visible(primary),
+      kickerText:kicker?.textContent?.trim()||"",
+      kickerVisible:visible(kicker),
+      visibleNarrationLabels:[...(layer?.querySelectorAll(".sc-story-name,.sc-story-kicker")||[])].filter(visible).map(n=>n.textContent.trim()).filter(x=>x==="NARRATION").length,
       panelActorOverlapArea:overlap,
       storyLayerBackground:layer?getComputedStyle(layer).backgroundColor:"",
       storyLayerCoversViewport:!!layer&&(()=>{const r=layer.getBoundingClientRect();return r.left<=0&&r.top<=0&&r.right>=innerWidth&&r.bottom>=innerHeight;})()
@@ -79,9 +102,8 @@ async function waitBeat(page,id){await page.waitForFunction(({scene,id})=>getAct
 async function advance(page){
   const before=await state(page);
   assert.notStrictEqual(before.mode,"choice","advance attempted on choice "+before.beatId);
-  let button=page.locator("#story-scene-presentation-layer .sc-chronicle-primary").first();
-  if(await button.count()===0)button=page.locator("#story-scene-presentation-layer .sc-story-actions > .sc-story-action:not(.sc-story-choice)").first();
-  await button.waitFor({state:"visible",timeout:8000});await button.click();
+  assert.strictEqual(before.primaryVisible,false,"legacy arrow advance control is visible @ "+before.beatId);
+  await page.locator("#story-scene-presentation-layer").click({position:{x:80,y:80}});
   await page.waitForFunction(old=>{
     const layer=document.getElementById("story-scene-presentation-layer");
     return getActiveStorySceneRuntime()?.beatId!==old.beat||layer?.querySelector(".sc-story-text")?.textContent?.trim()!==old.text;
@@ -127,9 +149,26 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
     assert(!["transparent","rgba(0, 0, 0, 0)"].includes(s.storyLayerBackground),label+" Story layer exposes World Map through transparent letterbox");
     assert(s.actors.some(a=>a.id==="academy_obito"&&/academy_obito\.png/.test(a.img)),label+" Obito card missing");
     assert(/GET TO TRAINING/.test(s.objective),label+" objective missing");
-    assert(s.panelRadius>=10,label+" narration panel is not benchmark-rounded");
+    assert(Math.abs(s.panelRadius-16)<0.1,label+" narration radius drift "+s.panelRadius);
+    assert(Math.abs(s.panelWidth-980)<1.5,label+" narration width is not Kakashi 980px cap "+s.panelWidth);
+    assert.deepStrictEqual(s.panelPadding,["11px","15px","12px","15px"],label+" narration padding drift");
+    assert.strictEqual(s.panelBorderColor,"rgba(93, 215, 225, 0.32)",label+" narration border drift");
+    assert(s.panelBackgroundImage.includes("rgba(5, 16, 22, 0.88)")&&s.panelBackgroundImage.includes("rgba(2, 9, 14, 0.95)"),label+" narration background drift "+s.panelBackgroundImage);
+    assert.strictEqual(s.speakerLabel,"NARRATION",label+" narration header drift");
+    assert.strictEqual(s.visibleNarrationLabels,1,label+" duplicate visible NARRATION header");
+    assert(/^1 \/ \d+$/.test(s.progressText),label+" cue counter missing "+s.progressText);
+    assert.strictEqual(s.progressVisible,true,label+" cue counter hidden");
+    assert.strictEqual(s.continueHint,"CLICK ANYWHERE TO CONTINUE",label+" click-anywhere hint drift");
+    assert.strictEqual(s.continueHintVisible,true,label+" click-anywhere hint hidden");
+    assert.strictEqual(s.primaryVisible,false,label+" legacy arrow advance control still visible");
+    assert.strictEqual(s.kickerVisible,false,label+" legacy kicker still visible");
+    assert.strictEqual(s.textMarginTop,"4px",label+" narration text margin drift");
+    assert(Math.abs(parseFloat(s.textFontSize)-13.536)<0.2,label+" narration font size drift "+s.textFontSize);
+    assert.strictEqual(s.textLineHeight,"19.2211px",label+" narration line-height drift");
+    assert(Math.abs(parseFloat(s.textMaxHeight)-76.5)<0.5,label+" narration max-height drift "+s.textMaxHeight);
     assert.strictEqual(s.panelActorOverlapArea,0,label+" opening panel overlaps Obito card");
     await assertBackdrop(page,"obi_depart",EXPECTED_BACKDROP.obi_depart);
+    if(label==="zero-help")await screenshot(page,label+"-opening-narration");
     const firstText=s.text;
     await page.locator("#story-scene-presentation-layer").click({position:{x:100,y:100}});
     await page.waitForFunction(old=>document.querySelector("#story-scene-presentation-layer .sc-story-text")?.textContent?.trim()!==old,firstText,{timeout:5000});
