@@ -1143,6 +1143,80 @@ R("izu_rogue_32900","academy_izuno",rogue,c=>({rogueGeninInterruptionResolvedByW
 {beatId:"izu_end",mode:"narration",text:"No Speed/Agility stat, morality score or automatic specialization is created.",exitScene:true}],onCompleteConsequences:[X("academy_izuno",[tracking,intercept,coop,rogue])]});})();
 // Mirai
 (()=>{const sub="occ_origin_mirai_substitution_verification_resolution",checkpoint="occ_origin_mirai_checkpoint_escort_resolution",scene=A.sceneByVariant.academy_mirai;
+
+// Presentation-only readiness for the WRITING GOLDEN replacement.
+// #338 (exact instructor Battle package) remains the runtime-replacement gate.
+// Do not attach these mappings to the obsolete compressed beats below.
+const MIRAI_PRESENTATION_ENV=Object.freeze({
+  assignment:Object.freeze({environmentId:"mirai_origin_academy_training_ground_courtyard"}),
+  mainStreet:Object.freeze({environmentId:"mirai_origin_konoha_main_street"}),
+  market:Object.freeze({environmentId:"mirai_origin_konoha_covered_market"}),
+  shortcut:Object.freeze({environmentId:"mirai_origin_konoha_storehouse_side_lane"}),
+  checkpoint:Object.freeze({environmentId:"mirai_origin_checkpoint_three_day"})
+});
+const MIRAI_PRESENTATION_BACKDROPS=Object.freeze({
+  mirai_origin_academy_training_ground_courtyard:"Mirai Origin Backdrop/academy_training_ground_courtyard.png",
+  mirai_origin_konoha_main_street:"Mirai Origin Backdrop/konoha_main_street.png",
+  mirai_origin_konoha_covered_market:"Mirai Origin Backdrop/konoha_covered_market.png",
+  mirai_origin_konoha_storehouse_side_lane:"Mirai Origin Backdrop/konoha_storehouse_side_lane.png",
+  mirai_origin_checkpoint_three_day:"Mirai Origin Backdrop/checkpoint_three_day.png"
+});
+try{
+  const reg=typeof registerSceneBackdropAssetPath==="function"?registerSceneBackdropAssetPath:globalThis.registerSceneBackdropAssetPath;
+  if(typeof reg==="function")for(const [id,path] of Object.entries(MIRAI_PRESENTATION_BACKDROPS))reg(id,path);
+}catch(_error){}
+const MIRAI_GOLDEN_PRESENTATION_SCENE_MAP=Object.freeze({
+  assignment:MIRAI_PRESENTATION_ENV.assignment,
+  walk:MIRAI_PRESENTATION_ENV.mainStreet,
+  market:MIRAI_PRESENTATION_ENV.market,
+  shortcut:MIRAI_PRESENTATION_ENV.shortcut,
+  roadAfter:MIRAI_PRESENTATION_ENV.mainStreet,
+  decision:Object.freeze({
+    shortcut:MIRAI_PRESENTATION_ENV.shortcut,
+    markedOrMain:MIRAI_PRESENTATION_ENV.mainStreet
+  }),
+  confront:Object.freeze({preserveReachedRouteEnvironment:true}),
+  changeRoute:MIRAI_PRESENTATION_ENV.mainStreet,
+  completeEscort:Object.freeze({
+    street:MIRAI_PRESENTATION_ENV.mainStreet,
+    checkpointApproach:MIRAI_PRESENTATION_ENV.checkpoint,
+    preserveAuthoredPosition:true
+  }),
+  checkpointThree:MIRAI_PRESENTATION_ENV.checkpoint,
+  after:MIRAI_PRESENTATION_ENV.checkpoint,
+  leaving:Object.freeze({preserveApprovedCheckpointExitGeography:true})
+});
+function runAcademyMiraiGoldenPresentationReadiness20260925(){
+  const paths=Object.values(MIRAI_PRESENTATION_BACKDROPS);
+  const checks={
+    exactDedicatedAssetCount:paths.length===5,
+    assignmentMapped:MIRAI_GOLDEN_PRESENTATION_SCENE_MAP.assignment.environmentId==="mirai_origin_academy_training_ground_courtyard",
+    coveredMarketMapped:MIRAI_GOLDEN_PRESENTATION_SCENE_MAP.market.environmentId==="mirai_origin_konoha_covered_market",
+    shortcutMapped:MIRAI_GOLDEN_PRESENTATION_SCENE_MAP.shortcut.environmentId==="mirai_origin_konoha_storehouse_side_lane",
+    checkpointMapped:MIRAI_GOLDEN_PRESENTATION_SCENE_MAP.checkpointThree.environmentId==="mirai_origin_checkpoint_three_day",
+    allDedicatedPaths:paths.every(asset=>String(asset).startsWith("Mirai Origin Backdrop/")),
+    routePreservationExplicit:MIRAI_GOLDEN_PRESENTATION_SCENE_MAP.confront.preserveReachedRouteEnvironment===true&&MIRAI_GOLDEN_PRESENTATION_SCENE_MAP.leaving.preserveApprovedCheckpointExitGeography===true,
+    combatDependencyFailClosed:true,
+    staleCompressedRuntimePromoted:false,
+    runtimeReplacementPerformed:false,
+    browserGoldenClaimed:false
+  };
+  const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
+  return{pass:failed.length===0,checks,failed,combatDependencyIssue:338,dependencyStatus:"OPEN_AT_IMPLEMENTATION",browserGoldenClaimed:false};
+}
+globalThis.runAcademyMiraiGoldenPresentationReadiness20260925=runAcademyMiraiGoldenPresentationReadiness20260925;
+globalThis.SC_ACADEMY_MIRAI_GOLDEN_PRESENTATION_20260925=Object.freeze({
+  writingAuthority:"Academy_Mirai_Origin_WRITING_GOLDEN_2026-09-24",
+  combatDependencyIssue:338,
+  dependencyStatusAtImplementation:"OPEN",
+  runtimeReplacementPerformed:false,
+  staleCompressedRuntimePromoted:false,
+  environments:MIRAI_PRESENTATION_ENV,
+  backdrops:MIRAI_PRESENTATION_BACKDROPS,
+  sceneMap:MIRAI_GOLDEN_PRESENTATION_SCENE_MAP,
+  browserGoldenClaimed:false
+});
+
 A.register({sceneId:scene,eventId:scene,title:"ACADEMY MIRAI",entryBeatId:"mir_start",participants:[],beats:[
 {beatId:"mir_start",mode:"narration",text:"A controlled Academy escort begins normally. The protected civilian is polite and cooperative; there is no suspicious opening cue.",nextBeatId:"mir_talk"},
 {beatId:"mir_talk",mode:"choice",text:"Mirai makes ordinary conversation.",choices:[C("ask_origin","Ask where they are from","mir_inconsistent",{talk:"origin"}),C("ask_route","Ask about the route","mir_inconsistent",{talk:"route"}),C("ask_family","Ask about their family","mir_inconsistent",{talk:"family"}),C("ask_trip","Ask about their trip to Konoha","mir_inconsistent",{talk:"trip"})]},
