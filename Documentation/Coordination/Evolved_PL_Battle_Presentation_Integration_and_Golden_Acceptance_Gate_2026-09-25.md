@@ -23,7 +23,8 @@ PR #372's `browserGoldenClaimed:false` was correct and remains meaningful.
 Preserve #369's semantic work unless a reproduced semantic defect proves otherwise:
 - PL / Remaining Battle PL identity;
 - exact Menma + Anko vs Altered + Brute + Unstable participant envelope;
-- Menma / Anko player-side entitlement;
+- alternating side-action semantics;
+- Active-only normal action bearer + withdrawal relay;
 - enemy Active-only relay;
 - independent PL ledgers;
 - exact whole-encounter receipt;
@@ -43,9 +44,9 @@ The canonical shared Battle presentation owner remains:
 
 `runtime/alpha-battle-modern-33000.js`
 
-The semantic runtime's synchronous `settleSemanticLoop()` can commit several autonomous actions before control returns to the next Menma input opportunity.
+The #369 semantic runtime also encoded a now-superseded Menma-specific Anko-assist cadence. That cadence must be removed while preserving the valid exactly-once semantic safeguards.
 
-That is valid semantic processing, but without a presentation queue it allows committed events to become effectively invisible to the player.
+The corrected semantic rhythm is one Active action per alternating side opportunity. Presentation still requires an ordered queue so committed actions and relay events are visibly exposed rather than swallowed by synchronous processing.
 
 The locked target remains:
 
@@ -83,7 +84,7 @@ Each receipt must contain enough immutable data to present at minimum:
 - relevant pre/post Remaining Battle PL;
 - withdrawal/result flags;
 - formation transition facts where applicable;
-- exact action role: Active, authored assist, or other authorised role.
+- exact action role, including whether the actor was the current Active and any committed relay/promotion facts.
 
 ## 4. Safeguard compatibility
 
@@ -141,27 +142,26 @@ Use approved frameless Battle portrait presentation, not collectible-card-panel 
 
 Exact geometry remains under existing UI/presentation authority.
 
-## 7. Anko assist presentation
+## 7. Allied relay presentation — Menma -> Anko
 
-Anko remains semantically Benched.
+Anko remains visibly Benched while Menma is Active and does not receive normal action playback.
 
-Her authored assist presentation is:
+If Menma reaches 0 Battle PL:
 
 ~~~text
-Anko Benched
--> temporary confrontation focus
--> exact action shown
--> exact target response shown
--> result / PL / state shown
--> Anko returns to Benched projection
+Menma withdrawal result is exposed
+-> Menma clears the Active position
+-> Anko slides/scales from Benched into Active
+-> formation settles
+-> because the enemy side caused the withdrawal, the next normal opportunity belongs to the player side
+-> Anko now acts as the allied Active
 ~~~
 
-This does not:
-- promote Anko;
-- replace Menma;
-- expose a second player dock;
-- create a second action;
-- rewrite formation order.
+Anko's first normal action occurs **after promotion**, not as a Benched assist.
+
+Do not leave two allied Active portraits.
+
+Do not reset side alternation during promotion.
 
 ## 8. Enemy action and relay presentation
 
@@ -177,7 +177,7 @@ outgoing Active result/withdrawal exposed
 -> next side opportunity becomes visible
 ~~~
 
-Menma proof uses Altered -> Brute -> Unstable, subject to any future relay candidate already withdrawn by Anko's off-slot assist.
+Menma proof uses Altered -> Brute -> Unstable. A future relay candidate may be skipped only if a separately authorised off-slot mechanic has already withdrawn that participant; the Menma Origin no longer grants Anko automatic off-slot assist turns.
 
 ## 9. Environment
 
@@ -246,14 +246,17 @@ Battle Golden now requires explicit player-facing assertions in addition to sema
 ### Playback
 - at least one Menma action visibly plays;
 - at least one enemy action visibly plays;
-- at least one Anko assist visibly plays;
+- Menma withdrawal visibly promotes Anko when the fixture exercises allied relay;
+- at least one promoted-Anko Active action visibly plays after relay;
 - actor/action/target/result/PL change are readable;
 - autonomous semantic events are not swallowed in a synchronous burst.
 
 ### Relay
-- Altered withdrawal visibly relays Brute;
+- Menma withdrawal visibly relays Anko and the player side acts next when the enemy caused the withdrawal;
+- Altered withdrawal visibly relays Brute and the enemy side acts next when the player caused the withdrawal;
 - Brute withdrawal visibly relays Unstable when applicable;
-- a relay candidate already withdrawn off-slot is skipped correctly.
+- side alternation does not reset across any relay;
+- a relay candidate already withdrawn by a separately authorised off-slot mechanic is skipped correctly.
 
 ### Terminal
 - final committed action/result is visible before Story navigation;
@@ -292,7 +295,6 @@ Canonical rule:
 
 This repair does not reopen:
 - PL formula/identity;
-- Menma/Anko cadence;
 - Anko Combat package;
 - MEN-03;
 - 100-Ryō reward;
@@ -306,6 +308,6 @@ Use the canonical shared Battle presentation owner.
 
 ## 15. Final lock
 
-> **#369 is preserved as the semantic foundation of the evolved PL Battle System, but it is not the completed player-facing Battle overhaul. The missing Alpha tranche is presentation integration through the canonical shared Battle owner: the exact multi-participant Squad Wedge and environment must be visible, and every already-committed Menma, enemy and Anko action must enter an immutable ordered presentation queue that visibly plays ACTOR -> ACTION -> TARGET -> IMPACT/RESPONSE -> RESULT -> PL CHANGE -> SETTLE without becoming semantic authority. Terminal Story navigation must wait for terminal presentation exposure or a safe hard-settle. Live legacy Menma wording/launcher state must migrate from the old Altered-only objective to the three-subject encounter. Battle Golden requires separate semantic, presentation, installed-browser and Stephen visual acceptance evidence.**
+> **#369 remains useful semantic foundation, but its Menma-specific Anko-assist cadence is superseded by the ordinary Active-relay law. The completed player-facing Battle must show Menma Active versus Altered Active until one withdraws; the withdrawing Active clears first, the next eligible Benched participant promotes, and ordinary side alternation continues without reset. Thus Altered knocking Menma out produces Menma exit -> Anko promotion -> Anko acts next, while Menma knocking Altered out produces Altered exit -> Brute promotion -> Brute acts next. The exact multi-participant Squad Wedge and environment must be visible, and every committed Active action/withdrawal/relay must enter the immutable ordered presentation queue without becoming semantic authority. Terminal Story navigation must wait for terminal presentation exposure or a safe hard-settle. Live legacy Menma wording/launcher state must migrate from the old Altered-only objective to the three-subject encounter. Battle Golden requires separate semantic, presentation, installed-browser and Stephen visual acceptance evidence.**
 
 **SEMANTICS GREEN != PRESENTATION GREEN != BATTLE GOLDEN.**
