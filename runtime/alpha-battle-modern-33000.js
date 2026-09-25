@@ -634,7 +634,12 @@
       trayMode:stage.dataset.formationTray,
       semanticWrite:false
     };
-  }  function battleEvidence33000(){
+  }
+
+  const BATTLE_PRESENTATION_CLASSES_33000=Object.freeze(["PHYSICAL_STRIKE","HEAVY_STRIKE","PROJECTILE","CHAKRA_RANGED","AREA_ATTACK","GUARD","EVADE","SUBSTITUTION","HEAL","BUFF","DEBUFF","RESTRAINT","SUMMON","ENVIRONMENTAL","TRANSFORMATION","DEFEAT"]);
+  const playedBattlePerformanceKeys33000=new Set();
+
+  function battleEvidence33000(){
     try{
       const runtime=typeof ensureBattleRuntimeState==="function"?ensureBattleRuntimeState():currentBattle&&currentBattle.runtime;
       const rows=runtime&&Array.isArray(runtime.evidence)?runtime.evidence:[];
