@@ -469,6 +469,7 @@ function resolveAnkoAssistOpportunity(){
   const s=ensureState();
   if(!s||s.phase!=="player"||currentPlayerEntitlement()!==ANKO_ID)return{success:false,reason:"anko_assist_not_entitled"};
   expireUnusedAnkoEvasionAtOpportunityStart();
+  try{if(typeof resolveBattleStartOfActionOpportunityEffects==="function")resolveBattleStartOfActionOpportunityEffects("player",ANKO_ID,currentOpportunityId("player"));}catch(_error){}
   if(!ankoPresent()){
     s.ankoWithdrawn=true;
     const skippedId="skip:"+currentOpportunityId("player");
@@ -617,8 +618,10 @@ function settleSemanticLoop(){
         if(!last||last.success!==true){
           const failId="skip:"+currentOpportunityId("enemy");
           if(!opportunityCommitted("enemy")){
-            recordBattleEvidence({eventType:"menma_origin_enemy_opportunity_failed_visible",committedOccurrence:true,actionId:failId,actorRef:activeEnemy()?createBattleParticipantRef("enemy",activeEnemy().id):null,data:{reason:last&&last.reason||"enemy_opportunity_failed",inventedFallback:false}});
-            markOpportunityCommitted("enemy",activeEnemy()&&activeEnemy().id,failId,"enemy_opportunity_failed_visible");
+            const failedEnemy=activeEnemy();
+            recordBattleEvidence({eventType:"menma_origin_enemy_opportunity_failed_visible",committedOccurrence:true,actionId:failId,actorRef:failedEnemy?createBattleParticipantRef("enemy",failedEnemy.id):null,data:{reason:last&&last.reason||"enemy_opportunity_failed",inventedFallback:false}});
+            if(failedEnemy){try{consumeBattleActionOpportunity("enemy",failedEnemy.id,failId,"enemy_opportunity_failed_visible");}catch(_error){}}
+            markOpportunityCommitted("enemy",failedEnemy&&failedEnemy.id,failId,"enemy_opportunity_failed_visible");
           }
         }
         if(battle().battleOver)break;
@@ -719,24 +722,27 @@ if(PRE_KINJUTSU_READ){
   globalThis.resolveMenmaOriginKinjutsuObservationRead=wrapped;try{resolveMenmaOriginKinjutsuObservationRead=wrapped;}catch(_error){}
 }
 
-function upstreamBattleReceipt(){
+function commitBattleOccurrenceReceipt(result="victory"){
   const b=battle(),p=player(),id=battleOccurrenceId(b);
   if(!b||!p||!id)return null;
   if(!Array.isArray(p.activityHistory))p.activityHistory=[];
   const existing=p.activityHistory.find(row=>row&&String(row.battleOccurrenceId||row.occurrenceId||"")===id&&row.type!=="origin_battle_reward");
   if(existing)return existing;
   updateResolvedHostiles();
-  const s=ensureState();
+  const state=ensureState();
+  const victory=result==="victory";
+  const resolved=victory?[...HOSTILE_IDS]:updateResolvedHostiles();
   const record={
     historyScope:typeof getCurrentChronicleOccurrenceHistoryScope==="function"?getCurrentChronicleOccurrenceHistoryScope("origin_battle_occurrence"):null,
-    type:"origin_battle_occurrence",activity:"battle",completed:true,committed:true,success:true,
-    outcome:"victory",sourceOccurrenceId:id,occurrenceId:id,battleOccurrenceId:id,
+    type:"origin_battle_occurrence",activity:"battle",completed:true,committed:true,success:victory,
+    outcome:victory?"victory":"defeat",sourceOccurrenceId:id,occurrenceId:id,battleOccurrenceId:id,
     actorVariantId:MENMA_ID,sceneId:STORY_SCENE_ID,storySceneInstanceId:sceneInstanceId(b),
     battleConfigId:BATTLE_CONFIG_ID,encounterId:ENCOUNTER_ID,objectiveId:OBJECTIVE_ID,
-    battleResult:"victory",terminalBattleResult:"victory",objectiveCompleted:true,
-    menmaWithdrawn:false,ankoWithdrawn:!!(s&&s.ankoWithdrawn),
+    battleResult:victory?"victory":"defeat",terminalBattleResult:victory?"victory":"defeat",
+    objectiveCompleted:victory,
+    menmaWithdrawn:!victory,ankoWithdrawn:!!(state&&state.ankoWithdrawn),
     alliedParticipantIds:[...ALLIED_IDS],hostileParticipantIds:[...HOSTILE_IDS],
-    resolvedHostileIds:[...HOSTILE_IDS],
+    resolvedHostileIds:victory?[...HOSTILE_IDS]:[...resolved],
     fact:{battlePLWithdrawalNotDeath:true,noInferredInjury:true,noInferredCustody:true,menmaOnlyTutorialAttribution:true,ankoAssistEntitlementId:ENTITLEMENT_ID},
     data:{battlePLWithdrawalNotDeath:true,noInferredInjury:true,noInferredCustody:true,menmaOnlyTutorialAttribution:true,ankoAssistEntitlementId:ENTITLEMENT_ID},
     timestamp:Date.now()
@@ -745,6 +751,7 @@ function upstreamBattleReceipt(){
   try{if(typeof activityHistory!=="undefined"&&Array.isArray(activityHistory)&&activityHistory!==p.activityHistory)activityHistory.push(record);}catch(_error){}
   return record;
 }
+function upstreamBattleReceipt(){return commitBattleOccurrenceReceipt("victory");}
 
 const PRE_COMPLETE_VICTORY=typeof completeBattleVictoryFromDamage==="function"?completeBattleVictoryFromDamage:null;
 if(PRE_COMPLETE_VICTORY){
@@ -783,6 +790,7 @@ if(PRE_COMPLETE_DEFEAT){
     if(defeatedParticipantId===MENMA_ID)s.menmaWithdrawn=true;
     s.terminalResult="defeat";
     s.inputLocked=true;
+    commitBattleOccurrenceReceipt("defeat");
     const result=PRE_COMPLETE_DEFEAT.call(this,defeatedParticipantId,envelope,reason);
     if(battle().outcome){
       battle().outcome.battleConfigId=BATTLE_CONFIG_ID;
@@ -879,7 +887,7 @@ if(PRE_RESTORE_TEST){
       const b=battle();
       b.menmaEvolvedPLBattle36900=normalizeState(savedState||b.menmaEvolvedPLBattle36900,sceneInstanceId(b));
       b.menma369LocalAllies={ [ANKO_ID]:makeAnkoParticipant() };
-      if(getBattleRemainingPL("player",ANKO_ID)<=0&&!b.menmaEvolvedPLBattle36900.ankoWithdrawn)setBattleRemainingPLRecord("player",ANKO_ID,ANKO_BASE_PL,ANKO_BASE_PL);
+      const ankoPLRecord=typeof getBattleRemainingPLRecord==="function"?getBattleRemainingPLRecord("player",ANKO_ID):null;\n      if(!ankoPLRecord&&!b.menmaEvolvedPLBattle36900.ankoWithdrawn)setBattleRemainingPLRecord("player",ANKO_ID,ANKO_BASE_PL,ANKO_BASE_PL);
       if(b.active&&!b.battleOver){
         settleSemanticLoop();
         try{openOverlay("combat");}catch(_error){}
@@ -912,6 +920,84 @@ function configureExactDeployment(){
   return{success:true};
 }
 function launchMenmaEvolvedPLBattle36900(context={}){
+  const menma=typeof getPlayerCharacter==="function"?getPlayerCharacter(MENMA_ID):null;
+  const altered=enemyDatabase&&enemyDatabase.test_subject_altered_shinobi;
+  const hostileParticipants=HOSTILE_IDS.map(id=>enemyDatabase&&enemyDatabase[id]).filter(Boolean);
+  if(!menma)return{success:false,reason:"academy_menma_origin_participant_missing"};
+  if(!altered||hostileParticipants.length!==HOSTILE_IDS.length)return{success:false,reason:"three_subject_opposition_authority_missing"};
+  const normalizedReturn=typeof normalizeBattleReturnContext==="function"?normalizeBattleReturnContext(context.returnContext||null):(context.returnContext||null);
+  if(context.returnContext&&typeof context.returnContext==="object"&&!normalizedReturn)return{success:false,reason:"battle_return_context_invalid"};
+
+  // Exact Origin launch: do not route through My Clan START. Menma's authored
+  // Story identity owns slot 1 for this one occurrence; this does not mutate My Clan.
+  selectedEnemy=altered;
+  const b=battle();
+  b.active=true;
+  b.battleId=createBattleInstanceId();
+  b.encounterId=ENCOUNTER_ID;
+  b.battleConfigId=BATTLE_CONFIG_ID;
+  b.objectiveId=OBJECTIVE_ID;
+  b.encounterOccurrenceId=null;
+  b.oppositionTemplateId=altered.id;
+  b.encounterStatePackageId=null;
+  b.characterId=MENMA_ID;
+  b.encounterEnemy=altered;
+  setBattleEnemyParticipants(hostileParticipants);
+  b.enemy=altered;
+  b.deployment={
+    player:{slots:createBattleDeploymentSlots([MENMA_ID,ANKO_ID])},
+    enemy:{slots:createBattleDeploymentSlots([...HOSTILE_IDS])},
+    transitionCounter:0,lastTransition:null
+  };
+  b.activePlayer=menma;
+  syncBattleActiveEnemyFromDeployment();
+  b.lastDamage=0;
+  b.battleOver=false;
+  b.completedAt=null;
+  b.claimedAt=null;
+  b.completionRecorded=false;
+  b.outcome=null;
+  b.defeat=null;
+  b.returnContext=normalizedReturn;
+  b.observerSafeResultContext=null;
+  b.unknownOperativeConfrontation=null;
+  b.mission7SanitisationEncounter=null;
+  b.mission5FemaleOperatorEncounter=null;
+  b.menma369LocalAllies={ [ANKO_ID]:makeAnkoParticipant() };
+  b.menmaEvolvedPLBattle36900=createState(context.active&&context.active.instanceId||sceneInstanceId(b));
+  b.battleLog=[
+    "Three altered test subjects move through the clearing.",
+    "Academy Menma takes Active. Special Jōnin Anko remains Benched as an autonomous assist."
+  ];
+  b.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],finishingShinobi:null,mvp:null};
+  b.enemyPower=calculateBattlePower(altered,"standard");
+  b.enemyMaxPower=b.enemyPower;
+
+  initializeBattleContributionRecordsFromDeployment();
+  initializeBattleSourcePackageRuntime();
+  initializeBattleRemainingPLFromDeployment({preserveExistingEnemyPower:true});
+  setBattleRemainingPLRecord("player",ANKO_ID,ANKO_BASE_PL,ANKO_BASE_PL);
+  initializeBattlePouchFromPreparedSelection();
+  initializeBattleAttachedSummonRuntimeFromDeployment();
+  initializeBattleDedicatedVariantRuntimePackages();
+  initializeBattleKisoganStartsActiveFromDeployment();
+
+  recordBattleEvidence({
+    eventType:"menma_evolved_pl_battle_started",committedOccurrence:true,
+    actorRef:createBattleParticipantRef("player",MENMA_ID),
+    targetRef:createBattleParticipantRef("enemy","test_subject_altered_shinobi"),
+    sourceRefs:[{type:"battle_config",id:BATTLE_CONFIG_ID},{type:"story_scene",id:STORY_SCENE_ID}],
+    data:{
+      battleConfigId:BATTLE_CONFIG_ID,encounterId:ENCOUNTER_ID,objectiveId:OBJECTIVE_ID,
+      alliedParticipantIds:[...ALLIED_IDS],hostileParticipantIds:[...HOSTILE_IDS],
+      playerSideStarts:true,plIdentity:"Battle PL",healthReplacement:false,
+      myClanStartBypassedForExactOriginOccurrence:true,myClanMutated:false
+    }
+  });
+  persistBattleSnapshot();
+  try{openOverlay("combat");}catch(_error){}
+  return{success:true,battleId:b.battleId,encounterId:ENCOUNTER_ID,battleConfigId:BATTLE_CONFIG_ID,objectiveId:OBJECTIVE_ID,battleOccurrenceId:battleOccurrenceId(b)};
+}){
   if(typeof launchBattleWithReturnContext!=="function")return{success:false,reason:"battle_launcher_missing"};
   const launched=launchBattleWithReturnContext("test_subject_altered_shinobi",ENCOUNTER_ID,context.returnContext||null);
   if(!launched||launched.success!==true)return launched||{success:false,reason:"battle_launch_failed"};
@@ -991,7 +1077,7 @@ function diagnostics(){
     staleTokenRejection:String(validateBattleActionEnvelope).includes("stale_side_opportunity_token")&&String(validateBattleActionEnvelope).includes("stale_battle_semantic_generation"),
     semanticLoopNoTimer:!source.includes("setTimeout")&&!source.includes("requestAnimationFrame")&&!source.includes("animationend"),
     menmaDefeatImmediate:String(handleBattleParticipantAtZeroPL).includes("academy_menma_withdrawn_before_objective"),
-    exactBattleReceipt:String(upstreamBattleReceipt).includes(BATTLE_OCCURRENCE_PREFIX)&&String(upstreamBattleReceipt).includes("resolvedHostileIds:[...HOSTILE_IDS]"),
+    exactBattleReceipt:String(commitBattleOccurrenceReceipt).includes(BATTLE_OCCURRENCE_PREFIX)&&String(commitBattleOccurrenceReceipt).includes("resolvedHostileIds:victory?[...HOSTILE_IDS]")&&String(completeBattleDefeat).includes('commitBattleOccurrenceReceipt("defeat")'),
     rewardAdapterPresent:!!globalThis.SC_ACADEMY_MENMA_THREE_SUBJECT_REWARD_36200,
     men03StableSource:typeof MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID==="undefined"||MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID==="combat_academy_menma_tutorial_performance_resolved",
     kakashiUntouched:!source.includes("academy_kakashi"),
