@@ -61,13 +61,26 @@ function registerStorySceneBoardDefinition(sceneId,definition){
 }
 function unregisterStorySceneBoardDefinition(sceneId){return registry.delete(String(sceneId||""));}
 function boardDefinition(sceneId){return registry.get(String(sceneId||""))||null;}
+function fallbackPerformanceSequenceForBeat33900(beat){
+  if(!beat)return null;
+  const choices=Array.isArray(beat.choices)?beat.choices:[];
+  const mode=String(beat.mode||"narration").toLowerCase();
+  if(mode==="choice"||mode==="battle_transition"||choices.length)return null;
+  const text=String(beat.text||"");
+  if(!text.trim()||!["narration","dialogue","record"].includes(mode))return null;
+  const cue={kind:mode,text};
+  const speaker=beat.speakerName||beat.speaker||beat.actorName||null;
+  if(mode==="dialogue"&&speaker)cue.speakerName=String(speaker);
+  return[cue];
+}
 function performanceSequenceFor(runtime=currentRuntime(),beat=currentBeat(runtime)){
   if(!runtime||!beat)return null;
-  const def=boardDefinition(runtime.sceneId),source=def&&def.performanceSequences;
-  if(!source)return null;
-  let seq=source[beat.beatId];
+  const def=boardDefinition(runtime.sceneId);if(!def)return null;
+  const source=def.performanceSequences;
+  let seq=source&&source[beat.beatId];
   if(typeof seq==="function")seq=seq({runtime,beat,context:runtime.localContext||{}});
-  return Array.isArray(seq)&&seq.length?seq:null;
+  if(Array.isArray(seq)&&seq.length)return seq;
+  return fallbackPerformanceSequenceForBeat33900(beat);
 }
 function performanceCursor(runtime=currentRuntime(),beat=currentBeat(runtime)){
   const seq=performanceSequenceFor(runtime,beat);
@@ -590,13 +603,14 @@ if(typeof document!=="undefined"){
 function runStorySceneBoard33900Diagnostics(){
   const checks={
     patchId:PATCH_ID==="story_scene_board_33900_2026_09_25_kakashi_exact_narration",
-    sharedKakashiBenchmarkPanels:installStyle.toString().includes("width:min(72%,980px)")&&installStyle.toString().includes("border-radius:16px")&&installStyle.toString().includes("padding:11px 15px 12px")&&String(updatePerformancePanel).includes("CLICK ANYWHERE TO CONTINUE")&&String(updatePerformancePanel).includes("sc-performance-progress-33900")&&String(updatePerformancePanel).includes("scHasChoices")&&installStyle.toString().includes(".sc-chronicle-primary{display:none!important}")&&installStyle.toString().includes('data-sc-has-choices="false"')&&installStyle.toString().includes('data-sc-cue-kind="dialogue"')&&installStyle.toString().includes("data-intent-icon"),
+    sharedKakashiBenchmarkPanels:String(installStyle).includes("width:min(72%,980px)!important")&&String(installStyle).includes("padding:11px 15px 12px!important")&&String(installStyle).includes("border-radius:16px!important")&&String(updatePerformancePanel).includes('hint.textContent="CLICK ANYWHERE TO CONTINUE"')&&String(updatePerformancePanel).includes("sc-performance-progress-33900")&&String(updatePerformancePanel).includes('primary.setAttribute("aria-hidden","true")'),
     sharedChoiceIntentClassifier:typeof storyChoiceIntentIcon33900==="function"&&["HELP HER","KEEP GOING","ASK ABOUT THE ROUTE","CONFRONT HIM"].every(label=>storyChoiceIntentIcon33900({label})!=="•"),
     cueLevelBackdropOverride:resolveBoardBackdropPath.toString().includes("resolveBackdrop")&&resolveBoardBackdropPath.toString().includes("performanceCursor"),
     compactLiveStateCallout:installStyle.toString().includes("width:max-content")&&installStyle.toString().includes("height:auto!important")&&installStyle.toString().includes("align-items:flex-start")&&installStyle.toString().includes("left:3.2%;right:auto"),
     reusableRegistry:typeof registerStorySceneBoardDefinition==="function"&&typeof unregisterStorySceneBoardDefinition==="function"&&typeof resolveStorySceneBoardProjection==="function",
     pendingRegistrationDrain:typeof drainPendingStorySceneBoardRegistrations33900==="function"&&pendingRegistrationDrain&&pendingRegistrationDrain.success===true,
     genericPerformanceLifecycle:typeof performanceSequenceFor==="function"&&typeof advanceStoryScene33900==="function"&&typeof performSceneCut==="function",
+    fallbackNarrationProjection:String(performanceSequenceFor).includes("fallbackPerformanceSequenceForBeat33900")&&Array.isArray(fallbackPerformanceSequenceForBeat33900({mode:"narration",text:"x"}))&&fallbackPerformanceSequenceForBeat33900({mode:"choice",text:"x",choices:[{choiceId:"x"}]})===null,
     sharedHardTransitionOwner:typeof playStoryHardSceneTransition33900==="function"&&typeof cancelStoryHardSceneTransition33900==="function"&&typeof getStoryHardSceneTransitionState33900==="function",
     documentCurtainOwnedHere:HARD_TRANSITION_CURTAIN_ID==="sc-story-hard-transition-33900"&&String(ensureStoryHardTransitionCurtain33900).includes("document.body.appendChild")&&installStyle.toString().includes("HARD_TRANSITION_CURTAIN_ID"),
     staleTransitionInvalidation:String(playStoryHardSceneTransition33900).includes('cancelStoryHardSceneTransition33900("superseded")')&&String(scheduleStoryHardTransition33900).includes("generation===hardTransitionGeneration"),
