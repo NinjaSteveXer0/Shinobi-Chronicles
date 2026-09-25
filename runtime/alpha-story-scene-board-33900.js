@@ -9,7 +9,7 @@
 "use strict";
 if(globalThis.SC_STORY_SCENE_BOARD_33900)return;
 
-const PATCH_ID="story_scene_board_33900_2026_09_25_origin_benchmark";
+const PATCH_ID="story_scene_board_33900_2026_09_25_kakashi_exact_narration";
 const STYLE_ID="sc-story-scene-board-33900-style";
 const PERFORMANCE_KEY="__storyPerformanceCursor33900";
 const HARD_TRANSITION_CURTAIN_ID="sc-story-hard-transition-33900";
@@ -280,17 +280,26 @@ function installStyle(){
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-master-frame{display:none!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-layout{position:relative;z-index:5;width:min(94%,1180px)!important;min-height:0!important;margin:0 0 1.2%!important;display:grid!important;grid-template-columns:1fr!important;gap:8px!important;padding:0!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-context{display:none!important;}
-#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-panel{position:relative;min-height:0!important;max-height:31vh;padding:13px 18px 12px!important;border:1px solid rgba(205,169,83,.62)!important;border-radius:14px!important;background:linear-gradient(180deg,rgba(3,9,14,.82),rgba(2,7,11,.94))!important;backdrop-filter:blur(8px);box-shadow:0 18px 45px rgba(0,0,0,.42)!important;overflow:visible!important;cursor:pointer;}
-#story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-story-panel{width:min(52%,650px)!important;border-color:rgba(103,221,230,.55)!important;background:linear-gradient(145deg,rgba(4,18,24,.94),rgba(2,9,14,.97))!important;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-panel{position:relative;min-height:0!important;box-sizing:border-box!important;overflow:visible!important;cursor:pointer;}
+/* Academy Kakashi Golden narration contract projected through the shared Story owner. */
+#story-scene-presentation-layer[data-sc-performance="true"]:not([data-sc-cue-kind="dialogue"]) .sc-chronicle-layout{width:100%!important;margin:0 0 3%!important;justify-items:center!important;}
+#story-scene-presentation-layer[data-sc-performance="true"]:not([data-sc-cue-kind="dialogue"]) .sc-story-panel{width:min(72%,980px)!important;min-height:0!important;max-height:none!important;display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;grid-template-rows:auto auto auto!important;column-gap:14px!important;padding:11px 15px 12px!important;border:1px solid rgba(93,215,225,.32)!important;border-radius:16px!important;background:linear-gradient(180deg,rgba(5,16,22,.88),rgba(2,9,14,.95))!important;box-shadow:0 18px 48px rgba(0,0,0,.46),inset 0 0 0 1px rgba(255,255,255,.025)!important;backdrop-filter:blur(8px);}
+#story-scene-presentation-layer[data-sc-performance="true"]:not([data-sc-cue-kind="dialogue"]) .sc-story-name{grid-column:1;grid-row:1;color:#e3bd5f!important;font-size:8px!important;font-weight:900!important;letter-spacing:.14em!important;text-transform:uppercase!important;min-height:11px!important;margin:0!important;line-height:normal!important;}
+#story-scene-presentation-layer[data-sc-performance="true"]:not([data-sc-cue-kind="dialogue"]) .sc-story-text{grid-column:1/-1;grid-row:2;margin-top:4px!important;max-height:8.5vh!important;overflow:auto!important;white-space:pre-wrap!important;color:#eef3f1!important;font-size:clamp(12px,.94vw,15px)!important;line-height:1.42!important;text-shadow:0 1px 2px #000;}
+#story-scene-presentation-layer[data-sc-performance="true"] .sc-performance-progress-33900{grid-column:2;grid-row:1;color:#71858c;font-size:8px;font-weight:900;letter-spacing:.08em;}
+#story-scene-presentation-layer[data-sc-performance="true"] .sc-performance-continue-hint-33900{grid-column:1/-1;grid-row:3;justify-self:end;margin-top:5px;color:#6fcfd8;font-size:7px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;opacity:.72;}
+#story-scene-presentation-layer[data-sc-performance="true"] .sc-story-kicker{display:none!important;}
+#story-scene-presentation-layer[data-sc-performance="true"] .sc-chronicle-primary{display:none!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-story-panel{width:min(52%,650px)!important;max-height:31vh!important;padding:13px 18px 12px!important;border:1px solid rgba(103,221,230,.55)!important;border-radius:16px!important;background:linear-gradient(145deg,rgba(4,18,24,.94),rgba(2,9,14,.97))!important;box-shadow:0 18px 48px rgba(0,0,0,.48),0 0 22px rgba(78,210,220,.08)!important;backdrop-filter:blur(8px);}
 #story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="player"] .sc-chronicle-layout{justify-items:start!important;}
 #story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-chronicle-layout{justify-items:end!important;}
-#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-panel{border-color:rgba(218,176,77,.58)!important;background:linear-gradient(145deg,rgba(25,18,6,.93),rgba(8,10,12,.97))!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-panel{border-color:rgba(218,176,77,.58)!important;background:linear-gradient(145deg,rgba(25,18,6,.93),rgba(8,10,12,.97))!important;box-shadow:0 18px 48px rgba(0,0,0,.48),0 0 22px rgba(218,176,77,.08)!important;}
 #story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-story-panel::after{content:"";position:absolute;top:-8px;left:22%;width:14px;height:14px;transform:translateX(-50%) rotate(45deg);border-left:1px solid rgba(103,221,230,.5);border-top:1px solid rgba(103,221,230,.5);background:rgba(2,9,14,.97);}
 #story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-panel::after{left:78%;border-color:rgba(218,176,77,.52);background:rgba(8,10,12,.97);}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-story-text{margin-top:5px!important;color:#f0f4f1!important;font-size:clamp(12px,.96vw,16px)!important;line-height:1.42!important;text-shadow:0 1px 2px #000;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-story-name{color:#78dfe7!important;font-size:8px!important;font-weight:900!important;letter-spacing:.15em!important;text-transform:uppercase!important;margin:0!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-name{color:#e5c66f!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-portrait{display:none!important;}
-#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-text{margin-top:6px!important;font-size:clamp(13px,1.05vw,17px)!important;line-height:1.42!important;}
-#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-name{font-size:11px!important;margin:0 0 2px!important;color:#e8c86e!important;font-weight:900!important;letter-spacing:.12em!important;text-transform:uppercase!important;line-height:1.15!important;}
-#story-scene-presentation-layer[data-sc-performance="true"] .sc-chronicle-primary{width:34px!important;height:30px!important;min-height:0!important;padding:0!important;font-size:20px!important;line-height:1!important;float:right;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-actions{margin-top:9px!important;gap:7px!important;}
 #story-scene-presentation-layer[data-sc-scene-mode="encounter"] .sc-chronicle-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-choice{position:relative;min-height:42px;align-items:center;border-radius:10px!important;padding-left:38px!important;background:linear-gradient(180deg,rgba(14,24,30,.93),rgba(7,14,19,.96))!important;border-color:rgba(207,169,76,.68)!important;}
@@ -367,7 +376,13 @@ function boardMarkup(projection){
 function clearBoard(layer){if(!layer)return;try{delete layer.dataset.scSceneBoard;delete layer.dataset.scSceneMode;delete layer.dataset.scPerformance;}catch(_error){};for(const node of layer.querySelectorAll?layer.querySelectorAll(".sc-scene-board-33900"):[]){if(typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(node,"scene_board_teardown");if(node&&typeof node.remove==="function")node.remove();}}
 function updatePerformancePanel(layer,runtime=currentRuntime()){
   if(!layer||!runtime)return false;const beat=currentBeat(runtime),p=performanceCursor(runtime,beat);
-  if(!p){delete layer.dataset.scPerformance;delete layer.dataset.scCueKind;delete layer.dataset.scCueSpeakerSide;return false;}
+  if(!p){
+    delete layer.dataset.scPerformance;delete layer.dataset.scCueKind;delete layer.dataset.scCueSpeakerSide;
+    const kicker=layer.querySelector&&layer.querySelector(".sc-story-kicker");if(kicker)kicker.style.removeProperty("display");
+    for(const node of layer.querySelectorAll?layer.querySelectorAll(".sc-performance-progress-33900,.sc-performance-continue-hint-33900"):[])node.remove();
+    const primary=layer.querySelector&&layer.querySelector(".sc-chronicle-primary");if(primary){primary.removeAttribute("aria-hidden");primary.removeAttribute("tabindex");}
+    return false;
+  }
   layer.dataset.scPerformance="true";const cue=p.cue||{};
   layer.dataset.scCueKind=String(cue.kind||"narration");
   if(cue.kind==="dialogue"){
@@ -381,12 +396,20 @@ function updatePerformancePanel(layer,runtime=currentRuntime()){
   const panel=layer.querySelector&&layer.querySelector(".sc-story-panel");
   let name=layer.querySelector&&layer.querySelector(".sc-story-name");
   const dialogueSpeaker=cue.kind==="dialogue"?String(cue.speakerName||cue.speaker||""):"";
-  const speakerLabel=dialogueSpeaker||(cue.kind==="record"?"SHINOBI RECORD":"NARRATION");
+  const speakerLabel=dialogueSpeaker||(cue.kind==="record"?"CHRONICLE RECEIPT":"NARRATION");
   if(!name&&panel){name=document.createElement("div");name.className="sc-story-name sc-performance-name-33900";}
   if(name&&panel&&!panel.contains(name)){const t=panel.querySelector(".sc-story-text");panel.insertBefore(name,t||null);}
   if(name){if(name.textContent!==speakerLabel)name.textContent=speakerLabel;name.style.display="block";}
-  const kicker=layer.querySelector&&layer.querySelector(".sc-story-kicker");const kickerText=String(cue.kind||"narration").toUpperCase();if(kicker&&kicker.textContent!==kickerText)kicker.textContent=kickerText;
-  const primary=layer.querySelector&&layer.querySelector(".sc-chronicle-primary");if(primary){if(primary.textContent!=="›")primary.textContent="›";primary.setAttribute("aria-label","Advance scene");primary.title="Advance scene";}
+  const kicker=layer.querySelector&&layer.querySelector(".sc-story-kicker");if(kicker)kicker.style.display="none";
+  let progress=panel&&panel.querySelector(".sc-performance-progress-33900");
+  if(panel&&!progress){progress=document.createElement("div");progress.className="sc-performance-progress-33900";panel.appendChild(progress);}
+  const progressText=`${Math.min(p.index+1,Math.max(1,p.sequence.length))} / ${Math.max(1,p.sequence.length)}`;
+  if(progress){if(progress.textContent!==progressText)progress.textContent=progressText;progress.hidden=cue.kind==="dialogue";}
+  let hint=panel&&panel.querySelector(".sc-performance-continue-hint-33900");
+  if(panel&&!hint){hint=document.createElement("div");hint.className="sc-performance-continue-hint-33900";hint.setAttribute("aria-hidden","true");hint.textContent="CLICK ANYWHERE TO CONTINUE";panel.appendChild(hint);}
+  const hasChoices=!!(beat&&(beat.mode==="choice"||(Array.isArray(beat.choices)&&beat.choices.length)));
+  if(hint)hint.hidden=cue.kind==="dialogue"||hasChoices;
+  const primary=layer.querySelector&&layer.querySelector(".sc-chronicle-primary");if(primary){primary.setAttribute("aria-hidden","true");primary.setAttribute("tabindex","-1");}
   return true;
 }
 function decorateStoryChoices33900(layer,runtime=currentRuntime()){
@@ -564,8 +587,8 @@ if(typeof document!=="undefined"){
 
 function runStorySceneBoard33900Diagnostics(){
   const checks={
-    patchId:PATCH_ID==="story_scene_board_33900_2026_09_25_origin_benchmark",
-    sharedKakashiBenchmarkPanels:installStyle.toString().includes("border-radius:14px")&&installStyle.toString().includes('data-sc-cue-kind="dialogue"')&&installStyle.toString().includes("data-intent-icon"),
+    patchId:PATCH_ID==="story_scene_board_33900_2026_09_25_kakashi_exact_narration",
+    sharedKakashiBenchmarkPanels:installStyle.toString().includes("width:min(72%,980px)")&&installStyle.toString().includes("border-radius:16px")&&installStyle.toString().includes("padding:11px 15px 12px")&&installStyle.toString().includes("CLICK ANYWHERE TO CONTINUE")===false&&String(updatePerformancePanel).includes("CLICK ANYWHERE TO CONTINUE")&&String(updatePerformancePanel).includes("sc-performance-progress-33900")&&installStyle.toString().includes(".sc-chronicle-primary{display:none!important}")&&installStyle.toString().includes('data-sc-cue-kind="dialogue"')&&installStyle.toString().includes("data-intent-icon"),
     sharedChoiceIntentClassifier:typeof storyChoiceIntentIcon33900==="function"&&["HELP HER","KEEP GOING","ASK ABOUT THE ROUTE","CONFRONT HIM"].every(label=>storyChoiceIntentIcon33900({label})!=="•"),
     cueLevelBackdropOverride:resolveBoardBackdropPath.toString().includes("resolveBackdrop")&&resolveBoardBackdropPath.toString().includes("performanceCursor"),
     compactLiveStateCallout:installStyle.toString().includes("width:max-content")&&installStyle.toString().includes("height:auto!important")&&installStyle.toString().includes("align-items:flex-start")&&installStyle.toString().includes("left:3.2%;right:auto"),
