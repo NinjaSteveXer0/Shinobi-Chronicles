@@ -245,7 +245,7 @@ function getStoryChoreographyState33900(root){
   return{active:!!controller,scopeKey:controller&&controller.scopeKey||root&&root.dataset&&root.dataset.scChoreographyScope||null,cueIndex:controller?controller.cueIndex:null,state:root&&root.dataset&&root.dataset.scChoreographyState||"settled",lastKinds,completedKinds};
 }
 
-function requestedAssetIdFromBeat(beat){const ref=beat&&beat.environmentRef;return typeof ref==="string"?ref:ref&&typeof ref==="object"&&ref.assetId?String(ref.assetId):null;}
+function requestedAssetIdFromBeat(beat){const ref=beat&&beat.environmentRef;return typeof ref==="string"?ref:ref&&typeof ref==="object"?(ref.assetId?String(ref.assetId):ref.environmentId?String(ref.environmentId):null):null;}
 function resolveBoardBackdropPath(runtime=currentRuntime(),beat=currentBeat(runtime)){
   const def=sceneDefinition(runtime),board=runtime?boardDefinition(runtime.sceneId):null;
   let assetId=null;
