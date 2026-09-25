@@ -270,7 +270,7 @@ function applyBoardBackdrop(stage,runtime=currentRuntime()){
 function installStyle(){
   if(typeof document==="undefined"||!document.head||document.getElementById(STYLE_ID))return false;
   const style=document.createElement("style");style.id=STYLE_ID;style.textContent=`
-#story-scene-presentation-layer[data-sc-presentation-hidden="true"]{display:none!important;pointer-events:none!important;}\n#story-scene-presentation-layer[data-sc-scene-board="true"]{background:transparent!important;}
+#story-scene-presentation-layer[data-sc-presentation-hidden="true"]{display:none!important;pointer-events:none!important;}\n#story-scene-presentation-layer[data-sc-scene-board="true"]{background:#030b10!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-environment{z-index:0!important;filter:saturate(1.04) brightness(.94);}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-environment-scrim{z-index:1!important;background:linear-gradient(180deg,rgba(2,5,8,.02),rgba(2,5,8,.06) 48%,rgba(2,5,8,.50) 84%,rgba(2,5,8,.76))!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-stage{width:min(100vw,calc(100vh * 1.7777778))!important;max-width:none!important;aspect-ratio:16/9!important;overflow:hidden;z-index:2!important;}
