@@ -887,7 +887,8 @@ if(PRE_RESTORE_TEST){
       const b=battle();
       b.menmaEvolvedPLBattle36900=normalizeState(savedState||b.menmaEvolvedPLBattle36900,sceneInstanceId(b));
       b.menma369LocalAllies={ [ANKO_ID]:makeAnkoParticipant() };
-      const ankoPLRecord=typeof getBattleRemainingPLRecord==="function"?getBattleRemainingPLRecord("player",ANKO_ID):null;\n      if(!ankoPLRecord&&!b.menmaEvolvedPLBattle36900.ankoWithdrawn)setBattleRemainingPLRecord("player",ANKO_ID,ANKO_BASE_PL,ANKO_BASE_PL);
+      const ankoPLRecord=typeof getBattleRemainingPLRecord==="function"?getBattleRemainingPLRecord("player",ANKO_ID):null;
+      if(!ankoPLRecord&&!b.menmaEvolvedPLBattle36900.ankoWithdrawn)setBattleRemainingPLRecord("player",ANKO_ID,ANKO_BASE_PL,ANKO_BASE_PL);
       if(b.active&&!b.battleOver){
         settleSemanticLoop();
         try{openOverlay("combat");}catch(_error){}
