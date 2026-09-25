@@ -775,7 +775,9 @@
         lastTransitionCounter:Number(currentBattle.deployment&&currentBattle.deployment.transitionCounter)||0,
         playbackToken:0,
         terminalExposed:false,
-        terminalNavigationConsumed:false
+        terminalNavigationConsumed:false,
+        terminalHardSettled:false,
+        terminalWatchdogScheduled:false
       };
       currentBattle.presentation33000=state;
     }
@@ -900,7 +902,30 @@
     stage.dataset.playerFormationCount=String(player.length);
     stage.dataset.enemyFormationCount=String(enemy.length);
     stage.dataset.formationMode=Math.max(player.length,enemy.length)<=1?"duel":Math.max(player.length,enemy.length)>=4?"arc":"wedge";
-    return{playerCount:player.length,enemyCount:enemy.length};
+
+    const projectActivePL=(side,row)=>{
+      if(!row)return;
+      const node=stage.querySelector(".battle-live-power-"+side);
+      if(!node)return;
+      const current=Number.isFinite(Number(row.remainingPL))?Number(row.remainingPL):0;
+      const maximum=Number.isFinite(Number(row.maximumPL))?Number(row.maximumPL):0;
+      const strong=node.querySelector("strong");
+      const span=node.querySelector("span");
+      if(strong)strong.textContent=String(current);
+      if(span)span.textContent="/ "+String(maximum)+" PL";
+      node.dataset.presentationParticipantId=String(row.participantId||"");
+      node.dataset.presentationRemainingPL=String(current);
+      node.dataset.presentationMaximumPL=String(maximum);
+    };
+    projectActivePL("player",playerActive);
+    projectActivePL("enemy",enemyActive);
+
+    return{
+      playerCount:player.length,
+      enemyCount:enemy.length,
+      playerActivePL:playerActive?playerActive.remainingPL:null,
+      enemyActivePL:enemyActive?enemyActive.remainingPL:null
+    };
   }
   window.projectFormationSnapshot33000=projectFormationSnapshot33000;
 
@@ -1074,6 +1099,25 @@
     if(!state||state.current||state.queue.length>0||!currentBattle)return false;
     const pending=String(currentBattle.presentationTerminalPending||"");
     if(!pending||state.terminalNavigationConsumed)return false;
+
+    const terminalReceiptExposed=state.exposedReceipts.some(receipt=>
+      receipt&&receipt.terminalAtCommit===true&&receipt.exposureFinished===true
+    );
+    if(!terminalReceiptExposed&&state.terminalHardSettled!==true){
+      if(!state.terminalWatchdogScheduled){
+        state.terminalWatchdogScheduled=true;
+        const battleId=state.battleId;
+        setTimeout(()=>{
+          const live=ensureBattlePresentationQueueState33000();
+          if(!live||live.battleId!==battleId||live.terminalNavigationConsumed)return;
+          if(String(currentBattle&&currentBattle.presentationTerminalPending||"")){
+            hardSettleBattlePresentation33000("terminal_presentation_watchdog");
+          }
+        },8000);
+      }
+      return false;
+    }
+
     state.terminalExposed=true;
     state.terminalNavigationConsumed=true;
     currentBattle.presentationTerminalPending=null;
@@ -1101,6 +1145,7 @@
       if(receipt)state.exposedReceipts.push({...cloneBattlePresentationValue33000(receipt),exposureStarted:true,exposureFinished:true,hardSettled:true,hardSettleReason:reason});
     }
     state.current=null;state.queue=[];state.playbackToken=(Number(state.playbackToken)||0)+1;
+    if(String(currentBattle&&currentBattle.presentationTerminalPending||""))state.terminalHardSettled=true;
     const stage=typeof document!=="undefined"?document.querySelector(".alpha-code-battle-stage"):null;
     if(stage){
       stage.dataset.presentationBusy="false";
@@ -1126,7 +1171,9 @@
       exposedReceipts:state.exposedReceipts,
       staleRejectedKeys:state.staleRejectedKeys,
       terminalExposed:state.terminalExposed,
-      terminalNavigationConsumed:state.terminalNavigationConsumed
+      terminalNavigationConsumed:state.terminalNavigationConsumed,
+      terminalHardSettled:state.terminalHardSettled,
+      terminalWatchdogScheduled:state.terminalWatchdogScheduled
     });
   }
   window.getBattlePresentationQueueState33000=getBattlePresentationQueueState33000;
