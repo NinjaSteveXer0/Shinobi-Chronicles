@@ -1,0 +1,71 @@
+name: Obito Story Presentation Installed Browser
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'game.js'
+      - 'runtime/alpha-origin-scenes-32900-core.js'
+      - 'runtime/alpha-origin-scenes-32900-c.js'
+      - 'runtime/alpha-story-scene-board-33900.js'
+      - 'runtime/alpha-origin-browser-realisation-33500.js'
+      - 'runtime/alpha-origin-screen-first-33700.js'
+      - 'runtime/alpha-browser-onboarding-fixes-33400.js'
+      - 'tools/qa_obito_story_presentation_browser.js'
+      - 'tools/browser_runtime_error_gate_311.js'
+      - '.github/workflows/obito-story-presentation-browser.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  installed-browser-obito-story:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Source syntax
+        run: |
+          node --check runtime/alpha-origin-scenes-32900-c.js
+          node --check runtime/alpha-story-scene-board-33900.js
+          node --check tools/qa_obito_story_presentation_browser.js
+      - name: Run Obito 32-route semantic matrix
+        run: node tools/qa_issue_331_obito_final_runtime.js
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start local Alpha server
+        run: |
+          python3 -m http.server 8080 > /tmp/obito-story-http.log 2>&1 &
+          echo $! > /tmp/obito-story-http.pid
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/obito-story-http.log
+          exit 1
+      - name: Run installed-browser Obito Story presentation matrix
+        env:
+          OBITO_STORY_BASE_URL: http://127.0.0.1:8080/index.html
+          OBITO_STORY_BROWSER_OUT: artifacts/obito-story-presentation-browser
+        run: xvfb-run -a node tools/qa_obito_story_presentation_browser.js
+      - name: Preserve server log
+        if: always()
+        run: |
+          mkdir -p artifacts/obito-story-presentation-browser
+          cp /tmp/obito-story-http.log artifacts/obito-story-presentation-browser/http-server.log || true
+      - name: Upload installed-browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: obito-story-presentation-installed-browser-evidence
+          path: artifacts/obito-story-presentation-browser
+          if-no-files-found: warn
