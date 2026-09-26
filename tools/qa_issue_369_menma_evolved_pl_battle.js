@@ -58,8 +58,8 @@ assert(runtime.includes('eventType:"skill_action_completed"'),"Guest Ally action
 assert(runtime.includes('guestAllyPlayerChosen:true')&&runtime.includes("men03Eligible:false"),"Anko player choice / MEN-03 exclusion evidence missing");
 assert(runtime.includes('phase:"player"')&&runtime.includes('phaseOrder:Object.freeze(["player","enemy"])'),"current-Active alternating phase model missing");
 assert(!runtime.includes("commitScriptedAnkoPhase"),"superseded forced Anko phase resolver still present");
-assert(!operationalRuntime.includes('phase:"scripted_a"')&&!operationalRuntime.includes('phase:"scripted_b"'),"superseded scripted phase state still present");
 const operationalRuntime=runtime.slice(0,runtime.indexOf("function diagnostics(){"));
+assert(!operationalRuntime.includes('phase:"scripted_a"')&&!operationalRuntime.includes('phase:"scripted_b"'),"superseded scripted phase state still present");
 assert(!operationalRuntime.includes("authored_scripted_takedown"),"forced scripted takedown action still present");
 
 assert(runtime.includes("presentation_pending_withdrawal"),"0-PL relay must wait for visible action settle");
