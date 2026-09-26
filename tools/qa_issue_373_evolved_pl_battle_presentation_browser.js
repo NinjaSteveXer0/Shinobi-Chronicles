@@ -282,6 +282,10 @@ async function boot(page){
 
     await gate.assertClean("issue-373-evolved-battle-presentation");
 
+    const playerFacingBodyText=await page.evaluate(()=>document.body.innerText||"");
+    assert(!playerFacingBodyText.includes("COMMITTED ZERO WAITING FOR PRESENTATION"),"internal pending-zero state leaked player-facing");
+    assert(!playerFacingBodyText.includes("AUTHORED ANKO TAKEDOWN"),"internal scripted readiness reason leaked player-facing");
+
     const summary={
       pass:true,
       issue:373,
@@ -301,7 +305,8 @@ async function boot(page){
         menmaThenUnstableSequentialPlayback:true,
         noAlteredOrBruteOrdinaryTurns:true,
         phaseCInputRestores:true,
-        browserErrorGateClean:true
+        browserErrorGateClean:true,
+        internalStateLabelsHidden:true
       },
       stephenVisualAcceptance:"PENDING",
       battleGoldenClaimed:false
