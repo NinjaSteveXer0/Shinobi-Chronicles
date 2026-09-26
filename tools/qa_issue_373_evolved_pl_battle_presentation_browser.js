@@ -202,6 +202,13 @@ async function boot(page){
   try{
     await boot(page);
 
+    // The real front door intentionally churns portrait previews while the
+    // player moves through selection/onboarding. Those aborted preview image
+    // requests are not Battle runtime failures. Start the #373 error gate at
+    // the actual installed Battle checkpoint so every subsequent event belongs
+    // to the surface this proof is validating.
+    await gate.reset();
+
     // Phase A must be a readable Anko -> Altered action while Altered remains
     // the visible Active target at committed 0 PL.
     await page.waitForFunction(({ANKO,ALTERED})=>{
