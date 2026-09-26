@@ -48,6 +48,13 @@ assert(menma.includes("unstable_phase_c_action"),"Unstable ordinary Phase-C acti
 assert(menma.includes("men03Eligible:false")&&menma.includes('men03Scope:"phase_c_only"'),"scripted A/B not excluded from MEN-03");
 assert(menma.includes('tutorialResult:"not_completed"')&&menma.includes("performanceBucket:null"),"failure continuation can fabricate a LOW bucket");
 assert(!menma.includes("menma_origin_anko_autonomous_assist"),"superseded Anko assist entitlement survived successor rewrite");
+assert(menma.includes("savedExactSuccessorSnapshot=true"),"real-player saved successor identity is not detected before base restore");
+assert(
+  menma.indexOf("b.battleConfigId=BATTLE_CONFIG_ID;")<menma.indexOf("const result=PRE_RESTORE_TEST.apply(this,arguments);"),
+  "BattleConfig identity is not seeded before generic restore; legacy Menma-first deployment can bypass successor guards"
+);
+assert(menma.includes('phaseC?[MENMA_ID,ANKO_ID]:[ANKO_ID,MENMA_ID]'),"restored allied Active slot is not rebuilt from successor semantic phase");
+assert(menma.includes("b.environmentPath=BATTLE_ENVIRONMENT_PATH")&&menma.includes("b.presentationEnvironmentPath=BATTLE_ENVIRONMENT_PATH"),"restored successor does not rebind forest presentation authority");
 
 const checks={
   syntax:true,
@@ -69,7 +76,10 @@ const checks={
   pairedMenmaUnstableHandoff:true,
   men03PhaseCOnly:true,
   failureNoFakeLow:true,
-  oldAssistCadenceRemoved:true
+  oldAssistCadenceRemoved:true,
+  legacyRestoreSeedsExactSuccessorIdentity:true,
+  legacyMenmaFirstDeploymentRejected:true,
+  restoredForestAuthorityRebound:true
 };
 
 console.log(JSON.stringify({pass:true,issue:373,checks,browserGoldenClaimed:false,stephenVisualAcceptance:"PENDING"},null,2));
