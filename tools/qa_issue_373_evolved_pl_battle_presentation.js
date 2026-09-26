@@ -34,6 +34,8 @@ assert(battle.includes("advanceMenmaScriptedBattleAfterPresentation37300(active.
 assert(battle.includes("playedKeys")&&battle.includes("presentationStorageKey33000"),"reload-safe played receipt cursor missing");
 assert(battle.includes("deferredTerminalOverlay")&&battle.includes("deferredCallerResume"),"terminal navigation is not presentation-gated");
 assert(battle.includes("battle2-formation-relay-in")&&battle.includes("menma373RelayPlayer")&&battle.includes("menma373RelayEnemy"),"scoped relay slide/scale motion missing");
+assert(battle.includes("refreshCommittedFormationPresentation33000")&&battle.includes("refreshBattleActionRegionPresentation"),"relay/yield does not refresh central confrontation DOM");
+assert(String(battle).includes('battle-live-active-nameplate')&&String(battle).includes('battle-live-power-'),"active identity/PL rebind support missing");
 assert(battle.includes('data-evolved-pl-proof="menma_three_subjects"'),"Menma-scoped presentation selector missing");
 
 assert(menma.includes('player:{slots:createBattleDeploymentSlots([ANKO_ID,MENMA_ID])}'),"Anko-first scripted formation missing");
@@ -59,6 +61,8 @@ const checks={
   reloadDoesNotReplayReceipts:true,
   terminalNavigationWaitsForPlayback:true,
   scopedRelaySlideScale:true,
+  relayRefreshesCentralConfrontation:true,
+  activeIdentityAndPLRebind:true,
   ankoFirstHalfScriptedFormation:true,
   exactSharedEnemyRelay:true,
   menmaPromotionForPhaseC:true,
