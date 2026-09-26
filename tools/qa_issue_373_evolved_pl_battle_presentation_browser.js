@@ -137,6 +137,66 @@ async function stageSnapshot(page){
   });
 }
 
+
+async function waitForPresentationIdle(page){
+  await page.waitForFunction(()=>{
+    const stage=document.querySelector(".alpha-code-battle-stage");
+    return !!stage&&stage.dataset.presentationQueueBusy!=="true";
+  },null,{timeout:15000});
+}
+
+async function openSkillsTray(page){
+  const stage=page.locator(".alpha-code-battle-stage");
+  const button=stage.locator('button[data-formation-family="skills"]').first();
+  await button.waitFor({state:"visible",timeout:10000});
+  const tray=stage.locator(".battle-live-skill-deck");
+  if(await tray.count()===0||!(await tray.isVisible().catch(()=>false))){
+    await button.click();
+  }
+  await stage.locator(".battle-live-skill-deck").waitFor({state:"visible",timeout:10000});
+}
+
+async function useVisibleSkill(page,skillId,displayName){
+  await openSkillsTray(page);
+  const stage=page.locator(".alpha-code-battle-stage");
+  let card=stage.locator('.battle-live-skill-deck .battle-dev-skill-card[data-skill-id="'+skillId+'"]').first();
+  if(await card.count()===0){
+    card=stage.locator(".battle-live-skill-deck .battle-dev-skill-card",{hasText:displayName}).first();
+  }
+  await card.waitFor({state:"visible",timeout:10000});
+  await card.click();
+  const use=stage.locator(".battle-live-use-skill").first();
+  await use.waitFor({state:"visible",timeout:10000});
+  await use.click();
+}
+
+async function waitForActionPresentation(page,{actor,target,label,afterOrdinal=0}){
+  const handle=await page.waitForFunction(({actor,target,label,afterOrdinal})=>{
+    const stage=document.querySelector(".alpha-code-battle-stage");
+    if(!stage||
+      stage.dataset.presentationActorId!==actor||
+      stage.dataset.presentationTargetId!==target||
+      stage.dataset.presentationQueueBusy!=="true"||
+      Number(stage.dataset.presentationSequenceOrdinal||0)<=afterOrdinal)return false;
+    const actionText=stage.querySelector(".battle2-performance-center strong")?.textContent?.trim()||"";
+    if(label&&actionText!==label)return false;
+    return{
+      ordinal:Number(stage.dataset.presentationSequenceOrdinal||0),
+      actor:stage.dataset.presentationActorId||null,
+      target:stage.dataset.presentationTargetId||null,
+      role:stage.dataset.presentationActionRole||null,
+      actionText,
+      actorNodes:stage.querySelectorAll(".battle2-performance-role-actor").length,
+      targetNodes:stage.querySelectorAll(".battle2-performance-role-target").length,
+      damage:Number(stage.dataset.presentationDamage||0),
+      beforePL:stage.dataset.presentationBeforePl===""?null:Number(stage.dataset.presentationBeforePl),
+      afterPL:stage.dataset.presentationAfterPl===""?null:Number(stage.dataset.presentationAfterPl),
+      resultText:stage.querySelector(".battle2-performance-result-chip")?.innerText?.replace(/\s+/g," ").trim()||""
+    };
+  },{actor,target,label,afterOrdinal},{timeout:15000});
+  return handle.jsonValue();
+}
+
 async function boot(page){
   await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});
   await page.waitForFunction(()=>typeof getRuntimeBuildFingerprint==="function"&&typeof runIssue369MenmaEvolvedPLBattleDiagnostics==="function"&&typeof runAlphaBattleModern33000Diagnostics==="function",null,{timeout:30000});
@@ -209,175 +269,149 @@ async function boot(page){
     // to the surface this proof is validating.
     await gate.reset();
 
-    // Phase A must be a readable Anko -> Altered action while Altered remains
-    // the visible Active target at committed 0 PL.
-    await page.waitForFunction(({ANKO,ALTERED})=>{
-      const stage=document.querySelector(".alpha-code-battle-stage");
-      return stage?.dataset.presentationActorId===ANKO&&stage?.dataset.presentationTargetId===ALTERED;
-    },{ANKO,ALTERED},{timeout:12000});
+    // Opening formation is player-actionable Guest Ally Anko. Nothing should
+    // auto-fire on Battle entry.
+    await waitForPresentationIdle(page);
+    const opening=await stageSnapshot(page);
+    assert.strictEqual(opening.environment,"forest_clearing_day");
+    assert.strictEqual(opening.proof,"menma_three_subjects");
+    assert(opening.background.includes("forest_clearing_day.png"),"forest backdrop absent");
+    assert.strictEqual(opening.playerCount,2);
+    assert.strictEqual(opening.enemyCount,3);
+    assert.strictEqual(opening.activePlayerId,ANKO);
+    assert.strictEqual(opening.activeEnemyId,ALTERED);
+    assert(opening.authorityPortraits.anko&&opening.activePlayerSrc===opening.authorityPortraits.anko,"Anko active portrait absent/wrong");
+    assert(opening.authorityPortraits.altered&&opening.activeEnemySrc===opening.authorityPortraits.altered,"Altered active portrait absent/wrong");
+    assert.strictEqual(opening.activePlayerFrameless,"true");
+    assert.strictEqual(opening.activeEnemyFrameless,"true");
+    const menmaSupport=opening.playerSupports.find(x=>x.id===MENMA);
+    const bruteSupport=opening.enemySupports.find(x=>x.id===BRUTE);
+    const unstableSupport=opening.enemySupports.find(x=>x.id===UNSTABLE);
+    assert(menmaSupport&&opening.authorityPortraits.menma&&menmaSupport.src===opening.authorityPortraits.menma,"Menma support portrait absent/wrong");
+    assert(bruteSupport&&opening.authorityPortraits.brute&&bruteSupport.src===opening.authorityPortraits.brute,"Brute support portrait absent/wrong");
+    assert(unstableSupport&&opening.authorityPortraits.unstable&&unstableSupport.src===opening.authorityPortraits.unstable,"Unstable support portrait absent/wrong");
 
-    const a=await stageSnapshot(page);
-    assert.strictEqual(a.environment,"forest_clearing_day");
-    assert.strictEqual(a.proof,"menma_three_subjects");
-    assert(a.background.includes("forest_clearing_day.png"),"forest backdrop absent");
-    assert.strictEqual(a.playerCount,2);
-    assert.strictEqual(a.enemyCount,3);
-    assert.strictEqual(a.activePlayerId,ANKO);
-    assert.strictEqual(a.activeEnemyId,ALTERED);
-    assert(a.authorityPortraits.anko&&a.activePlayerSrc===a.authorityPortraits.anko,"Anko active portrait absent/wrong");
-    assert(a.authorityPortraits.altered&&a.activeEnemySrc===a.authorityPortraits.altered,"Altered active portrait absent/wrong");
-    assert.strictEqual(a.activePlayerFrameless,"true");
-    assert.strictEqual(a.activeEnemyFrameless,"true");
-    const menmaSupport=a.playerSupports.find(x=>x.id===MENMA);
-    const bruteSupport=a.enemySupports.find(x=>x.id===BRUTE);
-    const unstableSupport=a.enemySupports.find(x=>x.id===UNSTABLE);
-    assert(menmaSupport&&a.authorityPortraits.menma&&menmaSupport.src===a.authorityPortraits.menma,"Menma support portrait absent/wrong");
-    assert(bruteSupport&&a.authorityPortraits.brute&&bruteSupport.src===a.authorityPortraits.brute,"Brute support portrait absent/wrong");
-    assert(unstableSupport&&a.authorityPortraits.unstable&&unstableSupport.src===a.authorityPortraits.unstable,"Unstable support portrait absent/wrong");
-    assert.strictEqual(a.presentation.busy,"true");
-    assert.strictEqual(a.presentation.actor,ANKO);
-    assert.strictEqual(a.presentation.target,ALTERED);
-    assert.strictEqual(a.presentation.role,"AUTHORED BEAT");
-    assert.strictEqual(a.presentation.actorNodes,1,"Phase A projected more than one actor");
-    assert.strictEqual(a.presentation.targetNodes,1,"Phase A projected more than one target");
-    assert.strictEqual(a.presentation.actionText,"Hidden Shadow Snake Hands");
-    assert.strictEqual(a.presentation.damage,18,"Phase A damage counter did not expose committed damage");
-    assert.strictEqual(a.presentation.beforePL,11,"Phase A PL-before readout mismatch");
-    assert.strictEqual(a.presentation.afterPL,0,"Phase A PL-after readout mismatch");
-    assert(a.presentation.resultText.includes("WITHDRAWAL"),"Phase A did not identify 0 PL as withdrawal");
-    assert(a.presentation.resultText.includes("18 DAMAGE"),"Phase A damage feedback missing");
-    assert(a.presentation.resultText.includes("PL 11 → 0"),"Phase A PL transition feedback missing");
-    await page.screenshot({path:path.join(OUT,"01-phase-a-anko-altered.png"),fullPage:false,timeout:12000});
+    await openSkillsTray(page);
+    const ankoDeck=await stageSnapshot(page);
+    for(const label of ["Hidden Shadow Snake Hands","Snake Bind","Fire Style: Dragon Flame","Serpent Evasion"]){
+      assert(ankoDeck.skillDeckText.includes(label),"Anko Guest Ally palette missing "+label);
+    }
+    assert(!ankoDeck.skillDeckText.includes("Twin Snakes Mutual Death"),"forbidden Anko Kinjutsu leaked into Origin palette");
+    await page.screenshot({path:path.join(OUT,"01-anko-guest-ally-input.png"),fullPage:false,timeout:12000});
 
-    // Phase B must not appear until Phase A has settled and Altered has relayed.
-    await page.waitForFunction(({ANKO,BRUTE})=>{
-      const stage=document.querySelector(".alpha-code-battle-stage");
-      return stage?.dataset.presentationActorId===ANKO&&stage?.dataset.presentationTargetId===BRUTE;
-    },{ANKO,BRUTE},{timeout:12000});
-    const b=await stageSnapshot(page);
-    assert.strictEqual(b.activePlayerId,ANKO);
-    assert.strictEqual(b.activeEnemyId,BRUTE);
-    await page.screenshot({path:path.join(OUT,"02-phase-b-debug-before-pl-assert.png"),fullPage:false,timeout:12000});
-    console.error("ISSUE373 PHASE B CENTRAL DEBUG "+JSON.stringify({
-      domName:b.activeEnemyDomName,expectedName:b.activeEnemyExpectedName,
-      domPL:b.enemyDomPL,expectedPL:b.enemyExpectedPL,
-      transition:b.transition,presentation:b.presentation
-    }));
-    assert.strictEqual(b.activeEnemyDomName,b.activeEnemyExpectedName,"Phase B central enemy nameplate remained stale");
-    assert.strictEqual(b.enemyDomPL,b.enemyExpectedPL,"Phase B central enemy PL remained stale: "+JSON.stringify({dom:b.enemyDomPL,expected:b.enemyExpectedPL}));
-    assert.strictEqual(b.presentation.actor,ANKO);
-    assert.strictEqual(b.presentation.target,BRUTE);
-    assert.strictEqual(b.presentation.ordinal>a.presentation.ordinal,true,"Phase B did not advance presentation ordinal");
-    assert.strictEqual(b.presentation.actorNodes,1);
-    assert.strictEqual(b.presentation.targetNodes,1);
-    assert.strictEqual(b.presentation.actionText,"Fire Style: Dragon Flame");
-    assert.strictEqual(b.presentation.damage,21,"Phase B damage counter did not expose committed damage");
-    assert.strictEqual(b.presentation.beforePL,13,"Phase B PL-before readout mismatch");
-    assert.strictEqual(b.presentation.afterPL,0,"Phase B PL-after readout mismatch");
-    assert(b.presentation.resultText.includes("WITHDRAWAL"),"Phase B did not identify 0 PL as withdrawal");
-    assert(b.presentation.resultText.includes("21 DAMAGE"),"Phase B damage feedback missing");
-    assert(b.presentation.resultText.includes("PL 13 → 0"),"Phase B PL transition feedback missing");
-    await page.screenshot({path:path.join(OUT,"02-phase-b-anko-brute.png"),fullPage:false,timeout:12000});
+    // The player deliberately chooses the high-damage legal technique. The
+    // deterministic numeric result is still Combat authority; only the choice
+    // is player-owned.
+    await useVisibleSkill(page,"sj_anko_hidden_shadow_snake_hands","Hidden Shadow Snake Hands");
+    const ankoAltered=await waitForActionPresentation(page,{actor:ANKO,target:ALTERED,label:"Hidden Shadow Snake Hands"});
+    assert.strictEqual(ankoAltered.role,"ACTIVE","player-controlled Guest Ally was presented as scripted/assist");
+    assert.strictEqual(ankoAltered.actorNodes,1);
+    assert.strictEqual(ankoAltered.targetNodes,1);
+    assert.strictEqual(ankoAltered.damage,18,"Anko -> Altered damage readout drift");
+    assert.strictEqual(ankoAltered.beforePL,11,"Altered PL-before readout drift");
+    assert.strictEqual(ankoAltered.afterPL,0,"Altered PL-after readout drift");
+    assert(ankoAltered.resultText.includes("WITHDRAWAL"),"Altered 0 PL did not read as withdrawal");
+    assert(ankoAltered.resultText.includes("18 DAMAGE"),"Anko damage counter missing");
+    assert(ankoAltered.resultText.includes("PL 11 → 0"),"Altered PL transition missing");
+    await page.screenshot({path:path.join(OUT,"02-player-chosen-anko-altered.png"),fullPage:false,timeout:12000});
 
-    // The authored handoff must finish with Menma and Unstable simultaneously
-    // promoted to the central Active confrontation while Anko remains Benched.
-    await page.waitForFunction(({MENMA,UNSTABLE})=>{
-      return getMenmaEvolvedPLBattleState36900()?.phase==="phase_c_player"&&
-        getBattleDeploymentParticipant("player",1)?.id===MENMA&&
-        getBattleDeploymentParticipant("enemy",1)?.id===UNSTABLE&&
-        getMenmaEvolvedPLBattleInputReadiness36900()?.ready===true;
-    },{MENMA,UNSTABLE},{timeout:15000});
+    // Because Anko/player caused Altered's withdrawal, Brute relays and the
+    // enemy side receives the ordinary next opportunity.
+    const bruteResponse=await waitForActionPresentation(page,{actor:BRUTE,target:ANKO,afterOrdinal:ankoAltered.ordinal});
+    assert.strictEqual(bruteResponse.role,"ACTIVE");
+    assert(bruteResponse.ordinal>ankoAltered.ordinal,"Brute response did not follow Anko action");
+    await page.screenshot({path:path.join(OUT,"03-brute-response-to-anko.png"),fullPage:false,timeout:12000});
+    await waitForPresentationIdle(page);
+
+    await page.waitForFunction(({ANKO,BRUTE})=>
+      getBattleDeploymentParticipant("player",1)?.id===ANKO&&
+      getBattleDeploymentParticipant("enemy",1)?.id===BRUTE&&
+      getMenmaEvolvedPLBattleInputReadiness36900()?.ready===true,
+      {ANKO,BRUTE},{timeout:12000});
+
+    const bruteSettled=await stageSnapshot(page);
+    assert.strictEqual(bruteSettled.activePlayerId,ANKO);
+    assert.strictEqual(bruteSettled.activeEnemyId,BRUTE);
+    assert.strictEqual(bruteSettled.activeEnemyDomName,bruteSettled.activeEnemyExpectedName,"Brute relay left stale central enemy identity");
+    assert.strictEqual(bruteSettled.enemyDomPL,bruteSettled.enemyExpectedPL,"Brute relay left stale central PL");
+
+    // The player chooses again. Brute legitimately reaches 0, Unstable relays,
+    // and the authored teaching handoff yields Anko -> Menma without creating
+    // a bonus player turn.
+    await useVisibleSkill(page,"sj_anko_fire_style_dragon_flame","Fire Style: Dragon Flame");
+    const ankoBrute=await waitForActionPresentation(page,{actor:ANKO,target:BRUTE,label:"Fire Style: Dragon Flame",afterOrdinal:bruteResponse.ordinal});
+    assert.strictEqual(ankoBrute.role,"ACTIVE");
+    assert.strictEqual(ankoBrute.damage,21,"Anko -> Brute damage readout drift");
+    assert.strictEqual(ankoBrute.beforePL,13,"Brute PL-before readout drift");
+    assert.strictEqual(ankoBrute.afterPL,0,"Brute PL-after readout drift");
+    assert(ankoBrute.resultText.includes("WITHDRAWAL"),"Brute 0 PL did not read as withdrawal");
+    assert(ankoBrute.resultText.includes("21 DAMAGE"),"Dragon Flame damage counter missing");
+    assert(ankoBrute.resultText.includes("PL 13 → 0"),"Brute PL transition missing");
+    await page.screenshot({path:path.join(OUT,"04-player-chosen-anko-brute.png"),fullPage:false,timeout:12000});
+
+    // CE #385 requires enemy-next after the authored yield. Therefore Unstable
+    // must visibly act against newly Active Menma before Menma's dock unlocks.
+    const unstableFirst=await waitForActionPresentation(page,{actor:UNSTABLE,target:MENMA,afterOrdinal:ankoBrute.ordinal});
+    assert.strictEqual(unstableFirst.role,"ACTIVE");
+    assert(unstableFirst.ordinal>ankoBrute.ordinal,"Unstable did not act after Anko -> Menma yield");
+    await page.screenshot({path:path.join(OUT,"05-unstable-first-vs-menma.png"),fullPage:false,timeout:12000});
+    await waitForPresentationIdle(page);
+
+    await page.waitForFunction(({MENMA,UNSTABLE})=>
+      getBattleDeploymentParticipant("player",1)?.id===MENMA&&
+      getBattleDeploymentParticipant("enemy",1)?.id===UNSTABLE&&
+      getMenmaEvolvedPLBattleInputReadiness36900()?.ready===true,
+      {MENMA,UNSTABLE},{timeout:15000});
 
     const c=await stageSnapshot(page);
     assert.strictEqual(c.activePlayerId,MENMA);
     assert.strictEqual(c.activeEnemyId,UNSTABLE);
-    assert.strictEqual(c.activePlayerDomName,c.activePlayerExpectedName,"Phase C player nameplate remained stale");
-    assert.strictEqual(c.activeEnemyDomName,c.activeEnemyExpectedName,"Phase C enemy nameplate remained stale");
-    assert.strictEqual(c.playerDomPL,c.playerExpectedPL,"Phase C player PL remained stale");
-    assert.strictEqual(c.enemyDomPL,c.enemyExpectedPL,"Phase C enemy PL remained stale");
-    assert.strictEqual(c.autonomousPhaseText,"","Phase C still displayed scripted Anko lock copy");
-    assert(c.skillDeckText.includes("Driving Chakra Fist"),"Phase C Menma Skill deck did not rebind to active actor");
-    assert(c.authorityPortraits.menma&&c.activePlayerSrc===c.authorityPortraits.menma,"Menma did not project as Active");
-    assert(c.authorityPortraits.unstable&&c.activeEnemySrc===c.authorityPortraits.unstable,"Unstable did not project as Active");
+    assert.strictEqual(c.activePlayerDomName,c.activePlayerExpectedName,"Menma handoff left stale player identity");
+    assert.strictEqual(c.activeEnemyDomName,c.activeEnemyExpectedName,"Unstable relay left stale enemy identity");
+    assert.strictEqual(c.playerDomPL,c.playerExpectedPL,"Menma handoff left stale player PL");
+    assert.strictEqual(c.enemyDomPL,c.enemyExpectedPL,"Unstable relay left stale enemy PL");
+    assert.strictEqual(c.autonomousPhaseText,"","Menma input still displayed autonomous/scripted lock copy");
+    await openSkillsTray(page);
+    const menmaDeck=await stageSnapshot(page);
+    assert(menmaDeck.skillDeckText.includes("Driving Chakra Fist"),"Menma Skill deck did not rebind to new Active");
     const ankoSupport=c.playerSupports.find(x=>x.id===ANKO);
-    assert(ankoSupport&&c.authorityPortraits.anko&&ankoSupport.src===c.authorityPortraits.anko,"Anko did not remain visible Benched");
-    assert(c.transition&&c.transition.type==="authored_active_yield","Menma handoff transition missing");
-    assert(c.transition.pairedEnemyRelayTransition&&c.transition.pairedEnemyRelayTransition.side==="enemy","Unstable relay not paired with Menma handoff");
-    assert.strictEqual(c.lastFormationTransitionId,c.transition.id,"formation renderer did not consume authored handoff");
-    await page.screenshot({path:path.join(OUT,"03-phase-c-menma-unstable.png"),fullPage:false,timeout:12000});
+    assert(ankoSupport&&c.authorityPortraits.anko&&ankoSupport.src===c.authorityPortraits.anko,"Anko did not remain visible Benched after yield");
+    assert(c.transition&&c.transition.type==="authored_active_yield","Anko -> Menma authored yield transition missing");
+    assert.strictEqual(c.transition.nextSide,"enemy","authored yield reset side order");
+    await page.screenshot({path:path.join(OUT,"06-menma-input-after-unstable.png"),fullPage:false,timeout:12000});
 
-    // Real Phase-C exchange: semantics may commit the response synchronously,
-    // but presentation must show Menma first and Unstable second, never both.
-    const action=await page.evaluate(()=>attemptBattlePreparedSkill("academy_menma_chakra_knuckle"));
-    assert(action?.success===true,"Menma Phase-C action failed "+JSON.stringify(action));
+    // Menma now uses the exact same visible controls the player learned with
+    // Anko. Presentation must remain sequential: Menma, then Unstable.
+    await useVisibleSkill(page,"academy_menma_chakra_knuckle","Driving Chakra Fist");
+    const menmaTurn=await waitForActionPresentation(page,{actor:MENMA,target:UNSTABLE,label:"Driving Chakra Fist",afterOrdinal:unstableFirst.ordinal});
+    assert.strictEqual(menmaTurn.role,"ACTIVE");
+    await page.screenshot({path:path.join(OUT,"07-menma-action.png"),fullPage:false,timeout:12000});
 
-    const menmaTurnHandle=await page.waitForFunction(({MENMA,UNSTABLE})=>{
-      const stage=document.querySelector(".alpha-code-battle-stage");
-      if(!stage||
-        stage.dataset.presentationActorId!==MENMA||
-        stage.dataset.presentationTargetId!==UNSTABLE||
-        stage.dataset.presentationQueueBusy!=="true")return false;
-      const actorNodes=stage.querySelectorAll(".battle2-performance-role-actor").length;
-      const targetNodes=stage.querySelectorAll(".battle2-performance-role-target").length;
-      const actionText=stage.querySelector(".battle2-performance-center strong")?.textContent?.trim()||"";
-      if(actorNodes!==1||targetNodes!==1||actionText!=="Driving Chakra Fist")return false;
-      return{
-        ordinal:Number(stage.dataset.presentationSequenceOrdinal||0),
-        actor:stage.dataset.presentationActorId||null,
-        target:stage.dataset.presentationTargetId||null,
-        actorNodes,targetNodes,actionText
-      };
-    },{MENMA,UNSTABLE},{timeout:12000});
-    const menmaTurn=await menmaTurnHandle.jsonValue();
-    assert.strictEqual(menmaTurn.actor,MENMA);
-    assert.strictEqual(menmaTurn.target,UNSTABLE);
-    assert.strictEqual(menmaTurn.actorNodes,1);
-    assert.strictEqual(menmaTurn.targetNodes,1);
-    assert.strictEqual(menmaTurn.actionText,"Driving Chakra Fist");
-    await page.screenshot({path:path.join(OUT,"04-phase-c-menma-action.png"),fullPage:false,timeout:12000});
-
-    const enemyTurnHandle=await page.waitForFunction(({MENMA,UNSTABLE,ordinal})=>{
-      const stage=document.querySelector(".alpha-code-battle-stage");
-      if(!stage||
-        stage.dataset.presentationActorId!==UNSTABLE||
-        stage.dataset.presentationTargetId!==MENMA||
-        Number(stage.dataset.presentationSequenceOrdinal||0)<=ordinal||
-        stage.dataset.presentationQueueBusy!=="true")return false;
-      const actorNodes=stage.querySelectorAll(".battle2-performance-role-actor").length;
-      const targetNodes=stage.querySelectorAll(".battle2-performance-role-target").length;
-      if(actorNodes!==1||targetNodes!==1)return false;
-      return{
-        ordinal:Number(stage.dataset.presentationSequenceOrdinal||0),
-        actor:stage.dataset.presentationActorId||null,
-        target:stage.dataset.presentationTargetId||null,
-        actorNodes,targetNodes,
-        actionText:stage.querySelector(".battle2-performance-center strong")?.textContent?.trim()||""
-      };
-    },{MENMA,UNSTABLE,ordinal:menmaTurn.ordinal},{timeout:12000});
-    const enemyTurn=await enemyTurnHandle.jsonValue();
-    assert.strictEqual(enemyTurn.actor,UNSTABLE);
-    assert.strictEqual(enemyTurn.target,MENMA);
-    assert.strictEqual(enemyTurn.actorNodes,1);
-    assert.strictEqual(enemyTurn.targetNodes,1);
+    const enemyTurn=await waitForActionPresentation(page,{actor:UNSTABLE,target:MENMA,afterOrdinal:menmaTurn.ordinal});
     assert(enemyTurn.ordinal>menmaTurn.ordinal,"Unstable presentation did not follow Menma sequentially");
-    await page.screenshot({path:path.join(OUT,"05-phase-c-unstable-response.png"),fullPage:false,timeout:12000});
+    await page.screenshot({path:path.join(OUT,"08-unstable-response.png"),fullPage:false,timeout:12000});
 
-    await page.waitForFunction(()=>document.querySelector(".alpha-code-battle-stage")?.dataset.presentationQueueBusy==="false",null,{timeout:12000});
+    await waitForPresentationIdle(page);
     const final=await page.evaluate(()=>({
       state:getMenmaEvolvedPLBattleState36900(),
       readiness:getMenmaEvolvedPLBattleInputReadiness36900(),
-      evidence:(currentBattle.runtime?.evidence||[]).map(r=>({eventType:r.eventType,actor:r.actorRef?.participantId||null,target:r.targetRef?.participantId||null}))
+      evidence:(currentBattle.runtime?.evidence||[]).map(r=>({
+        eventType:r.eventType,actor:r.actorRef?.participantId||null,target:r.targetRef?.participantId||null,
+        skillId:r.skillId||null,data:r.data||{}
+      }))
     }));
-    assert.strictEqual(final.state.phase,"phase_c_player","nonterminal exchange did not return to Menma");
+    assert.strictEqual(final.state.phase,"player","nonterminal exchange did not return to player side");
     assert.strictEqual(final.readiness.ready,true,"Menma input not restored after sequential enemy response");
-    assert.strictEqual(final.evidence.filter(r=>r.eventType==="enemy_authored_action_completed"&&r.actor===ALTERED).length,0,"Altered received an illegal ordinary turn");
-    assert.strictEqual(final.evidence.filter(r=>r.eventType==="enemy_authored_action_completed"&&r.actor===BRUTE).length,0,"Brute received an illegal ordinary turn");
-
+    assert(final.evidence.some(r=>r.eventType==="enemy_authored_action_completed"&&r.actor===BRUTE&&r.target===ANKO),"Brute did not receive its legitimate ordinary response");
+    assert(final.evidence.some(r=>r.eventType==="enemy_authored_action_completed"&&r.actor===UNSTABLE&&r.target===MENMA),"Unstable did not receive its legitimate ordinary response");
+    assert(final.evidence.some(r=>r.eventType==="skill_action_completed"&&r.actor===ANKO&&r.skillId==="sj_anko_hidden_shadow_snake_hands"),"player-chosen Anko action evidence missing");
+    assert(final.evidence.some(r=>r.eventType==="skill_action_completed"&&r.actor===ANKO&&r.skillId==="sj_anko_fire_style_dragon_flame"),"second player-chosen Anko action evidence missing");
+    assert(final.evidence.some(r=>r.eventType==="menma_origin_phase_c_started"&&r.actor===MENMA),"MEN-03 active-window evidence never started");
     await gate.assertClean("issue-373-evolved-battle-presentation");
 
     const playerFacingBodyText=await page.evaluate(()=>document.body.innerText||"");
     assert(!playerFacingBodyText.includes("COMMITTED ZERO WAITING FOR PRESENTATION"),"internal pending-zero state leaked player-facing");
-    assert(!playerFacingBodyText.includes("AUTHORED ANKO TAKEDOWN"),"internal scripted readiness reason leaked player-facing");
+    assert(!playerFacingBodyText.includes("AUTHORED ANKO TAKEDOWN"),"superseded scripted readiness reason leaked player-facing");
 
     const summary={
       pass:true,
@@ -388,20 +422,26 @@ async function boot(page){
         forestBackdropVisible:true,
         allFiveParticipantPortraitsVisible:true,
         framelessActiveProjection:true,
-        ankoAlteredReadableBeat:true,
+        ankoStartsAsPlayerControlledGuestAlly:true,
+        exactFourSkillGuestPalette:true,
+        playerChoosesHiddenShadowSnakeHands:true,
+        ankoAlteredReadableAction:true,
         alteredThenBruteRelay:true,
-        ankoBruteReadableBeat:true,
+        bruteGetsLegitimateEnemyResponse:true,
+        playerChoosesDragonFlame:true,
+        ankoBruteReadableAction:true,
         techniqueNamesVisiblyReadable:true,
         damageCountersVisible:true,
         battlePlBeforeAfterVisible:true,
         zeroPlReadsWithdrawal:true,
-        menmaAndUnstablePromoteIntoActiveConfrontation:true,
+        ankoYieldsToMenmaAfterLegitimateFirstTwo:true,
+        enemySideOrderPreservedAcrossYield:true,
+        unstableActsBeforeMenmaInput:true,
         centralIdentityAndPLRefreshAfterRelay:true,
-        phaseCActionDockRebindsToMenma:true,
+        menmaActionDockRebinds:true,
         ankoRemainsBenched:true,
         menmaThenUnstableSequentialPlayback:true,
-        noAlteredOrBruteOrdinaryTurns:true,
-        phaseCInputRestores:true,
+        menmaInputRestores:true,
         browserErrorGateClean:true,
         internalStateLabelsHidden:true,
         realFrontDoor33400OriginSelectionPath:true,
