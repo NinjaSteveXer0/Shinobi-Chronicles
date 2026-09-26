@@ -1248,11 +1248,14 @@ function upsertMenmaStoryBeat38800(scene,row){
   return true;
 }
 const MENMA_DEFEAT_FUTURE_BOARD_REGISTRATION_ID="academy_menma_defeat_future_38800";
+let MENMA_DEFEAT_FUTURE_BOARD_REGISTERED_38800=false;
+const MENMA_SUCCESSOR_PATCHED_SCENES_38800=new WeakSet();
 function isMenmaDefeatFutureBoardBeat38800(beatId){
   const id=String(beatId||"");
   return id.startsWith("menma_party_defeat_return_")||id.startsWith("menma_future_");
 }
 function registerMenmaDefeatFutureSceneBoard38800(){
+  if(MENMA_DEFEAT_FUTURE_BOARD_REGISTERED_38800)return{success:true,sceneId:STORY_SCENE_ID,idempotent:true};
   if(typeof globalThis.registerStorySceneBoardDefinition!=="function"){
     return{success:false,reason:"story_scene_board_not_loaded"};
   }
@@ -1277,14 +1280,14 @@ function registerMenmaDefeatFutureSceneBoard38800(){
       return null;
     }
   });
-  try{
-    if(result&&result.success===true&&typeof globalThis.renderStorySceneBoard33900==="function"){
-      globalThis.renderStorySceneBoard33900();
-    }
-  }catch(_error){}
+  if(result&&result.success===true)MENMA_DEFEAT_FUTURE_BOARD_REGISTERED_38800=true;
+  // Registration is semantic/presentation configuration only. Never render
+  // synchronously from a getStorySceneDefinition() read: Scene Board rendering
+  // itself reads that definition and would otherwise re-enter this installer.
   return result;
 }
 function ensureMenmaDefeatFutureSceneBoard38800(){
+  if(MENMA_DEFEAT_FUTURE_BOARD_REGISTERED_38800)return{success:true,sceneId:STORY_SCENE_ID,idempotent:true};
   if(globalThis.SC_STORY_SCENE_BOARD_33900)return registerMenmaDefeatFutureSceneBoard38800();
   const queue=globalThis.SC_STORY_SCENE_BOARD_PENDING_REGISTRATIONS||(globalThis.SC_STORY_SCENE_BOARD_PENDING_REGISTRATIONS=[]);
   if(!queue.some(row=>row&&row.id===MENMA_DEFEAT_FUTURE_BOARD_REGISTRATION_ID)){
@@ -1314,6 +1317,15 @@ function installMenmaDefeatStoryBridge38800(scene){
 }
 function applyMenmaSuccessorBattleAuthority(scene){
   if(!scene||!scene.beatMap||typeof scene.beatMap.get!=="function")return{success:false,reason:"menma_story_scene_missing"};
+  if(MENMA_SUCCESSOR_PATCHED_SCENES_38800.has(scene)){
+    const sceneBoard=ensureMenmaDefeatFutureSceneBoard38800();
+    return{
+      success:true,idempotent:true,sceneId:STORY_SCENE_ID,beatId:STORY_BATTLE_BEAT_ID,
+      objectiveText:PLAYER_OBJECTIVE_TEXT,environmentPath:BATTLE_ENVIRONMENT_PATH,
+      defeatBeatId:PARTY_DEFEAT_RETURN_BEAT_ID,futureEntryBeatId:FUTURE_ENTRY_BEAT_ID,
+      storyBridge:{success:true,idempotent:true,sceneBoardRegistered:sceneBoard&&sceneBoard.success===true}
+    };
+  }
   const storyBridge=installMenmaDefeatStoryBridge38800(scene);
   if(!storyBridge.success)return storyBridge;
   const beat=scene.beatMap.get(STORY_BATTLE_BEAT_ID);
@@ -1324,6 +1336,7 @@ function applyMenmaSuccessorBattleAuthority(scene){
   beat.battle.defeatBeatId=PARTY_DEFEAT_RETURN_BEAT_ID;
   beat.battle.launchResolver=launchMenmaEvolvedPLBattle36900;
   for(const row of scene.beatMap.values())migrateMenmaSuccessorDisplayValue(row);
+  MENMA_SUCCESSOR_PATCHED_SCENES_38800.add(scene);
   return{
     success:true,sceneId:STORY_SCENE_ID,beatId:STORY_BATTLE_BEAT_ID,
     objectiveText:PLAYER_OBJECTIVE_TEXT,environmentPath:BATTLE_ENVIRONMENT_PATH,
