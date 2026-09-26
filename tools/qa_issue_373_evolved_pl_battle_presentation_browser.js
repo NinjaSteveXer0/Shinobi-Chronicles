@@ -170,8 +170,14 @@ async function boot(page){
     const b=await stageSnapshot(page);
     assert.strictEqual(b.activePlayerId,ANKO);
     assert.strictEqual(b.activeEnemyId,BRUTE);
+    await page.screenshot({path:path.join(OUT,"02-phase-b-debug-before-pl-assert.png"),fullPage:false,timeout:12000});
+    console.error("ISSUE373 PHASE B CENTRAL DEBUG "+JSON.stringify({
+      domName:b.activeEnemyDomName,expectedName:b.activeEnemyExpectedName,
+      domPL:b.enemyDomPL,expectedPL:b.enemyExpectedPL,
+      transition:b.transition,presentation:b.presentation
+    }));
     assert.strictEqual(b.activeEnemyDomName,b.activeEnemyExpectedName,"Phase B central enemy nameplate remained stale");
-    assert.strictEqual(b.enemyDomPL,b.enemyExpectedPL,"Phase B central enemy PL remained stale");
+    assert.strictEqual(b.enemyDomPL,b.enemyExpectedPL,"Phase B central enemy PL remained stale: "+JSON.stringify({dom:b.enemyDomPL,expected:b.enemyExpectedPL}));
     assert.strictEqual(b.presentation.actor,ANKO);
     assert.strictEqual(b.presentation.target,BRUTE);
     assert.strictEqual(b.presentation.ordinal>a.presentation.ordinal,true,"Phase B did not advance presentation ordinal");
