@@ -45,7 +45,11 @@ for(const skillId of [
   "sj_anko_fire_style_dragon_flame",
   "sj_anko_serpent_evasion"
 ])assert(runtime.includes(skillId),"Anko legal Origin Skill missing: "+skillId);
-assert(!runtime.includes('"sj_anko_twin_snakes_mutual_death"'),"Twin Snakes Mutual Death leaked into Menma Origin palette");
+const ankoPaletteStart=runtime.indexOf("const ANKO_GUEST_SKILLS=Object.freeze({");
+const ankoPaletteEnd=runtime.indexOf("const ANKO_GUEST_SKILL_IDS=",ankoPaletteStart);
+assert(ankoPaletteStart>=0&&ankoPaletteEnd>ankoPaletteStart,"Anko Guest Ally palette definition missing");
+const ankoPaletteSource=runtime.slice(ankoPaletteStart,ankoPaletteEnd);
+assert(!ankoPaletteSource.includes("sj_anko_twin_snakes_mutual_death"),"Twin Snakes Mutual Death leaked into Menma Origin palette");
 assert(runtime.includes('sj_anko_hidden_shadow_snake_hands:Object.freeze({attackPL:20'),"Hidden Shadow Snake Hands ATK drift");
 assert(runtime.includes('sj_anko_fire_style_dragon_flame:Object.freeze({attackPL:24'),"Dragon Flame ATK drift");
 
