@@ -145,9 +145,9 @@ async function boot(page){
   assert.strictEqual(d.battle.pass,true,"33000 diagnostics RED "+JSON.stringify(d.battle));
   assert.strictEqual(d.menma.pass,true,"36900 diagnostics RED "+JSON.stringify(d.menma));
 
-  // #373 real-player path proof. No direct selectChronicleOrigin(),
-  // beginAlphaChronicleOriginPrologue(), setStorySceneBeat() or
-  // advanceStoryScene() calls are permitted here.
+  // #373 real-player path proof. Onboarding, Story progression and the
+  // Scene-7 Battle transition must all be driven through visible DOM controls;
+  // no direct runtime selection, beat mutation or Story-advance fixture calls.
   await page.waitForSelector("#sc-alpha-front-door-33300",{state:"visible",timeout:15000});
   await page.locator('#sc-alpha-front-door-33300 [data-afd-action="begin"]').click();
   await page.locator("#afd-ninja-id").fill("Issue373");
