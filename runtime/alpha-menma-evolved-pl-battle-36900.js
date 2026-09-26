@@ -1313,7 +1313,7 @@ function diagnostics(){
     partyDefeatWritingChainComplete:Array.from({length:24},(_,index)=>scene&&scene.beatMap&&scene.beatMap.has(`menma_party_defeat_return_${String(index+1).padStart(2,"0")}`)).every(Boolean)&&scene.beatMap.get("menma_party_defeat_return_24")?.nextBeatId===FUTURE_ENTRY_BEAT_ID,
     futureAmbitionBridgeInstalled:scene&&scene.beatMap&&scene.beatMap.has(FUTURE_ENTRY_BEAT_ID)&&scene.beatMap.has("menma_future_choice")&&scene.beatMap.get("menma_future_terminal")?.exitScene===true,
     futureAmbitionChoiceExact:scene&&scene.beatMap&&scene.beatMap.get("menma_future_choice")?.choices?.map(choice=>choice.label).join("|")==="MASTER WHAT THEY WON'T TEACH ME|BECOME TOO STRONG TO HOLD BACK|CREATE SOMETHING THAT'S MINE|FIND OUT HOW FAR I CAN GO",
-    futureAmbitionHistoryIntent:String(commitMenmaFutureAmbitionIntent38800).includes(FUTURE_INTENT_OCCURRENCE_ID)&&!String(commitMenmaFutureAmbitionIntent38800).includes("currentPL")&&!String(commitMenmaFutureAmbitionIntent38800).includes("BasePL"),
+    futureAmbitionHistoryIntent:String(commitMenmaFutureAmbitionIntent38800).includes("FUTURE_INTENT_OCCURRENCE_ID")&&!String(commitMenmaFutureAmbitionIntent38800).includes("currentPL")&&!String(commitMenmaFutureAmbitionIntent38800).includes("BasePL"),
     rewardAdapterPresent:!!globalThis.SC_ACADEMY_MENMA_THREE_SUBJECT_REWARD_36200,
     plIdentityPreserved:source.includes('plIdentity:"Battle PL"')&&!source.includes("hit"+"Points")&&!source.includes("health"+"Meter"),
     kakashiUntouched:!source.includes("academy_"+"kakashi"),
