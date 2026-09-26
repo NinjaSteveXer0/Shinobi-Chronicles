@@ -43,6 +43,7 @@ EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-anbu-root-contained-155-knowledge-fix.js",
     "runtime/alpha-arc1-reward-evaluation-35400.js",
     "runtime/alpha-menma-evolved-pl-battle-36900.js",
+    "runtime/alpha-combat-skill-lock-38300.js",
 ]
 
 PYTHON_GATES = [
