@@ -739,15 +739,21 @@ function completeMenmaSuccessorDefeat(actionId=null,defeatedParticipantId=null){
   st.terminalResult="defeat";st.phase="terminal";st.inputLocked=true;
   completeOccurrenceReceipt("defeat");
 
-  // Shared Battle may have already committed the generic defeat while the
-  // terminal action receipt is still presenting. #33000 deliberately defers
-  // caller resume until that receipt settles, so do not bail out merely
-  // because battleOver is already true: enrich the committed defeat with this
-  // encounter's authoritative facts before Story is allowed to resume.
+  // Generic defeat owns the reusable Battle lifecycle, but its Story caller
+  // must not resume until this encounter has appended its authoritative facts.
+  // Temporarily withhold only the caller envelope, let generic defeat commit,
+  // restore the same envelope, enrich outcome truth, persist, then resume once.
   const genericDefeatAlreadyCommitted=b.battleOver===true&&b.outcome&&b.outcome.type==="defeat";
-  const result=!genericDefeatAlreadyCommitted&&PRE_COMPLETE_DEFEAT
-    ?PRE_COMPLETE_DEFEAT.call(globalThis,defeatedParticipantId||null,null,"menma_scene7_allied_side_exhausted")
-    :b.outcome;
+  const callerReturnContext=!genericDefeatAlreadyCommitted?b.returnContext||null:null;
+  let result=b.outcome;
+  if(!genericDefeatAlreadyCommitted&&PRE_COMPLETE_DEFEAT){
+    b.returnContext=null;
+    try{
+      result=PRE_COMPLETE_DEFEAT.call(globalThis,defeatedParticipantId||null,null,"menma_scene7_allied_side_exhausted");
+    }finally{
+      b.returnContext=callerReturnContext;
+    }
+  }
 
   if(b.outcome&&b.outcome.type==="defeat"){
     Object.assign(b.outcome,{
@@ -761,6 +767,10 @@ function completeMenmaSuccessorDefeat(actionId=null,defeatedParticipantId=null){
     b.defeat=clone(b.outcome);
   }
   persistBattleSnapshot();
+
+  if(!genericDefeatAlreadyCommitted&&callerReturnContext&&typeof resumeBattleCallerAfterCompletion==="function"){
+    resumeBattleCallerAfterCompletion("defeat");
+  }
   return b.outcome||result;
 }
 
