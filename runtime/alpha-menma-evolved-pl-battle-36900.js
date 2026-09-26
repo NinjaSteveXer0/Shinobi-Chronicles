@@ -1173,7 +1173,7 @@ function diagnostics(){
     ankoPaletteExact:ANKO_GUEST_SKILL_IDS.join("|")==="sj_anko_hidden_shadow_snake_hands|sj_anko_snake_bind|sj_anko_fire_style_dragon_flame|sj_anko_serpent_evasion"&&!ANKO_GUEST_SKILL_IDS.includes("sj_anko_twin_snakes_mutual_death"),
     ordinaryCurrentActiveInput:String(getInputReadiness).includes("activeParticipantId:active.id")&&String(getInputReadiness).includes('st.phase!=="player"'),
     noForcedAnkoTakedown:!source.includes("scripted_a")&&!source.includes("scripted_b")&&!source.includes("authored_scripted_takedown"),
-    normalEnemyCadence:String(resolveEnemyOpportunity).includes("activePlayer()")&&String(resolveEnemyOpportunity).includes("getEnemyAuthoredBattleActions"),
+    normalEnemyCadence:String(resolveEnemyOpportunity).includes("activePlayer()")&&String(resolveEnemyOpportunity).includes("enemyEligibleActions")&&String(enemyEligibleActions).includes("getEnemyAuthoredBattleActions"),
     presentationGatesWithdrawal:String(advanceAfterPresentation).includes("advanceBattleParticipantAtZeroPL")&&String(handleBattleParticipantAtZeroPL).includes("presentation_pending_withdrawal"),
     exactEnemyRelay:HOSTILE_IDS.join("|")==="test_subject_altered_shinobi|test_subject_brute|test_subject_unstable",
     authoredYieldAfterLegitimateFirstTwo:String(shouldAuthorMenmaHandoff36900).includes("resolvedHostileIds.includes(HOSTILE_IDS[0])")&&String(shouldAuthorMenmaHandoff36900).includes("resolvedHostileIds.includes(HOSTILE_IDS[1])"),
