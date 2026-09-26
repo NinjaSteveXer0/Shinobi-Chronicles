@@ -37,7 +37,8 @@ assert(runtime.includes('player:{slots:createBattleDeploymentSlots([ANKO_ID,MENM
 assert(runtime.includes('skillId:"sj_anko_hidden_shadow_snake_hands"')&&runtime.includes("attackPL:20")&&runtime.includes("expectedDamage:18"),"Phase A package drift");
 assert(runtime.includes('skillId:"sj_anko_fire_style_dragon_flame"')&&runtime.includes("attackPL:24")&&runtime.includes("expectedDamage:21"),"Phase B package drift");
 assert(runtime.includes("ordinarySideOpportunityConsumed:false"),"scripted A/B must not consume ordinary side opportunity");
-assert(!/commitScriptedAnkoPhase[\s\S]{0,5000}consumeBattleActionOpportunity/.test(runtime),"scripted A/B consumed ordinary opportunity");
+const scriptedFn=runtime.slice(runtime.indexOf("function commitScriptedAnkoPhase"),runtime.indexOf("function enemyEligibleActions"));
+assert(!scriptedFn.includes("consumeBattleActionOpportunity"),"scripted A/B consumed ordinary opportunity");
 
 assert(runtime.includes("presentation_pending_withdrawal"),"0-PL relay must wait for visible action settle");
 assert(runtime.includes("advanceMenmaScriptedBattleAfterPresentation37300"),"presentation-settle continuation hook missing");
