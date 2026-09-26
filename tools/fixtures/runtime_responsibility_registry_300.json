@@ -534,10 +534,7 @@
         "currentBattle active participant and target refs",
         "currentBattle.deployment.lastTransition authored relay/yield projection"
       ],
-      "stateWrites": [
-        "presentation-only DOM formation / action-role projection",
-        "sessionStorage sc_battle_presentation_33000:* played receipt cursor"
-      ],
+      "stateWrites": [],
       "productionLoadPath": [
         "index.html",
         "runtime/alpha-battle-modern-33000.js"
