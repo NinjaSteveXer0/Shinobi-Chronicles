@@ -141,6 +141,11 @@ function participantClass(actor){
 }
 function productionBattleIdentityLooksReal(b){
   if(!b)return false;
+  // Explicit browser-QA fixtures are not production Battles and must never
+  // consume the player's first-Battle tutorial claim. Real-player-path QA
+  // (notably #373) deliberately does not set this flag and therefore exercises
+  // the actual tutorial.
+  if(globalThis.SC_DISABLE_FIRST_PL_BATTLE_TUTORIAL_QA===true)return false;
   const identity=[b.battleId,b.encounterId,b.battleConfigId,b.objectiveId].filter(Boolean).join("|").toLowerCase();
   return !/(diagnostic|preview|replay|qa_only|test_fixture)/.test(identity);
 }
