@@ -1232,10 +1232,20 @@
 
   const PRIOR_RESUME_BATTLE_CALLER_33000=typeof resumeBattleCallerAfterCompletion==="function"?resumeBattleCallerAfterCompletion:null;
   function rehydrateStoryCallerPresentation33000(resumed){
-    if(!resumed||resumed.success!==true||resumed.type!=="story_scene_resumed")return resumed;
+    const activeStory=typeof globalThis.getActiveStorySceneRuntime==="function"
+      ?globalThis.getActiveStorySceneRuntime()
+      :null;
+    const callerConsumed=!!(currentBattle&&currentBattle.battleOver===true&&!currentBattle.returnContext);
+    const confirmedStoryReturn=!!(
+      resumed&&resumed.success===true&&(
+        resumed.type==="story_scene_resumed"||
+        (activeStory&&callerConsumed)
+      )
+    );
+    if(!confirmedStoryReturn)return resumed;
     try{
       if(typeof globalThis.clearStoryPresentationHidden33900==="function")globalThis.clearStoryPresentationHidden33900();
-      if(PRIOR_OPEN_OVERLAY_33000)PRIOR_OPEN_OVERLAY_33000.call(globalThis,"story_scene");
+      if(typeof globalThis.renderStoryScenePresentationLayer==="function")globalThis.renderStoryScenePresentationLayer();
     }catch(_error){}
     return resumed;
   }
