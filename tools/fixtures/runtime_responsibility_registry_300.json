@@ -818,7 +818,7 @@
       "productionLoadPath": [
         "index.html",
         "game.js",
-        "runtime/alpha-kakashi-menma-skill-lock-38300.js"
+        "runtime/alpha-combat-skill-lock-38300.js"
       ],
       "extensionHooks": [
         "getClosureWaveBattleSkillDefinition",
@@ -864,7 +864,7 @@
     {
       "adapterId": "academy_kakashi_menma_skill_lock_38300",
       "reason": "Project the signed-off Academy Kakashi/Menma Combat Skill names, exact Kakashi conditional Attack PL recalibration, and prepared-slot supersession through the existing shared prepared-Skill definition APIs without creating a second Combat resolver.",
-      "owner": "runtime/alpha-kakashi-menma-skill-lock-38300.js",
+      "owner": "runtime/alpha-combat-skill-lock-38300.js",
       "sourceOwner": "game.js",
       "targetOwner": "game.js",
       "exactBehaviorBridged": "Stable-ID Skill definition projection: authored displayName, Kakashi Clone Switch-enhanced Precision Strike ATK 11, and existing Substitution Jutsu prepared-slot replacement.",
