@@ -1456,11 +1456,12 @@
       }
       .battle2-modern[data-formation-stage="true"] .battle2-performance-stage{transition:none!important;transform:none!important}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-stage.is-settled{transform:none!important}
-      .battle2-modern[data-formation-stage="true"] .battle2-performance-host{left:31%!important;right:31%!important;top:1.4%!important;height:8.2%!important}
-      .battle2-modern[data-formation-stage="true"] .battle2-performance-center{min-height:48px!important;padding:7px 16px!important;border:1px solid rgba(218,178,78,.34)!important;border-radius:9px!important;background:linear-gradient(90deg,rgba(2,8,12,.18),rgba(2,8,12,.88) 18%,rgba(2,8,12,.94) 82%,rgba(2,8,12,.18))!important;box-shadow:0 12px 28px rgba(0,0,0,.34)!important}
-      .battle2-modern[data-formation-stage="true"] .battle2-performance-center small{font-size:clamp(7px,.54vw,9px)!important;letter-spacing:.13em!important;color:#71dce5!important}
-      .battle2-modern[data-formation-stage="true"] .battle2-performance-center strong{margin-top:3px!important;font-size:clamp(14px,1.25vw,21px)!important;line-height:1.05!important;letter-spacing:.025em!important;color:#f3e7c9!important}
-      .battle2-modern[data-formation-stage="true"] .battle2-performance-target{display:block;margin-top:3px;color:#aabcc0;font-size:clamp(6px,.47vw,8px);font-weight:800;letter-spacing:.10em}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-host{left:43%!important;right:43%!important;top:1.5%!important;height:4.8%!important}
+      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-host{left:31%!important;right:31%!important;top:1.4%!important;height:8.2%!important}
+      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-center{min-height:48px!important;padding:7px 16px!important;border:1px solid rgba(218,178,78,.34)!important;border-radius:9px!important;background:linear-gradient(90deg,rgba(2,8,12,.18),rgba(2,8,12,.88) 18%,rgba(2,8,12,.94) 82%,rgba(2,8,12,.18))!important;box-shadow:0 12px 28px rgba(0,0,0,.34)!important}
+      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-center small{font-size:clamp(7px,.54vw,9px)!important;letter-spacing:.13em!important;color:#71dce5!important}
+      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-center strong{margin-top:3px!important;font-size:clamp(14px,1.25vw,21px)!important;line-height:1.05!important;letter-spacing:.025em!important;color:#f3e7c9!important}
+      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-target{display:block;margin-top:3px;color:#aabcc0;font-size:clamp(6px,.47vw,8px);font-weight:800;letter-spacing:.10em}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-result-chip{min-width:126px!important;padding:8px 9px!important;background:linear-gradient(90deg,transparent,rgba(3,9,13,.90))!important}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-result-chip b{font-size:clamp(10px,.82vw,14px)!important}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-result-chip em{font-size:clamp(9px,.70vw,12px)!important;color:#f0e4ca!important}
@@ -1553,7 +1554,7 @@
       transientStateChips:getVisibleBattleStatuses33000.toString().includes("transientStates"),
       sharedPerformanceProjection:String(battleEvidence33000).includes("runtime.evidence"),
       exactTargetFromEvidence:String(projectBattlePerformanceCompletion33000).includes("targetRef")&&String(projectBattlePerformanceCompletion33000).includes("exactTarget"),
-      resultGrammar:["HIT","MISS","EVADE","GUARD","BLOCK","SUBSTITUTION","DEFEAT"].every(token=>String(resultClass33000).includes(token)),
+      resultGrammar:["HIT","MISS","EVADE","GUARD","BLOCK","SUBSTITUTION","WITHDRAWAL"].every(token=>String(resultClass33000).includes(token)),
       performanceClassVocabulary:BATTLE_PRESENTATION_CLASSES_33000.length===16,
       noResolverSemanticsInPerformance:!String(resolveBattlePerformanceProjection33000).includes("resolveBattle"+"DamagePacket")&&!String(installBattlePerformance33000).includes("recordBattle"+"Evidence"),
       battlePortraitProjection:String(portrait33000).includes("resolveUIPortraitProjection")&&String(portrait33000).includes("resolveBattleEnemyPortraitProjection"),
@@ -1574,7 +1575,7 @@
       stableFormationMotion:styleText.includes("Final Kakashi Golden / Formation Stage motion policy")&&styleText.includes("transition:none!important;animation:none!important;will-change:auto!important")&&styleText.includes(".battle2-performance-result-chip"),
       playerCardNamesSuppressed:styleText.includes(".battle-live-active-card-player .battle-live-active-nameplate{display:none!important}")&&styleText.includes(".battle-live-roster-player .battle-live-roster-name{display:none!important}"),
       confrontationPLLaneAligned:styleText.includes('data-formation-mode="duel"] .battle-live-power-player')&&styleText.includes("left:43.5%!important")&&styleText.includes("left:56.5%!important"),
-      topHudStackSeparated:styleText.includes(".battle2-performance-host{left:43%!important;right:43%!important;top:1.5%!important;height:4.8%!important}")&&styleText.includes(".battle2-live-ticker{left:35%!important;top:7.2%!important;width:30%!important"),
+      topHudStackSeparated:styleText.includes('data-formation-stage="true"] .battle2-performance-host{left:43%!important;right:43%!important;top:1.5%!important;height:4.8%!important}')&&styleText.includes('data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-host{left:31%!important;right:31%!important;top:1.4%!important;height:8.2%!important}')&&styleText.includes(".battle2-live-ticker{left:35%!important;top:10.2%!important;width:30%!important"),
       storyCallerPresentationSuspension:String(suspendCallerStoryPresentation33000).includes("markStoryPresentationHidden33900")&&String(renderCombatOverlay).includes("suspendCallerStoryPresentation33000"),
       branchModesRemainExplicit:renderInspector33000.toString().includes("setSelectedBattleSkillMode"),
       browserGoldenClaimed:false
