@@ -541,6 +541,13 @@ if(PRE_CONSUME_OPPORTUNITY){
         if(!enemyResult||enemyResult.success!==true){
           recordBattleEvidence({eventType:"menma_origin_phase_c_enemy_opportunity_failed_visible",committedOccurrence:true,actionId:"failed:"+currentOpportunityId("enemy"),data:{reason:enemyResult&&enemyResult.reason||"enemy_resolution_failed",inventedFallback:false}});
           s.phase="phase_c_player";s.playerOpportunityOrdinal+=1;s.inputLocked=false;
+        }else if(!s.pendingZero){
+          // Nested enemy opportunity consumption occurs while this outer settle
+          // owns the semantic lock. Commit/advance it here exactly once rather
+          // than relying on the re-entrancy-suppressed wrapper.
+          const enemyActionId=enemyResult.envelope&&enemyResult.envelope.actionId||null;
+          if(!opportunityCommitted("enemy"))markOpportunityCommitted("enemy",HOSTILE_IDS[2],enemyActionId,"unstable_phase_c_action");
+          s.phase="phase_c_player";s.playerOpportunityOrdinal+=1;s.inputLocked=false;
         }
       }finally{s.processing=false;}
       persistBattleSnapshot();
