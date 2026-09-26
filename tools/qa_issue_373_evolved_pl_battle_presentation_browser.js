@@ -145,6 +145,25 @@ async function waitForPresentationIdle(page){
   },null,{timeout:15000});
 }
 
+async function waitForTutorialBeat(page,beatId){
+  const modal=page.locator('.sc-pl-battle-tutorial-38500[data-tutorial-beat="'+beatId+'"]').first();
+  await modal.waitFor({state:"visible",timeout:12000});
+  const state=await page.evaluate(()=>globalThis.SC_PL_BATTLE_TUTORIAL_38500?.getState?.()||null);
+  assert(state&&state.currentBeatId===beatId,"tutorial state/presentation mismatch for "+beatId+" "+JSON.stringify(state));
+  return modal;
+}
+
+async function acknowledgeTutorialBeat(page,beatId){
+  const modal=await waitForTutorialBeat(page,beatId);
+  const button=modal.locator('button[data-tutorial-action="continue"]').first();
+  await button.click();
+  await page.waitForFunction(id=>!document.querySelector('.sc-pl-battle-tutorial-38500[data-tutorial-beat="'+id+'"]'),beatId,{timeout:8000});
+}
+
+async function acknowledgeTutorialSequence(page,beatIds){
+  for(const beatId of beatIds)await acknowledgeTutorialBeat(page,beatId);
+}
+
 async function openSkillsTray(page){
   const stage=page.locator(".alpha-code-battle-stage");
   const button=stage.locator('button[data-formation-family="skills"]').first();
@@ -291,7 +310,13 @@ async function boot(page){
     assert(bruteSupport&&opening.authorityPortraits.brute&&bruteSupport.src===opening.authorityPortraits.brute,"Brute support portrait absent/wrong");
     assert(unstableSupport&&opening.authorityPortraits.unstable&&unstableSupport.src===opening.authorityPortraits.unstable,"Unstable support portrait absent/wrong");
 
+    // First legitimate PL Battle onboarding is part of the real player path.
+    // Prove the tutorial teaches the current Active and Anko's temporary
+    // player-control relationship before allowing the first Skill choice.
+    await acknowledgeTutorialSequence(page,["active_shinobi","guest_ally_control"]);
+
     await openSkillsTray(page);
+    await acknowledgeTutorialBeat(page,"skills_action_dock");
     const ankoDeck=await stageSnapshot(page);
     for(const label of ["Hidden Shadow Snake Hands","Snake Bind","Fire Style: Dragon Flame","Serpent Evasion"]){
       assert(ankoDeck.skillDeckText.includes(label),"Anko Guest Ally palette missing "+label);
@@ -314,6 +339,10 @@ async function boot(page){
     assert(ankoAltered.resultText.includes("18 DAMAGE"),"Anko damage counter missing");
     assert(ankoAltered.resultText.includes("PL 11 → 0"),"Altered PL transition missing");
     await page.screenshot({path:path.join(OUT,"02-player-chosen-anko-altered.png"),fullPage:false,timeout:12000});
+
+    // The first damage / 0-PL / relay sequence teaches those concepts exactly
+    // once. Presentation remains paused while each explanation is open.
+    await acknowledgeTutorialSequence(page,["battle_pl","withdrawal","relay"]);
 
     // Because Anko/player caused Altered's withdrawal, Brute relays and the
     // enemy side receives the ordinary next opportunity.
@@ -424,6 +453,12 @@ async function boot(page){
         framelessActiveProjection:true,
         ankoStartsAsPlayerControlledGuestAlly:true,
         exactFourSkillGuestPalette:true,
+        firstBattleTutorialActiveBeat:true,
+        firstBattleTutorialGuestControlBeat:true,
+        firstBattleTutorialSkillsBeat:true,
+        firstBattleTutorialBattlePLBeat:true,
+        firstBattleTutorialWithdrawalBeat:true,
+        firstBattleTutorialRelayBeat:true,
         playerChoosesHiddenShadowSnakeHands:true,
         ankoAlteredReadableAction:true,
         alteredThenBruteRelay:true,
