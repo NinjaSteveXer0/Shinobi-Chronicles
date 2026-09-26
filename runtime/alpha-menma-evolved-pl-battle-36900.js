@@ -769,7 +769,13 @@ function completeMenmaSuccessorDefeat(actionId=null,defeatedParticipantId=null){
   persistBattleSnapshot();
 
   if(!genericDefeatAlreadyCommitted&&callerReturnContext&&typeof resumeBattleCallerAfterCompletion==="function"){
-    resumeBattleCallerAfterCompletion("defeat");
+    const resumed=resumeBattleCallerAfterCompletion("defeat");
+    if(resumed&&resumed.success===true){
+      try{
+        if(typeof globalThis.clearStoryPresentationHidden33900==="function")globalThis.clearStoryPresentationHidden33900();
+        if(typeof globalThis.renderStoryScenePresentationLayer==="function")globalThis.renderStoryScenePresentationLayer();
+      }catch(_error){}
+    }
   }
   return b.outcome||result;
 }
