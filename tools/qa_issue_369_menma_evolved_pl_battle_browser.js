@@ -102,6 +102,20 @@ async function bootScenario(browser,label){
       brute:getBattleRemainingPL("enemy","test_subject_brute"),
       unstable:getBattleRemainingPL("enemy","test_subject_unstable")
     },
+    expectedPortraits:(()=>{
+      const portrait=(side,id)=>{
+        const participant=getBattleParticipantByIdentity(side,id);
+        const projection=side==="player"?resolveUIPortraitProjection(participant):resolveBattleEnemyPortraitProjection(participant);
+        return projection?.path||"";
+      };
+      return{
+        menma:portrait("player","academy_menma"),
+        anko:portrait("player","sj_anko"),
+        altered:portrait("enemy","test_subject_altered_shinobi"),
+        brute:portrait("enemy","test_subject_brute"),
+        unstable:portrait("enemy","test_subject_unstable")
+      };
+    })(),
     stage:(()=>{
       const stage=document.querySelector(".alpha-code-battle-stage");
       const support=(side,id)=>{
@@ -135,11 +149,11 @@ async function bootScenario(browser,label){
   assert.deepStrictEqual([initial.pl.altered,initial.pl.brute,initial.pl.unstable],[0,13,12],"Phase A must commit Altered to 0 while Brute/Unstable remain untouched");
   assert.strictEqual(initial.stage.environment,"forest_clearing_day","forest environment dataset missing");
   assert(initial.stage.background.includes("forest_clearing_day.png"),"forest backdrop not projected");
-  assert(initial.stage.menma.present&&/academy_menma/i.test(initial.stage.menma.src),"Menma support portrait missing");
-  assert(initial.stage.brute.present&&/test_subject_brute/i.test(initial.stage.brute.src),"Brute support portrait missing");
-  assert(initial.stage.unstable.present&&/test_subject_unstable/i.test(initial.stage.unstable.src),"Unstable support portrait missing");
-  assert(/sj_anko/i.test(initial.stage.activePlayerSrc),"Anko active portrait missing");
-  assert(/test_subject_altered_shinobi/i.test(initial.stage.activeEnemySrc),"Altered active portrait missing");
+  assert(initial.stage.menma.present&&initial.expectedPortraits.menma&&initial.stage.menma.src===initial.expectedPortraits.menma,"Menma support portrait missing/wrong "+JSON.stringify({actual:initial.stage.menma.src,expected:initial.expectedPortraits.menma}));
+  assert(initial.stage.brute.present&&initial.expectedPortraits.brute&&initial.stage.brute.src===initial.expectedPortraits.brute,"Brute support portrait missing/wrong "+JSON.stringify({actual:initial.stage.brute.src,expected:initial.expectedPortraits.brute}));
+  assert(initial.stage.unstable.present&&initial.expectedPortraits.unstable&&initial.stage.unstable.src===initial.expectedPortraits.unstable,"Unstable support portrait missing/wrong "+JSON.stringify({actual:initial.stage.unstable.src,expected:initial.expectedPortraits.unstable}));
+  assert(initial.expectedPortraits.anko&&initial.stage.activePlayerSrc===initial.expectedPortraits.anko,"Anko active portrait missing/wrong "+JSON.stringify({actual:initial.stage.activePlayerSrc,expected:initial.expectedPortraits.anko}));
+  assert(initial.expectedPortraits.altered&&initial.stage.activeEnemySrc===initial.expectedPortraits.altered,"Altered active portrait missing/wrong "+JSON.stringify({actual:initial.stage.activeEnemySrc,expected:initial.expectedPortraits.altered}));
   assert.deepStrictEqual(initial.clan,pre.clan,"Origin launch mutated My Clan order");
   assert.strictEqual(initial.ankoOwned,pre.ankoOwned,"encounter-local Anko changed ownership");
   assert.deepStrictEqual(initial.teamIds,pre.teamIds,"encounter-local Anko mutated owned team");
