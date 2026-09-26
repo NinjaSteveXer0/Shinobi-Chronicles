@@ -732,14 +732,25 @@ function completeMenmaSuccessorVictory(actionId=null,finishingActorId=null){
 }
 const PRE_COMPLETE_DEFEAT=typeof completeBattleDefeat==="function"?completeBattleDefeat:null;
 function completeMenmaSuccessorDefeat(actionId=null,defeatedParticipantId=null){
-  const st=ensureState();if(!st||battle().battleOver)return battle().outcome;
+  const b=battle(),st=ensureState();
+  if(!b||!st)return b&&b.outcome||null;
+  if(b.battleOver===true&&(!b.outcome||b.outcome.type!=="defeat"))return b.outcome;
+
   st.terminalResult="defeat";st.phase="terminal";st.inputLocked=true;
   completeOccurrenceReceipt("defeat");
-  const result=PRE_COMPLETE_DEFEAT
+
+  // Shared Battle may have already committed the generic defeat while the
+  // terminal action receipt is still presenting. #33000 deliberately defers
+  // caller resume until that receipt settles, so do not bail out merely
+  // because battleOver is already true: enrich the committed defeat with this
+  // encounter's authoritative facts before Story is allowed to resume.
+  const genericDefeatAlreadyCommitted=b.battleOver===true&&b.outcome&&b.outcome.type==="defeat";
+  const result=!genericDefeatAlreadyCommitted&&PRE_COMPLETE_DEFEAT
     ?PRE_COMPLETE_DEFEAT.call(globalThis,defeatedParticipantId||null,null,"menma_scene7_allied_side_exhausted")
-    :null;
-  if(battle().outcome){
-    Object.assign(battle().outcome,{
+    :b.outcome;
+
+  if(b.outcome&&b.outcome.type==="defeat"){
+    Object.assign(b.outcome,{
       battleConfigId:BATTLE_CONFIG_ID,encounterId:ENCOUNTER_ID,objectiveId:OBJECTIVE_ID,objectiveCompleted:false,
       menmaWithdrawn:st.menmaWithdrawn===true,ankoWithdrawn:st.ankoWithdrawn===true,
       resolvedHostileIds:[...(st.resolvedHostileIds||[])],
@@ -747,9 +758,10 @@ function completeMenmaSuccessorDefeat(actionId=null,defeatedParticipantId=null){
       battleOccurrenceId:battleOccurrenceId(),tutorialResult:"not_completed",performanceBucket:null,
       men03Scope:"menma_active_only",partyDefeat:true,battlePLWithdrawalNotDeath:true,noInferredInjury:true
     });
+    b.defeat=clone(b.outcome);
   }
   persistBattleSnapshot();
-  return result;
+  return b.outcome||result;
 }
 
 function advanceAfterEnemyOpportunity36900(){
