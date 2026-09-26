@@ -354,40 +354,64 @@ The three test subjects close.
 
 **AUTHOR / RUNTIME ONLY — DO NOT RENDER AS STORY PROSE**
 
-Current successor Battle intent from Stephen:
+Current CE Battle authority:
 
-**Half-scripted 2-v-3 encounter**
-
-1. Anko defeats / forces withdrawal of the first subject.
-2. The next subject relays in.
-3. Anko defeats / forces withdrawal of the second subject.
-4. The final subject relays in.
-5. Menma receives the final subject as the genuine player-resolved test.
-6. Menma's result depends on his legal skill/action choices.
-
-The first two Anko takedowns are authored encounter beats.
-
-They do **not** count as Menma performance.
-
-Current PL rule remains:
-**0 Battle PL = withdrawal, not death.**
-
-Therefore Menma's final subject is currently a defeat/withdrawal outcome unless later explicit lethal authority is added.
-
-ACTIVE RECONCILIATION:
-**#376 — CE / Codex / Coordination**
+- Anko = **Guest Ally**;
+- Anko starts Active;
+- Menma starts Benched;
+- player controls Anko's legal Origin Skills while she is Active;
+- enemy relay order = Altered -> Brute -> Unstable;
+- Anko's results are genuine player-selected Battle results;
+- no scripted guaranteed Anko takedowns;
+- if Anko withdraws early, Menma relays normally;
+- if Menma later withdraws and Anko is still eligible, Anko may relay back;
+- intended teaching handoff occurs only after Anko legitimately resolves Altered + Brute while remaining eligible;
+- 0 Battle PL = withdrawal, not injury/death.
 
 Story does not pre-author:
-- the exact player choices Menma will make;
-- exact Menma damage/performance;
-- exact Technique use;
+- exact chosen Skills;
+- exact damage;
+- exact withdrawal order;
+- exact Menma performance;
 - exact Kinjutsu/Fūinjutsu observation;
-- a literal kill;
-- a completed MEN-03 bucket if Menma fails the final phase.
+- literal death.
 
-Battle returns factual Menma-phase result/evidence.
+### Victory return
 
----
+If the allied side completes `stop_three_test_subjects`:
+- Battle returns exact factual evidence;
+- MEN-03 may produce HIGH / MIDDLE / LOW from Menma-attributable evidence only;
+- continue into the successful Scene 8 Anko conversation below.
+
+### Party-defeat return
+
+If no eligible allied participant remains before the objective completes:
+
+- `tutorialResult = not_completed`;
+- MEN-03 `performanceBucket = null`;
+- 0 Ryō;
+- do not fake LOW;
+- do not infer injury/death/capture;
+- return exactly once to:
+
+`menma_party_defeat_return_01`
+
+Binding defeat prose/beat chain:
+
+`Documentation/Story/Academy_Menma_Scene_7_Party_Defeat_Continuation_2026-09-26.md`
+
+commit:
+`5e25bb268f101e0f8ea5a08fe225f614a156e24e`
+
+That defeat path continues to:
+`menma_future_01`
+rather than the victory-only Scene 8 performance reaction.
+
+### Tutorial
+
+The global first-PL-Battle tutorial is event-driven/player-save scoped under current CE authority.
+
+Writing does not embed tutorial explanation in Menma dialogue.
 
 ## SCENE 8 — AFTER THE FIGHT
 

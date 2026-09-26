@@ -148,78 +148,131 @@ Continue:
 
 ## Scene 7 — PL Battle
 
-Stephen's current successor intent is now a **half-scripted 2-v-3 encounter**:
+Current reusable Battle authority is now closed by:
 
-> **Anko defeats the first two former test subjects as authored Battle beats. Menma then receives the final subject as the genuine player-resolved test.**
+`Documentation/Coordination/Battle_Participant_Control_and_First_PL_Battle_Tutorial_Contract_2026-09-26.md`
 
-This supersedes the earlier intent that Menma and Anko simply participate in an ordinary unscripted 2-v-3 cadence from the start.
+CE commit lineage:
+`13a258c68fd19a3fff6e8e84ea14eaf659041514`
 
-### Intended encounter shape
+### Current participant/control truth
 
-1. Anko acts first.
-2. Anko defeats / forces withdrawal of the first hostile.
-3. The next hostile relays in.
-4. Anko defeats / forces withdrawal of the second hostile.
-5. The final hostile relays in.
-6. Menma becomes the player-resolved focus for the last subject.
-7. Menma's success remains dependent on the player's legal skill/action choices.
+Allied:
+- `sj_anko` — **Guest Ally**, temporary/non-owned, **player-controlled while Active**;
+- `academy_menma` — Origin protagonist / owned actor, player-controlled while Active.
 
-The first two Anko victories are **authored encounter choreography**, not player performance and not Menma-attributable MEN-03 evidence.
+Enemy order:
+1. `test_subject_altered_shinobi`
+2. `test_subject_brute`
+3. `test_subject_unstable`
 
-The final Menma phase is the actual performance test.
+Starting formation:
 
-### PL / lethality boundary
+```
+ALLIED
+Active  = sj_anko
+Benched = academy_menma
 
-Current Battle law remains:
+ENEMY
+Active  = test_subject_altered_shinobi
+Benched = test_subject_brute
+Benched = test_subject_unstable
+```
 
-> **0 Battle PL = withdrawal, not injury/death.**
+Anko's legal Origin palette is available to the player while she is Active.
 
-Therefore this authority uses **defeat / withdrawal** for the final subject unless a later explicit Story/Combat consequence authorises literal killing.
+Her results are genuine player-driven PL Battle results.
 
-Stephen's colloquial "Menma gets the last one to kill" is currently interpreted as:
-- Menma gets the final subject to personally defeat;
-- not an automatic lethal resolver.
+Do not restore the superseded automated / guaranteed first-two takedowns.
 
-### Performance reactions
+### Intended teaching handoff
 
-The existing three Anko post-Battle reaction bands remain useful, but should consume **Menma's actual final-phase performance**, not Anko's scripted first-two takedowns.
+If Anko legitimately resolves Altered + Brute while remaining eligible:
+- Unstable relays;
+- Anko yields Active;
+- Menma promotes from Benched;
+- Anko becomes Benched;
+- side alternation does not reset;
+- Unstable acts next against Menma;
+- Menma then receives the next player-side action.
 
-Intended Writing interpretation:
-- **high** — Menma handles the final subject impressively;
-- **middle** — Menma wins solidly;
-- **low** — Menma wins, but the cost/pressure is obvious.
+### Legitimate divergence
 
-If Menma fails to resolve the final subject, do not fake a low-performance completion bucket merely to reach one of the three reactions.
+If Anko withdraws before the intended handoff:
+- Menma relays normally;
+- player controls Menma;
+- Battle continues against the current surviving enemy formation.
 
-Exact failure continuation remains Combat/CE-owned until reconciled.
+If Menma later withdraws while Anko remains eligible:
+- Anko may relay back;
+- player controls Anko;
+- Battle continues.
+
+### Party defeat
+
+Party defeat commits only when:
+
+> **no eligible allied participant remains before `stop_three_test_subjects` completes.**
+
+On party defeat:
+- 0 Battle PL still means withdrawal, not injury/death;
+- MEN-03 = `tutorialResult:not_completed`;
+- MEN-03 `performanceBucket:null`;
+- reward = 0 Ryō;
+- Story returns to:
+  `menma_party_defeat_return_01`.
+
+Binding Writing continuation:
+
+`Documentation/Story/Academy_Menma_Scene_7_Party_Defeat_Continuation_2026-09-26.md`
+
+commit:
+`5e25bb268f101e0f8ea5a08fe225f614a156e24e`
+
+The Origin does not auto-retry or terminate on party defeat.
+
+It continues from the defeat scene into:
+`menma_future_01`
+and the existing future-ambition choice.
+
+### MEN-03
+
+MEN-03 measures Menma only from the first legitimate moment he becomes Active.
+
+Exclude Anko actions/results.
+
+On allied victory:
+- high / middle / low may commit from Menma's actual evidence;
+- Menma withdrawal may legitimately contribute to LOW if the party later wins.
+
+On allied defeat:
+- no completed performance bucket;
+- do not fake LOW.
 
 ### Capability benchmark
 
-- Menma is especially strong in **Kinjutsu** and **Fūinjutsu** at character-identity level;
-- only currently legal prepared actions may appear in Battle;
-- legitimate Story observation may reflect exact committed actions only;
-- Anko retains her established capability identity;
-- neither character becomes a generic combatant merely because the first two phases are scripted.
+- Menma's Kinjutsu/Fūinjutsu identity may shape legitimate Story observation/approach;
+- only legal prepared Battle actions are selectable;
+- observed capability requires committed evidence;
+- Anko retains her own established capabilities;
+- neither character becomes generic.
 
 ### Backdrop / Battle environment
 
 Use:
 `Scene backdrops/forest_clearing_day.png`
 
-The full encounter remains in the same clearing.
+The Battle remains in the same clearing.
 
-### RECONCILIATION STATUS
+### Current status
 
-This successor half-scripted cadence supersedes the previously reconciled ordinary 2-v-3 cadence.
+Battle semantic authority: **CLOSED by CE #385**.
 
-Active CE issue:
-**#376 — Reconcile Menma 2v3 Active/Benched relay with generic Battle law**
+Coding implementation / visual acceptance remains owned by:
+- #373
+- PR #375
 
-That issue must now consume this newer Stephen-direct intent rather than the earlier generic relay shape.
-
-Writing must not claim runtime implementation/validation until #376 and downstream Coding have consumed the half-scripted structure.
-
----
+Writing defeat dependency: **CLOSED by #386 successor authority above**.
 
 ## Scene 8 — Post-Battle / Anko
 
