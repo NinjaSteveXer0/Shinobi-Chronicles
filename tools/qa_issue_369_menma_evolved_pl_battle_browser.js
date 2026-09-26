@@ -468,8 +468,17 @@ async function legitimatePartyDefeat(browser){
     assert.strictEqual(returnEntry.defeatReceiptCount,1,"party-defeat occurrence receipt duplicated before Story return");
 
     await page.evaluate(()=>saveTestState());
-    await page.evaluate(()=>restoreTestState());
-    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_party_defeat_return_01",null,{timeout:12000});
+    await page.reload({waitUntil:"domcontentloaded",timeout:60000});
+    await page.waitForFunction(()=>!!(
+      typeof getRuntimeBuildFingerprint==="function"&&
+      typeof getActiveStorySceneRuntime==="function"&&
+      typeof runIssue369MenmaEvolvedPLBattleDiagnostics==="function"&&
+      globalThis.SC_MENMA_EVOLVED_PL_BATTLE_36900
+    ),null,{timeout:30000});
+    await releaseFrontDoor(page);
+    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.sceneId===SCENE&&getActiveStorySceneRuntime()?.beatId==="menma_party_defeat_return_01",null,{timeout:20000});
+    await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:12000});
+    await waitForStoryMotionToSettle(page);
     const afterStoryReload=await page.evaluate(()=>({
       beatId:getActiveStorySceneRuntime()?.beatId||null,
       defeatReceiptCount:getActivityHistory().filter(r=>r&&r.battleConfigId==="academy_menma_origin_three_test_subjects_with_anko"&&r.type==="origin_battle_occurrence"&&r.battleResult==="defeat").length,
