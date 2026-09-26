@@ -1411,9 +1411,16 @@
     document.head.appendChild(style);
   }
 
+  function installedBattleModernStyleText33000(){
+    try{
+      const node=typeof document!=="undefined"?document.getElementById("alpha-battle-modern-33000-style"):null;
+      return node&&typeof node.textContent==="string"?node.textContent:"";
+    }catch(_error){return"";}
+  }
   function runAlphaBattleModern33000Diagnostics(){
     const source=enhanceBattle2DOM33000.toString();
     const summary=getBattleSkillYouthSummary33000.toString();
+    const styleText=installedBattleModernStyleText33000();
     const checks={
       patchId:PATCH_ID==="alpha_battle_modern_33000_2026_09_23_formation_stage",
       formationUsesDeploymentTruth:String(deployedFormation33000).includes("getBattleDeploymentParticipant")&&String(deployedFormation33000).includes("slot<=6"),
@@ -1443,12 +1450,12 @@
       orderedCommittedPlayback:String(syncBattlePresentationQueue33000).includes("collectBattlePerformanceProjections33000")&&String(playNextBattlePresentationReceipt33000).includes("playedKeys.add")&&String(projectBattlePerformanceCompletion33000).includes("immutableCommittedFacts:true")&&String(bindActiveBattlePresentation33000).includes("liveBattleStage33000"),
       reloadDoesNotDuplicatePresentation:String(resetPresentationQueueState33000).includes("playedKeys")&&String(presentationStorageKey33000).includes("battleId"),
       terminalNavigationDeferred:String(flushDeferredTerminalOverlay33000).includes("pendingBattlePresentation33000")&&String(openOverlay).includes("presentationDeferred")&&String(flushDeferredBattleCallerResume33000).includes("pendingBattlePresentation33000")&&String(resumeBattleCallerAfterCompletion).includes("callerResumeDeferred"),
-      menmaEnvironmentBound:String(applyBattleEnvironment33000).includes("forest_clearing_day")&&installStyle.toString().includes('data-battle-environment="forest_clearing_day"'),
+      menmaEnvironmentBound:String(applyBattleEnvironment33000).includes("forest_clearing_day")&&styleText.includes('data-battle-environment="forest_clearing_day"'),
       supportEmptySlotsCanProject:String(projectFormationSupports33000).includes('classList.remove("is-empty")')&&String(projectFormationSupports33000).includes('document.createElement("div")')&&String(projectFormationSupports33000).includes("framelessBattlePortrait"),
-      stableFormationMotion:installStyle.toString().includes("Final Kakashi Golden / Formation Stage motion policy")&&installStyle.toString().includes("transition:none!important;animation:none!important;will-change:auto!important")&&installStyle.toString().includes(".battle2-performance-result-chip"),
-      playerCardNamesSuppressed:installStyle.toString().includes(".battle-live-active-card-player .battle-live-active-nameplate{display:none!important}")&&installStyle.toString().includes(".battle-live-roster-player .battle-live-roster-name{display:none!important}"),
-      confrontationPLLaneAligned:installStyle.toString().includes('data-formation-mode="duel"] .battle-live-power-player')&&installStyle.toString().includes("left:43.5%!important")&&installStyle.toString().includes("left:56.5%!important"),
-      topHudStackSeparated:installStyle.toString().includes(".battle2-performance-host{left:43%!important;right:43%!important;top:1.5%!important;height:4.8%!important}")&&installStyle.toString().includes(".battle2-live-ticker{left:35%!important;top:7.2%!important;width:30%!important"),
+      stableFormationMotion:styleText.includes("Final Kakashi Golden / Formation Stage motion policy")&&styleText.includes("transition:none!important;animation:none!important;will-change:auto!important")&&styleText.includes(".battle2-performance-result-chip"),
+      playerCardNamesSuppressed:styleText.includes(".battle-live-active-card-player .battle-live-active-nameplate{display:none!important}")&&styleText.includes(".battle-live-roster-player .battle-live-roster-name{display:none!important}"),
+      confrontationPLLaneAligned:styleText.includes('data-formation-mode="duel"] .battle-live-power-player')&&styleText.includes("left:43.5%!important")&&styleText.includes("left:56.5%!important"),
+      topHudStackSeparated:styleText.includes(".battle2-performance-host{left:43%!important;right:43%!important;top:1.5%!important;height:4.8%!important}")&&styleText.includes(".battle2-live-ticker{left:35%!important;top:7.2%!important;width:30%!important"),
       storyCallerPresentationSuspension:String(suspendCallerStoryPresentation33000).includes("markStoryPresentationHidden33900")&&String(renderCombatOverlay).includes("suspendCallerStoryPresentation33000"),
       branchModesRemainExplicit:renderInspector33000.toString().includes("setSelectedBattleSkillMode"),
       browserGoldenClaimed:false
