@@ -446,6 +446,7 @@ async function legitimatePartyDefeat(browser){
       };
     });
     console.log("MENMA_DEFEAT_RETURN_DEBUG "+JSON.stringify(defeatReturnDebug));
+    console.log("MENMA_DEFEAT_RETURN_ERRORS "+JSON.stringify(await gate.snapshot()));
     await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:12000});
     await waitForStoryMotionToSettle(page);
 
