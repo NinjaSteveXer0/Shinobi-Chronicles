@@ -542,6 +542,12 @@ async function legitimatePartyDefeat(browser){
       const beat=await page.evaluate(()=>getCurrentStorySceneBeat());
       assert.strictEqual(beat.text,text,"#388 Scene-10 Story drift at "+beatId);
       if(beatId==="menma_future_01"){
+        await page.waitForFunction(()=>{
+          const layer=document.getElementById("story-scene-presentation-layer");
+          const stage=layer?.querySelector(".sc-chronicle-stage")||layer?.querySelector(".sc-story-stage");
+          return stage?.dataset.scSceneBoardBackdrop==="dedicated"&&
+            String(stage?.style.getPropertyValue("--sc-scene-board-backdrop")||"").includes("whisper_woods_forest_route.png");
+        },null,{timeout:5000});
         const futureBackdrop=await page.evaluate(()=>{
           const layer=document.getElementById("story-scene-presentation-layer");
           const stage=layer?.querySelector(".sc-chronicle-stage")||layer?.querySelector(".sc-story-stage");
