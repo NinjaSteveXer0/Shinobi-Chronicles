@@ -611,6 +611,21 @@ The PvE rule remains: player side starts first.
 
 Do not invent a hidden Speed/Initiative Stat merely to solve future PvP ordering.
 
+
+### Participant control taxonomy — CLOSED
+
+Reusable control authority is now defined in:
+
+Documentation/Coordination/Battle_Participant_Control_and_First_PL_Battle_Tutorial_Contract_2026-09-26.md
+
+Canonical relationship/control classes:
+
+- My Clan / owned team member = Player-controlled while Active;
+- Guest Ally = temporary non-owned ally, Player-controlled while Active;
+- Independent Ally = temporary non-owned ally, AI-controlled while Active.
+
+Control authority does not imply ownership, acquisition or My Clan assignment.
+
 ## 20. Ownership boundary
 
 ### Combat owns
@@ -673,6 +688,7 @@ The following concept is now locked:
 21. The Battle failure-containment and recovery safeguard contract is mandatory implementation authority: one validated semantic commit, exactly-once opportunity consumption, canonical-state recovery, stale-work rejection, deterministic persistence/reload, presentation fail-soft, semantic fail-closed, and no live legacy semantic fallback.
 22. The successor Battle runtime remains the PL Battle System; PL/Battle PL cannot be replaced by HP or a parallel health identity.
 23. The current Active is the sole normal action bearer for its side. Relay promotion changes that bearer only after withdrawal; promotion does not reset side alternation.
+24. Player-side Active control resolves by participant relationship: owned/My Clan = Player, Guest Ally = Player, Independent Ally = AI. Temporary control never grants ownership.
 
 ## 22. What remains OPEN
 
