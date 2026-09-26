@@ -476,7 +476,7 @@ async function legitimatePartyDefeat(browser){
       globalThis.SC_MENMA_EVOLVED_PL_BATTLE_36900
     ),null,{timeout:30000});
     await releaseFrontDoor(page);
-    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.sceneId===SCENE&&getActiveStorySceneRuntime()?.beatId==="menma_party_defeat_return_01",null,{timeout:20000});
+    await page.waitForFunction(scene=>getActiveStorySceneRuntime()?.sceneId===scene&&getActiveStorySceneRuntime()?.beatId==="menma_party_defeat_return_01",SCENE,{timeout:20000});
     await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:12000});
     await waitForStoryMotionToSettle(page);
     const afterStoryReload=await page.evaluate(()=>({
