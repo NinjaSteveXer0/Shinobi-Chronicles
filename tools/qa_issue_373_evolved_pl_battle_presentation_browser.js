@@ -61,6 +61,16 @@ async function stageSnapshot(page){
       activeEnemyId:currentBattle&&getBattleDeploymentParticipant("enemy",1)?.id||null,
       activePlayerSrc:img(".battle-live-active-card-player .battle-live-active-card-image"),
       activeEnemySrc:img(".battle-live-active-card-enemy .battle-live-active-card-image"),
+      activePlayerDomName:stage?.querySelector(".battle-live-active-card-player .battle-live-active-nameplate")?.textContent?.trim()||"",
+      activeEnemyDomName:stage?.querySelector(".battle-live-active-card-enemy .battle-live-active-nameplate")?.textContent?.trim()||"",
+      activePlayerExpectedName:getBattleDeploymentParticipant("player",1)?.displayName||getBattleDeploymentParticipant("player",1)?.name||"",
+      activeEnemyExpectedName:getBattleDeploymentParticipant("enemy",1)?.displayName||getBattleDeploymentParticipant("enemy",1)?.name||"",
+      playerDomPL:Number(stage?.querySelector(".battle-live-power-player strong")?.textContent||NaN),
+      enemyDomPL:Number(stage?.querySelector(".battle-live-power-enemy strong")?.textContent||NaN),
+      playerExpectedPL:Number(getBattleRemainingPL("player",getBattleDeploymentParticipant("player",1)?.id)||0),
+      enemyExpectedPL:Number(getBattleRemainingPL("enemy",getBattleDeploymentParticipant("enemy",1)?.id)||0),
+      autonomousPhaseText:stage?.querySelector(".battle-live-autonomous-phase")?.innerText?.replace(/\s+/g," ").trim()||"",
+      skillDeckText:stage?.querySelector(".battle-live-skill-deck")?.innerText?.replace(/\s+/g," ").trim()||"",
       activePlayerFrameless:stage?.querySelector(".battle-live-active-card-player")?.dataset.framelessBattlePortrait||null,
       activeEnemyFrameless:stage?.querySelector(".battle-live-active-card-enemy")?.dataset.framelessBattlePortrait||null,
       playerSupports:supports("player"),
@@ -160,6 +170,8 @@ async function boot(page){
     const b=await stageSnapshot(page);
     assert.strictEqual(b.activePlayerId,ANKO);
     assert.strictEqual(b.activeEnemyId,BRUTE);
+    assert.strictEqual(b.activeEnemyDomName,b.activeEnemyExpectedName,"Phase B central enemy nameplate remained stale");
+    assert.strictEqual(b.enemyDomPL,b.enemyExpectedPL,"Phase B central enemy PL remained stale");
     assert.strictEqual(b.presentation.actor,ANKO);
     assert.strictEqual(b.presentation.target,BRUTE);
     assert.strictEqual(b.presentation.ordinal>a.presentation.ordinal,true,"Phase B did not advance presentation ordinal");
@@ -180,6 +192,12 @@ async function boot(page){
     const c=await stageSnapshot(page);
     assert.strictEqual(c.activePlayerId,MENMA);
     assert.strictEqual(c.activeEnemyId,UNSTABLE);
+    assert.strictEqual(c.activePlayerDomName,c.activePlayerExpectedName,"Phase C player nameplate remained stale");
+    assert.strictEqual(c.activeEnemyDomName,c.activeEnemyExpectedName,"Phase C enemy nameplate remained stale");
+    assert.strictEqual(c.playerDomPL,c.playerExpectedPL,"Phase C player PL remained stale");
+    assert.strictEqual(c.enemyDomPL,c.enemyExpectedPL,"Phase C enemy PL remained stale");
+    assert.strictEqual(c.autonomousPhaseText,"","Phase C still displayed scripted Anko lock copy");
+    assert(c.skillDeckText.includes("Driving Chakra Fist"),"Phase C Menma Skill deck did not rebind to active actor");
     assert(c.authorityPortraits.menma&&c.activePlayerSrc===c.authorityPortraits.menma,"Menma did not project as Active");
     assert(c.authorityPortraits.unstable&&c.activeEnemySrc===c.authorityPortraits.unstable,"Unstable did not project as Active");
     const ankoSupport=c.playerSupports.find(x=>x.id===ANKO);
@@ -271,6 +289,8 @@ async function boot(page){
         alteredThenBruteRelay:true,
         ankoBruteReadableBeat:true,
         menmaAndUnstablePromoteIntoActiveConfrontation:true,
+        centralIdentityAndPLRefreshAfterRelay:true,
+        phaseCActionDockRebindsToMenma:true,
         ankoRemainsBenched:true,
         menmaThenUnstableSequentialPlayback:true,
         noAlteredOrBruteOrdinaryTurns:true,
