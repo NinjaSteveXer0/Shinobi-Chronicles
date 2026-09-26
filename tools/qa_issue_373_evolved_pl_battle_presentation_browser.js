@@ -41,7 +41,17 @@ async function stageSnapshot(page){
       frameless:node.dataset.framelessBattlePortrait||null,
       src:node.querySelector("img")?.getAttribute("src")||""
     }));
+    const portrait=(side,id)=>{
+      const participant=getBattleParticipantByIdentity(side,id);
+      const projection=side==="player"?resolveUIPortraitProjection(participant):resolveBattleEnemyPortraitProjection(participant);
+      return projection?.path||"";
+    };
     return{
+      authorityPortraits:{
+        menma:portrait("player","academy_menma"),anko:portrait("player","sj_anko"),
+        altered:portrait("enemy","test_subject_altered_shinobi"),
+        brute:portrait("enemy","test_subject_brute"),unstable:portrait("enemy","test_subject_unstable")
+      },
       environment:stage?.dataset.battleEnvironment||null,
       proof:stage?.dataset.evolvedPlProof||null,
       background:stage?getComputedStyle(stage).backgroundImage:"",
@@ -123,16 +133,16 @@ async function boot(page){
     assert.strictEqual(a.enemyCount,3);
     assert.strictEqual(a.activePlayerId,ANKO);
     assert.strictEqual(a.activeEnemyId,ALTERED);
-    assert(/sj_anko/i.test(a.activePlayerSrc),"Anko active portrait absent");
-    assert(/test_subject_altered_shinobi/i.test(a.activeEnemySrc),"Altered active portrait absent");
+    assert(a.authorityPortraits.anko&&a.activePlayerSrc===a.authorityPortraits.anko,"Anko active portrait absent/wrong");
+    assert(a.authorityPortraits.altered&&a.activeEnemySrc===a.authorityPortraits.altered,"Altered active portrait absent/wrong");
     assert.strictEqual(a.activePlayerFrameless,"true");
     assert.strictEqual(a.activeEnemyFrameless,"true");
     const menmaSupport=a.playerSupports.find(x=>x.id===MENMA);
     const bruteSupport=a.enemySupports.find(x=>x.id===BRUTE);
     const unstableSupport=a.enemySupports.find(x=>x.id===UNSTABLE);
-    assert(menmaSupport&&/academy_menma/i.test(menmaSupport.src),"Menma support portrait absent");
-    assert(bruteSupport&&/test_subject_brute/i.test(bruteSupport.src),"Brute support portrait absent");
-    assert(unstableSupport&&/test_subject_unstable/i.test(unstableSupport.src),"Unstable support portrait absent");
+    assert(menmaSupport&&a.authorityPortraits.menma&&menmaSupport.src===a.authorityPortraits.menma,"Menma support portrait absent/wrong");
+    assert(bruteSupport&&a.authorityPortraits.brute&&bruteSupport.src===a.authorityPortraits.brute,"Brute support portrait absent/wrong");
+    assert(unstableSupport&&a.authorityPortraits.unstable&&unstableSupport.src===a.authorityPortraits.unstable,"Unstable support portrait absent/wrong");
     assert.strictEqual(a.presentation.busy,"true");
     assert.strictEqual(a.presentation.actor,ANKO);
     assert.strictEqual(a.presentation.target,ALTERED);
@@ -170,10 +180,10 @@ async function boot(page){
     const c=await stageSnapshot(page);
     assert.strictEqual(c.activePlayerId,MENMA);
     assert.strictEqual(c.activeEnemyId,UNSTABLE);
-    assert(/academy_menma/i.test(c.activePlayerSrc),"Menma did not project as Active");
-    assert(/test_subject_unstable/i.test(c.activeEnemySrc),"Unstable did not project as Active");
+    assert(c.authorityPortraits.menma&&c.activePlayerSrc===c.authorityPortraits.menma,"Menma did not project as Active");
+    assert(c.authorityPortraits.unstable&&c.activeEnemySrc===c.authorityPortraits.unstable,"Unstable did not project as Active");
     const ankoSupport=c.playerSupports.find(x=>x.id===ANKO);
-    assert(ankoSupport&&/sj_anko/i.test(ankoSupport.src),"Anko did not remain visible Benched");
+    assert(ankoSupport&&c.authorityPortraits.anko&&ankoSupport.src===c.authorityPortraits.anko,"Anko did not remain visible Benched");
     assert(c.transition&&c.transition.type==="authored_active_yield","Menma handoff transition missing");
     assert(c.transition.pairedEnemyRelayTransition&&c.transition.pairedEnemyRelayTransition.side==="enemy","Unstable relay not paired with Menma handoff");
     assert.strictEqual(c.lastFormationTransitionId,c.transition.id,"formation renderer did not consume authored handoff");
