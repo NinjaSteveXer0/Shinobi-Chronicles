@@ -162,49 +162,50 @@ function ensureLocalAnko(){
 }
 function createState(sceneId=null){
   return {
-    version:2,battleConfigId:BATTLE_CONFIG_ID,encounterId:ENCOUNTER_ID,objectiveId:OBJECTIVE_ID,
-    scriptContractId:SCRIPT_CONTRACT_ID,storySceneInstanceId:sceneId||null,semanticGeneration:2,
-    phase:"scripted_a",inputLocked:true,processing:false,
+    version:3,battleConfigId:BATTLE_CONFIG_ID,encounterId:ENCOUNTER_ID,objectiveId:OBJECTIVE_ID,
+    scriptContractId:SCRIPT_CONTRACT_ID,storySceneInstanceId:sceneId||null,semanticGeneration:3,
+    phase:"player",inputLocked:false,processing:false,
     playerOpportunityOrdinal:1,enemyOpportunityOrdinal:0,
     committedOpportunities:{},rngChoices:{},
-    scriptedCompleted:{scripted_a:false,scripted_b:false},
-    pendingZero:null,resolvedHostileIds:[],
-    menmaWithdrawn:false,ankoWithdrawn:false,ankoYielded:false,
-    terminalResult:null,lastSemanticEvent:null
+    ankoBoundTargetIds:[],ankoSerpentEvasionSpent:false,
+    pendingZero:null,pendingAuthoredYieldActionId:null,
+    resolvedHostileIds:[],withdrawalOrder:[],
+    menmaWithdrawn:false,ankoWithdrawn:false,ankoYielded:false,authoredYieldCancelled:false,
+    menmaEvidenceStarted:false,terminalResult:null,lastSemanticEvent:null
   };
 }
 function normalizeState(raw,sceneId=null){
   const base=createState(sceneId);
   if(!raw||typeof raw!=="object")return base;
   const next={...base,...clone(raw)};
-  next.version=2;
+  next.version=3;
   next.battleConfigId=BATTLE_CONFIG_ID;next.encounterId=ENCOUNTER_ID;next.objectiveId=OBJECTIVE_ID;
-  next.scriptContractId=SCRIPT_CONTRACT_ID;
-  next.storySceneInstanceId=sceneId||next.storySceneInstanceId||null;
-  next.semanticGeneration=2;
-  next.committedOpportunities=next.committedOpportunities&&typeof next.committedOpportunities==="object"?next.committedOpportunities:{};
-  next.rngChoices=next.rngChoices&&typeof next.rngChoices==="object"?next.rngChoices:{};
-  next.scriptedCompleted=next.scriptedCompleted&&typeof next.scriptedCompleted==="object"?{scripted_a:next.scriptedCompleted.scripted_a===true,scripted_b:next.scriptedCompleted.scripted_b===true}:{scripted_a:false,scripted_b:false};
-  next.resolvedHostileIds=Array.isArray(next.resolvedHostileIds)?[...new Set(next.resolvedHostileIds.filter(id=>HOSTILE_IDS.includes(id)))]:[];
+  next.scriptContractId=SCRIPT_CONTRACT_ID;next.storySceneInstanceId=sceneId||next.storySceneInstanceId||null;
+  next.semanticGeneration=3;
+  next.phase=["player","enemy","terminal"].includes(next.phase)?next.phase:"player";
   next.playerOpportunityOrdinal=Math.max(1,Number(next.playerOpportunityOrdinal)||1);
   next.enemyOpportunityOrdinal=Math.max(0,Number(next.enemyOpportunityOrdinal)||0);
+  next.committedOpportunities=next.committedOpportunities&&typeof next.committedOpportunities==="object"?next.committedOpportunities:{};
+  next.rngChoices=next.rngChoices&&typeof next.rngChoices==="object"?next.rngChoices:{};
+  next.ankoBoundTargetIds=Array.isArray(next.ankoBoundTargetIds)?[...new Set(next.ankoBoundTargetIds.filter(id=>HOSTILE_IDS.includes(id)))]:[];
+  next.resolvedHostileIds=Array.isArray(next.resolvedHostileIds)?[...new Set(next.resolvedHostileIds.filter(id=>HOSTILE_IDS.includes(id)))]:[];
+  next.withdrawalOrder=Array.isArray(next.withdrawalOrder)?next.withdrawalOrder.filter(row=>row&&["player","enemy"].includes(row.side)&&row.participantId):[];
   next.processing=false;
 
-  // Deterministic migration away from the superseded #369 Menma/Anko assist cadence.
-  if(Number(raw.version||0)<2){
+  // Migrate old Scene-7 snapshots by preserving only already-committed facts.
+  // New executions never replay the superseded automated Anko takedowns.
+  if(Number(raw.version||0)<3){
+    const oldPhase=String(raw.phase||"");
     const resolved=new Set(next.resolvedHostileIds);
-    if(resolved.has(HOSTILE_IDS[0])&&resolved.has(HOSTILE_IDS[1]))next.phase="phase_c_player";
-    else if(resolved.has(HOSTILE_IDS[0]))next.phase="scripted_b";
-    else next.phase="scripted_a";
-    next.scriptedCompleted={
-      scripted_a:resolved.has(HOSTILE_IDS[0]),
-      scripted_b:resolved.has(HOSTILE_IDS[1])
-    };
-    next.pendingZero=null;
-    next.inputLocked=next.phase!=="phase_c_player";
-    next.ankoYielded=next.phase==="phase_c_player"||next.phase==="phase_c_enemy";
+    next.ankoYielded=raw.ankoYielded===true||
+      (resolved.has(HOSTILE_IDS[0])&&resolved.has(HOSTILE_IDS[1])&&(oldPhase==="phase_c_player"||oldPhase==="phase_c_enemy"));
+    next.menmaEvidenceStarted=next.ankoYielded||raw.menmaEvidenceStarted===true;
+    next.authoredYieldCancelled=raw.ankoWithdrawn===true&&!next.ankoYielded;
+    next.pendingZero=null;next.pendingAuthoredYieldActionId=null;
+    next.phase=oldPhase==="phase_c_enemy"?"enemy":"player";
+    next.inputLocked=false;
   }
-  if(!["scripted_a","scripted_b","phase_c_player","phase_c_enemy","terminal"].includes(next.phase))next.phase="scripted_a";
+  if(next.ankoWithdrawn&&next.ankoYielded!==true)next.authoredYieldCancelled=true;
   return next;
 }
 function ensureState(){
@@ -246,7 +247,7 @@ function markOpportunityCommitted(side,actorId,actionId,kind){
   const s=ensureState(),id=currentOpportunityId(side);
   if(!s||!id)return{success:false,reason:"semantic_state_missing"};
   if(s.committedOpportunities[id])return{success:false,idempotent:true,receipt:s.committedOpportunities[id]};
-  const receipt={opportunityId:id,side,actorId:actorId||null,actionId:actionId||null,kind:kind||"committed_action",semanticGeneration:2};
+  const receipt={opportunityId:id,side,actorId:actorId||null,actionId:actionId||null,kind:kind||"committed_action",semanticGeneration:3};
   s.committedOpportunities[id]=receipt;s.lastSemanticEvent=clone(receipt);return{success:true,receipt};
 }
 function committedChoice(opportunityId,choiceClass,candidateIds){
@@ -261,16 +262,19 @@ function committedChoice(opportunityId,choiceClass,candidateIds){
   return selectedId;
 }
 function getInputReadiness(){
-  const b=battle(),s=ensureState();
-  if(!s||!b||!b.active||b.battleOver)return{ready:false,reason:"battle_not_active"};
-  if(s.pendingZero)return{ready:false,reason:"committed_zero_waiting_for_presentation"};
-  if(s.phase==="scripted_a"||s.phase==="scripted_b")return{ready:false,reason:"authored_anko_takedown"};
-  if(s.phase!=="phase_c_player")return{ready:false,reason:"enemy_side_opportunity"};
+  const b=battle(),st=ensureState();
+  if(!st||!b||!b.active||b.battleOver)return{ready:false,reason:"battle_not_active"};
+  if(st.pendingZero||st.pendingAuthoredYieldActionId)return{ready:false,reason:"formation_settling"};
+  if(st.phase!=="player")return{ready:false,reason:"enemy_side_opportunity"};
   const active=activePlayer();
-  if(!active||active.id!==MENMA_ID)return{ready:false,reason:"menma_not_active"};
-  if(s.inputLocked||s.processing)return{ready:false,reason:"semantic_input_locked"};
+  if(!active||![ANKO_ID,MENMA_ID].includes(active.id))return{ready:false,reason:"player_active_missing"};
+  if(st.inputLocked||st.processing)return{ready:false,reason:"semantic_input_locked"};
   if(opportunityCommitted("player"))return{ready:false,reason:"side_opportunity_already_committed"};
-  return{ready:true,reason:null,opportunityId:currentOpportunityId("player")};
+  return{
+    ready:true,reason:null,opportunityId:currentOpportunityId("player"),
+    activeParticipantId:active.id,controlAuthority:"player",
+    participantClass:active.id===ANKO_ID?"guest_ally":"owned"
+  };
 }
 function persistBattleSnapshot(){
   try{if(typeof saveTestState==="function")saveTestState();}catch(_error){}
@@ -309,11 +313,16 @@ if(PRE_NORMALIZE_DEPLOYMENT){
   const wrapped=function(rawDeployment,fallbackActivePlayerId=null){
     const normalized=PRE_NORMALIZE_DEPLOYMENT.apply(this,arguments);
     if(!isExactBattle()||!rawDeployment||typeof rawDeployment!=="object")return normalized;
-    const s=ensureState();
-    normalized.player={slots:createBattleDeploymentSlots(
-      s&&(s.phase==="phase_c_player"||s.phase==="phase_c_enemy"||s.ankoYielded===true)
-        ?[MENMA_ID,ANKO_ID]:[ANKO_ID,MENMA_ID]
-    )};
+    const st=ensureState();
+    const ordered=[];
+    if(st&&st.ankoYielded===true){
+      if(!st.menmaWithdrawn)ordered.push(MENMA_ID);
+      if(!st.ankoWithdrawn)ordered.push(ANKO_ID);
+    }else{
+      if(!st?.ankoWithdrawn)ordered.push(ANKO_ID);
+      if(!st?.menmaWithdrawn)ordered.push(MENMA_ID);
+    }
+    normalized.player={slots:createBattleDeploymentSlots(ordered)};
     return normalized;
   };
   globalThis.normalizeBattleDeployment=wrapped;try{normalizeBattleDeployment=wrapped;}catch(_error){}
