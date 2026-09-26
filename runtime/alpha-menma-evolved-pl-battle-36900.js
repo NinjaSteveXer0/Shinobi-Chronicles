@@ -82,6 +82,38 @@ const SCRIPTED_PHASES=Object.freeze({
   })
 });
 
+const ANKO_GUEST_SKILLS=Object.freeze({
+  sj_anko_hidden_shadow_snake_hands:Object.freeze({
+    id:"sj_anko_hidden_shadow_snake_hands",displayName:"Hidden Shadow Snake Hands",ownerRegistryId:ANKO_ID,
+    primaryDiscipline:"Ninjutsu",targetMode:"current_enemy",actionClass:"guest_ally_direct",
+    resolutionKind:"authored_direct_damage",attackPL:20,
+    traits:Object.freeze(["guest_ally","origin_legal","direct_damage"]),requirements:Object.freeze([])
+  }),
+  sj_anko_snake_bind:Object.freeze({
+    id:"sj_anko_snake_bind",displayName:"Snake Bind",ownerRegistryId:ANKO_ID,
+    primaryDiscipline:"Ninjutsu",targetMode:"current_enemy",actionClass:"guest_ally_control",
+    resolutionKind:"physical_restraint",
+    traits:Object.freeze(["guest_ally","origin_legal","control"]),requirements:Object.freeze([])
+  }),
+  sj_anko_fire_style_dragon_flame:Object.freeze({
+    id:"sj_anko_fire_style_dragon_flame",displayName:"Fire Style: Dragon Flame",ownerRegistryId:ANKO_ID,
+    primaryDiscipline:"Ninjutsu",targetMode:"current_enemy",actionClass:"guest_ally_direct",
+    resolutionKind:"authored_direct_damage",attackPL:24,
+    traits:Object.freeze(["guest_ally","origin_legal","direct_damage"]),requirements:Object.freeze([])
+  }),
+  sj_anko_serpent_evasion:Object.freeze({
+    id:"sj_anko_serpent_evasion",displayName:"Serpent Evasion",ownerRegistryId:ANKO_ID,
+    primaryDiscipline:"Taijutsu",targetMode:"self",actionClass:"guest_ally_defense",
+    resolutionKind:"deterministic_evasion_state",
+    traits:Object.freeze(["guest_ally","origin_legal","defense"]),requirements:Object.freeze([])
+  })
+});
+const ANKO_GUEST_SKILL_IDS=Object.freeze(Object.keys(ANKO_GUEST_SKILLS));
+const ANKO_DIRECT_ACTIONS=Object.freeze({
+  sj_anko_hidden_shadow_snake_hands:Object.freeze({attackPL:20,discipline:"Ninjutsu"}),
+  sj_anko_fire_style_dragon_flame:Object.freeze({attackPL:24,discipline:"Ninjutsu"})
+});
+
 function clone(value){
   try{return typeof cloneBattleRuntimeValue==="function"?cloneBattleRuntimeValue(value):JSON.parse(JSON.stringify(value));}
   catch(_error){return value;}
@@ -119,7 +151,7 @@ function makeAnkoParticipant(){
     rank:"Special Jōnin",formalRank:"special_jonin",power:ANKO_BASE_PL,calibratedBasePL:ANKO_BASE_PL,
     baseStats:{...ANKO_STATS},stats:{...ANKO_STATS},
     uiPortrait:"Portraits/Special Jonin/sj_anko.png",
-    encounterLocalAlliedNpc:true,ownershipGranted:false,myClanAssigned:false,playerSelectable:false
+    encounterLocalAlliedNpc:true,ownershipGranted:false,myClanAssigned:false,playerSelectable:true,participantClass:"guest_ally",controlAuthority:"player",temporaryBattleParticipant:true
   };
 }
 function ensureLocalAnko(){
@@ -285,6 +317,99 @@ if(PRE_NORMALIZE_DEPLOYMENT){
     return normalized;
   };
   globalThis.normalizeBattleDeployment=wrapped;try{normalizeBattleDeployment=wrapped;}catch(_error){}
+}
+
+// Guest Ally Skill projection uses the ordinary Battle Skill deck. These
+// wrappers are exact-encounter only and do not register Anko into My Clan or
+// the permanent prepared-Skill authorities.
+const PRE_GET_BATTLE_UI_SKILL_PALETTE_36900=typeof getBattleUISkillPalettePresentation==="function"?getBattleUISkillPalettePresentation:null;
+if(PRE_GET_BATTLE_UI_SKILL_PALETTE_36900){
+  const wrapped=function(actor){
+    if(isExactBattle()&&actor&&actor.id===ANKO_ID){
+      return{skillIds:[...ANKO_GUEST_SKILL_IDS],source:"story_guest_ally_palette",authoredPackageSize:ANKO_GUEST_SKILL_IDS.length,temporaryBattleParticipant:true};
+    }
+    return PRE_GET_BATTLE_UI_SKILL_PALETTE_36900.apply(this,arguments);
+  };
+  globalThis.getBattleUISkillPalettePresentation=wrapped;try{getBattleUISkillPalettePresentation=wrapped;}catch(_error){}
+}
+const PRE_GET_BATTLE_PREPARED_SKILL_36900=typeof getBattlePreparedSkillDefinition==="function"?getBattlePreparedSkillDefinition:null;
+if(PRE_GET_BATTLE_PREPARED_SKILL_36900){
+  const wrapped=function(actor,skillId){
+    if(isExactBattle()&&actor&&actor.id===ANKO_ID&&ANKO_GUEST_SKILLS[skillId])return ANKO_GUEST_SKILLS[skillId];
+    return PRE_GET_BATTLE_PREPARED_SKILL_36900.apply(this,arguments);
+  };
+  globalThis.getBattlePreparedSkillDefinition=wrapped;try{getBattlePreparedSkillDefinition=wrapped;}catch(_error){}
+}
+const PRE_EVALUATE_BATTLE_PREPARED_SKILL_36900=typeof evaluateBattlePreparedSkillAvailability==="function"?evaluateBattlePreparedSkillAvailability:null;
+if(PRE_EVALUATE_BATTLE_PREPARED_SKILL_36900){
+  const wrapped=function(skill,actor,target){
+    if(isExactBattle()&&actor&&actor.id===ANKO_ID&&skill&&ANKO_GUEST_SKILLS[skill.id]){
+      const readiness=getInputReadiness();
+      if(!readiness.ready||readiness.activeParticipantId&&readiness.activeParticipantId!==ANKO_ID)return{available:false,reason:readiness.reason||"actor_not_active"};
+      if(skill.targetMode==="current_enemy"&&(!target||target.id!==activeEnemy()?.id))return{available:false,reason:"active_enemy_required"};
+      if(skill.id==="sj_anko_snake_bind"){
+        const st=ensureState();
+        if(st&&Array.isArray(st.ankoBoundTargetIds)&&target&&st.ankoBoundTargetIds.includes(target.id))return{available:false,reason:"target_already_bound_this_battle"};
+      }
+      if(skill.id==="sj_anko_serpent_evasion"){
+        const existing=typeof findBattleTransientState==="function"
+          ?findBattleTransientState({stateKey:"sj_anko_serpent_evasion_ready",targetSide:"player",targetParticipantId:ANKO_ID})
+          :null;
+        if(existing)return{available:false,reason:"serpent_evasion_already_ready"};
+      }
+      const traits=Array.isArray(skill.traits)?skill.traits:[];
+      const blocking=typeof getBattleBlockingConditions==="function"
+        ?getBattleBlockingConditions("player",ANKO_ID,skill.actionClass,traits):[];
+      if(blocking&&blocking.length)return{available:false,reason:"blocked_by_condition",blockingConditionIds:blocking.map(row=>row.conditionId)};
+      return{available:true,reason:null,temporaryGuestAllySkill:true};
+    }
+    return PRE_EVALUATE_BATTLE_PREPARED_SKILL_36900.apply(this,arguments);
+  };
+  globalThis.evaluateBattlePreparedSkillAvailability=wrapped;try{evaluateBattlePreparedSkillAvailability=wrapped;}catch(_error){}
+}
+
+function resolveAnkoGuestDirectDamage(skillId,target,envelope){
+  const contract=ANKO_DIRECT_ACTIONS[skillId];
+  if(!contract||!target)return{resolved:false,reason:"anko_direct_contract_missing"};
+  const output={
+    primaryDiscipline:contract.discipline,
+    statKey:typeof getBattlePrimaryDisciplineStatKey==="function"?getBattlePrimaryDisciplineStatKey(contract.discipline):"nin",
+    effectivePrimaryDiscipline:ANKO_STATS.nin,
+    coefficient:null,branch:"fixed_authored_anko_origin_guest_action",branchMultiplier:1,
+    authoredPreExecutionMagnitude:contract.attackPL,weaponExecutionMultiplier:1,
+    preDefenseAttackMagnitude:contract.attackPL,attackPL:contract.attackPL,fixedCalibration:true
+  };
+  const damage=resolveBattleDamagePacket({
+    envelope,skill:{id:skillId,mechanicalPacketCount:1},
+    actorSide:"player",actorParticipantId:ANKO_ID,targetSide:"enemy",targetParticipantId:target.id,
+    output,mitigable:true,excess:null,stateRefs:[]
+  });
+  return damage?{resolved:true,branch:"anko_origin_guest_direct_damage",damageApplied:true,finalDamage:Number(damage.finalDamage)||0,remainingBattlePLAfter:Number(getBattleRemainingPL("enemy",target.id)),damage}:{resolved:false,reason:"anko_damage_resolution_failed"};
+}
+function resolveAnkoGuestBind(target,envelope){
+  if(!target)return{resolved:false,reason:"anko_bind_target_missing"};
+  const st=ensureState();
+  if(st&&Array.isArray(st.ankoBoundTargetIds)&&st.ankoBoundTargetIds.includes(target.id))return{resolved:false,reason:"anko_bind_target_already_used"};
+  const condition=addBattleCondition({
+    conditionKey:"sj_anko_snake_bind",conditionType:"physical_restraint",
+    sourceSide:"player",sourceParticipantId:ANKO_ID,targetSide:"enemy",targetParticipantId:target.id,
+    sourceSkillId:"sj_anko_snake_bind",ownerRef:{type:"skill",id:"sj_anko_snake_bind"},
+    blockedActionTraits:["movement_dependent"],
+    data:{semanticClass:"physical_restraint",movementPreventing:true,blanketStun:false,notStun:true,remainingActionOpportunities:1,reapplication:"no_stack",activationActionId:envelope.actionId}
+  });
+  if(condition&&st&&!st.ankoBoundTargetIds.includes(target.id))st.ankoBoundTargetIds.push(target.id);
+  return condition?{resolved:true,branch:"anko_snake_bind",damageApplied:false,conditionRefs:[condition.conditionId],stateRefs:[]}:{resolved:false,reason:"anko_bind_establishment_failed"};
+}
+function resolveAnkoGuestEvasion(envelope){
+  const existing=findBattleTransientState({stateKey:"sj_anko_serpent_evasion_ready",targetSide:"player",targetParticipantId:ANKO_ID});
+  if(existing)return{resolved:false,reason:"anko_serpent_evasion_already_ready"};
+  const state=addBattleTransientState({
+    stateKey:"sj_anko_serpent_evasion_ready",
+    sourceSide:"player",sourceParticipantId:ANKO_ID,targetSide:"player",targetParticipantId:ANKO_ID,
+    ownerRef:{type:"skill",id:"sj_anko_serpent_evasion"},
+    data:{activationActionId:envelope.actionId,oneUse:true,deterministicAvoidance:true,noAccuracyRoll:true}
+  });
+  return state?{resolved:true,branch:"anko_serpent_evasion",damageApplied:false,stateRefs:[state.stateId],conditionRefs:[]}:{resolved:false,reason:"anko_serpent_evasion_state_failed"};
 }
 
 function resolveScriptedAnkoDamage(contract,envelope){
