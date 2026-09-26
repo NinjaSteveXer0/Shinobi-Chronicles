@@ -314,7 +314,21 @@
     if(!actionNode)return;
     const action=actionNode.getAttribute("data-afd2-action");
     if(action==="register"){startNewChronicle33400();return;}
-    if(action==="login"){if(hasBegunChronicle33400())release33400();return;}
+    if(action==="login"){
+      if(hasBegunChronicle33400()){
+        release33400();
+        // Returning-player login is presentation release, not navigation.
+        // If an Origin Story runtime survived reload, ask its existing
+        // rehydration authority to restore that exact beat. The helper already
+        // defers when an unresolved active Battle snapshot owns presentation.
+        try{
+          if(typeof restoreActiveOriginStoryPresentation32900==="function"){
+            restoreActiveOriginStoryPresentation32900();
+          }
+        }catch(_error){}
+      }
+      return;
+    }
     if(action==="back-account"){state.stage="account";state.feedback=null;render33400();return;}
     if(action==="save-id"){
       const input=document.getElementById("afd2-ninja-id");
