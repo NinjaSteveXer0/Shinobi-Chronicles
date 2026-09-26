@@ -603,8 +603,10 @@ if(PRE_RENDER_ACTION_REGION){
     if(isExactBattle()){
       const readiness=getInputReadiness(),s=ensureState();
       if(!readiness.ready){
-        const label=s&&(s.phase==="scripted_a"||s.phase==="scripted_b")?"ANKO ENGAGES":"RESOLVING";
-        return '<div class="battle-live-autonomous-phase" data-menma-36900-autonomous="true"><strong>'+label+'</strong><span>'+String(readiness.reason||"resolving").replaceAll("_"," ").toUpperCase()+'</span></div>';
+        // Scripted/resolving phases are narrated by the ordered performance
+        // presentation above the formation. Keep the action dock inert without
+        // leaking internal state-machine reasons into player-facing UI.
+        return '<div class="battle-live-autonomous-phase" data-menma-36900-autonomous="true" data-action-region-locked="true" aria-hidden="true"></div>';
       }
     }
     return PRE_RENDER_ACTION_REGION.apply(this,arguments);
