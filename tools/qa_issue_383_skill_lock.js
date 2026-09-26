@@ -7,13 +7,13 @@ const assert=require("assert");
 const vm=require("vm");
 
 const ROOT=path.resolve(__dirname,"..");
-const RUNTIME="runtime/alpha-kakashi-menma-skill-lock-38300.js";
+const RUNTIME="runtime/alpha-combat-skill-lock-38300.js";
 const INDEX="index.html";
 const source=fs.readFileSync(path.join(ROOT,RUNTIME),"utf8");
 const index=fs.readFileSync(path.join(ROOT,INDEX),"utf8");
 
 new vm.Script(source,{filename:RUNTIME});
-assert(index.includes('<script src="runtime/alpha-kakashi-menma-skill-lock-38300.js"></script>'),"#383 runtime adapter is not production-loaded");
+assert(index.includes('<script src="runtime/alpha-combat-skill-lock-38300.js"></script>'),"#383 runtime adapter is not production-loaded");
 
 const MENMA={
   academy_menma_chakra_knuckle:{id:"academy_menma_chakra_knuckle",authoredAttackPL:6},
