@@ -183,25 +183,14 @@ async function useVisibleSkill(page,skillId,displayName){
     card=stage.locator(".battle-live-skill-deck .battle-dev-skill-card",{hasText:displayName}).first();
   }
   await card.waitFor({state:"visible",timeout:10000});
+
+  // Alpha Browser Polish #32700 is the installed player interaction contract:
+  // a legal non-branch Skill card click commits through
+  // activateBattlePreparedSkillCard -> select -> confirm. There is deliberately
+  // no separate USE SKILL button. Exercise the exact visible production path.
+  const onclick=await card.getAttribute("onclick");
+  assert(onclick&&onclick.includes("activateBattlePreparedSkillCard"),"Skill card is not using the installed direct-click commit path: "+String(onclick));
   await card.click();
-  const use=stage.locator(".battle-live-use-skill").first();
-  try{
-    await use.waitFor({state:"visible",timeout:10000});
-  }catch(error){
-    const diagnostic=await page.evaluate(({skillId,displayName})=>({
-      skillId,displayName,
-      activePlayerId:typeof getBattleDeploymentParticipant==="function"?getBattleDeploymentParticipant("player",1)?.id||null:null,
-      readiness:typeof getMenmaEvolvedPLBattleInputReadiness36900==="function"?getMenmaEvolvedPLBattleInputReadiness36900():null,
-      actionState:typeof syncBattleActionRegionState==="function"?JSON.parse(JSON.stringify(syncBattleActionRegionState())):null,
-      definition:typeof getBattlePreparedSkillDefinition==="function"&&typeof getBattleDeploymentParticipant==="function"
-        ?getBattlePreparedSkillDefinition(getBattleDeploymentParticipant("player",1),skillId):null,
-      tray:document.querySelector(".alpha-code-battle-stage")?.dataset.formationTray||null,
-      deckHtml:document.querySelector(".alpha-code-battle-stage .battle-live-skill-deck")?.innerHTML||null,
-      detailHtml:document.querySelector(".alpha-code-battle-stage .battle-live-skill-details")?.innerHTML||null
-    }),{skillId,displayName});
-    throw new Error("selected Skill confirmation missing "+JSON.stringify(diagnostic)+" :: "+String(error&&error.message||error));
-  }
-  await use.click();
 }
 
 async function waitForActionPresentation(page,{actor,target,label,afterOrdinal=0}){
