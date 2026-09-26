@@ -421,91 +421,174 @@ function resolveAnkoGuestEvasion(envelope){
   return state?{resolved:true,branch:"anko_serpent_evasion",damageApplied:false,stateRefs:[state.stateId],conditionRefs:[]}:{resolved:false,reason:"anko_serpent_evasion_state_failed"};
 }
 
-function resolveScriptedAnkoDamage(contract,envelope){
-  const target=getBattleParticipantByIdentity("enemy",contract.targetId);
-  if(!target)return{resolved:false,reason:"scripted_target_missing"};
-  const output={
-    primaryDiscipline:"Ninjutsu",statKey:typeof getBattlePrimaryDisciplineStatKey==="function"?getBattlePrimaryDisciplineStatKey("Ninjutsu"):"nin",
-    effectivePrimaryDiscipline:ANKO_STATS.nin,coefficient:null,branch:"fixed_authored_anko_scripted_takedown",branchMultiplier:1,
-    authoredPreExecutionMagnitude:contract.attackPL,weaponExecutionMultiplier:1,preDefenseAttackMagnitude:contract.attackPL,
-    attackPL:contract.attackPL,fixedCalibration:true
-  };
-  const damage=resolveBattleDamagePacket({
-    envelope,skill:{id:contract.skillId,mechanicalPacketCount:1},
-    actorSide:"player",actorParticipantId:ANKO_ID,targetSide:"enemy",targetParticipantId:contract.targetId,
-    output,mitigable:true,excess:null,stateRefs:[]
-  });
-  return damage?{resolved:true,damageApplied:true,finalDamage:Number(damage.finalDamage)||0,damage}:{resolved:false,reason:"scripted_damage_failed"};
-}
-function commitScriptedAnkoPhase(phaseKey){
-  const s=ensureState(),contract=SCRIPTED_PHASES[phaseKey];
-  if(!s||!contract)return{success:false,reason:"scripted_phase_missing"};
-  if(s.phase!==phaseKey)return{success:false,reason:"scripted_phase_not_current",phase:s.phase};
-  if(s.scriptedCompleted[phaseKey]===true)return{success:true,idempotent:true,phase:phaseKey};
-  if(s.pendingZero)return{success:false,reason:"scripted_zero_already_pending"};
 
-  const enemy=activeEnemy();
-  if(!enemy||enemy.id!==contract.targetId)return{success:false,reason:"scripted_active_enemy_mismatch",expected:contract.targetId,actual:enemy&&enemy.id||null};
-  const actor=ensureLocalAnko();
-  const envelope=createBattleActionEnvelope({
-    actorSide:"player",actorParticipantId:ANKO_ID,targetSide:"enemy",targetParticipantId:contract.targetId,
-    actionClass:"authored_scripted_takedown",skillId:contract.skillId,
-    sourceRefs:[
-      {type:"combat_contract",id:SCRIPT_CONTRACT_ID},
-      {type:"character",id:ANKO_ID,role:"encounter_local_scripted_ally"}
-    ],
-    data:{
-      menmaHalfScriptedPhase:phaseKey,scriptedEncounterBeat:true,ordinarySideOpportunityConsumed:false,
-      men03Eligible:false,displayName:contract.displayName
+function hasMovementPreventingRestraint36900(side,participantId){
+  try{
+    const conditions=typeof getBattleParticipantConditions==="function"?getBattleParticipantConditions(side,participantId):[];
+    if(conditions.some(row=>row&&(row.conditionType==="physical_restraint"||(row.data&&row.data.movementPreventing===true))))return true;
+    const runtime=typeof ensureBattleRuntimeState==="function"?ensureBattleRuntimeState():null;
+    const states=runtime&&Array.isArray(runtime.transientStates)?runtime.transientStates:[];
+    return states.some(row=>row&&row.targetRef&&row.targetRef.side===side&&row.targetRef.participantId===participantId&&row.data&&row.data.semanticClass==="physical_restraint");
+  }catch(_error){return false;}
+}
+
+const PRE_DEFENSE_36900=typeof resolveBattlePreStaminaDefense==="function"?resolveBattlePreStaminaDefense:null;
+if(PRE_DEFENSE_36900){
+  const wrapped=function(definition){
+    if(isExactBattle()&&definition&&definition.targetSide==="player"&&definition.targetParticipantId===ANKO_ID&&definition.qualifyingDirectAttackPLPacket!==false){
+      const state=typeof findBattleTransientState==="function"
+        ?findBattleTransientState({stateKey:"sj_anko_serpent_evasion_ready",targetSide:"player",targetParticipantId:ANKO_ID})
+        :null;
+      if(state){
+        const incoming=Math.max(0,Math.round(Number(definition.attackPL)||0));
+        if(typeof removeBattleTransientState==="function")removeBattleTransientState(state.stateId);
+        try{
+          recordBattleEvidence({
+            eventType:"sj_anko_serpent_evasion_consumed",committedOccurrence:false,actionId:definition.actionId||null,
+            actorRef:createBattleParticipantRef("player",ANKO_ID),
+            sourceRefs:[{type:"skill",id:"sj_anko_serpent_evasion",role:"defensive_source"}],
+            stateRefs:[state.stateId],
+            data:{incomingAttackPL:incoming,resolvedAttackPL:0,deterministicAvoidance:true,noAccuracyRoll:true}
+          });
+        }catch(_error){}
+        return{
+          incomingAttackPL:incoming,resolvedAttackPL:0,
+          guardingStep:{participated:false,stateId:null,attemptedReduction:0,actualReduction:0},
+          enmaGuard:{participated:false,stateId:null,attemptedReduction:0,actualReduction:0,sourceId:null},
+          flatGuards:[],ratioGuards:[],consumedStateIds:[state.stateId],
+          serpentEvasion:{participated:true,stateId:state.stateId,deterministicAvoidance:true}
+        };
+      }
     }
-  });
-  const resolution=resolveScriptedAnkoDamage(contract,envelope);
-  if(!resolution.resolved)return{success:false,reason:resolution.reason||"scripted_resolution_failed"};
-  s.scriptedCompleted[phaseKey]=true;
-  recordBattleEvidence({
-    eventType:"menma_origin_scripted_anko_takedown_completed",committedOccurrence:true,actionId:envelope.actionId,
-    actorRef:createBattleParticipantRef("player",ANKO_ID),targetRef:createBattleParticipantRef("enemy",contract.targetId),
-    skillId:contract.skillId,sourceRefs:envelope.sourceRefs,
-    data:{
-      resolved:true,displayName:contract.displayName,scriptedPhase:phaseKey,
-      authoredAttackPL:contract.attackPL,expectedTargetStamina:contract.expectedStamina,
-      finalDamage:Number(resolution.finalDamage)||0,expectedDamage:contract.expectedDamage,
-      ordinarySideOpportunityConsumed:false,men03Eligible:false,
-      zeroPLWithdrawalPendingPresentation:true
+    return PRE_DEFENSE_36900.apply(this,arguments);
+  };
+  globalThis.resolveBattlePreStaminaDefense=wrapped;try{resolveBattlePreStaminaDefense=wrapped;}catch(_error){}
+}
+function expireUnusedAnkoEvasion36900(){
+  const state=typeof findBattleTransientState==="function"
+    ?findBattleTransientState({stateKey:"sj_anko_serpent_evasion_ready",targetSide:"player",targetParticipantId:ANKO_ID})
+    :null;
+  if(!state)return false;
+  if(typeof removeBattleTransientState==="function")removeBattleTransientState(state.stateId);
+  try{
+    recordBattleEvidence({
+      eventType:"sj_anko_serpent_evasion_expired",committedOccurrence:false,
+      actorRef:createBattleParticipantRef("player",ANKO_ID),stateRefs:[state.stateId],
+      data:{reason:"start_of_next_guest_ally_action_opportunity"}
+    });
+  }catch(_error){}
+  return true;
+}
+
+const PRE_ATTEMPT_BATTLE_PREPARED_SKILL_36900=typeof attemptBattlePreparedSkill==="function"?attemptBattlePreparedSkill:null;
+if(PRE_ATTEMPT_BATTLE_PREPARED_SKILL_36900){
+  const wrapped=function(skillId,targetParticipantId=null,options={}){
+    const actor=activePlayer();
+    const skill=actor&&actor.id===ANKO_ID?ANKO_GUEST_SKILLS[skillId]:null;
+    if(!isExactBattle()||!actor||actor.id!==ANKO_ID||!skill){
+      return PRE_ATTEMPT_BATTLE_PREPARED_SKILL_36900.apply(this,arguments);
     }
-  });
-  persistBattleSnapshot();
-  return{success:true,phase:phaseKey,envelope,resolution};
+    const readiness=getInputReadiness();
+    if(!readiness.ready||readiness.activeParticipantId!==ANKO_ID)return{success:false,reason:readiness.reason||"guest_ally_not_actionable"};
+
+    const enemy=activeEnemy();
+    const target=skill.targetMode==="self"?actor:enemy;
+    const availability=evaluateBattlePreparedSkillAvailability(skill,actor,target);
+    if(!availability||availability.available!==true)return{success:false,reason:availability&&availability.reason||"guest_ally_skill_unavailable",availability};
+
+    // A prior Serpent Evasion lasts through the immediately following enemy
+    // opportunity only. If unused, it expires when Anko begins her next action.
+    if(skill.id!=="sj_anko_serpent_evasion")expireUnusedAnkoEvasion36900();
+
+    const targetSide=skill.targetMode==="self"?"player":"enemy";
+    const targetId=targetSide==="player"?ANKO_ID:(target&&target.id||targetParticipantId);
+    if(!targetId)return{success:false,reason:"guest_ally_target_missing"};
+
+    const envelope=createBattleActionEnvelope({
+      actorSide:"player",actorParticipantId:ANKO_ID,targetSide,targetParticipantId:targetId,
+      actionClass:skill.actionClass,skillId:skill.id,
+      sourceRefs:[
+        {type:"character",id:ANKO_ID,role:"guest_ally_actor"},
+        {type:"combat_contract",id:"menma_scene7_anko_origin_palette",role:"legal_action_authority"}
+      ],
+      data:{
+        traits:Array.isArray(skill.traits)?[...skill.traits]:[],
+        participantClass:"guest_ally",controlAuthority:"player",
+        temporaryBattleParticipant:true,ownershipGranted:false,myClanAssigned:false
+      }
+    });
+    const entry=beginBattleActionResolution(envelope);
+    if(!entry||entry.accepted!==true)return{success:false,reason:entry&&entry.validation&&entry.validation.reason||"guest_ally_action_rejected",entry};
+
+    let resolution=null;
+    if(skill.id==="sj_anko_snake_bind")resolution=resolveAnkoGuestBind(enemy,envelope);
+    else if(skill.id==="sj_anko_serpent_evasion")resolution=resolveAnkoGuestEvasion(envelope);
+    else resolution=resolveAnkoGuestDirectDamage(skill.id,enemy,envelope);
+
+    const resolved=!!(resolution&&resolution.resolved===true);
+    recordBattleEvidence({
+      eventType:"skill_action_completed",committedOccurrence:resolved,actionId:envelope.actionId,
+      actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,
+      stateRefs:resolution&&Array.isArray(resolution.stateRefs)?resolution.stateRefs:[],
+      conditionRefs:resolution&&Array.isArray(resolution.conditionRefs)?resolution.conditionRefs:[],
+      data:{
+        resolved,branch:resolution&&resolution.branch||null,
+        damageApplied:!!(resolution&&resolution.damageApplied),
+        finalDamage:Number(resolution&&resolution.finalDamage)||0,
+        remainingBattlePLAfter:targetSide==="enemy"&&targetId?Number(getBattleRemainingPL("enemy",targetId)):null,
+        guestAllyPlayerChosen:true,men03Eligible:false
+      }
+    });
+    if(!resolved)return{success:false,reason:resolution&&resolution.reason||"guest_ally_resolution_failed",envelope,resolution};
+
+    consumeBattleActionOpportunity("player",ANKO_ID,envelope.actionId,"valid_guest_ally_player_action_completed");
+    persistBattleSnapshot();
+    try{if(!battle().battleOver)openOverlay("combat");}catch(_error){}
+    return{success:true,envelope,resolution,skillId:skill.id,targetId};
+  };
+  globalThis.attemptBattlePreparedSkill=wrapped;try{attemptBattlePreparedSkill=wrapped;}catch(_error){}
 }
 
 function enemyEligibleActions(enemy,target){
-  if(!enemy||enemy.id!=="test_subject_unstable"||!target||target.id!==MENMA_ID)return[];
+  if(!enemy||!target)return[];
   const authored=typeof getEnemyAuthoredBattleActions==="function"?getEnemyAuthoredBattleActions(enemy):[];
   return authored.filter(action=>{
-    const eligibility=typeof evaluateEnemyAuthoredActionEligibility==="function"?evaluateEnemyAuthoredActionEligibility(action,enemy,target):{eligible:true};
-    return !!eligibility&&eligibility.eligible===true;
+    const eligibility=typeof evaluateEnemyAuthoredActionEligibility==="function"
+      ?evaluateEnemyAuthoredActionEligibility(action,enemy,target):{eligible:true};
+    if(!eligibility||eligibility.eligible!==true)return false;
+    if(action.id==="test_subject_brute_body_rush"&&hasMovementPreventingRestraint36900("enemy",enemy.id))return false;
+    return true;
   });
 }
-function resolvePhaseCEnemyOpportunity(){
-  const s=ensureState();if(!s||s.phase!=="phase_c_enemy"||s.pendingZero)return{success:false,reason:"phase_c_enemy_not_ready"};
-  const enemy=activeEnemy(),target=getBattleParticipantByIdentity("player",MENMA_ID);
-  if(!enemy||enemy.id!=="test_subject_unstable")return{success:false,reason:"unstable_not_active"};
-  if(!target)return{success:false,reason:"menma_target_missing"};
+function resolveEnemyOpportunity(){
+  const st=ensureState();
+  if(!st||st.phase!=="enemy"||st.pendingZero)return{success:false,reason:"enemy_opportunity_not_ready"};
+  const enemy=activeEnemy(),target=activePlayer();
+  if(!enemy)return{success:false,reason:"enemy_active_missing"};
+  if(!target)return{success:false,reason:"player_active_missing"};
   const eligible=enemyEligibleActions(enemy,target);
-  if(eligible.length===0)return{success:false,reason:"unstable_no_legal_action"};
+  if(eligible.length===0){
+    const skippedId="skip:"+currentOpportunityId("enemy");
+    recordBattleEvidence({
+      eventType:"menma_origin_enemy_opportunity_skipped",committedOccurrence:true,actionId:skippedId,
+      actorRef:createBattleParticipantRef("enemy",enemy.id),targetRef:createBattleParticipantRef("player",target.id),
+      data:{reason:"no_semantically_eligible_enemy_action",inventedFallback:false}
+    });
+    consumeBattleActionOpportunity("enemy",enemy.id,skippedId,"enemy_opportunity_no_legal_action");
+    return{success:true,skipped:true,enemyId:enemy.id,targetId:target.id,actionId:skippedId};
+  }
   const opId=currentOpportunityId("enemy");
-  const selectedId=committedChoice(opId,"unstable_phase_c_action",eligible.map(row=>row.id));
+  const selectedId=committedChoice(opId,"enemy_active_authored_action",eligible.map(row=>row.id));
   const action=eligible.find(row=>row.id===selectedId);
-  if(!action)return{success:false,reason:"committed_unstable_action_no_longer_eligible"};
-  try{if(typeof resolveBattleStartOfActionOpportunityEffects==="function")resolveBattleStartOfActionOpportunityEffects("enemy",enemy.id,opId);}catch(_error){}
+  if(!action)return{success:false,reason:"committed_enemy_action_no_longer_eligible",selectedId};
   const envelope=createBattleActionEnvelope({
-    actorSide:"enemy",actorParticipantId:enemy.id,targetSide:"player",targetParticipantId:MENMA_ID,
+    actorSide:"enemy",actorParticipantId:enemy.id,targetSide:"player",targetParticipantId:target.id,
     actionClass:action.actionClass||"enemy_authored_action",skillId:action.skillId||action.id,
     sourceRefs:Array.isArray(action.sourceRefs)?action.sourceRefs:[],
-    data:{traits:Array.isArray(action.traits)?[...action.traits]:[],authoredEnemyAction:true,phaseCOnly:true}
+    data:{traits:Array.isArray(action.traits)?[...action.traits]:[],authoredEnemyAction:true,activeOnlyEnemyCadence:true}
   });
   const entry=beginBattleActionResolution(envelope);
-  if(!entry||entry.accepted!==true)return{success:false,reason:entry&&entry.validation&&entry.validation.reason||"unstable_envelope_rejected"};
+  if(!entry||entry.accepted!==true)return{success:false,reason:entry&&entry.validation&&entry.validation.reason||"enemy_envelope_rejected",entry};
   const resolution=action.resolve({enemy,target,envelope,currentBattle:battle()});
   const resolved=!!(resolution&&resolution.resolved===true);
   const secondary=resolved&&typeof resolveAlphaEnemyActionSecondaryConsumers==="function"
@@ -515,66 +598,89 @@ function resolvePhaseCEnemyOpportunity(){
     eventType:"enemy_authored_action_completed",committedOccurrence:resolved,actionId:envelope.actionId,
     actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:envelope.skillId,sourceRefs:envelope.sourceRefs,
     stateRefs:secondary&&secondary.stateRefs||[],conditionRefs:secondary&&secondary.conditionRefs||[],
-    data:{resolved,actionId:action.id,phaseCOnly:true,randomnessAppliedAfterEligibility:true,equalSelectionWeight:true}
+    data:{resolved,actionId:action.id,randomnessAppliedAfterEligibility:true,equalSelectionWeight:true,inventedFallback:false,activeOnlyEnemyCadence:true}
   });
-  if(!resolved)return{success:false,reason:"unstable_action_resolution_failed"};
+  if(!resolved)return{success:false,reason:"enemy_action_resolution_failed",envelope,resolution};
   consumeBattleActionOpportunity("enemy",enemy.id,envelope.actionId,"valid_enemy_action_completed");
-  return{success:true,envelope,resolution};
+  return{success:true,envelope,resolution,enemyId:enemy.id,targetId:target.id,actionId:action.id};
 }
 
-// Zero-PL commit and formation mutation are deliberately separated so the struck
-// participant remains visible until the committed action playback settles.
+function startMenmaEvidenceWindow36900(reason){
+  const st=ensureState(),active=activePlayer();
+  if(!st||st.menmaEvidenceStarted||!active||active.id!==MENMA_ID)return false;
+  st.menmaEvidenceStarted=true;
+  recordBattleEvidence({
+    eventType:"menma_origin_phase_c_started",committedOccurrence:true,
+    actorRef:createBattleParticipantRef("player",MENMA_ID),targetRef:activeEnemy()?createBattleParticipantRef("enemy",activeEnemy().id):null,
+    data:{men03Scope:"menma_active_only",entryReason:reason||"active_promotion",ankoActionsExcluded:true,firstLegitimateMenmaActiveMoment:true}
+  });
+  return true;
+}
+
 const PRE_ZERO=typeof handleBattleParticipantAtZeroPL==="function"?handleBattleParticipantAtZeroPL:null;
 if(PRE_ZERO){
   const wrapped=function(side,participantId,actor,envelope){
     if(!isExactBattle())return PRE_ZERO.apply(this,arguments);
-    const s=ensureState();
-    const actionId=envelope&&envelope.actionId||null;
-    const scriptedEnemy=(s.phase==="scripted_a"&&participantId===HOSTILE_IDS[0])||(s.phase==="scripted_b"&&participantId===HOSTILE_IDS[1]);
-    const phaseCEnemy=(s.phase==="phase_c_player"&&side==="enemy"&&participantId===HOSTILE_IDS[2]);
-    const phaseCPlayer=(s.phase==="phase_c_enemy"&&side==="player"&&participantId===MENMA_ID);
-    if((side==="enemy"&&scriptedEnemy)||phaseCEnemy||phaseCPlayer){
-      s.pendingZero={side,participantId,actionId,actorId:actor&&actor.id||null,phase:s.phase};
-      s.inputLocked=true;
-      if(side==="enemy"&&!s.resolvedHostileIds.includes(participantId))s.resolvedHostileIds.push(participantId);
-      if(side==="player"&&participantId===MENMA_ID)s.menmaWithdrawn=true;
+    const st=ensureState(),actionId=envelope&&envelope.actionId||null;
+    if(!st||!actionId)return PRE_ZERO.apply(this,arguments);
+    const relevant=(side==="enemy"&&HOSTILE_IDS.includes(participantId))||(side==="player"&&ALLIED_IDS.includes(participantId));
+    if(!relevant)return PRE_ZERO.apply(this,arguments);
+
+    if(!st.pendingZero){
+      st.pendingZero={
+        side,participantId,actionId,actorId:actor&&actor.id||envelope&&envelope.actorRef&&envelope.actorRef.participantId||null,
+        causedBySide:envelope&&envelope.actorRef&&envelope.actorRef.side||null,
+        phase:st.phase
+      };
+      st.inputLocked=true;
+      if(side==="enemy"&&!st.resolvedHostileIds.includes(participantId))st.resolvedHostileIds.push(participantId);
+      if(side==="player"){
+        if(participantId===MENMA_ID)st.menmaWithdrawn=true;
+        if(participantId===ANKO_ID){st.ankoWithdrawn=true;st.authoredYieldCancelled=true;}
+      }
+      if(!st.withdrawalOrder.some(row=>row&&row.side===side&&row.participantId===participantId)){
+        st.withdrawalOrder.push({side,participantId,actionId,causedBySide:st.pendingZero.causedBySide});
+      }
       persistBattleSnapshot();
-      return{type:"presentation_pending_withdrawal",side,participantId,actionId,presentationMustSettleFirst:true};
     }
-    return PRE_ZERO.apply(this,arguments);
+    return{type:"presentation_pending_withdrawal",side,participantId,actionId,presentationMustSettleFirst:true};
   };
   globalThis.handleBattleParticipantAtZeroPL=wrapped;try{handleBattleParticipantAtZeroPL=wrapped;}catch(_error){}
 }
 
-function swapAnkoToMenmaActive(){
-  const b=battle(),s=ensureState();if(!b||!s)return false;
-  const before=getBattleDeploymentParticipant("player",1);
+function shouldAuthorMenmaHandoff36900(){
+  const st=ensureState(),enemy=activeEnemy(),ally=activePlayer();
+  if(!st||st.authoredYieldCancelled||st.ankoYielded)return false;
+  if(st.ankoWithdrawn||st.menmaWithdrawn)return false;
+  if(!ally||ally.id!==ANKO_ID||!enemy||enemy.id!==HOSTILE_IDS[2])return false;
+  if(!st.resolvedHostileIds.includes(HOSTILE_IDS[0])||!st.resolvedHostileIds.includes(HOSTILE_IDS[1]))return false;
+  return Number(getBattleRemainingPL("player",ANKO_ID))>0&&Number(getBattleRemainingPL("player",MENMA_ID))>0;
+}
+function yieldAnkoToMenmaActive36900(){
+  const b=battle(),st=ensureState();if(!b||!st||!shouldAuthorMenmaHandoff36900())return false;
+  const deployment=b.deployment;
   b.deployment.player={slots:createBattleDeploymentSlots([MENMA_ID,ANKO_ID])};
+  if(typeof clearBattleActionSelectionForActorChange==="function")clearBattleActionSelectionForActorChange();
   if(typeof syncBattleActivePlayerFromDeployment==="function")syncBattleActivePlayerFromDeployment();
   else b.activePlayer=getBattleParticipantByIdentity("player",MENMA_ID);
-  s.ankoYielded=true;s.phase="phase_c_player";s.inputLocked=false;
   b.characterId=MENMA_ID;
-  const deployment=b.deployment;
-  const pairedEnemyRelayTransition=deployment.lastTransition&&deployment.lastTransition.side==="enemy"
-    ?clone(deployment.lastTransition):null;
+  st.ankoYielded=true;st.phase="enemy";st.inputLocked=true;
   deployment.transitionCounter=(Number(deployment.transitionCounter)||0)+1;
   deployment.lastTransition={
-    id:"menma_phase_c_yield_"+String(deployment.transitionCounter),type:"authored_active_yield",side:"player",
-    reason:"menma_origin_phase_c_handoff",withdrawnParticipantId:null,vacatedSlot:1,replacementParticipantId:MENMA_ID,
-    movements:[{participantId:ANKO_ID,fromSlot:1,toSlot:2,movementType:"authored_yield_to_bench"},{participantId:MENMA_ID,fromSlot:2,toSlot:1,movementType:"authored_bench_promotion"}],
-    pairedEnemyRelayTransition,
-    createdAt:Date.now()
+    id:"menma_guest_yield_"+String(deployment.transitionCounter),type:"authored_active_yield",side:"player",
+    reason:"menma_origin_guest_ally_teaching_handoff",withdrawnParticipantId:null,vacatedSlot:1,replacementParticipantId:MENMA_ID,
+    movements:[
+      {participantId:ANKO_ID,fromSlot:1,toSlot:2,movementType:"authored_yield_to_bench"},
+      {participantId:MENMA_ID,fromSlot:2,toSlot:1,movementType:"authored_bench_promotion"}
+    ],
+    sideOrderReset:false,nextSide:"enemy",createdAt:Date.now()
   };
   recordBattleEvidence({
     eventType:"battle_formation_yield_committed",committedOccurrence:true,
     actorRef:createBattleParticipantRef("player",ANKO_ID),targetRef:createBattleParticipantRef("player",MENMA_ID),
-    data:{yieldFrom:before&&before.id||ANKO_ID,promoteTo:MENMA_ID,ankoRemainsDeployed:true,menmaReceivesFirstNormalPlayerOpportunity:true}
+    data:{yieldFrom:ANKO_ID,promoteTo:MENMA_ID,ankoRemainsDeployed:true,actionOpportunityConsumed:false,sideOrderReset:false,nextSide:"enemy"}
   });
-  recordBattleEvidence({
-    eventType:"menma_origin_phase_c_started",committedOccurrence:true,
-    actorRef:createBattleParticipantRef("player",MENMA_ID),targetRef:createBattleParticipantRef("enemy",HOSTILE_IDS[2]),
-    data:{men03Scope:"phase_c_only",firstNormalPlayerOpportunity:true,ankoScriptedActionsExcluded:true}
-  });
+  startMenmaEvidenceWindow36900("authored_guest_ally_yield");
   persistBattleSnapshot();
   return true;
 }
@@ -585,8 +691,10 @@ function completeOccurrenceReceipt(result){
   if(!Array.isArray(p.activityHistory))p.activityHistory=[];
   const existing=p.activityHistory.find(row=>row&&String(row.battleOccurrenceId||row.occurrenceId||"")===id&&row.type!=="origin_battle_reward");
   if(existing)return existing;
-  const s=ensureState(),victory=result==="victory";
+  const st=ensureState(),victory=result==="victory";
   updateResolvedHostiles();
+  const resolved=victory?[...HOSTILE_IDS]:[...(st&&st.resolvedHostileIds||[])];
+  const unresolved=HOSTILE_IDS.filter(id=>!resolved.includes(id));
   const record={
     historyScope:typeof getCurrentChronicleOccurrenceHistoryScope==="function"?getCurrentChronicleOccurrenceHistoryScope("origin_battle_occurrence"):null,
     type:"origin_battle_occurrence",activity:"battle",completed:true,committed:true,success:victory,
@@ -594,132 +702,185 @@ function completeOccurrenceReceipt(result){
     actorVariantId:MENMA_ID,sceneId:STORY_SCENE_ID,storySceneInstanceId:sceneInstanceId(b),
     battleConfigId:BATTLE_CONFIG_ID,encounterId:ENCOUNTER_ID,objectiveId:OBJECTIVE_ID,
     battleResult:victory?"victory":"defeat",terminalBattleResult:victory?"victory":"defeat",objectiveCompleted:victory,
-    menmaWithdrawn:!!(s&&s.menmaWithdrawn),ankoWithdrawn:false,
+    menmaWithdrawn:!!(st&&st.menmaWithdrawn),ankoWithdrawn:!!(st&&st.ankoWithdrawn),
     alliedParticipantIds:[...ALLIED_IDS],hostileParticipantIds:[...HOSTILE_IDS],
-    resolvedHostileIds:victory?[...HOSTILE_IDS]:[...(s&&s.resolvedHostileIds||[])],
-    fact:{battlePLWithdrawalNotDeath:true,noInferredInjury:true,noInferredCustody:true,menmaOnlyTutorialAttribution:true,halfScriptedPhaseABExcludedFromMEN03:true},
-    data:{battlePLWithdrawalNotDeath:true,noInferredInjury:true,noInferredCustody:true,menmaOnlyTutorialAttribution:true,halfScriptedPhaseABExcludedFromMEN03:true},
+    resolvedHostileIds:resolved,unresolvedHostileIds:unresolved,
+    withdrawalOrder:clone(st&&st.withdrawalOrder||[]),
+    fact:{
+      battlePLWithdrawalNotDeath:true,noInferredInjury:true,noInferredCustody:true,
+      guestAllyControl:true,ownershipGranted:false,myClanMutated:false,
+      menmaOnlyTutorialAttribution:true,menmaEvidenceStarted:!!(st&&st.menmaEvidenceStarted)
+    },
+    data:{
+      battlePLWithdrawalNotDeath:true,noInferredInjury:true,noInferredCustody:true,
+      guestAllyControl:true,ownershipGranted:false,myClanMutated:false,
+      menmaOnlyTutorialAttribution:true,menmaEvidenceStarted:!!(st&&st.menmaEvidenceStarted)
+    },
     timestamp:Date.now()
   };
   p.activityHistory.push(record);
   try{if(typeof activityHistory!=="undefined"&&Array.isArray(activityHistory)&&activityHistory!==p.activityHistory)activityHistory.push(record);}catch(_error){}
   return record;
 }
-function upstreamBattleReceipt(){return completeOccurrenceReceipt("victory");}
 
 const PRE_COMPLETE_VICTORY=typeof completeBattleVictoryFromDamage==="function"?completeBattleVictoryFromDamage:null;
-function completeMenmaSuccessorVictory(actionId=null){
-  const s=ensureState();if(!s||battle().battleOver)return battle().outcome||battle().rewards;
+function completeMenmaSuccessorVictory(actionId=null,finishingActorId=null){
+  const st=ensureState();if(!st||battle().battleOver)return battle().outcome||battle().rewards;
   if(!HOSTILE_IDS.every(id=>Number(getBattleRemainingPL("enemy",id))<=0))return{success:false,reason:"three_subject_objective_incomplete"};
-  s.terminalResult="victory";s.phase="terminal";s.inputLocked=true;s.menmaWithdrawn=false;
-  upstreamBattleReceipt();
-  const menma=getBattleParticipantByIdentity("player",MENMA_ID);
-  const result=PRE_COMPLETE_VICTORY?PRE_COMPLETE_VICTORY.call(globalThis,menma,null,HOSTILE_IDS[2]):null;
+  st.terminalResult="victory";st.phase="terminal";st.inputLocked=true;
+  completeOccurrenceReceipt("victory");
+  const finisher=finishingActorId?getBattleParticipantByIdentity("player",finishingActorId):activePlayer();
+  const result=PRE_COMPLETE_VICTORY?PRE_COMPLETE_VICTORY.call(globalThis,finisher||activePlayer(),null,HOSTILE_IDS[2]):null;
   if(battle().outcome){
     Object.assign(battle().outcome,{
       battleConfigId:BATTLE_CONFIG_ID,encounterId:ENCOUNTER_ID,objectiveId:OBJECTIVE_ID,objectiveCompleted:true,
-      menmaWithdrawn:false,ankoWithdrawn:false,resolvedHostileIds:[...HOSTILE_IDS],battleOccurrenceId:battleOccurrenceId(),
-      tutorialResult:"completed",men03Scope:"phase_c_only"
+      menmaWithdrawn:st.menmaWithdrawn===true,ankoWithdrawn:st.ankoWithdrawn===true,
+      resolvedHostileIds:[...HOSTILE_IDS],battleOccurrenceId:battleOccurrenceId(),
+      tutorialResult:"completed",men03Scope:"menma_active_only",menmaEvidenceStarted:st.menmaEvidenceStarted===true
     });
   }
   try{if(typeof savePlayerData==="function")savePlayerData();}catch(_error){}
-  persistBattleSnapshot();return result;
+  persistBattleSnapshot();
+  return result;
 }
 const PRE_COMPLETE_DEFEAT=typeof completeBattleDefeat==="function"?completeBattleDefeat:null;
-function completeMenmaSuccessorDefeat(actionId=null){
-  const s=ensureState();if(!s||battle().battleOver)return battle().outcome;
-  s.terminalResult="defeat";s.phase="terminal";s.inputLocked=true;s.menmaWithdrawn=true;
+function completeMenmaSuccessorDefeat(actionId=null,defeatedParticipantId=null){
+  const st=ensureState();if(!st||battle().battleOver)return battle().outcome;
+  st.terminalResult="defeat";st.phase="terminal";st.inputLocked=true;
   completeOccurrenceReceipt("defeat");
-  const result=PRE_COMPLETE_DEFEAT?PRE_COMPLETE_DEFEAT.call(globalThis,MENMA_ID,null,"academy_menma_phase_c_withdrawn"):null;
+  const result=PRE_COMPLETE_DEFEAT
+    ?PRE_COMPLETE_DEFEAT.call(globalThis,defeatedParticipantId||null,null,"menma_scene7_allied_side_exhausted")
+    :null;
   if(battle().outcome){
     Object.assign(battle().outcome,{
       battleConfigId:BATTLE_CONFIG_ID,encounterId:ENCOUNTER_ID,objectiveId:OBJECTIVE_ID,objectiveCompleted:false,
-      menmaWithdrawn:true,ankoWithdrawn:false,resolvedHostileIds:[...(s.resolvedHostileIds||[])],battleOccurrenceId:battleOccurrenceId(),
-      tutorialResult:"not_completed",performanceBucket:null,men03Scope:"phase_c_only"
+      menmaWithdrawn:st.menmaWithdrawn===true,ankoWithdrawn:st.ankoWithdrawn===true,
+      resolvedHostileIds:[...(st.resolvedHostileIds||[])],
+      unresolvedHostileIds:HOSTILE_IDS.filter(id=>!(st.resolvedHostileIds||[]).includes(id)),
+      battleOccurrenceId:battleOccurrenceId(),tutorialResult:"not_completed",performanceBucket:null,
+      men03Scope:"menma_active_only",partyDefeat:true,battlePLWithdrawalNotDeath:true,noInferredInjury:true
     });
   }
-  persistBattleSnapshot();return result;
+  persistBattleSnapshot();
+  return result;
+}
+
+function advanceAfterEnemyOpportunity36900(){
+  const st=ensureState();if(!st||battle().battleOver)return;
+  st.phase="player";st.playerOpportunityOrdinal+=1;st.inputLocked=false;
+}
+function settleEnemyOpportunity36900(){
+  const st=ensureState();
+  if(!st||st.processing||battle().battleOver||st.pendingZero||st.phase!=="enemy")return{success:false,reason:"enemy_settle_unavailable"};
+  st.processing=true;
+  let result=null;
+  try{
+    result=resolveEnemyOpportunity();
+    const enemyId=result&&result.enemyId||activeEnemy()&&activeEnemy().id||null;
+    const actionId=result&&result.envelope&&result.envelope.actionId||result&&result.actionId||null;
+    if(!opportunityCommitted("enemy"))markOpportunityCommitted("enemy",enemyId,actionId||("failed:"+currentOpportunityId("enemy")),result&&result.success===true?"enemy_active_action":"enemy_action_failed");
+    if(!result||result.success!==true){
+      recordBattleEvidence({
+        eventType:"menma_origin_enemy_opportunity_failed_visible",committedOccurrence:true,
+        actionId:actionId||("failed:"+currentOpportunityId("enemy")),
+        actorRef:enemyId?createBattleParticipantRef("enemy",enemyId):null,
+        data:{reason:result&&result.reason||"enemy_resolution_failed",inventedFallback:false}
+      });
+    }
+    if(!st.pendingZero&&!battle().battleOver)advanceAfterEnemyOpportunity36900();
+  }finally{st.processing=false;}
+  persistBattleSnapshot();
+  return result||{success:false,reason:"enemy_resolution_missing"};
 }
 
 // Called by 33000 only after the exact committed action has visibly settled.
 function advanceAfterPresentation(receipt){
-  const s=ensureState();if(!s||!receipt||!receipt.actionId)return{success:false,reason:"presentation_receipt_missing"};
-  const pending=s.pendingZero;
+  const st=ensureState();if(!st||!receipt||!receipt.actionId)return{success:false,reason:"presentation_receipt_missing"};
+  const pending=st.pendingZero;
   if(!pending||String(pending.actionId||"")!==String(receipt.actionId||""))return{success:false,reason:"no_matching_pending_zero"};
-  s.pendingZero=null;
+  st.pendingZero=null;
+
+  const transition=typeof advanceBattleParticipantAtZeroPL==="function"
+    ?advanceBattleParticipantAtZeroPL(pending.side,pending.participantId):null;
 
   if(pending.side==="enemy"){
-    const from=pending.participantId;
-    const transition=typeof advanceBattleParticipantAtZeroPL==="function"
-      ?advanceBattleParticipantAtZeroPL("enemy",from):null;
     updateResolvedHostiles();
     const next=activeEnemy();
     recordBattleEvidence({
       eventType:"battle_formation_relay_committed",committedOccurrence:true,actionId:pending.actionId,
-      actorRef:createBattleParticipantRef("enemy",from),targetRef:next?createBattleParticipantRef("enemy",next.id):null,
-      data:{relayFrom:from,relayTo:next&&next.id||null,outgoingActiveExited:true,nextEligibleActive:next&&next.id||null,semanticFormationAlreadyCommitted:true}
+      actorRef:createBattleParticipantRef("enemy",pending.participantId),
+      targetRef:next?createBattleParticipantRef("enemy",next.id):null,
+      data:{relayFrom:pending.participantId,relayTo:next&&next.id||null,outgoingActiveExited:true,nextEligibleActive:next&&next.id||null,sideOrderReset:false}
     });
+    if(!next){
+      return{success:true,terminal:"victory",transition,result:completeMenmaSuccessorVictory(pending.actionId,pending.actorId)};
+    }
 
-    if(pending.phase==="scripted_a"){
-      if(!next||next.id!==HOSTILE_IDS[1])return{success:false,reason:"brute_relay_missing"};
-      s.phase="scripted_b";s.inputLocked=true;persistBattleSnapshot();
-      return commitScriptedAnkoPhase("scripted_b");
-    }
-    if(pending.phase==="scripted_b"){
-      if(!next||next.id!==HOSTILE_IDS[2])return{success:false,reason:"unstable_relay_missing"};
-      swapAnkoToMenmaActive();
-      return{success:true,phase:"phase_c_player",relay:transition};
-    }
-    if(pending.phase==="phase_c_player"){
-      if(next)return{success:false,reason:"unexpected_enemy_successor_after_unstable"};
-      return{success:true,terminal:"victory",result:completeMenmaSuccessorVictory(pending.actionId)};
-    }
+    // The player-side action that caused this withdrawal has been consumed.
+    // Enemy remains next even when the authored Anko -> Menma handoff occurs.
+    st.phase="enemy";st.enemyOpportunityOrdinal+=1;st.inputLocked=true;
+    yieldAnkoToMenmaActive36900();
+    persistBattleSnapshot();
+    const enemyResult=settleEnemyOpportunity36900();
+    return{success:true,relay:transition,enemyResult,activePlayerId:activePlayer()&&activePlayer().id||null,activeEnemyId:next.id};
   }
 
-  if(pending.side==="player"&&pending.participantId===MENMA_ID&&pending.phase==="phase_c_enemy"){
-    return{success:true,terminal:"defeat",result:completeMenmaSuccessorDefeat(pending.actionId)};
+  if(pending.side==="player"){
+    const next=activePlayer();
+    recordBattleEvidence({
+      eventType:"battle_formation_relay_committed",committedOccurrence:true,actionId:pending.actionId,
+      actorRef:createBattleParticipantRef("player",pending.participantId),
+      targetRef:next?createBattleParticipantRef("player",next.id):null,
+      data:{relayFrom:pending.participantId,relayTo:next&&next.id||null,outgoingActiveExited:true,nextEligibleActive:next&&next.id||null,sideOrderReset:false}
+    });
+    if(!next){
+      return{success:true,terminal:"defeat",transition,result:completeMenmaSuccessorDefeat(pending.actionId,pending.participantId)};
+    }
+    if(pending.participantId===ANKO_ID)st.authoredYieldCancelled=true;
+    if(next.id===MENMA_ID)startMenmaEvidenceWindow36900("normal_relay_after_anko_withdrawal");
+
+    const nextSide=pending.causedBySide==="enemy"?"player":"enemy";
+    if(nextSide==="player"){
+      st.phase="player";st.playerOpportunityOrdinal+=1;st.inputLocked=false;
+      persistBattleSnapshot();
+      return{success:true,relay:transition,nextSide:"player",activePlayerId:next.id};
+    }
+    st.phase="enemy";st.enemyOpportunityOrdinal+=1;st.inputLocked=true;
+    persistBattleSnapshot();
+    const enemyResult=settleEnemyOpportunity36900();
+    return{success:true,relay:transition,nextSide:"enemy",enemyResult,activePlayerId:next.id};
   }
   return{success:false,reason:"pending_zero_shape_unhandled"};
 }
 globalThis.advanceMenmaScriptedBattleAfterPresentation37300=advanceAfterPresentation;
 
-// Phase C side alternation. The enemy action may commit immediately after Menma,
-// but 33000 presents immutable receipts strictly one after another.
+// Current-Active side alternation. Player actions may be Menma or Guest Ally
+// Anko; control follows slot 1 and never implies ownership.
 const PRE_CONSUME_OPPORTUNITY=typeof consumeBattleActionOpportunity==="function"?consumeBattleActionOpportunity:null;
 if(PRE_CONSUME_OPPORTUNITY){
   const wrapped=function(side,participantId,actionId,reason){
     const result=PRE_CONSUME_OPPORTUNITY.apply(this,arguments);
     if(!isExactBattle())return result;
-    const s=ensureState();if(!s||s.processing||battle().battleOver)return result;
+    const st=ensureState();if(!st||battle().battleOver)return result;
 
-    if(side==="player"&&participantId===MENMA_ID&&s.phase==="phase_c_player"){
-      if(!opportunityCommitted("player"))markOpportunityCommitted("player",MENMA_ID,actionId,"menma_phase_c_action");
-      s.inputLocked=true;
-      if(s.pendingZero)return result;
-      s.phase="phase_c_enemy";s.enemyOpportunityOrdinal+=1;s.processing=true;
-      try{
-        const enemyResult=resolvePhaseCEnemyOpportunity();
-        if(!enemyResult||enemyResult.success!==true){
-          recordBattleEvidence({eventType:"menma_origin_phase_c_enemy_opportunity_failed_visible",committedOccurrence:true,actionId:"failed:"+currentOpportunityId("enemy"),data:{reason:enemyResult&&enemyResult.reason||"enemy_resolution_failed",inventedFallback:false}});
-          s.phase="phase_c_player";s.playerOpportunityOrdinal+=1;s.inputLocked=false;
-        }else if(!s.pendingZero){
-          // Nested enemy opportunity consumption occurs while this outer settle
-          // owns the semantic lock. Commit/advance it here exactly once rather
-          // than relying on the re-entrancy-suppressed wrapper.
-          const enemyActionId=enemyResult.envelope&&enemyResult.envelope.actionId||null;
-          if(!opportunityCommitted("enemy"))markOpportunityCommitted("enemy",HOSTILE_IDS[2],enemyActionId,"unstable_phase_c_action");
-          s.phase="phase_c_player";s.playerOpportunityOrdinal+=1;s.inputLocked=false;
-        }
-      }finally{s.processing=false;}
+    // Nested enemy resolution is owned by settleEnemyOpportunity36900.
+    if(st.processing)return result;
+
+    if(side==="player"&&st.phase==="player"){
+      const active=activePlayer();
+      if(!active||active.id!==participantId)return result;
+      if(!opportunityCommitted("player"))markOpportunityCommitted("player",participantId,actionId,participantId===ANKO_ID?"guest_ally_player_action":"menma_player_action");
+      if(participantId===MENMA_ID)startMenmaEvidenceWindow36900("menma_player_action");
+      st.inputLocked=true;
+
+      // A zero-PL target waits for this exact action's presentation. Relay then
+      // releases the next side without consuming a bonus opportunity.
+      if(st.pendingZero){persistBattleSnapshot();return result;}
+
+      st.phase="enemy";st.enemyOpportunityOrdinal+=1;
       persistBattleSnapshot();
+      settleEnemyOpportunity36900();
       return result;
-    }
-
-    if(side==="enemy"&&participantId===HOSTILE_IDS[2]&&s.phase==="phase_c_enemy"){
-      if(!opportunityCommitted("enemy"))markOpportunityCommitted("enemy",participantId,actionId,"unstable_phase_c_action");
-      if(s.pendingZero){s.inputLocked=true;persistBattleSnapshot();return result;}
-      s.phase="phase_c_player";s.playerOpportunityOrdinal+=1;s.inputLocked=false;
-      persistBattleSnapshot();
     }
     return result;
   };
