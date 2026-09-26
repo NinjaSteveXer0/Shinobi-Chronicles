@@ -3,7 +3,8 @@
 **Date:** 2026-09-26  
 **Owner:** CE / Codex / Coordination  
 **Incoming handoff:** #376  
-**Status:** **CE SUCCESSOR CONTRACT CLOSED / COMBAT SCRIPTED-BEAT PACKAGE REQUIRED / CODING UPDATE BLOCKED ON COMBAT**  
+**Status:** **SUPERSEDED FOR NEW EXECUTIONS BY GUEST-ALLY SUCCESSOR (#385)**  
+**Current successor:** Documentation/Coordination/Battle_Participant_Control_and_First_PL_Battle_Tutorial_Contract_2026-09-26.md  
 **Scope:** Academy Menma Origin Scene 7 only.
 
 ## 1. Successor authority
