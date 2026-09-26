@@ -1226,6 +1226,14 @@
   }
 
   const PRIOR_RESUME_BATTLE_CALLER_33000=typeof resumeBattleCallerAfterCompletion==="function"?resumeBattleCallerAfterCompletion:null;
+  function rehydrateStoryCallerPresentation33000(resumed){
+    if(!resumed||resumed.success!==true||resumed.type!=="story_scene_resumed")return resumed;
+    try{
+      if(typeof globalThis.clearStoryPresentationHidden33900==="function")globalThis.clearStoryPresentationHidden33900();
+      if(PRIOR_OPEN_OVERLAY_33000)PRIOR_OPEN_OVERLAY_33000.call(globalThis,"story_scene");
+    }catch(_error){}
+    return resumed;
+  }
   function flushDeferredBattleCallerResume33000(){
     const deferred=battlePresentationQueueState33000.deferredCallerResume;
     if(!deferred||!PRIOR_RESUME_BATTLE_CALLER_33000)return false;
@@ -1236,12 +1244,7 @@
     }
     battlePresentationQueueState33000.deferredCallerResume=null;
     const resumed=PRIOR_RESUME_BATTLE_CALLER_33000.apply(globalThis,deferred.args);
-    if(resumed&&resumed.success===true&&resumed.type==="story_scene_resumed"){
-      try{
-        if(typeof globalThis.clearStoryPresentationHidden33900==="function")globalThis.clearStoryPresentationHidden33900();
-        if(PRIOR_OPEN_OVERLAY_33000)PRIOR_OPEN_OVERLAY_33000.call(globalThis,"story_scene");
-      }catch(_error){}
-    }
+    rehydrateStoryCallerPresentation33000(resumed);
     return true;
   }
   if(PRIOR_RESUME_BATTLE_CALLER_33000){
@@ -1259,7 +1262,7 @@
           return{success:true,presentationDeferred:true,callerResumeDeferred:true,semanticBattleAlreadyCommitted:true};
         }
       }
-      return PRIOR_RESUME_BATTLE_CALLER_33000.apply(this,arguments);
+      return rehydrateStoryCallerPresentation33000(PRIOR_RESUME_BATTLE_CALLER_33000.apply(this,arguments));
     };
     globalThis.resumeBattleCallerAfterCompletion=wrappedResumeBattleCaller33000;
     try{resumeBattleCallerAfterCompletion=wrappedResumeBattleCaller33000;}catch(_error){}
