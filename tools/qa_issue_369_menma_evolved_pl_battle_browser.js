@@ -385,11 +385,38 @@ async function legitimatePartyDefeat(browser){
     assert.strictEqual(afterMenma.state.menmaWithdrawn,true);
     assert.deepStrictEqual(afterMenma.playerSlots,[ANKO],"Anko did not relay back after Menma withdrawal");
 
-    // Anko then uses a legal non-damaging control Skill at 1 PL. Unstable's
-    // ordinary enemy response depletes the last eligible ally => party defeat.
-    await page.evaluate(()=>setBattleRemainingPL("player","sj_anko",1));
-    await useSkill(page,"sj_anko_snake_bind");
-    await page.waitForFunction(()=>currentBattle?.battleOver===true&&currentBattle?.outcome?.type==="defeat"&&currentBattle?.outcome?.partyDefeat===true&&currentBattle?.outcome?.objectiveCompleted===false,null,{timeout:20000});
+    // Terminal-path fixture only: Anko's live Stamina is 55 while Unstable's
+    // authored attacks are 5/6/7 Attack PL with ordinary Stamina mitigation.
+    // Do not weaken Anko, buff Unstable, or pretend one ordinary hit must deal
+    // damage. Menma -> Anko relay above is already real-play proven. For the
+    // final allied-exhaustion boundary, shorten only Remaining Battle PL to 0,
+    // feed the existing zero-PL hook a QA-scoped enemy action envelope, then
+    // release that exact pending withdrawal through the production
+    // post-presentation continuation.
+    const terminalFixture=await page.evaluate(()=>{
+      const actionId="qa369_party_defeat_unstable_finisher";
+      setBattleRemainingPL("player","sj_anko",0);
+      const enemy=getBattleParticipantByIdentity("enemy","test_subject_unstable");
+      const envelope={
+        actionId,
+        actorRef:createBattleParticipantRef("enemy","test_subject_unstable"),
+        targetRef:createBattleParticipantRef("player","sj_anko")
+      };
+      const zero=handleBattleParticipantAtZeroPL("player","sj_anko",enemy,envelope);
+      const settled=advanceMenmaScriptedBattleAfterPresentation37300({actionId});
+      return{
+        zero:JSON.parse(JSON.stringify(zero||null)),
+        settled:JSON.parse(JSON.stringify(settled||null)),
+        remaining:getBattleRemainingPL("player","sj_anko"),
+        state:getMenmaEvolvedPLBattleState36900(),
+        outcome:JSON.parse(JSON.stringify(currentBattle.outcome||null))
+      };
+    });
+    assert.strictEqual(terminalFixture.remaining,0,"QA terminal fixture did not exhaust Anko Battle PL");
+    assert.strictEqual(terminalFixture.state.ankoWithdrawn,true,"QA terminal fixture did not commit Anko withdrawal");
+    assert.strictEqual(terminalFixture.outcome?.type,"defeat","allied exhaustion did not commit defeat");
+    assert.strictEqual(terminalFixture.outcome?.partyDefeat,true,"Menma successor defeat facts missing");
+    assert.strictEqual(terminalFixture.outcome?.objectiveCompleted,false,"party defeat incorrectly completed objective");
 
     const terminal=await page.evaluate(({REWARD_SOURCE})=>({
       state:getMenmaEvolvedPLBattleState36900(),
