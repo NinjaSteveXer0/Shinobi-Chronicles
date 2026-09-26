@@ -644,20 +644,76 @@ if(PRE_SAVE_TEST){
 const PRE_RESTORE_TEST=typeof restoreTestState==="function"?restoreTestState:null;
 if(PRE_RESTORE_TEST){
   const wrapped=function(){
-    let savedState=null,savedBattleActive=false;
+    let savedState=null,savedBattleActive=false,savedExactSuccessorSnapshot=false;
     if(typeof sessionStorage!=="undefined"){
       try{
         const raw=sessionStorage.getItem("shinobiTestState"),parsed=raw?JSON.parse(raw):null;
         if(parsed&&String(parsed.encounterId||"")===ENCOUNTER_ID&&String(parsed.battleConfigId||"")===BATTLE_CONFIG_ID){
-          savedState=parsed.menmaEvolvedPLBattle36900||null;savedBattleActive=parsed.menma369BattleActive===true;
+          savedState=parsed.menmaEvolvedPLBattle36900||null;
+          savedBattleActive=parsed.menma369BattleActive===true;
+          savedExactSuccessorSnapshot=true;
+
+          // #373 real-player restore repair.
+          //
+          // game.js intentionally does not know the scoped BattleConfig identity,
+          // so its base save/restore contract persists encounterId/deployment but
+          // not currentBattle.battleConfigId. The superseded #369 runtime DID
+          // persist battleConfigId in the session extension. Without restoring
+          // that scoped identity BEFORE the base restore, every exact-successor
+          // hook is false while normalizeBattleDeployment() runs; a legacy
+          // Menma-first [Menma, Anko] deployment is therefore restored verbatim.
+          //
+          // Seed only the exact saved Menma Scene-7 occurrence before delegating
+          // to the generic restore. This lets the already-installed scoped
+          // participant/deployment wrappers resolve encounter-local Anko and
+          // migrate the player Active slot from the saved semantic phase. It
+          // does not change generic Battle restore law.
+          const b=battle();
+          if(b){
+            b.encounterId=ENCOUNTER_ID;
+            b.battleConfigId=BATTLE_CONFIG_ID;
+            b.objectiveId=OBJECTIVE_ID;
+            b.playerFacingObjective=PLAYER_OBJECTIVE_TEXT;
+            b.environmentPath=BATTLE_ENVIRONMENT_PATH;
+            b.presentationEnvironmentPath=BATTLE_ENVIRONMENT_PATH;
+            b.menma369LocalAllies={[ANKO_ID]:makeAnkoParticipant()};
+            b.menmaEvolvedPLBattle36900=normalizeState(savedState,null);
+          }
         }
       }catch(_error){}
     }
+
     const result=PRE_RESTORE_TEST.apply(this,arguments);
+
+    if(savedExactSuccessorSnapshot){
+      const b=battle();
+      if(b){
+        // Reassert scoped fields the generic restore deliberately does not own.
+        b.encounterId=ENCOUNTER_ID;
+        b.battleConfigId=BATTLE_CONFIG_ID;
+        b.objectiveId=OBJECTIVE_ID;
+        b.playerFacingObjective=PLAYER_OBJECTIVE_TEXT;
+        b.environmentPath=BATTLE_ENVIRONMENT_PATH;
+        b.presentationEnvironmentPath=BATTLE_ENVIRONMENT_PATH;
+      }
+    }
+
     if(isExactBattle()){
-      const b=battle();b.menma369LocalAllies={[ANKO_ID]:makeAnkoParticipant()};
+      const b=battle();
+      b.menma369LocalAllies={[ANKO_ID]:makeAnkoParticipant()};
       b.menmaEvolvedPLBattle36900=normalizeState(savedState||b.menmaEvolvedPLBattle36900,sceneInstanceId(b));
       if(savedBattleActive&&b.battleOver!==true)b.active=true;
+
+      // Fail closed against the superseded Menma-first restore shape even if a
+      // caller supplied a deployment snapshot that bypassed the wrapped
+      // normalizeBattleDeployment() path. The current semantic phase is the
+      // authority for which ally owns Active; characterId remains Menma as the
+      // Story/ownership identity and is not used as Active truth.
+      const semantic=b.menmaEvolvedPLBattle36900;
+      const phaseC=semantic&&(semantic.phase==="phase_c_player"||semantic.phase==="phase_c_enemy"||semantic.ankoYielded===true);
+      if(!b.deployment||typeof b.deployment!=="object")b.deployment={};
+      b.deployment.player={slots:createBattleDeploymentSlots(phaseC?[MENMA_ID,ANKO_ID]:[ANKO_ID,MENMA_ID])};
+
       if(!getBattleRemainingPLRecord("player",ANKO_ID))setBattleRemainingPLRecord("player",ANKO_ID,ANKO_BASE_PL,ANKO_BASE_PL);
       if(typeof syncBattleActivePlayerFromDeployment==="function")syncBattleActivePlayerFromDeployment();
       if(typeof syncBattleActiveEnemyFromDeployment==="function")syncBattleActiveEnemyFromDeployment();
