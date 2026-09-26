@@ -194,28 +194,55 @@ async function boot(page){
     const action=await page.evaluate(()=>attemptBattlePreparedSkill("academy_menma_chakra_knuckle"));
     assert(action?.success===true,"Menma Phase-C action failed "+JSON.stringify(action));
 
-    await page.waitForFunction(({MENMA,UNSTABLE})=>{
+    const menmaTurnHandle=await page.waitForFunction(({MENMA,UNSTABLE})=>{
       const stage=document.querySelector(".alpha-code-battle-stage");
-      return stage?.dataset.presentationActorId===MENMA&&stage?.dataset.presentationTargetId===UNSTABLE&&stage?.dataset.presentationQueueBusy==="true";
+      if(!stage||
+        stage.dataset.presentationActorId!==MENMA||
+        stage.dataset.presentationTargetId!==UNSTABLE||
+        stage.dataset.presentationQueueBusy!=="true")return false;
+      const actorNodes=stage.querySelectorAll(".battle2-performance-role-actor").length;
+      const targetNodes=stage.querySelectorAll(".battle2-performance-role-target").length;
+      const actionText=stage.querySelector(".battle2-performance-center strong")?.textContent?.trim()||"";
+      if(actorNodes!==1||targetNodes!==1||actionText!=="Driving Chakra Fist")return false;
+      return{
+        ordinal:Number(stage.dataset.presentationSequenceOrdinal||0),
+        actor:stage.dataset.presentationActorId||null,
+        target:stage.dataset.presentationTargetId||null,
+        actorNodes,targetNodes,actionText
+      };
     },{MENMA,UNSTABLE},{timeout:12000});
-    const menmaTurn=await stageSnapshot(page);
-    assert.strictEqual(menmaTurn.presentation.actor,MENMA);
-    assert.strictEqual(menmaTurn.presentation.target,UNSTABLE);
-    assert.strictEqual(menmaTurn.presentation.actorNodes,1);
-    assert.strictEqual(menmaTurn.presentation.targetNodes,1);
-    assert.strictEqual(menmaTurn.presentation.actionText,"Driving Chakra Fist");
+    const menmaTurn=await menmaTurnHandle.jsonValue();
+    assert.strictEqual(menmaTurn.actor,MENMA);
+    assert.strictEqual(menmaTurn.target,UNSTABLE);
+    assert.strictEqual(menmaTurn.actorNodes,1);
+    assert.strictEqual(menmaTurn.targetNodes,1);
+    assert.strictEqual(menmaTurn.actionText,"Driving Chakra Fist");
     await page.screenshot({path:path.join(OUT,"04-phase-c-menma-action.png"),fullPage:false,timeout:12000});
 
-    await page.waitForFunction(({MENMA,UNSTABLE,ordinal})=>{
+    const enemyTurnHandle=await page.waitForFunction(({MENMA,UNSTABLE,ordinal})=>{
       const stage=document.querySelector(".alpha-code-battle-stage");
-      return stage?.dataset.presentationActorId===UNSTABLE&&stage?.dataset.presentationTargetId===MENMA&&Number(stage?.dataset.presentationSequenceOrdinal||0)>ordinal;
-    },{MENMA,UNSTABLE,ordinal:menmaTurn.presentation.ordinal},{timeout:12000});
-    const enemyTurn=await stageSnapshot(page);
-    assert.strictEqual(enemyTurn.presentation.actor,UNSTABLE);
-    assert.strictEqual(enemyTurn.presentation.target,MENMA);
-    assert.strictEqual(enemyTurn.presentation.actorNodes,1);
-    assert.strictEqual(enemyTurn.presentation.targetNodes,1);
-    assert(enemyTurn.presentation.ordinal>menmaTurn.presentation.ordinal,"Unstable presentation did not follow Menma sequentially");
+      if(!stage||
+        stage.dataset.presentationActorId!==UNSTABLE||
+        stage.dataset.presentationTargetId!==MENMA||
+        Number(stage.dataset.presentationSequenceOrdinal||0)<=ordinal||
+        stage.dataset.presentationQueueBusy!=="true")return false;
+      const actorNodes=stage.querySelectorAll(".battle2-performance-role-actor").length;
+      const targetNodes=stage.querySelectorAll(".battle2-performance-role-target").length;
+      if(actorNodes!==1||targetNodes!==1)return false;
+      return{
+        ordinal:Number(stage.dataset.presentationSequenceOrdinal||0),
+        actor:stage.dataset.presentationActorId||null,
+        target:stage.dataset.presentationTargetId||null,
+        actorNodes,targetNodes,
+        actionText:stage.querySelector(".battle2-performance-center strong")?.textContent?.trim()||""
+      };
+    },{MENMA,UNSTABLE,ordinal:menmaTurn.ordinal},{timeout:12000});
+    const enemyTurn=await enemyTurnHandle.jsonValue();
+    assert.strictEqual(enemyTurn.actor,UNSTABLE);
+    assert.strictEqual(enemyTurn.target,MENMA);
+    assert.strictEqual(enemyTurn.actorNodes,1);
+    assert.strictEqual(enemyTurn.targetNodes,1);
+    assert(enemyTurn.ordinal>menmaTurn.ordinal,"Unstable presentation did not follow Menma sequentially");
     await page.screenshot({path:path.join(OUT,"05-phase-c-unstable-response.png"),fullPage:false,timeout:12000});
 
     await page.waitForFunction(()=>document.querySelector(".alpha-code-battle-stage")?.dataset.presentationQueueBusy==="false",null,{timeout:12000});
