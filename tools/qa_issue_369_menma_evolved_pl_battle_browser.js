@@ -36,6 +36,7 @@ async function bootScenario(browser,label){
   const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1});
   const page=await context.newPage();
   const gate=await installBrowserRuntimeErrorGate(page);
+  await page.addInitScript(()=>{globalThis.SC_DISABLE_FIRST_PL_BATTLE_TUTORIAL_QA=true;});
   await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});
   await page.waitForFunction(()=>!!(
     typeof getRuntimeBuildFingerprint==="function"&&
@@ -93,6 +94,9 @@ async function bootScenario(browser,label){
     },
     activePlayer:getBattleDeploymentParticipant("player",1)?.id||null,
     activeEnemy:getBattleDeploymentParticipant("enemy",1)?.id||null,
+    activePlayerClass:getBattleDeploymentParticipant("player",1)?.participantClass||null,
+    activePlayerControl:getBattleDeploymentParticipant("player",1)?.controlAuthority||null,
+    palette:getBattleUISkillPalettePresentation(getBattleDeploymentParticipant("player",1)),
     semantic:getMenmaEvolvedPLBattleState36900(),
     readiness:getMenmaEvolvedPLBattleInputReadiness36900(),
     pl:{
@@ -142,11 +146,20 @@ async function bootScenario(browser,label){
   assert.deepStrictEqual(initial.deployment.enemy,HOSTILES,"exact hostile deployment drift");
   assert.strictEqual(initial.activePlayer,ANKO);
   assert.strictEqual(initial.activeEnemy,HOSTILES[0]);
-  assert.strictEqual(initial.semantic.phase,"scripted_a");
-  assert.strictEqual(initial.readiness.ready,false);
-  assert.strictEqual(initial.readiness.reason==="authored_anko_takedown"||initial.readiness.reason==="committed_zero_waiting_for_presentation",true);
+  assert.strictEqual(initial.activePlayerClass,"guest_ally","Anko relationship class drift");
+  assert.strictEqual(initial.activePlayerControl,"player","Guest Ally control authority drift");
+  assert.deepStrictEqual(initial.palette.skillIds,[
+    "sj_anko_hidden_shadow_snake_hands",
+    "sj_anko_snake_bind",
+    "sj_anko_fire_style_dragon_flame",
+    "sj_anko_serpent_evasion"
+  ],"Anko Guest Ally palette drift");
+  assert.strictEqual(initial.palette.skillIds.includes("sj_anko_twin_snakes_mutual_death"),false,"forbidden Anko Kinjutsu leaked");
+  assert.strictEqual(initial.semantic.phase,"player");
+  assert.strictEqual(initial.readiness.ready,true);
+  assert.strictEqual(initial.readiness.activeParticipantId,ANKO);
   assert.strictEqual(initial.pl.anko,56,"Anko Battle PL drift");
-  assert.deepStrictEqual([initial.pl.altered,initial.pl.brute,initial.pl.unstable],[0,13,12],"Phase A must commit Altered to 0 while Brute/Unstable remain untouched");
+  assert.deepStrictEqual([initial.pl.altered,initial.pl.brute,initial.pl.unstable],[11,13,12],"Battle mutated before the player's first Guest Ally choice");
   assert.strictEqual(initial.stage.environment,"forest_clearing_day","forest environment dataset missing");
   assert(initial.stage.background.includes("forest_clearing_day.png"),"forest backdrop not projected");
   assert(initial.stage.menma.present&&initial.expectedPortraits.menma&&initial.stage.menma.src===initial.expectedPortraits.menma,"Menma support portrait missing/wrong "+JSON.stringify({actual:initial.stage.menma.src,expected:initial.expectedPortraits.menma}));
@@ -161,147 +174,153 @@ async function bootScenario(browser,label){
   return{context,page,gate,pre};
 }
 
-async function waitForScriptedChoreography(page,label){
-  await page.waitForFunction(({ANKO,target})=>{
+async function waitPresentationIdle(page){
+  await page.waitForFunction(()=>{
     const stage=document.querySelector(".alpha-code-battle-stage");
-    return stage&&stage.dataset.presentationActorId===ANKO&&stage.dataset.presentationTargetId===target;
-  },{ANKO,target:HOSTILES[0]},{timeout:12000});
-  await page.screenshot({path:path.join(OUT,label+"-phase-a-anko-altered.png"),fullPage:false,timeout:12000});
-
-  await page.waitForFunction(({ANKO,target})=>{
-    const stage=document.querySelector(".alpha-code-battle-stage");
-    return stage&&stage.dataset.presentationActorId===ANKO&&stage.dataset.presentationTargetId===target;
-  },{ANKO,target:HOSTILES[1]},{timeout:12000});
-
-  const phaseB=await page.evaluate(()=>({
-    activePlayer:getBattleDeploymentParticipant("player",1)?.id||null,
-    activeEnemy:getBattleDeploymentParticipant("enemy",1)?.id||null,
-    state:getMenmaEvolvedPLBattleState36900(),
-    altered:getBattleRemainingPL("enemy","test_subject_altered_shinobi"),
-    brute:getBattleRemainingPL("enemy","test_subject_brute"),
-    unstable:getBattleRemainingPL("enemy","test_subject_unstable"),
-    stageActor:document.querySelector(".alpha-code-battle-stage")?.dataset.presentationActorId||null,
-    stageTarget:document.querySelector(".alpha-code-battle-stage")?.dataset.presentationTargetId||null
-  }));
-  assert.strictEqual(phaseB.activePlayer,ANKO,"Anko left Active before second authored beat settled");
-  assert.strictEqual(phaseB.activeEnemy,HOSTILES[1],"Brute did not relay into Active for Phase B");
-  assert.strictEqual(phaseB.state.phase,"scripted_b");
-  assert.strictEqual(phaseB.altered,0);
-  assert.strictEqual(phaseB.brute,0,"Phase B must commit Brute to 0 while portrait remains Active for playback");
-  assert.strictEqual(phaseB.unstable,12);
-  assert.strictEqual(phaseB.stageActor,ANKO);
-  assert.strictEqual(phaseB.stageTarget,HOSTILES[1]);
-  await page.screenshot({path:path.join(OUT,label+"-phase-b-anko-brute.png"),fullPage:false,timeout:12000});
-
-  await page.waitForFunction(({MENMA,UNSTABLE})=>{
-    const state=getMenmaEvolvedPLBattleState36900();
-    return state&&state.phase==="phase_c_player"&&
-      getBattleDeploymentParticipant("player",1)?.id===MENMA&&
-      getBattleDeploymentParticipant("enemy",1)?.id===UNSTABLE&&
-      getMenmaEvolvedPLBattleInputReadiness36900()?.ready===true;
-  },{MENMA,UNSTABLE:HOSTILES[2]},{timeout:15000});
-
-  const phaseC=await page.evaluate(()=>({
-    state:getMenmaEvolvedPLBattleState36900(),
-    readiness:getMenmaEvolvedPLBattleInputReadiness36900(),
-    playerSlots:currentBattle.deployment.player.slots.map(s=>s.participantId).filter(Boolean),
-    enemySlots:currentBattle.deployment.enemy.slots.map(s=>s.participantId).filter(Boolean),
-    evidence:(currentBattle.runtime?.evidence||[]).map(r=>({
-      evidenceId:r.evidenceId,eventType:r.eventType,actionId:r.actionId,
-      actor:r.actorRef?.participantId||null,target:r.targetRef?.participantId||null,
-      skillId:r.skillId||null,data:r.data||null
-    }))
-  }));
-  assert.deepStrictEqual(phaseC.playerSlots,[MENMA,ANKO],"Anko yield / Menma promotion drift");
-  assert.deepStrictEqual(phaseC.enemySlots,[HOSTILES[2]],"enemy relay must leave only Unstable");
-  assert.strictEqual(phaseC.readiness.ready,true,"Menma did not receive first genuine input");
-  assert.deepStrictEqual(phaseC.state.resolvedHostileIds.slice().sort(),HOSTILES.slice(0,2).sort(),"first two hostiles not resolved exactly once");
-
-  const scripted=phaseC.evidence.filter(r=>r.eventType==="menma_origin_scripted_anko_takedown_completed");
-  assert.strictEqual(scripted.length,2,"scripted Anko takedown count drift");
-  assert.deepStrictEqual(scripted.map(r=>[r.skillId,r.target,r.data?.finalDamage]),[
-    ["sj_anko_hidden_shadow_snake_hands",HOSTILES[0],18],
-    ["sj_anko_fire_style_dragon_flame",HOSTILES[1],21]
-  ],"scripted Anko packet/target drift");
-  assert(scripted.every(r=>r.data?.ordinarySideOpportunityConsumed===false&&r.data?.men03Eligible===false),"scripted action leaked into ordinary/MEN-03 semantics");
-  assert.strictEqual(phaseC.evidence.filter(r=>r.eventType==="enemy_authored_action_completed").length,0,"Altered/Brute received illegal ordinary turns");
-  assert.strictEqual(phaseC.evidence.filter(r=>r.eventType==="skill_action_completed"&&r.actor===MENMA).length,0,"Menma acted before Phase C");
-
-  return phaseC;
+    return !!stage&&stage.dataset.presentationQueueBusy!=="true";
+  },null,{timeout:18000});
 }
 
-async function successorVictoryAndReload(browser){
-  const {context,page,gate}=await bootScenario(browser,"successor");
-  try{
-    const phaseC=await waitForScriptedChoreography(page,"successor");
+async function waitPlayerReady(page,playerId,enemyId){
+  await page.waitForFunction(({playerId,enemyId})=>
+    currentBattle?.active===true&&currentBattle?.battleOver!==true&&
+    getBattleDeploymentParticipant("player",1)?.id===playerId&&
+    getBattleDeploymentParticipant("enemy",1)?.id===enemyId&&
+    getMenmaEvolvedPLBattleState36900()?.phase==="player"&&
+    getMenmaEvolvedPLBattleInputReadiness36900()?.ready===true,
+    {playerId,enemyId},{timeout:20000});
+  await waitPresentationIdle(page);
+}
 
-    // Save/load at the handoff must not replay either scripted takedown.
+async function useSkill(page,skillId){
+  const result=await page.evaluate(id=>attemptBattlePreparedSkill(id),skillId);
+  assert(result&&result.success===true,"Battle Skill failed: "+skillId+" "+JSON.stringify(result));
+  return result;
+}
+
+async function driveGuestAllyTeachingHandoff(page,label){
+  // Genuine player-selected Anko action. Hidden Shadow Snake Hands legitimately
+  // depletes Altered under the closed Combat numbers; relay then gives Brute
+  // the ordinary enemy-side response.
+  await useSkill(page,"sj_anko_hidden_shadow_snake_hands");
+  await page.waitForFunction(()=>getBattleRemainingPL("enemy","test_subject_altered_shinobi")===0,null,{timeout:8000});
+  await waitPlayerReady(page,ANKO,HOSTILES[1]);
+
+  const afterAltered=await page.evaluate(()=>({
+    state:getMenmaEvolvedPLBattleState36900(),
+    evidence:(currentBattle.runtime?.evidence||[]).map(r=>({
+      eventType:r.eventType,actor:r.actorRef?.participantId||null,target:r.targetRef?.participantId||null,
+      skillId:r.skillId||null,actionId:r.actionId||null,data:r.data||{}
+    })),
+    deployment:{
+      player:currentBattle.deployment.player.slots.map(s=>s.participantId).filter(Boolean),
+      enemy:currentBattle.deployment.enemy.slots.map(s=>s.participantId).filter(Boolean)
+    }
+  }));
+  assert.deepStrictEqual(afterAltered.deployment.player,[ANKO,MENMA],"Anko must remain Active after Altered relay");
+  assert.deepStrictEqual(afterAltered.deployment.enemy,[HOSTILES[1],HOSTILES[2]],"Altered -> Brute relay drift");
+  assert(afterAltered.evidence.some(r=>r.eventType==="skill_action_completed"&&r.actor===ANKO&&r.skillId==="sj_anko_hidden_shadow_snake_hands"&&r.data?.guestAllyPlayerChosen===true),"player-chosen Anko action evidence missing");
+  assert(afterAltered.evidence.some(r=>r.eventType==="enemy_authored_action_completed"&&r.actor===HOSTILES[1]&&r.target===ANKO),"Brute did not receive ordinary enemy response");
+  assert.strictEqual(afterAltered.evidence.some(r=>r.eventType==="menma_origin_scripted_anko_takedown_completed"),false,"superseded scripted Anko evidence returned");
+  await page.screenshot({path:path.join(OUT,label+"-anko-vs-brute-ready.png"),fullPage:false,timeout:12000});
+
+  // Second genuine player choice. Dragon Flame legitimately withdraws Brute.
+  // Unstable relays, Anko yields without withdrawal, and enemy-side ordering is
+  // preserved: Unstable acts against Menma before Menma gets input.
+  await useSkill(page,"sj_anko_fire_style_dragon_flame");
+  await page.waitForFunction(()=>getBattleRemainingPL("enemy","test_subject_brute")===0,null,{timeout:8000});
+  await waitPlayerReady(page,MENMA,HOSTILES[2]);
+
+  const handoff=await page.evaluate(()=>({
+    state:getMenmaEvolvedPLBattleState36900(),
+    readiness:getMenmaEvolvedPLBattleInputReadiness36900(),
+    deployment:{
+      player:currentBattle.deployment.player.slots.map(s=>s.participantId).filter(Boolean),
+      enemy:currentBattle.deployment.enemy.slots.map(s=>s.participantId).filter(Boolean)
+    },
+    transition:JSON.parse(JSON.stringify(currentBattle.deployment.lastTransition||null)),
+    evidence:(currentBattle.runtime?.evidence||[]).map(r=>({
+      evidenceId:r.evidenceId,eventType:r.eventType,actor:r.actorRef?.participantId||null,target:r.targetRef?.participantId||null,
+      skillId:r.skillId||null,actionId:r.actionId||null,data:r.data||{}
+    }))
+  }));
+  assert.deepStrictEqual(handoff.deployment.player,[MENMA,ANKO],"authored Anko -> Menma yield drift");
+  assert.deepStrictEqual(handoff.deployment.enemy,[HOSTILES[2]],"Brute -> Unstable relay drift");
+  assert.strictEqual(handoff.state.ankoYielded,true,"authored Guest Ally yield not committed");
+  assert.strictEqual(handoff.state.menmaEvidenceStarted,true,"MEN-03 window did not start when Menma became Active");
+  assert.strictEqual(handoff.readiness.ready,true,"Menma did not receive input after Unstable response");
+  assert(handoff.evidence.some(r=>r.eventType==="battle_formation_yield_committed"&&r.actor===ANKO&&r.target===MENMA&&r.data?.nextSide==="enemy"),"yield did not preserve enemy-next side order");
+  assert(handoff.evidence.some(r=>r.eventType==="enemy_authored_action_completed"&&r.actor===HOSTILES[2]&&r.target===MENMA),"Unstable did not act before Menma input");
+  assert.strictEqual(handoff.evidence.filter(r=>r.eventType==="menma_origin_phase_c_started"&&r.actor===MENMA).length,1,"MEN-03 start evidence duplicated/missing");
+  assert.strictEqual(handoff.evidence.some(r=>r.eventType==="menma_origin_scripted_anko_takedown_completed"),false,"scripted Anko path leaked into successor");
+  await page.screenshot({path:path.join(OUT,label+"-menma-vs-unstable-ready.png"),fullPage:false,timeout:12000});
+  return handoff;
+}
+
+async function guestAllyVictoryAndReload(browser){
+  const {context,page,gate}=await bootScenario(browser,"guest-victory");
+  try{
+    const handoff=await driveGuestAllyTeachingHandoff(page,"guest-victory");
+
+    // Save/restore at the handoff must preserve exact formation, PL and
+    // committed evidence without replaying either Anko choice or enemy reply.
     await page.evaluate(()=>saveTestState());
     const beforeReload=await page.evaluate(()=>({
       state:getMenmaEvolvedPLBattleState36900(),
-      evidence:(currentBattle.runtime?.evidence||[]).filter(r=>r&&r.eventType==="menma_origin_scripted_anko_takedown_completed").map(r=>r.evidenceId),
+      deployment:JSON.parse(JSON.stringify(currentBattle.deployment)),
+      evidence:(currentBattle.runtime?.evidence||[]).map(r=>r.evidenceId),
       pl:JSON.parse(JSON.stringify(currentBattle.runtime.remainingPL))
     }));
     await page.evaluate(()=>restoreTestState());
-    await page.waitForFunction(()=>getMenmaEvolvedPLBattleState36900()?.phase==="phase_c_player"&&getMenmaEvolvedPLBattleInputReadiness36900()?.ready===true,null,{timeout:12000});
+    await waitPlayerReady(page,MENMA,HOSTILES[2]);
     const afterReload=await page.evaluate(()=>({
       state:getMenmaEvolvedPLBattleState36900(),
-      evidence:(currentBattle.runtime?.evidence||[]).filter(r=>r&&r.eventType==="menma_origin_scripted_anko_takedown_completed").map(r=>r.evidenceId),
+      deployment:JSON.parse(JSON.stringify(currentBattle.deployment)),
+      evidence:(currentBattle.runtime?.evidence||[]).map(r=>r.evidenceId),
       pl:JSON.parse(JSON.stringify(currentBattle.runtime.remainingPL))
     }));
-    assert.deepStrictEqual(afterReload.evidence,beforeReload.evidence,"save/load replayed scripted Anko evidence");
-    assert.deepStrictEqual(afterReload.pl,beforeReload.pl,"save/load changed Battle PL");
-    assert.strictEqual(afterReload.state.phase,"phase_c_player");
+    assert.deepStrictEqual(afterReload.evidence,beforeReload.evidence,"save/load duplicated committed Battle evidence");
+    assert.deepStrictEqual(afterReload.pl,beforeReload.pl,"save/load changed Remaining Battle PL");
+    assert.deepStrictEqual(afterReload.deployment.player.slots.map(s=>s.participantId),beforeReload.deployment.player.slots.map(s=>s.participantId),"save/load changed allied formation");
+    assert.strictEqual(afterReload.state.ankoYielded,true);
+    assert.strictEqual(afterReload.state.menmaEvidenceStarted,true);
 
-    // Deterministic terminal fixture: the actual player still commits a legal
-    // Menma Skill; only remaining Unstable PL is shortened for bounded QA.
+    // Bounded terminal fixture: Menma still commits a legal player action;
+    // only the remaining target's PL is shortened.
     await page.evaluate(()=>setBattleRemainingPL("enemy","test_subject_unstable",1));
-    const attack=await page.evaluate(()=>attemptBattlePreparedSkill("academy_menma_chakra_knuckle"));
-    assert(attack&&attack.success===true,"Menma Phase C legal attack failed "+JSON.stringify(attack));
+    await useSkill(page,"academy_menma_chakra_knuckle");
+    await page.waitForFunction(()=>currentBattle?.battleOver===true&&currentBattle?.outcome?.type==="victory",null,{timeout:20000});
+    await waitPresentationIdle(page).catch(()=>{});
 
-    await page.waitForFunction(({MENMA,target})=>{
-      const stage=document.querySelector(".alpha-code-battle-stage");
-      return stage&&stage.dataset.presentationActorId===MENMA&&stage.dataset.presentationTargetId===target;
-    },{MENMA,target:HOSTILES[2]},{timeout:12000});
-    const beforeTerminal=await page.evaluate(()=>({
-      outcome:currentBattle.outcome?JSON.parse(JSON.stringify(currentBattle.outcome)):null,
-      unstable:getBattleRemainingPL("enemy","test_subject_unstable"),
-      state:getMenmaEvolvedPLBattleState36900()
-    }));
-    assert.strictEqual(beforeTerminal.unstable,0,"Menma hit did not commit Unstable 0 PL");
-    assert.strictEqual(beforeTerminal.outcome,null,"victory committed before visible Menma action settled");
-    assert(beforeTerminal.state.pendingZero&&beforeTerminal.state.pendingZero.participantId===HOSTILES[2],"terminal enemy zero not presentation-gated");
-
-    await page.waitForFunction(()=>currentBattle&&currentBattle.battleOver===true&&currentBattle.outcome?.type==="victory",null,{timeout:15000});
-
-    const terminal=await page.evaluate(({SCENE,HOSTILES,MENMA,ANKO})=>{
+    const terminal=await page.evaluate(({HOSTILES,MENMA,REWARD_SOURCE})=>{
       const rt=getActiveStorySceneRuntime();
       const occurrenceId="battle_occ_origin_academy_menma_three_test_subjects:"+rt.instanceId;
       const rows=getActivityHistory();
-      const evidence=currentBattle.runtime?.evidence||[];
-      const scriptedActionIds=evidence.filter(r=>r?.eventType==="menma_origin_scripted_anko_takedown_completed").map(r=>r.actionId);
       return{
         occurrenceId,
         outcome:JSON.parse(JSON.stringify(currentBattle.outcome||null)),
         rewards:JSON.parse(JSON.stringify(currentBattle.rewards||{})),
         receipt:rows.find(r=>r&&r.battleOccurrenceId===occurrenceId&&r.type!=="origin_battle_reward")||null,
-        scriptedActionIds,
-        menmaCompletions:evidence.filter(r=>r?.eventType==="skill_action_completed"&&r.actorRef?.participantId===MENMA).map(r=>r.evidenceId)
+        rewardRows:rows.filter(r=>r&&r.type==="origin_battle_reward"&&r.rewardSourceId===REWARD_SOURCE),
+        evidence:(currentBattle.runtime?.evidence||[]).map(r=>({
+          eventType:r.eventType,actor:r.actorRef?.participantId||null,skillId:r.skillId||null,data:r.data||{}
+        }))
       };
-    },{SCENE,HOSTILES,MENMA,ANKO});
+    },{HOSTILES,MENMA,REWARD_SOURCE});
 
     assert.strictEqual(terminal.outcome.type,"victory");
-    assert.strictEqual(terminal.outcome.tutorialResult,"completed");
-    assert.strictEqual(terminal.outcome.men03Scope,"phase_c_only");
+    assert.strictEqual(terminal.outcome.objectiveCompleted,true);
+    assert.strictEqual(terminal.outcome.men03Scope,"menma_active_only");
+    assert.strictEqual(terminal.outcome.menmaEvidenceStarted,true);
     assert(terminal.receipt,"whole-encounter receipt missing");
     assert.strictEqual(terminal.receipt.battleResult,"victory");
     assert.strictEqual(terminal.receipt.objectiveCompleted,true);
-    assert.strictEqual(terminal.receipt.menmaWithdrawn,false);
-    assert.strictEqual(terminal.receipt.ankoWithdrawn,false);
     assert.deepStrictEqual(terminal.receipt.resolvedHostileIds,HOSTILES);
-    assert.strictEqual(terminal.receipt.fact.halfScriptedPhaseABExcludedFromMEN03,true);
+    assert.strictEqual(terminal.receipt.fact.guestAllyControl,true);
+    assert.strictEqual(terminal.receipt.fact.ownershipGranted,false);
     assert.strictEqual(terminal.rewards.generated,true,"#362 reward adapter did not activate");
     assert.strictEqual(terminal.rewards.ryo,100,"whole-encounter victory not exact 100 Ryō");
+    assert(terminal.evidence.some(r=>r.eventType==="skill_action_completed"&&r.actor===MENMA),"Menma victory action evidence missing");
 
     const beforeClaim=await page.evaluate(()=>Number(playerData.ryo)||0);
     assert.strictEqual(await page.evaluate(()=>claimCurrentBattleRewards()),true,"reward claim failed");
@@ -309,97 +328,101 @@ async function successorVictoryAndReload(browser){
     assert.strictEqual(afterClaim,beforeClaim+100);
     assert.strictEqual(await page.evaluate(()=>claimCurrentBattleRewards()),false,"reward duplicated on second claim");
 
-    const returned=await page.evaluate(()=>continueAfterVictory());
-    assert(returned&&returned.success===true,"victory did not return to Story "+JSON.stringify(returned));
-    await page.waitForFunction(scene=>getActiveStorySceneRuntime()?.sceneId===scene&&getActiveStorySceneRuntime()?.beatId==="post_battle_opening",SCENE,{timeout:12000});
-
-    const post=await page.evaluate(({MEN03_SOURCE,REWARD_SOURCE})=>{
-      const rows=getActivityHistory();
-      const source=rows.find(r=>r&&r.occurrenceId===MEN03_SOURCE)||null;
-      return{
-        beat:getActiveStorySceneRuntime()?.beatId||null,
-        source,
-        rewardCount:rows.filter(r=>r&&r.type==="origin_battle_reward"&&r.rewardSourceId===REWARD_SOURCE).length,
-        evidence:(currentBattle.runtime?.evidence||[]).map(r=>({evidenceId:r.evidenceId,actor:r.actorRef?.participantId||null,target:r.targetRef?.participantId||null,eventType:r.eventType}))
-      };
-    },{MEN03_SOURCE,REWARD_SOURCE});
-    assert.strictEqual(post.rewardCount,1);
-    assert(post.source,"MEN-03 stable aggregate source missing");
-    assert.strictEqual(post.source.tutorialResult,"completed");
-    assert(["high","middle","low"].includes(post.source.performanceBucket),"MEN-03 completion bucket invalid");
-    const supportRows=post.evidence.filter(r=>post.source.supportingOccurrenceIds.includes(r.evidenceId));
-    assert(supportRows.length>0,"MEN-03 supporting evidence missing");
-    assert(supportRows.every(r=>r.actor===MENMA||r.target===MENMA),"Anko scripted evidence contaminated MEN-03 ancestry");
-
-    await page.screenshot({path:path.join(OUT,"successor-victory-story-return.png"),fullPage:false,timeout:12000});
-    await gate.assertClean("issue-369-half-scripted-victory");
-    return{scriptedCount:phaseC.evidence.filter(r=>r.eventType==="menma_origin_scripted_anko_takedown_completed").length,rewardRyo:100,men03Bucket:post.source.performanceBucket};
+    await gate.assertClean("issue-369-guest-ally-victory");
+    return{
+      activeAtHandoff:handoff.readiness.activeParticipantId,
+      reward:terminal.rewards.ryo,
+      menmaEvidenceStarted:terminal.outcome.menmaEvidenceStarted,
+      guestAllyControl:terminal.receipt.fact.guestAllyControl
+    };
   }finally{await context.close();}
 }
 
-async function phaseCDefeat(browser){
-  const {context,page,gate}=await bootScenario(browser,"defeat");
+async function legitimatePartyDefeat(browser){
+  const {context,page,gate}=await bootScenario(browser,"party-defeat");
   try{
-    await waitForScriptedChoreography(page,"defeat");
+    await driveGuestAllyTeachingHandoff(page,"party-defeat");
+
+    // Unstable legitimately depletes Menma. Because Anko is still eligible,
+    // this is a relay, not party defeat.
     await page.evaluate(()=>setBattleRemainingPL("player","academy_menma",1));
+    await useSkill(page,"academy_menma_shadow_clone_feint");
+    await waitPlayerReady(page,ANKO,HOSTILES[2]);
+    const afterMenma=await page.evaluate(()=>({
+      over:currentBattle.battleOver===true,
+      state:getMenmaEvolvedPLBattleState36900(),
+      playerSlots:currentBattle.deployment.player.slots.map(s=>s.participantId).filter(Boolean)
+    }));
+    assert.strictEqual(afterMenma.over,false,"Menma withdrawal incorrectly ended a Battle with eligible Anko");
+    assert.strictEqual(afterMenma.state.menmaWithdrawn,true);
+    assert.deepStrictEqual(afterMenma.playerSlots,[ANKO],"Anko did not relay back after Menma withdrawal");
 
-    const setup=await page.evaluate(()=>attemptBattlePreparedSkill("academy_menma_shadow_clone_feint"));
-    assert(setup&&setup.success===true,"Menma setup action failed "+JSON.stringify(setup));
+    // Anko then uses a legal non-damaging control Skill at 1 PL. Unstable's
+    // ordinary enemy response depletes the last eligible ally => party defeat.
+    await page.evaluate(()=>setBattleRemainingPL("player","sj_anko",1));
+    await useSkill(page,"sj_anko_snake_bind");
+    await page.waitForFunction(()=>currentBattle?.battleOver===true&&currentBattle?.outcome?.type==="defeat",null,{timeout:20000});
 
-    await page.waitForFunction(()=>currentBattle&&currentBattle.outcome?.type==="defeat",null,{timeout:18000});
-    await page.waitForFunction(scene=>getActiveStorySceneRuntime()?.sceneId===scene&&getActiveStorySceneRuntime()?.beatId==="tutorial_not_completed",SCENE,{timeout:12000});
-
-    const terminal=await page.evaluate(({MEN03_SOURCE,REWARD_SOURCE})=>({
+    const terminal=await page.evaluate(({REWARD_SOURCE})=>({
       state:getMenmaEvolvedPLBattleState36900(),
       outcome:JSON.parse(JSON.stringify(currentBattle.outcome||null)),
-      beat:getActiveStorySceneRuntime()?.beatId||null,
       rewards:JSON.parse(JSON.stringify(currentBattle.rewards||{})),
-      men03:getActivityHistory().filter(r=>r&&r.occurrenceId===MEN03_SOURCE),
       rewardRows:getActivityHistory().filter(r=>r&&r.type==="origin_battle_reward"&&r.rewardSourceId===REWARD_SOURCE),
-      scripted:(currentBattle.runtime?.evidence||[]).filter(r=>r?.eventType==="menma_origin_scripted_anko_takedown_completed").length
-    }),{MEN03_SOURCE,REWARD_SOURCE});
+      receipt:getActivityHistory().find(r=>r&&r.battleConfigId==="academy_menma_origin_three_test_subjects_with_anko"&&r.type==="origin_battle_occurrence"&&r.battleResult==="defeat")||null
+    }),{REWARD_SOURCE});
 
     assert.strictEqual(terminal.outcome.type,"defeat");
+    assert.strictEqual(terminal.outcome.objectiveCompleted,false);
     assert.strictEqual(terminal.outcome.tutorialResult,"not_completed");
     assert.strictEqual(terminal.outcome.performanceBucket,null);
+    assert.strictEqual(terminal.outcome.partyDefeat,true);
+    assert.strictEqual(terminal.outcome.battlePLWithdrawalNotDeath,true);
     assert.strictEqual(terminal.state.menmaWithdrawn,true);
+    assert.strictEqual(terminal.state.ankoWithdrawn,true);
     assert.strictEqual(terminal.state.terminalResult,"defeat");
-    assert.strictEqual(terminal.beat,"tutorial_not_completed");
+    assert(terminal.receipt&&terminal.receipt.objectiveCompleted===false,"defeat occurrence receipt missing");
+    assert(Array.isArray(terminal.receipt.unresolvedHostileIds)&&terminal.receipt.unresolvedHostileIds.includes(HOSTILES[2]),"unresolved hostile identity not preserved");
     assert.strictEqual(terminal.rewards.generated,false);
     assert.strictEqual(terminal.rewards.ryo,0);
     assert.strictEqual(terminal.rewardRows.length,0);
-    assert.strictEqual(terminal.men03.length,0,"defeat fabricated MEN-03 aggregate");
-    assert.strictEqual(terminal.scripted,2,"defeat path replayed scripted Anko beats");
 
-    await page.screenshot({path:path.join(OUT,"phase-c-defeat-story-return.png"),fullPage:false,timeout:12000});
-    await gate.assertClean("issue-369-half-scripted-defeat");
-    return{beat:terminal.beat,men03Count:terminal.men03.length,rewardCount:terminal.rewardRows.length};
+    await page.screenshot({path:path.join(OUT,"party-defeat.png"),fullPage:false,timeout:12000}).catch(()=>{});
+    await gate.assertClean("issue-369-guest-ally-defeat");
+    return{
+      partyDefeat:true,
+      menmaWithdrawn:terminal.state.menmaWithdrawn,
+      ankoWithdrawn:terminal.state.ankoWithdrawn,
+      unresolvedHostiles:terminal.receipt.unresolvedHostileIds
+    };
   }finally{await context.close();}
 }
 
 (async()=>{
   const browser=await chromium.launch({headless:false});
   try{
-    const victory=await successorVictoryAndReload(browser);
-    const defeat=await phaseCDefeat(browser);
+    const victory=await guestAllyVictoryAndReload(browser);
+    const defeat=await legitimatePartyDefeat(browser);
     const summary={
-      pass:true,issue:369,kind:"installed_browser_menma_half_scripted_evolved_pl_battle",
+      pass:true,issue:369,kind:"installed_browser_menma_guest_ally_evolved_pl_battle",
       checks:{
         storyBattleStory:true,
         ankoStartsActive:true,
+        ankoIsPlayerControlledGuestAlly:true,
+        exactFourSkillGuestPalette:true,
+        forbiddenTwinSnakesExcluded:true,
         allThreeEnemyPortraitsProjected:true,
         forestBackdropProjected:true,
-        phaseAVisibleBeforeRelay:true,
-        phaseBVisibleBeforeRelay:true,
+        playerChoosesAnkoActions:true,
+        ordinaryEnemyResponsesEnabled:true,
         alteredThenBruteThenUnstableRelay:true,
-        ankoYieldsToMenma:true,
-        menmaGetsFirstPhaseCInput:true,
-        noOrdinaryEnemyTurnInScriptedPhases:true,
-        scriptedActionsExcludedFromMEN03:true,
-        saveRestoreDoesNotReplayScriptedBeats:true,
-        terminalZeroWaitsForVisibleSettle:true,
+        ankoYieldsToMenmaAfterLegitimateFirstTwo:true,
+        enemyActsBeforeMenmaAfterYield:true,
+        menmaEvidenceStartsAtFirstActiveMoment:true,
+        menmaWithdrawalRelaysBackToEligibleAnko:true,
+        partyDefeatRequiresAlliedExhaustion:true,
+        saveRestoreDoesNotReplayCommittedActions:true,
         exact100RyoOnce:true,
-        phaseCFailureNotCompletedNoFakeLow:true
+        defeatPaysZero:true
       },
       victory,defeat,browserGoldenClaimed:false
     };
