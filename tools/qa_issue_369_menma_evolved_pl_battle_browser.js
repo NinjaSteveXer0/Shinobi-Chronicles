@@ -475,8 +475,17 @@ async function legitimatePartyDefeat(browser){
       typeof runIssue369MenmaEvolvedPLBattleDiagnostics==="function"&&
       globalThis.SC_MENMA_EVOLVED_PL_BATTLE_36900
     ),null,{timeout:30000});
-    await releaseFrontDoor(page);
     await page.waitForFunction(scene=>getActiveStorySceneRuntime()?.sceneId===scene&&getActiveStorySceneRuntime()?.beatId==="menma_party_defeat_return_01",SCENE,{timeout:20000});
+    await page.waitForFunction(()=>!!globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400,null,{timeout:12000});
+    const resumeState=await page.evaluate(()=>SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400.getSavedChronicleSnapshot());
+    assert.strictEqual(resumeState.begun,true,"Menma defeat reload was not recognised as a begun Chronicle: "+JSON.stringify(resumeState));
+    const frontDoor=page.locator("#sc-alpha-front-door-33400");
+    if(await frontDoor.count()){
+      const login=frontDoor.getByRole("button",{name:"LOGIN / CONTINUE",exact:true});
+      await login.waitFor({state:"visible",timeout:8000});
+      await login.click();
+      await page.waitForFunction(()=>!document.getElementById("sc-alpha-front-door-33400"),null,{timeout:8000});
+    }
     await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:12000});
     await waitForStoryMotionToSettle(page);
     const afterStoryReload=await page.evaluate(()=>({
