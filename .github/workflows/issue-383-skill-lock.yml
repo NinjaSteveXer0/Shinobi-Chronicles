@@ -5,7 +5,7 @@ on:
   pull_request:
     paths:
       - 'index.html'
-      - 'runtime/alpha-kakashi-menma-skill-lock-38300.js'
+      - 'runtime/alpha-combat-skill-lock-38300.js'
       - 'runtime/alpha-runtime-build-fingerprint-303.js'
       - 'tools/qa_issue_383_skill_lock.js'
       - 'tools/qa_issue_383_skill_lock_browser.js'
@@ -38,7 +38,7 @@ jobs:
 
       - name: Source and ownership proof
         run: |
-          node --check runtime/alpha-kakashi-menma-skill-lock-38300.js
+          node --check runtime/alpha-combat-skill-lock-38300.js
           node --check tools/qa_issue_383_skill_lock.js
           node --check tools/qa_issue_383_skill_lock_browser.js
           node tools/qa_issue_383_skill_lock.js
