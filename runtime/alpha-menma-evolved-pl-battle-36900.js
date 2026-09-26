@@ -394,11 +394,14 @@ function swapAnkoToMenmaActive(){
   s.ankoYielded=true;s.phase="phase_c_player";s.inputLocked=false;
   b.characterId=MENMA_ID;
   const deployment=b.deployment;
+  const pairedEnemyRelayTransition=deployment.lastTransition&&deployment.lastTransition.side==="enemy"
+    ?clone(deployment.lastTransition):null;
   deployment.transitionCounter=(Number(deployment.transitionCounter)||0)+1;
   deployment.lastTransition={
     id:"menma_phase_c_yield_"+String(deployment.transitionCounter),type:"authored_active_yield",side:"player",
     reason:"menma_origin_phase_c_handoff",withdrawnParticipantId:null,vacatedSlot:1,replacementParticipantId:MENMA_ID,
     movements:[{participantId:ANKO_ID,fromSlot:1,toSlot:2,movementType:"authored_yield_to_bench"},{participantId:MENMA_ID,fromSlot:2,toSlot:1,movementType:"authored_bench_promotion"}],
+    pairedEnemyRelayTransition,
     createdAt:Date.now()
   };
   recordBattleEvidence({
