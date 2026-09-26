@@ -1505,7 +1505,7 @@
         }
       }
 
-      .battle2-modern[data-formation-stage="true"] .battle2-live-ticker{left:35%!important;top:10.2%!important;width:30%!important;min-height:4.6%!important;padding:6px 10px!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-live-ticker{left:35%!important;top:8.4%!important;width:30%!important;min-height:4.6%!important;padding:6px 10px!important}
       .battle2-modern[data-formation-stage="true"] .battle-live-active-card-heading{top:1%!important}
       .battle2-modern[data-formation-mode="duel"] .battle-live-active-card{top:12.5%!important;width:33.5%!important;height:53.5%!important}
       .battle2-modern[data-formation-mode="duel"] .battle-live-power,
@@ -1575,7 +1575,7 @@
       stableFormationMotion:styleText.includes("Final Kakashi Golden / Formation Stage motion policy")&&styleText.includes("transition:none!important;animation:none!important;will-change:auto!important")&&styleText.includes(".battle2-performance-result-chip"),
       playerCardNamesSuppressed:styleText.includes(".battle-live-active-card-player .battle-live-active-nameplate{display:none!important}")&&styleText.includes(".battle-live-roster-player .battle-live-roster-name{display:none!important}"),
       confrontationPLLaneAligned:styleText.includes('data-formation-mode="duel"] .battle-live-power-player')&&styleText.includes("left:43.5%!important")&&styleText.includes("left:56.5%!important"),
-      topHudStackSeparated:styleText.includes('data-formation-stage="true"] .battle2-performance-host{left:43%!important;right:43%!important;top:1.5%!important;height:4.8%!important}')&&styleText.includes('data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-host{left:31%!important;right:31%!important;top:1.4%!important;height:8.2%!important}')&&styleText.includes(".battle2-live-ticker{left:35%!important;top:10.2%!important;width:30%!important"),
+      topHudStackSeparated:styleText.includes('data-formation-stage="true"] .battle2-performance-host{left:43%!important;right:43%!important;top:1.5%!important;height:4.8%!important}')&&styleText.includes('data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-host{left:31%!important;right:31%!important;top:1.4%!important;height:8.2%!important}')&&styleText.includes(".battle2-live-ticker{left:35%!important;top:8.4%!important;width:30%!important"),
       storyCallerPresentationSuspension:String(suspendCallerStoryPresentation33000).includes("markStoryPresentationHidden33900")&&String(renderCombatOverlay).includes("suspendCallerStoryPresentation33000"),
       branchModesRemainExplicit:renderInspector33000.toString().includes("setSelectedBattleSkillMode"),
       browserGoldenClaimed:false
