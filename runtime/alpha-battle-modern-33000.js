@@ -832,7 +832,7 @@
     const relay=group.find(row=>row&&row.eventType==="battle_formation_relay_committed")||null;
     const actionRole=completion.eventType==="menma_origin_scripted_anko_takedown_completed"
       ?"AUTHORED BEAT"
-      :completion.eventType==="menma_origin_anko_assist_completed"||(actorRef&&actorRef.participantId==="sj_anko")
+      :completion.eventType==="menma_origin_anko_assist_completed"
         ?"AUTHORED ASSIST":"ACTIVE";
     const opportunityId=opportunityIdForAction33000(completion.actionId);
     const receipt={
@@ -1054,8 +1054,8 @@
 
     stage=refreshCommittedFormationPresentation33000(stage,beforeTransitionId);
     try{installFormationStage33000(stage);}catch(_error){}
-    // Later committed actions (including the next scripted Anko beat or the
-    // ordinary Phase-C enemy response) are now eligible for ordered playback.
+    // Later committed actions, relays and ordinary enemy/player responses are
+    // now eligible for ordered playback.
     syncBattlePresentationQueue33000();
     persistPresentationQueueState33000();
     if(battlePresentationQueueState33000.active){
