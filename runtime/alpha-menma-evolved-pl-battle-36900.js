@@ -35,9 +35,30 @@ const HOSTILE_IDS=Object.freeze([
   "test_subject_brute",
   "test_subject_unstable"
 ]);
+const HOSTILE_BATTLE_PORTRAITS=Object.freeze({
+  test_subject_altered_shinobi:"Enemies Portraits/test_subject_altered_shinobi.png",
+  test_subject_brute:"Enemies Portraits/test_subject_brute.png",
+  test_subject_unstable:"Enemies Portraits/test_subject_unstable.png"
+});
 const ALLIED_IDS=Object.freeze([MENMA_ID,ANKO_ID]);
 const ANKO_STATS=Object.freeze({nin:56,tai:52,buki:48,fuin:44,kin:58,gen:39,stamina:55});
 const ANKO_BASE_PL=56;
+
+// Stephen-direct current Battle presentation authority confirms all three
+// existing Test Subject Battle/UI portraits are to be used. These remain
+// non-Registry opposition identities; binding enemy.image is presentation
+// authority only and does not promote them into the collectible Registry.
+function bindTestSubjectBattlePortraits36900(){
+  try{
+    if(typeof enemyDatabase!=="object"||!enemyDatabase)return false;
+    for(const [id,path] of Object.entries(HOSTILE_BATTLE_PORTRAITS)){
+      if(enemyDatabase[id]&&typeof enemyDatabase[id]==="object")enemyDatabase[id].image=path;
+    }
+    return HOSTILE_IDS.every(id=>enemyDatabase[id]&&enemyDatabase[id].image===HOSTILE_BATTLE_PORTRAITS[id]);
+  }catch(_error){return false;}
+}
+const TEST_SUBJECT_PORTRAITS_BOUND=bindTestSubjectBattlePortraits36900();
+
 const SCRIPTED_PHASES=Object.freeze({
   scripted_a:Object.freeze({
     phase:"scripted_a",
