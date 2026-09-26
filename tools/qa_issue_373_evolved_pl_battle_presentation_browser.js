@@ -20,14 +20,56 @@ const UNSTABLE="test_subject_unstable";
 
 fs.mkdirSync(OUT,{recursive:true});
 
-async function releaseFrontDoor(page){
-  await page.evaluate(()=>{
-    try{if(typeof releaseAlphaFrontDoor33300==="function")releaseAlphaFrontDoor33300();}catch(_){}
-    try{globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400?.release?.();}catch(_){}
-    const game=document.querySelector(".game-container");
-    if(game){game.removeAttribute("data-alpha-front-door-locked");game.inert=false;}
-    for(const id of ["sc-alpha-front-door-33300","sc-alpha-front-door-33400"])document.getElementById(id)?.remove();
-  });
+async function waitForStoryMotionToSettle(page){
+  try{
+    await page.waitForFunction(()=>{
+      try{
+        return typeof getStoryHardSceneTransitionState33900!=="function"||
+          getStoryHardSceneTransitionState33900()?.active!==true;
+      }catch(_error){return true;}
+    },null,{timeout:3000});
+  }catch(_error){}
+}
+
+async function clickStoryPrimary(page){
+  const root=page.locator("#story-scene-presentation-layer");
+  let button=root.locator(".sc-chronicle-primary").first();
+  if(await button.count()===0){
+    button=root.locator(".sc-story-actions > .sc-story-action:not(.sc-story-choice)").first();
+  }
+  await button.waitFor({state:"visible",timeout:8000});
+  await button.click();
+  await waitForStoryMotionToSettle(page);
+}
+
+async function progressStoryToBeat(page,targetBeatId){
+  const visited=[];
+  for(let step=0;step<120;step+=1){
+    const state=await page.evaluate(()=>({
+      sceneId:getActiveStorySceneRuntime()?.sceneId||null,
+      beatId:getActiveStorySceneRuntime()?.beatId||null,
+      text:document.querySelector("#story-scene-presentation-layer .sc-story-text")?.textContent?.trim()||""
+    }));
+    visited.push({beatId:state.beatId,text:state.text});
+    if(state.beatId===targetBeatId)return visited;
+    assert.strictEqual(state.sceneId,SCENE,"Story left Menma Origin before Scene 7: "+JSON.stringify(state));
+    await clickStoryPrimary(page);
+  }
+  throw new Error("Menma Story did not reach "+targetBeatId+" through visible Story controls: "+JSON.stringify(visited.slice(-12)));
+}
+
+async function launchBattleFromStoryUI(page){
+  for(let step=0;step<20;step+=1){
+    const state=await page.evaluate(()=>({
+      beatId:getActiveStorySceneRuntime()?.beatId||null,
+      battleActive:currentBattle?.active===true,
+      encounterId:currentBattle?.encounterId||null
+    }));
+    if(state.battleActive&&state.encounterId===ENCOUNTER)return true;
+    assert.strictEqual(state.beatId,"tutorial_battle","Story left tutorial_battle before Battle bootstrap: "+JSON.stringify(state));
+    await clickStoryPrimary(page);
+  }
+  return false;
 }
 
 async function stageSnapshot(page){
@@ -103,18 +145,35 @@ async function boot(page){
   assert.strictEqual(d.battle.pass,true,"33000 diagnostics RED "+JSON.stringify(d.battle));
   assert.strictEqual(d.menma.pass,true,"36900 diagnostics RED "+JSON.stringify(d.menma));
 
-  const started=await page.evaluate(()=>({
-    selected:selectChronicleOrigin("academy_menma","issue_373_browser"),
-    launched:beginAlphaChronicleOriginPrologue()
-  }));
-  assert(started.selected?.success===true,"Menma selection failed "+JSON.stringify(started));
-  assert(started.launched?.success===true,"Menma Story launch failed "+JSON.stringify(started));
-  await releaseFrontDoor(page);
+  // #373 real-player path proof. No direct selectChronicleOrigin(),
+  // beginAlphaChronicleOriginPrologue(), setStorySceneBeat() or
+  // advanceStoryScene() calls are permitted here.
+  await page.waitForSelector("#sc-alpha-front-door-33300",{state:"visible",timeout:15000});
+  await page.locator('#sc-alpha-front-door-33300 [data-afd-action="begin"]').click();
+  await page.locator("#afd-ninja-id").fill("Issue373");
+  await page.locator('#sc-alpha-front-door-33300 [data-afd-action="ninja-id-next"]').click();
+  await page.locator('#sc-alpha-front-door-33300 [data-village-id="konoha"]').click();
+  await page.locator('#sc-alpha-front-door-33300 [data-afd-action="village-next"]').click();
+  await page.locator('#sc-alpha-front-door-33300 [data-origin-id="academy_menma"]').click();
+  await page.locator('#sc-alpha-front-door-33300 [data-afd-action="confirm-ninja"]').click();
+
   await page.waitForFunction(scene=>getActiveStorySceneRuntime()?.sceneId===scene,SCENE,{timeout:15000});
-  await page.evaluate(()=>setStorySceneBeat("tutorial_battle"));
-  await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="tutorial_battle",null,{timeout:8000});
-  const launched=await page.evaluate(()=>advanceStoryScene());
-  assert(launched?.success===true,"Story -> Battle failed "+JSON.stringify(launched));
+  await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:12000});
+  const onboarding=await page.evaluate(()=>({
+    origin:ensurePlayerAcquisitionState()?.chronicleOriginVariantId||null,
+    sceneId:getActiveStorySceneRuntime()?.sceneId||null,
+    beatId:getActiveStorySceneRuntime()?.beatId||null
+  }));
+  assert.strictEqual(onboarding.origin,MENMA,"front-door selection did not commit Academy Menma");
+  assert.strictEqual(onboarding.sceneId,SCENE,"front-door confirmation did not launch Menma Origin");
+
+  const visited=await progressStoryToBeat(page,"tutorial_battle");
+  assert(visited.length>1,"#373 Story path did not visibly progress through Menma Origin");
+  const objective=await page.locator("#story-scene-presentation-layer").innerText();
+  assert(objective.includes("Stop the Test Subjects."),"Scene 7 successor objective not visible on real Story path");
+
+  const launched=await launchBattleFromStoryUI(page);
+  assert.strictEqual(launched,true,"visible Story Battle control did not bootstrap Scene 7 Battle");
   await page.waitForFunction(enc=>currentBattle?.active===true&&currentBattle?.encounterId===enc,ENCOUNTER,{timeout:12000});
   await page.waitForSelector(".alpha-code-battle-stage",{state:"visible",timeout:12000});
 }
@@ -306,7 +365,10 @@ async function boot(page){
         noAlteredOrBruteOrdinaryTurns:true,
         phaseCInputRestores:true,
         browserErrorGateClean:true,
-        internalStateLabelsHidden:true
+        internalStateLabelsHidden:true,
+        realFrontDoorOriginSelectionPath:true,
+        realStoryClickProgressionPath:true,
+        noDirectStoryBeatFixture:true
       },
       stephenVisualAcceptance:"PENDING",
       battleGoldenClaimed:false
