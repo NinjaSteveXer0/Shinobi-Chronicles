@@ -32,6 +32,34 @@ async function releaseFrontDoor(page){
   });
 }
 
+async function waitForStoryMotionToSettle(page){
+  try{
+    await page.waitForFunction(()=>{
+      try{
+        return typeof getStoryHardSceneTransitionState33900!=="function"||
+          getStoryHardSceneTransitionState33900()?.active!==true;
+      }catch(_error){return true;}
+    },null,{timeout:3000});
+  }catch(_error){}
+}
+
+async function clickStoryPrimary(page){
+  const root=page.locator("#story-scene-presentation-layer");
+  let button=root.locator(".sc-chronicle-primary").first();
+  if(await button.count()===0)button=root.locator(".sc-story-actions > .sc-story-action:not(.sc-story-choice)").first();
+  await button.waitFor({state:"visible",timeout:8000});
+  await button.click();
+  await waitForStoryMotionToSettle(page);
+}
+
+async function clickStoryChoice(page,label){
+  const root=page.locator("#story-scene-presentation-layer");
+  const button=root.locator(".sc-story-choice").filter({hasText:label}).first();
+  await button.waitFor({state:"visible",timeout:8000});
+  await button.click();
+  await waitForStoryMotionToSettle(page);
+}
+
 async function bootScenario(browser,label){
   const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1});
   const page=await context.newPage();
@@ -386,13 +414,164 @@ async function legitimatePartyDefeat(browser){
     assert.strictEqual(terminal.rewards.ryo,0);
     assert.strictEqual(terminal.rewardRows.length,0);
 
-    await page.screenshot({path:path.join(OUT,"party-defeat.png"),fullPage:false,timeout:12000}).catch(()=>{});
-    await gate.assertClean("issue-369-guest-ally-defeat");
+    // #386/#388 production bridge: terminal allied exhaustion must return
+    // exactly once to the authored defeat continuation, survive reload there,
+    // and then flow into the future-ambition choice rather than the obsolete
+    // LOW-performance / old Nine-Tails ending chain.
+    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_party_defeat_return_01",null,{timeout:25000});
+    await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:12000});
+    await waitForStoryMotionToSettle(page);
+
+    const returnEntry=await page.evaluate(()=> {
+      const rt=getActiveStorySceneRuntime(),beat=getCurrentStorySceneBeat(),def=getActiveStorySceneDefinition();
+      const env=resolveStorySceneEnvironmentProjection({},beat,def,rt);
+      const defeatRows=getActivityHistory().filter(r=>r&&r.battleConfigId==="academy_menma_origin_three_test_subjects_with_anko"&&r.type==="origin_battle_occurrence"&&r.battleResult==="defeat");
+      return{
+        beatId:rt?.beatId||null,text:beat?.text||null,assetPath:env?.asset_path||null,
+        pendingBattle:rt?.pendingBattle||null,caller:currentBattle?.returnContext||null,
+        defeatReceiptCount:defeatRows.length
+      };
+    });
+    assert.strictEqual(returnEntry.beatId,"menma_party_defeat_return_01");
+    assert.strictEqual(returnEntry.text,"The fight breaks apart before Menma can pull it back together.");
+    assert.strictEqual(returnEntry.assetPath,"Scene backdrops/forest_clearing_day.png");
+    assert.strictEqual(returnEntry.pendingBattle,null,"Story still thinks the terminal Battle is pending");
+    assert.strictEqual(returnEntry.caller,null,"Battle caller returnContext was not consumed exactly once");
+    assert.strictEqual(returnEntry.defeatReceiptCount,1,"party-defeat occurrence receipt duplicated before Story return");
+
+    await page.evaluate(()=>saveTestState());
+    await page.evaluate(()=>restoreTestState());
+    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_party_defeat_return_01",null,{timeout:12000});
+    const afterStoryReload=await page.evaluate(()=>({
+      beatId:getActiveStorySceneRuntime()?.beatId||null,
+      defeatReceiptCount:getActivityHistory().filter(r=>r&&r.battleConfigId==="academy_menma_origin_three_test_subjects_with_anko"&&r.type==="origin_battle_occurrence"&&r.battleResult==="defeat").length,
+      rewardRows:getActivityHistory().filter(r=>r&&r.type==="origin_battle_reward"&&r.rewardSourceId==="menma_origin_battle_three_test_subjects_victory_ryo_01").length
+    }));
+    assert.strictEqual(afterStoryReload.beatId,"menma_party_defeat_return_01","save/load replayed or skipped the Story return");
+    assert.strictEqual(afterStoryReload.defeatReceiptCount,1,"save/load duplicated party-defeat occurrence");
+    assert.strictEqual(afterStoryReload.rewardRows,0,"save/load fabricated a defeat reward");
+
+    const defeatBeats=[
+      ["menma_party_defeat_return_01","The fight breaks apart before Menma can pull it back together."],
+      ["menma_party_defeat_return_02","By the time the clearing settles, Menma and Anko are both at its edge."],
+      ["menma_party_defeat_return_03","The test subjects still able to move use the opening.\n\nThey disappear between the trees."],
+      ["menma_party_defeat_return_04","They're gone."],
+      ["menma_party_defeat_return_05","I know."],
+      ["menma_party_defeat_return_06","You wanted a real test."],
+      ["menma_party_defeat_return_07","I got one."],
+      ["menma_party_defeat_return_08","And?"],
+      ["menma_party_defeat_return_09","Menma looks at the gap in the trees where the last of them disappeared."],
+      ["menma_party_defeat_return_10","I need more."],
+      ["menma_party_defeat_return_11","Anko laughs once.\n\nNot because it is funny."],
+      ["menma_party_defeat_return_12","Yeah."],
+      ["menma_party_defeat_return_13","That sounds familiar."],
+      ["menma_party_defeat_return_14","You're going after them?"],
+      ["menma_party_defeat_return_15","I'm reporting where they went."],
+      ["menma_party_defeat_return_16","I can help."],
+      ["menma_party_defeat_return_17","No."],
+      ["menma_party_defeat_return_18","Menma gives her a look.\n\nAnko sees it immediately."],
+      ["menma_party_defeat_return_19","That wasn't a challenge."],
+      ["menma_party_defeat_return_20","Didn't say it was."],
+      ["menma_party_defeat_return_21","Go home, Menma."],
+      ["menma_party_defeat_return_22","Not the Academy."],
+      ["menma_party_defeat_return_23","Didn't say Academy."],
+      ["menma_party_defeat_return_24","Anko heads back toward the village.\n\nMenma waits until she is gone, then takes the forest route the other way."]
+    ];
+    for(const [beatId,text] of defeatBeats){
+      await page.waitForFunction(id=>getActiveStorySceneRuntime()?.beatId===id,beatId,{timeout:12000});
+      const beat=await page.evaluate(()=>getCurrentStorySceneBeat());
+      assert.strictEqual(beat.text,text,"#386 player-facing Story drift at "+beatId);
+      await clickStoryPrimary(page);
+    }
+
+    const futureBeats=[
+      ["menma_future_01","Menma is running again."],
+      ["menma_future_02","Through the trees, Konoha comes back into view. The Academy is somewhere beyond the rooftops."],
+      ["menma_future_03","Satisfied?"],
+      ["menma_future_04","No."],
+      ["menma_future_05","Good."]
+    ];
+    for(const [beatId,text] of futureBeats){
+      await page.waitForFunction(id=>getActiveStorySceneRuntime()?.beatId===id,beatId,{timeout:12000});
+      const beat=await page.evaluate(()=>getCurrentStorySceneBeat());
+      assert.strictEqual(beat.text,text,"#388 Scene-10 Story drift at "+beatId);
+      if(beatId==="menma_future_01"){
+        const futureBackdrop=await page.evaluate(()=>{
+          const rt=getActiveStorySceneRuntime(),beat=getCurrentStorySceneBeat(),def=getActiveStorySceneDefinition();
+          return resolveStorySceneEnvironmentProjection({},beat,def,rt)?.asset_path||null;
+        });
+        assert.strictEqual(futureBackdrop,"Scene backdrops/whisper_woods_forest_route.png","#388 Scene-10 backdrop drift");
+      }
+      await clickStoryPrimary(page);
+    }
+
+    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_future_choice",null,{timeout:12000});
+    const futureChoice=await page.evaluate(()=>({
+      labels:getCurrentStorySceneBeat()?.choices?.map(choice=>choice.label)||[],
+      oldEndingPresent:getActiveStorySceneDefinition()?.beatMap?.has("ending_nine_tails_right")===true
+    }));
+    assert.deepStrictEqual(futureChoice.labels,[
+      "MASTER WHAT THEY WON'T TEACH ME",
+      "BECOME TOO STRONG TO HOLD BACK",
+      "CREATE SOMETHING THAT'S MINE",
+      "FIND OUT HOW FAR I CAN GO"
+    ],"#388 future-ambition choices drifted");
+    await page.screenshot({path:path.join(OUT,"party-defeat-future-choice.png"),fullPage:false,timeout:12000}).catch(()=>{});
+
+    await clickStoryChoice(page,"MASTER WHAT THEY WON'T TEACH ME");
+    const intent=await page.evaluate(()=> {
+      const rows=getActivityHistory().filter(r=>r&&r.occurrenceId==="occ_origin_menma_future_ambition_intent");
+      const acq=ensurePlayerAcquisitionState();
+      return{
+        count:rows.length,
+        row:rows[0]||null,
+        currentPL:typeof getCurrentCharacterPL==="function"?getCurrentCharacterPL("academy_menma"):null,
+        originVariantId:acq.chronicleOriginVariantId
+      };
+    });
+    assert.strictEqual(intent.count,1,"future-ambition Story intent was not committed exactly once");
+    assert.strictEqual(intent.row?.fact?.futureAmbitionIntent,"master_what_they_wont_teach_me");
+    assert.strictEqual(intent.row?.fact?.storyIntent,true);
+    assert.strictEqual(intent.row?.fact?.progressionGranted,false);
+    assert.strictEqual(intent.originVariantId,MENMA);
+
+    for(const [beatId,text] of [
+      ["menma_future_master_01","If they won't teach me yet, I'll find out what I'm missing."],
+      ["menma_future_master_02","Hungry."],
+      ["menma_future_master_03","Ambitious."]
+    ]){
+      await page.waitForFunction(id=>getActiveStorySceneRuntime()?.beatId===id,beatId,{timeout:12000});
+      const beat=await page.evaluate(()=>getCurrentStorySceneBeat());
+      assert.strictEqual(beat.text,text,"#388 selected future branch drift at "+beatId);
+      await clickStoryPrimary(page);
+    }
+
+    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_future_terminal",null,{timeout:12000});
+    assert.strictEqual(await page.evaluate(()=>getCurrentStorySceneBeat()?.text||null),"Menma runs toward Konoha.");
+    await page.screenshot({path:path.join(OUT,"party-defeat-future-terminal.png"),fullPage:false,timeout:12000}).catch(()=>{});
+    await clickStoryPrimary(page);
+    await page.waitForFunction(()=>getActiveStorySceneRuntime()===null&&getAcademyTeamFormationSnapshot()?.required===true,null,{timeout:12000});
+    const completion=await page.evaluate(()=>({
+      activeScene:getActiveStorySceneRuntime(),
+      origin:ensurePlayerAcquisitionState().chronicleOrigin,
+      formation:getAcademyTeamFormationSnapshot(),
+      intentCount:getActivityHistory().filter(r=>r&&r.occurrenceId==="occ_origin_menma_future_ambition_intent").length
+    }));
+    assert.strictEqual(completion.activeScene,null,"Scene 10 terminal did not close the Origin");
+    assert.strictEqual(completion.origin?.prologueCompleted,true,"existing Origin completion boundary did not fire");
+    assert.strictEqual(completion.formation?.required,true,"existing Chronicle-begins/team-formation boundary did not follow Scene 10");
+    assert.strictEqual(completion.intentCount,1,"Origin completion duplicated future-ambition intent");
+
+    await gate.assertClean("issue-369-guest-ally-defeat-story-return");
     return{
       partyDefeat:true,
       menmaWithdrawn:terminal.state.menmaWithdrawn,
       ankoWithdrawn:terminal.state.ankoWithdrawn,
-      unresolvedHostiles:terminal.receipt.unresolvedHostileIds
+      unresolvedHostiles:terminal.receipt.unresolvedHostileIds,
+      storyReturnBeat:"menma_party_defeat_return_01",
+      futureChoice:true,
+      futureIntent:"master_what_they_wont_teach_me",
+      originCompleted:true
     };
   }finally{await context.close();}
 }
@@ -422,7 +601,12 @@ async function legitimatePartyDefeat(browser){
         partyDefeatRequiresAlliedExhaustion:true,
         saveRestoreDoesNotReplayCommittedActions:true,
         exact100RyoOnce:true,
-        defeatPaysZero:true
+        defeatPaysZero:true,
+        partyDefeatReturnsToExactWritingContinuation:true,
+        partyDefeatStoryReturnReloadSafe:true,
+        defeatContinuationReachesFutureAmbition:true,
+        futureAmbitionIntentHistoryOnly:true,
+        defeatPathCompletesOriginNormally:true
       },
       victory,defeat,browserGoldenClaimed:false
     };
