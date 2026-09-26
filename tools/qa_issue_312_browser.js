@@ -16,7 +16,7 @@ async function boot(browser){
   const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1});
   const page=await context.newPage();
   const runtimeErrorGate=await installBrowserRuntimeErrorGate(page);
-  await page.addInitScript(()=>{try{localStorage.clear();sessionStorage.clear();}catch(_){}});
+  await page.addInitScript(()=>{try{localStorage.clear();sessionStorage.clear();}catch(_){};globalThis.SC_DISABLE_FIRST_PL_BATTLE_TUTORIAL_QA=true;});
   await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});
   await page.waitForFunction(()=>typeof globalThis.getRuntimeBuildFingerprint==="function",null,{timeout:15000});
   assert.deepStrictEqual(await page.evaluate(()=>getRuntimeBuildFingerprint()),BUILD_MANIFEST,"#312 runtime fingerprint mismatch");
@@ -578,11 +578,11 @@ async function shot(page,name,selector=null){
     await shot(page,"05-battle-hit-performance.png",".alpha-code-battle-stage");
 
     await seed("defeat");
-    await page.waitForSelector('.battle2-performance-stage[data-result="DEFEAT"]',{state:"visible",timeout:8000});
+    await page.waitForSelector('.battle2-performance-stage[data-result="WITHDRAWAL"]',{state:"visible",timeout:8000});
     const defeat=await page.evaluate(()=>resolveBattlePerformanceProjection33000());
-    assert(defeat.result==="DEFEAT"&&defeat.afterPL===0,JSON.stringify(defeat));
-    assert(!JSON.stringify(defeat).toLowerCase().includes("death"),"#312 defeat presentation leaked death semantics");
-    await shot(page,"06-battle-defeat-performance.png",".alpha-code-battle-stage");
+    assert(defeat.result==="WITHDRAWAL"&&defeat.presentationClass==="DEFEAT"&&defeat.afterPL===0,JSON.stringify(defeat));
+    assert(!JSON.stringify(defeat).toLowerCase().includes("death"),"#312 withdrawal presentation leaked death semantics");
+    await shot(page,"06-battle-withdrawal-performance.png",".alpha-code-battle-stage");
 
     // FORMATION-STAGE SQUAD PROOF — consume a real authorised Kakashi 2v1
     // deployment rather than fabricating production roster truth. This proves

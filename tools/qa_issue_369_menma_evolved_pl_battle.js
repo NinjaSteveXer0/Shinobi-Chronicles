@@ -11,98 +11,126 @@ const RUNTIME="runtime/alpha-menma-evolved-pl-battle-36900.js";
 const INDEX="index.html";
 const GAME="game.js";
 const REWARD="runtime/alpha-menma-origin-rewards-36200.js";
+const PRESENTATION="runtime/alpha-battle-modern-33000.js";
+
 const runtime=fs.readFileSync(path.join(ROOT,RUNTIME),"utf8");
 const index=fs.readFileSync(path.join(ROOT,INDEX),"utf8");
 const game=fs.readFileSync(path.join(ROOT,GAME),"utf8");
 const reward=fs.readFileSync(path.join(ROOT,REWARD),"utf8");
+const presentation=fs.readFileSync(path.join(ROOT,PRESENTATION),"utf8");
 
 new vm.Script(runtime,{filename:RUNTIME});
+new vm.Script(presentation,{filename:PRESENTATION});
 
 const script='<script src="'+RUNTIME+'"></script>';
 assert.strictEqual(index.split(script).length-1,1,"#369 runtime must load exactly once");
 assert(index.indexOf(script)>index.indexOf('<script src="runtime/alpha-battle-modern-33000.js"></script>'),"#369 must load after shared Battle presentation");
-assert(index.indexOf(script)>index.indexOf('<script src="runtime/alpha-menma-origin-rewards-36200.js"></script>'),"#369 must load after the fail-closed reward adapter");
+assert(index.indexOf(script)>index.indexOf('<script src="runtime/alpha-menma-origin-rewards-36200.js"></script>'),"#369 must load after reward adapter");
 
-const exact={
-  config:"academy_menma_origin_three_test_subjects_with_anko",
-  encounter:"origin_academy_menma_prologue:three_test_subjects",
-  objective:"stop_three_test_subjects",
-  entitlement:"menma_origin_anko_autonomous_assist"
-};
-for(const value of Object.values(exact))assert(runtime.includes(value),"#369 missing exact authority "+value);
+for(const value of [
+  "academy_menma_origin_three_test_subjects_with_anko",
+  "origin_academy_menma_prologue:three_test_subjects",
+  "stop_three_test_subjects",
+  "menma_origin_guest_ally_controller_v3"
+])assert(runtime.includes(value),"#369 missing Guest Ally successor authority "+value);
 
-assert(runtime.includes('const ALLIED_IDS=Object.freeze([MENMA_ID,ANKO_ID])'),"#369 allied envelope drift");
-assert(runtime.includes('"test_subject_altered_shinobi"')&&runtime.includes('"test_subject_brute"')&&runtime.includes('"test_subject_unstable"'),"#369 hostile envelope drift");
-assert(runtime.includes('phase:"player"'),"#369 player side must start first");
-assert(runtime.includes('playerEntitlementIndex%2===0?MENMA_ID:ANKO_ID'),"#369 Menma/Anko alternating entitlement missing");
-assert(runtime.includes("side_opportunity_already_committed"),"#369 exactly-once side-opportunity guard missing");
-assert(runtime.includes("stale_side_opportunity_token"),"#369 stale opportunity callback guard missing");
-assert(runtime.includes("stale_battle_semantic_generation"),"#369 semantic generation guard missing");
-assert(runtime.includes("rngChoices")&&runtime.includes("persistBattleSnapshot"),"#369 committed RNG persistence missing");
-assert(runtime.includes("semantic_input_locked"),"#369 input lock missing");
-assert(!runtime.includes("setTimeout(")&&!runtime.includes("requestAnimationFrame(")&&!runtime.includes("animationend"),"#369 semantics must not depend on presentation timing");
+assert(runtime.includes('player:{slots:createBattleDeploymentSlots([ANKO_ID,MENMA_ID])}'),"Anko must start Active with Menma Benched");
+assert(runtime.includes('participantClass:"guest_ally"')&&runtime.includes('controlAuthority:"player"'),"Anko Guest Ally/player-control identity missing");
+assert(runtime.includes("ownershipGranted:false")&&runtime.includes("myClanAssigned:false"),"Guest Ally control leaked ownership/My Clan");
+assert(runtime.includes('source:"story_guest_ally_palette"'),"Anko palette is not projected through the ordinary Skill deck");
 
-assert(runtime.includes("sj_anko_hidden_shadow_snake_hands")&&runtime.includes("attackPL:20"),"#369 Anko Snake Hands 20 missing");
-assert(runtime.includes("sj_anko_fire_style_dragon_flame")&&runtime.includes("attackPL:24"),"#369 Anko Dragon Flame 24 missing");
-assert(runtime.includes("sj_anko_snake_bind"),"#369 Anko Snake Bind missing");
-assert(runtime.includes("sj_anko_serpent_evasion"),"#369 Anko Serpent Evasion missing");
-assert(!runtime.includes("sj_anko_twin_snakes_mutual_death"),"#369 Twin Snakes Mutual Death must remain illegal");
-assert(runtime.includes('["test_subject_brute","test_subject_unstable","test_subject_altered_shinobi"]'),"#369 Anko target priority drift");
+for(const skillId of [
+  "sj_anko_hidden_shadow_snake_hands",
+  "sj_anko_snake_bind",
+  "sj_anko_fire_style_dragon_flame",
+  "sj_anko_serpent_evasion"
+])assert(runtime.includes(skillId),"Anko legal Origin Skill missing: "+skillId);
+const ankoPaletteStart=runtime.indexOf("const ANKO_GUEST_SKILLS=Object.freeze({");
+const ankoPaletteEnd=runtime.indexOf("const ANKO_GUEST_SKILL_IDS=",ankoPaletteStart);
+assert(ankoPaletteStart>=0&&ankoPaletteEnd>ankoPaletteStart,"Anko Guest Ally palette definition missing");
+const ankoPaletteSource=runtime.slice(ankoPaletteStart,ankoPaletteEnd);
+assert(!ankoPaletteSource.includes("sj_anko_twin_snakes_mutual_death"),"Twin Snakes Mutual Death leaked into Menma Origin palette");
+assert(runtime.includes('sj_anko_hidden_shadow_snake_hands:Object.freeze({attackPL:20'),"Hidden Shadow Snake Hands ATK drift");
+assert(runtime.includes('sj_anko_fire_style_dragon_flame:Object.freeze({attackPL:24'),"Dragon Flame ATK drift");
 
-assert(runtime.includes('getBattleDeploymentParticipant("enemy",1)'),"#369 enemy side must consume Active only");
-assert(runtime.includes("[...HOSTILE_IDS]"),"#369 authored enemy relay order missing");
-assert(runtime.includes("test_subject_brute_body_rush")&&runtime.includes("hasMovementPreventingRestraint"),"#369 restrained Brute movement filtering missing");
-assert(runtime.includes('enemy.id==="test_subject_brute"||enemy.id==="test_subject_unstable"'),"#369 Brute/Unstable target-law branch missing");
-assert(runtime.includes("academy_menma_withdrawn_before_objective"),"#369 Menma withdrawal defeat missing");
-assert(runtime.includes("menmaRemainsSemanticActive:true"),"#369 Anko withdrawal must not promote her");
+assert(runtime.includes("PRE_ATTEMPT_BATTLE_PREPARED_SKILL_36900"),"Guest Ally actions do not consume normal prepared-Skill entry");
+assert(runtime.includes('eventType:"skill_action_completed"'),"Guest Ally action does not emit ordinary committed Skill evidence");
+assert(runtime.includes('guestAllyPlayerChosen:true')&&runtime.includes("men03Eligible:false"),"Anko player choice / MEN-03 exclusion evidence missing");
+assert(runtime.includes('phase:"player"')&&runtime.includes('phaseOrder:Object.freeze(["player","enemy"])'),"current-Active alternating phase model missing");
+assert(!runtime.includes("commitScriptedAnkoPhase"),"superseded forced Anko phase resolver still present");
+const operationalRuntime=runtime.slice(0,runtime.indexOf("function diagnostics(){"));
+assert(!operationalRuntime.includes('phase:"scripted_a"')&&!operationalRuntime.includes('phase:"scripted_b"'),"superseded scripted phase state still present");
+assert(!operationalRuntime.includes("authored_scripted_takedown"),"forced scripted takedown action still present");
 
-assert(runtime.includes('plIdentity:"Battle PL"'),"#369 PL identity marker missing");
+assert(runtime.includes("presentation_pending_withdrawal"),"0-PL relay must wait for visible action settle");
+assert(runtime.includes("advanceMenmaScriptedBattleAfterPresentation37300"),"presentation-settle continuation compatibility hook missing");
+assert(presentation.includes("advanceMenmaScriptedBattleAfterPresentation37300(active.receipt)"),"33000 does not release committed relay after visible settle");
+assert(runtime.includes("advanceBattleParticipantAtZeroPL(pending.side,pending.participantId)"),"withdrawal relay must use shared deployment queue");
+assert(runtime.includes('relayTo:next&&next.id||null'),"relay evidence missing exact next Active");
+
+assert(runtime.includes("function shouldAuthorMenmaHandoff36900"),"legitimate Anko->Menma handoff predicate missing");
+assert(runtime.includes("st.resolvedHostileIds.includes(HOSTILE_IDS[0])")&&runtime.includes("st.resolvedHostileIds.includes(HOSTILE_IDS[1])"),"handoff does not require legitimate first-two hostile resolution");
+assert(runtime.includes('nextSide:"enemy"')&&runtime.includes("sideOrderReset:false"),"Anko->Menma yield resets side order or grants bonus input");
+assert(runtime.includes("authoredYieldCancelled=true"),"Anko early withdrawal does not cancel authored yield");
+assert(runtime.includes('pending.side==="player"')&&runtime.includes("activePlayer()"),"ordinary allied relay path missing");
+assert(runtime.includes("menma_scene7_allied_side_exhausted"),"party defeat is not tied to allied exhaustion");
+
+assert(runtime.includes('men03Scope:"menma_active_only"')&&runtime.includes("firstLegitimateMenmaActiveMoment:true"),"MEN-03 does not start at Menma's first legitimate Active moment");
+assert(runtime.includes('tutorialResult:"not_completed"')&&runtime.includes("performanceBucket:null"),"party defeat must not fake LOW");
+assert(runtime.includes('PARTY_DEFEAT_RETURN_BEAT_ID="menma_party_defeat_return_01"')&&runtime.includes('beat.battle.defeatBeatId=PARTY_DEFEAT_RETURN_BEAT_ID'),"party defeat is not routed to the #386 Story continuation");
+for(let i=1;i<=24;i++)assert(runtime.includes('beatId:"menma_party_defeat_return_'+String(i).padStart(2,"0")+'"'),"#386 party-defeat beat missing "+i);
+assert(runtime.includes('FUTURE_ENTRY_BEAT_ID="menma_future_01"')&&runtime.includes('FUTURE_ENVIRONMENT_PATH="Scene backdrops/whisper_woods_forest_route.png"'),"#388 Scene-10 bridge missing");
+assert(runtime.includes('nextBeatId:FUTURE_ENTRY_BEAT_ID'),"#386 party-defeat return does not continue to Scene 10");
+for(const label of ["MASTER WHAT THEY WON'T TEACH ME","BECOME TOO STRONG TO HOLD BACK","CREATE SOMETHING THAT'S MINE","FIND OUT HOW FAR I CAN GO"])assert(runtime.includes(label),"#388 future-ambition choice missing "+label);
+assert(runtime.includes('FUTURE_INTENT_OCCURRENCE_ID="occ_origin_menma_future_ambition_intent"')&&runtime.includes("progressionGranted:false"),"future ambition intent history is not fail-safe against implicit progression");
+assert(game.includes('record.actorRef.participantId==="academy_menma"'),"baseline MEN-03 actor filter drifted");
+
+assert(runtime.includes('plIdentity:"Battle PL"'),"Battle PL identity marker missing");
 assert(!/\bHP\b/.test(runtime),"#369 introduced HP terminology");
-assert(!runtime.includes("healthMeter")&&!runtime.includes("genericHealth"),"#369 introduced parallel health semantics");
-assert(runtime.includes("battlePLWithdrawalNotDeath:true"),"#369 0 Battle PL withdrawal semantics missing");
-
-assert(!runtime.includes("const MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID="),"#369 must not redeclare/replace MEN-03 stable source authority");
-assert(game.includes('const MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID="combat_academy_menma_tutorial_performance_resolved"'),"#369 baseline MEN-03 source identity changed");
-assert(runtime.includes("menma_origin_anko_action_observed"),"#369 same-Battle Anko observation evidence missing");
-assert(runtime.includes('discipline==="Kinjutsu"'),"#369 MEN-02 Kinjutsu-only qualification missing");
-assert(!runtime.includes("invented Kinjutsu")&&!runtime.includes("new Kinjutsu"),"#369 must not invent a Menma Kinjutsu button");
-
-assert(runtime.includes('BATTLE_OCCURRENCE_PREFIX="battle_occ_origin_academy_menma_three_test_subjects:"'),"#369 authoritative Battle occurrence prefix missing");
-assert(runtime.includes("function commitBattleOccurrenceReceipt")&&runtime.includes("resolvedHostileIds:victory?[...HOSTILE_IDS]"),"#369 terminal Battle occurrence receipt missing exact victory hostile resolution");
-assert(runtime.includes('commitBattleOccurrenceReceipt("defeat")'),"#369 defeat must commit the exact terminal Battle occurrence receipt");
+assert(runtime.includes("battlePLWithdrawalNotDeath:true"),"0 Battle PL withdrawal semantics missing");
+assert(runtime.includes('BATTLE_OCCURRENCE_PREFIX="battle_occ_origin_academy_menma_three_test_subjects:"'),"whole-encounter receipt prefix drift");
+assert(runtime.includes("unresolvedHostileIds"),"defeat receipt lost unresolved hostile identity");
 assert(reward.includes("const FIXED_RYO=100"),"#362 exact 100 Ryō adapter drifted");
-assert(reward.includes("menma_three_subject_battle_receipt_missing"),"#362 adapter no longer fail-closed");
-assert(runtime.includes("upstreamBattleReceipt()"),"#369 exact upstream victory receipt producer missing");
-assert(!runtime.includes('launchBattleWithReturnContext("test_subject_altered_shinobi",ENCOUNTER_ID'),"#369 Origin launch must not inherit My Clan START authority");
-assert(runtime.includes("myClanStartBypassedForExactOriginOccurrence:true")&&runtime.includes("myClanMutated:false"),"#369 exact Origin launch/My Clan boundary missing");
+assert(reward.includes("menma_three_subject_battle_receipt_missing"),"#362 reward adapter no longer fail-closed");
 
-assert(runtime.includes("manual_withdraw_rejected"),"#369 manual WITHDRAW fail-closed evidence missing");
-assert(runtime.includes("canWithdrawActiveBattleFighter")&&runtime.includes("return false"),"#369 manual WITHDRAW UI boundary missing");
-assert(runtime.includes("saveTestState")&&runtime.includes("restoreTestState"),"#369 save/reload semantic state persistence missing");
-assert(runtime.includes('getBattleRemainingPLRecord("player",ANKO_ID)'),"#369 reload must distinguish missing Anko PL record from legitimate 0 Battle PL");
-assert(runtime.includes('consumeBattleActionOpportunity("enemy",failedEnemy.id,failId,"enemy_opportunity_failed_visible")'),"#369 failed enemy autonomous opportunity must still settle its lifecycle");
-assert(runtime.includes("menmaEvolvedPLBattle36900"),"#369 exact semantic owner state missing");
+assert(runtime.includes("saveTestState")&&runtime.includes("restoreTestState"),"Guest Ally Battle state save/load missing");
+assert(runtime.includes("pendingBattlePresentation33000"),"restore does not reconcile presentation-gated pending zero");
+assert(runtime.includes("rngChoices")&&runtime.includes("persistBattleSnapshot"),"committed enemy RNG persistence missing");
+assert(runtime.includes("canWithdrawActiveBattleFighter")&&runtime.includes("return false"),"manual WITHDRAW must remain blocked in this authored encounter");
+
+assert(runtime.includes('PLAYER_OBJECTIVE_TEXT="Stop the Test Subjects."'),"successor objective copy missing");
+assert(runtime.includes('BATTLE_ENVIRONMENT_PATH="Scene backdrops/forest_clearing_day.png"'),"forest clearing environment missing");
+assert(presentation.includes('"skill_action_completed"')&&presentation.includes('"enemy_authored_action_completed"'),"shared ordered playback does not consume normal player/enemy actions");
+assert(presentation.includes("battle2-formation-relay-in"),"relay slide/scale presentation hook missing");
+assert(!presentation.includes('actorRef&&actorRef.participantId==="sj_anko"'),"Guest Ally Anko is still blanket-labelled as an authored assist");
 
 assert(!runtime.includes("academy_kakashi"),"#369 must not touch frozen Kakashi");
-assert(!runtime.includes("choose one Skill from every active member"),"#369 accidentally consumed Beta batch");
-assert(!runtime.includes("player-side command batch")&&!runtime.includes("enemy-side command batch"),"#369 accidentally consumed Beta command batching");
+assert(!runtime.includes("choose one Skill from every active member"),"#369 accidentally consumed Beta batching");
 
 const checks={
   syntax:true,
   productionLoadOnce:true,
-  plIdentityPreserved:true,
-  playerFirst:true,
-  oneActionPerSideOpportunity:true,
-  menmaAnkoEntitlement:true,
-  committedRngPersistence:true,
-  staleCallbackRejection:true,
-  exactAnkoPackage:true,
-  enemyActiveOnlyRelay:true,
-  menmaDefeatBoundary:true,
+  guestAllyIdentity:true,
+  ankoStartsActive:true,
+  exactAnkoLegalPalette:true,
+  genuinePlayerSkillChoice:true,
+  ordinaryCurrentActiveCadence:true,
+  forcedAnkoTakedownsRemoved:true,
+  presentationGatedWithdrawal:true,
+  sharedRelayQueue:true,
+  legitimateAnkoToMenmaYield:true,
+  sideOrderPreserved:true,
+  emergencyAlliedRelay:true,
+  partyDefeatOnExhaustion:true,
+  men03MenmaActiveOnly:true,
+  failureNoFakeLow:true,
+  partyDefeatStoryReturnBound:true,
+  futureAmbitionScene10Bridge:true,
+  futureAmbitionHistoryOnly:true,
   wholeEncounterReceipt:true,
-  men03Stable:true,
-  exact100RyoAdapterPreserved:true,
-  saveReloadState:true,
+  exact100RyoPreserved:true,
+  saveReloadIdempotenceContract:true,
+  forestPresentationBound:true,
   kakashiFrozen:true,
   beta366Excluded:true
 };
