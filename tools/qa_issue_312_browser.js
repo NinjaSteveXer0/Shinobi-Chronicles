@@ -16,7 +16,7 @@ async function boot(browser){
   const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1});
   const page=await context.newPage();
   const runtimeErrorGate=await installBrowserRuntimeErrorGate(page);
-  await page.addInitScript(()=>{try{localStorage.clear();sessionStorage.clear();}catch(_){}});
+  await page.addInitScript(()=>{try{localStorage.clear();sessionStorage.clear();}catch(_){};globalThis.SC_DISABLE_FIRST_PL_BATTLE_TUTORIAL_QA=true;});
   await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});
   await page.waitForFunction(()=>typeof globalThis.getRuntimeBuildFingerprint==="function",null,{timeout:15000});
   assert.deepStrictEqual(await page.evaluate(()=>getRuntimeBuildFingerprint()),BUILD_MANIFEST,"#312 runtime fingerprint mismatch");
