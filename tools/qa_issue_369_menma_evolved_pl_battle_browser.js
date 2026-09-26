@@ -419,6 +419,33 @@ async function legitimatePartyDefeat(browser){
     // and then flow into the future-ambition choice rather than the obsolete
     // LOW-performance / old Nine-Tails ending chain.
     await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_party_defeat_return_01",null,{timeout:25000});
+    const defeatReturnDebug=await page.evaluate(()=> {
+      const layer=document.getElementById("story-scene-presentation-layer");
+      const style=layer?getComputedStyle(layer):null;
+      return{
+        active:getActiveStorySceneRuntime()?{
+          sceneId:getActiveStorySceneRuntime().sceneId,
+          beatId:getActiveStorySceneRuntime().beatId
+        }:null,
+        currentOverlayType:typeof currentOverlayType!=="undefined"?currentOverlayType:null,
+        battleOver:currentBattle?.battleOver===true,
+        battleReturnContext:currentBattle?.returnContext||null,
+        pendingBattlePresentation:typeof pendingBattlePresentation33000==="function"?pendingBattlePresentation33000():null,
+        resumeSource:typeof resumeBattleCallerAfterCompletion==="function"?String(resumeBattleCallerAfterCompletion).slice(0,900):null,
+        layer:layer?{
+          display:style?.display||null,
+          inlineDisplay:layer.style.display||null,
+          displayPriority:layer.style.getPropertyPriority("display")||null,
+          hidden:layer.dataset.scPresentationHidden||null,
+          hiddenReason:layer.dataset.scPresentationHiddenReason||null,
+          renderedBeatId:layer.dataset.beatId||null,
+          mode:layer.dataset.mode||null
+        }:null,
+        clearHook:typeof globalThis.clearStoryPresentationHidden33900,
+        boardRenderer:typeof globalThis.renderStorySceneBoard33900
+      };
+    });
+    console.log("MENMA_DEFEAT_RETURN_DEBUG "+JSON.stringify(defeatReturnDebug));
     await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:12000});
     await waitForStoryMotionToSettle(page);
 
