@@ -684,7 +684,7 @@
       "responsibilityIds": [
         "combat.prepared_skill.definition.shared"
       ],
-      "owner": "runtime/alpha-kakashi-menma-skill-lock-38300.js",
+      "owner": "runtime/alpha-combat-skill-lock-38300.js",
       "directCallers": [
         "index.html",
         "shared Battle prepared-Skill lookup"
