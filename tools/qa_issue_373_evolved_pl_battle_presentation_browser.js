@@ -148,14 +148,25 @@ async function boot(page){
   // #373 real-player path proof. Onboarding, Story progression and the
   // Scene-7 Battle transition must all be driven through visible DOM controls;
   // no direct runtime selection, beat mutation or Story-advance fixture calls.
-  await page.waitForSelector("#sc-alpha-front-door-33300",{state:"visible",timeout:15000});
-  await page.locator('#sc-alpha-front-door-33300 [data-afd-action="begin"]').click();
-  await page.locator("#afd-ninja-id").fill("Issue373");
-  await page.locator('#sc-alpha-front-door-33300 [data-afd-action="ninja-id-next"]').click();
-  await page.locator('#sc-alpha-front-door-33300 [data-village-id="konoha"]').click();
-  await page.locator('#sc-alpha-front-door-33300 [data-afd-action="village-next"]').click();
-  await page.locator('#sc-alpha-front-door-33300 [data-origin-id="academy_menma"]').click();
-  await page.locator('#sc-alpha-front-door-33300 [data-afd-action="confirm-ninja"]').click();
+  await page.waitForSelector("#sc-alpha-front-door-33400",{state:"visible",timeout:15000});
+
+  // The production NEW-player path deliberately reloads once after REGISTER so
+  // stale save/session state cannot survive into the new Chronicle.
+  await Promise.all([
+    page.waitForNavigation({waitUntil:"domcontentloaded",timeout:30000}),
+    page.locator('#sc-alpha-front-door-33400 [data-afd2-action="register"]').click()
+  ]);
+  await page.waitForFunction(()=>typeof getRuntimeBuildFingerprint==="function"&&typeof runIssue369MenmaEvolvedPLBattleDiagnostics==="function",null,{timeout:30000});
+  assert.deepStrictEqual(await page.evaluate(()=>getRuntimeBuildFingerprint()),BUILD_MANIFEST,"#373 post-register runtime fingerprint mismatch");
+
+  await page.waitForSelector("#sc-alpha-front-door-33400",{state:"visible",timeout:15000});
+  await page.locator("#afd2-ninja-id").fill("Issue373");
+  await page.locator('#sc-alpha-front-door-33400 [data-afd2-action="save-id"]').click();
+  await page.locator('#sc-alpha-front-door-33400 [data-village-id="konoha"]').click();
+  await page.locator('#sc-alpha-front-door-33400 [data-afd2-action="continue-village"]').click();
+  await page.locator('#sc-alpha-front-door-33400 [data-origin-id="academy_menma"]').click();
+  await page.locator('#sc-alpha-front-door-33400 [data-afd2-action="continue-ninja"]').click();
+  await page.locator('#sc-alpha-front-door-33400 [data-afd2-action="begin-origin"]').click();
 
   await page.waitForFunction(scene=>getActiveStorySceneRuntime()?.sceneId===scene,SCENE,{timeout:15000});
   await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:12000});
@@ -366,7 +377,8 @@ async function boot(page){
         phaseCInputRestores:true,
         browserErrorGateClean:true,
         internalStateLabelsHidden:true,
-        realFrontDoorOriginSelectionPath:true,
+        realFrontDoor33400OriginSelectionPath:true,
+        productionRegisterReloadBoundary:true,
         realStoryClickProgressionPath:true,
         noDirectStoryBeatFixture:true
       },
