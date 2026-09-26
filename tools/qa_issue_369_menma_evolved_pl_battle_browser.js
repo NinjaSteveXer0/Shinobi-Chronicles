@@ -543,10 +543,17 @@ async function legitimatePartyDefeat(browser){
       assert.strictEqual(beat.text,text,"#388 Scene-10 Story drift at "+beatId);
       if(beatId==="menma_future_01"){
         const futureBackdrop=await page.evaluate(()=>{
-          const rt=getActiveStorySceneRuntime(),beat=getCurrentStorySceneBeat(),def=getActiveStorySceneDefinition();
-          return resolveStorySceneEnvironmentProjection({},beat,def,rt)?.asset_path||null;
+          const layer=document.getElementById("story-scene-presentation-layer");
+          const stage=layer?.querySelector(".sc-chronicle-stage")||layer?.querySelector(".sc-story-stage");
+          return{
+            resolved:typeof resolveStorySceneBoardBackdropPath==="function"?resolveStorySceneBoardBackdropPath():null,
+            css:stage?.style.getPropertyValue("--sc-scene-board-backdrop")||"",
+            dedicated:stage?.dataset.scSceneBoardBackdrop||null
+          };
         });
-        assert.strictEqual(futureBackdrop,"Scene backdrops/whisper_woods_forest_route.png","#388 Scene-10 backdrop drift");
+        assert.strictEqual(futureBackdrop.resolved,"Scene backdrops/whisper_woods_forest_route.png","#388 Scene-10 Scene Board resolver drift");
+        assert.strictEqual(futureBackdrop.dedicated,"dedicated","#388 Scene-10 dedicated backdrop flag missing");
+        assert(futureBackdrop.css.includes("whisper_woods_forest_route.png"),"#388 Scene-10 live Scene Board backdrop CSS drift "+JSON.stringify(futureBackdrop));
       }
       await clickStoryPrimary(page);
     }
