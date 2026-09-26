@@ -1036,7 +1036,9 @@ if(PRE_RESTORE_TEST){
       if(!getBattleRemainingPLRecord("player",ANKO_ID))setBattleRemainingPLRecord("player",ANKO_ID,ANKO_BASE_PL,ANKO_BASE_PL);
       if(typeof syncBattleActivePlayerFromDeployment==="function")syncBattleActivePlayerFromDeployment();
       if(typeof syncBattleActiveEnemyFromDeployment==="function")syncBattleActiveEnemyFromDeployment();
-      try{openOverlay("combat");}catch(_error){}
+      if(savedBattleActive&&b.battleOver!==true){
+        try{openOverlay("combat");}catch(_error){}
+      }
       queueMicrotask(()=>{
         const st=ensureState();if(!st||battle().battleOver)return;
         if(st.pendingZero){
