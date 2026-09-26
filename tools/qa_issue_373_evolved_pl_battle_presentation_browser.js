@@ -125,7 +125,11 @@ async function stageSnapshot(page){
         role:stage?.dataset.presentationActionRole||null,
         actorNodes:stage?.querySelectorAll(".battle2-performance-role-actor").length||0,
         targetNodes:stage?.querySelectorAll(".battle2-performance-role-target").length||0,
-        actionText:stage?.querySelector(".battle2-performance-center strong")?.textContent?.trim()||""
+        actionText:stage?.querySelector(".battle2-performance-center strong")?.textContent?.trim()||"",
+        damage:Number(stage?.dataset.presentationDamage||0),
+        beforePL:stage?.dataset.presentationBeforePl===""?null:Number(stage?.dataset.presentationBeforePl),
+        afterPL:stage?.dataset.presentationAfterPl===""?null:Number(stage?.dataset.presentationAfterPl),
+        resultText:stage?.querySelector(".battle2-performance-result-chip")?.innerText?.replace(/\s+/g," ").trim()||""
       },
       transition:currentBattle?.deployment?.lastTransition?JSON.parse(JSON.stringify(currentBattle.deployment.lastTransition)):null,
       lastFormationTransitionId:stage?.dataset.lastFormationTransitionId||null
@@ -230,6 +234,12 @@ async function boot(page){
     assert.strictEqual(a.presentation.actorNodes,1,"Phase A projected more than one actor");
     assert.strictEqual(a.presentation.targetNodes,1,"Phase A projected more than one target");
     assert.strictEqual(a.presentation.actionText,"Hidden Shadow Snake Hands");
+    assert.strictEqual(a.presentation.damage,18,"Phase A damage counter did not expose committed damage");
+    assert.strictEqual(a.presentation.beforePL,11,"Phase A PL-before readout mismatch");
+    assert.strictEqual(a.presentation.afterPL,0,"Phase A PL-after readout mismatch");
+    assert(a.presentation.resultText.includes("WITHDRAWAL"),"Phase A did not identify 0 PL as withdrawal");
+    assert(a.presentation.resultText.includes("18 DAMAGE"),"Phase A damage feedback missing");
+    assert(a.presentation.resultText.includes("PL 11 → 0"),"Phase A PL transition feedback missing");
     await page.screenshot({path:path.join(OUT,"01-phase-a-anko-altered.png"),fullPage:false,timeout:12000});
 
     // Phase B must not appear until Phase A has settled and Altered has relayed.
@@ -254,6 +264,12 @@ async function boot(page){
     assert.strictEqual(b.presentation.actorNodes,1);
     assert.strictEqual(b.presentation.targetNodes,1);
     assert.strictEqual(b.presentation.actionText,"Fire Style: Dragon Flame");
+    assert.strictEqual(b.presentation.damage,21,"Phase B damage counter did not expose committed damage");
+    assert.strictEqual(b.presentation.beforePL,13,"Phase B PL-before readout mismatch");
+    assert.strictEqual(b.presentation.afterPL,0,"Phase B PL-after readout mismatch");
+    assert(b.presentation.resultText.includes("WITHDRAWAL"),"Phase B did not identify 0 PL as withdrawal");
+    assert(b.presentation.resultText.includes("21 DAMAGE"),"Phase B damage feedback missing");
+    assert(b.presentation.resultText.includes("PL 13 → 0"),"Phase B PL transition feedback missing");
     await page.screenshot({path:path.join(OUT,"02-phase-b-anko-brute.png"),fullPage:false,timeout:12000});
 
     // The authored handoff must finish with Menma and Unstable simultaneously
@@ -368,6 +384,10 @@ async function boot(page){
         ankoAlteredReadableBeat:true,
         alteredThenBruteRelay:true,
         ankoBruteReadableBeat:true,
+        techniqueNamesVisiblyReadable:true,
+        damageCountersVisible:true,
+        battlePlBeforeAfterVisible:true,
+        zeroPlReadsWithdrawal:true,
         menmaAndUnstablePromoteIntoActiveConfrontation:true,
         centralIdentityAndPLRefreshAfterRelay:true,
         phaseCActionDockRebindsToMenma:true,
