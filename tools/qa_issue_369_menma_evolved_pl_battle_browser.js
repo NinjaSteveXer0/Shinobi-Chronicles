@@ -389,7 +389,7 @@ async function legitimatePartyDefeat(browser){
     // ordinary enemy response depletes the last eligible ally => party defeat.
     await page.evaluate(()=>setBattleRemainingPL("player","sj_anko",1));
     await useSkill(page,"sj_anko_snake_bind");
-    await page.waitForFunction(()=>currentBattle?.battleOver===true&&currentBattle?.outcome?.type==="defeat",null,{timeout:20000});
+    await page.waitForFunction(()=>currentBattle?.battleOver===true&&currentBattle?.outcome?.type==="defeat"&&currentBattle?.outcome?.partyDefeat===true&&currentBattle?.outcome?.objectiveCompleted===false,null,{timeout:20000});
 
     const terminal=await page.evaluate(({REWARD_SOURCE})=>({
       state:getMenmaEvolvedPLBattleState36900(),
