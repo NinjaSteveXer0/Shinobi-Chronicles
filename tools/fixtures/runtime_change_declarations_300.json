@@ -736,11 +736,9 @@
         "tools/qa_kakashi_v2_browser.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ],
-      "replaces": [
-        "issue-369-menma-evolved-pl-battle-alpha-2026-09-25"
-      ],
+      "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
-      "rationale": "Consumes CE successor fca2d8a425a8c3115bfea5935dfa15ab0b433b8c and Combat closure 78d4523f7edfa6a99ec1352bf86249b43e114b11. Academy Menma Scene 7 is now scoped half-scripted: Anko Active performs two exact authored takedowns without ordinary side opportunities; Altered then Brute withdraw through the shared deployment queue; Unstable relays; Anko yields Active without withdrawing; Menma promotes and receives the first genuine Phase-C player input. MEN-03 consumes Menma Phase-C evidence only. Presentation holds a committed 0-PL target on screen until the exact action receipt visibly settles, then releases the already-authored relay/terminal continuation. Generic PL Battle law, Kakashi Golden, World reward amount, and Beta batching remain unchanged."
+      "rationale": "AUTHORITY_CHANGED supersedes the prior Menma-first assist contract semantically without replacing its registered owner. Consumes CE successor fca2d8a425a8c3115bfea5935dfa15ab0b433b8c and Combat closure 78d4523f7edfa6a99ec1352bf86249b43e114b11. Academy Menma Scene 7 is now scoped half-scripted: Anko Active performs two exact authored takedowns without ordinary side opportunities; Altered then Brute withdraw through the shared deployment queue; Unstable relays; Anko yields Active without withdrawing; Menma promotes and receives the first genuine Phase-C player input. MEN-03 consumes Menma Phase-C evidence only. Presentation holds a committed 0-PL target on screen until the exact action receipt visibly settles, then releases the already-authored relay/terminal continuation. Generic PL Battle law, Kakashi Golden, World reward amount, and Beta batching remain unchanged."
     }
   ]
 }
