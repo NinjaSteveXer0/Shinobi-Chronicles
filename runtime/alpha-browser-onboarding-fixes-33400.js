@@ -345,7 +345,9 @@
       // Scoped authored encounters may own their enemy opportunity cadence.
       // When they declare that ownership, this old browser-level convenience
       // scheduler must stand down rather than creating a second enemy turn.
-      if(typeof currentBattle.authoredEnemyOpportunityControllerId==="string"&&currentBattle.authoredEnemyOpportunityControllerId)return false;
+      const authoredControllerId=typeof currentBattle.authoredEnemyOpportunityControllerId==="string"?currentBattle.authoredEnemyOpportunityControllerId:"";
+      const authoredControllerBattleId=typeof currentBattle.authoredEnemyOpportunityControllerBattleId==="string"?currentBattle.authoredEnemyOpportunityControllerBattleId:"";
+      if(authoredControllerId&&authoredControllerBattleId&&authoredControllerBattleId===String(currentBattle.battleId||""))return false;
       if(typeof evaluateEnemyActionScheduler!=="function"||typeof executeEnemyAuthoredActionOpportunity!=="function")return false;
       const scheduler=evaluateEnemyActionScheduler();
       return !!(scheduler&&scheduler.ready===true);
@@ -403,7 +405,7 @@
       konohaOnlyAlphaStart:VILLAGES.filter(v=>v.enabled).length===1&&VILLAGES[0].id==="konoha",
       enemyTurnHooksCompletedPlayerOpportunity:consumeSource.includes('shouldRunEnemyTurn33400(side)')&&consumeSource.includes("executeEnemyAuthoredActionOpportunity"),
       enemyTurnRecursionGuard:consumeSource.includes("enemyTurnInProgress33400=true")&&shouldRunEnemyTurn33400.toString().includes('side!=="player"'),
-      authoredEnemyCadenceCanOptOut:shouldRunEnemyTurn33400.toString().includes("authoredEnemyOpportunityControllerId"),
+      authoredEnemyCadenceCanOptOut:shouldRunEnemyTurn33400.toString().includes("authoredEnemyOpportunityControllerId")&&shouldRunEnemyTurn33400.toString().includes("authoredEnemyOpportunityControllerBattleId"),
       plCalibrationInstalled:typeof document==="undefined"?true:!!document.getElementById(BATTLE_STYLE_ID),
       browserGoldenClaimed:false
     };
