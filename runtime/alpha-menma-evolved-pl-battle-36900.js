@@ -1247,6 +1247,51 @@ function upsertMenmaStoryBeat38800(scene,row){
   scene.beatMap.set(normalized.beatId,normalized);
   return true;
 }
+const MENMA_DEFEAT_FUTURE_BOARD_REGISTRATION_ID="academy_menma_defeat_future_38800";
+function isMenmaDefeatFutureBoardBeat38800(beatId){
+  const id=String(beatId||"");
+  return id.startsWith("menma_party_defeat_return_")||id.startsWith("menma_future_");
+}
+function registerMenmaDefeatFutureSceneBoard38800(){
+  if(typeof globalThis.registerStorySceneBoardDefinition!=="function"){
+    return{success:false,reason:"story_scene_board_not_loaded"};
+  }
+  const result=globalThis.registerStorySceneBoardDefinition(STORY_SCENE_ID,{
+    resolve:({beatId})=>{
+      const id=String(beatId||"");
+      if(!isMenmaDefeatFutureBoardBeat38800(id))return null;
+      return{
+        mode:"conversation",
+        location:id.startsWith("menma_future_")?"WHISPER WOODS":"FOREST CLEARING",
+        actors:[]
+      };
+    },
+    resolveBackdrop:({beatId})=>{
+      const id=String(beatId||"");
+      if(id.startsWith("menma_party_defeat_return_")){
+        return{assetPath:BATTLE_ENVIRONMENT_PATH,assetId:"konoha_forest_clearing_day"};
+      }
+      if(id.startsWith("menma_future_")){
+        return{assetPath:FUTURE_ENVIRONMENT_PATH,assetId:FUTURE_ENVIRONMENT_ASSET_ID};
+      }
+      return null;
+    }
+  });
+  try{
+    if(result&&result.success===true&&typeof globalThis.renderStorySceneBoard33900==="function"){
+      globalThis.renderStorySceneBoard33900();
+    }
+  }catch(_error){}
+  return result;
+}
+function ensureMenmaDefeatFutureSceneBoard38800(){
+  if(globalThis.SC_STORY_SCENE_BOARD_33900)return registerMenmaDefeatFutureSceneBoard38800();
+  const queue=globalThis.SC_STORY_SCENE_BOARD_PENDING_REGISTRATIONS||(globalThis.SC_STORY_SCENE_BOARD_PENDING_REGISTRATIONS=[]);
+  if(!queue.some(row=>row&&row.id===MENMA_DEFEAT_FUTURE_BOARD_REGISTRATION_ID)){
+    queue.push({id:MENMA_DEFEAT_FUTURE_BOARD_REGISTRATION_ID,register:registerMenmaDefeatFutureSceneBoard38800});
+  }
+  return{success:true,queued:true};
+}
 function installMenmaDefeatStoryBridge38800(scene){
   if(!scene||!scene.beatMap||typeof scene.beatMap.set!=="function")return{success:false,reason:"menma_story_scene_missing"};
   if(typeof normalizeStorySceneBeat!=="function")return{success:false,reason:"story_beat_normalizer_missing"};
@@ -1256,13 +1301,15 @@ function installMenmaDefeatStoryBridge38800(scene){
   }
   const rows=menmaDefeatAndFutureStoryBeats38800();
   if(!rows.every(row=>upsertMenmaStoryBeat38800(scene,row)))return{success:false,reason:"menma_story_bridge_normalization_failed"};
+  const sceneBoard=ensureMenmaDefeatFutureSceneBoard38800();
   return{
     success:true,
     defeatEntryBeatId:PARTY_DEFEAT_RETURN_BEAT_ID,
     defeatBeatCount:24,
     futureEntryBeatId:FUTURE_ENTRY_BEAT_ID,
     futureChoiceBeatId:"menma_future_choice",
-    futureEnvironmentPath:FUTURE_ENVIRONMENT_PATH
+    futureEnvironmentPath:FUTURE_ENVIRONMENT_PATH,
+    sceneBoardRegistered:sceneBoard&&sceneBoard.success===true
   };
 }
 function applyMenmaSuccessorBattleAuthority(scene){
