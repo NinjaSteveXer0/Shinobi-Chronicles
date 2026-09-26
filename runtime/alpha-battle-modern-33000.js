@@ -1479,6 +1479,10 @@
       .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-active-card-enemy.battle2-performance-role-actor{--menma385-action-x:-7%}
       .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-roster-player .battle2-performance-role-actor{--menma385-action-x:7%}
       .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-roster-enemy .battle2-performance-role-actor{--menma385-action-x:-7%}
+      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-active-card-player.battle2-performance-role-target{--menma385-impact-x:-3.5%}
+      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-active-card-enemy.battle2-performance-role-target{--menma385-impact-x:3.5%}
+      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-roster-player .battle2-performance-role-target{--menma385-impact-x:-3.5%}
+      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-roster-enemy .battle2-performance-role-target{--menma385-impact-x:3.5%}
       .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-role-actor .battle-live-active-card-image,
       .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-role-actor .battle-live-roster-portrait{
         animation:menma385ActorAction .72s .28s cubic-bezier(.2,.72,.2,1) both!important
@@ -1489,7 +1493,7 @@
       }
       @keyframes menma385TechniqueBanner{0%{opacity:0;transform:translateY(-8px) scale(.98)}100%{opacity:1;transform:translateY(0) scale(1)}}
       @keyframes menma385ActorAction{0%,100%{transform:translateX(0) scale(1);filter:brightness(1)}48%{transform:translateX(var(--menma385-action-x,0)) scale(1.035);filter:brightness(1.12)}}
-      @keyframes menma385TargetResponse{0%,100%{transform:translateX(0) scale(1);filter:brightness(1)}45%{transform:translateX(calc(var(--menma385-action-x,4%) * -.42)) scale(.975);filter:brightness(1.22)}}
+      @keyframes menma385TargetResponse{0%,100%{transform:translateX(0) scale(1);filter:brightness(1)}45%{transform:translateX(var(--menma385-impact-x,0)) scale(.975);filter:brightness(1.22)}}
       @keyframes menma385ResultReadout{0%{opacity:0;transform:translateY(-8px) scale(.96)}100%{opacity:1;transform:translateY(0) scale(1)}}
       @media(prefers-reduced-motion:reduce){
         .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-role-actor .battle-live-active-card-image,
