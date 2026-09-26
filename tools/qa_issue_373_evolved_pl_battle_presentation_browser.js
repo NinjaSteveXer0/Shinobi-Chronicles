@@ -148,7 +148,7 @@ async function waitForPresentationIdle(page){
 async function waitForTutorialBeat(page,beatId){
   const modal=page.locator('.sc-pl-battle-tutorial-38500[data-tutorial-beat="'+beatId+'"]').first();
   await modal.waitFor({state:"visible",timeout:12000});
-  const state=await page.evaluate(()=>globalThis.SC_PL_BATTLE_TUTORIAL_38500?.getState?.()||null);
+  const state=await page.evaluate(()=>typeof globalThis.getPLBattleTutorialState38500==="function"?globalThis.getPLBattleTutorialState38500():null);
   assert(state&&state.currentBeatId===beatId,"tutorial state/presentation mismatch for "+beatId+" "+JSON.stringify(state));
   return modal;
 }
