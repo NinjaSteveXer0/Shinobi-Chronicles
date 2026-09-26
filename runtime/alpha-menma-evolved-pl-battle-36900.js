@@ -1,31 +1,36 @@
 // ============================================================================
-// ISSUE #369 / #373 SUCCESSOR — ACADEMY MENMA HALF-SCRIPTED EVOLVED PL BATTLE
+// ISSUE #369 / #373 SUCCESSOR — ACADEMY MENMA GUEST-ALLY EVOLVED PL BATTLE
 // CE authority:
-// Documentation/Coordination/Academy_Menma_Half_Scripted_Three_Subject_Battle_Successor_2026-09-26.md
-// Combat authority:
+// Documentation/Coordination/Battle_Participant_Control_and_First_PL_Battle_Tutorial_Contract_2026-09-26.md
+// Writing defeat authority:
+// Documentation/Story/Academy_Menma_Scene_7_Party_Defeat_Continuation_2026-09-26.md
+// Combat Skill/numeric authority retained from:
 // Documentation/Combat/SC_Combat_Academy_Menma_Half_Scripted_Anko_Takedown_Package_2026-09-26.md
 // ============================================================================
-// Scene 7 is a scoped authored encounter. It does NOT rewrite generic PL Battle law.
+// Scene 7 is a scoped authored participant formation. It does NOT rewrite
+// generic PL Battle law or grant temporary participants permanent ownership.
 //
-// Phase A: Anko Active -> Hidden Shadow Snake Hands -> Altered withdraws.
-// Phase B: Anko Active -> Fire Style: Dragon Flame -> Brute withdraws.
-// Phase C: Anko yields -> Menma promotes -> Menma vs Unstable ordinary PL Battle.
+// Anko opens Active as a player-controlled Guest Ally. Her four legal Origin
+// Skills are genuine player choices. Ordinary Active-vs-Active cadence applies.
+// Enemy relay remains Altered -> Brute -> Unstable. If Anko legitimately resolves
+// Altered + Brute while still eligible/Active, she yields to Menma after the
+// Brute withdrawal and Unstable relay. Side alternation does not reset.
 //
-// Scripted A/B actions do not consume ordinary side opportunities and never count
-// toward MEN-03. Zero-PL withdrawal is presentation-gated so the struck portrait
-// remains present until the committed action has visibly settled.
+// Zero-PL formation mutation is presentation-gated so the outgoing participant
+// remains visible for the immutable action receipt. Presentation never chooses
+// or recalculates the semantic outcome.
 // ============================================================================
 (function installMenmaEvolvedPLBattle36900(){
 "use strict";
 
-const PATCH_ID="menma_half_scripted_evolved_pl_battle_36900_2026_09_26";
+const PATCH_ID="menma_guest_ally_evolved_pl_battle_36900_2026_09_26";
 const BATTLE_CONFIG_ID="academy_menma_origin_three_test_subjects_with_anko";
 const ENCOUNTER_ID="origin_academy_menma_prologue:three_test_subjects";
 const OBJECTIVE_ID="stop_three_test_subjects";
 const STORY_SCENE_ID="origin_academy_menma_prologue";
 const STORY_BATTLE_BEAT_ID="tutorial_battle";
 const BATTLE_OCCURRENCE_PREFIX="battle_occ_origin_academy_menma_three_test_subjects:";
-const SCRIPT_CONTRACT_ID="menma_origin_half_scripted_anko_takedown";
+const SCRIPT_CONTRACT_ID="menma_origin_guest_ally_controller_v3";
 const PLAYER_OBJECTIVE_TEXT="Stop the Test Subjects.";
 const BATTLE_ENVIRONMENT_PATH="Scene backdrops/forest_clearing_day.png";
 const MENMA_ID="academy_menma";
@@ -58,29 +63,6 @@ function bindTestSubjectBattlePortraits36900(){
   }catch(_error){return false;}
 }
 const TEST_SUBJECT_PORTRAITS_BOUND=bindTestSubjectBattlePortraits36900();
-
-const SCRIPTED_PHASES=Object.freeze({
-  scripted_a:Object.freeze({
-    phase:"scripted_a",
-    skillId:"sj_anko_hidden_shadow_snake_hands",
-    displayName:"Hidden Shadow Snake Hands",
-    targetId:"test_subject_altered_shinobi",
-    attackPL:20,
-    expectedStamina:11,
-    expectedDamage:18,
-    relayTo:"test_subject_brute"
-  }),
-  scripted_b:Object.freeze({
-    phase:"scripted_b",
-    skillId:"sj_anko_fire_style_dragon_flame",
-    displayName:"Fire Style: Dragon Flame",
-    targetId:"test_subject_brute",
-    attackPL:24,
-    expectedStamina:14,
-    expectedDamage:21,
-    relayTo:"test_subject_unstable"
-  })
-});
 
 const ANKO_GUEST_SKILLS=Object.freeze({
   sj_anko_hidden_shadow_snake_hands:Object.freeze({
@@ -1013,24 +995,32 @@ if(PRE_RESTORE_TEST){
       // authority for which ally owns Active; characterId remains Menma as the
       // Story/ownership identity and is not used as Active truth.
       const semantic=b.menmaEvolvedPLBattle36900;
-      const phaseC=semantic&&(semantic.phase==="phase_c_player"||semantic.phase==="phase_c_enemy"||semantic.ankoYielded===true);
+      const ordered=[];
+      if(semantic&&semantic.ankoYielded===true){
+        if(!semantic.menmaWithdrawn)ordered.push(MENMA_ID);
+        if(!semantic.ankoWithdrawn)ordered.push(ANKO_ID);
+      }else{
+        if(!semantic?.ankoWithdrawn)ordered.push(ANKO_ID);
+        if(!semantic?.menmaWithdrawn)ordered.push(MENMA_ID);
+      }
       if(!b.deployment||typeof b.deployment!=="object")b.deployment={};
-      b.deployment.player={slots:createBattleDeploymentSlots(phaseC?[MENMA_ID,ANKO_ID]:[ANKO_ID,MENMA_ID])};
+      b.deployment.player={slots:createBattleDeploymentSlots(ordered)};
 
       if(!getBattleRemainingPLRecord("player",ANKO_ID))setBattleRemainingPLRecord("player",ANKO_ID,ANKO_BASE_PL,ANKO_BASE_PL);
       if(typeof syncBattleActivePlayerFromDeployment==="function")syncBattleActivePlayerFromDeployment();
       if(typeof syncBattleActiveEnemyFromDeployment==="function")syncBattleActiveEnemyFromDeployment();
       try{openOverlay("combat");}catch(_error){}
       queueMicrotask(()=>{
-        const s=ensureState();if(!s||battle().battleOver)return;
-        if(s.pendingZero){
+        const st=ensureState();if(!st||battle().battleOver)return;
+        if(st.pendingZero){
           let pendingPresentation=false;
           try{pendingPresentation=typeof pendingBattlePresentation33000==="function"&&pendingBattlePresentation33000();}catch(_error){}
-          if(!pendingPresentation)advanceAfterPresentation({actionId:s.pendingZero.actionId});
+          if(!pendingPresentation)advanceAfterPresentation({actionId:st.pendingZero.actionId});
           return;
         }
-        if(s.phase==="scripted_a"&&!s.scriptedCompleted.scripted_a)commitScriptedAnkoPhase("scripted_a");
-        else if(s.phase==="scripted_b"&&!s.scriptedCompleted.scripted_b)commitScriptedAnkoPhase("scripted_b");
+        if(activePlayer()&&activePlayer().id===MENMA_ID)startMenmaEvidenceWindow36900("restored_active");
+        st.inputLocked=st.phase!=="player";
+        if(st.phase==="enemy")settleEnemyOpportunity36900();
       });
     }
     return result;
@@ -1104,14 +1094,17 @@ function launchMenmaEvolvedPLBattle36900(context={}){
     data:{
       battleConfigId:BATTLE_CONFIG_ID,encounterId:ENCOUNTER_ID,objectiveId:OBJECTIVE_ID,
       alliedParticipantIds:[...ALLIED_IDS],hostileParticipantIds:[...HOSTILE_IDS],
-      halfScripted:true,phaseAActor:ANKO_ID,phaseCPlayerActor:MENMA_ID,
+      participantControlModel:"guest_ally_current_active",startingPlayerActive:ANKO_ID,startingPlayerBenched:[MENMA_ID],
+      guestAllyPlayerControlled:true,ownershipGranted:false,
       plIdentity:"Battle PL",healthReplacement:false,myClanStartBypassedForExactOriginOccurrence:true,myClanMutated:false
     }
   });
   persistBattleSnapshot();
   try{openOverlay("combat");}catch(_error){}
-  const scripted=commitScriptedAnkoPhase("scripted_a");
-  return{success:scripted.success===true,battleId:b.battleId,encounterId:ENCOUNTER_ID,battleConfigId:BATTLE_CONFIG_ID,objectiveId:OBJECTIVE_ID,battleOccurrenceId:battleOccurrenceId(b),scripted};
+  return{
+    success:true,battleId:b.battleId,encounterId:ENCOUNTER_ID,battleConfigId:BATTLE_CONFIG_ID,objectiveId:OBJECTIVE_ID,
+    battleOccurrenceId:battleOccurrenceId(b),activeParticipantId:ANKO_ID,participantClass:"guest_ally",controlAuthority:"player"
+  };
 }
 function migrateMenmaSuccessorDisplayValue(value){
   if(typeof value==="string")return value.replaceAll("Stop the Altered Shinobi — not completed.","Stop the Test Subjects — not completed.").replaceAll("STOP THE ALTERED SHINOBI","STOP THE TEST SUBJECTS").replaceAll("Stop the Altered Shinobi.","Stop the Test Subjects.");
@@ -1166,24 +1159,29 @@ if(PRE_MENMA_PRODUCTION_DIAG){
 function diagnostics(){
   const scene=typeof getStorySceneDefinition==="function"?getStorySceneDefinition(STORY_SCENE_ID):null;
   const beat=scene&&scene.beatMap&&scene.beatMap.get(STORY_BATTLE_BEAT_ID);
-  const source=[launchMenmaEvolvedPLBattle36900,commitScriptedAnkoPhase,advanceAfterPresentation,resolvePhaseCEnemyOpportunity,completeOccurrenceReceipt].map(fn=>String(fn)).join("\n");
+  const source=[
+    launchMenmaEvolvedPLBattle36900,getInputReadiness,resolveEnemyOpportunity,
+    yieldAnkoToMenmaActive36900,advanceAfterPresentation,completeOccurrenceReceipt
+  ].map(fn=>String(fn)).join("\n");
   const checks={
-    patchId:PATCH_ID==="menma_half_scripted_evolved_pl_battle_36900_2026_09_26",
+    patchId:PATCH_ID==="menma_guest_ally_evolved_pl_battle_36900_2026_09_26",
     exactBattleIdentity:!!beat&&beat.battle&&beat.battle.battleConfigId===BATTLE_CONFIG_ID&&beat.battle.encounterId===ENCOUNTER_ID&&beat.battle.objectiveId===OBJECTIVE_ID,
     successorPlayerObjective:!!beat&&beat.battle&&beat.battle.objectiveText===PLAYER_OBJECTIVE_TEXT,
     exactBattleEnvironment:!!beat&&beat.battle&&beat.battle.environmentPath===BATTLE_ENVIRONMENT_PATH,
-    exactParticipants:ALLIED_IDS.join("|")==="academy_menma|sj_anko"&&HOSTILE_IDS.join("|")==="test_subject_altered_shinobi|test_subject_brute|test_subject_unstable",
-    phaseAExact:SCRIPTED_PHASES.scripted_a.skillId==="sj_anko_hidden_shadow_snake_hands"&&SCRIPTED_PHASES.scripted_a.attackPL===20&&SCRIPTED_PHASES.scripted_a.expectedDamage===18,
-    phaseBExact:SCRIPTED_PHASES.scripted_b.skillId==="sj_anko_fire_style_dragon_flame"&&SCRIPTED_PHASES.scripted_b.attackPL===24&&SCRIPTED_PHASES.scripted_b.expectedDamage===21,
-    scriptedDoesNotConsumeOrdinaryOpportunity:String(commitScriptedAnkoPhase).includes("ordinarySideOpportunityConsumed:false")&&!String(commitScriptedAnkoPhase).includes("consumeBattleActionOpportunity"),
-    presentationGatesWithdrawal:String(handleBattleParticipantAtZeroPL).includes("presentation_pending_withdrawal")&&String(advanceAfterPresentation).includes("advanceBattleParticipantAtZeroPL"),
+    exactParticipants:ALLIED_IDS.includes(MENMA_ID)&&ALLIED_IDS.includes(ANKO_ID)&&HOSTILE_IDS.join("|")==="test_subject_altered_shinobi|test_subject_brute|test_subject_unstable",
+    ankoGuestAlly:makeAnkoParticipant().participantClass==="guest_ally"&&makeAnkoParticipant().controlAuthority==="player"&&makeAnkoParticipant().ownershipGranted===false,
+    ankoPaletteExact:ANKO_GUEST_SKILL_IDS.join("|")==="sj_anko_hidden_shadow_snake_hands|sj_anko_snake_bind|sj_anko_fire_style_dragon_flame|sj_anko_serpent_evasion"&&!ANKO_GUEST_SKILL_IDS.includes("sj_anko_twin_snakes_mutual_death"),
+    ordinaryCurrentActiveInput:String(getInputReadiness).includes("activeParticipantId:active.id")&&String(getInputReadiness).includes('st.phase!=="player"'),
+    noForcedAnkoTakedown:!source.includes("scripted_a")&&!source.includes("scripted_b")&&!source.includes("authored_scripted_takedown"),
+    normalEnemyCadence:String(resolveEnemyOpportunity).includes("activePlayer()")&&String(resolveEnemyOpportunity).includes("getEnemyAuthoredBattleActions"),
+    presentationGatesWithdrawal:String(advanceAfterPresentation).includes("advanceBattleParticipantAtZeroPL")&&String(handleBattleParticipantAtZeroPL).includes("presentation_pending_withdrawal"),
     exactEnemyRelay:HOSTILE_IDS.join("|")==="test_subject_altered_shinobi|test_subject_brute|test_subject_unstable",
-    ankoYieldsToMenma:String(swapAnkoToMenmaActive).includes("[MENMA_ID,ANKO_ID]")&&String(swapAnkoToMenmaActive).includes("menmaReceivesFirstNormalPlayerOpportunity:true"),
-    phaseCOnlyPlayerControl:String(getInputReadiness).includes('s.phase!=="phase_c_player"')&&String(resolvePhaseCEnemyOpportunity).includes("test_subject_unstable"),
-    scopedEnemyCadenceOwner:String(bindAuthoredEnemyOpportunityController).includes("authoredEnemyOpportunityControllerId")&&String(launchMenmaEvolvedPLBattle36900).includes("bindAuthoredEnemyOpportunityController"),
-    men03ExcludesAnko:String(commitScriptedAnkoPhase).includes("men03Eligible:false")&&String(swapAnkoToMenmaActive).includes('men03Scope:"phase_c_only"'),
-    phaseCFailureNoFakeLow:String(completeMenmaSuccessorDefeat).includes('tutorialResult:"not_completed"')&&String(completeMenmaSuccessorDefeat).includes("performanceBucket:null"),
-    exactBattleReceipt:String(completeOccurrenceReceipt).includes("halfScriptedPhaseABExcludedFromMEN03:true")&&String(completeOccurrenceReceipt).includes("resolvedHostileIds:victory?[...HOSTILE_IDS]"),
+    authoredYieldAfterLegitimateFirstTwo:String(shouldAuthorMenmaHandoff36900).includes("resolvedHostileIds.includes(HOSTILE_IDS[0])")&&String(shouldAuthorMenmaHandoff36900).includes("resolvedHostileIds.includes(HOSTILE_IDS[1])"),
+    authoredYieldPreservesSideOrder:String(yieldAnkoToMenmaActive36900).includes('nextSide:"enemy"')&&String(yieldAnkoToMenmaActive36900).includes("sideOrderReset:false"),
+    ordinaryAlliedRelay:String(advanceAfterPresentation).includes('pending.side==="player"')&&String(advanceAfterPresentation).includes("activePlayer()"),
+    partyDefeatOnlyOnAlliedExhaustion:String(advanceAfterPresentation).includes('if(!next)')&&String(completeMenmaSuccessorDefeat).includes("allied_side_exhausted"),
+    men03StartsAtMenmaActive:String(startMenmaEvidenceWindow36900).includes("firstLegitimateMenmaActiveMoment:true")&&String(startMenmaEvidenceWindow36900).includes('men03Scope:"menma_active_only"'),
+    phaseFailureNoFakeLow:String(completeMenmaSuccessorDefeat).includes('tutorialResult:"not_completed"')&&String(completeMenmaSuccessorDefeat).includes("performanceBucket:null"),
     rewardAdapterPresent:!!globalThis.SC_ACADEMY_MENMA_THREE_SUBJECT_REWARD_36200,
     plIdentityPreserved:source.includes('plIdentity:"Battle PL"')&&!source.includes("hit"+"Points")&&!source.includes("health"+"Meter"),
     kakashiUntouched:!source.includes("academy_"+"kakashi"),
@@ -1198,11 +1196,10 @@ const storyPatch=patchMenmaStoryBattle();
 globalThis.launchMenmaEvolvedPLBattle36900=launchMenmaEvolvedPLBattle36900;
 globalThis.getMenmaEvolvedPLBattleInputReadiness36900=getInputReadiness;
 globalThis.getMenmaEvolvedPLBattleState36900=function(){return clone(ensureState());};
-globalThis.commitMenmaScriptedAnkoPhase36900=commitScriptedAnkoPhase;
 globalThis.runIssue369MenmaEvolvedPLBattleDiagnostics=diagnostics;
 globalThis.SC_MENMA_EVOLVED_PL_BATTLE_36900=Object.freeze({
   patchId:PATCH_ID,battleConfigId:BATTLE_CONFIG_ID,encounterId:ENCOUNTER_ID,objectiveId:OBJECTIVE_ID,
   scriptContractId:SCRIPT_CONTRACT_ID,alliedParticipantIds:Object.freeze([...ALLIED_IDS]),hostileParticipantIds:Object.freeze([...HOSTILE_IDS]),
-  phaseOrder:Object.freeze(["scripted_a","scripted_b","phase_c_player"]),storyPatch:clone(storyPatch),browserGoldenClaimed:false
+  controlModel:"guest_ally_current_active",phaseOrder:Object.freeze(["player","enemy"]),storyPatch:clone(storyPatch),browserGoldenClaimed:false
 });
 })();
