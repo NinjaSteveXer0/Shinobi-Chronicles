@@ -107,6 +107,12 @@ function battleOccurrenceId(value=battle()){
   const id=sceneInstanceId(value);
   return id?BATTLE_OCCURRENCE_PREFIX+id:null;
 }
+function bindAuthoredEnemyOpportunityController(value=battle()){
+  if(!value||!value.battleId)return false;
+  value.authoredEnemyOpportunityControllerId=SCRIPT_CONTRACT_ID;
+  value.authoredEnemyOpportunityControllerBattleId=String(value.battleId);
+  return true;
+}
 function makeAnkoParticipant(){
   return {
     id:ANKO_ID,registryId:ANKO_ID,name:"SPECIAL JŌNIN ANKO",displayName:"Special Jōnin Anko",
@@ -695,11 +701,13 @@ if(PRE_RESTORE_TEST){
         b.playerFacingObjective=PLAYER_OBJECTIVE_TEXT;
         b.environmentPath=BATTLE_ENVIRONMENT_PATH;
         b.presentationEnvironmentPath=BATTLE_ENVIRONMENT_PATH;
+        bindAuthoredEnemyOpportunityController(b);
       }
     }
 
     if(isExactBattle()){
       const b=battle();
+      bindAuthoredEnemyOpportunityController(b);
       b.menma369LocalAllies={[ANKO_ID]:makeAnkoParticipant()};
       b.menmaEvolvedPLBattle36900=normalizeState(savedState||b.menmaEvolvedPLBattle36900,sceneInstanceId(b));
       if(savedBattleActive&&b.battleOver!==true)b.active=true;
@@ -748,6 +756,7 @@ function configureExactDeployment(){
   else b.activePlayer=ensureLocalAnko();
   syncBattleActiveEnemyFromDeployment();
   b.characterId=MENMA_ID;b.enemy=getBattleDeploymentParticipant("enemy",1);
+  bindAuthoredEnemyOpportunityController(b);
   b.encounterEnemy=enemyDatabase.test_subject_altered_shinobi;
   initializeBattleContributionRecordsFromDeployment();
   initializeBattleRemainingPLFromDeployment({preserveExistingEnemyPower:false});
@@ -767,6 +776,7 @@ function launchMenmaEvolvedPLBattle36900(context={}){
   selectedEnemy=altered;
   const b=battle();
   b.active=true;b.battleId=createBattleInstanceId();b.encounterId=ENCOUNTER_ID;b.battleConfigId=BATTLE_CONFIG_ID;b.objectiveId=OBJECTIVE_ID;
+  bindAuthoredEnemyOpportunityController(b);
   b.playerFacingObjective=PLAYER_OBJECTIVE_TEXT;b.environmentPath=BATTLE_ENVIRONMENT_PATH;b.presentationEnvironmentPath=BATTLE_ENVIRONMENT_PATH;
   b.encounterOccurrenceId=null;b.oppositionTemplateId=altered.id;b.encounterStatePackageId=null;b.characterId=MENMA_ID;b.encounterEnemy=altered;
   setBattleEnemyParticipants(hostileParticipants);b.enemy=altered;
@@ -875,6 +885,7 @@ function diagnostics(){
     exactEnemyRelay:HOSTILE_IDS.join("|")==="test_subject_altered_shinobi|test_subject_brute|test_subject_unstable",
     ankoYieldsToMenma:String(swapAnkoToMenmaActive).includes("[MENMA_ID,ANKO_ID]")&&String(swapAnkoToMenmaActive).includes("menmaReceivesFirstNormalPlayerOpportunity:true"),
     phaseCOnlyPlayerControl:String(getInputReadiness).includes('s.phase!=="phase_c_player"')&&String(resolvePhaseCEnemyOpportunity).includes("test_subject_unstable"),
+    scopedEnemyCadenceOwner:String(bindAuthoredEnemyOpportunityController).includes("authoredEnemyOpportunityControllerId")&&String(launchMenmaEvolvedPLBattle36900).includes("bindAuthoredEnemyOpportunityController"),
     men03ExcludesAnko:String(commitScriptedAnkoPhase).includes("men03Eligible:false")&&String(swapAnkoToMenmaActive).includes('men03Scope:"phase_c_only"'),
     phaseCFailureNoFakeLow:String(completeMenmaSuccessorDefeat).includes('tutorialResult:"not_completed"')&&String(completeMenmaSuccessorDefeat).includes("performanceBucket:null"),
     exactBattleReceipt:String(completeOccurrenceReceipt).includes("halfScriptedPhaseABExcludedFromMEN03:true")&&String(completeOccurrenceReceipt).includes("resolvedHostileIds:victory?[...HOSTILE_IDS]"),
