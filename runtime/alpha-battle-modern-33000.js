@@ -1018,6 +1018,38 @@
     persistPresentationQueueState33000();
     return battlePresentationQueueState33000.queue.map(row=>row.receipt);
   }
+  function tutorialPresentationBlocking33000(){
+    try{
+      return typeof globalThis.isPLBattleTutorialPresentationBlocking38500==="function"&&
+        globalThis.isPLBattleTutorialPresentationBlocking38500()===true;
+    }catch(_error){return false;}
+  }
+  function notifyTutorialPresentationSettled33000(receipt){
+    try{
+      return typeof globalThis.onPLBattlePresentationSettled38500==="function"&&
+        globalThis.onPLBattlePresentationSettled38500(receipt)===true;
+    }catch(_error){return false;}
+  }
+  function resumeBattlePresentationAfterTutorial33000(){
+    ensurePresentationQueueBattle33000();
+    syncBattlePresentationQueue33000();
+    const stage=liveBattleStage33000(null);
+    if(!stage)return{success:false,reason:"battle_stage_missing"};
+    if(tutorialPresentationBlocking33000())return{success:false,reason:"tutorial_prompt_active"};
+    if(battlePresentationQueueState33000.active){
+      setPresentationQueueBusy33000(stage,true);
+      return{success:true,active:true};
+    }
+    if(battlePresentationQueueState33000.queue.length){
+      return{success:true,resumed:true,receipt:playNextBattlePresentationReceipt33000(stage)};
+    }
+    setPresentationQueueBusy33000(stage,false);
+    flushDeferredTerminalOverlay33000();
+    flushDeferredBattleCallerResume33000();
+    return{success:true,resumed:true,queueEmpty:true};
+  }
+  globalThis.resumeBattlePresentationAfterTutorial33000=resumeBattlePresentationAfterTutorial33000;
+
   function refreshCommittedFormationPresentation33000(stage,beforeTransitionId){
     const transition=currentBattle&&currentBattle.deployment&&currentBattle.deployment.lastTransition||null;
     const afterTransitionId=transition&&String(transition.id||"")||"";
@@ -1055,17 +1087,22 @@
     stage=refreshCommittedFormationPresentation33000(stage,beforeTransitionId);
     try{installFormationStage33000(stage);}catch(_error){}
     // Later committed actions, relays and ordinary enemy/player responses are
-    // now eligible for ordered playback.
+    // now eligible for ordered playback. First-Battle tutorial prompts may pause
+    // this presentation queue, but never alter the already-committed semantics.
+    const tutorialPaused=notifyTutorialPresentationSettled33000(active.receipt)||tutorialPresentationBlocking33000();
     syncBattlePresentationQueue33000();
     persistPresentationQueueState33000();
     if(battlePresentationQueueState33000.active){
       setPresentationQueueBusy33000(stage,true);
     }else if(battlePresentationQueueState33000.queue.length){
-      playNextBattlePresentationReceipt33000(stage);
+      if(tutorialPaused)setPresentationQueueBusy33000(stage,false);
+      else playNextBattlePresentationReceipt33000(stage);
     }else{
       setPresentationQueueBusy33000(stage,false);
-      flushDeferredTerminalOverlay33000();
-      flushDeferredBattleCallerResume33000();
+      if(!tutorialPaused){
+        flushDeferredTerminalOverlay33000();
+        flushDeferredBattleCallerResume33000();
+      }
     }
     return true;
   }
@@ -1150,7 +1187,7 @@
       lane.classList.toggle("is-playing",!played);lane.classList.toggle("is-settled",played);
       if(!played){
         playedBattlePerformanceKeys33000.add(key);applyBattlePerformanceRoles33000(stage,p);
-        setTimeout(()=>{if(lane.isConnected&&host.dataset.actionId===p.actionId){lane.classList.remove("is-playing");lane.classList.add("is-settled");clearBattlePerformanceRoles33000(stage,p.actionId);}},920);
+        setTimeout(()=>{if(lane.isConnected&&host.dataset.actionId===p.actionId){lane.classList.remove("is-playing");lane.classList.add("is-settled");clearBattlePerformanceRoles33000(stage,p.actionId);notifyTutorialPresentationSettled33000(p);}},920);
       }else clearBattlePerformanceRoles33000(stage);
     }
     return p;
