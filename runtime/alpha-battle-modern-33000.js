@@ -444,7 +444,10 @@
     try{
       if(typeof getBattleRemainingPLRecord==="function"){
         const record=getBattleRemainingPLRecord(side,participantId);
-        if(record&&Number.isFinite(Number(record.remaining)))return{remaining:Number(record.remaining),maximum:Number(record.maximum)||Number(record.remaining)};
+        if(record){
+          const current=Number.isFinite(Number(record.current))?Number(record.current):Number(record.remaining);
+          if(Number.isFinite(current))return{remaining:current,maximum:Number(record.maximum)||current};
+        }
       }
       if(typeof getBattleRemainingPL==="function"){
         const remaining=Number(getBattleRemainingPL(side,participantId));
@@ -563,10 +566,28 @@
     stage.dataset.playerFormationCount=String(player.length);
     stage.dataset.enemyFormationCount=String(enemy.length);
     applyBattleEnvironment33000(stage);
-    projectFormationActivePortrait33000(stage,"player",player.find(row=>row.slot===1)||player[0]||null);
-    projectFormationActivePortrait33000(stage,"enemy",enemy.find(row=>row.slot===1)||enemy[0]||null);
+    const playerActiveNode=projectFormationActivePortrait33000(stage,"player",player.find(row=>row.slot===1)||player[0]||null);
+    const enemyActiveNode=projectFormationActivePortrait33000(stage,"enemy",enemy.find(row=>row.slot===1)||enemy[0]||null);
     projectFormationSupports33000(stage,"player",player);
     projectFormationSupports33000(stage,"enemy",enemy);
+
+    // Scoped relay/yield motion for the evolved Menma proof only. Generic
+    // Formation Stage and frozen Kakashi remain under the no-tween policy.
+    const transition=currentBattle&&currentBattle.deployment&&currentBattle.deployment.lastTransition||null;
+    const transitionId=transition&&String(transition.id||"")||"";
+    if(stage.dataset.evolvedPlProof==="menma_three_subjects"&&transitionId&&stage.dataset.lastFormationTransitionId!==transitionId){
+      stage.dataset.lastFormationTransitionId=transitionId;
+      const animateNode=node=>{
+        if(!node)return;
+        node.classList.remove("battle2-formation-relay-in");
+        void node.offsetWidth;
+        node.classList.add("battle2-formation-relay-in");
+        setTimeout(()=>{if(node&&node.isConnected)node.classList.remove("battle2-formation-relay-in");},560);
+      };
+      if(transition.side==="player")animateNode(playerActiveNode);
+      if(transition.side==="enemy")animateNode(enemyActiveNode);
+      if(transition.pairedEnemyRelayTransition)animateNode(enemyActiveNode);
+    }
     for(const node of stage.querySelectorAll(".battle2-formation-participant")){
       node.classList.remove("battle2-formation-focus","battle2-formation-recessed","battle2-formation-selected-target");
     }
@@ -684,6 +705,7 @@
   }
   function actionLabel33000(completion,group,actor){
     const eventType=String(completion&&completion.eventType||"");
+    if(eventType==="menma_origin_scripted_anko_takedown_completed"&&completion&&completion.data&&completion.data.displayName)return String(completion.data.displayName);
     if(eventType==="menma_origin_enemy_opportunity_skipped")return"No Legal Action";
     if(eventType==="menma_origin_enemy_opportunity_failed_visible")return"Action Could Not Resolve";
     if(eventType==="menma_origin_anko_assist_skipped")return"Assist Skipped";
@@ -761,8 +783,10 @@
     const totalDamage=damages.reduce((sum,row)=>sum+Math.max(0,Number(row.data&&row.data.finalDamage)||0),0);
     const result=resultClass33000(completion,group);
     const relay=group.find(row=>row&&row.eventType==="battle_formation_relay_committed")||null;
-    const actionRole=completion.eventType==="menma_origin_anko_assist_completed"||(actorRef&&actorRef.participantId==="sj_anko")
-      ?"AUTHORED ASSIST":"ACTIVE";
+    const actionRole=completion.eventType==="menma_origin_scripted_anko_takedown_completed"
+      ?"AUTHORED BEAT"
+      :completion.eventType==="menma_origin_anko_assist_completed"||(actorRef&&actorRef.participantId==="sj_anko")
+        ?"AUTHORED ASSIST":"ACTIVE";
     const opportunityId=opportunityIdForAction33000(completion.actionId);
     const receipt={
       receiptVersion:BATTLE_PRESENTATION_QUEUE_VERSION_33000,
@@ -797,6 +821,8 @@
     "item_action_completed",
     "summon_skill_resolved_and_returned",
     "menma_origin_anko_assist_completed",
+    "menma_origin_scripted_anko_takedown_completed",
+    "menma_origin_phase_c_enemy_opportunity_failed_visible",
     "menma_origin_enemy_opportunity_skipped",
     "menma_origin_enemy_opportunity_failed_visible",
     "menma_origin_anko_assist_skipped",
@@ -950,10 +976,20 @@
     clearBattlePerformanceRoles33000(stage,active.receipt.actionId);
     battlePresentationQueueState33000.active=null;
     battlePresentationQueueState33000.timer=null;
+
+    // #373 successor: zero-PL is already committed, but the formation relay /
+    // terminal transition waits until this exact action is visibly settled.
+    // Presentation does not choose an outcome; it only releases the already
+    // committed authored continuation.
+    try{
+      if(typeof globalThis.advanceMenmaScriptedBattleAfterPresentation37300==="function"){
+        globalThis.advanceMenmaScriptedBattleAfterPresentation37300(active.receipt);
+      }
+    }catch(_error){}
+
     try{installFormationStage33000(stage);}catch(_error){}
-    // #369 may have committed later autonomous actions in the same semantic
-    // turn while this receipt was playing. Rescan committed evidence before
-    // declaring the presentation queue drained.
+    // Later committed actions (including the next scripted Anko beat or the
+    // ordinary Phase-C enemy response) are now eligible for ordered playback.
     syncBattlePresentationQueue33000();
     persistPresentationQueueState33000();
     if(battlePresentationQueueState33000.queue.length){
@@ -1334,6 +1370,14 @@
       .battle2-modern[data-formation-stage="true"] .battle-live-active-card,
       .battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.battle2-formation-support{
         transition:none!important;animation:none!important;will-change:auto!important
+      }
+      @keyframes menma373RelayPlayer{from{transform:translateX(-24%) scale(.72);opacity:.42}to{transform:translateX(0) scale(1);opacity:1}}
+      @keyframes menma373RelayEnemy{from{transform:translateX(24%) scale(.72);opacity:.42}to{transform:translateX(0) scale(1);opacity:1}}
+      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-active-card-player.battle2-formation-relay-in{
+        animation:menma373RelayPlayer .52s cubic-bezier(.2,.75,.2,1) both!important
+      }
+      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-active-card-enemy.battle2-formation-relay-in{
+        animation:menma373RelayEnemy .52s cubic-bezier(.2,.75,.2,1) both!important
       }
       .battle2-modern[data-formation-stage="true"] .battle2-formation-recessed{transform:none!important}
       .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-actor,
