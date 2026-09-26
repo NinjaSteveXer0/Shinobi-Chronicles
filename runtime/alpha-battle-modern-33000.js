@@ -1235,7 +1235,13 @@
       return false;
     }
     battlePresentationQueueState33000.deferredCallerResume=null;
-    PRIOR_RESUME_BATTLE_CALLER_33000.apply(globalThis,deferred.args);
+    const resumed=PRIOR_RESUME_BATTLE_CALLER_33000.apply(globalThis,deferred.args);
+    if(resumed&&resumed.success===true&&resumed.type==="story_scene_resumed"){
+      try{
+        if(typeof globalThis.clearStoryPresentationHidden33900==="function")globalThis.clearStoryPresentationHidden33900();
+        if(PRIOR_OPEN_OVERLAY_33000)PRIOR_OPEN_OVERLAY_33000.call(globalThis,"story_scene");
+      }catch(_error){}
+    }
     return true;
   }
   if(PRIOR_RESUME_BATTLE_CALLER_33000){
