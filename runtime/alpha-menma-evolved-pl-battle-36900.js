@@ -34,6 +34,7 @@ const SCRIPT_CONTRACT_ID="menma_origin_guest_ally_controller_v3";
 const PLAYER_OBJECTIVE_TEXT="Stop the Test Subjects.";
 const BATTLE_ENVIRONMENT_PATH="Scene backdrops/forest_clearing_day.png";
 const FUTURE_ENVIRONMENT_PATH="Scene backdrops/whisper_woods_forest_route.png";
+const FUTURE_ENVIRONMENT_ASSET_ID="whisper_woods_forest_route";
 const PARTY_DEFEAT_RETURN_BEAT_ID="menma_party_defeat_return_01";
 const FUTURE_ENTRY_BEAT_ID="menma_future_01";
 const FUTURE_INTENT_OCCURRENCE_ID="occ_origin_menma_future_ambition_intent";
@@ -1150,7 +1151,7 @@ function menmaFutureIntentChoice38800(choiceId,label,nextBeatId,intent){
 }
 function menmaDefeatAndFutureStoryBeats38800(){
   const clearing={mode:"authored_asset",assetId:"konoha_forest_clearing_day"};
-  const future={mode:"authored_asset",assetId:"konoha_forest_path_day"};
+  const future={mode:"authored_asset",assetId:FUTURE_ENVIRONMENT_ASSET_ID};
   const anko={sourceId:"anko",sourceType:"story_character",physicalPresence:true};
   const menma={sourceId:MENMA_ID,sourceType:"character",physicalPresence:true};
   const menmaInternal={sourceId:MENMA_ID,sourceType:"character",physicalPresence:false};
@@ -1224,7 +1225,7 @@ function installMenmaDefeatStoryBridge38800(scene){
   if(!scene||!scene.beatMap||typeof scene.beatMap.set!=="function")return{success:false,reason:"menma_story_scene_missing"};
   if(typeof registerSceneBackdropAssetPath==="function"){
     registerSceneBackdropAssetPath("konoha_forest_clearing_day",BATTLE_ENVIRONMENT_PATH);
-    registerSceneBackdropAssetPath("konoha_forest_path_day",FUTURE_ENVIRONMENT_PATH);
+    registerSceneBackdropAssetPath(FUTURE_ENVIRONMENT_ASSET_ID,FUTURE_ENVIRONMENT_PATH);
   }
   const rows=menmaDefeatAndFutureStoryBeats38800();
   rows.forEach(row=>upsertMenmaStoryBeat38800(scene,row));
