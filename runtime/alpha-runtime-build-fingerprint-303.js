@@ -47,7 +47,8 @@
       "academy-menma-evolved-pl-battle-369",
       "academy-menma-whole-encounter-reward-victory-trigger-379",
       "academy-kakashi-menma-skill-lock-383",
-      "academy-menma-half-scripted-battle-presentation-373"
+      "academy-menma-half-scripted-battle-presentation-373",
+      "academy-menma-half-scripted-relay-refresh-373"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
