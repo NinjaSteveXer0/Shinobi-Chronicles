@@ -1245,7 +1245,7 @@
     if(!confirmedStoryReturn)return resumed;
     try{
       if(typeof globalThis.clearStoryPresentationHidden33900==="function")globalThis.clearStoryPresentationHidden33900();
-      if(typeof globalThis.renderStoryScenePresentationLayer==="function")globalThis.renderStoryScenePresentationLayer();
+      if(PRIOR_OPEN_OVERLAY_33000)PRIOR_OPEN_OVERLAY_33000.call(globalThis,"story_scene");
     }catch(_error){}
     return resumed;
   }
