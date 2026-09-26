@@ -233,6 +233,11 @@ function makeTutorialDOM(beatId){
   return root;
 }
 function renderPrompt(){
+  if(globalThis.SC_DISABLE_FIRST_PL_BATTLE_TUTORIAL_QA===true){
+    const old=tutorialRoot();if(old)old.remove();
+    clearFocus();
+    return false;
+  }
   if(state.skipped||!state.started)return false;
   const stage=typeof document!=="undefined"?document.querySelector(".alpha-code-battle-stage"):null;
   if(!stage)return false;
@@ -322,6 +327,11 @@ function projectParticipantControlBadge(){
 }
 function afterBattleRender(){
   projectParticipantControlBadge();
+  if(globalThis.SC_DISABLE_FIRST_PL_BATTLE_TUTORIAL_QA===true){
+    const root=tutorialRoot();if(root)root.remove();
+    clearFocus();
+    return clone(state);
+  }
   bindFirstQualifyingBattle();
   if(state.started&&!state.skipped){
     const relation=relationshipBeatFor(activePlayer());
