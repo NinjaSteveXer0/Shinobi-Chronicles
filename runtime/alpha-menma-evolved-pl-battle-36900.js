@@ -33,6 +33,10 @@ const BATTLE_OCCURRENCE_PREFIX="battle_occ_origin_academy_menma_three_test_subje
 const SCRIPT_CONTRACT_ID="menma_origin_guest_ally_controller_v3";
 const PLAYER_OBJECTIVE_TEXT="Stop the Test Subjects.";
 const BATTLE_ENVIRONMENT_PATH="Scene backdrops/forest_clearing_day.png";
+const FUTURE_ENVIRONMENT_PATH="Scene backdrops/whisper_woods_forest_route.png";
+const PARTY_DEFEAT_RETURN_BEAT_ID="menma_party_defeat_return_01";
+const FUTURE_ENTRY_BEAT_ID="menma_future_01";
+const FUTURE_INTENT_OCCURRENCE_ID="occ_origin_menma_future_ambition_intent";
 const MENMA_ID="academy_menma";
 const ANKO_ID="sj_anko";
 const HOSTILE_IDS=Object.freeze([
@@ -1118,16 +1122,139 @@ function migrateMenmaSuccessorDisplayValue(value){
   }
   return value;
 }
+function commitMenmaFutureAmbitionIntent38800(intent){
+  const A=globalThis.SC_ALPHA_ORIGIN_32900;
+  if(!A||typeof A.commitOccurrence!=="function")return{success:false,reason:"menma_future_intent_history_authority_missing"};
+  return A.commitOccurrence(
+    MENMA_ID,
+    FUTURE_INTENT_OCCURRENCE_ID,
+    {futureAmbitionIntent:String(intent||""),storyIntent:true,progressionGranted:false},
+    [],
+    {
+      type:"origin_story_intent",
+      outcome:"future_ambition_intent_selected",
+      sourceRefs:[{type:"story_scene",id:STORY_SCENE_ID,role:"future_ambition_choice"}]
+    }
+  );
+}
+function menmaFutureIntentChoice38800(choiceId,label,nextBeatId,intent){
+  return{
+    choiceId,label,nextBeatId,
+    contextPatch:{menmaFutureAmbitionIntent:intent},
+    consequenceRequests:[{
+      requestId:`menma_future_ambition_intent_${intent}_38800`,
+      kind:"domain",
+      resolve:()=>commitMenmaFutureAmbitionIntent38800(intent)
+    }]
+  };
+}
+function menmaDefeatAndFutureStoryBeats38800(){
+  const clearing={mode:"authored_asset",assetId:"konoha_forest_clearing_day"};
+  const future={mode:"authored_asset",assetId:"konoha_forest_path_day"};
+  const anko={sourceId:"anko",sourceType:"story_character",physicalPresence:true};
+  const menma={sourceId:MENMA_ID,sourceType:"character",physicalPresence:true};
+  const menmaInternal={sourceId:MENMA_ID,sourceType:"character",physicalPresence:false};
+  const nineTails={sourceId:"nine_tails",sourceType:"communication_source",physicalPresence:false};
+  return[
+    {beatId:"menma_party_defeat_return_01",mode:"narration",text:"The fight breaks apart before Menma can pull it back together.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_02"},
+    {beatId:"menma_party_defeat_return_02",mode:"narration",text:"By the time the clearing settles, Menma and Anko are both at its edge.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_03"},
+    {beatId:"menma_party_defeat_return_03",mode:"narration",text:"The test subjects still able to move use the opening.\n\nThey disappear between the trees.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_04"},
+    {beatId:"menma_party_defeat_return_04",mode:"dialogue",speakerRef:anko,speakerName:"ANKO",text:"They're gone.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_05"},
+    {beatId:"menma_party_defeat_return_05",mode:"dialogue",speakerRef:menma,speakerName:"MENMA",text:"I know.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_06"},
+    {beatId:"menma_party_defeat_return_06",mode:"dialogue",speakerRef:anko,speakerName:"ANKO",text:"You wanted a real test.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_07"},
+    {beatId:"menma_party_defeat_return_07",mode:"dialogue",speakerRef:menma,speakerName:"MENMA",text:"I got one.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_08"},
+    {beatId:"menma_party_defeat_return_08",mode:"dialogue",speakerRef:anko,speakerName:"ANKO",text:"And?",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_09"},
+    {beatId:"menma_party_defeat_return_09",mode:"narration",text:"Menma looks at the gap in the trees where the last of them disappeared.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_10"},
+    {beatId:"menma_party_defeat_return_10",mode:"dialogue",speakerRef:menma,speakerName:"MENMA",text:"I need more.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_11"},
+    {beatId:"menma_party_defeat_return_11",mode:"narration",text:"Anko laughs once.\n\nNot because it is funny.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_12"},
+    {beatId:"menma_party_defeat_return_12",mode:"dialogue",speakerRef:anko,speakerName:"ANKO",text:"Yeah.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_13"},
+    {beatId:"menma_party_defeat_return_13",mode:"dialogue",speakerRef:anko,speakerName:"ANKO",text:"That sounds familiar.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_14"},
+    {beatId:"menma_party_defeat_return_14",mode:"dialogue",speakerRef:menma,speakerName:"MENMA",text:"You're going after them?",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_15"},
+    {beatId:"menma_party_defeat_return_15",mode:"dialogue",speakerRef:anko,speakerName:"ANKO",text:"I'm reporting where they went.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_16"},
+    {beatId:"menma_party_defeat_return_16",mode:"dialogue",speakerRef:menma,speakerName:"MENMA",text:"I can help.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_17"},
+    {beatId:"menma_party_defeat_return_17",mode:"dialogue",speakerRef:anko,speakerName:"ANKO",text:"No.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_18"},
+    {beatId:"menma_party_defeat_return_18",mode:"narration",text:"Menma gives her a look.\n\nAnko sees it immediately.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_19"},
+    {beatId:"menma_party_defeat_return_19",mode:"dialogue",speakerRef:anko,speakerName:"ANKO",text:"That wasn't a challenge.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_20"},
+    {beatId:"menma_party_defeat_return_20",mode:"dialogue",speakerRef:menma,speakerName:"MENMA",text:"Didn't say it was.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_21"},
+    {beatId:"menma_party_defeat_return_21",mode:"dialogue",speakerRef:anko,speakerName:"ANKO",text:"Go home, Menma.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_22"},
+    {beatId:"menma_party_defeat_return_22",mode:"dialogue",speakerRef:menma,speakerName:"MENMA",text:"Not the Academy.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_23"},
+    {beatId:"menma_party_defeat_return_23",mode:"dialogue",speakerRef:anko,speakerName:"ANKO",text:"Didn't say Academy.",environmentRef:clearing,nextBeatId:"menma_party_defeat_return_24"},
+    {beatId:"menma_party_defeat_return_24",mode:"narration",text:"Anko heads back toward the village.\n\nMenma waits until she is gone, then takes the forest route the other way.",environmentRef:clearing,nextBeatId:FUTURE_ENTRY_BEAT_ID},
+
+    {beatId:"menma_future_01",mode:"narration",text:"Menma is running again.",environmentRef:future,nextBeatId:"menma_future_02"},
+    {beatId:"menma_future_02",mode:"narration",text:"Through the trees, Konoha comes back into view. The Academy is somewhere beyond the rooftops.",environmentRef:future,nextBeatId:"menma_future_03"},
+    {beatId:"menma_future_03",mode:"internal_voice",speakerRef:nineTails,speakerName:"NINE-TAILS",text:"Satisfied?",environmentRef:future,nextBeatId:"menma_future_04"},
+    {beatId:"menma_future_04",mode:"internal_voice",speakerRef:menmaInternal,speakerName:"MENMA",text:"No.",environmentRef:future,nextBeatId:"menma_future_05"},
+    {beatId:"menma_future_05",mode:"internal_voice",speakerRef:nineTails,speakerName:"NINE-TAILS",text:"Good.",environmentRef:future,nextBeatId:"menma_future_choice"},
+    {beatId:"menma_future_choice",mode:"choice",text:"",environmentRef:future,choices:[
+      menmaFutureIntentChoice38800("master_what_they_wont_teach_me","MASTER WHAT THEY WON'T TEACH ME","menma_future_master_01","master_what_they_wont_teach_me"),
+      menmaFutureIntentChoice38800("become_too_strong_to_hold_back","BECOME TOO STRONG TO HOLD BACK","menma_future_strength_01","become_too_strong_to_hold_back"),
+      menmaFutureIntentChoice38800("create_something_thats_mine","CREATE SOMETHING THAT'S MINE","menma_future_create_01","create_something_thats_mine"),
+      menmaFutureIntentChoice38800("find_out_how_far_i_can_go","FIND OUT HOW FAR I CAN GO","menma_future_limit_01","find_out_how_far_i_can_go")
+    ]},
+
+    {beatId:"menma_future_master_01",mode:"internal_voice",speakerRef:menmaInternal,speakerName:"MENMA",text:"If they won't teach me yet, I'll find out what I'm missing.",environmentRef:future,nextBeatId:"menma_future_master_02"},
+    {beatId:"menma_future_master_02",mode:"internal_voice",speakerRef:nineTails,speakerName:"NINE-TAILS",text:"Hungry.",environmentRef:future,nextBeatId:"menma_future_master_03"},
+    {beatId:"menma_future_master_03",mode:"internal_voice",speakerRef:menmaInternal,speakerName:"MENMA",text:"Ambitious.",environmentRef:future,nextBeatId:"menma_future_terminal"},
+
+    {beatId:"menma_future_strength_01",mode:"internal_voice",speakerRef:menmaInternal,speakerName:"MENMA",text:"I'll get strong enough that nobody gets to decide I'm not ready.",environmentRef:future,nextBeatId:"menma_future_strength_02"},
+    {beatId:"menma_future_strength_02",mode:"internal_voice",speakerRef:nineTails,speakerName:"NINE-TAILS",text:"That sounds familiar.",environmentRef:future,nextBeatId:"menma_future_strength_03"},
+    {beatId:"menma_future_strength_03",mode:"internal_voice",speakerRef:menmaInternal,speakerName:"MENMA",text:"Good.",environmentRef:future,nextBeatId:"menma_future_terminal"},
+
+    {beatId:"menma_future_create_01",mode:"internal_voice",speakerRef:menmaInternal,speakerName:"MENMA",text:"Maybe I don't need what they're keeping from me.",environmentRef:future,nextBeatId:"menma_future_create_02"},
+    {beatId:"menma_future_create_02",mode:"internal_voice",speakerRef:menmaInternal,speakerName:"MENMA",text:"Maybe I'll make something better.",environmentRef:future,nextBeatId:"menma_future_create_03"},
+    {beatId:"menma_future_create_03",mode:"internal_voice",speakerRef:nineTails,speakerName:"NINE-TAILS",text:"Now that's more interesting.",environmentRef:future,nextBeatId:"menma_future_terminal"},
+
+    {beatId:"menma_future_limit_01",mode:"internal_voice",speakerRef:menmaInternal,speakerName:"MENMA",text:"I want to know where the limit actually is.",environmentRef:future,nextBeatId:"menma_future_limit_02"},
+    {beatId:"menma_future_limit_02",mode:"internal_voice",speakerRef:nineTails,speakerName:"NINE-TAILS",text:"And when you find it?",environmentRef:future,nextBeatId:"menma_future_limit_03"},
+    {beatId:"menma_future_limit_03",mode:"internal_voice",speakerRef:menmaInternal,speakerName:"MENMA",text:"I'll decide then.",environmentRef:future,nextBeatId:"menma_future_terminal"},
+
+    {beatId:"menma_future_terminal",mode:"narration",text:"Menma runs toward Konoha.",environmentRef:future,exitScene:true}
+  ];
+}
+function upsertMenmaStoryBeat38800(scene,row){
+  if(!scene||!row||!row.beatId)return false;
+  const index=Array.isArray(scene.beats)?scene.beats.findIndex(item=>item&&item.beatId===row.beatId):-1;
+  if(index>=0)scene.beats[index]=row;
+  else if(Array.isArray(scene.beats))scene.beats.push(row);
+  scene.beatMap.set(row.beatId,row);
+  return true;
+}
+function installMenmaDefeatStoryBridge38800(scene){
+  if(!scene||!scene.beatMap||typeof scene.beatMap.set!=="function")return{success:false,reason:"menma_story_scene_missing"};
+  if(typeof registerSceneBackdropAssetPath==="function"){
+    registerSceneBackdropAssetPath("konoha_forest_clearing_day",BATTLE_ENVIRONMENT_PATH);
+    registerSceneBackdropAssetPath("konoha_forest_path_day",FUTURE_ENVIRONMENT_PATH);
+  }
+  const rows=menmaDefeatAndFutureStoryBeats38800();
+  rows.forEach(row=>upsertMenmaStoryBeat38800(scene,row));
+  return{
+    success:true,
+    defeatEntryBeatId:PARTY_DEFEAT_RETURN_BEAT_ID,
+    defeatBeatCount:24,
+    futureEntryBeatId:FUTURE_ENTRY_BEAT_ID,
+    futureChoiceBeatId:"menma_future_choice",
+    futureEnvironmentPath:FUTURE_ENVIRONMENT_PATH
+  };
+}
 function applyMenmaSuccessorBattleAuthority(scene){
   if(!scene||!scene.beatMap||typeof scene.beatMap.get!=="function")return{success:false,reason:"menma_story_scene_missing"};
+  const storyBridge=installMenmaDefeatStoryBridge38800(scene);
+  if(!storyBridge.success)return storyBridge;
   const beat=scene.beatMap.get(STORY_BATTLE_BEAT_ID);
   if(!beat||beat.mode!=="battle_transition"||!beat.battle)return{success:false,reason:"menma_story_battle_beat_missing"};
   beat.battle.enemyId=HOSTILE_IDS[0];beat.battle.encounterId=ENCOUNTER_ID;beat.battle.battleConfigId=BATTLE_CONFIG_ID;beat.battle.objectiveId=OBJECTIVE_ID;
   beat.battle.objectiveText=PLAYER_OBJECTIVE_TEXT;beat.battle.objectiveLabel=PLAYER_OBJECTIVE_TEXT;
   beat.battle.environmentPath=BATTLE_ENVIRONMENT_PATH;beat.battle.backdrop=BATTLE_ENVIRONMENT_PATH;
+  beat.battle.defeatBeatId=PARTY_DEFEAT_RETURN_BEAT_ID;
   beat.battle.launchResolver=launchMenmaEvolvedPLBattle36900;
   for(const row of scene.beatMap.values())migrateMenmaSuccessorDisplayValue(row);
-  return{success:true,sceneId:STORY_SCENE_ID,beatId:STORY_BATTLE_BEAT_ID,objectiveText:PLAYER_OBJECTIVE_TEXT,environmentPath:BATTLE_ENVIRONMENT_PATH};
+  return{
+    success:true,sceneId:STORY_SCENE_ID,beatId:STORY_BATTLE_BEAT_ID,
+    objectiveText:PLAYER_OBJECTIVE_TEXT,environmentPath:BATTLE_ENVIRONMENT_PATH,
+    defeatBeatId:PARTY_DEFEAT_RETURN_BEAT_ID,futureEntryBeatId:FUTURE_ENTRY_BEAT_ID,
+    storyBridge
+  };
 }
 const PRE_GET_STORY_SCENE_DEFINITION=typeof getStorySceneDefinition==="function"?getStorySceneDefinition:null;
 if(PRE_GET_STORY_SCENE_DEFINITION){
@@ -1182,6 +1309,11 @@ function diagnostics(){
     partyDefeatOnlyOnAlliedExhaustion:String(advanceAfterPresentation).includes('if(!next)')&&String(completeMenmaSuccessorDefeat).includes("allied_side_exhausted"),
     men03StartsAtMenmaActive:String(startMenmaEvidenceWindow36900).includes("firstLegitimateMenmaActiveMoment:true")&&String(startMenmaEvidenceWindow36900).includes('men03Scope:"menma_active_only"'),
     phaseFailureNoFakeLow:String(completeMenmaSuccessorDefeat).includes('tutorialResult:"not_completed"')&&String(completeMenmaSuccessorDefeat).includes("performanceBucket:null"),
+    partyDefeatReturnsToWritingBeat:!!beat&&beat.battle&&beat.battle.defeatBeatId===PARTY_DEFEAT_RETURN_BEAT_ID,
+    partyDefeatWritingChainComplete:Array.from({length:24},(_,index)=>scene&&scene.beatMap&&scene.beatMap.has(`menma_party_defeat_return_${String(index+1).padStart(2,"0")}`)).every(Boolean)&&scene.beatMap.get("menma_party_defeat_return_24")?.nextBeatId===FUTURE_ENTRY_BEAT_ID,
+    futureAmbitionBridgeInstalled:scene&&scene.beatMap&&scene.beatMap.has(FUTURE_ENTRY_BEAT_ID)&&scene.beatMap.has("menma_future_choice")&&scene.beatMap.get("menma_future_terminal")?.exitScene===true,
+    futureAmbitionChoiceExact:scene&&scene.beatMap&&scene.beatMap.get("menma_future_choice")?.choices?.map(choice=>choice.label).join("|")==="MASTER WHAT THEY WON'T TEACH ME|BECOME TOO STRONG TO HOLD BACK|CREATE SOMETHING THAT'S MINE|FIND OUT HOW FAR I CAN GO",
+    futureAmbitionHistoryIntent:String(commitMenmaFutureAmbitionIntent38800).includes(FUTURE_INTENT_OCCURRENCE_ID)&&!String(commitMenmaFutureAmbitionIntent38800).includes("currentPL")&&!String(commitMenmaFutureAmbitionIntent38800).includes("BasePL"),
     rewardAdapterPresent:!!globalThis.SC_ACADEMY_MENMA_THREE_SUBJECT_REWARD_36200,
     plIdentityPreserved:source.includes('plIdentity:"Battle PL"')&&!source.includes("hit"+"Points")&&!source.includes("health"+"Meter"),
     kakashiUntouched:!source.includes("academy_"+"kakashi"),
