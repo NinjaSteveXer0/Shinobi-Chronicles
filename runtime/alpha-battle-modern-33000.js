@@ -444,10 +444,38 @@
     const pl=supportRemainingPL33000(side,row.participantId);
     const power=stage.querySelector(".battle-live-power-"+side);
     if(power&&pl){
-      const strong=power.querySelector("strong"),span=power.querySelector("span"),bar=power.querySelector("i");
-      if(strong)strong.textContent=String(pl.remaining);
-      if(span)span.textContent="/ "+String(pl.maximum)+" BATTLE PL";
-      if(bar)bar.style.width=String(pl.maximum?Math.max(0,Math.min(100,pl.remaining/pl.maximum*100)):0)+"%";
+      power.dataset.battlePlCurrent=String(pl.remaining);
+      power.dataset.battlePlMaximum=String(pl.maximum);
+
+      let strong=power.querySelector("strong");
+      let span=power.querySelector("span");
+      let bar=power.querySelector("i");
+
+      // Relay refresh can inherit a modernized PL-ring shell whose legacy
+      // current-value node has been removed. Recreate only missing
+      // presentation children; never touch Battle PL state here.
+      if(!strong){
+        strong=document.createElement("strong");
+        strong.className="battle2-formation-pl-current";
+        strong.dataset.battlePlCurrentValue="true";
+        power.prepend(strong);
+      }else{
+        strong.dataset.battlePlCurrentValue="true";
+      }
+      if(!span){
+        span=document.createElement("span");
+        span.className="battle2-formation-pl-maximum";
+        strong.insertAdjacentElement("afterend",span);
+      }
+      if(!bar){
+        bar=document.createElement("i");
+        bar.className="battle2-formation-pl-bar";
+        power.appendChild(bar);
+      }
+
+      strong.textContent=String(pl.remaining);
+      span.textContent="/ "+String(pl.maximum)+" BATTLE PL";
+      bar.style.width=String(pl.maximum?Math.max(0,Math.min(100,pl.remaining/pl.maximum*100)):0)+"%";
     }
     return node;
   }
@@ -1488,7 +1516,7 @@
       terminalNavigationDeferred:!!PRIOR_OPEN_OVERLAY_33000&&!!PRIOR_RESUME_BATTLE_CALLER_33000&&String(flushDeferredTerminalOverlay33000).includes("pendingBattlePresentation33000")&&String(flushDeferredBattleCallerResume33000).includes("pendingBattlePresentation33000")&&String(finishBattlePresentationReceipt33000).includes("flushDeferredTerminalOverlay33000")&&String(finishBattlePresentationReceipt33000).includes("flushDeferredBattleCallerResume33000"),
       menmaEnvironmentBound:String(applyBattleEnvironment33000).includes("forest_clearing_day")&&styleText.includes('data-battle-environment="forest_clearing_day"'),
       supportEmptySlotsCanProject:String(projectFormationSupports33000).includes('classList.remove("is-empty")')&&String(projectFormationSupports33000).includes('document.createElement("div")')&&String(projectFormationSupports33000).includes("framelessBattlePortrait"),
-      relayRefreshesCentralConfrontation:String(refreshCommittedFormationPresentation33000).includes("refreshBattleActionRegionPresentation")&&String(projectFormationActivePortrait33000).includes("battle-live-active-nameplate")&&String(projectFormationActivePortrait33000).includes("battle-live-power-"),
+      relayRefreshesCentralConfrontation:String(refreshCommittedFormationPresentation33000).includes("refreshBattleActionRegionPresentation")&&String(projectFormationActivePortrait33000).includes("battle-live-active-nameplate")&&String(projectFormationActivePortrait33000).includes("battle-live-power-")&&String(projectFormationActivePortrait33000).includes("battlePlCurrent")&&String(projectFormationActivePortrait33000).includes("document.createElement"),
       stableFormationMotion:styleText.includes("Final Kakashi Golden / Formation Stage motion policy")&&styleText.includes("transition:none!important;animation:none!important;will-change:auto!important")&&styleText.includes(".battle2-performance-result-chip"),
       playerCardNamesSuppressed:styleText.includes(".battle-live-active-card-player .battle-live-active-nameplate{display:none!important}")&&styleText.includes(".battle-live-roster-player .battle-live-roster-name{display:none!important}"),
       confrontationPLLaneAligned:styleText.includes('data-formation-mode="duel"] .battle-live-power-player')&&styleText.includes("left:43.5%!important")&&styleText.includes("left:56.5%!important"),
