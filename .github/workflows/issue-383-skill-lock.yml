@@ -1,0 +1,96 @@
+name: Issue 383 Kakashi Menma Skill Lock
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'runtime/alpha-combat-skill-lock-38300.js'
+      - 'runtime/alpha-runtime-build-fingerprint-303.js'
+      - 'tools/qa_issue_383_skill_lock.js'
+      - 'tools/qa_issue_383_skill_lock_browser.js'
+      - 'tools/qa_issue_312_story_battle_benchmark.js'
+      - 'tools/qa_issue_312_browser.js'
+      - 'tools/qa_kakashi_v2_browser.js'
+      - 'tools/qa_runtime_ownership_safety_300.js'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
+      - 'tools/fixtures/runtime_responsibility_registry_300.json'
+      - 'tools/fixtures/runtime_change_declarations_300.json'
+      - '.github/workflows/issue-383-skill-lock.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  signed-off-skill-lock:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Source and ownership proof
+        run: |
+          node --check runtime/alpha-combat-skill-lock-38300.js
+          node --check tools/qa_issue_383_skill_lock.js
+          node --check tools/qa_issue_383_skill_lock_browser.js
+          node tools/qa_issue_383_skill_lock.js
+          node tools/qa_issue_303_runtime_build_fingerprint.js
+          node tools/qa_runtime_ownership_safety_300.js
+          node tools/qa_issue_312_story_battle_benchmark.js
+          node tools/qa_kakashi_v2_clean_room.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python3 -m http.server 8080 > /tmp/issue-383-http.log 2>&1 &
+          echo $! > /tmp/issue-383-http.pid
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/issue-383-http.log
+          exit 1
+
+      - name: Installed-browser signed-off Skill proof
+        env:
+          ISSUE_383_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_383_BROWSER_OUT: artifacts/issue-383-skill-lock
+        run: xvfb-run -a node tools/qa_issue_383_skill_lock_browser.js
+
+      - name: Shared Battle installed-browser regression
+        env:
+          ISSUE_312_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_312_BROWSER_OUT: artifacts/issue-383-skill-lock/issue-312-regression
+        run: xvfb-run -a node tools/qa_issue_312_browser.js
+
+      - name: Frozen Kakashi installed-browser Golden regression
+        env:
+          KAKASHI_V2_BASE_URL: http://127.0.0.1:8080/index.html
+          KAKASHI_V2_BROWSER_OUT: artifacts/issue-383-skill-lock/kakashi-golden-regression
+        run: xvfb-run -a node tools/qa_kakashi_v2_browser.js
+
+      - name: Preserve server log
+        if: always()
+        run: |
+          mkdir -p artifacts/issue-383-skill-lock
+          cp /tmp/issue-383-http.log artifacts/issue-383-skill-lock/http-server.log || true
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-383-skill-lock-evidence
+          path: artifacts/issue-383-skill-lock
+          if-no-files-found: warn
