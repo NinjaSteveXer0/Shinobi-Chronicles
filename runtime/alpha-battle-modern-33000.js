@@ -672,7 +672,8 @@
   const BATTLE_PRESENTATION_REDUCED_MS_33000=420;
   const battlePresentationQueueState33000={
     battleId:null,queue:[],queuedKeys:new Set(),playedKeys:new Set(),active:null,timer:null,
-    deferredTerminalOverlay:null,deferredCallerResume:null,terminalWatchdog:null,lastSequenceOrdinal:0
+    deferredTerminalOverlay:null,deferredCallerResume:null,terminalWatchdog:null,lastSequenceOrdinal:0,
+    receiptSettlementInProgress:false
   };
   function orderedPlaybackEnabled33000(){
     return !!(currentBattle&&String(currentBattle.battleConfigId||"")==="academy_menma_origin_three_test_subjects_with_anko");
@@ -704,6 +705,7 @@
     battlePresentationQueueState33000.deferredCallerResume=null;
     battlePresentationQueueState33000.terminalWatchdog=null;
     battlePresentationQueueState33000.lastSequenceOrdinal=0;
+    battlePresentationQueueState33000.receiptSettlementInProgress=false;
     if(typeof sessionStorage!=="undefined"&&battlePresentationQueueState33000.battleId){
       try{
         const raw=sessionStorage.getItem(presentationStorageKey33000(battlePresentationQueueState33000.battleId));
@@ -1071,6 +1073,7 @@
     clearBattlePerformanceRoles33000(stage,active.receipt.actionId);
     battlePresentationQueueState33000.active=null;
     battlePresentationQueueState33000.timer=null;
+    battlePresentationQueueState33000.receiptSettlementInProgress=true;
     const beforeTransitionId=currentBattle&&currentBattle.deployment&&currentBattle.deployment.lastTransition
       ?String(currentBattle.deployment.lastTransition.id||""):"";
 
@@ -1092,6 +1095,7 @@
     const tutorialPaused=notifyTutorialPresentationSettled33000(active.receipt)||tutorialPresentationBlocking33000();
     syncBattlePresentationQueue33000();
     persistPresentationQueueState33000();
+    battlePresentationQueueState33000.receiptSettlementInProgress=false;
     if(battlePresentationQueueState33000.active){
       setPresentationQueueBusy33000(stage,true);
     }else if(battlePresentationQueueState33000.queue.length){
@@ -1146,6 +1150,7 @@
     battlePresentationQueueState33000.queue=[];
     battlePresentationQueueState33000.queuedKeys.clear();
     battlePresentationQueueState33000.active=null;
+    battlePresentationQueueState33000.receiptSettlementInProgress=false;
     if(stage){
       clearBattlePerformanceRoles33000(stage);
       setPresentationQueueBusy33000(stage,false);
@@ -1160,7 +1165,7 @@
   function pendingBattlePresentation33000(){
     ensurePresentationQueueBattle33000();
     syncBattlePresentationQueue33000();
-    return !!(battlePresentationQueueState33000.active||battlePresentationQueueState33000.queue.length);
+    return !!(battlePresentationQueueState33000.receiptSettlementInProgress||battlePresentationQueueState33000.active||battlePresentationQueueState33000.queue.length);
   }
   function installBattlePerformance33000(stage){
     if(!stage)return null;
