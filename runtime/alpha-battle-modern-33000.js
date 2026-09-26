@@ -436,8 +436,19 @@
       img.setAttribute("src",portrait);
       img.dataset.formationPortrait="true";
     }
+    if(img)img.setAttribute("alt",String(row.participant.displayName||row.participant.name||row.participantId));
     const heading=node.querySelector(".battle-live-active-card-heading");
     if(heading)heading.textContent=side==="player"?"ACTIVE SHINOBI":"ACTIVE OPPOSITION";
+    const nameplate=node.querySelector(".battle-live-active-nameplate");
+    if(nameplate)nameplate.textContent=String(row.participant.displayName||row.participant.name||row.participantId);
+    const pl=supportRemainingPL33000(side,row.participantId);
+    const power=stage.querySelector(".battle-live-power-"+side);
+    if(power&&pl){
+      const strong=power.querySelector("strong"),span=power.querySelector("span"),bar=power.querySelector("i");
+      if(strong)strong.textContent=String(pl.remaining);
+      if(span)span.textContent="/ "+String(pl.maximum)+" BATTLE PL";
+      if(bar)bar.style.width=String(pl.maximum?Math.max(0,Math.min(100,pl.remaining/pl.maximum*100)):0)+"%";
+    }
     return node;
   }
   function supportRemainingPL33000(side,participantId){
@@ -566,10 +577,18 @@
     stage.dataset.playerFormationCount=String(player.length);
     stage.dataset.enemyFormationCount=String(enemy.length);
     applyBattleEnvironment33000(stage);
-    const playerActiveNode=projectFormationActivePortrait33000(stage,"player",player.find(row=>row.slot===1)||player[0]||null);
-    const enemyActiveNode=projectFormationActivePortrait33000(stage,"enemy",enemy.find(row=>row.slot===1)||enemy[0]||null);
+    const playerActiveRow=player.find(row=>row.slot===1)||player[0]||null;
+    const enemyActiveRow=enemy.find(row=>row.slot===1)||enemy[0]||null;
+    const playerActiveNode=projectFormationActivePortrait33000(stage,"player",playerActiveRow);
+    const enemyActiveNode=projectFormationActivePortrait33000(stage,"enemy",enemyActiveRow);
     projectFormationSupports33000(stage,"player",player);
     projectFormationSupports33000(stage,"enemy",enemy);
+    const status=stage.querySelector(".battle-live-status span");
+    if(status){
+      const playerName=playerActiveRow&&String(playerActiveRow.participant.displayName||playerActiveRow.participant.name||playerActiveRow.participantId)||"NO ACTIVE SHINOBI";
+      const enemyName=enemyActiveRow&&String(enemyActiveRow.participant.displayName||enemyActiveRow.participant.name||enemyActiveRow.participantId)||"NO ACTIVE OPPOSITION";
+      status.textContent=playerName+" VS "+enemyName;
+    }
 
     // Scoped relay/yield motion for the evolved Menma proof only. Generic
     // Formation Stage and frozen Kakashi remain under the no-tween policy.
@@ -967,7 +986,19 @@
     persistPresentationQueueState33000();
     return battlePresentationQueueState33000.queue.map(row=>row.receipt);
   }
-  function finishBattlePresentationReceipt33000(stage,key){
+  function refreshCommittedFormationPresentation33000(stage,beforeTransitionId){
+    const transition=currentBattle&&currentBattle.deployment&&currentBattle.deployment.lastTransition||null;
+    const afterTransitionId=transition&&String(transition.id||"")||"";
+    if(!afterTransitionId||afterTransitionId===String(beforeTransitionId||""))return liveBattleStage33000(stage);
+    // Relay/yield semantics are already committed. Re-render only the Combat
+    // presentation so the central cards, PL rings and action dock consume the
+    // new Active participants before the next immutable receipt is shown.
+    try{
+      if(typeof refreshBattleActionRegionPresentation==="function")refreshBattleActionRegionPresentation();
+    }catch(_error){}
+    return liveBattleStage33000(stage);
+  }
+    function finishBattlePresentationReceipt33000(stage,key){
     if(!battlePresentationQueueState33000.active||battlePresentationQueueState33000.active.key!==key)return false;
     stage=liveBattleStage33000(stage);
     const active=battlePresentationQueueState33000.active;
@@ -976,6 +1007,8 @@
     clearBattlePerformanceRoles33000(stage,active.receipt.actionId);
     battlePresentationQueueState33000.active=null;
     battlePresentationQueueState33000.timer=null;
+    const beforeTransitionId=currentBattle&&currentBattle.deployment&&currentBattle.deployment.lastTransition
+      ?String(currentBattle.deployment.lastTransition.id||""):"";
 
     // #373 successor: zero-PL is already committed, but the formation relay /
     // terminal transition waits until this exact action is visibly settled.
@@ -987,12 +1020,15 @@
       }
     }catch(_error){}
 
+    stage=refreshCommittedFormationPresentation33000(stage,beforeTransitionId);
     try{installFormationStage33000(stage);}catch(_error){}
     // Later committed actions (including the next scripted Anko beat or the
     // ordinary Phase-C enemy response) are now eligible for ordered playback.
     syncBattlePresentationQueue33000();
     persistPresentationQueueState33000();
-    if(battlePresentationQueueState33000.queue.length){
+    if(battlePresentationQueueState33000.active){
+      setPresentationQueueBusy33000(stage,true);
+    }else if(battlePresentationQueueState33000.queue.length){
       playNextBattlePresentationReceipt33000(stage);
     }else{
       setPresentationQueueBusy33000(stage,false);
@@ -1452,6 +1488,7 @@
       terminalNavigationDeferred:!!PRIOR_OPEN_OVERLAY_33000&&!!PRIOR_RESUME_BATTLE_CALLER_33000&&String(flushDeferredTerminalOverlay33000).includes("pendingBattlePresentation33000")&&String(flushDeferredBattleCallerResume33000).includes("pendingBattlePresentation33000")&&String(finishBattlePresentationReceipt33000).includes("flushDeferredTerminalOverlay33000")&&String(finishBattlePresentationReceipt33000).includes("flushDeferredBattleCallerResume33000"),
       menmaEnvironmentBound:String(applyBattleEnvironment33000).includes("forest_clearing_day")&&styleText.includes('data-battle-environment="forest_clearing_day"'),
       supportEmptySlotsCanProject:String(projectFormationSupports33000).includes('classList.remove("is-empty")')&&String(projectFormationSupports33000).includes('document.createElement("div")')&&String(projectFormationSupports33000).includes("framelessBattlePortrait"),
+      relayRefreshesCentralConfrontation:String(refreshCommittedFormationPresentation33000).includes("refreshBattleActionRegionPresentation")&&String(projectFormationActivePortrait33000).includes("battle-live-active-nameplate")&&String(projectFormationActivePortrait33000).includes("battle-live-power-"),
       stableFormationMotion:styleText.includes("Final Kakashi Golden / Formation Stage motion policy")&&styleText.includes("transition:none!important;animation:none!important;will-change:auto!important")&&styleText.includes(".battle2-performance-result-chip"),
       playerCardNamesSuppressed:styleText.includes(".battle-live-active-card-player .battle-live-active-nameplate{display:none!important}")&&styleText.includes(".battle-live-roster-player .battle-live-roster-name{display:none!important}"),
       confrontationPLLaneAligned:styleText.includes('data-formation-mode="duel"] .battle-live-power-player')&&styleText.includes("left:43.5%!important")&&styleText.includes("left:56.5%!important"),
