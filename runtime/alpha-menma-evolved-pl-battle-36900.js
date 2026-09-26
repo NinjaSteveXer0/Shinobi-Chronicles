@@ -1236,21 +1236,24 @@ function menmaDefeatAndFutureStoryBeats38800(){
   ];
 }
 function upsertMenmaStoryBeat38800(scene,row){
-  if(!scene||!row||!row.beatId)return false;
+  if(!scene||!row||!row.beatId||typeof normalizeStorySceneBeat!=="function")return false;
   const index=Array.isArray(scene.beats)?scene.beats.findIndex(item=>item&&item.beatId===row.beatId):-1;
-  if(index>=0)scene.beats[index]=row;
-  else if(Array.isArray(scene.beats))scene.beats.push(row);
-  scene.beatMap.set(row.beatId,row);
+  const normalized=normalizeStorySceneBeat(row,index>=0?index:(Array.isArray(scene.beats)?scene.beats.length:0));
+  if(!normalized)return false;
+  if(index>=0)scene.beats[index]=normalized;
+  else if(Array.isArray(scene.beats))scene.beats.push(normalized);
+  scene.beatMap.set(normalized.beatId,normalized);
   return true;
 }
 function installMenmaDefeatStoryBridge38800(scene){
   if(!scene||!scene.beatMap||typeof scene.beatMap.set!=="function")return{success:false,reason:"menma_story_scene_missing"};
+  if(typeof normalizeStorySceneBeat!=="function")return{success:false,reason:"story_beat_normalizer_missing"};
   if(typeof registerSceneBackdropAssetPath==="function"){
     registerSceneBackdropAssetPath("konoha_forest_clearing_day",BATTLE_ENVIRONMENT_PATH);
     registerSceneBackdropAssetPath(FUTURE_ENVIRONMENT_ASSET_ID,FUTURE_ENVIRONMENT_PATH);
   }
   const rows=menmaDefeatAndFutureStoryBeats38800();
-  rows.forEach(row=>upsertMenmaStoryBeat38800(scene,row));
+  if(!rows.every(row=>upsertMenmaStoryBeat38800(scene,row)))return{success:false,reason:"menma_story_bridge_normalization_failed"};
   return{
     success:true,
     defeatEntryBeatId:PARTY_DEFEAT_RETURN_BEAT_ID,
