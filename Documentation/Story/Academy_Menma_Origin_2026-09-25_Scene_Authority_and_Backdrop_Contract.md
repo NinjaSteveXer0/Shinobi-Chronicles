@@ -399,7 +399,7 @@ It does not grant:
 
 MEN-01 / MEN-02 remain Combat-action sourced.
 
-MEN-03 remains Combat-owned aggregate tutorial-performance evidence under current durable authority, but its current encounter shape will require reconciliation if the Battle changes from 1-v-1 to Menma+Anko vs all three.
+MEN-03 remains Combat-owned aggregate tutorial-performance evidence. Under the current Guest Ally Battle contract, it measures Menma only from the first legitimate moment he becomes Active and excludes Anko actions/results.
 
 ---
 
@@ -415,10 +415,13 @@ Closed at Writing direction:
 - exact scene backdrop mapping;
 - backdrop-in-handoff production rule.
 
-Requires reconciliation before implementation:
-- Scene 7 Battle composition and any MEN-03 assumptions tied specifically to the old 1-v-1 tutorial configuration.
+Battle/CE status:
+- Scene 7 Guest Ally control and relay semantics are CLOSED by current CE authority;
+- party-defeat Story continuation is CLOSED by the dedicated Scene 7 defeat authority;
+- Coding/runtime consumption remains separate from Writing approval.
 
 Not yet Stephen-approved:
-- exact successor player-facing prose/dialogue.
+- exact whole-Origin successor player-facing prose/dialogue;
+- exact Scene 10 future-ambition wording/beat package.
 
 Therefore this document is **scene authority / rewrite input**, not yet whole-Origin Writing GOLDEN.
