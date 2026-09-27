@@ -424,6 +424,8 @@ Mission 9 starts with what remains.
 
 ## `m9_aftermath_01` — narration
 
+### AUTHOR / IMPLEMENTATION NOTE
+
 Project the actual persisted Mission-7 result into the scene.
 
 Do not narrate a canned list.
