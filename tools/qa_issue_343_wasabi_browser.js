@@ -60,6 +60,7 @@ async function boot(browser,label){
   await assertBackdrop(page,BACKDROPS.practical,label+" HEAD START");
   let opening=await info(page);
   assert.strictEqual(opening.performanceLabels.filter(x=>x==="NARRATION").length,1,label+" duplicate NARRATION labels "+JSON.stringify(opening.performanceLabels));
+  await assertStoryPresentationBenchmark(page,"narration",label+" opening narration");
   assert.deepStrictEqual(opening.actors.map(x=>[x.id,x.image]),[
     ["academy_izuno","Assets/Academy Student/academy_izuno.png"],
     ["wasabi_academy_instructor","NPC/izuno_instructor.png"]
@@ -71,12 +72,14 @@ async function boot(browser,label){
   assert.strictEqual(dialogue.speakerActorId,"academy_izuno",label+" Wasabi dialogue not anchored to Wasabi card");
   assert.strictEqual(dialogue.speakerSide,"player",label+" Wasabi dialogue side drift");
   assert.strictEqual(dialogue.actors.find(x=>x.id==="academy_izuno")?.focus,true,label+" Wasabi speaker card not focused");
+  await assertStoryPresentationBenchmark(page,"dialogue",label+" Wasabi dialogue");
   await continueTo(page,"izu_open_6");
   dialogue=await info(page);
   assert.strictEqual(dialogue.speaker,"ACADEMY INSTRUCTOR",label+" Instructor speaker attribution missing");
   assert.strictEqual(dialogue.speakerActorId,"wasabi_academy_instructor",label+" Instructor dialogue not anchored to Instructor card");
   assert.strictEqual(dialogue.speakerSide,"opposition",label+" Instructor dialogue side drift");
   assert.strictEqual(dialogue.actors.find(x=>x.id==="wasabi_academy_instructor")?.focus,true,label+" Instructor speaker card not focused");
+  await assertStoryPresentationBenchmark(page,"dialogue",label+" Instructor dialogue");
   return{context,page,runtimeErrorGate};
 }
 async function info(page){
@@ -100,6 +103,68 @@ async function info(page){
       rootVisible:visible(root),battleVisible:visible(document.querySelector(".alpha-code-battle-stage"))
     };
   });
+}
+async function assertStoryPresentationBenchmark(page,kind,label){
+  const row=await page.evaluate(kind=>{
+    const root=document.getElementById("story-scene-presentation-layer");
+    const stage=root?.querySelector(".sc-chronicle-stage")||root?.querySelector(".sc-story-stage")||root;
+    const layout=root?.querySelector(".sc-chronicle-layout"),panel=root?.querySelector(".sc-story-panel");
+    const rr=n=>{const r=n?.getBoundingClientRect();return r?{left:r.left,top:r.top,width:r.width,height:r.height,right:r.right,bottom:r.bottom}:null;};
+    const actorId=root?.dataset.scCueSpeakerActorId||null;
+    const actor=[...(root?.querySelectorAll(".sc-scene-board-33900__actor")||[])].find(n=>n.dataset.actorId===actorId)||null;
+    const stageRect=rr(stage),layoutRect=rr(layout),panelRect=rr(panel),actorRect=rr(actor);
+    const css=panel?getComputedStyle(panel):null;
+    const tailRaw=layout?.style.getPropertyValue("--sc-cue-speech-tail")||"";
+    const tail=parseFloat(tailRaw)||0;
+    const pointerX=layoutRect&&tail?layoutRect.left+layoutRect.width*(tail/100):null;
+    const actorCenter=actorRect?actorRect.left+actorRect.width/2:null;
+    return{
+      kind,cueKind:root?.dataset.scCueKind||null,stageRect,layoutRect,panelRect,actorRect,
+      actorId,speechX:layout?.style.getPropertyValue("--sc-cue-speech-x")||"",tailRaw,pointerX,actorCenter,
+      borderRadius:css?.borderRadius||"",recordBoardDisplay:getComputedStyle(root?.querySelector(".sc-scene-board-33900")||root).display,
+      primaryText:root?.querySelector(".sc-chronicle-primary")?.textContent?.trim()||""
+    };
+  },kind);
+  assert.strictEqual(row.cueKind,kind,label+" cue kind drift "+JSON.stringify(row));
+  assert(row.stageRect&&row.layoutRect&&row.panelRect,label+" presentation geometry missing "+JSON.stringify(row));
+  if(kind==="narration"){
+    assert(row.layoutRect.width<=row.stageRect.width*.74,label+" narration remains oversized "+JSON.stringify(row));
+    assert(parseFloat(row.borderRadius)>=15,label+" narration panel not on Kakashi rounded treatment "+JSON.stringify(row));
+  }else if(kind==="dialogue"){
+    assert(row.actorId&&row.actorRect,label+" dialogue speaker actor missing "+JSON.stringify(row));
+    assert(row.speechX&&row.tailRaw,label+" dialogue speaker geometry variables missing "+JSON.stringify(row));
+    assert(Math.abs(row.pointerX-row.actorCenter)<=36,label+" dialogue pointer misses speaker "+JSON.stringify(row));
+    assert(row.layoutRect.width<=Math.min(510,row.stageRect.width*.72),label+" dialogue panel too wide "+JSON.stringify(row));
+  }else if(kind==="record"){
+    const stageCenterX=row.stageRect.left+row.stageRect.width/2,stageCenterY=row.stageRect.top+row.stageRect.height/2;
+    const layoutCenterX=row.layoutRect.left+row.layoutRect.width/2,layoutCenterY=row.layoutRect.top+row.layoutRect.height/2;
+    assert(Math.abs(layoutCenterX-stageCenterX)<=8&&Math.abs(layoutCenterY-stageCenterY)<=8,label+" Receipt not centered "+JSON.stringify(row));
+    assert(row.layoutRect.width<=790,label+" Receipt width drift "+JSON.stringify(row));
+    assert.strictEqual(row.recordBoardDisplay,"none",label+" Story tableau still visible behind Receipt");
+    assert.strictEqual(row.primaryText,"CONTINUE",label+" Receipt continuation control drift");
+  }
+  return row;
+}
+async function assertBattlePLRings(page,label){
+  const rows=await page.evaluate(()=>[...document.querySelectorAll(".battle-live-power.alpha-battle-pl-radial")].map(power=>{
+    const ring=power.querySelector(".alpha-battle-pl-ring"),core=ring?.querySelector(".alpha-battle-pl-core"),current=core?.querySelector("strong"),maximum=core?.querySelector("small"),tag=core?.querySelector("em");
+    const rr=n=>{const r=n?.getBoundingClientRect();return r?{left:r.left,top:r.top,width:r.width,height:r.height}:null;};
+    const ringRect=rr(ring),currentRect=rr(current);
+    const centerDelta=ringRect&&currentRect?{
+      x:Math.abs((ringRect.left+ringRect.width/2)-(currentRect.left+currentRect.width/2)),
+      y:Math.abs((ringRect.top+ringRect.height/2)-(currentRect.top+currentRect.height/2))
+    }:null;
+    return{className:power.className,ring:!!ring,core:!!core,current:current?.textContent?.trim()||"",maximum:maximum?.textContent?.trim()||"",tag:tag?.textContent?.trim()||"",fill:ring?.style.getPropertyValue("--battle-pl-fill")||"",centerDelta};
+  }));
+  assert.strictEqual(rows.length,2,label+" expected two active radial PL rings "+JSON.stringify(rows));
+  for(const row of rows){
+    assert(row.ring&&row.core&&/^\d+$/.test(row.current),label+" radial PL core corrupted "+JSON.stringify(row));
+    assert(/^\/\s*\d+$/.test(row.maximum),label+" radial PL maximum corrupted "+JSON.stringify(row));
+    assert.strictEqual(row.tag,"BATTLE PL",label+" radial PL label drift");
+    assert(row.fill.endsWith("%"),label+" radial PL fill missing");
+    assert(row.centerDelta&&row.centerDelta.x<=4&&row.centerDelta.y<=9,label+" PL number not centered inside circle "+JSON.stringify(row));
+  }
+  return rows;
 }
 async function waitBeat(page,id){
   await page.waitForFunction(({scene,id})=>getActiveStorySceneRuntime()?.sceneId===scene&&getActiveStorySceneRuntime()?.beatId===id,{scene:SCENE,id},{timeout:12000});
@@ -221,6 +286,7 @@ async function finishFromCurrent(page,label,reflection="Sometimes the fastest pa
   const receipt=await info(page);
   assert.strictEqual(receipt.cueKind,"record",label+" Chronicle Receipt presentation mode missing");
   assert.strictEqual(receipt.speaker,"CHRONICLE RECEIPT",label+" Chronicle Receipt heading missing");
+  await assertStoryPresentationBenchmark(page,"record",label+" Chronicle Receipt");
   for(const heading of ["YOUR ORIGIN","ACADEMY WASABI IZUNO","RECORDED IN YOUR CHRONICLE","YOUR DECISIONS","WHAT HAPPENED","HISTORY CREATED","REWARDS"]){
     assert(receipt.text.includes(heading),label+" Chronicle Receipt missing "+heading);
   }
@@ -331,6 +397,7 @@ async function launchBattle(page,label){
   assert.deepStrictEqual(battle.rewards?.items||[],[]);assert.deepStrictEqual(battle.rewards?.rareDrops||[],[]);
   assert.strictEqual(battle.rewards?.requiresExplicitPostClaimContinue,true,"CLAIM collapsed into CONTINUE");
   assert(!battle.buttons.some(x=>/^WITHDRAW$/i.test(x)||/^SWITCH$/i.test(x)),"WITHDRAW/successor control visible in strict 1v1");
+  await assertBattlePLRings(page,label+" initial Battle");
   await shot(page,label,"battle",".alpha-code-battle-stage");
   return battle;
 }
@@ -395,6 +462,7 @@ async function reloadBattle(page,battle,label){
   assert.strictEqual(after.environmentPath,BACKDROPS.alley,label+" reloaded Battle environment drift");
   assert.strictEqual(after.presentationEnvironmentPath,BACKDROPS.alley,label+" reloaded Battle presentation environment drift");
   assert.deepStrictEqual(after.playerSlots,[WASABI]);assert.deepStrictEqual(after.enemySlots,[ROGUE]);
+  await assertBattlePLRings(page,label+" reloaded Battle");
   assert(after.store[battle.battleId],label+" launch receipt missing after reload");
   return after;
 }
@@ -511,7 +579,7 @@ async function runBattleRoute(browser,outcome){
       exactSourceOccurrences:[TRACKING,INTERCEPT,COOP,ROGUE_OCC,RIVER],
       strictOneVsOneBattle:true,battleSaveReload:true,bothBattleOutcomesReturn:true,
       fixedBattleVictoryRyo:50,sharedOriginStartingPurseRyo:100,claimSeparateFromContinue:true,exactBackdropContract:true,postBattleAlleyReturn:true,exactBattleEnvironment:true,
-      acceptedProgressionMappings409:true,riverStaminaDevelopment:true,visibleWasabiInstructorCards:true,speakerOwnedDialogue:true,singleNarrationLabel:true,originChronicleReceipt:true,
+      acceptedProgressionMappings409:true,riverStaminaDevelopment:true,visibleWasabiInstructorCards:true,speakerOwnedDialogue:true,speakerLinkedDialoguePointer:true,kakashiNarrationGeometry:true,singleNarrationLabel:true,originChronicleReceipt:true,kakashiReceiptGeometry:true,radialPLCoreCentered:true,
       rewardSpectrum409Consumed:true,originToChronicleBegins:true,browserGoldenClaimed:false
     };
     fs.writeFileSync(path.join(OUT,"summary.json"),JSON.stringify({summary,results},null,2));
