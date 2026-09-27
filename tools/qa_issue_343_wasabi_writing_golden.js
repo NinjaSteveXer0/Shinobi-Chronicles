@@ -63,6 +63,25 @@ assert.deepStrictEqual(labels("izu_reflect"),[
   "Next time I'm trusting the trail.","Next time I'm trusting what I notice.","Sometimes the fastest path isn't the obvious one.","Catching them wasn't the only thing that mattered."
 ]);
 
+// Writing-closed 2026-09-27 exact backdrop contract.
+for(const backdrop of [
+  "Izuno Origin Backdrop/practical_ground_day.png",
+  "Izuno Origin Backdrop/konoha_rooftop_pursuit_day.png",
+  "Izuno Origin Backdrop/konoha_main_street.png",
+  "Izuno Origin Backdrop/river_route_day.png",
+  "Izuno Origin Backdrop/konoha_narrow_yard.png",
+  "Izuno Origin Backdrop/konoha_alleyway_day.png",
+  "Izuno Origin Backdrop/training_grounds_day.png"
+])assert(wasabiSource.includes(backdrop),"missing exact Wasabi backdrop binding "+backdrop);
+assert(wasabiSource.includes("function izunoBackdropKey32900"),"Wasabi backdrop resolver missing");
+assert(wasabiSource.includes('if(id.startsWith("izu_rogue_"))return"alley"'),"Scene 4C alley continuity missing");
+assert(wasabiSource.includes('id.startsWith("izu_finish_")'),"Scene 5 training convergence missing");
+assert(wasabiSource.includes("registerWasabiOriginPresentation32900();"),"Wasabi Scene Board backdrop registration missing");
+const returnBridge=byId.get("izu_rogue_step_in_return_1");
+assert(returnBridge&&returnBridge.mode==="post_battle","STEP IN does not return through dedicated post-Battle alley bridge");
+assert.strictEqual(returnBridge.nextBeatId,"izu_finish_secondary_1","STEP IN return skips Scene 5 secondary finish");
+assert.deepStrictEqual(cueTexts("izu_finish_secondary"),Array.from(storyCtx.SC_ACADEMY_WASABI_WRITING_GOLDEN_343.get("finish_secondary"),cue=>cue.text),"Scene 5 secondary finish prose drifted");
+
 // Approved voice/dialogue anchors from Writing GOLDEN.
 for(const [prefix,line] of [
   ["izu_open","That's not a time."],
@@ -96,6 +115,9 @@ for(const b of beats){
   if(b.battle){
     assert.strictEqual(b.beatId,"izu_rogue_step_in_battle","unauthorised Wasabi PL Battle "+b.beatId);
     assert.strictEqual(b.battle.encounterId,"origin_academy_izuno_rogue_genin_step_in");
+    assert.strictEqual(b.battle.battleConfigId,"academy_izuno_origin_rogue_genin_step_in_battle");
+    assert.strictEqual(b.battle.environmentPath,"Izuno Origin Backdrop/konoha_alleyway_day.png");
+    assert.strictEqual(b.battle.backdrop,"Izuno Origin Backdrop/konoha_alleyway_day.png");
     assert.strictEqual(b.battle.victoryBeatId,"izu_rogue_step_in_return_1");
     assert.strictEqual(b.battle.defeatBeatId,"izu_rogue_step_in_return_1");
   }
@@ -274,6 +296,9 @@ assert.strictEqual(battleCtx.currentBattle.rewards.ryo,0);assert.strictEqual(bat
 assert.strictEqual(Array.from(battleCtx.currentBattle.rewards.items||[]).length,0);assert.strictEqual(Array.from(battleCtx.currentBattle.rewards.rareDrops||[]).length,0);
 assert.strictEqual(battleCtx.currentBattle.rewards.requiresExplicitPostClaimContinue,true);
 assert.strictEqual(battleCtx.currentBattle.wasabi343.strictOneVsOne,true);
+assert.strictEqual(battleCtx.currentBattle.environmentPath,"Izuno Origin Backdrop/konoha_alleyway_day.png");
+assert.strictEqual(battleCtx.currentBattle.presentationEnvironmentPath,"Izuno Origin Backdrop/konoha_alleyway_day.png");
+assert.strictEqual(battleCtx.currentBattle.wasabi343.environmentPath,"Izuno Origin Backdrop/konoha_alleyway_day.png");
 assert(!battleCtx.renderBattleActionFamilyRow({id:"academy_izuno"}).includes("WITHDRAW"),"strict 1v1 renderer leaked WITHDRAW");
 const savedWasabi343=battleCtx.currentBattle.wasabi343;delete battleCtx.currentBattle.wasabi343;
 assert(battleCtx.renderBattleActionFamilyRow({id:"academy_izuno"}).includes("WITHDRAW"),"non-Wasabi Battle renderer was altered");
@@ -292,6 +317,8 @@ assert.strictEqual(battleCtx.currentBattle.wasabi343.battleOccurrenceId,launched
 assert.strictEqual(battleCtx.currentBattle.battleConfigId,"academy_izuno_origin_rogue_genin_step_in_battle","session restore did not reconstruct Wasabi Battle config");
 assert.strictEqual(battleCtx.currentBattle.battleId,launched.battleId,"session restore did not reconstruct exact Wasabi Battle occurrence");
 assert.strictEqual(battleCtx.currentBattle.active,true,"session restore did not reactivate the saved Wasabi Battle");
+assert.strictEqual(battleCtx.currentBattle.environmentPath,"Izuno Origin Backdrop/konoha_alleyway_day.png","session restore lost exact Wasabi Battle environment");
+assert.strictEqual(battleCtx.currentBattle.presentationEnvironmentPath,"Izuno Origin Backdrop/konoha_alleyway_day.png","session restore lost exact Wasabi presentation environment");
 assert(battleCtx.playerData.wasabi343BattleLaunches[launched.battleId],"session restore did not reconstruct Wasabi launch idempotence receipt");
 assert.deepStrictEqual(Array.from(battleCtx.currentBattle.deployment.player.slots||[],x=>x.participantId),["academy_izuno"],"session restore drifted Wasabi deployment");
 assert.deepStrictEqual(Array.from(battleCtx.currentBattle.deployment.enemy.slots||[],x=>x.participantId),["wasabi_origin_rogue_genin_01"],"session restore drifted Rogue deployment");
