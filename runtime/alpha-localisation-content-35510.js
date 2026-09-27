@@ -98,6 +98,21 @@ const PAIRS=Object.freeze([
   ["Next time I'll trust what I notice.","La próxima vez confiaré en lo que note."],
   ["Sometimes the fastest path isn't the obvious one.","A veces el camino más rápido no es el más evidente."],
   ["Catching them wasn't the only thing that mattered.","Atraparlos no era lo único que importaba."],
+  // #343 Academy Wasabi Writing-Golden functional choice surfaces.
+  ["TAKE THE OBVIOUS TRAIL","SIGUE EL RASTRO EVIDENTE"],
+  ["LOOK FOR SOMETHING BETTER","BUSCA ALGO MEJOR"],
+  ["WORK WITH THE OTHERS","TRABAJA CON LOS DEMÁS"],
+  ["FORGET THE TRAIL — WHERE ARE THEY GOING?","OLVÍDATE DEL RASTRO — ¿ADÓNDE VAN?"],
+  ["TAKE THE RIVER","VE POR EL RÍO"],
+  ["FOLLOW THE STRONGER TRAIL","SIGUE EL RASTRO MÁS FUERTE"],
+  ["CHECK THE SHOUTING","INVESTIGA LOS GRITOS"],
+  ["CUT FOR THE INTERCEPT","CORTA CAMINO PARA INTERCEPTARLOS"],
+  ["STEP IN","INTERVÉN"],
+  ["CALL FOR HELP","PIDE AYUDA"],
+  ["KEEP PURSUING","SIGUE PERSIGUIENDO"],
+  ["RESOLVE RESULT","RESOLVER RESULTADO"],
+  ["Next time I'm trusting the trail.","La próxima vez confiaré en el rastro."],
+  ["Next time I'm trusting what I notice.","La próxima vez confiaré en lo que note."],
   ["No Speed/Agility stat, morality score or automatic specialization is created.","No se crea ninguna estadística de Velocidad/Agilidad, puntuación moral ni especialización automática."],
 
   // Mirai.
