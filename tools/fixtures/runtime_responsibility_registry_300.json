@@ -881,7 +881,10 @@
         "academy_wasabi_rogue_battle_adapter_343"
       ],
       "retiredOwners": [
-        "runtime/alpha-origin-scenes-32900-a.js::pre343_compressed_academy_izuno"
+        "runtime/alpha-origin-scenes-32900-a.js::pre343_compressed_academy_izuno",
+        "runtime/alpha-origin-browser-realisation-33500.js::patchIzuno33500",
+        "runtime/alpha-early-story-modernization-33600.js::patchIzuno",
+        "runtime/alpha-origin-screen-first-33700.js::patchIzuno"
       ],
       "saveSchemaRefs": [
         "activeStorySceneRuntime.localContext Wasabi pursuit facts",
