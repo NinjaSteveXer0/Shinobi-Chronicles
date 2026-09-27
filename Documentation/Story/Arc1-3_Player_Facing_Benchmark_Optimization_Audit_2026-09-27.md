@@ -662,3 +662,34 @@ Arc 3 benchmark successor set remains:
 **WRITING AMBER — BENCHMARK-OPTIMIZED CANDIDATE / STEPHEN SCENE-LEVEL REVIEW PENDING**
 
 This cleanup does not promote Arc 3 to WRITING GOLDEN and does not create a duplicate implementation handoff. Existing coordination issue #154 already owns the Arc-3 downstream implementation/content route.
+
+
+---
+
+# 19. Post-sweep Arc 1 #333 hard-separation cleanup
+
+Because Arc 1 is the immediate runtime/review priority, the same live-main #333 audit was run against the Arc-1 successor set.
+
+Mission 1 required no source change.
+
+Four small boundary defects were found across the remaining Arc-1 candidates:
+- author/state-commit guidance embedded after M2 narration;
+- specification wording inside the conditional Sarutobi evidence beat;
+- M9 factual aftermath projection guidance labelled directly as narration;
+- M11/M12 resolver/performance safeguards embedded in player-facing cue blocks.
+
+No Arc-1 route, occurrence meaning, outcome family, Battle result, evidence state, Chronicle history, or asset mapping changed.
+
+## Commits
+
+- Arc 1 M2–6 cleanup: `cf5d5ff4aaf039f9b0a8b4ddb3a4e128d2ae24c7`
+- Arc 1 M7–10 cleanup: `81b308e244d025e8ed51eb91427fb95d4d9fb5ba`
+- Arc 1 M11–12 cleanup: `e928d052af70c5bef693a981b4bcc0defdab2154`
+
+## Status
+
+The Arc-1 successor set remains:
+
+**WRITING AMBER — BENCHMARK-OPTIMIZED CANDIDATE / STEPHEN SCENE-LEVEL REVIEW PENDING**
+
+No new downstream issue is required. Existing Arc/runtime implementation and coordination lanes remain authoritative.
