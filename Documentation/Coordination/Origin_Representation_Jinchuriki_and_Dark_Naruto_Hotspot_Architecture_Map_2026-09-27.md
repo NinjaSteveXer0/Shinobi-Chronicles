@@ -1074,13 +1074,29 @@ Canonical benchmark chain:
 
 Do not rewrite the premise as `Orochimaru chooses Hinata because she has Byakugan`.
 
-## 12.17 Origin Evolution repeated-card stacking remains deliberately OPEN
+## 12.17 Origin Evolution is once per exact card — LOCKED
 
-One important balancing question is NOT locked yet:
+Stephen has now closed the remaining Evolution stacking question.
 
-> Can the same non-Origin card consume multiple difficulty-tier Evolution entitlements?
+> **Each exact card may undergo Origin/Beta Evolution at most once.**
 
-Current recommended safeguard remains one standard Evolution per exact card unless a later explicit multi-tier Evolution system is authored, but Stephen has not yet closed this power-ceiling decision.
+This applies whether the card is:
+- the selected Origin card; or
+- the one additional eligible Evolution target granted by a completed difficulty entitlement.
 
-Do not implement either behaviour by inference.
+Once an exact card has consumed its Evolution:
+- that card is permanently marked as Evolved for this system;
+- it cannot consume a later difficulty-tier Evolution entitlement;
+- it cannot be Evolved again at a higher difficulty;
+- it cannot stack Academy + Genin + Chūnin + later Evolution rewards on the same exact card;
+- repeated completion/reload/replay cannot regrant or recommit its Evolution.
 
+A later difficulty entitlement must therefore be spent on a **different eligible, not-yet-Evolved exact card** within that entitlement's allowed difficulty ceiling.
+
+Canonical rule:
+
+> **Evolution is one-time per exact card, non-repeatable and non-stackable.**
+
+This does not forbid a future separately-authored transformation, Jinchūriki state, Curse Mark, Enhancement, development path or other power system from affecting the same Character/card where compatibility is explicitly authorised. Those are separate systems and must not be treated as a second Evolution.
+
+Runtime/persistence must eventually preserve exact per-card Evolution-consumed state and entitlement-consumption provenance so save/load, Legacy flow or representation refresh cannot duplicate the Evolution.
