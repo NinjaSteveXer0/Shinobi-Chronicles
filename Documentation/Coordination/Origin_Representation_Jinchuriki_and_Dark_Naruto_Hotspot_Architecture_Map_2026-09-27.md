@@ -592,3 +592,282 @@ Acts only after exact owner contracts close. Coding must not invent Origin Evolu
 - exact relationship consequences / reconciliation route.
 
 **design clarified != owner mechanics closed != implemented != runtime validated != Golden/regression GREEN**
+
+---
+
+# 9. BETA LOCK — Origin Evolution entitlement and visual identity
+
+## 9.1 Beta scope timing
+
+Origin Evolution is a **Beta feature**.
+
+It must NOT expand Alpha scope or interrupt:
+- Academy Origin completion / Golden;
+- Tutorial completion;
+- first open-world/free-play activation.
+
+Activation target:
+
+> **Origins GREEN -> Tutorial GREEN -> game opens into ordinary play -> Beta Evolution/advanced progression systems may begin integration.**
+
+## 9.2 Evolved-card visual lock
+
+An evolved card must receive a visibly premium / badass evolved presentation that makes its increased status obvious while preserving the represented Character identity.
+
+The Evolution presentation must include a deliberately upgraded combination of:
+- **background**;
+- **frame**;
+- **card graphics / internal visual treatment**;
+- other approved presentation effects that clearly communicate that this exact card has become more powerful.
+
+This is not merely a Stat change hidden behind the same collectible presentation.
+
+Character Creation / Visuals owns the final Evolution art language; UI / Assets owns exact production projection; mechanics remain Progression/PL authority.
+
+Preserve:
+
+> **Evolution visual state != new person.**
+
+> **Evolution visual state != automatic Rank change.**
+
+> **Evolution art != mechanical authority by itself.**
+
+## 9.3 Difficulty-bounded Evolution entitlement
+
+For Beta, completion of a difficulty level grants an Evolution entitlement consisting of:
+
+1. the player's **Origin Character** as the privileged Origin-evolution target under the Origin Evolution system; and
+2. **exactly ONE additional non-Origin card Evolution choice** associated with that completed difficulty entitlement.
+
+The additional choice may be spent on one eligible card whose represented Rank/stage is **at or below the completed difficulty**.
+
+Example:
+
+> Completing **Chūnin difficulty** permits the additional Evolution choice to target exactly one eligible **Academy Student OR Genin OR Chūnin** card.
+
+It does **NOT** permit:
+
+- one Academy Student Evolution;
+- plus one Genin Evolution;
+- plus one Chūnin Evolution.
+
+The entitlement is one additional card, chosen from the complete eligible range at or below that difficulty.
+
+Canonical shorthand:
+
+> **completed difficulty entitlement = Origin Evolution access + ONE extra Evolution choice bounded to that difficulty or lower.**
+
+Different completed difficulty levels may each create their own one-extra entitlement according to the future Beta entitlement ledger; one entitlement never multiplies itself into one Evolution per eligible Rank band.
+
+Exact save/account/Legacy receipt mechanics remain future Progression/Legacy/Coding closure.
+
+## 9.4 Difficulty does not rewrite Base
+
+The difficulty ceiling controls **which cards may consume that extra Evolution entitlement**.
+
+It does not rewrite the selected card's canonical Base Stats/PL or formal Rank.
+
+A Chūnin-difficulty entitlement applied to an Academy card does not make that Academy card formally Chūnin-ranked.
+
+Preserve:
+
+> **difficulty eligibility ceiling != Rank mutation.**
+
+> **Evolution != Promotion.**
+
+> **Evolution != representation replacement.**
+
+---
+
+# 10. FUTURE DESIGN FRAME — CE power-source relationship / attunement pathways
+
+This section records the current brainstorming direction for later deliberate design closure. It is **NOT yet a final numeric/system lock** except where explicitly stated above.
+
+The reusable design problem is broader than Jinchūriki:
+
+> How does CE let a Character build enough legitimate history with a powerful external source that a hidden transformation / hosting / enhancement pathway becomes possible?
+
+A single generic friendship meter is insufficient because different sources have different causal relationships.
+
+Use one reusable **Source Relationship / Attunement evidence framework** with source-specific meanings.
+
+## 10.1 Reusable causal ladder
+
+Candidate reusable flow:
+
+**discover source**
+-> **prove access / defeat / acquire contact**
+-> **establish controlled repeatable interaction**
+-> **accumulate source-specific relationship / compatibility / control evidence**
+-> **unlock hidden opportunity**
+-> **perform irreversible/major host or enhancement transaction**
+-> **develop staged representations / capabilities**
+
+CE should build this from committed occurrences, not background time and not UI clicks.
+
+## 10.2 Tailed Beast / Jinchūriki Part 2 direction
+
+Stephen's current preferred direction for a future Sakura + Chōmei style route is:
+
+1. player earns legitimate account/Legacy access to a Tailed Beast opportunity;
+2. the Beast is found through authored World content such as a hidden area, hotspot, encounter or equivalent;
+3. the player must confront / defeat / otherwise resolve the Beast according to exact content;
+4. the Beast becomes legitimately usable in some bounded way before hosting;
+5. current preferred design direction is that a Tailed Beast may first become usable through a **Summon-like / deployable source-access phase** before it can become a Hosted Entity;
+6. repeated legitimate interaction / use / history creates the evidence needed for a deeper relationship/attunement state;
+7. when exact prerequisites are met, a **secret location / hidden Jinchūriki-creation opportunity** becomes eligible;
+8. the hosting/sealing transaction then creates the persistent host relationship;
+9. Resonance -> Manifestation -> Avatar progression begins from the new hosted state.
+
+Important:
+
+- Tailed Beast != ordinary Summon ontology;
+- "Summon-like first" is currently a **preferred access-path direction**, not permission to reclassify Bijū as ordinary Summons;
+- exact defeat/capture/access semantics remain Acquisition/World/Combat work;
+- hosting remains a separate transaction;
+- owning the Beast card + owning Sakura is not sufficient by itself.
+
+## 10.3 Legacy cadence candidate — NOT LOCKED
+
+Stephen supplied a useful example cadence:
+
+> **one Bijū unlock opportunity per five Legacy playthroughs.**
+
+This is recorded as a **candidate pacing/economy model**, not yet a locked numeric rule.
+
+The design intent behind it is authoritative:
+
+- Bijū access should be rare / earned;
+- Legacy completion may be an account-level source of opportunity;
+- the player should not instantly collect every Tailed Beast;
+- Tailed Beast access should create long-horizon goals across Chronicles.
+
+Exact cadence, whether unlock means eligibility / encounter access / source claim / something else, and how different difficulty completions count remain future Legacy/Acquisition design.
+
+## 10.4 Relationship evidence for sentient sources
+
+For Tailed Beasts and other sentient sources, CE may legitimately accumulate evidence such as:
+
+- repeated deployment/cooperation;
+- voluntary aid;
+- successful communication;
+- treatment after Battle;
+- promises kept/broken;
+- protection;
+- coercion;
+- refusal;
+- release/restraint choices;
+- shared victories/defeats;
+- source-specific dialogue/Story outcomes;
+- authored training;
+- reconciliation after conflict.
+
+These should be factual records, not automatically collapsed to one global friendship number.
+
+A source can have multiple simultaneous dimensions such as:
+- trust;
+- respect;
+- fear;
+- coercion;
+- cooperation;
+- compatibility;
+- control;
+- resentment;
+- familiarity.
+
+The exact dimensions need not be universal for every source.
+
+## 10.5 Non-sentient / imposed sources — Curse Mark family
+
+Curse Mark should reuse the same **causal evidence architecture** without pretending the Mark itself is a social relationship.
+
+For Curse Mark-style systems the relevant state may instead include:
+
+- source access/provenance;
+- implantation / application occurrence;
+- physiological compatibility;
+- survival/adaptation;
+- control;
+- suppression;
+- corruption/risk exposure;
+- repeated legitimate use;
+- specialist training;
+- source-creator / teacher relationship where relevant;
+- current Stage access.
+
+The live project already contains:
+- `Assets/Transformations/curse_mark_hinata.png`;
+- `Assets/Transformations/cs_anko.png`;
+- `Assets/Transformations/l2_anko.png`;
+- `Assets/Transformations/cs_sasuke.png`.
+
+These assets prove current/future representation demand, not mechanics.
+
+A future Curse Mark pathway may therefore follow a structurally similar flow:
+
+**discover/contact source**
+-> **qualify for application**
+-> **survive / stabilise**
+-> **gain Level 1 access**
+-> **build control/adaptation history**
+-> **hidden advancement opportunity**
+-> **Level 2 / later authored state**
+
+Exact Anko/Hinata/Sasuke rules remain source-specific. Do not infer shared Stats/Skills from asset similarity.
+
+## 10.6 Secret opportunity rule
+
+For both Jinchūriki creation and Curse Mark advancement, the hidden opportunity should only become eligible when committed Chronicle evidence proves the prerequisites.
+
+It should not appear as:
+- a greyed-out map icon;
+- a universal menu;
+- a shop upgrade;
+- a checklist that leaks undiscovered content.
+
+This extends current World v3 doctrine:
+
+> **different histories create different eligible opportunity spaces.**
+
+The same hidden location may even support different source-specific content depending on Chronicle history, but location != event != opportunity.
+
+## 10.7 Source lifecycle state
+
+The reusable CE envelope should eventually be able to distinguish:
+
+- source known;
+- source encountered;
+- source defeated/resolved;
+- source accessible;
+- source deployable;
+- source relationship/attunement developing;
+- source eligible for host/application transaction;
+- source hosted/applied;
+- stage progression;
+- extracted/removed/suppressed/lost;
+- prior history retained after loss.
+
+This is deliberately broader than Jinchūriki so Curse Marks, Hosted Entities, Summon-assisted powers and future special-source systems can reuse the same causal grammar without sharing inappropriate mechanics.
+
+---
+
+# 11. Beta activation / production sequencing lock
+
+These advanced systems are deliberately queued **after the game actually opens up**.
+
+Do not implement them as blockers before:
+1. all required Origins are playable/Golden to current Alpha target;
+2. Tutorial/opening flow is functioning;
+3. ordinary map/free-play loop exists;
+4. player can legitimately train, discover, fight, acquire, revisit and build Chronicle history.
+
+Reason:
+
+> Origin Evolution, created Jinchūriki, Curse Mark growth and Dark Naruto only become meaningful when the player has an actual game world in which to earn them.
+
+Until then:
+- record durable design;
+- prepare assets/contracts where useful;
+- do not turn future progression into Alpha blockers;
+- do not ask Coding to implement incomplete advanced systems.
+
