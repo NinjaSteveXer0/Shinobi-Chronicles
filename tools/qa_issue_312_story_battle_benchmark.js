@@ -20,6 +20,8 @@ const ownership=JSON.parse(read("tools/fixtures/runtime_responsibility_registry_
 
 assert(!storySource.includes("new MutationObserver"),"#312 shared Story owner must not depend on MutationObserver");
 assert(storySource.includes("SEMANTIC_STAGE_ANCHORS"),"#312 semantic Story anchors missing");
+assert(storySource.includes("expandStoryPerformanceSequence33900")&&storySource.includes("__sourceCueIndex33900"),"#370 paragraph pagination/source cue identity missing");
+assert(storySource.includes(':not([data-sc-cue-kind="record"]) .sc-story-text{max-height:none!important;overflow:visible!important;}'),"#370 ordinary Story text can still require an internal scrollbar");
 for(const token of ["PLAYER_LEFT","INNER_LEFT","CENTER","CENTER_OBJECT","INNER_RIGHT","OPPONENT_RIGHT","FAR_ENTRY_LEFT","FAR_ENTRY_RIGHT"]){
   assert(storySource.includes(token),"#312 Story anchor missing "+token);
 }
@@ -167,11 +169,19 @@ assert(kv2Battle.includes('available:!!enemy&&!sourceState("silent_body_flicker_
     setTimeout,clearTimeout,Map,Set,Object,Array,String,Number,Boolean,JSON,Math
   };
   ctx.globalThis=ctx;vm.createContext(ctx);vm.runInContext(storySource,ctx,{filename:"alpha-story-scene-board-33900.js"});
-  ctx.registerStorySceneBoardDefinition("qa_scene",{performanceSequences:{beat_a:[{kind:"narration",text:"A"},{kind:"narration",text:"B"}]}});
+  ctx.registerStorySceneBoardDefinition("qa_scene",{performanceSequences:{beat_a:[{kind:"narration",text:"A\n\nA2"},{kind:"narration",text:"B"}]}});
+  let perf=ctx.getStoryScenePerformance33900();
+  assert(perf&&perf.cue.text==="A"&&perf.sourceIndex===0&&perf.segmentIndex===0&&perf.segmentCount===2,"#370 first paragraph page/source ordinal incorrect");
   const first=ctx.advanceStoryScene();
   assert(first&&first.semanticBeatUnchanged===true&&semanticAdvanceCount===0,"#312 cue advance committed Story truth");
+  perf=ctx.getStoryScenePerformance33900();
+  assert(perf&&perf.cue.text==="A2"&&perf.sourceIndex===0&&perf.segmentIndex===1,"#370 second paragraph did not preserve parent cue identity");
   const second=ctx.advanceStoryScene();
-  assert(second&&second.success===true&&semanticAdvanceCount===1&&runtime.beatId==="beat_b","#312 semantic advancement was delayed/blocked by presentation");
+  assert(second&&second.semanticBeatUnchanged===true&&semanticAdvanceCount===0,"#370 paragraph pagination advanced Story truth early");
+  perf=ctx.getStoryScenePerformance33900();
+  assert(perf&&perf.cue.text==="B"&&perf.sourceIndex===1,"#370 source cue ordinal drift after pagination");
+  const third=ctx.advanceStoryScene();
+  assert(third&&third.success===true&&semanticAdvanceCount===1&&runtime.beatId==="beat_b","#312 semantic advancement was delayed/blocked by presentation");
 }
 
 // Executable Battle projection probes: the visual layer must derive its result
