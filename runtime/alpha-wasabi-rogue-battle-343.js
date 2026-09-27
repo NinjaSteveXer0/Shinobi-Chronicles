@@ -68,6 +68,14 @@ function feintAction(){
     }
   };
 }
+function fixedDamageAction(id,authoredAttackPL,options={}){
+  const action=makeEnemyFixedDamageAction(id,authoredAttackPL,options);
+  if(action&&typeof action==="object"){
+    action.authoredAttackPL=Math.max(0,Math.round(Number(authoredAttackPL)||0));
+    action.primaryDiscipline=options.primaryDiscipline||null;
+  }
+  return action;
+}
 function registerProfile(){
   if(typeof enemyDatabase!=="object"||!enemyDatabase)return{success:false,reason:"enemy_database_missing"};
   enemyDatabase[ROGUE]={
@@ -84,8 +92,8 @@ function registerProfile(){
     noSummon:true,noTransformation:true,noBossScaling:true
   };
   enemyDatabase[ROGUE].authoredBattleActions=[
-    makeEnemyFixedDamageAction("enemy_rogue_genin_kunai_rush",9,{primaryDiscipline:"Bukijutsu",traits:["one_authored_damage_packet","stamina_mitigated","no_bleed","no_stun","no_displacement","no_speed_modifier"]}),
-    makeEnemyFixedDamageAction("enemy_rogue_genin_shuriken_spread",7,{primaryDiscipline:"Bukijutsu",traits:["multiple_projectiles_one_packet","stamina_mitigated","no_hit_rng"]}),
+    fixedDamageAction("enemy_rogue_genin_kunai_rush",9,{primaryDiscipline:"Bukijutsu",traits:["one_authored_damage_packet","stamina_mitigated","no_bleed","no_stun","no_displacement","no_speed_modifier"]}),
+    fixedDamageAction("enemy_rogue_genin_shuriken_spread",7,{primaryDiscipline:"Bukijutsu",traits:["multiple_projectiles_one_packet","stamina_mitigated","no_hit_rng"]}),
     feintAction()
   ];
   return{success:true};
