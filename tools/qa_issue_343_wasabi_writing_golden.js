@@ -6,12 +6,14 @@ const fs=require("fs"),vm=require("vm"),assert=require("assert");
 const STORY="runtime/alpha-origin-scenes-32900-a.js";
 const CATALOGUE="runtime/academy-wasabi-writing-golden-343.js";
 const BATTLE="runtime/alpha-wasabi-rogue-battle-343.js";
+const CORE="game.js";
 const DOC="Documentation/Story/Academy_Wasabi_Izuno_Origin_WRITING_GOLDEN_2026-09-24.md";
-for(const p of [STORY,CATALOGUE,BATTLE,DOC])assert(fs.existsSync(p),"missing #343 authority/runtime file "+p);
+for(const p of [STORY,CATALOGUE,BATTLE,CORE,DOC])assert(fs.existsSync(p),"missing #343 authority/runtime file "+p);
 
 const storySource=fs.readFileSync(STORY,"utf8");
 const catalogueSource=fs.readFileSync(CATALOGUE,"utf8");
 const battleSource=fs.readFileSync(BATTLE,"utf8");
+const coreSource=fs.readFileSync(CORE,"utf8");
 const doc=fs.readFileSync(DOC,"utf8");
 
 const scenes=new Map(),commits=[];
@@ -75,6 +77,16 @@ for(const [prefix,line] of [
 ]) assert(cueTexts(prefix).includes(line),"missing GOLDEN line "+prefix+" :: "+line);
 assert(storyCtx.SC_ACADEMY_WASABI_WRITING_GOLDEN_343.get("eval_rogue_call_help").some(c=>c.text==="You handed it off."));
 assert(storyCtx.SC_ACADEMY_WASABI_WRITING_GOLDEN_343.get("eval_rogue_keep_pursuing").some(c=>c.text==="The instructor doesn't mention the Rogue Genin first."));
+
+// Shared Story core must preserve machine resolvers instead of normalising
+// them into terminal dialogue beats. Internal resolver labels are never player choices.
+assert(coreSource.includes('"resolver"')&&coreSource.includes('machineResolved:beat.machineResolved===true'),"core Story normalizer drops #343 resolver authority");
+assert(coreSource.includes('function resolveMachineStorySceneBeat()'),"shared machine Story resolver missing");
+assert(coreSource.includes('story_machine_resolver_cardinality_invalid')&&coreSource.includes('available.length!==1'),"machine resolver does not fail closed on non-single eligibility");
+assert(coreSource.includes('applyStorySceneChoice(available[0].choiceId)'),"machine resolver bypasses existing Story choice authority");
+assert(coreSource.includes('story_machine_resolver_player_choice_forbidden'),"machine resolver accepts player-forced internal branch");
+assert(coreSource.includes('beat.mode==="resolver"&&beat.machineResolved===true?[]:beat.choices'),"machine resolver internal choices leak into observer projection");
+assert(!coreSource.slice(coreSource.indexOf("function resolveMachineStorySceneBeat()"),coreSource.indexOf("function advanceStoryScene",coreSource.indexOf("function resolveMachineStorySceneBeat()"))).includes(".label"),"machine resolver infers semantics from labels");
 
 // Closed graph and one legal PL Battle seam only.
 const ids=new Set(beats.map(b=>b.beatId));
