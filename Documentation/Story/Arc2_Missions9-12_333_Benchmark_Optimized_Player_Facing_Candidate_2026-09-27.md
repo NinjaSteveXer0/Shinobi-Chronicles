@@ -233,6 +233,8 @@ It is what survived with them—
 
 and what survived without them.
 
+### AUTHOR / IMPLEMENTATION NOTE
+
 Project exact current:
 - records;
 - people;
@@ -566,7 +568,7 @@ Because people saw what his organisation prevented.
 
 Minato's freeze stops legitimate Konoha units from acting on forged orders across several sites.
 
-That prevents something larger than the confrontation in front of the player.
+That keeps several smaller confrontations from becoming one village-wide clash.
 
 It also means some local defenders spend too long waiting for permission they believe should have arrived sooner.
 
@@ -585,6 +587,8 @@ Both facts survive the mission.
 ## `a2m10_sasuke_argument` — dialogue — SASUKE
 
 **SASUKE:** “If the same chain keeps deciding whether it was compromised, they already won.”
+
+### AUTHOR / IMPLEMENTATION NOTE
 
 Do not add a narrator paragraph declaring which one is right.
 
@@ -707,6 +711,8 @@ Then, if challenged:
 
 **SASUKE:** “If the people and the independent proof are erased while everyone protects the command centre, restoring communications only restores the same monopoly we're already fighting about.”
 
+### AUTHOR / IMPLEMENTATION NOTE
+
 Do not label it “the second order” in dialogue.
 
 The player experiences two real directives.
@@ -746,6 +752,8 @@ The chosen front carries costs elsewhere.
 ## `a2m11_updates_01` — narration
 
 Information from the other fronts arrives late, incomplete and through people who were actually there.
+
+### AUTHOR / IMPLEMENTATION NOTE
 
 Never give omniscient certainty.
 
@@ -806,6 +814,8 @@ The attackers arranged the test.
 
 Konoha supplied the disagreement.
 
+### AUTHOR / IMPLEMENTATION NOTE
+
 Let the player infer the consequence.
 
 ---
@@ -827,6 +837,8 @@ Let the player infer the consequence.
 ## `a2m11_sasuke_fracture_02` — dialogue — SASUKE
 
 **SASUKE:** “So does asking the people you failed to protect to keep waiting.”
+
+### AUTHOR / IMPLEMENTATION NOTE
 
 Stop.
 
@@ -1038,6 +1050,8 @@ Both men are handed a reason to strike first.
 
 Both refuse it.
 
+### AUTHOR / IMPLEMENTATION NOTE
+
 Do not narrate a moral score afterward.
 
 ---
@@ -1207,6 +1221,8 @@ If Menma's final thought turns toward what comes next:
 Menma does not answer.
 
 He leaves.
+
+### AUTHOR / IMPLEMENTATION NOTE
 
 Do not convert the silence into a route selection.
 
