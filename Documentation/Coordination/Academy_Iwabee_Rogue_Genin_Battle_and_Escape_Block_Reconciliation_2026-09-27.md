@@ -3,7 +3,9 @@
 **Date:** 2026-09-27  
 **Owner:** CE / Codex / Coordination  
 **Incoming handoff:** #390  
-**Status:** **CE CONTRACT CLOSED / PL-REGISTRY REQUIRED / COMBAT FOLLOWS / WORLD FOLLOWS / CODING NOT YET RELEASED**
+**Status:** **SUPERSEDED IN PART BY FRESH-ORIGIN OVERMATCH SUCCESSOR / WORLD DISPOSITION REQUIRED / CODING NOT YET RELEASED**
+
+**Successor note — 2026-09-27:** Direct-confrontation viability is now governed by `Documentation/Coordination/Academy_Iwabee_Rogue_Genin_Fresh_Origin_Overmatch_Reconciliation_2026-09-27.md`. The PL23 Rogue / PL13 fresh-Iwabee mismatch is intentional baseline overmatch, not a balancing defect. All escape-block / IWA-02 / custody-separation rules below remain binding.
 
 ## 1. Scope
 
