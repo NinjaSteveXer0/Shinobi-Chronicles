@@ -121,6 +121,16 @@ if(PRE_CHOOSE){
   try{chooseEnemyAuthoredBattleAction=globalThis.chooseEnemyAuthoredBattleAction;}catch(_error){}
 }
 
+const PRE_RENDER_ACTION_ROW=typeof renderBattleActionFamilyRow==="function"?renderBattleActionFamilyRow:null;
+if(PRE_RENDER_ACTION_ROW){
+  globalThis.renderBattleActionFamilyRow=function renderWasabi343ActionFamilyRow(actor){
+    const html=PRE_RENDER_ACTION_ROW.apply(this,arguments);
+    if(!(currentBattle&&currentBattle.wasabi343&&currentBattle.wasabi343.strictOneVsOne===true))return html;
+    return String(html).replace(/\s*<button\b[^>]*class="[^"]*\bbattle-live-withdraw-action\b[^"]*"[^>]*>[\s\S]*?<\/button>/i,"");
+  };
+  try{renderBattleActionFamilyRow=globalThis.renderBattleActionFamilyRow;}catch(_error){}
+}
+
 const PRE_GENERATE_REWARDS=typeof generateBattleRewards==="function"?generateBattleRewards:null;
 if(PRE_GENERATE_REWARDS){
   globalThis.generateBattleRewards=function generateWasabi343ZeroBattleRewards(){
@@ -185,7 +195,7 @@ function launch(spec={}){
   currentBattle.wasabi343={
     patchId:PATCH_ID,battleConfigId:CONFIG,battleOccurrenceId:exactId,
     sourceOccurrenceId:SOURCE_OCCURRENCE,historicalParticipantRef:ROGUE,affectedParticipantRef:AFFECTED_STUDENT,
-    oppositionTemplateId:TEMPLATE,feintUsed:false,feintCreatedEnemyOpportunityIndex:null,launchEvidenceId:null
+    oppositionTemplateId:TEMPLATE,strictOneVsOne:true,feintUsed:false,feintCreatedEnemyOpportunityIndex:null,launchEvidenceId:null
   };
   initializeBattleRemainingPLFromDeployment({preserveExistingEnemyPower:true});
 
@@ -254,6 +264,7 @@ function diagnostics(){
     sharedScheduler:!!PRE_CHOOSE&&String(globalThis.chooseEnemyAuthoredBattleAction).includes("evaluateEnemyActionScheduler")&&String(globalThis.chooseEnemyAuthoredBattleAction).includes("equalSelectionWeight:true")&&String(globalThis.chooseEnemyAuthoredBattleAction).includes("no_semantically_eligible_enemy_action"),
     strictDeployment:String(strictWasabiDeployment).includes("createBattleDeploymentSlots([WASABI])")&&String(strictWasabiDeployment).includes("createBattleDeploymentSlots([ROGUE])"),
     withdrawNaturallyUnavailable:String(strictWasabiDeployment).includes("player={slots:createBattleDeploymentSlots([WASABI])}"),
+    withdrawControlHiddenOnlyHere:!!PRE_RENDER_ACTION_ROW&&String(globalThis.renderBattleActionFamilyRow).includes("strictOneVsOne")&&String(globalThis.renderBattleActionFamilyRow).includes("battle-live-withdraw-action"),
     exactOccurrenceId:exactBattleOccurrenceId("qa")==="battle_occ_origin_izuno_rogue_genin_step_in:qa"&&String(launch).includes("wasabi_battle_occurrence_already_committed_without_runtime"),
     zeroRewards:enemy.rewards.ryo.min===0&&enemy.rewards.ryo.max===0&&enemy.rewards.exp.min===0&&enemy.rewards.exp.max===0&&enemy.rewards.commonDrops.length===0&&enemy.rewards.rareDrops.length===0,
     claimSeparateFromContinue:!!PRE_GENERATE_REWARDS&&String(globalThis.generateBattleRewards).includes("requiresExplicitPostClaimContinue=true")&&String(launch).includes("requiresExplicitPostClaimContinue=true"),
