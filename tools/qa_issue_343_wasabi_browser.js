@@ -90,15 +90,17 @@ async function advanceResolver(page){
   await page.waitForFunction(old=>getActiveStorySceneRuntime()?.beatId!==old,before.beatId,{timeout:8000});
 }
 async function continueTo(page,target,{max=260}={}){
+  const trace=[];
   for(let i=0;i<max;i++){
     const row=await info(page);
-    assert.strictEqual(row.sceneId,SCENE,"scene drift while seeking "+target);
+    trace.push({sceneId:row.sceneId,beatId:row.beatId,mode:row.mode,text:row.text,choices:row.choices,localContext:row.localContext});
+    if(row.sceneId!==SCENE)throw new Error("scene drift while seeking "+target+" "+JSON.stringify({row,trace:trace.slice(-12)}));
     if(row.beatId===target)return row;
-    if(row.mode==="choice")throw new Error("unexpected choice before "+target+" @ "+row.beatId+" "+JSON.stringify(row.choices));
-    if(row.mode==="battle_transition")throw new Error("unexpected Battle before "+target+" @ "+row.beatId);
+    if(row.mode==="choice")throw new Error("unexpected choice before "+target+" @ "+row.beatId+" "+JSON.stringify({choices:row.choices,trace:trace.slice(-12)}));
+    if(row.mode==="battle_transition")throw new Error("unexpected Battle before "+target+" @ "+row.beatId+" "+JSON.stringify({trace:trace.slice(-12)}));
     if(row.mode==="resolver")await advanceResolver(page);else await clickContinue(page);
   }
-  throw new Error("continueTo guard exceeded "+target);
+  throw new Error("continueTo guard exceeded "+target+" "+JSON.stringify({trace:trace.slice(-12)}));
 }
 async function choose(page,label,expected=null){
   const before=await info(page);
