@@ -581,3 +581,42 @@ For Alpha implementation value:
 This is an implementation/review order, not a narrative-quality ranking.
 
 Arc 1 is the immediate runtime priority.
+
+
+---
+
+# 17. Post-sweep Arc 2 #333 hard-separation cleanup
+
+A live-main recheck after the Arc 1–3 modernization sweep found a small number of Arc-2 candidate blocks where implementation guidance still sat directly inside blocks labelled as player-facing narration/dialogue, plus one narration sentence that referred explicitly to a confrontation being “in front of the player.”
+
+No Arc graph, World fact, Combat seam, decision meaning, developer Chronicle history, or asset binding was changed.
+
+The cleanup only hard-separates player-facing Story from author/runtime guidance under the universal #333 quality gate.
+
+## Commits
+
+- Arc 2 M1–3 cleanup: `033ddbfee2af631688c2e5fef98f063503b33f3c`
+- Arc 2 M4–8 cleanup: `cb795205015ab4cd92bc632c55b8b41fbcdff83c`
+- Arc 2 M9–12 cleanup: `756eb865ae01790888a29f61094c57d1be2c1e04`
+
+## Verification
+
+Verified on current live source:
+- affected implementation instructions are now under explicit `AUTHOR / IMPLEMENTATION NOTE` boundaries;
+- the player-referential M10 narration sentence was replaced with an in-world consequence;
+- no identified stale system-language fragment remains in the corrected target passages;
+- unresolved asset requirements remain unresolved rather than guessed.
+
+Important asset boundary remains unchanged:
+- `Konoha Locations/root_hq.png` exists but is not automatically the exact A2M3 Scene Board service-access backdrop;
+- `Backgrounds/kusa.png` and `Backgrounds/ame.png` remain world/location art, not automatically approved close Story backdrops;
+- available Sasuke variants do not establish the current Arc-2/3 Story representation without exact Registry/Assets binding;
+- unresolved persistent actor cards remain marked as required.
+
+## Status
+
+Arc 2 benchmark successor set remains:
+
+**WRITING AMBER — BENCHMARK-OPTIMIZED CANDIDATE / STEPHEN SCENE-LEVEL REVIEW PENDING**
+
+This cleanup does not promote Arc 2 to WRITING GOLDEN and does not create a new downstream implementation handoff. Existing coordination issue #152 already owns the Arc-2 downstream implementation/content route.
