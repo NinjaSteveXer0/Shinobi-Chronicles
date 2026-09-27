@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
+      - 'game.js'
       - 'index.html'
       - 'runtime/academy-wasabi-writing-golden-343.js'
       - 'runtime/alpha-wasabi-rogue-battle-343.js'
