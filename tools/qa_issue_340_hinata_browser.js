@@ -95,6 +95,7 @@ async function info(page){
       speaker:root?.querySelector(".sc-story-name")?.textContent?.trim()||"",
       choices:[...(root?.querySelectorAll(".sc-story-choice")||[])].filter(visible).map(n=>n.textContent.trim()),
       primaryCount:[...(root?.querySelectorAll(".sc-chronicle-primary,.sc-story-actions > .sc-story-action:not(.sc-story-choice)")||[])].filter(visible).length,
+      backdropPath:typeof resolveStorySceneBoardBackdropPath==="function"?resolveStorySceneBoardBackdropPath():null,
       rootVisible:visible(root),
       battleVisible:visible(battle)
     };
@@ -129,8 +130,10 @@ async function clickContinue(page){
   if(before.beatId){
     await page.waitForFunction(old=>{
       const rt=getActiveStorySceneRuntime();
-      return !rt||rt.beatId!==old;
-    },before.beatId,{timeout:8000});
+      const root=document.getElementById("story-scene-presentation-layer");
+      const text=root?.querySelector(".sc-story-text")?.textContent?.trim()||"";
+      return !rt||rt.beatId!==old.beatId||text!==old.text;
+    },{beatId:before.beatId,text:before.text},{timeout:8000});
   }
 }
 
@@ -156,9 +159,10 @@ async function choose(page,label,expectedBeat=null){
   assert.strictEqual(before.mode,"choice","choice requested outside choice beat "+before.beatId);
   assert(before.choices.includes(label),"missing visible choice "+label+" @ "+before.beatId+": "+JSON.stringify(before.choices));
   const root=page.locator("#story-scene-presentation-layer");
-  const button=root.getByRole("button",{name:label,exact:true});
+  const button=root.locator(".sc-story-choice").filter({hasText:label});
   assert.strictEqual(await button.count(),1,"choice cardinality "+label);
-  await button.click();
+  assert.strictEqual((await button.first().textContent()).trim(),label,"choice text drift "+label);
+  await button.first().click();
   await page.waitForFunction(old=>{
     const rt=getActiveStorySceneRuntime();
     return !!rt&&rt.beatId!==old;
@@ -193,20 +197,19 @@ async function historyEvidence(page){
 }
 
 async function finishRoute(page,{label,youngLabel,youngId,expectedResponses}){
-  await continueTo(page,"hin_young_choice");
+  const finalScene=await continueTo(page,"hin_young_choice");
+  assert(finalScene.backdropPath&&finalScene.backdropPath.includes("Hinata Origin Backdrop/hyuga_compound_alt_angle.png"),label+" final Hinata scene did not switch to alternate Hyūga angle");
   const youngerLabels=await choiceLabels(page);
   assert.deepStrictEqual(youngerLabels,["SHOW HER ONCE","TELL HER WHAT YOU SAW","LEAVE THEM TO THEIR PRACTICE","WATCH ONE MORE EXCHANGE"],label+" younger choice surface");
   await shot(page,label,"younger-choice");
   await choose(page,youngLabel);
   await continueTo(page,"hin_close_1");
   const closeTexts=[];
-  for(let i=0;i<5;i++){
-    const row=await assertSceneHealthy(page,label+":close");
-    closeTexts.push(row.text);
-    if(i<4)await clickContinue(page);
-  }
+  const closeTerminal=await continueTo(page,"hin_close_5",{max:40,collect:closeTexts});
+  closeTexts.push(closeTerminal.text);
   assert(closeTexts.includes("Tomorrow…"),label+" missing Tomorrow…");
   assert(closeTexts.includes("I'll try again."),label+" missing I'll try again.");
+  assert(closeTerminal.backdropPath&&closeTerminal.backdropPath.includes("Hinata Origin Backdrop/hyuga_compound_alt_angle.png"),label+" closing scene lost alternate Hyūga angle");
   await shot(page,label,"closing");
   await clickContinue(page);
   await page.waitForFunction(()=>ensurePlayerAcquisitionState().chronicleOrigin?.prologueCompleted===true,null,{timeout:12000});
@@ -232,7 +235,8 @@ async function runWait(browser){
   const label="wait-show";
   const {context,page,runtimeErrorGate}=await boot(browser,label);
   try{
-    await continueTo(page,"hin_ex1_choice");
+    let backdropCheck=await continueTo(page,"hin_ex1_choice");
+    assert(backdropCheck.backdropPath&&backdropCheck.backdropPath.includes("Hinata Origin Backdrop/hyuga_compound.png"),label+" primary Hyūga backdrop missing before final scene");
     assert.deepStrictEqual(await choiceLabels(page),["WAIT FOR HIM TO COMMIT","STEP IN FIRST","BREAK AWAY AND RESET"]);
     await shot(page,label,"exchange1");
     await choose(page,"WAIT FOR HIM TO COMMIT","hin_ex1_wait_1");
