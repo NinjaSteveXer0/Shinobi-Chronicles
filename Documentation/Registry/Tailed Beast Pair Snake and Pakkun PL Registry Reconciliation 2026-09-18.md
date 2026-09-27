@@ -2,13 +2,23 @@
 
 **Date:** 2026-09-18  
 **Owner:** PL / Registry / Rank  
-**Status:** **BINDING PL / REGISTRY CLOSURE — SOURCE-AUDITED CORRECTION — ISSUE #236 CONSUMED**  
+**Status:** **BINDING PL / REGISTRY CLOSURE — SOURCE-AUDITED CORRECTION — ISSUE #236 CONSUMED — CHŌMEI/SEVEN-TAILS SECTION SUPERSEDED IN PART BY 2026-09-27 SUCCESSOR**  
 **Source issue:** #236  
 **Combat master:** #235  
 **Current live source baseline inspected:** `99257fa50b016a87f34deb7bf82e09ea8058b85b`  
 **Current `game.js` blob inspected:** `9a95e018ac76b993c22b62ed6aa02be5520e97b1`
 
 ## 1. Scope and supersession
+
+### 2026-09-27 Chōmei / Seven-Tails successor
+
+New owner direction now deliberately authors `seven_tails` and `chomei` as two exact representations of one persistent `beast_chomei` identity. The binding successor is:
+
+`Documentation/Registry/Seven Tails and Chomei Representation Recalibration 2026-09-27.md`
+
+That successor supersedes this document only where this document says Chōmei has one accepted exact representation or that `seven_tails` has no calibrated Registry row. The new accepted `seven_tails` row is `98/112/52/54/102/58/112` -> **PL107**; `chomei` remains `104/108/48/58/104/68/112` -> **PL107**. The retired historical PL103 row remains retired and is not revived.
+
+All unrelated #236 Registry/PL authority remains binding.
 
 This document closes the PL / Registry dependency opened by Combat master #235 for:
 
@@ -103,13 +113,16 @@ Stephen explicitly closed the current distinction:
 
 Relationship history is therefore an explicit eligibility/access distinction for this pair.
 
-#### Chōmei / Seven-Tails
+#### Chōmei / Seven-Tails — historical #236 finding, superseded in part 2026-09-27
 
-No pair-specific SC authority was found that defines `chomei` and `seven_tails` as different wild/cooperative, historical/body, relationship-history, or other exact representation states.
+At #236 closure time, no pair-specific SC authority established distinct `chomei` / `seven_tails` representation states, so PL / Registry correctly refused to mint a second numerical package from artwork alone.
 
-Recovered project evidence uses Chōmei / Seven-Tails as names for the same beast rather than defining two states.
+That evidence state later changed. Stephen explicitly directed Combat Source 14 to author Seven-Tails and Chōmei as two deliberate mechanics representations. The successor Registry authority now accepts:
 
-Therefore PL / Registry must **not mint two numerical representations merely because both PNGs exist**.
+- `seven_tails` — wild / non-cooperative raw-flight / horn-momentum — `98/112/52/54/102/58/112` -> **PL107**;
+- `chomei` — named / friendly / cooperative controlled-flight / aerial-routing — `104/108/48/58/104/68/112` -> **PL107**.
+
+The original #236 reasoning remains valid as a guard: **physical artwork alone is never sufficient to mint a representation.**
 
 ---
 
@@ -160,26 +173,27 @@ Same persistent beast; both exact representations reserve against simultaneous d
 
 This pair alone currently carries Stephen's explicit relationship-history eligibility rule.
 
-### 3.4 Chōmei
+### 3.4 Chōmei — successor-adjusted
 
 Persistent Entity key:
 
 `beast_chomei`
 
-Accepted exact Registry representation:
+Accepted exact Registry representations under 2026-09-27 successor authority:
 
-- `chomei` — Chōmei / Seven-Tails.
+- `seven_tails` — Seven-Tails — **wild / non-cooperative raw-flight / horn-momentum representation**;
+- `chomei` — Chōmei — **named / friendly / cooperative controlled-flight / aerial-routing representation**.
 
-`Assets/Tailed Beasts/chomei.png` and `Assets/Tailed Beasts/seven_tails.png` are both physical presentation sources for the same canonical beast family, but current authority does **not** establish a second exact `seven_tails` Registry representation.
+Same persistent beast; both exact representations reserve against simultaneous duplicate use.
 
-Therefore:
+The historical PL103 `seven_tails` row remains **RETIRED / SUPERSEDED** and is not restored.
 
-- `seven_tails` is **NOT** a separately calibrated Registry ID in this closure;
-- the prior PL103 `seven_tails` row is **RETIRED / SUPERSEDED**;
-- physical `seven_tails.png` remains an unratified alternate presentation asset until Assets/Registry authority explicitly gives it a distinct representation purpose or maps it as alternate art;
-- no second Chōmei ownership record, persistent beast, PL ledger, or simultaneous slot is created.
+Fresh successor calibration:
 
-This is a pair-specific reconciliation, not a global rule for numbered/name Tailed-Beast assets.
+- `seven_tails` = `98/112/52/54/102/58/112` -> **PL107**;
+- `chomei` remains `104/108/48/58/104/68/112` -> **PL107**.
+
+No second persistent Chōmei beast, duplicate ownership record, or simultaneous independent slot is created.
 
 ---
 
@@ -203,7 +217,8 @@ All accepted rows below are:
 | `beast_matatabi` | `matatabi` | Matatabi | named / friendly / cooperative | `104/112/50/58/108/52/112` | **108** | `Assets/Tailed Beasts/matatabi.png` |
 | `beast_isobu` | `three_tails` | Three-Tails | wild / pre-cooperation | `92/88/58/56/98/48/112` | **104** | `Assets/Tailed Beasts/three_tails.png` |
 | `beast_isobu` | `isobu` | Isobu | friendly / cooperative high-relationship | `98/94/60/62/102/54/116` | **108** | `Assets/Tailed Beasts/isobu.png` |
-| `beast_chomei` | `chomei` | Chōmei / Seven-Tails | single accepted exact representation; no second state authored | `104/108/48/58/104/68/112` | **107** | `Assets/Tailed Beasts/chomei.png`; `seven_tails.png` remains alternate/unratified |
+| `beast_chomei` | `seven_tails` | Seven-Tails | wild / non-cooperative raw-flight / horn-momentum | `98/112/52/54/102/58/112` | **107** | `Assets/Tailed Beasts/seven_tails.png` |
+| `beast_chomei` | `chomei` | Chōmei | named / friendly / cooperative controlled-flight / aerial-routing | `104/108/48/58/104/68/112` | **107** | `Assets/Tailed Beasts/chomei.png` |
 
 ### Formula checks
 
@@ -213,6 +228,7 @@ All accepted rows below are:
 - `matatabi` raw 107.6381... → **108**
 - `three_tails` raw 104.1952... → **104**
 - `isobu` raw 108.4905... → **108**
+- `seven_tails` raw 106.9666... → **107**
 - `chomei` raw 107.1000... → **107**
 
 The Stats above are exact representation Base packages, not additive relationship bonuses.
@@ -221,7 +237,7 @@ For Shukaku and Matatabi, the pair distinction is presentation/relationship-stat
 
 For Isobu, relationship history is explicitly part of representation eligibility.
 
-For Chōmei, no second state exists in current authority.
+For Chōmei-family authority, the 2026-09-27 successor now establishes the deliberate `seven_tails` wild/non-cooperative representation alongside cooperative named `chomei`. Equal PL107 is intentional; the distinction is Stat distribution/access/mechanics rather than a generic friendship scalar.
 
 ---
 
@@ -436,7 +452,7 @@ PL / Registry has now source-audited and closed the #236 dependency required by 
 - Shukaku: one persistent beast, two evidenced exact representations, both calibrated;
 - Matatabi: one persistent beast, two evidenced exact representations, both calibrated;
 - Isobu: one persistent beast, two explicitly relationship-history representations, both calibrated;
-- Chōmei: one persistent beast, **one accepted exact Registry representation**; unsupported second `seven_tails` PL row retired;
+- Chōmei: one persistent beast; the original unsupported PL103 `seven_tails` row remains retired, while 2026-09-27 successor authority now adds a freshly calibrated deliberate `seven_tails` PL107 representation alongside `chomei` PL107;
 - `snake`: generic Summon identity/ontology/Stats/Base PL closed at PL47;
 - Pakkun: PL16 is the sole current Base package; PL48 retired;
 - current live Registry baseline confirmed at **97 Characters + 18 Entities = 115**;
@@ -449,7 +465,7 @@ Combat must preserve:
 
 - pair-specific evidence rather than a universal numbered-vs-name rule;
 - no Isobu relationship-history threshold copied to Shukaku or Matatabi without new authority;
-- no second `seven_tails` PL package unless a genuinely distinct representation is later authored;
+- `seven_tails` now exists only because a genuinely distinct representation was later authored; preserve the fresh PL107 successor row and do not revive the old PL103 archaeology;
 - same-beast identity reservation;
 - no generic friendship multiplier;
 - no wholesale PL transfer;
@@ -462,4 +478,4 @@ Combat must preserve:
 
 ## 10. Final lock
 
-> **#236 is closed by pair-specific evidence, not by a universal naming pattern. Shukaku/One-Tail, Matatabi/Two-Tails, and Isobu/Three-Tails each retain two exact representations of one persistent beast because project authority supports those distinctions; only Isobu currently has an explicit relationship-history eligibility rule. Chōmei/Seven-Tails has no authored two-state distinction, so `chomei` is the sole accepted Registry representation at PL107 and the former separate `seven_tails` PL103 row is retired. `snake` is a generic Summon at PL47. Pakkun is PL16 under one exact Registry representation. Current live production remains 97 Characters + 18 Entities = 115, and downstream Combat must consume current `game.js` PL anchors rather than stale handoff numerics.**
+> **#236 remains closed by pair-specific evidence, not by a universal naming pattern. Its original Chōmei single-representation finding was correct at the time and is now superseded only by explicit 2026-09-27 owner/Combat authority. `seven_tails` is freshly calibrated at `98/112/52/54/102/58/112`, PL107, as the wild/non-cooperative raw-flight/horn-momentum representation; `chomei` remains `104/108/48/58/104/68/112`, PL107, as the named/friendly/cooperative controlled-flight representation. Both are one persistent `beast_chomei` and reserve against duplicate use. The historical PL103 row remains retired. All unrelated #236 closures, including generic `snake` PL47 and Pakkun PL16, remain binding.**
