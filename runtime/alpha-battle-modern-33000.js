@@ -447,35 +447,52 @@
       power.dataset.battlePlCurrent=String(pl.remaining);
       power.dataset.battlePlMaximum=String(pl.maximum);
 
-      let strong=power.querySelector("strong");
-      let span=power.querySelector("span");
-      let bar=power.querySelector("i");
-
-      // Relay refresh can inherit a modernized PL-ring shell whose legacy
-      // current-value node has been removed. Recreate only missing
-      // presentation children; never touch Battle PL state here.
-      if(!strong){
-        strong=document.createElement("strong");
-        strong.className="battle2-formation-pl-current";
-        strong.dataset.battlePlCurrentValue="true";
-        power.prepend(strong);
+      // The 32500 browser owner projects the active actor's PL as a radial
+      // <span>. Never treat that ring as the legacy maximum-value <span>.
+      // Update its nested core in place so the current PL stays inside the
+      // circle and the conic fill remains tied to authoritative Battle PL.
+      const ring=power.querySelector(".alpha-battle-pl-ring");
+      const core=ring&&ring.querySelector(".alpha-battle-pl-core");
+      if(ring&&core){
+        const currentNode=core.querySelector("strong");
+        const maximumNode=core.querySelector("small");
+        const labelNode=core.querySelector("em");
+        const percent=pl.maximum?Math.max(0,Math.min(100,pl.remaining/pl.maximum*100)):0;
+        ring.style.setProperty("--battle-pl-fill",percent.toFixed(2)+"%");
+        if(currentNode){
+          currentNode.dataset.battlePlCurrentValue="true";
+          currentNode.textContent=String(pl.remaining);
+        }
+        if(maximumNode)maximumNode.textContent="/ "+String(pl.maximum);
+        if(labelNode)labelNode.textContent="BATTLE PL";
       }else{
-        strong.dataset.battlePlCurrentValue="true";
+        // Legacy non-radial fallback. Restrict lookup to direct children so a
+        // future nested presentation shell cannot be mistaken for these nodes.
+        let strong=[...power.children].find(node=>node.tagName==="STRONG")||null;
+        let span=[...power.children].find(node=>node.tagName==="SPAN")||null;
+        let bar=[...power.children].find(node=>node.tagName==="I")||null;
+        if(!strong){
+          strong=document.createElement("strong");
+          strong.className="battle2-formation-pl-current";
+          strong.dataset.battlePlCurrentValue="true";
+          power.prepend(strong);
+        }else{
+          strong.dataset.battlePlCurrentValue="true";
+        }
+        if(!span){
+          span=document.createElement("span");
+          span.className="battle2-formation-pl-maximum";
+          strong.insertAdjacentElement("afterend",span);
+        }
+        if(!bar){
+          bar=document.createElement("i");
+          bar.className="battle2-formation-pl-bar";
+          power.appendChild(bar);
+        }
+        strong.textContent=String(pl.remaining);
+        span.textContent="/ "+String(pl.maximum)+" BATTLE PL";
+        bar.style.width=String(pl.maximum?Math.max(0,Math.min(100,pl.remaining/pl.maximum*100)):0)+"%";
       }
-      if(!span){
-        span=document.createElement("span");
-        span.className="battle2-formation-pl-maximum";
-        strong.insertAdjacentElement("afterend",span);
-      }
-      if(!bar){
-        bar=document.createElement("i");
-        bar.className="battle2-formation-pl-bar";
-        power.appendChild(bar);
-      }
-
-      strong.textContent=String(pl.remaining);
-      span.textContent="/ "+String(pl.maximum)+" BATTLE PL";
-      bar.style.width=String(pl.maximum?Math.max(0,Math.min(100,pl.remaining/pl.maximum*100)):0)+"%";
     }
     return node;
   }
@@ -1690,6 +1707,7 @@
       stableFormationMotion:styleText.includes("Final Kakashi Golden / Formation Stage motion policy")&&styleText.includes("transition:none!important;animation:none!important;will-change:auto!important")&&styleText.includes(".battle2-performance-result-chip"),
       playerCardNamesSuppressed:styleText.includes(".battle-live-active-card-player .battle-live-active-nameplate{display:none!important}")&&styleText.includes(".battle-live-roster-player .battle-live-roster-name{display:none!important}"),
       confrontationPLLaneAligned:styleText.includes('data-formation-mode="duel"] .battle-live-power-player')&&styleText.includes("left:43.5%!important")&&styleText.includes("left:56.5%!important"),
+      radialPLCorePreserved:String(projectFormationActivePortrait33000).includes('querySelector(".alpha-battle-pl-ring")')&&String(projectFormationActivePortrait33000).includes('querySelector(".alpha-battle-pl-core")')&&String(projectFormationActivePortrait33000).includes("--battle-pl-fill")&&String(projectFormationActivePortrait33000).includes("power.children"),
       topHudStackSeparated:styleText.includes('data-formation-stage="true"] .battle2-performance-host{left:43%!important;right:43%!important;top:1.5%!important;height:4.8%!important}')&&styleText.includes('data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-host{left:31%!important;right:31%!important;top:1.4%!important;height:8.2%!important}')&&styleText.includes(".battle2-live-ticker{left:35%!important;top:8.4%!important;width:30%!important"),
       storyCallerPresentationSuspension:typeof suspendCallerStoryPresentation33000==="function"&&String(suspendCallerStoryPresentation33000).includes("caller_owned_battle")&&String(enhanceBattle2DOM33000).includes("suspendCallerStoryPresentation33000")&&String(renderCombatOverlayModern33000).includes("enhanceBattle2DOM33000"),
       branchModesRemainExplicit:renderInspector33000.toString().includes("setSelectedBattleSkillMode"),
