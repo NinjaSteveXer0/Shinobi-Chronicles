@@ -80,7 +80,7 @@ assert(wasabiSource.includes("registerWasabiOriginPresentation32900();"),"Wasabi
 const returnBridge=byId.get("izu_rogue_step_in_return_1");
 assert(returnBridge&&returnBridge.mode==="post_battle","STEP IN does not return through dedicated post-Battle alley bridge");
 assert.strictEqual(returnBridge.nextBeatId,"izu_finish_secondary_1","STEP IN return skips Scene 5 secondary finish");
-assert.deepStrictEqual(cueTexts("izu_finish_secondary"),Array.from(storyCtx.SC_ACADEMY_WASABI_WRITING_GOLDEN_343.get("finish_secondary"),cue=>cue.text),"Scene 5 secondary finish prose drifted");
+assert.deepStrictEqual(JSON.parse(JSON.stringify(cueTexts("izu_finish_secondary"))),Array.from(storyCtx.SC_ACADEMY_WASABI_WRITING_GOLDEN_343.get("finish_secondary"),cue=>cue.text),"Scene 5 secondary finish prose drifted");
 
 // Approved voice/dialogue anchors from Writing GOLDEN.
 for(const [prefix,line] of [
