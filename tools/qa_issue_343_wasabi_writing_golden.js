@@ -192,6 +192,7 @@ const battleCtx={
   makeEnemyRatioGuardAction:(id,ratio,opts={})=>{ratioCalls.push({id,ratio,opts});return{id,skillId:id,actionClass:"enemy_ratio_guard",traits:opts.traits||[],evaluateAvailability:()=>({available:true}),resolve:()=>({resolved:true})};},
   chooseEnemyAuthoredBattleAction:()=>({success:false,reason:"qa_generic"}),
   generateBattleRewards:()=>({generated:true,claimed:false,ryo:88,exp:77,items:[{id:"bad"}],rareDrops:[{id:"bad_rare"}]}),
+  renderBattleActionFamilyRow:()=>'<nav class="battle-live-action-family-row"><button class="battle-live-action-family">SKILLS</button><button class="battle-live-action-family battle-live-withdraw-action" disabled>WITHDRAW</button></nav>',
   evaluateEnemyActionScheduler:()=>({ready:true,enemyId:"wasabi_origin_rogue_genin_01",eligibleActions:[]}),
   findBattleTransientState:()=>null,removeBattleTransientState:()=>true,
   getBattleActionOpportunityIndex:()=>0,
@@ -244,6 +245,11 @@ assert.deepStrictEqual(Array.from(battleCtx.currentBattle.deployment.enemy.slots
 assert.strictEqual(battleCtx.currentBattle.rewards.ryo,0);assert.strictEqual(battleCtx.currentBattle.rewards.exp,0);
 assert.strictEqual(Array.from(battleCtx.currentBattle.rewards.items||[]).length,0);assert.strictEqual(Array.from(battleCtx.currentBattle.rewards.rareDrops||[]).length,0);
 assert.strictEqual(battleCtx.currentBattle.rewards.requiresExplicitPostClaimContinue,true);
+assert.strictEqual(battleCtx.currentBattle.wasabi343.strictOneVsOne,true);
+assert(!battleCtx.renderBattleActionFamilyRow({id:"academy_izuno"}).includes("WITHDRAW"),"strict 1v1 renderer leaked WITHDRAW");
+const savedWasabi343=battleCtx.currentBattle.wasabi343;delete battleCtx.currentBattle.wasabi343;
+assert(battleCtx.renderBattleActionFamilyRow({id:"academy_izuno"}).includes("WITHDRAW"),"non-Wasabi Battle renderer was altered");
+battleCtx.currentBattle.wasabi343=savedWasabi343;
 const generatedZero=battleCtx.generateBattleRewards({rewards:{ryo:{min:99,max:99}}},{id:"academy_izuno"});
 assert.strictEqual(generatedZero.ryo,0);assert.strictEqual(generatedZero.exp,0);
 assert.strictEqual(Array.from(generatedZero.items||[]).length,0);assert.strictEqual(Array.from(generatedZero.rareDrops||[]).length,0);
