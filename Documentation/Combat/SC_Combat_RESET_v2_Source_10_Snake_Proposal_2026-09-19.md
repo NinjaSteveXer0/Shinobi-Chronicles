@@ -72,7 +72,7 @@ Generic Naruto snake use supports a clear mechanical identity without borrowing 
 - generic summoned snakes can constrict / capture a target;
 - snakes used through Hidden Shadow Snake Hands can surprise a target from the summoner's body/sleeve;
 - those snakes can also extend/latch to assist movement;
-- snake summons range from very small to very large, and established summoners can communicate with at least some summoned snakes, supporting a bounded messenger/courier role for an appropriately sized cooperative Snake.
+- snake summons range from very small to very large.
 
 Canon references consumed:
 - Summoning Technique material identifying Orochimaru and Sasuke as snake summoners;
@@ -111,11 +111,9 @@ This is deliberately not a generic Stat-stick.
 
 # D. Lifecycle / action economy
 
-## OWNED / AVAILABLE OUTSIDE BATTLE
+## OWNED
 
-- legitimate ownership does not create a generic Battle Stat bonus;
-- as a **small Summon**, Snake participates in the project-wide small/medium-Summon courier dialogue capability;
-- that courier capability is **not Snake's Enhancement** and does not require Snake to occupy a Battle participant slot.
+- legitimate ownership does not create a generic Battle Stat bonus.
 
 ## ATTACHED / PREPARED FOR BATTLE
 
@@ -147,13 +145,9 @@ Ordinary Alpha Battles do not infer a seventh Character slot or independent recu
 
 # E. REQUIRED Enhancement Package — CLOSED
 
-Stephen corrected and then closed the Source 10 Enhancement on **2026-09-27**:
+Snake's source-specific Enhancement is **Serpent Reach**. Its non-Battle source utility is **Narrow Passage**.
 
-> **ALL small-to-medium Summons can be used in dialogue choices as couriers. That shared capability is NOT Snake's Enhancement.**
-
-Therefore **Serpent Courier remains retired as Snake-specific Enhancement authority**.
-
-Snake's actual Enhancement is:
+These are the complete Source 10 Enhancement authorities. Global Summon rules are defined outside this source package.
 
 ## `snake_serpent_reach` — **Serpent Reach**
 
@@ -216,7 +210,6 @@ Exact authored capability:
 - Snake does not guarantee stealth, safety, retrieval, access or Mission success;
 - the occurrence owns hazards, blockers, what Snake can actually observe, and the factual result.
 
-This utility is **not the shared courier rule**. A courier dialogue choice concerns sending a small/medium Summon to carry a message/payload. **Narrow Passage** instead exploits Snake's body shape and size to access spaces the Character cannot.
 
 ### Explicit exclusions
 
@@ -464,8 +457,6 @@ No account-wide numeric collection bonus is created for Snake.
 
 Snake's source-specific persistent/non-Battle value is **Narrow Passage** infiltration/access/scouting when Snake is legitimately available.
 
-Snake's participation in courier dialogue choices remains separate and comes from the **shared small/medium-Summon courier capability**, not from Serpent Reach or Narrow Passage.
-
 No generic snake-family recruitment multiplier or named-snake contract progress is inferred.
 
 ---
@@ -507,7 +498,6 @@ No old live Snake skill package exists that must be preserved.
 
 > **Attach Snake to gain Serpent Reach: once per Battle, Snake can bridge ordinary distance for one close-range Taijutsu or Bukijutsu attack. Outside Battle, Narrow Passage lets Snake slip through small openings to scout, reveal reachable spaces or retrieve a small object where the scene allows it. Train with Snake separately to unlock Hidden Coil. Snake has no poison package.**
 
-Like every small-to-medium Summon, Snake may also appear in authored courier dialogue choices. That shared courier capability is not Snake's Enhancement.
 
 ---
 
@@ -515,7 +505,6 @@ Like every small-to-medium Summon, Snake may also appear in authored courier dia
 
 **Stephen correction / final sign-off:** **2026-09-27.**  
 **Identity / Stats / Base PL:** CLOSED by PL / Registry at `snake`, PL47.  
-**Shared courier dialogue capability:** **YES because Snake is small/medium; not source Enhancement authority.**  
 **Enhancement:** **Serpent Reach — CLOSED.**  
 **Serpent Reach Battle effect:** **once/Battle, bridge ordinary mid-range separation for one close-range single-target Taijutsu or Bukijutsu attack against the Active enemy; normal attack values/effects; no separate reposition action.**  
 **Non-Battle source utility:** **Narrow Passage — CLOSED** for physically plausible small-gap access/scouting/small-object interaction.  
