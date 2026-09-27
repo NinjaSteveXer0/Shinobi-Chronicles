@@ -299,6 +299,7 @@ Next ordinary Summon state:
 - **Source 10 — Snake** — **DESIGN CLOSED 2026-09-27**; generic `snake`, PL47, staged/not live. **Serpent Reach** = once/Battle ordinary-distance extension for one close-range Tai/Buki attack against the Active enemy. **Narrow Passage** = source-specific small-gap infiltration/scouting/small-object utility. Hidden Coil remains separately obtainable/learnable. **No Poison/venom Enhancement.**
 - **Source 11 — One-Tail / Shukaku** — **DESIGN CLOSED 2026-09-27**. Same persistent `beast_shukaku`; `one_tail` PL103 hostile/uncooperative vs `shukaku` PL107 cooperative. One-Tail = +10 Effective Kinjutsu, Cracked Seal Conduit, partial-possession/seal-strain branch; Shukaku = +10 Effective Fūinjutsu, Living Seal Markings, cooperative Sand Buckshot, Shukaku-derived Magnet Release Potential Skill branch. Distinct fifth manifested actions: Sand Burial Rupture vs Cursed Seal Lock.
 - **Source 12 — Two-Tails / Matatabi** — **DESIGN CLOSED 2026-09-27**. Same persistent `beast_matatabi`; `two_tails` PL103 hostile/non-cooperative vs `matatabi` PL108 cooperative. Two-Tails = +10 Effective Taijutsu, Predator's Pulse, partial feline manifestation/pursuit; Matatabi = +10 Effective Ninjutsu, Blue Flame Accord, controlled Fire/cover shaping, cooperative assisted Fire Skills and blue-flame Potential Skill branch. Shared manifested Tailed Beast Ball ATK58 once/Battle.
+- **Source 13 — Three-Tails / Isobu** — **DESIGN CLOSED 2026-09-27**. Same persistent `beast_isobu`; `three_tails` PL104 wild/pre-cooperation vs `isobu` PL108 friendly/cooperative high-relationship. Three-Tails = +10 Effective Stamina, Carapace Instinct, partial shell/rolling/body-pressure branch; Isobu = +10 Effective Ninjutsu, Coral Tide Accord, coral/Water control, cooperative Coral Palm/Shell Current Guard and Isobu-derived Potential Skill seed branch. Isobu relationship-history eligibility remains pair-specific authority.
 
 Source 09 proposal authority:
 `Documentation/Combat/SC_Combat_RESET_v2_Source_09_Kamatari_Proposal_2026-09-19.md`
@@ -337,5 +338,5 @@ Shared courier rule:
 - larger/specialised Summons do not inherit this specific size-bounded rule automatically;
 - occurrence success remains factual/contextual rather than guaranteed by the dialogue option.
 
-Next Combat work: proceed to **Source 13 — Three-Tails / Isobu**, then Chōmei, before Kurama-family Batch 4.
+Next Combat work: proceed to **Source 14 — Chōmei**, then Kurama-family Batch 4.
 
