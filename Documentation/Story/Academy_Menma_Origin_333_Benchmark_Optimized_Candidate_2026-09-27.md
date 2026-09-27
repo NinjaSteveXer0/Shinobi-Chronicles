@@ -23,7 +23,7 @@ It preserves the closed scene spine, current Guest Ally Battle contract, source 
 
 ## SCENE 1 — ACADEMY / RESTRICTION
 
-**BACKDROP:** `Scene backdrops/academy_classroom.png`
+**BACKDROP:** `Menma Origin Backdrop/academy_classroom.png`
 
 ### `menma_open_01` — narration
 
@@ -95,7 +95,7 @@ He leaves.
 
 ## SCENE 2 — FOREST / FREEDOM
 
-**BACKDROP:** `Scene backdrops/whisper_woods_forest_route.png`
+**BACKDROP:** `Menma Origin Backdrop/whisper_woods_forest_route.png`
 
 ### `menma_forest_01` — narration
 
@@ -125,7 +125,7 @@ Only for a moment.
 
 ## SCENE 3 — MENMA AND THE NINE-TAILS
 
-**BACKDROP:** continue `Scene backdrops/whisper_woods_forest_route.png`
+**BACKDROP:** continue `Menma Origin Backdrop/whisper_woods_forest_route.png`
 
 ### `menma_fox_01` — narration
 
@@ -175,7 +175,7 @@ Menma runs toward the fighting.
 
 ## SCENE 4 — DISCOVERY
 
-**BACKDROP:** `Scene backdrops/forest_clearing_day.png`
+**BACKDROP:** `Menma Origin Backdrop/forest_clearing_day.png`
 
 ### `menma_discovery_01` — narration
 
@@ -199,7 +199,7 @@ Nobody here is pulling a strike because Menma is young.
 
 ## SCENE 5 — MENMA ENTERS
 
-**BACKDROP:** continue `Scene backdrops/forest_clearing_day.png`
+**BACKDROP:** continue `Menma Origin Backdrop/forest_clearing_day.png`
 
 ### `menma_enter_01` — dialogue — NINE-TAILS
 
@@ -221,7 +221,7 @@ He jumps into the clearing.
 
 ## SCENE 6 — MENMA AND ANKO
 
-**BACKDROP:** continue `Scene backdrops/forest_clearing_day.png`
+**BACKDROP:** continue `Menma Origin Backdrop/forest_clearing_day.png`
 
 ### `menma_anko_pre_01` — narration
 
@@ -285,7 +285,7 @@ The fight does not wait for it.
 
 ## SCENE 7 — PL BATTLE
 
-**BACKDROP / BATTLE ENVIRONMENT:** `Scene backdrops/forest_clearing_day.png`
+**BACKDROP / BATTLE ENVIRONMENT:** `Menma Origin Backdrop/forest_clearing_day.png`
 
 **AUTHOR / RUNTIME ONLY — DO NOT RENDER**
 
@@ -320,7 +320,7 @@ No LOW bucket is fabricated on party defeat.
 
 ## SCENE 8 — AFTER THE FIGHT — VICTORY LINEAGE
 
-**BACKDROP:** continue `Scene backdrops/forest_clearing_day.png`
+**BACKDROP:** `Menma Origin Backdrop/forest_clearing_alt_angle.png`
 
 ### `menma_after_01` — narration
 
@@ -488,7 +488,7 @@ Menma smiles.
 
 ## SCENE 9 — PARTING — VICTORY LINEAGE
 
-**BACKDROP:** continue `Scene backdrops/forest_clearing_day.png`
+**BACKDROP:** continue `Menma Origin Backdrop/forest_clearing_alt_angle.png`
 
 ### `menma_part_01` — narration
 
@@ -560,7 +560,7 @@ Anko leaves.
 
 # SCENE 10 — FOREST / FUTURE
 
-**BACKDROP:** `Scene backdrops/whisper_woods_forest_route.png`
+**BACKDROP:** `Menma Origin Backdrop/whisper_woods_forest_route.png`
 
 ## Stable implementation target
 
@@ -688,14 +688,52 @@ Forward.
 
 ---
 
+# ACTOR / CARD PROJECTION
+
+## Scene 1
+- Menma: `Assets/Academy Student/academy_menma.png`
+- Academy Instructor: `NPC/menma_instructor.png`
+
+## Scenes 2–3
+- Menma: `Assets/Academy Student/academy_menma.png`
+- Nine-Tails is an **internal speaker/presence**. Do not project a physical forest actor card merely because dialogue occurs.
+
+## Scenes 4–6 Story
+- Menma: `Assets/Academy Student/academy_menma.png`
+- Anko: `Assets/Special Jonin/sj_anko.png`
+- Altered Shinobi: `Enemies/test_subject_altered_shinobi.png`
+- Brute: `Enemies/test_subject_brute.png`
+- Unstable: `Enemies/test_subject_unstable.png`
+
+## Scene 7 Battle
+- Menma portrait: `Portraits/Academy Student/academy_student_menma.png`
+- Anko portrait: `Portraits/Special Jonin/sj_anko.png`
+- Altered Shinobi portrait: `Enemies Portraits/test_subject_altered_shinobi.png`
+- Brute portrait: `Enemies Portraits/test_subject_brute.png`
+- Unstable portrait: `Enemies Portraits/test_subject_unstable.png`
+
+## Scenes 8–9
+- Menma: `Assets/Academy Student/academy_menma.png`
+- Anko: `Assets/Special Jonin/sj_anko.png`
+- resolved/withdrawn enemy actors should not remain projected unless exact Battle return facts say they are still physically present.
+
+## Scene 10
+- Menma: `Assets/Academy Student/academy_menma.png`
+- Nine-Tails remains internal; no physical actor card.
+
+Card projection follows physical/presentational truth and must not leak hidden state.
+
+---
+
 # AUTHOR / CODING BOUNDARIES
 
 ## Backdrops
 
-- Scene 1: `Scene backdrops/academy_classroom.png`
-- Scenes 2–3: `Scene backdrops/whisper_woods_forest_route.png`
-- Scenes 4–9 / Battle / #386 defeat: `Scene backdrops/forest_clearing_day.png`
-- Scene 10: `Scene backdrops/whisper_woods_forest_route.png`
+- Scene 1: `Menma Origin Backdrop/academy_classroom.png`
+- Scenes 2–3: `Menma Origin Backdrop/whisper_woods_forest_route.png`
+- Scenes 4–7 / Battle / #386 defeat: `Menma Origin Backdrop/forest_clearing_day.png`
+- Scenes 8–9 victory aftermath/parting: `Menma Origin Backdrop/forest_clearing_alt_angle.png`
+- Scene 10: `Menma Origin Backdrop/whisper_woods_rise.png`
 
 ## Knowledge repair
 
