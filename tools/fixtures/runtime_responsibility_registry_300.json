@@ -26,7 +26,8 @@
       "canonicalOwner": "runtime/alpha-story-scene-board-33900.js",
       "ownerType": "shared_presentation_infrastructure",
       "directCallers": [
-        "runtime/alpha-traversal-bridge-33200.js"
+        "runtime/alpha-traversal-bridge-33200.js",
+        "runtime/alpha-origin-scenes-32900-a.js"
       ],
       "stateReads": [
         "activeStorySceneRuntime.sceneId",
@@ -58,7 +59,9 @@
         "tools/qa_runtime_ownership_safety_300.js",
         "tools/qa_issue_312_story_battle_benchmark.js",
         "tools/qa_issue_312_browser.js",
-        "tools/qa_obito_story_presentation_browser.js"
+        "tools/qa_obito_story_presentation_browser.js",
+        "tools/qa_issue_343_wasabi_writing_golden.js",
+        "tools/qa_issue_343_wasabi_browser.js"
       ]
     },
     {
@@ -867,7 +870,8 @@
       "stateWrites": [
         "activeStorySceneRuntime.localContext Wasabi pursuit/route/Rogue response facts",
         "playerData.activityHistory exact IZU-01/02/03/04 occurrences",
-        "Story Scene Board exact Wasabi backdrop projection registry"
+        "Story Scene Board exact Wasabi backdrop + physical actor-card projection registry",
+        "read-only Wasabi Origin Chronicle Receipt presentation before shared completion"
       ],
       "productionLoadPath": [
         "index.html",
@@ -891,7 +895,8 @@
       ],
       "saveSchemaRefs": [
         "activeStorySceneRuntime.localContext Wasabi pursuit facts",
-        "playerData.activityHistory occ_origin_izuno_*"
+        "playerData.activityHistory occ_origin_izuno_*",
+        "activeStorySceneRuntime.localContext Wasabi decision/outcome fields read by Receipt presentation"
       ],
       "qaRefs": [
         "tools/qa_issue_343_wasabi_writing_golden.js",
