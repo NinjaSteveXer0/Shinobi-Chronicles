@@ -352,6 +352,8 @@ The fight ends with the lower service route still reachable.
 
 That matters more than the word **victory**.
 
+### AUTHOR / IMPLEMENTATION NOTE
+
 Whatever happened to Recall, whoever is still standing and whatever custody now exists must remain exactly as the resolver returned it.
 
 **Next:** lower service access / lower chamber.
@@ -714,6 +716,8 @@ If Menma/Echo still moves to help:
 ## `m12_ren_wound_01` — dialogue — REN
 
 **REN:** “Mine never did.”
+
+### AUTHOR / PERFORMANCE NOTE
 
 Do not explain the line afterward.
 
