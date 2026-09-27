@@ -662,7 +662,7 @@ These are not automatically learned.
 
 Global Potential Skill Roster thresholds remain under #382.
 
-## 1. `skill_isobu_coral_lance` — **Coral Release: Reef Lance**
+## 1. `skill_isobu_coral_lance` — **Isobu Art: Reef Lance**
 
 Classification:
 
@@ -699,7 +699,7 @@ Effect:
 
 ---
 
-## 2. `skill_isobu_reef_prison` — **Coral Release: Reef Prison**
+## 2. `skill_isobu_reef_prison` — **Isobu Art: Reef Prison**
 
 Classification:
 
@@ -831,7 +831,7 @@ Batch 5 must audit exact Isobu Jinchūriki/transformation representations before
 **Three-Tails host-assisted Skills:** Partial Shell Roll / Spike Wake / Breakwater Curl — PROPOSED.  
 **Isobu Enhancement:** Coral Tide Accord (+10 Effective Ninjutsu + Coral Follow-Through) — PROPOSED.  
 **Isobu cooperative assisted Skills:** Coral Palm / Shell Current Guard — PROPOSED.  
-**Isobu Potential Skill branch:** Reef Lance / Reef Prison / Breaking Tide — PROPOSED.  
+**Isobu Potential Skill branch:** Isobu Art: Reef Lance / Isobu Art: Reef Prison / Water Release: Breaking Tide — PROPOSED.  
 **Implementation:** NOT STARTED.  
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
