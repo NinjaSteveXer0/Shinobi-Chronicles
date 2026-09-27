@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-19  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons  
-**Status:** **PROPOSED FOR STEPHEN SIGN-OFF — SOURCE 10 UNDER RESET v2**  
+**Status:** **DESIGN CLOSED — STEPHEN SIGN-OFF 2026-09-27 / MESSENGER ENHANCEMENT + LEARNABLE HIDDEN COIL CORRECTION**  
 **Parent:** #235  
 **Reset authority:** `Documentation/Combat/SC_Combat_Summons_Tailed_Beasts_Full_Calibration_RESET_v2_2026-09-18.md`  
 **Global mechanics standard:** `Documentation/Combat/SC_Combat_Unique_Shinobi_Chronicles_Mechanics_Design_Standard_2026-09-19.md`  
@@ -71,7 +71,8 @@ Generic Naruto snake use supports a clear mechanical identity without borrowing 
 - generic summoned snakes can attack by biting;
 - generic summoned snakes can constrict / capture a target;
 - snakes used through Hidden Shadow Snake Hands can surprise a target from the summoner's body/sleeve;
-- those snakes can also extend/latch to assist movement.
+- those snakes can also extend/latch to assist movement;
+- snake summons range from very small to very large, and established summoners can communicate with at least some summoned snakes, supporting a bounded messenger/courier role for an appropriately sized cooperative Snake.
 
 Canon references consumed:
 - Summoning Technique material identifying Orochimaru and Sasuke as snake summoners;
@@ -92,15 +93,15 @@ Those require separate authority.
 
 ---
 
-# C. Battle role
+# C. Role
 
-**AMBUSH / RESTRAINT / CAPTURE PRESSURE**
+**MESSENGER / AMBUSH / RESTRAINT / CAPTURE PRESSURE**
 
 Snake's RESET v2 identity is:
 
-1. remain concealed while attached;
-2. spring out once to wrap a target after the controller establishes physical contact;
-3. if manifested, trade that surprise ambush for an independent PL47 body;
+1. provide a real outside-Battle courier role through **Serpent Courier -> Messenger Snake**;
+2. make **Hidden Coil** an obtainable source-assisted Battle Skill rather than an automatic attachment bonus;
+3. if a future/full-manifestation Battle mode permits it, field Snake as a PL47 body with constriction/capture actions;
 4. use constriction to restrict movement-dependent techniques;
 5. force a choice between preserving the bind or cashing it out for extra crush damage.
 
@@ -110,45 +111,118 @@ This is deliberately not a generic Stat-stick.
 
 # D. Lifecycle / action economy
 
-## OWNED
+## OWNED / AVAILABLE OUTSIDE BATTLE
 
-- collection presence only;
-- no global Battle bonus.
+- legitimate ownership does not create a generic Battle Stat bonus;
+- when Snake is legitimately available for a World / Mission / Hotspot context, its **Serpent Courier** enhancement exposes the outside-Battle **Messenger Snake** utility;
+- this does not require Snake to occupy a Battle participant slot.
 
-## ATTACHED / PREPARED
+## ATTACHED / PREPARED FOR BATTLE
 
-- Snake is the Character's active Summon;
-- no independent Snake Battle PL ledger;
-- no independent Snake action opportunity;
-- **Hidden Coil** is available once per Battle;
-- Snake is treated as concealed/prepared with the controller for this exact enhancement.
+- Snake is the Character's active/prepared Summon source;
+- no independent Snake Battle PL ledger merely from ordinary Alpha Summon-action use;
+- **Hidden Coil is NOT granted automatically by attachment**;
+- Hidden Coil may be used only if that exact learnable source-assisted Skill has been legitimately obtained;
+- if Hidden Coil is learned, Snake must be attached/prepared and not independently manifested for the follow-up to be available.
 
-## MANIFESTED
+## MANIFESTED — future/full-manifestation capability
+
+Where a later Battle mode explicitly permits independent manifestation:
 
 - Snake becomes independently targetable;
 - own Battle PL ledger = own Effective PL, starting from Base PL47;
-- own normal Entity action opportunity;
-- **Hidden Coil becomes unavailable while Snake is manifested**, because the same Snake is no longer concealed on/with the controller;
+- own Entity action opportunity under that manifestation model;
+- **Hidden Coil follow-up is unavailable while Snake is manifested**, because the same Snake is no longer concealed/prepared with the controller;
 - no second copy of Snake exists.
 
 If Snake returns from manifestation while remaining attached:
 
-- Hidden Coil becomes available again **only if it has not already been spent this Battle**;
-- manifestation does not refresh a spent Hidden Coil.
+- a learned Hidden Coil becomes available again only if its once-per-Battle use was not already spent;
+- manifestation never refreshes a spent Hidden Coil.
 
-Detaching/replacing Snake ends its source-owned state.
-
-This is an intentional attached-vs-manifested trade-off.
+Ordinary Alpha Battles do not infer a seventh Character slot or independent recurring Summon turn from this future-capability section.
 
 ---
 
 # E. REQUIRED Enhancement Package
 
+## `snake_serpent_courier` — **Serpent Courier**
+
+Activation ownership:
+
+**OWNED / LEGITIMATELY AVAILABLE OUTSIDE BATTLE**
+
+Classification:
+
+**NON-BATTLE UTILITY / WORLD-MISSION-HOTSPOT SUPPORT**
+
+Enhancement statement:
+
+> **Snake can act as a small courier when a mission, hotspot or Story opportunity gives it a real route to the recipient.**
+
+This Enhancement exposes the outside-Battle utility action:
+
+### `snake_messenger` — **Messenger Snake**
+
+Use:
+
+- outside Battle only;
+- send one written message, small token, mission marker or similarly small authored payload;
+- destination must be a **known recipient or known reachable location**;
+- Snake must have a physically legitimate route;
+- recipient may send a reply back if the World/Story occurrence permits it.
+
+Messenger Snake does **not**:
+
+- teleport;
+- guarantee instant delivery;
+- guarantee undetected delivery;
+- cross sealed/physically impossible routes by fiat;
+- create knowledge Snake could not have observed or been told;
+- force a recipient to answer;
+- auto-complete a Mission/Hotspot objective;
+- carry arbitrary inventory quantities.
+
+World / Mission / Hotspot authority owns:
+
+- travel time where relevant;
+- route hazards;
+- interception;
+- whether a recipient/location is reachable;
+- what factual reply or evidence returns.
+
+Combat owns only the source capability:
+
+> **Snake is a valid messenger/courier source when the external occurrence provides a legitimate route.**
+
+This restores the intended Anko-style messenger-snake utility without turning communication into teleportation or omniscience.
+
+### Family generalisation boundary
+
+Stephen also directed that **most suitably small-to-medium Summons should be able to perform this kind of messenger work for Hotspot Events and Missions**.
+
+That broader family rule is not silently applied to every Summon from this Snake document. It requires CE / World reconciliation for eligibility, size/cognition/cooperation boundaries and occurrence resolution.
+
+---
+
+# F. Learnable source-assisted Battle Skill
+
 ## `snake_hidden_coil` — **Hidden Coil**
 
-Activation:
+Availability:
 
-**ATTACHED / NOT MANIFESTED**
+**OBTAINABLE / LEARNABLE — NOT AUTOMATIC FROM OWNERSHIP OR ATTACHMENT**
+
+Exact unlock channel:
+
+**NOT Combat-owned.** Progression / Development / World opportunity may grant access through separately authorised training, practice, teacher/event or equivalent progression.
+
+Requirement at use time:
+
+- Snake is the Character's active/prepared Summon;
+- Snake is not independently manifested;
+- the controller has legitimately learned/unlocked Hidden Coil;
+- Hidden Coil has not already been spent this Battle.
 
 Limit:
 
@@ -156,15 +230,13 @@ Limit:
 
 Player text:
 
-> **Once per Battle, after one of your Taijutsu or Bukijutsu attacks hits, Snake can immediately coil that enemy and restrict movement-heavy techniques for their next action.**
+> **After one of your Taijutsu or Bukijutsu attacks hits, send Snake around that enemy to restrict movement-heavy techniques for their next action.**
 
 Trigger:
 
 - controller commits a **single-target Taijutsu or Bukijutsu ATTACK** against the current legally targetable hostile;
 - the attack resolves for **positive final damage**;
-- target is still present after resolution;
-- Snake is attached and not manifested;
-- Hidden Coil has not already been spent.
+- target is still present after resolution.
 
 Effect:
 
@@ -173,20 +245,17 @@ Effect:
 - duration: through the end of the target's next action opportunity;
 - actions requiring **substantial free movement / reposition / escape** are unavailable while the restraint remains;
 - ordinary ATTACK / DEFENSE / SUPPORT actions that do not require substantial free movement remain legal;
-- an exact escape / anti-restraint effect may remove or override it;
+- exact escape / anti-restraint effect may remove or override it;
 - this is **not Stun**;
 - no extra damage packet is created;
-- no extra controller action is created.
+- no second controller action is created;
+- the once-per-Battle learned Skill use is consumed when the follow-up is committed.
 
-The restraint is source-owned by Snake, not a transfer of Snake's PL/Stats to the controller.
-
-Why the positive-damage trigger exists:
-
-The controller must first genuinely get Snake close enough to spring the ambush. Hidden Coil is a follow-up to established contact, not a free remote bind.
+This preserves the previously approved Hidden Coil behavior while moving its ownership from an automatic attached Enhancement to a **learned source-assisted Skill**.
 
 ---
 
-# F. Manifested own Skill kit
+# G. Manifested own Skill kit
 
 ## 1. `snake_fang_lunge` — **Fang Lunge**
 
@@ -327,13 +396,14 @@ This makes Snake's body itself the defense rather than adding a generic guard pe
 
 ---
 
-# G. Counter / drawback
+# H. Counter / drawback
 
 Snake's main authored limitation is the **mode trade-off**:
 
-- ATTACHED gives one surprise **Hidden Coil**;
-- MANIFESTED gives independent PL47 actions and Coiling Interpose;
-- Hidden Coil cannot trigger while Snake is physically manifested.
+- ATTACHED does not automatically grant Hidden Coil;
+- if Hidden Coil has been legitimately learned, ATTACHED / not-manifested Snake enables that once-per-Battle follow-up;
+- MANIFESTED future-capability gives PL47 actions and Coiling Interpose;
+- learned Hidden Coil cannot trigger while Snake is physically manifested.
 
 Additional limitations:
 
@@ -345,7 +415,7 @@ Additional limitations:
 
 ---
 
-# H. Environmental interaction
+# I. Environmental interaction
 
 No default environmental bonus is proposed for generic Snake.
 
@@ -360,23 +430,27 @@ This keeps Snake inside currently modelled Battle authority.
 
 ---
 
-# I. Persistent / collection progression
+# J. Persistent / collection progression
 
-No account-wide persistent collection bonus is proposed.
+No account-wide numeric collection bonus is created.
 
-No generic "snake family" recruitment multiplier is created.
+Persistent source value is instead expressed through **Serpent Courier**:
 
-No named-snake contract progress is inferred from owning this generic Snake.
+- legitimately owned/available Snake may provide Messenger Snake in appropriate non-Battle occurrences;
+- this does not grant automatic Mission success;
+- no generic "snake family" recruitment multiplier is created;
+- no named-snake contract progress is inferred from owning this generic Snake.
 
 ---
 
-# J. Double-count / representation exclusions
+# K. Double-count / representation exclusions
 
 - Snake PL47 belongs to Snake only.
 - No PL/Stats transfer to controller.
-- Hidden Coil and manifested Snake are two states of the **same source**, not two Snakes.
-- Hidden Coil cannot trigger while manifested.
-- manifesting/returning does not refresh a spent Hidden Coil.
+- learned Hidden Coil and manifested Snake use the **same source**, not two Snakes;
+- Hidden Coil is unavailable while manifested;
+- manifesting/returning does not refresh a spent Hidden Coil;
+- ownership/attachment alone does not grant Hidden Coil; the Skill requires legitimate unlock authority.
 - generic Snake does not inherit Manda, Aoda or Manda II mechanics.
 - generic Snake does not automatically grant venom, shedding, Sage access or underground ambush.
 - a Character technique such as Hidden Shadow Snake Hands does not automatically mean the collectible `snake` Entity is separately attached unless exact source authority says so.
@@ -384,7 +458,7 @@ No named-snake contract progress is inferred from owning this generic Snake.
 
 ---
 
-# K. Current-runtime / admission note
+# L. Current-runtime / admission note
 
 Current source contains the Snake card/portrait assets, but `snake` is not currently implemented in the live runtime Entity Registry or live production Entity list.
 
@@ -400,23 +474,31 @@ No old live Snake skill package exists that must be preserved.
 
 ---
 
-# L. Player-facing summary
+# M. Player-facing summary
 
-## SNAKE — AMBUSH / RESTRAINT / CAPTURE
+## SNAKE — COURIER / AMBUSH / RESTRAINT / CAPTURE
 
-> **Keep Snake attached to spring one surprise coil after a Taijutsu or Bukijutsu hit. Manifest it instead for bites, constriction and a stronger crush that trades away the bind. While manifested, Snake can also take one direct attack for its summoner.**
+> **Snake can carry messages during missions and hotspot events when it has a real route to the recipient. Train with Snake to unlock Hidden Coil, letting it wrap an enemy after one of your Taijutsu or Bukijutsu hits. In future/full-manifestation Battles, Snake can also fight directly with bites, constriction and interception.**
 
 That is the complete Source 10 identity.
 
 ---
 
-# M. Decision state
+# N. Decision state
 
-**Mechanics:** PROPOSED / awaiting Stephen sign-off.  
+**Stephen sign-off:** **YES — 2026-09-27, with messenger/enhancement + Hidden Coil ownership correction.**  
 **Identity / Stats / Base PL:** CLOSED by PL / Registry at `snake`, PL47.  
+**Enhancement:** **Serpent Courier — CLOSED.**  
+**Outside-Battle utility:** **Messenger Snake — CLOSED for Snake.**  
+**Hidden Coil mechanics:** **CLOSED.**  
+**Hidden Coil ownership:** **OBTAINABLE / LEARNABLE, not automatic — CLOSED.**  
+**Exact Hidden Coil unlock pathway:** downstream Progression / Development / World authority; not invented here.  
+**Manifested/future Battle kit:** CLOSED as future/full-manifestation capability.  
 **Production admission:** NOT LIVE / separate downstream decision.  
 **Implementation:** NOT STARTED.  
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
 
-**design proposed != design closed != implemented != runtime validated != Golden GREEN**
+**SOURCE 10 SNAKE = DESIGN CLOSED under RESET v2.**
+
+**design closed != implemented != runtime validated != Golden GREEN**
