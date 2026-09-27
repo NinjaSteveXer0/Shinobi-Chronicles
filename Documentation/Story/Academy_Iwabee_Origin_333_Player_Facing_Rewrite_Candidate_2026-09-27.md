@@ -1,3 +1,10 @@
+> **SUPERSEDED CANDIDATE NOTICE — 2026-09-27**
+>
+> This review candidate is superseded for current player-facing review by:
+> `Documentation/Story/Academy_Iwabee_Origin_333_Benchmark_Optimized_Candidate_2026-09-27.md`
+>
+> Preserve this file only as archaeology. Do not implement or approve from this older candidate.
+
 > **2026-09-27 SUPERSEDED FOR REVIEW — BENCHMARK-OPTIMIZED SUCCESSOR**  
 > Current review candidate: `Documentation/Story/Academy_Iwabee_Origin_333_Benchmark_Optimized_Candidate_2026-09-27.md`. The successor repairs over-fragmentation and consumes the current CE / Registry Rogue-Genin authority. Do not consume this earlier candidate as current expression.
 
