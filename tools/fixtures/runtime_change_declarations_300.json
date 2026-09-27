@@ -790,7 +790,9 @@
         "currentBattle.wasabi343 strict Rogue Genin Battle metadata",
         "playerData.wasabi343BattleLaunches idempotence receipts",
         "shinobiTestState.wasabi343 / wasabi343BattleId / wasabi343BattleActive / wasabi343BattleLaunches scoped adapter envelope",
-        "currentBattle.wasabi343 / battleConfigId restore projection"
+        "currentBattle.wasabi343 / battleConfigId restore projection",
+        "Story Scene Board exact Wasabi scene/route backdrop projection",
+        "currentBattle.environmentPath / presentationEnvironmentPath exact Scene-4C alley continuity"
       ],
       "productionLoader": "index.html",
       "qaRefs": [
@@ -807,7 +809,7 @@
         "runtime/alpha-origin-screen-first-33700.js::patchIzuno"
       ],
       "contractChangeReason": "AUTHORITY_CHANGED",
-      "rationale": "Issue #343 consumes the approved Academy Wasabi Writing-Golden Story and closed Rogue Genin Combat package. It preserves IZU-01/02/03/04 source addresses, separates the secondary Rogue occurrence from the pursuit result, restores STEP IN through the shared Story-to-Battle return seam, enforces strict 1v1 deployment and zero Battle entitlement, persists only the #343 adapter envelope through the established saveTestState/restoreTestState session extension seam, retires all stale pre-GOLDEN Wasabi expression patches (33500/33600/33700), and adds no morality/personality/specialization inference or staged-vs-external World classification."
+      "rationale": "Issue #343 consumes the approved Academy Wasabi Writing-Golden Story, the closed Rogue Genin Combat package, and the Writing-closed Academy_Wasabi_Izuno_Origin_Backdrop_Projection_Binding_2026-09-27 authority. It preserves IZU-01/02/03/04 source addresses, separates the secondary Rogue occurrence from the pursuit result, restores STEP IN through the shared Story-to-Battle return seam, enforces strict 1v1 deployment and zero Battle entitlement, persists only the #343 adapter envelope through the established saveTestState/restoreTestState session extension seam, binds the seven exact dedicated Story backdrops, preserves the alley through STEP IN Battle and the post-Battle return before converging to Scene 5 training grounds, retires all stale pre-GOLDEN Wasabi expression patches (33500/33600/33700), and adds no morality/personality/specialization inference or staged-vs-external World classification."
     }
   ]
 }
