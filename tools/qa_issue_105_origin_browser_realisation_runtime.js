@@ -74,6 +74,7 @@ function beginOrigin(id){selectOrigin(id);const r=context.beginAlphaChronicleOri
 try{
   // Exact production Origin package order, then both browser-realisation layers.
   load("runtime/alpha-origin-scenes-32900-core.js");
+  load("runtime/academy-wasabi-writing-golden-343.js");
   registerStoryScene({sceneId:"origin_academy_menma_prologue",entryBeatId:"menma",beats:[{beatId:"menma",mode:"narration",text:"Menma",exitScene:true}],onCompleteConsequences:[]});
   load("runtime/alpha-origin-scenes-32900-a.js");load("runtime/alpha-origin-scenes-32900-b.js");load("runtime/alpha-origin-scenes-32900-c.js");load("runtime/alpha-origin-scenes-32900-integrator.js");load("runtime/alpha-origin-browser-realisation-33500.js");load("runtime/alpha-origin-choice-reaction-33510.js");
 
