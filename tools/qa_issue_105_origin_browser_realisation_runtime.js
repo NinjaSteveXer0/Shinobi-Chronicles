@@ -128,8 +128,8 @@ try{
   assert("mirai_prior_choice_changes_later_evidence",render.beatId==="mir_inconsistent"&&render.text.includes("route the escort described"),render);
 
   // Wasabi route and Iwabee terrain choice both change visible successor realization.
-  beginOrigin("academy_izuno");clickContinue();clickChoice("environmental_signs");clickChoice("stronger_trail");
-  assert("wasabi_route_choice_has_visible_successor",render.beatId==="izu_route_result"&&render.text.includes("false trail"),render);
+  beginOrigin("academy_izuno");continueUntil("izu_initial_choice");clickChoice("environmental_signs");continueUntil("izu_split_choice");clickChoice("stronger_trail");
+  assert("wasabi_route_choice_has_visible_successor",render.beatId==="izu_stronger_1"&&render.text.includes("new trail is better"),render);
   beginOrigin("academy_iwabee");clickContinue();clickChoice("build_path");
   assert("iwabee_terrain_choice_changes_visible_world_result",render.beatId==="iwa_expose"&&render.text.includes("builds a stable path"),render);
 
