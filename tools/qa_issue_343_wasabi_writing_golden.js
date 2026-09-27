@@ -100,6 +100,17 @@ assert(wasabiSource.includes('"YOUR DECISIONS"')&&wasabiSource.includes('"WHAT H
 assert(wasabiSource.includes("A.findOccurrence(tracking)")&&wasabiSource.includes("A.findOccurrence(intercept)")&&wasabiSource.includes("A.findOccurrence(coop)")&&wasabiSource.includes("A.findOccurrence(rogue)"),"Receipt does not read committed Wasabi history");
 assert(wasabiSource.includes('performanceTransitions:{[closeLastBeatId]:"wipe_right_to_left"}'),"Origin Close -> Receipt black wipe missing");
 assert(!wasabiSource.includes("pursuit_target.png"),"Coding guessed pursuit-target asset path before exact GitHub authority");
+for(const token of [
+  "intelligence.strategic_intelligence_analyst:multi_source_analysis",
+  "communications_and_cryptography.battlefield_communications_specialist:communications_planning",
+  "intelligence.counter_intelligence_analyst:deception_detection",
+  "covert_operations.extraction_specialist:subject_recovery",
+  "reconnaissance.tracker_nin:trail_analysis",
+  "reconnaissance.tracker_nin:route_intercept_execution"
+])assert(wasabiSource.includes(token),"#409 progression mapping missing "+token);
+assert(wasabiSource.includes("significance:1")&&wasabiSource.includes("specialistLevel:false"),"#409 evidence envelope drift");
+assert(wasabiSource.includes("commitRiverStamina40900")&&wasabiSource.includes("expGranted:1"),"#409 River +1 Stamina missing");
+assert(coreSource.includes('ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID="origin_completion_starting_purse_ryo_01"')&&coreSource.includes("ORIGIN_COMPLETION_STARTING_PURSE_RYO=100"),"#409 shared Origin purse missing");
 
 // Approved voice/dialogue anchors from Writing GOLDEN.
 for(const [prefix,line] of [
@@ -161,7 +172,8 @@ for(const id of [
   "occ_origin_izuno_pursuit_tracking_resolution",
   "occ_origin_izuno_intercept_prediction_resolution",
   "occ_origin_izuno_pursuit_cooperation_resolution",
-  "occ_origin_izuno_rogue_genin_interruption_resolution"
+  "occ_origin_izuno_rogue_genin_interruption_resolution",
+  "occ_origin_izuno_river_endurance_resolution"
 ])assert(wasabiSource.includes(id),"missing Wasabi source occurrence "+id);
 assert(wasabiSource.includes('"wasabi_origin_rogue_genin_01"')&&wasabiSource.includes('"wasabi_origin_interference_student"'));
 
@@ -169,7 +181,7 @@ assert(wasabiSource.includes('"wasabi_origin_rogue_genin_01"')&&wasabiSource.inc
 const interceptReq=byId.get("izu_after_base_1").onEnterConsequences.find(x=>x.requestId==="izu_intercept_32900");
 assert(interceptReq,"IZU-02 request missing");
 assert.deepStrictEqual(JSON.parse(JSON.stringify(interceptReq.__factResolver({outcome:"intercept_before_extraction"}))),{
-  interceptReachedByPrediction:true,pursuitOutcome:"intercept_before_extraction"
+  interceptReachedByPrediction:true,pursuitOutcome:"intercept_before_extraction",academyTrackingRecommendation:true
 });
 assert.deepStrictEqual(JSON.parse(JSON.stringify(interceptReq.__rowIdsResolver({outcome:"intercept_before_extraction"}))),["IZU-02"]);
 assert.deepStrictEqual(JSON.parse(JSON.stringify(interceptReq.__rowIdsResolver({predictionApproach:true,outcome:"arrive_just_after_target"}))),[]);
@@ -198,6 +210,8 @@ assert.strictEqual(callCommit.success,true);
 const izu04=commits.find(x=>x.occurrenceId==="occ_origin_izuno_rogue_genin_interruption_resolution");
 assert(izu04&&izu04.fact.rogueGeninResponse==="call_for_help");
 assert.strictEqual(izu04.fact.rogueGeninInterruptionResolvedByWasabiAction,true);
+assert.strictEqual(izu04.fact.affectedStudentPhysicallyRemoved,true);
+assert.strictEqual(izu04.fact.affectedStudentParticipantRef,"wasabi_origin_interference_student");
 assert.deepStrictEqual(izu04.fact.battleOccurrenceIds,[]);
 assert.deepStrictEqual(izu04.rowIds,["IZU-04"]);
 
@@ -235,11 +249,14 @@ const sessionStorage={
 const battleCtx={
   console,JSON,Object,Array,String,Number,Boolean,Set,Map,Date,globalThis:null,sessionStorage,
   Math:Object.create(Math),
-  playerData:{},currentBattle:null,enemyDatabase:{},
+  playerData:{ryo:0,activityHistory:[]},currentBattle:null,enemyDatabase:{},
   makeEnemyFixedDamageAction:(id,_pl,opts={})=>({id,skillId:id,actionClass:"enemy_authored_action",traits:opts.traits||[],evaluateAvailability:()=>({available:true}),resolve:()=>({resolved:true})}),
   makeEnemyRatioGuardAction:(id,ratio,opts={})=>{ratioCalls.push({id,ratio,opts});return{id,skillId:id,actionClass:"enemy_ratio_guard",traits:opts.traits||[],evaluateAvailability:()=>({available:true}),resolve:()=>({resolved:true})};},
   chooseEnemyAuthoredBattleAction:()=>({success:false,reason:"qa_generic"}),
   generateBattleRewards:()=>({generated:true,claimed:false,ryo:88,exp:77,items:[{id:"bad"}],rareDrops:[{id:"bad_rare"}]}),
+  claimCurrentBattleRewards:()=>false,
+  recordBattleChronicle:()=>true,
+  getCurrentChronicleOccurrenceHistoryScope:()=>null,
   renderBattleActionFamilyRow:()=>'<nav class="battle-live-action-family-row"><button class="battle-live-action-family">SKILLS</button><button class="battle-live-action-family battle-live-withdraw-action" disabled>WITHDRAW</button></nav>',
   evaluateEnemyActionScheduler:()=>({ready:true,enemyId:"wasabi_origin_rogue_genin_01",eligibleActions:[]}),
   findBattleTransientState:()=>null,removeBattleTransientState:()=>true,
@@ -341,11 +358,21 @@ assert.strictEqual(battleCtx.currentBattle.presentationEnvironmentPath,"Izuno Or
 assert(battleCtx.playerData.wasabi343BattleLaunches[launched.battleId],"session restore did not reconstruct Wasabi launch idempotence receipt");
 assert.deepStrictEqual(Array.from(battleCtx.currentBattle.deployment.player.slots||[],x=>x.participantId),["academy_izuno"],"session restore drifted Wasabi deployment");
 assert.deepStrictEqual(Array.from(battleCtx.currentBattle.deployment.enemy.slots||[],x=>x.participantId),["wasabi_origin_rogue_genin_01"],"session restore drifted Rogue deployment");
-const generatedZero=battleCtx.generateBattleRewards({rewards:{ryo:{min:99,max:99}}},{id:"academy_izuno"});
-assert.strictEqual(generatedZero.ryo,0);assert.strictEqual(generatedZero.exp,0);
-assert.strictEqual(Array.from(generatedZero.items||[]).length,0);assert.strictEqual(Array.from(generatedZero.rareDrops||[]).length,0);
-assert.strictEqual(generatedZero.requiresExplicitPostClaimContinue,true);
-assert.strictEqual(generatedZero.wasabi343ZeroEntitlement,true);
+battleCtx.currentBattle.outcome={type:"victory",finishingShinobiId:"academy_izuno"};
+const generatedFixed=battleCtx.generateBattleRewards({rewards:{ryo:{min:99,max:99}}},{id:"academy_izuno",name:"Wasabi"});
+assert.strictEqual(generatedFixed.ryo,50);assert.strictEqual(generatedFixed.exp,0);
+assert.strictEqual(Array.from(generatedFixed.items||[]).length,0);assert.strictEqual(Array.from(generatedFixed.rareDrops||[]).length,0);
+assert.strictEqual(generatedFixed.requiresExplicitPostClaimContinue,true);
+assert.strictEqual(generatedFixed.wasabi343FixedReward,true);
+assert.strictEqual(generatedFixed.wasabi343RewardSourceId,"wasabi_origin_rogue_genin_battle_victory_ryo_01");
+const beforeClaimRyo=battleCtx.playerData.ryo;
+assert.strictEqual(battleCtx.claimCurrentBattleRewards(),true);
+assert.strictEqual(battleCtx.playerData.ryo-beforeClaimRyo,50);
+assert.strictEqual(battleCtx.claimCurrentBattleRewards(),false);
+assert.strictEqual(battleCtx.playerData.ryo-beforeClaimRyo,50,"duplicate claim duplicated Wasabi victory cash");
+const rewardReceipts=battleCtx.playerData.activityHistory.filter(row=>row&&row.rewardSourceId==="wasabi_origin_rogue_genin_battle_victory_ryo_01");
+assert.strictEqual(rewardReceipts.length,1);
+assert.strictEqual(rewardReceipts[0].battleOccurrenceId,launched.battleId);
 assert.strictEqual(evidenceRows.length,1);
 const replay=battleCtx.launchAcademyWasabiRogueGeninBattle343(launchSpec);
 assert.strictEqual(replay.success,true);assert.strictEqual(replay.idempotent,true);assert.strictEqual(evidenceRows.length,1,"Battle launch replay duplicated evidence");
@@ -378,6 +405,7 @@ assert.strictEqual(projected.battleResult,"victory");assert.strictEqual(projecte
 
 // Production loader order: catalogue before 32900-a, adapter after shared Battle.
 const index=fs.readFileSync("index.html","utf8");
+assert(index.indexOf("alpha-special-jonin-evidence-producer-34700.js")<index.indexOf("alpha-origin-scenes-32900-a.js"));
 assert(index.indexOf("academy-wasabi-writing-golden-343.js")<index.indexOf("alpha-origin-scenes-32900-a.js"));
 assert(index.indexOf("alpha-battle-modern-33000.js")<index.indexOf("alpha-wasabi-rogue-battle-343.js"));
 assert(index.indexOf("alpha-wasabi-rogue-battle-343.js")<index.indexOf("alpha-alpha-sprint-33100.js"));
@@ -393,7 +421,7 @@ for(const label of [
 console.log(JSON.stringify({
   pass:true,issue:343,sceneId:def.sceneId,beatCount:beats.length,
   exactWritingGoldenCatalogue:true,routeGraphClosed:true,
-  sourceOccurrences:["IZU-01","IZU-02","IZU-03","IZU-04"],
-  rogueBattle:{strictOneVsOne:true,basePL:23,actions:["9","7","40% guard"],zeroEntitlement:true,idempotentOccurrence:true},
+  sourceOccurrences:["IZU-01","IZU-02","IZU-03","IZU-04","RIVER-ENDURANCE"],
+  rogueBattle:{strictOneVsOne:true,basePL:23,actions:["9","7","40% guard"],fixedVictoryRyo:50,idempotentOccurrence:true},
   moralityInference:false,browserGoldenClaimed:false
 },null,2));

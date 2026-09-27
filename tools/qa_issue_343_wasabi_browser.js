@@ -17,6 +17,9 @@ const TRACKING="occ_origin_izuno_pursuit_tracking_resolution";
 const INTERCEPT="occ_origin_izuno_intercept_prediction_resolution";
 const COOP="occ_origin_izuno_pursuit_cooperation_resolution";
 const ROGUE_OCC="occ_origin_izuno_rogue_genin_interruption_resolution";
+const RIVER="occ_origin_izuno_river_endurance_resolution";
+const PURSE_SOURCE="origin_completion_starting_purse_ryo_01";
+const BATTLE_REWARD_SOURCE="wasabi_origin_rogue_genin_battle_victory_ryo_01";
 const BACKDROPS=Object.freeze({
   practical:"Izuno Origin Backdrop/practical_ground_day.png",
   rooftop:"Izuno Origin Backdrop/konoha_rooftop_pursuit_day.png",
@@ -40,7 +43,7 @@ async function boot(browser,label){
   const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1});
   const page=await context.newPage(),runtimeErrorGate=await installBrowserRuntimeErrorGate(page);
   await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});
-  await page.waitForFunction(()=>typeof getRuntimeBuildFingerprint==="function"&&!!globalThis.SC_ACADEMY_WASABI_WRITING_GOLDEN_343&&!!globalThis.SC_ACADEMY_WASABI_ROGUE_BATTLE_343&&!!globalThis.SC_ALPHA_ORIGIN_32900,null,{timeout:30000});
+  await page.waitForFunction(()=>typeof getRuntimeBuildFingerprint==="function"&&!!globalThis.SC_ALPHA_SPECIAL_JONIN_EVIDENCE_PRODUCER_34700&&!!globalThis.SC_ACADEMY_WASABI_WRITING_GOLDEN_343&&!!globalThis.SC_ACADEMY_WASABI_ROGUE_BATTLE_343&&!!globalThis.SC_ALPHA_ORIGIN_32900,null,{timeout:30000});
   assert.deepStrictEqual(await page.evaluate(()=>getRuntimeBuildFingerprint()),BUILD,label+" runtime fingerprint mismatch");
   const started=await page.evaluate(()=>{
     const selected=selectChronicleOrigin("academy_izuno","issue_343_installed_browser");
@@ -197,11 +200,16 @@ async function history(page){
       exact,prologueCompleted:acq.chronicleOrigin?.prologueCompleted===true,
       teamFormationRequired:acq.academyTeamFormation?.required===true,
       activeStory:getActiveStorySceneRuntime()?JSON.parse(JSON.stringify(getActiveStorySceneRuntime())):null,
+      ryo:Number(playerData.ryo)||0,
+      rewardReceipts:rows.filter(r=>r&&["origin_completion_reward","origin_battle_reward"].includes(r.type)).map(r=>JSON.parse(JSON.stringify(r))),
+      developmentReceipts:rows.filter(r=>r&&r.type==="discipline_development").map(r=>JSON.parse(JSON.stringify(r))),
+      specialEvidence:Array.isArray(playerData.specialJoninContextualEvidence)?JSON.parse(JSON.stringify(playerData.specialJoninContextualEvidence)):[],
+      stamina:typeof getCharacterDisciplineProgression==="function"?JSON.parse(JSON.stringify(getCharacterDisciplineProgression("academy_izuno","stamina"))):null,
       bodyText:document.body.innerText||""
     };
-  },{ids:[TRACKING,INTERCEPT,COOP,ROGUE_OCC]});
+  },{ids:[TRACKING,INTERCEPT,COOP,ROGUE_OCC,RIVER]});
 }
-async function finishFromCurrent(page,label,reflection="Sometimes the fastest path isn't the obvious one."){
+async function finishFromCurrent(page,label,reflection="Sometimes the fastest path isn't the obvious one.",expect={battleRyo:0,river:false}){
   await continueTo(page,"izu_reflect");
   assert.deepStrictEqual((await info(page)).choices,[
     "Next time I'm trusting the trail.","Next time I'm trusting what I notice.","Sometimes the fastest path isn't the obvious one.","Catching them wasn't the only thing that mattered."
@@ -213,8 +221,31 @@ async function finishFromCurrent(page,label,reflection="Sometimes the fastest pa
   const receipt=await info(page);
   assert.strictEqual(receipt.cueKind,"record",label+" Chronicle Receipt presentation mode missing");
   assert.strictEqual(receipt.speaker,"CHRONICLE RECEIPT",label+" Chronicle Receipt heading missing");
-  for(const heading of ["YOUR ORIGIN","ACADEMY WASABI IZUNO","RECORDED IN YOUR CHRONICLE","YOUR DECISIONS","WHAT HAPPENED","HISTORY CREATED"]){
+  for(const heading of ["YOUR ORIGIN","ACADEMY WASABI IZUNO","RECORDED IN YOUR CHRONICLE","YOUR DECISIONS","WHAT HAPPENED","HISTORY CREATED","REWARDS"]){
     assert(receipt.text.includes(heading),label+" Chronicle Receipt missing "+heading);
+  }
+  assert(receipt.text.includes("Origin Starting Purse: +100 Ryō."),label+" Chronicle Receipt missing committed starting purse");
+  assert.strictEqual(receipt.text.includes("Rogue Genin Battle Victory: +50 Ryō."),Number(expect.battleRyo)===50,label+" Battle reward Receipt projection drift");
+  assert.strictEqual(receipt.text.includes("Stamina Development: +1."),expect.river===true,label+" River development Receipt projection drift");
+  for(const forbidden of ["occ_origin_","sjctx","specialistLevel","independentSourceId","significance","Chronicle Engine"])assert(!receipt.text.includes(forbidden),label+" Receipt leaked hidden machinery "+forbidden);
+  const committed=await history(page);
+  assert.strictEqual(committed.prologueCompleted,true,label+" Origin completion did not commit before Receipt projection");
+  const purse=committed.rewardReceipts.filter(r=>r.rewardSourceId===PURSE_SOURCE);
+  assert.strictEqual(purse.length,1,label+" starting purse missing/duplicated at Receipt");
+  assert.strictEqual(purse[0].ryo,100,label+" starting purse amount drift");
+  const battleCash=committed.rewardReceipts.filter(r=>r.rewardSourceId===BATTLE_REWARD_SOURCE);
+  assert.strictEqual(battleCash.length,Number(expect.battleRyo)===50?1:0,label+" Battle cash receipt count drift");
+  assert(!committed.rewardReceipts.some(r=>r.actorVariantId===WASABI&&Number(r.ryo)===25),label+" retired +25 route cash returned");
+  const beforeRepeat=committed.ryo;
+  const repeat=await page.evaluate(()=>completeChronicleOriginPrologue("academy_izuno",[]));
+  assert.strictEqual(repeat.success,true,label+" repeated Origin completion failed");
+  assert.strictEqual(repeat.originStartingPurseIdempotent,true,label+" starting purse repeat not idempotent");
+  assert.strictEqual(repeat.originStartingPurseRyoGranted,0,label+" starting purse repeated cash");
+  assert.strictEqual((await history(page)).ryo,beforeRepeat,label+" repeated completion changed Ryō");
+  if(expect.river===true){
+    const riverRows=committed.developmentReceipts.filter(r=>r.subjectVariantId===WASABI&&r.sourceOccurrenceId===RIVER&&r.disciplineId==="stamina");
+    assert.strictEqual(riverRows.length,1,label+" River Stamina receipt missing/duplicated");
+    assert.strictEqual(riverRows[0].expGranted,1,label+" River Stamina amount drift");
   }
   assert.strictEqual(receipt.actors.length,0,label+" Chronicle Receipt incorrectly stages Story actors");
   assert.strictEqual(receipt.performanceLabels.filter(x=>x==="CHRONICLE RECEIPT").length,1,label+" duplicate Chronicle Receipt labels");
@@ -253,7 +284,7 @@ async function runNonBattle(browser,{label,opening,route,rogueChoice=null,checks
     await assertBackdrop(page,BACKDROPS.training,label+" AFTER");
     const before=await history(page);
     await checks(page,before);
-    const completed=await finishFromCurrent(page,label);
+    const completed=await finishFromCurrent(page,label,"Sometimes the fastest path isn't the obvious one.",{battleRyo:0,river:route==="TAKE THE RIVER"});
     const errors=await runtimeErrorGate.assertClean(label);
     return{label,before,completed,errors};
   }finally{await context.close();}
@@ -376,12 +407,34 @@ async function terminateBattleToStory(page,outcome,label){
       return typeof prior==="function"?prior(side,id):1;
     };
     try{
-      currentBattle.outcome={...(currentBattle.outcome||{}),type:outcome,completedAt:Date.now(),finishingShinobiId:outcome==="victory"?wasabi:null};
+      const ryoBefore=Number(playerData.ryo)||0;
+      currentBattle.outcome={...(currentBattle.outcome||{}),type:outcome,committed:true,completedAt:Date.now(),finishingShinobiId:outcome==="victory"?wasabi:null};
       currentBattle.battleOver=true;currentBattle.active=false;
-      return resumeBattleCallerAfterCompletion(outcome);
+      let projected=null,firstClaim=null,secondClaim=null;
+      if(outcome==="victory"){
+        projected=JSON.parse(JSON.stringify(generateBattleRewards(enemyDatabase[rogue],getPlayerCharacter(wasabi))));
+        firstClaim=claimCurrentBattleRewards();
+        secondClaim=claimCurrentBattleRewards();
+      }
+      const ryoAfter=Number(playerData.ryo)||0;
+      const receipts=(playerData.activityHistory||[]).filter(row=>row&&row.rewardSourceId==="wasabi_origin_rogue_genin_battle_victory_ryo_01").map(row=>JSON.parse(JSON.stringify(row)));
+      const resumed=resumeBattleCallerAfterCompletion(outcome);
+      return{...resumed,rewardAudit:{ryoBefore,ryoAfter,projected,firstClaim,secondClaim,receipts}};
     }finally{globalThis.getBattleRemainingPL=prior;}
   },{outcome,wasabi:WASABI,rogue:ROGUE});
   assert(result?.success===true,label+" caller return failed "+JSON.stringify(result));
+  if(outcome==="victory"){
+    assert.strictEqual(result.rewardAudit.projected?.ryo,50,label+" Victory projection amount drift");
+    assert.strictEqual(result.rewardAudit.projected?.exp,0,label+" Victory generic EXP returned");
+    assert.deepStrictEqual(result.rewardAudit.projected?.items||[],[],label+" Victory fixed loot returned");
+    assert.strictEqual(result.rewardAudit.firstClaim,true,label+" Victory CLAIM failed");
+    assert.strictEqual(result.rewardAudit.secondClaim,false,label+" duplicate Victory CLAIM succeeded");
+    assert.strictEqual(result.rewardAudit.ryoAfter-result.rewardAudit.ryoBefore,50,label+" Victory did not grant exactly +50 Ryō");
+    assert.strictEqual(result.rewardAudit.receipts.length,1,label+" Victory reward receipt missing/duplicated");
+  }else{
+    assert.strictEqual(result.rewardAudit.ryoAfter-result.rewardAudit.ryoBefore,0,label+" Defeat granted Battle cash");
+    assert.strictEqual(result.rewardAudit.receipts.length,0,label+" Defeat wrote Victory reward receipt");
+  }
   await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:12000});
   await waitBeat(page,"izu_rogue_step_in_return_1");
   await assertBackdrop(page,BACKDROPS.alley,label+" post-Battle alley return");
@@ -420,7 +473,7 @@ async function runBattleRoute(browser,outcome){
     await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:12000});
     h=await history(page);
     assert.strictEqual(h.exact[ROGUE_OCC].length,1,label+" reload duplicated IZU-04");
-    const completed=await finishFromCurrent(page,label,"Catching them wasn't the only thing that mattered.");
+    const completed=await finishFromCurrent(page,label,"Catching them wasn't the only thing that mattered.",{battleRyo:outcome==="victory"?50:0,river:false});
     const errors=await runtimeErrorGate.assertClean(label);
     return{label,battle,reloaded,returnedOutcome:outcome,completed,errors};
   }finally{await context.close();}
@@ -431,19 +484,19 @@ async function runBattleRoute(browser,outcome){
   try{
     results.push(await runNonBattle(browser,{
       label:"obvious-river",opening:"TAKE THE OBVIOUS TRAIL",route:"TAKE THE RIVER",
-      checks:async(_page,h)=>{assert.strictEqual(h.exact[TRACKING].length,1);assert.strictEqual(h.exact[TRACKING][0].fact?.pursuitOutcome,"arrive_just_after_target");assert.strictEqual(h.exact[ROGUE_OCC].length,0);}
+      checks:async(_page,h)=>{assert.strictEqual(h.exact[TRACKING].length,1);assert.strictEqual(h.exact[TRACKING][0].fact?.pursuitOutcome,"arrive_just_after_target");assert.strictEqual(h.exact[RIVER].length,1);assert.strictEqual(h.exact[RIVER][0].fact?.sustainedEnduranceExertion,true);assert.strictEqual(h.developmentReceipts.filter(r=>r.sourceOccurrenceId===RIVER&&r.disciplineId==="stamina").length,1);assert.strictEqual(h.exact[ROGUE_OCC].length,0);}
     }));
     results.push(await runNonBattle(browser,{
       label:"better-stronger",opening:"LOOK FOR SOMETHING BETTER",route:"FOLLOW THE STRONGER TRAIL",
-      checks:async(_page,h)=>{assert.strictEqual(h.exact[TRACKING][0].fact?.reliableEnvironmentalTrackingEstablished,true);assert.strictEqual(h.exact[TRACKING][0].fact?.falseTrailCorrectlyDiscovered,true);assert.strictEqual(h.exact[TRACKING][0].fact?.pursuitOutcome,"false_trail_discovered");}
+      checks:async(_page,h)=>{assert.strictEqual(h.exact[TRACKING][0].fact?.reliableEnvironmentalTrackingEstablished,true);assert.strictEqual(h.exact[TRACKING][0].fact?.falseTrailCorrectlyDiscovered,true);assert.strictEqual(h.exact[TRACKING][0].fact?.academyTrackingRecommendation,true);assert.strictEqual(h.exact[TRACKING][0].fact?.pursuitOutcome,"false_trail_discovered");const tracker=h.specialEvidence.find(r=>r.qualificationId==="reconnaissance.tracker_nin"&&r.independentSourceId===TRACKING),ci=h.specialEvidence.find(r=>r.qualificationId==="intelligence.counter_intelligence_analyst"&&r.independentSourceId===TRACKING);assert(tracker?.tags?.includes("reconnaissance.tracker_nin:trail_analysis"));assert(ci?.tags?.includes("intelligence.counter_intelligence_analyst:deception_detection"));assert.strictEqual(tracker.significance,1);assert.strictEqual(ci.significance,1);assert.strictEqual(tracker.specialistLevel,false);assert.strictEqual(ci.specialistLevel,false);assert(!ci.tags.includes("intelligence.counter_intelligence_analyst:counter_intelligence_response"));}
     }));
     results.push(await runNonBattle(browser,{
       label:"predict-intercept",opening:"FORGET THE TRAIL — WHERE ARE THEY GOING?",route:"CUT FOR THE INTERCEPT",
-      checks:async(_page,h)=>{assert.strictEqual(h.exact[INTERCEPT][0].fact?.interceptReachedByPrediction,true);assert.strictEqual(h.exact[INTERCEPT][0].fact?.pursuitOutcome,"intercept_before_extraction");}
+      checks:async(_page,h)=>{assert.strictEqual(h.exact[INTERCEPT][0].fact?.interceptReachedByPrediction,true);assert.strictEqual(h.exact[INTERCEPT][0].fact?.academyTrackingRecommendation,true);assert.strictEqual(h.exact[INTERCEPT][0].fact?.pursuitOutcome,"intercept_before_extraction");const tracker=h.specialEvidence.find(r=>r.qualificationId==="reconnaissance.tracker_nin"&&r.independentSourceId===INTERCEPT);assert(tracker?.tags?.includes("reconnaissance.tracker_nin:route_intercept_execution"));assert.strictEqual(tracker.significance,1);}
     }));
     results.push(await runNonBattle(browser,{
       label:"cooperate-call-help",opening:"WORK WITH THE OTHERS",route:"CHECK THE SHOUTING",rogueChoice:"CALL FOR HELP",
-      checks:async(_page,h)=>{assert.strictEqual(h.exact[COOP][0].fact?.cooperatedWithAcademyStudents,true);assert.strictEqual(h.exact[ROGUE_OCC].length,1);assert.strictEqual(h.exact[ROGUE_OCC][0].fact?.rogueGeninResponse,"call_for_help");assert.deepStrictEqual(h.exact[ROGUE_OCC][0].fact?.battleOccurrenceIds,[]);}
+      checks:async(_page,h)=>{assert.strictEqual(h.exact[COOP][0].fact?.cooperatedWithAcademyStudents,true);assert.deepStrictEqual(h.exact[COOP][0].fact?.cooperatingParticipantRefs,["wasabi_origin_pursuit_student_roof_01","wasabi_origin_pursuit_student_street_02"]);assert.strictEqual(h.exact[ROGUE_OCC].length,1);assert.strictEqual(h.exact[ROGUE_OCC][0].fact?.rogueGeninResponse,"call_for_help");assert.strictEqual(h.exact[ROGUE_OCC][0].fact?.affectedStudentPhysicallyRemoved,true);assert.deepStrictEqual(h.exact[ROGUE_OCC][0].fact?.battleOccurrenceIds,[]);const strategic=h.specialEvidence.find(r=>r.qualificationId==="intelligence.strategic_intelligence_analyst"&&r.independentSourceId===COOP),comms=h.specialEvidence.find(r=>r.qualificationId==="communications_and_cryptography.battlefield_communications_specialist"&&r.independentSourceId===COOP),extract=h.specialEvidence.find(r=>r.qualificationId==="covert_operations.extraction_specialist"&&r.independentSourceId===ROGUE_OCC);assert(strategic?.tags?.includes("intelligence.strategic_intelligence_analyst:multi_source_analysis"));assert(comms?.tags?.includes("communications_and_cryptography.battlefield_communications_specialist:communications_planning"));assert(extract?.tags?.includes("covert_operations.extraction_specialist:subject_recovery"));assert.strictEqual(strategic.significance,1);assert.strictEqual(comms.significance,1);assert.strictEqual(extract.significance,1);assert.strictEqual(strategic.independentSourceId,comms.independentSourceId);assert(!strategic.tags.includes("intelligence.strategic_intelligence_analyst:strategic_assessment"));assert(!comms.tags.includes("communications_and_cryptography.battlefield_communications_specialist:communications_continuity"));assert(!extract.tags.includes("covert_operations.extraction_specialist:extraction_planning"));}
     }));
     results.push(await runNonBattle(browser,{
       label:"obvious-keep-pursuing",opening:"TAKE THE OBVIOUS TRAIL",route:"CHECK THE SHOUTING",rogueChoice:"KEEP PURSUING",
@@ -455,11 +508,11 @@ async function runBattleRoute(browser,outcome){
     const summary={
       pass:true,issue:343,kind:"installed_browser_wasabi_writing_golden_rogue_battle",
       routeFamilies:["obvious_river","better_stronger","predict_intercept","cooperate_call_help","keep_pursuing","step_in_victory","step_in_defeat"],
-      exactSourceOccurrences:[TRACKING,INTERCEPT,COOP,ROGUE_OCC],
+      exactSourceOccurrences:[TRACKING,INTERCEPT,COOP,ROGUE_OCC,RIVER],
       strictOneVsOneBattle:true,battleSaveReload:true,bothBattleOutcomesReturn:true,
-      zeroBattleEntitlement:true,claimSeparateFromContinue:true,exactBackdropContract:true,postBattleAlleyReturn:true,exactBattleEnvironment:true,
-      visibleWasabiInstructorCards:true,speakerOwnedDialogue:true,singleNarrationLabel:true,originChronicleReceipt:true,
-      routeSensitiveOriginRewardsPendingWorld404:true,originToChronicleBegins:true,browserGoldenClaimed:false
+      fixedBattleVictoryRyo:50,sharedOriginStartingPurseRyo:100,claimSeparateFromContinue:true,exactBackdropContract:true,postBattleAlleyReturn:true,exactBattleEnvironment:true,
+      acceptedProgressionMappings409:true,riverStaminaDevelopment:true,visibleWasabiInstructorCards:true,speakerOwnedDialogue:true,singleNarrationLabel:true,originChronicleReceipt:true,
+      rewardSpectrum409Consumed:true,originToChronicleBegins:true,browserGoldenClaimed:false
     };
     fs.writeFileSync(path.join(OUT,"summary.json"),JSON.stringify({summary,results},null,2));
     console.log(JSON.stringify(summary,null,2));

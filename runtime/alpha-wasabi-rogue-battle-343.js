@@ -22,6 +22,8 @@ const BATTLE_ENVIRONMENT="Izuno Origin Backdrop/konoha_alleyway_day.png";
 const SCENE_ID="origin_academy_izuno_prologue";
 const FEINT_ID="enemy_rogue_genin_substitution_feint";
 const FEINT_STATE="rogue_genin_substitution_feint_ready";
+const REWARD_SOURCE_ID="wasabi_origin_rogue_genin_battle_victory_ryo_01";
+const FIXED_VICTORY_RYO=50;
 
 const PROFILE=Object.freeze({
   id:ROGUE,name:"ROGUE GENIN",rank:"Rogue Genin",
@@ -203,17 +205,77 @@ if(PRE_RENDER_ACTION_ROW){
 }
 
 const PRE_GENERATE_REWARDS=typeof generateBattleRewards==="function"?generateBattleRewards:null;
+function projectWasabi343Rewards(finishingShinobi=null){
+  if(!(currentBattle&&currentBattle.wasabi343))return{handled:false};
+  const existing=currentBattle.rewards&&typeof currentBattle.rewards==="object"?currentBattle.rewards:{};
+  const victory=currentBattle.outcome&&currentBattle.outcome.type==="victory";
+  currentBattle.rewards={
+    generated:victory,claimed:existing.claimed===true,ryo:victory?FIXED_VICTORY_RYO:0,exp:0,items:[],rareDrops:[],
+    finishingShinobi:finishingShinobi&&finishingShinobi.name||existing.finishingShinobi||null,mvp:existing.mvp||null,
+    requiresExplicitPostClaimContinue:true,wasabi343FixedReward:true,wasabi343RewardSourceId:REWARD_SOURCE_ID,
+    wasabi343VictoryEntitlement:victory,wasabi343BattleOccurrenceId:String(currentBattle.wasabi343.battleOccurrenceId||currentBattle.battleId||"")
+  };
+  return{handled:true,victory,rewards:currentBattle.rewards};
+}
 if(PRE_GENERATE_REWARDS){
-  globalThis.generateBattleRewards=function generateWasabi343ZeroBattleRewards(){
+  globalThis.generateBattleRewards=function generateWasabi343BattleRewards(enemy,finishingShinobi){
     const result=PRE_GENERATE_REWARDS.apply(this,arguments);
     if(!(currentBattle&&currentBattle.wasabi343))return result;
-    const rewards=result&&typeof result==="object"?result:{};
-    rewards.ryo=0;rewards.exp=0;rewards.items=[];rewards.rareDrops=[];
-    rewards.requiresExplicitPostClaimContinue=true;
-    rewards.wasabi343ZeroEntitlement=true;
-    return rewards;
+    return projectWasabi343Rewards(finishingShinobi).rewards;
   };
   try{generateBattleRewards=globalThis.generateBattleRewards;}catch(_error){}
+}
+function rewardHistory(){if(!Array.isArray(playerData.activityHistory))playerData.activityHistory=[];return playerData.activityHistory;}
+function rewardReceipt(battleOccurrenceId){
+  return rewardHistory().find(row=>row&&row.type==="origin_battle_reward"&&String(row.rewardSourceId||row.sourceId||"")===REWARD_SOURCE_ID&&String(row.battleOccurrenceId||"")===String(battleOccurrenceId||""))||null;
+}
+function claimWasabi343VictoryReward(){
+  if(!(currentBattle&&currentBattle.wasabi343))return{handled:false};
+  const m=currentBattle.wasabi343,battleOccurrenceId=String(m.battleOccurrenceId||currentBattle.battleId||"");
+  if(!(currentBattle.outcome&&currentBattle.outcome.type==="victory"))return{handled:true,success:false,reason:"wasabi_rogue_victory_required",ryoGranted:0};
+  projectWasabi343Rewards();
+  const existing=rewardReceipt(battleOccurrenceId);
+  if(existing){
+    if(currentBattle.rewards)currentBattle.rewards.claimed=true;
+    currentBattle.claimedAt=Number(existing.timestamp)||currentBattle.claimedAt||Date.now();
+    return{handled:true,success:false,idempotent:true,reason:"battle_rewards_already_claimed",ryoGranted:0,receipt:clone(existing)};
+  }
+  const rows=rewardHistory(),beforeRyo=Number(playerData.ryo)||0,beforeLength=rows.length;
+  const claimedBefore=!!(currentBattle.rewards&&currentBattle.rewards.claimed),claimedAtBefore=currentBattle.claimedAt||null;
+  try{
+    playerData.ryo=beforeRyo+FIXED_VICTORY_RYO;
+    const timestamp=Date.now();
+    const record={
+      historyScope:typeof getCurrentChronicleOccurrenceHistoryScope==="function"?getCurrentChronicleOccurrenceHistoryScope("origin_battle_reward"):null,
+      type:"origin_battle_reward",activity:"battle_reward",completed:true,committed:true,success:true,outcome:"reward_granted",
+      rewardSourceId:REWARD_SOURCE_ID,sourceId:REWARD_SOURCE_ID,battleOccurrenceId,sourceOccurrenceId:battleOccurrenceId,
+      originSourceOccurrenceId:m.sourceOccurrenceId,actorVariantId:WASABI,sceneId:SCENE_ID,battleConfigId:CONFIG,encounterId:ENCOUNTER,
+      rewards:{ryo:FIXED_VICTORY_RYO,exp:0,items:[],rareDrops:[]},
+      fact:{terminalBattleResult:"victory",rogueGeninBattlePLDepleted:true,genericCharacterExp:false,noFixedLoot:true},timestamp
+    };
+    rows.push(record);currentBattle.rewards.claimed=true;currentBattle.claimedAt=timestamp;
+    const chronicleRecorded=typeof recordBattleChronicle==="function"?recordBattleChronicle():true;
+    if(chronicleRecorded!==true)throw new Error("battle_chronicle_record_failed");
+    if(typeof savePlayerData==="function")savePlayerData();
+    if(typeof saveTestState==="function")saveTestState();
+    return{handled:true,success:true,idempotent:false,ryoGranted:FIXED_VICTORY_RYO,receipt:clone(record),chronicleRecorded:true};
+  }catch(error){
+    playerData.ryo=beforeRyo;while(rows.length>beforeLength)rows.pop();
+    if(currentBattle.rewards)currentBattle.rewards.claimed=claimedBefore;
+    currentBattle.claimedAt=claimedAtBefore;
+    return{handled:true,success:false,reason:"wasabi_rogue_victory_reward_claim_failed",error:String(error&&error.message||error)};
+  }
+}
+const PRE_CLAIM_REWARDS=typeof claimCurrentBattleRewards==="function"?claimCurrentBattleRewards:null;
+if(PRE_CLAIM_REWARDS){
+  globalThis.claimCurrentBattleRewards=function claimWasabi343BattleRewards(){
+    if(currentBattle&&currentBattle.wasabi343){
+      const result=claimWasabi343VictoryReward();
+      return result.success===true;
+    }
+    return PRE_CLAIM_REWARDS.apply(this,arguments);
+  };
+  try{claimCurrentBattleRewards=globalThis.claimCurrentBattleRewards;}catch(_error){}
 }
 
 function strictWasabiDeployment(){
@@ -287,7 +349,7 @@ function launch(spec={}){
     data:{
       battleOccurrenceId:exactId,sourceOccurrenceId:SOURCE_OCCURRENCE,historicalParticipantRef:ROGUE,
       affectedParticipantRef:AFFECTED_STUDENT,oppositionTemplateId:TEMPLATE,battleConfigId:CONFIG,encounterId:ENCOUNTER,
-      strictOneVsOne:true,rewardRyo:0,visibleExp:0
+      strictOneVsOne:true,victoryRewardRyo:FIXED_VICTORY_RYO,rewardSourceId:REWARD_SOURCE_ID,visibleExp:0
     }
   });
   if(!evidence)return{success:false,reason:"wasabi_battle_launch_evidence_failed"};
@@ -300,7 +362,9 @@ function launch(spec={}){
   if(currentBattle.rewards){
     currentBattle.rewards.ryo=0;currentBattle.rewards.exp=0;currentBattle.rewards.items=[];currentBattle.rewards.rareDrops=[];
     currentBattle.rewards.requiresExplicitPostClaimContinue=true;
-    currentBattle.rewards.wasabi343ZeroEntitlement=true;
+    currentBattle.rewards.wasabi343FixedReward=true;
+    currentBattle.rewards.wasabi343RewardSourceId=REWARD_SOURCE_ID;
+    currentBattle.rewards.wasabi343VictoryRyo=FIXED_VICTORY_RYO;
   }
   savePlayerData();saveTestState();openOverlay("combat");
   return{success:true,battleId:exactId,encounterId:ENCOUNTER,battleConfigId:CONFIG,environmentPath:BATTLE_ENVIRONMENT,playerParticipantIds:[WASABI],oppositionParticipantIds:[ROGUE],launchEvidenceId:evidence.evidenceId};
@@ -343,8 +407,10 @@ function diagnostics(){
     saveReloadEnvelope:!!PRE_SAVE_TEST&&!!PRE_RESTORE_TEST&&String(globalThis.saveTestState).includes("state.wasabi343BattleLaunches")&&String(globalThis.restoreTestState).includes("savedLaunches")&&String(globalThis.restoreTestState).includes("currentBattle.battleConfigId=CONFIG")&&String(globalThis.restoreTestState).includes("PRE_RESTORE_TEST.apply"),
     exactBattleEnvironment:BATTLE_ENVIRONMENT==="Izuno Origin Backdrop/konoha_alleyway_day.png"&&String(applyBattleEnvironment).includes("currentBattle.environmentPath=BATTLE_ENVIRONMENT")&&String(applyBattleEnvironment).includes("currentBattle.presentationEnvironmentPath=BATTLE_ENVIRONMENT"),
     exactOccurrenceId:exactBattleOccurrenceId("qa")==="battle_occ_origin_izuno_rogue_genin_step_in:qa"&&String(launch).includes("wasabi_battle_occurrence_already_committed_without_runtime"),
-    zeroRewards:enemy.rewards.ryo.min===0&&enemy.rewards.ryo.max===0&&enemy.rewards.exp.min===0&&enemy.rewards.exp.max===0&&enemy.rewards.commonDrops.length===0&&enemy.rewards.rareDrops.length===0,
-    claimSeparateFromContinue:!!PRE_GENERATE_REWARDS&&String(globalThis.generateBattleRewards).includes("requiresExplicitPostClaimContinue=true")&&String(launch).includes("requiresExplicitPostClaimContinue=true"),
+    genericEnemyLootSuppressed:enemy.rewards.ryo.min===0&&enemy.rewards.ryo.max===0&&enemy.rewards.exp.min===0&&enemy.rewards.exp.max===0&&enemy.rewards.commonDrops.length===0&&enemy.rewards.rareDrops.length===0,
+    exactVictoryReward:REWARD_SOURCE_ID==="wasabi_origin_rogue_genin_battle_victory_ryo_01"&&FIXED_VICTORY_RYO===50&&String(projectWasabi343Rewards).includes("victory?FIXED_VICTORY_RYO:0"),
+    stableRewardReceipt:String(claimWasabi343VictoryReward).includes('type:"origin_battle_reward"')&&String(claimWasabi343VictoryReward).includes("battleOccurrenceId"),
+    claimSeparateFromContinue:!!PRE_GENERATE_REWARDS&&!!PRE_CLAIM_REWARDS&&String(projectWasabi343Rewards).includes("requiresExplicitPostClaimContinue:true")&&String(launch).includes("requiresExplicitPostClaimContinue=true"),
     observerSafeResult:Object.keys(projectResult.call({})||{}).length===0?true:String(projectResult).includes("rogueGeninBattlePLDepleted")&&!String(projectResult).includes("stats"),
     noStoryTruth:String(launch).includes("sourceOccurrenceId")&&!String(launch).includes("consumeStaticOriginSourceOccurrence")
   };
@@ -355,9 +421,10 @@ const installed=registerProfile();
 if(!installed.success)throw new Error(installed.reason);
 globalThis.launchAcademyWasabiRogueGeninBattle343=launch;
 globalThis.projectAcademyWasabiRogueGeninBattle343=projectResult;
+globalThis.claimAcademyWasabiRogueVictoryReward343=claimWasabi343VictoryReward;
 globalThis.runAcademyWasabiRogueGeninBattle343Diagnostics=diagnostics;
 globalThis.SC_ACADEMY_WASABI_ROGUE_BATTLE_343=Object.freeze({
-  patchId:PATCH_ID,battleConfigId:CONFIG,encounterId:ENCOUNTER,sourceOccurrenceId:SOURCE_OCCURRENCE,
+  patchId:PATCH_ID,battleConfigId:CONFIG,encounterId:ENCOUNTER,sourceOccurrenceId:SOURCE_OCCURRENCE,rewardSourceId:REWARD_SOURCE_ID,fixedVictoryRyo:FIXED_VICTORY_RYO,
   participantRefs:Object.freeze({wasabi:WASABI,rogueGenin:ROGUE,affectedStudent:AFFECTED_STUDENT}),
   oppositionTemplateId:TEMPLATE,environmentPath:BATTLE_ENVIRONMENT,browserGoldenClaimed:false
 });

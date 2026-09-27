@@ -6547,6 +6547,56 @@ function configureAcademyTeamFormationConstraint() {
   });
 }
 
+const ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID="origin_completion_starting_purse_ryo_01";
+const ORIGIN_COMPLETION_STARTING_PURSE_RYO=100;
+
+function getOriginCompletionStartingPurseReceipt(originVariantId,boundaryId) {
+  if (!originVariantId||!boundaryId||!playerData||!Array.isArray(playerData.activityHistory)) return null;
+  return playerData.activityHistory.find(record=>
+    record&&record.type==="origin_completion_reward"&&
+    String(record.rewardSourceId||record.sourceId||"")===ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID&&
+    record.originVariantId===originVariantId&&
+    record.originCompletionOccurrenceId===boundaryId
+  )||null;
+}
+
+function commitOriginCompletionStartingPurse(originVariantId,boundaryId) {
+  if (!originVariantId||!boundaryId) return {success:false,reason:"origin_completion_reward_identity_missing"};
+  const boundary=getActiveKonohaEntryBoundaryRecord(originVariantId);
+  if (!boundary||boundary.boundaryId!==boundaryId) return {success:false,reason:"sealed_origin_completion_occurrence_required"};
+  const existing=getOriginCompletionStartingPurseReceipt(originVariantId,boundaryId);
+  if (existing) return {success:true,idempotent:true,ryoGranted:0,receipt:cloneProgressionData(existing)};
+  if (!Array.isArray(playerData.activityHistory)) playerData.activityHistory=[];
+  const beforeRyo=Number(playerData.ryo)||0;
+  const historyLength=playerData.activityHistory.length;
+  try {
+    playerData.ryo=beforeRyo+ORIGIN_COMPLETION_STARTING_PURSE_RYO;
+    const record={
+      historyScope:boundary.historyScope?cloneProgressionData(boundary.historyScope):null,
+      type:"origin_completion_reward",activity:"origin_reward",completed:true,committed:true,success:true,
+      outcome:"origin_starting_purse_granted",
+      rewardSourceId:ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID,
+      sourceId:ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID,
+      originVariantId,actorVariantId:originVariantId,
+      originCompletionOccurrenceId:boundaryId,sourceOccurrenceId:boundaryId,
+      rewards:{ryo:ORIGIN_COMPLETION_STARTING_PURSE_RYO},
+      ryo:ORIGIN_COMPLETION_STARTING_PURSE_RYO,
+      routeIndependent:true,moralityIndependent:true,
+      sourceRefs:[{type:"chronicle_continuity_boundary",id:boundaryId,role:"sealed_origin_completion"}],
+      timestamp:Date.now()
+    };
+    playerData.activityHistory.push(record);
+    activityHistory=playerData.activityHistory;
+    savePlayerData();
+    return {success:true,idempotent:false,ryoGranted:ORIGIN_COMPLETION_STARTING_PURSE_RYO,receipt:cloneProgressionData(record)};
+  } catch (error) {
+    playerData.ryo=beforeRyo;
+    while (playerData.activityHistory.length>historyLength) playerData.activityHistory.pop();
+    activityHistory=playerData.activityHistory;
+    return {success:false,reason:"origin_starting_purse_commit_failed",error:String(error&&error.message||error)};
+  }
+}
+
 function completeChronicleOriginPrologue(originVariantId,evidenceIds=[]) {
   const state=ensurePlayerAcquisitionState();
   if (!originVariantId||state.chronicleOriginVariantId!==originVariantId) return {success:false,reason:"chronicle_origin_mismatch"};
@@ -6560,6 +6610,9 @@ function completeChronicleOriginPrologue(originVariantId,evidenceIds=[]) {
 
   const boundary=commitActiveKonohaEntryBoundary(originVariantId,existingOrigin.completionEvidenceIds);
   if (!boundary.success) return boundary;
+
+  const startingPurse=commitOriginCompletionStartingPurse(originVariantId,boundary.boundaryId);
+  if (!startingPurse.success) return startingPurse;
 
   const formation=state.academyTeamFormation||createDefaultAcquisitionState().academyTeamFormation;
   if (formation.completed!==true&&formation.unlocked!==true) {
@@ -6575,6 +6628,10 @@ function completeChronicleOriginPrologue(originVariantId,evidenceIds=[]) {
   return {
     success:true,idempotent:boundary.idempotent===true,originVariantId,
     activeKonohaEntered:true,activeKonohaEntryBoundaryId:boundary.boundaryId,
+    originStartingPurseCommitted:true,
+    originStartingPurseIdempotent:startingPurse.idempotent===true,
+    originStartingPurseRyoGranted:Number(startingPurse.ryoGranted)||0,
+    originStartingPurseRewardSourceId:ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID,
     academyTeamFormationRequired:state.academyTeamFormation.required===true,
     academyTeamFormationCompleted:state.academyTeamFormation.completed===true
   };

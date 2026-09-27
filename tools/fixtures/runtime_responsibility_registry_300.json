@@ -472,7 +472,8 @@
         "activeStorySceneRuntime"
       ],
       "stateWrites": [
-        "Origin completion/history state"
+        "Origin completion/history state",
+        "playerData.ryo + idempotent origin_completion_reward starting-purse receipt"
       ],
       "productionLoadPath": [
         "index.html",
@@ -486,7 +487,8 @@
         "runtime/alpha-kakashi-terminal-debrief-35100.js"
       ],
       "saveSchemaRefs": [
-        "playerData Origin completion/history"
+        "playerData Origin completion/history",
+        "playerData.activityHistory origin_completion_reward / origin_completion_starting_purse_ryo_01"
       ],
       "qaRefs": [
         "tools/qa_kakashi_v2_clean_room.js",
@@ -657,7 +659,8 @@
       "canonicalOwner": "runtime/alpha-special-jonin-evidence-producer-34700.js",
       "ownerType": "shared_progression_evidence_producer",
       "directCallers": [
-        "runtime/alpha-kakashi-v2-core-36020.js"
+        "runtime/alpha-kakashi-v2-core-36020.js",
+        "runtime/alpha-origin-scenes-32900-a.js"
       ],
       "stateReads": [
         "playerData.activityHistory committed factual source occurrences",
@@ -667,7 +670,8 @@
         "playerData.specialJoninContextualEvidence"
       ],
       "productionLoadPath": [
-        "runtime/alpha-traversal-bridge-33200.js",
+        "index.html",
+        "game.js",
         "runtime/alpha-special-jonin-evidence-producer-34700.js"
       ],
       "extensionHooks": [
@@ -683,7 +687,8 @@
       "qaRefs": [
         "tools/qa_issue_322_kakashi_dispositions.js",
         "tools/qa_runtime_ownership_safety_300.js",
-        "tools/qa_save_compatibility_311.js"
+        "tools/qa_save_compatibility_311.js",
+        "tools/qa_issue_343_wasabi_browser.js"
       ]
     },
     {
@@ -869,9 +874,10 @@
       ],
       "stateWrites": [
         "activeStorySceneRuntime.localContext Wasabi pursuit/route/Rogue response facts",
-        "playerData.activityHistory exact IZU-01/02/03/04 occurrences",
+        "playerData.activityHistory exact IZU-01/02/03/04 + River endurance occurrences",
         "Story Scene Board exact Wasabi backdrop + physical actor-card projection registry",
-        "read-only Wasabi Origin Chronicle Receipt presentation before shared completion"
+        "Wasabi Origin Chronicle Receipt projection from committed rewards/development after shared completion commit",
+        "academy_izuno Stamina discipline progression through existing discipline ledger + exact discipline_development receipt"
       ],
       "productionLoadPath": [
         "index.html",
@@ -896,7 +902,8 @@
       "saveSchemaRefs": [
         "activeStorySceneRuntime.localContext Wasabi pursuit facts",
         "playerData.activityHistory occ_origin_izuno_*",
-        "activeStorySceneRuntime.localContext Wasabi decision/outcome fields read by Receipt presentation"
+        "activeStorySceneRuntime.localContext Wasabi decision/outcome fields read by Receipt presentation",
+        "playerData.activityHistory occ_origin_izuno_river_endurance_resolution / discipline_development"
       ],
       "qaRefs": [
         "tools/qa_issue_343_wasabi_writing_golden.js",
@@ -910,7 +917,9 @@
       "canonicalOwner": "runtime/alpha-wasabi-rogue-battle-343.js",
       "ownerType": "origin_battle_adapter",
       "directCallers": [
-        "runtime/alpha-origin-scenes-32900-a.js"
+        "runtime/alpha-origin-scenes-32900-a.js",
+        "generateBattleRewards",
+        "claimCurrentBattleRewards"
       ],
       "stateReads": [
         "activeStorySceneRuntime.pendingBattle",
@@ -923,7 +932,8 @@
         "currentBattle.runtime.evidence via shared Battle evidence authority",
         "shinobiTestState.wasabi343 / wasabi343BattleId / wasabi343BattleActive / wasabi343BattleLaunches scoped adapter envelope",
         "currentBattle.battleConfigId reconstruction for restored #343 encounter",
-        "currentBattle.environmentPath / presentationEnvironmentPath exact Wasabi alley Battle environment"
+        "currentBattle.environmentPath / presentationEnvironmentPath exact Wasabi alley Battle environment",
+        "currentBattle.rewards fixed Wasabi STEP IN victory projection + playerData.ryo origin_battle_reward receipt"
       ],
       "productionLoadPath": [
         "index.html",
@@ -932,7 +942,8 @@
       ],
       "extensionHooks": [
         "launchAcademyWasabiRogueGeninBattle343",
-        "projectAcademyWasabiRogueGeninBattle343"
+        "projectAcademyWasabiRogueGeninBattle343",
+        "claimAcademyWasabiRogueVictoryReward343"
       ],
       "permittedAdapters": [
         "academy_wasabi_rogue_battle_adapter_343"
@@ -944,7 +955,8 @@
         "activeStorySceneRuntime.pendingBattle",
         "shinobiTestState.wasabi343 adapter envelope",
         "currentBattle.wasabi343 restored Battle metadata",
-        "shinobiTestState.wasabi343BattleId / wasabi343BattleActive / wasabi343BattleLaunches"
+        "shinobiTestState.wasabi343BattleId / wasabi343BattleActive / wasabi343BattleLaunches",
+        "playerData.activityHistory origin_battle_reward / wasabi_origin_rogue_genin_battle_victory_ryo_01"
       ],
       "qaRefs": [
         "tools/qa_issue_343_wasabi_writing_golden.js",
@@ -1231,6 +1243,21 @@
       "stateRef": "activeStorySceneRuntime machine-resolver beat/choice transition",
       "owner": "game.js",
       "responsibilityId": "story.machine_resolver.shared"
+    },
+    {
+      "stateRef": "playerData.ryo / origin_completion_reward starting purse",
+      "owner": "game.js",
+      "responsibilityId": "origin.completion.shared"
+    },
+    {
+      "stateRef": "academy_izuno Stamina discipline progression / discipline_development receipt",
+      "owner": "runtime/alpha-origin-scenes-32900-a.js",
+      "responsibilityId": "origin.academy_izuno.final_story_state"
+    },
+    {
+      "stateRef": "currentBattle.rewards / playerData.ryo Wasabi STEP IN victory reward",
+      "owner": "runtime/alpha-wasabi-rogue-battle-343.js",
+      "responsibilityId": "origin.academy_izuno.rogue_battle"
     }
   ]
 }

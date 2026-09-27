@@ -16,10 +16,10 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-27-AS",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-27-AT",
     sourceBaselineCommit:"fbaefdf3da4a644f738d5384c3c1db452d6bed8c",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
-    runtimeGeneration:"academy-wasabi-browser-red-repair-343",
+    runtimeGeneration:"academy-wasabi-reward-spectrum-409",
     majorRuntimeFeatures:Object.freeze([
       "academy-kakashi-v2",
       "runtime-ownership-safety-300",
@@ -56,7 +56,8 @@
       "story-machine-resolver-343",
       "academy-wasabi-exact-backdrop-projection-343",
       "academy-wasabi-scene-cards-dialogue-receipt-343",
-      "shared-story-speaker-owned-dialogue-presentation-343"
+      "shared-story-speaker-owned-dialogue-presentation-343",
+      "academy-wasabi-reward-spectrum-409"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -89,10 +90,10 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-27-AS",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-27-AT",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
-      generationPresent:first.runtimeGeneration==="academy-wasabi-browser-red-repair-343"&&first.majorRuntimeFeatures.includes("academy-wasabi-exact-backdrop-projection-343")&&first.majorRuntimeFeatures.includes("academy-wasabi-scene-cards-dialogue-receipt-343")&&first.majorRuntimeFeatures.includes("shared-story-speaker-owned-dialogue-presentation-343"),
+      generationPresent:first.runtimeGeneration==="academy-wasabi-reward-spectrum-409"&&first.majorRuntimeFeatures.includes("academy-wasabi-exact-backdrop-projection-343")&&first.majorRuntimeFeatures.includes("academy-wasabi-scene-cards-dialogue-receipt-343")&&first.majorRuntimeFeatures.includes("shared-story-speaker-owned-dialogue-presentation-343")&&first.majorRuntimeFeatures.includes("academy-wasabi-reward-spectrum-409"),
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)
