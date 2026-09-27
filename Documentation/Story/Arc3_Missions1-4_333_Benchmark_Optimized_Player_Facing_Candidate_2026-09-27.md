@@ -199,6 +199,8 @@ For one second, everyone looks at the same blood.
 
 Then they look at each other.
 
+### AUTHOR / IMPLEMENTATION NOTE
+
 Exact injury/death belongs to the owning resolver.
 
 Do not fabricate the victim or severity from prose.
@@ -236,6 +238,8 @@ Neither needs to invent everything.
 Each version begins with a true fact.
 
 Each chooses a different one.
+
+### AUTHOR / IMPLEMENTATION NOTE
 
 Do not give either side a moustache-twirling propaganda speech.
 
@@ -339,6 +343,8 @@ People who trained together receive different instructions from different chains
 # NPC AUTONOMY PASS
 
 ## `a3m2_autonomy_01` — contextual conversation family
+
+### AUTHOR / IMPLEMENTATION NOTE
 
 Relevant companions, mentors and relatives state/perform their own immediate intentions.
 
@@ -612,6 +618,8 @@ Sasuke-side security may offer:
 - reduced dependence on central channels;
 - political/operational obligations to the coalition.
 
+### AUTHOR / IMPLEMENTATION NOTE
+
 Do not narrate either package as the “good” one.
 
 ---
@@ -692,6 +700,8 @@ The fact that people stay alive is useful too.
 ## `a3m3_menma_02` — internal dialogue — MENMA
 
 **MENMA:** “Fuck off.”
+
+### AUTHOR / IMPLEMENTATION NOTE
 
 Preserve the dry/self-interested relationship. Do not turn this into moral counselling.
 
@@ -816,7 +826,7 @@ Only legitimate current options.
 
 ## `a3m4_crossing_01` — narration
 
-The decision is easy while it is still a menu.
+The decision is easy while it is still theoretical.
 
 Then the checkpoint asks for names.
 
@@ -875,6 +885,8 @@ Minato formalises limited strategic movement restrictions.
 
 Menma hears ownership where Minato says protection.
 
+### AUTHOR / IMPLEMENTATION NOTE
+
 Do not decide the argument for the player.
 
 ---
@@ -885,7 +897,7 @@ Do not decide the argument for the player.
 
 The village is still one place on the map.
 
-The player can no longer move through it as if that were the whole truth.
+Moving through it no longer feels like moving through one authority.
 
 ---
 
