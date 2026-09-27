@@ -1843,7 +1843,9 @@ function boardLocation(beatId){
 function boardBackdropEnvironment331(beatId,performance){
   const id=String(beatId||"");
   if(id==="obi_end_day"){
-    const cueIndex=performance&&Number.isInteger(performance.index)?performance.index:0;
+    const cueIndex=performance&&Number.isInteger(performance.sourceIndex)
+      ?performance.sourceIndex
+      :performance&&Number.isInteger(performance.index)?performance.index:0;
     return cueIndex>=2?ENV.streetLate.environmentId:ENV.trainingLate.environmentId;
   }
   if(id==="obi_arrival"||id==="obi_training")return ENV.trainingDay.environmentId;
@@ -1907,7 +1909,8 @@ function diagnostics(){
     furnitureResidentialBackdrop:BACKDROPS[ENV.residential.environmentId]==="Obito Origin Backdrop/quiet_residential_lane.png",
     academyApproachBackdrop:BACKDROPS[ENV.academyApproach.environmentId]==="Obito Origin Backdrop/academy_approach_sloped_lane.png",
     homeDedicatedBackdrop:BACKDROPS[ENV.home.environmentId]==="Obito Origin Backdrop/obito_home_interior.png",
-    endDayPresentationMovesYardToStreet:typeof boardBackdropEnvironment331==="function"&&boardBackdropEnvironment331("obi_end_day",{index:0})===ENV.trainingLate.environmentId&&boardBackdropEnvironment331("obi_end_day",{index:2})===ENV.streetLate.environmentId,
+    endDayPresentationMovesYardToStreet:typeof boardBackdropEnvironment331==="function"&&boardBackdropEnvironment331("obi_end_day",{sourceIndex:0,index:0})===ENV.trainingLate.environmentId&&boardBackdropEnvironment331("obi_end_day",{sourceIndex:2,index:99})===ENV.streetLate.environmentId,
+    paragraphPaginationCannotShiftBackdrop:boardBackdropEnvironment331("obi_end_day",{sourceIndex:1,index:99})===ENV.trainingLate.environmentId,
     directBackdropPathProjection:typeof registerFinalSceneBoard==="function"&&registerFinalSceneBoard.toString().includes("return assetPath?{assetPath,environmentId}:null"),
     stableBeatBackdropProjection:boardBackdropEnvironment331("obi_depart")===ENV.mainStreet.environmentId&&boardBackdropEnvironment331("obi_furniture_choice")===ENV.residential.environmentId&&boardBackdropEnvironment331("obi_equipment_choice")===ENV.academyApproach.environmentId&&boardBackdropEnvironment331("obi_arrival")===ENV.trainingDay.environmentId&&boardBackdropEnvironment331("obi_home")===ENV.home.environmentId,
     closeRemainsHome:definition.beatMap instanceof Map?definition.beatMap.get("obi_close")&&definition.beatMap.get("obi_close").environmentRef===ENV.home:definition.beats.some(b=>b.beatId==="obi_close"&&b.environmentRef===ENV.home),

@@ -739,6 +739,33 @@
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "AUTHORITY_CHANGED supersedes the prior Menma-first assist contract semantically without replacing its registered owner. Consumes CE successor fca2d8a425a8c3115bfea5935dfa15ab0b433b8c and Combat closure 78d4523f7edfa6a99ec1352bf86249b43e114b11. Academy Menma Scene 7 is now scoped half-scripted: Anko Active performs two exact authored takedowns without ordinary side opportunities; Altered then Brute withdraw through the shared deployment queue; Unstable relays; Anko yields Active without withdrawing; Menma promotes and receives the first genuine Phase-C player input. MEN-03 consumes Menma Phase-C evidence only. Presentation holds a committed 0-PL target on screen until the exact action receipt visibly settles, then releases the already-authored relay/terminal continuation. Generic PL Battle law, Kakashi Golden, World reward amount, and Beta batching remain unchanged."
+    },
+    {
+      "changeId": "issue-370-story-box-paragraph-segmentation",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "story.scene.presentation.shared"
+      ],
+      "owner": "runtime/alpha-story-scene-board-33900.js",
+      "directCallers": [
+        "game.js Story presentation layer",
+        "runtime/alpha-origin-scenes-32900-c.js",
+        "index.html"
+      ],
+      "stateTouched": [
+        "activeStorySceneRuntime.localContext.__storyPerformanceCursor33900 presentation cursor only",
+        "presentation-only Story cue pagination metadata"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_312_story_battle_benchmark.js",
+        "tools/qa_obito_story_presentation_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_303_runtime_build_fingerprint.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Consumes Writing #370 and Story_Narration_and_Dialogue_Box_Segmentation_Authority_2026-09-25. Ordinary narration/dialogue/internal voice is paginated at authored blank-line boundaries (with bounded narration sentence fallback) while preserving parent source-cue ordinal for backdrop timing. This extends the existing shared Story presentation owner; no runtime owner is retired or replaced. Semantic Story beats, choices, consequences, routes, save truth, Battle, rewards and document-like record surfaces remain unchanged."
     }
   ]
 }

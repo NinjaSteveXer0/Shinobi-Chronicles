@@ -61,25 +61,103 @@ function registerStorySceneBoardDefinition(sceneId,definition){
 }
 function unregisterStorySceneBoardDefinition(sceneId){return registry.delete(String(sceneId||""));}
 function boardDefinition(sceneId){return registry.get(String(sceneId||""))||null;}
+const STORY_SEGMENTABLE_CUE_KINDS_33900=new Set(["narration","dialogue","internal_voice"]);
+const STORY_NARRATION_PAGE_TARGET_33900=360;
+function splitLongNarrationParagraph33900(text){
+  const value=String(text||"").trim();
+  if(!value||value.length<=STORY_NARRATION_PAGE_TARGET_33900)return value?[value]:[];
+  const sentences=(value.match(/[^.!?…]+(?:[.!?…]+(?:["'”’)]*)|$)/g)||[]).map(row=>row.trim()).filter(Boolean);
+  if(sentences.length<2)return[value];
+  const pages=[];let page="";
+  for(const sentence of sentences){
+    const candidate=page?page+" "+sentence:sentence;
+    if(page&&candidate.length>STORY_NARRATION_PAGE_TARGET_33900){pages.push(page);page=sentence;}
+    else page=candidate;
+  }
+  if(page)pages.push(page);
+  return pages.length?pages:[value];
+}
+function expandStoryPerformanceSequence33900(sequence){
+  const out=[];
+  for(const [sourceIndex,rawCue] of (Array.isArray(sequence)?sequence:[]).entries()){
+    const cue=rawCue&&typeof rawCue==="object"?clone(rawCue):{kind:"narration",text:String(rawCue??"")};
+    const kind=String(cue.kind||"narration");
+    const text=String(cue.text||"");
+    let pages=[text];
+    if(STORY_SEGMENTABLE_CUE_KINDS_33900.has(kind)){
+      const paragraphs=text.split(/\n\s*\n+/).map(row=>row.trim()).filter(Boolean);
+      pages=paragraphs.length?paragraphs:[text.trim()];
+      if(kind!=="dialogue")pages=pages.flatMap(splitLongNarrationParagraph33900);
+    }
+    const cleanPages=pages.filter(page=>String(page||"").trim().length>0);
+    const finalPages=cleanPages.length?cleanPages:[text];
+    for(let segmentIndex=0;segmentIndex<finalPages.length;segmentIndex+=1){
+      out.push({
+        ...cue,
+        text:String(finalPages[segmentIndex]||""),
+        __sourceCueIndex33900:sourceIndex,
+        __segmentIndex33900:segmentIndex,
+        __segmentCount33900:finalPages.length
+      });
+    }
+  }
+  return out;
+}
+function fallbackPerformanceSequenceForBeat33900(beat){
+  if(!beat||beat.mode==="choice"||beat.mode==="battle_transition"||(Array.isArray(beat.choices)&&beat.choices.length))return null;
+  const text=String(beat.text||"").trim();
+  if(!text)return null;
+  const kind=beat.mode==="dialogue"?"dialogue":beat.mode==="internal_voice"?"internal_voice":beat.mode==="record"?"record":"narration";
+  return[{
+    kind,
+    text,
+    speakerName:beat.speakerName||beat.speaker||null,
+    speaker:beat.speaker||null,
+    fallbackFromSemanticBeat33900:true
+  }];
+}
 function performanceSequenceFor(runtime=currentRuntime(),beat=currentBeat(runtime)){
   if(!runtime||!beat)return null;
-  const def=boardDefinition(runtime.sceneId),source=def&&def.performanceSequences;
-  if(!source)return null;
-  let seq=source[beat.beatId];
+  const def=boardDefinition(runtime.sceneId);
+  if(!def)return null;
+  const source=def.performanceSequences;
+  let seq=source&&source[beat.beatId];
   if(typeof seq==="function")seq=seq({runtime,beat,context:runtime.localContext||{}});
-  return Array.isArray(seq)&&seq.length?seq:null;
+  if(!Array.isArray(seq)||!seq.length)seq=fallbackPerformanceSequenceForBeat33900(beat);
+  const expanded=expandStoryPerformanceSequence33900(seq);
+  return expanded.length?expanded:null;
 }
 function performanceCursor(runtime=currentRuntime(),beat=currentBeat(runtime)){
   const seq=performanceSequenceFor(runtime,beat);
   if(!seq)return null;
   const row=runtime.localContext&&runtime.localContext[PERFORMANCE_KEY];
-  const index=row&&row.beatId===beat.beatId&&Number.isInteger(row.index)?Math.max(0,Math.min(seq.length-1,row.index)):0;
-  return{sequence:seq,index,cue:seq[index],atEnd:index>=seq.length-1};
+  let index=0;
+  if(row&&row.beatId===beat.beatId){
+    if(row.version===2&&Number.isInteger(row.index))index=Math.max(0,Math.min(seq.length-1,row.index));
+    else if(Number.isInteger(row.index)){
+      const migrated=seq.findIndex(cue=>cue&&cue.__sourceCueIndex33900===row.index&&cue.__segmentIndex33900===0);
+      index=migrated>=0?migrated:Math.max(0,Math.min(seq.length-1,row.index));
+    }
+  }
+  const cue=seq[index]||{};
+  return{
+    sequence:seq,index,cue,atEnd:index>=seq.length-1,
+    sourceIndex:Number.isInteger(cue.__sourceCueIndex33900)?cue.__sourceCueIndex33900:index,
+    segmentIndex:Number.isInteger(cue.__segmentIndex33900)?cue.__segmentIndex33900:0,
+    segmentCount:Number.isInteger(cue.__segmentCount33900)?cue.__segmentCount33900:1
+  };
 }
 function persistPerformanceCursor(runtime,beat,index){
   if(!runtime||!beat)return;
   if(!runtime.localContext||typeof runtime.localContext!=="object")runtime.localContext={};
-  runtime.localContext[PERFORMANCE_KEY]={beatId:beat.beatId,index};
+  const seq=performanceSequenceFor(runtime,beat)||[];
+  const safeIndex=Math.max(0,Math.min(Math.max(0,seq.length-1),Number(index)||0));
+  const cue=seq[safeIndex]||{};
+  runtime.localContext[PERFORMANCE_KEY]={
+    version:2,beatId:beat.beatId,index:safeIndex,
+    sourceIndex:Number.isInteger(cue.__sourceCueIndex33900)?cue.__sourceCueIndex33900:safeIndex,
+    segmentIndex:Number.isInteger(cue.__segmentIndex33900)?cue.__segmentIndex33900:0
+  };
   try{if(typeof savePlayerData==="function")savePlayerData();}catch(_error){}
 }
 function clearPerformanceCursor(runtime){
@@ -289,6 +367,8 @@ function installStyle(){
 #story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-panel::after{left:78%;border-color:rgba(218,176,77,.52);background:rgba(8,10,12,.97);}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-portrait{display:none!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-text{margin-top:6px!important;font-size:clamp(13px,1.05vw,17px)!important;line-height:1.42!important;}
+#story-scene-presentation-layer[data-sc-performance="true"]:not([data-sc-cue-kind="record"]) .sc-story-panel{max-height:none!important;overflow:visible!important;}
+#story-scene-presentation-layer[data-sc-performance="true"]:not([data-sc-cue-kind="record"]) .sc-story-text{max-height:none!important;overflow:visible!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-name{font-size:11px!important;margin:0 0 2px!important;color:#e8c86e!important;font-weight:900!important;letter-spacing:.12em!important;text-transform:uppercase!important;line-height:1.15!important;}
 #story-scene-presentation-layer[data-sc-performance="true"] .sc-chronicle-primary{width:34px!important;height:30px!important;min-height:0!important;padding:0!important;font-size:20px!important;line-height:1!important;float:right;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-actions{margin-top:9px!important;gap:7px!important;}
@@ -572,6 +652,9 @@ function runStorySceneBoard33900Diagnostics(){
     reusableRegistry:typeof registerStorySceneBoardDefinition==="function"&&typeof unregisterStorySceneBoardDefinition==="function"&&typeof resolveStorySceneBoardProjection==="function",
     pendingRegistrationDrain:typeof drainPendingStorySceneBoardRegistrations33900==="function"&&pendingRegistrationDrain&&pendingRegistrationDrain.success===true,
     genericPerformanceLifecycle:typeof performanceSequenceFor==="function"&&typeof advanceStoryScene33900==="function"&&typeof performSceneCut==="function",
+    paragraphSizedStoryPages:typeof expandStoryPerformanceSequence33900==="function"&&expandStoryPerformanceSequence33900([{kind:"narration",text:"One.\n\nTwo."}]).length===2,
+    sourceCueOrdinalPreserved:performanceSequenceFor.toString().includes("expandStoryPerformanceSequence33900")&&performanceCursor.toString().includes("sourceIndex"),
+    ordinaryStoryScrollRetired:installStyle.toString().includes(':not([data-sc-cue-kind="record"]) .sc-story-text{max-height:none!important;overflow:visible!important;}'),
     sharedHardTransitionOwner:typeof playStoryHardSceneTransition33900==="function"&&typeof cancelStoryHardSceneTransition33900==="function"&&typeof getStoryHardSceneTransitionState33900==="function",
     documentCurtainOwnedHere:HARD_TRANSITION_CURTAIN_ID==="sc-story-hard-transition-33900"&&String(ensureStoryHardTransitionCurtain33900).includes("document.body.appendChild")&&installStyle.toString().includes("HARD_TRANSITION_CURTAIN_ID"),
     staleTransitionInvalidation:String(playStoryHardSceneTransition33900).includes('cancelStoryHardSceneTransition33900("superseded")')&&String(scheduleStoryHardTransition33900).includes("generation===hardTransitionGeneration"),
@@ -611,6 +694,7 @@ globalThis.resolveStorySceneBoardBackdropPath=resolveBoardBackdropPath;
 globalThis.storyChoiceIntentIcon33900=storyChoiceIntentIcon33900;
 globalThis.renderStorySceneBoard33900=renderStorySceneBoard33900;
 globalThis.getStoryScenePerformance33900=()=>performanceCursor(currentRuntime(),currentBeat(currentRuntime()));
+globalThis.expandStoryPerformanceSequence33900=expandStoryPerformanceSequence33900;
 globalThis.applyStoryStageAnchor33900=applyStoryStageAnchor33900;
 globalThis.playStoryChoreography33900=playStoryChoreography33900;
 globalThis.cancelStoryChoreography33900=cancelStoryChoreography33900;

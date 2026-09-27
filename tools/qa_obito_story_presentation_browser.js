@@ -70,6 +70,10 @@ async function state(page){
       choices:[...(layer?.querySelectorAll(".sc-story-choice")||[])].filter(visible).map(n=>({label:n.textContent.trim(),icon:n.getAttribute("data-intent-icon")||""})),
       panelRadius:panel?parseFloat(getComputedStyle(panel).borderRadius):0,
       panelActorOverlapArea:overlap,
+      textOverflowY:layer?.querySelector(".sc-story-text")?getComputedStyle(layer.querySelector(".sc-story-text")).overflowY:"",
+      textScrollHeight:layer?.querySelector(".sc-story-text")?.scrollHeight||0,
+      textClientHeight:layer?.querySelector(".sc-story-text")?.clientHeight||0,
+      performance:typeof getStoryScenePerformance33900==="function"?(()=>{const p=getStoryScenePerformance33900();return p?{index:p.index,sourceIndex:p.sourceIndex,segmentIndex:p.segmentIndex,segmentCount:p.segmentCount}:null;})():null,
       storyLayerBackground:layer?getComputedStyle(layer).backgroundColor:"",
       storyLayerCoversViewport:!!layer&&(()=>{const r=layer.getBoundingClientRect();return r.left<=0&&r.top<=0&&r.right>=innerWidth&&r.bottom>=innerHeight;})()
     };
@@ -91,7 +95,7 @@ async function toBeat(page,target,max=220){
   for(let i=0;i<max;i++){const s=await state(page);if(s.beatId===target)return s;if(s.mode==="choice")throw new Error("unexpected choice "+s.beatId+" before "+target);await advance(page);}
   throw new Error("guard exceeded "+target);
 }
-async function finishActiveStory(page,max=24){
+async function finishActiveStory(page,max=80){
   for(let i=0;i<max;i++){
     const active=await page.evaluate(()=>getActiveStorySceneRuntime()?{sceneId:getActiveStorySceneRuntime().sceneId,beatId:getActiveStorySceneRuntime().beatId}:null);
     if(!active)return true;
@@ -122,7 +126,10 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
   const {context,page,gate}=await boot(browser,label);
   try{
     let s=await state(page);
-    assert.strictEqual(s.beatId,"obi_depart");assert(s.text.includes("The first thing Obito notices is the time."));
+    assert.strictEqual(s.beatId,"obi_depart");assert.strictEqual(s.text,"The first thing Obito notices is the time.");
+    assert(s.performance&&s.performance.sourceIndex===0&&s.performance.segmentIndex===0&&s.performance.segmentCount===2,label+" opening narration was not paragraph-paginated");
+    assert.notStrictEqual(s.textOverflowY,"auto",label+" ordinary narration still uses internal auto-scroll");
+    assert.notStrictEqual(s.textOverflowY,"scroll",label+" ordinary narration still uses internal scroll");
     assert.strictEqual(s.storyLayerCoversViewport,true,label+" Story layer does not own full viewport");
     assert(!["transparent","rgba(0, 0, 0, 0)"].includes(s.storyLayerBackground),label+" Story layer exposes World Map through transparent letterbox");
     assert(s.actors.some(a=>a.id==="academy_obito"&&/academy_obito\.png/.test(a.img)),label+" Obito card missing");
@@ -133,7 +140,10 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
     const firstText=s.text;
     await page.locator("#story-scene-presentation-layer").click({position:{x:100,y:100}});
     await page.waitForFunction(old=>document.querySelector("#story-scene-presentation-layer .sc-story-text")?.textContent?.trim()!==old,firstText,{timeout:5000});
-    assert.strictEqual((await state(page)).beatId,"obi_depart",label+" click-anywhere skipped semantic beat");
+    const secondPage=await state(page);
+    assert.strictEqual(secondPage.beatId,"obi_depart",label+" click-anywhere skipped semantic beat");
+    assert.strictEqual(secondPage.text,"The second is that noticing it hasn't made him any less late.",label+" second authored paragraph did not receive its own narration box");
+    assert(secondPage.performance&&secondPage.performance.sourceIndex===0&&secondPage.performance.segmentIndex===1,label+" paragraph page lost parent cue identity");
 
     for(let i=0;i<CHOICES.length;i++){
       const [beat,help,keep]=CHOICES[i];await toBeat(page,beat);
@@ -156,10 +166,17 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
     assert.strictEqual(diversionRows.reduce((sum,r)=>sum+Number(r.fact?.journeyDelayMinutes||0),0),expectedDelay,label+" journey delay changed");
 
     await toBeat(page,"obi_end_day");
-    let end=await state(page);assert(end.backdrop.includes("training_grounds_late_afternoon.png"),label+" end-day should begin in training yard");
-    await advance(page);end=await state(page);
-    if(end.beatId==="obi_end_day"&&end.backdrop.includes("training_grounds_late_afternoon.png"))await advance(page);
-    end=await state(page);assert.strictEqual(end.beatId,"obi_end_day");assert(end.backdrop.includes("konoha_street_late_afternoon.png"),label+" end-day did not move to street");
+    let end=await state(page);
+    assert(end.backdrop.includes("training_grounds_late_afternoon.png"),label+" end-day should begin in training yard");
+    assert(end.performance&&end.performance.sourceIndex===0,label+" end-day source cue should begin at 0");
+    for(let guard=0;guard<30&&end.beatId==="obi_end_day"&&end.performance&&end.performance.sourceIndex<2;guard++){
+      assert(end.backdrop.includes("training_grounds_late_afternoon.png"),label+" pagination changed backdrop before authored source cue 2");
+      await advance(page);
+      end=await state(page);
+    }
+    assert.strictEqual(end.beatId,"obi_end_day");
+    assert(end.performance&&end.performance.sourceIndex===2,label+" end-day never reached authored street source cue");
+    assert(end.backdrop.includes("konoha_street_late_afternoon.png"),label+" end-day did not move to street at authored source cue 2");
 
     await toBeat(page,"obi_home");await assertBackdrop(page,"obi_home",EXPECTED_BACKDROP.obi_home);
     await toBeat(page,"obi_reflect");s=await state(page);

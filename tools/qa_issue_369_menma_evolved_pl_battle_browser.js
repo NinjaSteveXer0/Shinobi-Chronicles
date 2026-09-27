@@ -59,6 +59,14 @@ async function clickStoryChoice(page,label){
   await button.click();
   await waitForStoryMotionToSettle(page);
 }
+async function advanceStorySemanticBeat369(page,beatId,max=24){
+  for(let i=0;i<max;i++){
+    const active=await page.evaluate(()=>getActiveStorySceneRuntime()?.beatId||null);
+    if(active!==beatId)return active;
+    await clickStoryPrimary(page);
+  }
+  throw new Error("Story pagination did not leave semantic beat "+beatId);
+}
 
 async function bootScenario(browser,label){
   const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1});
@@ -600,7 +608,7 @@ async function legitimatePartyDefeat(browser){
       await page.waitForFunction(id=>getActiveStorySceneRuntime()?.beatId===id,beatId,{timeout:12000});
       const beat=await page.evaluate(()=>getCurrentStorySceneBeat());
       assert.strictEqual(beat.text,text,"#386 player-facing Story drift at "+beatId);
-      await clickStoryPrimary(page);
+      await advanceStorySemanticBeat369(page,beatId);
     }
 
     const futureBeats=[
@@ -634,7 +642,7 @@ async function legitimatePartyDefeat(browser){
         assert.strictEqual(futureBackdrop.dedicated,"dedicated","#388 Scene-10 dedicated backdrop flag missing");
         assert(futureBackdrop.css.includes("whisper_woods_forest_route.png"),"#388 Scene-10 live Scene Board backdrop CSS drift "+JSON.stringify(futureBackdrop));
       }
-      await clickStoryPrimary(page);
+      await advanceStorySemanticBeat369(page,beatId);
     }
 
     await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_future_choice",null,{timeout:12000});

@@ -16,10 +16,10 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-26-AN",
-    sourceBaselineCommit:"8068cb143d212198c26b6a4a99db43eaa4968c82",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-27-AP",
+    sourceBaselineCommit:"3e01ec245e22ef8e5cad39ed8280280ebc0870df",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
-    runtimeGeneration:"alpha-menma-half-scripted-relay-refresh-373",
+    runtimeGeneration:"origin-story-segmentation-backdrops-393",
     majorRuntimeFeatures:Object.freeze([
       "academy-kakashi-v2",
       "runtime-ownership-safety-300",
@@ -48,7 +48,9 @@
       "academy-menma-whole-encounter-reward-victory-trigger-379",
       "academy-kakashi-menma-skill-lock-383",
       "academy-menma-half-scripted-battle-presentation-373",
-      "academy-menma-half-scripted-relay-refresh-373"
+      "academy-menma-half-scripted-relay-refresh-373",
+      "story-box-paragraph-segmentation-370",
+      "origin-backdrop-tranche-hinata-menma-393"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -81,10 +83,10 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-26-AN",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-27-AP",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
-      generationPresent:first.runtimeGeneration==="alpha-menma-half-scripted-relay-refresh-373",
+      generationPresent:first.runtimeGeneration==="origin-story-segmentation-backdrops-393",
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)

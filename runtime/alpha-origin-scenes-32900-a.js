@@ -1126,9 +1126,70 @@ const youngCommit=R("hin_young_32900","academy_hinata",young,c=>({
 }),c=>c.young==="stay_and_watch"?["HIN-02"]:["show_movement","explain_error"].includes(c.young)?["HIN-03"]:[]);
 seq("hin_close",G.close,null,{first:{onEnterConsequences:[youngCommit]},last:{exitScene:true}});
 
+const HINATA_ORIGIN_BACKDROP_ID="hinata_origin_hyuga_compound";
+const HINATA_ORIGIN_BACKDROP_PATH="Hinata Origin Backdrop/hyuga_compound.png";
+const HINATA_ORIGIN_FINAL_BACKDROP_ID="hinata_origin_hyuga_compound_alt_angle";
+const HINATA_ORIGIN_FINAL_BACKDROP_PATH="Hinata Origin Backdrop/hyuga_compound_alt_angle.png";
+function isHinataFinalSceneBeat32900(beatId){
+  const id=String(beatId||"");
+  return id.startsWith("hin_children_intro_")||
+    id==="hin_young_choice"||
+    id.startsWith("hin_young_")||
+    id.startsWith("hin_close_");
+}
+function registerHinataOriginPresentation32900(){
+  try{
+    const registerPath=typeof registerSceneBackdropAssetPath==="function"?registerSceneBackdropAssetPath:globalThis.registerSceneBackdropAssetPath;
+    if(typeof registerPath==="function"){
+      registerPath(HINATA_ORIGIN_BACKDROP_ID,HINATA_ORIGIN_BACKDROP_PATH);
+      registerPath(HINATA_ORIGIN_FINAL_BACKDROP_ID,HINATA_ORIGIN_FINAL_BACKDROP_PATH);
+    }
+  }catch(_error){}
+  const registerBoard=()=>{
+    if(typeof globalThis.registerStorySceneBoardDefinition!=="function")return{success:false,reason:"story_scene_board_not_loaded"};
+    return globalThis.registerStorySceneBoardDefinition(scene,{
+      resolve:()=>({mode:"conversation",location:"HYŪGA COMPOUND · TRAINING COURTYARD",actors:[]}),
+      resolveBackdrop:({beatId})=>isHinataFinalSceneBeat32900(beatId)
+        ?{assetPath:HINATA_ORIGIN_FINAL_BACKDROP_PATH,assetId:HINATA_ORIGIN_FINAL_BACKDROP_ID}
+        :{assetPath:HINATA_ORIGIN_BACKDROP_PATH,assetId:HINATA_ORIGIN_BACKDROP_ID}
+    });
+  };
+  if(globalThis.SC_STORY_SCENE_BOARD_33900)return registerBoard();
+  const queue=globalThis.SC_STORY_SCENE_BOARD_PENDING_REGISTRATIONS||(globalThis.SC_STORY_SCENE_BOARD_PENDING_REGISTRATIONS=[]);
+  if(!queue.some(row=>row&&row.id==="academy_hinata_backdrop_32900"))queue.push({id:"academy_hinata_backdrop_32900",register:registerBoard});
+  return{success:true,queued:true};
+}
+registerHinataOriginPresentation32900();
 A.register({sceneId:scene,eventId:scene,title:"ACADEMY HINATA",entryBeatId:id("hin_opening"),participants:[],beats,onCompleteConsequences:[X("academy_hinata",[spar,young])]});})();
 // Wasabi Izuno
 (()=>{const tracking="occ_origin_izuno_pursuit_tracking_resolution",intercept="occ_origin_izuno_intercept_prediction_resolution",coop="occ_origin_izuno_pursuit_cooperation_resolution",rogue="occ_origin_izuno_rogue_genin_interruption_resolution",scene=A.sceneByVariant.academy_izuno;
+const IZUNO_PRESENTATION_BACKDROPS=Object.freeze({
+  izuno_origin_training_grounds_day:"Izuno Origin Backdrop/training_grounds_day.png",
+  izuno_origin_practical_ground_day:"Izuno Origin Backdrop/practical_ground_day.png",
+  izuno_origin_konoha_main_street:"Izuno Origin Backdrop/konoha_main_street.png",
+  izuno_origin_konoha_alleyway_day:"Izuno Origin Backdrop/konoha_alleyway_day.png",
+  izuno_origin_konoha_narrow_yard:"Izuno Origin Backdrop/konoha_narrow_yard.png",
+  izuno_origin_konoha_rooftop_pursuit_day:"Izuno Origin Backdrop/konoha_rooftop_pursuit_day.png",
+  izuno_origin_river_route_day:"Izuno Origin Backdrop/river_route_day.png"
+});
+try{
+  const registerPath=typeof registerSceneBackdropAssetPath==="function"?registerSceneBackdropAssetPath:globalThis.registerSceneBackdropAssetPath;
+  if(typeof registerPath==="function")for(const [id,path] of Object.entries(IZUNO_PRESENTATION_BACKDROPS))registerPath(id,path);
+}catch(_error){}
+const IZUNO_GOLDEN_PRESENTATION_READINESS=Object.freeze({
+  writingAuthority:"Academy_Wasabi_Izuno_Origin_WRITING_GOLDEN_2026-09-24",
+  codingIssue:343,
+  runtimeReplacementPerformed:false,
+  staleCompressedRuntimePromoted:false,
+  provenSceneMappings:Object.freeze({
+    riverRoute:Object.freeze({environmentId:"izuno_origin_river_route_day",assetPath:"Izuno Origin Backdrop/river_route_day.png"})
+  }),
+  unresolvedExactAssetBindings:Object.freeze([
+    "head_start","street_trail","split_non_river","stronger_trail","rogue_interruption","intercept","finish","instructor_debrief","after"
+  ]),
+  backdrops:IZUNO_PRESENTATION_BACKDROPS
+});
+globalThis.SC_ACADEMY_IZUNO_GOLDEN_PRESENTATION_READINESS_20260927=IZUNO_GOLDEN_PRESENTATION_READINESS;
 A.register({sceneId:scene,eventId:scene,title:"ACADEMY WASABI IZUNO",entryBeatId:"izu_start",participants:[],beats:[
 {beatId:"izu_start",mode:"narration",text:"Academy pursuit trial: find the target before they reach the extraction point.",nextBeatId:"izu_initial"},
 {beatId:"izu_initial",mode:"choice",text:"Choose how Wasabi begins.",choices:[C("obvious_trail","Follow the obvious trail","izu_split",{initial:"obvious_trail"}),C("environmental_signs","Search for environmental signs","izu_split",{initial:"environmental_signs",environmental:true}),C("cooperate_students","Cooperate with other students","izu_split",{initial:"cooperate_students",cooperated:true}),C("predict_destination","Ignore the trail and predict the destination","izu_split",{initial:"predict_destination",predicted:true})]},
@@ -1143,6 +1204,66 @@ R("izu_rogue_32900","academy_izuno",rogue,c=>({rogueGeninInterruptionResolvedByW
 {beatId:"izu_end",mode:"narration",text:"No Speed/Agility stat, morality score or automatic specialization is created.",exitScene:true}],onCompleteConsequences:[X("academy_izuno",[tracking,intercept,coop,rogue])]});})();
 // Mirai
 (()=>{const sub="occ_origin_mirai_substitution_verification_resolution",checkpoint="occ_origin_mirai_checkpoint_escort_resolution",scene=A.sceneByVariant.academy_mirai;
+const MIRAI_PRESENTATION_ENV=Object.freeze({
+  assignment:Object.freeze({environmentId:"mirai_origin_academy_training_ground_courtyard"}),
+  mainStreet:Object.freeze({environmentId:"mirai_origin_konoha_main_street"}),
+  market:Object.freeze({environmentId:"mirai_origin_konoha_covered_market"}),
+  shortcut:Object.freeze({environmentId:"mirai_origin_konoha_storehouse_side_lane"}),
+  checkpoint:Object.freeze({environmentId:"mirai_origin_checkpoint_three_day"})
+});
+const MIRAI_PRESENTATION_BACKDROPS=Object.freeze({
+  mirai_origin_academy_training_ground_courtyard:"Mirai Origin Backdrop/academy_training_ground_courtyard.png",
+  mirai_origin_konoha_main_street:"Mirai Origin Backdrop/konoha_main_street.png",
+  mirai_origin_konoha_covered_market:"Mirai Origin Backdrop/konoha_covered_market.png",
+  mirai_origin_konoha_storehouse_side_lane:"Mirai Origin Backdrop/konoha_storehouse_side_lane.png",
+  mirai_origin_checkpoint_three_day:"Mirai Origin Backdrop/checkpoint_three_day.png"
+});
+try{
+  const registerPath=typeof registerSceneBackdropAssetPath==="function"?registerSceneBackdropAssetPath:globalThis.registerSceneBackdropAssetPath;
+  if(typeof registerPath==="function")for(const [id,path] of Object.entries(MIRAI_PRESENTATION_BACKDROPS))registerPath(id,path);
+}catch(_error){}
+const MIRAI_GOLDEN_PRESENTATION_SCENE_MAP=Object.freeze({
+  assignment:MIRAI_PRESENTATION_ENV.assignment,
+  walk:MIRAI_PRESENTATION_ENV.mainStreet,
+  market:MIRAI_PRESENTATION_ENV.market,
+  shortcut:MIRAI_PRESENTATION_ENV.shortcut,
+  roadAfter:MIRAI_PRESENTATION_ENV.mainStreet,
+  decision:Object.freeze({shortcut:MIRAI_PRESENTATION_ENV.shortcut,markedOrMain:MIRAI_PRESENTATION_ENV.mainStreet}),
+  confront:Object.freeze({preserveReachedRouteEnvironment:true}),
+  changeRoute:MIRAI_PRESENTATION_ENV.mainStreet,
+  completeEscort:Object.freeze({street:MIRAI_PRESENTATION_ENV.mainStreet,checkpointApproach:MIRAI_PRESENTATION_ENV.checkpoint,preserveAuthoredPosition:true}),
+  checkpointThree:MIRAI_PRESENTATION_ENV.checkpoint,
+  after:MIRAI_PRESENTATION_ENV.checkpoint,
+  leaving:Object.freeze({preserveApprovedCheckpointExitGeography:true})
+});
+function runAcademyMiraiGoldenPresentationReadiness20260927(){
+  const paths=Object.values(MIRAI_PRESENTATION_BACKDROPS);
+  const checks={
+    exactDedicatedAssetCount:paths.length===5,
+    assignmentMapped:MIRAI_GOLDEN_PRESENTATION_SCENE_MAP.assignment.environmentId==="mirai_origin_academy_training_ground_courtyard",
+    coveredMarketMapped:MIRAI_GOLDEN_PRESENTATION_SCENE_MAP.market.environmentId==="mirai_origin_konoha_covered_market",
+    shortcutMapped:MIRAI_GOLDEN_PRESENTATION_SCENE_MAP.shortcut.environmentId==="mirai_origin_konoha_storehouse_side_lane",
+    checkpointMapped:MIRAI_GOLDEN_PRESENTATION_SCENE_MAP.checkpointThree.environmentId==="mirai_origin_checkpoint_three_day",
+    allDedicatedPaths:paths.every(asset=>String(asset).startsWith("Mirai Origin Backdrop/")),
+    combatDependencyIssue338StillRequired:true,
+    staleCompressedRuntimePromoted:false,
+    runtimeReplacementPerformed:false,
+    browserGoldenClaimed:false
+  };
+  const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
+  return{pass:failed.length===0,checks,failed,combatDependencyIssue:338,browserGoldenClaimed:false};
+}
+globalThis.runAcademyMiraiGoldenPresentationReadiness20260927=runAcademyMiraiGoldenPresentationReadiness20260927;
+globalThis.SC_ACADEMY_MIRAI_GOLDEN_PRESENTATION_20260927=Object.freeze({
+  writingAuthority:"Academy_Mirai_Origin_WRITING_GOLDEN_2026-09-24",
+  combatDependencyIssue:338,
+  runtimeReplacementPerformed:false,
+  staleCompressedRuntimePromoted:false,
+  environments:MIRAI_PRESENTATION_ENV,
+  backdrops:MIRAI_PRESENTATION_BACKDROPS,
+  sceneMap:MIRAI_GOLDEN_PRESENTATION_SCENE_MAP,
+  browserGoldenClaimed:false
+});
 A.register({sceneId:scene,eventId:scene,title:"ACADEMY MIRAI",entryBeatId:"mir_start",participants:[],beats:[
 {beatId:"mir_start",mode:"narration",text:"A controlled Academy escort begins normally. The protected civilian is polite and cooperative; there is no suspicious opening cue.",nextBeatId:"mir_talk"},
 {beatId:"mir_talk",mode:"choice",text:"Mirai makes ordinary conversation.",choices:[C("ask_origin","Ask where they are from","mir_inconsistent",{talk:"origin"}),C("ask_route","Ask about the route","mir_inconsistent",{talk:"route"}),C("ask_family","Ask about their family","mir_inconsistent",{talk:"family"}),C("ask_trip","Ask about their trip to Konoha","mir_inconsistent",{talk:"trip"})]},
