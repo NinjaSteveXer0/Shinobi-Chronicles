@@ -140,24 +140,51 @@ The unnamed stable Genin is the opponent.
 
 ### Controlled PL Battle seam
 
-Battle must resolve through a real current controlled PL Battle package.
+Current CE / Registry authority is closed for the spar shape.
 
-Writing does not invent:
-- opponent PL;
-- opponent Skills;
-- damage;
-- turn structure;
-- victory/defeat mechanics.
+Exact config:
+`academy_metal_lee_origin_controlled_spar`
 
-Origin-specific post-Battle interpretation uses Metal's Remaining Battle PL:
+Exact encounter:
+`origin_academy_metal_lee:inviting_genin_spar`
 
-- **> 50%** -> `strong`
-- **25%–50%** -> `mixed`
-- **< 25%** -> `rough`
+Participants:
+- `academy_metal_lee`
+- `metal_origin_inviting_genin`
 
-These bands are Metal-Origin-specific interpretation only.
+Stable Genin Registry/Battle identity:
+`metal_origin_inviting_genin`
+
+Genin Base PL:
+**15**
+
+Metal Base PL remains:
+**13**
+
+The spar is a one-on-one ordinary PL Battle.
+
+0 Battle PL = withdrawal, not injury/death.
+
+Metal withdrawal does not fail the Origin.
+
+Caller:
+after `met_spar_05`
+
+Return selector:
+- **> 50%** -> `strong` -> `met_spar_strong_01`
+- **25%–50%** -> `mixed` -> `met_spar_mixed_01`
+- **< 25%** -> `rough` -> `met_spar_rough_01`
+
+Exact 50% and 25% are `mixed`.
+0 PL is `rough`.
+
+No reward is currently authorised.
+
+These bands are Metal-Origin-specific Story interpretation only.
 
 They do not rewrite Base capability or create a permanent anxiety/confidence state.
+
+Exact opponent Skills / AI remain Combat-owned downstream.
 
 ### Backdrop / Battle environment
 `Scene backdrops/academy_training_ground_courtyard.png`
@@ -254,7 +281,18 @@ Writing therefore defines three result classes for every protective Action:
 - **partial**
 - **failure**
 
-The resolver/mechanics deciding those classes are not Writing-owned and require CE/Combat closure.
+The resolver is now closed at CE level as a **contextual capability resolver, not a PL Battle**.
+
+Capability channels:
+- `redirect_dummy` -> Taijutsu redirection;
+- `take_impact` -> Stamina stopping capacity;
+- `destroy_dummy` -> Taijutsu striking/control.
+
+Exact deterministic success/partial/failure thresholds remain Combat-owned downstream.
+
+MET-02 pressured-performance class must not be used as a direct MET-03 lookup.
+
+No RNG, confidence/anxiety stat, Protector Trait or morality score is authorised.
 
 ## REDIRECT THE DUMMY
 
@@ -441,37 +479,36 @@ Choices appear only after all preceding authored beats.
 
 ---
 
-# 15. Current implementation dependencies
+# 15. Current implementation status
 
-## A. SPAR Battle package
+## Spar
 
-Current runtime still fail-closes SPAR because no exact controlled PL Battle caller/opponent package is installed.
+CE semantic contract: **CLOSED**  
+Registry / PL identity: **CLOSED**
 
-Requires:
-- exact opponent Battle representation linked to `metal_origin_inviting_genin`;
-- stats/PL/legal Skill package under owning authorities;
-- Battle caller/return;
-- Remaining Battle PL -> strong/mixed/rough projection.
+Durable CE:
+`Documentation/Coordination/Academy_Metal_Spar_and_Protective_Response_Reconciliation_2026-09-27.md`
 
-## B. Protective-response resolver
+Registry:
+`Documentation/Registry/Academy Metal Lee Origin Inviting Genin Registry and PL Calibration 2026-09-27.md`
 
-Current runtime only records `protectiveResponseOutcome:"attempt_committed"`.
+Remaining downstream:
+- Combat exact Genin Skill / AI package;
+- Combat exact deterministic MET-03 thresholds;
+- Coding consumption after those close.
 
-That does not satisfy the current MET-03/source authority or Stephen's scene requirement.
+Current downstream issue:
+**#394**
 
-Requires a scoped resolver returning:
-- `success`
-- `partial`
-- `failure`
+Writing must not invent those mechanics.
 
-for:
-- redirect;
-- take impact;
-- destroy.
+## Presentation
 
-Writing has closed the player-facing result prose classes.
+No dedicated Genin card / uiPortrait is currently authorised by Registry.
 
-Mechanics remain external.
+Presentation owner may supply/ratify a legal non-collectible projection separately.
+
+Lack of portrait authority does not erase the stable participant.
 
 ---
 
