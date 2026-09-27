@@ -220,7 +220,7 @@ This is not a morality penalty.
 
 KEEP PURSUING remains eligible for all pursuit/tracking/intercept/cooperation rewards whose factual predicates are actually met, including the +50 formal pursuit-success reward.
 
-## 9. Route stacking and current maximum
+## 9. Route stacking and lawful totals
 
 Every reward source above is independently factual and one-shot.
 
@@ -281,17 +281,13 @@ Total:
 
 This demonstrates that KEEP PURSUING is not punished for being the "immoral" option.
 
-### Current maximum
+### Lawful total
 
-The current authored source set can legitimately reach:
+Do not introduce a separate total cap and do not assume that only one IZU-derived source can exist unless the committed Story graph actually makes them mutually exclusive.
 
-**150 Ryō**
+Pay the exact sum of independently qualified authorised sources.
 
-when the same Origin occurrence independently satisfies completion + one qualifying opening-route contribution + route-intercept execution + formal pursuit success.
-
-Do not introduce a separate total cap.
-
-Pay the sum of independently qualified authorised sources.
+A common high-value authored line such as cooperation -> successful route intercept pays **150 Ryō**, but Coding must not clamp a different legitimately qualified source combination to that example total.
 
 ## 10. Intentionally zero material-result cases
 
