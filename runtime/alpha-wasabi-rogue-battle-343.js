@@ -121,6 +121,29 @@ if(PRE_CHOOSE){
   try{chooseEnemyAuthoredBattleAction=globalThis.chooseEnemyAuthoredBattleAction;}catch(_error){}
 }
 
+const PRE_GET_RUNTIME_SAVE=typeof getBattleRuntimeSaveState==="function"?getBattleRuntimeSaveState:null;
+if(PRE_GET_RUNTIME_SAVE){
+  globalThis.getBattleRuntimeSaveState=function getWasabi343BattleRuntimeSaveState(){
+    const saved=PRE_GET_RUNTIME_SAVE.apply(this,arguments);
+    if(saved&&currentBattle&&currentBattle.wasabi343)saved.wasabi343=clone(currentBattle.wasabi343);
+    return saved;
+  };
+  try{getBattleRuntimeSaveState=globalThis.getBattleRuntimeSaveState;}catch(_error){}
+}
+const PRE_RESTORE_RUNTIME=typeof restoreBattleRuntimeState==="function"?restoreBattleRuntimeState:null;
+if(PRE_RESTORE_RUNTIME){
+  globalThis.restoreBattleRuntimeState=function restoreWasabi343BattleRuntimeState(rawRuntime){
+    const restored=PRE_RESTORE_RUNTIME.apply(this,arguments);
+    const saved=rawRuntime&&rawRuntime.wasabi343&&typeof rawRuntime.wasabi343==="object"?rawRuntime.wasabi343:null;
+    if(saved&&currentBattle&&String(currentBattle.encounterId||"")===ENCOUNTER){
+      currentBattle.wasabi343=clone(saved);
+      currentBattle.battleConfigId=String(saved.battleConfigId||CONFIG);
+    }
+    return restored;
+  };
+  try{restoreBattleRuntimeState=globalThis.restoreBattleRuntimeState;}catch(_error){}
+}
+
 const PRE_RENDER_ACTION_ROW=typeof renderBattleActionFamilyRow==="function"?renderBattleActionFamilyRow:null;
 if(PRE_RENDER_ACTION_ROW){
   globalThis.renderBattleActionFamilyRow=function renderWasabi343ActionFamilyRow(actor){
@@ -265,6 +288,7 @@ function diagnostics(){
     strictDeployment:String(strictWasabiDeployment).includes("createBattleDeploymentSlots([WASABI])")&&String(strictWasabiDeployment).includes("createBattleDeploymentSlots([ROGUE])"),
     withdrawNaturallyUnavailable:String(strictWasabiDeployment).includes("player={slots:createBattleDeploymentSlots([WASABI])}"),
     withdrawControlHiddenOnlyHere:!!PRE_RENDER_ACTION_ROW&&String(globalThis.renderBattleActionFamilyRow).includes("strictOneVsOne")&&String(globalThis.renderBattleActionFamilyRow).includes("battle-live-withdraw-action"),
+    saveReloadEnvelope:!!PRE_GET_RUNTIME_SAVE&&!!PRE_RESTORE_RUNTIME&&String(globalThis.getBattleRuntimeSaveState).includes("saved.wasabi343")&&String(globalThis.restoreBattleRuntimeState).includes("rawRuntime.wasabi343")&&String(globalThis.restoreBattleRuntimeState).includes("currentBattle.battleConfigId"),
     exactOccurrenceId:exactBattleOccurrenceId("qa")==="battle_occ_origin_izuno_rogue_genin_step_in:qa"&&String(launch).includes("wasabi_battle_occurrence_already_committed_without_runtime"),
     zeroRewards:enemy.rewards.ryo.min===0&&enemy.rewards.ryo.max===0&&enemy.rewards.exp.min===0&&enemy.rewards.exp.max===0&&enemy.rewards.commonDrops.length===0&&enemy.rewards.rareDrops.length===0,
     claimSeparateFromContinue:!!PRE_GENERATE_REWARDS&&String(globalThis.generateBattleRewards).includes("requiresExplicitPostClaimContinue=true")&&String(launch).includes("requiresExplicitPostClaimContinue=true"),
