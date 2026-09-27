@@ -188,7 +188,7 @@ const battleCtx={
   console,JSON,Object,Array,String,Number,Boolean,Set,Map,Date,globalThis:null,
   Math:Object.create(Math),
   playerData:{},currentBattle:null,enemyDatabase:{},
-  makeEnemyFixedDamageAction:(id,pl,opts={})=>({id,skillId:id,actionClass:"enemy_authored_action",traits:opts.traits||[],authoredAttackPL:pl,evaluateAvailability:()=>({available:true}),resolve:()=>({resolved:true})}),
+  makeEnemyFixedDamageAction:(id,_pl,opts={})=>({id,skillId:id,actionClass:"enemy_authored_action",traits:opts.traits||[],evaluateAvailability:()=>({available:true}),resolve:()=>({resolved:true})}),
   makeEnemyRatioGuardAction:(id,ratio,opts={})=>{ratioCalls.push({id,ratio,opts});return{id,skillId:id,actionClass:"enemy_ratio_guard",traits:opts.traits||[],evaluateAvailability:()=>({available:true}),resolve:()=>({resolved:true})};},
   chooseEnemyAuthoredBattleAction:()=>({success:false,reason:"qa_generic"}),
   generateBattleRewards:()=>({generated:true,claimed:false,ryo:88,exp:77,items:[{id:"bad"}],rareDrops:[{id:"bad_rare"}]}),
