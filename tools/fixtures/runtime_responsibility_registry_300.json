@@ -866,7 +866,8 @@
       ],
       "stateWrites": [
         "activeStorySceneRuntime.localContext Wasabi pursuit/route/Rogue response facts",
-        "playerData.activityHistory exact IZU-01/02/03/04 occurrences"
+        "playerData.activityHistory exact IZU-01/02/03/04 occurrences",
+        "Story Scene Board exact Wasabi backdrop projection registry"
       ],
       "productionLoadPath": [
         "index.html",
@@ -875,6 +876,8 @@
       ],
       "extensionHooks": [
         "SC_ALPHA_ORIGIN_32900.register",
+        "registerStorySceneBoardDefinition",
+        "registerSceneBackdropAssetPath",
         "completeChronicleOriginPrologue"
       ],
       "permittedAdapters": [
@@ -914,7 +917,8 @@
         "playerData.wasabi343BattleLaunches",
         "currentBattle.runtime.evidence via shared Battle evidence authority",
         "shinobiTestState.wasabi343 / wasabi343BattleId / wasabi343BattleActive / wasabi343BattleLaunches scoped adapter envelope",
-        "currentBattle.battleConfigId reconstruction for restored #343 encounter"
+        "currentBattle.battleConfigId reconstruction for restored #343 encounter",
+        "currentBattle.environmentPath / presentationEnvironmentPath exact Wasabi alley Battle environment"
       ],
       "productionLoadPath": [
         "index.html",
