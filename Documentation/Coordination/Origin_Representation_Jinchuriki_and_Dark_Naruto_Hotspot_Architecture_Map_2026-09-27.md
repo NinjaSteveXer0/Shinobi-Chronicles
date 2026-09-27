@@ -871,3 +871,216 @@ Until then:
 - do not turn future progression into Alpha blockers;
 - do not ask Coding to implement incomplete advanced systems.
 
+
+---
+
+# 12. LOCKED BETA SOURCE-ACQUISITION SAFEGUARDS — STEPHEN SIGN-OFF 2026-09-27
+
+Stephen explicitly signs off the safeguards below as locked design rules for future Beta source-power acquisition/progression.
+
+These rules apply to authored Jinchūriki Part 2, Curse Mark routes and other comparable externally-sourced power systems unless a later exact source-specific exception is deliberately authored.
+
+## 12.1 Provenance is mandatory
+
+Every special-source acquisition must preserve exact provenance sufficient to answer:
+
+- who / what the source was;
+- which exact Character received it;
+- which exact factual occurrence caused the acquisition/application;
+- what method created the state;
+- whether the result was voluntary, coerced, forced, contractual, discovered, inherited, transferred or another exact authored class;
+- which later state transitions consumed that provenance.
+
+A representation asset, catalogue row or UI selection cannot create provenance.
+
+## 12.2 Defeat does not equal acquisition
+
+Defeating a Tailed Beast, source bearer, source creature or source actor resolves that encounter only.
+
+It does not automatically grant:
+- ownership;
+- deployable access;
+- hosting;
+- transformation;
+- a Curse Mark;
+- a Skill;
+- an Enhancement;
+- the source's equipment.
+
+Any acquisition requires its own exact downstream authority and transaction.
+
+## 12.3 Access does not equal hosting / application
+
+Examples:
+
+- deployable or Summon-like Bijū access != Jinchūriki hosting;
+- meeting Orochimaru != receiving a Curse Mark;
+- receiving a Mark != mastering it;
+- owning the Beast card != hosted access;
+- owning a transformation card != factual transformation eligibility.
+
+Each boundary requires its own committed evidence / receipt.
+
+## 12.4 Acquisition does not equal activation or mastery
+
+Possessing a source state does not imply that it is:
+- currently active;
+- automatically deployed;
+- fully controlled;
+- mastered;
+- available at every stage.
+
+`hasSource != sourceActive != sourceControlled != sourceMastered`.
+
+## 12.5 Stage skipping is forbidden by default
+
+Staged source systems require the exact prior-stage and development evidence their source contract defines.
+
+For current Part-2 Jinchūriki:
+`Resonance -> Manifestation -> Avatar`.
+
+For current Curse Mark families, where authored:
+`application/stabilisation -> Level 1 / first usable state -> control/adaptation development -> Level 2 / later exact state`.
+
+A later-stage asset cannot be used as permission to skip causal stages.
+
+## 12.6 Exact source reservation
+
+A unique Tailed Beast or exact partition cannot occupy incompatible hosts/deployments simultaneously merely because multiple collectible representations exist.
+
+Transfer/extraction/resealing must causally move the source.
+
+Same-person transformed/hosted/evolved representations likewise do not create duplicate simultaneous people.
+
+## 12.7 Multiple powers do not auto-stack
+
+Two separately legal source powers do not automatically create one legal combined state.
+
+`source A access + source B access != combined representation / combined mechanics`.
+
+Any combined Jinchūriki + Curse Mark, Hosted Entity + Bloodline, Summon-source + Transformation or similar interaction requires explicit compatibility and anti-double-count authority.
+
+## 12.8 Loss does not erase history
+
+Extraction, suppression, cure, sealing, removal, transfer, source separation or another loss state may remove current access.
+
+It does not erase:
+- the original occurrence;
+- prior use;
+- prior relationship/history;
+- prior Knowledge;
+- previously earned development that remains independently persistent.
+
+Current access/state and historical fact remain separate.
+
+## 12.9 Secret paths remain zero-leak
+
+An ineligible source route must not be exposed through:
+- greyed-out map markers;
+- hidden-menu rows;
+- shop placeholders;
+- spoiler checklists;
+- inaccessible transformation cards presented as current objectives;
+- accessibility/DOM leaks.
+
+The opportunity becomes discoverable/actionable only when current Chronicle evidence legitimately supports it.
+
+## 12.10 Reload / retry cannot duplicate or migrate acquisition
+
+Save/load, replay, UI reopen or retry cannot:
+- duplicate a Beast claim;
+- duplicate a Curse Mark;
+- create a second host relationship;
+- move a committed source to another Character;
+- regrant an Evolution entitlement;
+- reroll a committed stage reward.
+
+All source transitions require stable idempotent provenance.
+
+## 12.11 Compatibility is source-specific
+
+Do not universalise one route's eligibility predicate into all source routes.
+
+Examples:
+- Byakugan relevance in one Orochimaru/Hinata route does not mean Byakugan generically grants Curse Mark eligibility;
+- Fūinjutsu relevance to one sealing route does not make every Jinchūriki route require the same threshold;
+- one Bijū's trust conditions do not become every Bijū's relationship model.
+
+Reusable architecture may carry evidence; exact source content decides what evidence matters.
+
+## 12.12 Voluntary / coerced / forced are factual route classes, not morality scores
+
+A source may be:
+- accepted voluntarily;
+- bargained for;
+- coerced;
+- forced on the target;
+- taken from the source;
+- inherited/transferred;
+- another exact authored mode.
+
+Record what happened.
+
+Do not automatically convert the mode into a hidden good/evil score.
+
+## 12.13 Survival / stabilisation / control are semantic boundaries, not universal random rolls
+
+Where a source can be dangerous, the system may separately author:
+- application success;
+- survival;
+- stabilisation;
+- control;
+- suppression;
+- later mastery.
+
+Do not create one universal random survival percentage or berserk chance for every Curse Mark / Bijū / source-power route.
+
+Exact resolver logic remains source-specific.
+
+## 12.14 Base / development / active source package remain separate
+
+A source transformation, Evolution or host state must not silently rewrite canonical Base.
+
+Use:
+- canonical Base;
+- separately committed persistent development;
+- exact current source/representation package;
+- Effective/Battle state.
+
+Do not double-count old and new stage packages.
+
+## 12.15 Acquisition source does not imply all later capabilities
+
+A Curse Mark application does not grant every Level / technique.
+
+A hosted Bijū relationship does not grant every cloak / Avatar / Beast Skill.
+
+A Summon contract does not grant every Summon-assisted Skill.
+
+Knowledge != Access != Competence != Power != Mastery remains binding.
+
+## 12.16 Orochimaru / Hinata benchmark provenance correction
+
+Stephen's authored alternate-world Curse Mark Hinata premise is:
+
+- during the Chūnin Exams, shy Hyūga Hinata defeats one of Orochimaru's giant snakes;
+- **the unexpected victory itself is what impresses / interests Orochimaru**;
+- her Byakugan may be an additional factor in his consideration, but it is NOT the primary causal reason for his interest;
+- Orochimaru later marks her under the exact authored Story route.
+
+Canonical benchmark chain:
+
+`Hinata defeats giant snake -> Orochimaru is impressed by the unexpected feat -> additional interest may include her Byakugan -> exact Orochimaru/Hinata marking occurrence -> survival/stabilisation -> Curse Mark access/development`.
+
+Do not rewrite the premise as `Orochimaru chooses Hinata because she has Byakugan`.
+
+## 12.17 Origin Evolution repeated-card stacking remains deliberately OPEN
+
+One important balancing question is NOT locked yet:
+
+> Can the same non-Origin card consume multiple difficulty-tier Evolution entitlements?
+
+Current recommended safeguard remains one standard Evolution per exact card unless a later explicit multi-tier Evolution system is authored, but Stephen has not yet closed this power-ceiling decision.
+
+Do not implement either behaviour by inference.
+
