@@ -225,7 +225,50 @@ async function launchBattle(page,label){
 }
 async function reloadBattle(page,battle,label){
   await page.reload({waitUntil:"domcontentloaded",timeout:60000});
-  await page.waitForFunction(id=>currentBattle&&currentBattle.battleId===id&&currentBattle.wasabi343,null,battle.battleId,{timeout:20000});
+  await page.waitForFunction(()=>!!globalThis.SC_ACADEMY_WASABI_ROGUE_BATTLE_343,null,{timeout:30000});
+  try{
+    await page.waitForFunction(id=>currentBattle&&currentBattle.battleId===id&&currentBattle.wasabi343,null,battle.battleId,{timeout:20000});
+  }catch(error){
+    const trace=await page.evaluate(expectedBattleId=>{
+      let saved=null;
+      try{
+        const raw=sessionStorage.getItem("shinobiTestState");
+        saved=raw?JSON.parse(raw):null;
+      }catch(parseError){
+        saved={parseError:String(parseError)};
+      }
+      const b=typeof currentBattle==="object"&&currentBattle?currentBattle:null;
+      return{
+        expectedBattleId,
+        readyState:document.readyState,
+        adapterLoaded:!!globalThis.SC_ACADEMY_WASABI_ROGUE_BATTLE_343,
+        saveHook:typeof saveTestState==="function"?saveTestState.name:null,
+        restoreHook:typeof restoreTestState==="function"?restoreTestState.name:null,
+        live:b?{
+          battleId:b.battleId||null,
+          encounterId:b.encounterId||null,
+          battleConfigId:b.battleConfigId||null,
+          active:b.active===true,
+          battleOver:b.battleOver===true,
+          hasWasabi343:!!b.wasabi343,
+          wasabi343:b.wasabi343||null,
+          playerSlots:(b.deployment?.player?.slots||[]).map(s=>s.participantId).filter(Boolean),
+          enemySlots:(b.deployment?.enemy?.slots||[]).map(s=>s.participantId).filter(Boolean)
+        }:null,
+        saved:saved?{
+          keys:Object.keys(saved).sort(),
+          battleId:saved.battleId||null,
+          encounterId:saved.encounterId||null,
+          battleConfigId:saved.battleConfigId||null,
+          wasabi343BattleActive:saved.wasabi343BattleActive===true,
+          wasabi343BattleId:saved.wasabi343BattleId||null,
+          wasabi343:saved.wasabi343||null
+        }:null,
+        launchStore:playerData&&playerData.wasabi343BattleLaunches||null
+      };
+    },battle.battleId);
+    throw new Error(label+" Wasabi Battle reload restore timeout "+JSON.stringify(trace)+"\n"+String(error&&error.stack||error));
+  }
   await releaseFrontDoor(page);
   await page.evaluate(()=>{try{if(currentBattle?.active)openOverlay("combat");}catch(_){ }});
   await page.waitForSelector(".alpha-code-battle-stage",{state:"visible",timeout:12000});
