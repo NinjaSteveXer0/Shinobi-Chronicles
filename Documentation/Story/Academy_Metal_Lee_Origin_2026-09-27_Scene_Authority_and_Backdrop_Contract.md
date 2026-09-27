@@ -288,7 +288,25 @@ Capability channels:
 - `take_impact` -> Stamina stopping capacity;
 - `destroy_dummy` -> Taijutsu striking/control.
 
-Exact deterministic success/partial/failure thresholds remain Combat-owned downstream.
+Combat has now closed the deterministic thresholds:
+
+- `redirect_dummy` — Effective Taijutsu:
+  - >=14 success
+  - 11–13 partial
+  - <=10 failure
+- `take_impact` — Effective Stamina:
+  - >=14 success
+  - 11–13 partial
+  - <=10 failure
+- `destroy_dummy` — Effective Taijutsu:
+  - >=15 success
+  - 12–14 partial
+  - <=11 failure
+
+Fresh Base Academy Metal therefore resolves:
+- redirect = partial
+- take impact = success
+- destroy = partial
 
 MET-02 pressured-performance class must not be used as a direct MET-03 lookup.
 
@@ -492,15 +510,30 @@ Durable CE:
 Registry:
 `Documentation/Registry/Academy Metal Lee Origin Inviting Genin Registry and PL Calibration 2026-09-27.md`
 
+Combat package is now **CLOSED** by:
+
+`Documentation/Combat/SC_Combat_Academy_Metal_Lee_Controlled_Spar_and_MET03_Protective_Resolver_Closure_2026-09-27.md`
+
+Combat commit:
+`979237ff699437961c2c4fc7b28e3cfdb579ab9b`
+
+Exact Genin spar palette:
+- Sparring Jab ATK5
+- Turning Kick ATK6
+- Guarded Stance — 25% one-use pre-Stamina guard
+- Feint Entry setup
+- Committed Lunge ATK6 / ATK7 after exact feint
+
+AI cycle:
+Jab -> Turning Kick -> Guard -> Feint -> Lunge -> repeat
+
+Metal acts first.
+
 Remaining downstream:
-- Combat exact Genin Skill / AI package;
-- Combat exact deterministic MET-03 thresholds;
-- Coding consumption after those close.
+- Coding/runtime consumption;
+- Browser validation / Golden.
 
-Current downstream issue:
-**#394**
-
-Writing must not invent those mechanics.
+Writing must not re-author Combat values.
 
 ## Presentation
 
