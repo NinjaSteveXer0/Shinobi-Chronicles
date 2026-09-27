@@ -705,6 +705,40 @@
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Consumes signed-off Combat authority d280f8eff7bef1e946afb87aa05bb03879e781b8: exact Academy Menma/Kakashi display names, Kakashi Precision Strike Clone Switch-enhanced ATK 11, and existing Substitution Jutsu prepared-slot supersession. Stable IDs, Menma raw values, Kakashi normal ATK 5, Battle semantics outside the exact enhancement, PL/Stats, enemy calibration, Story and rewards remain unchanged."
+    },
+    {
+      "changeId": "issue-373-menma-half-scripted-evolved-battle-presentation",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "origin.academy_menma.three_subject.battle_semantics",
+        "battle.presentation.shared"
+      ],
+      "owner": "runtime/alpha-menma-evolved-pl-battle-36900.js + runtime/alpha-battle-modern-33000.js",
+      "directCallers": [
+        "game.js Battle resolver / Story return surfaces",
+        "index.html"
+      ],
+      "stateTouched": [
+        "currentBattle.menmaEvolvedPLBattle36900 half-scripted phase / pending-zero / Phase-C side-opportunity state",
+        "currentBattle deployment exact Anko Active -> Menma Active and Altered -> Brute -> Unstable relay",
+        "currentBattle.runtime.evidence immutable committed action playback source",
+        "sessionStorage.shinobiTestState Menma successor Battle resume payload",
+        "sessionStorage sc_battle_presentation_33000:* presentation receipt cursor"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_369_menma_evolved_pl_battle.js",
+        "tools/qa_issue_369_menma_evolved_pl_battle_browser.js",
+        "tools/qa_issue_373_evolved_pl_battle_presentation.js",
+        "tools/qa_issue_373_evolved_pl_battle_presentation_browser.js",
+        "tools/qa_issue_312_story_battle_benchmark.js",
+        "tools/qa_issue_312_browser.js",
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "AUTHORITY_CHANGED supersedes the prior Menma-first assist contract semantically without replacing its registered owner. Consumes CE successor fca2d8a425a8c3115bfea5935dfa15ab0b433b8c and Combat closure 78d4523f7edfa6a99ec1352bf86249b43e114b11. Academy Menma Scene 7 is now scoped half-scripted: Anko Active performs two exact authored takedowns without ordinary side opportunities; Altered then Brute withdraw through the shared deployment queue; Unstable relays; Anko yields Active without withdrawing; Menma promotes and receives the first genuine Phase-C player input. MEN-03 consumes Menma Phase-C evidence only. Presentation holds a committed 0-PL target on screen until the exact action receipt visibly settles, then releases the already-authored relay/terminal continuation. Generic PL Battle law, Kakashi Golden, World reward amount, and Beta batching remain unchanged."
     }
   ]
 }

@@ -64,6 +64,14 @@ async function installBrowserRuntimeErrorGate(page,{allowlist=[]}={}){
       const snap=await this.snapshot();
       assert.strictEqual(snap.unexpected.length,0,"#311 unexpected browser runtime errors @ "+label+": "+JSON.stringify(snap.unexpected,null,2));
       return{label,eventCount:snap.events.length,unexpectedCount:0,allowlistCount:allowlist.length};
+    },
+    async reset(){
+      events.length=0;
+      await page.evaluate(()=>{
+        if(Array.isArray(globalThis.__scBrowserRuntimeErrors311))globalThis.__scBrowserRuntimeErrors311.length=0;
+        else globalThis.__scBrowserRuntimeErrors311=[];
+      });
+      return true;
     }
   };
 }

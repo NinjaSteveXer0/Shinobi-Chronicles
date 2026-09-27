@@ -314,7 +314,21 @@
     if(!actionNode)return;
     const action=actionNode.getAttribute("data-afd2-action");
     if(action==="register"){startNewChronicle33400();return;}
-    if(action==="login"){if(hasBegunChronicle33400())release33400();return;}
+    if(action==="login"){
+      if(hasBegunChronicle33400()){
+        release33400();
+        // Returning-player login is presentation release, not navigation.
+        // If an Origin Story runtime survived reload, ask its existing
+        // rehydration authority to restore that exact beat. The helper already
+        // defers when an unresolved active Battle snapshot owns presentation.
+        try{
+          if(typeof restoreActiveOriginStoryPresentation32900==="function"){
+            restoreActiveOriginStoryPresentation32900();
+          }
+        }catch(_error){}
+      }
+      return;
+    }
     if(action==="back-account"){state.stage="account";state.feedback=null;render33400();return;}
     if(action==="save-id"){
       const input=document.getElementById("afd2-ninja-id");
@@ -342,6 +356,12 @@
     if(side!=="player"||enemyTurnInProgress33400)return false;
     try{
       if(!currentBattle||currentBattle.active!==true||currentBattle.battleOver===true)return false;
+      // Scoped authored encounters may own their enemy opportunity cadence.
+      // When they declare that ownership, this old browser-level convenience
+      // scheduler must stand down rather than creating a second enemy turn.
+      const authoredControllerId=typeof currentBattle.authoredEnemyOpportunityControllerId==="string"?currentBattle.authoredEnemyOpportunityControllerId:"";
+      const authoredControllerBattleId=typeof currentBattle.authoredEnemyOpportunityControllerBattleId==="string"?currentBattle.authoredEnemyOpportunityControllerBattleId:"";
+      if(authoredControllerId&&authoredControllerBattleId&&authoredControllerBattleId===String(currentBattle.battleId||""))return false;
       if(typeof evaluateEnemyActionScheduler!=="function"||typeof executeEnemyAuthoredActionOpportunity!=="function")return false;
       const scheduler=evaluateEnemyActionScheduler();
       return !!(scheduler&&scheduler.ready===true);
@@ -399,6 +419,7 @@
       konohaOnlyAlphaStart:VILLAGES.filter(v=>v.enabled).length===1&&VILLAGES[0].id==="konoha",
       enemyTurnHooksCompletedPlayerOpportunity:consumeSource.includes('shouldRunEnemyTurn33400(side)')&&consumeSource.includes("executeEnemyAuthoredActionOpportunity"),
       enemyTurnRecursionGuard:consumeSource.includes("enemyTurnInProgress33400=true")&&shouldRunEnemyTurn33400.toString().includes('side!=="player"'),
+      authoredEnemyCadenceCanOptOut:shouldRunEnemyTurn33400.toString().includes("authoredEnemyOpportunityControllerId")&&shouldRunEnemyTurn33400.toString().includes("authoredEnemyOpportunityControllerBattleId"),
       plCalibrationInstalled:typeof document==="undefined"?true:!!document.getElementById(BATTLE_STYLE_ID),
       browserGoldenClaimed:false
     };

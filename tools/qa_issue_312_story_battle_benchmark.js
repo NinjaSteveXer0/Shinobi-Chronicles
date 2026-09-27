@@ -216,8 +216,8 @@ assert(kv2Battle.includes('available:!!enemy&&!sourceState("silent_body_flicker_
     {battleId:"battle312",evidenceId:"d2",eventType:"skill_action_completed",actionId:"d1",actorRef:{side:"player",participantId:"actor"},targetRef:{side:"enemy",participantId:"target"},skillId:"finisher",data:{resolved:true,damageApplied:true,finalDamage:9}}
   ];
   p=ctx.resolveBattlePerformanceProjection33000();
-  assert(p.result==="DEFEAT"&&p.afterPL===0,"#312 Battle defeat projection missing");
-  assert(!JSON.stringify(p).includes('"death"'),"#312 Battle defeat presentation invented death");
+  assert(p.result==="WITHDRAWAL"&&p.presentationClass==="DEFEAT"&&p.afterPL===0,"#312 Battle withdrawal projection missing");
+  assert(!JSON.stringify(p).includes('"death"'),"#312 Battle withdrawal presentation invented death");
 }
 
 console.log(JSON.stringify({
@@ -230,7 +230,7 @@ console.log(JSON.stringify({
   battleEvidenceProjection:{
     hit:true,
     substitution:true,
-    defeat:true,
+    withdrawal:true,
     exactTarget:true,
     semanticWriter:false
   },

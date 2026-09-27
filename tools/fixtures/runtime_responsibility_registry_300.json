@@ -531,7 +531,8 @@
         "currentBattle.battleId",
         "currentBattle.runtime.evidence",
         "currentBattle.deployment",
-        "currentBattle active participant and target refs"
+        "currentBattle active participant and target refs",
+        "currentBattle.deployment.lastTransition authored relay/yield projection"
       ],
       "stateWrites": [],
       "productionLoadPath": [
@@ -540,18 +541,26 @@
       ],
       "extensionHooks": [
         "resolveBattlePerformanceProjection33000",
-        "installBattlePerformance33000"
+        "installBattlePerformance33000",
+        "collectBattlePerformanceProjections33000",
+        "syncBattlePresentationQueue33000",
+        "pendingBattlePresentation33000",
+        "hardSettleBattlePresentationQueue33000"
       ],
       "permittedAdapters": [
         "academy_kakashi_v2_battle_adapter_36010"
       ],
       "retiredOwners": [],
-      "saveSchemaRefs": [],
+      "saveSchemaRefs": [
+        "sessionStorage sc_battle_presentation_33000:<battleId> presentation cursor only"
+      ],
       "qaRefs": [
         "tools/qa_alpha_battle_browser_32600.py",
         "tools/qa_issue_312_story_battle_benchmark.js",
         "tools/qa_issue_312_browser.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_373_evolved_pl_battle_presentation.js",
+        "tools/qa_issue_373_evolved_pl_battle_presentation_browser.js"
       ]
     },
     {
@@ -766,13 +775,14 @@
         "currentBattle deployment / Remaining Battle PL / runtime evidence",
         "enemyDatabase exact three Test Subject action packages",
         "Academy Menma prepared five-action package",
-        "Special Jōnin Anko closed Origin action package"
+        "Special Jōnin Anko scripted takedown Combat authority"
       ],
       "stateWrites": [
-        "currentBattle.menmaEvolvedPLBattle36900 side-opportunity / entitlement / committed RNG state",
+        "currentBattle.menmaEvolvedPLBattle36900 half-scripted phase / pending-zero / Phase-C side-opportunity state",
         "currentBattle.menma369LocalAllies encounter-local Anko projection",
+        "currentBattle deployment scoped Anko-to-Menma authored yield and ordinary enemy relay state",
         "playerData.activityHistory exact Academy Menma three-subject Battle occurrence receipt",
-        "sessionStorage.shinobiTestState exact Menma Battle semantic resume state"
+        "sessionStorage.shinobiTestState exact Menma half-scripted Battle resume payload"
       ],
       "productionLoadPath": [
         "index.html",
@@ -780,7 +790,8 @@
       ],
       "extensionHooks": [
         "launchMenmaEvolvedPLBattle36900",
-        "settleMenmaEvolvedPLBattle36900",
+        "commitMenmaScriptedAnkoPhase36900",
+        "advanceMenmaScriptedBattleAfterPresentation37300",
         "getMenmaEvolvedPLBattleInputReadiness36900",
         "getMenmaEvolvedPLBattleState36900",
         "runIssue369MenmaEvolvedPLBattleDiagnostics"
@@ -798,7 +809,10 @@
         "tools/qa_issue_362_menma_three_subject_reward.js",
         "tools/qa_runtime_ownership_safety_300.js",
         "tools/qa_issue_369_menma_evolved_pl_battle_browser.js",
-        ".github/workflows/issue-369-menma-evolved-pl-battle.yml"
+        ".github/workflows/issue-369-menma-evolved-pl-battle.yml",
+        "tools/qa_issue_373_evolved_pl_battle_presentation.js",
+        "tools/qa_issue_373_evolved_pl_battle_presentation_browser.js",
+        ".github/workflows/issue-373-evolved-pl-battle-presentation.yml"
       ]
     },
     {
