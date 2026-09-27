@@ -259,10 +259,15 @@ commit:
 The expected fresh-Iwabee loss is a normal Story branch:
 `iwa_confront_loss_01 -> ... -> iwa_confront_loss_05 -> iwa_confront_loss_world_result`
 
-World #398 then resolves the Rogue disposition and returns to:
-`iwa_eval_route_confront_loss_01 -> ... -> iwa_eval_core_01`
+Closed fresh-defeat disposition:
+- Rogue escapes;
+- instructor protects withdrawn Iwabee;
+- no custody;
+- no injury/death;
+- no retry / Origin failure.
 
-No retry / injury / death / Origin failure.
+The binding defeat bridge now plays the exact World result before:
+`iwa_eval_route_confront_loss_01 -> ... -> iwa_eval_core_01`.
 
 ### Legitimate victory return
 
@@ -272,7 +277,7 @@ When the confrontation is over, the repaired section of training ground is still
 
 Whatever became of the Rogue Genin is a second fact the instructor now has to deal with.
 
-**AUTHOR:** project exact World disposition only when the owning resolver supplies it.
+**AUTHOR:** on legitimate Iwabee victory, the Rogue withdraws and the instructor establishes `TEMPORARY_INSTRUCTOR_DETENTION`. Direct victory still does not satisfy IWA-02.
 
 **Next:** `iwa_eval_route_confront`
 
@@ -311,13 +316,22 @@ Iwabee glances at the blocked route.
 
 Constraint does NOT imply immobilisation, Stun, capture, PL damage or Battle advantage.
 
-World/Combat own what follows.
+Current World result:
+- Rogue surrenders;
+- instructor establishes `TEMPORARY_INSTRUCTOR_DETENTION`;
+- no second Battle.
 
 ### `iwa_block_return_01` — narration
 
-However the Rogue situation resolves, the raised barrier remains across the route he tried to use.
+The Rogue looks at the new wall.
 
-Iwabee looks at it, then at the first section of ground he repaired.
+Then at the instructor.
+
+Whatever calculation he makes ends there.
+
+He raises his hands.
+
+The instructor takes control of the situation while Iwabee looks from the barrier to the first section of ground he repaired.
 
 Two changes.
 
@@ -351,7 +365,13 @@ Iwabee does.
 
 He does not look pleased about it.
 
-**AUTHOR:** World owns exact Rogue disposition after escalation.
+### `iwa_call_05` — narration
+
+The Rogue sees the instructor commit to shielding the students and takes the open route instead.
+
+By the time the instructor can safely move after him, he is gone.
+
+**AUTHOR:** Rogue escapes. No custody.
 
 **Next:** `iwa_eval_route_call`
 
@@ -377,7 +397,13 @@ Whatever happens behind him, the training ground is usable when he is finished.
 
 That part is not ambiguous.
 
-**AUTHOR:** World owns whether the Rogue escapes or is resolved by another legitimate actor. Do not credit Iwabee with resolving him.
+### `iwa_finish_04` — narration
+
+Behind him, footsteps break toward the open side of the yard.
+
+The Rogue is gone before Iwabee finishes the last section.
+
+**AUTHOR:** Rogue escapes. Do not credit Iwabee with resolving him. IWA-01 remains complete.
 
 **Next:** `iwa_eval_route_finish`
 
