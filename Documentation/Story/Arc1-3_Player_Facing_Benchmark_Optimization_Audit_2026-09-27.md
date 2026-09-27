@@ -361,3 +361,223 @@ Existing explicit autonomous authoring delegation remains valid only within its 
 > **Machine contracts remain precise. Player-facing Story becomes cinematic, character-specific, observer-bounded and scene-ready.**
 
 > **Arc expression must reach the Origin benchmark or exceed it without turning every protagonist into the developer Menma route.**
+
+
+---
+
+# 12. 2026-09-27 modernization sweep completion
+
+The player-facing successor sweep is now complete across **Arc 1, Arc 2 and Arc 3**.
+
+These are expression/presentation successors over the existing structural authority.
+
+They do **not** supersede:
+- machine-addressable contracts;
+- neutral production skeletons;
+- current World / Registry / Combat / Progression authority;
+- binding developer-Chronicle historical records.
+
+They supersede stale/specification-style player-facing expression where Coding later consumes approved Story.
+
+## Arc 1 successor set
+
+### Mission 1
+`Documentation/Story/Arc1_Mission1_Whisper_Woods_333_Benchmark_Optimized_Player_Facing_Candidate_2026-09-27.md`
+
+Creation commit:
+`68cb094c656548c0f85c6493872b3ed05b65cbef`
+
+### Missions 2–6
+`Documentation/Story/Arc1_Missions2-6_333_Benchmark_Optimized_Player_Facing_Candidate_2026-09-27.md`
+
+Creation commit:
+`d35e4d607e90d1d5fae0199fdb5f5943d9843000`
+
+### Missions 7–10
+`Documentation/Story/Arc1_Missions7-10_333_Benchmark_Optimized_Player_Facing_Candidate_2026-09-27.md`
+
+Creation commit:
+`bee2bea694819fcf8cf58e86b793612eaf02a05d`
+
+### Missions 11–12
+`Documentation/Story/Arc1_Missions11-12_333_Benchmark_Optimized_Player_Facing_Candidate_2026-09-27.md`
+
+Creation commit:
+`3a0e8c25a1950c2a109c052cf91a73b96562f4e2`
+
+## Arc 2 successor set
+
+### Missions 1–3
+`Documentation/Story/Arc2_Missions1-3_333_Benchmark_Optimized_Player_Facing_Candidate_2026-09-27.md`
+
+Creation commit:
+`8d96cba2599c28bea67f3b0ccee3142dab1cd603`
+
+### Missions 4–8
+`Documentation/Story/Arc2_Missions4-8_333_Benchmark_Optimized_Player_Facing_Candidate_2026-09-27.md`
+
+Creation commit:
+`1840c4d5f5e6cb431259fe5f61e783c7b4fe99f7`
+
+### Missions 9–12
+`Documentation/Story/Arc2_Missions9-12_333_Benchmark_Optimized_Player_Facing_Candidate_2026-09-27.md`
+
+Creation commit:
+`fbbd270821cf0136f5c5a0e43d06bcd94eb206ff`
+
+## Arc 3 successor set
+
+### Missions 1–4
+`Documentation/Story/Arc3_Missions1-4_333_Benchmark_Optimized_Player_Facing_Candidate_2026-09-27.md`
+
+Creation commit:
+`94a3d131b962d8263ec5fa687130a9d5b740b8b7`
+
+### Missions 5–8
+`Documentation/Story/Arc3_Missions5-8_333_Benchmark_Optimized_Player_Facing_Candidate_2026-09-27.md`
+
+Creation commit:
+`5d11f10f42dc14dafc2ff684a0d3b47dc868a9a9`
+
+### Missions 9–12
+`Documentation/Story/Arc3_Missions9-12_333_Benchmark_Optimized_Player_Facing_Candidate_2026-09-27.md`
+
+Creation commit:
+`af186dae0a4c9b36ddd46dd2e3bf6b36769c8f60`
+
+---
+
+# 13. What changed across the Arc sweep
+
+## Story performance
+
+Removed or prevented:
+- state-report narration;
+- CE / QA language exposed to the player;
+- narration explaining player agency;
+- generic faction exposition;
+- one-sentence-per-click over-fragmentation;
+- scroll-box specification prose;
+- developer-Menma history silently becoming universal protagonist truth.
+
+Added:
+- lived scene entry/movement/consequence;
+- participant-specific reaction slots;
+- route-reactive post-Battle continuation;
+- actual dramatic decisions rather than personality labels;
+- one complete readable dramatic beat per Story box.
+
+## Political scenes
+
+Arc 2–3 political material now defaults to:
+- competing actions;
+- concrete costs;
+- operational decisions;
+- divided relationships;
+- physical control/custody/movement;
+- institutional performance;
+
+instead of characters acting as political-position terminals.
+
+Minato and Sasuke remain individually voiced and factually credible.
+
+## Chronicle-specific overlays
+
+Developer Menma history remains available as conditional overlays:
+- Echo/Kurama material;
+- Grey Line;
+- Non-Conformance compact;
+- specific foreign Kusa/Ame relationships;
+- private ROOT / Sealed Wall history;
+- current Menma/Kurama exact dialogue anchors.
+
+These are never projected into unrelated protagonists merely to preserve the developer path.
+
+## Battle boundaries
+
+Writing never fabricates:
+- PL;
+- loadouts;
+- damage;
+- unsupported winner;
+- injury;
+- power unlock.
+
+Most importantly:
+- Arc 3 M11 may reach Minato vs Sasuke direct confrontation;
+- Writing does **not** declare a winner;
+- the Menma reference disengagement remains a Story consequence of changing battlefield leverage, not a fabricated Combat result.
+
+---
+
+# 14. Visual projection sweep
+
+All successor files now include presentation requirements.
+
+Existing assets are bound where current live authority supports them.
+
+Where no exact approved asset path is durably visible, successors explicitly use:
+
+`BACKDROP ASSET REQUIRED`
+
+or:
+
+`ACTOR PROJECTION ASSET REQUIRED`
+
+Coding must not infer/guess assets from prose.
+
+Important currently visible reusable assets include:
+- Arc 1 dedicated backdrop set;
+- Hokage Administration interiors;
+- Hokage district exterior;
+- Konoha streets/main gate;
+- medical interior;
+- Academy grounds;
+- Whisper Woods / current Origin sets;
+- current Minato / Naruto / Kushina / Anko cards;
+- late Arc-1 Ren/Echo/Kagawa/operative assets.
+
+Important unresolved exact mappings include, among others:
+- current Arc-2/3 Sasuke representation;
+- several persistent foreign intermediaries;
+- Arc-3 custody / command / coordinator / ceasefire-specific scene backdrops.
+
+---
+
+# 15. Approval status
+
+## Academy Origins
+
+Current optimized Academy Origin sweep:
+**STEPHEN APPROVED / WRITING GOLDEN**.
+
+## Arc 1–3 successors in this sweep
+
+Current status:
+**WRITING AMBER — BENCHMARK-OPTIMIZED CANDIDATES / STEPHEN SCENE-LEVEL REVIEW PENDING**
+
+Stephen authorised the modernization work.
+
+That authorisation does **not** silently convert all newly authored Arc prose into production GOLDEN without review.
+
+Until approved:
+- structural authority remains closed and usable;
+- developer histories remain binding where applicable;
+- Coding should not bulk-replace production prose with these candidates as if already GOLDEN.
+
+---
+
+# 16. Recommended review order
+
+For Alpha implementation value:
+
+1. Arc 1 M1
+2. Arc 1 M2–6
+3. Arc 1 M7–10
+4. Arc 1 M11–12
+5. Arc 2
+6. Arc 3
+
+This is an implementation/review order, not a narrative-quality ranking.
+
+Arc 1 is the immediate runtime priority.
