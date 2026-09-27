@@ -110,21 +110,73 @@ Secondary indexing does not outrank official/manga or Shinobi Chronicles Recorde
 
 # 2. Shared Kurama canon baseline
 
-## 2.1 Nine-Tails and Kurama are one canonical being
+## 2.1 Identity is one axis; relationship-state representation is another
 
-Canon does **not** contain one persistent creature called "Nine-Tails" and a second unrelated creature called "Kurama".
+Canon establishes that **Nine-Tails** is Kurama's numbered/title identity and **Kurama** is his personal name.
 
-Safe baseline:
+For Shinobi Chronicles, Stephen clarified on **2026-09-27** that this naming difference is also used to project a materially different **Jinchūriki relationship state**:
 
-> **Nine-Tails = title/numbered identity of Kurama. Kurama = personal/true name of the same canonical Tailed Beast.**
+> **Nine-Tails and Kurama are the same persistent person/beast, but the relationship with the Jinchūriki is different.**
 
-Therefore:
+The relevant canonical pattern is Naruto's progression:
 
-- SC may legitimately author different exact representations called `nine_tails` and `kurama_complete`;
-- but the mechanical distinction must come from explicit SC historical/relationship/body-state authority;
-- filename/title difference alone is insufficient.
+### Nine-Tails relationship state
 
-## 2.2 Core source capabilities
+Before true voluntary partnership, Kurama may:
+- be sealed or controlled;
+- resist the host;
+- manipulate or bargain;
+- lend/push chakra for self-interested reasons;
+- seek escape/freedom;
+- be hostile, adversarial, transactional, or even **cordial** without yet becoming a genuine cooperative partner.
+
+Examples across Naruto's pre-partnership history include:
+- Kurama being controlled during Naruto's birth;
+- Kurama exploiting danger and chakra use as routes toward freedom;
+- escalating cloak/tail access before genuine partnership;
+- the chakra tug-of-war;
+- four-tail loss-of-control consequences.
+
+Therefore in SC:
+
+> **friendly/civil dialogue != Kurama-partnership representation**
+
+> **chakra access != Kurama-partnership representation**
+
+> **cloak access != Kurama-partnership representation**
+
+> **one voluntary loan != Kurama-partnership representation**
+
+### Kurama relationship state
+
+The named **Kurama** relationship-state representation is reserved for genuine voluntary partnership/cooperation: the beast and Jinchūriki knowingly choose to work together rather than merely coexist, bargain, manipulate, or tolerate one another.
+
+Official Naruto material marks the major Naruto/Kurama transition at chapter 570, when Kurama chooses to help Naruto and the two become partners.
+
+Therefore the SC transition is not:
+
+`different creature -> different creature`
+
+It is:
+
+`same persistent Kurama + materially changed relationship state -> different exact representation`
+
+This relationship-state rule is separate from partition/body-state.
+
+## 2.2 Partition/body state is a separate axis
+
+Preserve:
+
+- **Yin / Yang** = partition state;
+- **Complete Kurama** = reunited whole;
+- **Nine-Tails / Kurama** = relationship-state representation semantics in SC;
+- **Menma-specific exact representations** = relationship-state + host/history-specific projection.
+
+Do not collapse these axes.
+
+A beast can remain the same exact half while its relationship with its Jinchūriki develops from Nine-Tails-state to Kurama-state.
+
+## 2.3 Core source capabilities
 
 Safe Kurama-family canon anchors include:
 
@@ -141,7 +193,33 @@ Safe Kurama-family canon anchors include:
 
 These are foundations, not automatic buttons for every SC representation.
 
-## 2.3 Elemental nature caution
+## 2.4 Himawari / Reborn Kurama — exceptional compatibility guardrail
+
+This relationship must be treated as an exceptional canon case, not merely another "friendly Kurama" package.
+
+Official author Q&A on the NARUTO/BORUTO site states that Himawari's Uzumaki + Hyūga inheritance has a **synergetic effect with Kurama's chakra**, producing unusually enormous potential.
+
+Current manga-indexed material further reports Kurama explaining that Himawari's compatibility with him exceeds prior hosts/predecessors, including Naruto.
+
+Therefore the safe SC design guardrail is:
+
+> **Himawari ↔ Reborn Kurama represents historically exceptional Biju/Jinchūriki compatibility and must not be flattened to an ordinary cooperative-host package if the existing closure is ever revised.**
+
+Current SC already expresses this through dedicated Himawari representations and stronger access/action packages rather than additive Reborn-Kurama PL.
+
+Do not convert the canon synergy into:
+- a generic `synergyMultiplier`;
+- hidden friendship PL;
+- automatic source-PL transfer.
+
+But if future RESET-v2 auditing changes the Reborn Kurama/Himawari package, it must preserve the relationship as an **upper-end compatibility/resonance benchmark**, not downgrade it to the same expression as an ordinary Jinchūriki partnership.
+
+Research sources:
+- NARUTO Official Two Blue Vortex author Q&A: Himawari's Uzumaki/Hyūga blood and Kurama chakra have a synergetic effect;
+- Boruto Database: Kurama (Nine Tails): reborn Kurama/Himawari canon state;
+- manga-indexed secondary source: Kurama states Himawari's compatibility exceeds predecessors / Naruto.
+
+## 2.5 Elemental nature caution
 
 Anime sources give Kurama Fire/Wind nature use.
 
@@ -149,7 +227,7 @@ The manga-baseline identity does **not** require us to make Fire Release or Wind
 
 Do not baseline an elemental bonus from anime-only nature material unless SC deliberately adopts it.
 
-## 2.4 Baryon Mode boundary
+## 2.6 Baryon Mode boundary
 
 Baryon Mode is a special Naruto + Kurama terminal interaction, not a generic "Kurama own Skill" to attach to every Kurama representation.
 
@@ -251,142 +329,191 @@ Do not derive those by simply doubling a half.
 
 ---
 
-# 5. `nine_tails` — current SC semantic seam
+# 5. `nine_tails` — SC relationship-state authority clarified
 
-Current durable Registry ontology says:
+Stephen resolved the conceptual distinction on **2026-09-27**.
 
-- stable ID: `nine_tails`
-- Entity -> Tailed Beast
-- exact **Nine-Tails/Kurama representation**
+`nine_tails` is not a different persistent creature from Kurama.
 
-Current durable authority reviewed for this dossier does **not** yet define the exact historical/body/relationship distinction between:
+It represents the **pre-partnership Nine-Tails relationship state**: Kurama exists as the same person/beast, but true voluntary Jinchūriki partnership has not yet been established.
 
-- `nine_tails`
-- `kurama_complete`
+This state can include:
+- hostility;
+- coercion;
+- manipulation;
+- transactional cooperation;
+- self-interested chakra lending;
+- containment/sealing conflict;
+- **cordial coexistence**.
 
-Canon cannot solve this by itself because "Nine-Tails" and "Kurama" are names/titles for the same beast.
+Therefore:
 
-Therefore this is an **SC representation question**, not a canon question.
+> **cordial != partnered**
 
-Before source-specific RESET-v2 mechanics are authored for `nine_tails`, coordination must establish what exact state it represents.
+> **friendly dialogue != representation upgrade**
 
-Do not assume:
-- hostile/unfriendly;
-- pre-name;
-- pre-cooperation;
-- pre-split;
-- post-split;
-- Naruto-specific;
-- generic full beast;
+> **using Kurama chakra != representation upgrade**
 
-unless current SC authority explicitly returns that meaning.
+> **a cloak != representation upgrade**
+
+The relationship-state transition to a named Kurama representation requires a materially deeper cooperative relationship than simple civility/access.
+
+### Relationship axis vs Complete body axis
+
+`kurama_complete` remains the **reunited whole/body-state representation**.
+
+Do not treat `nine_tails` and `kurama_complete` as a simple "hostile version / friendly version" pair.
+
+They encode different axes:
+- `nine_tails` primarily expresses a pre-partnership relationship-state;
+- `kurama_complete` expresses the reunited whole, and its exact relationship package must be authored consistently with that later historical state.
 
 ---
 
-# 6. Menma canon comparators — do not collapse into SC Menma
+# 6. Menma canon comparator + SC starting identity
 
-There are two useful Naruto-franchise Menma comparators, but neither automatically defines Shinobi Chronicles Menma.
+Stephen clarified on **2026-09-27**:
+
+> **Shinobi Chronicles Menma is Road to Ninja Menma before he chooses the rogue path.**
+
+That gives Character baseline/personality/history context.
+
+It does **not** mean every later Road-to-Ninja rogue-path mechanic is automatically active at Academy start.
 
 ## 6.1 Road to Ninja — Menma Uzumaki
 
-Movie-only alternate-world Menma:
+Movie continuity establishes:
+- Menma as Naruto's alternate-world counterpart;
+- Black Nine-Tails / movie-specific Tailed-Beast presentation;
+- Nine Masked Beasts as a later rogue-path power structure.
 
-- Naruto counterpart;
-- jinchūriki of the **Black Nine-Tails**, an alternate-world counterpart;
-- Black Nine-Tails is not simply "normal Kurama with a dark skin";
-- Menma can use Nine Masked Beasts derived from that movie-specific power structure.
+SC consumes **pre-rogue Menma as its baseline**, then follows its own Recorded History.
 
-This is **not automatically SC authority**.
+Therefore:
+- do not discard Road-to-Ninja Menma as irrelevant;
+- do not automatically grant Academy Menma every later rogue-path ability;
+- Black Nine-Tails / Nine Masked Beasts mechanics still require explicit SC adoption if they are to become executable source mechanics.
 
-Do not grant SC Menma:
-- Black Nine-Tails identity;
-- Nine Masked Beasts;
-- Road-to-Ninja-exclusive mechanics;
+## 6.2 Infinite-Tsukuyomi Menma
 
-merely because the character is named Menma.
-
-## 6.2 Infinite Tsukuyomi — Menma Namikaze
-
-Anime-only dream Menma:
-
-- is associated with **normal Kurama**, not the Black Nine-Tails;
-- can use Nine-Tails Chakra Mode / Kurama-linked power in that dream continuity.
-
-Again, this is a comparison source, not automatic SC authority.
+Anime-only Menma Namikaze remains a secondary comparator and does not control SC Menma.
 
 ---
 
 # 7. Shinobi Chronicles Menma / Kurama Recorded History
 
-Current durable SC Story authority is stronger than either franchise comparator.
+Current durable SC Story authority plus Stephen's 2026-09-27 clarification establishes:
 
-Relevant SC authority establishes:
-
-- Menma hosts **Kurama** as a distinct persistent Entity;
-- Menma keeps Kurama's identity as the Nine-Tails/Fox secret from teammates unless legitimately revealed;
-- Naruto has **Kurama's other half**;
-- Menma's Kurama explicitly refers to Naruto's Kurama as his other half;
-- Menma/Kurama relationship is built around agency, freedom, secrecy, friction and increasing cooperation;
-- Kurama may voluntarily lend Menma limited power in exact occurrences;
-- temporary Kurama loans do not equal permanent access/mastery;
-- Menma remains decision-maker;
+- Academy Student Menma begins with his **Nine-Tails-state Kurama source already present**;
+- Menma and the beast may already be **cordial**;
+- cordiality is explicitly insufficient for the named Kurama representation;
+- Menma can later reach **One-Tailed Chakra Cloak Menma** before the full relationship-state upgrade;
+- therefore cloak access is explicit proof that **power access != partnership representation**;
+- Menma remains the decision-maker;
 - Kurama remains a distinct causal participant;
 - no hidden additive Kurama PL transfer is allowed.
 
-Therefore:
-
-> **SC Menma is its own Recorded History.**
-
-Canon comparator material is used to anchor what Kurama/Menma-like relationships can look like, but it does not overwrite the Chronicle.
-
----
-
-# 8. `menma_nine_tails` vs `menma_kurama` — current SC semantic seam
-
-Current durable Registry ontology recognises both as exact Tailed Beast representations:
-
-- `menma_nine_tails`
-- `menma_kurama`
-
-Current Story authority proves:
+SC Story also establishes:
 - Menma hosts one Kurama half;
-- Naruto hosts the other half;
-- Menma/Kurama relationship can develop/cooperate.
-
-But the durable sources reviewed here do **not** explicitly state the exact representation distinction between the two IDs.
-
-In particular, current authority does not safely establish:
-
-- `menma_nine_tails` = hostile and `menma_kurama` = friendly;
-- one = Road-to-Ninja Black Nine-Tails;
-- one = Infinite-Tsukuyomi Menma Kurama;
-- one = independent beast and one = hosted beast;
-- which exact Yin/Yang partition each card represents.
-
-Do not infer any of those merely from names/artwork.
-
-This needs explicit SC reconciliation before different source packages are authored.
-
----
-
-# 9. Which half does Menma host?
-
-Current Story authority clearly establishes a split:
-
-> Menma's Kurama has an "other half" hosted by Naruto.
-
-However, the durable sources reviewed in this pass do not explicitly map:
-
-- Menma -> Yin or Yang;
-- Naruto -> Yin or Yang.
-
-Canon Naruto history normally maps Naruto to Yang and Minato to Yin, but Shinobi Chronicles has deliberately divergent Menma/Naruto family history.
+- Naruto hosts Kurama's other half;
+- Menma's Kurama explicitly thinks/talks about Naruto's other half;
+- Menma/Kurama relationship develops through agency, freedom, secrecy, friction and increasing cooperation.
 
 Therefore:
 
-> **do not import the canon host mapping into SC without explicit authority.**
+> **SC Menma is Road-to-Ninja Menma before the rogue path, then diverges through Shinobi Chronicles Recorded History.**
 
-The partition identity should be returned by CE / Registry / Story coordination from existing SC history or closed prospectively before Kurama-family mechanics depend on it.
+---
+
+# 8. `menma_nine_tails` -> `menma_kurama` — relationship-state transition
+
+Stephen closed the conceptual distinction on **2026-09-27**.
+
+## `menma_nine_tails`
+
+This is Menma's **pre-partnership relationship-state representation**.
+
+Important:
+- it is **not required to be hostile**;
+- it may be cordial;
+- it may permit dialogue;
+- it may permit exact chakra loans/access;
+- it may support One-Tailed Chakra Cloak Menma;
+- none of those alone cross the representation gate.
+
+## `menma_kurama`
+
+This is the later Menma-specific **genuine partnership/cooperation representation**.
+
+Stephen explicitly stated that the requirements for Menma reaching `menma_kurama` should be the same **kind of relationship achievement** as Naruto changing from `nine_tails` to `yang_kurama`.
+
+Canonical rule:
+
+> **Menma Nine-Tails -> Menma Kurama and Naruto Nine-Tails -> Yang Kurama are parallel relationship-development transitions.**
+
+But the exact gameplay producer/threshold is **not yet authored**.
+
+At minimum it must not collapse to:
+- one friendly dialogue;
+- one positive choice;
+- one chakra loan;
+- one cloak use;
+- one Battle win;
+- possession/implantation alone.
+
+Exact persistent relationship evidence/unlock mechanics belong to the later Combat + Progression design pass.
+
+---
+
+# 9. Naruto transition and Kurama partition mapping
+
+Stephen explicitly identified Naruto's named partnership-state target as:
+
+`yang_kurama`
+
+Therefore in SC:
+
+- Naruto's underlying Kurama half is the **Yang** partition;
+- Naruto's pre-partnership relationship projects through the `nine_tails` state;
+- genuine partnership later projects through `yang_kurama`.
+
+SC Story says Menma hosts Naruto's **other half**.
+
+Therefore the persistent partition history resolves:
+
+- **Naruto -> Yang half**
+- **Menma -> complementary Yin half**
+
+However:
+
+- `menma_kurama` is still a Menma-specific exact relationship/history representation;
+- it must not be collapsed mechanically into the generic `yin_kurama` collectible representation merely because the underlying partition is Yin;
+- exact representation reservation / simultaneous-use rules must preserve one persistent Yin half underneath both where relevant.
+
+This resolves the underlying partition identity without erasing the Menma-specific exact representation.
+
+---
+
+# 9A. Acquisition / implantation remains OPEN
+
+Stephen explicitly stated that Shinobi Chronicles has **not yet created the system for how a player obtains a Tailed Beast or implants/seals one into a Character**.
+
+Therefore this research/design tranche must not smuggle in:
+
+- generic Tailed-Beast acquisition;
+- implant/seal UI flow;
+- automatic host compatibility;
+- ownership from card possession;
+- relationship-state upgrade merely from implantation;
+- free reassignment between Characters.
+
+Preserve:
+
+> **Tailed Beast obtainability/implantation != relationship development**
+
+> **hosted/sealed != partnered**
+
+Acquisition / Character Systems owns future obtainability/ownership/implantation semantics, with Fūinjutsu/Combat/Progression consumers added only when explicitly contracted.
 
 ---
 
@@ -502,25 +629,36 @@ Catalogue row != source closure.
 
 # 13. Current Kurama-family project state
 
-| Representation | Current SC lifecycle / meaning recovered | Canon research | Full RESET-v2 source package |
+| Representation | Current SC meaning recovered | Canon research | Full RESET-v2 source package |
 |---|---|---|---|
-| `yang_kurama` | exact Tailed Beast partition representation | **researched** | **NOT CLOSED** |
-| `yin_kurama` | exact Tailed Beast partition representation | **researched** | **NOT CLOSED** |
-| `kurama_complete` | exact mature reunited Complete Kurama representation | **researched** | **NOT CLOSED** |
-| `nine_tails` | exact Nine-Tails/Kurama representation; exact distinction from Complete remains underdefined | **researched baseline** | **BLOCKED ON SC SEMANTIC RECONCILIATION** |
-| `menma_kurama` | exact Menma Kurama representation; Menma relationship history exists | **canon + SC researched** | **BLOCKED ON EXACT REPRESENTATION MEANING** |
-| `menma_nine_tails` | exact Menma Nine-Tails representation | **canon + SC researched** | **BLOCKED ON EXACT REPRESENTATION MEANING** |
+| `nine_tails` | pre-partnership Nine-Tails relationship state; same persistent Kurama | **researched + semantics clarified** | **NOT CLOSED** |
+| `yang_kurama` | Naruto's Yang-half genuine partnership-state representation | **researched + semantics clarified** | **NOT CLOSED** |
+| `yin_kurama` | generic/exact Yin partition representation; not automatically identical to Menma-specific card | **researched** | **NOT CLOSED** |
+| `kurama_complete` | reunited whole/body-state representation | **researched** | **NOT CLOSED** |
+| `menma_nine_tails` | Menma pre-partnership state; cordiality/cloak access permitted without upgrade | **canon + SC researched** | **NOT CLOSED** |
+| `menma_kurama` | Menma-specific genuine partnership/cooperation representation over the underlying Yin half | **canon + SC researched** | **NOT CLOSED** |
 | `breakout_kurama` | Forced Manifestation | **canon + SC researched** | **NOT RESET-v2 CLOSED** |
-| `reborn_kurama` | Hosted Entity / Himawari-era rebirth | **researched** | **EXISTING COMBAT CLOSURE — AUDIT, DO NOT REBUILD BY DEFAULT** |
+| `reborn_kurama` | Hosted Entity / Himawari-era rebirth; historically exceptional compatibility benchmark | **researched** | **EXISTING COMBAT CLOSURE — AUDIT, DO NOT REBUILD BY DEFAULT** |
+
+Relationship-state semantics are now sufficiently clear to design source packages later.
+
+Exact **unlock evidence/thresholds** and **Tailed-Beast acquisition/implantation** remain separate unresolved systems.
 
 ---
 
 # 14. Design constraints produced by research
 
-When Batch 4 begins:
+## Relationship-state rule
+- Nine-Tails-state and Kurama-state are different Jinchūriki relationship representations of the same persistent being;
+- cordial/friendly does not equal partnered;
+- chakra access does not equal partnered;
+- cloak access does not equal partnered;
+- one voluntary loan does not equal partnered.
 
 ## Yin / Yang
 - same persistent Kurama, partition states;
+- Naruto's SC underlying half = Yang;
+- Menma's SC underlying half = Yin by the existing "other half" Story relation;
 - no generic light/dark RPG polarity;
 - no morality split;
 - no arbitrary opposite-element design.
@@ -530,41 +668,52 @@ When Batch 4 begins:
 - do not stack two half-source packages on top of a Complete package;
 - no simple x2 arithmetic.
 
-## Nine-Tails
-- title != separate canon being;
-- exact SC representation meaning must be explicit before unique mechanics.
-
 ## Menma
-- SC Recorded History outranks Road to Ninja / Infinite Tsukuyomi comparisons;
-- do not auto-use Black Nine-Tails;
-- do not auto-use Nine Masked Beasts;
-- do not import canon Naruto host-half mapping without SC authority;
-- preserve Menma/Kurama agency, secrecy and voluntary-loan boundaries.
+- SC baseline = Road-to-Ninja Menma before rogue path;
+- Academy Menma begins with Menma Nine-Tails relationship state;
+- cordiality and One-Tailed Cloak access can predate genuine partnership;
+- Menma Kurama requires the same category of genuine relationship achievement as Naruto's Nine-Tails -> Yang Kurama transition;
+- exact unlock evidence remains to be designed;
+- later Road-to-Ninja rogue powers are not automatic Academy inheritance.
+
+## Himawari / Reborn
+- preserve historically exceptional Kurama compatibility/resonance;
+- do not flatten to ordinary cooperative-host expression;
+- preserve dedicated stronger representation/access rather than generic hidden multiplier;
+- existing Reborn/Himawari closure remains authoritative unless a real contradiction requires revision.
 
 ## Breakout
 - forced manifestation identity must matter mechanically;
 - no ordinary ownership/cooperation semantics by default.
 
-## Reborn
-- existing closed Combat package remains authority unless a real contradiction is found;
-- Himawari dedicated representations must not receive additive Reborn Kurama PL/source packages twice.
+## Acquisition
+- no generic Tailed-Beast obtainability/implantation system currently exists;
+- do not solve acquisition accidentally inside Combat source design.
 
 ---
 
 # 15. Research closure
 
-**Canon research is now complete for the Kurama family at the level required to begin representation reconciliation.**
+**Canon research and the core Kurama relationship-state representation semantics are now complete enough to begin later source-specific RESET-v2 design.**
 
-However three SC semantic questions remain before the affected RESET-v2 mechanics can be authored safely:
+Closed owner-level semantic decisions:
 
-1. exact `nine_tails` meaning vs `kurama_complete`;
-2. exact `menma_nine_tails` meaning vs `menma_kurama`;
-3. exact Yin/Yang partition mapping for Menma vs Naruto in Shinobi Chronicles.
+1. `Nine-Tails` vs named `Kurama` is a **relationship-state distinction**, not a separate persistent being;
+2. cordial/friendly interaction alone does not cross the partnership gate;
+3. cloak/chakra access can exist before partnership;
+4. Academy Menma begins in `menma_nine_tails` state and may later reach One-Tailed Cloak before `menma_kurama`;
+5. Menma's `menma_nine_tails -> menma_kurama` transition and Naruto's `nine_tails -> yang_kurama` transition use the same category of genuine voluntary partnership achievement;
+6. Naruto's underlying half is Yang; Menma's is the complementary Yin half under current SC "other half" Recorded History;
+7. Tailed-Beast acquisition/implantation is still an uncreated separate system;
+8. Himawari/Reborn Kurama is an exceptional compatibility/resonance benchmark that future changes must preserve.
 
-Those are SC canon/representation questions, not internet-canon questions.
+Still OPEN for future design:
+- exact persistent evidence/threshold that upgrades Nine-Tails-state to Kurama-state;
+- exact acquisition/implantation system;
+- exact distinct Enhancement/Skill packages for each representation.
 
-The safe production sequence is:
+The safe production sequence is now:
 
-> **resolve SC representation meaning -> author source-specific Enhancement/Skills -> anti-double-count audit**
+> **research -> source-specific mechanics design -> relationship-unlock contract -> anti-double-count audit -> later acquisition integration**
 
-**research complete != representation semantics complete != design closed != implemented != runtime validated != Golden GREEN**
+**research complete != design closed != implemented != runtime validated != Golden GREEN**
