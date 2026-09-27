@@ -1283,6 +1283,47 @@
     try{resumeBattleCallerAfterCompletion=wrappedResumeBattleCaller33000;}catch(_error){}
   }
 
+  // Menma's closed whole-encounter reward is a reward-gained presentation,
+  // not a wallet-total counter. The generic Victory reveal first paints the
+  // final number and then restarts a delayed 0 -> target animation, which reads
+  // as a meaningless 100 -> 100 roll on this exact reward. Keep generic Victory
+  // animation untouched; scope the correction to this authored reward only.
+  function isMenmaWholeEncounterRewardPresentation33000(rewards){
+    return !!(
+      currentBattle&&
+      String(currentBattle.battleConfigId||"")==="academy_menma_origin_three_test_subjects_with_anko"&&
+      currentBattle.rewards&&
+      currentBattle.rewards.menmaThreeSubjectReward===true&&
+      currentBattle.rewards.fixedWholeEncounterReward===true&&
+      Number(rewards&&rewards.ryo)===100
+    );
+  }
+  const PRIOR_VICTORY_REVEAL_33000=typeof runVictoryRevealAnimations==="function"?runVictoryRevealAnimations:null;
+  if(PRIOR_VICTORY_REVEAL_33000){
+    const wrappedVictoryReveal33000=function(container,rewards){
+      if(isMenmaWholeEncounterRewardPresentation33000(rewards)){
+        const ryoElement=container&&container.querySelector?container.querySelector(".victory-ryo-number"):null;
+        const expElement=container&&container.querySelector?container.querySelector(".victory-exp-number"):null;
+        const ryoGranted=Math.max(0,Number(rewards&&rewards.ryo)||0);
+        const expGranted=Math.max(0,Number(rewards&&rewards.exp)||0);
+        if(ryoElement){
+          ryoElement.textContent="+"+String(ryoGranted);
+          ryoElement.dataset.rewardPresentation="earned_delta";
+          ryoElement.dataset.rewardAmount=String(ryoGranted);
+        }
+        if(expElement){
+          expElement.textContent=String(expGranted);
+          expElement.dataset.rewardPresentation="earned_amount";
+          expElement.dataset.rewardAmount=String(expGranted);
+        }
+        return{success:true,presentationOnly:true,rewardMode:"earned_delta",ryoGranted,expGranted,animated:false};
+      }
+      return PRIOR_VICTORY_REVEAL_33000.apply(this,arguments);
+    };
+    globalThis.runVictoryRevealAnimations=wrappedVictoryReveal33000;
+    try{runVictoryRevealAnimations=wrappedVictoryReveal33000;}catch(_error){}
+  }
+
   const PRIOR_OPEN_OVERLAY_33000=typeof openOverlay==="function"?openOverlay:null;
   function flushDeferredTerminalOverlay33000(){
     const deferred=battlePresentationQueueState33000.deferredTerminalOverlay;
@@ -1300,6 +1341,18 @@
       if(orderedPlaybackEnabled33000()&&(target==="victory"||target==="defeat")&&currentBattle&&currentBattle.battleOver===true){
         ensurePresentationQueueBattle33000();
         syncBattlePresentationQueue33000();
+
+        // Defer only while an immutable committed Battle receipt is genuinely
+        // still playing/settling. A later Victory re-render (for example after
+        // the explicit reward claim) must not manufacture a fresh 12-second
+        // dead period after the queue is already empty.
+        if(!pendingBattlePresentation33000()){
+          battlePresentationQueueState33000.deferredTerminalOverlay=null;
+          if(battlePresentationQueueState33000.terminalWatchdog)clearTimeout(battlePresentationQueueState33000.terminalWatchdog);
+          battlePresentationQueueState33000.terminalWatchdog=null;
+          return PRIOR_OPEN_OVERLAY_33000.apply(this,arguments);
+        }
+
         battlePresentationQueueState33000.deferredTerminalOverlay={type:target,args:[...arguments],battleId:String(currentBattle.battleId||"")};
         const stage=typeof document!=="undefined"?document.querySelector(".alpha-code-battle-stage"):null;
         if(stage){installBattlePerformance33000(stage);}
