@@ -52,7 +52,8 @@
       "story-box-paragraph-segmentation-370",
       "origin-backdrop-tranche-hinata-menma-393",
       "academy-wasabi-writing-golden-343",
-      "academy-wasabi-rogue-genin-battle-343"
+      "academy-wasabi-rogue-genin-battle-343",
+      "story-machine-resolver-343"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
