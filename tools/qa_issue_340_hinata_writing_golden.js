@@ -28,6 +28,10 @@ const def=scenes.get("origin_academy_hinata_prologue");
 assert(def,"Hinata scene missing");
 const beats=def.beats||[], byId=def.beatMap;
 const hinataSource=source.slice(source.indexOf("// Hinata"),source.indexOf("// Wasabi Izuno"));
+assert(hinataSource.includes('HINATA_ORIGIN_BACKDROP_PATH="Hinata Origin Backdrop/hyuga_compound.png"'),"Hinata primary Hyūga compound backdrop missing");
+assert(hinataSource.includes('HINATA_ORIGIN_FINAL_BACKDROP_PATH="Hinata Origin Backdrop/hyuga_compound_alt_angle.png"'),"Hinata final-scene alternate backdrop missing");
+assert(hinataSource.includes("isHinataFinalSceneBeat32900")&&hinataSource.includes('id==="hin_young_choice"')&&hinataSource.includes('id.startsWith("hin_close_")'),"Hinata final-scene backdrop boundary missing");
+assert(hinataSource.includes("registerHinataOriginPresentation32900")&&hinataSource.includes("academy_hinata_backdrop_32900"),"Hinata Scene Board backdrop registration missing");
 
 function labels(beatId){const b=byId.get(beatId);assert(b,`missing beat ${beatId}`);return Array.from(b.choices||[],c=>String(c.label));}
 function choice(beatId,choiceId){const b=byId.get(beatId);assert(b,`missing beat ${beatId}`);const c=(b.choices||[]).find(x=>x.choiceId===choiceId);assert(c,`missing choice ${beatId}/${choiceId}`);return c;}
