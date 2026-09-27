@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-19  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons  
-**Status:** **DESIGN CLOSED — STEPHEN SIGN-OFF 2026-09-27 / MESSENGER ENHANCEMENT + LEARNABLE HIDDEN COIL CORRECTION**  
+**Status:** **PARTIALLY REOPENED BY STEPHEN 2026-09-27 — COURIER RECLASSIFIED AS SHARED SMALL/MEDIUM-SUMMON DIALOGUE CAPABILITY / TRUE SNAKE ENHANCEMENT OPEN**  
 **Parent:** #235  
 **Reset authority:** `Documentation/Combat/SC_Combat_Summons_Tailed_Beasts_Full_Calibration_RESET_v2_2026-09-18.md`  
 **Global mechanics standard:** `Documentation/Combat/SC_Combat_Unique_Shinobi_Chronicles_Mechanics_Design_Standard_2026-09-19.md`  
@@ -95,15 +95,15 @@ Those require separate authority.
 
 # C. Role
 
-**MESSENGER / AMBUSH / RESTRAINT / CAPTURE PRESSURE**
+**AMBUSH / RESTRAINT / CAPTURE PRESSURE**
 
 Snake's RESET v2 identity is:
 
-1. provide a real outside-Battle courier role through **Serpent Courier -> Messenger Snake**;
-2. make **Hidden Coil** an obtainable source-assisted Battle Skill rather than an automatic attachment bonus;
-3. if a future/full-manifestation Battle mode permits it, field Snake as a PL47 body with constriction/capture actions;
-4. use constriction to restrict movement-dependent techniques;
-5. force a choice between preserving the bind or cashing it out for extra crush damage.
+1. make **Hidden Coil** an obtainable source-assisted Battle Skill rather than an automatic attachment bonus;
+2. if a future/full-manifestation Battle mode permits it, field Snake as a PL47 body with constriction/capture actions;
+3. use constriction to restrict movement-dependent techniques;
+4. force a choice between preserving the bind or cashing it out for extra crush damage;
+5. receive a separate Snake-specific Enhancement once that reopened package is closed.
 
 This is deliberately not a generic Stat-stick.
 
@@ -114,8 +114,8 @@ This is deliberately not a generic Stat-stick.
 ## OWNED / AVAILABLE OUTSIDE BATTLE
 
 - legitimate ownership does not create a generic Battle Stat bonus;
-- when Snake is legitimately available for a World / Mission / Hotspot context, its **Serpent Courier** enhancement exposes the outside-Battle **Messenger Snake** utility;
-- this does not require Snake to occupy a Battle participant slot.
+- as a **small Summon**, Snake participates in the project-wide small/medium-Summon courier dialogue capability;
+- that courier capability is **not Snake's Enhancement** and does not require Snake to occupy a Battle participant slot.
 
 ## ATTACHED / PREPARED FOR BATTLE
 
@@ -144,64 +144,22 @@ Ordinary Alpha Battles do not infer a seventh Character slot or independent recu
 
 ---
 
-# E. REQUIRED Enhancement Package
+# E. REQUIRED Enhancement Package — REOPENED / OPEN
 
-## `snake_serpent_courier` — **Serpent Courier**
+Stephen corrected the previous Source 10 closure on **2026-09-27**:
 
-Activation ownership:
+> **ALL small-to-medium Summons can be used in dialogue choices as couriers. That shared capability is NOT Snake's Enhancement.**
 
-**OWNED / LEGITIMATELY AVAILABLE OUTSIDE BATTLE**
+Therefore:
 
-Classification:
+- **Serpent Courier is RETIRED as Snake-specific Enhancement authority**;
+- Snake still qualifies for courier dialogue choices because Snake is a small Summon;
+- courier use belongs to the shared Summon capability/Story-World dialogue layer;
+- Snake still requires a **real, separate Enhancement package** under RESET v2;
+- that replacement Enhancement must remain distinct from the learnable **Hidden Coil** Skill;
+- no replacement Enhancement is invented in this correction.
 
-**NON-BATTLE UTILITY / WORLD-MISSION-HOTSPOT SUPPORT**
-
-Enhancement statement:
-
-> **Snake can act as a small courier when a mission, hotspot or Story opportunity gives it a real route to the recipient.**
-
-This Enhancement exposes the outside-Battle utility action:
-
-### `snake_messenger` — **Messenger Snake**
-
-Use:
-
-- outside Battle only;
-- send one written message, small token, mission marker or similarly small authored payload;
-- destination must be a **known recipient or known reachable location**;
-- Snake must have a physically legitimate route;
-- recipient may send a reply back if the World/Story occurrence permits it.
-
-Messenger Snake does **not**:
-
-- teleport;
-- guarantee instant delivery;
-- guarantee undetected delivery;
-- cross sealed/physically impossible routes by fiat;
-- create knowledge Snake could not have observed or been told;
-- force a recipient to answer;
-- auto-complete a Mission/Hotspot objective;
-- carry arbitrary inventory quantities.
-
-World / Mission / Hotspot authority owns:
-
-- travel time where relevant;
-- route hazards;
-- interception;
-- whether a recipient/location is reachable;
-- what factual reply or evidence returns.
-
-Combat owns only the source capability:
-
-> **Snake is a valid messenger/courier source when the external occurrence provides a legitimate route.**
-
-This restores the intended Anko-style messenger-snake utility without turning communication into teleportation or omniscience.
-
-### Family generalisation boundary
-
-Stephen also directed that **most suitably small-to-medium Summons should be able to perform this kind of messenger work for Hotspot Events and Missions**.
-
-That broader family rule is not silently applied to every Summon from this Snake document. It requires CE / World reconciliation for eligibility, size/cognition/cooperation boundaries and occurrence resolution.
+The already signed-off Snake identity, PL47, Hidden Coil mechanics and manifested/future combat kit remain preserved.
 
 ---
 
@@ -432,14 +390,11 @@ This keeps Snake inside currently modelled Battle authority.
 
 # J. Persistent / collection progression
 
-No account-wide numeric collection bonus is created.
+No account-wide numeric collection bonus is currently closed for Snake.
 
-Persistent source value is instead expressed through **Serpent Courier**:
+Snake's participation in courier dialogue choices comes from the **shared small/medium-Summon courier capability**, not a Snake-specific persistent Enhancement.
 
-- legitimately owned/available Snake may provide Messenger Snake in appropriate non-Battle occurrences;
-- this does not grant automatic Mission success;
-- no generic "snake family" recruitment multiplier is created;
-- no named-snake contract progress is inferred from owning this generic Snake.
+No generic snake-family recruitment multiplier or named-snake contract progress is inferred.
 
 ---
 
@@ -474,31 +429,31 @@ No old live Snake skill package exists that must be preserved.
 
 ---
 
-# M. Player-facing summary
+# M. Player-facing summary — CURRENT REOPENED STATE
 
-## SNAKE — COURIER / AMBUSH / RESTRAINT / CAPTURE
+## SNAKE — AMBUSH / RESTRAINT / CAPTURE
 
-> **Snake can carry messages during missions and hotspot events when it has a real route to the recipient. Train with Snake to unlock Hidden Coil, letting it wrap an enemy after one of your Taijutsu or Bukijutsu hits. In future/full-manifestation Battles, Snake can also fight directly with bites, constriction and interception.**
+> **Train with Snake to unlock Hidden Coil, letting it wrap an enemy after one of your Taijutsu or Bukijutsu hits. In future/full-manifestation Battles, Snake can fight directly with bites, constriction and interception. Like every small-to-medium Summon, Snake may also appear in authored courier dialogue choices; that shared courier use is not Snake's Enhancement.**
 
-That is the complete Source 10 identity.
+The final source summary remains incomplete until Snake's replacement Enhancement is closed.
 
 ---
 
 # N. Decision state
 
-**Stephen sign-off:** **YES — 2026-09-27, with messenger/enhancement + Hidden Coil ownership correction.**  
+**Stephen correction:** **2026-09-27 — courier is shared small/medium-Summon dialogue capability, not Snake's Enhancement.**  
 **Identity / Stats / Base PL:** CLOSED by PL / Registry at `snake`, PL47.  
-**Enhancement:** **Serpent Courier — CLOSED.**  
-**Outside-Battle utility:** **Messenger Snake — CLOSED for Snake.**  
+**Enhancement:** **REOPENED / OPEN — Serpent Courier retired as Snake-specific Enhancement.**  
+**Shared courier dialogue capability:** **YES because Snake is small/medium; not source Enhancement authority.**  
 **Hidden Coil mechanics:** **CLOSED.**  
 **Hidden Coil ownership:** **OBTAINABLE / LEARNABLE, not automatic — CLOSED.**  
-**Exact Hidden Coil unlock pathway:** downstream Progression / Development / World authority; not invented here.  
+**Exact Hidden Coil unlock pathway:** downstream Progression / Development / World authority.  
 **Manifested/future Battle kit:** CLOSED as future/full-manifestation capability.  
 **Production admission:** NOT LIVE / separate downstream decision.  
-**Implementation:** NOT STARTED.  
+**Implementation:** HOLD — full RESET v2 source is not closed until a true Snake Enhancement is signed off.  
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
 
-**SOURCE 10 SNAKE = DESIGN CLOSED under RESET v2.**
+**SOURCE 10 SNAKE = PARTIALLY REOPENED ON ENHANCEMENT ONLY.**
 
-**design closed != implemented != runtime validated != Golden GREEN**
+**combat kit closed != enhancement closed != implemented != runtime validated != Golden GREEN**
