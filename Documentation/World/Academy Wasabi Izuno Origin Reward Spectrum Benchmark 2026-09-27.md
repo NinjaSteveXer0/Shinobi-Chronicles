@@ -68,9 +68,11 @@ Current Wasabi Rogue Genin Battle:
 
 The Battle pays money because all player Battle victories do. It does not fabricate loot.
 
-Current rarity remains:
+Stephen-approved reward rarity hierarchy is:
 
-`normal -> common -> rare -> legendary`.
+`common -> uncommon -> rare -> legendary`.
+
+Any current Combat catalogue rows still carrying `normal` require owner-side reconciliation; this benchmark does not silently rewrite Item/Weapon definitions.
 
 No rarity entitlement is created merely by winning this encounter.
 
