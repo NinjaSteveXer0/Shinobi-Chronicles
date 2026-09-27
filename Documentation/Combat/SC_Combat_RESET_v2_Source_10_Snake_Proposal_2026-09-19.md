@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-19  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons  
-**Status:** **PARTIALLY REOPENED BY STEPHEN 2026-09-27 — COURIER RECLASSIFIED AS SHARED SMALL/MEDIUM-SUMMON DIALOGUE CAPABILITY / TRUE SNAKE ENHANCEMENT OPEN**  
+**Status:** **DESIGN CLOSED BY STEPHEN 2026-09-27 — SERPENT REACH / NARROW PASSAGE ENHANCEMENT / LEARNABLE HIDDEN COIL**  
 **Parent:** #235  
 **Reset authority:** `Documentation/Combat/SC_Combat_Summons_Tailed_Beasts_Full_Calibration_RESET_v2_2026-09-18.md`  
 **Global mechanics standard:** `Documentation/Combat/SC_Combat_Unique_Shinobi_Chronicles_Mechanics_Design_Standard_2026-09-19.md`  
@@ -103,7 +103,7 @@ Snake's RESET v2 identity is:
 2. if a future/full-manifestation Battle mode permits it, field Snake as a PL47 body with constriction/capture actions;
 3. use constriction to restrict movement-dependent techniques;
 4. force a choice between preserving the bind or cashing it out for extra crush damage;
-5. receive a separate Snake-specific Enhancement once that reopened package is closed.
+5. provide **Serpent Reach** as the attached Battle Enhancement and **Narrow Passage** as its source-specific infiltration utility.
 
 This is deliberately not a generic Stat-stick.
 
@@ -120,6 +120,7 @@ This is deliberately not a generic Stat-stick.
 ## ATTACHED / PREPARED FOR BATTLE
 
 - Snake is the Character's active/prepared Summon source;
+- **Serpent Reach** is active while Snake is attached/prepared;
 - no independent Snake Battle PL ledger merely from ordinary Alpha Summon-action use;
 - **Hidden Coil is NOT granted automatically by attachment**;
 - Hidden Coil may be used only if that exact learnable source-assisted Skill has been legitimately obtained;
@@ -144,22 +145,91 @@ Ordinary Alpha Battles do not infer a seventh Character slot or independent recu
 
 ---
 
-# E. REQUIRED Enhancement Package — REOPENED / OPEN
+# E. REQUIRED Enhancement Package — CLOSED
 
-Stephen corrected the previous Source 10 closure on **2026-09-27**:
+Stephen corrected and then closed the Source 10 Enhancement on **2026-09-27**:
 
 > **ALL small-to-medium Summons can be used in dialogue choices as couriers. That shared capability is NOT Snake's Enhancement.**
 
-Therefore:
+Therefore **Serpent Courier remains retired as Snake-specific Enhancement authority**.
 
-- **Serpent Courier is RETIRED as Snake-specific Enhancement authority**;
-- Snake still qualifies for courier dialogue choices because Snake is a small Summon;
-- courier use belongs to the shared Summon capability/Story-World dialogue layer;
-- Snake still requires a **real, separate Enhancement package** under RESET v2;
-- that replacement Enhancement must remain distinct from the learnable **Hidden Coil** Skill;
-- no replacement Enhancement is invented in this correction.
+Snake's actual Enhancement is:
 
-The already signed-off Snake identity, PL47, Hidden Coil mechanics and manifested/future combat kit remain preserved.
+## `snake_serpent_reach` — **Serpent Reach**
+
+Activation:
+
+**ATTACHED / PREPARED**
+
+Limit:
+
+**once per Battle**
+
+Classification:
+
+**REACH / POSITIONING ASSIST**
+
+Player text:
+
+> **Once per Battle, Snake can bridge the distance for one close-range Taijutsu or Bukijutsu attack against the Active enemy.**
+
+Exact mechanics:
+
+- controller declares one **single-target Taijutsu or Bukijutsu ATTACK** against the current legally targetable **Active** enemy;
+- the attack must normally require close-range engagement;
+- the target may be at ordinary **mid-range** separation that would otherwise require the controller to reposition first;
+- Snake extends/latches across that ordinary separation and creates the physical route for that one attack;
+- the declared attack resolves at its **normal authored ATK / effects**;
+- no extra damage, Stat, PL, Crit, accuracy or hidden scaling is added;
+- the controller does **not** spend a separate reposition action merely to bridge that ordinary separation;
+- Serpent Reach does not target Benched/Reserve enemies, does not bypass sealed or impossible barriers, and does not defeat exact space-time / untargetable / superior-distance rules;
+- using Serpent Reach consumes the once-per-Battle Enhancement use when the assisted attack is committed;
+- this does **not** create a second action;
+- if the assisted attack deals positive final damage and the controller has legitimately learned an unspent **Hidden Coil**, Hidden Coil may still be offered under its own separate rules. Serpent Reach does not grant or refresh Hidden Coil.
+
+This preserves Snake's source identity as an extending/latching body without turning the Enhancement into poison or a generic Stat stick.
+
+## `snake_narrow_passage` — **Narrow Passage**
+
+Classification:
+
+**NON-BATTLE INFILTRATION / ACCESS / SCOUTING SUPPORT**
+
+Activation:
+
+Snake must be legitimately **available** to the Character in the current Story / Mission / Hotspot context.
+
+Player-facing meaning:
+
+> **Snake can slip through openings too small for a shinobi, scout the reachable space beyond, and interact with small reachable objects where the scene permits it.**
+
+Exact authored capability:
+
+- Snake may traverse a **physically plausible small opening, gap, vent, pipe, crack, crawlspace or similarly confined route** that the Character cannot normally enter;
+- where World/Story authority provides an eligible connected space, Snake may:
+  - scout what it can directly observe;
+  - reveal a reachable passage / room / point of interest;
+  - retrieve or carry back **one small authored object** appropriate to Snake's physical scale;
+  - reach a simple small latch, cord, token, marker or equivalent interaction point where physically plausible;
+- Snake does not phase through sealed walls or barriers;
+- Snake does not automatically understand documents, codes, mechanisms or hidden facts merely by entering the space;
+- Snake does not guarantee stealth, safety, retrieval, access or Mission success;
+- the occurrence owns hazards, blockers, what Snake can actually observe, and the factual result.
+
+This utility is **not the shared courier rule**. A courier dialogue choice concerns sending a small/medium Summon to carry a message/payload. **Narrow Passage** instead exploits Snake's body shape and size to access spaces the Character cannot.
+
+### Explicit exclusions
+
+Snake's Enhancement does **not** grant:
+
+- Poison;
+- venom;
+- shedding;
+- Sage mechanics;
+- burrowing by default;
+- named-snake powers;
+- wholesale PL/Stats;
+- automatic Hidden Coil.
 
 ---
 
@@ -390,9 +460,11 @@ This keeps Snake inside currently modelled Battle authority.
 
 # J. Persistent / collection progression
 
-No account-wide numeric collection bonus is currently closed for Snake.
+No account-wide numeric collection bonus is created for Snake.
 
-Snake's participation in courier dialogue choices comes from the **shared small/medium-Summon courier capability**, not a Snake-specific persistent Enhancement.
+Snake's source-specific persistent/non-Battle value is **Narrow Passage** infiltration/access/scouting when Snake is legitimately available.
+
+Snake's participation in courier dialogue choices remains separate and comes from the **shared small/medium-Summon courier capability**, not from Serpent Reach or Narrow Passage.
 
 No generic snake-family recruitment multiplier or named-snake contract progress is inferred.
 
@@ -429,31 +501,35 @@ No old live Snake skill package exists that must be preserved.
 
 ---
 
-# M. Player-facing summary — CURRENT REOPENED STATE
+# M. Player-facing summary
 
-## SNAKE — AMBUSH / RESTRAINT / CAPTURE
+## SNAKE — REACH / INFILTRATION / RESTRAINT / CAPTURE
 
-> **Train with Snake to unlock Hidden Coil, letting it wrap an enemy after one of your Taijutsu or Bukijutsu hits. In future/full-manifestation Battles, Snake can fight directly with bites, constriction and interception. Like every small-to-medium Summon, Snake may also appear in authored courier dialogue choices; that shared courier use is not Snake's Enhancement.**
+> **Attach Snake to gain Serpent Reach: once per Battle, Snake can bridge ordinary distance for one close-range Taijutsu or Bukijutsu attack. Outside Battle, Narrow Passage lets Snake slip through small openings to scout, reveal reachable spaces or retrieve a small object where the scene allows it. Train with Snake separately to unlock Hidden Coil. Snake has no poison package.**
 
-The final source summary remains incomplete until Snake's replacement Enhancement is closed.
+Like every small-to-medium Summon, Snake may also appear in authored courier dialogue choices. That shared courier capability is not Snake's Enhancement.
 
 ---
 
 # N. Decision state
 
-**Stephen correction:** **2026-09-27 — courier is shared small/medium-Summon dialogue capability, not Snake's Enhancement.**  
+**Stephen correction / final sign-off:** **2026-09-27.**  
 **Identity / Stats / Base PL:** CLOSED by PL / Registry at `snake`, PL47.  
-**Enhancement:** **REOPENED / OPEN — Serpent Courier retired as Snake-specific Enhancement.**  
 **Shared courier dialogue capability:** **YES because Snake is small/medium; not source Enhancement authority.**  
+**Enhancement:** **Serpent Reach — CLOSED.**  
+**Serpent Reach Battle effect:** **once/Battle, bridge ordinary mid-range separation for one close-range single-target Taijutsu or Bukijutsu attack against the Active enemy; normal attack values/effects; no separate reposition action.**  
+**Non-Battle source utility:** **Narrow Passage — CLOSED** for physically plausible small-gap access/scouting/small-object interaction.  
+**Poison/venom Enhancement:** **NONE / explicitly rejected.**  
 **Hidden Coil mechanics:** **CLOSED.**  
 **Hidden Coil ownership:** **OBTAINABLE / LEARNABLE, not automatic — CLOSED.**  
 **Exact Hidden Coil unlock pathway:** downstream Progression / Development / World authority.  
 **Manifested/future Battle kit:** CLOSED as future/full-manifestation capability.  
 **Production admission:** NOT LIVE / separate downstream decision.  
-**Implementation:** HOLD — full RESET v2 source is not closed until a true Snake Enhancement is signed off.  
+**Combat design:** **DESIGN CLOSED.**  
+**Implementation:** NOT STARTED.  
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
 
-**SOURCE 10 SNAKE = PARTIALLY REOPENED ON ENHANCEMENT ONLY.**
+**SOURCE 10 SNAKE = DESIGN CLOSED under RESET v2.**
 
-**combat kit closed != enhancement closed != implemented != runtime validated != Golden GREEN**
+**design closed != implemented != runtime validated != Golden GREEN**
