@@ -1166,6 +1166,72 @@ A.register({sceneId:scene,eventId:scene,title:"ACADEMY HINATA",entryBeatId:id("h
 const W=globalThis.SC_ACADEMY_WASABI_WRITING_GOLDEN_343;if(!W)throw new Error("academy_wasabi_writing_golden_343_required");
 const G=key=>W.get(key);
 const beats=[];
+const IZUNO_BACKDROPS=Object.freeze({
+  practical:Object.freeze({assetId:"academy_izuno_practical_ground_day",assetPath:"Izuno Origin Backdrop/practical_ground_day.png"}),
+  rooftop:Object.freeze({assetId:"academy_izuno_konoha_rooftop_pursuit_day",assetPath:"Izuno Origin Backdrop/konoha_rooftop_pursuit_day.png"}),
+  mainStreet:Object.freeze({assetId:"academy_izuno_konoha_main_street",assetPath:"Izuno Origin Backdrop/konoha_main_street.png"}),
+  river:Object.freeze({assetId:"academy_izuno_river_route_day",assetPath:"Izuno Origin Backdrop/river_route_day.png"}),
+  narrowYard:Object.freeze({assetId:"academy_izuno_konoha_narrow_yard",assetPath:"Izuno Origin Backdrop/konoha_narrow_yard.png"}),
+  alley:Object.freeze({assetId:"academy_izuno_konoha_alleyway_day",assetPath:"Izuno Origin Backdrop/konoha_alleyway_day.png"}),
+  training:Object.freeze({assetId:"academy_izuno_training_grounds_day",assetPath:"Izuno Origin Backdrop/training_grounds_day.png"})
+});
+const IZUNO_BATTLE_ENVIRONMENT=IZUNO_BACKDROPS.alley.assetPath;
+function izunoBackdropKey32900(beatId){
+  const id=String(beatId||"");
+  if(id.startsWith("izu_open_"))return"practical";
+  if(id.startsWith("izu_trail_")||id==="izu_initial_choice"||id.startsWith("izu_initial_"))return"rooftop";
+  if(id.startsWith("izu_split_intro_")||id==="izu_split_choice")return"mainStreet";
+  if(id.startsWith("izu_river_"))return"river";
+  if(id.startsWith("izu_stronger_"))return"narrowYard";
+  if(id.startsWith("izu_intercept_"))return"mainStreet";
+  if(
+    id.startsWith("izu_finish_")||
+    id.startsWith("izu_rogue_call_help_finish_")||
+    id.startsWith("izu_rogue_keep_finish_")||
+    id.startsWith("izu_eval_")||
+    id.startsWith("izu_after_")||
+    id==="izu_reflect"
+  )return"training";
+  if(id.startsWith("izu_close_"))return"mainStreet";
+  if(id.startsWith("izu_rogue_"))return"alley";
+  return null;
+}
+function izunoSceneLabel32900(beatId){
+  const id=String(beatId||"");
+  if(id.startsWith("izu_open_"))return"HEAD START";
+  if(id.startsWith("izu_trail_")||id==="izu_initial_choice"||id.startsWith("izu_initial_"))return"THE TRAIL";
+  if(id.startsWith("izu_split_intro_")||id==="izu_split_choice")return"THE SPLIT";
+  if(id.startsWith("izu_river_"))return"THE RIVER";
+  if(id.startsWith("izu_stronger_"))return"THE STRONGER TRAIL";
+  if(id.startsWith("izu_intercept_"))return"THE INTERCEPT";
+  if(id.startsWith("izu_finish_")||id.startsWith("izu_rogue_call_help_finish_")||id.startsWith("izu_rogue_keep_finish_"))return"THE FINISH";
+  if(id.startsWith("izu_eval_"))return"WHAT THE INSTRUCTOR SAW";
+  if(id.startsWith("izu_after_")||id==="izu_reflect")return"AFTER";
+  if(id.startsWith("izu_close_"))return"ORIGIN CLOSE";
+  if(id.startsWith("izu_rogue_"))return"THE SHOUTING";
+  return"ACADEMY WASABI IZUNO";
+}
+function izunoBackdropProjection32900(beatId){
+  const key=izunoBackdropKey32900(beatId),row=key&&IZUNO_BACKDROPS[key]||null;
+  return row?{assetId:row.assetId,assetPath:row.assetPath}:null;
+}
+function registerWasabiOriginPresentation32900(){
+  try{
+    const registerPath=typeof registerSceneBackdropAssetPath==="function"?registerSceneBackdropAssetPath:globalThis.registerSceneBackdropAssetPath;
+    if(typeof registerPath==="function")for(const row of Object.values(IZUNO_BACKDROPS))registerPath(row.assetId,row.assetPath);
+  }catch(_error){}
+  const registerBoard=()=>{
+    if(typeof globalThis.registerStorySceneBoardDefinition!=="function")return{success:false,reason:"story_scene_board_not_loaded"};
+    return globalThis.registerStorySceneBoardDefinition(scene,{
+      resolve:({beatId})=>({mode:"conversation",location:izunoSceneLabel32900(beatId),actors:[]}),
+      resolveBackdrop:({beatId})=>izunoBackdropProjection32900(beatId)
+    });
+  };
+  if(globalThis.SC_STORY_SCENE_BOARD_33900)return registerBoard();
+  const queue=globalThis.SC_STORY_SCENE_BOARD_PENDING_REGISTRATIONS||(globalThis.SC_STORY_SCENE_BOARD_PENDING_REGISTRATIONS=[]);
+  if(!queue.some(row=>row&&row.id==="academy_izuno_backdrops_343"))queue.push({id:"academy_izuno_backdrops_343",register:registerBoard});
+  return{success:true,queued:true};
+}
 function norm(cue){return cue.kind==="dialogue"?{mode:"dialogue",speakerName:cue.speakerName,text:cue.text}:{mode:"narration",text:cue.text};}
 function seq(prefix,cues,nextBeatId,{first={},last={}}={}){
   const rows=Array.isArray(cues)?cues:[];
@@ -1182,6 +1248,8 @@ function battleResume(ctx){return ctx&&ctx.sceneContext&&ctx.sceneContext.battle
 function battleSpec(){
   return{
     encounterId:"origin_academy_izuno_rogue_genin_step_in",
+    battleConfigId:"academy_izuno_origin_rogue_genin_step_in_battle",
+    environmentPath:IZUNO_BATTLE_ENVIRONMENT,backdrop:IZUNO_BATTLE_ENVIRONMENT,
     victoryBeatId:"izu_rogue_step_in_return_1",defeatBeatId:"izu_rogue_step_in_return_1",
     resultProjector:()=>globalThis.projectAcademyWasabiRogueGeninBattle343?globalThis.projectAcademyWasabiRogueGeninBattle343():null,
     actionLabel:"BEGIN PL BATTLE",
@@ -1270,7 +1338,8 @@ beats.push({beatId:"izu_rogue_choice",mode:"choice",text:"",choices:[
 ]});
 seq("izu_rogue_step_in",G("rogue_step_in"),"izu_rogue_step_in_battle");
 beats.push({beatId:"izu_rogue_step_in_battle",mode:"battle_transition",text:"",battle:battleSpec()});
-seq("izu_rogue_step_in_return",G("finish_secondary"),"izu_eval_base_1",{first:{onEnterConsequences:[captureBattleReturn]}});
+beats.push({beatId:"izu_rogue_step_in_return_1",mode:"post_battle",text:"",nextBeatId:"izu_finish_secondary_1",onEnterConsequences:[captureBattleReturn]});
+seq("izu_finish_secondary",G("finish_secondary"),"izu_eval_base_1");
 seq("izu_rogue_call_help",G("rogue_call_help"),"izu_rogue_call_help_finish_1");
 seq("izu_rogue_call_help_finish",G("finish_secondary"),"izu_eval_base_1");
 seq("izu_rogue_keep_pursuing",G("rogue_keep_pursuing"),"izu_rogue_keep_finish_1");
@@ -1320,6 +1389,7 @@ beats.push({beatId:"izu_reflect",mode:"choice",text:"",choices:[
   C("catch_not_only","Catching them wasn't the only thing that mattered.","izu_close_1",{reflection:"catch_not_only"})
 ]});
 seq("izu_close",G("origin_close"),null,{last:{exitScene:true}});
+registerWasabiOriginPresentation32900();
 
 A.register({
   sceneId:scene,eventId:scene,title:"ACADEMY WASABI IZUNO",entryBeatId:"izu_open_1",participants:[],beats,
