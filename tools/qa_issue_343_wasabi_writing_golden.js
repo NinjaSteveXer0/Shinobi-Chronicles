@@ -283,6 +283,8 @@ assert.strictEqual(persistedSession.wasabi343.battleOccurrenceId,launched.battle
 assert.strictEqual(persistedSession.wasabi343BattleId,launched.battleId,"session save lost exact Wasabi Battle occurrence");
 assert.strictEqual(persistedSession.wasabi343BattleActive,true,"session save lost active Wasabi Battle state");
 assert.strictEqual(persistedSession.battleConfigId,"academy_izuno_origin_rogue_genin_step_in_battle","session save lost scoped Battle config");
+assert(persistedSession.wasabi343BattleLaunches[launched.battleId],"session save lost Wasabi launch idempotence receipt");
+delete battleCtx.playerData.wasabi343BattleLaunches;
 battleCtx.currentBattle={active:false,battleOver:false,battleId:null,encounterId:null,deployment:{}};
 const restoredSession=battleCtx.restoreTestState();
 assert.strictEqual(restoredSession,true,"base Battle session restore did not run");
@@ -290,6 +292,7 @@ assert.strictEqual(battleCtx.currentBattle.wasabi343.battleOccurrenceId,launched
 assert.strictEqual(battleCtx.currentBattle.battleConfigId,"academy_izuno_origin_rogue_genin_step_in_battle","session restore did not reconstruct Wasabi Battle config");
 assert.strictEqual(battleCtx.currentBattle.battleId,launched.battleId,"session restore did not reconstruct exact Wasabi Battle occurrence");
 assert.strictEqual(battleCtx.currentBattle.active,true,"session restore did not reactivate the saved Wasabi Battle");
+assert(battleCtx.playerData.wasabi343BattleLaunches[launched.battleId],"session restore did not reconstruct Wasabi launch idempotence receipt");
 assert.deepStrictEqual(Array.from(battleCtx.currentBattle.deployment.player.slots||[],x=>x.participantId),["academy_izuno"],"session restore drifted Wasabi deployment");
 assert.deepStrictEqual(Array.from(battleCtx.currentBattle.deployment.enemy.slots||[],x=>x.participantId),["wasabi_origin_rogue_genin_01"],"session restore drifted Rogue deployment");
 const generatedZero=battleCtx.generateBattleRewards({rewards:{ryo:{min:99,max:99}}},{id:"academy_izuno"});

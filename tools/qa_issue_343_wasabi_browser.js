@@ -227,7 +227,7 @@ async function reloadBattle(page,battle,label){
   await page.reload({waitUntil:"domcontentloaded",timeout:60000});
   await page.waitForFunction(()=>!!globalThis.SC_ACADEMY_WASABI_ROGUE_BATTLE_343,null,{timeout:30000});
   try{
-    await page.waitForFunction(id=>currentBattle&&currentBattle.battleId===id&&currentBattle.wasabi343,null,battle.battleId,{timeout:20000});
+    await page.waitForFunction(id=>currentBattle&&currentBattle.battleId===id&&currentBattle.wasabi343,battle.battleId,{timeout:20000});
   }catch(error){
     const trace=await page.evaluate(expectedBattleId=>{
       let saved=null;

@@ -136,6 +136,7 @@ if(PRE_SAVE_TEST){
         state.wasabi343BattleActive=currentBattle.active===true&&currentBattle.battleOver!==true;
         state.wasabi343BattleId=String(currentBattle.battleId||currentBattle.wasabi343.battleOccurrenceId||"");
         state.wasabi343=clone(currentBattle.wasabi343);
+        state.wasabi343BattleLaunches=clone(playerData&&playerData.wasabi343BattleLaunches||{});
         sessionStorage.setItem("shinobiTestState",JSON.stringify(state));
       }catch(_error){}
     }
@@ -146,7 +147,7 @@ if(PRE_SAVE_TEST){
 const PRE_RESTORE_TEST=typeof restoreTestState==="function"?restoreTestState:null;
 if(PRE_RESTORE_TEST){
   globalThis.restoreTestState=function restoreWasabi343TestState(){
-    let saved=null,savedBattleActive=false,savedBattleId=null,savedExact=false;
+    let saved=null,savedBattleActive=false,savedBattleId=null,savedLaunches=null,savedExact=false;
     if(typeof sessionStorage!=="undefined"){
       try{
         const raw=sessionStorage.getItem("shinobiTestState"),parsed=raw?JSON.parse(raw):null;
@@ -154,6 +155,7 @@ if(PRE_RESTORE_TEST){
           saved=clone(parsed.wasabi343);
           savedBattleActive=parsed.wasabi343BattleActive===true;
           savedBattleId=String(parsed.wasabi343BattleId||saved.battleOccurrenceId||"").trim()||null;
+          savedLaunches=parsed.wasabi343BattleLaunches&&typeof parsed.wasabi343BattleLaunches==="object"?clone(parsed.wasabi343BattleLaunches):null;
           savedExact=true;
           if(currentBattle){
             currentBattle.encounterId=ENCOUNTER;
@@ -171,6 +173,10 @@ if(PRE_RESTORE_TEST){
       if(savedBattleId)currentBattle.battleId=savedBattleId;
       currentBattle.wasabi343=clone(saved);
       if(savedBattleActive&&currentBattle.battleOver!==true)currentBattle.active=true;
+    }
+    if(savedExact&&savedLaunches&&playerData){
+      if(!playerData.wasabi343BattleLaunches||typeof playerData.wasabi343BattleLaunches!=="object")playerData.wasabi343BattleLaunches={};
+      Object.assign(playerData.wasabi343BattleLaunches,clone(savedLaunches));
     }
     return restored;
   };
@@ -321,7 +327,7 @@ function diagnostics(){
     strictDeployment:String(strictWasabiDeployment).includes("createBattleDeploymentSlots([WASABI])")&&String(strictWasabiDeployment).includes("createBattleDeploymentSlots([ROGUE])"),
     withdrawNaturallyUnavailable:String(strictWasabiDeployment).includes("player={slots:createBattleDeploymentSlots([WASABI])}"),
     withdrawControlHiddenOnlyHere:!!PRE_RENDER_ACTION_ROW&&String(globalThis.renderBattleActionFamilyRow).includes("strictOneVsOne")&&String(globalThis.renderBattleActionFamilyRow).includes("battle-live-withdraw-action"),
-    saveReloadEnvelope:!!PRE_SAVE_TEST&&!!PRE_RESTORE_TEST&&String(globalThis.saveTestState).includes("state.wasabi343")&&String(globalThis.restoreTestState).includes("parsed.wasabi343")&&String(globalThis.restoreTestState).includes("currentBattle.battleConfigId=CONFIG")&&String(globalThis.restoreTestState).includes("PRE_RESTORE_TEST.apply"),
+    saveReloadEnvelope:!!PRE_SAVE_TEST&&!!PRE_RESTORE_TEST&&String(globalThis.saveTestState).includes("state.wasabi343BattleLaunches")&&String(globalThis.restoreTestState).includes("savedLaunches")&&String(globalThis.restoreTestState).includes("currentBattle.battleConfigId=CONFIG")&&String(globalThis.restoreTestState).includes("PRE_RESTORE_TEST.apply"),
     exactOccurrenceId:exactBattleOccurrenceId("qa")==="battle_occ_origin_izuno_rogue_genin_step_in:qa"&&String(launch).includes("wasabi_battle_occurrence_already_committed_without_runtime"),
     zeroRewards:enemy.rewards.ryo.min===0&&enemy.rewards.ryo.max===0&&enemy.rewards.exp.min===0&&enemy.rewards.exp.max===0&&enemy.rewards.commonDrops.length===0&&enemy.rewards.rareDrops.length===0,
     claimSeparateFromContinue:!!PRE_GENERATE_REWARDS&&String(globalThis.generateBattleRewards).includes("requiresExplicitPostClaimContinue=true")&&String(launch).includes("requiresExplicitPostClaimContinue=true"),

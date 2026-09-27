@@ -789,7 +789,7 @@
         "playerData.activityHistory occ_origin_izuno_* factual source occurrences",
         "currentBattle.wasabi343 strict Rogue Genin Battle metadata",
         "playerData.wasabi343BattleLaunches idempotence receipts",
-        "shinobiTestState.wasabi343 / wasabi343BattleId / wasabi343BattleActive scoped adapter envelope",
+        "shinobiTestState.wasabi343 / wasabi343BattleId / wasabi343BattleActive / wasabi343BattleLaunches scoped adapter envelope",
         "currentBattle.wasabi343 / battleConfigId restore projection"
       ],
       "productionLoader": "index.html",
