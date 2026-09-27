@@ -108,6 +108,8 @@ Sasuke does not automatically endorse all of it.
 
 ## `a3m9_agency_01` — contextual conversation
 
+### AUTHOR / IMPLEMENTATION NOTE
+
 Before any protagonist choice about another strategic person, surface that person's own intent when they are capable of expressing it.
 
 Do not let the player “deploy Naruto” as if Naruto were equipment.
@@ -273,6 +275,8 @@ People start asking the question armies hate:
 
 ## `a3m10_minato_01` — contextual Minato dialogue
 
+### AUTHOR / PERFORMANCE NOTE
+
 Required current baseline meaning:
 
 - restore one lawful command structure;
@@ -292,6 +296,8 @@ He has lived through its failures.
 # SASUKE PROGRAMME
 
 ## `a3m10_sasuke_01` — contextual Sasuke dialogue
+
+### AUTHOR / PERFORMANCE NOTE
 
 Required current baseline meaning:
 
@@ -373,7 +379,7 @@ Different meaning.
 
 ## `a3m10_test_01` — narration
 
-Before any programme can become a speech the player forgets, the village gives it a problem.
+Before either programme can settle into a speech, the village gives it a problem.
 
 A district under mixed control suffers a real security collapse.
 
@@ -521,6 +527,8 @@ Nobody in the surrounding fight needs the scene explained.
 
 The two people contesting Konoha's authority are now physically trying to stop each other.
 
+### AUTHOR / IMPLEMENTATION NOTE
+
 **AUTHOR HARD LOCK:**
 - Minato and Sasuke directly engage;
 - Writing does **not** declare PL winner;
@@ -542,6 +550,8 @@ A damaged medical/utility district.
 A civilian route.
 
 Wounded from both commands.
+
+### AUTHOR / IMPLEMENTATION NOTE
 
 Whatever exact site current World history supplies, make the consequence arrive through people living it.
 
@@ -701,6 +711,8 @@ Negotiation starts from facts, not equal screen time.
 ## `a3m12_redlines_01` — contextual scene
 
 Minato, Sasuke and any legitimate third actor state actual red lines.
+
+### AUTHOR / PERFORMANCE NOTE
 
 Keep each voice distinct.
 
@@ -903,6 +915,8 @@ A pause.
 
 Menma snickers internally.
 
+### AUTHOR / PERFORMANCE NOTE
+
 Keep the relationship sharp.
 
 Do not add:
@@ -937,6 +951,8 @@ Nobody calls this unity.
 That may be why the shooting stops.
 
 For now.
+
+### AUTHOR / IMPLEMENTATION NOTE
 
 Commit:
 **ARC 3 / MISSION 12 COMPLETE**
