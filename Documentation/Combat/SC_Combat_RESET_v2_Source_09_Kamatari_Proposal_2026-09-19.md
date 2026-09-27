@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-19  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons  
-**Status:** **PARTIALLY REOPENED BY STEPHEN 2026-09-27 — PL82 TARGET LOCKED / SICKLEWIND ROUTE RECLASSIFIED AS ATTACK / ENHANCEMENT OPEN**  
+**Status:** **COMBAT MECHANICS CLOSED BY STEPHEN 2026-09-27 — PL82 FORMULA-VALID STATS STILL OPEN UNDER #258**  
 **Parent:** #235  
 **Stephen mechanics sign-off:** 2026-09-19  
 **PL / Registry dependency:** #258  
@@ -105,9 +105,9 @@ The already-approved tactical identity remains:
 4. Kamatari retains pursuit pressure against movement/reposition;
 5. **Quick Beheading Dance** remains his signature wide cutting attack.
 
-The exact Attack-PL number for Sicklewind Route was never closed in the prior approval and remains **OPEN for Combat balancing**.
+Stephen has now closed **Sicklewind Route at ATK24**.
 
-Kamatari's actual **Enhancement package is separately OPEN** and must not be fabricated by relabelling Sicklewind Route.
+Kamatari's actual Enhancement is separately closed as **Wind-Sickle Mastery**: an attached Wind Release + Bukijutsu offensive enhancement with a distinct **Windtrail Hunt** discovery/pursuit utility. Sicklewind Route itself remains an attack, not the Enhancement.
 
 ---
 
@@ -125,7 +125,7 @@ Kamatari's actual **Enhancement package is separately OPEN** and must not be fab
 - **Sicklewind Route is an attack/action, not an attached passive or Enhancement**;
 - using Sicklewind Route consumes the legal action opportunity for that Summon attack;
 - no second Kamatari Battle PL ledger is created merely by ordinary Alpha Summon-action use;
-- Kamatari's separate Enhancement package remains **OPEN**.
+- **Wind-Sickle Mastery** is the attached/prepared Enhancement package.
 
 ## MANIFESTED — future/full-manifestation capability
 
@@ -141,26 +141,64 @@ No ordinary Alpha Battle should infer a seventh Character slot or independent Su
 
 ---
 
-# E. REQUIRED Enhancement Package — OPEN
+# E. REQUIRED Enhancement Package — CLOSED
 
-Stephen's 2026-09-27 correction explicitly reopens this section.
+Stephen's 2026-09-27 correction remains binding:
 
 **Sicklewind Route is NOT the Enhancement.**
 
-The former RESET v2 interpretation that used Sicklewind Route as the attached Enhancement is superseded.
+## `wr_kamatari_wind_sickle_mastery` — **Wind-Sickle Mastery**
 
-Current requirements for the eventual Kamatari Enhancement:
+Activation:
 
-- it must be distinct from Sicklewind Route and Kamatari's own attacks;
-- it must have exact activation ownership;
-- it must not transfer Kamatari's PL wholesale;
-- it must pass the Shinobi Chronicles unique-mechanics / name-swap test;
-- it must not be silently inferred from the legacy `+6 Bukijutsu` row merely because that row exists in runtime;
-- Stephen sign-off is required before this source is fully calibrated again.
+**ATTACHED / PREPARED** — remains the source Enhancement while Kamatari is manifested in any future mode that legally permits manifestation.
 
-Until that is closed:
+Player text:
 
-> **KAMATARI SKILLS/ATTACKS ≠ KAMATARI ENHANCEMENT.**
+> **While Kamatari is your active Summon, your Wind Release attacks deal +10% damage and your Bukijutsu attacks deal +10% damage. If an attack is both, both bonuses apply. Kamatari can also help uncover pursuit routes and hidden places during appropriate searches.**
+
+### Combat enhancement
+
+- controller's qualifying direct **Wind Release** Attack-PL packets: **+10% pre-Stamina Attack PL**;
+- controller's qualifying direct **Bukijutsu** Attack-PL packets: **+10% pre-Stamina Attack PL**;
+- a packet legitimately classified as **both Wind Release and Bukijutsu** receives both modifiers once, for **+20% total pre-Stamina Attack PL**;
+- round once at the resolver boundary after the applicable Kamatari modifiers are combined;
+- no Base PL increase;
+- no Ninjutsu/Bukijutsu Stat rewrite;
+- no new Wind Release or Bukijutsu access is granted;
+- no bonus action is created;
+- Sicklewind Route is not consumed by these percentage modifiers and remains its own once-per-Battle attack.
+
+Why both:
+
+- Kamatari's source identity is the combination of **wind-carried movement and sickle/blade combat**;
+- the enhancement therefore rewards the controller's Wind Release and Bukijutsu routes directly instead of reviving the legacy generic +6 Bukijutsu Stat row.
+
+### `kamatari_windtrail_hunt` — **Windtrail Hunt**
+
+Classification:
+
+**NON-BATTLE DISCOVERY / PURSUIT SUPPORT**
+
+Activation:
+
+Kamatari must be legitimately **available** to the Character in the current Story / Mission / Hotspot context.
+
+Use:
+
+- an authored pursuit/search dialogue choice may ask Kamatari to inspect local airflow, wind-carried disturbance and the physical route through the current area;
+- where World/Story authority has an eligible **hidden route, hidden location, point of interest, escape trail or pursuit lead** that can plausibly be found this way, Kamatari may reveal it or lead the player toward it;
+- this is especially appropriate to **missing-nin / fugitive pursuit** content without creating a new formal "Missing-nin specialization" Stat that does not currently exist in project authority;
+- the capability may improve an authored search/pursuit option, but it does not fabricate a target, route or clue that is not present;
+- it does not guarantee capture, mission success or knowledge of a destination Kamatari could not derive from the current area.
+
+World / Story / Mission authority owns the actual hidden location, point of interest, route, lead and outcome.
+
+Combat owns the source capability:
+
+> **Kamatari can help discover pursuit routes and hidden places where local wind/route evidence makes that discovery plausible.**
+
+This is deliberately separate from the global small/medium-Summon courier-dialogue capability.
 
 ---
 
@@ -197,9 +235,15 @@ Exact behavior:
 - no hidden Stat or PL increase;
 - no universal targeting bypass.
 
-**Attack PL: OPEN.**
+**ATK: 24**
 
-The previous design never closed an exact Attack-PL number for this action. Combat must balance and obtain Stephen sign-off on that packet separately rather than inventing it here.
+Player text:
+
+> **Once per Battle, cut through one enemy outside the Active slot for 24 ATK.**
+
+- one direct Attack-PL packet;
+- ordinary Stamina mitigation;
+- its tactical premium is the off-slot target access, not oversized damage.
 
 ---
 
@@ -351,25 +395,27 @@ This preserves Kamatari's wide cutting signature while keeping the new formation
 
 # G. Counter / drawback
 
-Kamatari's defining enhancement is deliberately limited to **one off-slot strike per Battle**.
+Wind-Sickle Mastery is deliberately narrow:
 
-- ordinary attacks still obey the normal active-enemy targeting structure;
-- Sicklewind Route must be spent on one qualifying single-target Wind Release or Bukijutsu attack;
-- using it does not reorder the enemy formation or pull the waiting target into Active Slot 1;
-- Reaping Rush and Gale Pursuit remain ordinary manifested attacks unless another exact rule changes their target eligibility;
-- no artificial elemental weakness is added.
+- only qualifying **Wind Release** and/or **Bukijutsu** Attack-PL packets receive the combat bonus;
+- attacks with neither classification receive nothing;
+- dual-classified Wind + Bukijutsu packets receive each Kamatari modifier once, never duplicate copies of the same modifier;
+- the enhancement grants no elemental/discipline access and no extra action;
+- Windtrail Hunt depends on an authored, physically plausible local lead and cannot manufacture a hidden location or auto-complete a pursuit.
 
-Crosswind Cutoff is limited to once per Battle and preserves target choice rather than creating generic hard crowd control.
+Sicklewind Route remains limited to once per Battle and does not reorder the target formation.
+
+Crosswind Cutoff remains limited to once per Battle and preserves target choice rather than creating generic hard crowd control.
 
 ---
 
 # H. Persistent / collection progression
 
-No account-wide persistent collection bonus is currently closed for Kamatari.
+No account-wide numeric collection bonus is created for Kamatari.
 
-No generic rarity bonus is added.
+The persistent/non-Battle value of the source is instead the contextual **Windtrail Hunt** discovery/pursuit capability when Kamatari is legitimately available.
 
-Do not use this section to substitute for the still-open **Enhancement package**.
+No generic rarity bonus or invented Missing-nin Stat is added.
 
 ---
 
@@ -377,7 +423,7 @@ Do not use this section to substitute for the still-open **Enhancement package**
 
 - Kamatari's own Base PL is Kamatari's Battle capacity only.
 - no Entity PL transfers to controller.
-- the legacy `wr_kamatari.sicklewind_guidance` +6 Bukijutsu row is **not ratified as final Enhancement authority by this correction**; whether it is retired or superseded by a new Enhancement remains OPEN;
+- the legacy `wr_kamatari.sicklewind_guidance` +6 Bukijutsu Stat row is **RETIRED** by Wind-Sickle Mastery;
 - do not treat Sicklewind Route as a replacement passive Enhancement;
 - Sicklewind Route is consumed as its own once-per-Battle off-slot attack and cannot be reused in the same Battle.
 - manifested Kamatari remains the same attached source; no duplicate second Kamatari package is created.
@@ -405,19 +451,17 @@ Current correction requires future implementation to:
 - do not stack old and new actions/effects;
 - preserve live implementation until the corrected Source 09 package is fully closed;
 - resolve #258 with Formula-valid Base Stats for **PL82** before claiming Kamatari's final Base PL / Stats are numerically closed;
-- wait for a separately signed-off Kamatari Enhancement package before migrating the legacy enhancement row.
+- replace the legacy +6 Bukijutsu row with the signed-off **Wind-Sickle Mastery** package; do not stack old and new enhancement authority.
 
 No runtime implementation / browser validation / Golden claim is made by this proposal.
 
 ---
 
-# K. Player-facing summary — CURRENT CORRECTED DIRECTION
+# K. Player-facing summary
 
 ## KAMATARI — WIND-RIDING SICKLE / PURSUIT / FORMATION BYPASS
 
-> **Sicklewind Route is Kamatari's once-per-Battle attack that can strike an enemy outside the Active slot. His separate attached Enhancement is still being designed.**
-
-The full player-facing source summary is therefore **not final** until the Enhancement package and Sicklewind Route Attack PL are closed.
+> **Wind Release damage +10%. Bukijutsu damage +10%; attacks that are both gain both bonuses. Once per Battle, Sicklewind Route can hit an enemy outside the Active slot for 24 ATK. Outside Battle, Kamatari can help uncover hidden routes, places and pursuit leads where the local wind and terrain provide a real trail.**
 
 ---
 
@@ -426,13 +470,18 @@ The full player-facing source summary is therefore **not final** until the Enhan
 **Stable identity:** `wr_kamatari` preserved.  
 **PL target:** **82 — LOCKED BY STEPHEN 2026-09-27.**  
 **Formula-valid seven Stats:** OPEN / owned by PL-Registry-Rank under #258.  
-**Sicklewind Route classification:** **ATTACK — CLOSED correction.**  
+**Sicklewind Route classification:** **ATTACK — CLOSED.**  
 **Sicklewind Route off-slot behavior:** **CLOSED.**  
-**Sicklewind Route Attack PL:** **OPEN.**  
-**Kamatari Enhancement package:** **OPEN.**  
-**Other signed-off Kamatari attack concepts:** preserved unless later balancing evidence requires a specific numeric correction.  
-**Implementation:** HOLD — corrected source package is not fully closed.  
+**Sicklewind Route Attack PL:** **ATK24 — CLOSED by Stephen 2026-09-27.**  
+**Enhancement:** **Wind-Sickle Mastery — CLOSED.**  
+**Wind Release enhancement:** **+10% direct Attack-PL.**  
+**Bukijutsu enhancement:** **+10% direct Attack-PL.**  
+**Dual Wind + Bukijutsu packet:** **+20% total from Kamatari, applied once per modifier.**  
+**Non-Battle source utility:** **Windtrail Hunt — CLOSED** as contextual discovery/pursuit support; no invented formal Missing-nin Stat.  
+**Other signed-off Kamatari attack concepts:** preserved.  
+**Combat mechanics:** **CLOSED.**  
+**Implementation:** HOLD only on #258's Formula-v1.0-valid PL82 Stats and later explicit downstream implementation routing.  
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
 
-**PL target locked != Stats calibrated != attack numerics fully closed != enhancement closed != implemented != runtime validated != Golden GREEN**
+**Combat mechanics closed != PL / Registry numeric row closed != implemented != runtime validated != Golden GREEN**
