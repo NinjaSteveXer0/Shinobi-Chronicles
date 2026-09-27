@@ -230,8 +230,10 @@ Base PL:
 Caller:
 after `iwa_confront_05`
 
-Return:
-`iwa_confront_return_01`
+Return selector:
+
+- Iwabee withdrawal / Rogue still eligible -> `iwa_confront_loss_01`
+- Rogue withdrawal / Iwabee still eligible -> `iwa_confront_return_01`
 
 0 PL = withdrawal only.
 
@@ -245,7 +247,24 @@ Battle result does not itself establish:
 
 No reward.
 
-Combat / World own the factual aftermath.
+### Defeat bridge
+
+Binding authority:
+
+`Documentation/Story/Academy_Iwabee_Direct_Confrontation_Defeat_Story_Bridge_2026-09-27.md`
+
+commit:
+`c86b8f408cd4f59a0d8f19343bea6e4b048dcd4d`
+
+The expected fresh-Iwabee loss is a normal Story branch:
+`iwa_confront_loss_01 -> ... -> iwa_confront_loss_05 -> iwa_confront_loss_world_result`
+
+World #398 then resolves the Rogue disposition and returns to:
+`iwa_eval_route_confront_loss_01 -> ... -> iwa_eval_core_01`
+
+No retry / injury / death / Origin failure.
+
+### Legitimate victory return
 
 ### `iwa_confront_return_01` — narration
 
