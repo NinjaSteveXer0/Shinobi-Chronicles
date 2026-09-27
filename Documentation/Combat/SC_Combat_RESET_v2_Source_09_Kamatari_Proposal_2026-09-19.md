@@ -107,7 +107,7 @@ The already-approved tactical identity remains:
 
 Stephen has now closed **Sicklewind Route at ATK24**.
 
-Kamatari's actual Enhancement is separately closed as **Wind-Sickle Mastery**: an attached Wind Release + Bukijutsu offensive enhancement with a distinct **Windtrail Hunt** discovery/pursuit utility. Sicklewind Route itself remains an attack, not the Enhancement.
+Kamatari's Enhancement **direction is locked** as Wind + Bukijutsu offense plus relevant pursuit/discovery utility. Combat's proposed exact package is **Wind-Sickle Mastery** with **Windtrail Hunt**; the exact numeric calibration and final utility wording still await Stephen sign-off. Sicklewind Route itself remains an attack, not the Enhancement.
 
 ---
 
@@ -125,7 +125,7 @@ Kamatari's actual Enhancement is separately closed as **Wind-Sickle Mastery**: a
 - **Sicklewind Route is an attack/action, not an attached passive or Enhancement**;
 - using Sicklewind Route consumes the legal action opportunity for that Summon attack;
 - no second Kamatari Battle PL ledger is created merely by ordinary Alpha Summon-action use;
-- **Wind-Sickle Mastery** is the attached/prepared Enhancement package.
+- if Stephen signs off the exact proposed package, **Wind-Sickle Mastery** is the attached/prepared Enhancement package.
 
 ## MANIFESTED — future/full-manifestation capability
 
