@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-19  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons  
-**Status:** **SICKLEWIND ATK24 CLOSED BY STEPHEN 2026-09-27 / ENHANCEMENT DIRECTION LOCKED / EXACT ENHANCEMENT NUMERICS PROPOSED / PL82 STATS OPEN UNDER #258**  
+**Status:** **COMBAT MECHANICS DESIGN CLOSED BY STEPHEN 2026-09-27 / PL82 FORMULA-VALID STATS OPEN UNDER #258**  
 **Parent:** #235  
 **Stephen mechanics sign-off:** 2026-09-19  
 **PL / Registry dependency:** #258  
@@ -107,7 +107,7 @@ The already-approved tactical identity remains:
 
 Stephen has now closed **Sicklewind Route at ATK24**.
 
-Kamatari's Enhancement **direction is locked** as Wind + Bukijutsu offense plus relevant pursuit/discovery utility. Combat's proposed exact package is **Wind-Sickle Mastery** with **Windtrail Hunt**; the exact numeric calibration and final utility wording still await Stephen sign-off. Sicklewind Route itself remains an attack, not the Enhancement.
+Kamatari's Enhancement is now **DESIGN CLOSED** as **Wind-Sickle Mastery** with **Windtrail Hunt**. Sicklewind Route itself remains an attack, not the Enhancement.
 
 ---
 
@@ -125,7 +125,7 @@ Kamatari's Enhancement **direction is locked** as Wind + Bukijutsu offense plus 
 - **Sicklewind Route is an attack/action, not an attached passive or Enhancement**;
 - using Sicklewind Route consumes the legal action opportunity for that Summon attack;
 - no second Kamatari Battle PL ledger is created merely by ordinary Alpha Summon-action use;
-- if Stephen signs off the exact proposed package, **Wind-Sickle Mastery** is the attached/prepared Enhancement package.
+- **Wind-Sickle Mastery** is the attached/prepared Enhancement package.
 
 ## MANIFESTED — future/full-manifestation capability
 
@@ -141,11 +141,9 @@ No ordinary Alpha Battle should infer a seventh Character slot or independent Su
 
 ---
 
-# E. REQUIRED Enhancement Package — DIRECTION LOCKED / EXACT NUMERICS PROPOSED
+# E. REQUIRED Enhancement Package — CLOSED
 
-Stephen's 2026-09-27 direction remains binding: Kamatari's Enhancement must enhance **Wind + Bukijutsu** and include something relevant to pursuit/discovery rather than using Sicklewind Route as the Enhancement.
-
-The exact numeric calibration below is Combat's proposed final package and still requires Stephen's explicit sign-off before Source 09 becomes fully DESIGN CLOSED:
+Stephen explicitly signed off the exact package below on **2026-09-27**:
 
 **Sicklewind Route is NOT the Enhancement.**
 
@@ -475,15 +473,14 @@ No runtime implementation / browser validation / Golden claim is made by this pr
 **Sicklewind Route classification:** **ATTACK — CLOSED.**  
 **Sicklewind Route off-slot behavior:** **CLOSED.**  
 **Sicklewind Route Attack PL:** **ATK24 — CLOSED by Stephen 2026-09-27.**  
-**Enhancement direction:** **Wind + Bukijutsu + pursuit/discovery — LOCKED by Stephen.**  
-**Proposed exact Enhancement:** **Wind-Sickle Mastery — AWAITING FINAL NUMERIC SIGN-OFF.**  
-**Proposed Wind Release enhancement:** **+10% direct Attack-PL.**  
-**Proposed Bukijutsu enhancement:** **+10% direct Attack-PL.**  
-**Proposed dual Wind + Bukijutsu packet:** **+20% total from Kamatari, applied once per modifier.**  
-**Proposed non-Battle source utility:** **Windtrail Hunt** as contextual discovery/pursuit support; no invented formal Missing-nin Stat.  
+**Enhancement:** **Wind-Sickle Mastery — CLOSED.**  
+**Wind Release enhancement:** **+10% direct Attack-PL — CLOSED.**  
+**Bukijutsu enhancement:** **+10% direct Attack-PL — CLOSED.**  
+**Dual Wind + Bukijutsu packet:** **+20% total from Kamatari, applied once per modifier — CLOSED.**  
+**Non-Battle source utility:** **Windtrail Hunt — CLOSED** as contextual discovery/pursuit support; no invented formal Missing-nin Stat.  
 **Other signed-off Kamatari attack concepts:** preserved.  
-**Combat mechanics:** **PARTIALLY CLOSED — Sicklewind ATK24 closed; exact Enhancement numerics/utility wording awaiting Stephen sign-off.**  
-**Implementation:** HOLD on Enhancement final sign-off + #258 Formula-v1.0-valid PL82 Stats + later explicit downstream implementation routing.  
+**Combat mechanics:** **DESIGN CLOSED.**  
+**Implementation:** HOLD on #258 Formula-v1.0-valid PL82 Stats + later explicit downstream implementation routing.  
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
 
