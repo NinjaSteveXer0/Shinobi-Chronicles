@@ -17,6 +17,15 @@ const TRACKING="occ_origin_izuno_pursuit_tracking_resolution";
 const INTERCEPT="occ_origin_izuno_intercept_prediction_resolution";
 const COOP="occ_origin_izuno_pursuit_cooperation_resolution";
 const ROGUE_OCC="occ_origin_izuno_rogue_genin_interruption_resolution";
+const BACKDROPS=Object.freeze({
+  practical:"Izuno Origin Backdrop/practical_ground_day.png",
+  rooftop:"Izuno Origin Backdrop/konoha_rooftop_pursuit_day.png",
+  mainStreet:"Izuno Origin Backdrop/konoha_main_street.png",
+  river:"Izuno Origin Backdrop/river_route_day.png",
+  narrowYard:"Izuno Origin Backdrop/konoha_narrow_yard.png",
+  alley:"Izuno Origin Backdrop/konoha_alleyway_day.png",
+  training:"Izuno Origin Backdrop/training_grounds_day.png"
+});
 
 function slug(v){return String(v||"route").replace(/[^a-z0-9_-]+/gi,"-").toLowerCase();}
 async function releaseFrontDoor(page){
@@ -45,6 +54,7 @@ async function boot(browser,label){
     const rt=getActiveStorySceneRuntime(),root=document.getElementById("story-scene-presentation-layer");
     return !!rt&&rt.sceneId===scene&&!!root&&root.dataset.sceneId===scene&&root.style.display!=="none";
   },SCENE,{timeout:15000});
+  await assertBackdrop(page,BACKDROPS.practical,label+" HEAD START");
   return{context,page,runtimeErrorGate};
 }
 async function info(page){
@@ -63,6 +73,28 @@ async function info(page){
 }
 async function waitBeat(page,id){
   await page.waitForFunction(({scene,id})=>getActiveStorySceneRuntime()?.sceneId===scene&&getActiveStorySceneRuntime()?.beatId===id,{scene:SCENE,id},{timeout:12000});
+}
+async function assertBackdrop(page,expected,label){
+  await page.waitForFunction(expectedPath=>{
+    const layer=document.getElementById("story-scene-presentation-layer");
+    const stage=layer?.querySelector(".sc-chronicle-stage")||layer?.querySelector(".sc-story-stage");
+    const resolved=typeof resolveStorySceneBoardBackdropPath==="function"?resolveStorySceneBoardBackdropPath():null;
+    return resolved===expectedPath&&stage?.dataset.scSceneBoardBackdrop==="dedicated"&&String(stage?.style.getPropertyValue("--sc-scene-board-backdrop")||"").includes(expectedPath);
+  },expected,{timeout:8000});
+  const actual=await page.evaluate(()=>{
+    const layer=document.getElementById("story-scene-presentation-layer");
+    const stage=layer?.querySelector(".sc-chronicle-stage")||layer?.querySelector(".sc-story-stage");
+    return{
+      beatId:getActiveStorySceneRuntime()?.beatId||null,
+      resolved:typeof resolveStorySceneBoardBackdropPath==="function"?resolveStorySceneBoardBackdropPath():null,
+      dedicated:stage?.dataset.scSceneBoardBackdrop||null,
+      css:stage?.style.getPropertyValue("--sc-scene-board-backdrop")||""
+    };
+  });
+  assert.strictEqual(actual.resolved,expected,label+" backdrop resolver drift");
+  assert.strictEqual(actual.dedicated,"dedicated",label+" dedicated backdrop flag missing");
+  assert(actual.css.includes(expected),label+" live backdrop CSS drift "+JSON.stringify(actual));
+  return actual;
 }
 async function clickContinue(page){
   const before=await info(page);
@@ -119,11 +151,13 @@ async function shot(page,label,name,selector="#story-scene-presentation-layer"){
 }
 async function startToInitial(page){
   await continueTo(page,"izu_initial_choice");
+  await assertBackdrop(page,BACKDROPS.rooftop,"THE TRAIL");
   assert.deepStrictEqual((await info(page)).choices,["TAKE THE OBVIOUS TRAIL","LOOK FOR SOMETHING BETTER","WORK WITH THE OTHERS","FORGET THE TRAIL — WHERE ARE THEY GOING?"]);
 }
 async function toSplit(page,opening){
   await startToInitial(page);await choose(page,opening);
   await continueTo(page,"izu_split_choice");
+  await assertBackdrop(page,BACKDROPS.mainStreet,"THE SPLIT");
   assert.deepStrictEqual((await info(page)).choices,["TAKE THE RIVER","FOLLOW THE STRONGER TRAIL","CHECK THE SHOUTING","CUT FOR THE INTERCEPT"]);
 }
 async function history(page){
@@ -147,6 +181,7 @@ async function finishFromCurrent(page,label,reflection="Sometimes the fastest pa
   ]);
   await shot(page,label,"reflection");
   await choose(page,reflection,"izu_close_1");
+  await assertBackdrop(page,BACKDROPS.mainStreet,label+" ORIGIN CLOSE");
   for(let i=0;i<80;i++){
     const rt=await page.evaluate(()=>getActiveStorySceneRuntime()?{beatId:getActiveStorySceneRuntime().beatId}:null);
     if(!rt)break;
@@ -167,6 +202,14 @@ async function runNonBattle(browser,{label,opening,route,rogueChoice=null,checks
   try{
     await toSplit(page,opening);
     await choose(page,route);
+    const routeBackdrop={
+      "TAKE THE RIVER":BACKDROPS.river,
+      "FOLLOW THE STRONGER TRAIL":BACKDROPS.narrowYard,
+      "CHECK THE SHOUTING":BACKDROPS.alley,
+      "CUT FOR THE INTERCEPT":BACKDROPS.mainStreet
+    }[route];
+    assert(routeBackdrop,label+" route backdrop fixture missing");
+    await assertBackdrop(page,routeBackdrop,label+" route "+route);
     if(route==="CHECK THE SHOUTING"){
       await continueTo(page,"izu_rogue_choice");
       assert.deepStrictEqual((await info(page)).choices,["STEP IN","CALL FOR HELP","KEEP PURSUING"]);
@@ -174,6 +217,7 @@ async function runNonBattle(browser,{label,opening,route,rogueChoice=null,checks
       await choose(page,rogueChoice);
     }
     await continueTo(page,"izu_reflect");
+    await assertBackdrop(page,BACKDROPS.training,label+" AFTER");
     const before=await history(page);
     await checks(page,before);
     const completed=await finishFromCurrent(page,label);
@@ -194,6 +238,7 @@ async function launchBattle(page,label){
   await page.waitForSelector(".alpha-code-battle-stage",{state:"visible",timeout:12000});
   const battle=await page.evaluate(()=>({
     battleId:currentBattle.battleId,encounterId:currentBattle.encounterId,
+    environmentPath:currentBattle.environmentPath||null,presentationEnvironmentPath:currentBattle.presentationEnvironmentPath||null,
     returnContext:JSON.parse(JSON.stringify(currentBattle.returnContext||null)),
     playerSlots:(currentBattle.deployment?.player?.slots||[]).map(s=>s.participantId).filter(Boolean),
     enemySlots:(currentBattle.deployment?.enemy?.slots||[]).map(s=>s.participantId).filter(Boolean),
@@ -210,6 +255,8 @@ async function launchBattle(page,label){
   const instanceId=battle.returnContext?.sceneInstanceId||battle.returnContext?.storyInstanceId||battle.returnContext?.instanceId;
   assert.strictEqual(battle.battleId,"battle_occ_origin_izuno_rogue_genin_step_in:"+instanceId,label+" exact Battle occurrence");
   assert.strictEqual(battle.encounterId,"origin_academy_izuno_rogue_genin_step_in");
+  assert.strictEqual(battle.environmentPath,BACKDROPS.alley,label+" Battle environment drift");
+  assert.strictEqual(battle.presentationEnvironmentPath,BACKDROPS.alley,label+" Battle presentation environment drift");
   assert.deepStrictEqual(battle.playerSlots,[WASABI]);assert.deepStrictEqual(battle.enemySlots,[ROGUE]);
   assert.strictEqual(battle.enemy.pl,23);assert.deepStrictEqual(battle.enemy.stats,{nin:23,tai:22,buki:21,fuin:10,kin:14,gen:15,stamina:24});
   assert.strictEqual(battle.enemy.template,"rogue_genin");
@@ -274,12 +321,15 @@ async function reloadBattle(page,battle,label){
   await page.waitForSelector(".alpha-code-battle-stage",{state:"visible",timeout:12000});
   const after=await page.evaluate(()=>({
     battleId:currentBattle.battleId,
+    environmentPath:currentBattle.environmentPath||null,presentationEnvironmentPath:currentBattle.presentationEnvironmentPath||null,
     playerSlots:(currentBattle.deployment?.player?.slots||[]).map(s=>s.participantId).filter(Boolean),
     enemySlots:(currentBattle.deployment?.enemy?.slots||[]).map(s=>s.participantId).filter(Boolean),
     meta:JSON.parse(JSON.stringify(currentBattle.wasabi343||null)),
     store:JSON.parse(JSON.stringify(playerData.wasabi343BattleLaunches||{}))
   }));
   assert.strictEqual(after.battleId,battle.battleId,label+" Battle occurrence changed on reload");
+  assert.strictEqual(after.environmentPath,BACKDROPS.alley,label+" reloaded Battle environment drift");
+  assert.strictEqual(after.presentationEnvironmentPath,BACKDROPS.alley,label+" reloaded Battle presentation environment drift");
   assert.deepStrictEqual(after.playerSlots,[WASABI]);assert.deepStrictEqual(after.enemySlots,[ROGUE]);
   assert(after.store[battle.battleId],label+" launch receipt missing after reload");
   return after;
@@ -301,6 +351,7 @@ async function terminateBattleToStory(page,outcome,label){
   assert(result?.success===true,label+" caller return failed "+JSON.stringify(result));
   await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:12000});
   await waitBeat(page,"izu_rogue_step_in_return_1");
+  await assertBackdrop(page,BACKDROPS.alley,label+" post-Battle alley return");
   const returned=await info(page);
   assert.strictEqual(returned.localContext.rogueGeninResponse,"intervene");
   assert.strictEqual(returned.localContext.rogueResolved,true);
@@ -320,7 +371,11 @@ async function runBattleRoute(browser,outcome){
     const battle=await launchBattle(page,label);
     const reloaded=await reloadBattle(page,battle,label);
     await terminateBattleToStory(page,outcome,label);
+    await clickContinue(page);
+    await waitBeat(page,"izu_finish_secondary_1");
+    await assertBackdrop(page,BACKDROPS.training,label+" Scene 5 convergence");
     await continueTo(page,"izu_reflect");
+    await assertBackdrop(page,BACKDROPS.training,label+" AFTER");
     let h=await history(page);
     assert.strictEqual(h.exact[ROGUE_OCC].length,1,label+" IZU-04 missing/duplicated");
     assert.strictEqual(h.exact[ROGUE_OCC][0].fact?.rogueGeninResponse,"intervene");
@@ -369,7 +424,7 @@ async function runBattleRoute(browser,outcome){
       routeFamilies:["obvious_river","better_stronger","predict_intercept","cooperate_call_help","keep_pursuing","step_in_victory","step_in_defeat"],
       exactSourceOccurrences:[TRACKING,INTERCEPT,COOP,ROGUE_OCC],
       strictOneVsOneBattle:true,battleSaveReload:true,bothBattleOutcomesReturn:true,
-      zeroBattleEntitlement:true,claimSeparateFromContinue:true,originToChronicleBegins:true,browserGoldenClaimed:false
+      zeroBattleEntitlement:true,claimSeparateFromContinue:true,exactBackdropContract:true,postBattleAlleyReturn:true,exactBattleEnvironment:true,originToChronicleBegins:true,browserGoldenClaimed:false
     };
     fs.writeFileSync(path.join(OUT,"summary.json"),JSON.stringify({summary,results},null,2));
     console.log(JSON.stringify(summary,null,2));
