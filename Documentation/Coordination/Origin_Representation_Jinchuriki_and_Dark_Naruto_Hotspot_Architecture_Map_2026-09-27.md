@@ -1,342 +1,594 @@
-# Shinobi Chronicles — Origin Representation Upgrade, Jinchūriki Lifecycle and Dark Naruto Hotspot Architecture Map
+# Shinobi Chronicles — Origin Evolution, Jinchūriki Part 1 / Part 2 and Dark Naruto Side-Arc Architecture
 
 **Date:** 2026-09-27
 **Owner:** CE / Codex / Coordination
-**Status:** **DURABLE ARCHITECTURE MAP — REUSES EXISTING SYSTEMS; EXACT OWNER MECHANICS / CONTENT / IMPLEMENTATION REMAIN SEPARATE**
+**Status:** **CORRECTED DURABLE ARCHITECTURE MAP — SUPERSEDES THE EARLIER SAME-DAY INTERPRETATION OF ORIGIN UPGRADE AS REPRESENTATION REPLACEMENT**
 
-## Purpose
+## 0. Why this correction exists
 
-Stephen identified the next three related systems that need to be mapped:
+Stephen clarified that three related future systems have distinct purposes:
 
-1. Dark Naruto path hotspot event;
-2. Origin Character upgrade;
-3. Jinchūriki system.
+1. **Origin Character Evolution** rewards a player who continues investing in the exact Origin card instead of discarding it when stronger roster cards arrive.
+2. **Jinchūriki Part 1** governs Characters who are already Jinchūriki in their represented history.
+3. **Jinchūriki Part 2** lets authored non-Jinchūriki Character cards become their own Jinchūriki through Chronicle play, with three exact host-stage representations: **Resonance -> Manifestation -> Avatar**.
+4. **Dark Naruto** belongs to Part 1 because Naruto already hosts Kurama, but his coercive route deserves a full optional side-arc / side-quest chain from **Stolen Chakra -> Black Gold KCM**.
 
-These should NOT become three unrelated engines.
+The earlier interpretation that Origin Character upgrade meant moving the Origin protagonist from Academy representation to a later Genin/Chūnin/Jōnin card was incorrect for this feature.
 
-> **Origin Character upgrade = representation progression over one persistent Character.**
+> **Origin Evolution strengthens the exact Origin card. It does not replace it.**
 
-> **Jinchūriki = one persistent Character + one separately-addressed Tailed-Beast/Hosted-Entity relationship with source-owned hosting, relationship, access, control and manifestation state.**
+> **Progressing in Rank or obtaining stronger cards must not invalidate lower-rank cards.**
 
-> **Dark Naruto = one authored coercive Naruto/Kurama branch inside that Jinchūriki lifecycle, surfaced through the existing capability/history-responsive World hotspot ecology.**
-
-No second World-event system, no second progression system, no generic friendship meter and no generic transformation inventory are created here.
-
-## Authority consumed
-
-- Documentation/Coordination/Opening Journey Academy Free Play Promotion and Dynamic Genin Team Availability 2026-09-10.md
-- Documentation/Acquisition/Dynamic Genin Roster Candidate and CE Team Preparation Contract 2026-09-10.md
-- Documentation/Coordination/Menma Multiple Hosted Entity and Echo Arc 1 Contract 2026-09-09.md
-- Documentation/World/Capability_Responsive_Chronicle_Event_Ecology_v3_Consolidated_Lock_2026-09-10.md
-- Documentation/Combat/SC_Combat_Kurama_Family_Canon_and_SC_Representation_Research_2026-09-27.md
-- GitHub #382 persistent later-technique queue
-- GitHub #403 Kurama-family relationship/partition reconciliation.
+> **All cards may have meaningful long-term potential when the player deliberately invests in them.**
 
 Existing non-collapse remains:
 
-- PL != Progression
-- Rank != Progression
-- Registry identity != ownership
-- ownership != assignment != deployment
-- persistent person/entity != representation
-- Origin completion != Promotion
-- Promotion != roster-transition completion
-- Tailed Beast != ordinary Summon
-- Entity PL != host PL
-- attachment/hosting != ownership
-- access != cooperation != partnership
-- relationship state != partition/body state
-- manifestation != independent Battle participant by default
-- World opportunity != Progression automatically
+- PL != Progression;
+- Rank != Progression;
+- Base != Developed != Effective/Battle state;
+- Registry identity != ownership;
+- ownership != assignment != deployment;
+- representation != person identity;
+- Origin completion != Promotion;
+- Promotion != Origin Evolution;
+- higher formal Rank != mandatory higher personal ceiling;
+- Tailed Beast != ordinary Summon;
+- Entity PL != host PL;
+- hosting != ownership;
+- access != control != cooperation != partnership;
+- relationship state != partition/body state;
+- manifestation != independent Battle participant by default;
+- World opportunity != Progression automatically;
 - event eligibility != selection != discovery != actionability != success.
 
 ---
 
-# 1. Origin Character upgrade — representation progression, not reacquisition
+# 1. Origin Character Evolution — keep the Origin card competitive
 
-## Stable identity
+## 1.1 Design goal
 
-The selected Origin protagonist establishes one persistent owned Character identity. The Academy representation is the Character's current exact representation at Chronicle start.
+The Origin card is not disposable onboarding equipment.
 
-A later Genin, Chūnin, Jōnin, route-specific, Hosted-Entity, transformation or other exact representation does NOT create a second historical person merely because it has another card/Registry representation ID.
+A player who remains invested in the Character they started the Chronicle with should eventually receive a special opportunity that allows that **exact Origin representation** to break past its ordinary starting power trajectory.
 
-> **Character progression changes eligible/current representation; it does not reacquire the same person.**
+Example intent:
 
-## Representation lineage
+> An Academy Student Konohamaru who has been trained and developed for a long time should be able to become competitive with a much stronger starting representation such as ANBU Kakashi, without ceasing to be Academy Student Konohamaru.
 
-Each persistent Character may have a source-authored representation lineage:
+This is deliberately different from a game where low-rarity / low-rank cards become mathematically obsolete and years of tiny per-level gains are required to rescue them.
 
-Academy representation -> later eligible representation(s) -> later branch representation(s)
+## 1.2 Core rule
 
-The lineage is not necessarily linear. Branch causes may include formal Promotion where an exact successor exists, persistent development, Bloodline access, Hosted-Entity relationship state, transformation state, exact Story/World history, route-specific history, or another owner-authorised eligibility source.
+Origin Evolution applies on top of:
 
-No future/adult/canon ability back-propagates merely because the later representation exists.
+**canonical Base Stats**
++ **all legitimate persistent development already earned by that exact Origin card**
++ **the Origin Evolution reward**
 
-## Promotion and representation remain separate
+Base identity remains canonical and auditable.
 
-Academy -> Genin Promotion changes Rank for the exact assessment subject. It does not itself imply reacquisition, teammate upgrades, automatic Skill gain, automatic Stat development, or automatic representation substitution.
+The Evolution reward is therefore a new persistent development source / breakthrough layered on top of existing gains rather than a silent rewrite of historical Base Stats.
 
-Where a specific Origin protagonist owns a legitimate Genin successor, successful Promotion may be one required predicate for successor eligibility. Exact transition still requires explicit Registry/Progression authority.
+PL continues to derive from Stats under the authoritative PL formula. Do not award a hidden direct PL bonus merely because the Character evolved.
 
-> **Rank change may enable representation progression, but Rank is not the representation-progress system.**
+## 1.3 Same card, same person, same history
 
-## Persistent representation state
+Origin Evolution does NOT:
 
-A future runtime contract should separate at least:
+- turn Academy Naruto into Genin Naruto;
+- turn Academy Konohamaru into an unrelated higher-rank card;
+- reacquire the same person;
+- erase training already earned;
+- reset development;
+- fabricate Promotion;
+- grant adult/canon techniques automatically;
+- change formal Rank by itself.
 
-- stable owned Character/person ID;
-- current representation ID;
-- historically/unlocked eligible representation IDs where collection/history requires them;
-- current formal Rank;
-- persistent development state;
-- current temporary state/projection.
+The reward means:
 
-Changing current representation must not duplicate ownership. Older representations may remain historical/collection evidence where authorised, but one stable person cannot occupy multiple Battle/team deployment identities simultaneously merely because multiple representations are unlocked.
+> **this exact Origin representation has become an exceptional version of itself because of this Chronicle's investment/history.**
 
-> **multiple representations of one person != multiple simultaneous people.**
+## 1.4 Roster philosophy
 
-## Base vs persistent development
+High-end Kage, ANBU, Sannin, Jinchūriki and rare cards still matter because they may begin from much stronger Base packages, possess different Skills, Bloodlines, Summons, equipment access, Hosted Entities or representation-specific capabilities.
 
-A successor representation owns its own authoritative Base identity/Stats/PL. Persistent development that legitimately carries across representation progression remains a separate Development overlay.
+But their existence must not create a permanent rule that:
 
-Do not calculate a successor by blindly adding the old representation's Base package to the new Base package.
+> higher-rank card = always better forever.
 
-> **Base representation package != persistent development ledger.**
+The intended roster economy is:
 
-## Upgrade transaction
+- stronger cards provide immediate power / different capability packages;
+- lower-stage cards may require more commitment;
+- long-term development can make personally important cards competitive;
+- Rank remains institutional identity, not an absolute power ceiling;
+- players can build around favourites rather than being forced into an all-Kage roster.
 
-Conceptual resolution:
+## 1.5 Anti-grind requirement
 
-stable Character + committed eligibility evidence + target representation contract -> representation-transition receipt -> current representation changes
+Do not implement the Origin Evolution fantasy through tiny fixed gains repeated for hundreds of levels.
 
-The receipt should preserve stable Character/owned ID, from/to representation, exact evidence refs, source occurrence refs, Rank state where relevant, persistent-development continuity, ownership continuity, Chronicle point and idempotence/supersession provenance.
+The system should use meaningful milestones / events / training/development decisions rather than a years-long `+0.5 to five Stats per level` treadmill.
 
-UI cannot create this transition merely by clicking a card.
+The exact eligibility threshold is still open, but it should measure real Chronicle investment rather than raw UI time or an arbitrary level number.
+
+Useful evidence families may include only owner-authorised facts such as:
+
+- legitimate persistent training/development;
+- meaningful continued Battle usage;
+- authored Story/World participation;
+- milestone achievements tied to the Origin;
+- retained long-term roster/team importance;
+- other exact Chronicle evidence.
+
+Do not require the player to use no other cards. 'Staying true to the Origin' means continuing to meaningfully develop/use the Origin rather than permanently discarding it once numerically stronger cards appear.
+
+## 1.6 Evolution event
+
+The power breakthrough should be delivered through a real authored event / opportunity rather than a silent stat pop-up.
+
+Recovered earlier design direction used the working concept **Evolution Chamber**: an Origin-focused event that preserves identity/history, awards persistent Stat development and can offer different development emphases such as strengthening weaknesses, pushing strengths, balancing growth or another directed build choice.
+
+That older working name / exact route menu remains subject to current owner review, but the recovered design principle is compatible with Stephen's clarified goal:
+
+> **the player earns a meaningful one-time / milestone breakthrough for the Origin card rather than grinding microscopic level gains forever.**
+
+A visual/collectible evolution reward may accompany the event where Assets/Character Creation later authorises one; presentation does not create the mechanical reward.
+
+## 1.7 Current open design questions
+
+Still to close later:
+
+- exact eligibility predicate;
+- whether Origin Evolution is once per Chronicle / once per Origin / multi-tier;
+- exact Stat budget and distribution rules;
+- whether every Origin receives the same total development budget or character-specific packages;
+- exact event fiction/location;
+- exact UI/presentation;
+- whether later non-Origin cards may receive a different long-term breakthrough system.
+
+Do not solve these with generic level grinding.
 
 ---
 
-# 2. Jinchūriki system — separate axes over one host/entity relationship
+# 2. Jinchūriki Part 1 — Characters who already host a Tailed Beast
 
-The Jinchūriki system extends existing Hosted-Entity semantics rather than creating an unrelated subsystem.
+Part 1 applies when the represented Character is already a Jinchūriki under current Story/Registry history.
 
-A Jinchūriki state is not one scalar bond level. It is the intersection of independently-owned axes.
+Examples include Naruto/Menma/Kurama-family states and other canon/SC host representations.
 
-## Persistent identities
+The system extends current Hosted-Entity semantics.
 
-Preserve one stable host Character/person, one stable Tailed-Beast Entity/person, one exact hosted/sealed relationship record, exact Entity partition/body representation where relevant, and exact host representation where relevant.
+## 2.1 Independent state axes
 
-One host may have multiple separately-authored Hosted Entities under the existing Menma multi-host contract. A Tailed Beast does not become part of the host's person identity.
+A Jinchūriki relationship is not one bond meter. Preserve separate axes:
 
-## Hosting / attachment axis
+### Host / attachment
+- hosted/sealed;
+- temporarily externalised;
+- extracted/separated;
+- forced manifestation;
+- another exact source-authored lifecycle state.
 
-This answers where/how the Entity is currently related to the host. Source-authored states may include not hosted, sealing/implantation pending, hosted/sealed, partially externalised, extracted/separated, forced manifestation, reborn-hosted exceptional case, or another exact lifecycle state.
+### Relationship / cooperation
+- relationship evidence;
+- cooperation state;
+- genuine partnership where specifically earned.
 
-This map does not author generic Tailed-Beast acquisition/implantation yet. Acquisition / Character Systems still owns that future contract.
+Kurama-family authority already establishes:
+- friendly dialogue != partnership;
+- chakra access != partnership;
+- cloak access != partnership;
+- one voluntary loan != partnership;
+- control != cooperation.
 
-## Relationship / cooperation axis
+### Access
+What exact Tailed-Beast power may the host currently use?
 
-This answers what relationship evidence currently exists. Do NOT create one universal numeric friendship meter.
+### Control
+Can the host intentionally control the currently accessed power?
 
-Kurama authority already establishes Nine-Tails-state as pre-genuine-partnership and named Kurama partnership-state as genuine voluntary partnership/cooperation. Friendly dialogue, chakra access, cloak access and one voluntary loan do not prove partnership.
+### Manifestation
+Internal, cloak/body projection, partial manifestation, external manifestation, forced manifestation, etc.
 
-Other Bijū may use the same architecture without mechanically copying Kurama's exact naming/history rule.
+### Partition / body state
+Where relevant: Yin, Yang, Complete/reunited, Reborn, or another exact state.
 
-## Access axis
+### Ownership / acquisition
+Card/Entity ownership, hosting and Battle manifestation remain separate.
 
-This answers what source power/capability the host may currently access. Access may be temporary or persistent and can include one authored loan, exact chakra access, exact cloak/host transformation access, source-assisted Skills, or manifested action packages.
+## 2.2 No hidden additive Beast PL
 
-Access does not prove partnership or mastery.
+Entity PL never transfers wholesale into host PL.
 
-## Control axis
+Dedicated Jinchūriki / embodied representations must not receive the same source package twice.
 
-This answers whether the host can intentionally control the currently accessed power.
-
-A host may access power without stable control, control power coercively without partnership, cooperate voluntarily, or lose control under an exact authored trigger.
-
-No universal random berserk roll is authorised.
-
-## Manifestation axis
-
-This answers how the Entity/power is physically represented right now: internal/no external manifestation, cloak/host-body projection, partial manifestation, voluntary external manifestation, full source manifestation, forced manifestation, or another exact state.
-
-Manifestation does not automatically create a second normal team slot, ordinary Summon lifecycle, recurring independent turn, or additive Entity PL onto host PL.
-
-Combat owns exact action economy.
-
-## Partition / body-state axis
-
-For entities where it matters, partition/body state remains separate from relationship state.
-
-Kurama example: Yin, Yang, Complete/reunited, Reborn.
-
-Naruto's underlying Kurama half is Yang. Menma's complementary underlying half is Yin. Menma-specific representations remain Menma-specific history/relationship representations and do not collapse into generic yin_kurama.
-
-## Ownership / acquisition axis
-
-Collectible/card ownership, Registry existence, hosted relationship, representation access and Battle manifestation remain separate.
-
-Preserve:
-
-- card possession != hosted access;
-- hosted/sealed != partnered;
-- encountered manifestation != ownership;
-- ownership != assignment/deployment;
-- forced manifestation != ordinary Summon ownership.
-
-The future implantation/sealing system must write a hosted-relationship receipt; it must not merely toggle a card.
-
-## Persistent Jinchūriki relationship envelope
-
-A future machine-facing relationship envelope should preserve at least hostRelationshipId, hostCharacterId, entityId, entity partition/body state, hosting state, relationship evidence refs, relationship representation state, persistent access refs, temporary access refs, control state, manifestation state, source occurrence refs and provenance.
-
-Exact field names remain Coding authority after semantic closure. The core requirement is that one axis cannot silently overwrite another.
+Exact Skills, Enhancements, Stat modifiers and manifestation action economy remain Combat/PL authority.
 
 ---
 
-# 3. Dark Naruto — coercive Jinchūriki route, not a morality subsystem
+# 3. Jinchūriki Part 2 — create a new Jinchūriki in this Chronicle
 
-Dark Naruto is a Chronicle route/history family, not a hidden morality score.
+## 3.1 Design goal
 
-The defining Tailed-Beast decision is:
+Part 2 allows an authored non-Jinchūriki Character to become a Jinchūriki through the player's Chronicle rather than requiring the Character to have been born/introduced as one.
 
-> **Naruto deliberately develops the capability to take/control Kurama's power rather than earning genuine voluntary partnership.**
+This is not a generic 'equip Bijū' slot.
 
-Current #403 authority already closes that this is compatible with breakout_kurama Forced Manifestation and that power taken != power freely given.
+It is a persistent host-creation pathway:
 
-## Initial hotspot classification
+eligible Character + legitimate Tailed-Beast availability + exact sealing/host-establishment opportunity
+-> new hosted relationship
+-> Jinchūriki development
+-> dedicated staged host representations.
 
-The first Dark-Naruto/Kurama power-taking opportunity should reuse World v3 ecology as a **compound-path responsive hotspot**.
+## 3.2 Current authored proof families
 
-Initial eligibility should consume exact authority for:
+Stephen has already created five host/beast lines, represented in the live repository by three-stage collectible cards:
 
-- stable Naruto Character/person;
-- a legitimate Naruto representation capable of entering the content;
-- current hosted Kurama/Nine-Tails relationship;
-- pre-partnership state rather than completed genuine partnership;
-- exact Fūinjutsu threshold supplied by Progression;
-- required location/world availability supplied by World;
-- no contradictory state such as Kurama already absent/extracted;
-- any exact route/history prerequisite later authored.
+### Sakura + Chōmei
+- `Assets/Jinchuriki/sakura_resonance.png`
+- `Assets/Jinchuriki/sakura_manifestation.png`
+- `Assets/Jinchuriki/sakura_avatar.png`
 
-If ineligible, the dedicated hotspot remains absent. Do not show a disabled Dark Naruto marker.
+### Shikamaru + Kurama Yang
+- `Assets/Jinchuriki/shikamaru_resonance_yang.png`
+- `Assets/Jinchuriki/shikamaru_manifestation_yang.png`
+- `Assets/Jinchuriki/shikamaru_avatar_yang.png`
 
-## First-event purpose
+### Shikamaru + Kurama Yin
+- `Assets/Jinchuriki/shikamaru_resonance_yin.png`
+- `Assets/Jinchuriki/shikamaru_manifestation_yin.png`
+- `Assets/Jinchuriki/shikamaru_avatar_yin.png`
 
-The first hotspot should create the first factual coercive-route occurrence if the player deliberately chooses that path; it should not hand Naruto a finished high-stage transformation.
+### Rin + Isobu
+- `Assets/Jinchuriki/rin_resonance.png`
+- `Assets/Jinchuriki/rin_manifestation.png`
+- `Assets/Jinchuriki/rin_avatar.png`
+
+### Tobirama + Shukaku
+- `Assets/Jinchuriki/tobirama_resonance.png`
+- `Assets/Jinchuriki/tobirama_manifestation.png`
+- `Assets/Jinchuriki/tobirama_avatar.png`
+
+These assets prove the intended representation families exist physically. They do not by themselves author PL, Skills, acquisition, eligibility or runtime behavior.
+
+## 3.3 Three-stage universal host-progression grammar
+
+For Part 2 authored host lines, the representation spine is:
+
+> **RESONANCE -> MANIFESTATION -> AVATAR**
+
+The names are locked as the current three-stage design language for these created Jinchūriki families.
+
+At architecture level:
+
+- **Resonance** = first dedicated created-Jinchūriki stage;
+- **Manifestation** = deeper developed host/Beast expression;
+- **Avatar** = highest of the current three dedicated created-Jinchūriki stages.
+
+Exact chakra access, relationship requirements, manifestation visuals, Stat packages, Skills and control requirements are source-specific and must be authored by Progression/Combat/Registry. Do not assume every Bijū/host pair progresses identically just because the stage names are shared.
+
+## 3.4 Host creation is an authored transaction
+
+Part 2 requires a real acquisition/World/Progression transaction. A player may not create Sakura+Chōmei merely by owning both cards.
 
 Conceptual flow:
 
-eligible Naruto + hosted pre-partnership Kurama + qualifying Fūinjutsu -> hotspot -> player engages or leaves -> exact coercive resolver -> factual result -> committed route history -> later owner consequences
+1. own / legitimately control the eligible Character representation;
+2. make the exact Tailed Beast legitimately available under its acquisition/lifecycle rules;
+3. satisfy any exact sealing/Fūinjutsu/Story/World requirements;
+4. resolve the host-creation occurrence;
+5. create one durable hostRelationshipId linking that Character and that exact Tailed Beast/partition;
+6. unlock the first eligible Jinchūriki representation only when its exact requirements are met;
+7. later relationship/access/control/development history may unlock Manifestation and Avatar.
 
-Leaving/non-action is legitimate history, not failure. Coercion does not automatically guarantee success.
+The sealer/ritual capability does not necessarily have to belong to the future host; exact content will decide who performs the sealing.
 
-## Route evidence
+## 3.5 Pair-authorable, not combinatorial by default
 
-The first successful deliberate power-taking occurrence should establish a durable route/history fact equivalent to dark_naruto_coercive_kurama_route_started.
+The system should be reusable for future authored host/beast combinations, but do not automatically generate every possible Character x Tailed-Beast permutation.
 
-That fact means only that Naruto knowingly began the coercive route. It does not itself grant partnership, all cloak stages, Breakout ownership, every future coercive Skill, a morality label or permanent PL bonus.
+Each supported pairing needs exact authority for:
 
-## Staged escalation
+- host identity;
+- Beast / partition identity;
+- eligibility;
+- acquisition/host-establishment route;
+- three representation assets where required;
+- Stats/PL;
+- Skills/Enhancements;
+- progression requirements;
+- loss/extraction behavior;
+- anti-double-count/reservation rules.
 
-After the first committed coercive-route occurrence, later stages should become **history-generated follow-up opportunities** under existing World ecology rather than one infinitely repeatable hotspot.
+The five current families are the first proof set, not permission for uncontrolled combinatorial generation.
 
-Each later stage may require prior stage history, higher/exact Fūinjutsu capability, exact current hosted state, exact control/access evidence, exact location/Story/world conditions and absence of incompatible relationship/body state.
+## 3.6 Same Character, branched Jinchūriki history
 
-Each stage represents Naruto taking/controlling more of Kurama's power. Exact stage count, stage names, Stats, PL, Skills and representation mappings remain owner work.
+Sakura Resonance/Manifestation/Avatar remain Sakura.
+Rin Resonance/Manifestation/Avatar remain Rin.
+Tobirama Resonance/Manifestation/Avatar remain Tobirama.
+Shikamaru Yang and Shikamaru Yin are separate host/partition branches over the same Shikamaru person and must not be simultaneously deployed as duplicate Shikamarus.
 
-## Existing coercive_cloak representation
+The host's legitimate persistent development must carry according to Progression authority.
 
-A live/ratified coercive_cloak representation already exists in project representation/portrait authority. Current source review does not provide sufficient semantic authority to bind it to a particular coercive stage merely from its name.
+The Tailed Beast source then contributes only the exact stage/source package authorised for the Jinchūriki representation.
 
-> **coercive_cloak is a strong candidate consumer of this route, but Registry/Progression/Combat must confirm exact eligibility and mechanics before binding it to a stage.**
+Do not stack:
 
-Do not infer mechanics from card art or filename.
+host Base + every old host representation Base + full Beast PL + Resonance package + Manifestation package + Avatar package.
 
-## Breakout transition
+Only the exact active representation/source package applies, plus legitimate persistent development.
 
-breakout_kurama remains the same persistent Kurama represented in a Forced Manifestation/coercive-control-failure state.
+## 3.7 Beast reservation / exclusivity
 
-Safe architecture:
+A persistent Tailed Beast or exact partition cannot be hosted by multiple incompatible Characters simultaneously merely because multiple cards exist.
 
-coercive route history + exact accessed-power/control state + exact authored trigger -> loss-of-control/forced-emergence occurrence -> breakout_kurama manifestation -> World/Combat exact outcome package
+Kurama Yin and Yang are separate partition states where current authority allows separate hosting. The same exact Yang half cannot simultaneously be hosted by Naruto and Shikamaru in one Chronicle unless a later causal transfer/extraction history actually moved it.
 
-Do not reduce this to bad RNG -> Kurama appears, and do not make every coercive stage automatically end in breakout.
+Part 2 therefore requires source reservation / transfer history, not just card ownership.
 
-## Breakout occurrence vs permanent unlock
+## 3.8 Extraction/loss
 
-Preserve #403:
+If a Beast is later extracted or otherwise no longer legitimately hosted:
 
-- forced breakout occurrence != permanent Breakout Kurama obtainment;
-- permanent Breakout representation eligibility/ownership != ordinary Summon ownership.
+- the Character person remains owned;
+- prior history remains true;
+- current Jinchūriki stage eligibility/access may be suspended or replaced according to exact owner authority;
+- the Beast/partition becomes available only through its legitimate post-extraction lifecycle;
+- no relationship/history is erased.
 
-Progression / Acquisition later owns the exact persistent unlock receipt if Breakout Kurama is collectible/usable after a qualifying route. Combat/World owns what manifested Kurama actually does.
-
-## Relationship consequence
-
-A coercive occurrence is legitimate relationship-history evidence. It must not be silently translated into a generic numeric Kurama-hates-Naruto meter.
-
-Future relationship-state resolvers may consume exact coercion history when deciding whether partnership is possible, delayed, altered or requires reconciliation, but that consequence needs explicit source authority.
+Exact loss/recovery rules remain open.
 
 ---
 
-# 4. How the three systems connect
+# 4. Dark Naruto — Part 1 Jinchūriki coercion side arc
 
-Origin protagonist stable person -> current Academy representation -> free play / Rank / development / Story history -> exact representation eligibility -> successor current representation -> separately-addressed Jinchūriki relationship where applicable -> World hotspot consumes exact relationship/capability/history -> occurrence -> Progression persistent consequence -> Combat executable mechanics -> Registry representation eligibility -> later World events consume resulting state.
+Dark Naruto is NOT a Part-2 newly-created Jinchūriki. Naruto already hosts Kurama.
 
-No layer may skip its owner.
+His route is a Part-1 relationship/control divergence:
+
+> **Naruto rejects the friendship/partnership route and deliberately takes Kurama's power for himself.**
+
+This is not a hidden morality score.
+
+## 4.1 It should be a side arc, not one hotspot
+
+The first hotspot/event can discover or launch the route, but the development from first theft to Black Gold KCM deserves a full optional side-arc / side-quest series.
+
+The live repository already contains the required visual spine:
+
+- `Assets/Variant/stolen_chakra.png`
+- `Assets/Variant/coercive_cloak.png`
+- `Assets/Variant/three_tail_dominion.png`
+- `Assets/Variant/six_tail_dominion.png`
+- `Assets/Rare Cards/black_gold_naruto.png`
+
+Therefore the current side-arc progression spine is:
+
+> **STOLEN CHAKRA -> COERCIVE CLOAK -> THREE-TAIL DOMINION -> SIX-TAIL DOMINION -> BLACK GOLD KCM**
+
+These are representations / route milestones of the same Naruto person, not five separately acquired Narutos.
+
+## 4.2 Narrative escalation purpose
+
+At a high level the chain should dramatise increasing deliberate appropriation and control of Kurama's chakra:
+
+### Stolen Chakra
+The first successful intentional taking of Kurama's power. This establishes the coercive-route history.
+
+### Coercive Cloak
+Naruto can force a more stable/useful cloak expression without having earned voluntary partnership.
+
+### Three-Tail Dominion
+A larger coercive control milestone. Power access escalates and the cost/risk of controlling Kurama becomes more serious.
+
+### Six-Tail Dominion
+A near-breakpoint high-power stage where Naruto is controlling a much greater portion of Kurama's power and the danger of reversal/loss of control becomes substantially more relevant.
+
+### Black Gold KCM
+The side-arc culmination: Naruto achieves his own coerced KCM-style state built from power taken rather than genuine Kurama partnership.
+
+Exact Story scenes, choices, Battle encounters, failure states, Skills, Stats and unlock thresholds remain owner work.
+
+## 4.3 Progression rules
+
+Each stage should require committed history from the prior stage plus exact capability/development prerequisites.
+
+Fūinjutsu is a core route capability under current Combat/Kurama authority, but exact thresholds are still Progression-owned.
+
+Do not make the chain:
+
+- raw level-gated;
+- automatic from winning ordinary Battles;
+- a generic friendship bar;
+- random;
+- obtainable merely because the asset exists.
+
+Each stage should feel like a real Chronicle achievement with authored events/decisions/resolvers.
+
+## 4.4 Relationship meaning
+
+Moving forward on the route proves increasing **control/taking**, not increasing partnership.
+
+Preserve:
+
+- power taken != power freely given;
+- control != cooperation;
+- chakra access != partnership;
+- Black Gold KCM != Yang Kurama partnership;
+- coercive route success != Kurama approval.
+
+Exact future reconciliation or incompatibility with the partnership route must be authored explicitly; do not infer a simple numeric trust penalty.
+
+## 4.5 Breakout Kurama — separate dangerous branch
+
+`breakout_kurama` remains the same persistent Kurama in a **Forced Manifestation** state.
+
+Breakout is not one of the mandatory five Dark Naruto side-arc milestones.
+
+It is a possible authored consequence/failure/reversal when the host/Beast control relationship reaches an exact dangerous state.
+
+Conceptually:
+
+coercive-route history + exact current power/control state + authored loss-of-control trigger
+-> Kurama forces emergence
+-> Breakout Kurama occurrence
+-> exact World/Combat outcome.
+
+Forced occurrence != permanent Breakout ownership.
+
+## 4.6 Post-Black-Gold representations
+
+The live Variant asset tree also contains:
+
+- `kurama_dominion.png`
+- `kurama_sovereign.png`
+
+These existing representations are not automatically inserted into the Stolen-Chakra-to-Black-Gold side arc merely because they exist.
+
+Stephen has currently defined this side arc's timeline as **Stolen Chakra -> Black Gold KCM**. Kurama Dominion / Kurama Sovereign should remain later/post-arc route consumers until their exact Story/Progression role is deliberately closed.
 
 ---
 
-# 5. Ownership map
+# 5. How the systems now connect
+
+## Origin path
+
+Origin card
+-> ordinary persistent training/development
+-> continued meaningful Chronicle investment
+-> Origin Evolution opportunity
+-> permanent Origin-specific breakthrough
+-> same exact Origin card remains viable at high-end play.
+
+## Jinchūriki Part 1
+
+already-hosted Character
+-> relationship/access/control/manifestation development
+-> source-specific transformations / representations / routes
+-> e.g. partnership route OR Dark Naruto coercive route where applicable.
+
+## Jinchūriki Part 2
+
+non-Jinchūriki Character + legitimate Beast availability
+-> host-establishment/sealing occurrence
+-> persistent host relationship
+-> Resonance
+-> Manifestation
+-> Avatar.
+
+These pathways may intersect with training, World events, Story and Combat, but none of those owners may silently manufacture another owner's state.
+
+---
+
+# 6. Ownership map
 
 ## CE / Codex / Coordination
 
-Stable-person vs representation non-collapse; shared Jinchūriki axis grammar; cross-system provenance; Dark Naruto route classification; anti-double-count and same-entity reservation semantics.
+- same-card Origin Evolution vs representation replacement distinction;
+- reusable Jinchūriki Part-1/Part-2 grammar;
+- same-person / same-Beast non-collapse;
+- route collision / reservation semantics;
+- Dark Naruto side-arc cross-system sequencing.
 
 ## Progression / Development
 
-Origin successor eligibility where development-gated; Fūinjutsu thresholds; coercive-stage development; persistent host/source access; relationship-development evidence/thresholds where progression-owned; later character-authentic technique unlocks under #382.
+- Origin Evolution eligibility and persistent Stat-development contract;
+- exact Origin Evolution growth budget / routes;
+- Part-1 relationship/access/control development evidence where Progression-owned;
+- Part-2 Resonance -> Manifestation -> Avatar development requirements;
+- Dark Naruto Fūinjutsu thresholds and stage-development gates;
+- persistent carryover / anti-double-count.
 
 ## Acquisition / Character Systems
 
-Generic Tailed-Beast acquisition; implantation/sealing/host-establishment transaction; ownership vs hosted relationship; permanent Breakout obtainment transaction if applicable; no duplicate same-person acquisition during representation upgrade.
+- Tailed-Beast obtainability;
+- transfer/extraction availability;
+- Part-2 sealing/implantation/host-establishment transaction;
+- ownership vs hosting;
+- Beast/partition reservation;
+- any persistent unlock/acquisition receipt for stage representations where Acquisition participates.
 
 ## World / Missions / Events
 
-Dark Naruto hotspot location/availability; first coercive opportunity; history-generated follow-up stages; factual non-action/failure/success outcomes; loss-of-control / forced-breakout event context where World-owned.
+- Origin Evolution event opportunity/fiction;
+- Part-2 host-creation opportunity context;
+- Dark Naruto launch hotspot;
+- Dark Naruto side-arc quests / history-generated follow-ups;
+- loss-of-control / Breakout event context where World-owned.
 
 ## Combat / Skills / Items / Weapons / Summons / Tailed Beasts
 
-Kurama/Nine-Tails/Breakout action packages; source-assisted Skills; cloak/manifestation Battle effects; manifestation action economy; loss-of-control Battle behavior; Breakout post-emergence behavior; no additive Entity PL transfer.
+- exact stage action packages;
+- Enhancements / source-assisted Skills;
+- manifestation action economy;
+- Dark Naruto stage mechanics;
+- Breakout post-emergence behavior;
+- no wholesale Entity PL transfer.
 
 ## PL / Registry / Rank
 
-Exact representation IDs/lineage mapping; Base Stats/Base PL; same-person/same-Entity reservation; Rank facts independently of representation progression.
+- canonical Base Stats/Base PL remain distinct from developed/evolved state;
+- Origin Evolution Stat gains recalculate PL through Formula v1.0 rather than direct PL bonus;
+- exact Jinchūriki representation IDs/calibration;
+- same-person and same-Beast reservation;
+- formal Rank remains independent of Origin Evolution/Jinchūriki progression.
+
+## Writing / Story
+
+- player-facing Dark Naruto side-arc narrative once system predicates/outcomes are closed;
+- Origin Evolution scene writing after event semantics close;
+- Part-2 sealing/relationship scenes where Story owns the occurrence;
+- no system/QA language in player-facing prose.
 
 ## Coding / Runtime
 
-Acts only after exact owner contracts close. Coding does not invent thresholds, representation transitions, hotspot outcomes, implantation, relationship scores or Breakout behavior.
+Acts only after exact owner contracts close. Coding must not invent Origin Evolution values, Jinchūriki pairing rules, Beast transfer, Dark Naruto thresholds, relationship scores or Breakout behavior.
 
 ---
 
-# 6. Recommended closure order
+# 7. Recommended next closure order
 
-1. Close reusable Origin representation progression transaction.
-2. Close generic Jinchūriki hosted-relationship lifecycle/acquisition boundary.
-3. Let Progression define exact relationship/access/control development surfaces.
-4. Let World author Dark Naruto first hotspot + follow-up chain.
-5. Let Combat map exact coercive-cloak / Breakout mechanics.
-6. Let Registry bind exact representation transitions.
-7. Only then hand implementation to Coding.
-
-This order prevents the Dark Naruto hotspot from accidentally inventing the Jinchūriki system.
+1. Close the **Origin Evolution persistent-development contract** and exact reward shape.
+2. Close **Jinchūriki Part 2 host-establishment / Beast reservation / transfer semantics**.
+3. Close reusable **Resonance -> Manifestation -> Avatar** progression grammar.
+4. Calibrate the five current Part-2 host families through PL/Combat/Progression without inventing packages from the artwork.
+5. Close the **Dark Naruto five-stage side-arc system contract** from Stolen Chakra -> Black Gold KCM.
+6. Author World/Story side-arc content and exact Combat packages.
+7. Route implementation to Coding only after these contracts are exact.
 
 ---
 
-# 7. Status
+# 8. Current status
 
-Closed/reusable now: stable person/entity != representation; Rank != Progression; Hosted Entity multiplicity; Hosted Entity PL != host PL; manifestation != independent participant by default; World responsive-event ecology; history-generated follow-ups; Kurama relationship-state vs partition-state; Naruto Yang / Menma Yin; coercive power-taking != partnership; Breakout Kurama = Forced Manifestation; forced occurrence != permanent obtainment.
+## Closed / clarified now
 
-Still open: exact Origin successor transition eligibility; representation retention/switch policy per Character family; generic Tailed-Beast acquisition/implantation; exact Jinchūriki relationship-development persistence grammar; exact Fūinjutsu thresholds/stage count for Dark Naruto; exact coercive_cloak mapping; exact forced-breakout trigger grammar; exact Breakout post-emergence behavior; exact source Skills/Enhancements.
+- Origin Evolution strengthens the exact Origin card; it is not rank/representation replacement.
+- all cards may retain long-term competitive potential through meaningful development.
+- no Ninja-Manager-style microscopic years-long level grind.
+- Origin Evolution adds a persistent breakthrough on top of already-earned gains.
+- Part 1 = already-existing Jinchūriki.
+- Part 2 = new host creation in the Chronicle.
+- Part 2 uses Resonance -> Manifestation -> Avatar.
+- current Part-2 proof families: Sakura+Chōmei, Shikamaru+Yang Kurama, Shikamaru+Yin Kurama, Rin+Isobu, Tobirama+Shukaku.
+- Dark Naruto is Part 1.
+- Dark Naruto deserves a full side arc, not one isolated hotspot.
+- Dark Naruto side-arc spine: Stolen Chakra -> Coercive Cloak -> Three-Tail Dominion -> Six-Tail Dominion -> Black Gold KCM.
+- Breakout Kurama remains a separate Forced Manifestation branch, not a mandatory stage.
 
-**architecture mapped != design fully closed != implemented != runtime validated != Golden/regression GREEN**
+## Still open
+
+- exact Origin Evolution eligibility and Stat budget;
+- exact Evolution event fiction/name/UI;
+- generic Tailed-Beast acquisition/transfer/extraction;
+- exact Part-2 sealing/implantation requirements;
+- exact stage requirements and source packages for the five Part-2 families;
+- exact Dark Naruto Fūinjutsu thresholds;
+- exact side-arc missions/scenes/Battles;
+- exact Black Gold KCM mechanics;
+- exact Breakout trigger and post-emergence behavior;
+- exact relationship consequences / reconciliation route.
+
+**design clarified != owner mechanics closed != implemented != runtime validated != Golden/regression GREEN**
