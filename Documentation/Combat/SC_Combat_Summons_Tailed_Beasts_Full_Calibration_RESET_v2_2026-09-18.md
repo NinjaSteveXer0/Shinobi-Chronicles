@@ -297,6 +297,8 @@ Next ordinary Summon state:
 
 - **Source 09 — Kamatari** — **COMBAT DESIGN CLOSED 2026-09-27**: Base PL target **82** remains locked; #258 still owes Formula-v1.0-valid seven Stats. **Sicklewind Route = ATK24 once/Battle against one occupied non-Active enemy. Wind-Sickle Mastery = Wind +10% / Bukijutsu +10% / dual-qualified +20%. Windtrail Hunt = contextual pursuit/discovery utility.**
 - **Source 10 — Snake** — **DESIGN CLOSED 2026-09-27**; generic `snake`, PL47, staged/not live. **Serpent Reach** = once/Battle ordinary-distance extension for one close-range Tai/Buki attack against the Active enemy. **Narrow Passage** = source-specific small-gap infiltration/scouting/small-object utility. Hidden Coil remains separately obtainable/learnable. **No Poison/venom Enhancement.**
+- **Source 11 — One-Tail / Shukaku** — **DESIGN CLOSED 2026-09-27**. Same persistent `beast_shukaku`; `one_tail` PL103 hostile/uncooperative vs `shukaku` PL107 cooperative. One-Tail = +10 Effective Kinjutsu, Cracked Seal Conduit, partial-possession/seal-strain branch; Shukaku = +10 Effective Fūinjutsu, Living Seal Markings, cooperative Sand Buckshot, Shukaku-derived Magnet Release Potential Skill branch. Distinct fifth manifested actions: Sand Burial Rupture vs Cursed Seal Lock.
+- **Source 12 — Two-Tails / Matatabi** — **DESIGN CLOSED 2026-09-27**. Same persistent `beast_matatabi`; `two_tails` PL103 hostile/non-cooperative vs `matatabi` PL108 cooperative. Two-Tails = +10 Effective Taijutsu, Predator's Pulse, partial feline manifestation/pursuit; Matatabi = +10 Effective Ninjutsu, Blue Flame Accord, controlled Fire/cover shaping, cooperative assisted Fire Skills and blue-flame Potential Skill branch. Shared manifested Tailed Beast Ball ATK58 once/Battle.
 
 Source 09 proposal authority:
 `Documentation/Combat/SC_Combat_RESET_v2_Source_09_Kamatari_Proposal_2026-09-19.md`
@@ -335,5 +337,5 @@ Shared courier rule:
 - larger/specialised Summons do not inherit this specific size-bounded rule automatically;
 - occurrence success remains factual/contextual rather than guaranteed by the dialogue option.
 
-Next Combat work: while #258 independently finishes Kamatari's PL82 Stat row, proceed into accepted Tailed-Beast representations.
+Next Combat work: proceed to **Source 13 — Three-Tails / Isobu**, then Chōmei, before Kurama-family Batch 4.
 
