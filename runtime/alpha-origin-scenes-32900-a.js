@@ -1176,6 +1176,11 @@ const IZUNO_BACKDROPS=Object.freeze({
   training:Object.freeze({assetId:"academy_izuno_training_grounds_day",assetPath:"Izuno Origin Backdrop/training_grounds_day.png"})
 });
 const IZUNO_BATTLE_ENVIRONMENT=IZUNO_BACKDROPS.alley.assetPath;
+const IZUNO_ACTORS=Object.freeze({
+  wasabi:Object.freeze({id:"academy_izuno",label:"WASABI",image:"Assets/Academy Student/academy_izuno.png"}),
+  instructor:Object.freeze({id:"wasabi_academy_instructor",label:"ACADEMY INSTRUCTOR",image:"NPC/izuno_instructor.png"}),
+  rogue:Object.freeze({id:"wasabi_origin_rogue_genin_01",label:"ROGUE GENIN",image:"Enemies/rogue_genin.png"})
+});
 function izunoBackdropKey32900(beatId){
   const id=String(beatId||"");
   if(id.startsWith("izu_open_"))return"practical";
@@ -1212,9 +1217,84 @@ function izunoSceneLabel32900(beatId){
   return"ACADEMY WASABI IZUNO";
 }
 function izunoBackdropProjection32900(beatId){
+  if(String(beatId||"")==="izu_receipt")return null;
   const key=izunoBackdropKey32900(beatId),row=key&&IZUNO_BACKDROPS[key]||null;
   return row?{assetId:row.assetId,assetPath:row.assetPath}:null;
 }
+function izunoActorKeys32900(beatId){
+  const id=String(beatId||"");
+  if(id==="izu_receipt")return[];
+  if(id.startsWith("izu_open_"))return["wasabi","instructor"];
+  if(id.startsWith("izu_finish_river_")||id.startsWith("izu_finish_false_"))return["wasabi","instructor"];
+  if(id.startsWith("izu_eval_"))return["wasabi","instructor"];
+  if(id.startsWith("izu_rogue_")&&!id.startsWith("izu_rogue_step_in_battle"))return["wasabi","rogue"];
+  return["wasabi"];
+}
+function izunoActors32900(beatId,performance){
+  const speaker=String(performance&&performance.cue&&(performance.cue.speakerName||performance.cue.speaker)||"").trim().toUpperCase();
+  return izunoActorKeys32900(beatId).map((key,index)=>{
+    const row=IZUNO_ACTORS[key];
+    return{...row,focus:speaker?String(row.label||"").toUpperCase()===speaker:index===0};
+  });
+}
+function wasabiReceiptLines32900(){
+  const c=A.clone(local()),lines=[
+    "YOUR ORIGIN",
+    "ACADEMY WASABI IZUNO",
+    "",
+    "RECORDED IN YOUR CHRONICLE",
+    "",
+    "YOUR DECISIONS"
+  ];
+  const initial={
+    obvious_trail:"Trusted the obvious pursuit trail.",
+    environmental_signs:"Stopped to look for better environmental signs.",
+    cooperate_students:"Worked with the other Academy students.",
+    predict_destination:"Focused on where the target was going."
+  };
+  const route={
+    river_route:"Took the river route.",
+    stronger_trail:"Followed the stronger trail.",
+    rogue_interruption:"Checked the shouting during the pursuit.",
+    intercept_prediction:"Cut for the intercept."
+  };
+  const rogueChoice={
+    intervene:"Stepped in against the Rogue Genin.",
+    call_for_help:"Called for help at the Rogue Genin interruption.",
+    keep_pursuing:"Kept pursuing the target."
+  };
+  const reflection={
+    trust_trail:"Next time, trust the trail.",
+    trust_notice:"Next time, trust what you notice.",
+    fastest_not_obvious:"The fastest path is not always the obvious one.",
+    catch_not_only:"Catching the target was not the only thing that mattered."
+  };
+  if(initial[c.initial])lines.push("• "+initial[c.initial]);
+  if(route[c.route])lines.push("• "+route[c.route]);
+  if(rogueChoice[c.rogueGeninResponse])lines.push("• "+rogueChoice[c.rogueGeninResponse]);
+  if(reflection[c.reflection])lines.push("• "+reflection[c.reflection]);
+  lines.push("","WHAT HAPPENED");
+  const outcome={
+    arrive_just_after_target:"Reached extraction just after the target.",
+    false_trail_discovered:"Discovered that the stronger trail was false.",
+    secondary_occurrence_costs_pursuit:"The Rogue Genin interruption cost time in the pursuit.",
+    intercept_before_extraction:"Reached the target before extraction.",
+    direct_catch:"Caught the target before extraction."
+  };
+  if(outcome[c.outcome])lines.push("• "+outcome[c.outcome]);
+  if(c.rogueBattleResult==="victory")lines.push("• Defeated the Rogue Genin in the PL Battle.");
+  if(c.rogueBattleResult==="defeat")lines.push("• Wasabi withdrew after her Battle PL was depleted.");
+  lines.push("","HISTORY CREATED");
+  const trackingRow=A.findOccurrence(tracking),interceptRow=A.findOccurrence(intercept),coopRow=A.findOccurrence(coop),rogueRow=A.findOccurrence(rogue);
+  if(trackingRow&&trackingRow.fact&&trackingRow.fact.reliableEnvironmentalTrackingEstablished===true)lines.push("• Reliable environmental tracking was demonstrated.");
+  if(trackingRow&&trackingRow.fact&&trackingRow.fact.falseTrailCorrectlyDiscovered===true)lines.push("• The planted false trail was recognised.");
+  if(interceptRow&&interceptRow.fact&&interceptRow.fact.interceptReachedByPrediction===true)lines.push("• Wasabi predicted the target's route and reached the intercept.");
+  if(coopRow&&coopRow.fact&&coopRow.fact.cooperatedWithAcademyStudents===true)lines.push("• Wasabi cooperated with other Academy students during the pursuit.");
+  if(rogueRow)lines.push("• The Rogue Genin interruption is part of Wasabi's recorded Origin history.");
+  if(lines[lines.length-1]==="HISTORY CREATED")lines.push("• The completed pursuit exercise is part of Wasabi's Chronicle.");
+  return lines;
+}
+function buildWasabiReceipt32900(){return wasabiReceiptLines32900().join("\n");}
 function registerWasabiOriginPresentation32900(){
   try{
     const registerPath=typeof registerSceneBackdropAssetPath==="function"?registerSceneBackdropAssetPath:globalThis.registerSceneBackdropAssetPath;
@@ -1222,9 +1302,18 @@ function registerWasabiOriginPresentation32900(){
   }catch(_error){}
   const registerBoard=()=>{
     if(typeof globalThis.registerStorySceneBoardDefinition!=="function")return{success:false,reason:"story_scene_board_not_loaded"};
+    const closeLastBeatId="izu_close_"+G("origin_close").length;
     return globalThis.registerStorySceneBoardDefinition(scene,{
-      resolve:({beatId})=>({mode:"conversation",location:izunoSceneLabel32900(beatId),actors:[]}),
-      resolveBackdrop:({beatId})=>izunoBackdropProjection32900(beatId)
+      resolve:({beatId,performance})=>({
+        mode:String(beatId||"")==="izu_receipt"?"record":"conversation",
+        location:String(beatId||"")==="izu_receipt"?"YOUR ORIGIN":izunoSceneLabel32900(beatId),
+        actors:izunoActors32900(beatId,performance)
+      }),
+      resolveBackdrop:({beatId})=>izunoBackdropProjection32900(beatId),
+      performanceSequences:{
+        izu_receipt:()=>[{kind:"record",text:buildWasabiReceipt32900()}]
+      },
+      performanceTransitions:{[closeLastBeatId]:"wipe_right_to_left"}
     });
   };
   if(globalThis.SC_STORY_SCENE_BOARD_33900)return registerBoard();
@@ -1388,7 +1477,8 @@ beats.push({beatId:"izu_reflect",mode:"choice",text:"",choices:[
   C("fastest_not_obvious","Sometimes the fastest path isn't the obvious one.","izu_close_1",{reflection:"fastest_not_obvious"}),
   C("catch_not_only","Catching them wasn't the only thing that mattered.","izu_close_1",{reflection:"catch_not_only"})
 ]});
-seq("izu_close",G("origin_close"),null,{last:{exitScene:true}});
+seq("izu_close",G("origin_close"),"izu_receipt");
+beats.push({beatId:"izu_receipt",mode:"record",text:"",exitScene:true});
 registerWasabiOriginPresentation32900();
 
 A.register({
