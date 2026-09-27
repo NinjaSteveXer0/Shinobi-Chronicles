@@ -410,11 +410,11 @@ Chōmei's "lucky" motif stays personality/flavour; it does not become RNG.
 
 ---
 
-### 5B. `chomei_wing_shelter` — **Wing Shelter**
+### 5B. `chomei_skyhook_rescue` — **Skyhook Rescue**
 
 Class:
 
-**REACTION / DEFENSE / ALLY EXTRACTION**
+**REACTION / FLIGHT / EXTRACTION**
 
 Limit:
 
@@ -422,22 +422,25 @@ Limit:
 
 Trigger:
 
-Chōmei or its exact bonded controller is targeted by one direct Attack-PL packet while ordinary reposition remains legal.
+Chōmei or its exact bonded controller is targeted by one direct attack that is explicitly **ground-bound + close-range**, and legal flight is physically available.
 
 Player text:
 
-> **Chōmei sweeps the target out of the attack line. Reduce one direct hit by 50%, then carry the protected target to ordinary mid-range if the route is open.**
+> **Chōmei snatches the target into the air before a ground-bound close attack lands. Cancel that attack and keep the protected target airborne until their next action.**
 
 Effect:
-- reduce triggering direct packet **50% pre-Stamina**;
-- ordinary Stamina then resolves against the original target;
-- after resolution, protected target may move to ordinary mid-range;
-- no target swap;
-- no duplicated packet;
-- no untargetability;
-- sealed/impossible routes or exact movement locks can prevent the reposition.
+- the triggering ground-bound close attack cannot reach the protected target and resolves with **no damage/effect against that target**;
+- the attacker still spent the committed action;
+- protected target enters `chomei_airborne_rescue`;
+- while airborne, ordinary ground-bound close attacks cannot target that actor;
+- ranged attacks and exact reach / flight / anti-air actions remain legal;
+- the state ends when the protected actor resolves their next action, voluntarily lands, or is forced down;
+- no generic Dodge percentage;
+- no damage-reduction scalar;
+- no counterattack;
+- cannot trigger where exact restraints, sealed space or anti-flight authority prevent Chōmei from lifting the target.
 
-This gives cooperative Chōmei a protective flight identity instead of another generic guard.
+This is cooperative Chōmei using flight to **change whether the attack line exists**, rather than copying another beast's armour/guard mechanic.
 
 ---
 
@@ -649,31 +652,45 @@ Rules:
 
 ---
 
-## `chomei_lift_and_break` — **Lift and Break**
+## `chomei_scale_trail_feint` — **Scale Trail Feint**
 
 Classification:
 
-**COOPERATIVE SOURCE-ASSISTED REACTION / DEFENSE / FLIGHT**
+**COOPERATIVE SOURCE-ASSISTED / FLIGHT / VISIBILITY**
+
+SC divergence:
+
+This is an explicit Shinobi Chronicles adaptation inspired by Fū's manga-supported host-linked **Scale Powder / Hiding in Scale Powder** technique.
+
+It is NOT presented as proof that Chōmei independently uses Scale Powder as a manga-own manifested Skill.
 
 Limit:
 
 **once per Battle**
 
-Trigger:
+Use:
 
-host is targeted by one direct close-range Taijutsu/Bukijutsu packet.
+The host commits one legal **movement-dependent ATTACK** using Chōmei-assisted flight.
 
 Player text:
 
-> **Chōmei lifts you off the attack line. Reduce one close physical hit by 50%, then move to ordinary mid-range if the route is open.**
+> **Scatter Chōmei-linked scale powder across your flight path. One ordinary reaction that depends on visually tracking your movement cannot trigger against that approach.**
 
 Effect:
-- reduce triggering packet **50% pre-Stamina**;
-- ordinary Stamina resolves;
-- host may shift to ordinary mid-range after resolution;
-- no random dodge;
-- no counterattack;
-- exact movement lock / sealed environment can prevent reposition.
+- declared movement-dependent attack otherwise resolves normally;
+- one ordinary enemy **movement-triggered reaction / intercept** whose trigger depends on maintaining direct visual tracking of the host's approach cannot trigger;
+- this does NOT suppress:
+  - area reactions that do not need exact visual tracking;
+  - exact non-visual sensory/tracking authority;
+  - sealed barriers;
+  - anti-flight fields;
+  - reactions triggered by the attack itself rather than the movement;
+- no bonus damage;
+- no Blind condition;
+- no invisibility state;
+- no second action.
+
+This gives cooperative Chōmei a precise **approach-control** tool instead of another generic damage reduction reaction.
 
 ---
 
@@ -748,30 +765,52 @@ Rules:
 
 ---
 
-### 3. `skill_chomei_carapace_glide` — **Chōmei Art: Carapace Glide**
+### 3. `skill_chomei_scale_veil` — **Chōmei Art: Scale Veil**
 
 Classification:
 
-**LEARNABLE / CHŌMEI-DERIVED / DEFENSE / FLIGHT**
+**LEARNABLE / CHŌMEI-DERIVED / SCALE POWDER / VISIBILITY CONTROL**
+
+SC divergence:
+
+**Explicit Shinobi Chronicles host-development adaptation** from Fū's manga-supported Chōmei-linked Scale Powder technique.
+
+This is not claimed as a manga-proven independent Chōmei-own Skill.
+
+Potential prerequisites:
+- legitimate Chōmei-derived source access;
+- sufficient future-framework Ninjutsu / source-control development;
+- exact training/development authority;
+- separate persistent unlock.
 
 Limit:
 
 **once per Battle**
 
-Trigger:
+Target:
 
-one direct close-range physical packet targets the user.
+one hostile observer
 
 Player text:
 
-> **Turn a partial carapace into a gliding retreat. Reduce one close physical attack's ATK by 45%, then shift to ordinary mid-range if the route is open.**
+> **Fill the flight lane with luminous scale powder. Until your next action, that enemy cannot make a direct single-target attack against you if it requires ordinary visual tracking.**
 
 Effect:
-- reduce packet **45% pre-Stamina**;
-- ordinary Stamina resolves;
-- optional mid-range reposition after resolution;
-- no counterattack;
-- no generic Dodge.
+- apply `chomei_scale_veil` against one selected hostile observer through the user's next action opportunity;
+- while active, that hostile cannot legally target the user with a direct single-target action whose targeting requires ordinary visual tracking;
+- the hostile may still:
+  - target another legal actor;
+  - use an AREA action that does not require exact visual lock;
+  - use exact non-visual sensory/tracking authority;
+  - use an exact technique that explicitly penetrates/clears the veil;
+- no generic Blind condition;
+- no accuracy roll;
+- no universal untargetability;
+- effect ends after user's next action or exact counter-authority clears it.
+
+Decision:
+
+> **Use the veil to deny one observer's clean targeting lane, not to make yourself invisible to the whole battlefield.**
 
 ---
 
@@ -783,14 +822,19 @@ However current research does NOT cleanly prove Chōmei independently uses the p
 
 Therefore this Source 14 proposal does NOT place Scale Powder in Chōmei's manifested own kit.
 
-### Proposed future treatment
+### Source 14 proposed treatment
 
-Scale Powder should enter the Potential Skill system as either:
+Source 14 deliberately chooses the second route:
 
-1. a **Fū-specific character hybrid branch** where her exact history supports it; and/or
-2. a later **explicit SC adaptation** that allows other sufficiently developed Chōmei hosts to learn a scale-powder branch.
+- Fū's exact canon technique remains a valid **Fū-specific character branch**;
+- SC may also allow sufficiently developed legitimate Chōmei hosts to learn a **source-derived scale-powder branch**;
+- that generalisation is an explicit **Shinobi Chronicles adaptation**, not a claim that manga Chōmei independently demonstrated it.
 
-No generic blindness, combustion, poison or Cocoon mechanics are authored here.
+Current proposed adaptations:
+- **Scale Trail Feint** — cooperative source-assisted approach control;
+- **Chōmei Art: Scale Veil** — later learnable observer-specific visual targeting control.
+
+No generic Blind status, combustion, poison, accuracy penalty or Cocoon mechanic is created.
 
 ---
 
@@ -865,13 +909,13 @@ Batch 5 must audit any dedicated Chōmei/Fū/Jinchūriki representations before 
 **Historical retired Seven-Tails PL103 row:** RETIRED / NOT revived; fresh PL107 row is successor authority.  
 **Shared manifested core:** PROPOSED.  
 **Seven-Tails manifested variants:** Overrun Dive + Six-Wing Circuit — PROPOSED.  
-**Chōmei manifested variants:** Lucky Horn Vector + Wing Shelter — PROPOSED.  
+**Chōmei manifested variants:** Lucky Horn Vector + Skyhook Rescue — PROPOSED.  
 **Seven-Tails Enhancement:** Unbound Wings — PROPOSED.  
 **Seven-Tails host-assisted Skills:** Horn Dive Manifestation / Wing Scissor / Groundbreak Lift — PROPOSED.  
 **Chōmei Enhancement:** Skyway Accord — PROPOSED.  
-**Chōmei cooperative assisted Skills:** Shining Horn Dive / Lift and Break — PROPOSED.  
-**Chōmei Potential Skill seed branch:** Horn Vector / Crosswing Sweep / Carapace Glide — PROPOSED.  
-**Scale Powder:** deliberately NOT in manifested own kit; future Fū-specific hybrid and/or explicit SC adaptation remains open.  
+**Chōmei cooperative assisted Skills:** Shining Horn Dive / Scale Trail Feint — PROPOSED.  
+**Chōmei Potential Skill seed branch:** Horn Vector / Crosswing Sweep / Scale Veil — PROPOSED.  
+**Scale Powder:** deliberately NOT in Chōmei's manifested own kit. Source 14 now proposes an explicit SC **host-development adaptation** through Scale Trail Feint / Scale Veil, grounded in Fū's manga-supported host-linked technique and clearly labelled as SC divergence.  
 **Implementation:** NOT STARTED.  
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
