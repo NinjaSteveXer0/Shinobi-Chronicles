@@ -1,3 +1,10 @@
+> **SUPERSEDED CANDIDATE NOTICE — 2026-09-27**
+>
+> This review candidate is superseded for current player-facing review by:
+> `Documentation/Story/Academy_Menma_Origin_333_Benchmark_Optimized_Candidate_2026-09-27.md`
+>
+> Preserve this file only as archaeology. Do not implement or approve from this older candidate.
+
 > **2026-09-27 SUPERSEDED FOR REVIEW — BENCHMARK-OPTIMIZED SUCCESSOR**  
 > Do not consume this earlier candidate as current player-facing Writing. Current review candidate: `Documentation/Story/Academy_Menma_Origin_333_Benchmark_Optimized_Candidate_2026-09-27.md`. The successor removes stale Battle assumptions, repairs Knowledge/presentation drift and defines the missing `menma_future_01` continuation. This older file remains historical candidate material only.
 
