@@ -198,7 +198,14 @@ Return using Metal's Remaining Battle PL against fixed start-of-spar underlying 
 Exact 50% / 25% = mixed.
 0 = rough.
 
-Combat owns exact Genin Skill/AI package.
+Combat package is closed:
+- Sparring Jab ATK5
+- Turning Kick ATK6
+- Guarded Stance — 25% one-use pre-Stamina guard
+- Feint Entry
+- Committed Lunge ATK6 / ATK7 after feint
+- deterministic cycle: Jab -> Turning Kick -> Guard -> Feint -> Lunge -> repeat
+- Metal acts first.
 
 ---
 
@@ -726,9 +733,17 @@ Outcomes:
 - partial
 - failure
 
-Exact deterministic thresholds remain downstream Combat authority (#394).
+Deterministic resolver:
+- redirect_dummy / Effective Taijutsu >=14 success, 11–13 partial, <=10 failure
+- take_impact / Effective Stamina >=14 success, 11–13 partial, <=10 failure
+- destroy_dummy / Effective Taijutsu >=15 success, 12–14 partial, <=11 failure
 
-Partial/failure may use the same stable Genin as intervening actor.
+Fresh Base Metal resolves:
+- redirect = partial
+- take impact = success
+- destroy = partial
+
+Partial/failure uses the same stable Genin as intervening actor.
 
 No injury inference.
 
