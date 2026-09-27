@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-28  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons / Tailed Beasts  
-**Status:** **PROPOSED — AWAITING STEPHEN SIGN-OFF / CE #403 ACTIVE**  
+**Status:** **COMBAT DESIGN CLOSED BY STEPHEN 2026-09-28 — CE #403 FAMILY-WIDE RECONCILIATION STILL ACTIVE**  
 **Parent:** #235  
 **Canon/SC research:** `Documentation/Combat/SC_Combat_Kurama_Family_Canon_and_SC_Representation_Research_2026-09-27.md`  
 **Cross-system reconciliation:** #403  
@@ -742,16 +742,16 @@ Do not:
 
 **Persistent Kurama / relationship / partition semantics:** conceptually closed by Stephen; CE #403 active for durable reusable reconciliation.  
 **Current PL anchors:** nine_tails PL130 / yang_kurama PL125 preserved from durable Combat audit; live runtime rows absent; exact seven-Stat republication still unresolved.  
-**Kurama-family common capability layer:** PROPOSED.  
-**Nine-Tails manifested:** Nine-Tail Isolation / Caged Source Refusal — PROPOSED.  
-**Nine-Tails Enhancement:** Nine-Tails Chakra Surge — PROPOSED.  
-**Nine-Tails host Skills:** Bargained Chakra Flood / Nine-Tails Chakra Bind / Red Chakra Counterlash — PROPOSED.  
-**Yang Kurama manifested:** Comrade Chakra Transfer / Comrade Mantle — PROPOSED.  
-**Yang Kurama Enhancement:** Comrade Chakra Network — PROPOSED.  
-**Yang Kurama host Skills:** Kurama Chakra Arm / Chakra Arm Guard / Kurama Chakra Roar — PROPOSED; Kurama Chakra Link is relationship/source access, not a prepared Battle Skill.  
-**Potential Skill direction:** PROPOSED seed architecture only.  
+**Kurama-family common capability layer:** CLOSED for Source 15 consumption; family-wide normalisation remains later Batch-4 work.  
+**Nine-Tails manifested:** Nine-Tail Isolation / Caged Source Refusal — CLOSED.  
+**Nine-Tails Enhancement:** Nine-Tails Chakra Surge — CLOSED.  
+**Nine-Tails host Skills:** Bargained Chakra Flood / Nine-Tails Chakra Bind / Red Chakra Counterlash — CLOSED.  
+**Yang Kurama manifested:** Comrade Chakra Transfer / Comrade Mantle — CLOSED.  
+**Yang Kurama Enhancement:** Comrade Chakra Network — CLOSED.  
+**Yang Kurama host Skills:** Kurama Chakra Arm / Chakra Arm Guard / Kurama Chakra Roar — CLOSED; Kurama Chakra Link is relationship/source access, not a prepared Battle Skill.  
+**Potential Skill direction:** CLOSED as seed architecture only, NOT a lifetime ceiling.  
 **Implementation:** NOT STARTED.  
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
 
-**Awaiting Stephen review before Source 15 design closure.**
+**Stephen final sign-off received 2026-09-28. Source 15 Combat design is CLOSED. CE #403 remains the active family-wide reusable non-collapse reconciliation and does not reopen these signed mechanics unless it returns a real contradiction. Implementation/runtime/Golden remain unclaimed.**
