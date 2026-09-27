@@ -39,6 +39,8 @@ assert(battle.includes("advanceMenmaScriptedBattleAfterPresentation37300(active.
 assert(battle.includes("notifyTutorialPresentationSettled33000")&&battle.includes("resumeBattlePresentationAfterTutorial33000"),"first-Battle tutorial is not integrated with ordered playback");
 assert(battle.includes("playedKeys")&&battle.includes("presentationStorageKey33000"),"reload-safe played receipt cursor missing");
 assert(battle.includes("deferredTerminalOverlay")&&battle.includes("deferredCallerResume"),"terminal navigation is not presentation-gated");
+assert(battle.includes("if(!pendingBattlePresentation33000())")&&battle.includes('return PRIOR_OPEN_OVERLAY_33000.apply(this,arguments);'),"settled terminal re-render is still forced through the watchdog delay");
+assert(battle.includes('rewardMode:"earned_delta"')&&battle.includes('ryoElement.dataset.rewardPresentation="earned_delta"')&&battle.includes('Number(rewards&&rewards.ryo)===100'),"Menma fixed 100 Ryō still uses the meaningless generic delayed count-up");
 assert(battle.includes("battle2-formation-relay-in")&&battle.includes("menma373RelayPlayer")&&battle.includes("menma373RelayEnemy"),"scoped relay slide/scale motion missing");
 assert(battle.includes("refreshCommittedFormationPresentation33000")&&battle.includes("refreshBattleActionRegionPresentation"),"relay/yield does not refresh central confrontation DOM");
 assert(battle.includes("battle-live-active-nameplate")&&battle.includes("battle-live-power-"),"active identity/PL rebind support missing");
@@ -101,6 +103,8 @@ const checks={
   zeroPLReadsWithdrawal:true,
   reloadDoesNotReplayReceipts:true,
   terminalNavigationWaitsForPlayback:true,
+  settledTerminalRerenderBypassesWatchdog:true,
+  menmaRyoUsesEarnedDeltaPresentation:true,
   tutorialCanPauseAndResumePlayback:true,
   scopedRelaySlideScale:true,
   relayRefreshesCentralConfrontation:true,
