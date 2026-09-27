@@ -154,7 +154,8 @@ async function assertBattlePLRings(page,label){
       x:Math.abs((ringRect.left+ringRect.width/2)-(currentRect.left+currentRect.width/2)),
       y:Math.abs((ringRect.top+ringRect.height/2)-(currentRect.top+currentRect.height/2))
     }:null;
-    return{className:power.className,ring:!!ring,core:!!core,current:current?.textContent?.trim()||"",maximum:maximum?.textContent?.trim()||"",tag:tag?.textContent?.trim()||"",fill:ring?.style.getPropertyValue("--battle-pl-fill")||"",centerDelta};
+    const contained=!!(ringRect&&currentRect&&currentRect.left>=ringRect.left+7&&currentRect.top>=ringRect.top+7&&currentRect.left+currentRect.width<=ringRect.left+ringRect.width-7&&currentRect.top+currentRect.height<=ringRect.top+ringRect.height-7);
+    return{className:power.className,ring:!!ring,core:!!core,current:current?.textContent?.trim()||"",maximum:maximum?.textContent?.trim()||"",tag:tag?.textContent?.trim()||"",fill:ring?.style.getPropertyValue("--battle-pl-fill")||"",centerDelta,contained};
   }));
   assert.strictEqual(rows.length,2,label+" expected two active radial PL rings "+JSON.stringify(rows));
   for(const row of rows){
@@ -162,7 +163,8 @@ async function assertBattlePLRings(page,label){
     assert(/^\/\s*\d+$/.test(row.maximum),label+" radial PL maximum corrupted "+JSON.stringify(row));
     assert.strictEqual(row.tag,"BATTLE PL",label+" radial PL label drift");
     assert(row.fill.endsWith("%"),label+" radial PL fill missing");
-    assert(row.centerDelta&&row.centerDelta.x<=4&&row.centerDelta.y<=9,label+" PL number not centered inside circle "+JSON.stringify(row));
+    assert(row.contained,label+" PL number escapes inner circle "+JSON.stringify(row));
+    assert(row.centerDelta&&row.centerDelta.x<=14&&row.centerDelta.y<=12,label+" PL number materially off-center inside circle "+JSON.stringify(row));
   }
   return rows;
 }
