@@ -83,6 +83,8 @@ When he finally understands why the question is being asked, he does not look su
 
 **SAI:** “Sometimes the response is the objective.”
 
+### AUTHOR / IMPLEMENTATION NOTE
+
 Do not explain the line.
 
 Let the next scene prove it.
@@ -143,6 +145,8 @@ Different enough to trace.
 Ordinary enough that nobody should care.
 
 Then it waits to see which version somebody outside the room reacts to.
+
+### AUTHOR / IMPLEMENTATION NOTE
 
 Do not narrate “canary operation.”
 
@@ -338,6 +342,8 @@ The burn was not only destruction.
 
 It was meant to make lingering dangerous.
 
+### AUTHOR / IMPLEMENTATION NOTE
+
 Whatever second-stage cleanup remains should be projected through the exact resolver/world facts.
 
 No named Technique is invented merely because the environment becomes hostile.
@@ -482,6 +488,8 @@ Civilian survival does not align neatly with either.
 The same corridor can carry unrelated customers.
 
 That is evidence against treating **Kusa** like one person with one motive.
+
+### AUTHOR / IMPLEMENTATION NOTE
 
 Do not explain this as political doctrine; let actual participants embody the disagreement where assets/actors exist.
 
