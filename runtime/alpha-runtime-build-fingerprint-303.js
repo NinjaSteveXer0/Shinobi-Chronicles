@@ -90,7 +90,7 @@
       exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-27-AR",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
-      generationPresent:first.runtimeGeneration==="academy-wasabi-golden-battle-343",
+      generationPresent:first.runtimeGeneration==="academy-wasabi-backdrop-binding-343"&&first.majorRuntimeFeatures.includes("academy-wasabi-exact-backdrop-projection-343"),
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)
