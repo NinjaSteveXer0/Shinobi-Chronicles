@@ -18,6 +18,7 @@ const TEMPLATE="rogue_genin";
 const SOURCE_OCCURRENCE="occ_origin_izuno_rogue_genin_interruption_resolution";
 const CONFIG="academy_izuno_origin_rogue_genin_step_in_battle";
 const ENCOUNTER="origin_academy_izuno_rogue_genin_step_in";
+const BATTLE_ENVIRONMENT="Izuno Origin Backdrop/konoha_alleyway_day.png";
 const SCENE_ID="origin_academy_izuno_prologue";
 const FEINT_ID="enemy_rogue_genin_substitution_feint";
 const FEINT_STATE="rogue_genin_substitution_feint_ready";
@@ -30,6 +31,12 @@ const PROFILE=Object.freeze({
 });
 
 function clone(v){try{return typeof cloneBattleRuntimeValue==="function"?cloneBattleRuntimeValue(v):JSON.parse(JSON.stringify(v));}catch(_){return v;}}
+function applyBattleEnvironment(){
+  if(!currentBattle)return false;
+  currentBattle.environmentPath=BATTLE_ENVIRONMENT;
+  currentBattle.presentationEnvironmentPath=BATTLE_ENVIRONMENT;
+  return true;
+}
 function meta(){return currentBattle&&currentBattle.wasabi343||null;}
 function feintState(){
   try{return findBattleTransientState({stateKey:FEINT_STATE,sourceSide:"enemy",sourceParticipantId:ROGUE,targetSide:"enemy",targetParticipantId:ROGUE})||null;}
@@ -162,6 +169,7 @@ if(PRE_RESTORE_TEST){
             currentBattle.battleConfigId=CONFIG;
             if(savedBattleId)currentBattle.battleId=savedBattleId;
             currentBattle.wasabi343=clone(saved);
+            applyBattleEnvironment();
           }
         }
       }catch(_error){}
@@ -172,6 +180,7 @@ if(PRE_RESTORE_TEST){
       currentBattle.battleConfigId=CONFIG;
       if(savedBattleId)currentBattle.battleId=savedBattleId;
       currentBattle.wasabi343=clone(saved);
+      applyBattleEnvironment();
       if(savedBattleActive&&currentBattle.battleOver!==true)currentBattle.active=true;
     }
     if(savedExact&&savedLaunches&&playerData){
@@ -240,7 +249,10 @@ function launch(spec={}){
   if(!sceneInstanceId)return{success:false,reason:"wasabi_story_instance_missing"};
   const exactId=exactBattleOccurrenceId(sceneInstanceId),store=launchStore(),prior=store[exactId]||null;
   if(prior){
-    if(currentBattle&&currentBattle.battleId===exactId&&currentBattle.wasabi343)return{success:true,idempotent:true,battleId:exactId,encounterId:ENCOUNTER,battleConfigId:CONFIG,launchEvidenceId:prior.launchEvidenceId||null};
+    if(currentBattle&&currentBattle.battleId===exactId&&currentBattle.wasabi343){
+      applyBattleEnvironment();
+      return{success:true,idempotent:true,battleId:exactId,encounterId:ENCOUNTER,battleConfigId:CONFIG,environmentPath:BATTLE_ENVIRONMENT,launchEvidenceId:prior.launchEvidenceId||null};
+    }
     return{success:false,reason:"wasabi_battle_occurrence_already_committed_without_runtime",battleId:exactId,launchEvidenceId:prior.launchEvidenceId||null};
   }
 
@@ -250,6 +262,7 @@ function launch(spec={}){
   currentBattle.battleId=exactId;
   currentBattle.encounterId=ENCOUNTER;
   currentBattle.oppositionTemplateId=TEMPLATE;
+  applyBattleEnvironment();
   const deployment=strictWasabiDeployment();
   if(!deployment.success)return deployment;
   currentBattle.enemyPower=PROFILE.pl;
@@ -257,7 +270,7 @@ function launch(spec={}){
   currentBattle.wasabi343={
     patchId:PATCH_ID,battleConfigId:CONFIG,battleOccurrenceId:exactId,
     sourceOccurrenceId:SOURCE_OCCURRENCE,historicalParticipantRef:ROGUE,affectedParticipantRef:AFFECTED_STUDENT,
-    oppositionTemplateId:TEMPLATE,strictOneVsOne:true,feintUsed:false,feintCreatedEnemyOpportunityIndex:null,launchEvidenceId:null
+    oppositionTemplateId:TEMPLATE,environmentPath:BATTLE_ENVIRONMENT,strictOneVsOne:true,feintUsed:false,feintCreatedEnemyOpportunityIndex:null,launchEvidenceId:null
   };
   initializeBattleRemainingPLFromDeployment({preserveExistingEnemyPower:true});
 
@@ -290,7 +303,7 @@ function launch(spec={}){
     currentBattle.rewards.wasabi343ZeroEntitlement=true;
   }
   savePlayerData();saveTestState();openOverlay("combat");
-  return{success:true,battleId:exactId,encounterId:ENCOUNTER,battleConfigId:CONFIG,playerParticipantIds:[WASABI],oppositionParticipantIds:[ROGUE],launchEvidenceId:evidence.evidenceId};
+  return{success:true,battleId:exactId,encounterId:ENCOUNTER,battleConfigId:CONFIG,environmentPath:BATTLE_ENVIRONMENT,playerParticipantIds:[WASABI],oppositionParticipantIds:[ROGUE],launchEvidenceId:evidence.evidenceId};
 }
 function projectResult(){
   const m=meta();if(!m)return null;
@@ -328,6 +341,7 @@ function diagnostics(){
     withdrawNaturallyUnavailable:String(strictWasabiDeployment).includes("player={slots:createBattleDeploymentSlots([WASABI])}"),
     withdrawControlHiddenOnlyHere:!!PRE_RENDER_ACTION_ROW&&String(globalThis.renderBattleActionFamilyRow).includes("strictOneVsOne")&&String(globalThis.renderBattleActionFamilyRow).includes("battle-live-withdraw-action"),
     saveReloadEnvelope:!!PRE_SAVE_TEST&&!!PRE_RESTORE_TEST&&String(globalThis.saveTestState).includes("state.wasabi343BattleLaunches")&&String(globalThis.restoreTestState).includes("savedLaunches")&&String(globalThis.restoreTestState).includes("currentBattle.battleConfigId=CONFIG")&&String(globalThis.restoreTestState).includes("PRE_RESTORE_TEST.apply"),
+    exactBattleEnvironment:BATTLE_ENVIRONMENT==="Izuno Origin Backdrop/konoha_alleyway_day.png"&&String(applyBattleEnvironment).includes("currentBattle.environmentPath=BATTLE_ENVIRONMENT")&&String(applyBattleEnvironment).includes("currentBattle.presentationEnvironmentPath=BATTLE_ENVIRONMENT"),
     exactOccurrenceId:exactBattleOccurrenceId("qa")==="battle_occ_origin_izuno_rogue_genin_step_in:qa"&&String(launch).includes("wasabi_battle_occurrence_already_committed_without_runtime"),
     zeroRewards:enemy.rewards.ryo.min===0&&enemy.rewards.ryo.max===0&&enemy.rewards.exp.min===0&&enemy.rewards.exp.max===0&&enemy.rewards.commonDrops.length===0&&enemy.rewards.rareDrops.length===0,
     claimSeparateFromContinue:!!PRE_GENERATE_REWARDS&&String(globalThis.generateBattleRewards).includes("requiresExplicitPostClaimContinue=true")&&String(launch).includes("requiresExplicitPostClaimContinue=true"),
@@ -345,6 +359,6 @@ globalThis.runAcademyWasabiRogueGeninBattle343Diagnostics=diagnostics;
 globalThis.SC_ACADEMY_WASABI_ROGUE_BATTLE_343=Object.freeze({
   patchId:PATCH_ID,battleConfigId:CONFIG,encounterId:ENCOUNTER,sourceOccurrenceId:SOURCE_OCCURRENCE,
   participantRefs:Object.freeze({wasabi:WASABI,rogueGenin:ROGUE,affectedStudent:AFFECTED_STUDENT}),
-  oppositionTemplateId:TEMPLATE,browserGoldenClaimed:false
+  oppositionTemplateId:TEMPLATE,environmentPath:BATTLE_ENVIRONMENT,browserGoldenClaimed:false
 });
 })();
