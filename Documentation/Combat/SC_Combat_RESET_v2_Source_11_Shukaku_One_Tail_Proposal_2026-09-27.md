@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-27  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons / Tailed Beasts  
-**Status:** **PARTIAL SIGN-OFF — SHARED SHUKAKU ARCHITECTURE + MAGNET RELEASE BRANCH ACCEPTED BY STEPHEN / EXACT ONE-TAIL vs SHUKAKU VARIANT SPLIT PROPOSED**  
+**Status:** **DESIGN CLOSED BY STEPHEN 2026-09-27 — SOURCE 11 RESET v2 COMPLETE**  
 **Parent:** #235  
 **Reset authority:** `Documentation/Combat/SC_Combat_Summons_Tailed_Beasts_Full_Calibration_RESET_v2_2026-09-18.md`  
 **Canon research:** `Documentation/Combat/SC_Combat_Tailed_Beasts_Canon_Research_Shukaku_Matatabi_Isobu_Chomei_2026-09-27.md`  
@@ -1180,21 +1180,21 @@ Known project anti-double-count example:
 **Identity / Base Stats / Base PL:** CLOSED by PL / Registry.  
 **Canon research:** COMPLETE.  
 **Shared four-action manifested core:** **ACCEPTED in principle by Stephen; exact variant split below remains proposal-level.**  
-**One-Tail fifth action:** **Sand Burial Rupture — PROPOSED.**  
-**Shukaku fifth action:** **Cursed Seal Lock — PROPOSED.**  
-**One-Tail host Enhancement:** **Cracked Seal Conduit — +10 Effective Kinjutsu + once/Battle +20% One-Tail-assisted attack with seal-strain tradeoff — PROPOSED.**  
-**One-Tail host-assisted Skills:** **Possession Claw / Sand Maw Eruption / Malice Breakout — PROPOSED.**  
-**Cooperative Shukaku Enhancement:** **Living Seal Markings — PROPOSED.**  
-**Living Seal Markings Fūinjutsu modifier:** **+10 Effective Fūinjutsu — PROPOSED.**  
-**Seal Reinforcement:** **once/Battle — PROPOSED.**  
-**Cooperative assisted Skill:** **Wind Release: Sand Buckshot ATK38 each up to 3, once/Battle — PROPOSED.**  
+**One-Tail fifth action:** **Sand Burial Rupture — CLOSED.**  
+**Shukaku fifth action:** **Cursed Seal Lock — CLOSED.**  
+**One-Tail host Enhancement:** **Cracked Seal Conduit — +10 Effective Kinjutsu + once/Battle +20% One-Tail-assisted attack with seal-strain tradeoff — CLOSED.**  
+**One-Tail host-assisted Skills:** **Possession Claw / Sand Maw Eruption / Malice Breakout — CLOSED.**  
+**Cooperative Shukaku Enhancement:** **Living Seal Markings — CLOSED.**  
+**Living Seal Markings Fūinjutsu modifier:** **+10 Effective Fūinjutsu — CLOSED.**  
+**Seal Reinforcement:** **once/Battle — CLOSED.**  
+**Cooperative assisted Skill:** **Wind Release: Sand Buckshot ATK38 each up to 3, once/Battle — CLOSED.**  
 **Tailed Beast Ball:** **NOT in proposed Shukaku own kit.**  
-**Potential learnable Magnet Release roster:** **Core SC branch = Cursed Sand Bind + Polarity Burial + Polar Sand Guard; character-specific hybrid = Sage Art: Magnet Release Rasengan — PROPOSED.**  
+**Potential learnable Magnet Release roster:** **Core SC branch = Cursed Sand Bind + Polarity Burial + Polar Sand Guard; character-specific hybrid = Sage Art: Magnet Release Rasengan — CLOSED as Combat potential catalogue.**  
 **Global Potential Skill Roster / exact Stat thresholds:** **NOT YET CLOSED — future shared unlock framework under #382.**  
 **Implementation:** NOT STARTED.  
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
 
-**Stephen has signed off the Shukaku-family direction and Magnet Release branch. The revised One-Tail package now treats the uncooperative representation as a distinct Kinjutsu / partial-possession / seal-strain branch rather than a punishment state. This exact One-Tail package awaits Stephen confirmation before Source 11 is marked fully DESIGN CLOSED.**
+**Stephen final sign-off: 2026-09-27. Source 11 Shukaku / One-Tail Combat design is CLOSED. Global Potential Skill Roster thresholds remain separately open under #382; implementation/runtime/Golden remain unclaimed.**
 
 **proposal != design closed != implemented != runtime validated != Golden GREEN**
