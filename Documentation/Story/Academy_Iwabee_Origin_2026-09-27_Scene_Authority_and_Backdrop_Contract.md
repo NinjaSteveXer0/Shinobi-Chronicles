@@ -244,6 +244,26 @@ No reward is currently authorised.
 
 ---
 
+
+## Direct-confrontation defeat continuation
+
+Current CE successor accepts fresh Academy Iwabee vs Rogue Genin as intentionally overmatched without scripted defeat or rebalancing.
+
+Writing defeat authority:
+`Documentation/Story/Academy_Iwabee_Direct_Confrontation_Defeat_Story_Bridge_2026-09-27.md`
+
+commit:
+`c86b8f408cd4f59a0d8f19343bea6e4b048dcd4d`
+
+If Iwabee reaches 0 Battle PL while the Rogue remains eligible:
+- return to `iwa_confront_loss_01`;
+- play the authored overmatch defeat beats;
+- hand the exact Rogue disposition to World at `iwa_confront_loss_world_result`;
+- after World resolution, resume at `iwa_eval_route_confront_loss_01`;
+- continue to the shared instructor evaluation and final self-interpretation choice.
+
+This is a normal Chronicle branch, not Origin failure.
+
 # 7. Scene 6 — Instructor evaluation
 
 The instructor evaluates two separate things:
