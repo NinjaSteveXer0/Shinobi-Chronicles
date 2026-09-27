@@ -203,17 +203,41 @@ There is **no mandatory Battle** in this Origin.
 
 Battle is legal only when the Rogue Genin encounter genuinely produces a confrontation requiring Battle.
 
+Current CE contract closes the direct confrontation as:
+
+Config:
+`academy_iwabee_origin_rogue_confrontation`
+
+Encounter:
+`origin_academy_iwabee:rogue_genin_confrontation`
+
+Historical participant:
+`iwabee_origin_rogue_genin_01`
+
+Reusable Battle template:
+`rogue_genin`
+
+Rogue Base PL:
+**23**
+
+Iwabee Base PL remains:
+**13**
+
+Caller:
+after `iwa_confront_05`
+
+Return:
+`iwa_confront_return_01`
+
 Earth Release practical remains Story.
 
-Environmental constraint remains Story unless/until the resolver transitions into Battle.
+Environmental constraint remains Story unless/until World/Combat transitions into Battle.
 
-Battle return must preserve:
-- terrain-task result;
-- exact Rogue Genin response;
-- Battle result;
-- IWA-02 factual Earth-Release constraint truth.
+0 Battle PL remains withdrawal, not automatic injury/death/capture/escape.
 
-0 Battle PL remains withdrawal, not automatic injury/death.
+Direct Battle victory does not satisfy IWA-02 by itself and does not determine final World disposition.
+
+No reward is currently authorised.
 
 ### Backdrop / Battle environment
 `Scene backdrops/academy_training_ground_courtyard.png`
@@ -345,22 +369,59 @@ Choices appear only after the complete preceding beat.
 
 ---
 
-# 13. Current implementation dependency
+# 13. Current implementation status
 
-Current runtime fail-closes:
-- **CONFRONT HIM**;
-- **BLOCK HIS ESCAPE WITH EARTH RELEASE**.
+CE has closed both scoped semantics.
 
-The first lacks an exact Rogue Genin PL Battle package/caller.
+## CONFRONT HIM
 
-The second lacks an exact resolver deciding:
-- constrained surrender/capture;
-- confrontation/Battle;
-- other current authorised outcome.
+Exact Battle shape:
+- config `academy_iwabee_origin_rogue_confrontation`;
+- encounter `origin_academy_iwabee:rogue_genin_confrontation`;
+- Iwabee vs stable `iwabee_origin_rogue_genin_01`;
+- stable Rogue consumes reusable `rogue_genin` template;
+- Base PL23;
+- caller after `iwa_confront_05`;
+- return `iwa_confront_return_01`;
+- no reward;
+- 0 PL = withdrawal only.
 
-Writing can close all player-facing branches now.
+Combat owns exact action-package viability / AI.
 
-Coding must not invent these mechanics.
+World owns post-Battle escape/custody/surrender/unresolved state.
+
+## BLOCK HIS ESCAPE WITH EARTH RELEASE
+
+At the authored environmental-constraint boundary, commit exactly once:
+
+`earthReleaseUsedToConstrainRogueGenin = true`
+
+and preserve:
+
+`rogueGeninParticipantRef = iwabee_origin_rogue_genin_01`
+
+That boundary commits IWA-02.
+
+Constraint means:
+- escape route narrowed/blocked;
+- not automatic immobilisation;
+- not Stun;
+- not capture;
+- no PL damage;
+- no starting-PL reduction;
+- no first-turn bonus;
+- no hidden Battle modifier.
+
+If a later Battle occurs, ordinary starting state applies unless Combat separately authorises exact context.
+
+## Remaining downstream
+
+Registry/PL mapping is now durable:
+`Documentation/Registry/Academy Iwabee Origin Rogue Genin Registry and PL Mapping 2026-09-27.md`
+
+Combat -> World -> Coding still own the remaining implementation chain.
+
+Writing must not invent the final Rogue disposition.
 
 ---
 
