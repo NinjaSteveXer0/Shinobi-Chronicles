@@ -96,6 +96,8 @@ Project from current facts:
 
 ## `a3m5_consequence_01` — narration
 
+### AUTHOR / IMPLEMENTATION NOTE
+
 The result should cost something whether the protagonist obeyed or refused.
 
 Possible costs:
@@ -158,6 +160,8 @@ To the packet:
 **KURAMA:** “That is how rules introduce themselves.”
 
 Menma dislikes that answer.
+
+### AUTHOR / IMPLEMENTATION NOTE
 
 Do not explain why.
 
@@ -619,6 +623,8 @@ The village has become several battles sharing the same walls.
 
 ## `a3m8_objectives_01` — narration
 
+### AUTHOR / IMPLEMENTATION NOTE
+
 Current urgent objectives may include:
 - command;
 - hospital;
@@ -669,6 +675,10 @@ No omniscient summary.
 No perfect victory everywhere.
 
 Something else changed while the protagonist was busy.
+
+### AUTHOR / IMPLEMENTATION NOTE
+
+Do not replace the bounded second-front report with an omniscient outcome summary.
 
 ---
 
