@@ -449,7 +449,177 @@ The technique is available only when **both halves of the interaction are actual
 
 ---
 
-# H. Counterplay / drawbacks
+# H. Potential learnable Magnet Release roster
+
+Stephen requested Shukaku's Magnet Release identity to appear in the **learnable potential Skill roster**, not only in Shukaku's own manifested kit.
+
+This section authors Combat mechanics for those potential Skills.
+
+It does **not** automatically grant them from:
+- owning Shukaku;
+- hosting Shukaku;
+- friendly dialogue;
+- one Battle;
+- meeting a Stat threshold alone.
+
+The shared persistent **Potential Skill Roster / unlock grammar is not yet globally closed**. Existing coordination issue **#382** owns that future framework.
+
+Combat therefore closes only:
+- what the Skill does;
+- which source/prerequisite categories make it a legitimate candidate.
+
+Progression / Development later owns:
+- exact Stat thresholds;
+- training/development requirement;
+- persistent unlock receipt/state;
+- mastery/stage progression.
+
+World may own the actual teacher/event/hotspot/training opportunity where applicable.
+
+Preserve:
+
+> **potential != learned**
+
+> **Stat eligibility != automatic unlock**
+
+> **source compatibility != mastery**
+
+## 1. `skill_shukaku_magnet_release_cursed_sand_bind` — **Magnet Release: Cursed Sand Bind**
+
+Classification:
+
+**LEARNABLE / MAGNET RELEASE / FŪINJUTSU / SAND CONTROL**
+
+Canon basis:
+
+Shukaku combines Magnet Release with its cursed markings, and Shukaku-derived Magnet Release has demonstrated binding/sealing behavior.
+
+SC adaptation:
+
+This is an original Shinobi Chronicles technique built from Shukaku's Magnet Release + cursed-marking + sand identity. It is **not presented as a named canon jutsu**.
+
+Potential-roster prerequisites:
+
+- exact cooperative Shukaku source/relationship or another future authority explicitly granting the same Shukaku-derived Magnet Release route;
+- sufficient **Ninjutsu** under the future global Skill-potential framework;
+- sufficient **Fūinjutsu** under that framework;
+- legitimate learned/developed **Magnet Release access** from the Shukaku route;
+- separate persistent Skill unlock.
+
+No exact numeric thresholds are authored here.
+
+Battle use:
+
+Limit:
+
+**once per Battle**
+
+Target:
+
+one hostile
+
+ATK:
+
+**34**
+
+Player text:
+
+> **Drive magnetised sand and Shukaku's seal markings into one enemy for 34 ATK. If it deals damage, the markings bind them through their next action.**
+
+Effect:
+
+- one direct Attack-PL packet;
+- ordinary Stamina mitigation;
+- on positive final damage apply `shukaku_magnetic_cursed_bind`;
+- duration: through target's next action opportunity;
+- blocks ordinary movement / reposition / escape;
+- also blocks **one new activation** of an exact transformation / manifestation / hosted-power route while the bind persists;
+- ordinary attacks / defence / support remain legal where they do not require a blocked route;
+- does not cancel a transformation already active;
+- exact seal-breaking / anti-Fūinjutsu / superior source-specific escape may remove or override it;
+- not Stun.
+
+This deliberately combines **Magnet Release + cursed markings + Fūinjutsu**, so it is not merely Sand Binding Crush with a different label.
+
+---
+
+## 2. `skill_shukaku_sage_art_magnet_release_rasengan` — **Sage Art: Magnet Release Rasengan**
+
+Classification:
+
+**LEARNABLE / CANON TECHNIQUE / MAGNET RELEASE / RASENGAN / SENJUTSU**
+
+Canon anchor:
+
+Naruto uses **Sage Art: Magnet Release Rasengan** after gaining Shukaku's chakra. The technique incorporates Shukaku's Magnet Release/cursed markings and binds the target when struck.
+
+This is a high-condition potential Skill, not a general Shukaku freebie.
+
+Potential-roster prerequisites:
+
+- legitimate **Rasengan** Skill access;
+- legitimate **Senjutsu / Sage** capability required for the exact Sage Art technique;
+- exact compatible **Shukaku-derived Magnet Release** source access;
+- sufficient future-framework Ninjutsu / Fūinjutsu or other technical-development predicates as later closed by Progression;
+- separate persistent Skill unlock.
+
+A Character who merely has Shukaku but does not know Rasengan / Senjutsu does **not** have this Skill in their learnable-ready state.
+
+Battle use:
+
+Limit:
+
+**once per Battle**
+
+Target:
+
+one hostile
+
+ATK:
+
+**48**
+
+Player text:
+
+> **Drive Shukaku's Magnet Release through a Sage-powered Rasengan for 48 ATK. If it deals damage, the cursed markings immobilise the target's movement through their next action.**
+
+Effect:
+
+- one direct Attack-PL packet;
+- ordinary Stamina mitigation;
+- on positive final damage apply `shukaku_magnet_rasengan_bind`;
+- through target's next action opportunity:
+  - ordinary movement / reposition / escape unavailable;
+  - actions not requiring substantial free movement remain legal;
+- exact superior seal-breaking / anti-Fūinjutsu authority may remove/override where applicable;
+- not Stun;
+- no automatic transformation suppression beyond the movement restraint;
+- no second Shukaku damage packet;
+- host owns the action opportunity.
+
+This technique is intentionally narrower than Cursed Sand Bind on route suppression, but stronger in direct attack pressure.
+
+---
+
+## 3. Roster philosophy exposed by Shukaku
+
+Shukaku demonstrates why a global Potential Skill Roster is useful.
+
+Different Characters can legitimately have different future Shukaku-derived possibilities:
+
+- a high-Fūinjutsu / high-Ninjutsu Character may qualify for **Cursed Sand Bind** development;
+- a Character who also knows Rasengan and Senjutsu may qualify for **Sage Art: Magnet Release Rasengan**;
+- a Character lacking those prerequisites may still use the ordinary cooperative Shukaku package without either Skill.
+
+Therefore:
+
+> **same Tailed Beast source != identical future Skill ceiling for every host**
+
+The engine/framework should filter an **authored catalogue** through Character-specific eligibility predicates. It must not procedurally invent new techniques from raw Stats.
+
+---
+
+# I. Counterplay / drawbacks
 
 ## One-Tail relationship state
 
@@ -480,7 +650,7 @@ No arbitrary Water weakness, Lightning weakness or generic elemental chart is cr
 
 ---
 
-# I. Persistent / non-Battle utility
+# J. Persistent / non-Battle utility
 
 No generic account-wide persistent bonus is proposed for Shukaku.
 
@@ -490,7 +660,7 @@ Shukaku's meaningful persistent difference in this package is the **relationship
 
 ---
 
-# J. Dedicated representation / anti-double-count exclusions
+# K. Dedicated representation / anti-double-count exclusions
 
 Do not:
 
@@ -509,7 +679,7 @@ Known project anti-double-count example:
 
 ---
 
-# K. Player-facing summary
+# L. Player-facing summary
 
 ## ONE-TAIL — NON-COOPERATIVE SAND / WIND / SEALING BEAST
 
@@ -521,7 +691,7 @@ Known project anti-double-count example:
 
 ---
 
-# L. Decision state
+# M. Decision state
 
 **Identity / Base Stats / Base PL:** CLOSED by PL / Registry.  
 **Canon research:** COMPLETE.  
@@ -532,6 +702,8 @@ Known project anti-double-count example:
 **Seal Reinforcement:** **once/Battle — PROPOSED.**  
 **Cooperative assisted Skill:** **Wind Release: Sand Buckshot ATK38 each up to 3, once/Battle — PROPOSED.**  
 **Tailed Beast Ball:** **NOT in proposed Shukaku own kit.**  
+**Potential learnable Magnet Release roster:** **Cursed Sand Bind + Sage Art: Magnet Release Rasengan — PROPOSED.**  
+**Global Potential Skill Roster / exact Stat thresholds:** **NOT YET CLOSED — future shared unlock framework under #382.**  
 **Implementation:** NOT STARTED.  
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
