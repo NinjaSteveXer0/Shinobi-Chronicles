@@ -295,32 +295,41 @@ Source 03 Ibuse closure preserves the signed-off Neurotoxin package:
 
 Next ordinary Summon state:
 
-- **Source 09 — Kamatari** — **MECHANICS DESIGN CLOSED under Stephen sign-off**; PL / Registry numeric reconciliation remains open as #258 before full Source 09 identity/PL closure.
-- **Source 10 — Snake** — PROPOSED / awaiting Stephen sign-off; PL / Registry identity already closed at generic `snake`, PL47, staged/not live.
+- **Source 09 — Kamatari** — **PARTIALLY REOPENED 2026-09-27**: Stephen locked Base PL target **82**; #258 must return Formula-v1.0-valid Stats. **Sicklewind Route is an ATTACK/action, not the attached Enhancement.** Off-slot behavior remains closed; exact Sicklewind Attack PL and the separate Kamatari Enhancement package are OPEN.
+- **Source 10 — Snake** — **DESIGN CLOSED under Stephen sign-off 2026-09-27**; generic `snake`, PL47, staged/not live. Enhancement = **Serpent Courier** with outside-Battle **Messenger Snake** utility. **Hidden Coil** is an obtainable/learnable source-assisted Skill, not an automatic attachment Enhancement.
 
 Source 09 proposal authority:
 `Documentation/Combat/SC_Combat_RESET_v2_Source_09_Kamatari_Proposal_2026-09-19.md`
 
-Kamatari RESET v2 mechanical closure:
-- **Stephen sign-off recorded 2026-09-19**;
-- retire generic +6 Bukijutsu Stat-stick in favour of **Sicklewind Route**;
-- **Sicklewind Route = once per Battle**, while Kamatari is attached, one qualifying single-target Wind Release or Bukijutsu attack may target one occupied enemy waiting slot (Slots 2–6) instead of Enemy Active Slot 1;
-- the waiting enemy remains in its queue slot; the route does not reorder formation, create a bonus action, add hidden Attack PL, or bypass exact targeting protection;
-- this uses the Battle system's real active/waiting-slot structure and explicitly rejects invented vegetation/debris/soft-cover mechanics;
-- manifested package remains Reaping Rush ATK30, Gale Pursuit ATK24 / 32 after enemy movement, Crosswind Cutoff once/Battle target-choice pursuit reaction, and Quick Beheading Dance once/Battle ATK32 each up to 3 legally exposed hostiles;
+Kamatari RESET v2 corrected state:
+- Stephen's earlier off-slot concept remains approved, but on **2026-09-27 Stephen corrected its classification**;
+- Base PL target is now explicitly **82**;
+- #258 must return Formula-v1.0-valid seven Base Stats for PL82; current live PL77 row is drift;
+- **Sicklewind Route is Kamatari's own ATTACK/action**, not an attached Enhancement;
+- approved behavior remains: once per Battle, attack one legally occupied enemy not occupying the Active slot; no promotion/reorder/bonus action merely from using it;
+- exact **Sicklewind Route Attack PL remains OPEN** because no exact packet was ever signed off;
+- the separate **Kamatari Enhancement package is OPEN**;
+- Reaping Rush ATK30, Gale Pursuit ATK24 / 32 after enemy movement, Crosswind Cutoff once/Battle target-choice pursuit reaction, and Quick Beheading Dance once/Battle ATK32 each up to 3 legally exposed hostiles remain preserved as prior signed-off attack concepts;
 - no generic accuracy roll / Speed Stat / hard Stun / hidden PL scaling;
-- **mechanics design is CLOSED**, but full Source 09 closure still awaits #258's authoritative seven Stats / Base PL return.
+- do not route Source 09 to implementation until PL82 Stats, Sicklewind Attack PL and the separate Enhancement are closed.
 
 Source 10 proposal authority:
 `Documentation/Combat/SC_Combat_RESET_v2_Source_10_Snake_Proposal_2026-09-19.md`
 
-Snake RESET v2 proposed direction:
+Snake RESET v2 final closure:
 - generic `snake`, PL47; explicitly not Manda/Aoda/Manda II and not live;
-- ATTACHED / NOT MANIFESTED enhancement = **Hidden Coil**, once/Battle after one qualifying single-target Taijutsu or Bukijutsu attack deals positive final damage, applying one-action movement-specific physical restraint to the same target;
-- Hidden Coil becomes unavailable while the same Snake is manifested and does not refresh after manifestation;
-- manifested package = Fang Lunge ATK18; Constricting Bite ATK12 + one-action movement restraint on positive damage; Coiling Crush ATK14 / ATK24 against same-source constriction and releases the bind on the boosted branch; Coiling Interpose once/Battle redirects one qualifying direct packet from controller to Snake;
+- **Enhancement = Serpent Courier**;
+- outside Battle, legitimately available Snake exposes **Messenger Snake** for Mission / Hotspot / Story courier work where a physically legitimate route exists;
+- Messenger Snake can carry a written message, small token or similarly small authored payload to a known reachable recipient/location and may return with a reply where World/Story permits;
+- no teleportation, guaranteed stealth, guaranteed delivery, automatic knowledge or automatic Mission success;
+- **Hidden Coil is an obtainable/learnable source-assisted Skill**, not automatic from ownership/attachment;
+- learned Hidden Coil preserves the once/Battle after-hit movement-specific physical-restraint follow-up and is unavailable while Snake is independently manifested;
+- exact unlock route belongs downstream Progression / Development / World opportunity authority;
+- future/full-manifestation package remains Fang Lunge ATK18; Constricting Bite ATK12 + movement restraint; Coiling Crush ATK14 / ATK24 against same-source constriction and releases the bind on the boosted branch; Coiling Interpose once/Battle redirects one qualifying direct packet from controller to Snake;
 - no Poison/venom, shedding, Sage package, burrow package, environmental bonus, named-snake scale/history or generic Stat-stick;
 - no Stun; exact escape/anti-restraint remains counterplay.
 
-Then continue into Source 10 Snake, accepted Tailed-Beast representations, Kurama-family reconciliation, and Jinchūriki/transformation anti-double-count audit.
+Stephen also directed a broader future rule: **most suitably small-to-medium Summons should be capable of messenger/courier work in Missions and Hotspot Events.** Snake owns the closed concrete example; CE / World should generalise eligibility/occurrence resolution rather than Combat silently applying it to every source.
+
+Next Combat work after Kamatari's reopened seams: accepted Tailed-Beast representations, Kurama-family reconciliation, and Jinchūriki/transformation anti-double-count audit.
 
