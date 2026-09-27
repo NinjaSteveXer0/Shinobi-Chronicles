@@ -1,7 +1,14 @@
 'use strict';
 const fs=require('fs'),vm=require('vm'),path=require('path');
 const ROOT=path.resolve(__dirname,'..');
-const files=['core','a','b','c','integrator'].map(n=>path.join(ROOT,'runtime',`alpha-origin-scenes-32900-${n}.js`));
+const files=[
+  path.join(ROOT,'runtime','alpha-origin-scenes-32900-core.js'),
+  path.join(ROOT,'runtime','academy-wasabi-writing-golden-343.js'),
+  path.join(ROOT,'runtime','alpha-origin-scenes-32900-a.js'),
+  path.join(ROOT,'runtime','alpha-origin-scenes-32900-b.js'),
+  path.join(ROOT,'runtime','alpha-origin-scenes-32900-c.js'),
+  path.join(ROOT,'runtime','alpha-origin-scenes-32900-integrator.js')
+];
 const scenes=new Map([['origin_academy_menma_prologue',{sceneId:'origin_academy_menma_prologue',beats:[{beatId:'menma'}],beatMap:new Map([['menma',{beatId:'menma'}]])}]]);
 const receipts=[];const completions=[];let active=null;
 const expectedSource={
@@ -34,7 +41,16 @@ startStoryScene:(sceneId,opts)=>{const def=scenes.get(sceneId);if(!def)return{su
 function resolveReq(req,key){if(!req)return;const once=`${active.instanceId}:${active.beatId}:${key}:${req.requestId}`;if(active.processed.has(once))return;const out=req.resolve();if(!out||out.success!==true)throw new Error(`${req.requestId} failed: ${JSON.stringify(out)}`);active.processed.add(once);}
 function enter(){const def=scenes.get(active.sceneId),beat=def.beatMap.get(active.beatId);(beat.onEnterConsequences||[]).forEach((r,i)=>resolveReq(r,`enter${i}`));}
 function step(choiceId){const def=scenes.get(active.sceneId),beat=def.beatMap.get(active.beatId);if(choiceId){const c=(beat.choices||[]).find(x=>x.choiceId===choiceId);if(!c)throw new Error(`choice ${choiceId} missing @ ${active.sceneId}/${active.beatId}`);if(typeof c.availability==='function'){const a=c.availability();if(!a.available)throw new Error(`choice unavailable ${choiceId}: ${a.knownBlocker}`);}if(c.contextPatch)Object.assign(active.localContext,JSON.parse(JSON.stringify(c.contextPatch)));active.beatId=c.nextBeatId||beat.nextBeatId;enter();return;}if(beat.nextBeatId){active.beatId=beat.nextBeatId;enter();return;}if(beat.exitScene){(def.onCompleteConsequences||[]).forEach((r,i)=>resolveReq(r,`complete${i}`));active=null;return;}throw new Error(`no transition @ ${active.sceneId}/${active.beatId}`);}
-function run(origin,choices){ctx.playerData.activityHistory=[];ctx.activityHistory=ctx.playerData.activityHistory;ctx.playerData.acquisition={chronicleOriginVariantId:origin,chronicleOrigin:{prologueCompleted:false}};active=null;const started=ctx.beginAlphaChronicleOriginPrologue();if(!started.success)throw new Error(`${origin} start failed ${JSON.stringify(started)}`);for(const c of choices){while(active){const b=scenes.get(active.sceneId).beatMap.get(active.beatId);if((b.choices||[]).length)break;if(b.nextBeatId)step(null);else break;}step(c);}while(active){const beat=scenes.get(active.sceneId).beatMap.get(active.beatId);if(beat.exitScene)step(null);else if(beat.nextBeatId&&!beat.choices?.length)step(null);else throw new Error(`path stopped @ ${origin}/${active.beatId}`);}if(!ctx.playerData.acquisition.chronicleOrigin.prologueCompleted)throw new Error(`${origin} did not complete`);}
+function advanceMachineResolvers(){
+  while(active){
+    const b=scenes.get(active.sceneId).beatMap.get(active.beatId);
+    if(!b||b.machineResolved!==true)break;
+    const available=(b.choices||[]).filter(ch=>!ch.availability||ch.availability().available);
+    if(available.length!==1)throw new Error(`machine resolver cardinality ${available.length} @ ${active.sceneId}/${active.beatId}`);
+    step(available[0].choiceId);
+  }
+}
+function run(origin,choices){ctx.playerData.activityHistory=[];ctx.activityHistory=ctx.playerData.activityHistory;ctx.playerData.acquisition={chronicleOriginVariantId:origin,chronicleOrigin:{prologueCompleted:false}};active=null;const started=ctx.beginAlphaChronicleOriginPrologue();if(!started.success)throw new Error(`${origin} start failed ${JSON.stringify(started)}`);for(const c of choices){while(active){advanceMachineResolvers();if(!active)break;const b=scenes.get(active.sceneId).beatMap.get(active.beatId);if((b.choices||[]).length)break;if(b.nextBeatId)step(null);else break;}advanceMachineResolvers();step(c);}while(active){advanceMachineResolvers();if(!active)break;const beat=scenes.get(active.sceneId).beatMap.get(active.beatId);if(beat.exitScene)step(null);else if(beat.nextBeatId&&!beat.choices?.length)step(null);else throw new Error(`path stopped @ ${origin}/${active.beatId}`);}if(!ctx.playerData.acquisition.chronicleOrigin.prologueCompleted)throw new Error(`${origin} did not complete`);}
 run('academy_hinata',['attack_immediately','press_draw_counter','trust_spar','stay_and_watch']);
 run('academy_izuno',['predict_destination','intercept_prediction','trust_notice']);
 run('academy_mirai',['ask_route','test_question','investigate_quietly']);
@@ -50,4 +66,4 @@ const kakashiPending=ctx.beginAlphaChronicleOriginPrologue();
 const checks={diagPass:diag.pass,allEightImplementedOriginsCompleted:['academy_hinata','academy_izuno','academy_mirai','academy_kushina','academy_kurenai','academy_iwabee','academy_metal_lee','academy_obito'].every(id=>completions.some(c=>c.id===id)),
 expectedCoreReceipts:['HIN-01','HIN-02','IZU-02','MIR-01','KUS-01','KUS-02','KUS-05','KUR-02','IWA-01','MET-01','MET-02','MET-03','MET-04','OBI-02'].every(id=>receipts.some(r=>r.rowId===id)),
 obitoNoFakeDiversionReceipt:!receipts.some(r=>r.rowId==='OBI-01'),kakashiV2FailsClosed:kakashiPending&&kakashiPending.success===false&&kakashiPending.reason==='academy_kakashi_v2_pending',browserGoldenClaimed:false};
-const pass=Object.entries(checks).filter(([k])=>k!=='browserGoldenClaimed').every(([,v])=>v===true);console.log(JSON.stringify({pass,checks,receiptCount:receipts.length,completionCount:completions.length},null,2));if(!pass)process.exit(1);
+const pass=Object.entries(checks).filter(([k])=>k!=='browserGoldenClaimed').every(([,v])=>v===true);console.log(JSON.stringify({pass,checks,diagChecks:diag.checks||null,receiptCount:receipts.length,completionCount:completions.length},null,2));if(!pass)process.exit(1);
