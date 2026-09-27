@@ -1,0 +1,88 @@
+name: Issue 343 Wasabi Installed Browser
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'runtime/academy-wasabi-writing-golden-343.js'
+      - 'runtime/alpha-wasabi-rogue-battle-343.js'
+      - 'runtime/alpha-origin-scenes-32900-a.js'
+      - 'runtime/alpha-origin-scenes-32900-core.js'
+      - 'runtime/alpha-origin-scenes-32900-integrator.js'
+      - 'runtime/alpha-battle-modern-33000.js'
+      - 'runtime/alpha-battle-browser-32600.js'
+      - 'runtime/alpha-alpha-sprint-33100.js'
+      - 'runtime/alpha-runtime-build-fingerprint-303.js'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
+      - 'tools/fixtures/runtime_*_300.json'
+      - 'tools/qa_issue_343_wasabi_writing_golden.js'
+      - 'tools/qa_issue_343_wasabi_browser.js'
+      - 'tools/browser_runtime_error_gate_311.js'
+      - 'tools/qa_runtime_ownership_safety_300.js'
+      - '.github/workflows/issue-343-wasabi-browser.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  installed-browser-wasabi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Source and ownership pre-browser gate
+        run: |
+          node --check runtime/academy-wasabi-writing-golden-343.js
+          node --check runtime/alpha-wasabi-rogue-battle-343.js
+          node --check runtime/alpha-origin-scenes-32900-a.js
+          node --check tools/qa_issue_343_wasabi_writing_golden.js
+          node tools/qa_issue_343_wasabi_writing_golden.js
+          node tools/qa_runtime_ownership_safety_300.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python3 -m http.server 8080 > /tmp/wasabi-343-http.log 2>&1 &
+          echo $! > /tmp/wasabi-343-http.pid
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/wasabi-343-http.log
+          exit 1
+
+      - name: Run installed-browser Wasabi Writing-Golden replay
+        env:
+          ISSUE_343_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_343_BROWSER_OUT: artifacts/issue-343-wasabi-browser
+        run: xvfb-run -a node tools/qa_issue_343_wasabi_browser.js
+
+      - name: Preserve server log
+        if: always()
+        run: |
+          mkdir -p artifacts/issue-343-wasabi-browser
+          cp /tmp/wasabi-343-http.log artifacts/issue-343-wasabi-browser/http-server.log || true
+
+      - name: Upload installed-browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-343-wasabi-installed-browser-evidence
+          path: artifacts/issue-343-wasabi-browser
+          if-no-files-found: warn
