@@ -158,7 +158,7 @@ The cooperative named state offers:
 
 - controlled flight;
 - precise aerial routing;
-- defensive extraction/reposition;
+- defensive extraction/protection;
 - shared aerial attack lines;
 - a broad future flight/insect-body Potential Skill branch.
 
