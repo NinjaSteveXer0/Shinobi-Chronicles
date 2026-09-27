@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-27  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons / Tailed Beasts  
-**Status:** **PROPOSED — AWAITING STEPHEN SIGN-OFF**  
+**Status:** **PARTIAL SIGN-OFF — SHARED SHUKAKU ARCHITECTURE + MAGNET RELEASE BRANCH ACCEPTED BY STEPHEN / EXACT ONE-TAIL vs SHUKAKU VARIANT SPLIT PROPOSED**  
 **Parent:** #235  
 **Reset authority:** `Documentation/Combat/SC_Combat_Summons_Tailed_Beasts_Full_Calibration_RESET_v2_2026-09-18.md`  
 **Canon research:** `Documentation/Combat/SC_Combat_Tailed_Beasts_Canon_Research_Shukaku_Matatabi_Isobu_Chomei_2026-09-27.md`  
@@ -96,41 +96,75 @@ Do not infer:
 
 # C. Representation design law
 
-The two cards share one beast and therefore share the same **core manifested own-action identity**.
+The two cards are the same persistent beast, so they share Shukaku's underlying canon capability pool.
 
-Their key difference is relationship access:
+They are **not identical prepared gameplay packages**.
 
-## One-Tail
+Stephen clarified on **2026-09-27** that `one_tail` and `shukaku` must have meaningful variations.
 
-`one_tail` represents a non-cooperative Shukaku relationship.
+Canonical SC rule:
 
-It receives:
+> **same persistent beast = shared core capability identity**
 
-- Shukaku's own manifested action package when an exact lifecycle legitimately manifests the beast;
-- **no automatic host-facing cooperative Enhancement**;
-- **no cooperative Sand Buckshot host assist**.
+> **different exact representation = different prepared action/access package where relationship/history justifies it**
 
-This is deliberate.
+This does not mean one representation has metaphysically "forgotten" techniques the same beast is capable of. It means the exact collectible/runtime representation exposes a deliberately different default package.
 
-RESET v2 does not require Combat to invent a fake passive bonus for a beast that is not cooperating.
+## `one_tail` — One-Tail
 
-Any future coercive/partial-access Jinchūriki package must be separately authored through the future Tailed-Beast host/control system.
+Relationship state:
 
-## Shukaku
+**unfriendly / non-cooperative**
 
-`shukaku` represents genuine cooperative relationship state.
+Mechanical projection:
 
-It receives:
+**RAMPAGE / SAND PRESSURE / SELF-SERVING CONTROL**
 
-- the same Shukaku own-action package;
-- the **Living Seal Markings** host Enhancement;
-- access to the exact cooperative **Wind Release: Sand Buckshot** assist when the host also has legitimate sand-manipulation capability.
+Default manifested palette:
+- Wind Release: Drilling Air Bullet;
+- Sand Binding Crush;
+- Sandstorm Barrage;
+- Sand Reformation;
+- **Sand Burial Rupture** — One-Tail-specific aggressive payoff.
+
+Host-facing access:
+- **no Living Seal Markings cooperative Enhancement**;
+- **no Wind Release: Sand Buckshot cooperative assist**;
+- **no automatic Shukaku-derived Magnet Release learnable branch merely from possessing/hosting the non-cooperative representation**.
+
+A future coercive extraction/control system may explicitly grant partial source capabilities, including Magnet Release, but that requires its own authored contract.
+
+## `shukaku` — Shukaku
+
+Relationship state:
+
+**friendly / cooperative named representation**
+
+Mechanical projection:
+
+**SEALING / DEFENSE / COOPERATION / MAGNET DEVELOPMENT**
+
+Default manifested palette:
+- Wind Release: Drilling Air Bullet;
+- Sand Binding Crush;
+- Sandstorm Barrage;
+- Sand Reformation;
+- **Cursed Seal Lock** — cooperative/named representation's precision sealing slot.
+
+Host-facing access:
+- **Living Seal Markings** Enhancement;
+- cooperative **Wind Release: Sand Buckshot** when the host already has legitimate sand manipulation;
+- Shukaku-derived **Magnet Release Potential Skill branch** under the future unlock framework.
 
 Preserve:
 
-> **same beast != same relationship access**
+> **One-Tail power access != Shukaku cooperation**
 
-> **non-cooperative manifestation != cooperative host Enhancement**
+> **same beast != identical prepared palette**
+
+> **prepared palette variation != separate persistent beast**
+
+> **non-cooperative possession != automatic Magnet Release mastery**
 
 ---
 
@@ -163,9 +197,15 @@ Exact Jinchūriki transformation/partial-cloak manifestation remains separately 
 
 ---
 
-# E. Core manifested own Skill kit — shared by One-Tail and Shukaku
+# E. Manifested own Skill packages
 
-## 1. `shukaku_drilling_air_bullet` — **Wind Release: Drilling Air Bullet**
+Four core actions are shared because both cards are the same Shukaku.
+
+The fifth prepared action varies by representation.
+
+## Shared core actions — `one_tail` + `shukaku`
+
+### 1. `shukaku_drilling_air_bullet` — **Wind Release: Drilling Air Bullet**
 
 Class:
 
@@ -184,7 +224,6 @@ Player text:
 > **Blast one enemy with a compressed Wind projectile for 44 ATK.**
 
 Rules:
-
 - one direct Attack-PL packet;
 - ordinary Stamina mitigation;
 - no automatic Stun;
@@ -192,11 +231,9 @@ Rules:
 - no invented accuracy roll;
 - does not grant Wind Release to a host.
 
-This is the reliable high-pressure ranged attack.
-
 ---
 
-## 2. `shukaku_sand_binding_crush` — **Sand Binding Crush**
+### 2. `shukaku_sand_binding_crush` — **Sand Binding Crush**
 
 Class:
 
@@ -215,21 +252,18 @@ Player text:
 > **Crush one enemy with sand for 32 ATK. If it deals damage, their footing stays buried and they cannot reposition or escape on their next action.**
 
 Rules:
-
 - one direct Attack-PL packet;
 - ordinary Stamina mitigation;
-- if positive final damage is dealt, apply `shukaku_buried_footing`;
-- duration: through the target's next action opportunity;
-- blocks ordinary movement / reposition / escape actions;
-- attacks, defence and support that do not require substantial free movement remain legal;
-- exact anti-restraint / space-time / superior-movement authority may override where explicitly authored;
+- positive final damage applies `shukaku_buried_footing`;
+- duration: through target's next action opportunity;
+- blocks ordinary movement / reposition / escape;
+- other attacks / defence / support remain legal when they do not require substantial free movement;
+- exact anti-restraint / space-time / superior movement may override;
 - not Stun.
-
-This expresses Shukaku's sand as battlefield control rather than generic bonus damage.
 
 ---
 
-## 3. `shukaku_sandstorm_barrage` — **Sandstorm Barrage**
+### 3. `shukaku_sandstorm_barrage` — **Sandstorm Barrage**
 
 Class:
 
@@ -248,55 +282,16 @@ Player text:
 > **Drive a sandstorm through up to 3 exposed enemies for 34 ATK each.**
 
 Rules:
-
 - one direct packet per target;
 - ordinary Stamina mitigation independently;
 - no random miss;
 - no automatic Blind;
 - no automatic terrain destruction;
-- does not target waiting/Benched/Reserve slots merely because it is area-capable.
-
-This is Shukaku's broad pressure option without inventing a generic status rider.
+- no waiting/Benched/Reserve targeting merely because it is area-capable.
 
 ---
 
-## 4. `shukaku_cursed_seal_lock` — **Cursed Seal Lock**
-
-Class:
-
-**CONTROL / FŪINJUTSU**
-
-Limit:
-
-**once per Battle**
-
-Target:
-
-one hostile with a currently addressable transformation / manifestation / hosted-power activation route.
-
-Player text:
-
-> **Seal one enemy's transformation or hosted-power route. They cannot activate that route on their next action.**
-
-Exact mechanics:
-
-- no direct damage;
-- on valid commit apply `shukaku_cursed_seal_lock`;
-- duration: through target's next action opportunity;
-- blocks activation of one exact legally addressable:
-  - transformation route;
-  - forced/voluntary manifestation route;
-  - hosted-source activation route;
-- ordinary attacks / defence / support remain available unless they independently require the blocked route;
-- does not remove an already-active transformation unless an exact later Skill says so;
-- exact superior seal-breaking / anti-Fūinjutsu authority may remove or override it;
-- if target has no legally addressable qualifying route, this Skill is invalid precommit and the once-per-Battle use is not consumed.
-
-This makes Shukaku's sealing identity mechanically distinct instead of turning Fūinjutsu into another damage type.
-
----
-
-## 5. `shukaku_sand_reformation` — **Sand Reformation**
+### 4. `shukaku_sand_reformation` — **Sand Reformation**
 
 Class:
 
@@ -315,15 +310,87 @@ Player text:
 > **Break Shukaku's body into sand around one physical hit, cutting that attack's ATK by 55%.**
 
 Effect:
-
-- reduce that qualifying direct Attack-PL packet by **55% pre-Stamina**;
-- ordinary Stamina then resolves against the reduced packet;
-- no effect against direct Ninjutsu / Kinjutsu packets, Genjutsu, control-only effects or Story consequences;
+- reduce that qualifying packet by **55% pre-Stamina**;
+- ordinary Stamina then resolves;
+- no effect against direct Ninjutsu/Kinjutsu packets, Genjutsu, control-only effects or Story consequences;
 - no second capacity pool;
 - no permanent physical immunity;
-- no healing packet is created.
+- no healing packet.
 
-This converts Shukaku's sand body into bounded physical resilience without claiming infinite regeneration.
+---
+
+## One-Tail-specific fifth action
+
+### 5A. `one_tail_sand_burial_rupture` — **Sand Burial Rupture**
+
+Classification:
+
+**ATTACK / SAND / CONTROL CASH-OUT**
+
+Target:
+
+one hostile
+
+Base ATK:
+
+**36**
+
+Buried target ATK:
+
+**48**
+
+Player text:
+
+> **Rupture the sand beneath one enemy for 36 ATK. If One-Tail already buried their footing, crush for 48 instead but release the bind.**
+
+Rules:
+- one direct Attack-PL packet;
+- ordinary Stamina mitigation;
+- ATK48 requires the target currently carries same-source `shukaku_buried_footing`;
+- when ATK48 resolves, that buried-footing state ends after resolution;
+- no new restraint is created;
+- no Stun;
+- no bonus action.
+
+Decision:
+
+> **Keep the target pinned for control, or cash the buried footing out for One-Tail's heavier hit.**
+
+This gives the non-cooperative representation a more aggressive expression without changing Shukaku into a different creature.
+
+---
+
+## Cooperative Shukaku-specific fifth action
+
+### 5B. `shukaku_cursed_seal_lock` — **Cursed Seal Lock**
+
+Class:
+
+**CONTROL / FŪINJUTSU**
+
+Limit:
+
+**once per Battle**
+
+Target:
+
+one hostile with a currently addressable transformation / manifestation / hosted-power activation route.
+
+Player text:
+
+> **Seal one enemy's transformation or hosted-power route. They cannot activate that route on their next action.**
+
+Exact mechanics:
+- no direct damage;
+- on valid commit apply `shukaku_cursed_seal_lock`;
+- duration: through target's next action opportunity;
+- blocks activation of one exact legally addressable transformation / forced-or-voluntary manifestation / hosted-source activation route;
+- ordinary attacks / defence / support remain available unless they independently require the blocked route;
+- does not remove an already-active transformation;
+- exact superior seal-breaking / anti-Fūinjutsu may remove or override it;
+- invalid precommit if no qualifying route exists, without consuming the once-per-Battle use.
+
+This is the cooperative named representation's precision-control slot.
 
 ---
 
@@ -861,7 +928,9 @@ Known project anti-double-count example:
 
 **Identity / Base Stats / Base PL:** CLOSED by PL / Registry.  
 **Canon research:** COMPLETE.  
-**Core own manifested kit:** PROPOSED.  
+**Shared four-action manifested core:** **ACCEPTED in principle by Stephen; exact variant split below remains proposal-level.**  
+**One-Tail fifth action:** **Sand Burial Rupture — PROPOSED.**  
+**Shukaku fifth action:** **Cursed Seal Lock — PROPOSED.**  
 **One-Tail host Enhancement:** **NONE while non-cooperative — PROPOSED.**  
 **Cooperative Shukaku Enhancement:** **Living Seal Markings — PROPOSED.**  
 **Living Seal Markings Fūinjutsu modifier:** **+10 Effective Fūinjutsu — PROPOSED.**  
@@ -874,6 +943,6 @@ Known project anti-double-count example:
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
 
-**Awaiting Stephen sign-off / edits.**
+**Stephen has signed off the Shukaku-family direction and Magnet Release branch. Exact One-Tail vs Shukaku prepared-palette variation above awaits final confirmation before Source 11 is marked fully DESIGN CLOSED.**
 
 **proposal != design closed != implemented != runtime validated != Golden GREEN**
