@@ -453,6 +453,15 @@ The technique is available only when **both halves of the interaction are actual
 
 Stephen requested Shukaku's Magnet Release identity to appear in the **learnable potential Skill roster**, not only in Shukaku's own manifested kit.
 
+Stephen then corrected the first draft on **2026-09-27**:
+
+> Shukaku must not expose a Naruto-only Magnet Release roster. Tobirama–Shukaku, Sasuke, or another legitimate future host/source user needs meaningful Shukaku-derived Magnet Release techniques that do not depend on Rasengan.
+
+Therefore the roster is split into:
+
+1. **CORE SHUKAKU-DERIVED MAGNET RELEASE BRANCH** — SC-original techniques that any legitimate Shukaku-derived Magnet Release learner may potentially develop if their own predicates are satisfied;
+2. **CHARACTER-SPECIFIC HYBRID BRANCHES** — techniques such as Sage Art: Magnet Release Rasengan that additionally require another Character-specific technique/capability chain.
+
 This section authors Combat mechanics for those potential Skills.
 
 It does **not** automatically grant them from:
@@ -484,7 +493,17 @@ Preserve:
 
 > **source compatibility != mastery**
 
-## 1. `skill_shukaku_magnet_release_cursed_sand_bind` — **Magnet Release: Cursed Sand Bind**
+> **Shukaku access != Rasengan access**
+
+---
+
+## CORE SHUKAKU-DERIVED MAGNET RELEASE BRANCH
+
+These Skills are intended to be valid future-development candidates for **any Character who legitimately develops Shukaku-derived Magnet Release**, subject to their own Stats / training / prerequisites.
+
+They are not Naruto-only.
+
+### 1. `skill_shukaku_magnet_release_cursed_sand_bind` — **Magnet Release: Cursed Sand Bind**
 
 Classification:
 
@@ -543,7 +562,133 @@ This deliberately combines **Magnet Release + cursed markings + Fūinjutsu**, so
 
 ---
 
-## 2. `skill_shukaku_sage_art_magnet_release_rasengan` — **Sage Art: Magnet Release Rasengan**
+### 2. `skill_shukaku_magnet_release_polarity_burial` — **Magnet Release: Polarity Burial**
+
+Classification:
+
+**LEARNABLE / MAGNET RELEASE / SAND CONTROL / MOVEMENT TRAP**
+
+SC origin:
+
+**Original Shinobi Chronicles technique.**
+
+Source idea:
+
+The user polarises the target and the surrounding Shukaku-derived magnetic sand against one another, creating a temporary pull-field that punishes escape.
+
+Potential-roster prerequisites:
+
+- legitimate Shukaku-derived Magnet Release access;
+- sufficient **Ninjutsu** under the future framework;
+- sufficient control/development predicate under Progression;
+- separate persistent Skill unlock.
+
+No exact numeric threshold is authored here.
+
+Battle use:
+
+Target:
+
+one hostile
+
+ATK:
+
+**28**
+
+Player text:
+
+> **Strike one enemy with magnetised sand for 28 ATK and polarise the ground around them. If they try to move away on their next action, they must abandon the movement or force through the pull and take another hit.**
+
+Effect:
+
+- one direct Attack-PL packet;
+- ordinary Stamina mitigation;
+- on positive final damage establish `shukaku_polarity_burial`;
+- duration: through target's next action opportunity.
+
+If the target begins an ordinary movement / reposition / escape action while marked, they choose:
+
+**BREAK OFF**
+- cancel the movement / reposition / escape portion;
+- no additional damage;
+- the mark ends;
+- this is not Stun.
+
+**FORCE THROUGH**
+- movement resolves;
+- after movement resolves, magnetic sand snaps across the route for **ATK18**;
+- ordinary Stamina mitigation applies;
+- the mark ends.
+
+Exact superior movement / space-time movement that explicitly ignores ordinary battlefield pull may bypass the trap.
+
+No hidden Speed Stat and no universal movement cancellation are created.
+
+Decision:
+
+> **Stay and fight, abandon the escape, or force through Shukaku's magnetic field and pay for it.**
+
+---
+
+### 3. `skill_shukaku_magnet_release_polar_sand_guard` — **Magnet Release: Polar Sand Guard**
+
+Classification:
+
+**LEARNABLE / MAGNET RELEASE / DEFENSE / METAL-WEAPON COUNTER**
+
+SC origin:
+
+**Original Shinobi Chronicles technique.**
+
+Source idea:
+
+The user magnetises a screen of Shukaku-derived sand to wrench an incoming metal weapon or projectile off its clean attack line.
+
+Potential-roster prerequisites:
+
+- legitimate Shukaku-derived Magnet Release access;
+- sufficient **Ninjutsu** under the future framework;
+- sufficient **Bukijutsu** understanding OR another future technical-control predicate accepted by Progression;
+- separate persistent Skill unlock.
+
+No exact numeric threshold is authored here.
+
+Battle use:
+
+Limit:
+
+**once per Battle**
+
+Trigger:
+
+the user is targeted by one direct attack whose exact attack/weapon metadata identifies a **metal-bearing Bukijutsu weapon/projectile**.
+
+Player text:
+
+> **Pull one incoming metal weapon off-line with magnetised sand, reducing that attack's ATK by 60%.**
+
+Effect:
+
+- reduce the qualifying direct Attack-PL packet by **60% pre-Stamina**;
+- ordinary Stamina then resolves against the reduced packet;
+- no effect against unarmed Taijutsu;
+- no effect against non-metal weapons;
+- no effect against pure Ninjutsu/Kinjutsu packets merely because a Character happens to carry metal equipment;
+- no weapon is permanently stolen;
+- no disarm inventory state is created;
+- no counterattack is created.
+
+This gives Shukaku-derived Magnet Release a defensive fingerprint that matters against the actual material being manipulated rather than acting as a generic guard percentage.
+
+---
+
+## CHARACTER-SPECIFIC HYBRID BRANCH
+
+These Skills are **not** part of every Shukaku host's core Magnet Release branch.
+
+They appear in a Character's Potential Skill Roster only if that Character also satisfies the separate external technique/capability chain.
+
+### 4. `skill_shukaku_sage_art_magnet_release_rasengan` — **Sage Art: Magnet Release Rasengan**
 
 Classification:
 
@@ -553,7 +698,7 @@ Canon anchor:
 
 Naruto uses **Sage Art: Magnet Release Rasengan** after gaining Shukaku's chakra. The technique incorporates Shukaku's Magnet Release/cursed markings and binds the target when struck.
 
-This is a high-condition potential Skill, not a general Shukaku freebie.
+This is a high-condition **character-specific hybrid potential Skill**, not a general Shukaku Skill.
 
 Potential-roster prerequisites:
 
@@ -563,7 +708,12 @@ Potential-roster prerequisites:
 - sufficient future-framework Ninjutsu / Fūinjutsu or other technical-development predicates as later closed by Progression;
 - separate persistent Skill unlock.
 
-A Character who merely has Shukaku but does not know Rasengan / Senjutsu does **not** have this Skill in their learnable-ready state.
+Therefore:
+
+- Tobirama–Shukaku does **not** learn Magnet Release Rasengan merely because he has Shukaku;
+- Sasuke does **not** learn Magnet Release Rasengan merely because he has Shukaku;
+- any arbitrary Shukaku host does **not** learn Magnet Release Rasengan merely because they have Shukaku;
+- a Character who independently possesses all required technique/capability predicates may potentially develop it.
 
 Battle use:
 
@@ -597,23 +747,39 @@ Effect:
 - no second Shukaku damage packet;
 - host owns the action opportunity.
 
-This technique is intentionally narrower than Cursed Sand Bind on route suppression, but stronger in direct attack pressure.
-
 ---
 
-## 3. Roster philosophy exposed by Shukaku
+## Roster philosophy exposed by Shukaku
 
-Shukaku demonstrates why a global Potential Skill Roster is useful.
+Shukaku now demonstrates two separate layers of Skill potential.
 
-Different Characters can legitimately have different future Shukaku-derived possibilities:
+### Source-derived core branch
 
-- a high-Fūinjutsu / high-Ninjutsu Character may qualify for **Cursed Sand Bind** development;
-- a Character who also knows Rasengan and Senjutsu may qualify for **Sage Art: Magnet Release Rasengan**;
-- a Character lacking those prerequisites may still use the ordinary cooperative Shukaku package without either Skill.
+A Character who legitimately develops **Shukaku-derived Magnet Release** can potentially pursue source-authored techniques such as:
+
+- Cursed Sand Bind;
+- Polarity Burial;
+- Polar Sand Guard.
+
+These do not care whether the Character is Naruto, Tobirama, Sasuke or another future host.
+
+Their exact eligibility still depends on the Character's own Stats / development predicates.
+
+### Character-specific hybrid branch
+
+A Skill that combines Shukaku with another exact technique family appears only where both branches exist.
+
+Example:
+
+- Shukaku Magnet Release + Rasengan + Senjutsu -> potential **Sage Art: Magnet Release Rasengan**.
 
 Therefore:
 
 > **same Tailed Beast source != identical future Skill ceiling for every host**
+
+and:
+
+> **source-derived discipline branch != character-specific hybrid technique**
 
 The engine/framework should filter an **authored catalogue** through Character-specific eligibility predicates. It must not procedurally invent new techniques from raw Stats.
 
@@ -702,7 +868,7 @@ Known project anti-double-count example:
 **Seal Reinforcement:** **once/Battle — PROPOSED.**  
 **Cooperative assisted Skill:** **Wind Release: Sand Buckshot ATK38 each up to 3, once/Battle — PROPOSED.**  
 **Tailed Beast Ball:** **NOT in proposed Shukaku own kit.**  
-**Potential learnable Magnet Release roster:** **Cursed Sand Bind + Sage Art: Magnet Release Rasengan — PROPOSED.**  
+**Potential learnable Magnet Release roster:** **Core SC branch = Cursed Sand Bind + Polarity Burial + Polar Sand Guard; character-specific hybrid = Sage Art: Magnet Release Rasengan — PROPOSED.**  
 **Global Potential Skill Roster / exact Stat thresholds:** **NOT YET CLOSED — future shared unlock framework under #382.**  
 **Implementation:** NOT STARTED.  
 **Runtime validation:** NOT CLAIMED.  
