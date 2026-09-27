@@ -174,6 +174,8 @@ and more:
 
 **what do they expect Konoha to do next?**
 
+### AUTHOR / IMPLEMENTATION NOTE
+
 Render material tradecraft where current history supports it:
 - false/compromised orders;
 - planted or manipulated trails;
@@ -376,6 +378,8 @@ It only proves the coordinate was real.
 Menma commits to going down.
 
 **ARC 2 / MISSION 2 COMPLETE**
+
+### AUTHOR / IMPLEMENTATION NOTE
 
 Do not continue the descent inside M2.
 
@@ -607,6 +611,8 @@ Keep the exact authored result without turning it into tutorial prose:
 
 **KURAMA:** “You stole the room.”
 
+### AUTHOR / IMPLEMENTATION NOTE
+
 Do not explain the joke afterward.
 
 ---
@@ -660,6 +666,8 @@ When Minato asks what she was protecting:
 
 **MENMA:** “That wasn't part of the answer.”
 
+### AUTHOR / IMPLEMENTATION NOTE
+
 Keep Minato's reaction grounded in current father/Hokage Knowledge.
 
 Do not have him magically infer the chamber.
@@ -675,6 +683,8 @@ Do not have him magically infer the chamber.
 ## `a2m3_menma_good_01` — dialogue — MENMA
 
 **MENMA:** “Good.”
+
+### AUTHOR / IMPLEMENTATION NOTE
 
 This is Menma's voice.
 
