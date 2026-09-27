@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-19  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons  
-**Status:** **MECHANICS DESIGN CLOSED — STEPHEN SIGN-OFF — PL / REGISTRY NUMERIC RECONCILIATION #258 OPEN**  
+**Status:** **PARTIALLY REOPENED BY STEPHEN 2026-09-27 — PL82 TARGET LOCKED / SICKLEWIND ROUTE RECLASSIFIED AS ATTACK / ENHANCEMENT OPEN**  
 **Parent:** #235  
 **Stephen mechanics sign-off:** 2026-09-19  
 **PL / Registry dependency:** #258  
@@ -34,9 +34,13 @@ Production state:
 
 **LIVE Entity Registry source.**
 
-## PL / Registry conflict — not owned by Combat
+## PL / Registry decision — target locked by Stephen
 
-Current live `game.js` records:
+Stephen explicitly resolved the target on **2026-09-27**:
+
+> **Kamatari Base PL = 82.**
+
+Current live `game.js` still records:
 
 - Ninjutsu **74**
 - Taijutsu **78**
@@ -47,15 +51,15 @@ Current live `game.js` records:
 - Stamina **70**
 - Base PL **77**
 
-Those Stats resolve to PL77 under Formula v1.0.
+Those live Stats resolve to PL77 under Formula v1.0 and are therefore now implementation drift rather than final calibration authority.
 
-However, #236's opening PL / Registry authority says Kamatari is an existing live anchor at **PL82**.
+Combat will not create a direct/hidden PL bonus and will not invent Kamatari's replacement seven-Stat row.
 
-Combat will not invent a hidden PL bonus or silently rewrite Stats to reconcile that contradiction.
+Issue **#258** remains the PL / Registry / Rank lane for the exact **Formula-v1.0-valid seven Base Stats that resolve to PL82**.
 
-Issue **#258** has therefore been routed to PL / Registry / Rank for the authoritative seven Stats + Base PL.
+Stable ID remains:
 
-This proposal deliberately authors Kamatari's mechanics without depending on whether the returned Base PL is 77 or 82.
+`wr_kamatari`
 
 No Kamatari PL transfers wholesale to a controller.
 
@@ -89,18 +93,21 @@ SC adaptation below does **not** claim every gameplay state or number is literal
 
 **WIND-RIDING BUKIJUTSU / PURSUIT / FORMATION BYPASS**
 
-Kamatari's RESET v2 identity is not:
+Stephen corrected the Source 09 classification on **2026-09-27**:
 
-> +6 Bukijutsu because he carries a sickle.
+> **Sicklewind Route is an ATTACK / action. It is not Kamatari's attached Enhancement.**
 
-His source-specific identity is:
+The already-approved tactical identity remains:
 
-1. use Kamatari's wind-riding speed to reach **one enemy outside Active Slot 1** once per Battle;
-2. let the controller break the normal front-target restriction with an exact Wind Release / Bukijutsu strike rather than a generic Stat bonus;
-3. pursue enemies who try to reposition or escape;
-4. retain **Quick Beheading Dance** as Kamatari's signature manifested attack without inventing vegetation, debris or cover objects the current Battle model does not use.
+1. **Sicklewind Route** may be used once per Battle to attack one enemy **not occupying the Active slot**;
+2. the target may be a legally occupied waiting/Benched/Reserve enemy slot;
+3. resolving the attack does not by itself promote that enemy, reorder the queue or create a second action;
+4. Kamatari retains pursuit pressure against movement/reposition;
+5. **Quick Beheading Dance** remains his signature wide cutting attack.
 
-This deliberately replaces the old generic Stat-stick interpretation.
+The exact Attack-PL number for Sicklewind Route was never closed in the prior approval and remains **OPEN for Combat balancing**.
+
+Kamatari's actual **Enhancement package is separately OPEN** and must not be fabricated by relabelling Sicklewind Route.
 
 ---
 
@@ -109,81 +116,94 @@ This deliberately replaces the old generic Stat-stick interpretation.
 ## OWNED
 
 - collection presence only;
-- no global Battle bonus.
+- no global Battle bonus by ownership alone.
 
 ## ATTACHED / PREPARED
 
-- Kamatari is the Character's active Summon;
-- **Sicklewind Route** enhancement is active;
-- no independent Kamatari Battle PL ledger;
-- no independent Kamatari action opportunity;
-- no +6 Bukijutsu Stat modifier under this RESET v2 proposal.
+- Kamatari is the Character's active/prepared Summon source;
+- Kamatari's authorised Summon actions may be exposed through the current Battle's legal Summon-action interface;
+- **Sicklewind Route is an attack/action, not an attached passive or Enhancement**;
+- using Sicklewind Route consumes the legal action opportunity for that Summon attack;
+- no second Kamatari Battle PL ledger is created merely by ordinary Alpha Summon-action use;
+- Kamatari's separate Enhancement package remains **OPEN**.
 
-## MANIFESTED
+## MANIFESTED — future/full-manifestation capability
+
+Where a later Battle mode explicitly permits independent manifestation:
 
 - Kamatari becomes independently targetable;
-- own Battle PL ledger = his own Effective PL after #258 numeric authority is resolved;
-- own normal Entity action opportunity;
-- **Sicklewind Route remains active** while Kamatari is still the attached source;
+- own Battle PL ledger uses his own Effective PL, with Base PL target **82** after #258 returns formula-valid Stats;
+- Kamatari uses his own action opportunity under that manifestation model;
+- his attacks remain his own attacks;
 - no Kamatari Stats / PL transfer to controller.
 
-If Kamatari leaves manifestation but remains attached:
-
-- Sicklewind Route remains;
-- Kamatari's body / own Battle PL ledger / own actions leave play.
-
-Detaching or replacing Kamatari:
-
-- ends Sicklewind Route;
-- removes any unused Sicklewind Route opportunity.
+No ordinary Alpha Battle should infer a seventh Character slot or independent Summon turn merely from this future-capability section.
 
 ---
 
-# E. REQUIRED Enhancement Package
+# E. REQUIRED Enhancement Package — OPEN
 
-## `kamatari_sicklewind_route` — **Sicklewind Route**
+Stephen's 2026-09-27 correction explicitly reopens this section.
 
-Activation:
+**Sicklewind Route is NOT the Enhancement.**
 
-**ATTACHED** — remains available while manifested.
+The former RESET v2 interpretation that used Sicklewind Route as the attached Enhancement is superseded.
 
-Limit:
+Current requirements for the eventual Kamatari Enhancement:
 
-**once per Battle**
+- it must be distinct from Sicklewind Route and Kamatari's own attacks;
+- it must have exact activation ownership;
+- it must not transfer Kamatari's PL wholesale;
+- it must pass the Shinobi Chronicles unique-mechanics / name-swap test;
+- it must not be silently inferred from the legacy `+6 Bukijutsu` row merely because that row exists in runtime;
+- Stephen sign-off is required before this source is fully calibrated again.
 
-Player text:
+Until that is closed:
 
-> **Once per Battle, use a Wind Release or Bukijutsu attack on one enemy in the waiting formation instead of the active enemy.**
-
-Exact Battle mechanics:
-
-- normal enemy targeting is centered on **Enemy Active Slot 1**;
-- Sicklewind Route may be declared when Kamatari's controller uses one qualifying **single-target Wind Release or Bukijutsu ATTACK**;
-- instead of Enemy Active Slot 1, choose one occupied enemy waiting slot from **Slots 2–6**;
-- resolve that attack normally against the chosen participant;
-- the chosen waiting enemy does **not** become the active enemy merely because it was attacked;
-- the enemy deployment queue is not reordered merely because Sicklewind Route was used;
-- if the attack legitimately depletes that participant to 0 Battle PL, ordinary depletion / queue rules handle the result;
-- Sicklewind Route cannot target an empty, already-depleted or otherwise legally untargetable participant;
-- the route does not bypass exact immunity, protection, sealing, space-time or technique-specific targeting restrictions;
-- the route is consumed when the off-slot attack is committed;
-- no second attack, bonus action, hidden Attack PL or Stat increase is created.
-
-Why this is Kamatari-specific:
-
-Kamatari's defining wind-riding speed lets the controller **cut past the fighter currently occupying the front of the formation** and reach someone waiting behind them. SC expresses that canon identity through its actual six-slot Battle deployment model rather than through vegetation, debris or other environmental objects the current game does not model.
-
-Decision created:
-
-> **Do I spend Kamatari's one route now to hit a dangerous enemy before they reach Active Slot 1, or save it for later?**
-
-This replaces the proposed generic wind-lane / soft-cover concept.
+> **KAMATARI SKILLS/ATTACKS ≠ KAMATARI ENHANCEMENT.**
 
 ---
 
 # F. Own Skill Kit
 
-## 1. `kamatari_reaping_rush` — **Reaping Rush**
+## 1. `kamatari_sicklewind_route` — **Sicklewind Route**
+
+Class:
+
+**ATTACK / FORMATION BYPASS**
+
+Limit:
+
+**once per Battle**
+
+Target:
+
+one legally occupied enemy slot **not occupying the Active slot**
+
+Approved player-facing rule:
+
+> **Once per Battle, attack an enemy NOT occupying the Active slot.**
+
+Exact behavior:
+
+- target one legally occupied waiting / Benched / Reserve enemy participant;
+- bring that target into confrontation focus for the action presentation where needed;
+- resolve the attack against that target;
+- after resolution, the target remains in its ordinary queue/formation state unless normal depletion/formation rules independently change it;
+- the current Active enemy remains Active merely because Sicklewind Route was used;
+- no queue reorder;
+- no forced promotion;
+- no bonus action;
+- no hidden Stat or PL increase;
+- no universal targeting bypass.
+
+**Attack PL: OPEN.**
+
+The previous design never closed an exact Attack-PL number for this action. Combat must balance and obtain Stephen sign-off on that packet separately rather than inventing it here.
+
+---
+
+## 2. `kamatari_reaping_rush` — **Reaping Rush**
 
 Class:
 
@@ -214,7 +234,7 @@ This is Kamatari's reliable no-setup attack.
 
 ---
 
-## 2. `kamatari_gale_pursuit` — **Gale Pursuit**
+## 3. `kamatari_gale_pursuit` — **Gale Pursuit**
 
 Class:
 
@@ -252,7 +272,7 @@ Decision created:
 
 ---
 
-## 3. `kamatari_crosswind_cutoff` — **Crosswind Cutoff**
+## 4. `kamatari_crosswind_cutoff` — **Crosswind Cutoff**
 
 Class:
 
@@ -292,7 +312,7 @@ This is not a generic "root" or "slow": the target chooses whether the route is 
 
 ---
 
-## 4. `kamatari_quick_beheading_dance` — **Quick Beheading Dance**
+## 5. `kamatari_quick_beheading_dance` — **Quick Beheading Dance**
 
 Class:
 
@@ -322,8 +342,8 @@ Rules:
 - does not create an extra controller action;
 - does not automatically kill, dismember or remove a target;
 - does **not** invent destructible vegetation, debris or soft-cover objects;
-- Sicklewind Route is the separate once-per-Battle rule that permits the controller to target a waiting-slot enemy;
-- Quick Beheading Dance does not independently grant unrestricted access to Slots 2–6 unless another exact rule makes those participants legally exposed.
+- Sicklewind Route is the separate once-per-Battle **attack** that can target a non-Active enemy;
+- Quick Beheading Dance does not independently grant unrestricted access to waiting/Benched/Reserve enemies unless another exact rule makes those participants legally exposed.
 
 This preserves Kamatari's wide cutting signature while keeping the new formation-bypass enhancement mechanically distinct.
 
@@ -345,11 +365,11 @@ Crosswind Cutoff is limited to once per Battle and preserves target choice rathe
 
 # H. Persistent / collection progression
 
-No account-wide persistent collection bonus is proposed for Kamatari.
+No account-wide persistent collection bonus is currently closed for Kamatari.
 
 No generic rarity bonus is added.
 
-His identity lives in the active Sicklewind Route / manifested combat package.
+Do not use this section to substitute for the still-open **Enhancement package**.
 
 ---
 
@@ -357,9 +377,9 @@ His identity lives in the active Sicklewind Route / manifested combat package.
 
 - Kamatari's own Base PL is Kamatari's Battle capacity only.
 - no Entity PL transfers to controller.
-- RESET v2 **retires** the old generic `wr_kamatari.sicklewind_guidance` +6 Bukijutsu Stat package if this proposal is approved.
-- do not apply +6 Bukijutsu and Sicklewind Route together.
-- Sicklewind Route is consumed by one committed off-slot attack and cannot be reused in the same Battle.
+- the legacy `wr_kamatari.sicklewind_guidance` +6 Bukijutsu row is **not ratified as final Enhancement authority by this correction**; whether it is retired or superseded by a new Enhancement remains OPEN;
+- do not treat Sicklewind Route as a replacement passive Enhancement;
+- Sicklewind Route is consumed as its own once-per-Battle off-slot attack and cannot be reused in the same Battle.
 - manifested Kamatari remains the same attached source; no duplicate second Kamatari package is created.
 - a dedicated future representation that already embodies this exact Kamatari wind-lane package must not receive it twice.
 
@@ -377,37 +397,42 @@ Current `game.js` still contains the historical Kamatari package:
 
 Those rows pre-date RESET v2 and the global unique-mechanics standard.
 
-Stephen sign-off requires implementation to:
+Current correction requires future implementation to:
 
-- replace +6 Bukijutsu with **Sicklewind Route**;
-- replace the old Kamatari manifested action palette with the signed-off Source 09 kit;
+- **NOT** replace an Enhancement with Sicklewind Route;
+- implement Sicklewind Route only after its own exact Attack-PL packet is closed;
+- replace old Kamatari attacks only from final signed-off Combat authority;
 - do not stack old and new actions/effects;
-- preserve live implementation until Coding performs the explicit migration;
-- resolve #258 before claiming Kamatari's final Base PL / Stats are numerically closed.
+- preserve live implementation until the corrected Source 09 package is fully closed;
+- resolve #258 with Formula-valid Base Stats for **PL82** before claiming Kamatari's final Base PL / Stats are numerically closed;
+- wait for a separately signed-off Kamatari Enhancement package before migrating the legacy enhancement row.
 
 No runtime implementation / browser validation / Golden claim is made by this proposal.
 
 ---
 
-# K. Player-facing summary
+# K. Player-facing summary — CURRENT CORRECTED DIRECTION
 
 ## KAMATARI — WIND-RIDING SICKLE / PURSUIT / FORMATION BYPASS
 
-> **Attach Kamatari to gain Sicklewind Route: once per Battle, one of your Wind Release or Bukijutsu attacks can target an enemy waiting outside Active Slot 1. Manifest Kamatari for fast sickle attacks, pursuit and Quick Beheading Dance.**
+> **Sicklewind Route is Kamatari's once-per-Battle attack that can strike an enemy outside the Active slot. His separate attached Enhancement is still being designed.**
 
-That is the intended Source 09 identity.
+The full player-facing source summary is therefore **not final** until the Enhancement package and Sicklewind Route Attack PL are closed.
 
 ---
 
 # L. Decision state
 
-**Mechanics:** **DESIGN CLOSED — Stephen sign-off.**  
-**Identity:** stable ID `wr_kamatari` preserved.  
-**PL numeric closure:** BLOCKED only on PL / Registry issue #258.  
-**Implementation:** NOT STARTED under RESET v2.  
+**Stable identity:** `wr_kamatari` preserved.  
+**PL target:** **82 — LOCKED BY STEPHEN 2026-09-27.**  
+**Formula-valid seven Stats:** OPEN / owned by PL-Registry-Rank under #258.  
+**Sicklewind Route classification:** **ATTACK — CLOSED correction.**  
+**Sicklewind Route off-slot behavior:** **CLOSED.**  
+**Sicklewind Route Attack PL:** **OPEN.**  
+**Kamatari Enhancement package:** **OPEN.**  
+**Other signed-off Kamatari attack concepts:** preserved unless later balancing evidence requires a specific numeric correction.  
+**Implementation:** HOLD — corrected source package is not fully closed.  
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
 
-**KAMATARI MECHANICS DESIGN CLOSED.** PL / Registry numeric authority remains open under #258.
-
-**mechanics design closed != PL numeric authority closed != implemented != runtime validated != Golden GREEN**
+**PL target locked != Stats calibrated != attack numerics fully closed != enhancement closed != implemented != runtime validated != Golden GREEN**
