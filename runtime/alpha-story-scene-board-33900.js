@@ -359,12 +359,18 @@ function installStyle(){
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-layout{position:relative;z-index:5;width:min(94%,1180px)!important;min-height:0!important;margin:0 0 1.2%!important;display:grid!important;grid-template-columns:1fr!important;gap:8px!important;padding:0!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-context{display:none!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-panel{position:relative;min-height:0!important;max-height:31vh;padding:13px 18px 12px!important;border:1px solid rgba(205,169,83,.62)!important;border-radius:14px!important;background:linear-gradient(180deg,rgba(3,9,14,.82),rgba(2,7,11,.94))!important;backdrop-filter:blur(8px);box-shadow:0 18px 45px rgba(0,0,0,.42)!important;overflow:visible!important;cursor:pointer;}
-#story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-story-panel{width:min(52%,650px)!important;border-color:rgba(103,221,230,.55)!important;background:linear-gradient(145deg,rgba(4,18,24,.94),rgba(2,9,14,.97))!important;}
-#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="player"] .sc-chronicle-layout{justify-items:start!important;}
-#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-chronicle-layout{justify-items:end!important;}
-#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-panel{border-color:rgba(218,176,77,.58)!important;background:linear-gradient(145deg,rgba(25,18,6,.93),rgba(8,10,12,.97))!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-chronicle-layout{position:absolute!important;left:4%!important;right:4%!important;bottom:23.5%!important;width:auto!important;margin:0!important;display:flex!important;align-items:flex-end!important;justify-content:flex-start!important;padding:0!important;z-index:31!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-story-panel{width:min(36vw,500px)!important;border-color:rgba(103,221,230,.55)!important;background:linear-gradient(145deg,rgba(4,18,24,.94),rgba(2,9,14,.97))!important;box-shadow:0 18px 48px rgba(0,0,0,.48),0 0 22px rgba(78,210,220,.08)!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="player"] .sc-chronicle-layout{justify-content:flex-start!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-chronicle-layout{justify-content:flex-end!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-panel{border-color:rgba(218,176,77,.58)!important;background:linear-gradient(145deg,rgba(25,18,6,.93),rgba(8,10,12,.97))!important;box-shadow:0 18px 48px rgba(0,0,0,.48),0 0 22px rgba(218,176,77,.08)!important;}
 #story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-story-panel::after{content:"";position:absolute;top:-8px;left:22%;width:14px;height:14px;transform:translateX(-50%) rotate(45deg);border-left:1px solid rgba(103,221,230,.5);border-top:1px solid rgba(103,221,230,.5);background:rgba(2,9,14,.97);}
 #story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-panel::after{left:78%;border-color:rgba(218,176,77,.52);background:rgba(8,10,12,.97);}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-story-name{color:#78dfe7!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-name{color:#e5c66f!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="record"] .sc-chronicle-layout{width:min(88%,1040px)!important;margin:0 0 2.4%!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="record"] .sc-story-panel{max-height:58vh!important;padding:22px 26px 20px!important;border-color:rgba(218,176,77,.72)!important;background:linear-gradient(180deg,rgba(6,14,18,.96),rgba(2,7,11,.985))!important;box-shadow:0 20px 60px rgba(0,0,0,.56)!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="record"] .sc-story-text{white-space:pre-wrap!important;max-height:46vh!important;overflow:auto!important;font-size:clamp(12px,.92vw,15px)!important;line-height:1.5!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-portrait{display:none!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-text{margin-top:6px!important;font-size:clamp(13px,1.05vw,17px)!important;line-height:1.42!important;}
 #story-scene-presentation-layer[data-sc-performance="true"]:not([data-sc-cue-kind="record"]) .sc-story-panel{max-height:none!important;overflow:visible!important;}
@@ -436,8 +442,12 @@ function installStyle(){
   document.head.appendChild(style);return true;
 }
 function actorMarkup(actor){
-  const image=actor.image?`<img src="${escapeHTML(actor.image)}" alt="">`:`<div class="sc-scene-board-33900__actor-silhouette" aria-hidden="true"></div>`;
-  return `<figure class="sc-scene-board-33900__actor ${actor.focus?"is-focus":""} ${actor.entering?"is-entering":""}" data-actor-id="${escapeHTML(actor.id||"")}"><div class="sc-scene-board-33900__actor-frame"></div>${image}<figcaption class="sc-scene-board-33900__actor-tag"><strong>${escapeHTML(actor.label||"UNKNOWN")}</strong>${actor.state?`<small>${escapeHTML(actor.state)}</small>`:""}</figcaption></figure>`;
+  const hasImage=!!actor.image;
+  const image=hasImage?`<img src="${escapeHTML(actor.image)}" alt="">`:`<div class="sc-scene-board-33900__actor-silhouette" aria-hidden="true"></div>`;
+  const identity=hasImage?"":`<strong>${escapeHTML(actor.label||"UNKNOWN")}</strong>`;
+  const state=actor.state?`<small>${escapeHTML(actor.state)}</small>`:"";
+  const tag=identity||state?`<figcaption class="sc-scene-board-33900__actor-tag">${identity}${state}</figcaption>`:"";
+  return `<figure class="sc-scene-board-33900__actor ${actor.focus?"is-focus":""} ${actor.entering?"is-entering":""}" data-actor-id="${escapeHTML(actor.id||"")}" data-actor-label="${escapeHTML(actor.label||"")}"><div class="sc-scene-board-33900__actor-frame"></div>${image}${tag}</figure>`;
 }
 function boardMarkup(projection){
   const actors=Array.isArray(projection.actors)?projection.actors.slice(0,3):[];
@@ -447,25 +457,34 @@ function boardMarkup(projection){
 function clearBoard(layer){if(!layer)return;try{delete layer.dataset.scSceneBoard;delete layer.dataset.scSceneMode;delete layer.dataset.scPerformance;}catch(_error){};for(const node of layer.querySelectorAll?layer.querySelectorAll(".sc-scene-board-33900"):[]){if(typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(node,"scene_board_teardown");if(node&&typeof node.remove==="function")node.remove();}}
 function updatePerformancePanel(layer,runtime=currentRuntime()){
   if(!layer||!runtime)return false;const beat=currentBeat(runtime),p=performanceCursor(runtime,beat);
-  if(!p){delete layer.dataset.scPerformance;delete layer.dataset.scCueKind;delete layer.dataset.scCueSpeakerSide;return false;}
+  const kicker=layer.querySelector&&layer.querySelector(".sc-story-kicker");
+  if(!p){
+    delete layer.dataset.scPerformance;delete layer.dataset.scCueKind;delete layer.dataset.scCueSpeakerSide;delete layer.dataset.scCueSpeakerActorId;
+    if(kicker)kicker.style.removeProperty("display");
+    return false;
+  }
   layer.dataset.scPerformance="true";const cue=p.cue||{};
   layer.dataset.scCueKind=String(cue.kind||"narration");
   if(cue.kind==="dialogue"){
     const projection=resolveStorySceneBoardProjection(runtime.sceneId,beat&&beat.beatId,runtime);
     const actors=projection&&Array.isArray(projection.actors)?projection.actors:[];
-    const speaker=String(cue.speakerName||cue.speaker||"").toUpperCase();
-    const first=String(actors[0]&&actors[0].label||"").toUpperCase();
-    layer.dataset.scCueSpeakerSide=speaker&&first&&speaker===first?"player":"opposition";
-  }else delete layer.dataset.scCueSpeakerSide;
+    const speaker=String(cue.speakerName||cue.speaker||"").trim().toUpperCase();
+    const speakerIndex=actors.findIndex(actor=>String(actor&&actor.label||"").trim().toUpperCase()===speaker);
+    const speakerActor=speakerIndex>=0?actors[speakerIndex]:null;
+    layer.dataset.scCueSpeakerSide=speakerIndex===0?"player":"opposition";
+    if(speakerActor&&speakerActor.id)layer.dataset.scCueSpeakerActorId=String(speakerActor.id);else delete layer.dataset.scCueSpeakerActorId;
+  }else{
+    delete layer.dataset.scCueSpeakerSide;delete layer.dataset.scCueSpeakerActorId;
+  }
   const text=layer.querySelector&&layer.querySelector(".sc-story-text");const cueText=String(cue.text||"");if(text&&text.textContent!==cueText)text.textContent=cueText;
   const panel=layer.querySelector&&layer.querySelector(".sc-story-panel");
   let name=layer.querySelector&&layer.querySelector(".sc-story-name");
   const dialogueSpeaker=cue.kind==="dialogue"?String(cue.speakerName||cue.speaker||""):"";
-  const speakerLabel=dialogueSpeaker||(cue.kind==="record"?"SHINOBI RECORD":"NARRATION");
+  const speakerLabel=dialogueSpeaker||(cue.kind==="record"?"CHRONICLE RECEIPT":"NARRATION");
   if(!name&&panel){name=document.createElement("div");name.className="sc-story-name sc-performance-name-33900";}
   if(name&&panel&&!panel.contains(name)){const t=panel.querySelector(".sc-story-text");panel.insertBefore(name,t||null);}
   if(name){if(name.textContent!==speakerLabel)name.textContent=speakerLabel;name.style.display="block";}
-  const kicker=layer.querySelector&&layer.querySelector(".sc-story-kicker");const kickerText=String(cue.kind||"narration").toUpperCase();if(kicker&&kicker.textContent!==kickerText)kicker.textContent=kickerText;
+  if(kicker)kicker.style.setProperty("display","none","important");
   const primary=layer.querySelector&&layer.querySelector(".sc-chronicle-primary");if(primary){if(primary.textContent!=="›")primary.textContent="›";primary.setAttribute("aria-label","Advance scene");primary.title="Advance scene";}
   return true;
 }
@@ -645,7 +664,10 @@ if(typeof document!=="undefined"){
 function runStorySceneBoard33900Diagnostics(){
   const checks={
     patchId:PATCH_ID==="story_scene_board_33900_2026_09_25_origin_benchmark",
-    sharedKakashiBenchmarkPanels:installStyle.toString().includes("border-radius:14px")&&installStyle.toString().includes('data-sc-cue-kind="dialogue"')&&installStyle.toString().includes("data-intent-icon"),
+    sharedKakashiBenchmarkPanels:installStyle.toString().includes("bottom:23.5%")&&installStyle.toString().includes('data-sc-cue-kind="dialogue"')&&installStyle.toString().includes("data-intent-icon"),
+    singlePerformanceLabel:String(updatePerformancePanel).includes('kicker.style.setProperty("display","none","important")')&&String(updatePerformancePanel).includes('cue.kind==="record"?"CHRONICLE RECEIPT":"NARRATION"'),
+    speakerOwnedDialogue:String(updatePerformancePanel).includes("speakerIndex=actors.findIndex")&&String(updatePerformancePanel).includes("scCueSpeakerActorId"),
+    bakedCardIdentityNotDuplicated:String(actorMarkup).includes('const identity=hasImage?"":')&&String(actorMarkup).includes("data-actor-label"),
     sharedChoiceIntentClassifier:typeof storyChoiceIntentIcon33900==="function"&&["HELP HER","KEEP GOING","ASK ABOUT THE ROUTE","CONFRONT HIM"].every(label=>storyChoiceIntentIcon33900({label})!=="•"),
     cueLevelBackdropOverride:resolveBoardBackdropPath.toString().includes("resolveBackdrop")&&resolveBoardBackdropPath.toString().includes("performanceCursor"),
     compactLiveStateCallout:installStyle.toString().includes("width:max-content")&&installStyle.toString().includes("height:auto!important")&&installStyle.toString().includes("align-items:flex-start")&&installStyle.toString().includes("left:3.2%;right:auto"),
