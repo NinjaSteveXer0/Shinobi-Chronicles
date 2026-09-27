@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-27  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons / Tailed Beasts  
-**Status:** **MECHANICS PROPOSED — NEW SEVEN-TAILS EXACT REPRESENTATION REQUIRES PL / REGISTRY RECALIBRATION**  
+**Status:** **PROPOSED — PL / REGISTRY DEPENDENCY CLOSED / AWAITING STEPHEN MECHANICS SIGN-OFF**  
 **Parent:** #235  
 **Reset authority:** `Documentation/Combat/SC_Combat_Summons_Tailed_Beasts_Full_Calibration_RESET_v2_2026-09-18.md`  
 **Canon research:** `Documentation/Combat/SC_Combat_Tailed_Beasts_Canon_Research_Shukaku_Matatabi_Isobu_Chomei_2026-09-27.md`  
@@ -36,11 +36,39 @@ Mechanical identity:
 
 **AERIAL OVERRUN / HORN-CARAPACE MOMENTUM / RAW FLIGHT**
 
-Exact Base Stats / Base PL:
+Exact Base Stats:
 
-**OPEN — PL / Registry / Rank must recalibrate under current Formula v1.0.**
+- Ninjutsu **98**
+- Taijutsu **112**
+- Bukijutsu **52**
+- Fūinjutsu **54**
+- Kinjutsu **102**
+- Genjutsu **58**
+- Stamina **112**
 
-The retired historical PL103 row may be inspected as archaeology only. It is not reactivated by this proposal.
+Formula v1.0 raw:
+
+**106.966666...**
+
+Base PL:
+
+**107**
+
+Registry state:
+
+**DURABLY CALIBRATED / STAGED / NOT LIVE**
+
+Asset:
+
+`Assets/Tailed Beasts/seven_tails.png`
+
+Fresh authority:
+`Documentation/Registry/Seven Tails and Chomei Representation Recalibration 2026-09-27.md`
+
+Calibration commit:
+`27feea09f1916ab6d59359a4afd0b02d47950b09`
+
+The retired historical PL103 row remains archaeology only and is NOT reactivated.
 
 ## `chomei` — Chōmei
 
@@ -833,8 +861,8 @@ Batch 5 must audit any dedicated Chōmei/Fū/Jinchūriki representations before 
 
 **Persistent beast:** `beast_chomei` — preserved.  
 **Chōmei Base Stats / PL107:** CLOSED by current Registry.  
-**New Seven-Tails exact representation:** PROPOSED by Stephen's current owner direction; **PL/Registry numeric row OPEN**.  
-**Historical retired Seven-Tails PL103 row:** NOT automatically revived.  
+**Seven-Tails exact representation:** ACCEPTED by PL / Registry — wild / non-cooperative raw-flight / horn-momentum, Base Stats `98/112/52/54/102/58/112`, Base PL **107**.  
+**Historical retired Seven-Tails PL103 row:** RETIRED / NOT revived; fresh PL107 row is successor authority.  
 **Shared manifested core:** PROPOSED.  
 **Seven-Tails manifested variants:** Overrun Dive + Six-Wing Circuit — PROPOSED.  
 **Chōmei manifested variants:** Lucky Horn Vector + Wing Shelter — PROPOSED.  
@@ -848,6 +876,6 @@ Batch 5 must audit any dedicated Chōmei/Fū/Jinchūriki representations before 
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
 
-**Combat can close mechanics after Stephen sign-off, but full Source 14 closure additionally requires PL/Registry return for the newly deliberate Seven-Tails exact representation.**
+**PL / Registry dependency #410 is CLOSED. Source 14 now requires only Stephen's final mechanics sign-off before Combat DESIGN CLOSED status.**
 
 **proposal != design closed != implemented != runtime validated != Golden GREEN**
