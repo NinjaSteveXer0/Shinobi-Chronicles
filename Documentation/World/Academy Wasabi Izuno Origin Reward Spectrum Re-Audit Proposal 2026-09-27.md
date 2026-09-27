@@ -3,8 +3,16 @@
 **Date:** 2026-09-27  
 **Owner:** World / Missions / Events / Rewards  
 **Source:** GitHub #406 / re-audit of #404  
-**Status:** **WORLD PROPOSAL — STEPHEN SIGN-OFF REQUIRED / DO NOT IMPLEMENT YET**  
+**Status:** **SUPERSEDED BY STEPHEN-APPROVED BENCHMARK**  
 **Purpose:** First benchmark candidate under the binding Reward Spectrum Firewall. Do **not** propagate this benchmark to the other Origins until Stephen signs off.
+
+## Superseded
+
+Stephen reviewed the proposal and approved the multi-channel direction with explicit corrections for universal Origin spending money, mandatory Battle-victory cash, Investigation/Intelligence treatment, NPC-card projection and hidden CE presentation.
+
+Current authority:
+
+`Documentation/World/Academy Wasabi Izuno Origin Reward Spectrum Benchmark 2026-09-27.md`
 
 ## 1. Binding authority consumed
 
