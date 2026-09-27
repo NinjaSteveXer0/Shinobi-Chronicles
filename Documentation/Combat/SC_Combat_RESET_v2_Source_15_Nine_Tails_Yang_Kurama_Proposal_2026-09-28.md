@@ -276,11 +276,11 @@ This is self-interest:
 
 ---
 
-# G. Nine-Tails Enhancement — Caged Fox Intervention
+# G. Nine-Tails Enhancement — Nine-Tails Chakra Surge
 
 ID:
 
-`nine_tails_caged_fox_intervention`
+`nine_tails_chakra_surge`
 
 Activation:
 
@@ -288,49 +288,36 @@ Activation:
 
 No generic Stat bonus.
 
-One shared use per Battle.
+Limit:
 
-The player may spend that one use on **either** branch below.
-
-## Branch A — Preserve the Container
+**once per Battle**
 
 Trigger:
 
-one direct hostile Attack-PL packet would reduce the host to 0 Remaining Battle PL.
+one hostile direct Attack-PL packet deals positive final damage to the host and leaves the host at or below **50% of their authoritative underlying Battle PL maximum**.
+
+If that packet would reduce the host to 0, resolve this source-owned surge **before withdrawal commits**.
+
+Player text:
+
+> **Nine-Tails floods the host with violent chakra when its container is pushed too far. Restore 20 Battle PL and empower the next Nine-Tails-assisted attack by 20%.**
 
 Effect:
-- before withdrawal commits, Kurama forces enough chakra through the host to leave them at exactly **1 Remaining Battle PL**;
-- the triggering packet is otherwise considered resolved;
-- no restoration above 1;
-- no Injury erasure;
-- no automatic extra action;
+- restore **20 underlying Remaining Battle PL**, capped at the host's authoritative Battle maximum;
+- if the triggering packet reduced the host to 0, the restoration occurs before withdrawal; if the restored result is above 0, withdrawal does not commit;
+- establish `nine_tails_surge` through the host's next action opportunity;
+- the next direct `nine_tails`-assisted ATTACK receives **+20% pre-Stamina Attack PL**;
+- the surge expires after that qualifying attack resolves or after the host's next action opportunity;
+- no Injury healing;
+- no Base/Current/Effective Stat rewrite;
+- no extra action;
 - no permanent power unlock.
 
-This is not friendship.
+This is not friendship and not a one-PL safety net.
 
-Kurama's own survival/freedom interest is sufficient reason to preserve the container.
+It represents Kurama violently forcing chakra through the host when the shared survival state becomes unacceptable.
 
-## Branch B — Refuse the Hand
-
-Trigger:
-
-one compatible hostile effect attempts to:
-- suppress the Kurama source;
-- extract it;
-- force-transfer it;
-- seize/control the source route.
-
-Effect:
-- cancel that ordinary source-targeting effect;
-- independent damage remains normal where separable.
-
-One Branch A or Branch B use consumes the Enhancement for the Battle.
-
-Decision:
-
-> **Spend Kurama's self-interested intervention to keep the host standing, or save it in case somebody attacks the source relationship itself.**
-
-This is deliberately different from cooperative Yang Kurama.
+> **self-preservation can create power without creating partnership**
 
 ---
 
@@ -545,88 +532,149 @@ This creates a real cooperative decision:
 
 # K. Yang Kurama host-assisted Skills
 
-## 1. `yang_kurama_shared_chakra_arm` — **Shared Chakra Arm**
+These require legitimate cooperative `yang_kurama` access.
+
+They are Character-owned actions/reactions and do not create a second Kurama turn.
+
+## 1. `yang_kurama_chakra_arm` — **Kurama Chakra Arm**
 
 Classification:
 
-**COOPERATIVE SOURCE-ASSISTED / ALLY RESCUE**
+**COOPERATIVE SOURCE-ASSISTED ATTACK / CHAKRA ARM**
+
+Target:
+
+one hostile
+
+ATK:
+
+**42**
+
+Player text:
+
+> **Kurama forms a massive chakra arm through the host and smashes one enemy for 42 ATK.**
+
+Rules:
+- one direct Attack-PL packet;
+- ordinary Stamina mitigation;
+- no automatic Stun;
+- no automatic restraint;
+- no second Kurama packet;
+- the chakra arm is a source construct, not a participant.
+
+This supersedes any Source-15 implication that Chakra Arm is primarily an unrestrain tool.
+
+---
+
+## 2. `yang_kurama_chakra_arm_guard` — **Chakra Arm Guard**
+
+Classification:
+
+**COOPERATIVE SOURCE-ASSISTED REACTION / ALLY PROTECTION**
 
 Limit:
 
 **once per Battle**
 
-Target:
+Trigger:
 
-one allied Active or Benched participant under one compatible physical restraint.
+one allied Active or Benched participant is targeted by one direct hostile Attack-PL packet and the Kurama host is legally able to project the chakra arm.
 
 Player text:
 
-> **Kurama forms a chakra arm through the host and tears one ally out of a compatible physical restraint.**
+> **Throw a Kurama chakra arm across the attack line and shield one ally. Reduce that direct attack's ATK by 45%.**
 
 Effect:
-- remove exactly one physical restraint/control state whose metadata permits external physical release;
-- no damage;
-- does not remove Fūinjutsu seals, Poison, Genjutsu, chakra disruption or unrelated control;
-- no extra action.
+- reduce the qualifying packet **45% pre-Stamina**;
+- ordinary Stamina then resolves against the protected ally;
+- no target swap;
+- no second health bar;
+- no counterattack;
+- no restraint removal;
+- no protection against AREA effects that legitimately affect multiple participants;
+- invalid if exact source suppression/control prevents the host from projecting Kurama chakra.
+
+This is a chakra arm being used as a shield because its physical projection can plausibly block an attack.
 
 ---
 
-## 2. `yang_kurama_alliance_roar` — **Alliance Chakra Roar**
+## 3. `yang_kurama_chakra_roar` — **Kurama Chakra Roar**
 
 Classification:
 
-**COOPERATIVE SOURCE-ASSISTED ATTACK / FORMATION COVER**
+**COOPERATIVE SOURCE-ASSISTED ATTACK / TAILED-BEAST CHAKRA**
+
+The player chooses one mode when committing the action.
+
+### FOCUS
 
 Target:
 
-enemy Active
+one hostile
 
 ATK:
 
-**38**
+**46**
 
 Player text:
 
-> **Strike the enemy Active with a Kurama chakra roar. If it deals damage, one allied Benched participant may be protected by Kurama's chakra until the enemy completes its next action.**
+> **Concentrate Kurama's roar into one enemy for 46 ATK.**
 
-Effect:
-- one direct packet;
+### SWEEP
+
+Targets:
+
+up to **2 legally exposed hostiles**
+
+ATK:
+
+**34 each**
+
+Player text:
+
+> **Sweep Kurama's roar across up to 2 exposed enemies for 34 ATK each.**
+
+Shared rules:
 - ordinary Stamina mitigation;
-- on positive damage choose one allied occupied Benched participant;
-- establish `yang_kurama_bench_cover`;
-- through the enemy's next normal action opportunity, that chosen Benched participant cannot be selected by an ordinary direct off-slot attack unless the attack explicitly penetrates/ignores source cover;
-- AREA actions that legitimately affect that participant remain legal;
-- no PL restoration;
-- no Formation movement/reorder.
+- SWEEP resolves one packet per target;
+- no automatic displacement;
+- no Stun;
+- no defensive/protective rider;
+- no invented Wind Release;
+- no bonus action.
 
-This turns Kurama's cooperation into **team protection against off-slot pressure** rather than another self-guard.
+Decision:
+
+> **Focus the roar into one target or spread the pressure across two.**
 
 ---
 
-## 3. `yang_kurama_voluntary_loan_routing` — **Voluntary Loan Routing**
+## Cooperative source link — NOT a prepared Battle Skill
+
+### `kurama_chakra_link` — **Kurama Chakra Link**
 
 Classification:
 
-**COOPERATIVE SOURCE-ASSISTED / LOAN SETUP**
+**RELATIONSHIP / SOURCE ACCESS STATE**
 
-Status:
+This replaces the awkward player-facing concept **Voluntary Loan Routing** as the Source-15 relationship/access term.
 
-Consumes and supersedes the intent of existing catalogue row:
+When genuine `yang_kurama` partnership is active:
+
+- Kurama may voluntarily establish a current chakra link with the host;
+- that link may satisfy exact source predicates for already-learned compatible Kurama-assisted Skills;
+- it does **not** itself consume a Battle action;
+- it does **not** grant a Skill the Character never learned;
+- it does **not** add Kurama PL/Stats to the host;
+- it does **not** persist after the relationship/source state ends unless another exact authority says so.
+
+Existing catalogue row:
 
 `skill_kurama_voluntary_loan_routing`
 
-where this Source 15 package is the more exact authority.
+should be treated as stale terminology to reconcile later, not as a second Battle action alongside this source package.
 
-Use:
-
-host establishes one exact current voluntary Kurama-loan route for a compatible already-learned Skill/action that requires it.
-
-Rules:
-- does not itself grant Stats/PL;
-- does not automatically teach the downstream Skill;
-- does not create standing access after source/relationship ends;
-- Kurama's willingness is explicit;
-- loan request/acceptance remains factual relationship evidence, not automatic representation upgrade.
+Player-facing wording should use **Kurama Chakra Link** or the exact downstream technique name, not financial/technical "routing" language.
 
 ---
 
@@ -685,7 +733,8 @@ Do not:
 - make Kurama a second recurring host turn;
 - stack dedicated Naruto transformation/card packages with the same source package where that representation already embodies it;
 - let Caged Fox Intervention count as positive partnership evidence merely because Kurama protected the container;
-- let voluntary Yang transfer imply source ownership by the recipient ally.
+- let voluntary Yang transfer imply source ownership by the recipient ally;
+- treat Kurama Chakra Link as a second action or automatic Skill grant.
 
 ---
 
@@ -695,11 +744,11 @@ Do not:
 **Current PL anchors:** nine_tails PL130 / yang_kurama PL125 preserved from durable Combat audit; live runtime rows absent; exact seven-Stat republication still unresolved.  
 **Kurama-family common capability layer:** PROPOSED.  
 **Nine-Tails manifested:** Nine-Tail Isolation / Caged Source Refusal — PROPOSED.  
-**Nine-Tails Enhancement:** Caged Fox Intervention — PROPOSED.  
+**Nine-Tails Enhancement:** Nine-Tails Chakra Surge — PROPOSED.  
 **Nine-Tails host Skills:** Bargained Chakra Flood / Nine-Tails Chakra Bind / Red Chakra Counterlash — PROPOSED.  
 **Yang Kurama manifested:** Comrade Chakra Transfer / Comrade Mantle — PROPOSED.  
 **Yang Kurama Enhancement:** Comrade Chakra Network — PROPOSED.  
-**Yang Kurama host Skills:** Shared Chakra Arm / Alliance Chakra Roar / Voluntary Loan Routing — PROPOSED.  
+**Yang Kurama host Skills:** Kurama Chakra Arm / Chakra Arm Guard / Kurama Chakra Roar — PROPOSED; Kurama Chakra Link is relationship/source access, not a prepared Battle Skill.  
 **Potential Skill direction:** PROPOSED seed architecture only.  
 **Implementation:** NOT STARTED.  
 **Runtime validation:** NOT CLAIMED.  
