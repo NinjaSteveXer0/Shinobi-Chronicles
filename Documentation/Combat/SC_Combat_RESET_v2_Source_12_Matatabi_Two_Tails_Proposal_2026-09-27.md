@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-27  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons / Tailed Beasts  
-**Status:** **PROPOSED — AWAITING STEPHEN SIGN-OFF**  
+**Status:** **DESIGN CLOSED BY STEPHEN 2026-09-27 — SOURCE 12 RESET v2 COMPLETE**  
 **Parent:** #235  
 **Reset authority:** `Documentation/Combat/SC_Combat_Summons_Tailed_Beasts_Full_Calibration_RESET_v2_2026-09-18.md`  
 **Canon research:** `Documentation/Combat/SC_Combat_Tailed_Beasts_Canon_Research_Shukaku_Matatabi_Isobu_Chomei_2026-09-27.md`  
@@ -834,19 +834,19 @@ Batch 5 must audit dedicated Matatabi Jinchūriki/transformation representations
 
 **Identity / Base Stats / Base PL:** CLOSED by PL / Registry.  
 **Canon research:** COMPLETE.  
-**Shared manifested core:** PROPOSED.  
-**Two-Tails manifested variants:** Predator's Pounce + Flame-Rake Rush — PROPOSED.  
-**Matatabi manifested variants:** Blue Flame Arc + Feline Slip — PROPOSED.  
-**Two-Tails Enhancement:** Predator's Pulse (+10 Effective Taijutsu + prey retaliation window) — PROPOSED.  
-**Two-Tails host-assisted Skills:** Flame Claw Manifestation / Twin-Tail Maul / Hunting Pounce — PROPOSED.  
-**Matatabi Enhancement:** Blue Flame Accord (+10 Effective Ninjutsu + Guided Flame) — PROPOSED.  
-**Matatabi cooperative assisted Skills:** Cat Flame Roaring Fire / Feline Flame Step — PROPOSED.  
-**Matatabi Potential Skill branch:** Blue Flame Crescent / Pouncing Flame / Blue Flame Guard — PROPOSED.  
-**Tailed Beast Ball:** shared manifested own action, ATK58 once/Battle — PROPOSED.  
+**Shared manifested core:** CLOSED.  
+**Two-Tails manifested variants:** Predator's Pounce + Flame-Rake Rush — CLOSED.  
+**Matatabi manifested variants:** Blue Flame Arc + Feline Slip — CLOSED.  
+**Two-Tails Enhancement:** Predator's Pulse (+10 Effective Taijutsu + prey retaliation window) — CLOSED.  
+**Two-Tails host-assisted Skills:** Flame Claw Manifestation / Twin-Tail Maul / Hunting Pounce — CLOSED.  
+**Matatabi Enhancement:** Blue Flame Accord (+10 Effective Ninjutsu + Guided Flame) — CLOSED.  
+**Matatabi cooperative assisted Skills:** Cat Flame Roaring Fire / Feline Flame Step — CLOSED.  
+**Matatabi Potential Skill branch:** Blue Flame Crescent / Pouncing Flame / Blue Flame Guard — CLOSED as Combat potential catalogue.  
+**Tailed Beast Ball:** shared manifested own action, ATK58 once/Battle — CLOSED.  
 **Implementation:** NOT STARTED.  
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
 
-**Awaiting Stephen sign-off / edits.**
+**Stephen final sign-off: 2026-09-27. Source 12 Matatabi / Two-Tails Combat design is CLOSED. Global Potential Skill Roster thresholds remain separately open under #382; implementation/runtime/Golden remain unclaimed.**
 
 **proposal != design closed != implemented != runtime validated != Golden GREEN**
