@@ -318,7 +318,10 @@ async function guestAllyVictoryAndReload(browser){
     await page.evaluate(()=>setBattleRemainingPL("enemy","test_subject_unstable",1));
     await useSkill(page,"academy_menma_chakra_knuckle");
     await page.waitForFunction(()=>currentBattle?.battleOver===true&&currentBattle?.outcome?.type==="victory",null,{timeout:20000});
-    await waitPresentationIdle(page).catch(()=>{});
+    // The final committed action still gets its normal visible settlement.
+    // Once that is genuinely done, the terminal Victory surface must arrive
+    // promptly rather than sitting behind a synthetic watchdog delay.
+    await page.waitForSelector(".alpha-victory-code-screen",{state:"visible",timeout:6000});
 
     const terminal=await page.evaluate(({HOSTILES,MENMA,REWARD_SOURCE})=>{
       const rt=getActiveStorySceneRuntime();
@@ -350,11 +353,45 @@ async function guestAllyVictoryAndReload(browser){
     assert.strictEqual(terminal.rewards.ryo,100,"whole-encounter victory not exact 100 Ryō");
     assert(terminal.evidence.some(r=>r.eventType==="skill_action_completed"&&r.actor===MENMA),"Menma victory action evidence missing");
 
+    // Real Victory-surface proof for Stephen's two presentation blockers.
+    // This is an earned reward delta, not a wallet-total animation.
+    await page.waitForFunction(()=>{
+      const node=document.querySelector(".alpha-victory-code-screen .victory-ryo-number");
+      return node&&node.textContent.trim()==="+100"&&node.dataset.rewardPresentation==="earned_delta";
+    },null,{timeout:2000});
+    const rewardPresentation=await page.evaluate(()=>({
+      ryoText:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.textContent?.trim()||"",
+      rewardMode:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.dataset?.rewardPresentation||null,
+      action:document.querySelector(".alpha-victory-code-screen .victory-continue")?.textContent?.trim()||""
+    }));
+    assert.strictEqual(rewardPresentation.ryoText,"+100","Victory reward did not present exact earned +100 Ryō");
+    assert.strictEqual(rewardPresentation.rewardMode,"earned_delta","Victory Ryō presentation is not reward-gained mode");
+    assert.strictEqual(rewardPresentation.action,"CLAIM REWARDS","Victory claim action missing before reward commit");
+
     const beforeClaim=await page.evaluate(()=>Number(playerData.ryo)||0);
-    assert.strictEqual(await page.evaluate(()=>claimCurrentBattleRewards()),true,"reward claim failed");
+    const claimStarted=Date.now();
+    await page.locator(".alpha-victory-code-screen .victory-continue").click();
+    await page.waitForFunction(()=>{
+      const button=document.querySelector(".alpha-victory-code-screen .victory-continue");
+      return button&&button.textContent.trim()==="CONTINUE";
+    },null,{timeout:2000});
+    const claimToContinueMs=Date.now()-claimStarted;
+    assert(claimToContinueMs<2000,"post-claim Victory continuation remained watchdog-delayed: "+claimToContinueMs+"ms");
+
     const afterClaim=await page.evaluate(()=>Number(playerData.ryo)||0);
     assert.strictEqual(afterClaim,beforeClaim+100);
     assert.strictEqual(await page.evaluate(()=>claimCurrentBattleRewards()),false,"reward duplicated on second claim");
+
+    const postClaimPresentation=await page.evaluate(()=>({
+      ryoText:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.textContent?.trim()||"",
+      rewardMode:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.dataset?.rewardPresentation||null,
+      action:document.querySelector(".alpha-victory-code-screen .victory-continue")?.textContent?.trim()||""
+    }));
+    assert.deepStrictEqual(postClaimPresentation,{
+      ryoText:"+100",
+      rewardMode:"earned_delta",
+      action:"CONTINUE"
+    },"post-claim Victory presentation drift");
 
     await gate.assertClean("issue-369-guest-ally-victory");
     return{
