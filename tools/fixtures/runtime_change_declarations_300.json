@@ -772,6 +772,7 @@
       "classification": "REPLACES",
       "responsibilityIds": [
         "story.machine_resolver.shared",
+        "story.scene.presentation.shared",
         "origin.academy_izuno.final_story_state",
         "origin.academy_izuno.rogue_battle"
       ],
@@ -791,7 +792,9 @@
         "playerData.wasabi343BattleLaunches idempotence receipts",
         "shinobiTestState.wasabi343 / wasabi343BattleId / wasabi343BattleActive / wasabi343BattleLaunches scoped adapter envelope",
         "currentBattle.wasabi343 / battleConfigId restore projection",
-        "Story Scene Board exact Wasabi scene/route backdrop projection",
+        "Story Scene Board exact Wasabi scene/route backdrop + physical actor-card projection",
+        "shared Story performance DOM speaker-owned dialogue / single-label narration projection",
+        "read-only Wasabi Origin Chronicle Receipt before shared Origin completion",
         "currentBattle.environmentPath / presentationEnvironmentPath exact Scene-4C alley continuity"
       ],
       "productionLoader": "index.html",
@@ -809,7 +812,7 @@
         "runtime/alpha-origin-screen-first-33700.js::patchIzuno"
       ],
       "contractChangeReason": "AUTHORITY_CHANGED",
-      "rationale": "Issue #343 consumes the approved Academy Wasabi Writing-Golden Story, the closed Rogue Genin Combat package, and the Writing-closed Academy_Wasabi_Izuno_Origin_Backdrop_Projection_Binding_2026-09-27 authority. It preserves IZU-01/02/03/04 source addresses, separates the secondary Rogue occurrence from the pursuit result, restores STEP IN through the shared Story-to-Battle return seam, enforces strict 1v1 deployment and zero Battle entitlement, persists only the #343 adapter envelope through the established saveTestState/restoreTestState session extension seam, binds the seven exact dedicated Story backdrops, preserves the alley through STEP IN Battle and the post-Battle return before converging to Scene 5 training grounds, retires all stale pre-GOLDEN Wasabi expression patches (33500/33600/33700), and adds no morality/personality/specialization inference or staged-vs-external World classification."
+      "rationale": "Issue #343 consumes the approved Academy Wasabi Writing-Golden Story, the closed Rogue Genin Combat package, the Writing-closed exact backdrop binding, and Stephen's installed-browser RED evidence. It preserves IZU-01/02/03/04 source addresses, separates the secondary Rogue occurrence from the pursuit result, restores STEP IN through the shared Story-to-Battle return seam, enforces strict 1v1 deployment and zero Battle entitlement, persists only the #343 adapter envelope through the established saveTestState/restoreTestState session extension seam, binds the seven exact dedicated Story backdrops, stages the already-authoritative Wasabi/Instructor/Rogue cards without guessing the not-yet-visible pursuit-target path, aligns generic shared Story dialogue with the Kakashi speaker-owned presentation rule, removes duplicate narration labelling, inserts the mandatory read-only Origin Chronicle Receipt before shared Origin completion, preserves the alley through STEP IN Battle and post-Battle return before Scene 5 training convergence, retires stale pre-GOLDEN Wasabi expression patches (33500/33600/33700), and does not invent World-owned route reward values while #404 is open."
     }
   ]
 }
