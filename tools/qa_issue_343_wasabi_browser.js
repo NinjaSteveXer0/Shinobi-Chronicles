@@ -73,7 +73,12 @@ async function clickContinue(page){
   if(await button.count()===0)button=root.locator(".sc-story-actions > .sc-story-action:not(.sc-story-choice)").first();
   await button.waitFor({state:"visible",timeout:8000});
   await button.click();
-  await page.waitForFunction(old=>!getActiveStorySceneRuntime()||getActiveStorySceneRuntime().beatId!==old, before.beatId,{timeout:8000});
+  await page.waitForFunction(old=>{
+    const rt=getActiveStorySceneRuntime();
+    const root=document.getElementById("story-scene-presentation-layer");
+    const text=root?.querySelector(".sc-story-text")?.textContent?.trim()||"";
+    return !rt||rt.beatId!==old.beatId||text!==old.text;
+  },{beatId:before.beatId,text:before.text},{timeout:8000});
 }
 async function advanceResolver(page){
   const before=await info(page);
@@ -99,9 +104,10 @@ async function choose(page,label,expected=null){
   const before=await info(page);
   assert.strictEqual(before.mode,"choice","choice requested outside choice beat "+before.beatId);
   assert(before.choices.includes(label),"missing choice "+label+" @ "+before.beatId+" "+JSON.stringify(before.choices));
-  const button=page.locator("#story-scene-presentation-layer").getByRole("button",{name:label,exact:true});
+  const button=page.locator("#story-scene-presentation-layer").locator(".sc-story-choice").filter({hasText:label});
   assert.strictEqual(await button.count(),1,"choice cardinality "+label);
-  await button.click();
+  assert.strictEqual((await button.first().textContent()).trim(),label,"choice text drift "+label);
+  await button.first().click();
   await page.waitForFunction(old=>getActiveStorySceneRuntime()?.beatId!==old,before.beatId,{timeout:8000});
   if(expected)await waitBeat(page,expected);
 }
