@@ -7,7 +7,7 @@ game=(ROOT/'game.js').read_text(encoding='utf-8')
 patch=(ROOT/'runtime/alpha-menma-tutorial-111.js').read_text(encoding='utf-8')
 index=(ROOT/'index.html').read_text(encoding='utf-8')
 
-EXPECTED_BLOB='b7aad188329beca49ecb448843873960ddc97f41'
+EXPECTED_BLOB='b767c519827e998910fa1b09cea2298e8bc59099'
 # #409 authorises the shared Origin-completion purse seam in game.js. Rebaseline only the audited blob; every Menma-specific assertion below remains binding.
 def git_blob_sha(text:str)->str:
     raw=text.encode('utf-8')
