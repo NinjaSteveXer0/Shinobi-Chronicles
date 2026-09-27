@@ -295,33 +295,34 @@ Source 03 Ibuse closure preserves the signed-off Neurotoxin package:
 
 Next ordinary Summon state:
 
-- **Source 09 — Kamatari** — **PARTIALLY REOPENED 2026-09-27**: Stephen locked Base PL target **82**; #258 must return Formula-v1.0-valid Stats. **Sicklewind Route is an ATTACK/action, not the attached Enhancement.** Off-slot behavior remains closed; exact Sicklewind Attack PL and the separate Kamatari Enhancement package are OPEN.
-- **Source 10 — Snake** — **DESIGN CLOSED under Stephen sign-off 2026-09-27**; generic `snake`, PL47, staged/not live. Enhancement = **Serpent Courier** with outside-Battle **Messenger Snake** utility. **Hidden Coil** is an obtainable/learnable source-assisted Skill, not an automatic attachment Enhancement.
+- **Source 09 — Kamatari** — **COMBAT MECHANICS CLOSED 2026-09-27**: Base PL target **82** remains locked; #258 still owes Formula-v1.0-valid seven Stats. **Sicklewind Route = ATK24 once/Battle against one occupied non-Active enemy.** Enhancement = **Wind-Sickle Mastery**: Wind Release direct Attack-PL +10%, Bukijutsu direct Attack-PL +10%, dual-qualified packet +20% total from Kamatari. **Windtrail Hunt** provides contextual hidden-route/location/POI/pursuit-lead discovery where World/Story has a real detectable lead.
+- **Source 10 — Snake** — **PARTIALLY REOPENED ON ENHANCEMENT ONLY 2026-09-27**; generic `snake`, PL47, staged/not live. Hidden Coil remains an obtainable/learnable source-assisted Skill and the manifested/future combat kit remains closed. **Serpent Courier is retired as Snake-specific Enhancement authority. A true separate Snake Enhancement is OPEN.**
 
 Source 09 proposal authority:
 `Documentation/Combat/SC_Combat_RESET_v2_Source_09_Kamatari_Proposal_2026-09-19.md`
 
 Kamatari RESET v2 corrected state:
-- Stephen's earlier off-slot concept remains approved, but on **2026-09-27 Stephen corrected its classification**;
-- Base PL target is now explicitly **82**;
-- #258 must return Formula-v1.0-valid seven Base Stats for PL82; current live PL77 row is drift;
+- Base PL target is explicitly **82**;
+- #258 must return Formula-v1.0-valid seven Base Stats for PL82; current live PL77 row remains drift;
 - **Sicklewind Route is Kamatari's own ATTACK/action**, not an attached Enhancement;
-- approved behavior remains: once per Battle, attack one legally occupied enemy not occupying the Active slot; no promotion/reorder/bonus action merely from using it;
-- exact **Sicklewind Route Attack PL remains OPEN** because no exact packet was ever signed off;
-- the separate **Kamatari Enhancement package is OPEN**;
-- Reaping Rush ATK30, Gale Pursuit ATK24 / 32 after enemy movement, Crosswind Cutoff once/Battle target-choice pursuit reaction, and Quick Beheading Dance once/Battle ATK32 each up to 3 legally exposed hostiles remain preserved as prior signed-off attack concepts;
+- **Sicklewind Route = ATK24**, once/Battle, one legally occupied enemy not occupying the Active slot; no promotion/reorder/bonus action;
+- **Wind-Sickle Mastery** is ATTACHED/PREPARED: qualifying Wind Release direct Attack-PL +10%; qualifying Bukijutsu direct Attack-PL +10%; a dual Wind + Bukijutsu packet gets both once for +20% total;
+- **Windtrail Hunt** is a contextual discovery/pursuit utility that can expose authored hidden routes, hidden locations, points of interest, escape trails or pursuit leads where local evidence makes the discovery plausible;
+- no invented formal Missing-nin Stat is created;
+- Reaping Rush ATK30, Gale Pursuit ATK24 / 32 after enemy movement, Crosswind Cutoff once/Battle target-choice pursuit reaction, and Quick Beheading Dance once/Battle ATK32 each up to 3 legally exposed hostiles remain preserved;
 - no generic accuracy roll / Speed Stat / hard Stun / hidden PL scaling;
-- do not route Source 09 to implementation until PL82 Stats, Sicklewind Attack PL and the separate Enhancement are closed.
+- Combat mechanics are closed; do not route implementation until #258 returns the Formula-valid PL82 Stats and downstream routing is explicitly released.
 
 Source 10 proposal authority:
 `Documentation/Combat/SC_Combat_RESET_v2_Source_10_Snake_Proposal_2026-09-19.md`
 
-Snake RESET v2 final closure:
+Snake RESET v2 corrected state:
 - generic `snake`, PL47; explicitly not Manda/Aoda/Manda II and not live;
-- **Enhancement = Serpent Courier**;
-- outside Battle, legitimately available Snake exposes **Messenger Snake** for Mission / Hotspot / Story courier work where a physically legitimate route exists;
-- Messenger Snake can carry a written message, small token or similarly small authored payload to a known reachable recipient/location and may return with a reply where World/Story permits;
-- no teleportation, guaranteed stealth, guaranteed delivery, automatic knowledge or automatic Mission success;
+- **Serpent Courier is NOT Snake's Enhancement** and is retired as source-specific Enhancement authority;
+- **ALL small-to-medium Summons may be used in authored dialogue choices as couriers**; this is a shared Summon capability, not a per-source Enhancement;
+- Story / World / Mission owns the actual dialogue occurrence, destination, hazards, factual reply and outcome;
+- courier capability does not imply teleportation, omniscience or automatic objective success;
+- Snake's true replacement Enhancement remains **OPEN**;
 - **Hidden Coil is an obtainable/learnable source-assisted Skill**, not automatic from ownership/attachment;
 - learned Hidden Coil preserves the once/Battle after-hit movement-specific physical-restraint follow-up and is unavailable while Snake is independently manifested;
 - exact unlock route belongs downstream Progression / Development / World opportunity authority;
@@ -329,7 +330,11 @@ Snake RESET v2 final closure:
 - no Poison/venom, shedding, Sage package, burrow package, environmental bonus, named-snake scale/history or generic Stat-stick;
 - no Stun; exact escape/anti-restraint remains counterplay.
 
-Stephen also directed a broader future rule: **most suitably small-to-medium Summons should be capable of messenger/courier work in Missions and Hotspot Events.** Snake owns the closed concrete example; CE / World should generalise eligibility/occurrence resolution rather than Combat silently applying it to every source.
+Shared courier rule:
+- **ALL small-to-medium Summons** are eligible to appear in authored **dialogue choices as couriers**;
+- courier eligibility is not an Enhancement and must not consume/replace a source's required RESET v2 Enhancement package;
+- larger/specialised Summons do not inherit this specific size-bounded rule automatically;
+- occurrence success remains factual/contextual rather than guaranteed by the dialogue option.
 
-Next Combat work after Kamatari's reopened seams: accepted Tailed-Beast representations, Kurama-family reconciliation, and Jinchūriki/transformation anti-double-count audit.
+Next Combat work: close Snake's true Enhancement while #258 independently finishes Kamatari's PL82 Stat row, then proceed into accepted Tailed-Beast representations.
 
