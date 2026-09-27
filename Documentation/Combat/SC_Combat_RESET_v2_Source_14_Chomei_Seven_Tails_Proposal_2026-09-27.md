@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-27  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons / Tailed Beasts  
-**Status:** **PROPOSED — PL / REGISTRY DEPENDENCY CLOSED / AWAITING STEPHEN MECHANICS SIGN-OFF**  
+**Status:** **PARTIAL SIGN-OFF — FLIGHT/CONTEXT ARCHITECTURE + ENHANCEMENTS ACCEPTED BY STEPHEN / REMAINING SKILL PACKAGE REVISED FOR FINAL REVIEW**  
 **Parent:** #235  
 **Reset authority:** `Documentation/Combat/SC_Combat_Summons_Tailed_Beasts_Full_Calibration_RESET_v2_2026-09-18.md`  
 **Canon research:** `Documentation/Combat/SC_Combat_Tailed_Beasts_Canon_Research_Shukaku_Matatabi_Isobu_Chomei_2026-09-27.md`  
@@ -293,30 +293,31 @@ Simple by design: the body mechanic is canon-supported and does not need a fake 
 
 Class:
 
-**ATTACK / FLIGHT / AREA**
-
-SC origin:
-
-**Original Shinobi Chronicles technique built from Chōmei's canonical flight/body identity.**
+**ATTACK / FLIGHT**
 
 Target:
 
-up to **2 legally exposed hostiles**
+one hostile
 
 ATK:
 
-**34 each**
+**40**
 
 Player text:
 
-> **Fly through up to 2 exposed enemies and strike each for 34 ATK.**
+> **Cross the attack line on Chōmei-family wings and strike one enemy for 40 ATK.**
 
 Rules:
-- one packet per target;
+- one direct Attack-PL packet;
 - ordinary Stamina mitigation;
-- no waiting/Benched/Reserve bypass;
+- this action is explicitly **FLIGHT-tagged**;
 - no Wind Release classification;
-- no automatic forced movement.
+- no automatic forced movement;
+- no off-slot targeting by itself.
+
+Role:
+
+This is a deliberately simple **foundational Flight attack**. Its tactical value is that it legitimately establishes/feeds source mechanics that care about a FLIGHT-tagged action, including Seven-Tails' Six-Wing Circuit.
 
 ---
 
@@ -342,12 +343,12 @@ Flight-momentum ATK:
 
 Player text:
 
-> **Dive into one enemy for 40 ATK. If Seven-Tails crossed ordinary battlefield distance on its previous action, carry that flight momentum through for 54 instead.**
+> **Dive into one enemy for 40 ATK. If Seven-Tails begins the action AIRBORNE from Six-Wing Circuit, carry the aerial momentum through for 54 instead.**
 
 Rules:
 - one direct packet;
 - ordinary Stamina mitigation;
-- ATK54 requires the immediately previous Seven-Tails action to have included legitimate movement/flight crossing;
+- ATK54 requires Seven-Tails to begin the action in its legitimate `seven_tails_aerial_circuit` / AIRBORNE state;
 - no hidden Speed Stat;
 - no Stun;
 - no bonus action.
@@ -395,7 +396,7 @@ The state ends:
 
 Interaction:
 
-- **Overrun Dive** qualifies for its ATK54 branch when Seven-Tails' immediately previous action was a legitimate FLIGHT-tagged action;
+- **Overrun Dive** qualifies for its ATK54 branch when Seven-Tails begins the action AIRBORNE through Six-Wing Circuit;
 - Six-Wing Circuit itself adds no damage packet or scalar damage bonus.
 
 Decision:
@@ -517,15 +518,15 @@ This is wild Seven-Tails turning flight into **violent attack permission**, not 
 
 ---
 
-## `seven_tails_horn_dive_manifestation` — **Horn Dive Manifestation**
+## `seven_tails_hornline_breakthrough` — **Hornline Breakthrough**
 
 Classification:
 
-**SOURCE-ASSISTED ATTACK / PARTIAL MANIFESTATION / FLIGHT**
+**SOURCE-ASSISTED ATTACK / PARTIAL MANIFESTATION / RELAY PRESSURE**
 
 Target:
 
-one hostile
+enemy **Active**
 
 ATK:
 
@@ -533,41 +534,60 @@ ATK:
 
 Player text:
 
-> **Manifest Seven-Tails' horn and wings and drive into one enemy for 42 ATK.**
+> **Drive Seven-Tails' horn through the enemy Active for 42 ATK. If this withdraws them, carry the charge into the shinobi who relays into Active for another 18 ATK.**
 
 Rules:
 - host owns the action;
-- one direct packet;
+- first packet targets enemy Active only;
 - ordinary Stamina mitigation;
-- no Stun;
-- no second Entity body.
+- if the first packet causes that Active to withdraw:
+  1. commit the withdrawal;
+  2. normalize the enemy formation once under normal relay rules;
+  3. if a new enemy Active exists and remains a legal target, resolve one **ATK18** follow-through packet against that promoted Active;
+- ordinary Stamina mitigates the follow-through;
+- if no replacement Active exists, no second packet is created;
+- no bonus action;
+- no manual reorder;
+- no follow-through merely because the target was already at 0 PL before this action.
+
+This turns wild Seven-Tails' horn momentum into pressure on the **relay itself**, rather than another generic heavy attack.
 
 ---
 
-## `seven_tails_wing_scissor` — **Wing Scissor**
+## `seven_tails_wingtail_harrow` — **Wing-Tail Harrow**
 
 Classification:
 
-**SOURCE-ASSISTED ATTACK / PARTIAL MANIFESTATION / AREA**
+**SOURCE-ASSISTED ATTACK / FLIGHT / FORMATION OVERRUN**
 
-Target:
+Limit:
 
-up to **2 legally exposed hostiles**
+**once per Battle**
+
+Targets:
+
+- enemy **Active**;
+- one occupied enemy **Benched** slot.
 
 ATK:
 
-**34 each**
+**30 each**
 
 Player text:
 
-> **Manifest the wing-tails and cut through up to 2 exposed enemies for 34 ATK each.**
+> **Sweep through the enemy formation with Seven-Tails' wing-tails, hitting the Active and one Benched enemy for 30 ATK each.**
 
 Rules:
-- one packet per target;
-- ordinary Stamina mitigation;
-- no Bleed;
-- no waiting-slot bypass;
-- no Wind Release classification.
+- host owns one action opportunity;
+- one direct packet per target;
+- ordinary Stamina mitigation independently;
+- if no occupied Benched target exists, only the Active packet resolves;
+- cannot target Reserve;
+- cannot hit the same participant twice;
+- no Formation reorder/promotion;
+- no Bleed / Stun / Wind Release classification.
+
+This is wild flight used to **overrun the formation**, not simply an AREA tag.
 
 ---
 
@@ -575,7 +595,7 @@ Rules:
 
 Classification:
 
-**SOURCE-ASSISTED REACTION / FLIGHT / MOVEMENT**
+**SOURCE-ASSISTED REACTION / FLIGHT / GROUND-STATE ESCAPE**
 
 Limit:
 
@@ -585,7 +605,7 @@ Trigger:
 
 host becomes subject to one ordinary **GROUND_BOUND** control/terrain state that depends on contact with the ground and does not physically bind the host's body.
 
-Examples of qualifying source categories:
+Examples:
 - unstable/impassable ground;
 - ordinary ground snare zone;
 - a terrain/control state whose restriction exists only while the actor remains grounded.
@@ -595,13 +615,11 @@ Player text:
 > **Burst Seven-Tails' wings and leave the ground, escaping one ordinary ground-bound control state.**
 
 Effect:
-- remove/ignore one qualifying ground-dependent movement restriction for the host;
+- remove/ignore one qualifying ground-dependent state;
 - does NOT break ropes, coral, sand wrapped around the body, seals, chakra restraints or other actual body-binding effects;
 - no damage;
 - no bonus action;
 - exact anti-flight or sealed-space authority may prevent it.
-
-This makes flight matter mechanically without becoming a universal cleanse.
 
 ---
 
@@ -651,30 +669,43 @@ Outside Battle, flight remains an inherent automatic contextual capability and d
 
 # H. Cooperative Chōmei source-assisted Skills
 
-## `chomei_assisted_shining_horn` — **Shining Horn Dive**
+## `chomei_aerial_relay` — **Aerial Relay**
 
 Classification:
 
-**COOPERATIVE SOURCE-ASSISTED ATTACK / FLIGHT / HORN**
+**COOPERATIVE SOURCE-ASSISTED / FORMATION / ACTIVE ROTATION**
 
-Target:
+Limit:
 
-one hostile
+**once per Battle**
 
-ATK:
+Use:
 
-**42**
+The bonded Chōmei host is the current allied **Active**, and at least one eligible allied **Benched** participant exists.
 
 Player text:
 
-> **Let Chōmei form horn and wings through your chakra and strike one enemy for 42 ATK.**
+> **Have Chōmei airlift one Benched ally into Active while carrying you into that ally's Benched place. This uses your action; the enemy acts next.**
 
-Rules:
-- host owns the action;
-- one direct packet;
-- ordinary Stamina mitigation;
-- no Stun;
-- no second Chōmei participant.
+Effect:
+- choose one eligible allied Benched participant;
+- current Active host moves into that participant's Benched presentation/formation role;
+- chosen Benched participant becomes the new Active;
+- this consumes the player's current normal action opportunity;
+- normal alternating side order continues, so the enemy side receives the next normal action opportunity;
+- no Battle PL is restored/reset;
+- no buffs/debuffs/control/history are cleared merely by rotating;
+- no withdrawal is created;
+- no Reserve is promoted;
+- persistent My Clan priority/order is not rewritten;
+- the rotation is Battle-state-only and must settle through the existing Formation presentation grammar;
+- invalid if exact control/restraint authority prevents either participant from being moved.
+
+Decision:
+
+> **Spend this turn changing who will be Active for the next exchange, rather than waiting for a withdrawal to force the relay.**
+
+This makes cooperative Chōmei uniquely capable of deliberate **turn-based formation rotation**.
 
 ---
 
@@ -773,30 +804,36 @@ This is the learned host analogue of Chōmei's controlled aerial formation-routi
 
 ---
 
-### 2. `skill_chomei_crosswing_sweep` — **Chōmei Art: Crosswing Sweep**
+### 2. `skill_chomei_wingline_intercept` — **Chōmei Art: Wingline Intercept**
 
 Classification:
 
-**LEARNABLE / CHŌMEI-DERIVED / PARTIAL WINGS / AREA**
+**LEARNABLE / CHŌMEI-DERIVED / FLIGHT / FORMATION DEFENSE**
 
-Target:
+Limit:
 
-up to **2 legally exposed hostiles**
+**once per Battle**
 
-ATK:
+Trigger:
 
-**36 each**
+an enemy commits one direct action against an allied **Benched** participant while the user is the allied **Active**.
 
 Player text:
 
-> **Sweep manifested wing-tails through up to 2 exposed enemies for 36 ATK each.**
+> **Cut across the formation on Chōmei-derived wings and take one direct off-slot attack in your ally's place.**
 
-Rules:
-- one packet per target;
-- ordinary Stamina mitigation;
-- no Bleed;
-- no Wind classification;
-- no waiting-slot bypass.
+Effect:
+- user may become the target of that committed direct action instead of the Benched ally;
+- only valid if the user is a legal target for the action;
+- the attack resolves against the user at its normal authored ATK/effects;
+- no damage reduction;
+- no duplicated packet;
+- no counterattack;
+- no action opportunity is granted;
+- cannot intercept AREA effects that already legally affect multiple participants;
+- cannot intercept an action whose exact source says its chosen target cannot be replaced.
+
+This is a defensive formation-control technique: **protect the bench by personally taking the hit**, not by adding another generic guard percentage.
 
 ---
 
@@ -866,7 +903,7 @@ Source 14 deliberately chooses the second route:
 - that generalisation is an explicit **Shinobi Chronicles adaptation**, not a claim that manga Chōmei independently demonstrated it.
 
 Current proposed adaptations:
-- **Scale Trail Feint** — cooperative source-assisted approach control;
+- **Scale Trail Feint** — cooperative source-assisted visual-reaction control;
 - **Chōmei Art: Scale Veil** — later learnable observer-specific visual targeting control.
 
 No generic Blind status, combustion, poison, accuracy penalty or Cocoon mechanic is created.
@@ -958,15 +995,22 @@ Batch 5 must audit any dedicated Chōmei/Fū/Jinchūriki representations before 
 **Seven-Tails manifested variants:** Overrun Dive + Six-Wing Circuit — PROPOSED.  
 **Chōmei manifested variants:** Lucky Horn Vector + Skyhook Rescue — PROPOSED.  
 **Seven-Tails Enhancement:** Unbound Wings — PROPOSED.  
-**Seven-Tails host-assisted Skills:** Horn Dive Manifestation / Wing Scissor / Groundbreak Lift — PROPOSED.  
+**Seven-Tails host-assisted Skills:** Hornline Breakthrough / Wing-Tail Harrow / Groundbreak Lift — PROPOSED.  
 **Chōmei Enhancement:** Skyway Accord — PROPOSED.  
-**Chōmei cooperative assisted Skills:** Shining Horn Dive / Scale Trail Feint — PROPOSED.  
-**Chōmei Potential Skill seed branch:** Horn Vector / Crosswing Sweep / Scale Veil — PROPOSED.  
+**Chōmei cooperative assisted Skills:** Aerial Relay / Scale Trail Feint — PROPOSED.  
+**Chōmei Potential Skill seed branch:** Horn Vector / Wingline Intercept / Scale Veil — PROPOSED.  
 **Scale Powder:** deliberately NOT in Chōmei's manifested own kit. Source 14 now proposes an explicit SC **host-development adaptation** through Scale Trail Feint / Scale Veil, grounded in Fū's manga-supported host-linked technique and clearly labelled as SC divergence.  
 **Implementation:** NOT STARTED.  
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
 
-**PL / Registry dependency #410 is CLOSED. Source 14 now requires only Stephen's final mechanics sign-off before Combat DESIGN CLOSED status.**
+**Stephen sign-off received 2026-09-28 for:**
+- automatic inherent contextual flight rule;
+- no invented close/mid/far range/reposition system;
+- Seven-Tails Enhancement **Unbound Wings**;
+- Chōmei Enhancement **Skyway Accord**;
+- AIRBORNE / GROUND_CONTACT_REQUIRED / GROUND_BOUND Battle grammar.
+
+**Remaining manifested / source-assisted / Potential Skill package has received a final uniqueness rewrite and awaits Stephen's final review before Source 14 DESIGN CLOSED.**
 
 **proposal != design closed != implemented != runtime validated != Golden GREEN**
