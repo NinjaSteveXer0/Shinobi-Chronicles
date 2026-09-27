@@ -33,8 +33,19 @@ const BATTLE_OCCURRENCE_PREFIX="battle_occ_origin_academy_menma_three_test_subje
 const SCRIPT_CONTRACT_ID="menma_origin_guest_ally_controller_v3";
 const PLAYER_OBJECTIVE_TEXT="Stop the Test Subjects.";
 const BATTLE_ENVIRONMENT_PATH="Scene backdrops/forest_clearing_day.png";
+const MENMA_CLASSROOM_ENVIRONMENT_ID="konoha_academy_classroom_day";
+const MENMA_CLASSROOM_ENVIRONMENT_PATH="Scene backdrops/academy_classroom.png";
+const MENMA_FOREST_ROUTE_ENVIRONMENT_ID="konoha_forest_path_day";
+const MENMA_FOREST_ROUTE_ENVIRONMENT_PATH="Scene backdrops/whisper_woods_forest_route.png";
+const MENMA_CLEARING_ENVIRONMENT_ID="konoha_forest_clearing_day";
 const FUTURE_ENVIRONMENT_PATH="Scene backdrops/whisper_woods_forest_route.png";
 const FUTURE_ENVIRONMENT_ASSET_ID="whisper_woods_forest_route";
+const MENMA_STORY_BACKDROPS_36900=Object.freeze({
+  [MENMA_CLASSROOM_ENVIRONMENT_ID]:MENMA_CLASSROOM_ENVIRONMENT_PATH,
+  [MENMA_FOREST_ROUTE_ENVIRONMENT_ID]:MENMA_FOREST_ROUTE_ENVIRONMENT_PATH,
+  [MENMA_CLEARING_ENVIRONMENT_ID]:BATTLE_ENVIRONMENT_PATH,
+  [FUTURE_ENVIRONMENT_ASSET_ID]:FUTURE_ENVIRONMENT_PATH
+});
 const PARTY_DEFEAT_RETURN_BEAT_ID="menma_party_defeat_return_01";
 const FUTURE_ENTRY_BEAT_ID="menma_future_01";
 const FUTURE_INTENT_OCCURRENCE_ID="occ_origin_menma_future_ambition_intent";
@@ -1254,31 +1265,40 @@ function isMenmaDefeatFutureBoardBeat38800(beatId){
   const id=String(beatId||"");
   return id.startsWith("menma_party_defeat_return_")||id.startsWith("menma_future_");
 }
+function menmaEnvironmentIdForBeat36900(beat){
+  const ref=beat&&beat.environmentRef;
+  return typeof ref==="string"?ref:ref&&typeof ref==="object"?(ref.environmentId||ref.assetId||null):null;
+}
+function menmaBackdropProjection36900(beatId,beat){
+  const id=String(beatId||"");
+  if(id.startsWith("menma_party_defeat_return_"))return{assetPath:BATTLE_ENVIRONMENT_PATH,assetId:MENMA_CLEARING_ENVIRONMENT_ID};
+  if(id.startsWith("menma_future_"))return{assetPath:FUTURE_ENVIRONMENT_PATH,assetId:FUTURE_ENVIRONMENT_ASSET_ID};
+  const environmentId=menmaEnvironmentIdForBeat36900(beat);
+  const assetPath=environmentId?MENMA_STORY_BACKDROPS_36900[environmentId]||null:null;
+  return assetPath?{assetPath,assetId:environmentId}:null;
+}
+function menmaLocationForBeat36900(beatId,beat){
+  const id=String(beatId||"");
+  if(id.startsWith("menma_future_"))return"WHISPER WOODS";
+  if(id.startsWith("menma_party_defeat_return_"))return"FOREST CLEARING";
+  const environmentId=menmaEnvironmentIdForBeat36900(beat);
+  if(environmentId===MENMA_CLASSROOM_ENVIRONMENT_ID)return"KONOHA NINJA ACADEMY · CLASSROOM";
+  if(environmentId===MENMA_FOREST_ROUTE_ENVIRONMENT_ID)return"WHISPER WOODS · FOREST ROUTE";
+  if(environmentId===MENMA_CLEARING_ENVIRONMENT_ID)return"FOREST CLEARING";
+  return null;
+}
 function registerMenmaDefeatFutureSceneBoard38800(){
   if(MENMA_DEFEAT_FUTURE_BOARD_REGISTERED_38800)return{success:true,sceneId:STORY_SCENE_ID,idempotent:true};
   if(typeof globalThis.registerStorySceneBoardDefinition!=="function"){
     return{success:false,reason:"story_scene_board_not_loaded"};
   }
   const result=globalThis.registerStorySceneBoardDefinition(STORY_SCENE_ID,{
-    resolve:({beatId})=>{
-      const id=String(beatId||"");
-      if(!isMenmaDefeatFutureBoardBeat38800(id))return null;
-      return{
-        mode:"conversation",
-        location:id.startsWith("menma_future_")?"WHISPER WOODS":"FOREST CLEARING",
-        actors:[]
-      };
+    resolve:({beatId,beat})=>{
+      const backdrop=menmaBackdropProjection36900(beatId,beat);
+      if(!backdrop)return null;
+      return{mode:"conversation",location:menmaLocationForBeat36900(beatId,beat)||"ACADEMY MENMA",actors:[]};
     },
-    resolveBackdrop:({beatId})=>{
-      const id=String(beatId||"");
-      if(id.startsWith("menma_party_defeat_return_")){
-        return{assetPath:BATTLE_ENVIRONMENT_PATH,assetId:"konoha_forest_clearing_day"};
-      }
-      if(id.startsWith("menma_future_")){
-        return{assetPath:FUTURE_ENVIRONMENT_PATH,assetId:FUTURE_ENVIRONMENT_ASSET_ID};
-      }
-      return null;
-    }
+    resolveBackdrop:({beatId,beat})=>menmaBackdropProjection36900(beatId,beat)
   });
   if(result&&result.success===true)MENMA_DEFEAT_FUTURE_BOARD_REGISTERED_38800=true;
   // Registration is semantic/presentation configuration only. Never render
@@ -1299,8 +1319,9 @@ function installMenmaDefeatStoryBridge38800(scene){
   if(!scene||!scene.beatMap||typeof scene.beatMap.set!=="function")return{success:false,reason:"menma_story_scene_missing"};
   if(typeof normalizeStorySceneBeat!=="function")return{success:false,reason:"story_beat_normalizer_missing"};
   if(typeof registerSceneBackdropAssetPath==="function"){
-    registerSceneBackdropAssetPath("konoha_forest_clearing_day",BATTLE_ENVIRONMENT_PATH);
-    registerSceneBackdropAssetPath(FUTURE_ENVIRONMENT_ASSET_ID,FUTURE_ENVIRONMENT_PATH);
+    for(const [environmentId,assetPath] of Object.entries(MENMA_STORY_BACKDROPS_36900)){
+      registerSceneBackdropAssetPath(environmentId,assetPath);
+    }
   }
   const rows=menmaDefeatAndFutureStoryBeats38800();
   if(!rows.every(row=>upsertMenmaStoryBeat38800(scene,row)))return{success:false,reason:"menma_story_bridge_normalization_failed"};
@@ -1383,6 +1404,12 @@ function diagnostics(){
     exactBattleIdentity:!!beat&&beat.battle&&beat.battle.battleConfigId===BATTLE_CONFIG_ID&&beat.battle.encounterId===ENCOUNTER_ID&&beat.battle.objectiveId===OBJECTIVE_ID,
     successorPlayerObjective:!!beat&&beat.battle&&beat.battle.objectiveText===PLAYER_OBJECTIVE_TEXT,
     exactBattleEnvironment:!!beat&&beat.battle&&beat.battle.environmentPath===BATTLE_ENVIRONMENT_PATH,
+    exactStoryBackdropContract:
+      MENMA_STORY_BACKDROPS_36900[MENMA_CLASSROOM_ENVIRONMENT_ID]===MENMA_CLASSROOM_ENVIRONMENT_PATH&&
+      MENMA_STORY_BACKDROPS_36900[MENMA_FOREST_ROUTE_ENVIRONMENT_ID]===MENMA_FOREST_ROUTE_ENVIRONMENT_PATH&&
+      MENMA_STORY_BACKDROPS_36900[MENMA_CLEARING_ENVIRONMENT_ID]===BATTLE_ENVIRONMENT_PATH&&
+      MENMA_STORY_BACKDROPS_36900[FUTURE_ENVIRONMENT_ASSET_ID]===FUTURE_ENVIRONMENT_PATH,
+    baseStorySceneBoardBackdropAware:String(registerMenmaDefeatFutureSceneBoard38800).includes("menmaBackdropProjection36900"),
     exactParticipants:ALLIED_IDS.includes(MENMA_ID)&&ALLIED_IDS.includes(ANKO_ID)&&HOSTILE_IDS.join("|")==="test_subject_altered_shinobi|test_subject_brute|test_subject_unstable",
     ankoGuestAlly:makeAnkoParticipant().participantClass==="guest_ally"&&makeAnkoParticipant().controlAuthority==="player"&&makeAnkoParticipant().ownershipGranted===false,
     ankoPaletteExact:ANKO_GUEST_SKILL_IDS.join("|")==="sj_anko_hidden_shadow_snake_hands|sj_anko_snake_bind|sj_anko_fire_style_dragon_flame|sj_anko_serpent_evasion"&&!ANKO_GUEST_SKILL_IDS.includes("sj_anko_twin_snakes_mutual_death"),
