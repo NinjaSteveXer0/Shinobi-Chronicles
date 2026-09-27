@@ -620,3 +620,45 @@ Arc 2 benchmark successor set remains:
 **WRITING AMBER — BENCHMARK-OPTIMIZED CANDIDATE / STEPHEN SCENE-LEVEL REVIEW PENDING**
 
 This cleanup does not promote Arc 2 to WRITING GOLDEN and does not create a new downstream implementation handoff. Existing coordination issue #152 already owns the Arc-2 downstream implementation/content route.
+
+
+---
+
+# 18. Post-sweep Arc 3 #333 hard-separation cleanup
+
+The same live-main #333 audit was applied to the Arc-3 benchmark successor set after the Arc-2 cleanup.
+
+A small number of candidate blocks still mixed player-facing scene labels with author/runtime guidance, and two narration lines referred directly to UI/player framing rather than the lived world.
+
+The correction is expression-only.
+
+No Arc-3 graph, political outcome, faction support rule, Chronicle-specific trajectory, World fact, Combat seam, Battle winner, Progression state, or asset binding changed.
+
+## Commits
+
+- Arc 3 M1–4 cleanup: `5ec8949c62a6e5df2e70dd805fdfb47e7d0d41c8`
+- Arc 3 M5–8 cleanup: `7d0146ad44b306473ab9ede276f1d78737e2cac8`
+- Arc 3 M9–12 cleanup: `7e1b408f87f025fb6959223622547efa5bf291f0`
+
+## Corrected execution
+
+The pass:
+- moved resolver/performance safeguards behind explicit `AUTHOR / IMPLEMENTATION NOTE` or `AUTHOR / PERFORMANCE NOTE` boundaries;
+- replaced “while it is still a menu” with lived-world language;
+- replaced “a speech the player forgets” with lived-world language;
+- replaced the M4 “The player can no longer move through it...” narration with an in-world movement/authority consequence;
+- kept participant autonomy, Minato/Sasuke disagreement, Grey-Line conditionality and Jinchūriki/Hosted-Entity consent semantics unchanged.
+
+## Verification
+
+Remaining references to “player” in the three Arc-3 candidate files occur only in author/performance guidance, not as intended player-facing narration/dialogue.
+
+Unresolved asset bindings remain unresolved and must not be guessed.
+
+## Status
+
+Arc 3 benchmark successor set remains:
+
+**WRITING AMBER — BENCHMARK-OPTIMIZED CANDIDATE / STEPHEN SCENE-LEVEL REVIEW PENDING**
+
+This cleanup does not promote Arc 3 to WRITING GOLDEN and does not create a duplicate implementation handoff. Existing coordination issue #154 already owns the Arc-3 downstream implementation/content route.
