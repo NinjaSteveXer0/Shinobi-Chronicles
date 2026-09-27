@@ -127,7 +127,24 @@ Status:
 - `Izuno Origin Backdrop/river_route_day.png`
 - `Izuno Origin Backdrop/konoha_narrow_yard.png`
 
-Exact scene-by-scene use should follow the GOLDEN route geography.
+Exact scene-by-scene use is now closed by:
+
+`Documentation/Story/Academy_Wasabi_Izuno_Origin_Backdrop_Projection_Binding_2026-09-27.md`
+
+Authoritative summary:
+- Scene 1 HEAD START -> `practical_ground_day.png`
+- Scene 2 THE TRAIL + its four first-choice route beats -> `konoha_rooftop_pursuit_day.png`
+- Scene 3 THE SPLIT -> `konoha_main_street.png`
+- Scene 4A RIVER -> `river_route_day.png`
+- Scene 4B STRONGER TRAIL -> `konoha_narrow_yard.png`
+- Scene 4C SHOUTING / STEP IN / CALL FOR HELP / KEEP PURSUING -> `konoha_alleyway_day.png`
+- STEP IN PL Battle environment -> `konoha_alleyway_day.png`
+- post-Battle Story return -> `konoha_alleyway_day.png`
+- Scene 4D INTERCEPT -> `konoha_main_street.png`
+- Scenes 5–7 finish/evaluation/reflection -> `training_grounds_day.png`
+- ORIGIN CLOSE -> `konoha_main_street.png`
+
+Do not infer a different route mapping from filenames.
 
 ## NPC / enemy cards — live main
 
