@@ -296,7 +296,7 @@ Source 03 Ibuse closure preserves the signed-off Neurotoxin package:
 Next ordinary Summon state:
 
 - **Source 09 — Kamatari** — **COMBAT DESIGN CLOSED 2026-09-27**: Base PL target **82** remains locked; #258 still owes Formula-v1.0-valid seven Stats. **Sicklewind Route = ATK24 once/Battle against one occupied non-Active enemy. Wind-Sickle Mastery = Wind +10% / Bukijutsu +10% / dual-qualified +20%. Windtrail Hunt = contextual pursuit/discovery utility.**
-- **Source 10 — Snake** — **DESIGN CLOSED 2026-09-27**; generic `snake`, PL47, staged/not live. **Serpent Reach** = once/Battle ordinary-distance extension for one close-range Tai/Buki attack against the Active enemy. **Narrow Passage** = source-specific small-gap infiltration/scouting/small-object utility. Hidden Coil remains separately obtainable/learnable. **No Poison/venom Enhancement.** Shared courier dialogue use remains a global small/medium-Summon capability, not Snake's Enhancement.
+- **Source 10 — Snake** — **DESIGN CLOSED 2026-09-27**; generic `snake`, PL47, staged/not live. **Serpent Reach** = once/Battle ordinary-distance extension for one close-range Tai/Buki attack against the Active enemy. **Narrow Passage** = source-specific small-gap infiltration/scouting/small-object utility. Hidden Coil remains separately obtainable/learnable. **No Poison/venom Enhancement.**
 
 Source 09 proposal authority:
 `Documentation/Combat/SC_Combat_RESET_v2_Source_09_Kamatari_Proposal_2026-09-19.md`
@@ -319,10 +319,6 @@ Source 10 proposal authority:
 
 Snake RESET v2 final state:
 - generic `snake`, PL47; explicitly not Manda/Aoda/Manda II and not live;
-- **Serpent Courier is NOT Snake's Enhancement** and remains retired as source-specific Enhancement authority;
-- **ALL small-to-medium Summons may be used in authored dialogue choices as couriers**; this is a shared Summon capability, not a per-source Enhancement;
-- Story / World / Mission owns the actual dialogue occurrence, destination, hazards, factual reply and outcome;
-- courier capability does not imply teleportation, omniscience or automatic objective success;
 - **Enhancement = Serpent Reach**: ATTACHED/PREPARED, once/Battle, bridge ordinary mid-range separation for one close-range single-target Taijutsu or Bukijutsu attack against the Active enemy; normal attack ATK/effects; no separate reposition action; no off-slot targeting or impossible-barrier bypass;
 - **Narrow Passage** = contextual small-gap infiltration/access/scouting utility: Snake may traverse physically plausible confined routes to observe reachable spaces, reveal an authored route/POI, retrieve one small object or reach a simple small interaction point where the occurrence permits;
 - **no Poison/venom Enhancement**;
