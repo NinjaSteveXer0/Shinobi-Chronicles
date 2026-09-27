@@ -184,16 +184,21 @@ for(const forbidden of ["personalityTrait","alignment","specialization","moralit
 
 // Battle adapter executes under bounded mocks.
 const ratioCalls=[],evidenceRows=[];
+const sessionRows=new Map();
+const sessionStorage={
+  getItem:key=>sessionRows.has(String(key))?sessionRows.get(String(key)):null,
+  setItem:(key,value)=>{sessionRows.set(String(key),String(value));},
+  removeItem:key=>sessionRows.delete(String(key)),
+  clear:()=>sessionRows.clear()
+};
 const battleCtx={
-  console,JSON,Object,Array,String,Number,Boolean,Set,Map,Date,globalThis:null,
+  console,JSON,Object,Array,String,Number,Boolean,Set,Map,Date,globalThis:null,sessionStorage,
   Math:Object.create(Math),
   playerData:{},currentBattle:null,enemyDatabase:{},
   makeEnemyFixedDamageAction:(id,_pl,opts={})=>({id,skillId:id,actionClass:"enemy_authored_action",traits:opts.traits||[],evaluateAvailability:()=>({available:true}),resolve:()=>({resolved:true})}),
   makeEnemyRatioGuardAction:(id,ratio,opts={})=>{ratioCalls.push({id,ratio,opts});return{id,skillId:id,actionClass:"enemy_ratio_guard",traits:opts.traits||[],evaluateAvailability:()=>({available:true}),resolve:()=>({resolved:true})};},
   chooseEnemyAuthoredBattleAction:()=>({success:false,reason:"qa_generic"}),
   generateBattleRewards:()=>({generated:true,claimed:false,ryo:88,exp:77,items:[{id:"bad"}],rareDrops:[{id:"bad_rare"}]}),
-  getBattleRuntimeSaveState:()=>({battleId:battleCtx.currentBattle?.battleId||null,actionSequence:0,battleContext:{facts:{}}}),
-  restoreBattleRuntimeState:raw=>{battleCtx.currentBattle.runtime=JSON.parse(JSON.stringify(raw||{}));return battleCtx.currentBattle.runtime;},
   renderBattleActionFamilyRow:()=>'<nav class="battle-live-action-family-row"><button class="battle-live-action-family">SKILLS</button><button class="battle-live-action-family battle-live-withdraw-action" disabled>WITHDRAW</button></nav>',
   evaluateEnemyActionScheduler:()=>({ready:true,enemyId:"wasabi_origin_rogue_genin_01",eligibleActions:[]}),
   findBattleTransientState:()=>null,removeBattleTransientState:()=>true,
@@ -216,7 +221,28 @@ const battleCtx={
   recordBattleEvidence:row=>{evidenceRows.push(JSON.parse(JSON.stringify(row)));return{evidenceId:"wasabi-evidence-"+evidenceRows.length};},
   createBattleParticipantRef:(side,participantId)=>({side,participantId}),
   getBattleRemainingPL:(side,id)=>side==="enemy"?23:15,
-  savePlayerData:()=>true,saveTestState:()=>true,openOverlay:()=>true
+  savePlayerData:()=>true,
+  saveTestState:()=>{
+    const b=battleCtx.currentBattle||{};
+    const state={
+      battleId:b.battleId||null,
+      encounterId:b.encounterId||null,
+      deployment:JSON.parse(JSON.stringify(b.deployment||{}))
+    };
+    sessionStorage.setItem("shinobiTestState",JSON.stringify(state));
+    return true;
+  },
+  restoreTestState:()=>{
+    const raw=sessionStorage.getItem("shinobiTestState"),parsed=raw?JSON.parse(raw):null;
+    if(!parsed)return false;
+    battleCtx.currentBattle={
+      active:true,battleOver:false,battleId:parsed.battleId||null,encounterId:parsed.encounterId||null,
+      deployment:JSON.parse(JSON.stringify(parsed.deployment||{})),
+      rewards:{ryo:0,exp:0,items:[],rareDrops:[]}
+    };
+    return true;
+  },
+  openOverlay:()=>true
 };
 battleCtx.globalThis=battleCtx;
 vm.createContext(battleCtx);
@@ -252,12 +278,20 @@ assert(!battleCtx.renderBattleActionFamilyRow({id:"academy_izuno"}).includes("WI
 const savedWasabi343=battleCtx.currentBattle.wasabi343;delete battleCtx.currentBattle.wasabi343;
 assert(battleCtx.renderBattleActionFamilyRow({id:"academy_izuno"}).includes("WITHDRAW"),"non-Wasabi Battle renderer was altered");
 battleCtx.currentBattle.wasabi343=savedWasabi343;
-const runtimeSaved=battleCtx.getBattleRuntimeSaveState();
-assert.strictEqual(runtimeSaved.wasabi343.battleOccurrenceId,launched.battleId,"save/reload envelope lost Wasabi metadata");
-delete battleCtx.currentBattle.wasabi343;delete battleCtx.currentBattle.battleConfigId;
-battleCtx.restoreBattleRuntimeState(runtimeSaved);
-assert.strictEqual(battleCtx.currentBattle.wasabi343.battleOccurrenceId,launched.battleId,"restore did not reconstruct Wasabi metadata");
-assert.strictEqual(battleCtx.currentBattle.battleConfigId,"academy_izuno_origin_rogue_genin_step_in_battle","restore did not reconstruct Wasabi Battle config");
+const persistedSession=JSON.parse(sessionStorage.getItem("shinobiTestState"));
+assert.strictEqual(persistedSession.wasabi343.battleOccurrenceId,launched.battleId,"session save lost Wasabi adapter metadata");
+assert.strictEqual(persistedSession.wasabi343BattleId,launched.battleId,"session save lost exact Wasabi Battle occurrence");
+assert.strictEqual(persistedSession.wasabi343BattleActive,true,"session save lost active Wasabi Battle state");
+assert.strictEqual(persistedSession.battleConfigId,"academy_izuno_origin_rogue_genin_step_in_battle","session save lost scoped Battle config");
+battleCtx.currentBattle={active:false,battleOver:false,battleId:null,encounterId:null,deployment:{}};
+const restoredSession=battleCtx.restoreTestState();
+assert.strictEqual(restoredSession,true,"base Battle session restore did not run");
+assert.strictEqual(battleCtx.currentBattle.wasabi343.battleOccurrenceId,launched.battleId,"session restore did not reconstruct Wasabi metadata");
+assert.strictEqual(battleCtx.currentBattle.battleConfigId,"academy_izuno_origin_rogue_genin_step_in_battle","session restore did not reconstruct Wasabi Battle config");
+assert.strictEqual(battleCtx.currentBattle.battleId,launched.battleId,"session restore did not reconstruct exact Wasabi Battle occurrence");
+assert.strictEqual(battleCtx.currentBattle.active,true,"session restore did not reactivate the saved Wasabi Battle");
+assert.deepStrictEqual(Array.from(battleCtx.currentBattle.deployment.player.slots||[],x=>x.participantId),["academy_izuno"],"session restore drifted Wasabi deployment");
+assert.deepStrictEqual(Array.from(battleCtx.currentBattle.deployment.enemy.slots||[],x=>x.participantId),["wasabi_origin_rogue_genin_01"],"session restore drifted Rogue deployment");
 const generatedZero=battleCtx.generateBattleRewards({rewards:{ryo:{min:99,max:99}}},{id:"academy_izuno"});
 assert.strictEqual(generatedZero.ryo,0);assert.strictEqual(generatedZero.exp,0);
 assert.strictEqual(Array.from(generatedZero.items||[]).length,0);assert.strictEqual(Array.from(generatedZero.rareDrops||[]).length,0);

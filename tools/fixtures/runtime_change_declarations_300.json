@@ -789,7 +789,7 @@
         "playerData.activityHistory occ_origin_izuno_* factual source occurrences",
         "currentBattle.wasabi343 strict Rogue Genin Battle metadata",
         "playerData.wasabi343BattleLaunches idempotence receipts",
-        "shared Battle runtime save payload wasabi343 adapter envelope",
+        "shinobiTestState.wasabi343 / wasabi343BattleId / wasabi343BattleActive scoped adapter envelope",
         "currentBattle.wasabi343 / battleConfigId restore projection"
       ],
       "productionLoader": "index.html",
@@ -807,7 +807,7 @@
         "runtime/alpha-origin-screen-first-33700.js::patchIzuno"
       ],
       "contractChangeReason": "AUTHORITY_CHANGED",
-      "rationale": "Issue #343 consumes the approved Academy Wasabi Writing-Golden Story and closed Rogue Genin Combat package. It preserves IZU-01/02/03/04 source addresses, separates the secondary Rogue occurrence from the pursuit result, restores STEP IN through the shared Story-to-Battle return seam, enforces strict 1v1 deployment and zero Battle entitlement, persists only the #343 adapter envelope through the existing shared Battle save/restore hooks, retires all stale pre-GOLDEN Wasabi expression patches (33500/33600/33700), and adds no morality/personality/specialization inference or staged-vs-external World classification."
+      "rationale": "Issue #343 consumes the approved Academy Wasabi Writing-Golden Story and closed Rogue Genin Combat package. It preserves IZU-01/02/03/04 source addresses, separates the secondary Rogue occurrence from the pursuit result, restores STEP IN through the shared Story-to-Battle return seam, enforces strict 1v1 deployment and zero Battle entitlement, persists only the #343 adapter envelope through the established saveTestState/restoreTestState session extension seam, retires all stale pre-GOLDEN Wasabi expression patches (33500/33600/33700), and adds no morality/personality/specialization inference or staged-vs-external World classification."
     }
   ]
 }

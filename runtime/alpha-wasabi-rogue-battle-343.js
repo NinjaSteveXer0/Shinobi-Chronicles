@@ -121,27 +121,60 @@ if(PRE_CHOOSE){
   try{chooseEnemyAuthoredBattleAction=globalThis.chooseEnemyAuthoredBattleAction;}catch(_error){}
 }
 
-const PRE_GET_RUNTIME_SAVE=typeof getBattleRuntimeSaveState==="function"?getBattleRuntimeSaveState:null;
-if(PRE_GET_RUNTIME_SAVE){
-  globalThis.getBattleRuntimeSaveState=function getWasabi343BattleRuntimeSaveState(){
-    const saved=PRE_GET_RUNTIME_SAVE.apply(this,arguments);
-    if(saved&&currentBattle&&currentBattle.wasabi343)saved.wasabi343=clone(currentBattle.wasabi343);
-    return saved;
+// Persist only the #343 adapter envelope through the established Battle session
+// extension seam. Generic Battle save/restore remains canonical; this adapter
+// only restores the scoped identity that game.js intentionally does not own.
+const PRE_SAVE_TEST=typeof saveTestState==="function"?saveTestState:null;
+if(PRE_SAVE_TEST){
+  globalThis.saveTestState=function saveWasabi343TestState(){
+    const result=PRE_SAVE_TEST.apply(this,arguments);
+    if(currentBattle&&String(currentBattle.encounterId||"")===ENCOUNTER&&currentBattle.wasabi343&&typeof sessionStorage!=="undefined"){
+      try{
+        const raw=sessionStorage.getItem("shinobiTestState"),state=raw?JSON.parse(raw):{};
+        state.encounterId=ENCOUNTER;
+        state.battleConfigId=CONFIG;
+        state.wasabi343BattleActive=currentBattle.active===true&&currentBattle.battleOver!==true;
+        state.wasabi343BattleId=String(currentBattle.battleId||currentBattle.wasabi343.battleOccurrenceId||"");
+        state.wasabi343=clone(currentBattle.wasabi343);
+        sessionStorage.setItem("shinobiTestState",JSON.stringify(state));
+      }catch(_error){}
+    }
+    return result;
   };
-  try{getBattleRuntimeSaveState=globalThis.getBattleRuntimeSaveState;}catch(_error){}
+  try{saveTestState=globalThis.saveTestState;}catch(_error){}
 }
-const PRE_RESTORE_RUNTIME=typeof restoreBattleRuntimeState==="function"?restoreBattleRuntimeState:null;
-if(PRE_RESTORE_RUNTIME){
-  globalThis.restoreBattleRuntimeState=function restoreWasabi343BattleRuntimeState(rawRuntime){
-    const restored=PRE_RESTORE_RUNTIME.apply(this,arguments);
-    const saved=rawRuntime&&rawRuntime.wasabi343&&typeof rawRuntime.wasabi343==="object"?rawRuntime.wasabi343:null;
-    if(saved&&currentBattle&&String(currentBattle.encounterId||"")===ENCOUNTER){
+const PRE_RESTORE_TEST=typeof restoreTestState==="function"?restoreTestState:null;
+if(PRE_RESTORE_TEST){
+  globalThis.restoreTestState=function restoreWasabi343TestState(){
+    let saved=null,savedBattleActive=false,savedBattleId=null,savedExact=false;
+    if(typeof sessionStorage!=="undefined"){
+      try{
+        const raw=sessionStorage.getItem("shinobiTestState"),parsed=raw?JSON.parse(raw):null;
+        if(parsed&&String(parsed.encounterId||"")===ENCOUNTER&&String(parsed.battleConfigId||"")===CONFIG&&parsed.wasabi343&&typeof parsed.wasabi343==="object"){
+          saved=clone(parsed.wasabi343);
+          savedBattleActive=parsed.wasabi343BattleActive===true;
+          savedBattleId=String(parsed.wasabi343BattleId||saved.battleOccurrenceId||"").trim()||null;
+          savedExact=true;
+          if(currentBattle){
+            currentBattle.encounterId=ENCOUNTER;
+            currentBattle.battleConfigId=CONFIG;
+            if(savedBattleId)currentBattle.battleId=savedBattleId;
+            currentBattle.wasabi343=clone(saved);
+          }
+        }
+      }catch(_error){}
+    }
+    const restored=PRE_RESTORE_TEST.apply(this,arguments);
+    if(savedExact&&currentBattle){
+      currentBattle.encounterId=ENCOUNTER;
+      currentBattle.battleConfigId=CONFIG;
+      if(savedBattleId)currentBattle.battleId=savedBattleId;
       currentBattle.wasabi343=clone(saved);
-      currentBattle.battleConfigId=String(saved.battleConfigId||CONFIG);
+      if(savedBattleActive&&currentBattle.battleOver!==true)currentBattle.active=true;
     }
     return restored;
   };
-  try{restoreBattleRuntimeState=globalThis.restoreBattleRuntimeState;}catch(_error){}
+  try{restoreTestState=globalThis.restoreTestState;}catch(_error){}
 }
 
 const PRE_RENDER_ACTION_ROW=typeof renderBattleActionFamilyRow==="function"?renderBattleActionFamilyRow:null;
@@ -288,7 +321,7 @@ function diagnostics(){
     strictDeployment:String(strictWasabiDeployment).includes("createBattleDeploymentSlots([WASABI])")&&String(strictWasabiDeployment).includes("createBattleDeploymentSlots([ROGUE])"),
     withdrawNaturallyUnavailable:String(strictWasabiDeployment).includes("player={slots:createBattleDeploymentSlots([WASABI])}"),
     withdrawControlHiddenOnlyHere:!!PRE_RENDER_ACTION_ROW&&String(globalThis.renderBattleActionFamilyRow).includes("strictOneVsOne")&&String(globalThis.renderBattleActionFamilyRow).includes("battle-live-withdraw-action"),
-    saveReloadEnvelope:!!PRE_GET_RUNTIME_SAVE&&!!PRE_RESTORE_RUNTIME&&String(globalThis.getBattleRuntimeSaveState).includes("saved.wasabi343")&&String(globalThis.restoreBattleRuntimeState).includes("rawRuntime.wasabi343")&&String(globalThis.restoreBattleRuntimeState).includes("currentBattle.battleConfigId"),
+    saveReloadEnvelope:!!PRE_SAVE_TEST&&!!PRE_RESTORE_TEST&&String(globalThis.saveTestState).includes("state.wasabi343")&&String(globalThis.restoreTestState).includes("parsed.wasabi343")&&String(globalThis.restoreTestState).includes("currentBattle.battleConfigId=CONFIG")&&String(globalThis.restoreTestState).includes("PRE_RESTORE_TEST.apply"),
     exactOccurrenceId:exactBattleOccurrenceId("qa")==="battle_occ_origin_izuno_rogue_genin_step_in:qa"&&String(launch).includes("wasabi_battle_occurrence_already_committed_without_runtime"),
     zeroRewards:enemy.rewards.ryo.min===0&&enemy.rewards.ryo.max===0&&enemy.rewards.exp.min===0&&enemy.rewards.exp.max===0&&enemy.rewards.commonDrops.length===0&&enemy.rewards.rareDrops.length===0,
     claimSeparateFromContinue:!!PRE_GENERATE_REWARDS&&String(globalThis.generateBattleRewards).includes("requiresExplicitPostClaimContinue=true")&&String(launch).includes("requiresExplicitPostClaimContinue=true"),
