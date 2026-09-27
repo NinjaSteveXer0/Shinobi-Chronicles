@@ -97011,6 +97011,8 @@ function runAlphaArc1M1WhisperMajorContactStoryCallerDiagnostics() {
     // Separate Detain launch proves objective selection is independent from Kill.
     const detainFixture=prepareArc1M1WhisperMajorContactDiagnosticFixture();
     checks.detainFixtureReady=detainFixture.success===true;
+    const detainBaselineRyo=Number(playerData.ryo)||0;
+    const detainBaselineExp=Number(playerData.exp)||0;
     const detainApproach=routeWorldOpportunityInteraction(A.opportunityId,"approach_contact");
     advanceStoryScene();
     const detainChoice=applyStorySceneChoice("detain");
@@ -97021,7 +97023,7 @@ function runAlphaArc1M1WhisperMajorContactStoryCallerDiagnostics() {
 
     const ryo=Number(playerData.ryo)||0;
     const exp=Number(playerData.exp)||0;
-    checks.noHiddenRewardOrPLMutation=ryo===0&&exp===0&&!commitArc1M1WhisperResolutionIntent.toString().includes("power")&&!commitArc1M1WhisperResolutionIntent.toString().includes("statGrowth")&&!commitArc1M1WhisperResolutionIntent.toString().includes("plGrowth");
+    checks.noHiddenRewardOrPLMutation=ryo===detainBaselineRyo&&exp===detainBaselineExp&&!commitArc1M1WhisperResolutionIntent.toString().includes("power")&&!commitArc1M1WhisperResolutionIntent.toString().includes("statGrowth")&&!commitArc1M1WhisperResolutionIntent.toString().includes("plGrowth");
     checks.worldOpportunityStillNoDirectBattle=getRegisteredWorldEventOpportunity(A.opportunityId).interactions.every(action=>action.kind!=="battle");
     checks.storySceneUsesExistingBattlePackage=typeof getStorySceneDefinition(A.sceneId).beatMap.get("major_contact_battle_transition").battle.launchResolver==="function"&&getStorySceneDefinition(A.sceneId).beatMap.get("major_contact_battle_transition").battle.encounterId===A.encounterPackageId;
   } catch (caught) {
