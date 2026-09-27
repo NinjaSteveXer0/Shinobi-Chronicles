@@ -378,6 +378,15 @@ async function guestAllyVictoryAndReload(browser){
     const claimToContinueMs=Date.now()-claimStarted;
     assert(claimToContinueMs<2000,"post-claim Victory continuation remained watchdog-delayed: "+claimToContinueMs+"ms");
 
+    // CONTINUE is inserted synchronously by the post-claim Victory re-render;
+    // the presentation-only earned-delta decoration is applied on its scheduled
+    // requestAnimationFrame. Keep the latency measurement above independent,
+    // then require the next visible frame to be the same +100 earned delta.
+    await page.waitForFunction(()=>{
+      const node=document.querySelector(".alpha-victory-code-screen .victory-ryo-number");
+      return node&&node.textContent.trim()==="+100"&&node.dataset.rewardPresentation==="earned_delta";
+    },null,{timeout:1000});
+
     const afterClaim=await page.evaluate(()=>Number(playerData.ryo)||0);
     assert.strictEqual(afterClaim,beforeClaim+100);
     assert.strictEqual(await page.evaluate(()=>claimCurrentBattleRewards()),false,"reward duplicated on second claim");
