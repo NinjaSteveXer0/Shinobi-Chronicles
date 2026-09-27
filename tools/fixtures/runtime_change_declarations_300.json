@@ -795,10 +795,13 @@
       ],
       "replaces": [
         "runtime/alpha-origin-scenes-32900-a.js::pre343_compressed_academy_izuno",
-        "runtime/alpha-origin-scenes-32900-a.js::pre343 STEP IN battle fail-closed placeholder"
+        "runtime/alpha-origin-scenes-32900-a.js::pre343 STEP IN battle fail-closed placeholder",
+        "runtime/alpha-origin-browser-realisation-33500.js::patchIzuno33500",
+        "runtime/alpha-early-story-modernization-33600.js::patchIzuno",
+        "runtime/alpha-origin-screen-first-33700.js::patchIzuno"
       ],
       "contractChangeReason": "AUTHORITY_CHANGED",
-      "rationale": "Issue #343 consumes the approved Academy Wasabi Writing-Golden Story and closed Rogue Genin Combat package. It preserves IZU-01/02/03/04 source addresses, separates the secondary Rogue occurrence from the pursuit result, restores STEP IN through the shared Story-to-Battle return seam, enforces strict 1v1 deployment and zero Battle entitlement, and adds no morality/personality/specialization inference or staged-vs-external World classification."
+      "rationale": "Issue #343 consumes the approved Academy Wasabi Writing-Golden Story and closed Rogue Genin Combat package. It preserves IZU-01/02/03/04 source addresses, separates the secondary Rogue occurrence from the pursuit result, restores STEP IN through the shared Story-to-Battle return seam, enforces strict 1v1 deployment and zero Battle entitlement, retires all stale pre-GOLDEN Wasabi expression patches (33500/33600/33700), and adds no morality/personality/specialization inference or staged-vs-external World classification."
     }
   ]
 }
