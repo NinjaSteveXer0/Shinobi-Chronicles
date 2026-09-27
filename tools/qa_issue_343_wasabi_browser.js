@@ -87,6 +87,7 @@ async function info(page){
     }));
     return{
       sceneId:rt?.sceneId||null,beatId:rt?.beatId||null,mode:beat?.mode||null,machineResolved:beat?.machineResolved===true,
+      cueKind:root?.dataset.scCueKind||null,
       localContext:rt?.localContext?JSON.parse(JSON.stringify(rt.localContext)):{},
       text:root?.querySelector(".sc-story-text")?.textContent?.trim()||"",
       speaker:root?.querySelector(".sc-story-name")?.textContent?.trim()||"",
@@ -210,7 +211,7 @@ async function finishFromCurrent(page,label,reflection="Sometimes the fastest pa
   await assertBackdrop(page,BACKDROPS.mainStreet,label+" ORIGIN CLOSE");
   await continueTo(page,"izu_receipt");
   const receipt=await info(page);
-  assert.strictEqual(receipt.mode,"record",label+" Chronicle Receipt mode missing");
+  assert.strictEqual(receipt.cueKind,"record",label+" Chronicle Receipt presentation mode missing");
   assert.strictEqual(receipt.speaker,"CHRONICLE RECEIPT",label+" Chronicle Receipt heading missing");
   for(const heading of ["YOUR ORIGIN","ACADEMY WASABI IZUNO","RECORDED IN YOUR CHRONICLE","YOUR DECISIONS","WHAT HAPPENED","HISTORY CREATED"]){
     assert(receipt.text.includes(heading),label+" Chronicle Receipt missing "+heading);
