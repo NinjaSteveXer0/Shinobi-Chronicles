@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-27  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons / Tailed Beasts  
-**Status:** **PARTIAL SIGN-OFF — FLIGHT/CONTEXT ARCHITECTURE + ENHANCEMENTS ACCEPTED BY STEPHEN / REMAINING SKILL PACKAGE REVISED FOR FINAL REVIEW**  
+**Status:** **DESIGN CLOSED BY STEPHEN 2026-09-28 — SOURCE 14 RESET v2 COMPLETE**  
 **Parent:** #235  
 **Reset authority:** `Documentation/Combat/SC_Combat_Summons_Tailed_Beasts_Full_Calibration_RESET_v2_2026-09-18.md`  
 **Canon research:** `Documentation/Combat/SC_Combat_Tailed_Beasts_Canon_Research_Shukaku_Matatabi_Isobu_Chomei_2026-09-27.md`  
@@ -991,26 +991,29 @@ Batch 5 must audit any dedicated Chōmei/Fū/Jinchūriki representations before 
 **Chōmei Base Stats / PL107:** CLOSED by current Registry.  
 **Seven-Tails exact representation:** ACCEPTED by PL / Registry — wild / non-cooperative raw-flight / horn-momentum, Base Stats `98/112/52/54/102/58/112`, Base PL **107**.  
 **Historical retired Seven-Tails PL103 row:** RETIRED / NOT revived; fresh PL107 row is successor authority.  
-**Shared manifested core:** PROPOSED.  
-**Seven-Tails manifested variants:** Overrun Dive + Six-Wing Circuit — PROPOSED.  
-**Chōmei manifested variants:** Lucky Horn Vector + Skyhook Rescue — PROPOSED.  
-**Seven-Tails Enhancement:** Unbound Wings — PROPOSED.  
-**Seven-Tails host-assisted Skills:** Hornline Breakthrough / Wing-Tail Harrow / Groundbreak Lift — PROPOSED.  
-**Chōmei Enhancement:** Skyway Accord — PROPOSED.  
-**Chōmei cooperative assisted Skills:** Aerial Relay / Scale Trail Feint — PROPOSED.  
-**Chōmei Potential Skill seed branch:** Horn Vector / Wingline Intercept / Scale Veil — PROPOSED.  
-**Scale Powder:** deliberately NOT in Chōmei's manifested own kit. Source 14 now proposes an explicit SC **host-development adaptation** through Scale Trail Feint / Scale Veil, grounded in Fū's manga-supported host-linked technique and clearly labelled as SC divergence.  
+**Shared manifested core:** CLOSED.  
+**Seven-Tails manifested variants:** Overrun Dive + Six-Wing Circuit — CLOSED.  
+**Chōmei manifested variants:** Lucky Horn Vector + Skyhook Rescue — CLOSED.  
+**Seven-Tails Enhancement:** Unbound Wings — CLOSED.  
+**Seven-Tails host-assisted Skills:** Hornline Breakthrough / Wing-Tail Harrow / Groundbreak Lift — CLOSED.  
+**Chōmei Enhancement:** Skyway Accord — CLOSED.  
+**Chōmei cooperative assisted Skills:** Aerial Relay / Scale Trail Feint — CLOSED.  
+**Chōmei Potential Skill seed branch:** Horn Vector / Wingline Intercept / Scale Veil — CLOSED as Combat seed catalogue, NOT a lifetime ceiling.  
+**Scale Powder:** deliberately NOT in Chōmei's manifested own kit. Source 14 closes an explicit SC **host-development adaptation** through Scale Trail Feint / Scale Veil, grounded in Fū's manga-supported host-linked technique and clearly labelled as SC divergence.  
 **Implementation:** NOT STARTED.  
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
 
-**Stephen sign-off received 2026-09-28 for:**
+**Stephen final sign-off received 2026-09-28.**
+
+Closed Source 14 includes:
 - automatic inherent contextual flight rule;
 - no invented close/mid/far range/reposition system;
-- Seven-Tails Enhancement **Unbound Wings**;
-- Chōmei Enhancement **Skyway Accord**;
-- AIRBORNE / GROUND_CONTACT_REQUIRED / GROUND_BOUND Battle grammar.
+- AIRBORNE / GROUND_CONTACT_REQUIRED / GROUND_BOUND Battle grammar;
+- Seven-Tails manifested, Enhancement and host-assisted packages;
+- Chōmei manifested, Enhancement and cooperative host-assisted packages;
+- Chōmei Potential Skill seed branch and explicit SC Scale Powder host-development adaptation.
 
-**Remaining manifested / source-assisted / Potential Skill package has received a final uniqueness rewrite and awaits Stephen's final review before Source 14 DESIGN CLOSED.**
+**Source 14 Combat design is CLOSED. Implementation/runtime/Golden remain unclaimed.**
 
 **proposal != design closed != implemented != runtime validated != Golden GREEN**
