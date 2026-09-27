@@ -93,11 +93,13 @@ Special material rewards must consume an authorised definition/source and preser
 
 ## 4. Rarity hierarchy
 
-Current Alpha rarity authority remains:
+Stephen-approved reward rarity hierarchy is:
 
-`normal -> common -> rare -> legendary`
+`common -> uncommon -> rare -> legendary`
 
-Do not invent `uncommon`, `epic`, `mythic` or another intermediate tier without changing the owning catalogue authority.
+This supersedes the prior World-facing `normal -> common -> rare -> legendary` statement.
+
+Current Combat / Item / Weapon catalogue rows that still use `normal` require owner reconciliation; World must not silently remap live definitions itself. Until that owner return lands, reward authoring uses the Stephen-approved hierarchy semantically while exact live catalogue entries retain their current owner-authored rarity field.
 
 Rarity is a property of the exact Item/Weapon/Equipment definition.
 
@@ -205,4 +207,4 @@ It adds two explicit economic baselines:
 
 ## Canonical lock
 
-> **Every Origin ends with a one-shot 100-Ryō starting purse so the player enters Shinobi Chronicles' main economy with spending money. Every player Battle victory pays non-zero Ryō, while special Item/Weapon/Equipment/material rewards remain causal and optional. Missions and side quests do not require cash unless an actual economic source exists. Current rarity remains normal -> common -> rare -> legendary. Chronicle Engine internals stay hidden: players experience the outcomes of their decisions, not the machinery, IDs, weights or future-eligibility logic behind those outcomes.**
+> **Every Origin ends with a one-shot 100-Ryō starting purse so the player enters Shinobi Chronicles' main economy with spending money. Every player Battle victory pays non-zero Ryō, while special Item/Weapon/Equipment/material rewards remain causal and optional. Missions and side quests do not require cash unless an actual economic source exists. Stephen-approved reward rarity is common -> uncommon -> rare -> legendary; any live catalogue `normal` rows require owner reconciliation rather than silent World mutation. Chronicle Engine internals stay hidden: players experience the outcomes of their decisions, not the machinery, IDs, weights or future-eligibility logic behind those outcomes.**
