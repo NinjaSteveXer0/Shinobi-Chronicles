@@ -82,6 +82,25 @@ assert(returnBridge&&returnBridge.mode==="post_battle","STEP IN does not return 
 assert.strictEqual(returnBridge.nextBeatId,"izu_finish_secondary_1","STEP IN return skips Scene 5 secondary finish");
 assert.deepStrictEqual(JSON.parse(JSON.stringify(cueTexts("izu_finish_secondary"))),Array.from(storyCtx.SC_ACADEMY_WASABI_WRITING_GOLDEN_343.get("finish_secondary"),cue=>cue.text),"Scene 5 secondary finish prose drifted");
 
+// Stephen-installed-browser RED repair: actor projection + shared Receipt.
+for(const actorPath of [
+  "Assets/Academy Student/academy_izuno.png",
+  "NPC/izuno_instructor.png",
+  "Enemies/rogue_genin.png"
+])assert(wasabiSource.includes(actorPath),"missing Wasabi actor-card binding "+actorPath);
+assert(wasabiSource.includes("function izunoActors32900"),"Wasabi actor projection resolver missing");
+assert(wasabiSource.includes('if(id.startsWith("izu_open_"))return["wasabi","instructor"]'),"HEAD START does not stage Wasabi + Instructor");
+assert(wasabiSource.includes('if(id.startsWith("izu_eval_"))return["wasabi","instructor"]'),"evaluation does not stage Wasabi + Instructor");
+assert(wasabiSource.includes('return["wasabi","rogue"]'),"Rogue interruption does not stage Wasabi + Rogue Genin");
+const receiptBeat=byId.get("izu_receipt");
+assert(receiptBeat&&receiptBeat.mode==="record"&&receiptBeat.exitScene===true,"mandatory Wasabi Chronicle Receipt beat missing");
+assert.strictEqual(tail("izu_close").nextBeatId,"izu_receipt","Origin Close bypasses mandatory Chronicle Receipt");
+assert(wasabiSource.includes("function buildWasabiReceipt32900"),"Wasabi Chronicle Receipt builder missing");
+assert(wasabiSource.includes('"YOUR DECISIONS"')&&wasabiSource.includes('"WHAT HAPPENED"')&&wasabiSource.includes('"HISTORY CREATED"'),"Receipt semantic groupings missing");
+assert(wasabiSource.includes("A.findOccurrence(tracking)")&&wasabiSource.includes("A.findOccurrence(intercept)")&&wasabiSource.includes("A.findOccurrence(coop)")&&wasabiSource.includes("A.findOccurrence(rogue)"),"Receipt does not read committed Wasabi history");
+assert(wasabiSource.includes('performanceTransitions:{[closeLastBeatId]:"wipe_right_to_left"}'),"Origin Close -> Receipt black wipe missing");
+assert(!wasabiSource.includes("pursuit_target.png"),"Coding guessed pursuit-target asset path before exact GitHub authority");
+
 // Approved voice/dialogue anchors from Writing GOLDEN.
 for(const [prefix,line] of [
   ["izu_open","That's not a time."],
