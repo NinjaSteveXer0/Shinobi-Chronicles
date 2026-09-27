@@ -77,7 +77,9 @@ Different destinations.
 
 The same operation touching all four.
 
-**AUTHOR:** once legitimately examined enough, commit:
+### AUTHOR / IMPLEMENTATION NOTE
+
+Once legitimately examined enough, commit:
 `occ_arc1_m2_warehouse_ledger_distributed_operation_discovered`
 
 Do not narrate “distributed operation established” to the player.
@@ -108,7 +110,9 @@ Another part of the warehouse record is less abstract.
 
 A current Sarutobi-linked logistics trail touches the operation closely enough that coincidence stops being a comfortable answer.
 
-That still leaves a large distance between **this participant was involved here** and **the clan did this**.
+That is not the same thing as proving the Sarutobi clan stands behind it.
+
+### AUTHOR / IMPLEMENTATION NOTE
 
 Do not narrate that distinction as a rule.
 
