@@ -68,6 +68,9 @@ function patchHinata(){
 
 function patchIzuno(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const def=editable(A.sceneByVariant.academy_izuno);if(!def)return false;
+  // #343 native WRITING GOLDEN owns Wasabi's player-facing expression.
+  // Retire this stale pre-GOLDEN prose layer instead of re-registering over it.
+  if(beat(def,"izu_initial_choice")&&beat(def,"izu_split_choice")&&beat(def,"izu_rogue_choice")&&beat(def,"izu_rogue_step_in_battle")&&beat(def,"izu_reflect"))return true;
   text(def,"izu_start","The Academy target gets a head start and vanishes into the village training routes. A flare at the extraction point marks the only thing Wasabi knows for certain: if it goes up before she gets there, she was too slow—or followed the wrong story.");
   text(def,"izu_initial","The obvious trail is almost too obvious. Scuffed dirt points east. A snapped reed points toward the drainage path. Two other students are already arguing over which one matters.");
   label(def,"izu_initial","obvious_trail","Take the trail at face value and move.");
