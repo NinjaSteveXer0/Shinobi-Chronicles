@@ -1,3 +1,6 @@
+> **2026-09-27 SUPERSEDED FOR REVIEW — BENCHMARK-OPTIMIZED SUCCESSOR**  
+> Current review candidate: `Documentation/Story/Academy_Kushina_Origin_333_Benchmark_Optimized_Candidate_2026-09-27.md`. The successor preserves all KUS semantics and recovered Gerotora dialogue while repairing over-fragmented Story pagination. Do not consume this earlier candidate as final expression.
+
 # Academy Kushina Origin — #333 Player-Facing Rewrite Candidate
 
 **Date:** 2026-09-27  
