@@ -771,16 +771,20 @@
       "changeId": "academy-wasabi-writing-golden-rogue-battle-343",
       "classification": "REPLACES",
       "responsibilityIds": [
+        "story.machine_resolver.shared",
         "origin.academy_izuno.final_story_state",
         "origin.academy_izuno.rogue_battle"
       ],
-      "owner": "runtime/alpha-origin-scenes-32900-a.js + runtime/alpha-wasabi-rogue-battle-343.js",
+      "owner": "game.js shared Story machine-resolver seam + runtime/alpha-origin-scenes-32900-a.js + runtime/alpha-wasabi-rogue-battle-343.js",
       "directCallers": [
+        "runtime/alpha-origin-scenes-32900-a.js",
+        "game.js",
         "runtime/alpha-origin-scenes-32900-integrator.js",
         "runtime/alpha-story-scene-board-33900.js",
         "runtime/alpha-battle-modern-33000.js"
       ],
       "stateTouched": [
+        "activeStorySceneRuntime machine-resolver normalization / exact-one internal branch advance",
         "activeStorySceneRuntime.localContext Academy Wasabi pursuit/route/Rogue response facts",
         "playerData.activityHistory occ_origin_izuno_* factual source occurrences",
         "currentBattle.wasabi343 strict Rogue Genin Battle metadata",
@@ -801,7 +805,7 @@
         "runtime/alpha-origin-screen-first-33700.js::patchIzuno"
       ],
       "contractChangeReason": "AUTHORITY_CHANGED",
-      "rationale": "Issue #343 consumes the approved Academy Wasabi Writing-Golden Story and closed Rogue Genin Combat package. It preserves IZU-01/02/03/04 source addresses, separates the secondary Rogue occurrence from the pursuit result, restores STEP IN through the shared Story-to-Battle return seam, enforces strict 1v1 deployment and zero Battle entitlement, retires all stale pre-GOLDEN Wasabi expression patches (33500/33600/33700), and adds no morality/personality/specialization inference or staged-vs-external World classification."
+      "rationale": "Issue #343 consumes the approved Academy Wasabi Writing-Golden Story and closed Rogue Genin Combat package. The shared game.js Story runtime now preserves an explicit machine-resolver beat kind, hides its internal authored branches from player projection, requires exactly one semantically eligible branch, and delegates that branch through the existing Story choice authority. This closes the browser-only normalization gap without label inference or a second Story system. Wasabi preserves IZU-01/02/03/04 source addresses, separates the secondary Rogue occurrence from pursuit result, restores STEP IN through the shared Story-to-Battle return seam, enforces strict 1v1 deployment and zero Battle entitlement, retires all stale pre-GOLDEN Wasabi expression patches (33500/33600/33700), and adds no morality/personality/specialization inference or staged-vs-external World classification."
     }
   ]
 }
