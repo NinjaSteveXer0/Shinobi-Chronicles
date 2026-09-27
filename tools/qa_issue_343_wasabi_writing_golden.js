@@ -192,6 +192,8 @@ const battleCtx={
   makeEnemyRatioGuardAction:(id,ratio,opts={})=>{ratioCalls.push({id,ratio,opts});return{id,skillId:id,actionClass:"enemy_ratio_guard",traits:opts.traits||[],evaluateAvailability:()=>({available:true}),resolve:()=>({resolved:true})};},
   chooseEnemyAuthoredBattleAction:()=>({success:false,reason:"qa_generic"}),
   generateBattleRewards:()=>({generated:true,claimed:false,ryo:88,exp:77,items:[{id:"bad"}],rareDrops:[{id:"bad_rare"}]}),
+  getBattleRuntimeSaveState:()=>({battleId:battleCtx.currentBattle?.battleId||null,actionSequence:0,battleContext:{facts:{}}}),
+  restoreBattleRuntimeState:raw=>{battleCtx.currentBattle.runtime=JSON.parse(JSON.stringify(raw||{}));return battleCtx.currentBattle.runtime;},
   renderBattleActionFamilyRow:()=>'<nav class="battle-live-action-family-row"><button class="battle-live-action-family">SKILLS</button><button class="battle-live-action-family battle-live-withdraw-action" disabled>WITHDRAW</button></nav>',
   evaluateEnemyActionScheduler:()=>({ready:true,enemyId:"wasabi_origin_rogue_genin_01",eligibleActions:[]}),
   findBattleTransientState:()=>null,removeBattleTransientState:()=>true,
@@ -250,6 +252,12 @@ assert(!battleCtx.renderBattleActionFamilyRow({id:"academy_izuno"}).includes("WI
 const savedWasabi343=battleCtx.currentBattle.wasabi343;delete battleCtx.currentBattle.wasabi343;
 assert(battleCtx.renderBattleActionFamilyRow({id:"academy_izuno"}).includes("WITHDRAW"),"non-Wasabi Battle renderer was altered");
 battleCtx.currentBattle.wasabi343=savedWasabi343;
+const runtimeSaved=battleCtx.getBattleRuntimeSaveState();
+assert.strictEqual(runtimeSaved.wasabi343.battleOccurrenceId,launched.battleId,"save/reload envelope lost Wasabi metadata");
+delete battleCtx.currentBattle.wasabi343;delete battleCtx.currentBattle.battleConfigId;
+battleCtx.restoreBattleRuntimeState(runtimeSaved);
+assert.strictEqual(battleCtx.currentBattle.wasabi343.battleOccurrenceId,launched.battleId,"restore did not reconstruct Wasabi metadata");
+assert.strictEqual(battleCtx.currentBattle.battleConfigId,"academy_izuno_origin_rogue_genin_step_in_battle","restore did not reconstruct Wasabi Battle config");
 const generatedZero=battleCtx.generateBattleRewards({rewards:{ryo:{min:99,max:99}}},{id:"academy_izuno"});
 assert.strictEqual(generatedZero.ryo,0);assert.strictEqual(generatedZero.exp,0);
 assert.strictEqual(Array.from(generatedZero.items||[]).length,0);assert.strictEqual(Array.from(generatedZero.rareDrops||[]).length,0);
