@@ -3,7 +3,17 @@
 **Date:** 2026-09-27  
 **Owner:** World / Missions / Events / Rewards  
 **Source handoff:** GitHub #404  
-**Status:** **WORLD CLOSED — IMPLEMENTATION / BROWSER VALIDATION REQUIRED**
+**Status:** **SUPERSEDED / IMPLEMENTATION HOLD — #406 REWARD-SPECTRUM RE-AUDIT IN PROGRESS**  
+
+## Supersession notice
+
+Do **not** implement the additive Ryō matrix in this document as final authority.
+
+Binding CE reward-spectrum firewall #406 requires a full re-audit. Current proposed replacement:
+
+`Documentation/World/Academy Wasabi Izuno Origin Reward Spectrum Re-Audit Proposal 2026-09-27.md`
+
+That proposal requires Stephen sign-off before implementation or propagation to other Origins.
 
 ## 1. Purpose
 
