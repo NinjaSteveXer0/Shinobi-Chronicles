@@ -295,7 +295,7 @@ Source 03 Ibuse closure preserves the signed-off Neurotoxin package:
 
 Next ordinary Summon state:
 
-- **Source 09 — Kamatari** — **COMBAT MECHANICS CLOSED 2026-09-27**: Base PL target **82** remains locked; #258 still owes Formula-v1.0-valid seven Stats. **Sicklewind Route = ATK24 once/Battle against one occupied non-Active enemy.** Enhancement = **Wind-Sickle Mastery**: Wind Release direct Attack-PL +10%, Bukijutsu direct Attack-PL +10%, dual-qualified packet +20% total from Kamatari. **Windtrail Hunt** provides contextual hidden-route/location/POI/pursuit-lead discovery where World/Story has a real detectable lead.
+- **Source 09 — Kamatari** — **PARTIALLY CLOSED 2026-09-27**: Base PL target **82** remains locked; #258 still owes Formula-v1.0-valid seven Stats. **Sicklewind Route = ATK24 once/Battle against one occupied non-Active enemy — CLOSED by Stephen.** Stephen also locked the Enhancement direction as **Wind + Bukijutsu + relevant pursuit/discovery**. Combat proposes **Wind-Sickle Mastery** at Wind +10% / Bukijutsu +10% (dual-qualified +20%) plus **Windtrail Hunt** contextual discovery; those exact Enhancement numerics/wording still await Stephen final sign-off.
 - **Source 10 — Snake** — **PARTIALLY REOPENED ON ENHANCEMENT ONLY 2026-09-27**; generic `snake`, PL47, staged/not live. Hidden Coil remains an obtainable/learnable source-assisted Skill and the manifested/future combat kit remains closed. **Serpent Courier is retired as Snake-specific Enhancement authority. A true separate Snake Enhancement is OPEN.**
 
 Source 09 proposal authority:
@@ -306,12 +306,14 @@ Kamatari RESET v2 corrected state:
 - #258 must return Formula-v1.0-valid seven Base Stats for PL82; current live PL77 row remains drift;
 - **Sicklewind Route is Kamatari's own ATTACK/action**, not an attached Enhancement;
 - **Sicklewind Route = ATK24**, once/Battle, one legally occupied enemy not occupying the Active slot; no promotion/reorder/bonus action;
-- **Wind-Sickle Mastery** is ATTACHED/PREPARED: qualifying Wind Release direct Attack-PL +10%; qualifying Bukijutsu direct Attack-PL +10%; a dual Wind + Bukijutsu packet gets both once for +20% total;
-- **Windtrail Hunt** is a contextual discovery/pursuit utility that can expose authored hidden routes, hidden locations, points of interest, escape trails or pursuit leads where local evidence makes the discovery plausible;
+- Stephen's **Enhancement direction** is locked: Wind + Bukijutsu + relevant pursuit/discovery;
+- Combat's proposed exact **Wind-Sickle Mastery** calibration is ATTACHED/PREPARED: qualifying Wind Release direct Attack-PL +10%; qualifying Bukijutsu direct Attack-PL +10%; a dual Wind + Bukijutsu packet gets both once for +20% total;
+- Combat's proposed **Windtrail Hunt** is a contextual discovery/pursuit utility that can expose authored hidden routes, hidden locations, points of interest, escape trails or pursuit leads where local evidence makes the discovery plausible;
 - no invented formal Missing-nin Stat is created;
+- exact Enhancement numerics/utility wording are not yet attributed as Stephen sign-off;
 - Reaping Rush ATK30, Gale Pursuit ATK24 / 32 after enemy movement, Crosswind Cutoff once/Battle target-choice pursuit reaction, and Quick Beheading Dance once/Battle ATK32 each up to 3 legally exposed hostiles remain preserved;
 - no generic accuracy roll / Speed Stat / hard Stun / hidden PL scaling;
-- Combat mechanics are closed; do not route implementation until #258 returns the Formula-valid PL82 Stats and downstream routing is explicitly released.
+- Sicklewind Route is closed; do not route implementation until Stephen signs off the exact Enhancement package, #258 returns the Formula-valid PL82 Stats, and downstream routing is explicitly released.
 
 Source 10 proposal authority:
 `Documentation/Combat/SC_Combat_RESET_v2_Source_10_Snake_Proposal_2026-09-19.md`
