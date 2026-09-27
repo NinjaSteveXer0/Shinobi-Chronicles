@@ -101,25 +101,51 @@ That is not the same thing as agreeing.
 
 ---
 
-# 3. World disposition insertion point
+# 3. Fresh-defeat World result — CLOSED
 
-After `iwa_confront_loss_05`, hand control to the authoritative World result from #398.
+Current World authority:
 
-Stable insertion address:
+`Documentation/World/Academy Iwabee Rogue Genin Disposition and Custody Resolution 2026-09-27.md`
 
-`iwa_confront_loss_world_result`
+commit:
+`b8af7bb8eaac5ae14811c88b3141107aeb82de1f`
 
-World owns the exact factual answer to:
-- Rogue attempts escape or not;
-- instructor intervenes or not;
-- surrender / detention / custody / escape / unresolved state;
-- responsible actor;
-- any movement out of the yard.
+After `iwa_confront_loss_05`:
 
-Writing must not guess those facts.
+## `iwa_confront_loss_world_result` — narration
 
-When World resolution is complete, resume at:
+The Rogue Genin's eyes flick toward the open edge of the yard.
 
+The instructor moves before Iwabee can.
+
+Not toward the Rogue.
+
+Between the Rogue and the student who has already been forced out of the fight.
+
+## `iwa_confront_loss_world_result_02` — dialogue — INSTRUCTOR
+
+**INSTRUCTOR:** “Enough.”
+
+## `iwa_confront_loss_world_result_03` — narration
+
+The Rogue does not argue.
+
+He takes the opening and runs.
+
+The instructor lets him go long enough to make sure Iwabee stays standing.
+
+No one calls it a victory.
+
+No one needs to.
+
+**AUTHOR FACTS:**
+- Rogue escapes;
+- instructor protects withdrawn Iwabee;
+- no custody;
+- no injury/death;
+- no Origin failure.
+
+**Next:**
 `iwa_eval_route_confront_loss_01`
 
 ---
