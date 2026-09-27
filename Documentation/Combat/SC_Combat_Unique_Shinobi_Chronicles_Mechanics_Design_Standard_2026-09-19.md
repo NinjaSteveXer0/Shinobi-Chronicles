@@ -632,3 +632,62 @@ It does not by itself claim:
 - Golden/regression GREEN.
 
 **design authority != implementation != runtime validated != Golden GREEN**
+
+
+---
+
+# 26. Family-common capability vs signature identity budget
+
+**Added:** 2026-09-27 after Tailed-Beast Source 14 review.
+
+A capability being shared by a family does NOT justify consuming the identity budget of every member's signature package.
+
+Examples include:
+- Tailed Beast Ball across Bijū that legitimately possess it;
+- ordinary family/body fundamentals;
+- shared baseline movement or manifestation primitives.
+
+Canonical rule:
+
+> **Family-common capability may be shared. Signature mechanics must still explain why this exact source is worth choosing.**
+
+Where runtime architecture permits, family-common capabilities should be represented through a **shared family technique layer / common action surface** rather than replacing bespoke source-defining slots.
+
+If current runtime temporarily requires a shared technique to occupy a prepared slot, design closure must still provide enough bespoke actions/Enhancements to establish a distinct tactical identity.
+
+## Shared anatomy is not sufficient duplication authority
+
+Two sources having:
+- hard shells;
+- claws;
+- wings;
+- poison;
+- Fire;
+- armour;
+- similar body parts
+
+does NOT by itself justify giving them mechanically equivalent signature Skills.
+
+The shared trait is a **design primitive**.
+
+The final mechanic must ask:
+
+> **How does THIS source use that trait differently?**
+
+Example correction:
+
+Isobu's shell identity supports body armour / rolling impact / coral-linked defence.
+
+Chōmei also has a carapace, but its defining source identity is flight / wing-tail geometry / aerial routing. Therefore a copied shell-guard reaction is a design failure even though both creatures physically have hard outer bodies.
+
+## Tailed Beast Ball
+
+Tailed Beast Ball is a valid family-common technique for beasts with legitimate authority to use it.
+
+It should not be treated as the main creative differentiator between Bijū.
+
+SC may later place Bijū Bomb / Tailed Beast Ball in a shared Bijū technique layer, transformation layer, or equivalent common source surface so the individual beast's bespoke palette can spend more of its identity budget on unique mechanics.
+
+This section does NOT automatically rewrite already-closed source packages. Revisit them deliberately when the shared Bijū action architecture is authored.
+
+**family capability != signature identity**
