@@ -55,17 +55,43 @@ async function boot(browser,label){
     return !!rt&&rt.sceneId===scene&&!!root&&root.dataset.sceneId===scene&&root.style.display!=="none";
   },SCENE,{timeout:15000});
   await assertBackdrop(page,BACKDROPS.practical,label+" HEAD START");
+  let opening=await info(page);
+  assert.strictEqual(opening.performanceLabels.filter(x=>x==="NARRATION").length,1,label+" duplicate NARRATION labels "+JSON.stringify(opening.performanceLabels));
+  assert.deepStrictEqual(opening.actors.map(x=>[x.id,x.image]),[
+    ["academy_izuno","Assets/Academy Student/academy_izuno.png"],
+    ["wasabi_academy_instructor","NPC/izuno_instructor.png"]
+  ],label+" HEAD START actor cards drift");
+  assert(opening.actors.every(x=>x.tag===""),label+" baked actor identity was duplicated by coded tag "+JSON.stringify(opening.actors));
+  await continueTo(page,"izu_open_4");
+  let dialogue=await info(page);
+  assert.strictEqual(dialogue.speaker,"WASABI",label+" Wasabi speaker attribution missing");
+  assert.strictEqual(dialogue.speakerActorId,"academy_izuno",label+" Wasabi dialogue not anchored to Wasabi card");
+  assert.strictEqual(dialogue.speakerSide,"player",label+" Wasabi dialogue side drift");
+  assert.strictEqual(dialogue.actors.find(x=>x.id==="academy_izuno")?.focus,true,label+" Wasabi speaker card not focused");
+  await continueTo(page,"izu_open_6");
+  dialogue=await info(page);
+  assert.strictEqual(dialogue.speaker,"ACADEMY INSTRUCTOR",label+" Instructor speaker attribution missing");
+  assert.strictEqual(dialogue.speakerActorId,"wasabi_academy_instructor",label+" Instructor dialogue not anchored to Instructor card");
+  assert.strictEqual(dialogue.speakerSide,"opposition",label+" Instructor dialogue side drift");
+  assert.strictEqual(dialogue.actors.find(x=>x.id==="wasabi_academy_instructor")?.focus,true,label+" Instructor speaker card not focused");
   return{context,page,runtimeErrorGate};
 }
 async function info(page){
   return page.evaluate(()=>{
     const rt=getActiveStorySceneRuntime(),beat=getCurrentStorySceneBeat(),root=document.getElementById("story-scene-presentation-layer");
     const visible=n=>!!n&&n.getClientRects().length>0&&getComputedStyle(n).display!=="none"&&getComputedStyle(n).visibility!=="hidden"&&Number(getComputedStyle(n).opacity)!==0;
+    const performanceLabels=[...(root?.querySelectorAll(".sc-story-kicker,.sc-story-name")||[])].filter(visible).map(n=>n.textContent.trim()).filter(Boolean);
+    const actors=[...(root?.querySelectorAll(".sc-scene-board-33900__actor")||[])].map(n=>({
+      id:n.dataset.actorId||"",label:n.dataset.actorLabel||"",focus:n.classList.contains("is-focus"),
+      image:n.querySelector("img")?.getAttribute("src")||"",tag:n.querySelector(".sc-scene-board-33900__actor-tag")?.textContent?.trim()||""
+    }));
     return{
       sceneId:rt?.sceneId||null,beatId:rt?.beatId||null,mode:beat?.mode||null,machineResolved:beat?.machineResolved===true,
       localContext:rt?.localContext?JSON.parse(JSON.stringify(rt.localContext)):{},
       text:root?.querySelector(".sc-story-text")?.textContent?.trim()||"",
       speaker:root?.querySelector(".sc-story-name")?.textContent?.trim()||"",
+      speakerSide:root?.dataset.scCueSpeakerSide||null,speakerActorId:root?.dataset.scCueSpeakerActorId||null,
+      performanceLabels,actors,
       choices:[...(root?.querySelectorAll(".sc-story-choice")||[])].filter(visible).map(n=>n.textContent.trim()),
       rootVisible:visible(root),battleVisible:visible(document.querySelector(".alpha-code-battle-stage"))
     };
@@ -182,12 +208,18 @@ async function finishFromCurrent(page,label,reflection="Sometimes the fastest pa
   await shot(page,label,"reflection");
   await choose(page,reflection,"izu_close_1");
   await assertBackdrop(page,BACKDROPS.mainStreet,label+" ORIGIN CLOSE");
-  for(let i=0;i<80;i++){
-    const rt=await page.evaluate(()=>getActiveStorySceneRuntime()?{beatId:getActiveStorySceneRuntime().beatId}:null);
-    if(!rt)break;
-    const row=await info(page);
-    if(row.mode==="resolver")await advanceResolver(page);else await clickContinue(page);
+  await continueTo(page,"izu_receipt");
+  const receipt=await info(page);
+  assert.strictEqual(receipt.mode,"record",label+" Chronicle Receipt mode missing");
+  assert.strictEqual(receipt.speaker,"CHRONICLE RECEIPT",label+" Chronicle Receipt heading missing");
+  for(const heading of ["YOUR ORIGIN","ACADEMY WASABI IZUNO","RECORDED IN YOUR CHRONICLE","YOUR DECISIONS","WHAT HAPPENED","HISTORY CREATED"]){
+    assert(receipt.text.includes(heading),label+" Chronicle Receipt missing "+heading);
   }
+  assert.strictEqual(receipt.actors.length,0,label+" Chronicle Receipt incorrectly stages Story actors");
+  assert.strictEqual(receipt.performanceLabels.filter(x=>x==="CHRONICLE RECEIPT").length,1,label+" duplicate Chronicle Receipt labels");
+  await shot(page,label,"chronicle-receipt");
+  await clickContinue(page);
+  await page.waitForFunction(()=>!getActiveStorySceneRuntime(),null,{timeout:12000});
   await page.waitForFunction(()=>ensurePlayerAcquisitionState().chronicleOrigin?.prologueCompleted===true,null,{timeout:12000});
   await page.waitForFunction(()=>/YOUR CHRONICLE BEGINS/i.test(document.body.innerText||""),null,{timeout:12000});
   const h=await history(page);
@@ -424,7 +456,9 @@ async function runBattleRoute(browser,outcome){
       routeFamilies:["obvious_river","better_stronger","predict_intercept","cooperate_call_help","keep_pursuing","step_in_victory","step_in_defeat"],
       exactSourceOccurrences:[TRACKING,INTERCEPT,COOP,ROGUE_OCC],
       strictOneVsOneBattle:true,battleSaveReload:true,bothBattleOutcomesReturn:true,
-      zeroBattleEntitlement:true,claimSeparateFromContinue:true,exactBackdropContract:true,postBattleAlleyReturn:true,exactBattleEnvironment:true,originToChronicleBegins:true,browserGoldenClaimed:false
+      zeroBattleEntitlement:true,claimSeparateFromContinue:true,exactBackdropContract:true,postBattleAlleyReturn:true,exactBattleEnvironment:true,
+      visibleWasabiInstructorCards:true,speakerOwnedDialogue:true,singleNarrationLabel:true,originChronicleReceipt:true,
+      routeSensitiveOriginRewardsPendingWorld404:true,originToChronicleBegins:true,browserGoldenClaimed:false
     };
     fs.writeFileSync(path.join(OUT,"summary.json"),JSON.stringify({summary,results},null,2));
     console.log(JSON.stringify(summary,null,2));
