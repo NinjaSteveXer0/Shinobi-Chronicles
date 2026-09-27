@@ -296,11 +296,11 @@ This is wild Chōmei-family power expressed as momentum rather than precision.
 
 ---
 
-### 5A. `seven_tails_carapace_spinout` — **Carapace Spinout**
+### 5A. `seven_tails_six_wing_circuit` — **Six-Wing Circuit**
 
 Class:
 
-**REACTION / DEFENSE / FLIGHT ESCAPE**
+**FLIGHT STATE / AERIAL ROUTING / MOMENTUM**
 
 Limit:
 
@@ -308,20 +308,43 @@ Limit:
 
 Trigger:
 
-Seven-Tails is targeted by one direct close-range Taijutsu/Bukijutsu packet.
+Seven-Tails resolves a **FLIGHT-tagged ATTACK** that actually crossed ordinary battlefield distance.
 
 Player text:
 
-> **Roll the carapace through one close attack, reduce its ATK by 45%, then burst back to ordinary mid-range.**
+> **Stay airborne after a flying attack. Until Seven-Tails acts again, ordinary ground-bound close attacks cannot reach it. Its next flight attack can cross ordinary battlefield distance without first repositioning.**
 
 Effect:
-- reduce qualifying packet **45% pre-Stamina**;
-- ordinary Stamina then resolves;
-- after resolution, Seven-Tails may move to ordinary mid-range;
-- exact movement lock / sealed environment may prevent the reposition;
-- no random dodge;
-- no counterattack;
-- no effect against pure Ninjutsu/Kinjutsu/Genjutsu.
+
+after the qualifying attack resolves, Seven-Tails may enter `seven_tails_aerial_circuit`.
+
+While `seven_tails_aerial_circuit` is active:
+
+- Seven-Tails remains **airborne** through its next action opportunity;
+- an attack that is explicitly **ground-bound and close-range** cannot legally target Seven-Tails unless that attacker has an exact reach / flight / anti-air capability that solves the height problem;
+- ranged attacks remain legal;
+- Ninjutsu / Kinjutsu / Bukijutsu or other actions that can legitimately reach the airborne target remain legal;
+- Seven-Tails' next **FLIGHT-tagged ATTACK** may cross ordinary close-to-mid battlefield separation and ordinary ground-only route obstruction without spending a separate reposition action;
+- no generic Dodge percentage is created;
+- Seven-Tails is not globally untargetable;
+- sealed ceilings, anti-flight authority, forced grounding or impossible aerial routes can end/prevent the state.
+
+The state ends:
+
+- after Seven-Tails resolves its next action;
+- if Seven-Tails voluntarily lands;
+- if an exact effect forces it out of flight.
+
+Interaction:
+
+- **Overrun Dive** may qualify for its ATK54 momentum branch if the immediately previous qualifying action established Six-Wing Circuit through legitimate flight movement;
+- Six-Wing Circuit itself adds **no damage packet and no scalar damage bonus**.
+
+Decision:
+
+> **Use the aerial circuit to stay above ground-bound pressure and preserve a flight lane for the next attack, knowing ranged/anti-air enemies can still punish the airborne route.**
+
+This is deliberately NOT another shell guard. Its identity comes from Chōmei's six wing-tail structures and sustained aerial routing.
 
 ---
 
@@ -813,7 +836,7 @@ Batch 5 must audit any dedicated Chōmei/Fū/Jinchūriki representations before 
 **New Seven-Tails exact representation:** PROPOSED by Stephen's current owner direction; **PL/Registry numeric row OPEN**.  
 **Historical retired Seven-Tails PL103 row:** NOT automatically revived.  
 **Shared manifested core:** PROPOSED.  
-**Seven-Tails manifested variants:** Overrun Dive + Carapace Spinout — PROPOSED.  
+**Seven-Tails manifested variants:** Overrun Dive + Six-Wing Circuit — PROPOSED.  
 **Chōmei manifested variants:** Lucky Horn Vector + Wing Shelter — PROPOSED.  
 **Seven-Tails Enhancement:** Unbound Wings — PROPOSED.  
 **Seven-Tails host-assisted Skills:** Horn Dive Manifestation / Wing Scissor / Groundbreak Lift — PROPOSED.  
