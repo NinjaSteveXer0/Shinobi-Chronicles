@@ -33,6 +33,89 @@ Canonical shorthand:
 
 > **Context supplies the opportunity; the Skill supplies a distinct Shinobi Chronicles interaction.**
 
+## 1B. Inherent contextual capabilities are automatic
+
+**Stephen lock — 2026-09-28**
+
+Some contextual capabilities are not Skills at all.
+
+If a Character, Summon, Construct, Tailed Beast, Hosted source/body state or other legitimate source **inherently and physically possesses a capability**, Story / World / Mission / Event content may automatically recognise that capability when the factual context is compatible.
+
+Examples include:
+- flight;
+- carrying/sending a message where the source is physically capable of acting as a courier;
+- fitting through a physically plausible tight space;
+- swimming / aquatic traversal;
+- climbing / burrowing / crawling or equivalent body capability where actually supported;
+- carrying an appropriate person/object where body size/strength/source state legitimately permits it.
+
+Canonical rule:
+
+> **Do not make the player unlock, equip or spend an Enhancement slot to use a natural capability the exact present source already physically has.**
+
+These capabilities are best represented as:
+
+`inherent_contextual_capability`
+
+not as:
+- a Battle Skill merely to expose the verb;
+- an Enhancement;
+- a reward unlock;
+- a generic Stat bonus.
+
+### Automatic means eligibility, not guaranteed success
+
+Automatic contextual capability means the engine/content can recognise the verb **without a separate learned-Skill gate**.
+
+It does NOT mean:
+- the capability creates its own event;
+- the route/object/opportunity exists;
+- success is guaranteed;
+- stealth is guaranteed;
+- hazards are ignored;
+- payload limits are ignored;
+- sealed/impossible geometry is bypassed;
+- the objective is automatically completed.
+
+Story / World / Mission / Event authority still owns:
+- the factual opportunity;
+- exact route/space/object/destination;
+- hazards;
+- interception;
+- payload feasibility;
+- what can actually be observed;
+- outcome/consequence.
+
+### Source-state precision
+
+The exact present state must genuinely provide the capability.
+
+Examples:
+- Chōmei's own body can fly;
+- a host only has host-flight automatically if the current exact hosted/transformation/source state legitimately provides wing/flight access;
+- a tiny Snake may fit through a narrow physical gap that a giant snake cannot;
+- a courier option requires a source physically capable of travelling with the message.
+
+Do not infer capability from category alone.
+
+### Relationship to contextual Skills
+
+A learned contextual Skill is still appropriate when the Character must know **how** to perform a specialised technique.
+
+Examples:
+- False Identity;
+- specialised seal analysis;
+- trained medical diagnosis;
+- Scale Powder concealment technique.
+
+The distinction is:
+
+> **natural verb = automatic capability**
+
+> **specialised technique = learned/contextual Skill where authored**
+
+---
+
 ## 2. Ownership boundary
 
 - **Story / World / Missions / Events:** factual situation, event eligibility, exact object/system/person/location/query/opportunity and resulting narrative continuation.

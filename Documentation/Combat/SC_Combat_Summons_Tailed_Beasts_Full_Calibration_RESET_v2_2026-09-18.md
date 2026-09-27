@@ -295,32 +295,50 @@ Source 03 Ibuse closure preserves the signed-off Neurotoxin package:
 
 Next ordinary Summon state:
 
-- **Source 09 — Kamatari** — **MECHANICS DESIGN CLOSED under Stephen sign-off**; PL / Registry numeric reconciliation remains open as #258 before full Source 09 identity/PL closure.
-- **Source 10 — Snake** — PROPOSED / awaiting Stephen sign-off; PL / Registry identity already closed at generic `snake`, PL47, staged/not live.
+- **Source 09 — Kamatari** — **COMBAT DESIGN CLOSED 2026-09-27**: Base PL target **82** remains locked; #258 still owes Formula-v1.0-valid seven Stats. **Sicklewind Route = ATK24 once/Battle against one occupied non-Active enemy. Wind-Sickle Mastery = Wind +10% / Bukijutsu +10% / dual-qualified +20%. Windtrail Hunt = contextual pursuit/discovery utility.**
+- **Source 10 — Snake** — **DESIGN CLOSED 2026-09-27**; generic `snake`, PL47, staged/not live. **Serpent Reach** = once/Battle ordinary-distance extension for one close-range Tai/Buki attack against the Active enemy. **Narrow Passage** = source-specific small-gap infiltration/scouting/small-object utility. Hidden Coil remains separately obtainable/learnable. **No Poison/venom Enhancement.**
+- **Source 11 — One-Tail / Shukaku** — **DESIGN CLOSED 2026-09-27**. Same persistent `beast_shukaku`; `one_tail` PL103 hostile/uncooperative vs `shukaku` PL107 cooperative. One-Tail = +10 Effective Kinjutsu, Cracked Seal Conduit, partial-possession/seal-strain branch; Shukaku = +10 Effective Fūinjutsu, Living Seal Markings, cooperative Sand Buckshot, Shukaku-derived Magnet Release Potential Skill branch. Distinct fifth manifested actions: Sand Burial Rupture vs Cursed Seal Lock.
+- **Source 12 — Two-Tails / Matatabi** — **DESIGN CLOSED 2026-09-27**. Same persistent `beast_matatabi`; `two_tails` PL103 hostile/non-cooperative vs `matatabi` PL108 cooperative. Two-Tails = +10 Effective Taijutsu, Predator's Pulse, partial feline manifestation/pursuit; Matatabi = +10 Effective Ninjutsu, Blue Flame Accord, controlled Fire/cover shaping, cooperative assisted Fire Skills and blue-flame Potential Skill branch. Shared manifested Tailed Beast Ball ATK58 once/Battle.
+- **Source 13 — Three-Tails / Isobu** — **DESIGN CLOSED 2026-09-27**. Same persistent `beast_isobu`; `three_tails` PL104 wild/pre-cooperation vs `isobu` PL108 friendly/cooperative high-relationship. Three-Tails = +10 Effective Stamina, Carapace Instinct, partial shell/rolling/body-pressure branch; Isobu = +10 Effective Ninjutsu, Coral Tide Accord, coral/Water control, cooperative Coral Palm/Shell Current Guard and Isobu-derived Potential Skill seed branch. Isobu relationship-history eligibility remains pair-specific authority.
+- **Source 14 — Seven-Tails / Chōmei** — **DESIGN CLOSED 2026-09-28**. Same persistent `beast_chomei`; both exact representations PL107 with different Stat distributions. `seven_tails` = wild/non-cooperative raw-flight/horn-momentum, Unbound Wings, Overrun Dive, Six-Wing Circuit, Hornline Breakthrough, Wing-Tail Harrow, Groundbreak Lift. `chomei` = cooperative controlled-flight/aerial-routing, Skyway Accord, Lucky Horn Vector, Skyhook Rescue, Aerial Relay, Scale Trail Feint, and Potential Skill seeds Horn Vector / Wingline Intercept / Scale Veil. Flight is automatic inherent contextual capability; no fake range/reposition system. Scale Powder host development is explicit SC adaptation, not claimed as manga-proven Chōmei-own technique.
+- **Source 15 — Nine-Tails / Yang Kurama** — **COMBAT DESIGN CLOSED 2026-09-28**. Same persistent Yang Kurama partition across a relationship-state transition. `nine_tails` = pre-partnership/self-interested source with Nine-Tail Isolation, Caged Source Refusal, Nine-Tails Chakra Surge, Bargained Chakra Flood, Nine-Tails Chakra Bind and Red Chakra Counterlash. `yang_kurama` = genuine voluntary partnership with Comrade Chakra Transfer, Comrade Mantle, Comrade Chakra Network, Kurama Chakra Arm, Chakra Arm Guard and Kurama Chakra Roar. `kurama_chakra_link` is a relationship/source-access state, not a prepared Battle Skill. Tailed Beast Bomb/common Kurama capability remains family-common identity, not signature-slot filler. Existing PL anchors 130/125 are preserved as staged audit authority only; no friendship-strength inference. CE #403 family-wide non-collapse contract remains active.
 
 Source 09 proposal authority:
 `Documentation/Combat/SC_Combat_RESET_v2_Source_09_Kamatari_Proposal_2026-09-19.md`
 
-Kamatari RESET v2 mechanical closure:
-- **Stephen sign-off recorded 2026-09-19**;
-- retire generic +6 Bukijutsu Stat-stick in favour of **Sicklewind Route**;
-- **Sicklewind Route = once per Battle**, while Kamatari is attached, one qualifying single-target Wind Release or Bukijutsu attack may target one occupied enemy waiting slot (Slots 2–6) instead of Enemy Active Slot 1;
-- the waiting enemy remains in its queue slot; the route does not reorder formation, create a bonus action, add hidden Attack PL, or bypass exact targeting protection;
-- this uses the Battle system's real active/waiting-slot structure and explicitly rejects invented vegetation/debris/soft-cover mechanics;
-- manifested package remains Reaping Rush ATK30, Gale Pursuit ATK24 / 32 after enemy movement, Crosswind Cutoff once/Battle target-choice pursuit reaction, and Quick Beheading Dance once/Battle ATK32 each up to 3 legally exposed hostiles;
+Kamatari RESET v2 corrected state:
+- Base PL target is explicitly **82**;
+- #258 must return Formula-v1.0-valid seven Base Stats for PL82; current live PL77 row remains drift;
+- **Sicklewind Route is Kamatari's own ATTACK/action**, not an attached Enhancement;
+- **Sicklewind Route = ATK24**, once/Battle, one legally occupied enemy not occupying the Active slot; no promotion/reorder/bonus action;
+- **Wind-Sickle Mastery** is ATTACHED/PREPARED: qualifying Wind Release direct Attack-PL +10%; qualifying Bukijutsu direct Attack-PL +10%; a dual Wind + Bukijutsu packet gets both once for +20% total;
+- **Windtrail Hunt** is a contextual discovery/pursuit utility that can expose authored hidden routes, hidden locations, points of interest, escape trails or pursuit leads where local evidence makes the discovery plausible;
+- no invented formal Missing-nin Stat is created;
+- Stephen explicitly signed off the exact Enhancement numerics/utility direction on 2026-09-27;
+- Reaping Rush ATK30, Gale Pursuit ATK24 / 32 after enemy movement, Crosswind Cutoff once/Battle target-choice pursuit reaction, and Quick Beheading Dance once/Battle ATK32 each up to 3 legally exposed hostiles remain preserved;
 - no generic accuracy roll / Speed Stat / hard Stun / hidden PL scaling;
-- **mechanics design is CLOSED**, but full Source 09 closure still awaits #258's authoritative seven Stats / Base PL return.
+- Kamatari Combat design is closed; do not route implementation until #258 returns the Formula-valid PL82 Stats and downstream routing is explicitly released.
 
 Source 10 proposal authority:
 `Documentation/Combat/SC_Combat_RESET_v2_Source_10_Snake_Proposal_2026-09-19.md`
 
-Snake RESET v2 proposed direction:
+Snake RESET v2 final state:
 - generic `snake`, PL47; explicitly not Manda/Aoda/Manda II and not live;
-- ATTACHED / NOT MANIFESTED enhancement = **Hidden Coil**, once/Battle after one qualifying single-target Taijutsu or Bukijutsu attack deals positive final damage, applying one-action movement-specific physical restraint to the same target;
-- Hidden Coil becomes unavailable while the same Snake is manifested and does not refresh after manifestation;
-- manifested package = Fang Lunge ATK18; Constricting Bite ATK12 + one-action movement restraint on positive damage; Coiling Crush ATK14 / ATK24 against same-source constriction and releases the bind on the boosted branch; Coiling Interpose once/Battle redirects one qualifying direct packet from controller to Snake;
+- **Enhancement = Serpent Reach**: ATTACHED/PREPARED, once/Battle, bridge ordinary mid-range separation for one close-range single-target Taijutsu or Bukijutsu attack against the Active enemy; normal attack ATK/effects; no separate reposition action; no off-slot targeting or impossible-barrier bypass;
+- **Narrow Passage** = contextual small-gap infiltration/access/scouting utility: Snake may traverse physically plausible confined routes to observe reachable spaces, reveal an authored route/POI, retrieve one small object or reach a simple small interaction point where the occurrence permits;
+- **no Poison/venom Enhancement**;
+- **Hidden Coil is an obtainable/learnable source-assisted Skill**, not automatic from ownership/attachment;
+- learned Hidden Coil preserves the once/Battle after-hit movement-specific physical-restraint follow-up and is unavailable while Snake is independently manifested;
+- exact unlock route belongs downstream Progression / Development / World opportunity authority;
+- future/full-manifestation package remains Fang Lunge ATK18; Constricting Bite ATK12 + movement restraint; Coiling Crush ATK14 / ATK24 against same-source constriction and releases the bind on the boosted branch; Coiling Interpose once/Battle redirects one qualifying direct packet from controller to Snake;
 - no Poison/venom, shedding, Sage package, burrow package, environmental bonus, named-snake scale/history or generic Stat-stick;
 - no Stun; exact escape/anti-restraint remains counterplay.
 
-Then continue into Source 10 Snake, accepted Tailed-Beast representations, Kurama-family reconciliation, and Jinchūriki/transformation anti-double-count audit.
+Shared courier rule:
+- **ALL small-to-medium Summons** are eligible to appear in authored **dialogue choices as couriers**;
+- courier eligibility is not an Enhancement and must not consume/replace a source's required RESET v2 Enhancement package;
+- larger/specialised Summons do not inherit this specific size-bounded rule automatically;
+- occurrence success remains factual/contextual rather than guaranteed by the dialogue option.
+
+Next Combat work: proceed to **Source 16 — Menma Nine-Tails / Menma Kurama**, then Yin Kurama + Complete Kurama, then Breakout/Reborn audit and later Jinchūriki/transformation anti-double-count.
 

@@ -28,7 +28,7 @@ His frustration is not "school is boring." He believes his ability is being rest
 The scene ends with Menma making the consequential decision to **leave the Academy**.
 
 ### Backdrop
-`Scene backdrops/academy_classroom.png`
+`Menma Origin Backdrop/academy_classroom.png`
 
 Current asset blob:
 `94d69570c2ca3abe291745af8ccdc9d001fd2a10`
@@ -47,7 +47,7 @@ The forest must feel different from the Academy:
 While moving through the woods, he hears fighting somewhere ahead.
 
 ### Backdrop
-`Scene backdrops/whisper_woods_forest_route.png`
+`Menma Origin Backdrop/whisper_woods_forest_route.png`
 
 Current asset blob:
 `5f7b3a5e1c622b20c3c507eacaed297c5c054534`
@@ -77,7 +77,7 @@ Preserve:
 
 ### Backdrop
 Continue:
-`Scene backdrops/whisper_woods_forest_route.png`
+`Menma Origin Backdrop/whisper_woods_forest_route.png`
 
 Do not reset to a generic dark/internal-void background unless a later approved presentation authority explicitly creates one.
 
@@ -97,7 +97,7 @@ Current stable opposition identities remain:
 - `test_subject_unstable`
 
 ### Backdrop
-`Scene backdrops/forest_clearing_day.png`
+`Menma Origin Backdrop/forest_clearing_day.png`
 
 Current asset blob:
 `522265bde2731ca27c481b2935f5cf835ba3497c`
@@ -124,7 +124,7 @@ Legitimate Menma motives include:
 
 ### Backdrop
 Continue:
-`Scene backdrops/forest_clearing_day.png`
+`Menma Origin Backdrop/forest_clearing_day.png`
 
 ---
 
@@ -142,7 +142,7 @@ Personality collision:
 
 ### Backdrop
 Continue:
-`Scene backdrops/forest_clearing_day.png`
+`Menma Origin Backdrop/forest_clearing_day.png`
 
 ---
 
@@ -260,7 +260,7 @@ On allied defeat:
 ### Backdrop / Battle environment
 
 Use:
-`Scene backdrops/forest_clearing_day.png`
+`Menma Origin Backdrop/forest_clearing_day.png`
 
 The Battle remains in the same clearing.
 
@@ -275,6 +275,13 @@ Coding implementation / visual acceptance remains owned by:
 Writing defeat dependency: **CLOSED by #386 successor authority above**.
 
 ## Scene 8 — Post-Battle / Anko
+
+### Backdrop
+Use:
+`Menma Origin Backdrop/forest_clearing_alt_angle.png`
+
+This is the same clearing after the Battle from a dedicated aftermath angle.
+
 
 After the test subjects are dealt with, Anko and Menma finally have the conversation the fight did not permit.
 
@@ -300,7 +307,7 @@ Capability/evidence boundary:
 
 ### Backdrop
 Continue:
-`Scene backdrops/forest_clearing_day.png`
+`Menma Origin Backdrop/forest_clearing_day.png`
 
 ---
 
@@ -314,7 +321,7 @@ Her final words leave Menma something to think about rather than defining him fo
 
 ### Backdrop
 Continue:
-`Scene backdrops/forest_clearing_day.png`
+`Menma Origin Backdrop/forest_clearing_day.png`
 
 ---
 
@@ -331,7 +338,7 @@ The final meaningful CE choice shapes what Academy Menma **wants to become / int
 This is not a morality referendum on whether leaving the Academy was correct.
 
 ### Backdrop
-`Scene backdrops/whisper_woods_forest_route.png`
+`Menma Origin Backdrop/whisper_woods_forest_route.png`
 
 ---
 
@@ -425,3 +432,27 @@ Not yet Stephen-approved:
 - exact Scene 10 future-ambition wording/beat package.
 
 Therefore this document is **scene authority / rewrite input**, not yet whole-Origin Writing GOLDEN.
+
+
+# Actor / Character Card Projection Addendum — 2026-09-27
+
+Current live assets:
+
+- Menma Story card: `Assets/Academy Student/academy_menma.png`
+- Menma Battle portrait: `Portraits/Academy Student/academy_student_menma.png`
+- Menma Academy Instructor: `NPC/menma_instructor.png`
+- Anko Story card: `Assets/Special Jonin/sj_anko.png`
+- Anko Battle portrait: `Portraits/Special Jonin/sj_anko.png`
+- Altered Shinobi Story/Battle:
+  - `Enemies/test_subject_altered_shinobi.png`
+  - `Enemies Portraits/test_subject_altered_shinobi.png`
+- Brute Story/Battle:
+  - `Enemies/test_subject_brute.png`
+  - `Enemies Portraits/test_subject_brute.png`
+- Unstable Story/Battle:
+  - `Enemies/test_subject_unstable.png`
+  - `Enemies Portraits/test_subject_unstable.png`
+
+The Nine-Tails is an internal speaker in this Origin and must not be projected as a physical forest actor card.
+
+Physical actor presence and card projection must follow the exact Story/Battle state.

@@ -1,13 +1,20 @@
-# Academy Menma Origin — #333 Benchmark-Optimized Candidate
+> **APPROVAL RECORD — 2026-09-27**
+>
+> Stephen explicitly approved the benchmark-optimized Origin sweep for promotion. This file is the production Writing authority for player-facing expression. Runtime implementation and Browser GOLDEN remain separate.
+>
+> Presentation binding also consumes:
+> `Documentation/Story/Academy_Origins_NPC_Card_and_Backdrop_Projection_Manifest_2026-09-27.md`
+
+# Academy Menma Origin — WRITING GOLDEN
 
 **Date:** 2026-09-27  
 **Owner:** Writing / Story — Konoha  
-**Status:** **WRITING AMBER — STEPHEN REVIEW CANDIDATE / NOT GOLDEN**  
+**Status:** **WRITING GOLDEN — STEPHEN APPROVED 2026-09-27**  
 **Origin:** `academy_menma`
 
 ## Successor purpose
 
-This supersedes the earlier Menma player-facing candidate for prose/pacing review.
+This is the Stephen-approved production Writing successor for the current Origin prose/pacing authority.
 
 It preserves the closed scene spine, current Guest Ally Battle contract, source occurrences, exact backdrops and #386 party-defeat lineage while repairing:
 
@@ -749,10 +756,10 @@ All Menma performance reactions consume Menma-attributable evidence under the cu
 
 ## #388
 
-This candidate defines the exact missing stable target:
+This GOLDEN authority defines the exact stable target:
 `menma_future_01`
 
-Coding may consume it only after Stephen approves this successor wording / promotes it to production authority.
+Coding may consume this successor wording as production Writing authority.
 
 ---
 
@@ -770,4 +777,4 @@ Coding may consume it only after Stephen approves this successor wording / promo
 - exact backdrops: GREEN
 - Battle/runtime ownership separation: GREEN
 - Scene 10 implementation target: defined
-- Stephen approval: **PENDING**
+- Stephen approval: **APPROVED 2026-09-27**

@@ -1,13 +1,20 @@
-# Academy Iwabee Origin — #333 Benchmark-Optimized Candidate
+> **APPROVAL RECORD — 2026-09-27**
+>
+> Stephen explicitly approved the benchmark-optimized Origin sweep for promotion. This file is the production Writing authority for player-facing expression. Runtime implementation and Browser GOLDEN remain separate.
+>
+> Presentation binding also consumes:
+> `Documentation/Story/Academy_Origins_NPC_Card_and_Backdrop_Projection_Manifest_2026-09-27.md`
+
+# Academy Iwabee Origin — WRITING GOLDEN
 
 **Date:** 2026-09-27  
 **Owner:** Writing / Story — Konoha  
-**Status:** **WRITING AMBER — STEPHEN REVIEW CANDIDATE / NOT GOLDEN**  
+**Status:** **WRITING GOLDEN — STEPHEN APPROVED 2026-09-27**  
 **Origin:** `academy_iwabee`
 
 ## Successor purpose
 
-This supersedes the earlier 2026-09-27 Iwabee candidate for prose/pacing review.
+This is the Stephen-approved production Writing successor for Academy Iwabee.
 
 It preserves the locked terrain/Rogue/instructor/self-interpretation spine while:
 - consuming the current CE Rogue confrontation contract;
@@ -683,4 +690,4 @@ Every scene:
 - no-scroll: GREEN
 - over-fragmentation: repaired
 - exact backdrop: GREEN
-- Stephen approval: **PENDING**
+- Stephen approval: **APPROVED 2026-09-27**
