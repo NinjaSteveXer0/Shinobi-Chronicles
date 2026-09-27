@@ -128,11 +128,25 @@ Default manifested palette:
 - **Sand Burial Rupture** — One-Tail-specific aggressive payoff.
 
 Host-facing access:
+- **Cracked Seal Conduit** — One-Tail's uncooperative host Enhancement;
+- **Possession Claw** — partial-manifestation attack;
+- **Sand Maw Eruption** — aggressive sand/possession attack;
+- **Malice Breakout** — source-assisted escape from ordinary restraint/containment;
 - **no Living Seal Markings cooperative Enhancement**;
 - **no Wind Release: Sand Buckshot cooperative assist**;
 - **no automatic Shukaku-derived Magnet Release learnable branch merely from possessing/hosting the non-cooperative representation**.
 
-A future coercive extraction/control system may explicitly grant partial source capabilities, including Magnet Release, but that requires its own authored contract.
+This is deliberately **not a punishment package**.
+
+One-Tail offers a different kind of value:
+- stronger Kinjutsu-facing development;
+- dangerous partial possession;
+- violent source-assisted attacks;
+- the ability to force power outward through the seal.
+
+A future host-specific dark/coercive evolution may build on this logic, but **no Dark Gaara representation or shared Dark Naruto visual/evolution template is authored here**.
+
+Each Jinchūriki's coercive/dark path must remain unique to that host + Bijū relationship.
 
 ## `shukaku` — Shukaku
 
@@ -394,7 +408,236 @@ This is the cooperative named representation's precision-control slot.
 
 ---
 
-# F. Cooperative Shukaku Enhancement
+# F. Uncooperative One-Tail Enhancement + host-assisted Skills
+
+Available only from the non-cooperative exact representation:
+
+`one_tail`
+
+This package exists so One-Tail is **different, not worse** than cooperative Shukaku.
+
+Mechanical identity:
+
+**KINJUTSU / PARTIAL POSSESSION / SEAL STRAIN / VIOLENT ACCESS**
+
+The design premise is early hostile Shukaku:
+
+> Shukaku may willingly give the host **more dangerous power** when doing so increases instability, dependence, seal pressure or the possibility of greater manifestation later.
+
+This is not friendship.
+
+It is mutually useful coercion.
+
+## `one_tail_cracked_seal_conduit` — **Cracked Seal Conduit**
+
+Activation:
+
+**HOSTED / UNCOOPERATIVE**
+
+Player text:
+
+> **One-Tail feeds dangerous chakra through the seal. Gain +10 Kinjutsu. Once per Battle, overfeed one One-Tail-assisted attack for +20% ATK, but strain the seal through your next action.**
+
+### Effective Stat modifier
+
+While the exact non-cooperative One-Tail relationship is active:
+
+- controller **Effective Kinjutsu +10**;
+- source-owned modifier;
+- Effective PL recomputes normally from Stats;
+- no Base Stat mutation;
+- source removal ends the modifier;
+- does not grant unrelated Kinjutsu techniques automatically.
+
+### Open the Crack
+
+Limit:
+
+**once per Battle**
+
+Use:
+
+Before committing one direct **One-Tail-assisted ATTACK**, the host may allow Shukaku to push additional chakra through the seal.
+
+Effect:
+
+- that attack receives **+20% pre-Stamina Attack PL**;
+- round once after the modifier is applied;
+- after the attack resolves, apply `one_tail_seal_strain`.
+
+### `one_tail_seal_strain`
+
+Duration:
+
+through the end of the host's **next action opportunity**.
+
+While strained:
+
+- host cannot use a Fūinjutsu action whose primary purpose is **containing, suppressing or resealing the hosted Tailed-Beast source**;
+- unrelated Fūinjutsu remains legal;
+- One-Tail-assisted attacks remain legal;
+- no automatic loss of control occurs from this state by itself.
+
+Future Jinchūriki loss-of-control systems may use this exact state as authored evidence/pressure, but this proposal does not invent that future resolver.
+
+Decision:
+
+> **Take the stronger One-Tail attack now, knowing you temporarily weaken your ability to clamp Shukaku back down.**
+
+### Explicit exclusions
+
+Cracked Seal Conduit does NOT grant:
+
+- Magnet Release;
+- Shukaku's cooperative sealing Enhancement;
+- Gaara's personal techniques;
+- automatic transformation;
+- automatic loss of control;
+- Shukaku PL;
+- a second action.
+
+---
+
+## `one_tail_possession_claw` — **Possession Claw**
+
+Classification:
+
+**SOURCE-ASSISTED ATTACK / PARTIAL MANIFESTATION / KINJUTSU**
+
+Availability:
+
+exact `one_tail` hosted relationship is currently valid.
+
+Target:
+
+one hostile
+
+ATK:
+
+**40**
+
+Player text:
+
+> **Let One-Tail form a massive claw through your body and strike one enemy for 40 ATK, reaching across ordinary close-to-mid distance.**
+
+Rules:
+
+- host owns the action opportunity;
+- one direct Attack-PL packet;
+- ordinary Stamina mitigation;
+- may bridge ordinary close-to-mid battlefield separation;
+- does not create a second Shukaku participant;
+- no automatic Bleed / Stun / restraint;
+- no extra movement action is required merely to bridge that ordinary separation;
+- cannot bypass impossible barriers, untargetable states or superior space-time separation.
+
+This is **partial possession used as reach and force**, not a generic melee buff.
+
+---
+
+## `one_tail_sand_maw_eruption` — **Sand Maw Eruption**
+
+Classification:
+
+**SOURCE-ASSISTED ATTACK / SAND / PARTIAL POSSESSION**
+
+Availability:
+
+exact `one_tail` hosted relationship is currently valid.
+
+Target:
+
+up to **2 legally exposed hostiles**
+
+Base ATK:
+
+**34 each**
+
+Strained ATK:
+
+**42 each**
+
+Player text:
+
+> **One-Tail erupts through the sand beneath up to 2 enemies for 34 ATK each. If your seal is already strained, let Shukaku push farther through for 42 ATK each and end the strain.**
+
+Rules:
+
+- one direct Attack-PL packet per target;
+- ordinary Stamina mitigation independently;
+- base branch does not require `one_tail_seal_strain`;
+- ATK42 branch requires active `one_tail_seal_strain`;
+- if the ATK42 branch is committed, that seal-strain state ends after resolution;
+- no automatic restraint / Blind / Stun;
+- no waiting/Benched/Reserve targeting merely from being area-capable;
+- no permanent transformation is created.
+
+Decision:
+
+> **Use seal strain as a liability, or deliberately cash it into a stronger partial-possession eruption.**
+
+This prevents the strain mechanic from being pure punishment.
+
+---
+
+## `one_tail_malice_breakout` — **Malice Breakout**
+
+Classification:
+
+**SOURCE-ASSISTED REACTION / PARTIAL POSSESSION / ESCAPE**
+
+Limit:
+
+**once per Battle**
+
+Trigger:
+
+the host becomes subject to one qualifying:
+- physical restraint;
+- sand/earth-style immobilising bind;
+- ordinary Fūinjutsu containment state
+
+that restricts movement / escape.
+
+Player text:
+
+> **Let One-Tail rip chakra through the restraint. Break one ordinary bind, but strain your seal.**
+
+Effect:
+
+- remove **one** qualifying ordinary restraint/containment state from the host;
+- then apply `one_tail_seal_strain`;
+- no damage packet is created;
+- no bonus action is created;
+- does not remove superior/exact unbreakable authority;
+- does not cleanse Poison, Genjutsu, injury, transformation suppression or unrelated conditions;
+- exact higher-order sealing authority may explicitly resist this effect.
+
+This is Shukaku helping the host escape because **breaking containment also benefits Shukaku**.
+
+---
+
+## One-Tail relationship boundary
+
+These One-Tail host Skills are not proof of trust or cooperation.
+
+They represent:
+
+- Shukaku lending dangerous power for its own reasons;
+- partial possession rather than refined partnership;
+- the host accepting more source pressure in exchange for immediate capability.
+
+Therefore:
+
+> **power willingly supplied != cooperative relationship**
+
+and:
+
+> **uncooperative != mechanically inferior**
+
+---
+
+# G. Cooperative Shukaku Enhancement
 
 Available only from the cooperative named representation:
 
@@ -460,7 +703,7 @@ Living Seal Markings does NOT grant:
 
 ---
 
-# G. Cooperative source-assisted Skill
+# H. Cooperative source-assisted Skill
 
 ## `shukaku_wind_release_sand_buckshot` — **Wind Release: Sand Buckshot**
 
@@ -516,7 +759,7 @@ The technique is available only when **both halves of the interaction are actual
 
 ---
 
-# H. Potential learnable Magnet Release roster
+# I. Potential learnable Magnet Release roster
 
 Stephen requested Shukaku's Magnet Release identity to appear in the **learnable potential Skill roster**, not only in Shukaku's own manifested kit.
 
@@ -852,15 +1095,23 @@ The engine/framework should filter an **authored catalogue** through Character-s
 
 ---
 
-# I. Counterplay / drawbacks
+# J. Counterplay / drawbacks
 
 ## One-Tail relationship state
 
-The strongest drawback is relationship itself:
+One-Tail is not a downgraded Shukaku package.
 
-- no cooperative host Enhancement;
-- no cooperative Sand Buckshot assist;
-- future coerced/partial power must be authored separately rather than inferred.
+Its counterplay is the **kind of power it offers**:
+
+- Cracked Seal Conduit enhances Kinjutsu rather than Fūinjutsu;
+- its burst option creates `one_tail_seal_strain`;
+- seal strain temporarily prevents the host from using source-containment / resealing Fūinjutsu;
+- Sand Maw Eruption can cash that strain out for stronger pressure;
+- Malice Breakout escapes ordinary restraint but creates strain;
+- no cooperative Sand Buckshot;
+- no cooperative Magnet Release development branch by default.
+
+The host chooses between immediate violent access and maintaining tighter control of the source.
 
 ## Sand control
 
@@ -883,7 +1134,7 @@ No arbitrary Water weakness, Lightning weakness or generic elemental chart is cr
 
 ---
 
-# J. Persistent / non-Battle utility
+# K. Persistent / non-Battle utility
 
 No generic account-wide persistent bonus is proposed for Shukaku.
 
@@ -893,7 +1144,7 @@ Shukaku's meaningful persistent difference in this package is the **relationship
 
 ---
 
-# K. Dedicated representation / anti-double-count exclusions
+# L. Dedicated representation / anti-double-count exclusions
 
 Do not:
 
@@ -912,11 +1163,11 @@ Known project anti-double-count example:
 
 ---
 
-# L. Player-facing summary
+# M. Player-facing summary
 
-## ONE-TAIL — NON-COOPERATIVE SAND / WIND / SEALING BEAST
+## ONE-TAIL — UNCOOPERATIVE POSSESSION / KINJUTSU / SAND PRESSURE
 
-> **Manifest One-Tail to use Shukaku's sand, Wind Release and sealing attacks. Because this representation is not cooperating with its host, it does not grant the cooperative Shukaku Enhancement or Sand Buckshot assist.**
+> **One-Tail gives +10 Kinjutsu and dangerous partial-possession Skills. Once per Battle, crack the seal wider to overfeed an assisted attack for +20% ATK, but temporarily weaken your ability to contain Shukaku. Possession Claw, Sand Maw Eruption and Malice Breakout turn that instability into aggressive power instead of making One-Tail a weaker Shukaku.**
 
 ## SHUKAKU — COOPERATIVE SAND / WIND / SEALING PARTNER
 
@@ -924,14 +1175,15 @@ Known project anti-double-count example:
 
 ---
 
-# M. Decision state
+# N. Decision state
 
 **Identity / Base Stats / Base PL:** CLOSED by PL / Registry.  
 **Canon research:** COMPLETE.  
 **Shared four-action manifested core:** **ACCEPTED in principle by Stephen; exact variant split below remains proposal-level.**  
 **One-Tail fifth action:** **Sand Burial Rupture — PROPOSED.**  
 **Shukaku fifth action:** **Cursed Seal Lock — PROPOSED.**  
-**One-Tail host Enhancement:** **NONE while non-cooperative — PROPOSED.**  
+**One-Tail host Enhancement:** **Cracked Seal Conduit — +10 Effective Kinjutsu + once/Battle +20% One-Tail-assisted attack with seal-strain tradeoff — PROPOSED.**  
+**One-Tail host-assisted Skills:** **Possession Claw / Sand Maw Eruption / Malice Breakout — PROPOSED.**  
 **Cooperative Shukaku Enhancement:** **Living Seal Markings — PROPOSED.**  
 **Living Seal Markings Fūinjutsu modifier:** **+10 Effective Fūinjutsu — PROPOSED.**  
 **Seal Reinforcement:** **once/Battle — PROPOSED.**  
@@ -943,6 +1195,6 @@ Known project anti-double-count example:
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
 
-**Stephen has signed off the Shukaku-family direction and Magnet Release branch. Exact One-Tail vs Shukaku prepared-palette variation above awaits final confirmation before Source 11 is marked fully DESIGN CLOSED.**
+**Stephen has signed off the Shukaku-family direction and Magnet Release branch. The revised One-Tail package now treats the uncooperative representation as a distinct Kinjutsu / partial-possession / seal-strain branch rather than a punishment state. This exact One-Tail package awaits Stephen confirmation before Source 11 is marked fully DESIGN CLOSED.**
 
 **proposal != design closed != implemented != runtime validated != Golden GREEN**
