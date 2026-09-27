@@ -176,18 +176,53 @@ A hosted relationship does not automatically create:
 - a second Battle PL ledger;
 - Entity PL transfer.
 
-## Flight boundary
+## Battle flight boundary
 
-Flight is real source capability, but it is not generic untargetability.
+Current PL Battle authority explicitly preserves:
 
-Where an exact Chōmei/Seven-Tails action establishes aerial movement:
+> **formation position != Combat range / distance / aggro / legality**
 
-- ordinary **ground-only route obstruction** may be bypassed where physically plausible;
-- ordinary close-to-mid separation may be crossed when the action says so;
-- flight does not bypass sealed ceilings, impossible barriers, space-time separation or exact anti-flight authority;
-- flying does not automatically avoid ranged attacks;
-- flying does not create a generic Dodge/Speed Stat;
-- an action must explicitly grant any defensive benefit.
+Therefore Source 14 does **not** create close/mid/far range bands or a generic reposition system.
+
+Flight is expressed through exact turn-based predicates/states instead:
+
+- `AIRBORNE`;
+- `GROUND_CONTACT_REQUIRED`;
+- `GROUND_BOUND` control/terrain authority;
+- exact anti-air / flight / reach authority;
+- visual tracking / reaction / intercept predicates;
+- exact Formation-slot targeting where separately authored.
+
+Canonical rules:
+
+- flight does not make an actor globally untargetable;
+- an `AIRBORNE` actor cannot be targeted by an action whose exact legality requires ground contact, unless that action also has explicit reach / flight / anti-air authority;
+- ranged or otherwise legitimately air-capable actions remain legal;
+- flight may defeat an exact `GROUND_BOUND` restriction only where the effect depends on staying on the ground and does not physically bind the actor's body;
+- flight does not break ropes, coral, sand wrapped around the body, seals, chakra bindings or other body-bound control merely because the actor has wings;
+- no hidden Speed, Dodge, Accuracy or distance Stat is created.
+
+## Outside Battle — inherent flight capability
+
+Flight is an **inherent contextual capability** of Chōmei / Seven-Tails when the exact present representation/source state physically provides flight.
+
+It is NOT an Enhancement and does not require a separate learned "Fly" Skill.
+
+Story / World / Mission content may automatically recognise flight for factual opportunities such as:
+- reaching an elevated/open-air point;
+- crossing a physically flyable gap;
+- aerial observation from a legitimate viewpoint;
+- carrying an appropriate payload/person where size/capability permits.
+
+Occurrence authority still owns:
+- whether a real aerial route exists;
+- weather/hazard facts;
+- payload feasibility;
+- visibility/exposure;
+- destination accessibility;
+- actual success/outcome.
+
+Flight does not fabricate a route, guarantee stealth, reveal hidden knowledge, cross sealed structures or solve an objective automatically.
 
 ---
 
@@ -215,13 +250,11 @@ ATK:
 
 Player text:
 
-> **Drive Chōmei's horn through one enemy for 46 ATK, crossing ordinary close-to-mid distance as part of the charge.**
+> **Drive Chōmei's horn through one enemy for 46 ATK.**
 
 Rules:
 - one direct Attack-PL packet;
 - ordinary Stamina mitigation;
-- may bridge ordinary close-to-mid separation;
-- no separate reposition action;
 - no automatic Stun;
 - no Wind Release classification.
 
@@ -281,7 +314,6 @@ Player text:
 Rules:
 - one packet per target;
 - ordinary Stamina mitigation;
-- ordinary ground-only route obstruction may be crossed where physically plausible;
 - no waiting/Benched/Reserve bypass;
 - no Wind Release classification;
 - no automatic forced movement.
@@ -336,43 +368,39 @@ Limit:
 
 Trigger:
 
-Seven-Tails resolves a **FLIGHT-tagged ATTACK** that actually crossed ordinary battlefield distance.
+Seven-Tails resolves a **FLIGHT-tagged ATTACK**.
 
 Player text:
 
-> **Stay airborne after a flying attack. Until Seven-Tails acts again, ordinary ground-bound close attacks cannot reach it. Its next flight attack can cross ordinary battlefield distance without first repositioning.**
+> **Stay airborne after a flying attack. Until Seven-Tails acts again, ground-contact attacks cannot target it unless they have reach or anti-air authority. Its next Flight action can ignore one ordinary ground-bound restriction.**
 
 Effect:
 
 after the qualifying attack resolves, Seven-Tails may enter `seven_tails_aerial_circuit`.
 
-While `seven_tails_aerial_circuit` is active:
+While active:
 
-- Seven-Tails remains **airborne** through its next action opportunity;
-- an attack that is explicitly **ground-bound and close-range** cannot legally target Seven-Tails unless that attacker has an exact reach / flight / anti-air capability that solves the height problem;
-- ranged attacks remain legal;
-- Ninjutsu / Kinjutsu / Bukijutsu or other actions that can legitimately reach the airborne target remain legal;
-- Seven-Tails' next **FLIGHT-tagged ATTACK** may cross ordinary close-to-mid battlefield separation and ordinary ground-only route obstruction without spending a separate reposition action;
-- no generic Dodge percentage is created;
-- Seven-Tails is not globally untargetable;
-- sealed ceilings, anti-flight authority, forced grounding or impossible aerial routes can end/prevent the state.
+- Seven-Tails is **AIRBORNE** through its next action opportunity;
+- an action tagged/defined as `GROUND_CONTACT_REQUIRED` cannot legally target Seven-Tails unless that exact action/source also has explicit reach / flight / anti-air authority;
+- ranged or otherwise legitimately air-capable attacks remain legal;
+- Seven-Tails' next **FLIGHT-tagged action** may ignore one ordinary `GROUND_BOUND` restriction that depends on being on the ground;
+- that exception does NOT remove body-bound restraint, seals, chakra binding, anti-flight authority or impossible-environment constraints;
+- no generic Dodge/Accuracy modifier is created.
 
 The state ends:
 
 - after Seven-Tails resolves its next action;
 - if Seven-Tails voluntarily lands;
-- if an exact effect forces it out of flight.
+- if an exact effect forces grounding / suppresses flight.
 
 Interaction:
 
-- **Overrun Dive** may qualify for its ATK54 momentum branch if the immediately previous qualifying action established Six-Wing Circuit through legitimate flight movement;
-- Six-Wing Circuit itself adds **no damage packet and no scalar damage bonus**.
+- **Overrun Dive** qualifies for its ATK54 branch when Seven-Tails' immediately previous action was a legitimate FLIGHT-tagged action;
+- Six-Wing Circuit itself adds no damage packet or scalar damage bonus.
 
 Decision:
 
-> **Use the aerial circuit to stay above ground-bound pressure and preserve a flight lane for the next attack, knowing ranged/anti-air enemies can still punish the airborne route.**
-
-This is deliberately NOT another shell guard. Its identity comes from Chōmei's six wing-tail structures and sustained aerial routing.
+> **Stay airborne to deny ground-contact options and preserve a flight-capable next action, knowing proper ranged/anti-air responses still work.**
 
 ---
 
@@ -382,11 +410,15 @@ This is deliberately NOT another shell guard. Its identity comes from Chōmei's 
 
 Class:
 
-**ATTACK / CONTROLLED FLIGHT / POSITIONING**
+**ATTACK / CONTROLLED FLIGHT / FORMATION ROUTING**
+
+Limit:
+
+**once per Battle**
 
 Target:
 
-one hostile
+the enemy **Active**
 
 ATK:
 
@@ -394,19 +426,21 @@ ATK:
 
 Player text:
 
-> **Strike one enemy for 40 ATK, then choose to remain engaged or fly back to ordinary mid-range.**
+> **Strike the enemy Active for 40 ATK and trace an aerial route through their formation. If the hit deals damage, Chōmei's next Flight attack may target one Benched enemy instead of the Active.**
 
-Rules:
-- one direct packet;
+Effect:
+- one direct Attack-PL packet;
 - ordinary Stamina mitigation;
-- after resolution choose:
-  - **PRESS** — remain in ordinary close engagement;
-  - **BREAK AWAY** — move to ordinary mid-range where legal;
-- no random "luck" roll;
+- on positive final damage establish `chomei_aerial_vector` through Chōmei's next action opportunity;
+- while the vector is active, Chōmei's next **FLIGHT-tagged ATTACK** may choose one otherwise legal occupied **Benched** enemy instead of the enemy Active;
+- Reserve targeting is NOT granted;
+- the chosen attack keeps its normal ATK/effects;
+- the vector is consumed when used or expires after Chōmei's next action;
 - no bonus action;
-- no Wind Release.
+- no Formation reorder/promotion;
+- no random "luck" roll.
 
-Chōmei's "lucky" motif stays personality/flavour; it does not become RNG.
+This turns cooperative flight into controlled **formation routing**, using the real Active/Benched Battle structure instead of invented range bands.
 
 ---
 
@@ -422,17 +456,17 @@ Limit:
 
 Trigger:
 
-Chōmei or its exact bonded controller is targeted by one direct attack that is explicitly **ground-bound + close-range**, and legal flight is physically available.
+Chōmei or its exact bonded controller is targeted by one direct action whose targeting legality is explicitly **GROUND_CONTACT_REQUIRED**, and legal flight is physically available.
 
 Player text:
 
-> **Chōmei snatches the target into the air before a ground-bound close attack lands. Cancel that attack and keep the protected target airborne until their next action.**
+> **Chōmei snatches the target airborne before a ground-contact attack lands. Cancel that attack and keep the protected target airborne until their next action.**
 
 Effect:
-- the triggering ground-bound close attack cannot reach the protected target and resolves with **no damage/effect against that target**;
+- the triggering GROUND_CONTACT_REQUIRED action cannot legally reach the protected target and resolves with **no damage/effect against that target**;
 - the attacker still spent the committed action;
 - protected target enters `chomei_airborne_rescue`;
-- while airborne, ordinary ground-bound close attacks cannot target that actor;
+- while airborne, actions requiring ground contact cannot target that actor unless they have explicit reach / flight / anti-air authority;
 - ranged attacks and exact reach / flight / anti-air actions remain legal;
 - the state ends when the protected actor resolves their next action, voluntarily lands, or is forced down;
 - no generic Dodge percentage;
@@ -456,11 +490,7 @@ Activation:
 
 Player text:
 
-> **Seven-Tails forces raw wings through your chakra. Once per Battle, overrun one enemy from ordinary close-to-mid distance for +20% ATK and ignore one ordinary ground-only route obstruction.**
-
-No generic Stat bonus is required.
-
-This Enhancement is intentionally a **capability change**, not another Stat stick.
+> **Seven-Tails forces raw wings through your chakra. Once per Battle, overfeed one Taijutsu or Seven-Tails attack for +20% ATK and ignore one ordinary ground-bound restriction or ground-only intercept that would stop that attack.**
 
 ### Wing Overrun
 
@@ -469,19 +499,21 @@ Limit:
 **once per Battle**
 
 Use:
-- host declares one direct Taijutsu or Seven-Tails-assisted ATTACK against an otherwise legal target;
-- target may be at ordinary close-to-mid separation;
-- one ordinary **ground-only route obstruction** may lie between them.
+- host commits one direct **Taijutsu or Seven-Tails-assisted ATTACK**.
 
 Effect:
-- bridge the ordinary separation as part of the attack;
-- bypass that one ordinary ground-only route obstruction where flight physically solves it;
-- qualifying attack receives **+20% pre-Stamina ATK**;
-- after resolution, host remains in ordinary close engagement unless the exact attack says otherwise;
-- cannot bypass sealed ceilings, impossible barriers, untargetable states, space-time separation or lack of target knowledge;
-- no second action.
+- qualifying attack receives **+20% pre-Stamina Attack PL**;
+- for that action only, ignore one ordinary `GROUND_BOUND` restriction or ground-only movement/intercept predicate that would otherwise make the attack illegal;
+- this does NOT defeat:
+  - body-bound restraints;
+  - seals/chakra binding;
+  - exact anti-flight authority;
+  - untargetable states;
+  - Formation-slot illegality not explicitly solved by the attack;
+- no second action;
+- no hidden range/reposition state.
 
-This gives wild Seven-Tails a powerful aggressive aerial route without copying Shukaku/Matatabi/Isobu Stat Enhancements.
+This is wild Seven-Tails turning flight into **violent attack permission**, not a generic mobility button.
 
 ---
 
@@ -501,13 +533,12 @@ ATK:
 
 Player text:
 
-> **Manifest Seven-Tails' horn and wings, cross ordinary distance and drive into one enemy for 42 ATK.**
+> **Manifest Seven-Tails' horn and wings and drive into one enemy for 42 ATK.**
 
 Rules:
 - host owns the action;
 - one direct packet;
 - ordinary Stamina mitigation;
-- bridges ordinary close-to-mid separation;
 - no Stun;
 - no second Entity body.
 
@@ -552,16 +583,16 @@ Limit:
 
 Trigger:
 
-host becomes subject to one ordinary **ground-dependent movement restriction** that does not physically bind the host's body.
+host becomes subject to one ordinary **GROUND_BOUND** control/terrain state that depends on contact with the ground and does not physically bind the host's body.
 
 Examples of qualifying source categories:
 - unstable/impassable ground;
 - ordinary ground snare zone;
-- terrain effect that prevents walking/reposition through the floor route.
+- a terrain/control state whose restriction exists only while the actor remains grounded.
 
 Player text:
 
-> **Burst Seven-Tails' wings and leave the ground, escaping one ordinary ground-bound movement restriction.**
+> **Burst Seven-Tails' wings and leave the ground, escaping one ordinary ground-bound control state.**
 
 Effect:
 - remove/ignore one qualifying ground-dependent movement restriction for the host;
@@ -584,41 +615,37 @@ Activation:
 
 Player text:
 
-> **Cooperative Chōmei gives you controlled wing access. Once per Battle, one movement-dependent attack can cross ordinary close-to-mid distance and one ordinary ground-only obstruction without spending a separate reposition action. Outside Battle, authored scenes may offer legitimate aerial routes.**
+> **Once per Battle after a Chōmei-assisted action, remain in controlled flight through the enemy's next action. Ground-contact attacks cannot target you, and your next Chōmei-assisted action can ignore one ordinary ground-bound restriction.**
 
-### Battle: Skyway Route
+### Controlled Flight
 
 Limit:
 
 **once per Battle**
 
-Use:
-- host declares one otherwise legal movement-dependent ATTACK;
-- target is at ordinary close-to-mid separation and/or one ordinary ground-only route obstruction lies between them.
+Trigger:
+
+the host resolves a legitimate **Chōmei-assisted Battle action**.
 
 Effect:
-- Chōmei carries the host through the valid aerial route;
-- declared attack resolves at its normal authored ATK/effects;
-- no bonus damage;
-- no separate reposition action;
-- cannot cross sealed/impossible barriers, unknown destinations, space-time separation or exact anti-flight authority.
 
-### Non-Battle: Aerial Access
+the host may enter `chomei_controlled_flight` through the end of the enemy side's next normal action opportunity.
 
-Where Story/World authorises an actual reachable aerial route, cooperative Chōmei may enable:
-- crossing a chasm/roofline/vertical approach;
-- reaching an elevated point;
-- bypassing an ordinary ground-route obstruction;
-- aerial reconnaissance from a physically plausible viewpoint.
+While active:
 
-It does NOT guarantee:
-- stealth;
-- Mission success;
-- knowledge of hidden facts;
-- entry through sealed structures;
-- safe flight through authored hazards.
+- the host is **AIRBORNE**;
+- actions whose targeting legality is `GROUND_CONTACT_REQUIRED` cannot target the host unless they also possess explicit reach / flight / anti-air authority;
+- ranged or otherwise air-capable actions remain legal;
+- the host's next Chōmei-assisted action may ignore one ordinary `GROUND_BOUND` restriction that depends on remaining grounded;
+- body-bound restraint, seals, anti-flight authority and unrelated targeting restrictions remain normal;
+- no damage bonus;
+- no extra action;
+- no Dodge/Accuracy roll;
+- no range/reposition state.
 
-This is a source-specific traversal Enhancement rather than a generic Stat bonus.
+This is the cooperative Enhancement because Chōmei gives the host **controlled sustained flight across the opponent's turn**, not merely the biological fact that Chōmei can fly.
+
+Outside Battle, flight remains an inherent automatic contextual capability and does not depend on Skyway Accord.
 
 ---
 
@@ -640,13 +667,12 @@ ATK:
 
 Player text:
 
-> **Let Chōmei form horn and wings through your chakra, cross ordinary distance and strike for 42 ATK.**
+> **Let Chōmei form horn and wings through your chakra and strike one enemy for 42 ATK.**
 
 Rules:
 - host owns the action;
 - one direct packet;
 - ordinary Stamina mitigation;
-- bridge ordinary close-to-mid separation;
 - no Stun;
 - no second Chōmei participant.
 
@@ -670,21 +696,21 @@ Limit:
 
 Use:
 
-The host commits one legal **movement-dependent ATTACK** using Chōmei-assisted flight.
+The host commits one legal **Chōmei-assisted FLIGHT ATTACK**.
 
 Player text:
 
-> **Scatter Chōmei-linked scale powder across your flight path. One ordinary reaction that depends on visually tracking your movement cannot trigger against that approach.**
+> **Scatter Chōmei-linked scale powder through the attack path. One ordinary reaction or intercept that depends on visually tracking that Flight action cannot trigger.**
 
 Effect:
-- declared movement-dependent attack otherwise resolves normally;
-- one ordinary enemy **movement-triggered reaction / intercept** whose trigger depends on maintaining direct visual tracking of the host's approach cannot trigger;
+- the declared Flight attack otherwise resolves normally;
+- one ordinary enemy **reaction / intercept** whose trigger requires direct visual tracking of that Flight action cannot trigger;
 - this does NOT suppress:
   - area reactions that do not need exact visual tracking;
   - exact non-visual sensory/tracking authority;
   - sealed barriers;
   - anti-flight fields;
-  - reactions triggered by the attack itself rather than the movement;
+  - reactions that do not depend on visually tracking the Flight action;
 - no bonus damage;
 - no Blind condition;
 - no invisibility state;
@@ -706,7 +732,7 @@ Global breadth/unlock framework remains under #382.
 
 Classification:
 
-**LEARNABLE / CHŌMEI-DERIVED / FLIGHT / TAIJUTSU**
+**LEARNABLE / CHŌMEI-DERIVED / FLIGHT / TAIJUTSU / FORMATION ROUTING**
 
 SC origin:
 
@@ -717,9 +743,13 @@ Potential prerequisites:
 - sufficient future-framework Taijutsu and/or source-control development;
 - separate persistent unlock.
 
+Limit:
+
+**once per Battle**
+
 Target:
 
-one hostile
+enemy **Active**
 
 ATK:
 
@@ -727,14 +757,19 @@ ATK:
 
 Player text:
 
-> **Manifest a horned aerial line, cross ordinary close-to-mid distance and strike for 40 ATK. Afterward choose to remain close or break back to mid-range.**
+> **Strike the enemy Active for 40 ATK. If it deals damage, your next Chōmei-derived Flight attack may target one Benched enemy instead.**
 
 Rules:
-- one packet;
+- one direct packet;
 - ordinary Stamina mitigation;
-- no Stun;
-- no Wind Release;
-- reposition choice after resolution where legal.
+- positive final damage creates `chomei_horn_vector` through user's next action;
+- next Chōmei-derived FLIGHT ATTACK may select one otherwise legal occupied Benched enemy instead of Active;
+- Reserve access is not granted;
+- no Formation reorder/promotion;
+- no bonus action;
+- no Wind Release.
+
+This is the learned host analogue of Chōmei's controlled aerial formation-routing identity.
 
 ---
 
@@ -859,16 +894,28 @@ No generic Blind status, combustion, poison, accuracy penalty or Cocoon mechanic
 
 # K. Persistent / non-Battle utility
 
-Cooperative Chōmei's **Aerial Access** is the primary non-Battle utility.
+## Inherent contextual capability — Flight
 
-Occurrence authority owns:
-- whether a real aerial route exists;
-- weather/hazard facts;
-- destination accessibility;
-- stealth/exposure;
-- what can actually be observed.
+Chōmei / Seven-Tails flight is automatic contextual capability when the exact present source/body state physically provides it.
 
-Wild Seven-Tails receives no automatic peaceful traversal utility merely from encounter existence.
+It is NOT:
+- an Enhancement;
+- a learned Skill requirement;
+- a reward unlock merely to use wings the source already has.
+
+Story / World / Mission may expose physically valid flight affordances automatically.
+
+The same global law applies to other inherent source capabilities such as:
+- message carrying/courier use where the source is physically capable;
+- fitting through a physically plausible tight space;
+- swimming/aquatic traversal;
+- climbing/burrowing or equivalent body capability where actually supported.
+
+Context owns whether the route/opportunity exists and what happens.
+
+**inherent capability != guaranteed success**
+
+**automatic contextual eligibility != automatic objective completion**
 
 ---
 
@@ -893,11 +940,11 @@ Batch 5 must audit any dedicated Chōmei/Fū/Jinchūriki representations before 
 
 ## SEVEN-TAILS — WILD AERIAL OVERRUN
 
-> **Wild Seven-Tails turns flight into aggression. Overrun enemies across ordinary battlefield distance, manifest horn and wing-tails for aerial attacks, and use raw flight to escape ground-bound route control. Flight does not make you untargetable or break actual body restraints.**
+> **Wild Seven-Tails turns flight into aggression. Overfeed one attack through Unbound Wings, stay airborne through Six-Wing Circuit, and use raw flight to defeat ground-bound control without breaking real body restraints.**
 
 ## CHŌMEI — COOPERATIVE SKYWAY / CONTROLLED FLIGHT
 
-> **Cooperative Chōmei gives controlled aerial access. Once per Battle, carry one movement-dependent attack across ordinary distance or a ground-only obstruction without a separate reposition action. Outside Battle, authored aerial routes can open new ways through the world.**
+> **Cooperative Chōmei controls the airspace. Skyway Accord can keep the host airborne across the enemy's turn, Lucky Horn Vector opens a one-action route to a Benched target, and Scale Powder development can disrupt visual reactions. Outside Battle, flight is automatic inherent capability rather than an Enhancement.**
 
 ---
 
