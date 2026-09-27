@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-27  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons / Tailed Beasts  
-**Status:** **PROPOSED — AWAITING STEPHEN SIGN-OFF**  
+**Status:** **DESIGN CLOSED BY STEPHEN 2026-09-27 — SOURCE 13 RESET v2 COMPLETE**  
 **Parent:** #235  
 **Reset authority:** `Documentation/Combat/SC_Combat_Summons_Tailed_Beasts_Full_Calibration_RESET_v2_2026-09-18.md`  
 **Canon research:** `Documentation/Combat/SC_Combat_Tailed_Beasts_Canon_Research_Shukaku_Matatabi_Isobu_Chomei_2026-09-27.md`  
@@ -824,18 +824,18 @@ Batch 5 must audit exact Isobu Jinchūriki/transformation representations before
 **Identity / Base Stats / Base PL:** CLOSED by PL / Registry.  
 **Relationship-state identity:** CLOSED by Registry; exact high-relationship evidence/threshold remains separate authority.  
 **Canon research:** COMPLETE.  
-**Shared manifested core:** PROPOSED.  
-**Three-Tails manifested variants:** Wild Shell Crash + Spiked Recoil — PROPOSED.  
-**Isobu manifested variants:** Coral Bulwark + Reef Current — PROPOSED.  
-**Three-Tails Enhancement:** Carapace Instinct (+10 Effective Stamina + Shell Contact) — PROPOSED.  
-**Three-Tails host-assisted Skills:** Partial Shell Roll / Spike Wake / Breakwater Curl — PROPOSED.  
-**Isobu Enhancement:** Coral Tide Accord (+10 Effective Ninjutsu + Coral Follow-Through) — PROPOSED.  
-**Isobu cooperative assisted Skills:** Coral Palm / Shell Current Guard — PROPOSED.  
-**Isobu Potential Skill branch:** Isobu Art: Reef Lance / Isobu Art: Reef Prison / Water Release: Breaking Tide — PROPOSED.  
+**Shared manifested core:** CLOSED.  
+**Three-Tails manifested variants:** Wild Shell Crash + Spiked Recoil — CLOSED.  
+**Isobu manifested variants:** Coral Bulwark + Reef Current — CLOSED.  
+**Three-Tails Enhancement:** Carapace Instinct (+10 Effective Stamina + Shell Contact) — CLOSED.  
+**Three-Tails host-assisted Skills:** Partial Shell Roll / Spike Wake / Breakwater Curl — CLOSED.  
+**Isobu Enhancement:** Coral Tide Accord (+10 Effective Ninjutsu + Coral Follow-Through) — CLOSED.  
+**Isobu cooperative assisted Skills:** Coral Palm / Shell Current Guard — CLOSED.  
+**Isobu Potential Skill branch:** Isobu Art: Reef Lance / Isobu Art: Reef Prison / Water Release: Breaking Tide — CLOSED as Combat seed catalogue, NOT a lifetime ceiling.  
 **Implementation:** NOT STARTED.  
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
 
-**Awaiting Stephen sign-off / edits.**
+**Stephen final sign-off: 2026-09-27. Source 13 Three-Tails / Isobu Combat design is CLOSED. The three learnable Isobu techniques are seed examples for future Beta expansion, not a complete lifetime Skill ceiling. Implementation/runtime/Golden remain unclaimed.**
 
 **proposal != design closed != implemented != runtime validated != Golden GREEN**
