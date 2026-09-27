@@ -912,7 +912,9 @@
       "stateWrites": [
         "currentBattle.wasabi343",
         "playerData.wasabi343BattleLaunches",
-        "currentBattle.runtime.evidence via shared Battle evidence authority"
+        "currentBattle.runtime.evidence via shared Battle evidence authority",
+        "shared Battle runtime save payload wasabi343 adapter envelope",
+        "currentBattle.battleConfigId reconstruction for restored #343 encounter"
       ],
       "productionLoadPath": [
         "index.html",
@@ -930,7 +932,9 @@
       "saveSchemaRefs": [
         "currentBattle.wasabi343",
         "playerData.wasabi343BattleLaunches",
-        "activeStorySceneRuntime.pendingBattle"
+        "activeStorySceneRuntime.pendingBattle",
+        "runtime.wasabi343 adapter envelope",
+        "currentBattle.wasabi343 restored Battle metadata"
       ],
       "qaRefs": [
         "tools/qa_issue_343_wasabi_writing_golden.js",
