@@ -22,6 +22,7 @@ GAME = ROOT / "game.js"
 EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-runtime-build-fingerprint-303.js",
     "game.js",
+    "runtime/alpha-special-jonin-evidence-producer-34700.js",
     "runtime/alpha-menma-tutorial-111.js",
     "runtime/alpha-menma-origin-rewards-36200.js",
     "runtime/alpha-world-konoha-112-core.js",

@@ -846,7 +846,9 @@
         "tools/qa_issue_343_wasabi_browser.js",
         "tools/qa_alpha_origin_scenes_32900_runtime.js",
         "tools/qa_runtime_ownership_safety_300.js",
-        "tools/qa_issue_303_runtime_build_fingerprint.js"
+        "tools/qa_issue_303_runtime_build_fingerprint.js",
+        "tools/qa_issue_111_menma_tutorial.py",
+        "tools/qa_issue_141_pre_alpha_runtime_closure.py"
       ],
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
