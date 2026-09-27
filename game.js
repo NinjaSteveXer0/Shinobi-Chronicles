@@ -45611,6 +45611,7 @@ const STORY_SCENE_PRESENTATION_MODES=Object.freeze([
   "internal_voice",
   "narration",
   "choice",
+  "resolver",
   "battle_transition",
   "post_battle"
 ]);
@@ -45781,6 +45782,7 @@ const STORY_SCENE_UI_MODE_BY_RUNTIME_MODE=Object.freeze({
   internal_voice:"internal_or_remote_voice",
   narration:"narration_action",
   choice:"choice",
+  resolver:"narration_action",
   battle_transition:"battle_transition",
   post_battle:"post_battle"
 });
@@ -45817,6 +45819,7 @@ function resolveStoryScenePortraitProjection(authoredPresentation,beat,speakerRe
 function createStorySceneTransitionInstruction(beat) {
   if (!beat) return null;
   if (beat.mode==="choice") return {kind:"choice",requires_explicit_player_action:true};
+  if (beat.mode==="resolver"&&beat.machineResolved===true) return {kind:"resolver",requires_explicit_player_action:false};
   if (beat.mode==="battle_transition") return {kind:"battle",requires_explicit_player_action:true};
   if (beat.exitScene===true||!beat.nextBeatId) return {kind:"complete",requires_explicit_player_action:true};
   return {kind:"advance",requires_explicit_player_action:true};
@@ -45921,6 +45924,7 @@ function normalizeStorySceneBeat(beat,index=0) {
   return {
     beatId,
     mode,
+    machineResolved:beat.machineResolved===true,
     speakerRef:normalizeStorySceneSourceRef(beat.speakerRef||beat.speakerSourceId||beat.speakerId||null,mode),
     speakerName:beat.speakerName?String(beat.speakerName):null,
     text:typeof beat.text==="string"?beat.text:"",
@@ -46151,7 +46155,8 @@ function createStorySceneObserverSafeProjection() {
   }
 
   const speakerRef=normalizeStorySceneSourceRef(authoredPresentation.speakerRef||beat.speakerRef,beat.mode);
-  const choices=beat.choices.map(choice=>{
+  const observerChoices=beat.mode==="resolver"&&beat.machineResolved===true?[]:beat.choices;
+  const choices=observerChoices.map(choice=>{
     const availability=evaluateStorySceneChoiceAvailability(choice);
     return {
       choice_id:choice.choiceId,
@@ -46240,6 +46245,9 @@ function setStorySceneBeat(beatId,options={}) {
   const entered=processStorySceneConsequenceRequests(beat.onEnterConsequences,"enter");
   if (!entered.success) return entered;
   savePlayerData();
+  if (beat.mode==="resolver"&&beat.machineResolved===true) {
+    return resolveMachineStorySceneBeat();
+  }
   if (options.render!==false) openOverlay("story_scene");
   return {success:true,beatId};
 }
@@ -46489,10 +46497,31 @@ function resumeBattleCallerAfterCompletion(outcomeType=null) {
   return {success:false,reason:"battle_return_context_type_unhandled",type:returnContext.type||null,outcomeType};
 }
 
+function resolveMachineStorySceneBeat() {
+  const active=getActiveStorySceneRuntime();
+  const beat=getCurrentStorySceneBeat();
+  if (!active||!beat) return {success:false,reason:"story_scene_not_active"};
+  if (beat.mode!=="resolver"||beat.machineResolved!==true) return {success:false,reason:"story_beat_not_machine_resolver"};
+  const available=(beat.choices||[]).filter(choice=>evaluateStorySceneChoiceAvailability(choice).available===true);
+  if (available.length!==1) {
+    return {
+      success:false,
+      reason:"story_machine_resolver_cardinality_invalid",
+      availableChoiceIds:available.map(choice=>choice.choiceId)
+    };
+  }
+  return applyStorySceneChoice(available[0].choiceId);
+}
+
 function advanceStoryScene(choiceId=null) {
   const active=getActiveStorySceneRuntime();
   const beat=getCurrentStorySceneBeat();
   if (!active||!beat) return {success:false,reason:"story_scene_not_active"};
+  if (beat.mode==="resolver") {
+    if (beat.machineResolved!==true) return {success:false,reason:"story_machine_resolver_not_authorised"};
+    if (choiceId!==null&&choiceId!==undefined) return {success:false,reason:"story_machine_resolver_player_choice_forbidden"};
+    return resolveMachineStorySceneBeat();
+  }
   if (beat.mode==="choice") {
     if (!choiceId) return {success:false,reason:"story_choice_required"};
     return applyStorySceneChoice(choiceId);
@@ -46873,7 +46902,11 @@ function runAlphaStorySceneRuntimeDiagnostics() {
   const closeSource=closeOverlay.toString();
   const result={
     reusableSceneRegistry:registered.success===true&&!!definition,
-    requiredPresentationModes:["dialogue","internal_voice","narration","choice","battle_transition","post_battle"].every(mode=>STORY_SCENE_PRESENTATION_MODES.includes(mode)),
+    requiredPresentationModes:["dialogue","internal_voice","narration","choice","resolver","battle_transition","post_battle"].every(mode=>STORY_SCENE_PRESENTATION_MODES.includes(mode)),
+    machineResolverNormalized:(()=>{const row=normalizeStorySceneBeat({beatId:"resolver_diag",mode:"resolver",machineResolved:true,choices:[{choiceId:"only",label:"INTERNAL",nextBeatId:"post"}]});return !!row&&row.mode==="resolver"&&row.machineResolved===true;})(),
+    machineResolverExactOneBranch:String(resolveMachineStorySceneBeat).includes("available.length!==1")&&String(resolveMachineStorySceneBeat).includes("applyStorySceneChoice(available[0].choiceId)"),
+    machineResolverNoLabelInference:!String(resolveMachineStorySceneBeat).includes(".label")&&!String(resolveMachineStorySceneBeat).includes("textContent"),
+    machineResolverHiddenFromObserver:String(createStorySceneObserverSafeProjection).includes('beat.mode==="resolver"&&beat.machineResolved===true?[]:beat.choices'),
     noParallelStoryHistoryStore:!Object.prototype.hasOwnProperty.call(emptyRuntime,"history")&&!Object.prototype.hasOwnProperty.call(emptyRuntime,"chronicle")&&!sourceCode.includes("storySceneHistory"),
     internalVoiceSourceNotPhysical:!!internal&&internal.speakerRef.sourceId==="nine_tails"&&internal.speakerRef.physicalPresence===false,
     speakerDoesNotRequireRegistryParticipant:!!internal&&internal.speakerRef.sourceType==="communication_source"&&!normalizeStorySceneSourceRef.toString().includes("getCharacterRegistryEntry"),
