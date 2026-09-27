@@ -517,7 +517,7 @@ Acquisition / Character Systems owns future obtainability/ownership/implantation
 
 ---
 
-# 10. Breakout Kurama
+# 10. Breakout Kurama — forced manifestation / coercive power-taking route
 
 Current SC ontology:
 
@@ -527,19 +527,114 @@ Classification:
 
 **Entity -> Forced Manifestation**
 
-This is not an ordinary Tailed-Beast ownership/attachment state.
+Stephen clarified the exact SC purpose on **2026-09-27**.
+
+## 10.1 Deliberate coercive route — Naruto takes Kurama's power
+
+Breakout Kurama is obtainable through a Naruto route where:
+
+- Naruto has a **high Fūinjutsu capability**;
+- Naruto deliberately chooses to **take Kurama's power for himself** rather than earn genuine partnership;
+- the route advances through multiple stages;
+- each stage represents Naruto taking/controlling **more of Kurama's power**.
+
+Canon anchor:
+
+Naruto's canonical Nine-Tails control training explicitly involved fighting Kurama and forcibly pulling/absorbing the beast's chakra into his own power before true partnership existed.
+
+SC divergence:
+
+Shinobi Chronicles makes that coercive/control logic into an intentional player route with persistent consequences rather than treating it as a one-off canon training beat.
+
+Important:
+
+- **high Fūinjutsu** is a qualitative gate here; the exact Stat/Skill threshold is NOT yet authored;
+- the exact number/names of power-taking stages are NOT yet authored;
+- each stage's exact modifiers/Skills are NOT yet authored;
+- progression along this route does NOT automatically create genuine Kurama partnership;
+- taking more power may increase capability while worsening control/relationship risk.
 
 Preserve:
 
-- hostile/involuntary/occurrence-owned manifestation;
-- forced manifestation != cooperation;
-- forced manifestation != ownership;
-- forced manifestation != prepared source;
-- forced manifestation != stable host Enhancement.
+> **power taken != power freely given**
 
-Canon provides ample basis for Kurama exerting power against seals/hosts, but **Breakout Kurama is an SC lifecycle representation**, not a canon-named separate Kurama individual.
+> **control != cooperation**
 
-RESET-v2 design must therefore emphasise the forced-manifestation state rather than copy a cooperative Kurama package.
+> **Fūinjutsu capability != relationship trust**
+
+## 10.2 Generic Jinchūriki loss-of-control rule
+
+Stephen also established a broader future Jinchūriki rule:
+
+> **Where host/Bijū relationship is insufficient, authored situations may cause the Jinchūriki to lose control of their Tailed-Beast power.**
+
+This is not Naruto-only.
+
+Future runtime/content may author loss-of-control triggers based on:
+- insufficient relationship/cooperation state;
+- escalating accessed power;
+- exact Story/Battle pressure;
+- another explicitly authored trigger.
+
+Do not create one universal random berserk roll from this statement.
+
+Exact trigger thresholds, probabilities/determinism and affected transformations remain later system design.
+
+## 10.3 Dark Naruto path — Kurama forces his way out
+
+On the specific **Dark Naruto** route:
+
+- Breakout Kurama may **force his way out of Naruto**;
+- this is Kurama-driven forced manifestation, not Naruto willingly summoning/deploying him;
+- Naruto's deliberate coercive use of Kurama's power can therefore create a state where control reverses and Kurama asserts physical manifestation.
+
+This is the strongest current authored identity for `breakout_kurama`.
+
+The exact Battle/event package after emergence remains intentionally OPEN:
+
+- what Breakout Kurama attacks;
+- whether it is hostile to all participants or selectively hostile;
+- objective/escape behavior;
+- number of turns/action economy;
+- whether Naruto remains a participant;
+- recovery/reseal routes;
+- battlefield consequences;
+- rewards/consequences.
+
+Combat will decide those during the Breakout Kurama RESET-v2 mechanics pass.
+
+## 10.4 Obtainability vs occurrence
+
+Preserve the distinction:
+
+### Obtainable representation route
+A qualifying Naruto may unlock/obtain the **Breakout Kurama representation** through the deliberate high-Fūinjutsu coercive power-taking path once its exact future unlock contract is authored.
+
+### Forced occurrence
+A Breakout Kurama manifestation can also occur as an authored **loss-of-control event** without implying that every such occurrence grants permanent ownership/unlock.
+
+Therefore:
+
+> **encountered breakout != automatically obtained Breakout Kurama**
+
+> **obtained Breakout Kurama representation != ordinary Summon ownership**
+
+Acquisition / Progression must later define the exact unlock receipt/state.
+
+## 10.5 Hard non-collapse
+
+Breakout Kurama is NOT:
+
+- a cooperative Kurama upgrade;
+- the same relationship-state as `yang_kurama`;
+- an ordinary Summon;
+- automatic evidence that Naruto/Kurama relationship is high;
+- a generic "evil Kurama";
+- a separate persistent fox person from Kurama.
+
+It is:
+
+> **the same Kurama represented in an SC forced-manifestation / coercive-control failure state.**
 
 ---
 
@@ -637,7 +732,7 @@ Catalogue row != source closure.
 | `kurama_complete` | reunited whole/body-state representation | **researched** | **NOT CLOSED** |
 | `menma_nine_tails` | Menma pre-partnership state; cordiality/cloak access permitted without upgrade | **canon + SC researched** | **NOT CLOSED** |
 | `menma_kurama` | Menma-specific genuine partnership/cooperation representation over the underlying Yin half | **canon + SC researched** | **NOT CLOSED** |
-| `breakout_kurama` | Forced Manifestation | **canon + SC researched** | **NOT RESET-v2 CLOSED** |
+| `breakout_kurama` | Forced Manifestation; deliberate high-Fūinjutsu coercive power-taking route and authored loss-of-control/Dark Naruto forced-emergence state | **canon + SC researched + owner semantics clarified** | **NOT RESET-v2 CLOSED** |
 | `reborn_kurama` | Hosted Entity / Himawari-era rebirth; historically exceptional compatibility benchmark | **researched** | **EXISTING COMBAT CLOSURE — AUDIT, DO NOT REBUILD BY DEFAULT** |
 
 Relationship-state semantics are now sufficiently clear to design source packages later.
@@ -684,7 +779,14 @@ Exact **unlock evidence/thresholds** and **Tailed-Beast acquisition/implantation
 
 ## Breakout
 - forced manifestation identity must matter mechanically;
-- no ordinary ownership/cooperation semantics by default.
+- Naruto may deliberately pursue a high-Fūinjutsu coercive power-taking route;
+- each authored stage takes/controls more Kurama power;
+- control/power access does not equal cooperation;
+- generic Jinchūriki loss-of-control occurrences may exist when relationship is insufficient;
+- Dark Naruto has a specific route where Kurama forces his way out;
+- encountered forced manifestation does not automatically equal permanent Breakout-Kurama unlock;
+- exact post-emergence behavior remains open for the later Combat mechanics pass;
+- no ordinary Summon semantics.
 
 ## Acquisition
 - no generic Tailed-Beast obtainability/implantation system currently exists;
@@ -705,7 +807,8 @@ Closed owner-level semantic decisions:
 5. Menma's `menma_nine_tails -> menma_kurama` transition and Naruto's `nine_tails -> yang_kurama` transition use the same category of genuine voluntary partnership achievement;
 6. Naruto's underlying half is Yang; Menma's is the complementary Yin half under current SC "other half" Recorded History;
 7. Tailed-Beast acquisition/implantation is still an uncreated separate system;
-8. Himawari/Reborn Kurama is an exceptional compatibility/resonance benchmark that future changes must preserve.
+8. Himawari/Reborn Kurama is an exceptional compatibility/resonance benchmark that future changes must preserve;
+9. Breakout Kurama is the forced-manifestation/coercive-control representation: a high-Fūinjutsu Naruto can pursue deliberate power-taking stages, low relationship may support authored Jinchūriki loss-of-control events, and Dark Naruto may suffer a Kurama-forced breakout.
 
 Still OPEN for future design:
 - exact persistent evidence/threshold that upgrades Nine-Tails-state to Kurama-state;
