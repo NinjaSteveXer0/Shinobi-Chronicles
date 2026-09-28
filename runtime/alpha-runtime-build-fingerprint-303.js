@@ -16,10 +16,10 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-28-AQ",
-    sourceBaselineCommit:"151df1cf2b7154333f97c39ce709f67c5ca9ec39",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-28-AR",
+    sourceBaselineCommit:"da811fbda363dc85fff848e2377f8c2fa38be73d",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
-    runtimeGeneration:"origin-metal-iwabee-skillnames-400",
+    runtimeGeneration:"origin-metal-iwabee-skillnames-400-route-closure",
     majorRuntimeFeatures:Object.freeze([
       "academy-kakashi-v2",
       "runtime-ownership-safety-300",
@@ -54,7 +54,8 @@
       "academy-metal-controlled-spar-met03-396",
       "academy-iwabee-reusable-rogue-genin-package-399",
       "academy-iwabee-rogue-disposition-399",
-      "academy-origin-eight-palette-display-names-400"
+      "academy-origin-eight-palette-display-names-400",
+      "academy-metal-story-graph-route-closure-396"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -87,10 +88,10 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-28-AQ",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-28-AR",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
-      generationPresent:first.runtimeGeneration==="origin-metal-iwabee-skillnames-400",
+      generationPresent:first.runtimeGeneration==="origin-metal-iwabee-skillnames-400-route-closure",
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)
