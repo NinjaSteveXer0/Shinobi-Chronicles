@@ -45,7 +45,8 @@ async function snapshot(page){
       hint:root?.querySelector(".sc-performance-hint-33900")?.textContent?.trim()||"",
       receiptVisible:root?.dataset.scCueKind==="record",
       choices:[...(root?.querySelectorAll(".sc-story-choice")||[])].map(n=>n.textContent.trim()).filter(Boolean),
-      legacyContinue:[...(root?.querySelectorAll("button")||[])].some(n=>n.textContent.trim()==="CONTINUE"&&!n.classList.contains("sc-chronicle-primary"))
+      legacyContinue:[...(root?.querySelectorAll("button")||[])].some(n=>n.textContent.trim()==="CONTINUE"&&!n.classList.contains("sc-chronicle-primary")),
+      bodyText:document.body.innerText||""
     };
   });
 }
@@ -230,8 +231,8 @@ async function proveMiraiTerminalReceipt(browser){
         assert.strictEqual(row.cueKind,"dialogue","Nine-Tails spoken line rendered as narration");
         assert.strictEqual(row.speaker,"NINE-TAILS","Nine-Tails did not own its dialogue box");
         const fox=row.actors.find(a=>a.id==="menma_nine_tails");
-        assert(fox&&fox.image==="Portraits/Tailed Beasts/menma_nine_tails.png","Menma Nine-Tails exact portrait missing "+JSON.stringify(row.actors));
-        assert(!row.text.includes("SOURCE"),"internal SOURCE label leaked into Nine-Tails dialogue");
+        assert(fox&&fox.image==="Assets/Tailed Beasts/menma_nine_tails.png","Menma Nine-Tails Story Character Card missing "+JSON.stringify(row.actors));
+        assert(!row.text.includes("SOURCE")&&!row.bodyText.includes("NON-PHYSICAL SOURCE"),"internal source metadata leaked into Nine-Tails dialogue");
 
         await page.evaluate(()=>{
           const rt=globalThis.getActiveStorySceneRuntime?.();
@@ -258,10 +259,66 @@ async function proveMiraiTerminalReceipt(browser){
         assert.strictEqual(row.speaker,"ANKO","Menma parting router did not select Anko dialogue");
         assert.strictEqual(row.text,"Try not to find another disaster before you get home.","Menma standard parting prose drift");
 
-        await page.evaluate(()=>globalThis.setStorySceneBeat?.("menma_close_01"));
-        await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="menma_close_01",null,{timeout:8000});
+        await page.evaluate(()=>globalThis.setStorySceneBeat?.("menma_future_02"));
+        await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="menma_future_02",null,{timeout:8000});
         row=await snapshot(page);
-        assert(row.text.includes("Menma runs toward Konoha."),"Menma final GOLDEN prose is not visible");
+        assert.strictEqual(row.cueKind,"dialogue","Menma ending Nine-Tails line rendered as narration");
+        assert.strictEqual(row.speaker,"NINE-TAILS","Menma ending Nine-Tails line lost speaker ownership");
+        assert.strictEqual(row.text,"Satisfied?","Menma ending Nine-Tails prose drift");
+        assert(row.actors.some(a=>a.id==="menma_nine_tails"&&a.image==="Assets/Tailed Beasts/menma_nine_tails.png"),"Menma ending does not use the Nine-Tails Character Card");
+        assert(!row.bodyText.includes("NON-PHYSICAL SOURCE"),"Menma ending leaked non-physical source metadata");
+
+        row=await advanceOne(page);
+        assert.strictEqual(row.beatId,"menma_future_03");
+        assert.strictEqual(row.cueKind,"dialogue","Menma ending reply rendered as narration");
+        assert.strictEqual(row.speaker,"MENMA","Menma ending reply lost speaker ownership");
+        assert.strictEqual(row.text,"No.");
+
+        row=await advanceOne(page);
+        assert.strictEqual(row.beatId,"menma_future_03a");
+        assert.strictEqual(row.cueKind,"narration");
+
+        row=await advanceOne(page);
+        assert.strictEqual(row.beatId,"menma_future_04");
+        assert.strictEqual(row.cueKind,"dialogue","Nine-Tails ending Good line rendered as narration");
+        assert.strictEqual(row.speaker,"NINE-TAILS");
+        assert.strictEqual(row.text,"Good.");
+
+        const futureChoice=await advanceUntilBeat(page,"menma_future_choice",20);
+        assert.deepStrictEqual(futureChoice.row.choices,["MASTER WHAT THEY WON'T TEACH ME","BECOME TOO STRONG TO HOLD BACK","CREATE SOMETHING THAT'S MINE","FIND THE LIMIT"],"Menma future choice drift");
+        const strongChoice=page.locator("#story-scene-presentation-layer .sc-story-choice").filter({hasText:"BECOME TOO STRONG TO HOLD BACK"}).first();
+        await strongChoice.click();
+        await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="menma_future_strong_01",null,{timeout:8000});
+
+        row=await snapshot(page);
+        assert.strictEqual(row.cueKind,"dialogue");
+        assert.strictEqual(row.speaker,"MENMA");
+        row=await advanceOne(page);
+        assert.strictEqual(row.beatId,"menma_future_strong_02");
+        assert.strictEqual(row.cueKind,"dialogue");
+        assert.strictEqual(row.speaker,"NINE-TAILS");
+        row=await advanceOne(page);
+        assert.strictEqual(row.beatId,"menma_future_strong_03");
+        assert.strictEqual(row.cueKind,"dialogue","Menma final Good line rendered as narration");
+        assert.strictEqual(row.speaker,"MENMA");
+        assert.strictEqual(row.text,"Good.");
+
+        const close=await advanceUntilBeat(page,"menma_close_01",10);
+        assert(close.row.text.includes("Menma runs toward Konoha."),"Menma final GOLDEN prose is not visible");
+        let receipt=null;
+        for(let i=0;i<12;i++){
+          row=await snapshot(page);
+          if(row.beatId==="menma_receipt"){receipt=row;break;}
+          assert.notStrictEqual(row.mode,"choice","unexpected choice before Menma Receipt");
+          await advanceOne(page);
+        }
+        assert(receipt,"Menma did not reach Origin Chronicle Receipt");
+        assert.strictEqual(receipt.cueKind,"record","Menma Receipt is not a record cue");
+        assert.strictEqual(receipt.speaker,"CHRONICLE RECEIPT","Menma Receipt heading missing");
+        assert(receipt.text.includes("ACADEMY MENMA")&&receipt.text.includes("REWARDS"),"Menma Receipt content missing identity/rewards");
+        assert.strictEqual(receipt.primary,"CONTINUE","Menma Receipt dedicated CONTINUE missing");
+        assert.strictEqual(receipt.hint,"USE CONTINUE TO CONFIRM","Menma Receipt still advertises click-anywhere");
+        assert.strictEqual(receipt.actors.length,0,"Menma Receipt incorrectly stages Story actors");
       }else if(row.mode!=="choice"){
         row=await advanceOne(page);
       }
@@ -270,6 +327,6 @@ async function proveMiraiTerminalReceipt(browser){
       await context.close();
     }
     const miraiTerminal=await proveMiraiTerminalReceipt(browser);
-    console.log(JSON.stringify({pass:true,issue:105,cases:CASES.map(x=>x[0]),legacyFallbackRejected:true,clickAnywhereProven:true,miraiWritingGoldenProven:true,menmaWritingGoldenOpeningProven:true,menmaNineTailsDialoguePortraitProven:true,menmaPostBattleSegmentationProven:true,miraiTerminal,goldenSaveReloadResumeProven:true,browserGoldenClaimed:false},null,2));
+    console.log(JSON.stringify({pass:true,issue:105,cases:CASES.map(x=>x[0]),legacyFallbackRejected:true,clickAnywhereProven:true,miraiWritingGoldenProven:true,menmaWritingGoldenOpeningProven:true,menmaNineTailsDialogueCharacterCardProven:true,menmaPostBattleSegmentationProven:true,menmaEndingDialogueAndReceiptProven:true,miraiTerminal,goldenSaveReloadResumeProven:true,browserGoldenClaimed:false},null,2));
   }finally{await browser.close();}
 })().catch(err=>{console.error(err);process.exit(1);});

@@ -27,7 +27,7 @@ const PATH=Object.freeze({
   miraiCheckpointInstructor:"NPC/mirai_checkpoint_instructor.png",
   traveller:"NPC/traveller.png",
   menma:"Assets/Academy Student/academy_menma.png",
-  menmaNineTails:"Portraits/Tailed Beasts/menma_nine_tails.png",
+  menmaNineTails:"Assets/Tailed Beasts/menma_nine_tails.png",
   menmaInstructor:"NPC/menma_instructor.png",
   anko:"Assets/Special Jonin/sj_anko.png",
   altered:"Enemies/test_subject_altered_shinobi.png",
@@ -259,6 +259,31 @@ function miraiActors(beatId,performance,beat){
   return rows;
 }
 
+function menmaPerformanceSequences105(){
+  const rows={
+    menma_receipt:()=>[{kind:"record",text:buildMenmaReceipt105()}]
+  };
+  const def=typeof globalThis.getStorySceneDefinition==="function"
+    ?globalThis.getStorySceneDefinition("origin_academy_menma_prologue")
+    :null;
+  for(const sourceBeat of def&&Array.isArray(def.beats)?def.beats:[]){
+    if(!sourceBeat||!sourceBeat.beatId||sourceBeat.beatId==="menma_receipt")continue;
+    if(["choice","battle_transition","resolver"].includes(String(sourceBeat.mode||"")))continue;
+    rows[sourceBeat.beatId]=({beat})=>{
+      const live=beat||sourceBeat;
+      const text=String(live&&live.text||"").trim();
+      if(!text)return[];
+      const speakerName=String(live&&live.speakerName||live&&live.speaker||"").trim();
+      return[{
+        kind:speakerName?"dialogue":String(live&&live.mode||"")==="record"?"record":"narration",
+        text:String(live&&live.text||""),
+        ...(speakerName?{speakerName}:{})
+      }];
+    };
+  }
+  return rows;
+}
+
 function menmaBackdrop(beatId,beat){
   const id=String(beatId||"");
   if(id.startsWith("menma_future_"))return BACKDROP.menmaFuture;
@@ -397,9 +422,7 @@ function installDefinitions(){
     resolveBackdrop:({beatId,beat})=>String(beatId||"")==="menma_receipt"
       ?null
       :{assetPath:menmaBackdrop(beatId,beat),assetId:"issue105_menma"},
-    performanceSequences:{
-      menma_receipt:()=>[{kind:"record",text:buildMenmaReceipt105()}]
-    }
+    performanceSequences:menmaPerformanceSequences105()
   });
   results.kushina=registerDefinition(scene("academy_kushina"),{
     resolve:({beatId,performance,beat})=>projection("ACADEMY · FŪINJUTSU PRACTICAL",kushinaActors(beatId,performance,beat)),
@@ -437,7 +460,8 @@ function diagnostics(){
     kakashiExcluded:!String(installDefinitions).includes("academy_kakashi"),
     knownHinataActors:PATH.hinata&&PATH.hinataInstructor&&PATH.hinataPartner,
     knownMiraiActors:PATH.mirai&&PATH.miraiInstructor&&PATH.traveller,
-    menmaNineTailsPortraitExact:PATH.menmaNineTails==="Portraits/Tailed Beasts/menma_nine_tails.png"&&String(menmaActors).includes("menma_nine_tails"),
+    menmaNineTailsCharacterCardExact:PATH.menmaNineTails==="Assets/Tailed Beasts/menma_nine_tails.png"&&String(menmaActors).includes("menma_nine_tails"),
+    menmaSpokenCueProjection:String(menmaPerformanceSequences105).includes('speakerName?"dialogue"'),
     knownMenmaPhysicalActors:[PATH.menma,PATH.menmaInstructor,PATH.anko,PATH.altered].every(Boolean),
     knownKurenaiInstructor:PATH.kurenaiInstructor==="NPC/kurenai_instructor.png",
     issue419ActorPathsResolved:

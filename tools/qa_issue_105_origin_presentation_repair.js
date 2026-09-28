@@ -47,7 +47,7 @@ assert(binder.includes('rows.push(instructor(),traveller())')&&binder.includes('
 for(const asset of [
   "Assets/Academy Student/academy_hinata.png","NPC/hyuga_instructor.png","NPC/hyuga_sparring_partner.png",
   "Assets/Academy Student/academy_mirai.png","NPC/mirai_instructor.png","NPC/traveller.png","NPC/mirai_porter.png","NPC/mirai_checkpoint_instructor.png",
-  "Assets/Academy Student/academy_menma.png","Portraits/Tailed Beasts/menma_nine_tails.png","NPC/menma_instructor.png","Assets/Special Jonin/sj_anko.png",
+  "Assets/Academy Student/academy_menma.png","Assets/Tailed Beasts/menma_nine_tails.png","NPC/menma_instructor.png","Assets/Special Jonin/sj_anko.png",
   "Assets/Academy Student/academy_kushina.png","NPC/kushina_instructor.png","NPC/kushina_classmate.png",
   "Assets/Academy Student/academy_kurenai.png","NPC/kurenai_instructor.png",
   "Assets/Academy Student/academy_iwabe.png","NPC/iwabe_instructor.png",
@@ -70,9 +70,11 @@ for(const asset of ["NPC/furniture_civilian.png","NPC/vegetable_vendor.png","NPC
   assert(sceneC.includes(asset),"Obito native Scene Board did not consume #419 asset "+asset);
 }
 const menmaActorBody=binder.slice(binder.indexOf("function menmaActors("),binder.indexOf("function kushinaActors("));
-assert(fs.existsSync("Portraits/Tailed Beasts/menma_nine_tails.png"),"approved Menma Nine-Tails portrait missing from live tree");
-assert(binder.includes('menmaNineTails:"Portraits/Tailed Beasts/menma_nine_tails.png"')&&menmaActorBody.includes('actor("menma_nine_tails","NINE-TAILS",PATH.menmaNineTails'),"Menma Nine-Tails portrait is not bound to its Story speaker");
-assert(golden.includes('row.mode="dialogue";row.speakerRef={sourceId:"nine_tails"'),"Menma Nine-Tails speech is not speaker-owned dialogue");
+assert(fs.existsSync("Assets/Tailed Beasts/menma_nine_tails.png"),"approved Menma Nine-Tails portrait missing from live tree");
+assert(binder.includes('menmaNineTails:"Assets/Tailed Beasts/menma_nine_tails.png"')&&menmaActorBody.includes('actor("menma_nine_tails","NINE-TAILS",PATH.menmaNineTails'),"Menma Nine-Tails portrait is not bound to its Story speaker");
+assert(golden.includes('function V(id,speaker,text,next,environment,onEnterConsequences){return D(id,speaker,text,next,environment,onEnterConsequences);}'),"Menma Nine-Tails speech is not speaker-owned dialogue");
+assert(!golden.includes('speakerRef={sourceId:"nine_tails"'),"Menma Nine-Tails still exposes renderer-visible non-physical source metadata");
+assert(binder.includes("function menmaPerformanceSequences105()")&&binder.includes('speakerName?"dialogue"'),"Menma ending spoken cues are not protected as speaker-owned dialogue");
 assert(!golden.includes("Combat package (#338)")&&!golden.includes("waiting on the exact Academy instructor"),"Mirai leaks internal Combat/GitHub blocker text");
 assert(golden.includes('beatId:"mir_leaving_choice_router",mode:"resolver",machineResolved:true')&&!golden.includes('beatId:"mir_leaving_router"'),"Mirai terminal still exposes the stale empty/fake Continue router");
 assert(golden.includes('beatId:"mir_receipt",mode:"record"')&&binder.includes('mir_receipt:()=>[{kind:"record",text:buildMiraiReceipt105()}]'),"Mirai Origin Chronicle Receipt missing");
@@ -116,7 +118,7 @@ assert(sceneBoardDoc.includes("no visible arrow/CONTINUE button for ordinary nar
 assert(battle.includes('querySelector(".alpha-battle-pl-core")'),"radial PL refresh does not target inner core");
 assert(battle.includes('core.querySelector("strong")')||battle.includes('core?.querySelector("strong")'),"radial PL current value not refreshed inside core");
 assert(!game.includes("ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID"),"frozen game.js contains successor purse mutation");
-assert(fingerprint.includes('buildId:"SC-ALPHA-RUNTIME-R303-2026-09-29-AZ"')&&fingerprint.includes('sourceBaselineCommit:"604daa50b3bc274fd6533fdeb8075806e614d30b"'),"#105 repair runtime fingerprint was not advanced from current live-main authority");
+assert(fingerprint.includes('buildId:"SC-ALPHA-RUNTIME-R303-2026-09-29-BA"')&&fingerprint.includes('sourceBaselineCommit:"9f90d86ff989caf59f96711e6067d497249f039e"'),"#105 repair runtime fingerprint was not advanced from current live-main authority");
 console.log(JSON.stringify({pass:true,issue:105,checks:{
   sevenNonKakashiBindings:true,kakashiExcluded:true,hinataSparringSpeakerAlias:true,hinataFinalPairBound:true,hinataChronicleReceipt:true,miraiMenmaWritingGolden:true,legacyGoldenShimsRetired:true,knownAssetsExact:true,issue419AssetsConsumed:true,wasabiPursuitTargetActorProjection:true,missingAssetsNotGuessed:true,
   menmaNineTailsDialoguePortrait:true,miraiTerminalRouterClean:true,miraiMenmaReceipts:true,menmaPostBattleSegmented:true,menmaRewardDiagnosticRemoved:true,globalReceiptInputLock:true,globalStartPLBattleCTA:true,loadOrder:true,sharedSceneBoard:true,clickAnywhere:true,

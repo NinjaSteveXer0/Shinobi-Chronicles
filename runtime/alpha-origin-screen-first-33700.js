@@ -277,6 +277,7 @@ function patchMetal(){
 
 function patchMenma(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const d=editable(A.sceneByVariant.academy_menma);if(!d)return false;
+  if(globalThis.SC_ALPHA_ORIGIN_WRITING_GOLDEN_105&&globalThis.SC_ALPHA_ORIGIN_WRITING_GOLDEN_105.installed===true)return true;
   if(d.entryBeatId==="menma_open_01"&&beat(d,"menma_open_15")&&beat(d,"tutorial_battle"))return true;
   const entry=beat(d,d.entryBeatId);if(entry){entry.mode="narration";delete entry.speakerName;entry.text="Iruka drops the marked practice sheet onto Menma's desk. Every line is clean.\n\n\"Again.\"\n\nMenma looks at the sheet, then at him. \"Why?\"\n\n\"Because doing it once isn't mastery.\"\n\nMenma leans back. \"I can do more.\"\n\nIruka's expression softens by exactly enough to irritate him. \"I know. You're still doing this.\"";}
   const forest=d.beats.find(b=>b&&typeof b.text==="string"&&/clear your head|wood|forest/i.test(b.text));
