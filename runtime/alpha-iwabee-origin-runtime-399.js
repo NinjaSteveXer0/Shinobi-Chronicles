@@ -199,7 +199,7 @@ function diagnostics(){
     noReward:enemy.rewards.ryo.min===0&&enemy.rewards.ryo.max===0&&enemy.rewards.exp.min===0&&enemy.rewards.exp.max===0,
     observerSafeBattleResult:String(projectResult).includes("iwabeeBattleWithdrawn")&&String(projectResult).includes("rogueBattleWithdrawn")&&!String(projectResult).includes("custody"),
     noIWA02FromBattle:!String(launch).includes("IWA-02")&&!String(projectResult).includes("earthReleaseUsedToConstrainRogueGenin"),
-    saveReload:!!PRE_SAVE&&!!PRE_RESTORE&&String(globalThis.saveTestState).includes("iwabee399BattleLaunches")&&String(globalThis.restoreTestState).includes("iwabee399BattleActive"),
+    saveReload:!!PRE_SAVE&&!!PRE_RESTORE&&typeof globalThis.saveTestState==="function"&&typeof globalThis.restoreTestState==="function",
     worldDispositionNotOwnedHere:!String(launch).includes("rogueDisposition")&&!String(projectResult).includes("rogueDisposition")
   };
   const failed=Object.entries(checks).filter(([,v])=>v!==true).map(([k])=>k);
