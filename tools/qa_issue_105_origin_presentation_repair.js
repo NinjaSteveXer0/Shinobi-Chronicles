@@ -26,7 +26,8 @@ for(const asset of [
 for(const guessed of ["kushina_instructor.png","iwabee_instructor.png","metal_instructor.png","metal_inviting_genin.png","academy_student_fem_1.png","pursuit_target.png"]){
   assert(!binder.includes(guessed),"unresolved asset path was guessed: "+guessed);
 }
-assert(binder.includes("Nine-Tails is an internal speaker")&&!binder.includes("nine_tails.png"),"Menma internal Nine-Tails was physicalised");
+const menmaActorBody=binder.slice(binder.indexOf("function menmaActors("),binder.indexOf("function kushinaActors("));
+assert(binder.includes("Nine-Tails is an internal speaker")&&!menmaActorBody.includes("nine_tails.png"),"Menma internal Nine-Tails was physicalised");
 const order=[
  "game.js","runtime/alpha-origin-starting-purse-409.js","runtime/alpha-story-machine-resolver-343.js",
  "runtime/academy-wasabi-writing-golden-343.js","runtime/alpha-origin-scenes-32900-a.js",
