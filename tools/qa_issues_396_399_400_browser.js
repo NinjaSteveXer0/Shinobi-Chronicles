@@ -220,8 +220,8 @@ async function runIwabeeWorldBranch(browser,beatId,expected){
       assert.strictEqual(met03.redirect.protectiveResponseOutcome,"partial");
       assert.strictEqual(met03.impact.protectiveResponseOutcome,"success");
       assert.strictEqual(met03.destroy.protectiveResponseOutcome,"partial");
-      assert.strictEqual(met03.redirect.interveningParticipantRef,"metal_origin_inviting_genin");
-      assert.strictEqual(met03.impact.interventionOccurred,false);
+      assert.strictEqual(met03.redirect.interventionParticipantRef,"metal_origin_inviting_genin");
+      assert.strictEqual(met03.impact.interventionRequired,false);
       await gate.assertClean("metal-met03");
       await context.close();
       results.push({met03});
@@ -234,7 +234,7 @@ async function runIwabeeWorldBranch(browser,beatId,expected){
       custodyState:"TEMPORARY_INSTRUCTOR_DETENTION",
       instructorIntervention:"ACCEPT_SURRENDER_AND_SECURE",
       earthReleaseUsedToConstrainRogueGenin:true,
-      alternateEscapeRouteAvailableAfterConstraint:false,
+      alternateEscapeRouteAvailable:false,
       followupBattleOccurred:false
     }));
     results.push(await runIwabeeWorldBranch(browser,"iwa_call_05",{
