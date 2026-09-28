@@ -66,7 +66,7 @@ for(const value of [
   'instructorIntervention:"SHIELD_STUDENTS_NO_PURSUIT"'
 ])assert(story.includes(value),"missing Iwabee World fact "+value);
 assert(story.includes('earthReleaseUsedToConstrainRogueGenin:true'));
-assert(story.includes('alternateEscapeRouteAvailableAfterConstraint:false'));
+assert(story.includes('alternateEscapeRouteAvailable:false'));
 assert(story.includes('followupBattleOccurred:false'));
 assert(story.includes('beatId:"iwa_confront_loss_01"'));
 assert(story.includes('beatId:"met_spar_strong_01"'));
@@ -108,8 +108,11 @@ assert(order.every(x=>x>=0),"production loader missing new Battle modules");
 assert(order.every((x,i)=>i===0||x>order[i-1]),"new Battle modules load in wrong order");
 assert(index.indexOf("runtime/alpha-origin-skill-display-names-400.js")>index.indexOf("runtime/alpha-combat-skill-lock-38300.js"),"#400 must load after #383");
 
-assert(!game.includes('protectiveResponseKind:"intercept",protectiveResponseOutcome:"protected"'),"stale MET-03 diagnostic vocabulary remains");
-assert(game.includes('protectiveResponseKind:"redirect_dummy",protectiveResponseOutcome:"partial"'),"closed MET-03 diagnostic missing");
+assert(!game.includes('protectiveResponseKind:"intercept",protectiveResponseOutcome:"protected"'),"stale MET-03 diagnostic vocabulary remains in game.js");
+assert(!story.includes('protectiveResponseOutcome:"attempt_committed"'),"stale MET-03 attempt_committed authority remains in canonical Story owner");
+assert(metal.includes('attempted:true'));
+assert(metal.includes('interventionRequired:!!intervention'));
+assert(metal.includes('interventionParticipantRef:intervention'));
 
 console.log(JSON.stringify({
   pass:true,
