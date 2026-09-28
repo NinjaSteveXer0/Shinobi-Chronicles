@@ -3,6 +3,8 @@
 const fs=require("fs"),assert=require("assert");
 const read=p=>fs.readFileSync(p,"utf8");
 const binder=read("runtime/alpha-origin-scene-board-bindings-105.js");
+const sceneA=read("runtime/alpha-origin-scenes-32900-a.js");
+const sceneC=read("runtime/alpha-origin-scenes-32900-c.js");
 const golden=read("runtime/alpha-origin-writing-golden-105.js");
 const shim335=read("runtime/alpha-origin-browser-realisation-33500.js");
 const shim336=read("runtime/alpha-early-story-modernization-33600.js");
@@ -14,7 +16,7 @@ const battle=read("runtime/alpha-battle-modern-33000.js");
 const index=read("index.html");
 const game=read("game.js");
 
-for(const [name,src] of Object.entries({binder,golden,shim335,shim336,shim337,board,battle,kakashiRenderer})){
+for(const [name,src] of Object.entries({binder,sceneA,sceneC,golden,shim335,shim336,shim337,board,battle,kakashiRenderer})){
   assert.doesNotThrow(()=>new Function(src),name+" syntax failure");
 }
 for(const token of [
@@ -37,13 +39,26 @@ assert(binder.includes('id.startsWith("mir_assignment_")')&&binder.includes('id.
 assert(binder.includes('rows.push(instructor(),traveller())')&&binder.includes('id.startsWith("mir_confront_")'),"Mirai GOLDEN actor/disguise projection missing");
 for(const asset of [
   "Assets/Academy Student/academy_hinata.png","NPC/hyuga_instructor.png","NPC/hyuga_sparring_partner.png",
-  "Assets/Academy Student/academy_mirai.png","NPC/mirai_instructor.png","NPC/traveller.png",
+  "Assets/Academy Student/academy_mirai.png","NPC/mirai_instructor.png","NPC/traveller.png","NPC/mirai_porter.png","NPC/mirai_checkpoint_instructor.png",
   "Assets/Academy Student/academy_menma.png","NPC/menma_instructor.png","Assets/Special Jonin/sj_anko.png",
+  "Assets/Academy Student/academy_kushina.png","NPC/kushina_instructor.png","NPC/kushina_classmate.png",
   "Assets/Academy Student/academy_kurenai.png","NPC/kurenai_instructor.png",
-  "Assets/Academy Student/academy_iwabe.png","Assets/Academy Student/academy_metal.png"
+  "Assets/Academy Student/academy_iwabe.png","NPC/iwabe_instructor.png",
+  "Assets/Academy Student/academy_metal.png","NPC/metal_classmate_1.png","NPC/metal_classmate_2.png"
 ]) assert(binder.includes(asset),"known exact actor asset missing "+asset);
-for(const guessed of ["kushina_instructor.png","iwabee_instructor.png","metal_instructor.png","metal_inviting_genin.png","academy_student_fem_1.png","pursuit_target.png"]){
-  assert(!binder.includes(guessed),"unresolved asset path was guessed: "+guessed);
+for(const guessed of ["iwabee_instructor.png","metal_instructor.png","metal_inviting_genin.png"]){
+  assert(!binder.includes(guessed),"unapproved actor path was guessed: "+guessed);
+}
+for(const asset of [
+  "NPC/academy_student_fem_1.png","NPC/izuno_student_2.png","NPC/izuno_proctor.png","NPC/pursuit_target.png",
+  "NPC/furniture_civilian.png","NPC/vegetable_vendor.png","NPC/equipment_custodian.png","NPC/delivery_worker.png",
+  "NPC/runaway_cart_civillian.png","NPC/obito_instructor.png"
+]) assert(fs.existsSync(asset),"#419 durable NPC binary missing from candidate "+asset);
+for(const asset of ["NPC/academy_student_fem_1.png","NPC/izuno_student_2.png","NPC/izuno_proctor.png","NPC/pursuit_target.png"]){
+  assert(sceneA.includes(asset),"Wasabi native Scene Board did not consume #419 asset "+asset);
+}
+for(const asset of ["NPC/furniture_civilian.png","NPC/vegetable_vendor.png","NPC/equipment_custodian.png","NPC/delivery_worker.png","NPC/runaway_cart_civillian.png","NPC/obito_instructor.png"]){
+  assert(sceneC.includes(asset),"Obito native Scene Board did not consume #419 asset "+asset);
 }
 const menmaActorBody=binder.slice(binder.indexOf("function menmaActors("),binder.indexOf("function kushinaActors("));
 assert(binder.includes("Nine-Tails is an internal speaker")&&!menmaActorBody.includes("nine_tails.png"),"Menma internal Nine-Tails was physicalised");
@@ -78,7 +93,7 @@ assert(battle.includes('querySelector(".alpha-battle-pl-core")'),"radial PL refr
 assert(battle.includes('core.querySelector("strong")')||battle.includes('core?.querySelector("strong")'),"radial PL current value not refreshed inside core");
 assert(!game.includes("ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID"),"frozen game.js contains successor purse mutation");
 console.log(JSON.stringify({pass:true,issue:105,checks:{
-  sevenNonKakashiBindings:true,kakashiExcluded:true,hinataSparringSpeakerAlias:true,hinataFinalPairBound:true,hinataChronicleReceipt:true,miraiMenmaWritingGolden:true,legacyGoldenShimsRetired:true,knownAssetsExact:true,missingAssetsNotGuessed:true,
+  sevenNonKakashiBindings:true,kakashiExcluded:true,hinataSparringSpeakerAlias:true,hinataFinalPairBound:true,hinataChronicleReceipt:true,miraiMenmaWritingGolden:true,legacyGoldenShimsRetired:true,knownAssetsExact:true,issue419AssetsConsumed:true,missingAssetsNotGuessed:true,
   internalVoiceNotPhysical:true,loadOrder:true,sharedSceneBoard:true,clickAnywhere:true,
   speakerLinkedDialogue:true,globalCyanStoryFrames:true,kakashiFrameParity:true,kakashiTextAndAdvanceParity:true,radialPLContainmentRefresh:true,frozenCorePreserved:true,browserGoldenClaimed:false
 }},null,2));
