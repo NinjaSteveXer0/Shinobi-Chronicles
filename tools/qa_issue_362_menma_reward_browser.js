@@ -89,7 +89,7 @@ async function setupBattle(page,resolved,{terminal=false,menmaWithdrawn=false,re
       : null;
     currentBattle.returnContext={
       type:"story_scene",sceneId:SCENE,sceneInstanceId:rt.instanceId,
-      sourceBeatId:"tutorial_battle",victoryBeatId:"post_battle_opening",defeatBeatId:"tutorial_not_completed",
+      sourceBeatId:"tutorial_battle",victoryBeatId:"menma_after_01",defeatBeatId:"tutorial_not_completed",
       postBattleBeatId:null,exposeFinisher:false
     };
     currentBattle.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],finishingShinobi:null,mvp:null};
@@ -212,7 +212,7 @@ async function rewardState(page){
         currentBattle.active=false;currentBattle.battleOver=true;currentBattle.battleId="battle_issue_362_"+rt.instanceId;
         currentBattle.encounterId=ENCOUNTER;currentBattle.characterId="academy_menma";currentBattle.enemy=enemy;currentBattle.encounterEnemy=enemy;
         currentBattle.outcome={type:"victory",committed:true,completedAt:Date.now(),finishingShinobiId:"academy_menma",menmaWithdrawn:false};
-        currentBattle.returnContext={type:"story_scene",sceneId:SCENE,sceneInstanceId:rt.instanceId,sourceBeatId:"tutorial_battle",victoryBeatId:"post_battle_opening",defeatBeatId:"tutorial_not_completed",postBattleBeatId:null,exposeFinisher:false};
+        currentBattle.returnContext={type:"story_scene",sceneId:SCENE,sceneInstanceId:rt.instanceId,sourceBeatId:"tutorial_battle",victoryBeatId:"menma_after_01",defeatBeatId:"tutorial_not_completed",postBattleBeatId:null,exposeFinisher:false};
         currentBattle.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],finishingShinobi:null,mvp:null};
       },{ENCOUNTER,SCENE});
     }
@@ -226,10 +226,10 @@ async function rewardState(page){
 
     // CLAIM is complete before Story return; CONTINUE resumes exact Menma Story.
     const returned=await page.evaluate(()=>continueAfterVictory());
-    await page.waitForFunction(scene=>getActiveStorySceneRuntime()?.sceneId===scene&&getActiveStorySceneRuntime()?.beatId==="post_battle_opening",SCENE,{timeout:10000});
+    await page.waitForFunction(scene=>getActiveStorySceneRuntime()?.sceneId===scene&&getActiveStorySceneRuntime()?.beatId==="menma_after_01",SCENE,{timeout:10000});
     state=await rewardState(page);
     assert.strictEqual(state.activeStory.sceneId,SCENE);
-    assert.strictEqual(state.activeStory.beatId,"post_battle_opening");
+    assert.strictEqual(state.activeStory.beatId,"menma_after_01");
     assert.strictEqual(state.ryo,startingRyo+100,"Story return retriggered reward");
     assert.strictEqual(state.exactReceipts.length,1,"Story return duplicated reward receipt");
     await page.screenshot({path:path.join(OUT,"menma-story-return-after-reward.png"),fullPage:false,timeout:12000});
