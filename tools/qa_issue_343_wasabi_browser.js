@@ -114,6 +114,10 @@ async function assertStoryPresentationBenchmark(page,kind,label){
     const actor=[...(root?.querySelectorAll(".sc-scene-board-33900__actor")||[])].find(n=>n.dataset.actorId===actorId)||null;
     const stageRect=rr(stage),layoutRect=rr(layout),panelRect=rr(panel),actorRect=rr(actor);
     const css=panel?getComputedStyle(panel):null;
+    const nameNode=root?.querySelector(".sc-story-name"),textNode=root?.querySelector(".sc-story-text"),primary=root?.querySelector(".sc-chronicle-primary");
+    const hint=root?.querySelector(".sc-performance-hint-33900"),progress=root?.querySelector(".sc-performance-progress-33900");
+    const nameCss=nameNode?getComputedStyle(nameNode):null,textCss=textNode?getComputedStyle(textNode):null,primaryCss=primary?getComputedStyle(primary):null;
+    const hintCss=hint?getComputedStyle(hint):null,progressCss=progress?getComputedStyle(progress):null;
     const tailRaw=layout?.style.getPropertyValue("--sc-cue-speech-tail")||"";
     const tail=parseFloat(tailRaw)||0;
     const pointerX=layoutRect&&tail?layoutRect.left+layoutRect.width*(tail/100):null;
@@ -124,7 +128,10 @@ async function assertStoryPresentationBenchmark(page,kind,label){
       borderRadius:css?.borderRadius||"",borderColor:css?.borderColor||"",
       tailBorderTopColor:kind==="dialogue"&&panel?getComputedStyle(panel,"::after").borderTopColor:"",
       recordBoardDisplay:getComputedStyle(root?.querySelector(".sc-scene-board-33900")||root).display,
-      primaryText:root?.querySelector(".sc-chronicle-primary")?.textContent?.trim()||""
+      primaryText:primary?.textContent?.trim()||"",primaryDisplay:primaryCss?.display||"",
+      nameFontSize:nameCss?.fontSize||"",textFontSize:textCss?.fontSize||"",
+      hintText:hint?.textContent?.trim()||"",hintDisplay:hintCss?.display||"",
+      progressText:progress?.textContent?.trim()||"",progressDisplay:progressCss?.display||""
     };
   },kind);
   assert.strictEqual(row.cueKind,kind,label+" cue kind drift "+JSON.stringify(row));
@@ -133,6 +140,12 @@ async function assertStoryPresentationBenchmark(page,kind,label){
     assert(row.layoutRect.width<=row.stageRect.width*.74,label+" narration remains oversized "+JSON.stringify(row));
     assert(parseFloat(row.borderRadius)>=15,label+" narration panel not on Kakashi rounded treatment "+JSON.stringify(row));
     assert(row.borderColor.includes("93, 215, 225"),label+" narration outline is not canonical cyan "+JSON.stringify(row));
+    assert.strictEqual(row.primaryDisplay,"none",label+" legacy narration arrow button is still visible "+JSON.stringify(row));
+    assert.strictEqual(row.hintText,"CLICK ANYWHERE TO CONTINUE",label+" narration click-anywhere hint drift "+JSON.stringify(row));
+    assert.notStrictEqual(row.hintDisplay,"none",label+" narration click-anywhere hint hidden "+JSON.stringify(row));
+    assert(/^\d+ \/ \d+$/.test(row.progressText)&&row.progressDisplay!=="none",label+" narration cue counter missing "+JSON.stringify(row));
+    assert.strictEqual(row.nameFontSize,"8px",label+" narration label typography drift "+JSON.stringify(row));
+    assert(parseFloat(row.textFontSize)>=12&&parseFloat(row.textFontSize)<=15.1,label+" narration body typography drift "+JSON.stringify(row));
   }else if(kind==="dialogue"){
     assert(row.actorId&&row.actorRect,label+" dialogue speaker actor missing "+JSON.stringify(row));
     assert(row.speechX&&row.tailRaw,label+" dialogue speaker geometry variables missing "+JSON.stringify(row));
@@ -140,6 +153,10 @@ async function assertStoryPresentationBenchmark(page,kind,label){
     assert(row.layoutRect.width<=Math.min(510,row.stageRect.width*.72),label+" dialogue panel too wide "+JSON.stringify(row));
     assert(row.borderColor.includes("103, 221, 230"),label+" dialogue outline is not canonical cyan "+JSON.stringify(row));
     assert(row.tailBorderTopColor.includes("103, 221, 230"),label+" dialogue pointer outline is not canonical cyan "+JSON.stringify(row));
+    assert.strictEqual(row.primaryDisplay,"none",label+" legacy dialogue arrow button is still visible "+JSON.stringify(row));
+    assert(row.hintDisplay==="none"&&row.progressDisplay==="none",label+" narration hint/progress leaked into dialogue "+JSON.stringify(row));
+    assert.strictEqual(row.nameFontSize,"8px",label+" dialogue speaker-label typography drift "+JSON.stringify(row));
+    assert(parseFloat(row.textFontSize)>=12&&parseFloat(row.textFontSize)<=16.1,label+" dialogue body typography drift "+JSON.stringify(row));
   }else if(kind==="record"){
     const stageCenterX=row.stageRect.left+row.stageRect.width/2,stageCenterY=row.stageRect.top+row.stageRect.height/2;
     const layoutCenterX=row.layoutRect.left+row.layoutRect.width/2,layoutCenterY=row.layoutRect.top+row.layoutRect.height/2;
