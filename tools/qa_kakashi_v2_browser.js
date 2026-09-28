@@ -133,10 +133,17 @@ async function inspect(page,label){
     const dialogue=root&&root.querySelector(".kv2-dialogue");
     const speech=root&&root.querySelector(".kv2-speech");
     const receipt=root&&root.querySelector(".kv2-receipt");
+    const dialogueCss=dialogue?getComputedStyle(dialogue):null;
+    const speechCss=speech?getComputedStyle(speech):null;
+    const speechTailCss=speech?getComputedStyle(speech,"::after"):null;
     return{
       beatId:getActiveStorySceneRuntime()?.beatId||null,
       preset:root?.dataset.preset||null,
       cueKind:root?.dataset.cueKind||null,
+      hasChoices:root?.dataset.hasChoices==="true",
+      narrationBorderColor:dialogueCss?.borderColor||"",
+      speechBorderColor:speechCss?.borderColor||"",
+      speechTailBorderTopColor:speechTailCss?.borderTopColor||"",
       geometry:runAcademyKakashiV2Geometry36030(),
       renderer:runAcademyKakashiV2Renderer36030Diagnostics(),
       transition:runAcademyKakashiV2Transition36040Diagnostics(),
@@ -163,8 +170,16 @@ async function inspect(page,label){
   }else{
     assert(row.geometry.pass,label+" geometry: "+JSON.stringify(row.geometry));
     assert.strictEqual(row.visibleNarrationSurfaces+row.visibleSpeechSurfaces,1,label+" exactly one narration/speech surface must be visible");
-    if(row.cueKind==="dialogue")assert.strictEqual(row.visibleSpeechSurfaces,1,label+" dialogue must use actor-linked speech surface");
-    else assert.strictEqual(row.visibleNarrationSurfaces,1,label+" narration must use compact narration surface");
+    if(row.cueKind==="dialogue"){
+      assert.strictEqual(row.visibleSpeechSurfaces,1,label+" dialogue must use actor-linked speech surface");
+      if(!row.hasChoices){
+        assert(row.speechBorderColor.includes("103, 221, 230"),label+" dialogue outline is not canonical cyan: "+JSON.stringify(row));
+        assert(row.speechTailBorderTopColor.includes("103, 221, 230"),label+" dialogue pointer outline is not canonical cyan: "+JSON.stringify(row));
+      }
+    }else{
+      assert.strictEqual(row.visibleNarrationSurfaces,1,label+" narration must use compact narration surface");
+      if(row.cueKind==="narration"&&!row.hasChoices)assert(row.narrationBorderColor.includes("93, 215, 225"),label+" narration outline is not canonical cyan: "+JSON.stringify(row));
+    }
   }
   return row;
 }
