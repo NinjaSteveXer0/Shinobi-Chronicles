@@ -197,6 +197,11 @@ assert.deepStrictEqual(JSON.parse(JSON.stringify(interceptReq.__factResolver({ou
 });
 assert.deepStrictEqual(JSON.parse(JSON.stringify(interceptReq.__rowIdsResolver({outcome:"intercept_before_extraction"}))),["IZU-02"]);
 assert.deepStrictEqual(JSON.parse(JSON.stringify(interceptReq.__rowIdsResolver({predictionApproach:true,outcome:"arrive_just_after_target"}))),[]);
+commits.length=0;
+activeRt.localContext={route:"river_route",outcome:"direct_catch"};
+const riverInterceptSkip=interceptReq.resolve();
+assert.strictEqual(riverInterceptSkip.success,true);assert.strictEqual(riverInterceptSkip.skipped,true);
+assert.strictEqual(commits.some(x=>x.occurrenceId==="occ_origin_izuno_intercept_prediction_resolution"),false,"River direct catch wrote IZU-02 intercept occurrence");
 
 // Rogue response remains separate from pursuit outcome.
 assert.deepStrictEqual(JSON.parse(JSON.stringify(choice("izu_rogue_choice","intervene").contextPatch)),{

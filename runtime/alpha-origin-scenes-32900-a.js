@@ -1406,6 +1406,12 @@ const interceptCommit=R("izu_intercept_32900","academy_izuno",intercept,c=>({
   pursuitOutcome:c.outcome||null,
   academyTrackingRecommendation:c.outcome==="intercept_before_extraction"
 }),c=>c.outcome==="intercept_before_extraction"?["IZU-02"]:[],c=>({participantRefs:["wasabi_origin_pursuit_target_01"]}));
+const interceptCommitResolve32900=interceptCommit.resolve;
+interceptCommit.resolve=()=>{
+  const c=A.clone(local());
+  if(c.outcome!=="intercept_before_extraction")return{success:true,skipped:true,reason:"izu02_prediction_intercept_not_reached"};
+  return interceptCommitResolve32900();
+};
 const coopCommit=R("izu_coop_32900","academy_izuno",coop,c=>({
   cooperatedWithAcademyStudents:c.cooperated===true,
   cooperatingParticipantRefs:c.cooperated===true?["wasabi_origin_pursuit_student_roof_01","wasabi_origin_pursuit_student_street_02"]:[],

@@ -119,7 +119,7 @@ assert(sceneBoardDoc.includes("no visible arrow/CONTINUE button for ordinary nar
 assert(battle.includes('querySelector(".alpha-battle-pl-core")'),"radial PL refresh does not target inner core");
 assert(battle.includes('core.querySelector("strong")')||battle.includes('core?.querySelector("strong")'),"radial PL current value not refreshed inside core");
 assert(!game.includes("ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID"),"frozen game.js contains successor purse mutation");
-assert(fingerprint.includes('buildId:"SC-ALPHA-RUNTIME-R303-2026-09-29-BD"')&&fingerprint.includes('sourceBaselineCommit:"9f90d86ff989caf59f96711e6067d497249f039e"'),"#105 repair runtime fingerprint was not advanced from current live-main authority");
+assert(fingerprint.includes('buildId:"SC-ALPHA-RUNTIME-R303-2026-09-29-BE"')&&fingerprint.includes('sourceBaselineCommit:"9f90d86ff989caf59f96711e6067d497249f039e"'),"#105 repair runtime fingerprint was not advanced from current live-main authority");
 console.log(JSON.stringify({pass:true,issue:105,checks:{
   sevenNonKakashiBindings:true,kakashiExcluded:true,hinataSparringSpeakerAlias:true,hinataFinalPairBound:true,hinataChronicleReceipt:true,miraiMenmaWritingGolden:true,legacyGoldenShimsRetired:true,knownAssetsExact:true,issue419AssetsConsumed:true,wasabiPursuitTargetActorProjection:true,missingAssetsNotGuessed:true,
   menmaNineTailsDialoguePortrait:true,miraiTerminalRouterClean:true,miraiMenmaReceipts:true,menmaPostBattleSegmented:true,menmaRewardDiagnosticRemoved:true,globalReceiptInputLock:true,globalStartPLBattleCTA:true,loadOrder:true,sharedSceneBoard:true,clickAnywhere:true,

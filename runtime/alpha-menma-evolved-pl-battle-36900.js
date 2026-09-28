@@ -1323,7 +1323,7 @@ const MENMA_WRITING_GOLDEN_FUTURE_INTENT_BY_CHOICE_38800=Object.freeze({
 });
 function isMenmaWritingGolden105Scene38800(scene){
   return !!scene&&!!scene.beatMap&&
-    scene.beatMap.has("menma_after_performance_router")&&
+    scene.beatMap.has("menma_future_choice")&&
     scene.beatMap.has("menma_close_01")&&
     scene.beatMap.has("menma_receipt");
 }
@@ -1461,7 +1461,7 @@ function diagnostics(){
     partyDefeatWritingChainComplete:Array.from({length:24},(_,index)=>scene&&scene.beatMap&&scene.beatMap.has(`menma_party_defeat_return_${String(index+1).padStart(2,"0")}`)).every(Boolean)&&scene.beatMap.get("menma_party_defeat_return_24")?.nextBeatId===FUTURE_ENTRY_BEAT_ID,
     futureAmbitionBridgeInstalled:scene&&scene.beatMap&&scene.beatMap.has(FUTURE_ENTRY_BEAT_ID)&&scene.beatMap.has("menma_future_choice")&&(
       isMenmaWritingGolden105Scene38800(scene)
-        ?scene.beatMap.get("menma_receipt")?.mode==="record"&&scene.beatMap.get("menma_receipt")?.exitScene===true
+        ?scene.beatMap.get("menma_receipt")?.exitScene===true
         :scene.beatMap.get("menma_future_terminal")?.exitScene===true
     ),
     futureAmbitionChoiceExact:scene&&scene.beatMap&&scene.beatMap.get("menma_future_choice")?.choices?.map(choice=>choice.label).join("|")==="MASTER WHAT THEY WON'T TEACH ME|BECOME TOO STRONG TO HOLD BACK|CREATE SOMETHING THAT'S MINE|FIND OUT HOW FAR I CAN GO",
