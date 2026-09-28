@@ -259,7 +259,7 @@ function resolveProtectiveResponse(kind){
   const rule=table[kind];if(!rule)return{success:false,reason:"metal_protective_response_kind_invalid"};
   const value=effectiveStat(rule.statKey),outcome=value>=rule.successMin?"success":value>=rule.partialMin?"partial":"failure";
   const intervention=outcome==="success"?null:GENIN;
-  return{success:true,resolverId:"academy_metal_lee_origin_protective_response_v1",hazardId:"academy_metal_origin_training_dummy_hazard_v1",protectiveResponseKind:kind,protectiveResponseOutcome:outcome,resolverStatKey:rule.statKey,resolverStatLabel:rule.statLabel,resolverStatValue:value,successThreshold:rule.successMin,partialThreshold:rule.partialMin,interventionOccurred:!!intervention,interveningParticipantRef:intervention};
+  return{success:true,resolverId:"academy_metal_lee_origin_protective_response_v1",hazardId:"academy_metal_origin_training_dummy_hazard_v1",attempted:true,protectiveResponseKind:kind,protectiveResponseOutcome:outcome,resolverStatKey:rule.statKey,resolverStatLabel:rule.statLabel,resolverStatValue:value,successThreshold:rule.successMin,partialThreshold:rule.partialMin,interventionRequired:!!intervention,interventionParticipantRef:intervention};
 }
 function diagnostics(){
   const enemy=enemyDatabase&&enemyDatabase[GENIN],actions=enemy&&enemy.authoredBattleActions||[];
