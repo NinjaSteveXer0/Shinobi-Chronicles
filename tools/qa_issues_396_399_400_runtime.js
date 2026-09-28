@@ -1,0 +1,132 @@
+#!/usr/bin/env node
+"use strict";
+
+const fs=require("fs");
+const path=require("path");
+const assert=require("assert");
+
+const ROOT=path.resolve(__dirname,"..");
+const read=rel=>fs.readFileSync(path.join(ROOT,rel),"utf8");
+
+const metal=read("runtime/alpha-metal-origin-runtime-396.js");
+const rogue=read("runtime/alpha-rogue-genin-opposition-399.js");
+const iwabee=read("runtime/alpha-iwabee-origin-runtime-399.js");
+const names=read("runtime/alpha-origin-skill-display-names-400.js");
+const story=read("runtime/alpha-origin-scenes-32900-b.js");
+const index=read("index.html");
+const game=read("game.js");
+
+for(const [file,src] of Object.entries({metal,rogue,iwabee,names,story})){
+  assert.doesNotThrow(()=>new Function(src),file+" syntax failure");
+}
+
+const metalActions=[
+  "metal_origin_inviting_genin_sparring_jab",
+  "metal_origin_inviting_genin_turning_kick",
+  "metal_origin_inviting_genin_guarded_stance",
+  "metal_origin_inviting_genin_feint_entry",
+  "metal_origin_inviting_genin_committed_lunge"
+];
+metalActions.forEach(id=>assert(metal.includes(id),"missing Metal action "+id));
+assert(metal.includes('stats:Object.freeze({nin:12,tai:16,buki:11,fuin:6,kin:7,gen:8,stamina:15})'));
+assert(metal.includes('pl:15'));
+assert(metal.includes('const START_MAX=13'));
+assert(metal.includes('ratio>0.50?"strong":ratio>=0.25?"mixed":"rough"'));
+assert(metal.includes('makeEnemyRatioGuardAction(id,0.25'));
+assert(metal.includes('contextualAttackPL:Object.freeze({normal:6,afterFeint:7})'));
+assert(metal.includes('academy_metal_lee_origin_protective_response_v1'));
+assert(metal.includes('academy_metal_origin_training_dummy_hazard_v1'));
+assert(metal.includes('redirect_dummy:{statKey:"tai",statLabel:"Taijutsu",successMin:14,partialMin:11}'));
+assert(metal.includes('take_impact:{statKey:"stamina",statLabel:"Stamina",successMin:14,partialMin:11}'));
+assert(metal.includes('destroy_dummy:{statKey:"tai",statLabel:"Taijutsu",successMin:15,partialMin:12}'));
+assert(!metal.includes("Math.random"),"Metal deterministic AI introduced RNG");
+
+assert(rogue.includes('makeEnemyRatioGuardAction(FEINT_ID,0.40'));
+assert(rogue.includes('m.feintUsed!==true'));
+assert(rogue.includes('now>created'));
+assert(!rogue.includes("iwabee_origin_rogue_genin_01"));
+assert(!rogue.includes("wasabi_origin_rogue_genin_01"));
+
+assert(iwabee.includes('stats:Object.freeze({nin:23,tai:22,buki:21,fuin:10,kin:14,gen:15,stamina:24})'));
+assert(iwabee.includes('oppositionTemplateId:TEMPLATE'));
+assert(iwabee.includes('buildReusableRogueGeninOppositionActions399'));
+assert(iwabee.includes('battleResultDoesNotEstablishDisposition:true'));
+assert(!iwabee.includes('earthReleaseUsedToConstrainRogueGenin:true'),"Battle adapter illegally owns IWA-02");
+assert(!iwabee.includes('rogueDisposition:'),"Battle adapter illegally owns World disposition");
+
+for(const value of [
+  'rogueDisposition:"ESCAPED_AFTER_IWABEE_WITHDRAWAL"',
+  'rogueDisposition:"DETAINED_AFTER_ROGUE_BATTLE_WITHDRAWAL"',
+  'rogueDisposition:"SURRENDERED_AFTER_EARTH_ROUTE_CONSTRAINT"',
+  'rogueDisposition:"ESCAPED_AFTER_INSTRUCTOR_ESCALATION"',
+  'rogueDisposition:"ESCAPED_WHILE_IWABEE_FINISHED_PRACTICAL"',
+  'instructorIntervention:"PROTECT_WITHDRAWN_STUDENT_NO_PURSUIT"',
+  'instructorIntervention:"SECURE_WITHDRAWN_ROGUE"',
+  'instructorIntervention:"ACCEPT_SURRENDER_AND_SECURE"',
+  'instructorIntervention:"SHIELD_STUDENTS_NO_PURSUIT"'
+])assert(story.includes(value),"missing Iwabee World fact "+value);
+assert(story.includes('earthReleaseUsedToConstrainRogueGenin:true'));
+assert(story.includes('alternateEscapeRouteAvailableAfterConstraint:false'));
+assert(story.includes('followupBattleOccurred:false'));
+assert(story.includes('beatId:"iwa_confront_loss_01"'));
+assert(story.includes('beatId:"met_spar_strong_01"'));
+assert(story.includes('beatId:"met_spar_mixed_01"'));
+assert(story.includes('beatId:"met_spar_rough_01"'));
+for(const prefix of ["met_redirect","met_impact","met_destroy"]){
+  for(const outcome of ["success","partial","failure"])assert(story.includes('beatId:"'+prefix+"_"+outcome+'_01"'),"missing MET-03 outcome "+prefix+" "+outcome);
+}
+
+const namePairs={
+  academy_hinata_gentle_palm:"Gentle Fist: Flowing Palm",
+  academy_izuno_pouncing_palm:"Cat Fang Palm",
+  academy_mirai_twin_kunai:"Twin Fang Kunai",
+  academy_kushina_red_whirlwind:"Crimson Whirlwind",
+  academy_kurenai_false_opening:"Petal Mirage",
+  academy_iwabee_earth_style_rising_wall:"Earth Style: Rising Rampart",
+  academy_iwabee_stone_snare:"Earth Style: Stone Grasp",
+  academy_metal_lee_leaf_rising_kick:"Leaf Rising Heel",
+  academy_obito_fire_style_ember_burst:"Fire Style: Cinder Burst"
+};
+for(const [id,label] of Object.entries(namePairs)){
+  assert(names.includes(id),"#400 id missing "+id);
+  assert(names.includes(label),"#400 displayName missing "+label);
+}
+assert(names.includes("displayNameCount:40"));
+assert(names.includes("stableIdsUnchanged:true"));
+assert(names.includes("mechanicsUnchanged:true"));
+assert(names.includes("paletteOrderUnchanged:true"));
+assert(!names.includes('academy_menma:Object.freeze'),"#400 reopened Menma");
+assert(!names.includes('academy_kakashi:Object.freeze'),"#400 reopened Kakashi");
+
+const order=[
+  "runtime/alpha-battle-modern-33000.js",
+  "runtime/alpha-metal-origin-runtime-396.js",
+  "runtime/alpha-rogue-genin-opposition-399.js",
+  "runtime/alpha-iwabee-origin-runtime-399.js"
+].map(x=>index.indexOf(x));
+assert(order.every(x=>x>=0),"production loader missing new Battle modules");
+assert(order.every((x,i)=>i===0||x>order[i-1]),"new Battle modules load in wrong order");
+assert(index.indexOf("runtime/alpha-origin-skill-display-names-400.js")>index.indexOf("runtime/alpha-combat-skill-lock-38300.js"),"#400 must load after #383");
+
+assert(!game.includes('protectiveResponseKind:"intercept",protectiveResponseOutcome:"protected"'),"stale MET-03 diagnostic vocabulary remains");
+assert(game.includes('protectiveResponseKind:"redirect_dummy",protectiveResponseOutcome:"partial"'),"closed MET-03 diagnostic missing");
+
+console.log(JSON.stringify({
+  pass:true,
+  issues:[396,399,400],
+  checks:{
+    metalExactOpponent:true,
+    metalDeterministicFiveActionCycle:true,
+    metalFixedPerformanceBands:true,
+    met03ExactDeterministicThresholds:true,
+    rogueCapabilitySeparatedFromHistoricalIdentity:true,
+    iwabeeBattleWorldSeparation:true,
+    iwabeeFiveDispositionOutcomes:true,
+    iwabeeAuthoredDefeatBridge:true,
+    eightPaletteDisplayNames:true,
+    stableSkillIdsAndMechanics:true,
+    productionLoadOrder:true,
+    staleMet03VocabularyRetired:true
+  },
+  browserGoldenClaimed:false
+},null,2));
