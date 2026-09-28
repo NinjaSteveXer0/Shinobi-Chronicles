@@ -1275,13 +1275,15 @@
       "symbol": "chooseEnemyAuthoredBattleAction",
       "chain": [
         "runtime/alpha-metal-origin-runtime-396.js",
-        "runtime/alpha-iwabee-origin-runtime-399.js"
+        "runtime/alpha-iwabee-origin-runtime-399.js",
+        "runtime/alpha-kakashi-v2-battle-36010.js"
       ],
-      "canonicalActiveOwner": "runtime/alpha-iwabee-origin-runtime-399.js",
-      "activationCondition": "Origin-scoped Battle adapter condition; each wrapper delegates outside its exact encounter",
+      "canonicalActiveOwner": "runtime/alpha-kakashi-v2-battle-36010.js",
+      "activationCondition": "Metal396 and Iwabee399 exact encounter wrappers delegate outside scope; dynamically loaded Kakashi V2 wrapper remains final production owner and delegates to the prior chain outside Kakashi battles",
       "qaRefs": [
         "tools/qa_issues_396_399_400_browser.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_kakashi_v2_browser.js"
       ]
     },
     {
