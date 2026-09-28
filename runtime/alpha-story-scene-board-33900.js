@@ -381,6 +381,7 @@ function installStyle(){
 #story-scene-presentation-layer[data-sc-performance="true"]:not([data-sc-cue-kind="record"]) .sc-story-panel{max-height:none!important;overflow:visible!important;}
 #story-scene-presentation-layer[data-sc-performance="true"]:not([data-sc-cue-kind="record"]) .sc-story-text{max-height:none!important;overflow:visible!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-name{font-size:11px!important;margin:0 0 2px!important;color:#e8c86e!important;font-weight:900!important;letter-spacing:.12em!important;text-transform:uppercase!important;line-height:1.15!important;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-source-state{display:none!important;}
 #story-scene-presentation-layer[data-sc-cue-kind="narration"] .sc-chronicle-layout,
 #story-scene-presentation-layer[data-sc-cue-kind="internal_voice"] .sc-chronicle-layout{position:absolute!important;left:50%!important;right:auto!important;bottom:3%!important;width:min(72%,980px)!important;margin:0!important;transform:translateX(-50%)!important;z-index:30!important;}
 #story-scene-presentation-layer[data-sc-cue-kind="narration"] .sc-story-name,

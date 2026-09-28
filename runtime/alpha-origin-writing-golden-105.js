@@ -36,7 +36,7 @@ function reg(def){
 function env(id){return {environmentId:id};}
 function N(id,text,next,environment,onEnterConsequences){const row={beatId:id,mode:"narration",text};if(next)row.nextBeatId=next;if(environment)row.environmentRef=environment;if(onEnterConsequences)row.onEnterConsequences=onEnterConsequences;return row;}
 function D(id,speaker,text,next,environment,onEnterConsequences){const row={beatId:id,mode:"dialogue",speakerName:speaker,text};if(next)row.nextBeatId=next;if(environment)row.environmentRef=environment;if(onEnterConsequences)row.onEnterConsequences=onEnterConsequences;return row;}
-function V(id,speaker,text,next,environment,onEnterConsequences){return D(id,speaker,text,next,environment,onEnterConsequences);}
+function V(id,speaker,text,next,environment,onEnterConsequences){const row=D(id,speaker,text,next,environment,onEnterConsequences);row.speakerRef={sourceId:"nine_tails",sourceType:"communication_source",physicalPresence:false};return row;}
 function Q(id,text,choices,environment){const row={beatId:id,mode:"choice",text,choices};if(environment)row.environmentRef=environment;return row;}
 function battleUnavailable(label){
   return ()=>({available:false,knownBlocker:label||"This route is unavailable right now."});
