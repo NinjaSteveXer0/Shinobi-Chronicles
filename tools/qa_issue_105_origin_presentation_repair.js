@@ -18,6 +18,7 @@ for(const token of [
   'scene("academy_kushina")','scene("academy_kurenai")','scene("academy_iwabee")','scene("academy_metal_lee")'
 ]) assert(binder.includes(token),"missing #105 Scene Board binding "+token);
 assert(!binder.includes('scene("academy_kakashi")'),"Kakashi Golden Story was bound by #105 adapter");
+assert(binder.includes('"SPARRING STUDENT","HYŪGA SPARRING PARTNER"'),"Hinata sparring partner is missing authored speaker aliases");
 for(const asset of [
   "Assets/Academy Student/academy_hinata.png","NPC/hyuga_instructor.png","NPC/hyuga_sparring_partner.png",
   "Assets/Academy Student/academy_mirai.png","NPC/mirai_instructor.png","NPC/traveller.png",
@@ -60,7 +61,7 @@ assert(battle.includes('querySelector(".alpha-battle-pl-core")'),"radial PL refr
 assert(battle.includes('core.querySelector("strong")')||battle.includes('core?.querySelector("strong")'),"radial PL current value not refreshed inside core");
 assert(!game.includes("ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID"),"frozen game.js contains successor purse mutation");
 console.log(JSON.stringify({pass:true,issue:105,checks:{
-  sevenNonKakashiBindings:true,kakashiExcluded:true,knownAssetsExact:true,missingAssetsNotGuessed:true,
+  sevenNonKakashiBindings:true,kakashiExcluded:true,hinataSparringSpeakerAlias:true,knownAssetsExact:true,missingAssetsNotGuessed:true,
   internalVoiceNotPhysical:true,loadOrder:true,sharedSceneBoard:true,clickAnywhere:true,
   speakerLinkedDialogue:true,globalCyanStoryFrames:true,kakashiFrameParity:true,kakashiTextAndAdvanceParity:true,radialPLContainmentRefresh:true,frozenCorePreserved:true,browserGoldenClaimed:false
 }},null,2));
