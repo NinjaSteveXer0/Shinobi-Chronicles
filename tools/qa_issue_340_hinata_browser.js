@@ -93,6 +93,7 @@ async function info(page){
       localContext:rt&&rt.localContext?JSON.parse(JSON.stringify(rt.localContext)):{},
       text:root?.querySelector(".sc-story-text")?.textContent?.trim()||"",
       speaker:root?.querySelector(".sc-story-name")?.textContent?.trim()||"",
+      cueKind:root?.dataset.scCueKind||null,
       cueSpeakerActorId:root?.dataset.scCueSpeakerActorId||null,
       focusedActorIds:[...(root?.querySelectorAll(".sc-scene-board-33900__actor.is-focus")||[])].map(n=>n.dataset.actorId||"").filter(Boolean),
       actorIds:[...(root?.querySelectorAll(".sc-scene-board-33900__actor")||[])].map(n=>n.dataset.actorId||"").filter(Boolean),
@@ -248,7 +249,7 @@ async function finishRoute(page,{label,youngLabel,youngId,expectedResponses}){
   await shot(page,label,"closing");
   await clickContinue(page);
   const receipt=await continueTo(page,"hin_receipt",{max:4});
-  assert.strictEqual(receipt.mode,"record",label+" Hinata Chronicle Receipt semantic mode missing");
+  assert.strictEqual(receipt.cueKind,"record",label+" Hinata Chronicle Receipt presentation cue missing");
   assert.strictEqual(receipt.speaker,"CHRONICLE RECEIPT",label+" Chronicle Receipt label missing");
   assert(receipt.text.includes("ACADEMY HINATA"),label+" Chronicle Receipt missing Origin title");
   assert(receipt.text.includes("RECORDED IN YOUR CHRONICLE"),label+" Chronicle Receipt missing Chronicle heading");
