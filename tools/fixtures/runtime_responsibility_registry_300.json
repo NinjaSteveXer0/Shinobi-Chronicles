@@ -1261,12 +1261,14 @@
     {
       "symbol": "advanceStoryScene",
       "chain": [
+        "runtime/alpha-metal-origin-runtime-396.js",
         "runtime/alpha-story-scene-board-33900.js",
         "runtime/alpha-kakashi-v2-transition-36040.js"
       ],
       "canonicalActiveOwner": "runtime/alpha-kakashi-v2-transition-36040.js",
-      "activationCondition": "active Story scene is origin_academy_kakashi_anbu_retrieval",
+      "activationCondition": "Metal396 wrapper auto-routes only exact deterministic Metal outcome dispatches and delegates otherwise; shared Scene Board remains the generic presentation wrapper; Kakashi V2 remains final owner for its exact Origin",
       "qaRefs": [
+        "tools/qa_issues_396_399_400_browser.js",
         "tools/qa_kakashi_v2_browser.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
