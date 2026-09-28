@@ -346,7 +346,7 @@ function applyBoardBackdrop(stage,runtime=currentRuntime()){
   if(stage.dataset)delete stage.dataset.scSceneBoardBackdrop;stage.style.removeProperty("--sc-scene-board-backdrop");return null;
 }
 
-function installStyle(){
+// Owner lock 2026-09-28: narration/dialogue frame outlines are cyan for every speaker side.\nfunction installStyle(){
   if(typeof document==="undefined"||!document.head||document.getElementById(STYLE_ID))return false;
   const style=document.createElement("style");style.id=STYLE_ID;style.textContent=`
 #story-scene-presentation-layer[data-sc-presentation-hidden="true"]{display:none!important;pointer-events:none!important;}\n#story-scene-presentation-layer[data-sc-scene-board="true"]{background:#030b10!important;}
@@ -363,9 +363,9 @@ function installStyle(){
 #story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-story-panel{width:100%!important;box-sizing:border-box!important;border-color:rgba(103,221,230,.55)!important;background:linear-gradient(145deg,rgba(4,18,24,.94),rgba(2,9,14,.97))!important;box-shadow:0 18px 48px rgba(0,0,0,.48),0 0 22px rgba(78,210,220,.08)!important;}
 #story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="player"] .sc-chronicle-layout{justify-content:flex-start!important;}
 #story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-chronicle-layout{justify-content:flex-end!important;}
-#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-panel{border-color:rgba(218,176,77,.58)!important;background:linear-gradient(145deg,rgba(25,18,6,.93),rgba(8,10,12,.97))!important;box-shadow:0 18px 48px rgba(0,0,0,.48),0 0 22px rgba(218,176,77,.08)!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-panel{border-color:rgba(103,221,230,.55)!important;background:linear-gradient(145deg,rgba(25,18,6,.93),rgba(8,10,12,.97))!important;box-shadow:0 18px 48px rgba(0,0,0,.48),0 0 22px rgba(78,210,220,.08)!important;}
 #story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-story-panel::after{content:"";position:absolute;top:-8px;left:var(--sc-cue-speech-tail,50%);width:14px;height:14px;transform:translateX(-50%) rotate(45deg);border-left:1px solid rgba(103,221,230,.5);border-top:1px solid rgba(103,221,230,.5);background:rgba(2,9,14,.97);}
-#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-panel::after{border-color:rgba(218,176,77,.52);background:rgba(8,10,12,.97);}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-panel::after{border-color:rgba(103,221,230,.5);background:rgba(8,10,12,.97);}
 #story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-story-name{color:#78dfe7!important;}
 #story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-name{color:#e5c66f!important;}
 #story-scene-presentation-layer[data-sc-cue-kind="record"] .sc-scene-board-33900{display:none!important;}
