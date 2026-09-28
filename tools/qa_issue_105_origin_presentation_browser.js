@@ -70,6 +70,22 @@ async function advanceUntilBeat(page,target,max=120){
   }
   throw new Error("advanceUntilBeat guard exceeded "+target);
 }
+async function reloadAtExactBeat(page,beatId){
+  const before=await snapshot(page);
+  assert.strictEqual(before.beatId,beatId,"reload proof started from wrong beat");
+  await page.reload({waitUntil:"domcontentloaded",timeout:60000});
+  await page.waitForFunction(()=>!!globalThis.SC_ALPHA_ORIGIN_SCENE_BOARD_BINDINGS_105&&!!globalThis.SC_STORY_SCENE_BOARD_33900&&!!globalThis.SC_ALPHA_ORIGIN_32900,null,{timeout:30000});
+  await release(page);
+  await page.waitForFunction(expected=>{
+    const rt=globalThis.getActiveStorySceneRuntime?.();
+    const root=document.getElementById("story-scene-presentation-layer");
+    return rt?.beatId===expected&&root?.dataset.beatId===expected&&root?.dataset.scSceneBoard==="true";
+  },beatId,{timeout:15000});
+  const after=await snapshot(page);
+  assert.strictEqual(after.beatId,beatId,"save/reload resumed a different Story beat");
+  assert.strictEqual(after.text,before.text,"save/reload changed the current GOLDEN cue");
+  return after;
+}
 
 (async()=>{
   const browser=await chromium.launch({headless:true});
@@ -111,6 +127,7 @@ async function advanceUntilBeat(page,target,max=120){
         const talk=page.locator("#story-scene-presentation-layer .sc-story-choice").filter({hasText:"TALK TO HIM"}).first();
         await talk.click();
         await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="mir_talk_01",null,{timeout:8000});
+        await reloadAtExactBeat(page,"mir_talk_01");
         const talkRoute=await advanceUntilBeat(page,"mir_market_talk_01",120);
         const talkText=talkRoute.seen.map(x=>x.text).join("\n");
         assert(talkText.includes("Have you been here before?")&&talkText.includes("…First time."),"Mirai authored Traveller branch dialogue missing");
@@ -119,7 +136,10 @@ async function advanceUntilBeat(page,target,max=120){
       }else if(variant==="academy_menma"){
         assert.strictEqual(row.beatId,"menma_open_01","Menma did not start at Writing-GOLDEN menma_open_01");
         assert(row.text.includes("practice sheet lands on Menma's desk"),"Menma GOLDEN opening prose missing "+JSON.stringify(row));
-        const opening=await advanceUntilBeat(page,"menma_forest_01",120);
+        const preReload=await advanceUntilBeat(page,"menma_open_08",120);
+        await reloadAtExactBeat(page,"menma_open_08");
+        const postReload=await advanceUntilBeat(page,"menma_forest_01",120);
+        const opening={row:postReload.row,seen:[...preReload.seen,...postReload.seen]};
         const seenIds=new Set(opening.seen.map(x=>x.beatId));
         for(let n=1;n<=15;n++)assert(seenIds.has("menma_open_"+String(n).padStart(2,"0")),"Menma GOLDEN opening skipped menma_open_"+String(n).padStart(2,"0"));
         const openingText=opening.seen.map(x=>x.text).join("\n");
@@ -134,6 +154,6 @@ async function advanceUntilBeat(page,target,max=120){
       await gate.assertClean(variant);
       await context.close();
     }
-    console.log(JSON.stringify({pass:true,issue:105,cases:CASES.map(x=>x[0]),legacyFallbackRejected:true,clickAnywhereProven:true,miraiWritingGoldenProven:true,menmaWritingGoldenOpeningProven:true,browserGoldenClaimed:false},null,2));
+    console.log(JSON.stringify({pass:true,issue:105,cases:CASES.map(x=>x[0]),legacyFallbackRejected:true,clickAnywhereProven:true,miraiWritingGoldenProven:true,menmaWritingGoldenOpeningProven:true,goldenSaveReloadResumeProven:true,browserGoldenClaimed:false},null,2));
   }finally{await browser.close();}
 })().catch(err=>{console.error(err);process.exit(1);});
