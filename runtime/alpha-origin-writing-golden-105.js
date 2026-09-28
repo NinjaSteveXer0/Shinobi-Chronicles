@@ -20,7 +20,7 @@ if(!A||typeof globalThis.registerStoryScene!=="function"||typeof globalThis.getS
   globalThis.SC_ALPHA_ORIGIN_WRITING_GOLDEN_105=Object.freeze({patchId:PATCH_ID,installed:false,reason:"origin_story_runtime_missing",browserGoldenClaimed:false});
   return;
 }
-const C=A.choice,R=A.commitRequest,X=A.completionRequest;
+const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A);
 const cloneBeat=beat=>beat?({...beat,choices:Array.isArray(beat.choices)?beat.choices.map(choice=>({...choice,contextPatch:choice.contextPatch&&typeof choice.contextPatch==="object"?{...choice.contextPatch}:choice.contextPatch})):beat.choices}):null;
 const oldMenma=getStorySceneDefinition("origin_academy_menma_prologue");
 const oldMenmaBeat=id=>oldMenma?(oldMenma.beatMap instanceof Map?oldMenma.beatMap.get(id):Array.isArray(oldMenma.beats)?oldMenma.beats.find(row=>row&&row.beatId===id):null):null;
