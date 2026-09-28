@@ -1217,6 +1217,92 @@
         "tools/qa_issue_343_wasabi_writing_golden.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
+    },
+    {
+      "responsibilityId": "origin.academy_mirai.final_story_state",
+      "canonicalOwner": "runtime/alpha-origin-writing-golden-105.js",
+      "ownerType": "origin_semantic_owner",
+      "directCallers": [
+        "index.html",
+        "runtime/alpha-origin-scenes-32900-a.js"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime.localContext",
+        "playerData.activityHistory Academy Mirai source occurrences",
+        "playerData acquisition / Origin completion state"
+      ],
+      "stateWrites": [
+        "activeStorySceneRuntime.localContext Mirai conversation/route/verification choices",
+        "playerData.activityHistory exact Academy Mirai source facts"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-origin-writing-golden-105.js"
+      ],
+      "extensionHooks": [
+        "SC_ALPHA_ORIGIN_32900.register",
+        "completeChronicleOriginPrologue"
+      ],
+      "permittedAdapters": [
+        "academy_origin_scene_board_bindings_105"
+      ],
+      "retiredOwners": [
+        "runtime/alpha-origin-browser-realisation-33500.js::pre_golden_mirai_expression_shim",
+        "runtime/alpha-early-story-modernization-33600.js::pre_golden_mirai_expression_shim",
+        "runtime/alpha-origin-screen-first-33700.js::pre_golden_mirai_expression_shim"
+      ],
+      "saveSchemaRefs": [
+        "activeStorySceneRuntime.localContext Mirai GOLDEN route/knowledge choices",
+        "playerData.activityHistory occ_origin_mirai_*"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_105_origin_presentation_repair.js",
+        "tools/qa_issue_105_origin_presentation_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "origin.academy_menma.final_story_state",
+      "canonicalOwner": "runtime/alpha-origin-writing-golden-105.js",
+      "ownerType": "origin_semantic_owner",
+      "directCallers": [
+        "index.html",
+        "runtime/alpha-menma-evolved-pl-battle-36900.js"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime.localContext",
+        "existing origin_academy_menma_prologue tutorial_battle seam",
+        "playerData.activityHistory Academy Menma source occurrences",
+        "playerData acquisition / Origin completion state"
+      ],
+      "stateWrites": [
+        "activeStorySceneRuntime.localContext Menma GOLDEN future-choice state",
+        "playerData.activityHistory Academy Menma internal-exchange/future facts"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-origin-writing-golden-105.js"
+      ],
+      "extensionHooks": [
+        "SC_ALPHA_ORIGIN_32900.register",
+        "completeChronicleOriginPrologue"
+      ],
+      "permittedAdapters": [
+        "academy_origin_scene_board_bindings_105"
+      ],
+      "retiredOwners": [
+        "runtime/alpha-origin-screen-first-33700.js::pre_golden_menma_expression_shim"
+      ],
+      "saveSchemaRefs": [
+        "activeStorySceneRuntime.localContext Menma GOLDEN Story choices",
+        "playerData.activityHistory occ_origin_menma_*"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_105_origin_presentation_repair.js",
+        "tools/qa_issue_105_origin_presentation_browser.js",
+        "tools/qa_issue_369_menma_evolved_pl_battle.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
     }
   ],
   "adapters": [
@@ -1465,6 +1551,16 @@
       "semanticId": "origin.starting_purse.commit",
       "owner": "runtime/alpha-origin-starting-purse-409.js",
       "responsibilityId": "origin.completion.shared"
+    },
+    {
+      "semanticId": "academy_mirai.final.story",
+      "owner": "runtime/alpha-origin-writing-golden-105.js",
+      "responsibilityId": "origin.academy_mirai.final_story_state"
+    },
+    {
+      "semanticId": "academy_menma.final.story",
+      "owner": "runtime/alpha-origin-writing-golden-105.js",
+      "responsibilityId": "origin.academy_menma.final_story_state"
     }
   ],
   "globalWrapperChains": [
@@ -1729,6 +1825,16 @@
       "stateRef": "playerData.ryo / activityHistory origin_completion_starting_purse_ryo_01",
       "owner": "runtime/alpha-origin-starting-purse-409.js",
       "responsibilityId": "origin.completion.shared"
+    },
+    {
+      "stateRef": "activeStorySceneRuntime.localContext Academy Mirai GOLDEN Story choices",
+      "owner": "runtime/alpha-origin-writing-golden-105.js",
+      "responsibilityId": "origin.academy_mirai.final_story_state"
+    },
+    {
+      "stateRef": "activeStorySceneRuntime.localContext Academy Menma GOLDEN Story choices",
+      "owner": "runtime/alpha-origin-writing-golden-105.js",
+      "responsibilityId": "origin.academy_menma.final_story_state"
     }
   ]
 }
