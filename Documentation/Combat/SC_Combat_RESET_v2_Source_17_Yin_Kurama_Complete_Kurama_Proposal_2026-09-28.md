@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-28  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons / Tailed Beasts  
-**Status:** **YIN KURAMA COMBAT DESIGN CLOSED BY STEPHEN 2026-09-28 / DUAL-PARTITION COOP + COMPLETE KURAMA REVISED PROPOSAL**  
+**Status:** **COMBAT DESIGN CLOSED BY STEPHEN 2026-09-28 — SOURCE 17 RESET v2 COMPLETE**  
 **Parent:** #235  
 **CE non-collapse authority:** `Documentation/Coordination/Kurama_Persistent_Source_Relationship_Partition_and_Manifestation_Non_Collapse_Contract_2026-09-28.md`  
 **Canon/SC research:** `Documentation/Combat/SC_Combat_Kurama_Family_Canon_and_SC_Representation_Research_2026-09-27.md`
@@ -445,38 +445,39 @@ Activation:
 
 **EXACT COMPLETE / REUNITED WHOLE STATE**
 
-Limit:
+Type:
 
-**once per Battle**
-
-Use:
-
-before Complete Kurama commits one Kurama-family ATTACK.
+**PASSIVE ATTACK ENHANCEMENT**
 
 Player text:
 
-> **Unleash the full Nine-Tails. Empower the attack, then keep enough chakra around Kurama to withstand the counterattack.**
+> **The full Nine-Tails hits harder. Kurama's attacks deal 20% more ATK.**
 
 Effect:
 
-1. the committed Kurama-family ATTACK gains **+20% pre-Stamina Attack PL** on each authored damage packet of that exact action;
-2. the action gains no new targets or extra packets;
-3. after the attack resolves, establish `kurama_complete_full_power_guard`;
-4. the first qualifying direct hostile Attack-PL packet against Complete Kurama before its next legitimate action opportunity is reduced **40% pre-Stamina**;
-5. ordinary Stamina then resolves;
-6. guard is consumed by that packet or expires at Complete Kurama's next action opportunity.
+- every qualifying Complete-Kurama ATTACK gains **+20% Attack PL pre-Stamina**;
+- applies to single-hit attacks;
+- applies to multi-hit / multi-target attacks;
+- for multi-packet actions, apply the +20% increase to **each authored damage packet independently**;
+- ordinary Stamina mitigation still applies independently to every packet after the +20% Attack-PL increase;
+- does not add a new damage packet;
+- does not add targets;
+- does not create a bonus action;
+- does not change Base Stats or Base PL;
+- does not create a second capacity pool;
+- does not expose hidden Yin/Yang sub-packages.
 
-No:
-- Stat rewrite;
-- extra action;
-- second PL pool;
-- internal Yin/Yang mode;
-- self-damage;
-- host PL transfer.
+Examples:
+
+- **Chakra Overrun** ATK58 -> **69.6 pre-Stamina Attack PL** before ordinary rounding/runtime handling;
+- **Nine-Tail Cataclysm** ATK42 each -> **50.4 pre-Stamina Attack PL per target**;
+- **Full-Power Tailed Beast Bomb — DEVASTATION** ATK58 each -> **69.6 pre-Stamina Attack PL per target**.
+
+Exact runtime rounding must follow the existing shared Attack-PL arithmetic rule; this Enhancement does not invent a separate rounding system.
 
 Identity:
 
-> **A half may have to decide where to spend a reserve. Complete Kurama has enough accumulated chakra to hit at full force and still carry protection into the enemy response.**
+> **Complete Kurama is the accumulated full Nine-Tails. The power increase is always present, not a one-turn trick.**
 
 ---
 
@@ -705,13 +706,13 @@ Shared family-common capabilities may still appear where explicitly authored wit
 **Yin manifested Skills — Nine-Tail Convergence / Compressed Chakra Burst:** CLOSED.  
 **Yin Potential Skill direction:** CLOSED as seed architecture only, NOT lifetime ceiling.  
 **Dual Yin+Yang Hosted-Entity coexistence:** owner-approved design fact; CE durable reconciliation requested separately.  
-**Twin Beast Bomb:** cooperative dual-partition technique direction CLOSED; exact ATK38+38 CONVERGE/SPLIT implementation contract PROPOSED pending Stephen numeric/mechanical sign-off.  
-**Complete Kurama identity — one reunited whole Entity / full Nine-Tails power:** CLOSED owner direction.  
-**Complete Enhancement — Nine-Tails: Full Power:** REVISED PROPOSAL.  
-**Complete manifested Skills — Full-Power Tailed Beast Bomb / Nine-Tail Cataclysm / Chakra Overrun / Nine-Tails Roar:** REVISED PROPOSAL.  
+**Twin Beast Bomb:** CLOSED — CONVERGE ATK38 + ATK38 on one hostile, or SPLIT ATK38 / ATK38 across two distinct legal hostiles; one host action; consumes ordinary TBB availability for both halves.  
+**Complete Kurama identity — one reunited whole Entity / full Nine-Tails power:** CLOSED.  
+**Complete Enhancement — Nine-Tails: Full Power:** CLOSED — passive +20% ATK to every qualifying single-hit and multi-packet Complete-Kurama attack, applied per packet before ordinary Stamina.  
+**Complete manifested Skills — Full-Power Tailed Beast Bomb / Nine-Tail Cataclysm / Chakra Overrun / Nine-Tails Roar:** CLOSED.  
 **Generic host-assisted palette:** deliberately NOT authored; dedicated Jinchūriki/host packages own that surface.  
 **Implementation:** NOT STARTED.  
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
 
-**Yin Kurama is DESIGN CLOSED. Complete Kurama and exact Twin Beast Bomb numerics remain awaiting Stephen review.**
+**Stephen final sign-off received 2026-09-28. Yin Kurama, Twin Beast Bomb, and Complete Kurama are COMBAT DESIGN CLOSED. Implementation/runtime/Golden remain unclaimed.**
