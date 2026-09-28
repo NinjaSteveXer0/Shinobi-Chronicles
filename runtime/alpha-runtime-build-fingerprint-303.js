@@ -16,10 +16,10 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-28-AT",
-    sourceBaselineCommit:"da811fbda363dc85fff848e2377f8c2fa38be73d",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-28-AU",
+    sourceBaselineCommit:"deb510ec970ca66a8770a65a70b1d624046908a7",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
-    runtimeGeneration:"origin-presentation-repair-105-wasabi-343",
+    runtimeGeneration:"origin-writing-golden-105-mirai-menma",
     majorRuntimeFeatures:Object.freeze([
       "academy-kakashi-v2",
       "runtime-ownership-safety-300",
@@ -63,6 +63,7 @@
       "academy-wasabi-machine-resolver-adapter-343",
       "academy-origin-starting-purse-409",
       "shared-origin-story-presentation-parity-105",
+      "academy-mirai-menma-writing-golden-runtime-105",
       "shared-radial-battle-pl-containment-105"
     ]),
     productionLoader:"index.html",
@@ -96,10 +97,10 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-28-AT",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-28-AU",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
-      generationPresent:first.runtimeGeneration==="origin-presentation-repair-105-wasabi-343",
+      generationPresent:first.runtimeGeneration==="origin-writing-golden-105-mirai-menma",
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)
