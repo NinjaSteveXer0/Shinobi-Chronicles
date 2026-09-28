@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "buildId": "SC-ALPHA-RUNTIME-R303-2026-09-29-AW",
+  "buildId": "SC-ALPHA-RUNTIME-R303-2026-09-29-AX",
   "sourceBaselineCommit": "604daa50b3bc274fd6533fdeb8075806e614d30b",
   "sourceRef": "issue-303-runtime-build-fingerprint-v1",
   "runtimeGeneration": "origin-golden-repair-105-mirai-menma-global-ui",

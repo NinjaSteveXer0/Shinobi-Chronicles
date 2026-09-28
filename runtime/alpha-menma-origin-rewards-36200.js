@@ -339,10 +339,16 @@ if(PRE_CLAIM){
 }
 
 function appendVictoryDisclosure(container,projection){
-  if(!container)return false;
+  if(!container||!projection||projection.handled!==true||projection.ready!==true)return false;
   const existing=container.querySelector&&container.querySelector(".menma-three-subject-reward-36200");
   if(existing)existing.remove();
-  return false;
+  const reward=document.createElement("div");
+  reward.className="menma-three-subject-reward-36200";
+  reward.setAttribute("aria-label","Battle reward");
+  reward.style.cssText="margin:10px auto 0;max-width:360px;padding:9px 14px;border:1px solid rgba(214,169,58,.52);border-radius:10px;background:rgba(4,12,17,.88);color:#f2d77b;font-size:13px;line-height:1.3;text-align:center;font-weight:900;letter-spacing:.05em;";
+  reward.textContent="+100 RYŌ";
+  container.appendChild(reward);
+  return true;
 }
 
 const PRE_RENDER=typeof renderVictoryOverlay==="function"?renderVictoryOverlay:null;

@@ -383,6 +383,22 @@ async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedB
   const meta=await page.evaluate(()=>{const b=getCurrentStorySceneBeat();return b?{mode:b.mode,encounterId:b.battle&&b.battle.encounterId||null}:null;});
   assert(meta&&meta.mode==="battle_transition",`expected Battle transition at ${battleBeat}: ${JSON.stringify(meta)}`);
   await fastDrain(page);
+  const battleCta=await page.evaluate(()=>{
+    const root=document.getElementById("kakashi-v2-scene-board");
+    const buttons=[...(root?.querySelectorAll(".kv2-actions button")||[])].filter(node=>node.getClientRects().length>0);
+    const button=buttons[0]||null,style=button?getComputedStyle(button):null;
+    return{
+      count:buttons.length,
+      text:button?.textContent?.trim()||"",
+      battleClass:button?.classList.contains("kv2-battle")===true,
+      background:style?.backgroundImage||"",
+      rootBattleOnly:root?.dataset.battleActionOnly||""
+    };
+  });
+  assert.strictEqual(battleCta.count,1,`Kakashi Battle seam must expose one CTA: ${JSON.stringify(battleCta)}`);
+  assert.strictEqual(battleCta.text,"Start PL Battle","Kakashi global Battle CTA text drift");
+  assert.strictEqual(battleCta.battleClass,true,"Kakashi Battle CTA class missing");
+  assert(/rgb\(168, 34, 34\)|rgb\(93, 13, 13\)/.test(battleCta.background),`Kakashi Battle CTA is not the approved red treatment: ${battleCta.background}`);
   const launched=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040());
   assert(launched&&launched.success===true,JSON.stringify(launched));
   await page.waitForFunction(()=>!!(typeof currentBattle!=="undefined"&&currentBattle&&currentBattle.returnContext&&currentBattle.returnContext.type==="story_scene"),null,{timeout:12000});
@@ -543,6 +559,14 @@ async function validateTerminalCadence(page,label,expectedTotalRyo=null){
   const receipt=await waitReceiptProjection(page,label+":receipt");
   assert(receipt.receiptText.includes("FIRST ACTION"),label+" Chronicle Receipt facts missing after projection settled");
   assert(!receipt.receiptText.includes("Origin occurrence sealed"),label+" stale raw Origin close leaked into Receipt");
+  const receiptButton=page.locator("#kakashi-v2-scene-board .kv2-receipt [data-kv2-advance]").first();
+  assert.strictEqual((await receiptButton.textContent()||"").trim(),"CONTINUE",label+" Receipt dedicated continuation button missing");
+  await page.locator("#kakashi-v2-scene-board").click({position:{x:20,y:20}});
+  await page.waitForTimeout(120);
+  assert.strictEqual(await currentBeat(page),"v2_receipt",label+" stage click bypassed Chronicle Receipt");
+  await page.keyboard.press("Space");
+  await page.waitForTimeout(120);
+  assert.strictEqual(await currentBeat(page),"v2_receipt",label+" global keyboard advance bypassed Chronicle Receipt");
 
   const rewardProof=await page.evaluate(()=>{
     const rt=getActiveStorySceneRuntime(),s=getAcademyKakashiV2State36020();

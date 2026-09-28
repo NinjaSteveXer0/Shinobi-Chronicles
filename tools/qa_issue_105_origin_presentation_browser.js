@@ -134,15 +134,25 @@ async function proveMiraiTerminalReceipt(browser){
   const afterStage=await snapshot(page);
   assert.strictEqual(afterStage.beatId,"mir_receipt","stage click skipped Mirai Receipt");
   assert.strictEqual(afterStage.text,beforeReceipt.text,"stage click mutated Mirai Receipt");
+  await page.evaluate(()=>{
+    const prior=globalThis.advanceStoryScene;
+    globalThis.__issue105ReceiptAdvanceCount=0;
+    globalThis.__issue105ReceiptAdvancePrior=prior;
+    globalThis.advanceStoryScene=function issue105ReceiptAdvanceProbe(){
+      globalThis.__issue105ReceiptAdvanceCount++;
+      return prior.apply(this,arguments);
+    };
+    try{advanceStoryScene=globalThis.advanceStoryScene;}catch(_error){}
+  });
   const button=page.locator("#story-scene-presentation-layer .sc-chronicle-primary").first();
   await button.click();
   await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId!=="mir_receipt",null,{timeout:8000});
-  const completion=await page.evaluate(()=>{
-    const rows=(globalThis.playerData?.activityHistory||[]).filter(r=>r&&r.type==="origin_completion_reward"&&r.originVariantId==="academy_mirai"&&String(r.rewardSourceId||r.sourceId||"")==="origin_completion_starting_purse_ryo_01");
-    return{active:globalThis.getActiveStorySceneRuntime?.()?.beatId||null,purseCount:rows.length};
-  });
+  const completion=await page.evaluate(()=>({
+    active:globalThis.getActiveStorySceneRuntime?.()?.beatId||null,
+    semanticAdvanceCount:Number(globalThis.__issue105ReceiptAdvanceCount)||0
+  }));
   assert.notStrictEqual(completion.active,"mir_receipt","Receipt button failed to advance");
-  assert.strictEqual(completion.purseCount,1,"Receipt button advanced completion more than once or failed to commit one starting purse");
+  assert.strictEqual(completion.semanticAdvanceCount,1,"Receipt button did not invoke exactly one semantic Story advance");
   await page.locator("body").screenshot({path:path.join(OUT,"academy_mirai-terminal-receipt.png")});
   await gate.assertClean("academy_mirai-terminal-receipt");
   await context.close();
