@@ -223,6 +223,35 @@ function projectResult(){
   const c=classify(),outcome=currentBattle.outcome&&currentBattle.outcome.type||null;
   return{battleOccurrenceId:currentBattle.metal396.battleOccurrenceId,battleResult:outcome==="victory"?"victory":outcome==="defeat"?"defeat":"unresolved",metalBattlePLDepleted:getBattleRemainingPL("player",METAL)<=0,geninBattlePLDepleted:getBattleRemainingPL("enemy",GENIN)<=0,finalMetalRemainingBattlePL:c.remaining,startingUnderlyingMaximum:c.startingUnderlyingMaximum,finalRemainingRatio:c.ratio,performanceClass:c.performanceClass};
 }
+const PRE_ADVANCE=typeof advanceStoryScene==="function"?advanceStoryScene:null;
+function metalInternalRouteTarget396(active){
+  if(!active||active.sceneId!==SCENE_ID)return null;
+  const lc=active.localContext||{};
+  if(active.beatId==="met_spar_dispatch"){
+    const cls=lc.metalSparPerformanceClass;
+    return ["strong","mixed","rough"].includes(cls)?"met_spar_"+cls+"_01":null;
+  }
+  const responsePrefix={
+    met_resolve_redirect:"met_redirect",
+    met_resolve_impact:"met_impact",
+    met_resolve_destroy:"met_destroy",
+    met_redirect_dispatch:"met_redirect",
+    met_impact_dispatch:"met_impact",
+    met_destroy_dispatch:"met_destroy"
+  }[active.beatId]||null;
+  const outcome=lc.metalProtectiveOutcome;
+  return responsePrefix&&["success","partial","failure"].includes(outcome)?responsePrefix+"_"+outcome+"_01":null;
+}
+if(PRE_ADVANCE){
+  globalThis.advanceStoryScene=function advanceMetal396Story(choiceId=null){
+    const active=typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;
+    const target=metalInternalRouteTarget396(active);
+    if(target&&typeof setStorySceneBeat==="function")return setStorySceneBeat(target);
+    return PRE_ADVANCE.apply(this,arguments);
+  };
+  try{advanceStoryScene=globalThis.advanceStoryScene;}catch(_){}
+}
+
 const PRE_RESUME=typeof resumeBattleCallerAfterCompletion==="function"?resumeBattleCallerAfterCompletion:null;
 if(PRE_RESUME){
   globalThis.resumeBattleCallerAfterCompletion=function resumeMetal396Caller(outcomeType=null){
@@ -275,6 +304,8 @@ function diagnostics(){
     noReward:enemy.rewards.ryo.min===0&&enemy.rewards.ryo.max===0&&enemy.rewards.exp.min===0&&enemy.rewards.exp.max===0,
     met03ExactResolver:resolveProtectiveResponse("redirect_dummy").resolverId==="academy_metal_lee_origin_protective_response_v1"&&resolveProtectiveResponse("take_impact").hazardId==="academy_metal_origin_training_dummy_hazard_v1",
     met03NoRandomness:!String(resolveProtectiveResponse).includes("Math.random"),
+    met03ClosedVocabulary:!String(resolveProtectiveResponse).includes("attempt_committed")&&!String(resolveProtectiveResponse).includes('protectiveResponseKind:"intercept"')&&!String(resolveProtectiveResponse).includes('protectiveResponseOutcome:"protected"'),
+    internalDispatchAutoRouted:!!PRE_ADVANCE&&String(globalThis.advanceStoryScene).includes("metalInternalRouteTarget396"),
     saveReload:!!PRE_SAVE&&!!PRE_RESTORE&&String(globalThis.saveTestState).includes("metal396BattleLaunches")&&String(globalThis.restoreTestState).includes("metal396BattleActive"),
     noStoryOccurrenceCommit:String(launch).includes("sourceOccurrenceId")&&!String(launch).includes("consumeStaticOriginSourceOccurrence")
   };
