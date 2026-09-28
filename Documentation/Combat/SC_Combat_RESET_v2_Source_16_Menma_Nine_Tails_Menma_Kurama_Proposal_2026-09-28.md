@@ -353,7 +353,7 @@ This rewards alternating **Menma -> Kurama**, instead of spamming Kurama Skills 
 
 ---
 
-## 2. `menma_kurama_two_mind_read` — **Two-Mind Read**
+## 2. `menma_kurama_one_look_is_enough` — **One Look Is Enough**
 
 Class:
 
@@ -376,11 +376,11 @@ If the same hostile later uses that same exact direct Skill against Menma again 
 
 - reduce that repeated direct Attack-PL packet **50% pre-Stamina**;
 - ordinary Stamina then resolves;
-- consume Two-Mind Read.
+- consume One Look Is Enough.
 
 Player text:
 
-> **Menma and Kurama remember the attack. If that enemy uses the same move on Menma again, cut its ATK in half.**
+> **Menma and Kurama only need to see a move once. If that enemy uses the same move on Menma again, cut its ATK in half.**
 
 Rules:
 - the first use is only the read;
@@ -447,7 +447,7 @@ Future Skills should explore:
 
 Future Skills should explore:
 - alternating Menma/Kurama combo chains;
-- two-mind reads;
+- learning an enemy's repeated attack pattern;
 - backup-plan follow-throughs;
 - source-aware tactical feints;
 - Menma/Kurama/Echo hybrid techniques only where the Echo is actually present and separately authorised;
@@ -491,7 +491,7 @@ Preserve Menma/Kurama character authority:
 **Menma Nine-Tails Enhancement:** Cloak Bargain — PROPOSED.  
 **Menma Nine-Tails host Skills:** One-Tail Lash / Pressure Rush / Tail Snare — PROPOSED.  
 **Menma Kurama Enhancement:** Two Minds, One Move — PROPOSED.  
-**Menma Kurama host Skills:** Kurama Follow-Through / Two-Mind Read / Plan B — PROPOSED.  
+**Menma Kurama host Skills:** Kurama Follow-Through / One Look Is Enough / Plan B — PROPOSED.  
 **Automatic private communication / contextual sensing:** PROPOSED as inherent relationship capability, not Skill.  
 **Potential Skill direction:** PROPOSED seed architecture only.  
 **Implementation:** NOT STARTED.  
