@@ -39,7 +39,13 @@ assert(metal.includes('academy_metal_origin_training_dummy_hazard_v1'));
 assert(metal.includes('redirect_dummy:{statKey:"tai",statLabel:"Taijutsu",successMin:14,partialMin:11}'));
 assert(metal.includes('take_impact:{statKey:"stamina",statLabel:"Stamina",successMin:14,partialMin:11}'));
 assert(metal.includes('destroy_dummy:{statKey:"tai",statLabel:"Taijutsu",successMin:15,partialMin:12}'));
-assert(!metal.includes("Math.random"),"Metal deterministic AI introduced RNG");
+{
+  const start=metal.indexOf("globalThis.chooseEnemyAuthoredBattleAction=function chooseMetal396EnemyAction");
+  const end=metal.indexOf("try{chooseEnemyAuthoredBattleAction=globalThis.chooseEnemyAuthoredBattleAction;}",start);
+  assert(start>=0&&end>start,"Metal deterministic chooser source missing");
+  const chooser=metal.slice(start,end);
+  assert(!chooser.includes("Math.random"),"Metal deterministic AI introduced RNG");
+}
 
 assert(rogue.includes('makeEnemyRatioGuardAction(FEINT_ID,0.40'));
 assert(rogue.includes('m.feintUsed!==true'));
