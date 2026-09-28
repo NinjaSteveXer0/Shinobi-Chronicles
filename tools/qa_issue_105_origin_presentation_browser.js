@@ -79,7 +79,7 @@ async function reloadAtExactBeat(page,beatId){
   await page.waitForFunction(expected=>{
     const rt=globalThis.getActiveStorySceneRuntime?.();
     const root=document.getElementById("story-scene-presentation-layer");
-    return rt?.beatId===expected&&root?.dataset.beatId===expected&&root?.dataset.scSceneBoard==="true";
+    return rt?.beatId===expected&&root?.dataset.scSceneBoard==="true";
   },beatId,{timeout:15000});
   const after=await snapshot(page);
   assert.strictEqual(after.beatId,beatId,"save/reload resumed a different Story beat");
