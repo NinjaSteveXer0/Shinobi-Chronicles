@@ -19,6 +19,8 @@ const PATH=Object.freeze({
   hinata:"Assets/Academy Student/academy_hinata.png",
   hinataInstructor:"NPC/hyuga_instructor.png",
   hinataPartner:"NPC/hyuga_sparring_partner.png",
+  hinataYoungerStudent:"NPC/younger_student.png",
+  hinataYoungerSparringPartner:"NPC/younger_sparring_partner.png",
   mirai:"Assets/Academy Student/academy_mirai.png",
   miraiInstructor:"NPC/mirai_instructor.png",
   traveller:"NPC/traveller.png",
@@ -92,15 +94,57 @@ function hinataFinal(beatId){
 }
 function hinataActors(beatId,performance,beat){
   const id=String(beatId||""),sp=speaker(performance,beat);
+  if(id==="hin_receipt")return[];
   const rows=[actor("academy_hinata","HINATA",PATH.hinata,sp)];
   if(hinataFinal(id)){
-    rows.push(actor("hinata_younger_student","YOUNGER STUDENT",null,sp,["YOUNG HYŪGA","YOUNGER HYŪGA"]));
+    rows.push(actor("hinata_younger_student","YOUNGER STUDENT",PATH.hinataYoungerStudent,sp,["YOUNG HYŪGA","YOUNGER HYŪGA","YOUNGER GIRL"]));
+    rows.push(actor("hinata_younger_sparring_partner","YOUNGER SPARRING PARTNER",PATH.hinataYoungerSparringPartner,sp,["YOUNGER BOY","YOUNGER HYŪGA BOY","YOUNGER SPARRING STUDENT"]));
   }else{
     rows.push(actor("hinata_academy_instructor","INSTRUCTOR",PATH.hinataInstructor,sp,["HYŪGA INSTRUCTOR","ACADEMY INSTRUCTOR"]));
     rows.push(actor("hinata_sparring_partner","SPARRING PARTNER",PATH.hinataPartner,sp,["PARTNER","HYŪGA STUDENT","SPARRING STUDENT","HYŪGA SPARRING PARTNER"]));
   }
   return rows;
 }
+function hinataReceiptLines105(){
+  const runtime=A&&typeof A.active==="function"?A.active():null;
+  const ctx=runtime&&runtime.localContext&&typeof runtime.localContext==="object"?runtime.localContext:{};
+  const lines=["YOUR ORIGIN","ACADEMY HINATA","","RECORDED IN YOUR CHRONICLE","","YOUR DECISIONS"];
+  const h1={
+    wait_for_opening:"Waited for the opening.",
+    attack_immediately:"Stepped in first.",
+    defensive_stance:"Broke away and reset."
+  };
+  const h2={
+    wait_hold_ground:"Held her ground.",
+    wait_give_opening:"Gave him an opening.",
+    wait_go_first:"Stopped waiting and went first.",
+    press_keep_pressure:"Kept the pressure on.",
+    press_draw_counter:"Drew out his counter.",
+    press_back_off:"Backed off before the trap.",
+    reset_meet_him:"Met him before he closed the space.",
+    reset_circle_out:"Circled out.",
+    reset_corner_bait:"Let him think he had her cornered."
+  };
+  const h3={
+    answer_with_form:"Answered with the form she practised.",
+    trust_spar:"Trusted what she had seen in the spar.",
+    break_rhythm:"Broke the rhythm before he could set it."
+  };
+  const young={
+    show_movement:"Showed the younger student once.",
+    explain_error:"Explained what she saw.",
+    leave_them_to_figure_it_out:"Left the younger students to their practice.",
+    stay_and_watch:"Stayed to watch one more exchange."
+  };
+  for(const row of [h1[ctx.h1],h2[ctx.h2],h3[ctx.h3],young[ctx.young]])if(row)lines.push("• "+row);
+  lines.push("","WHAT HAPPENED","• Completed the controlled Hyūga spar.","• The younger students kept practising.");
+  const history=typeof A.history==="function"?A.history():[];
+  const purse=history.find(row=>row&&String(row.rewardSourceId||row.sourceId||"")==="origin_completion_starting_purse_ryo_01"&&(row.originVariantId==="academy_hinata"||row.actorVariantId==="academy_hinata"));
+  lines.push("","REWARDS");
+  if(purse)lines.push("• Origin Starting Purse: +100 Ryō.");
+  return lines;
+}
+function buildHinataReceipt105(){return hinataReceiptLines105().join("\n");}
 
 function miraiBackdrop(beatId,runtime){
   const id=String(beatId||""),ctx=runtime&&runtime.localContext||{};
@@ -208,8 +252,15 @@ function installDefinitions(){
 
   const results={};
   results.hinata=registerDefinition(scene("academy_hinata"),{
-    resolve:({beatId,performance,beat})=>projection("HYŪGA COMPOUND · TRAINING COURTYARD",hinataActors(beatId,performance,beat)),
-    resolveBackdrop:({beatId})=>({assetPath:hinataFinal(beatId)?BACKDROP.hinataFinal:BACKDROP.hinataMain,assetId:hinataFinal(beatId)?"issue105_hinataFinal":"issue105_hinataMain"})
+    resolve:({beatId,performance,beat})=>String(beatId||"")==="hin_receipt"
+      ?{mode:"record",location:"YOUR ORIGIN",actors:[]}
+      :projection("HYŪGA COMPOUND · TRAINING COURTYARD",hinataActors(beatId,performance,beat)),
+    resolveBackdrop:({beatId})=>String(beatId||"")==="hin_receipt"
+      ?null
+      :{assetPath:hinataFinal(beatId)?BACKDROP.hinataFinal:BACKDROP.hinataMain,assetId:hinataFinal(beatId)?"issue105_hinataFinal":"issue105_hinataMain"},
+    performanceSequences:{
+      hin_receipt:()=>[{kind:"record",text:buildHinataReceipt105()}]
+    }
   });
   results.mirai=registerDefinition(scene("academy_mirai"),{
     resolve:({beatId,performance,beat})=>projection("ACADEMY MIRAI · ESCORT ASSESSMENT",miraiActors(beatId,performance,beat)),
