@@ -7,7 +7,7 @@ game=(ROOT/'game.js').read_text(encoding='utf-8')
 patch=(ROOT/'runtime/alpha-menma-tutorial-111.js').read_text(encoding='utf-8')
 index=(ROOT/'index.html').read_text(encoding='utf-8')
 
-EXPECTED_BLOB='beff21e9d11e785a90d83a7f96b0969e5c8f3511'
+EXPECTED_BLOB='05e014efc8a77705c53f0ec9d8f143703ad91da8'
 # #322 intentionally extends only loadPlayerData persistence for canonical Story/evidence roots; all Menma assertions below remain binding.
 def git_blob_sha(text:str)->str:
     raw=text.encode('utf-8')

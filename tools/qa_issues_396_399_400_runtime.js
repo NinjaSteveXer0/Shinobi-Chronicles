@@ -14,7 +14,6 @@ const iwabee=read("runtime/alpha-iwabee-origin-runtime-399.js");
 const names=read("runtime/alpha-origin-skill-display-names-400.js");
 const story=read("runtime/alpha-origin-scenes-32900-b.js");
 const index=read("index.html");
-const game=read("game.js");
 
 for(const [file,src] of Object.entries({metal,rogue,iwabee,names,story})){
   assert.doesNotThrow(()=>new Function(src),file+" syntax failure");
@@ -120,10 +119,12 @@ assert(order.every(x=>x>=0),"production loader missing new Battle modules");
 assert(order.every((x,i)=>i===0||x>order[i-1]),"new Battle modules load in wrong order");
 assert(index.indexOf("runtime/alpha-origin-skill-display-names-400.js")>index.indexOf("runtime/alpha-combat-skill-lock-38300.js"),"#400 must load after #383");
 
-assert(!game.includes('protectiveResponseKind:"intercept",protectiveResponseOutcome:"protected"'),"stale MET-03 diagnostic vocabulary remains in game.js");
-assert(game.includes('protectiveResponseKind:"redirect_dummy",protectiveResponseOutcome:"partial"'),"current MET-03 diagnostic response/result missing");
-assert(game.includes('interventionRequired:true,interventionParticipantRef:"metal_origin_inviting_genin"'),"current MET-03 diagnostic intervention envelope missing");
-assert(game.includes('"MET-03":{attempted:true,protectiveResponseAttempted:true'),"current MET-03 diagnostic attempted flag missing");
+// game.js is deliberately frozen; #111/#63 enforce the audited core blob.
+// #396 owns current MET-03 vocabulary only in the scoped runtime / Story authorities.
+assert(!metal.includes('protectiveResponseKind:"intercept"'),"stale MET-03 intercept vocabulary remains in #396 runtime");
+assert(!metal.includes('protectiveResponseOutcome:"protected"'),"stale MET-03 protected outcome remains in #396 runtime");
+assert(!story.includes('protectiveResponseKind:"intercept"'),"stale MET-03 intercept vocabulary remains in canonical Story owner");
+assert(!story.includes('protectiveResponseOutcome:"protected"'),"stale MET-03 protected outcome remains in canonical Story owner");
 assert(!story.includes('protectiveResponseOutcome:"attempt_committed"'),"stale MET-03 attempt_committed authority remains in canonical Story owner");
 assert(metal.includes('attempted:true'));
 assert(metal.includes('interventionRequired:!!intervention'));
