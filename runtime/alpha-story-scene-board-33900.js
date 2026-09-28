@@ -346,7 +346,8 @@ function applyBoardBackdrop(stage,runtime=currentRuntime()){
   if(stage.dataset)delete stage.dataset.scSceneBoardBackdrop;stage.style.removeProperty("--sc-scene-board-backdrop");return null;
 }
 
-// Owner lock 2026-09-28: narration/dialogue frame outlines are cyan for every speaker side.\nfunction installStyle(){
+// Owner lock 2026-09-28: narration/dialogue frame outlines are cyan for every speaker side.
+function installStyle(){
   if(typeof document==="undefined"||!document.head||document.getElementById(STYLE_ID))return false;
   const style=document.createElement("style");style.id=STYLE_ID;style.textContent=`
 #story-scene-presentation-layer[data-sc-presentation-hidden="true"]{display:none!important;pointer-events:none!important;}\n#story-scene-presentation-layer[data-sc-scene-board="true"]{background:#030b10!important;}
