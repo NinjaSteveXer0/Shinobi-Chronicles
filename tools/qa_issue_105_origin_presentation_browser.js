@@ -78,7 +78,7 @@ async function snapshot(page){
         },before,{timeout:8000});
       }
       await page.locator("#story-scene-presentation-layer").screenshot({path:path.join(OUT,variant+".png")});
-      await gate.assertNoErrors(variant);
+      await gate.assertClean(variant);
       await context.close();
     }
     console.log(JSON.stringify({pass:true,issue:105,cases:CASES.map(x=>x[0]),legacyFallbackRejected:true,clickAnywhereProven:true,browserGoldenClaimed:false},null,2));
