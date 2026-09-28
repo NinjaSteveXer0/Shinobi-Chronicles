@@ -23,6 +23,7 @@ It supersedes older Mirai player-facing prose / choreography expression, includi
 The older authorities remain useful only for semantic/source history not contradicted by this file.
 
 This Writing GOLDEN consumes:
+- `Documentation/Story/Academy_Mirai_Instructor_Female_Identity_Correction_2026-09-29.md` — Mirai's Academy instructor is female; the temporary male Traveller disguise changes presentation only;
 
 - `Documentation/Story/Universal_Player_Facing_Story_Narration_Dialogue_and_Conversation_Quality_Gate_2026-09-23.md`;
 - `Documentation/Story/Academy_Mirai_Character_Voice_and_Personality_Anchor_2026-09-23.md`;
@@ -44,7 +45,7 @@ Core protected distinctions:
 
 The optional Mirai PL Battle opponent is now Story-closed:
 
-> **The apparent Escort himself is the Battle opponent — because the person currently presenting as the Escort is actually the Academy instructor in disguise after switching places with the real Escort during the covered-market separation.**
+> **The apparent Escort is the Battle opponent — because the person currently presenting as the male Escort is actually the female Academy instructor in disguise after switching places with the real Escort during the covered-market separation.**
 
 Preserve:
 
@@ -74,7 +75,7 @@ Not a little early.
 
 Early enough that the checkpoint map is still rolled up on the instructor's desk.
 
-He looks at her.
+She looks at her.
 
 Then at the empty yard behind her.
 
@@ -968,11 +969,11 @@ Not *I knew it.*
 
 Not *Did I pass?*
 
-The instructor jerks his head toward the checkpoint.
+The instructor jerks her head toward the checkpoint.
 
 **ACADEMY INSTRUCTOR:** “Safe.”
 
-Mirai looks past him.
+Mirai looks past her.
 
 Only when she sees the checkpoint building does she breathe again.
 
@@ -1088,7 +1089,7 @@ He lowers the cup.
 
 Mirai turns slowly toward the instructor.
 
-He has the decency not to look amused.
+She has the decency not to look amused.
 
 ---
 
@@ -1130,9 +1131,9 @@ A beat.
 
 **MIRAI:** “No.”
 
-The instructor folds his arms.
+The instructor folds her arms.
 
-Mirai points at him.
+Mirai points at her.
 
 **MIRAI:** “No.”
 
@@ -1178,13 +1179,13 @@ Looks back toward the road.
 
 All the way to the covered market.
 
-Then back to him.
+Then back to her.
 
 **MIRAI:** “You walked beside me for half the village.”
 
 **ACADEMY INSTRUCTOR:** “Yes.”
 
-Mirai stares at him.
+Mirai stares at her.
 
 **MIRAI:** “I don't like you very much right now.”
 
@@ -1214,7 +1215,7 @@ The instructor taps the covered market.
 
 **ACADEMY INSTRUCTOR:** “When?”
 
-Mirai knows what he means.
+Mirai knows what she means.
 
 She looks at the mark.
 
@@ -1252,7 +1253,7 @@ That's enough.
 
 **ACADEMY INSTRUCTOR:** “What after it?”
 
-Mirai looks at him.
+Mirai looks at her.
 
 **MIRAI:** “You felt different.”
 
@@ -1308,13 +1309,13 @@ The instructor looks down at the map.
 
 **ACADEMY INSTRUCTOR:** “You got the person beside you here without letting anything happen to them.”
 
-Mirai looks at him.
+Mirai looks at her.
 
 **ACADEMY INSTRUCTOR:** “That's true.”
 
 She waits.
 
-He leaves it there.
+The instructor leaves it there.
 
 No lecture.
 
@@ -1344,7 +1345,7 @@ He points at her.
 
 Mirai looks toward the instructor.
 
-He looks away.
+She looks away.
 
 The traveller laughs and disappears into the crowd.
 
@@ -1424,7 +1425,7 @@ Changes it.
 
 The instructor says nothing.
 
-Mirai doesn't need him to.
+Mirai doesn't need her to.
 
 ---
 
@@ -1532,6 +1533,7 @@ World Truth:
 5. Any PL Battle against the apparent Escort after the switch is therefore against the disguised instructor.
 6. Mirai does not receive this hidden truth automatically.
 7. The reveal occurs only through the authored route/resolver.
+8. The Academy instructor's underlying identity is female; during the disguise she may still be perceived and described as the male Traveller until reveal.
 
 Preserve:
 
@@ -1581,6 +1583,7 @@ Locked by Stephen:
 - no CE explanation leaking into player-facing prose;
 - no unrelated Battle enemy;
 - PL Battle opponent = apparent Escort = disguised Academy instructor;
+- Academy instructor underlying identity = female; male Traveller presentation exists only while the disguise is active;
 - real Escort remains separate and safe;
 - World Truth / Knowledge / inference remain separate.
 
