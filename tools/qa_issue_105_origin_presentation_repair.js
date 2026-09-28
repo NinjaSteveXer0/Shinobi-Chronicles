@@ -3,6 +3,10 @@
 const fs=require("fs"),assert=require("assert");
 const read=p=>fs.readFileSync(p,"utf8");
 const binder=read("runtime/alpha-origin-scene-board-bindings-105.js");
+const golden=read("runtime/alpha-origin-writing-golden-105.js");
+const shim335=read("runtime/alpha-origin-browser-realisation-33500.js");
+const shim336=read("runtime/alpha-early-story-modernization-33600.js");
+const shim337=read("runtime/alpha-origin-screen-first-33700.js");
 const board=read("runtime/alpha-story-scene-board-33900.js");
 const kakashiRenderer=read("runtime/alpha-kakashi-v2-renderer-36030.js");
 const sceneBoardDoc=read("Documentation/UI/Chronicle Interaction Interactive Scene Board Addendum 2026-09-13.md");
@@ -10,7 +14,7 @@ const battle=read("runtime/alpha-battle-modern-33000.js");
 const index=read("index.html");
 const game=read("game.js");
 
-for(const [name,src] of Object.entries({binder,board,battle,kakashiRenderer})){
+for(const [name,src] of Object.entries({binder,golden,shim335,shim336,shim337,board,battle,kakashiRenderer})){
   assert.doesNotThrow(()=>new Function(src),name+" syntax failure");
 }
 for(const token of [
@@ -23,6 +27,14 @@ assert(binder.includes('hinataYoungerStudent:"NPC/younger_student.png"'),"Hinata
 assert(binder.includes('hinataYoungerSparringPartner:"NPC/younger_sparring_partner.png"'),"Hinata younger sparring-partner exact path missing");
 assert(binder.includes('actor("hinata_younger_student","YOUNGER STUDENT",PATH.hinataYoungerStudent')&&binder.includes('actor("hinata_younger_sparring_partner","YOUNGER SPARRING PARTNER",PATH.hinataYoungerSparringPartner'),"Hinata final three-actor projection missing");
 assert(binder.includes('hin_receipt:()=>[{kind:"record",text:buildHinataReceipt105()}]'),"Hinata Chronicle Receipt projection missing");
+assert(golden.includes('const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A);'),"GOLDEN consumer methods are not bound to Origin runtime");
+assert(golden.includes('entryBeatId:"menma_open_01"')&&golden.includes('D("menma_open_15","MENMA","I know."'),"Menma full GOLDEN Academy opening missing");
+assert(golden.includes('entryBeatId:"mir_assignment_01"')&&golden.includes('Q("mir_walk_choice"')&&golden.includes('Q("mir_reflection_choice"'),"Mirai GOLDEN conversation graph missing");
+assert(golden.includes('const oldTutorial=cloneBeat(oldMenmaBeat("tutorial_battle"))')&&golden.includes('victoryBeatId:"menma_after_01"'),"Menma evolved Battle seam was not preserved into GOLDEN Story");
+assert(shim335.includes('beat33500(def,"mir_assignment_01")')&&shim336.includes('beat(def,"mir_assignment_01")'),"legacy Mirai expression shims do not stand down for GOLDEN graph");
+assert(shim337.includes('beat(d,"mir_assignment_01")')&&shim337.includes('d.entryBeatId==="menma_open_01"'),"33700 stale Mirai/Menma shims do not stand down for GOLDEN graph");
+assert(binder.includes('id.startsWith("mir_assignment_")')&&binder.includes('id.startsWith("mir_market_")')&&binder.includes('id.startsWith("mir_checkpoint_")'),"Mirai GOLDEN backdrop families are not bound");
+assert(binder.includes('rows.push(instructor(),traveller())')&&binder.includes('id.startsWith("mir_confront_")'),"Mirai GOLDEN actor/disguise projection missing");
 for(const asset of [
   "Assets/Academy Student/academy_hinata.png","NPC/hyuga_instructor.png","NPC/hyuga_sparring_partner.png",
   "Assets/Academy Student/academy_mirai.png","NPC/mirai_instructor.png","NPC/traveller.png",
@@ -39,7 +51,8 @@ const order=[
  "game.js","runtime/alpha-origin-starting-purse-409.js","runtime/alpha-story-machine-resolver-343.js",
  "runtime/academy-wasabi-writing-golden-343.js","runtime/alpha-origin-scenes-32900-a.js",
  "runtime/alpha-battle-modern-33000.js","runtime/alpha-wasabi-rogue-battle-343.js",
- "runtime/alpha-menma-evolved-pl-battle-36900.js","runtime/alpha-origin-scene-board-bindings-105.js"
+ "runtime/alpha-menma-evolved-pl-battle-36900.js","runtime/alpha-origin-writing-golden-105.js",
+ "runtime/alpha-origin-scene-board-bindings-105.js"
 ].map(x=>index.indexOf(x));
 assert(order.every(x=>x>=0),"#105 production loader missing module");
 assert(order.every((x,i)=>i===0||x>order[i-1]),"#105 production load order drift");
@@ -65,7 +78,7 @@ assert(battle.includes('querySelector(".alpha-battle-pl-core")'),"radial PL refr
 assert(battle.includes('core.querySelector("strong")')||battle.includes('core?.querySelector("strong")'),"radial PL current value not refreshed inside core");
 assert(!game.includes("ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID"),"frozen game.js contains successor purse mutation");
 console.log(JSON.stringify({pass:true,issue:105,checks:{
-  sevenNonKakashiBindings:true,kakashiExcluded:true,hinataSparringSpeakerAlias:true,hinataFinalPairBound:true,hinataChronicleReceipt:true,knownAssetsExact:true,missingAssetsNotGuessed:true,
+  sevenNonKakashiBindings:true,kakashiExcluded:true,hinataSparringSpeakerAlias:true,hinataFinalPairBound:true,hinataChronicleReceipt:true,miraiMenmaWritingGolden:true,legacyGoldenShimsRetired:true,knownAssetsExact:true,missingAssetsNotGuessed:true,
   internalVoiceNotPhysical:true,loadOrder:true,sharedSceneBoard:true,clickAnywhere:true,
   speakerLinkedDialogue:true,globalCyanStoryFrames:true,kakashiFrameParity:true,kakashiTextAndAdvanceParity:true,radialPLContainmentRefresh:true,frozenCorePreserved:true,browserGoldenClaimed:false
 }},null,2));
