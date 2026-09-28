@@ -174,12 +174,11 @@ async function rewardState(page){
     await page.waitForSelector(".alpha-victory-code-screen",{state:"visible",timeout:8000});
     await page.waitForSelector(".menma-three-subject-reward-36200",{state:"visible",timeout:8000});
     const rewardLine=(await page.locator(".menma-three-subject-reward-36200").textContent()||"").trim();
-    const victoryText=await page.locator(".alpha-victory-code-screen").innerText();
+    const visiblePageText=await page.locator("body").innerText();
     assert.strictEqual(rewardLine,"+100 RYŌ","Victory reward line drifted from the actual committed reward");
-    assert(/\+100\s*RYŌ/i.test(victoryText),"Victory did not present the exact 100 Ryō reward");
-    assert(!/FIXED ENCOUNTER REWARD/i.test(victoryText),"Victory leaked internal fixed-reward diagnostic");
-    assert(!/No generic Character EXP/i.test(victoryText),"Victory leaked internal EXP contract prose");
-    assert(!/No items\/materials/i.test(victoryText),"Victory leaked internal loot contract prose");
+    assert(!/FIXED ENCOUNTER REWARD/i.test(visiblePageText),"Victory leaked internal fixed-reward diagnostic");
+    assert(!/No generic Character EXP/i.test(visiblePageText),"Victory leaked internal EXP contract prose");
+    assert(!/No items\/materials/i.test(visiblePageText),"Victory leaked internal loot contract prose");
     await page.screenshot({path:path.join(OUT,"menma-three-subject-victory-before-claim.png"),fullPage:false,timeout:12000});
 
     const claim=page.getByRole("button",{name:"CLAIM REWARDS",exact:true});
