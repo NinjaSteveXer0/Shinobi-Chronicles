@@ -1,0 +1,271 @@
+// ============================================================================
+// ISSUE #105 — ACADEMY ORIGIN SHARED SCENE-BOARD BINDINGS
+//
+// Presentation adapter only. Reuses alpha-story-scene-board-33900.js.
+// Does not own Story truth, choices, consequences, Battle semantics or rewards.
+// Missing exact asset paths remain silhouettes; filenames are never guessed.
+// Academy Kakashi is intentionally excluded: its owner-confirmed Golden Story
+// presentation remains frozen. Reusable Battle presentation may still apply.
+// ============================================================================
+(function installOriginSceneBoardBindings105(){
+"use strict";
+if(globalThis.SC_ALPHA_ORIGIN_SCENE_BOARD_BINDINGS_105)return;
+
+const PATCH_ID="alpha_origin_scene_board_bindings_105_2026_09_28";
+const GENERIC_COURTYARD="Scene backdrops/academy_training_ground_courtyard.png";
+const A=globalThis.SC_ALPHA_ORIGIN_32900||null;
+
+const PATH=Object.freeze({
+  hinata:"Assets/Academy Student/academy_hinata.png",
+  hinataInstructor:"NPC/hyuga_instructor.png",
+  hinataPartner:"NPC/hyuga_sparring_partner.png",
+  mirai:"Assets/Academy Student/academy_mirai.png",
+  miraiInstructor:"NPC/mirai_instructor.png",
+  traveller:"NPC/traveller.png",
+  menma:"Assets/Academy Student/academy_menma.png",
+  menmaInstructor:"NPC/menma_instructor.png",
+  anko:"Assets/Special Jonin/sj_anko.png",
+  altered:"Enemies/test_subject_altered_shinobi.png",
+  brute:"Enemies/test_subject_brute.png",
+  unstable:"Enemies/test_subject_unstable.png",
+  kushina:"Assets/Academy Student/academy_kushina.png",
+  gerotora:"Assets/Summons/key_gero.png",
+  kurenai:"Assets/Academy Student/academy_kurenai.png",
+  kurenaiInstructor:"NPC/kurenai_instructor.png",
+  iwabee:"Assets/Academy Student/academy_iwabe.png",
+  rogue:"Enemies/rogue_genin.png",
+  metal:"Assets/Academy Student/academy_metal.png"
+});
+
+const BACKDROP=Object.freeze({
+  hinataMain:"Hinata Origin Backdrop/hyuga_compound.png",
+  hinataFinal:"Hinata Origin Backdrop/hyuga_compound_alt_angle.png",
+  miraiCourtyard:"Mirai Origin Backdrop/academy_training_ground_courtyard.png",
+  miraiStreet:"Mirai Origin Backdrop/konoha_main_street.png",
+  miraiMarket:"Mirai Origin Backdrop/konoha_covered_market.png",
+  miraiLane:"Mirai Origin Backdrop/konoha_storehouse_side_lane.png",
+  miraiCheckpoint:"Mirai Origin Backdrop/checkpoint_three_day.png",
+  menmaClassroom:"Menma Origin Backdrop/academy_classroom.png",
+  menmaForest:"Menma Origin Backdrop/whisper_woods_forest_route.png",
+  menmaClearing:"Menma Origin Backdrop/forest_clearing_day.png",
+  menmaAfter:"Menma Origin Backdrop/forest_clearing_alt_angle.png",
+  menmaFuture:"Menma Origin Backdrop/whisper_woods_rise.png"
+});
+
+function scene(variant){
+  return A&&A.sceneByVariant?A.sceneByVariant[variant]||null:null;
+}
+function speaker(performance,beat){
+  return String(
+    performance&&performance.cue&&(performance.cue.speakerName||performance.cue.speaker)||
+    beat&&beat.speakerName||""
+  ).trim().toUpperCase();
+}
+function actor(id,label,image,speakerName="",aliases=[]){
+  const names=[label,...aliases].map(v=>String(v||"").toUpperCase());
+  const useSpeaker=speakerName&&names.includes(String(speakerName).toUpperCase());
+  return{id,label:useSpeaker?speakerName:label,image:image||null,focus:useSpeaker};
+}
+function ensureFocus(rows){
+  if(!rows.length)return rows;
+  if(!rows.some(row=>row&&row.focus))rows[0].focus=true;
+  return rows;
+}
+function projection(location,actors,mode="conversation"){
+  return{mode,location,actors:ensureFocus(actors.filter(Boolean))};
+}
+function registerPath(id,path){
+  try{
+    const fn=typeof registerSceneBackdropAssetPath==="function"
+      ?registerSceneBackdropAssetPath
+      :globalThis.registerSceneBackdropAssetPath;
+    if(typeof fn==="function")fn(id,path);
+  }catch(_error){}
+}
+Object.entries(BACKDROP).forEach(([id,path])=>registerPath("issue105_"+id,path));
+registerPath("issue105_generic_courtyard",GENERIC_COURTYARD);
+
+function hinataFinal(beatId){
+  const id=String(beatId||"");
+  return id.startsWith("hin_children_intro_")||id==="hin_young_choice"||
+    id.startsWith("hin_young_")||id.startsWith("hin_close_");
+}
+function hinataActors(beatId,performance,beat){
+  const id=String(beatId||""),sp=speaker(performance,beat);
+  const rows=[actor("academy_hinata","HINATA",PATH.hinata,sp)];
+  if(hinataFinal(id)){
+    rows.push(actor("hinata_younger_student","YOUNGER STUDENT",null,sp,["YOUNG HYŪGA","YOUNGER HYŪGA"]));
+  }else{
+    rows.push(actor("hinata_academy_instructor","INSTRUCTOR",PATH.hinataInstructor,sp,["HYŪGA INSTRUCTOR","ACADEMY INSTRUCTOR"]));
+    rows.push(actor("hinata_sparring_partner","SPARRING PARTNER",PATH.hinataPartner,sp,["PARTNER","HYŪGA STUDENT"]));
+  }
+  return rows;
+}
+
+function miraiBackdrop(beatId,runtime){
+  const id=String(beatId||""),ctx=runtime&&runtime.localContext||{};
+  if(id==="mir_start")return BACKDROP.miraiCourtyard;
+  if(id==="mir_talk")return BACKDROP.miraiStreet;
+  if(id==="mir_inconsistent")return BACKDROP.miraiMarket;
+  if(id==="mir_deeper"){
+    return ctx.miraiSuspicionResponse==="change_route"?BACKDROP.miraiLane:BACKDROP.miraiMarket;
+  }
+  if(id==="mir_checkpoint"||id==="mir_verified"||id==="mir_eval"||id==="mir_end")return BACKDROP.miraiCheckpoint;
+  return BACKDROP.miraiStreet;
+}
+function miraiActors(beatId,performance,beat){
+  const id=String(beatId||""),sp=speaker(performance,beat);
+  const rows=[actor("academy_mirai","MIRAI",PATH.mirai,sp)];
+  if(["mir_eval","mir_end"].includes(id)){
+    rows.push(actor("mirai_academy_instructor","INSTRUCTOR",PATH.miraiInstructor,sp,["ACADEMY INSTRUCTOR"]));
+  }else{
+    rows.push(actor("mirai_traveller","TRAVELLER",PATH.traveller,sp,["TRAVELER","CIVILIAN","ESCORT"]));
+  }
+  return rows;
+}
+
+function menmaBackdrop(beatId,beat){
+  const id=String(beatId||"");
+  if(id.startsWith("menma_future_"))return BACKDROP.menmaFuture;
+  if(id.startsWith("menma_after_")||id.startsWith("menma_part_")||id.startsWith("menma_party_defeat_return_"))return BACKDROP.menmaAfter;
+  if(id.startsWith("menma_discovery_")||id.startsWith("menma_enter_")||id.startsWith("menma_anko_")||id.includes("battle"))return BACKDROP.menmaClearing;
+  if(id.startsWith("menma_forest_")||id.startsWith("menma_fox_"))return BACKDROP.menmaForest;
+  const ref=beat&&beat.environmentRef;
+  const env=typeof ref==="string"?ref:ref&&typeof ref==="object"?(ref.environmentId||ref.assetId||""):"";
+  if(String(env).includes("classroom"))return BACKDROP.menmaClassroom;
+  if(String(env).includes("forest_clearing"))return BACKDROP.menmaClearing;
+  if(String(env).includes("forest")||String(env).includes("whisper"))return BACKDROP.menmaForest;
+  return BACKDROP.menmaClassroom;
+}
+function menmaActors(beatId,performance,beat){
+  const id=String(beatId||""),sp=speaker(performance,beat);
+  if(id.startsWith("menma_discovery_")){
+    return[
+      actor("sj_anko","ANKO",PATH.anko,sp),
+      actor("test_subject_altered_shinobi","ALTERED SHINOBI",PATH.altered,sp)
+    ];
+  }
+  const rows=[actor("academy_menma","MENMA",PATH.menma,sp)];
+  if(id.startsWith("menma_open_")||id.includes("academy")){
+    rows.push(actor("menma_academy_instructor","IRUKA",PATH.menmaInstructor,sp,["INSTRUCTOR","ACADEMY INSTRUCTOR"]));
+  }else if(id.startsWith("menma_enter_")||id.startsWith("menma_anko_")){
+    rows.push(actor("sj_anko","ANKO",PATH.anko,sp));
+    rows.push(actor("test_subject_altered_shinobi","ALTERED SHINOBI",PATH.altered,sp));
+  }else if(id.startsWith("menma_after_")||id.startsWith("menma_part_")||id.startsWith("menma_party_defeat_return_")){
+    rows.push(actor("sj_anko","ANKO",PATH.anko,sp));
+  }
+  // Nine-Tails is an internal speaker in this Origin. Never project it as a
+  // physical forest actor card.
+  return rows;
+}
+
+function kushinaActors(beatId,performance,beat){
+  const id=String(beatId||""),sp=speaker(performance,beat);
+  const rows=[actor("academy_kushina","KUSHINA",PATH.kushina,sp)];
+  if(id.startsWith("kus_gero_")||id==="kus_contact_choice"||id.startsWith("kus_close")||id.startsWith("kus_answer")||id.startsWith("kus_last")){
+    rows.push(actor("key_gero","GEROTORA",PATH.gerotora,sp));
+  }else if(id.startsWith("kus_protect_student_")){
+    rows.push(actor("kushina_classmate","CLASSMATE",null,sp,["STUDENT"]));
+    rows.push(actor("kushina_academy_instructor","INSTRUCTOR",null,sp,["ACADEMY INSTRUCTOR"]));
+  }else{
+    rows.push(actor("kushina_academy_instructor","INSTRUCTOR",null,sp,["ACADEMY INSTRUCTOR"]));
+  }
+  return rows;
+}
+function kurenaiActors(beatId,performance,beat){
+  const sp=speaker(performance,beat);
+  return[
+    actor("academy_kurenai","KURENAI",PATH.kurenai,sp),
+    actor("kurenai_academy_instructor","INSTRUCTOR",PATH.kurenaiInstructor,sp,["ACADEMY INSTRUCTOR"])
+  ];
+}
+function iwabeeActors(beatId,performance,beat){
+  const id=String(beatId||""),sp=speaker(performance,beat);
+  const rows=[actor("academy_iwabee","IWABEE",PATH.iwabee,sp)];
+  const roguePresent=id.includes("rogue")||id.includes("confront")||id.includes("earth")||id.includes("call_instructor")||id.includes("finish_practical");
+  if(roguePresent)rows.push(actor("iwabee_origin_rogue_genin_01","ROGUE GENIN",PATH.rogue,sp));
+  else rows.push(actor("iwabee_academy_instructor","INSTRUCTOR",null,sp,["ACADEMY INSTRUCTOR"]));
+  return rows;
+}
+function metalActors(beatId,performance,beat){
+  const id=String(beatId||""),sp=speaker(performance,beat);
+  const rows=[actor("academy_metal_lee","METAL",PATH.metal,sp,["METAL LEE"])];
+  if(!id.startsWith("met_open_")&&!id.startsWith("met_private_")){
+    rows.push(actor("metal_origin_inviting_genin","GENIN",null,sp,["INVITING GENIN"]));
+  }
+  if(id.includes("protect")||id.includes("redirect")||id.includes("impact")||id.includes("destroy")){
+    rows.push(actor("metal_origin_threatened_student","STUDENT",null,sp,["ACADEMY STUDENT"]));
+  }
+  return rows;
+}
+
+function registerDefinition(sceneId,definition){
+  if(!sceneId||typeof globalThis.registerStorySceneBoardDefinition!=="function")return{success:false,reason:"story_scene_board_not_loaded"};
+  return globalThis.registerStorySceneBoardDefinition(sceneId,definition);
+}
+function installDefinitions(){
+  if(!A)return{success:false,reason:"origin_runtime_missing"};
+
+  const results={};
+  results.hinata=registerDefinition(scene("academy_hinata"),{
+    resolve:({beatId,performance,beat})=>projection("HYŪGA COMPOUND · TRAINING COURTYARD",hinataActors(beatId,performance,beat)),
+    resolveBackdrop:({beatId})=>({assetPath:hinataFinal(beatId)?BACKDROP.hinataFinal:BACKDROP.hinataMain,assetId:hinataFinal(beatId)?"issue105_hinataFinal":"issue105_hinataMain"})
+  });
+  results.mirai=registerDefinition(scene("academy_mirai"),{
+    resolve:({beatId,performance,beat})=>projection("ACADEMY MIRAI · ESCORT ASSESSMENT",miraiActors(beatId,performance,beat)),
+    resolveBackdrop:({beatId,runtime})=>({assetPath:miraiBackdrop(beatId,runtime),assetId:"issue105_mirai"})
+  });
+  results.menma=registerDefinition("origin_academy_menma_prologue",{
+    resolve:({beatId,performance,beat})=>projection("ACADEMY MENMA",menmaActors(beatId,performance,beat)),
+    resolveBackdrop:({beatId,beat})=>({assetPath:menmaBackdrop(beatId,beat),assetId:"issue105_menma"})
+  });
+  results.kushina=registerDefinition(scene("academy_kushina"),{
+    resolve:({beatId,performance,beat})=>projection("ACADEMY · FŪINJUTSU PRACTICAL",kushinaActors(beatId,performance,beat)),
+    resolveBackdrop:()=>({assetPath:GENERIC_COURTYARD,assetId:"issue105_generic_courtyard"})
+  });
+  results.kurenai=registerDefinition(scene("academy_kurenai"),{
+    resolve:({beatId,performance,beat})=>projection("ACADEMY · BELL TEST",kurenaiActors(beatId,performance,beat)),
+    resolveBackdrop:()=>({assetPath:GENERIC_COURTYARD,assetId:"issue105_generic_courtyard"})
+  });
+  results.iwabee=registerDefinition(scene("academy_iwabee"),{
+    resolve:({beatId,performance,beat})=>projection("ACADEMY · PRACTICAL TRAINING GROUND",iwabeeActors(beatId,performance,beat)),
+    resolveBackdrop:()=>({assetPath:GENERIC_COURTYARD,assetId:"issue105_generic_courtyard"})
+  });
+  results.metal=registerDefinition(scene("academy_metal_lee"),{
+    resolve:({beatId,performance,beat})=>projection("ACADEMY · TRAINING COURTYARD",metalActors(beatId,performance,beat)),
+    resolveBackdrop:()=>({assetPath:GENERIC_COURTYARD,assetId:"issue105_generic_courtyard"})
+  });
+  return{success:Object.values(results).every(r=>r&&r.success===true),results};
+}
+
+function ensureInstalled(){
+  if(globalThis.SC_STORY_SCENE_BOARD_33900)return installDefinitions();
+  const queue=globalThis.SC_STORY_SCENE_BOARD_PENDING_REGISTRATIONS||(globalThis.SC_STORY_SCENE_BOARD_PENDING_REGISTRATIONS=[]);
+  if(!queue.some(row=>row&&row.id==="issue105_origin_scene_board_bindings")){
+    queue.push({id:"issue105_origin_scene_board_bindings",register:installDefinitions});
+  }
+  return{success:true,queued:true};
+}
+
+function diagnostics(){
+  const checks={
+    sharedSceneBoardReused:true,
+    kakashiExcluded:!String(installDefinitions).includes("academy_kakashi"),
+    knownHinataActors:PATH.hinata&&PATH.hinataInstructor&&PATH.hinataPartner,
+    knownMiraiActors:PATH.mirai&&PATH.miraiInstructor&&PATH.traveller,
+    menmaInternalNineTailsNotPhysical:!String(menmaActors).includes("nine_tails.png"),
+    knownMenmaPhysicalActors:[PATH.menma,PATH.menmaInstructor,PATH.anko,PATH.altered].every(Boolean),
+    knownKurenaiInstructor:PATH.kurenaiInstructor==="NPC/kurenai_instructor.png",
+    missingAssetPathsNotGuessed:
+      !PATH.kushinaInstructor&&!PATH.iwabeeInstructor&&!PATH.metalInvitingGenin,
+    clickAnywhereOwnedBySharedSceneBoard:true,
+    browserGoldenClaimed:false
+  };
+  const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
+  return{patchId:PATCH_ID,pass:failed.length===0,checks,failed,browserGoldenClaimed:false};
+}
+
+const installed=ensureInstalled();
+globalThis.runIssue105OriginSceneBoardBindingsDiagnostics=diagnostics;
+globalThis.SC_ALPHA_ORIGIN_SCENE_BOARD_BINDINGS_105=Object.freeze({patchId:PATCH_ID,installed,browserGoldenClaimed:false});
+})();
