@@ -1230,7 +1230,9 @@ function izunoActorKeys32900(beatId){
   const id=String(beatId||"");
   if(id==="izu_receipt")return[];
   if(id.startsWith("izu_open_"))return["wasabi","instructor"];
-  if(id.startsWith("izu_finish_river_")||id.startsWith("izu_finish_false_"))return["wasabi","instructor"];
+  if(id.startsWith("izu_river_"))return["wasabi","target"];
+  if(id.startsWith("izu_finish_river_"))return["wasabi","instructor","target"];
+  if(id.startsWith("izu_finish_false_"))return["wasabi","instructor"];
   if(id.startsWith("izu_eval_"))return["wasabi","instructor"];
   if(id.startsWith("izu_rogue_")&&!id.startsWith("izu_rogue_step_in_battle"))return["wasabi","rogue"];
   return["wasabi"];

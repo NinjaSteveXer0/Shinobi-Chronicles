@@ -367,6 +367,25 @@ async function runNonBattle(browser,{label,opening,route,rogueChoice=null,checks
     }[route];
     assert(routeBackdrop,label+" route backdrop fixture missing");
     await assertBackdrop(page,routeBackdrop,label+" route "+route);
+    if(route==="TAKE THE RIVER"){
+      await continueTo(page,"izu_river_17");
+      const riverTarget=await info(page);
+      assert.strictEqual(riverTarget.text,"Runs harder.",label+" river target proof cue drift");
+      assert.deepStrictEqual(riverTarget.actors.map(x=>[x.id,x.image]),[
+        ["academy_izuno","Assets/Academy Student/academy_izuno.png"],
+        ["wasabi_origin_pursuit_target_01","NPC/pursuit_target.png"]
+      ],label+" pursuit target missing from live river chase");
+      await shot(page,label,"river-target-visible");
+      await continueTo(page,"izu_finish_river_2");
+      const riverFinish=await info(page);
+      assert.strictEqual(riverFinish.text,"The target is already across.",label+" river finish proof cue drift");
+      assert.deepStrictEqual(riverFinish.actors.map(x=>[x.id,x.image]),[
+        ["academy_izuno","Assets/Academy Student/academy_izuno.png"],
+        ["wasabi_academy_instructor","NPC/izuno_instructor.png"],
+        ["wasabi_origin_pursuit_target_01","NPC/pursuit_target.png"]
+      ],label+" pursuit target missing from river extraction finish");
+      await shot(page,label,"river-target-finish-visible");
+    }
     if(route==="CHECK THE SHOUTING"){
       await continueTo(page,"izu_rogue_choice");
       assert.deepStrictEqual((await info(page)).choices,["STEP IN","CALL FOR HELP","KEEP PURSUING"]);
@@ -606,7 +625,7 @@ async function runBattleRoute(browser,outcome){
       exactSourceOccurrences:[TRACKING,INTERCEPT,COOP,ROGUE_OCC,RIVER],
       strictOneVsOneBattle:true,battleSaveReload:true,bothBattleOutcomesReturn:true,
       fixedBattleVictoryRyo:50,sharedOriginStartingPurseRyo:100,claimSeparateFromContinue:true,exactBackdropContract:true,postBattleAlleyReturn:true,exactBattleEnvironment:true,
-      acceptedProgressionMappings409:true,riverStaminaDevelopment:true,visibleWasabiInstructorCards:true,speakerOwnedDialogue:true,speakerLinkedDialoguePointer:true,kakashiNarrationGeometry:true,singleNarrationLabel:true,originChronicleReceipt:true,kakashiReceiptGeometry:true,radialPLCoreCentered:true,
+      acceptedProgressionMappings409:true,riverStaminaDevelopment:true,visibleWasabiInstructorCards:true,visiblePursuitTargetOnRiverAndFinish:true,speakerOwnedDialogue:true,speakerLinkedDialoguePointer:true,kakashiNarrationGeometry:true,singleNarrationLabel:true,originChronicleReceipt:true,kakashiReceiptGeometry:true,radialPLCoreCentered:true,
       rewardSpectrum409Consumed:true,originToChronicleBegins:true,browserGoldenClaimed:false
     };
     fs.writeFileSync(path.join(OUT,"summary.json"),JSON.stringify({summary,results},null,2));
