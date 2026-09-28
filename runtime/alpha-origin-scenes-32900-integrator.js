@@ -134,9 +134,14 @@ function runAlphaOriginScene32900Diagnostics(){
     activeOriginReloadPresentationRehydrated:String(restoreActiveOriginStoryPresentation32900).includes('active.sceneId!==sceneId')&&String(restoreActiveOriginStoryPresentation32900).includes('openOverlay("story_scene")')&&String(restoreActiveOriginStoryPresentation32900).includes("origin_prologue_already_completed"),
     pendingBattleRestoreOutranksStoryPresentation:String(restoreActiveOriginStoryPresentation32900).includes("origin_story_presentation_deferred_for_pending_battle_restore")&&String(getPendingBattleSessionForOriginPresentation32900).includes('parsed.overlayType==="combat"')&&String(getPendingBattleSessionForOriginPresentation32900).includes("parsed.battleOver!==true"),
     noDirectPLGrant:!A.commitOccurrence.toString().includes("currentPL")&&!A.commitOccurrence.toString().includes("BasePL"),
+    wasabiRogueBattleSeamImplemented:(()=>{
+      const def=typeof getStorySceneDefinition==="function"?getStorySceneDefinition(A.sceneByVariant.academy_izuno):null;
+      const beat=def&&def.beatMap&&def.beatMap.get("izu_rogue_step_in_battle");
+      return !!beat&&beat.mode==="battle_transition"&&!!beat.battle&&beat.battle.encounterId==="origin_academy_izuno_rogue_genin_step_in";
+    })(),
     unresolvedOptionalBattleScenesExact:
-      A.battleFailClosedScenes.size===2&&
-      A.battleFailClosedScenes.has(A.sceneByVariant.academy_izuno)&&
+      A.battleFailClosedScenes.size===1&&
+      !A.battleFailClosedScenes.has(A.sceneByVariant.academy_izuno)&&
       A.battleFailClosedScenes.has(A.sceneByVariant.academy_mirai)&&
       !A.battleFailClosedScenes.has(A.sceneByVariant.academy_iwabee)&&
       !A.battleFailClosedScenes.has(A.sceneByVariant.academy_metal_lee),
