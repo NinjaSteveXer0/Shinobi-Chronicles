@@ -35,6 +35,7 @@ assert(hinataSource.includes('HINATA_ORIGIN_BACKDROP_PATH="Hinata Origin Backdro
 assert(hinataSource.includes('HINATA_ORIGIN_FINAL_BACKDROP_PATH="Hinata Origin Backdrop/hyuga_compound_alt_angle.png"'),"Hinata final-scene alternate backdrop missing");
 assert(hinataSource.includes("isHinataFinalSceneBeat32900")&&hinataSource.includes('id==="hin_young_choice"')&&hinataSource.includes('id.startsWith("hin_close_")'),"Hinata final-scene backdrop boundary missing");
 assert(hinataSource.includes("registerHinataOriginPresentation32900")&&hinataSource.includes("academy_hinata_backdrop_32900"),"Hinata Scene Board backdrop registration missing");
+assert(hinataSource.includes('beatId:"hin_receipt",mode:"record"')&&hinataSource.includes('onEnterConsequences:[X("academy_hinata",[spar,young])]'),"Hinata Chronicle Receipt completion beat missing");
 
 function labels(beatId){const b=byId.get(beatId);assert(b,`missing beat ${beatId}`);return Array.from(b.choices||[],c=>String(c.label));}
 function choice(beatId,choiceId){const b=byId.get(beatId);assert(b,`missing beat ${beatId}`);const c=(b.choices||[]).find(x=>x.choiceId===choiceId);assert(c,`missing choice ${beatId}/${choiceId}`);return c;}
@@ -192,6 +193,7 @@ console.log(JSON.stringify({
   connectedThreeExchangeGraph:true,
   mixedApproachEvaluation:true,
   stableSourceOccurrences:true,
+  chronicleReceipt:true,
   plBattle:false,
   browserGoldenClaimed:false
 },null,2));
