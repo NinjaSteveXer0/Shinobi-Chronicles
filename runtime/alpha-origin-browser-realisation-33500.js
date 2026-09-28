@@ -211,6 +211,7 @@ function patchIzuno33500(){
 function patchMirai33500(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
   const def=editableScene33500(A.sceneByVariant.academy_mirai);if(!def)return false;
+  if(beat33500(def,"mir_assignment_01")&&beat33500(def,"mir_walk_choice")&&beat33500(def,"mir_reflection_choice"))return true;
   const inconsistent=beat33500(def,"mir_inconsistent");
   const deeper=beat33500(def,"mir_deeper");
   const evalBeat=beat33500(def,"mir_eval");
