@@ -934,27 +934,33 @@
       "classification": "EXTENDS",
       "responsibilityIds": [
         "story.scene.presentation.shared",
-        "battle.presentation.shared"
+        "battle.presentation.shared",
+        "origin.academy_mirai.final_story_state",
+        "origin.academy_menma.final_story_state"
       ],
-      "owner": "runtime/alpha-origin-scene-board-bindings-105.js + runtime/alpha-story-scene-board-33900.js + runtime/alpha-battle-modern-33000.js",
+      "owner": "runtime/alpha-origin-writing-golden-105.js + runtime/alpha-origin-scene-board-bindings-105.js + native Origin Scene Board owners + runtime/alpha-story-scene-board-33900.js + runtime/alpha-battle-modern-33000.js",
       "directCallers": [
         "index.html",
         "runtime/alpha-traversal-bridge-33200.js"
       ],
       "stateTouched": [
-        "presentation-only Scene Board actor/backdrop projection for non-Kakashi Academy Origins",
+        "Academy Mirai approved GOLDEN Story graph / local Story choices",
+        "Academy Menma approved GOLDEN Story graph around the preserved evolved PL Battle seam",
+        "Scene Board actor/backdrop projection using exact #419 durable NPC paths",
         "presentation-only radial Battle PL DOM refresh"
       ],
       "productionLoader": "index.html + runtime/alpha-traversal-bridge-33200.js",
       "qaRefs": [
         "tools/qa_issue_105_origin_presentation_repair.js",
+        "tools/qa_issue_105_origin_presentation_browser.js",
+        "tools/qa_issue_340_hinata_browser.js",
         "tools/qa_issue_343_wasabi_browser.js",
         "tools/qa_issue_312_browser.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ],
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
-      "rationale": "Stephen's 2026-09-28 ten-Origin installed-browser review established that route-complete automation had missed legacy black Story fallbacks, absent actors/backdrops, missing click-anywhere progression and radial PL values outside their circles. This extends only shared presentation projection. Kakashi Golden Story remains frozen; only the reusable shared Battle renderer changes there."
+      "rationale": "Stephen's 2026-09-28 installed-browser review exposed presentation gaps plus stale/compressed Mirai and Menma player-facing Story. #105 now consumes the current Writing-GOLDEN graphs, preserves Menma's evolved PL Battle authority, retires stale expression shims when GOLDEN is present, and binds exact durable #419 NPC assets. Kakashi GOLDEN remains untouched except reusable shared Battle presentation."
     }
   ]
 }
