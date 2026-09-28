@@ -19,6 +19,10 @@ for(const token of [
 ]) assert(binder.includes(token),"missing #105 Scene Board binding "+token);
 assert(!binder.includes('scene("academy_kakashi")'),"Kakashi Golden Story was bound by #105 adapter");
 assert(binder.includes('"SPARRING STUDENT","HYŪGA SPARRING PARTNER"'),"Hinata sparring partner is missing authored speaker aliases");
+assert(binder.includes('hinataYoungerStudent:"NPC/younger_student.png"'),"Hinata younger-student exact path missing");
+assert(binder.includes('hinataYoungerSparringPartner:"NPC/younger_sparring_partner.png"'),"Hinata younger sparring-partner exact path missing");
+assert(binder.includes('actor("hinata_younger_student","YOUNGER STUDENT",PATH.hinataYoungerStudent')&&binder.includes('actor("hinata_younger_sparring_partner","YOUNGER SPARRING PARTNER",PATH.hinataYoungerSparringPartner'),"Hinata final three-actor projection missing");
+assert(binder.includes('hin_receipt:()=>[{kind:"record",text:buildHinataReceipt105()}]'),"Hinata Chronicle Receipt projection missing");
 for(const asset of [
   "Assets/Academy Student/academy_hinata.png","NPC/hyuga_instructor.png","NPC/hyuga_sparring_partner.png",
   "Assets/Academy Student/academy_mirai.png","NPC/mirai_instructor.png","NPC/traveller.png",
@@ -61,7 +65,7 @@ assert(battle.includes('querySelector(".alpha-battle-pl-core")'),"radial PL refr
 assert(battle.includes('core.querySelector("strong")')||battle.includes('core?.querySelector("strong")'),"radial PL current value not refreshed inside core");
 assert(!game.includes("ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID"),"frozen game.js contains successor purse mutation");
 console.log(JSON.stringify({pass:true,issue:105,checks:{
-  sevenNonKakashiBindings:true,kakashiExcluded:true,hinataSparringSpeakerAlias:true,knownAssetsExact:true,missingAssetsNotGuessed:true,
+  sevenNonKakashiBindings:true,kakashiExcluded:true,hinataSparringSpeakerAlias:true,hinataFinalPairBound:true,hinataChronicleReceipt:true,knownAssetsExact:true,missingAssetsNotGuessed:true,
   internalVoiceNotPhysical:true,loadOrder:true,sharedSceneBoard:true,clickAnywhere:true,
   speakerLinkedDialogue:true,globalCyanStoryFrames:true,kakashiFrameParity:true,kakashiTextAndAdvanceParity:true,radialPLContainmentRefresh:true,frozenCorePreserved:true,browserGoldenClaimed:false
 }},null,2));
