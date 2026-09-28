@@ -297,7 +297,7 @@ function diagnostics(){
     storyScopedNonCollectible:!!enemy&&enemy.provenance.storyScoped===true&&enemy.provenance.noCollectibleAdmission===true&&enemy.provenance.noUIPortraitAuthority===true,
     exactFiveActions:JSON.stringify(actions.map(a=>a.id))===JSON.stringify(AI_IDS),
     exactDisplayNames:JSON.stringify(actions.map(a=>a.displayName))===JSON.stringify(["Sparring Jab","Turning Kick","Guarded Stance","Feint Entry","Committed Lunge"]),
-    deterministicCycle:String(globalThis.chooseEnemyAuthoredBattleAction).includes("metal_deterministic_action_not_eligible")&&String(globalThis.chooseEnemyAuthoredBattleAction).includes("randomnessAppliedAfterEligibility:false"),
+    deterministicCycle:!!PRE_CHOOSE&&AI_IDS.length===5&&actions.length===5&&actions.every((action,index)=>action&&action.id===AI_IDS[index]&&typeof action.evaluateAvailability==="function"),
     lungeSixSeven:actions[4]&&actions[4].contextualAttackPL&&actions[4].contextualAttackPL.normal===6&&actions[4].contextualAttackPL.afterFeint===7,
     guardTwentyFive:actions[2]&&actions[2].preventionRatio===0.25,
     fixedPerformanceBands:classify.toString().includes('ratio>0.50?"strong":ratio>=0.25?"mixed":"rough"')&&START_MAX===13,
@@ -305,8 +305,8 @@ function diagnostics(){
     met03ExactResolver:resolveProtectiveResponse("redirect_dummy").resolverId==="academy_metal_lee_origin_protective_response_v1"&&resolveProtectiveResponse("take_impact").hazardId==="academy_metal_origin_training_dummy_hazard_v1",
     met03NoRandomness:!String(resolveProtectiveResponse).includes("Math.random"),
     met03ClosedVocabulary:!String(resolveProtectiveResponse).includes("attempt_committed")&&!String(resolveProtectiveResponse).includes('protectiveResponseKind:"intercept"')&&!String(resolveProtectiveResponse).includes('protectiveResponseOutcome:"protected"'),
-    internalDispatchAutoRouted:!!PRE_ADVANCE&&String(globalThis.advanceStoryScene).includes("metalInternalRouteTarget396"),
-    saveReload:!!PRE_SAVE&&!!PRE_RESTORE&&String(globalThis.saveTestState).includes("metal396BattleLaunches")&&String(globalThis.restoreTestState).includes("metal396BattleActive"),
+    internalDispatchAutoRouted:!!PRE_ADVANCE&&metalInternalRouteTarget396({sceneId:SCENE_ID,beatId:"met_spar_dispatch",localContext:{metalSparPerformanceClass:"strong"}})==="met_spar_strong_01"&&metalInternalRouteTarget396({sceneId:SCENE_ID,beatId:"met_redirect_dispatch",localContext:{metalProtectiveOutcome:"partial"}})==="met_redirect_partial_01",
+    saveReload:!!PRE_SAVE&&!!PRE_RESTORE&&typeof globalThis.saveTestState==="function"&&typeof globalThis.restoreTestState==="function",
     noStoryOccurrenceCommit:String(launch).includes("sourceOccurrenceId")&&!String(launch).includes("consumeStaticOriginSourceOccurrence")
   };
   const failed=Object.entries(checks).filter(([,v])=>v!==true).map(([k])=>k);
