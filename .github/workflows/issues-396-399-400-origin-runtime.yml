@@ -1,0 +1,105 @@
+name: Issues 396 399 400 Origin Runtime
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'game.js'
+      - 'index.html'
+      - 'runtime/alpha-origin-scenes-32900-b.js'
+      - 'runtime/alpha-metal-origin-runtime-396.js'
+      - 'runtime/alpha-rogue-genin-opposition-399.js'
+      - 'runtime/alpha-iwabee-origin-runtime-399.js'
+      - 'runtime/alpha-origin-skill-display-names-400.js'
+      - 'runtime/alpha-runtime-build-fingerprint-303.js'
+      - 'tools/qa_issues_396_399_400_runtime.js'
+      - 'tools/qa_issues_396_399_400_browser.js'
+      - 'tools/qa_issue_383_skill_lock.js'
+      - 'tools/qa_issue_383_skill_lock_browser.js'
+      - 'tools/qa_runtime_ownership_safety_300.js'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
+      - 'tools/fixtures/runtime_responsibility_registry_300.json'
+      - 'tools/fixtures/runtime_change_declarations_300.json'
+      - '.github/workflows/issues-396-399-400-origin-runtime.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  origin-runtime-handoffs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Source ownership and regression proof
+        run: |
+          node --check runtime/alpha-metal-origin-runtime-396.js
+          node --check runtime/alpha-rogue-genin-opposition-399.js
+          node --check runtime/alpha-iwabee-origin-runtime-399.js
+          node --check runtime/alpha-origin-skill-display-names-400.js
+          node --check runtime/alpha-origin-scenes-32900-b.js
+          node --check tools/qa_issues_396_399_400_runtime.js
+          node --check tools/qa_issues_396_399_400_browser.js
+          node tools/qa_issues_396_399_400_runtime.js
+          node tools/qa_issue_303_runtime_build_fingerprint.js
+          node tools/qa_runtime_ownership_safety_300.js
+          node tools/qa_issue_383_skill_lock.js
+          node tools/qa_alpha_origin_scenes_32900_runtime.js
+          node tools/qa_issue_312_story_battle_benchmark.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python3 -m http.server 8080 > /tmp/issues-396-399-400-http.log 2>&1 &
+          echo $! > /tmp/issues-396-399-400-http.pid
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/issues-396-399-400-http.log
+          exit 1
+
+      - name: Installed-browser handoff proof
+        env:
+          ISSUES_396_399_400_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUES_396_399_400_BROWSER_OUT: artifacts/issues-396-399-400
+        run: xvfb-run -a node tools/qa_issues_396_399_400_browser.js
+
+      - name: Earlier Kakashi Menma Skill lock regression
+        env:
+          ISSUE_383_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_383_BROWSER_OUT: artifacts/issues-396-399-400/issue-383-regression
+        run: xvfb-run -a node tools/qa_issue_383_skill_lock_browser.js
+
+      - name: Shared Battle installed-browser regression
+        env:
+          ISSUE_312_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_312_BROWSER_OUT: artifacts/issues-396-399-400/issue-312-regression
+        run: xvfb-run -a node tools/qa_issue_312_browser.js
+
+      - name: Preserve server log
+        if: always()
+        run: |
+          mkdir -p artifacts/issues-396-399-400
+          cp /tmp/issues-396-399-400-http.log artifacts/issues-396-399-400/http-server.log || true
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issues-396-399-400-origin-runtime-evidence
+          path: artifacts/issues-396-399-400
+          if-no-files-found: warn
