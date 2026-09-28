@@ -70,7 +70,7 @@ assert(menma.includes('pending.side==="player"')&&menma.includes("startMenmaEvid
 assert(menma.includes('men03Scope:"menma_active_only"')&&menma.includes("firstLegitimateMenmaActiveMoment:true"),"MEN-03 does not start at Menma's first legitimate Active moment");
 assert(menma.includes('tutorialResult:"not_completed"')&&menma.includes("performanceBucket:null")&&menma.includes("allied_side_exhausted"),"party defeat can fabricate a completed MEN-03 bucket");
 assert(menma.includes('PARTY_DEFEAT_RETURN_BEAT_ID="menma_party_defeat_return_01"')&&menma.includes('beat.battle.defeatBeatId=PARTY_DEFEAT_RETURN_BEAT_ID'),"party defeat is not bound to the exact #386 Story return beat");
-assert(menma.includes('FUTURE_ENTRY_BEAT_ID="menma_future_01"')&&menma.includes('FUTURE_ENVIRONMENT_PATH="Scene backdrops/whisper_woods_forest_route.png"'),"#388 future-ambition bridge identity/backdrop missing");
+assert(menma.includes('FUTURE_ENTRY_BEAT_ID="menma_future_01"')&&menma.includes('FUTURE_ENVIRONMENT_PATH="Menma Origin Backdrop/whisper_woods_rise.png"'),"#388 future-ambition bridge identity/backdrop missing");
 for(let i=1;i<=24;i++)assert(menma.includes('beatId:"menma_party_defeat_return_'+String(i).padStart(2,"0")+'"'),"#386 party-defeat beat missing "+i);
 assert(menma.includes('nextBeatId:FUTURE_ENTRY_BEAT_ID'),"#386 defeat chain does not continue to menma_future_01");
 for(const label of ["MASTER WHAT THEY WON'T TEACH ME","BECOME TOO STRONG TO HOLD BACK","CREATE SOMETHING THAT'S MINE","FIND OUT HOW FAR I CAN GO"])assert(menma.includes(label),"#388 future-ambition choice missing "+label);
