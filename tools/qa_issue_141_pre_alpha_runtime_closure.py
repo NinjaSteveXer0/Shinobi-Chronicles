@@ -76,6 +76,7 @@ NODE_GATES = [
     "tools/qa_alpha_origin_scenes_32900_runtime.js",
     "tools/qa_issue_340_hinata_writing_golden.js",
     "tools/qa_issue_343_wasabi_writing_golden.js",
+    "tools/qa_issue_105_origin_presentation_repair.js",
     "tools/qa_issue_331_obito_final_runtime.js",
     "tools/qa_issue_155_anbu_root_runtime.js",
     "tools/qa_issue_141_traversal_runtime.js",
