@@ -94991,7 +94991,7 @@ function buildIssue34OriginSourceDiagnosticEnvelope(rowId,sourceOccurrenceIdOver
     "IWA-02":{earthReleaseUsedToConstrainRogueGenin:true,rogueGeninParticipantRef:"iwabee_origin_rogue_genin_01"},
     "MET-01":{qualifyingPrivateTaijutsuOrConditioningWorkCompleted:true,observerDiscoveryOccurredAfterQualifyingPrivateWork:true},
     "MET-02":{pressuredPerformanceClass:"strong"},
-    "MET-03":{protectiveResponseAttempted:true,protectiveResponseKind:"redirect_dummy",protectiveResponseOutcome:"partial",resolverId:"academy_metal_lee_origin_protective_response_v1",hazardId:"academy_metal_origin_training_dummy_hazard_v1",effectiveStatKey:"tai",effectiveStatValue:13,interventionOccurred:true,interveningParticipantRef:"metal_origin_inviting_genin"},
+    "MET-03":{attempted:true,protectiveResponseAttempted:true,protectiveResponseKind:"redirect_dummy",protectiveResponseOutcome:"partial",resolverId:"academy_metal_lee_origin_protective_response_v1",hazardId:"academy_metal_origin_training_dummy_hazard_v1",effectiveStatKey:"tai",effectiveStatValue:13,interventionRequired:true,interventionParticipantRef:"metal_origin_inviting_genin"},
     "MET-04":{invitingGeninEncounterOccurred:true,invitingGeninParticipantRef:"metal_origin_inviting_genin"},
     "KAK-01":{packageDisposition:"secured",packageInstanceRef:"kakashi_origin_outer_route_packet"},
     "KAK-02":{retrievalIntelligenceClass:"mixed",observerKnowledgeBasis:"diag_observation"},
