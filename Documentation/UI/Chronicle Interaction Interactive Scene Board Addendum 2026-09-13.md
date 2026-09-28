@@ -256,6 +256,45 @@ Canonical rule:
 
 > **Baked nameplates identify participants. Runtime state strips describe visible participant state. Live State Callouts describe the wider evolving situation. None of them creates the truth it displays.**
 
+## 7C. GLOBAL NARRATION / DIALOGUE FRAME COLOUR LOCK — 2026-09-28
+
+Stephen-approved global presentation rule:
+
+> **Every ordinary Story narration box and every speaker-owned Story dialogue box uses the cyan/teal Shinobi Chronicles frame outline. Speaker side must never switch the frame to orange, gold or brown.**
+
+This rule applies to **every Origin**, including Academy Kakashi.
+
+Canonical Alpha frame contract:
+
+- **Narration surface**
+  - lower-stage compact strip;
+  - width: `min(72%, 980px)`;
+  - bottom offset: approximately `3%`;
+  - padding: `11px 15px 12px`;
+  - radius: `16px`;
+  - outline: `1px solid rgba(93, 215, 225, .32)`;
+  - dark neutral glass fill.
+
+- **Speaker-owned dialogue surface**
+  - anchored to the actual visible speaker;
+  - width: `min(36vw, 500px)`;
+  - bottom offset: approximately `23.5%`;
+  - padding: `12px 15px 13px`;
+  - radius: `16px`;
+  - outline: `1px solid rgba(103, 221, 230, .55)`;
+  - pointer/tail outline: cyan/teal (`rgba(103, 221, 230, .5)`);
+  - speaker ownership is communicated by card focus, placement, pointer and speaker label — **not by changing the frame to gold/brown**.
+
+The frame/glow colour is presentation-only and must not encode Player / Opposition / Guest / Independent semantic authority.
+
+Speaker-name text or subtle dark fill treatment may still carry bounded presentation variation where useful, but the **outer dialogue/narration outline and dialogue pointer remain cyan/teal globally**.
+
+This lock does **not** recolour Chronicle Receipts, choice/action controls, committed-state callouts, or other components whose existing gold semantics represent committed/pivotal state.
+
+No Origin-local renderer may override this frame rule.
+
+---
+
 ## 7B. Story-scene actor asset boundary
 
 Story / Chronicle scene presentation must not reuse **Battle Portraits** merely because the same participant also appears in Battle.
