@@ -171,10 +171,12 @@ async function rewardState(page){
     assert.deepStrictEqual(generated.rareDrops,[]);
 
     await page.evaluate(()=>openOverlay("victory"));
-    await page.waitForSelector(".menma-three-subject-reward-36200",{state:"visible",timeout:8000});
-    const disclosure=await page.locator(".menma-three-subject-reward-36200").textContent();
-    assert(/\+100 RYŌ/.test(disclosure),"Victory did not disclose +100 Ryō");
-    assert(/No generic Character EXP/.test(disclosure),"Victory did not separate generic EXP");
+    await page.waitForSelector(".alpha-victory-code-screen",{state:"visible",timeout:8000});
+    const victoryText=await page.locator(".alpha-victory-code-screen").innerText();
+    assert(/100\s*RYŌ/i.test(victoryText),"Victory did not present the exact 100 Ryō reward");
+    assert(!/FIXED ENCOUNTER REWARD/i.test(victoryText),"Victory leaked internal fixed-reward diagnostic");
+    assert(!/No generic Character EXP/i.test(victoryText),"Victory leaked internal EXP contract prose");
+    assert.strictEqual(await page.locator(".menma-three-subject-reward-36200").count(),0,"retired Menma reward diagnostic node returned");
     await page.screenshot({path:path.join(OUT,"menma-three-subject-victory-before-claim.png"),fullPage:false,timeout:12000});
 
     const claim=page.getByRole("button",{name:"CLAIM REWARDS",exact:true});
@@ -238,7 +240,7 @@ async function rewardState(page){
     const summary={
       pass:true,issue:362,kind:"installed_browser_menma_three_subject_reward",
       battleOccurrenceId:full.occurrenceId,rewardSourceId:SOURCE_ID,ryoGranted:100,
-      checks:{oneHostileZero:true,twoHostilesZero:true,defeatAllMetadataZero:true,menmaWithdrawnVictoryProjects100:true,fullVictoryExact100:true,reopenNoDuplicate:true,refreshNoDuplicate:true,storyReturnExact:true,retired50SourceAbsent:true},
+      checks:{oneHostileZero:true,twoHostilesZero:true,defeatAllMetadataZero:true,menmaWithdrawnVictoryProjects100:true,fullVictoryExact100:true,playerFacingInternalDiagnosticAbsent:true,reopenNoDuplicate:true,refreshNoDuplicate:true,storyReturnExact:true,retired50SourceAbsent:true},
       runtimeErrors:errors,browserGoldenClaimed:false
     };
     fs.writeFileSync(path.join(OUT,"summary.json"),JSON.stringify(summary,null,2)+"\n");

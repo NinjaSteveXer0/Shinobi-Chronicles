@@ -22,6 +22,10 @@ on:
       - 'runtime/alpha-origin-scenes-32900-c.js'
       - 'tools/qa_issue_105_origin_presentation_repair.js'
       - 'tools/qa_issue_105_origin_presentation_browser.js'
+      - 'tools/qa_issue_362_menma_reward_browser.js'
+      - 'tools/fixtures/runtime_change_declarations_300.json'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
+      - 'runtime/alpha-runtime-build-fingerprint-303.js'
       - '.github/workflows/issue-105-origin-presentation-repair.yml'
 permissions:
   contents: read
