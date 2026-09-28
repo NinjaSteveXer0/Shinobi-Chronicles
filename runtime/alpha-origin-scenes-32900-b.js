@@ -103,7 +103,7 @@ const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A)
     iwabeeBattleWithdrawn:false,rogueBattleWithdrawn:false,
     rogueDisposition:null,custodyState:"NONE",custodyActorRef:null,
     instructorIntervened:false,instructorIntervention:"NONE",
-    alternateEscapeRouteAvailableAfterConstraint:null,followupBattleOccurred:false,
+    alternateEscapeRouteAvailable:null,followupBattleOccurred:false,academyInstructorRef:INSTRUCTOR,
     trainingGroundReshapeObjectiveCompletedByIwabee:true,originFailure:false,injuryInferred:false,deathInferred:false,
     ...extra
   });
@@ -126,7 +126,7 @@ const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A)
     rogueDisposition:"SURRENDERED_AFTER_EARTH_ROUTE_CONSTRAINT",
     custodyState:"TEMPORARY_INSTRUCTOR_DETENTION",custodyActorRef:INSTRUCTOR,
     instructorIntervened:true,instructorIntervention:"ACCEPT_SURRENDER_AND_SECURE",
-    alternateEscapeRouteAvailableAfterConstraint:false,followupBattleOccurred:false
+    alternateEscapeRouteAvailable:false,followupBattleOccurred:false
   }),["IWA-02"],{participantRefs:[ROGUE,INSTRUCTOR]});
   const callCommit=R("iwabee_rogue_call_399","academy_iwabee",rogue,worldFact("CALL_INSTRUCTOR",{
     rogueDisposition:"ESCAPED_AFTER_INSTRUCTOR_ESCALATION",
@@ -262,15 +262,15 @@ const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A)
     active.localContext={...(active.localContext||{}),
       metalProtectiveResponse:kind,metalProtectiveOutcome:resolved.protectiveResponseOutcome,
       metalProtectiveResolverStatKey:resolved.resolverStatKey,metalProtectiveResolverStatValue:resolved.resolverStatValue,
-      metalProtectiveInterventionOccurred:resolved.interventionOccurred,metalProtectiveInterveningParticipantRef:resolved.interveningParticipantRef};
+      metalProtectiveInterventionRequired:resolved.interventionRequired,metalProtectiveInterventionParticipantRef:resolved.interventionParticipantRef};
     const committed=A.commitOccurrence("academy_metal_lee",protect,{
-      protectiveResponseAttempted:true,protectiveResponseKind:kind,protectiveResponseOutcome:resolved.protectiveResponseOutcome,
+      attempted:true,protectiveResponseAttempted:true,protectiveResponseKind:kind,protectiveResponseOutcome:resolved.protectiveResponseOutcome,
       resolverId:resolved.resolverId,hazardId:resolved.hazardId,
       effectiveStatKey:resolved.resolverStatKey,effectiveStatValue:resolved.resolverStatValue,
       successThreshold:resolved.successThreshold,partialThreshold:resolved.partialThreshold,
-      interventionOccurred:resolved.interventionOccurred,interveningParticipantRef:resolved.interveningParticipantRef,
+      interventionRequired:resolved.interventionRequired,interventionParticipantRef:resolved.interventionParticipantRef,
       injuryInferred:false,deathInferred:false
-    },["MET-03"],{participantRefs:resolved.interveningParticipantRef?[GENIN]:[]});
+    },["MET-03"],{participantRefs:resolved.interventionParticipantRef?[GENIN]:[]});
     if(!committed||committed.success!==true)return committed||{success:false,reason:"metal_met03_commit_failed"};
     const prefix=kind==="redirect_dummy"?"met_redirect":kind==="take_impact"?"met_impact":"met_destroy";
     const target=prefix+"_"+resolved.protectiveResponseOutcome+"_01";
