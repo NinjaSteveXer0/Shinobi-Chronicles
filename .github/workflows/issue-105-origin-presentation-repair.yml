@@ -5,6 +5,10 @@ on:
     paths:
       - 'index.html'
       - 'runtime/alpha-origin-scene-board-bindings-105.js'
+      - 'runtime/alpha-origin-writing-golden-105.js'
+      - 'runtime/alpha-origin-browser-realisation-33500.js'
+      - 'runtime/alpha-early-story-modernization-33600.js'
+      - 'runtime/alpha-origin-screen-first-33700.js'
       - 'runtime/alpha-story-scene-board-33900.js'
       - 'runtime/alpha-battle-modern-33000.js'
       - 'runtime/alpha-story-machine-resolver-343.js'
@@ -29,6 +33,10 @@ jobs:
       - name: Source presentation contract
         run: |
           node --check runtime/alpha-origin-scene-board-bindings-105.js
+          node --check runtime/alpha-origin-writing-golden-105.js
+          node --check runtime/alpha-origin-browser-realisation-33500.js
+          node --check runtime/alpha-early-story-modernization-33600.js
+          node --check runtime/alpha-origin-screen-first-33700.js
           node --check runtime/alpha-story-machine-resolver-343.js
           node --check tools/qa_issue_105_origin_presentation_repair.js
           node --check tools/qa_issue_105_origin_presentation_browser.js
