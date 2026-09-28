@@ -16,7 +16,7 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-29-BA",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-29-BB",
     sourceBaselineCommit:"9f90d86ff989caf59f96711e6067d497249f039e",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
     runtimeGeneration:"origin-golden-repair-105-mirai-menma-global-ui",
@@ -62,6 +62,7 @@
       "academy-wasabi-rogue-genin-battle-343",
       "academy-wasabi-pursuit-target-actor-343",
       "academy-menma-story-character-card-dialogue-receipt-105",
+      "academy-wasabi-river-direct-catch-343",
       "academy-wasabi-machine-resolver-adapter-343",
       "academy-origin-starting-purse-409",
       "shared-origin-story-presentation-parity-105",
@@ -104,7 +105,7 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-29-BA",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-29-BB",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
       generationPresent:first.runtimeGeneration==="origin-golden-repair-105-mirai-menma-global-ui",

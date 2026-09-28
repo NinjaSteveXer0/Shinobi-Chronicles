@@ -10,7 +10,8 @@ const CORE="game.js";
 const RESOLVER="runtime/alpha-story-machine-resolver-343.js";
 const PURSE="runtime/alpha-origin-starting-purse-409.js";
 const DOC="Documentation/Story/Academy_Wasabi_Izuno_Origin_WRITING_GOLDEN_2026-09-24.md";
-for(const p of [STORY,CATALOGUE,BATTLE,CORE,RESOLVER,PURSE,DOC])assert(fs.existsSync(p),"missing #343 authority/runtime file "+p);
+const RIVER_CORRECTION="Documentation/Story/Academy_Wasabi_Izuno_River_Route_Owner_Correction_2026-09-29.md";
+for(const p of [STORY,CATALOGUE,BATTLE,CORE,RESOLVER,PURSE,DOC,RIVER_CORRECTION])assert(fs.existsSync(p),"missing #343 authority/runtime file "+p);
 
 const storySource=fs.readFileSync(STORY,"utf8");
 const catalogueSource=fs.readFileSync(CATALOGUE,"utf8");
@@ -19,6 +20,7 @@ const coreSource=fs.readFileSync(CORE,"utf8");
 const resolverSource=fs.readFileSync(RESOLVER,"utf8");
 const purseSource=fs.readFileSync(PURSE,"utf8");
 const doc=fs.readFileSync(DOC,"utf8");
+const riverCorrection=fs.readFileSync(RIVER_CORRECTION,"utf8");
 
 const scenes=new Map(),commits=[];
 let activeRt={sceneId:"origin_academy_izuno_prologue",instanceId:"qa-wasabi-scene",localContext:{},battleResume:null};
@@ -63,6 +65,10 @@ assert.deepStrictEqual(labels("izu_initial_choice"),[
 ]);
 assert.deepStrictEqual(labels("izu_split_choice"),["TAKE THE RIVER","FOLLOW THE STRONGER TRAIL","CHECK THE SHOUTING","CUT FOR THE INTERCEPT"]);
 assert.deepStrictEqual(labels("izu_rogue_choice"),["STEP IN","CALL FOR HELP","KEEP PURSUING"]);
+assert.deepStrictEqual(JSON.parse(JSON.stringify(choice("izu_split_choice","river_route").contextPatch)),{route:"river_route",outcome:"direct_catch"},"River route owner correction not consumed");
+assert(riverCorrection.includes('outcome = "direct_catch"')&&riverCorrection.includes("exactly +1 Stamina Discipline Development EXP"),"River correction authority drift");
+assert(cueTexts("izu_river").includes("Her fingers catch the back of their shirt before the extraction marker."),"River catch prose not corrected");
+assert(cueTexts("izu_finish_river").includes("The target is still this side of the extraction marker."),"River finish still describes a near-miss");
 assert.deepStrictEqual(labels("izu_reflect"),[
   "Next time I'm trusting the trail.","Next time I'm trusting what I notice.","Sometimes the fastest path isn't the obvious one.","Catching them wasn't the only thing that mattered."
 ]);

@@ -1503,7 +1503,7 @@ seq("izu_initial_cooperate",G("initial_cooperate"),"izu_split_intro_1");
 seq("izu_initial_predict",G("initial_predict"),"izu_split_intro_1");
 seq("izu_split_intro",G("scene3"),"izu_split_choice");
 beats.push({beatId:"izu_split_choice",mode:"choice",text:"",choices:[
-  C("river_route","TAKE THE RIVER","izu_river_1",{route:"river_route",outcome:"arrive_just_after_target"}),
+  C("river_route","TAKE THE RIVER","izu_river_1",{route:"river_route",outcome:"direct_catch"}),
   C("stronger_trail","FOLLOW THE STRONGER TRAIL","izu_stronger_1",{route:"stronger_trail",falseTrail:true,outcome:"false_trail_discovered"}),
   C("rogue_interruption","CHECK THE SHOUTING","izu_rogue_intro_1",{route:"rogue_interruption"}),
   C("intercept_prediction","CUT FOR THE INTERCEPT","izu_intercept_1",{route:"intercept_prediction",outcome:"intercept_before_extraction"})

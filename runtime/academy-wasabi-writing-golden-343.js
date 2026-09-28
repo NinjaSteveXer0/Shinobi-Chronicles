@@ -9,6 +9,7 @@
 "use strict";
 if(globalThis.SC_ACADEMY_WASABI_WRITING_GOLDEN_343)return;
 const SOURCE="Documentation/Story/Academy_Wasabi_Izuno_Origin_WRITING_GOLDEN_2026-09-24.md";
+const RIVER_CORRECTION_SOURCE="Documentation/Story/Academy_Wasabi_Izuno_River_Route_Owner_Correction_2026-09-29.md";
 const SECTIONS=Object.freeze({
   "scene1": {
     "sourceRange": [
@@ -791,11 +792,11 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Her fingers miss the back of their shirt by less than a handspan."
+        "text": "Her fingers catch the back of their shirt before the extraction marker."
       },
       {
         "kind": "narration",
-        "text": "The target crosses."
+        "text": "The target stops short of extraction."
       },
       {
         "kind": "narration",
@@ -804,7 +805,7 @@ const SECTIONS=Object.freeze({
       {
         "kind": "dialogue",
         "speakerName": "PROCTOR",
-        "text": "Extraction."
+        "text": "Caught."
       },
       {
         "kind": "narration",
@@ -825,7 +826,7 @@ const SECTIONS=Object.freeze({
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "That counts?"
+        "text": "Caught you."
       },
       {
         "kind": "narration",
@@ -1513,15 +1514,15 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "The target is already across."
+        "text": "The target is still this side of the extraction marker."
       },
       {
         "kind": "narration",
-        "text": "By seconds."
+        "text": "Caught before the line."
       },
       {
         "kind": "narration",
-        "text": "Maybe less."
+        "text": "Barely."
       },
       {
         "kind": "narration",
@@ -1538,7 +1539,7 @@ const SECTIONS=Object.freeze({
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "How much?"
+        "text": "How close?"
       },
       {
         "kind": "narration",
@@ -1551,12 +1552,12 @@ const SECTIONS=Object.freeze({
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "That's nothing."
+        "text": "Still caught them."
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY INSTRUCTOR",
-        "text": "It was enough."
+        "text": "You did."
       },
       {
         "kind": "narration",
@@ -2275,6 +2276,9 @@ function get(key){const row=SECTIONS[String(key||"")];return row&&Array.isArray(
 function diagnostics(){
  const checks={
   sourceExact:SOURCE.endsWith("Academy_Wasabi_Izuno_Origin_WRITING_GOLDEN_2026-09-24.md"),
+  riverCorrectionExact:RIVER_CORRECTION_SOURCE.endsWith("Academy_Wasabi_Izuno_River_Route_Owner_Correction_2026-09-29.md"),
+  riverDirectCatch:get("river").some(c=>c.text==="Her fingers catch the back of their shirt before the extraction marker.")&&get("river").some(c=>c.text==="The target stops short of extraction.")&&!get("river").some(c=>/miss the back|target crosses/i.test(c.text||"")),
+  riverFinishCorrected:get("finish_river").some(c=>c.text==="The target is still this side of the extraction marker.")&&get("finish_river").some(c=>c.speakerName==="ACADEMY INSTRUCTOR"&&c.text==="You did."),
   openingExact:get("scene1").some(c=>c.text==="The target is already gone.")&&get("scene1").some(c=>c.speakerName==="WASABI"&&c.text==="That\'s not a time."),
   choicesExcluded:!JSON.stringify(SECTIONS).includes("TAKE THE OBVIOUS TRAIL")&&!JSON.stringify(SECTIONS).includes("STEP IN"),
   battleScaffoldingExcluded:!JSON.stringify(SECTIONS).includes("PL BATTLE"),
@@ -2288,5 +2292,5 @@ function diagnostics(){
 }
 globalThis.getAcademyWasabiWritingGoldenCues343=get;
 globalThis.runAcademyWasabiWritingGolden343Diagnostics=diagnostics;
-globalThis.SC_ACADEMY_WASABI_WRITING_GOLDEN_343=Object.freeze({patchId:"academy_wasabi_writing_golden_343_2026_09_24",source:SOURCE,sections:SECTIONS,get,browserGoldenClaimed:false});
+globalThis.SC_ACADEMY_WASABI_WRITING_GOLDEN_343=Object.freeze({patchId:"academy_wasabi_writing_golden_343_2026_09_29_river_correction",source:SOURCE,riverCorrectionSource:RIVER_CORRECTION_SOURCE,sections:SECTIONS,get,browserGoldenClaimed:false});
 })();

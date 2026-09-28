@@ -378,7 +378,7 @@ async function runNonBattle(browser,{label,opening,route,rogueChoice=null,checks
       await shot(page,label,"river-target-visible");
       await continueTo(page,"izu_finish_river_2");
       const riverFinish=await info(page);
-      assert.strictEqual(riverFinish.text,"The target is already across.",label+" river finish proof cue drift");
+      assert.strictEqual(riverFinish.text,"The target is still this side of the extraction marker.",label+" river finish proof cue drift");
       assert.deepStrictEqual(riverFinish.actors.map(x=>[x.id,x.image]),[
         ["academy_izuno","Assets/Academy Student/academy_izuno.png"],
         ["wasabi_academy_instructor","NPC/izuno_instructor.png"],
@@ -598,7 +598,7 @@ async function runBattleRoute(browser,outcome){
   try{
     results.push(await runNonBattle(browser,{
       label:"obvious-river",opening:"TAKE THE OBVIOUS TRAIL",route:"TAKE THE RIVER",
-      checks:async(_page,h)=>{assert.strictEqual(h.exact[TRACKING].length,1);assert.strictEqual(h.exact[TRACKING][0].fact?.pursuitOutcome,"arrive_just_after_target");assert.strictEqual(h.exact[RIVER].length,1);assert.strictEqual(h.exact[RIVER][0].fact?.sustainedEnduranceExertion,true);assert.strictEqual(h.developmentReceipts.filter(r=>r.sourceOccurrenceId===RIVER&&r.disciplineId==="stamina").length,1);assert.strictEqual(h.exact[ROGUE_OCC].length,0);}
+      checks:async(_page,h)=>{assert.strictEqual(h.exact[TRACKING].length,1);assert.strictEqual(h.exact[TRACKING][0].fact?.pursuitOutcome,"direct_catch");assert.strictEqual(h.exact[INTERCEPT].length,0,"River direct catch incorrectly created IZU-02 intercept history");assert.strictEqual(h.exact[RIVER].length,1);assert.strictEqual(h.exact[RIVER][0].fact?.pursuitOutcome,"direct_catch");assert.strictEqual(h.exact[RIVER][0].fact?.sustainedEnduranceExertion,true);assert.strictEqual(h.developmentReceipts.filter(r=>r.sourceOccurrenceId===RIVER&&r.disciplineId==="stamina").length,1);assert.strictEqual(h.exact[ROGUE_OCC].length,0);}
     }));
     results.push(await runNonBattle(browser,{
       label:"better-stronger",opening:"LOOK FOR SOMETHING BETTER",route:"FOLLOW THE STRONGER TRAIL",
@@ -625,7 +625,7 @@ async function runBattleRoute(browser,outcome){
       exactSourceOccurrences:[TRACKING,INTERCEPT,COOP,ROGUE_OCC,RIVER],
       strictOneVsOneBattle:true,battleSaveReload:true,bothBattleOutcomesReturn:true,
       fixedBattleVictoryRyo:50,sharedOriginStartingPurseRyo:100,claimSeparateFromContinue:true,exactBackdropContract:true,postBattleAlleyReturn:true,exactBattleEnvironment:true,
-      acceptedProgressionMappings409:true,riverStaminaDevelopment:true,visibleWasabiInstructorCards:true,visiblePursuitTargetOnRiverAndFinish:true,speakerOwnedDialogue:true,speakerLinkedDialoguePointer:true,kakashiNarrationGeometry:true,singleNarrationLabel:true,originChronicleReceipt:true,kakashiReceiptGeometry:true,radialPLCoreCentered:true,
+      acceptedProgressionMappings409:true,riverStaminaDevelopment:true,riverDirectCatchOwnerCorrection:true,visibleWasabiInstructorCards:true,visiblePursuitTargetOnRiverAndFinish:true,speakerOwnedDialogue:true,speakerLinkedDialoguePointer:true,kakashiNarrationGeometry:true,singleNarrationLabel:true,originChronicleReceipt:true,kakashiReceiptGeometry:true,radialPLCoreCentered:true,
       rewardSpectrum409Consumed:true,originToChronicleBegins:true,browserGoldenClaimed:false
     };
     fs.writeFileSync(path.join(OUT,"summary.json"),JSON.stringify({summary,results},null,2));
