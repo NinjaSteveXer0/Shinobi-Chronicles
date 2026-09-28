@@ -75,6 +75,7 @@ assert(binder.includes('menmaNineTails:"Assets/Tailed Beasts/menma_nine_tails.pn
 assert(golden.includes('row.speakerRef={sourceId:"nine_tails",sourceType:"communication_source",physicalPresence:false}'),"Menma Nine-Tails communication-source semantics were lost");
 assert(board.includes('.sc-chronicle-source-state{display:none!important;}'),"internal Story source-state label is still player-visible on Scene Board");
 assert(binder.includes("function menmaPerformanceSequences105()")&&binder.includes('speakerName?"dialogue"'),"Menma ending spoken cues are not protected as speaker-owned dialogue");
+assert(menmaBattle.includes("isMenmaWritingGolden105Scene38800")&&menmaBattle.includes("writingGoldenFuturePreserved"),"Menma evolved Battle adapter still overwrites the #105 Writing-Golden future/Receipt");
 assert(!golden.includes("Combat package (#338)")&&!golden.includes("waiting on the exact Academy instructor"),"Mirai leaks internal Combat/GitHub blocker text");
 assert(golden.includes('beatId:"mir_leaving_choice_router",mode:"resolver",machineResolved:true')&&!golden.includes('beatId:"mir_leaving_router"'),"Mirai terminal still exposes the stale empty/fake Continue router");
 assert(golden.includes('beatId:"mir_receipt",mode:"record"')&&binder.includes('mir_receipt:()=>[{kind:"record",text:buildMiraiReceipt105()}]'),"Mirai Origin Chronicle Receipt missing");
@@ -118,7 +119,7 @@ assert(sceneBoardDoc.includes("no visible arrow/CONTINUE button for ordinary nar
 assert(battle.includes('querySelector(".alpha-battle-pl-core")'),"radial PL refresh does not target inner core");
 assert(battle.includes('core.querySelector("strong")')||battle.includes('core?.querySelector("strong")'),"radial PL current value not refreshed inside core");
 assert(!game.includes("ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID"),"frozen game.js contains successor purse mutation");
-assert(fingerprint.includes('buildId:"SC-ALPHA-RUNTIME-R303-2026-09-29-BC"')&&fingerprint.includes('sourceBaselineCommit:"9f90d86ff989caf59f96711e6067d497249f039e"'),"#105 repair runtime fingerprint was not advanced from current live-main authority");
+assert(fingerprint.includes('buildId:"SC-ALPHA-RUNTIME-R303-2026-09-29-BD"')&&fingerprint.includes('sourceBaselineCommit:"9f90d86ff989caf59f96711e6067d497249f039e"'),"#105 repair runtime fingerprint was not advanced from current live-main authority");
 console.log(JSON.stringify({pass:true,issue:105,checks:{
   sevenNonKakashiBindings:true,kakashiExcluded:true,hinataSparringSpeakerAlias:true,hinataFinalPairBound:true,hinataChronicleReceipt:true,miraiMenmaWritingGolden:true,legacyGoldenShimsRetired:true,knownAssetsExact:true,issue419AssetsConsumed:true,wasabiPursuitTargetActorProjection:true,missingAssetsNotGuessed:true,
   menmaNineTailsDialoguePortrait:true,miraiTerminalRouterClean:true,miraiMenmaReceipts:true,menmaPostBattleSegmented:true,menmaRewardDiagnosticRemoved:true,globalReceiptInputLock:true,globalStartPLBattleCTA:true,loadOrder:true,sharedSceneBoard:true,clickAnywhere:true,

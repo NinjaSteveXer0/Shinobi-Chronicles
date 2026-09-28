@@ -285,7 +285,7 @@ async function proveMiraiTerminalReceipt(browser){
         assert.strictEqual(row.text,"Good.");
 
         const futureChoice=await advanceUntilBeat(page,"menma_future_choice",20);
-        assert.deepStrictEqual(futureChoice.row.choices,["MASTER WHAT THEY WON'T TEACH ME","BECOME TOO STRONG TO HOLD BACK","CREATE SOMETHING THAT'S MINE","FIND THE LIMIT"],"Menma future choice drift");
+        assert.deepStrictEqual(futureChoice.row.choices,["MASTER WHAT THEY WON'T TEACH ME","BECOME TOO STRONG TO HOLD BACK","CREATE SOMETHING THAT'S MINE","FIND OUT HOW FAR I CAN GO"],"Menma future choice drift");
         const strongChoice=page.locator("#story-scene-presentation-layer .sc-story-choice").filter({hasText:"BECOME TOO STRONG TO HOLD BACK"}).first();
         await strongChoice.click();
         await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="menma_future_strong_01",null,{timeout:8000});

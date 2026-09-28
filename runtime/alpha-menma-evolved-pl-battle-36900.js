@@ -1315,6 +1315,34 @@ function ensureMenmaDefeatFutureSceneBoard38800(){
   }
   return{success:true,queued:true};
 }
+const MENMA_WRITING_GOLDEN_FUTURE_INTENT_BY_CHOICE_38800=Object.freeze({
+  master:"master_what_they_wont_teach_me",
+  strong:"become_too_strong_to_hold_back",
+  create:"create_something_thats_mine",
+  limit:"find_out_how_far_i_can_go"
+});
+function isMenmaWritingGolden105Scene38800(scene){
+  return !!scene&&!!scene.beatMap&&
+    scene.beatMap.has("menma_after_performance_router")&&
+    scene.beatMap.has("menma_close_01")&&
+    scene.beatMap.has("menma_receipt");
+}
+function bindMenmaWritingGoldenFutureIntent38800(scene){
+  const beat=scene&&scene.beatMap&&scene.beatMap.get("menma_future_choice");
+  if(!beat||!Array.isArray(beat.choices)||beat.choices.length!==4)return false;
+  for(const choice of beat.choices){
+    const intent=MENMA_WRITING_GOLDEN_FUTURE_INTENT_BY_CHOICE_38800[String(choice&&choice.choiceId||"")]||null;
+    if(!intent)return false;
+    const requestId="menma_future_ambition_intent_"+intent+"_38800";
+    choice.contextPatch={...(choice.contextPatch||{}),menmaFutureAmbitionIntent:intent};
+    const prior=Array.isArray(choice.consequenceRequests)?choice.consequenceRequests.filter(row=>row&&row.requestId!==requestId):[];
+    choice.consequenceRequests=[...prior,{
+      requestId,kind:"domain",
+      resolve:()=>commitMenmaFutureAmbitionIntent38800(intent)
+    }];
+  }
+  return true;
+}
 function installMenmaDefeatStoryBridge38800(scene){
   if(!scene||!scene.beatMap||typeof scene.beatMap.set!=="function")return{success:false,reason:"menma_story_scene_missing"};
   if(typeof normalizeStorySceneBeat!=="function")return{success:false,reason:"story_beat_normalizer_missing"};
@@ -1323,8 +1351,11 @@ function installMenmaDefeatStoryBridge38800(scene){
       registerSceneBackdropAssetPath(environmentId,assetPath);
     }
   }
-  const rows=menmaDefeatAndFutureStoryBeats38800();
+  const writingGolden=isMenmaWritingGolden105Scene38800(scene);
+  const authoredRows=menmaDefeatAndFutureStoryBeats38800();
+  const rows=writingGolden?authoredRows.filter(row=>String(row&&row.beatId||"").startsWith("menma_party_defeat_return_")):authoredRows;
   if(!rows.every(row=>upsertMenmaStoryBeat38800(scene,row)))return{success:false,reason:"menma_story_bridge_normalization_failed"};
+  if(writingGolden&&!bindMenmaWritingGoldenFutureIntent38800(scene))return{success:false,reason:"menma_writing_golden_future_intent_bind_failed"};
   const sceneBoard=ensureMenmaDefeatFutureSceneBoard38800();
   return{
     success:true,
@@ -1333,6 +1364,7 @@ function installMenmaDefeatStoryBridge38800(scene){
     futureEntryBeatId:FUTURE_ENTRY_BEAT_ID,
     futureChoiceBeatId:"menma_future_choice",
     futureEnvironmentPath:FUTURE_ENVIRONMENT_PATH,
+    writingGoldenFuturePreserved:writingGolden,
     sceneBoardRegistered:sceneBoard&&sceneBoard.success===true
   };
 }
@@ -1427,9 +1459,21 @@ function diagnostics(){
     phaseFailureNoFakeLow:String(completeMenmaSuccessorDefeat).includes('tutorialResult:"not_completed"')&&String(completeMenmaSuccessorDefeat).includes("performanceBucket:null"),
     partyDefeatReturnsToWritingBeat:!!beat&&beat.battle&&beat.battle.defeatBeatId===PARTY_DEFEAT_RETURN_BEAT_ID,
     partyDefeatWritingChainComplete:Array.from({length:24},(_,index)=>scene&&scene.beatMap&&scene.beatMap.has(`menma_party_defeat_return_${String(index+1).padStart(2,"0")}`)).every(Boolean)&&scene.beatMap.get("menma_party_defeat_return_24")?.nextBeatId===FUTURE_ENTRY_BEAT_ID,
-    futureAmbitionBridgeInstalled:scene&&scene.beatMap&&scene.beatMap.has(FUTURE_ENTRY_BEAT_ID)&&scene.beatMap.has("menma_future_choice")&&scene.beatMap.get("menma_future_terminal")?.exitScene===true,
+    futureAmbitionBridgeInstalled:scene&&scene.beatMap&&scene.beatMap.has(FUTURE_ENTRY_BEAT_ID)&&scene.beatMap.has("menma_future_choice")&&(
+      isMenmaWritingGolden105Scene38800(scene)
+        ?scene.beatMap.get("menma_receipt")?.mode==="record"&&scene.beatMap.get("menma_receipt")?.exitScene===true
+        :scene.beatMap.get("menma_future_terminal")?.exitScene===true
+    ),
     futureAmbitionChoiceExact:scene&&scene.beatMap&&scene.beatMap.get("menma_future_choice")?.choices?.map(choice=>choice.label).join("|")==="MASTER WHAT THEY WON'T TEACH ME|BECOME TOO STRONG TO HOLD BACK|CREATE SOMETHING THAT'S MINE|FIND OUT HOW FAR I CAN GO",
     futureAmbitionHistoryIntent:String(commitMenmaFutureAmbitionIntent38800).includes("FUTURE_INTENT_OCCURRENCE_ID")&&!String(commitMenmaFutureAmbitionIntent38800).includes("currentPL")&&!String(commitMenmaFutureAmbitionIntent38800).includes("BasePL"),
+    writingGoldenFuturePreserved:!isMenmaWritingGolden105Scene38800(scene)||(
+      scene.beatMap.get("menma_future_02")?.mode==="dialogue"&&
+      scene.beatMap.get("menma_future_02")?.speakerName==="NINE-TAILS"&&
+      scene.beatMap.get("menma_close_01")?.nextBeatId==="menma_receipt"
+    ),
+    writingGoldenFutureIntentBound:!isMenmaWritingGolden105Scene38800(scene)||scene.beatMap.get("menma_future_choice")?.choices?.every(choice=>
+      Array.isArray(choice.consequenceRequests)&&choice.consequenceRequests.some(row=>String(row&&row.requestId||"").startsWith("menma_future_ambition_intent_"))
+    ),
     rewardAdapterPresent:!!globalThis.SC_ACADEMY_MENMA_THREE_SUBJECT_REWARD_36200,
     plIdentityPreserved:source.includes('plIdentity:"Battle PL"')&&!source.includes("hit"+"Points")&&!source.includes("health"+"Meter"),
     kakashiUntouched:!source.includes("academy_"+"kakashi"),

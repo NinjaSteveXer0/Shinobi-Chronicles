@@ -75,6 +75,7 @@ for(let i=1;i<=24;i++)assert(menma.includes('beatId:"menma_party_defeat_return_'
 assert(menma.includes('nextBeatId:FUTURE_ENTRY_BEAT_ID'),"#386 defeat chain does not continue to menma_future_01");
 for(const label of ["MASTER WHAT THEY WON'T TEACH ME","BECOME TOO STRONG TO HOLD BACK","CREATE SOMETHING THAT'S MINE","FIND OUT HOW FAR I CAN GO"])assert(menma.includes(label),"#388 future-ambition choice missing "+label);
 assert(menma.includes('FUTURE_INTENT_OCCURRENCE_ID="occ_origin_menma_future_ambition_intent"')&&menma.includes("progressionGranted:false"),"future ambition is not recorded as non-progression Story intent");
+assert(menma.includes("isMenmaWritingGolden105Scene38800")&&menma.includes("writingGoldenFuturePreserved"),"#369/#373 successor bridge can still overwrite #105 Menma Writing-Golden future scene");
 assert(!operationalMenma.includes("menma_origin_anko_autonomous_assist"),"superseded autonomous-assist entitlement survived");
 assert(menma.includes("savedExactSuccessorSnapshot=true"),"real-player saved successor identity is not detected before base restore");
 assert(

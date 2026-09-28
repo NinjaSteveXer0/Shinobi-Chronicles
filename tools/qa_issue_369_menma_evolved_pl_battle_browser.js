@@ -615,16 +615,18 @@ async function legitimatePartyDefeat(browser){
     }
 
     const futureBeats=[
-      ["menma_future_01","Menma is running again."],
-      ["menma_future_02","Through the trees, Konoha comes back into view. The Academy is somewhere beyond the rooftops."],
-      ["menma_future_03","Satisfied?"],
-      ["menma_future_04","No."],
-      ["menma_future_05","Good."]
+      ["menma_future_01","Menma runs again.\n\nThe forest that felt enormous when he left the Academy feels different now—not safer, not quieter. Just less like a boundary.","narration"],
+      ["menma_future_02","Satisfied?","dialogue"],
+      ["menma_future_03","No.","dialogue"],
+      ["menma_future_03a","A low chuckle answers him.","narration"],
+      ["menma_future_04","Good.","dialogue"],
+      ["menma_future_05","Menma slows on a rise where Konoha shows through the trees. The Academy is somewhere beyond the rooftops, along with everything adults keep locking behind the word ready.\n\nHe looks at the village, then past it.","narration"]
     ];
-    for(const [beatId,text] of futureBeats){
+    for(const [beatId,text,mode] of futureBeats){
       await page.waitForFunction(id=>getActiveStorySceneRuntime()?.beatId===id,beatId,{timeout:12000});
       const beat=await page.evaluate(()=>getCurrentStorySceneBeat());
-      assert.strictEqual(beat.text,text,"#388 Scene-10 Story drift at "+beatId);
+      assert.strictEqual(beat.text,text,"#388/#105 Scene-10 Story drift at "+beatId);
+      assert.strictEqual(beat.mode,mode,"#388/#105 Scene-10 speaker mode drift at "+beatId);
       if(beatId==="menma_future_01"){
         await page.waitForFunction(()=>{
           const layer=document.getElementById("story-scene-presentation-layer");
@@ -689,9 +691,21 @@ async function legitimatePartyDefeat(browser){
       await clickStoryPrimary(page);
     }
 
-    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_future_terminal",null,{timeout:12000});
-    assert.strictEqual(await page.evaluate(()=>getCurrentStorySceneBeat()?.text||null),"Menma runs toward Konoha.");
-    await page.screenshot({path:path.join(OUT,"party-defeat-future-terminal.png"),fullPage:false,timeout:12000}).catch(()=>{});
+    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_close_01",null,{timeout:12000});
+    assert.strictEqual(await page.evaluate(()=>getCurrentStorySceneBeat()?.text||null),"Menma runs toward Konoha.\n\nNot back to the morning he left.\n\nForward.");
+    await advanceStorySemanticBeat369(page,"menma_close_01");
+    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_receipt",null,{timeout:12000});
+    const receipt=await page.evaluate(()=>({
+      mode:getCurrentStorySceneBeat()?.mode||null,
+      text:document.querySelector("#story-scene-presentation-layer .sc-story-text")?.textContent?.trim()||"",
+      heading:document.querySelector("#story-scene-presentation-layer .sc-story-name")?.textContent?.trim()||"",
+      button:document.querySelector("#story-scene-presentation-layer .sc-chronicle-primary")?.textContent?.trim()||""
+    }));
+    assert.strictEqual(receipt.mode,"record","#105 Menma Chronicle Receipt mode missing after #369 defeat return");
+    assert.strictEqual(receipt.heading,"CHRONICLE RECEIPT","#105 Menma Chronicle Receipt heading missing after #369 defeat return");
+    assert(receipt.text.includes("ACADEMY MENMA"),"#105 Menma Chronicle Receipt content missing after #369 defeat return");
+    assert.strictEqual(receipt.button,"CONTINUE","#105 Menma Chronicle Receipt dedicated button missing");
+    await page.screenshot({path:path.join(OUT,"party-defeat-future-receipt.png"),fullPage:false,timeout:12000}).catch(()=>{});
     await clickStoryPrimary(page);
     await page.waitForFunction(()=>getActiveStorySceneRuntime()===null&&getAcademyTeamFormationSnapshot()?.required===true,null,{timeout:12000});
     const completion=await page.evaluate(()=>({

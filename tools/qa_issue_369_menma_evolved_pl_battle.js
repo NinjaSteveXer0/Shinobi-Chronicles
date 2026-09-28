@@ -83,6 +83,7 @@ assert(runtime.includes('FUTURE_ENTRY_BEAT_ID="menma_future_01"')&&runtime.inclu
 assert(runtime.includes('nextBeatId:FUTURE_ENTRY_BEAT_ID'),"#386 party-defeat return does not continue to Scene 10");
 for(const label of ["MASTER WHAT THEY WON'T TEACH ME","BECOME TOO STRONG TO HOLD BACK","CREATE SOMETHING THAT'S MINE","FIND OUT HOW FAR I CAN GO"])assert(runtime.includes(label),"#388 future-ambition choice missing "+label);
 assert(runtime.includes('FUTURE_INTENT_OCCURRENCE_ID="occ_origin_menma_future_ambition_intent"')&&runtime.includes("progressionGranted:false"),"future ambition intent history is not fail-safe against implicit progression");
+assert(runtime.includes("isMenmaWritingGolden105Scene38800")&&runtime.includes("bindMenmaWritingGoldenFutureIntent38800"),"#369 still overwrites #105 Menma Writing-Golden future scene instead of preserving it");
 assert(game.includes('record.actorRef.participantId==="academy_menma"'),"baseline MEN-03 actor filter drifted");
 
 assert(runtime.includes('plIdentity:"Battle PL"'),"Battle PL identity marker missing");
