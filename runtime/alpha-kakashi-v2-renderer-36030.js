@@ -35,7 +35,7 @@ function cueState(){
   if(typeof getAcademyKakashiV2TransitionState36040==="function")return getAcademyKakashiV2TransitionState36040();
   const p=projection(),cues=p&&p.cues||[];return{cueIndex:0,cueCount:cues.length,atEnd:cues.length<=1};
 }
-function installStyle(){
+// Owner lock 2026-09-28: narration/dialogue frame outlines are cyan for every speaker side.\nfunction installStyle(){
   if(typeof document==="undefined"||!document.head||document.getElementById(STYLE_ID))return;
   const s=document.createElement("style");s.id=STYLE_ID;s.textContent=`
 #story-scene-presentation-layer[data-kakashi-v2="true"]{display:block!important;background:#020508!important;overflow:hidden!important;align-items:stretch!important;justify-content:stretch!important}
@@ -119,8 +119,8 @@ function installStyle(){
 #${ROOT_ID} .kv2-speech{position:absolute;left:var(--kv2-speech-x,50%);bottom:23.5%;z-index:31;width:min(36vw,500px);box-sizing:border-box;transform:translateX(-50%);padding:12px 15px 13px;border:1px solid rgba(103,221,230,.55);border-radius:16px;background:linear-gradient(145deg,rgba(4,18,24,.94),rgba(2,9,14,.97));box-shadow:0 18px 48px rgba(0,0,0,.48),0 0 22px rgba(78,210,220,.08);backdrop-filter:blur(8px);pointer-events:none}
 #${ROOT_ID} .kv2-speech[hidden]{display:none!important}
 #${ROOT_ID} .kv2-speech::after{content:"";position:absolute;left:var(--kv2-speech-tail,50%);top:-8px;width:14px;height:14px;transform:translateX(-50%) rotate(45deg);border-left:1px solid rgba(103,221,230,.5);border-top:1px solid rgba(103,221,230,.5);background:rgba(2,9,14,.97)}
-#${ROOT_ID} .kv2-speech[data-speaker-side="opposition"]{border-color:rgba(218,176,77,.58);background:linear-gradient(145deg,rgba(25,18,6,.93),rgba(8,10,12,.97));box-shadow:0 18px 48px rgba(0,0,0,.48),0 0 22px rgba(218,176,77,.08)}
-#${ROOT_ID} .kv2-speech[data-speaker-side="opposition"]::after{border-color:rgba(218,176,77,.52);background:rgba(8,10,12,.97)}
+#${ROOT_ID} .kv2-speech[data-speaker-side="opposition"]{border-color:rgba(103,221,230,.55);background:linear-gradient(145deg,rgba(25,18,6,.93),rgba(8,10,12,.97));box-shadow:0 18px 48px rgba(0,0,0,.48),0 0 22px rgba(78,210,220,.08)}
+#${ROOT_ID} .kv2-speech[data-speaker-side="opposition"]::after{border-color:rgba(103,221,230,.5);background:rgba(8,10,12,.97)}
 #${ROOT_ID} .kv2-speech-name{color:#78dfe7;font-size:8px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}
 #${ROOT_ID} .kv2-speech[data-speaker-side="opposition"] .kv2-speech-name{color:#e5c66f}
 #${ROOT_ID} .kv2-speech-text{margin-top:5px;color:#f0f4f1;font-size:clamp(12px,.96vw,16px);line-height:1.42;text-shadow:0 1px 2px #000}
