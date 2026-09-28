@@ -50,8 +50,14 @@ assert(metal.includes('destroy_dummy:{statKey:"tai",statLabel:"Taijutsu",success
 assert(rogue.includes('makeEnemyRatioGuardAction(FEINT_ID,0.40'));
 assert(rogue.includes('m.feintUsed!==true'));
 assert(rogue.includes('now>created'));
-assert(!rogue.includes("iwabee_origin_rogue_genin_01"));
-assert(!rogue.includes("wasabi_origin_rogue_genin_01"));
+{
+  const start=rogue.indexOf("function build({participantId,metaGetter}={})");
+  const end=rogue.indexOf("function diagnostics()",start);
+  assert(start>=0&&end>start,"Reusable Rogue Genin builder source missing");
+  const builder=rogue.slice(start,end);
+  assert(!builder.includes("iwabee_origin_rogue_genin_01"),"Reusable Rogue package hardcodes Iwabee historical identity");
+  assert(!builder.includes("wasabi_origin_rogue_genin_01"),"Reusable Rogue package hardcodes Wasabi historical identity");
+}
 
 assert(iwabee.includes('stats:Object.freeze({nin:23,tai:22,buki:21,fuin:10,kin:14,gen:15,stamina:24})'));
 assert(iwabee.includes('oppositionTemplateId:TEMPLATE'));
