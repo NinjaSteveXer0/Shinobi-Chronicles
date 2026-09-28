@@ -93,6 +93,8 @@ async function info(page){
       localContext:rt&&rt.localContext?JSON.parse(JSON.stringify(rt.localContext)):{},
       text:root?.querySelector(".sc-story-text")?.textContent?.trim()||"",
       speaker:root?.querySelector(".sc-story-name")?.textContent?.trim()||"",
+      cueSpeakerActorId:root?.dataset.scCueSpeakerActorId||null,
+      focusedActorIds:[...(root?.querySelectorAll(".sc-scene-board-33900__actor.is-focus")||[])].map(n=>n.dataset.actorId||"").filter(Boolean),
       choices:[...(root?.querySelectorAll(".sc-story-choice")||[])].filter(visible).map(n=>n.textContent.trim()),
       primaryCount:[...(root?.querySelectorAll(".sc-chronicle-primary,.sc-story-actions > .sc-story-action:not(.sc-story-choice)")||[])].filter(visible).length,
       backdropPath:typeof resolveStorySceneBoardBackdropPath==="function"?resolveStorySceneBoardBackdropPath():null,
@@ -149,6 +151,31 @@ async function continueTo(page,target,{max=180,collect=null}={}){
     await clickContinue(page);
   }
   throw new Error("continueTo guard exceeded "+target);
+}
+
+async function assertOpeningSpeakerOwnership(page){
+  let sawPartner=false,sawHinataReply=false;
+  for(let i=0;i<80;i++){
+    const row=await assertSceneHealthy(page,"opening-speaker-ownership");
+    if(row.mode==="choice")break;
+    if(row.text==="Ready?"){
+      assert.strictEqual(row.speaker,"SPARRING STUDENT","Ready? speaker label drift");
+      assert.strictEqual(row.cueSpeakerActorId,"hinata_sparring_partner","Ready? did not bind to sparring partner");
+      assert.deepStrictEqual(row.focusedActorIds,["hinata_sparring_partner"],"Ready? focused the wrong Character Card");
+      sawPartner=true;
+    }
+    if(row.text==="Yes."){
+      assert.strictEqual(row.speaker,"HINATA","Yes. speaker label drift");
+      assert.strictEqual(row.cueSpeakerActorId,"academy_hinata","Yes. did not bind back to Hinata");
+      assert.deepStrictEqual(row.focusedActorIds,["academy_hinata"],"Yes. focused the wrong Character Card");
+      sawHinataReply=true;
+      break;
+    }
+    await clickContinue(page);
+  }
+  assert.strictEqual(sawPartner,true,"opening never proved SPARRING STUDENT ownership");
+  assert.strictEqual(sawHinataReply,true,"opening never proved Hinata reply ownership");
+  return true;
 }
 
 async function choiceLabels(page){
@@ -238,6 +265,7 @@ async function runWait(browser){
   const label="wait-show";
   const {context,page,runtimeErrorGate}=await boot(browser,label);
   try{
+    await assertOpeningSpeakerOwnership(page);
     let backdropCheck=await continueTo(page,"hin_ex1_choice");
     assert(backdropCheck.backdropPath&&backdropCheck.backdropPath.includes("Hinata Origin Backdrop/hyuga_compound.png"),label+" primary Hyūga backdrop missing before final scene");
     assert.deepStrictEqual(await choiceLabels(page),["WAIT FOR HIM TO COMMIT","STEP IN FIRST","BREAK AWAY AND RESET"]);
