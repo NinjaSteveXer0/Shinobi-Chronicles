@@ -1290,26 +1290,31 @@
       "symbol": "saveTestState",
       "chain": [
         "runtime/alpha-metal-origin-runtime-396.js",
-        "runtime/alpha-iwabee-origin-runtime-399.js"
+        "runtime/alpha-iwabee-origin-runtime-399.js",
+        "runtime/alpha-arc1-reward-evaluation-35400.js",
+        "runtime/alpha-menma-evolved-pl-battle-36900.js"
       ],
-      "canonicalActiveOwner": "runtime/alpha-iwabee-origin-runtime-399.js",
-      "activationCondition": "persist exact scoped adapter envelope when Metal396 or Iwabee399 Battle is active",
+      "canonicalActiveOwner": "runtime/alpha-menma-evolved-pl-battle-36900.js",
+      "activationCondition": "Origin adapters persist exact scoped envelopes; existing Arc-1 reward and Menma evolved-Battle wrappers load later and remain final production save owner while delegating the prior chain",
       "qaRefs": [
         "tools/qa_issues_396_399_400_browser.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_369_menma_evolved_pl_battle.js"
       ]
     },
     {
       "symbol": "restoreTestState",
       "chain": [
         "runtime/alpha-metal-origin-runtime-396.js",
-        "runtime/alpha-iwabee-origin-runtime-399.js"
+        "runtime/alpha-iwabee-origin-runtime-399.js",
+        "runtime/alpha-menma-evolved-pl-battle-36900.js"
       ],
-      "canonicalActiveOwner": "runtime/alpha-iwabee-origin-runtime-399.js",
-      "activationCondition": "restore exact scoped adapter envelope when saved encounter/config matches",
+      "canonicalActiveOwner": "runtime/alpha-menma-evolved-pl-battle-36900.js",
+      "activationCondition": "Origin adapters restore exact scoped envelopes; the existing Menma evolved-Battle restore wrapper loads later and remains final production restore owner while delegating the prior chain",
       "qaRefs": [
         "tools/qa_issues_396_399_400_browser.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_369_menma_evolved_pl_battle.js"
       ]
     },
     {
