@@ -169,11 +169,15 @@ async function runIwabeeWorldBranch(browser,beatId,expected){
   const {context,page,gate}=await boot(browser,label,"academy_iwabee");
   try{
     const row=await page.evaluate(({beatId})=>{
-      const set=setStorySceneBeat(beatId,{render:false});
-      const r=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");
-      return{set,fact:JSON.parse(JSON.stringify(r?.fact||null))};
+      const first=setStorySceneBeat(beatId,{render:false});
+      const second=setStorySceneBeat(beatId,{render:false});
+      const rows=(playerData.activityHistory||[]).filter(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");
+      const r=rows[0]||null;
+      return{first,second,receiptCount:rows.length,fact:JSON.parse(JSON.stringify(r?.fact||null))};
     },{beatId});
-    assert.strictEqual(row.set?.success,true,label+" set return beat");
+    assert.strictEqual(row.first?.success,true,label+" first set return beat");
+    assert.strictEqual(row.second?.success,true,label+" idempotent re-entry");
+    assert.strictEqual(row.receiptCount,1,label+" duplicated World disposition receipt");
     assert(row.fact,label+" missing World occurrence");
     for(const [key,value] of Object.entries(expected))assert.deepStrictEqual(row.fact[key],value,label+" "+key);
     await gate.assertClean(label);
@@ -212,25 +216,119 @@ async function runIwabeeWorldBranch(browser,beatId,expected){
 
     {
       const {context,page,gate}=await boot(browser,"metal-met03","academy_metal_lee");
-      const met03=await page.evaluate(()=>({
-        redirect:resolveAcademyMetalProtectiveResponse396("redirect_dummy"),
-        impact:resolveAcademyMetalProtectiveResponse396("take_impact"),
-        destroy:resolveAcademyMetalProtectiveResponse396("destroy_dummy")
-      }));
-      assert.strictEqual(met03.redirect.protectiveResponseOutcome,"partial");
-      assert.strictEqual(met03.impact.protectiveResponseOutcome,"success");
-      assert.strictEqual(met03.destroy.protectiveResponseOutcome,"partial");
-      assert.strictEqual(met03.redirect.interventionParticipantRef,"metal_origin_inviting_genin");
-      assert.strictEqual(met03.impact.interventionRequired,false);
+      const met03=await page.evaluate(()=>{
+        const fresh={
+          redirect:resolveAcademyMetalProtectiveResponse396("redirect_dummy"),
+          impact:resolveAcademyMetalProtectiveResponse396("take_impact"),
+          destroy:resolveAcademyMetalProtectiveResponse396("destroy_dummy")
+        };
+        const original=globalThis.getDevelopedEffectiveCharacterStats;
+        const synthetic={};
+        try{
+          const run=(key,kind,tai,stamina)=>{
+            globalThis.getDevelopedEffectiveCharacterStats=()=>({tai,stamina});
+            synthetic[key]=resolveAcademyMetalProtectiveResponse396(kind);
+          };
+          run("redirect_success","redirect_dummy",14,0);
+          run("redirect_partial","redirect_dummy",11,0);
+          run("redirect_failure","redirect_dummy",10,0);
+          run("impact_success","take_impact",0,14);
+          run("impact_partial","take_impact",0,11);
+          run("impact_failure","take_impact",0,10);
+          run("destroy_success","destroy_dummy",15,0);
+          run("destroy_partial","destroy_dummy",12,0);
+          run("destroy_failure","destroy_dummy",11,0);
+        }finally{
+          globalThis.getDevelopedEffectiveCharacterStats=original;
+        }
+        const first=setStorySceneBeat("met_resolve_redirect",{render:false});
+        const firstBeat=getActiveStorySceneRuntime()?.beatId||null;
+        const countAfterFirst=(playerData.activityHistory||[]).filter(x=>x&&x.occurrenceId==="occ_origin_metal_protective_response_resolution").length;
+        const second=setStorySceneBeat("met_resolve_redirect",{render:false});
+        const countAfterSecond=(playerData.activityHistory||[]).filter(x=>x&&x.occurrenceId==="occ_origin_metal_protective_response_resolution").length;
+        const receipt=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_metal_protective_response_resolution");
+        return{fresh,synthetic,first,firstBeat,countAfterFirst,second,countAfterSecond,receipt:JSON.parse(JSON.stringify(receipt?.fact||null))};
+      });
+      assert.strictEqual(met03.fresh.redirect.protectiveResponseOutcome,"partial");
+      assert.strictEqual(met03.fresh.impact.protectiveResponseOutcome,"success");
+      assert.strictEqual(met03.fresh.destroy.protectiveResponseOutcome,"partial");
+      assert.strictEqual(met03.fresh.redirect.interventionParticipantRef,"metal_origin_inviting_genin");
+      assert.strictEqual(met03.fresh.redirect.interventionRequired,true);
+      assert.strictEqual(met03.fresh.impact.interventionRequired,false);
+      assert.strictEqual(met03.fresh.impact.interventionParticipantRef,null);
+      assert.strictEqual(met03.fresh.redirect.attempted,true);
+      for(const key of ["redirect","impact","destroy"]){
+        assert.strictEqual(met03.synthetic[key+"_success"].protectiveResponseOutcome,"success",key+" success threshold");
+        assert.strictEqual(met03.synthetic[key+"_partial"].protectiveResponseOutcome,"partial",key+" partial threshold");
+        assert.strictEqual(met03.synthetic[key+"_failure"].protectiveResponseOutcome,"failure",key+" failure threshold");
+      }
+      assert.strictEqual(met03.first?.success,true);
+      assert.strictEqual(met03.firstBeat,"met_redirect_partial_01");
+      assert.strictEqual(met03.countAfterFirst,1);
+      assert.strictEqual(met03.second?.success,true);
+      assert.strictEqual(met03.countAfterSecond,1,"MET-03 receipt duplicated on re-entry");
+      assert.strictEqual(met03.receipt?.attempted,true);
+      assert.strictEqual(met03.receipt?.protectiveResponseKind,"redirect_dummy");
+      assert.strictEqual(met03.receipt?.protectiveResponseOutcome,"partial");
+      assert.strictEqual(met03.receipt?.interventionRequired,true);
+      assert.strictEqual(met03.receipt?.interventionParticipantRef,"metal_origin_inviting_genin");
       await gate.assertClean("metal-met03");
       await context.close();
       results.push({met03});
+    }
+
+    {
+      const {context,page,gate}=await boot(browser,"metal-save-reload","academy_metal_lee");
+      const proof=await page.evaluate(()=>{
+        const set=setStorySceneBeat("met_spar_battle",{render:false});
+        const battle=launchStorySceneBattle();
+        if(!set?.success||!battle?.success)return{set,battle};
+        const genin="metal_origin_inviting_genin";
+        const runtime=ensureBattleRuntimeState();
+        runtime.actionOpportunityState=runtime.actionOpportunityState||{counters:{player:{},enemy:{}},startedTokens:{}};
+        runtime.actionOpportunityState.counters=runtime.actionOpportunityState.counters||{player:{},enemy:{}};
+        runtime.actionOpportunityState.counters.enemy=runtime.actionOpportunityState.counters.enemy||{};
+        runtime.actionOpportunityState.counters.enemy[genin]=4;
+        const existing=findBattleTransientState({stateKey:"metal_origin_inviting_genin_feint_entry_ready",sourceSide:"enemy",sourceParticipantId:genin,targetSide:"enemy",targetParticipantId:genin});
+        if(existing)removeBattleTransientState(existing.stateId);
+        const state=addBattleTransientState({
+          stateKey:"metal_origin_inviting_genin_feint_entry_ready",
+          sourceSide:"enemy",sourceParticipantId:genin,targetSide:"enemy",targetParticipantId:genin,
+          ownerRef:{type:"skill",id:"metal_origin_inviting_genin_feint_entry"},
+          data:{sourceSkillId:"metal_origin_inviting_genin_feint_entry",feedsSkillId:"metal_origin_inviting_genin_committed_lunge",refreshReplace:true}
+        });
+        const beforeIndex=getBattleActionOpportunityIndex("enemy",genin);
+        saveTestState();
+        runtime.actionOpportunityState.counters.enemy[genin]=0;
+        if(state)removeBattleTransientState(state.stateId);
+        const restored=restoreTestState();
+        const afterIndex=getBattleActionOpportunityIndex("enemy",genin);
+        const restoredState=findBattleTransientState({stateKey:"metal_origin_inviting_genin_feint_entry_ready",sourceSide:"enemy",sourceParticipantId:genin,targetSide:"enemy",targetParticipantId:genin});
+        const eligible=(enemyDatabase[genin]?.authoredBattleActions||[]).filter(Boolean);
+        const choice=chooseEnemyAuthoredBattleAction({ready:true,enemyId:genin,eligibleActions:eligible});
+        return{
+          set,battle,restored,beforeIndex,afterIndex,
+          restoredStateKey:restoredState?.stateKey||null,
+          nextActionId:choice?.action?.id||null,
+          battleId:currentBattle?.battleId||null
+        };
+      });
+      assert.strictEqual(proof.set?.success,true,"Metal reload proof set Battle beat");
+      assert.strictEqual(proof.battle?.success,true,"Metal reload proof launch");
+      assert.strictEqual(proof.beforeIndex,4,"Metal pre-save deterministic action index");
+      assert.strictEqual(proof.afterIndex,4,"Metal save/reload changed deterministic action index");
+      assert.strictEqual(proof.restoredStateKey,"metal_origin_inviting_genin_feint_entry_ready","Metal Feint Entry transient did not restore");
+      assert.strictEqual(proof.nextActionId,"metal_origin_inviting_genin_committed_lunge","Metal restored next AI action drift");
+      await gate.assertClean("metal-save-reload");
+      await context.close();
+      results.push({metalSaveReload:proof});
     }
 
     results.push(await runIwabeeBattle(browser,"victory"));
     results.push(await runIwabeeBattle(browser,"defeat"));
     results.push(await runIwabeeWorldBranch(browser,"iwa_block_return_01",{
       rogueDisposition:"SURRENDERED_AFTER_EARTH_ROUTE_CONSTRAINT",
+      academyInstructorRef:"iwabee_origin_practical_instructor_01",
       custodyState:"TEMPORARY_INSTRUCTOR_DETENTION",
       instructorIntervention:"ACCEPT_SURRENDER_AND_SECURE",
       earthReleaseUsedToConstrainRogueGenin:true,
@@ -239,12 +337,14 @@ async function runIwabeeWorldBranch(browser,beatId,expected){
     }));
     results.push(await runIwabeeWorldBranch(browser,"iwa_call_05",{
       rogueDisposition:"ESCAPED_AFTER_INSTRUCTOR_ESCALATION",
+      academyInstructorRef:"iwabee_origin_practical_instructor_01",
       custodyState:"NONE",
       instructorIntervention:"SHIELD_STUDENTS_NO_PURSUIT",
       earthReleaseUsedToConstrainRogueGenin:false
     }));
     results.push(await runIwabeeWorldBranch(browser,"iwa_finish_04",{
       rogueDisposition:"ESCAPED_WHILE_IWABEE_FINISHED_PRACTICAL",
+      academyInstructorRef:"iwabee_origin_practical_instructor_01",
       custodyState:"NONE",
       instructorIntervened:false,
       instructorIntervention:"NONE",
@@ -260,12 +360,16 @@ async function runIwabeeWorldBranch(browser,beatId,expected){
         metalStrongMixedRoughRuntimeRouting:true,
         metalFixed13Denominator:true,
         metalMet03FreshBaseOutcomes:true,
+        metalMet03SyntheticThresholdMatrix:true,
+        metalMet03IdempotentReceipt:true,
+        metalSaveReloadRestoresNextAIAndFeint:true,
         iwabeeHistoricalRogueSeparatedFromTemplate:true,
         iwabeeVictoryDetention:true,
         iwabeeDefeatEscapeBridge:true,
         iwabeeBlockSurrender:true,
         iwabeeCallEscape:true,
         iwabeeFinishEscape:true,
+        iwabeeDispositionReentryIdempotent:true,
         browserRuntimeErrorGateClean:true
       },
       results,browserGoldenClaimed:false
