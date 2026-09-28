@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-28  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons / Tailed Beasts  
-**Status:** **PROPOSED — AWAITING STEPHEN SIGN-OFF**  
+**Status:** **YIN KURAMA COMBAT DESIGN CLOSED BY STEPHEN 2026-09-28 / DUAL-PARTITION COOP + COMPLETE KURAMA REVISED PROPOSAL**  
 **Parent:** #235  
 **CE non-collapse authority:** `Documentation/Coordination/Kurama_Persistent_Source_Relationship_Partition_and_Manifestation_Non_Collapse_Contract_2026-09-28.md`  
 **Canon/SC research:** `Documentation/Combat/SC_Combat_Kurama_Family_Canon_and_SC_Representation_Research_2026-09-27.md`
@@ -298,67 +298,256 @@ Preserve:
 
 ---
 
-# H. Complete Kurama Enhancement — Reunited Reservoir
+# H. Dual-partition cooperative lane — Yin + Yang hosted together
+
+Stephen explicitly closes the design direction that one Character may legitimately host both Yin and Yang as **two separately-addressed Hosted Entities** where exact history/host authority permits it.
+
+This does NOT automatically create Complete Kurama.
+
+Preserve:
+
+> **two hosted halves != reunited whole**
+
+While split:
+- Yin remains Yin;
+- Yang remains Yang;
+- each source remains independently addressable;
+- each source reservation remains real;
+- cooperative dual-source actions may require both current sources;
+- one host action may carry both sources without granting either Entity an independent extra turn.
+
+When an exact reunion occurrence later creates `kurama_complete`:
+- the two split-source hosted states cease to be the current source model;
+- one Complete Kurama source replaces them;
+- Twin/dual-source actions are no longer valid merely from historical prior hosting.
+
+## `kurama_twin_beast_bomb` — **Twin Beast Bomb**
+
+Classification:
+
+**DUAL-PARTITION COOPERATIVE ATTACK / YIN + YANG / TAILED BEAST BOMB**
+
+Status:
+
+**PROPOSED exact Combat numbers — cooperative-technique direction approved by Stephen**
+
+Requirements:
+
+- same acting Character currently has legitimate access to both exact Yin and Yang Kurama partitions, OR another future exact Battle contract places both split sources in a valid cooperative action relation;
+- both sources are currently available for this action;
+- current relationship/control state permits cooperation from each source;
+- neither source is suppressed/separated in a way that makes its contribution illegal.
+
+Action economy:
+
+- acting Character spends **one normal action opportunity**;
+- Yin and Yang do NOT gain separate turns;
+- one use consumes the current Battle's ordinary Tailed Beast Bomb availability for **both participating halves** so the same source energy is not double-spent through separate TBB actions.
+
+Player text:
+
+> **Yin and Yang form a Tailed Beast Bomb together. Converge both bombs on one enemy, or split them across two targets.**
+
+Choose one mode:
+
+### CONVERGE
+
+Target:
+
+one hostile
+
+Packets:
+
+- Yin packet: **ATK38**
+- Yang packet: **ATK38**
+
+Rules:
+- both packets target the same hostile;
+- ordinary Stamina mitigates each packet separately;
+- exact packet provenance remains Yin / Yang;
+- one action, two source packets;
+- no third/bonus packet.
+
+### SPLIT
+
+Targets:
+
+two distinct legal hostiles
+
+Packets:
+
+- one target receives Yin **ATK38**;
+- the other receives Yang **ATK38**.
+
+Rules:
+- ordinary Stamina independently;
+- cannot target the same hostile twice in SPLIT;
+- if only one legal hostile exists, use CONVERGE instead;
+- no Reserve/off-slot legality is created by this Skill itself.
+
+Hard boundaries:
+
+- Twin Beast Bomb does NOT merge Yin and Yang;
+- it does NOT unlock `kurama_complete`;
+- it does NOT add PL123 + PL125 to the host;
+- it does NOT create a second action opportunity;
+- it does NOT copy the two full source packages onto the host;
+- it is unavailable after a legitimate reunion has replaced the split-source state with Complete Kurama unless later history splits the source again.
+
+Why two packets:
+
+> **Twin Beast Bomb is two half-sources coordinating. Complete Kurama's bomb is one whole source firing as one entity.**
+
+That gives the two states different Battle behaviour instead of making Complete a cosmetic rename.
+
+---
+
+# I. Complete Kurama — rebuilt identity
+
+The earlier Reunited Reservoir proposal is superseded.
+
+Stephen correction:
+
+> **Complete Kurama is one single Entity — the conjoinment and accumulation of Yin + Yang into the full power of the Nine-Tailed Fox.**
+
+Therefore Complete Kurama must not play like:
+- a Yin mode;
+- a Yang mode;
+- a choice between half-like effects;
+- two hidden Hosted Entities underneath one card;
+- a generic Kurama with a small numeric bump.
+
+Fingerprint:
+
+> **FULL NINE-TAILS / UNIFIED CHAKRA CORE / MAXIMUM ORDINARY KURAMA SCALE**
+
+Canonical mechanical rule:
+
+> **Two powerful partitions coordinate while split. One more powerful source acts when reunited.**
+
+Complete Kurama has:
+- one Entity identity;
+- one Battle PL ledger when legitimately manifested;
+- one action opportunity under the applicable lifecycle;
+- one source package;
+- one complete chakra reservoir;
+- no internal Yin/yang action split.
+
+---
+
+# J. Complete Kurama Enhancement — Nine-Tails: Full Power
 
 ID:
 
-`kurama_complete_reunited_reservoir`
+`kurama_complete_full_power`
 
 Activation:
 
 **EXACT COMPLETE / REUNITED WHOLE STATE**
 
-No generic Stat bonus.
+Limit:
+
+**once per Battle**
+
+Use:
+
+before Complete Kurama commits one Kurama-family ATTACK.
+
+Player text:
+
+> **Unleash the full Nine-Tails. Empower the attack, then keep enough chakra around Kurama to withstand the counterattack.**
+
+Effect:
+
+1. the committed Kurama-family ATTACK gains **+20% pre-Stamina Attack PL** on each authored damage packet of that exact action;
+2. the action gains no new targets or extra packets;
+3. after the attack resolves, establish `kurama_complete_full_power_guard`;
+4. the first qualifying direct hostile Attack-PL packet against Complete Kurama before its next legitimate action opportunity is reduced **40% pre-Stamina**;
+5. ordinary Stamina then resolves;
+6. guard is consumed by that packet or expires at Complete Kurama's next action opportunity.
+
+No:
+- Stat rewrite;
+- extra action;
+- second PL pool;
+- internal Yin/Yang mode;
+- self-damage;
+- host PL transfer.
+
+Identity:
+
+> **A half may have to decide where to spend a reserve. Complete Kurama has enough accumulated chakra to hit at full force and still carry protection into the enemy response.**
+
+---
+
+# K. Complete Kurama manifested signature actions
+
+## 1. `kurama_complete_full_power_tailed_beast_bomb` — **Full-Power Tailed Beast Bomb**
+
+Class:
+
+**ATTACK / COMPLETE KURAMA / TAILED BEAST BOMB**
 
 Limit:
 
 **once per Battle**
 
-Before Complete Kurama commits one Kurama-family ATTACK, choose one mode:
+Choose one mode.
 
-## OVERFLOW
+### FOCUS
 
-Player text:
+Target:
 
-> **Pour the reunited chakra reserve into one attack. That attack gains 25% ATK.**
+one hostile
 
-Effect:
-- qualifying attack gains **+25% pre-Stamina Attack PL**;
-- no extra packet;
-- no target-count increase;
-- no second action.
+ATK:
 
-## RESERVE
+**72**
 
 Player text:
 
-> **Hold the extra chakra back instead. Restore 24 Battle PL to Complete Kurama.**
+> **Compress the full Nine-Tails' chakra into one Tailed Beast Bomb for 72 ATK.**
 
-Effect:
-- restore **24 underlying Remaining Battle PL** to Complete Kurama;
-- capped at its authoritative Battle maximum;
-- full Battle PL is invalid precommit;
-- no Injury healing;
-- no Stat rewrite;
-- no temporary capacity.
+Rules:
+- one direct packet;
+- ordinary Stamina mitigation;
+- no automatic Stun/displacement/terrain destruction.
 
-Using either mode consumes Reunited Reservoir for the Battle.
+### DEVASTATION
 
-Decision:
+Targets:
 
-> **Spend the whole reserve on one huge attack, or keep that reserve inside Kurama and stay in the fight longer.**
+up to **3 legally exposed hostiles**
 
-This represents the greater total chakra state of reunited Kurama without adding Yin and Yang packages together.
+ATK:
+
+**58 each**
+
+Player text:
+
+> **Detonate the full Nine-Tails' chakra across up to 3 exposed enemies for 58 ATK each.**
+
+Rules:
+- one packet per target;
+- ordinary Stamina independently;
+- no additional targets beyond 3;
+- no automatic Stun/displacement/terrain destruction.
+
+Shared rules:
+
+- this is Complete Kurama's own whole-source Tailed Beast Bomb;
+- it is NOT Yin TBB + Yang TBB;
+- it consumes Complete Kurama's TBB availability only;
+- it may receive **Nine-Tails: Full Power** if that Enhancement is still available;
+- no hidden Excess multiplier.
 
 ---
 
-# I. Complete Kurama manifested signature actions
-
-## 1. `kurama_complete_nine_tail_rupture` — **Nine-Tail Rupture**
+## 2. `kurama_complete_nine_tail_cataclysm` — **Nine-Tail Cataclysm**
 
 Class:
 
-**ATTACK / WHOLE-BODY TAIL PRESSURE / FORMATION**
+**ATTACK / FULL-BODY TAIL ASSAULT / FORMATION PRESSURE**
 
 Limit:
 
@@ -371,33 +560,31 @@ Targets:
 
 ATK:
 
-**38 each**
+**42 each**
 
 Player text:
 
-> **Crash all nine tails through the enemy formation. Hit the Active and up to 2 Benched enemies for 38 ATK each.**
+> **Crash all nine tails through the enemy formation. Hit the Active and up to 2 Benched enemies for 42 ATK each.**
 
 Rules:
 - one packet per target;
-- ordinary Stamina mitigation independently;
+- ordinary Stamina independently;
 - no Reserve targeting;
-- no forced reorder;
-- no promotion;
-- no Stun;
-- no restraint;
-- if no Benched participants exist, only the Active packet resolves.
+- no manual reorder;
+- no forced promotion;
+- no Stun/restraint.
 
 Identity:
 
-> **Complete Kurama pressures the whole visible formation at once instead of turning "whole" into a hidden Stat multiplier.**
+**the complete body can pressure several formation positions with all nine tails at once.**
 
 ---
 
-## 2. `kurama_complete_chakra_overrun` — **Chakra Overrun**
+## 3. `kurama_complete_chakra_overrun` — **Chakra Overrun**
 
 Class:
 
-**ATTACK / OVERWHELMING CHAKRA**
+**ATTACK / OVERWHELMING COMPLETE CHAKRA**
 
 Limit:
 
@@ -409,105 +596,72 @@ one hostile
 
 ATK:
 
-**54**
+**58**
 
 Player text:
 
-> **Drive overwhelming Kurama chakra through one enemy for 54 ATK. If they are protected by a direct guard, cut that guard's protection in half for this hit.**
+> **Drive the full Nine-Tails' chakra through one enemy for 58 ATK. If a direct guard protects them, halve that guard's protection for this hit.**
 
 Effect:
 - one direct Attack-PL packet;
-- before ordinary Stamina, inspect one qualifying pre-Stamina direct guard/prevention state protecting the target;
-- for this packet only, halve that guard's prevention percentage;
-  - example: 40% guard becomes 20% for this packet;
-- if multiple different guard states would apply, existing defence-order authority decides which exact state is being modified; do not halve every defence;
+- inspect one qualifying pre-Stamina direct guard/prevention state;
+- halve that one guard's prevention percentage for this packet only;
+- example: 40% becomes 20%;
+- existing defence-order authority determines the exact state if more than one could apply;
 - ordinary Stamina then resolves;
-- does not erase the guard state unless that state's own lifecycle consumes it;
+- does not erase the guard unless its own lifecycle consumes it;
 - no Stun;
-- no guard deletion;
 - no hidden piercing Stat.
 
 Identity:
 
-> **The whole Kurama does not ignore defence; it forces more chakra through it.**
+**full Kurama does not magically ignore defence; he overwhelms more of it with raw chakra.**
 
 ---
 
-## 3. `kurama_complete_reunited_guard` — **Reunited Guard**
+## 4. `kurama_complete_nine_tails_roar` — **Nine-Tails Roar**
 
 Class:
 
-**DEFENCE / WHOLE-BODY CHAKRA**
+**ATTACK / COMPLETE CHAKRA PRESSURE / AREA**
 
-Limit:
+Targets:
 
-**once per Battle**
+up to **2 legally exposed hostiles**
 
-Trigger:
+ATK:
 
-Complete Kurama is targeted by one qualifying direct hostile Attack-PL packet.
+**44 each**
 
 Player text:
 
-> **Wrap Kurama's full chakra around the impact. Reduce one direct attack by 55%.**
+> **Release the full Nine-Tails' chakra in a crushing roar. Hit up to 2 exposed enemies for 44 ATK each.**
 
-Effect:
-- reduce the qualifying packet **55% pre-Stamina**;
-- ordinary Stamina then resolves;
-- no counterattack;
-- no second capacity pool;
-- no source split;
-- no protection against unrelated control-only/world effects.
+Rules:
+- one packet per target;
+- ordinary Stamina independently;
+- no invented Wind Release;
+- no automatic displacement;
+- no Stun.
 
-This is a full-source defensive expression inside Complete Kurama's own package, not inherited Yang/Yin defence stacking.
-
----
-
-# J. Host-package boundary
-
-Source 17 deliberately does **not** author a generic host-assisted Skill palette for:
-
-- `yin_kurama`;
-- `kurama_complete`.
-
-Reason:
-
-These exact cards primarily encode **partition/body state**, not one exact host relationship.
-
-Future Jinchūriki/host representations must author their own exact source-assisted packages.
-
-Examples:
-- Menma-specific Yin relationship already has Source 16;
-- Shikamaru Yin/other future Jinchūriki representations require their own dedicated authority;
-- a future Complete-Kurama host package must not be inferred simply because `kurama_complete` exists.
-
-This prevents:
-
-> **generic source card -> automatic host Skill inheritance**
-
-and
-
-> **dedicated Jinchūriki package + full generic source package stacking**
+This supersedes the ordinary shared Chakra Roar when the exact Complete Kurama package is active.
 
 ---
 
-# K. Complete Kurama Potential Skill seed direction
+# L. Complete-source replacement rule
 
-Future learned/source branches may explore:
+When `kurama_complete` is the current legitimate source state:
 
-- high-volume chakra compression;
-- formation-wide tail pressure;
-- stronger Tailed Beast Bomb expressions;
-- full-reserve defensive states;
-- advanced sensory/telepathic cooperation where an exact host/relationship exists;
-- source-specific whole-Kurama techniques.
+- do not also expose Yin Deep Reserve;
+- do not expose Yang Comrade Chakra Network merely because Yang was a prior partition state;
+- do not expose Twin Beast Bomb;
+- do not maintain separate Yin/Yang TBB cooldowns;
+- do not add half PL values together;
+- do not run three source packages.
 
-Do not create:
-- Baryon Mode by inference;
-- automatic Naruto/KCM inheritance;
-- Yin+Yang Skill stacking;
-- generic host access;
-- doubled half-techniques merely because Kurama is complete.
+Complete Kurama's own package **replaces** current split-half packages.
+
+Historical Yin/Yang relationship records remain true; current Combat source state changes.
 
 ---
 
@@ -528,6 +682,8 @@ Do not:
 
 Do not:
 - stack Complete + Yin + Yang source packages;
+- treat Complete as two hidden Entities under one card;
+- retain Twin Beast Bomb after reunion merely because both halves existed historically;
 - derive PL/Stats by adding halves;
 - treat Complete as automatic partnership with any host;
 - grant Baryon Mode;
@@ -542,17 +698,20 @@ Shared family-common capabilities may still appear where explicitly authored wit
 
 **CE partition/body non-collapse:** CLOSED and consumed.  
 **Current staged PL anchors:** yin_kurama PL123 / kurama_complete PL138 preserved; exact seven-Stat republication not claimed here.  
-**Shared Kurama-family body/chakra layer:** CLOSED for Source-17 consumption.  
-**Yin fake-polarity exclusion + standalone-source rule:** PROPOSED.  
-**Counterpart Recognition:** PROPOSED inherent contextual fact only; no buff / no Yin identity budget.  
-**Yin Enhancement — Deep Reserve:** PROPOSED.  
-**Yin manifested Skills — Nine-Tail Convergence / Compressed Chakra Burst:** PROPOSED.  
-**Yin Potential Skill direction:** PROPOSED seed only; future Twin Beast Bomb is optional Yin+Yang cooperation, not Yin's core identity.  
-**Complete Enhancement — Reunited Reservoir:** PROPOSED.  
-**Complete manifested Skills — Nine-Tail Rupture / Chakra Overrun / Reunited Guard:** PROPOSED.  
+**Shared Kurama-family body/chakra layer:** CLOSED for split-source consumption.  
+**Yin standalone-source rule:** CLOSED by Stephen 2026-09-28.  
+**Counterpart Recognition:** CLOSED inherent contextual fact only; no buff / no Yin identity budget.  
+**Yin Enhancement — Deep Reserve:** CLOSED.  
+**Yin manifested Skills — Nine-Tail Convergence / Compressed Chakra Burst:** CLOSED.  
+**Yin Potential Skill direction:** CLOSED as seed architecture only, NOT lifetime ceiling.  
+**Dual Yin+Yang Hosted-Entity coexistence:** owner-approved design fact; CE durable reconciliation requested separately.  
+**Twin Beast Bomb:** cooperative dual-partition technique direction CLOSED; exact ATK38+38 CONVERGE/SPLIT implementation contract PROPOSED pending Stephen numeric/mechanical sign-off.  
+**Complete Kurama identity — one reunited whole Entity / full Nine-Tails power:** CLOSED owner direction.  
+**Complete Enhancement — Nine-Tails: Full Power:** REVISED PROPOSAL.  
+**Complete manifested Skills — Full-Power Tailed Beast Bomb / Nine-Tail Cataclysm / Chakra Overrun / Nine-Tails Roar:** REVISED PROPOSAL.  
 **Generic host-assisted palette:** deliberately NOT authored; dedicated Jinchūriki/host packages own that surface.  
 **Implementation:** NOT STARTED.  
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
 
-**Awaiting Stephen review before Source 17 Combat design closure.**
+**Yin Kurama is DESIGN CLOSED. Complete Kurama and exact Twin Beast Bomb numerics remain awaiting Stephen review.**
