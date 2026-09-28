@@ -287,6 +287,11 @@ Canonical Alpha frame contract:
   - padding: `11px 15px 12px`;
   - radius: `16px`;
   - outline: `1px solid rgba(93, 215, 225, .32)`;
+  - speaker/header text: `8px`, bold, compact tracking;
+  - body text: `clamp(12px, .94vw, 15px)`, line-height `1.42`;
+  - compact cue counter in the upper-right of the panel;
+  - subtle `CLICK ANYWHERE TO CONTINUE` hint in the lower-right;
+  - **no visible arrow/CONTINUE button for ordinary narration**;
   - dark neutral glass fill.
 
 - **Speaker-owned dialogue surface**
@@ -297,6 +302,9 @@ Canonical Alpha frame contract:
   - radius: `16px`;
   - outline: `1px solid rgba(103, 221, 230, .55)`;
   - pointer/tail outline: cyan/teal (`rgba(103, 221, 230, .5)`);
+  - speaker label: `8px`, bold, compact tracking;
+  - body text: `clamp(12px, .96vw, 16px)`, line-height `1.42`;
+  - **no visible arrow/CONTINUE button for ordinary dialogue**;
   - speaker ownership is communicated by card focus, placement, pointer and speaker label — **not by changing the frame to gold/brown**.
 
 The frame/glow colour is presentation-only and must not encode Player / Opposition / Guest / Independent semantic authority.
@@ -306,6 +314,8 @@ Speaker-name text or subtle dark fill treatment may still carry bounded presenta
 This lock does **not** recolour Chronicle Receipts, choice/action controls, committed-state callouts, or other components whose existing gold semantics represent committed/pivotal state.
 
 No Origin-local renderer may override this frame rule.
+
+Academy Kakashi is the visual benchmark for these box dimensions/typography. All other Origins must consume the same shared specification rather than maintaining a separate Origin-local dialogue/narration treatment.
 
 ---
 
