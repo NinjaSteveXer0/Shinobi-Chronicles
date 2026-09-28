@@ -41,6 +41,9 @@ async function snapshot(page){
       backdrop:globalThis.resolveStorySceneBoardBackdropPath?.()||null,
       dedicated:stage?.dataset.scSceneBoardBackdrop||null,
       primary:root?.querySelector(".sc-chronicle-primary")?.textContent?.trim()||"",
+      speaker:root?.querySelector(".sc-story-name")?.textContent?.trim()||"",
+      hint:root?.querySelector(".sc-performance-hint-33900")?.textContent?.trim()||"",
+      receiptVisible:root?.dataset.scCueKind==="record",
       choices:[...(root?.querySelectorAll(".sc-story-choice")||[])].map(n=>n.textContent.trim()).filter(Boolean),
       legacyContinue:[...(root?.querySelectorAll("button")||[])].some(n=>n.textContent.trim()==="CONTINUE"&&!n.classList.contains("sc-chronicle-primary"))
     };
@@ -86,6 +89,64 @@ async function reloadAtExactBeat(page,beatId){
   assert.strictEqual(after.beatId,beatId,"save/reload resumed a different Story beat");
   assert.strictEqual(after.text,before.text,"save/reload changed the current GOLDEN cue");
   return after;
+}
+
+async function proveMiraiTerminalReceipt(browser){
+  const context=await browser.newContext({viewport:{width:1440,height:900}});
+  const page=await context.newPage();
+  const gate=await installBrowserRuntimeErrorGate(page);
+  await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});
+  await page.waitForFunction(()=>!!globalThis.SC_ALPHA_ORIGIN_SCENE_BOARD_BINDINGS_105&&!!globalThis.SC_STORY_SCENE_BOARD_33900&&!!globalThis.SC_ALPHA_ORIGIN_32900,null,{timeout:30000});
+  const start=await page.evaluate(()=>({select:selectChronicleOrigin("academy_mirai","issue_105_mirai_terminal_receipt"),launch:beginAlphaChronicleOriginPrologue()}));
+  assert.strictEqual(start.select?.success,true,"Mirai terminal proof select failed");
+  assert.strictEqual(start.launch?.success,true,"Mirai terminal proof launch failed");
+  await release(page);
+  const seen=[];
+  let receipt=null;
+  for(let i=0;i<520;i++){
+    const row=await snapshot(page);
+    seen.push({beatId:row.beatId,mode:row.mode,text:row.text,choices:row.choices});
+    const body=(await page.locator("body").innerText()).trim();
+    assert(!body.includes("#338"),"Mirai exposed GitHub issue #338 to the player at "+row.beatId);
+    assert(!/Combat package/i.test(body),"Mirai exposed internal Combat-package text at "+row.beatId);
+    assert(!row.choices.some(label=>label==="CONTINUE"),"Mirai exposed redundant CONTINUE choice at "+row.beatId+" "+JSON.stringify(row.choices));
+    if(row.beatId==="mir_receipt"){receipt=row;break;}
+    if(row.mode==="choice"){
+      const enabled=page.locator("#story-scene-presentation-layer .sc-story-choice:not(:disabled)");
+      const count=await enabled.count();
+      assert(count>0,"Mirai route has no enabled authored choice at "+row.beatId);
+      const before=row.beatId;
+      await enabled.first().click();
+      await page.waitForFunction(old=>globalThis.getActiveStorySceneRuntime?.()?.beatId!==old,before,{timeout:8000});
+    }else{
+      await advanceOne(page);
+    }
+  }
+  assert(receipt,"Mirai did not reach Origin Chronicle Receipt");
+  assert.strictEqual(receipt.cueKind,"record","Mirai Receipt is not a record cue");
+  assert(receipt.text.includes("ACADEMY MIRAI")&&receipt.text.includes("REWARDS"),"Mirai Receipt content missing identity/reward summary");
+  assert.strictEqual(receipt.primary,"CONTINUE","Mirai Receipt dedicated button missing");
+  assert.strictEqual(receipt.hint,"USE CONTINUE TO CONFIRM","Mirai Receipt still instructs click-anywhere");
+  const beforeReceipt=await snapshot(page);
+  const stage=page.locator("#story-scene-presentation-layer .sc-chronicle-stage,#story-scene-presentation-layer .sc-story-stage").first();
+  await stage.click({position:{x:28,y:28}});
+  await page.waitForTimeout(180);
+  const afterStage=await snapshot(page);
+  assert.strictEqual(afterStage.beatId,"mir_receipt","stage click skipped Mirai Receipt");
+  assert.strictEqual(afterStage.text,beforeReceipt.text,"stage click mutated Mirai Receipt");
+  const button=page.locator("#story-scene-presentation-layer .sc-chronicle-primary").first();
+  await button.click();
+  await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId!=="mir_receipt",null,{timeout:8000});
+  const completion=await page.evaluate(()=>{
+    const rows=(globalThis.playerData?.activityHistory||[]).filter(r=>r&&r.type==="origin_completion_reward"&&r.originVariantId==="academy_mirai"&&String(r.rewardSourceId||r.sourceId||"")==="origin_completion_starting_purse_ryo_01");
+    return{active:globalThis.getActiveStorySceneRuntime?.()?.beatId||null,purseCount:rows.length};
+  });
+  assert.notStrictEqual(completion.active,"mir_receipt","Receipt button failed to advance");
+  assert.strictEqual(completion.purseCount,1,"Receipt button advanced completion more than once or failed to commit one starting purse");
+  await page.locator("body").screenshot({path:path.join(OUT,"academy_mirai-terminal-receipt.png")});
+  await gate.assertClean("academy_mirai-terminal-receipt");
+  await context.close();
+  return{seenCount:seen.length,receiptStageLocked:true,receiptButtonSingleCompletion:true,noInternal338:true,noDuplicateContinue:true};
 }
 
 (async()=>{
@@ -148,6 +209,49 @@ async function reloadAtExactBeat(page,beatId){
           assert(openingText.includes(line),"Menma GOLDEN Academy exchange missing: "+line);
         }
         row=opening.row;
+        const nineTails=await page.evaluate(()=>{
+          const rt=globalThis.getActiveStorySceneRuntime?.();
+          if(!rt.localContext||typeof rt.localContext!=="object")rt.localContext={};
+          return globalThis.setStorySceneBeat?.("menma_fox_02");
+        });
+        assert.strictEqual(nineTails?.success,true,"Menma Nine-Tails test beat could not be entered");
+        await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="menma_fox_02"&&document.getElementById("story-scene-presentation-layer")?.dataset.scCueKind==="dialogue",null,{timeout:8000});
+        row=await snapshot(page);
+        assert.strictEqual(row.cueKind,"dialogue","Nine-Tails spoken line rendered as narration");
+        assert.strictEqual(row.speaker,"NINE-TAILS","Nine-Tails did not own its dialogue box");
+        const fox=row.actors.find(a=>a.id==="menma_nine_tails");
+        assert(fox&&fox.image==="Portraits/Tailed Beasts/menma_nine_tails.png","Menma Nine-Tails exact portrait missing "+JSON.stringify(row.actors));
+        assert(!row.text.includes("SOURCE"),"internal SOURCE label leaked into Nine-Tails dialogue");
+
+        await page.evaluate(()=>{
+          const rt=globalThis.getActiveStorySceneRuntime?.();
+          rt.battleResume={authored:{performanceBucket:"low",observedKinjutsu:false}};
+          globalThis.setStorySceneBeat?.("menma_after_04a");
+        });
+        const low=await advanceUntilBeat(page,"menma_after_low_02",30);
+        row=low.row;
+        assert.strictEqual(row.cueKind,"dialogue","Menma low-performance aftermath did not segment to dialogue");
+        assert.strictEqual(row.speaker,"MENMA","Menma did not own “We won.”");
+        assert.strictEqual(row.text,"We won.","Menma aftermath prose drift");
+        row=await advanceOne(page);
+        assert.strictEqual(row.speaker,"ANKO","Anko did not own her post-Battle reply");
+        assert.strictEqual(row.text,"Yeah.","Anko aftermath prose drift");
+        assert(!row.text.includes("MENMA:")&&!row.text.includes("ANKO:")&&!row.text.includes("SOURCE"),"post-Battle raw speaker/source text leaked");
+
+        await page.evaluate(()=>{
+          const rt=globalThis.getActiveStorySceneRuntime?.();
+          rt.battleResume={authored:{performanceBucket:"standard",observedKinjutsu:false}};
+          globalThis.setStorySceneBeat?.("menma_part_07");
+        });
+        const parting=await advanceUntilBeat(page,"menma_part_standard_01",20);
+        row=parting.row;
+        assert.strictEqual(row.speaker,"ANKO","Menma parting router did not select Anko dialogue");
+        assert.strictEqual(row.text,"Try not to find another disaster before you get home.","Menma standard parting prose drift");
+
+        await page.evaluate(()=>globalThis.setStorySceneBeat?.("menma_close_01"));
+        await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="menma_close_01",null,{timeout:8000});
+        row=await snapshot(page);
+        assert(row.text.includes("Menma runs toward Konoha."),"Menma final GOLDEN prose is not visible");
       }else if(row.mode!=="choice"){
         row=await advanceOne(page);
       }
@@ -155,6 +259,7 @@ async function reloadAtExactBeat(page,beatId){
       await gate.assertClean(variant);
       await context.close();
     }
-    console.log(JSON.stringify({pass:true,issue:105,cases:CASES.map(x=>x[0]),legacyFallbackRejected:true,clickAnywhereProven:true,miraiWritingGoldenProven:true,menmaWritingGoldenOpeningProven:true,goldenSaveReloadResumeProven:true,browserGoldenClaimed:false},null,2));
+    const miraiTerminal=await proveMiraiTerminalReceipt(browser);
+    console.log(JSON.stringify({pass:true,issue:105,cases:CASES.map(x=>x[0]),legacyFallbackRejected:true,clickAnywhereProven:true,miraiWritingGoldenProven:true,menmaWritingGoldenOpeningProven:true,menmaNineTailsDialoguePortraitProven:true,menmaPostBattleSegmentationProven:true,miraiTerminal,goldenSaveReloadResumeProven:true,browserGoldenClaimed:false},null,2));
   }finally{await browser.close();}
 })().catch(err=>{console.error(err);process.exit(1);});

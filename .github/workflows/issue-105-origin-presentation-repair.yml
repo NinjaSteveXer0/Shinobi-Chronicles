@@ -10,6 +10,10 @@ on:
       - 'runtime/alpha-early-story-modernization-33600.js'
       - 'runtime/alpha-origin-screen-first-33700.js'
       - 'runtime/alpha-story-scene-board-33900.js'
+      - 'runtime/alpha-kakashi-v2-renderer-36030.js'
+      - 'runtime/alpha-menma-evolved-pl-battle-36900.js'
+      - 'runtime/alpha-menma-origin-rewards-36200.js'
+      - 'runtime/alpha-journey-surface-32800.js'
       - 'runtime/alpha-battle-modern-33000.js'
       - 'runtime/alpha-story-machine-resolver-343.js'
       - 'runtime/academy-wasabi-writing-golden-343.js'
@@ -38,6 +42,10 @@ jobs:
           node --check runtime/alpha-early-story-modernization-33600.js
           node --check runtime/alpha-origin-screen-first-33700.js
           node --check runtime/alpha-story-machine-resolver-343.js
+          node --check runtime/alpha-journey-surface-32800.js
+          node --check runtime/alpha-menma-origin-rewards-36200.js
+          node --check runtime/alpha-menma-evolved-pl-battle-36900.js
+          node --check runtime/alpha-kakashi-v2-renderer-36030.js
           node --check tools/qa_issue_105_origin_presentation_repair.js
           node --check tools/qa_issue_105_origin_presentation_browser.js
           node tools/qa_issue_105_origin_presentation_repair.js

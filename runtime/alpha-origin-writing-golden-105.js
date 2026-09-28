@@ -726,17 +726,13 @@ line("mir_after_missed",[
  {mode:"narration",text:"She waits.\n\nHe leaves it there.\n\nNo lecture.\n\nMirai turns back to the road herself."}
 ],MIRAI_ENV.checkpoint,"mir_leaving_start");
 
-push(N("mir_leaving_start","The exercise ends.\n\nThe traveller heads toward East Market.\n\nAt the corner, he turns.","mir_leaving_router",MIRAI_ENV.checkpoint));
-push({
-  beatId:"mir_leaving_router",mode:"narration",text:"",environmentRef:MIRAI_ENV.checkpoint,
-  presentationResolver:()=>({text:A.local().mirTalked?"The traveller pauses at the corner, remembering their earlier conversation.":"The traveller pauses at the corner and looks back at Mirai."}),
-  nextBeatId:"mir_leaving_choice_router"
-});
+push(N("mir_leaving_start","The exercise ends.\n\nThe traveller heads toward East Market.\n\nAt the corner, he turns.","mir_leaving_choice_router",MIRAI_ENV.checkpoint));
 push({beatId:"mir_leaving_choice_router",mode:"resolver",machineResolved:true,text:"",environmentRef:MIRAI_ENV.checkpoint,choices:[
  C("talked","RESOLVE TALKED LEAVING","mir_leaving_talk_01",null,{availability:()=>({available:A.local().mirTalked===true,knownBlocker:null})}),
  C("professional","RESOLVE PROFESSIONAL LEAVING","mir_leaving_prof_01",null,{availability:()=>({available:A.local().mirTalked!==true,knownBlocker:null})})
 ]});
 line("mir_leaving_talk",[
+ {mode:"narration",text:"The traveller pauses at the corner, remembering their earlier conversation."},
  {mode:"dialogue",speaker:"TRAVELLER",text:"If my sister offers you tea, say no."},
  {mode:"narration",text:"Mirai folds her arms."},
  {mode:"dialogue",speaker:"MIRAI",text:"I thought you liked your sister more than you disliked the tea."},
@@ -745,6 +741,7 @@ line("mir_leaving_talk",[
  {mode:"narration",text:"Mirai looks toward the instructor.\n\nHe looks away.\n\nThe traveller laughs and disappears into the crowd."}
 ],MIRAI_ENV.checkpoint,"mir_reflection_choice");
 line("mir_leaving_prof",[
+ {mode:"narration",text:"The traveller pauses at the corner and looks back at Mirai."},
  {mode:"narration",text:"The traveller points toward Mirai's pocket."},
  {mode:"dialogue",speaker:"TRAVELLER",text:"You keeping that?"},
  {mode:"narration",text:"Mirai checks the wrapped sweet."},

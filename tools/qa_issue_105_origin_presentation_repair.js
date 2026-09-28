@@ -4,6 +4,7 @@ const fs=require("fs"),assert=require("assert");
 const read=p=>fs.readFileSync(p,"utf8");
 const binder=read("runtime/alpha-origin-scene-board-bindings-105.js");
 const sceneA=read("runtime/alpha-origin-scenes-32900-a.js");
+const sceneB=read("runtime/alpha-origin-scenes-32900-b.js");
 const sceneC=read("runtime/alpha-origin-scenes-32900-c.js");
 const golden=read("runtime/alpha-origin-writing-golden-105.js");
 const shim335=read("runtime/alpha-origin-browser-realisation-33500.js");
@@ -13,10 +14,13 @@ const board=read("runtime/alpha-story-scene-board-33900.js");
 const kakashiRenderer=read("runtime/alpha-kakashi-v2-renderer-36030.js");
 const sceneBoardDoc=read("Documentation/UI/Chronicle Interaction Interactive Scene Board Addendum 2026-09-13.md");
 const battle=read("runtime/alpha-battle-modern-33000.js");
+const journey=read("runtime/alpha-journey-surface-32800.js");
+const menmaBattle=read("runtime/alpha-menma-evolved-pl-battle-36900.js");
+const menmaReward=read("runtime/alpha-menma-origin-rewards-36200.js");
 const index=read("index.html");
 const game=read("game.js");
 
-for(const [name,src] of Object.entries({binder,sceneA,sceneC,golden,shim335,shim336,shim337,board,battle,kakashiRenderer})){
+for(const [name,src] of Object.entries({binder,sceneA,sceneB,sceneC,golden,shim335,shim336,shim337,board,battle,journey,menmaBattle,menmaReward,kakashiRenderer})){
   assert.doesNotThrow(()=>new Function(src),name+" syntax failure");
 }
 for(const token of [
@@ -42,7 +46,7 @@ assert(binder.includes('rows.push(instructor(),traveller())')&&binder.includes('
 for(const asset of [
   "Assets/Academy Student/academy_hinata.png","NPC/hyuga_instructor.png","NPC/hyuga_sparring_partner.png",
   "Assets/Academy Student/academy_mirai.png","NPC/mirai_instructor.png","NPC/traveller.png","NPC/mirai_porter.png","NPC/mirai_checkpoint_instructor.png",
-  "Assets/Academy Student/academy_menma.png","NPC/menma_instructor.png","Assets/Special Jonin/sj_anko.png",
+  "Assets/Academy Student/academy_menma.png","Portraits/Tailed Beasts/menma_nine_tails.png","NPC/menma_instructor.png","Assets/Special Jonin/sj_anko.png",
   "Assets/Academy Student/academy_kushina.png","NPC/kushina_instructor.png","NPC/kushina_classmate.png",
   "Assets/Academy Student/academy_kurenai.png","NPC/kurenai_instructor.png",
   "Assets/Academy Student/academy_iwabe.png","NPC/iwabe_instructor.png",
@@ -63,7 +67,16 @@ for(const asset of ["NPC/furniture_civilian.png","NPC/vegetable_vendor.png","NPC
   assert(sceneC.includes(asset),"Obito native Scene Board did not consume #419 asset "+asset);
 }
 const menmaActorBody=binder.slice(binder.indexOf("function menmaActors("),binder.indexOf("function kushinaActors("));
-assert(binder.includes("Nine-Tails is an internal speaker")&&!menmaActorBody.includes("nine_tails.png"),"Menma internal Nine-Tails was physicalised");
+assert(fs.existsSync("Portraits/Tailed Beasts/menma_nine_tails.png"),"approved Menma Nine-Tails portrait missing from live tree");
+assert(binder.includes('menmaNineTails:"Portraits/Tailed Beasts/menma_nine_tails.png"')&&menmaActorBody.includes('actor("menma_nine_tails","NINE-TAILS",PATH.menmaNineTails'),"Menma Nine-Tails portrait is not bound to its Story speaker");
+assert(golden.includes('row.mode="dialogue";row.speakerRef={sourceId:"nine_tails"'),"Menma Nine-Tails speech is not speaker-owned dialogue");
+assert(!golden.includes("Combat package (#338)")&&!golden.includes("waiting on the exact Academy instructor"),"Mirai leaks internal Combat/GitHub blocker text");
+assert(golden.includes('beatId:"mir_leaving_choice_router",mode:"resolver",machineResolved:true')&&!golden.includes('beatId:"mir_leaving_router"'),"Mirai terminal still exposes the stale empty/fake Continue router");
+assert(golden.includes('beatId:"mir_receipt",mode:"record"')&&binder.includes('mir_receipt:()=>[{kind:"record",text:buildMiraiReceipt105()}]'),"Mirai Origin Chronicle Receipt missing");
+assert(golden.includes('beatId:"menma_receipt",mode:"record"')&&binder.includes('menma_receipt:()=>[{kind:"record",text:buildMenmaReceipt105()}]'),"Menma Origin Chronicle Receipt missing");
+assert(golden.includes('beatId:"menma_after_performance_router",mode:"resolver",machineResolved:true')&&golden.includes('beatId:"menma_part_optional_router",mode:"resolver",machineResolved:true'),"Menma post-Battle conditional dialogue is not routed through hidden deterministic resolvers");
+assert(!golden.includes('mode:"post_battle",speakerName:"ANKO",text:""')&&!golden.includes('mode:"post_battle",speakerName:"MENMA",text:""'),"Menma still contains empty post-Battle speaker panels");
+assert(!menmaReward.includes("FIXED ENCOUNTER REWARD")&&!menmaReward.includes("No generic Character EXP"),"Menma Victory screen still contains internal reward diagnostic prose");
 const order=[
  "game.js","runtime/alpha-origin-starting-purse-409.js","runtime/alpha-story-machine-resolver-343.js",
  "runtime/academy-wasabi-writing-golden-343.js","runtime/alpha-origin-scenes-32900-a.js",
@@ -75,6 +88,12 @@ assert(order.every(x=>x>=0),"#105 production loader missing module");
 assert(order.every((x,i)=>i===0||x>order[i-1]),"#105 production load order drift");
 assert(board.includes('data-sc-performance')||board.includes("scPerformance"),"shared Story performance mode missing");
 assert(board.includes("click")&&board.includes("advanceStoryScene"),"shared Story click-anywhere owner missing");
+assert(board.includes('p.cue&&p.cue.kind==="record"')&&board.includes("USE CONTINUE TO CONFIRM"),"Chronicle Receipt stage-click/keyboard lock missing from shared Scene Board");
+assert(kakashiRenderer.includes('root.dataset.canAdvance="false"')&&kakashiRenderer.includes('root.dataset.preset==="chronicle_receipt"'),"Kakashi Receipt can still bypass its dedicated button");
+assert(sceneBoardDoc.includes("GLOBAL ORIGIN RECEIPT INPUT LOCK"),"durable global Receipt input lock missing");
+assert(sceneA.includes('actionLabel:"Start PL Battle"')&&((sceneB.match(/actionLabel:"Start PL Battle"/g)||[]).length===2)&&menmaBattle.includes('beat.battle.actionLabel="Start PL Battle"')&&kakashiRenderer.includes('label:"Start PL Battle"'),"global Start PL Battle CTA text is not applied to current Origin Battle seams");
+assert(journey.includes('background:linear-gradient(180deg,#a82222,#5d0d0d)')&&kakashiRenderer.includes('background:linear-gradient(180deg,#a82222,#5d0d0d)'),"global Start PL Battle CTA is not red in shared/Kakashi presentation");
+assert(sceneBoardDoc.includes("GLOBAL STORY → PL BATTLE CTA"),"durable global PL Battle CTA lock missing");
 assert(board.includes("syncSpeakerLinkedPanel33900"),"speaker-linked dialogue geometry missing");
 assert(board.includes('border:1px solid rgba(93,215,225,.32)!important;border-radius:16px!important'),"shared narration frame no longer matches Kakashi cyan baseline");
 assert(board.includes('width:min(36vw,500px)!important')&&board.includes('border-color:rgba(103,221,230,.55)!important'),"shared dialogue frame no longer matches Kakashi cyan baseline");
@@ -96,6 +115,6 @@ assert(battle.includes('core.querySelector("strong")')||battle.includes('core?.q
 assert(!game.includes("ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID"),"frozen game.js contains successor purse mutation");
 console.log(JSON.stringify({pass:true,issue:105,checks:{
   sevenNonKakashiBindings:true,kakashiExcluded:true,hinataSparringSpeakerAlias:true,hinataFinalPairBound:true,hinataChronicleReceipt:true,miraiMenmaWritingGolden:true,legacyGoldenShimsRetired:true,knownAssetsExact:true,issue419AssetsConsumed:true,missingAssetsNotGuessed:true,
-  internalVoiceNotPhysical:true,loadOrder:true,sharedSceneBoard:true,clickAnywhere:true,
+  menmaNineTailsDialoguePortrait:true,miraiTerminalRouterClean:true,miraiMenmaReceipts:true,menmaPostBattleSegmented:true,menmaRewardDiagnosticRemoved:true,globalReceiptInputLock:true,globalStartPLBattleCTA:true,loadOrder:true,sharedSceneBoard:true,clickAnywhere:true,
   speakerLinkedDialogue:true,globalCyanStoryFrames:true,kakashiFrameParity:true,kakashiTextAndAdvanceParity:true,radialPLContainmentRefresh:true,frozenCorePreserved:true,browserGoldenClaimed:false
 }},null,2));
