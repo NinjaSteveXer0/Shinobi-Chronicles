@@ -121,8 +121,9 @@ assert(index.indexOf("runtime/alpha-origin-skill-display-names-400.js")>index.in
 
 // game.js is deliberately frozen; #111/#63 enforce the audited core blob.
 // #396 owns current MET-03 vocabulary only in the scoped runtime / Story authorities.
-assert(!metal.includes('protectiveResponseKind:"intercept"'),"stale MET-03 intercept vocabulary remains in #396 runtime");
-assert(!metal.includes('protectiveResponseOutcome:"protected"'),"stale MET-03 protected outcome remains in #396 runtime");
+assert(metal.includes('met03ClosedVocabulary:!String(resolveProtectiveResponse).includes("attempt_committed")'),"MET-03 closed-vocabulary diagnostic missing");
+assert(metal.includes('!String(resolveProtectiveResponse).includes(\'protectiveResponseKind:"intercept"\')'),"MET-03 intercept retirement diagnostic missing");
+assert(metal.includes('!String(resolveProtectiveResponse).includes(\'protectiveResponseOutcome:"protected"\')'),"MET-03 protected-outcome retirement diagnostic missing");
 assert(!story.includes('protectiveResponseKind:"intercept"'),"stale MET-03 intercept vocabulary remains in canonical Story owner");
 assert(!story.includes('protectiveResponseOutcome:"protected"'),"stale MET-03 protected outcome remains in canonical Story owner");
 assert(!story.includes('protectiveResponseOutcome:"attempt_committed"'),"stale MET-03 attempt_committed authority remains in canonical Story owner");
