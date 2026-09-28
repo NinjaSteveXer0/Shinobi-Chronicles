@@ -46,6 +46,31 @@ async function snapshot(page){
     };
   });
 }
+async function advanceOne(page){
+  const before=await snapshot(page);
+  assert.notStrictEqual(before.mode,"choice","advanceOne called on choice "+before.beatId);
+  const stage=page.locator("#story-scene-presentation-layer .sc-chronicle-stage,#story-scene-presentation-layer .sc-story-stage").first();
+  await stage.waitFor({state:"visible",timeout:8000});
+  await stage.click({position:{x:30,y:30}});
+  await page.waitForFunction(old=>{
+    const rt=globalThis.getActiveStorySceneRuntime?.(),root=document.getElementById("story-scene-presentation-layer");
+    const text=root?.querySelector(".sc-story-text")?.textContent?.trim()||"";
+    return !rt||rt.beatId!==old.beatId||text!==old.text;
+  },{beatId:before.beatId,text:before.text},{timeout:8000});
+  return snapshot(page);
+}
+async function advanceUntilBeat(page,target,max=120){
+  const seen=[];
+  for(let i=0;i<max;i++){
+    const row=await snapshot(page);
+    seen.push({beatId:row.beatId,text:row.text});
+    if(row.beatId===target)return{row,seen};
+    if(row.mode==="choice")throw new Error("choice reached before "+target+": "+row.beatId);
+    await advanceOne(page);
+  }
+  throw new Error("advanceUntilBeat guard exceeded "+target);
+}
+
 (async()=>{
   const browser=await chromium.launch({headless:true});
   try{
@@ -60,7 +85,7 @@ async function snapshot(page){
       assert.strictEqual(start.launch?.success,true,variant+" launch failed "+JSON.stringify(start));
       await release(page);
       await page.waitForFunction(()=>document.getElementById("story-scene-presentation-layer")?.dataset.scSceneBoard==="true",null,{timeout:15000});
-      const row=await snapshot(page);
+      let row=await snapshot(page);
       assert.strictEqual(row.board,"true",variant+" fell back to legacy black Story surface");
       if(row.mode==="choice"){
         assert(row.choices.length>0,variant+" shared choice presentation has no visible choices "+JSON.stringify(row));
@@ -72,20 +97,43 @@ async function snapshot(page){
       assert(row.actors.some(a=>a.image===protagonist),variant+" protagonist card missing "+JSON.stringify(row.actors));
       assert(row.backdrop,variant+" has no resolved Story backdrop");
       assert.strictEqual(row.legacyContinue,false,variant+" legacy CONTINUE panel leaked into Scene Board");
-      if(row.mode!=="choice"){
-        const before={beatId:row.beatId,text:row.text};
-        const stage=page.locator("#story-scene-presentation-layer .sc-chronicle-stage").first();
-        await stage.click({position:{x:30,y:30}});
-        await page.waitForFunction(old=>{
-          const rt=globalThis.getActiveStorySceneRuntime?.(),root=document.getElementById("story-scene-presentation-layer");
-          const text=root?.querySelector(".sc-story-text")?.textContent?.trim()||"";
-          return !rt||rt.beatId!==old.beatId||text!==old.text;
-        },before,{timeout:8000});
+
+      if(variant==="academy_mirai"){
+        assert.strictEqual(row.beatId,"mir_assignment_01","Mirai did not start at Writing-GOLDEN Assignment");
+        assert(row.text.includes("Mirai arrives early"),"Mirai GOLDEN opening prose missing "+JSON.stringify(row));
+        const assignmentWalk=await advanceUntilBeat(page,"mir_walk_choice",120);
+        const walkText=assignmentWalk.seen.map(x=>x.text).join("\n");
+        assert(walkText.includes("You're aware this doesn't start for another ten minutes."),"Mirai Assignment instructor exchange skipped");
+        assert(walkText.includes("I'm guessing she's mine."),"Mirai Assignment Traveller exchange skipped");
+        assert(walkText.includes("Should I be ducking?")&&walkText.includes("Terrifying.")&&walkText.includes("I won't report you."),"Mirai Walk conversation was compressed or skipped");
+        row=assignmentWalk.row;
+        assert.deepStrictEqual(row.choices,["TALK TO HIM","KEEP YOUR ATTENTION ON THE ESCORT"],"Mirai GOLDEN walk choice drift");
+        const talk=page.locator("#story-scene-presentation-layer .sc-story-choice").filter({hasText:"TALK TO HIM"}).first();
+        await talk.click();
+        await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="mir_talk_01",null,{timeout:8000});
+        const talkRoute=await advanceUntilBeat(page,"mir_market_talk_01",120);
+        const talkText=talkRoute.seen.map(x=>x.text).join("\n");
+        assert(talkText.includes("Have you been here before?")&&talkText.includes("…First time."),"Mirai authored Traveller branch dialogue missing");
+        assert(talkText.includes("It's fruit pretending it belongs in tea."),"Mirai authored plum-tea conversation missing");
+        row=talkRoute.row;
+      }else if(variant==="academy_menma"){
+        assert.strictEqual(row.beatId,"menma_open_01","Menma did not start at Writing-GOLDEN menma_open_01");
+        assert(row.text.includes("practice sheet lands on Menma's desk"),"Menma GOLDEN opening prose missing "+JSON.stringify(row));
+        const opening=await advanceUntilBeat(page,"menma_forest_01",120);
+        const seenIds=new Set(opening.seen.map(x=>x.beatId));
+        for(let n=1;n<=15;n++)assert(seenIds.has("menma_open_"+String(n).padStart(2,"0")),"Menma GOLDEN opening skipped menma_open_"+String(n).padStart(2,"0"));
+        const openingText=opening.seen.map(x=>x.text).join("\n");
+        for(const line of ["Again?","Again.","You already know I can do it.","I know you can do this one.","Then give me something harder.","That's all anybody says.","Class isn't finished.","Mine is.","If you walk out, that's your decision.","I know."]){
+          assert(openingText.includes(line),"Menma GOLDEN Academy exchange missing: "+line);
+        }
+        row=opening.row;
+      }else if(row.mode!=="choice"){
+        row=await advanceOne(page);
       }
       await page.locator("#story-scene-presentation-layer").screenshot({path:path.join(OUT,variant+".png")});
       await gate.assertClean(variant);
       await context.close();
     }
-    console.log(JSON.stringify({pass:true,issue:105,cases:CASES.map(x=>x[0]),legacyFallbackRejected:true,clickAnywhereProven:true,browserGoldenClaimed:false},null,2));
+    console.log(JSON.stringify({pass:true,issue:105,cases:CASES.map(x=>x[0]),legacyFallbackRejected:true,clickAnywhereProven:true,miraiWritingGoldenProven:true,menmaWritingGoldenOpeningProven:true,browserGoldenClaimed:false},null,2));
   }finally{await browser.close();}
 })().catch(err=>{console.error(err);process.exit(1);});
