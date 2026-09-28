@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-28  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons / Tailed Beasts  
-**Status:** **PROPOSED — AWAITING STEPHEN SIGN-OFF**  
+**Status:** **COMBAT DESIGN CLOSED BY STEPHEN 2026-09-28 — SOURCE 16 RESET v2 COMPLETE**  
 **Parent:** #235  
 **CE non-collapse authority:** `Documentation/Coordination/Kurama_Persistent_Source_Relationship_Partition_and_Manifestation_Non_Collapse_Contract_2026-09-28.md`  
 **Canon/SC research:** `Documentation/Combat/SC_Combat_Kurama_Family_Canon_and_SC_Representation_Research_2026-09-27.md`  
@@ -487,15 +487,15 @@ Preserve Menma/Kurama character authority:
 
 **Persistent source / Yin reservation:** CLOSED by CE Batch-4 contract.  
 **Current staged PL anchors:** menma_nine_tails PL121 / menma_kurama PL118 preserved; live rows absent; exact seven-Stat republication not claimed here.  
-**Shared manifested fox-body layer:** PROPOSED consumption of Kurama-family common body actions.  
-**Menma Nine-Tails Enhancement:** Cloak Bargain — PROPOSED.  
-**Menma Nine-Tails host Skills:** One-Tail Lash / Pressure Rush / Tail Snare — PROPOSED.  
-**Menma Kurama Enhancement:** Two Minds, One Move — PROPOSED.  
-**Menma Kurama host Skills:** Kurama Follow-Through / Kinetic Read / Plan B — PROPOSED.  
-**Automatic private communication / contextual sensing:** PROPOSED as inherent relationship capability, not Skill.  
-**Potential Skill direction:** PROPOSED seed architecture only.  
+**Shared manifested fox-body layer:** CLOSED consumption of Kurama-family common body actions.  
+**Menma Nine-Tails Enhancement:** Cloak Bargain — CLOSED.  
+**Menma Nine-Tails host Skills:** One-Tail Lash / Pressure Rush / Tail Snare — CLOSED.  
+**Menma Kurama Enhancement:** Two Minds, One Move — CLOSED.  
+**Menma Kurama host Skills:** Kurama Follow-Through / Kinetic Read / Plan B — CLOSED.  
+**Automatic private communication / contextual sensing:** CLOSED as inherent relationship capability, not Skill.  
+**Potential Skill direction:** CLOSED as seed architecture only, NOT a lifetime ceiling.  
 **Implementation:** NOT STARTED.  
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
 
-**Awaiting Stephen review before Source 16 Combat design closure.**
+**Stephen final sign-off received 2026-09-28. Source 16 Combat design is CLOSED. Implementation/runtime/Golden remain unclaimed.**
