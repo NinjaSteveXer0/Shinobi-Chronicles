@@ -39,7 +39,7 @@ assert(board.includes('data-sc-performance')||board.includes("scPerformance"),"s
 assert(board.includes("click")&&board.includes("advanceStoryScene"),"shared Story click-anywhere owner missing");
 assert(board.includes("syncSpeakerLinkedPanel33900"),"speaker-linked dialogue geometry missing");
 assert(battle.includes('querySelector(".alpha-battle-pl-core")'),"radial PL refresh does not target inner core");
-assert(battle.includes('core.querySelector("strong")')||battle.includes("core?.querySelector("strong")"),"radial PL current value not refreshed inside core");
+assert(battle.includes('core.querySelector("strong")')||battle.includes('core?.querySelector("strong")'),"radial PL current value not refreshed inside core");
 assert(!game.includes("ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID"),"frozen game.js contains successor purse mutation");
 console.log(JSON.stringify({pass:true,issue:105,checks:{
   sevenNonKakashiBindings:true,kakashiExcluded:true,knownAssetsExact:true,missingAssetsNotGuessed:true,
