@@ -121,7 +121,9 @@ async function assertStoryPresentationBenchmark(page,kind,label){
     return{
       kind,cueKind:root?.dataset.scCueKind||null,stageRect,layoutRect,panelRect,actorRect,
       actorId,speechX:layout?.style.getPropertyValue("--sc-cue-speech-x")||"",tailRaw,pointerX,actorCenter,
-      borderRadius:css?.borderRadius||"",recordBoardDisplay:getComputedStyle(root?.querySelector(".sc-scene-board-33900")||root).display,
+      borderRadius:css?.borderRadius||"",borderColor:css?.borderColor||"",
+      tailBorderTopColor:kind==="dialogue"&&panel?getComputedStyle(panel,"::after").borderTopColor:"",
+      recordBoardDisplay:getComputedStyle(root?.querySelector(".sc-scene-board-33900")||root).display,
       primaryText:root?.querySelector(".sc-chronicle-primary")?.textContent?.trim()||""
     };
   },kind);
@@ -130,11 +132,14 @@ async function assertStoryPresentationBenchmark(page,kind,label){
   if(kind==="narration"){
     assert(row.layoutRect.width<=row.stageRect.width*.74,label+" narration remains oversized "+JSON.stringify(row));
     assert(parseFloat(row.borderRadius)>=15,label+" narration panel not on Kakashi rounded treatment "+JSON.stringify(row));
+    assert(row.borderColor.includes("93, 215, 225"),label+" narration outline is not canonical cyan "+JSON.stringify(row));
   }else if(kind==="dialogue"){
     assert(row.actorId&&row.actorRect,label+" dialogue speaker actor missing "+JSON.stringify(row));
     assert(row.speechX&&row.tailRaw,label+" dialogue speaker geometry variables missing "+JSON.stringify(row));
     assert(Math.abs(row.pointerX-row.actorCenter)<=36,label+" dialogue pointer misses speaker "+JSON.stringify(row));
     assert(row.layoutRect.width<=Math.min(510,row.stageRect.width*.72),label+" dialogue panel too wide "+JSON.stringify(row));
+    assert(row.borderColor.includes("103, 221, 230"),label+" dialogue outline is not canonical cyan "+JSON.stringify(row));
+    assert(row.tailBorderTopColor.includes("103, 221, 230"),label+" dialogue pointer outline is not canonical cyan "+JSON.stringify(row));
   }else if(kind==="record"){
     const stageCenterX=row.stageRect.left+row.stageRect.width/2,stageCenterY=row.stageRect.top+row.stageRect.height/2;
     const layoutCenterX=row.layoutRect.left+row.layoutRect.width/2,layoutCenterY=row.layoutRect.top+row.layoutRect.height/2;
