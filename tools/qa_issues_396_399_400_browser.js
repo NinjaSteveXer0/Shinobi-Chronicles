@@ -243,11 +243,16 @@ async function runIwabeeWorldBranch(browser,beatId,expected){
         }
         const first=setStorySceneBeat("met_resolve_redirect",{render:false});
         const firstBeat=getActiveStorySceneRuntime()?.beatId||null;
+        const firstRoute=advanceStoryScene();
+        const firstRoutedBeat=getActiveStorySceneRuntime()?.beatId||null;
         const countAfterFirst=(playerData.activityHistory||[]).filter(x=>x&&x.occurrenceId==="occ_origin_metal_protective_response_resolution").length;
         const second=setStorySceneBeat("met_resolve_redirect",{render:false});
+        const secondBeat=getActiveStorySceneRuntime()?.beatId||null;
+        const secondRoute=advanceStoryScene();
+        const secondRoutedBeat=getActiveStorySceneRuntime()?.beatId||null;
         const countAfterSecond=(playerData.activityHistory||[]).filter(x=>x&&x.occurrenceId==="occ_origin_metal_protective_response_resolution").length;
         const receipt=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_metal_protective_response_resolution");
-        return{fresh,synthetic,first,firstBeat,countAfterFirst,second,countAfterSecond,receipt:JSON.parse(JSON.stringify(receipt?.fact||null))};
+        return{fresh,synthetic,first,firstBeat,firstRoute,firstRoutedBeat,countAfterFirst,second,secondBeat,secondRoute,secondRoutedBeat,countAfterSecond,receipt:JSON.parse(JSON.stringify(receipt?.fact||null))};
       });
       assert.strictEqual(met03.fresh.redirect.protectiveResponseOutcome,"partial");
       assert.strictEqual(met03.fresh.impact.protectiveResponseOutcome,"success");
@@ -263,9 +268,14 @@ async function runIwabeeWorldBranch(browser,beatId,expected){
         assert.strictEqual(met03.synthetic[key+"_failure"].protectiveResponseOutcome,"failure",key+" failure threshold");
       }
       assert.strictEqual(met03.first?.success,true);
-      assert.strictEqual(met03.firstBeat,"met_redirect_partial_01");
+      assert.strictEqual(met03.firstBeat,"met_resolve_redirect","MET-03 authored action beat was skipped");
+      assert.strictEqual(met03.firstRoute?.success,true,"MET-03 internal outcome route failed");
+      assert.strictEqual(met03.firstRoutedBeat,"met_redirect_partial_01");
       assert.strictEqual(met03.countAfterFirst,1);
       assert.strictEqual(met03.second?.success,true);
+      assert.strictEqual(met03.secondBeat,"met_resolve_redirect","MET-03 re-entry did not restore authored action beat");
+      assert.strictEqual(met03.secondRoute?.success,true,"MET-03 re-entry outcome route failed");
+      assert.strictEqual(met03.secondRoutedBeat,"met_redirect_partial_01");
       assert.strictEqual(met03.countAfterSecond,1,"MET-03 receipt duplicated on re-entry");
       assert.strictEqual(met03.receipt?.attempted,true);
       assert.strictEqual(met03.receipt?.protectiveResponseKind,"redirect_dummy");
