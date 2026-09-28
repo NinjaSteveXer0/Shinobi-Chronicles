@@ -4,11 +4,13 @@ const fs=require("fs"),assert=require("assert");
 const read=p=>fs.readFileSync(p,"utf8");
 const binder=read("runtime/alpha-origin-scene-board-bindings-105.js");
 const board=read("runtime/alpha-story-scene-board-33900.js");
+const kakashiRenderer=read("runtime/alpha-kakashi-v2-renderer-36030.js");
+const sceneBoardDoc=read("Documentation/UI/Chronicle Interaction Interactive Scene Board Addendum 2026-09-13.md");
 const battle=read("runtime/alpha-battle-modern-33000.js");
 const index=read("index.html");
 const game=read("game.js");
 
-for(const [name,src] of Object.entries({binder,board,battle})){
+for(const [name,src] of Object.entries({binder,board,battle,kakashiRenderer})){
   assert.doesNotThrow(()=>new Function(src),name+" syntax failure");
 }
 for(const token of [
@@ -39,11 +41,22 @@ assert(order.every((x,i)=>i===0||x>order[i-1]),"#105 production load order drift
 assert(board.includes('data-sc-performance')||board.includes("scPerformance"),"shared Story performance mode missing");
 assert(board.includes("click")&&board.includes("advanceStoryScene"),"shared Story click-anywhere owner missing");
 assert(board.includes("syncSpeakerLinkedPanel33900"),"speaker-linked dialogue geometry missing");
+assert(board.includes('border:1px solid rgba(93,215,225,.32)!important;border-radius:16px!important'),"shared narration frame no longer matches Kakashi cyan baseline");
+assert(board.includes('width:min(36vw,500px)!important')&&board.includes('border-color:rgba(103,221,230,.55)!important'),"shared dialogue frame no longer matches Kakashi cyan baseline");
+assert(board.includes('[data-sc-cue-speaker-side="opposition"] .sc-story-panel{border-color:rgba(103,221,230,.55)!important'),"shared opposition dialogue frame is not cyan");
+assert(board.includes('[data-sc-cue-speaker-side="opposition"] .sc-story-panel::after{border-color:rgba(103,221,230,.5)'),"shared opposition dialogue pointer is not cyan");
+assert(!board.includes('[data-sc-cue-speaker-side="opposition"] .sc-story-panel{border-color:rgba(218,176,77,.58)!important'),"gold/brown opposition dialogue outline returned in shared Scene Board");
+assert(kakashiRenderer.includes('.kv2-dialogue{position:absolute;left:50%;bottom:3%;width:min(72%,980px)')&&kakashiRenderer.includes('border:1px solid rgba(93,215,225,.32);border-radius:16px'),"Kakashi narration frame baseline drift");
+assert(kakashiRenderer.includes('.kv2-speech{position:absolute;left:var(--kv2-speech-x,50%);bottom:23.5%;z-index:31;width:min(36vw,500px)')&&kakashiRenderer.includes('border:1px solid rgba(103,221,230,.55);border-radius:16px'),"Kakashi dialogue frame baseline drift");
+assert(kakashiRenderer.includes('.kv2-speech[data-speaker-side="opposition"]{border-color:rgba(103,221,230,.55);'),"Kakashi opposition dialogue frame is not cyan");
+assert(kakashiRenderer.includes('.kv2-speech[data-speaker-side="opposition"]::after{border-color:rgba(103,221,230,.5);'),"Kakashi opposition dialogue pointer is not cyan");
+assert(!kakashiRenderer.includes('.kv2-speech[data-speaker-side="opposition"]{border-color:rgba(218,176,77,.58);'),"gold/brown opposition dialogue outline returned in Kakashi");
+assert(sceneBoardDoc.includes("GLOBAL NARRATION / DIALOGUE FRAME COLOUR LOCK"),"global cyan Story frame lock missing");
 assert(battle.includes('querySelector(".alpha-battle-pl-core")'),"radial PL refresh does not target inner core");
 assert(battle.includes('core.querySelector("strong")')||battle.includes('core?.querySelector("strong")'),"radial PL current value not refreshed inside core");
 assert(!game.includes("ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID"),"frozen game.js contains successor purse mutation");
 console.log(JSON.stringify({pass:true,issue:105,checks:{
   sevenNonKakashiBindings:true,kakashiExcluded:true,knownAssetsExact:true,missingAssetsNotGuessed:true,
   internalVoiceNotPhysical:true,loadOrder:true,sharedSceneBoard:true,clickAnywhere:true,
-  speakerLinkedDialogue:true,radialPLContainmentRefresh:true,frozenCorePreserved:true,browserGoldenClaimed:false
+  speakerLinkedDialogue:true,globalCyanStoryFrames:true,kakashiFrameParity:true,radialPLContainmentRefresh:true,frozenCorePreserved:true,browserGoldenClaimed:false
 }},null,2));
