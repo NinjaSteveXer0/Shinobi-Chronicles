@@ -289,6 +289,27 @@ function registerDefinition(sceneId,definition){
   if(!sceneId||typeof globalThis.registerStorySceneBoardDefinition!=="function")return{success:false,reason:"story_scene_board_not_loaded"};
   return globalThis.registerStorySceneBoardDefinition(sceneId,definition);
 }
+function rehydrateActiveOriginPresentation105(){
+  const runtime=typeof globalThis.getActiveStorySceneRuntime==="function"?globalThis.getActiveStorySceneRuntime():null;
+  if(!runtime||!runtime.sceneId)return{success:false,reason:"no_active_story"};
+  const ownedScenes=new Set([
+    scene("academy_hinata"),scene("academy_mirai"),"origin_academy_menma_prologue",
+    scene("academy_kushina"),scene("academy_kurenai"),scene("academy_iwabee"),scene("academy_metal_lee")
+  ].filter(Boolean));
+  if(!ownedScenes.has(runtime.sceneId))return{success:false,reason:"different_story_owner",sceneId:runtime.sceneId};
+  const restored=typeof globalThis.restoreActiveOriginStoryPresentation32900==="function"
+    ?globalThis.restoreActiveOriginStoryPresentation32900()
+    :{success:false,reason:"origin_presentation_restore_api_missing"};
+  if(restored&&restored.pendingBattleRestore===true)return restored;
+  if(typeof globalThis.renderStorySceneBoard33900==="function")globalThis.renderStorySceneBoard33900();
+  return{success:true,rehydrated:true,sceneId:runtime.sceneId,beatId:runtime.beatId,restore:restored};
+}
+function scheduleActiveOriginPresentationRehydrate105(){
+  const run=()=>{try{rehydrateActiveOriginPresentation105();}catch(_error){}};
+  if(typeof queueMicrotask==="function")queueMicrotask(run);
+  else if(typeof setTimeout==="function")setTimeout(run,0);
+  else run();
+}
 function installDefinitions(){
   if(!A)return{success:false,reason:"origin_runtime_missing"};
 
@@ -328,7 +349,9 @@ function installDefinitions(){
     resolve:({beatId,performance,beat})=>projection("ACADEMY · TRAINING COURTYARD",metalActors(beatId,performance,beat)),
     resolveBackdrop:()=>({assetPath:GENERIC_COURTYARD,assetId:"issue105_generic_courtyard"})
   });
-  return{success:Object.values(results).every(r=>r&&r.success===true),results};
+  const outcome={success:Object.values(results).every(r=>r&&r.success===true),results};
+  if(outcome.success)scheduleActiveOriginPresentationRehydrate105();
+  return outcome;
 }
 
 function ensureInstalled(){
@@ -358,6 +381,10 @@ function diagnostics(){
       PATH.miraiPorter==="NPC/mirai_porter.png"&&
       PATH.miraiCheckpointInstructor==="NPC/mirai_checkpoint_instructor.png",
     clickAnywhereOwnedBySharedSceneBoard:true,
+    activeGoldenReloadRehydrate:
+      String(rehydrateActiveOriginPresentation105).includes("restoreActiveOriginStoryPresentation32900")&&
+      String(rehydrateActiveOriginPresentation105).includes("renderStorySceneBoard33900")&&
+      String(rehydrateActiveOriginPresentation105).includes("pendingBattleRestore"),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
