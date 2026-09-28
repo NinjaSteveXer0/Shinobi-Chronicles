@@ -1124,7 +1124,8 @@ const youngCommit=R("hin_young_32900","academy_hinata",young,c=>({
   selfTaijutsuLearningOccurred:c.young==="stay_and_watch",
   youngerStudentParticipantRef:null
 }),c=>c.young==="stay_and_watch"?["HIN-02"]:["show_movement","explain_error"].includes(c.young)?["HIN-03"]:[]);
-seq("hin_close",G.close,null,{first:{onEnterConsequences:[youngCommit]},last:{exitScene:true}});
+seq("hin_close",G.close,"hin_receipt",{first:{onEnterConsequences:[youngCommit]}});
+beats.push({beatId:"hin_receipt",mode:"record",text:"",exitScene:true,onEnterConsequences:[X("academy_hinata",[spar,young])]});
 
 const HINATA_ORIGIN_BACKDROP_ID="hinata_origin_hyuga_compound";
 const HINATA_ORIGIN_BACKDROP_PATH="Hinata Origin Backdrop/hyuga_compound.png";
