@@ -103,7 +103,7 @@ assert(wasabiSource.includes("function buildWasabiReceipt32900"),"Wasabi Chronic
 assert(wasabiSource.includes('"YOUR DECISIONS"')&&wasabiSource.includes('"WHAT HAPPENED"')&&wasabiSource.includes('"HISTORY CREATED"'),"Receipt semantic groupings missing");
 assert(wasabiSource.includes("A.findOccurrence(tracking)")&&wasabiSource.includes("A.findOccurrence(intercept)")&&wasabiSource.includes("A.findOccurrence(coop)")&&wasabiSource.includes("A.findOccurrence(rogue)"),"Receipt does not read committed Wasabi history");
 assert(wasabiSource.includes('performanceTransitions:{[closeLastBeatId]:"wipe_right_to_left"}'),"Origin Close -> Receipt black wipe missing");
-assert(!wasabiSource.includes("pursuit_target.png"),"Coding guessed pursuit-target asset path before exact GitHub authority");
+assert(wasabiSource.includes('target:Object.freeze({id:"wasabi_origin_pursuit_target_01",label:"TARGET",image:"NPC/pursuit_target.png"})'),"resolved #419 pursuit-target asset path missing");
 for(const token of [
   "intelligence.strategic_intelligence_analyst:multi_source_analysis",
   "communications_and_cryptography.battlefield_communications_specialist:communications_planning",
