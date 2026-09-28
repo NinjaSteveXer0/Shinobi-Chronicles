@@ -185,7 +185,9 @@
         "resumeBattleCallerAfterCompletion"
       ],
       "permittedAdapters": [
-        "academy_kakashi_v2_battle_adapter_36010"
+        "academy_kakashi_v2_battle_adapter_36010",
+        "academy_metal_origin_battle_adapter_396",
+        "academy_iwabee_rogue_battle_adapter_399"
       ],
       "retiredOwners": [],
       "saveSchemaRefs": [
@@ -194,7 +196,9 @@
       ],
       "qaRefs": [
         "tools/qa_issue_141_arc1_battle_return_runtime.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issues_396_399_400_runtime.js",
+        "tools/qa_issues_396_399_400_browser.js"
       ]
     },
     {
@@ -548,7 +552,9 @@
         "hardSettleBattlePresentationQueue33000"
       ],
       "permittedAdapters": [
-        "academy_kakashi_v2_battle_adapter_36010"
+        "academy_kakashi_v2_battle_adapter_36010",
+        "academy_metal_origin_battle_adapter_396",
+        "academy_iwabee_rogue_battle_adapter_399"
       ],
       "retiredOwners": [],
       "saveSchemaRefs": [
@@ -560,7 +566,9 @@
         "tools/qa_issue_312_browser.js",
         "tools/qa_runtime_ownership_safety_300.js",
         "tools/qa_issue_373_evolved_pl_battle_presentation.js",
-        "tools/qa_issue_373_evolved_pl_battle_presentation_browser.js"
+        "tools/qa_issue_373_evolved_pl_battle_presentation_browser.js",
+        "tools/qa_issues_396_399_400_runtime.js",
+        "tools/qa_issues_396_399_400_browser.js"
       ]
     },
     {
@@ -832,20 +840,226 @@
       "productionLoadPath": [
         "index.html",
         "game.js",
-        "runtime/alpha-combat-skill-lock-38300.js"
+        "runtime/alpha-combat-skill-lock-38300.js",
+        "runtime/alpha-origin-skill-display-names-400.js"
       ],
       "extensionHooks": [
         "getClosureWaveBattleSkillDefinition",
         "getBattlePreparedSkillDefinition"
       ],
       "permittedAdapters": [
-        "academy_kakashi_menma_skill_lock_38300"
+        "academy_kakashi_menma_skill_lock_38300",
+        "academy_origin_skill_display_name_adapter_400"
       ],
       "retiredOwners": [],
       "saveSchemaRefs": [],
       "qaRefs": [
         "tools/qa_issue_383_skill_lock.js",
         "tools/qa_issue_383_skill_lock_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issues_396_399_400_runtime.js",
+        "tools/qa_issues_396_399_400_browser.js"
+      ]
+    },
+    {
+      "responsibilityId": "origin.academy_metal_lee.final_story_state",
+      "canonicalOwner": "runtime/alpha-origin-scenes-32900-b.js",
+      "ownerType": "origin_semantic_owner",
+      "directCallers": [
+        "runtime/alpha-origin-scenes-32900-integrator.js",
+        "runtime/alpha-metal-origin-runtime-396.js"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime.localContext",
+        "playerData.activityHistory Academy Metal source occurrences",
+        "Academy Metal WRITING_GOLDEN authored beat graph"
+      ],
+      "stateWrites": [
+        "activeStorySceneRuntime.localContext Metal choice / protective resolver facts",
+        "playerData.activityHistory MET-01/MET-02/MET-03/MET-04 source occurrences"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-origin-scenes-32900-b.js"
+      ],
+      "extensionHooks": [
+        "SC_ALPHA_ORIGIN_32900.register",
+        "SC_ALPHA_ORIGIN_32900.commitOccurrence",
+        "completeChronicleOriginPrologue"
+      ],
+      "permittedAdapters": [
+        "academy_metal_origin_battle_adapter_396"
+      ],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "activeStorySceneRuntime.localContext metal*",
+        "playerData.activityHistory occ_origin_metal_*"
+      ],
+      "qaRefs": [
+        "tools/qa_issues_396_399_400_runtime.js",
+        "tools/qa_issues_396_399_400_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "origin.academy_metal_lee.controlled_spar_battle",
+      "canonicalOwner": "runtime/alpha-metal-origin-runtime-396.js",
+      "ownerType": "origin_battle_adapter",
+      "directCallers": [
+        "runtime/alpha-origin-scenes-32900-b.js",
+        "runtime/alpha-battle-modern-33000.js"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime.pendingBattle",
+        "currentBattle",
+        "shared enemy action / transient guard runtime",
+        "academy_metal_lee current effective Stats"
+      ],
+      "stateWrites": [
+        "currentBattle.metal396",
+        "playerData.metal396BattleLaunches",
+        "shinobiTestState.metal396 scoped adapter envelope",
+        "activeStorySceneRuntime.localContext Metal spar return facts"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-battle-modern-33000.js",
+        "runtime/alpha-metal-origin-runtime-396.js"
+      ],
+      "extensionHooks": [
+        "launchAcademyMetalControlledSpar396",
+        "projectAcademyMetalControlledSpar396",
+        "resolveAcademyMetalProtectiveResponse396"
+      ],
+      "permittedAdapters": [
+        "academy_metal_origin_battle_adapter_396"
+      ],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "currentBattle.metal396",
+        "playerData.metal396BattleLaunches",
+        "shinobiTestState.metal396 / metal396BattleActive / metal396BattleLaunches"
+      ],
+      "qaRefs": [
+        "tools/qa_issues_396_399_400_runtime.js",
+        "tools/qa_issues_396_399_400_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "combat.rogue_genin.opposition_template.shared",
+      "canonicalOwner": "runtime/alpha-rogue-genin-opposition-399.js",
+      "ownerType": "shared_combat_content_runtime",
+      "directCallers": [
+        "runtime/alpha-iwabee-origin-runtime-399.js"
+      ],
+      "stateReads": [
+        "shared Battle transient-state authority",
+        "caller-owned historical Rogue participant identity"
+      ],
+      "stateWrites": [
+        "current Battle transient ratio-guard state only through shared Battle transient authority"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-rogue-genin-opposition-399.js"
+      ],
+      "extensionHooks": [
+        "buildReusableRogueGeninOppositionActions399"
+      ],
+      "permittedAdapters": [
+        "academy_iwabee_rogue_battle_adapter_399"
+      ],
+      "retiredOwners": [],
+      "saveSchemaRefs": [],
+      "qaRefs": [
+        "tools/qa_issues_396_399_400_runtime.js",
+        "tools/qa_issues_396_399_400_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "origin.academy_iwabee.final_story_state",
+      "canonicalOwner": "runtime/alpha-origin-scenes-32900-b.js",
+      "ownerType": "origin_semantic_owner",
+      "directCallers": [
+        "runtime/alpha-origin-scenes-32900-integrator.js",
+        "runtime/alpha-iwabee-origin-runtime-399.js"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime.localContext",
+        "playerData.activityHistory Academy Iwabee source occurrences",
+        "Academy Iwabee WRITING_GOLDEN / World disposition authority"
+      ],
+      "stateWrites": [
+        "activeStorySceneRuntime.localContext Iwabee route facts",
+        "playerData.activityHistory IWA-01 and occurrence-local Rogue response facts including World disposition/custody"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-origin-scenes-32900-b.js"
+      ],
+      "extensionHooks": [
+        "SC_ALPHA_ORIGIN_32900.register",
+        "SC_ALPHA_ORIGIN_32900.commitOccurrence",
+        "completeChronicleOriginPrologue"
+      ],
+      "permittedAdapters": [
+        "academy_iwabee_rogue_battle_adapter_399"
+      ],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "activeStorySceneRuntime.localContext iwabee*",
+        "playerData.activityHistory occ_origin_iwabee_*"
+      ],
+      "qaRefs": [
+        "tools/qa_issues_396_399_400_runtime.js",
+        "tools/qa_issues_396_399_400_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "origin.academy_iwabee.rogue_battle",
+      "canonicalOwner": "runtime/alpha-iwabee-origin-runtime-399.js",
+      "ownerType": "origin_battle_adapter",
+      "directCallers": [
+        "runtime/alpha-origin-scenes-32900-b.js",
+        "runtime/alpha-battle-modern-33000.js",
+        "runtime/alpha-rogue-genin-opposition-399.js"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime.pendingBattle",
+        "currentBattle",
+        "combat.rogue_genin.opposition_template.shared"
+      ],
+      "stateWrites": [
+        "currentBattle.iwabee399",
+        "playerData.iwabee399BattleLaunches",
+        "shinobiTestState.iwabee399 scoped adapter envelope",
+        "activeStorySceneRuntime.localContext Iwabee Battle return facts"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-battle-modern-33000.js",
+        "runtime/alpha-rogue-genin-opposition-399.js",
+        "runtime/alpha-iwabee-origin-runtime-399.js"
+      ],
+      "extensionHooks": [
+        "launchAcademyIwabeeRogueConfrontation399",
+        "projectAcademyIwabeeRogueConfrontation399"
+      ],
+      "permittedAdapters": [
+        "academy_iwabee_rogue_battle_adapter_399"
+      ],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "currentBattle.iwabee399",
+        "playerData.iwabee399BattleLaunches",
+        "shinobiTestState.iwabee399 / iwabee399BattleActive / iwabee399BattleLaunches"
+      ],
+      "qaRefs": [
+        "tools/qa_issues_396_399_400_runtime.js",
+        "tools/qa_issues_396_399_400_browser.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
     }
@@ -885,6 +1099,42 @@
       "retirementCondition": "Review when the canonical shared Skill definitions in game.js directly encode the 2026-09-26 signed-off names and Kakashi enhanced packet without requiring an authority-consumption wrapper.",
       "milestone": "shared Combat content consolidation",
       "qaRef": "tools/qa_issue_383_skill_lock.js",
+      "temporary": false
+    },
+    {
+      "adapterId": "academy_metal_origin_battle_adapter_396",
+      "reason": "Translate Academy Metal Lee's authored controlled-spar Story seam into the existing shared PL Battle runtime while preserving fixed PL15 opponent calibration, deterministic authored action cadence and Story-owned MET-02 evidence.",
+      "owner": "runtime/alpha-metal-origin-runtime-396.js",
+      "sourceOwner": "runtime/alpha-origin-scenes-32900-b.js",
+      "targetOwner": "runtime/alpha-battle-modern-33000.js",
+      "exactBehaviorBridged": "Strict Metal-vs-Genin deployment, deterministic five-action opponent cycle, fixed 13-PL post-spar performance denominator, observer-safe Battle result and same-Story return.",
+      "retirementCondition": "Review when the shared Origin Story-to-Battle adapter natively supports deterministic opponent cadence and post-Battle remaining-PL band routing.",
+      "milestone": "shared Origin runtime propagation review",
+      "qaRef": "tools/qa_issues_396_399_400_browser.js",
+      "temporary": false
+    },
+    {
+      "adapterId": "academy_iwabee_rogue_battle_adapter_399",
+      "reason": "Translate Academy Iwabee's direct Rogue Genin confrontation into the existing shared PL Battle runtime without allowing Battle result to author World custody/disposition.",
+      "owner": "runtime/alpha-iwabee-origin-runtime-399.js",
+      "sourceOwner": "runtime/alpha-origin-scenes-32900-b.js",
+      "targetOwner": "runtime/alpha-battle-modern-33000.js",
+      "exactBehaviorBridged": "Strict Iwabee-vs-historical-Rogue deployment, reusable rogue_genin capability package, no auto-scaling, observer-safe withdrawal result and same-Story return.",
+      "retirementCondition": "Review when the shared Origin Story-to-Battle adapter natively supports historical-opposition/template separation and exact World-safe result projection.",
+      "milestone": "shared Origin runtime propagation review",
+      "qaRef": "tools/qa_issues_396_399_400_browser.js",
+      "temporary": false
+    },
+    {
+      "adapterId": "academy_origin_skill_display_name_adapter_400",
+      "reason": "Project the signed-off player-facing displayName layer for the remaining eight Academy Origin prepared-Skill palettes without changing stable IDs, palette order or mechanics.",
+      "owner": "runtime/alpha-origin-skill-display-names-400.js",
+      "sourceOwner": "game.js",
+      "targetOwner": "runtime/alpha-battle-modern-33000.js",
+      "exactBehaviorBridged": "Forty exact authored display names resolve through canonical Skill definitions and the existing Battle UI displayName-first renderer.",
+      "retirementCondition": "Review when all forty signed-off display names are authored directly in the canonical shared Skill definitions.",
+      "milestone": "Combat content consolidation",
+      "qaRef": "tools/qa_issues_396_399_400_browser.js",
       "temporary": false
     }
   ],
@@ -967,6 +1217,31 @@
       "semanticId": "academy_menma.three_subject.battle.semantic_loop",
       "owner": "runtime/alpha-menma-evolved-pl-battle-36900.js",
       "responsibilityId": "origin.academy_menma.three_subject.battle_semantics"
+    },
+    {
+      "semanticId": "academy_metal_lee.final.story",
+      "owner": "runtime/alpha-origin-scenes-32900-b.js",
+      "responsibilityId": "origin.academy_metal_lee.final_story_state"
+    },
+    {
+      "semanticId": "academy_metal_lee.controlled_spar.launch",
+      "owner": "runtime/alpha-metal-origin-runtime-396.js",
+      "responsibilityId": "origin.academy_metal_lee.controlled_spar_battle"
+    },
+    {
+      "semanticId": "rogue_genin.opposition_template.build",
+      "owner": "runtime/alpha-rogue-genin-opposition-399.js",
+      "responsibilityId": "combat.rogue_genin.opposition_template.shared"
+    },
+    {
+      "semanticId": "academy_iwabee.final.story",
+      "owner": "runtime/alpha-origin-scenes-32900-b.js",
+      "responsibilityId": "origin.academy_iwabee.final_story_state"
+    },
+    {
+      "semanticId": "academy_iwabee.rogue_battle.launch",
+      "owner": "runtime/alpha-iwabee-origin-runtime-399.js",
+      "responsibilityId": "origin.academy_iwabee.rogue_battle"
     }
   ],
   "globalWrapperChains": [
@@ -993,6 +1268,72 @@
       "activationCondition": "active Story scene is origin_academy_kakashi_anbu_retrieval",
       "qaRefs": [
         "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "symbol": "chooseEnemyAuthoredBattleAction",
+      "chain": [
+        "runtime/alpha-metal-origin-runtime-396.js",
+        "runtime/alpha-iwabee-origin-runtime-399.js"
+      ],
+      "canonicalActiveOwner": "runtime/alpha-iwabee-origin-runtime-399.js",
+      "activationCondition": "Origin-scoped Battle adapter condition; each wrapper delegates outside its exact encounter",
+      "qaRefs": [
+        "tools/qa_issues_396_399_400_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "symbol": "saveTestState",
+      "chain": [
+        "runtime/alpha-metal-origin-runtime-396.js",
+        "runtime/alpha-iwabee-origin-runtime-399.js"
+      ],
+      "canonicalActiveOwner": "runtime/alpha-iwabee-origin-runtime-399.js",
+      "activationCondition": "persist exact scoped adapter envelope when Metal396 or Iwabee399 Battle is active",
+      "qaRefs": [
+        "tools/qa_issues_396_399_400_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "symbol": "restoreTestState",
+      "chain": [
+        "runtime/alpha-metal-origin-runtime-396.js",
+        "runtime/alpha-iwabee-origin-runtime-399.js"
+      ],
+      "canonicalActiveOwner": "runtime/alpha-iwabee-origin-runtime-399.js",
+      "activationCondition": "restore exact scoped adapter envelope when saved encounter/config matches",
+      "qaRefs": [
+        "tools/qa_issues_396_399_400_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "symbol": "renderBattleActionFamilyRow",
+      "chain": [
+        "runtime/alpha-metal-origin-runtime-396.js",
+        "runtime/alpha-iwabee-origin-runtime-399.js"
+      ],
+      "canonicalActiveOwner": "runtime/alpha-iwabee-origin-runtime-399.js",
+      "activationCondition": "strict 1v1 Origin Battles suppress only the shared withdraw control",
+      "qaRefs": [
+        "tools/qa_issues_396_399_400_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "symbol": "resumeBattleCallerAfterCompletion",
+      "chain": [
+        "runtime/alpha-battle-modern-33000.js",
+        "runtime/alpha-metal-origin-runtime-396.js",
+        "runtime/alpha-iwabee-origin-runtime-399.js"
+      ],
+      "canonicalActiveOwner": "runtime/alpha-iwabee-origin-runtime-399.js",
+      "activationCondition": "shared Story return plus exact Metal performance-band / Iwabee observer-safe context projection",
+      "qaRefs": [
+        "tools/qa_issues_396_399_400_browser.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
     }
@@ -1047,6 +1388,36 @@
       "stateRef": "playerData.activityHistory menma three-subject battle occurrence receipt",
       "owner": "runtime/alpha-menma-evolved-pl-battle-36900.js",
       "responsibilityId": "origin.academy_menma.three_subject.battle_semantics"
+    },
+    {
+      "stateRef": "playerData.activityHistory Academy Metal source occurrences",
+      "owner": "runtime/alpha-origin-scenes-32900-b.js",
+      "responsibilityId": "origin.academy_metal_lee.final_story_state"
+    },
+    {
+      "stateRef": "currentBattle.metal396 / playerData.metal396BattleLaunches",
+      "owner": "runtime/alpha-metal-origin-runtime-396.js",
+      "responsibilityId": "origin.academy_metal_lee.controlled_spar_battle"
+    },
+    {
+      "stateRef": "activeStorySceneRuntime.localContext Academy Metal spar Battle return facts",
+      "owner": "runtime/alpha-metal-origin-runtime-396.js",
+      "responsibilityId": "origin.academy_metal_lee.controlled_spar_battle"
+    },
+    {
+      "stateRef": "playerData.activityHistory Academy Iwabee source occurrences and Rogue World disposition",
+      "owner": "runtime/alpha-origin-scenes-32900-b.js",
+      "responsibilityId": "origin.academy_iwabee.final_story_state"
+    },
+    {
+      "stateRef": "currentBattle.iwabee399 / playerData.iwabee399BattleLaunches",
+      "owner": "runtime/alpha-iwabee-origin-runtime-399.js",
+      "responsibilityId": "origin.academy_iwabee.rogue_battle"
+    },
+    {
+      "stateRef": "activeStorySceneRuntime.localContext Academy Iwabee Battle return facts",
+      "owner": "runtime/alpha-iwabee-origin-runtime-399.js",
+      "responsibilityId": "origin.academy_iwabee.rogue_battle"
     }
   ]
 }
