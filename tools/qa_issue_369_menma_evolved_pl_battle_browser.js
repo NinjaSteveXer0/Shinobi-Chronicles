@@ -627,7 +627,7 @@ async function legitimatePartyDefeat(browser){
           const layer=document.getElementById("story-scene-presentation-layer");
           const stage=layer?.querySelector(".sc-chronicle-stage")||layer?.querySelector(".sc-story-stage");
           return stage?.dataset.scSceneBoardBackdrop==="dedicated"&&
-            String(stage?.style.getPropertyValue("--sc-scene-board-backdrop")||"").includes("whisper_woods_forest_route.png");
+            String(stage?.style.getPropertyValue("--sc-scene-board-backdrop")||"").includes("whisper_woods_rise.png");
         },null,{timeout:5000});
         const futureBackdrop=await page.evaluate(()=>{
           const layer=document.getElementById("story-scene-presentation-layer");
@@ -638,9 +638,9 @@ async function legitimatePartyDefeat(browser){
             dedicated:stage?.dataset.scSceneBoardBackdrop||null
           };
         });
-        assert.strictEqual(futureBackdrop.resolved,"Scene backdrops/whisper_woods_forest_route.png","#388 Scene-10 Scene Board resolver drift");
+        assert.strictEqual(futureBackdrop.resolved,"Menma Origin Backdrop/whisper_woods_rise.png","#388 Scene-10 Scene Board resolver drift");
         assert.strictEqual(futureBackdrop.dedicated,"dedicated","#388 Scene-10 dedicated backdrop flag missing");
-        assert(futureBackdrop.css.includes("whisper_woods_forest_route.png"),"#388 Scene-10 live Scene Board backdrop CSS drift "+JSON.stringify(futureBackdrop));
+        assert(futureBackdrop.css.includes("whisper_woods_rise.png"),"#388 Scene-10 live Scene Board backdrop CSS drift "+JSON.stringify(futureBackdrop));
       }
       await advanceStorySemanticBeat369(page,beatId);
     }
