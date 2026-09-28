@@ -41,6 +41,7 @@ async function snapshot(page){
       backdrop:globalThis.resolveStorySceneBoardBackdropPath?.()||null,
       dedicated:stage?.dataset.scSceneBoardBackdrop||null,
       primary:root?.querySelector(".sc-chronicle-primary")?.textContent?.trim()||"",
+      choices:[...(root?.querySelectorAll(".sc-story-choice")||[])].map(n=>n.textContent.trim()).filter(Boolean),
       legacyContinue:[...(root?.querySelectorAll("button")||[])].some(n=>n.textContent.trim()==="CONTINUE"&&!n.classList.contains("sc-chronicle-primary"))
     };
   });
@@ -58,11 +59,15 @@ async function snapshot(page){
       assert.strictEqual(start.select?.success,true,variant+" select failed "+JSON.stringify(start));
       assert.strictEqual(start.launch?.success,true,variant+" launch failed "+JSON.stringify(start));
       await release(page);
-      await page.waitForFunction(()=>document.getElementById("story-scene-presentation-layer")?.dataset.scSceneBoard==="true"&&document.getElementById("story-scene-presentation-layer")?.dataset.scPerformance==="true",null,{timeout:15000});
+      await page.waitForFunction(()=>document.getElementById("story-scene-presentation-layer")?.dataset.scSceneBoard==="true",null,{timeout:15000});
       const row=await snapshot(page);
       assert.strictEqual(row.board,"true",variant+" fell back to legacy black Story surface");
-      assert.strictEqual(row.performance,"true",variant+" did not enter shared performance presentation");
-      assert(["narration","dialogue","record"].includes(row.cueKind),variant+" shared cue kind missing "+JSON.stringify(row));
+      if(row.mode==="choice"){
+        assert(row.choices.length>0,variant+" shared choice presentation has no visible choices "+JSON.stringify(row));
+      }else{
+        assert.strictEqual(row.performance,"true",variant+" did not enter shared performance presentation");
+        assert(["narration","dialogue","record"].includes(row.cueKind),variant+" shared cue kind missing "+JSON.stringify(row));
+      }
       assert(row.actors.length>=1,variant+" has no visible Scene Board actors");
       assert(row.actors.some(a=>a.image===protagonist),variant+" protagonist card missing "+JSON.stringify(row.actors));
       assert(row.backdrop,variant+" has no resolved Story backdrop");
