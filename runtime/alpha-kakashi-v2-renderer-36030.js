@@ -35,7 +35,8 @@ function cueState(){
   if(typeof getAcademyKakashiV2TransitionState36040==="function")return getAcademyKakashiV2TransitionState36040();
   const p=projection(),cues=p&&p.cues||[];return{cueIndex:0,cueCount:cues.length,atEnd:cues.length<=1};
 }
-// Owner lock 2026-09-28: narration/dialogue frame outlines are cyan for every speaker side.\nfunction installStyle(){
+// Owner lock 2026-09-28: narration/dialogue frame outlines are cyan for every speaker side.
+function installStyle(){
   if(typeof document==="undefined"||!document.head||document.getElementById(STYLE_ID))return;
   const s=document.createElement("style");s.id=STYLE_ID;s.textContent=`
 #story-scene-presentation-layer[data-kakashi-v2="true"]{display:block!important;background:#020508!important;overflow:hidden!important;align-items:stretch!important;justify-content:stretch!important}
