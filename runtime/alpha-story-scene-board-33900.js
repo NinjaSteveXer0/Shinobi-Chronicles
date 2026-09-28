@@ -531,7 +531,8 @@ function updatePerformancePanel(layer,runtime=currentRuntime()){
   if(!progress&&panel){progress=document.createElement("span");progress.className="sc-performance-progress-33900";panel.appendChild(progress);}
   if(progress)progress.textContent=(p.index+1)+" / "+p.sequence.length;
   let hint=panel&&panel.querySelector(".sc-performance-hint-33900");
-  if(!hint&&panel){hint=document.createElement("span");hint.className="sc-performance-hint-33900";hint.textContent="CLICK ANYWHERE TO CONTINUE";panel.appendChild(hint);}
+  if(!hint&&panel){hint=document.createElement("span");hint.className="sc-performance-hint-33900";panel.appendChild(hint);}
+  if(hint)hint.textContent=cue.kind==="record"?"USE CONTINUE TO CONFIRM":"CLICK ANYWHERE TO CONTINUE";
   if(kicker)kicker.style.setProperty("display","none","important");
   const primary=layer.querySelector&&layer.querySelector(".sc-chronicle-primary");if(primary){const label=cue.kind==="record"?"CONTINUE":"›";if(primary.textContent!==label)primary.textContent=label;primary.setAttribute("aria-label",cue.kind==="record"?"Continue":"Advance scene");primary.title=cue.kind==="record"?"Continue":"Advance scene";}
   return true;
@@ -700,10 +701,10 @@ if(typeof document!=="undefined"){
     const layer=event.target&&event.target.closest?event.target.closest("#story-scene-presentation-layer[data-sc-performance='true']"):null;
     if(!layer||event.target.closest("button,a,input,select,textarea,.sc-story-choice"))return;
     const runtime=currentRuntime(),beat=currentBeat(runtime),p=performanceCursor(runtime,beat);
-    if(!p||!beat||beat.mode==="choice"||(Array.isArray(beat.choices)&&beat.choices.length))return;
+    if(!p||!beat||p.cue&&p.cue.kind==="record"||beat.mode==="choice"||(Array.isArray(beat.choices)&&beat.choices.length))return;
     event.preventDefault();advanceStoryScene33900();
   });
-  document.addEventListener("keydown",event=>{if(event.defaultPrevented||!(event.key==="Enter"||event.key===" "))return;const tag=String(event.target&&event.target.tagName||"").toLowerCase();if(["input","textarea","select","button","a"].includes(tag))return;const runtime=currentRuntime(),p=performanceCursor(runtime,currentBeat(runtime));if(!p)return;event.preventDefault();advanceStoryScene33900();});
+  document.addEventListener("keydown",event=>{if(event.defaultPrevented||!(event.key==="Enter"||event.key===" "))return;const tag=String(event.target&&event.target.tagName||"").toLowerCase();if(["input","textarea","select","button","a"].includes(tag))return;const runtime=currentRuntime(),p=performanceCursor(runtime,currentBeat(runtime));if(!p||p.cue&&p.cue.kind==="record")return;event.preventDefault();advanceStoryScene33900();});
 }
 
 // Origin-specific board definitions are registered by their own consumers.
@@ -731,6 +732,8 @@ function runStorySceneBoard33900Diagnostics(){
     reducedMotionPreservesSemanticIndependence:String(playStoryHardSceneTransition33900).includes("isReduced")&&!String(playStoryHardSceneTransition33900).includes("PRE_ADVANCE"),
     legacyRootWipeRetired:!installStyle.toString().includes("transform:translateX(100%)")&&!String(performSceneCut).includes("createElement"),
     performanceAdvanceCommitsNoOccurrence:advanceStoryScene33900.toString().includes("performanceCursor")&&!advanceStoryScene33900.toString().includes("commitOccurrence"),
+    receiptHintRequiresButton:String(updatePerformancePanel).includes("USE CONTINUE TO CONFIRM"),
+    receiptPrimaryButtonVisible:String(updatePerformancePanel).includes('cue.kind==="record"?"CONTINUE":"›"'),
     semanticAdvancePrecedesWipe:advanceStoryScene33900.toString().indexOf("PRE_ADVANCE.apply")<advanceStoryScene33900.toString().indexOf("performSceneCut"),
     semanticAnchorVocabulary:["PLAYER_LEFT","INNER_LEFT","CENTER","CENTER_OBJECT","INNER_RIGHT","OPPONENT_RIGHT","FAR_ENTRY_LEFT","FAR_ENTRY_RIGHT"].every(key=>Object.prototype.hasOwnProperty.call(SEMANTIC_STAGE_ANCHORS,key)),
     boundedChoreographyVocabulary:CHOREOGRAPHY_CLASSES.length===17&&Object.values(CHOREOGRAPHY_DURATION_MS).every(ms=>ms<=650),

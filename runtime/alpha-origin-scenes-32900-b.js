@@ -176,7 +176,7 @@ const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A)
     {beatId:"iwa_confront_05",mode:"narration",environmentRef:courtyard,text:"The Rogue Genin stops looking for a way around him.",nextBeatId:"iwa_confront_battle"},
     {beatId:"iwa_confront_battle",mode:"battle_transition",environmentRef:courtyard,text:"Iwabee confronts the Rogue Genin.",battle:{
       encounterId:"origin_academy_iwabee:rogue_genin_confrontation",launchResolver:battleLaunch,
-      victoryBeatId:"iwa_confront_return_01",defeatBeatId:"iwa_confront_loss_01",resultProjector:battleProject,actionLabel:"BEGIN PL BATTLE"}},
+      victoryBeatId:"iwa_confront_return_01",defeatBeatId:"iwa_confront_loss_01",resultProjector:battleProject,actionLabel:"Start PL Battle"}},
     {beatId:"iwa_confront_return_01",mode:"narration",environmentRef:courtyard,text:"When the confrontation is over, the repaired section of training ground is still where Iwabee put it. Whatever became of the Rogue Genin is a second fact the instructor now has to deal with.",onEnterConsequences:[confrontVictory],nextBeatId:"iwa_eval_route_confront"},
     {beatId:"iwa_confront_loss_01",mode:"narration",environmentRef:courtyard,text:"Iwabee's stance gives before the Rogue Genin's does. Not because the ground shifted. Not because somebody interrupted. This one is his.",nextBeatId:"iwa_confront_loss_02"},
     {beatId:"iwa_confront_loss_02",mode:"narration",environmentRef:courtyard,text:"He forces himself upright again anyway. The Rogue is still standing. Another exchange is not happening.",nextBeatId:"iwa_confront_loss_03"},
@@ -303,7 +303,7 @@ const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A)
     {beatId:"met_spar_05",mode:"narration",environmentRef:courtyard,text:"Somebody behind the Genin shifts for a better view. Metal hears it. He wishes he hadn't.",nextBeatId:"met_spar_battle"},
     {beatId:"met_spar_battle",mode:"battle_transition",environmentRef:courtyard,text:"Metal and the Genin begin the controlled spar.",battle:{
       encounterId:"origin_academy_metal_lee:inviting_genin_spar",launchResolver:battleLaunch,
-      victoryBeatId:"met_spar_dispatch",defeatBeatId:"met_spar_dispatch",postBattleBeatId:"met_spar_dispatch",resultProjector:battleProject,actionLabel:"BEGIN PL BATTLE"}},
+      victoryBeatId:"met_spar_dispatch",defeatBeatId:"met_spar_dispatch",postBattleBeatId:"met_spar_dispatch",resultProjector:battleProject,actionLabel:"Start PL Battle"}},
     {beatId:"met_spar_dispatch",mode:"choice",environmentRef:courtyard,text:"",choices:[
       C("route_strong","CONTINUE","met_spar_strong_01",null,{availability:ctx=>({available:(ctx&&ctx.localContext||A.local()).metalSparPerformanceClass==="strong",knownBlocker:null})}),
       C("route_mixed","CONTINUE","met_spar_mixed_01",null,{availability:ctx=>({available:(ctx&&ctx.localContext||A.local()).metalSparPerformanceClass==="mixed",knownBlocker:null})}),

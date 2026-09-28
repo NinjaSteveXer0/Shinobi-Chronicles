@@ -1365,7 +1365,7 @@ function battleSpec(){
     environmentPath:IZUNO_BATTLE_ENVIRONMENT,backdrop:IZUNO_BATTLE_ENVIRONMENT,
     victoryBeatId:"izu_rogue_step_in_return_1",defeatBeatId:"izu_rogue_step_in_return_1",
     resultProjector:()=>globalThis.projectAcademyWasabiRogueGeninBattle343?globalThis.projectAcademyWasabiRogueGeninBattle343():null,
-    actionLabel:"BEGIN PL BATTLE",
+    actionLabel:"Start PL Battle",
     launchResolver:({active:returnActive,returnContext})=>{
       if(!globalThis.launchAcademyWasabiRogueGeninBattle343)return{success:false,reason:"wasabi_rogue_battle_adapter_missing"};
       return globalThis.launchAcademyWasabiRogueGeninBattle343({

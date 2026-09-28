@@ -140,6 +140,8 @@ function installStyle(){
 #${ROOT_ID}[data-battle-action-only="true"] .kv2-speaker,#${ROOT_ID}[data-battle-action-only="true"] .kv2-progress,#${ROOT_ID}[data-battle-action-only="true"] .kv2-text,#${ROOT_ID}[data-battle-action-only="true"] .kv2-continue-hint{display:none!important}
 #${ROOT_ID}[data-battle-action-only="true"] .kv2-dialogue{display:grid!important;width:min(56%,720px);padding:10px 14px;grid-template-rows:1fr}
 #${ROOT_ID}[data-battle-action-only="true"] .kv2-actions{grid-row:1;margin-top:0;grid-template-columns:1fr}
+#${ROOT_ID}[data-battle-action-only="true"] .kv2-actions button{justify-self:center;width:min(220px,100%);min-height:42px;padding:10px 16px;border:1px solid rgba(244,82,82,.78);border-radius:6px;background:linear-gradient(180deg,#a82222,#5d0d0d);color:#fff;text-align:center;box-shadow:0 8px 24px rgba(109,8,8,.26)}
+#${ROOT_ID}[data-battle-action-only="true"] .kv2-actions button::before{display:none}
 #${ROOT_ID} .kv2-receipt button{margin-top:24px;width:100%;min-height:40px;border:1px solid rgba(95,215,225,.42);border-radius:10px;background:rgba(7,33,39,.72);color:#78dfe7;font-weight:900;letter-spacing:.1em;cursor:pointer}
 #${ROOT_ID}[data-can-advance="true"]{cursor:pointer}
 #${ROOT_ID}[data-has-choices="true"]{cursor:default}
@@ -645,7 +647,7 @@ function syncStandard(root,p,t){
   const battleReady=t.atEnd&&beat&&beat.mode==="battle_transition";
   root.dataset.battleActionOnly=battleReady&&Number(t.cueCount||0)===0?"true":"false";
   const semanticNext=t.atEnd&&beat&&(isMachineResolvedBeat36030(beat)||(beat.mode!=="choice"&&beat.mode!=="battle_transition"));
-  const actions=choices.length?choices.map(row=>({choiceId:row.choiceId,label:row.label})):battleReady?[{label:"BEGIN PL BATTLE",battle:true}]:[];
+  const actions=choices.length?choices.map(row=>({choiceId:row.choiceId,label:row.label})):battleReady?[{label:"Start PL Battle",battle:true}]:[];
   syncActions(root,actions);
   const actionBox=root.querySelector(".kv2-actions");if(actionBox)actionBox.style.display=actions.length?"grid":"none";
   root.dataset.hasChoices=actions.length?"true":"false";
@@ -653,6 +655,8 @@ function syncStandard(root,p,t){
 }
 function syncReceipt(root,p,t){
   root.dataset.battleActionOnly="false";
+  root.dataset.hasChoices="false";
+  root.dataset.canAdvance="false";
   setBackdrop(root,p.backdrop);
   syncActors(root,[]);
   const cue=currentCue(p,t),pre=root.querySelector(".kv2-receipt pre");
@@ -734,7 +738,7 @@ if(PRE_RENDER){
   try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_e){}
 }
 if(typeof document!=="undefined"){
-  document.addEventListener("keydown",e=>{if(!isActive()||e.defaultPrevented||!(e.key==="Enter"||e.key===" "))return;const tag=String(e.target&&e.target.tagName||"").toLowerCase();if(["input","textarea","select"].includes(tag))return;e.preventDefault();globalThis.advanceAcademyKakashiV236040?globalThis.advanceAcademyKakashiV236040():advanceStoryScene();});
+  document.addEventListener("keydown",e=>{if(!isActive()||e.defaultPrevented||!(e.key==="Enter"||e.key===" "))return;const tag=String(e.target&&e.target.tagName||"").toLowerCase();if(["input","textarea","select","button","a"].includes(tag))return;const root=document.getElementById(ROOT_ID);if(root&&root.dataset.preset==="chronicle_receipt")return;e.preventDefault();globalThis.advanceAcademyKakashiV236040?globalThis.advanceAcademyKakashiV236040():advanceStoryScene();});
 }
 function geometryDiagnostics(){
   if(typeof document==="undefined")return{pass:true,headless:true};

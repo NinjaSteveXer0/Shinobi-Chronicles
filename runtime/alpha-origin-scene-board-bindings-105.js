@@ -27,6 +27,7 @@ const PATH=Object.freeze({
   miraiCheckpointInstructor:"NPC/mirai_checkpoint_instructor.png",
   traveller:"NPC/traveller.png",
   menma:"Assets/Academy Student/academy_menma.png",
+  menmaNineTails:"Portraits/Tailed Beasts/menma_nine_tails.png",
   menmaInstructor:"NPC/menma_instructor.png",
   anko:"Assets/Special Jonin/sj_anko.png",
   altered:"Enemies/test_subject_altered_shinobi.png",
@@ -153,6 +154,55 @@ function hinataReceiptLines105(){
 }
 function buildHinataReceipt105(){return hinataReceiptLines105().join("\n");}
 
+function originStartingPurseAmount105(){
+  const amount=Number(globalThis.SC_ORIGIN_STARTING_PURSE_409&&globalThis.SC_ORIGIN_STARTING_PURSE_409.amount);
+  return Number.isFinite(amount)&&amount>0?amount:100;
+}
+function buildMiraiReceipt105(){
+  const runtime=A&&typeof A.active==="function"?A.active():null;
+  const ctx=runtime&&runtime.localContext&&typeof runtime.localContext==="object"?runtime.localContext:{};
+  const lines=["YOUR ORIGIN","ACADEMY MIRAI","","RECORDED IN YOUR CHRONICLE","","YOUR DECISIONS"];
+  if(ctx.mirTalked===true)lines.push("• Talked with the traveller during the escort.");
+  else if(ctx.mirTalked===false)lines.push("• Kept attention on the escort.");
+  const shortcut={stay:"Stayed on the assigned route.",ask:"Questioned the shortcut.",follow:"Tried to follow the shortcut."}[ctx.mirShortcut];
+  if(shortcut)lines.push("• "+shortcut);
+  if(ctx.mirConfronted===true)lines.push("• Confronted the suspected substitute.");
+  else if(ctx.mirChangedRoute===true)lines.push("• Changed the route.");
+  else if(ctx.mirContinued===true)lines.push("• Continued the escort to Checkpoint Three.");
+  const reflection={
+    physical_protection_matters:"Getting the escort there safely still mattered.",
+    verify_identity:"Decided to verify who she was protecting.",
+    need_evidence:"Decided suspicion needs evidence.",
+    watch_person:"Decided to watch the person, not only the route."
+  }[ctx.mirReflection];
+  if(reflection)lines.push("• "+reflection);
+  lines.push("","WHAT HAPPENED","• Completed the Academy escort assessment.","• Reached Checkpoint Three and reviewed the route.");
+  lines.push("","REWARDS",`• Origin Starting Purse: +${originStartingPurseAmount105()} Ryō.`);
+  return lines.join("\n");
+}
+function buildMenmaReceipt105(){
+  const runtime=A&&typeof A.active==="function"?A.active():null;
+  const ctx=runtime&&runtime.localContext&&typeof runtime.localContext==="object"?runtime.localContext:{};
+  const history=typeof A.history==="function"?A.history():[];
+  const battle=[...history].reverse().find(row=>row&&row.actorVariantId==="academy_menma"&&row.encounterId==="origin_academy_menma_prologue:three_test_subjects"&&row.type==="origin_battle_occurrence");
+  const battleReward=[...history].reverse().find(row=>row&&String(row.rewardSourceId||row.sourceId||"")==="menma_origin_battle_three_test_subjects_victory_ryo_01");
+  const lines=["YOUR ORIGIN","ACADEMY MENMA","","RECORDED IN YOUR CHRONICLE","","YOUR DECISIONS"];
+  const future={
+    master:"Chose to master what the Academy will not teach yet.",
+    strong:"Chose to become too strong to hold back.",
+    create:"Chose to create something of his own.",
+    limit:"Chose to find out how far he can go."
+  }[ctx.menmaFuture];
+  if(future)lines.push("• "+future);
+  lines.push("","WHAT HAPPENED","• Left the Academy and followed the disturbance into the forest.","• Met Anko and the three altered shinobi.");
+  if(battle&&battle.battleResult==="victory")lines.push("• Stopped all three test subjects with Anko.");
+  else if(battle&&battle.battleResult==="defeat")lines.push("• Withdrew after the fight was lost.");
+  lines.push("","REWARDS");
+  if(battleReward)lines.push("• PL Battle Victory: +100 Ryō.");
+  lines.push(`• Origin Starting Purse: +${originStartingPurseAmount105()} Ryō.`);
+  return lines.join("\n");
+}
+
 function miraiBackdrop(beatId,runtime){
   const id=String(beatId||""),ctx=runtime&&runtime.localContext||{};
   if(id==="mir_start"||id.startsWith("mir_assignment_"))return BACKDROP.miraiCourtyard;
@@ -170,6 +220,7 @@ function miraiBackdrop(beatId,runtime){
 }
 function miraiActors(beatId,performance,beat){
   const id=String(beatId||""),sp=speaker(performance,beat);
+  if(id==="mir_receipt")return[];
   const rows=[actor("academy_mirai","MIRAI",PATH.mirai,sp)];
   const traveller=()=>actor("mirai_traveller","TRAVELLER",PATH.traveller,sp,["TRAVELER","CIVILIAN","ESCORT"]);
   const instructor=()=>actor("mirai_academy_instructor","INSTRUCTOR",PATH.miraiInstructor,sp,["ACADEMY INSTRUCTOR"]);
@@ -224,6 +275,7 @@ function menmaBackdrop(beatId,beat){
 }
 function menmaActors(beatId,performance,beat){
   const id=String(beatId||""),sp=speaker(performance,beat);
+  if(id==="menma_receipt")return[];
   if(id.startsWith("menma_discovery_")){
     return[
       actor("academy_menma","MENMA",PATH.menma,sp),
@@ -232,6 +284,10 @@ function menmaActors(beatId,performance,beat){
     ];
   }
   const rows=[actor("academy_menma","MENMA",PATH.menma,sp)];
+  if(sp==="NINE-TAILS"||sp==="NINE TAILS"){
+    rows.push(actor("menma_nine_tails","NINE-TAILS",PATH.menmaNineTails,sp,["NINE TAILS"]));
+    return rows;
+  }
   if(id.startsWith("menma_open_")||id.includes("academy")){
     rows.push(actor("menma_academy_instructor","INSTRUCTOR",PATH.menmaInstructor,sp,["ACADEMY INSTRUCTOR"]));
   }else if(id.startsWith("menma_enter_")||id.startsWith("menma_anko_")){
@@ -240,8 +296,6 @@ function menmaActors(beatId,performance,beat){
   }else if(id.startsWith("menma_after_")||id.startsWith("menma_part_")||id.startsWith("menma_party_defeat_return_")){
     rows.push(actor("sj_anko","ANKO",PATH.anko,sp));
   }
-  // Nine-Tails is an internal speaker in this Origin. Never project it as a
-  // physical forest actor card.
   return rows;
 }
 
@@ -326,12 +380,26 @@ function installDefinitions(){
     }
   });
   results.mirai=registerDefinition(scene("academy_mirai"),{
-    resolve:({beatId,performance,beat})=>projection("ACADEMY MIRAI · ESCORT ASSESSMENT",miraiActors(beatId,performance,beat)),
-    resolveBackdrop:({beatId,runtime})=>({assetPath:miraiBackdrop(beatId,runtime),assetId:"issue105_mirai"})
+    resolve:({beatId,performance,beat})=>String(beatId||"")==="mir_receipt"
+      ?{mode:"record",location:"YOUR ORIGIN",actors:[]}
+      :projection("ACADEMY MIRAI · ESCORT ASSESSMENT",miraiActors(beatId,performance,beat)),
+    resolveBackdrop:({beatId,runtime})=>String(beatId||"")==="mir_receipt"
+      ?null
+      :{assetPath:miraiBackdrop(beatId,runtime),assetId:"issue105_mirai"},
+    performanceSequences:{
+      mir_receipt:()=>[{kind:"record",text:buildMiraiReceipt105()}]
+    }
   });
   results.menma=registerDefinition("origin_academy_menma_prologue",{
-    resolve:({beatId,performance,beat})=>projection("ACADEMY MENMA",menmaActors(beatId,performance,beat)),
-    resolveBackdrop:({beatId,beat})=>({assetPath:menmaBackdrop(beatId,beat),assetId:"issue105_menma"})
+    resolve:({beatId,performance,beat})=>String(beatId||"")==="menma_receipt"
+      ?{mode:"record",location:"YOUR ORIGIN",actors:[]}
+      :projection("ACADEMY MENMA",menmaActors(beatId,performance,beat)),
+    resolveBackdrop:({beatId,beat})=>String(beatId||"")==="menma_receipt"
+      ?null
+      :{assetPath:menmaBackdrop(beatId,beat),assetId:"issue105_menma"},
+    performanceSequences:{
+      menma_receipt:()=>[{kind:"record",text:buildMenmaReceipt105()}]
+    }
   });
   results.kushina=registerDefinition(scene("academy_kushina"),{
     resolve:({beatId,performance,beat})=>projection("ACADEMY · FŪINJUTSU PRACTICAL",kushinaActors(beatId,performance,beat)),
@@ -369,7 +437,7 @@ function diagnostics(){
     kakashiExcluded:!String(installDefinitions).includes("academy_kakashi"),
     knownHinataActors:PATH.hinata&&PATH.hinataInstructor&&PATH.hinataPartner,
     knownMiraiActors:PATH.mirai&&PATH.miraiInstructor&&PATH.traveller,
-    menmaInternalNineTailsNotPhysical:!String(menmaActors).includes("nine_tails.png"),
+    menmaNineTailsPortraitExact:PATH.menmaNineTails==="Portraits/Tailed Beasts/menma_nine_tails.png"&&String(menmaActors).includes("menma_nine_tails"),
     knownMenmaPhysicalActors:[PATH.menma,PATH.menmaInstructor,PATH.anko,PATH.altered].every(Boolean),
     knownKurenaiInstructor:PATH.kurenaiInstructor==="NPC/kurenai_instructor.png",
     issue419ActorPathsResolved:

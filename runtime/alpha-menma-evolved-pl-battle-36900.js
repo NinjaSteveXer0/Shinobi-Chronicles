@@ -1355,6 +1355,7 @@ function applyMenmaSuccessorBattleAuthority(scene){
   beat.battle.objectiveText=PLAYER_OBJECTIVE_TEXT;beat.battle.objectiveLabel=PLAYER_OBJECTIVE_TEXT;
   beat.battle.environmentPath=BATTLE_ENVIRONMENT_PATH;beat.battle.backdrop=BATTLE_ENVIRONMENT_PATH;
   beat.battle.defeatBeatId=PARTY_DEFEAT_RETURN_BEAT_ID;
+  beat.battle.actionLabel="Start PL Battle";
   beat.battle.launchResolver=launchMenmaEvolvedPLBattle36900;
   for(const row of scene.beatMap.values())migrateMenmaSuccessorDisplayValue(row);
   MENMA_SUCCESSOR_PATCHED_SCENES_38800.add(scene);

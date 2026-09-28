@@ -468,3 +468,32 @@ Only after this benchmark feels like **Shinobi Chronicles gameplay** rather than
 > **Do not illustrate every branch. Recompose authoritative state inside reusable places.**
 
 > **A Story choice that merely selects a different paragraph is not the target. A Story choice should be capable of changing the visible situation, later affordances, factual consequences, or Chronicle-relative reactions where the underlying authority supports it.**
+
+
+---
+
+## GLOBAL ORIGIN RECEIPT INPUT LOCK — 2026-09-29
+
+This is a global Origin presentation/input rule.
+
+- Ordinary Story narration/dialogue keeps click-anywhere advancement.
+- A visible Chronicle Receipt MUST NOT advance from a stage/background click.
+- Enter/Space MUST NOT bypass a Receipt through the global Story advance handler.
+- The player advances a Receipt through its visible Receipt continuation button.
+- Normal keyboard activation of that focused button remains valid.
+- The Receipt button advances exactly once.
+- This rule applies to every Origin, including already-GOLDEN Origins, without changing their Receipt content.
+
+## GLOBAL STORY → PL BATTLE CTA — 2026-09-29
+
+Every current Origin Story → PL Battle seam uses one reusable presentation rule:
+
+- exact visible text: `Start PL Battle`
+- centered
+- compact squared/rectangular treatment
+- red
+- visually distinct as the Battle commitment action
+
+Retire per-Origin variants such as `BEGIN PL BATTLE`, `STOP THE TEST SUBJECTS`, and gold Battle-start controls.
+
+This presentation rule does not alter Battle mechanics, route truth, rewards, or frozen Origin Story content.

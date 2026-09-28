@@ -36,10 +36,17 @@ function reg(def){
 function env(id){return {environmentId:id};}
 function N(id,text,next,environment,onEnterConsequences){const row={beatId:id,mode:"narration",text};if(next)row.nextBeatId=next;if(environment)row.environmentRef=environment;if(onEnterConsequences)row.onEnterConsequences=onEnterConsequences;return row;}
 function D(id,speaker,text,next,environment,onEnterConsequences){const row={beatId:id,mode:"dialogue",speakerName:speaker,text};if(next)row.nextBeatId=next;if(environment)row.environmentRef=environment;if(onEnterConsequences)row.onEnterConsequences=onEnterConsequences;return row;}
-function V(id,speaker,text,next,environment,onEnterConsequences){const row=D(id,speaker,text,next,environment,onEnterConsequences);row.mode="internal_voice";row.speakerRef={sourceId:"nine_tails",sourceType:"communication_source",physicalPresence:false};return row;}
+function V(id,speaker,text,next,environment,onEnterConsequences){const row=D(id,speaker,text,next,environment,onEnterConsequences);row.mode="dialogue";row.speakerRef={sourceId:"nine_tails",sourceType:"communication_source",physicalPresence:false};return row;}
 function Q(id,text,choices,environment){const row={beatId:id,mode:"choice",text,choices};if(environment)row.environmentRef=environment;return row;}
 function battleUnavailable(label){
-  return ()=>({available:false,knownBlocker:label||"This Battle route is waiting on the exact Academy instructor Combat package (#338)."});
+  return ()=>({available:false,knownBlocker:label||"This route is unavailable right now."});
+}
+function menmaBattleAuthoredValue(key){
+  const runtime=A.active(),resume=runtime&&runtime.battleResume,authored=resume&&resume.authored;
+  return authored&&Object.prototype.hasOwnProperty.call(authored,key)?authored[key]:null;
+}
+function hiddenResolverAvailability(predicate){
+  return ()=>({available:!!predicate(),knownBlocker:null});
 }
 
 // ---------------------------------------------------------------------------
@@ -124,7 +131,7 @@ const menmaBeats=[
 if(oldTutorial){
   oldTutorial.nextBeatId=undefined;
   oldTutorial.environmentRef=MENMA_ENV.clearing;
-  oldTutorial.battle={...(oldTutorial.battle||{}),victoryBeatId:"menma_after_01"};
+  oldTutorial.battle={...(oldTutorial.battle||{}),victoryBeatId:"menma_after_01",actionLabel:"Start PL Battle"};
   menmaBeats.push(oldTutorial);
 }else{
   menmaBeats.push({beatId:"tutorial_battle",mode:"battle_transition",text:"Stop the three altered shinobi.",environmentRef:MENMA_ENV.clearing});
@@ -137,13 +144,24 @@ menmaBeats.push(
   D("menma_after_02","ANKO","You. Come here.","menma_after_03",MENMA_ENV.after),
   D("menma_after_03","MENMA","I'm fine.","menma_after_04",MENMA_ENV.after),
   D("menma_after_04","ANKO","That wasn't a medical diagnosis.","menma_after_04a",MENMA_ENV.after),
-  N("menma_after_04a","She looks him over anyway. Menma tolerates it with the expression of somebody granting a favour.","menma_after_performance",MENMA_ENV.after),
-  {beatId:"menma_after_performance",mode:"post_battle",speakerName:"ANKO",text:"",environmentRef:MENMA_ENV.after,presentationResolver:(context)=>{
-    const bucket=context&&context.battleResume&&context.battleResume.authored&&context.battleResume.authored.performanceBucket;
-    if(bucket==="high")return{text:"Okay. That was annoyingly good.\n\nMENMA: “You can say impressive.”\n\nANKO: “I could.”\n\nShe doesn't."};
-    if(bucket==="low")return{text:"Anko's attention lingers on how much the fight took out of him.\n\nMENMA: “We won.”\n\nANKO: “Yeah.”\n\nShe looks him over once more.\n\nANKO: “I'm looking at the price tag.”"};
-    return{text:"You held your own.\n\nMENMA: “I know.”\n\nANKO: “Of course you do.”"};
-  },nextBeatId:"menma_after_history_01"},
+  N("menma_after_04a","She looks him over anyway. Menma tolerates it with the expression of somebody granting a favour.","menma_after_performance_router",MENMA_ENV.after),
+  {beatId:"menma_after_performance_router",mode:"resolver",machineResolved:true,text:"",environmentRef:MENMA_ENV.after,choices:[
+    C("high","RESOLVE HIGH PERFORMANCE","menma_after_high_01",null,{availability:hiddenResolverAvailability(()=>menmaBattleAuthoredValue("performanceBucket")==="high")}),
+    C("low","RESOLVE LOW PERFORMANCE","menma_after_low_01",null,{availability:hiddenResolverAvailability(()=>menmaBattleAuthoredValue("performanceBucket")==="low")}),
+    C("standard","RESOLVE STANDARD PERFORMANCE","menma_after_standard_01",null,{availability:hiddenResolverAvailability(()=>!["high","low"].includes(menmaBattleAuthoredValue("performanceBucket")))})
+  ]},
+  D("menma_after_high_01","ANKO","Okay. That was annoyingly good.","menma_after_high_02",MENMA_ENV.after),
+  D("menma_after_high_02","MENMA","You can say impressive.","menma_after_high_03",MENMA_ENV.after),
+  D("menma_after_high_03","ANKO","I could.","menma_after_high_04",MENMA_ENV.after),
+  N("menma_after_high_04","She doesn't.","menma_after_history_01",MENMA_ENV.after),
+  N("menma_after_low_01","Anko's attention lingers on how much the fight took out of him.","menma_after_low_02",MENMA_ENV.after),
+  D("menma_after_low_02","MENMA","We won.","menma_after_low_03",MENMA_ENV.after),
+  D("menma_after_low_03","ANKO","Yeah.","menma_after_low_04",MENMA_ENV.after),
+  N("menma_after_low_04","She looks him over once more.","menma_after_low_05",MENMA_ENV.after),
+  D("menma_after_low_05","ANKO","I'm looking at the price tag.","menma_after_history_01",MENMA_ENV.after),
+  D("menma_after_standard_01","ANKO","You held your own.","menma_after_standard_02",MENMA_ENV.after),
+  D("menma_after_standard_02","MENMA","I know.","menma_after_standard_03",MENMA_ENV.after),
+  D("menma_after_standard_03","ANKO","Of course you do.","menma_after_history_01",MENMA_ENV.after),
 
   N("menma_after_history_01","Anko turns toward the former test subjects. The irritation in her face changes when she sees the marks clearly.\n\nHer hand almost lifts toward her own neck before she stops it.","menma_after_history_02",MENMA_ENV.after),
   D("menma_after_history_02","MENMA","You know them?","menma_after_history_03",MENMA_ENV.after),
@@ -173,16 +191,21 @@ menmaBeats.push(
   D("menma_part_04","MENMA","And I still handled it.","menma_part_05",MENMA_ENV.after),
   D("menma_part_05","ANKO","Those can both be true.","menma_part_06",MENMA_ENV.after),
   D("menma_part_06","MENMA","That's not an answer.","menma_part_07",MENMA_ENV.after),
-  D("menma_part_07","ANKO","Sure it is.","menma_part_optional_01",MENMA_ENV.after),
-  {beatId:"menma_part_optional_01",mode:"post_battle",speakerName:"MENMA",text:"",environmentRef:MENMA_ENV.after,presentationResolver:(context)=>({text:context&&context.battleResume&&context.battleResume.authored&&context.battleResume.authored.observedKinjutsu?"You said my techniques worried you.":""}),nextBeatId:"menma_part_optional_02"},
-  {beatId:"menma_part_optional_02",mode:"post_battle",speakerName:"ANKO",text:"",environmentRef:MENMA_ENV.after,presentationResolver:(context)=>({text:context&&context.battleResume&&context.battleResume.authored&&context.battleResume.authored.observedKinjutsu?"They do.":""}),nextBeatId:"menma_part_optional_03"},
-  {beatId:"menma_part_optional_03",mode:"post_battle",speakerName:"MENMA",text:"",environmentRef:MENMA_ENV.after,presentationResolver:(context)=>({text:context&&context.battleResume&&context.battleResume.authored&&context.battleResume.authored.observedKinjutsu?"Teach me something better.":""}),nextBeatId:"menma_part_optional_04"},
-  {beatId:"menma_part_optional_04",mode:"post_battle",speakerName:"ANKO",text:"",environmentRef:MENMA_ENV.after,presentationResolver:(context)=>({text:context&&context.battleResume&&context.battleResume.authored&&context.battleResume.authored.observedKinjutsu?"You really don't hear the word ‘no’ very well.":""}),nextBeatId:"menma_part_optional_05"},
-  {beatId:"menma_part_optional_05",mode:"post_battle",speakerName:"MENMA",text:"",environmentRef:MENMA_ENV.after,presentationResolver:(context)=>({text:context&&context.battleResume&&context.battleResume.authored&&context.battleResume.authored.observedKinjutsu?"I hear it.":""}),nextBeatId:"menma_part_optional_06"},
-  {beatId:"menma_part_optional_06",mode:"post_battle",speakerName:"ANKO",text:"",environmentRef:MENMA_ENV.after,presentationResolver:(context)=>({text:context&&context.battleResume&&context.battleResume.authored&&context.battleResume.authored.observedKinjutsu?"That's worse.":""}),nextBeatId:"menma_part_optional_07"},
-  {beatId:"menma_part_optional_07",mode:"post_battle",speakerName:"ANKO",text:"",environmentRef:MENMA_ENV.after,presentationResolver:(context)=>({text:context&&context.battleResume&&context.battleResume.authored&&context.battleResume.authored.observedKinjutsu?"Ask me again when I don't have three escaped experiments ruining my day.":"Try not to find another disaster before you get home."}),nextBeatId:"menma_part_optional_08"},
-  {beatId:"menma_part_optional_08",mode:"post_battle",speakerName:"MENMA",text:"",environmentRef:MENMA_ENV.after,presentationResolver:(context)=>({text:context&&context.battleResume&&context.battleResume.authored&&context.battleResume.authored.observedKinjutsu?"":"No promises."}),nextBeatId:"menma_part_optional_09"},
-  {beatId:"menma_part_optional_09",mode:"post_battle",speakerName:"ANKO",text:"",environmentRef:MENMA_ENV.after,presentationResolver:(context)=>({text:context&&context.battleResume&&context.battleResume.authored&&context.battleResume.authored.observedKinjutsu?"":"I know."}),nextBeatId:"menma_part_end"},
+  D("menma_part_07","ANKO","Sure it is.","menma_part_optional_router",MENMA_ENV.after),
+  {beatId:"menma_part_optional_router",mode:"resolver",machineResolved:true,text:"",environmentRef:MENMA_ENV.after,choices:[
+    C("kinjutsu","RESOLVE KINJUTSU REACTION","menma_part_kinjutsu_01",null,{availability:hiddenResolverAvailability(()=>menmaBattleAuthoredValue("observedKinjutsu")===true)}),
+    C("standard","RESOLVE STANDARD PARTING","menma_part_standard_01",null,{availability:hiddenResolverAvailability(()=>menmaBattleAuthoredValue("observedKinjutsu")!==true)})
+  ]},
+  D("menma_part_kinjutsu_01","MENMA","You said my techniques worried you.","menma_part_kinjutsu_02",MENMA_ENV.after),
+  D("menma_part_kinjutsu_02","ANKO","They do.","menma_part_kinjutsu_03",MENMA_ENV.after),
+  D("menma_part_kinjutsu_03","MENMA","Teach me something better.","menma_part_kinjutsu_04",MENMA_ENV.after),
+  D("menma_part_kinjutsu_04","ANKO","You really don't hear the word ‘no’ very well.","menma_part_kinjutsu_05",MENMA_ENV.after),
+  D("menma_part_kinjutsu_05","MENMA","I hear it.","menma_part_kinjutsu_06",MENMA_ENV.after),
+  D("menma_part_kinjutsu_06","ANKO","That's worse.","menma_part_kinjutsu_07",MENMA_ENV.after),
+  D("menma_part_kinjutsu_07","ANKO","Ask me again when I don't have three escaped experiments ruining my day.","menma_part_end",MENMA_ENV.after),
+  D("menma_part_standard_01","ANKO","Try not to find another disaster before you get home.","menma_part_standard_02",MENMA_ENV.after),
+  D("menma_part_standard_02","MENMA","No promises.","menma_part_standard_03",MENMA_ENV.after),
+  D("menma_part_standard_03","ANKO","I know.","menma_part_end",MENMA_ENV.after),
   N("menma_part_end","Anko leaves.","menma_future_01",MENMA_ENV.after),
 
   N("menma_future_01","Menma runs again.\n\nThe forest that felt enormous when he left the Academy feels different now—not safer, not quieter. Just less like a boundary.","menma_future_02",MENMA_ENV.future),
@@ -212,9 +235,9 @@ menmaBeats.push(
   V("menma_future_limit_02","NINE-TAILS","And when you find it?","menma_future_limit_02a",MENMA_ENV.future),
   N("menma_future_limit_02a","Menma starts running again.","menma_future_limit_03",MENMA_ENV.future),
   D("menma_future_limit_03","MENMA","I'll decide then.","menma_close_01",MENMA_ENV.future),
-  N("menma_close_01","Menma runs toward Konoha.\n\nNot back to the morning he left.\n\nForward.",null,MENMA_ENV.future)
+  N("menma_close_01","Menma runs toward Konoha.\n\nNot back to the morning he left.\n\nForward.","menma_receipt",MENMA_ENV.future),
+  {beatId:"menma_receipt",mode:"record",text:"",exitScene:true}
 );
-menmaBeats[menmaBeats.length-1].exitScene=true;
 
 reg({
   sceneId:"origin_academy_menma_prologue",
@@ -709,10 +732,10 @@ push({
   presentationResolver:()=>({text:A.local().mirTalked?"The traveller pauses at the corner, remembering their earlier conversation.":"The traveller pauses at the corner and looks back at Mirai."}),
   nextBeatId:"mir_leaving_choice_router"
 });
-push(Q("mir_leaving_choice_router","",[
- C("talked","CONTINUE","mir_leaving_talk_01",null,{availability:()=>({available:A.local().mirTalked===true,knownBlocker:""})}),
- C("professional","CONTINUE","mir_leaving_prof_01",null,{availability:()=>({available:A.local().mirTalked!==true,knownBlocker:""})})
-],MIRAI_ENV.checkpoint));
+push({beatId:"mir_leaving_choice_router",mode:"resolver",machineResolved:true,text:"",environmentRef:MIRAI_ENV.checkpoint,choices:[
+ C("talked","RESOLVE TALKED LEAVING","mir_leaving_talk_01",null,{availability:()=>({available:A.local().mirTalked===true,knownBlocker:null})}),
+ C("professional","RESOLVE PROFESSIONAL LEAVING","mir_leaving_prof_01",null,{availability:()=>({available:A.local().mirTalked!==true,knownBlocker:null})})
+]});
 line("mir_leaving_talk",[
  {mode:"dialogue",speaker:"TRAVELLER",text:"If my sister offers you tea, say no."},
  {mode:"narration",text:"Mirai folds her arms."},
@@ -762,8 +785,10 @@ line("mir_reflect_person",[
  {mode:"dialogue",speaker:"MIRAI",text:"Didn't know enough about him."},
  {mode:"narration",text:"She puts the map away.\n\nThe next escort will still have a route.\n\nMirai doubts she'll stare at it quite as much."}
 ],MIRAI_ENV.checkpoint,"mir_close_01");
-push(N("mir_close_01","Mirai leaves Checkpoint Three alone.\n\nThe village is exactly as busy as it was when she started.\n\nSame streets.\n\nSame roofs.\n\nSame market.\n\nShe passes the junction where the shortcut split away.\n\nKeeps walking.\n\nThis time, she doesn't take out the map.",null,MIRAI_ENV.checkpoint));
-miraiBeats[miraiBeats.length-1].exitScene=true;
+push(
+  N("mir_close_01","Mirai leaves Checkpoint Three alone.\n\nThe village is exactly as busy as it was when she started.\n\nSame streets.\n\nSame roofs.\n\nSame market.\n\nShe passes the junction where the shortcut split away.\n\nKeeps walking.\n\nThis time, she doesn't take out the map.","mir_receipt",MIRAI_ENV.checkpoint),
+  {beatId:"mir_receipt",mode:"record",text:"",exitScene:true}
+);
 
 reg({
  sceneId:MIRAI_SCENE,eventId:MIRAI_SCENE,title:"ACADEMY MIRAI",participants:[],

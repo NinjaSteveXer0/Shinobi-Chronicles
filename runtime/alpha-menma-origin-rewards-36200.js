@@ -339,19 +339,10 @@ if(PRE_CLAIM){
 }
 
 function appendVictoryDisclosure(container,projection){
-  if(!container||!projection||projection.handled!==true)return false;
+  if(!container)return false;
   const existing=container.querySelector&&container.querySelector(".menma-three-subject-reward-36200");
   if(existing)existing.remove();
-  const note=document.createElement("div");
-  note.className="menma-three-subject-reward-36200";
-  note.style.cssText="margin:8px auto 0;max-width:720px;padding:8px 12px;border:1px solid rgba(214,169,58,.45);border-radius:10px;background:rgba(4,12,17,.88);color:#d9e1df;font-size:10px;line-height:1.45;text-align:center;letter-spacing:.02em;";
-  if(projection.ready===true){
-    note.textContent="FIXED ENCOUNTER REWARD · +100 RYŌ · No items/materials · No generic Character EXP. Menma action-derived discipline/Stamina development, if any, is recorded separately from this cash reward.";
-  }else{
-    note.textContent="REWARD PENDING AUTHORITATIVE THREE-SUBJECT BATTLE RECEIPT · No partial payout is available.";
-  }
-  container.appendChild(note);
-  return true;
+  return false;
 }
 
 const PRE_RENDER=typeof renderVictoryOverlay==="function"?renderVictoryOverlay:null;
