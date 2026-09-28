@@ -23,6 +23,8 @@ const PATH=Object.freeze({
   hinataYoungerSparringPartner:"NPC/younger_sparring_partner.png",
   mirai:"Assets/Academy Student/academy_mirai.png",
   miraiInstructor:"NPC/mirai_instructor.png",
+  miraiPorter:"NPC/mirai_porter.png",
+  miraiCheckpointInstructor:"NPC/mirai_checkpoint_instructor.png",
   traveller:"NPC/traveller.png",
   menma:"Assets/Academy Student/academy_menma.png",
   menmaInstructor:"NPC/menma_instructor.png",
@@ -31,12 +33,17 @@ const PATH=Object.freeze({
   brute:"Enemies/test_subject_brute.png",
   unstable:"Enemies/test_subject_unstable.png",
   kushina:"Assets/Academy Student/academy_kushina.png",
+  kushinaInstructor:"NPC/kushina_instructor.png",
+  kushinaClassmate:"NPC/kushina_classmate.png",
   gerotora:"Assets/Summons/key_gero.png",
   kurenai:"Assets/Academy Student/academy_kurenai.png",
   kurenaiInstructor:"NPC/kurenai_instructor.png",
   iwabee:"Assets/Academy Student/academy_iwabe.png",
+  iwabeeInstructor:"NPC/iwabe_instructor.png",
   rogue:"Enemies/rogue_genin.png",
-  metal:"Assets/Academy Student/academy_metal.png"
+  metal:"Assets/Academy Student/academy_metal.png",
+  metalInvitingGenin:"NPC/metal_classmate_1.png",
+  metalThreatenedStudent:"NPC/metal_classmate_2.png"
 });
 
 const BACKDROP=Object.freeze({
@@ -166,7 +173,7 @@ function miraiActors(beatId,performance,beat){
   const rows=[actor("academy_mirai","MIRAI",PATH.mirai,sp)];
   const traveller=()=>actor("mirai_traveller","TRAVELLER",PATH.traveller,sp,["TRAVELER","CIVILIAN","ESCORT"]);
   const instructor=()=>actor("mirai_academy_instructor","INSTRUCTOR",PATH.miraiInstructor,sp,["ACADEMY INSTRUCTOR"]);
-  const checkpoint=()=>actor("mirai_checkpoint_instructor","CHECKPOINT INSTRUCTOR",null,sp);
+  const checkpoint=()=>actor("mirai_checkpoint_instructor","CHECKPOINT INSTRUCTOR",PATH.miraiCheckpointInstructor,sp);
 
   if(id.startsWith("mir_assignment_")){
     rows.push(instructor(),traveller());
@@ -196,7 +203,7 @@ function miraiActors(beatId,performance,beat){
   if(["mir_eval","mir_end"].includes(id))rows.push(instructor());
   else{
     rows.push(traveller());
-    if(id.startsWith("mir_market_")&&sp==="PORTER")rows.push(actor("mirai_porter","PORTER",null,sp));
+    if(id.startsWith("mir_market_")&&sp==="PORTER")rows.push(actor("mirai_porter","PORTER",PATH.miraiPorter,sp));
   }
   return rows;
 }
@@ -244,10 +251,10 @@ function kushinaActors(beatId,performance,beat){
   if(id.startsWith("kus_gero_")||id==="kus_contact_choice"||id.startsWith("kus_close")||id.startsWith("kus_answer")||id.startsWith("kus_last")){
     rows.push(actor("key_gero","GEROTORA",PATH.gerotora,sp));
   }else if(id.startsWith("kus_protect_student_")){
-    rows.push(actor("kushina_classmate","CLASSMATE",null,sp,["STUDENT"]));
-    rows.push(actor("kushina_academy_instructor","INSTRUCTOR",null,sp,["ACADEMY INSTRUCTOR"]));
+    rows.push(actor("kushina_classmate","CLASSMATE",PATH.kushinaClassmate,sp,["STUDENT"]));
+    rows.push(actor("kushina_academy_instructor","INSTRUCTOR",PATH.kushinaInstructor,sp,["ACADEMY INSTRUCTOR"]));
   }else{
-    rows.push(actor("kushina_academy_instructor","INSTRUCTOR",null,sp,["ACADEMY INSTRUCTOR"]));
+    rows.push(actor("kushina_academy_instructor","INSTRUCTOR",PATH.kushinaInstructor,sp,["ACADEMY INSTRUCTOR"]));
   }
   return rows;
 }
@@ -263,17 +270,17 @@ function iwabeeActors(beatId,performance,beat){
   const rows=[actor("academy_iwabee","IWABEE",PATH.iwabee,sp)];
   const roguePresent=id.includes("rogue")||id.includes("confront")||id.includes("earth")||id.includes("call_instructor")||id.includes("finish_practical");
   if(roguePresent)rows.push(actor("iwabee_origin_rogue_genin_01","ROGUE GENIN",PATH.rogue,sp));
-  else rows.push(actor("iwabee_academy_instructor","INSTRUCTOR",null,sp,["ACADEMY INSTRUCTOR"]));
+  else rows.push(actor("iwabee_academy_instructor","INSTRUCTOR",PATH.iwabeeInstructor,sp,["ACADEMY INSTRUCTOR"]));
   return rows;
 }
 function metalActors(beatId,performance,beat){
   const id=String(beatId||""),sp=speaker(performance,beat);
   const rows=[actor("academy_metal_lee","METAL",PATH.metal,sp,["METAL LEE"])];
   if(!id.startsWith("met_open_")&&!id.startsWith("met_private_")){
-    rows.push(actor("metal_origin_inviting_genin","GENIN",null,sp,["INVITING GENIN"]));
+    rows.push(actor("metal_origin_inviting_genin","GENIN",PATH.metalInvitingGenin,sp,["INVITING GENIN"]));
   }
   if(id.includes("protect")||id.includes("redirect")||id.includes("impact")||id.includes("destroy")){
-    rows.push(actor("metal_origin_threatened_student","STUDENT",null,sp,["ACADEMY STUDENT"]));
+    rows.push(actor("metal_origin_threatened_student","STUDENT",PATH.metalThreatenedStudent,sp,["ACADEMY STUDENT"]));
   }
   return rows;
 }
@@ -342,8 +349,14 @@ function diagnostics(){
     menmaInternalNineTailsNotPhysical:!String(menmaActors).includes("nine_tails.png"),
     knownMenmaPhysicalActors:[PATH.menma,PATH.menmaInstructor,PATH.anko,PATH.altered].every(Boolean),
     knownKurenaiInstructor:PATH.kurenaiInstructor==="NPC/kurenai_instructor.png",
-    missingAssetPathsNotGuessed:
-      !PATH.kushinaInstructor&&!PATH.iwabeeInstructor&&!PATH.metalInvitingGenin,
+    issue419ActorPathsResolved:
+      PATH.kushinaInstructor==="NPC/kushina_instructor.png"&&
+      PATH.kushinaClassmate==="NPC/kushina_classmate.png"&&
+      PATH.iwabeeInstructor==="NPC/iwabe_instructor.png"&&
+      PATH.metalInvitingGenin==="NPC/metal_classmate_1.png"&&
+      PATH.metalThreatenedStudent==="NPC/metal_classmate_2.png"&&
+      PATH.miraiPorter==="NPC/mirai_porter.png"&&
+      PATH.miraiCheckpointInstructor==="NPC/mirai_checkpoint_instructor.png",
     clickAnywhereOwnedBySharedSceneBoard:true,
     browserGoldenClaimed:false
   };
