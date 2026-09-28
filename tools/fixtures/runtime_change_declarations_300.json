@@ -855,6 +855,106 @@
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Consumes issue #400 signed-off player-facing names for the eight remaining Academy Origin palettes. Stable machine IDs, palette ordering and all mechanics/numerics remain unchanged. Authored displayName is projected onto canonical shared Skill objects after #383, while Academy Menma and Academy Kakashi remain governed by their earlier lock."
+    },
+    {
+      "changeId": "academy-wasabi-writing-golden-rogue-battle-343-modular-2026-09-28",
+      "classification": "REPLACES",
+      "responsibilityIds": [
+        "story.machine_resolver.shared",
+        "story.scene.presentation.shared",
+        "origin.academy_izuno.final_story_state",
+        "origin.academy_izuno.rogue_battle",
+        "battle.return.story_scene.shared"
+      ],
+      "owner": "runtime/alpha-story-machine-resolver-343.js + runtime/alpha-origin-scenes-32900-a.js + runtime/alpha-wasabi-rogue-battle-343.js",
+      "directCallers": [
+        "index.html",
+        "runtime/alpha-origin-scenes-32900-a.js",
+        "runtime/alpha-origin-scenes-32900-integrator.js",
+        "runtime/alpha-story-scene-board-33900.js",
+        "runtime/alpha-battle-modern-33000.js"
+      ],
+      "stateTouched": [
+        "activeStorySceneRuntime machine resolver exact-one authored branch routing",
+        "activeStorySceneRuntime.localContext Academy Wasabi pursuit/route/Rogue response facts",
+        "playerData.activityHistory occ_origin_izuno_* factual sources",
+        "currentBattle.wasabi343 / playerData.wasabi343BattleLaunches",
+        "Wasabi Scene Board exact dedicated backdrops and known physical actor cards"
+      ],
+      "productionLoader": "index.html + runtime/alpha-traversal-bridge-33200.js",
+      "qaRefs": [
+        "tools/qa_issue_343_wasabi_writing_golden.js",
+        "tools/qa_issue_343_wasabi_browser.js",
+        "tools/qa_alpha_origin_scenes_32900_runtime.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [
+        "runtime/alpha-origin-scenes-32900-a.js::pre343_compressed_academy_izuno",
+        "runtime/alpha-origin-browser-realisation-33500.js::patchIzuno33500",
+        "runtime/alpha-early-story-modernization-33600.js::patchIzuno",
+        "runtime/alpha-origin-screen-first-33700.js::patchIzuno"
+      ],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Consumes the already-approved #343 Wasabi Writing-Golden and Rogue Battle contract on the #414 successor while preserving frozen game.js. Machine-resolver support is moved to a scoped adapter that delegates through existing Story choice authority. Stephen's installed-browser review showed #414 omitted this presentation lane."
+    },
+    {
+      "changeId": "issue-409-origin-starting-purse-modular-2026-09-28",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "origin.completion.shared",
+        "origin.academy_izuno.final_story_state",
+        "origin.academy_izuno.rogue_battle",
+        "progression.special_jonin.contextual_evidence_producer.shared"
+      ],
+      "owner": "runtime/alpha-origin-starting-purse-409.js + runtime/alpha-origin-scenes-32900-a.js + runtime/alpha-wasabi-rogue-battle-343.js + runtime/alpha-special-jonin-evidence-producer-34700.js",
+      "directCallers": [
+        "index.html",
+        "completeChronicleOriginPrologue",
+        "runtime/alpha-origin-scenes-32900-a.js",
+        "claimCurrentBattleRewards"
+      ],
+      "stateTouched": [
+        "playerData.ryo one-shot Origin starting purse + origin_completion_reward receipt",
+        "academy_izuno Stamina discipline progression",
+        "playerData.specialJoninContextualEvidence",
+        "Wasabi exact Battle victory reward"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_343_wasabi_writing_golden.js",
+        "tools/qa_issue_343_wasabi_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Preserves the closed #409 reward spectrum while obeying the frozen-core requirement: the one-shot 100 Ryō Origin purse is an explicit permitted wrapper around successful canonical Origin completion rather than a game.js mutation."
+    },
+    {
+      "changeId": "issue-105-ten-origin-presentation-repair-2026-09-28",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "story.scene.presentation.shared",
+        "battle.presentation.shared"
+      ],
+      "owner": "runtime/alpha-origin-scene-board-bindings-105.js + runtime/alpha-story-scene-board-33900.js + runtime/alpha-battle-modern-33000.js",
+      "directCallers": [
+        "index.html",
+        "runtime/alpha-traversal-bridge-33200.js"
+      ],
+      "stateTouched": [
+        "presentation-only Scene Board actor/backdrop projection for non-Kakashi Academy Origins",
+        "presentation-only radial Battle PL DOM refresh"
+      ],
+      "productionLoader": "index.html + runtime/alpha-traversal-bridge-33200.js",
+      "qaRefs": [
+        "tools/qa_issue_105_origin_presentation_repair.js",
+        "tools/qa_issue_343_wasabi_browser.js",
+        "tools/qa_issue_312_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Stephen's 2026-09-28 ten-Origin installed-browser review established that route-complete automation had missed legacy black Story fallbacks, absent actors/backdrops, missing click-anywhere progression and radial PL values outside their circles. This extends only shared presentation projection. Kakashi Golden Story remains frozen; only the reusable shared Battle renderer changes there."
     }
   ]
 }
