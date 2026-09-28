@@ -10,7 +10,14 @@ const {analyzeStoryScene}=require("./story_graph_integrity_311.js");
 const ROOT=path.resolve(__dirname,"..");
 
 function loadRegularOriginScenes(){
-  const files=["core","a","b","c","integrator"].map(n=>path.join(ROOT,"runtime","alpha-origin-scenes-32900-"+n+".js"));
+  const files=[
+    path.join(ROOT,"runtime","alpha-origin-scenes-32900-core.js"),
+    path.join(ROOT,"runtime","academy-wasabi-writing-golden-343.js"),
+    path.join(ROOT,"runtime","alpha-origin-scenes-32900-a.js"),
+    path.join(ROOT,"runtime","alpha-origin-scenes-32900-b.js"),
+    path.join(ROOT,"runtime","alpha-origin-scenes-32900-c.js"),
+    path.join(ROOT,"runtime","alpha-origin-scenes-32900-integrator.js")
+  ];
   const scenes=new Map([
     ["origin_academy_menma_prologue",{
       sceneId:"origin_academy_menma_prologue",

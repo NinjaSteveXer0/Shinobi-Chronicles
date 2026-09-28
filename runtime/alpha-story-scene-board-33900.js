@@ -356,15 +356,25 @@ function installStyle(){
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-stage.is-master-art-off{background:transparent!important;box-shadow:none!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-stage[data-sc-scene-board-backdrop="dedicated"]{background-color:#03080c!important;background-image:linear-gradient(180deg,rgba(2,5,8,.02),rgba(2,5,8,.05) 50%,rgba(2,5,8,.42) 82%,rgba(2,5,8,.70)),var(--sc-scene-board-backdrop)!important;background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-master-frame{display:none!important;}
-#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-layout{position:relative;z-index:5;width:min(94%,1180px)!important;min-height:0!important;margin:0 0 1.2%!important;display:grid!important;grid-template-columns:1fr!important;gap:8px!important;padding:0!important;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-layout{position:relative;z-index:5;width:min(72%,980px)!important;min-height:0!important;margin:0 0 3%!important;display:grid!important;grid-template-columns:1fr!important;gap:8px!important;padding:0!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-context{display:none!important;}
-#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-panel{position:relative;min-height:0!important;max-height:31vh;padding:13px 18px 12px!important;border:1px solid rgba(205,169,83,.62)!important;border-radius:14px!important;background:linear-gradient(180deg,rgba(3,9,14,.82),rgba(2,7,11,.94))!important;backdrop-filter:blur(8px);box-shadow:0 18px 45px rgba(0,0,0,.42)!important;overflow:visible!important;cursor:pointer;}
-#story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-story-panel{width:min(52%,650px)!important;border-color:rgba(103,221,230,.55)!important;background:linear-gradient(145deg,rgba(4,18,24,.94),rgba(2,9,14,.97))!important;}
-#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="player"] .sc-chronicle-layout{justify-items:start!important;}
-#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-chronicle-layout{justify-items:end!important;}
-#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-panel{border-color:rgba(218,176,77,.58)!important;background:linear-gradient(145deg,rgba(25,18,6,.93),rgba(8,10,12,.97))!important;}
-#story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-story-panel::after{content:"";position:absolute;top:-8px;left:22%;width:14px;height:14px;transform:translateX(-50%) rotate(45deg);border-left:1px solid rgba(103,221,230,.5);border-top:1px solid rgba(103,221,230,.5);background:rgba(2,9,14,.97);}
-#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-panel::after{left:78%;border-color:rgba(218,176,77,.52);background:rgba(8,10,12,.97);}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-panel{position:relative;min-height:0!important;max-height:31vh;padding:11px 15px 12px!important;border:1px solid rgba(93,215,225,.32)!important;border-radius:16px!important;background:linear-gradient(180deg,rgba(5,16,22,.88),rgba(2,9,14,.95))!important;backdrop-filter:blur(8px);box-shadow:0 18px 48px rgba(0,0,0,.46),inset 0 0 0 1px rgba(255,255,255,.025)!important;overflow:visible!important;cursor:pointer;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-chronicle-layout{position:absolute!important;left:var(--sc-cue-speech-x,22%)!important;right:auto!important;bottom:23.5%!important;width:min(36vw,500px)!important;margin:0!important;display:block!important;transform:translateX(-50%)!important;padding:0!important;z-index:31!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-story-panel{width:100%!important;box-sizing:border-box!important;border-color:rgba(103,221,230,.55)!important;background:linear-gradient(145deg,rgba(4,18,24,.94),rgba(2,9,14,.97))!important;box-shadow:0 18px 48px rgba(0,0,0,.48),0 0 22px rgba(78,210,220,.08)!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="player"] .sc-chronicle-layout{justify-content:flex-start!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-chronicle-layout{justify-content:flex-end!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-panel{border-color:rgba(218,176,77,.58)!important;background:linear-gradient(145deg,rgba(25,18,6,.93),rgba(8,10,12,.97))!important;box-shadow:0 18px 48px rgba(0,0,0,.48),0 0 22px rgba(218,176,77,.08)!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-story-panel::after{content:"";position:absolute;top:-8px;left:var(--sc-cue-speech-tail,50%);width:14px;height:14px;transform:translateX(-50%) rotate(45deg);border-left:1px solid rgba(103,221,230,.5);border-top:1px solid rgba(103,221,230,.5);background:rgba(2,9,14,.97);}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-panel::after{border-color:rgba(218,176,77,.52);background:rgba(8,10,12,.97);}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"] .sc-story-name{color:#78dfe7!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="dialogue"][data-sc-cue-speaker-side="opposition"] .sc-story-name{color:#e5c66f!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="record"] .sc-scene-board-33900{display:none!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="record"] .sc-chronicle-layout{position:absolute!important;left:50%!important;top:50%!important;bottom:auto!important;width:min(780px,78vw)!important;margin:0!important;transform:translate(-50%,-50%)!important;z-index:40!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="record"] .sc-story-panel{max-height:76vh!important;padding:34px 38px!important;border:1px solid rgba(214,173,74,.72)!important;border-radius:18px!important;background:linear-gradient(165deg,rgba(6,13,17,.98),rgba(2,7,10,.99))!important;box-shadow:0 36px 90px rgba(0,0,0,.72),inset 0 0 50px rgba(201,162,73,.03)!important;overflow:auto!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="record"] .sc-story-name{color:#e5c66f!important;font:900 clamp(21px,2.1vw,34px)/1 Georgia,serif!important;letter-spacing:.05em!important;text-transform:uppercase!important;margin:0 0 18px!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="record"] .sc-story-name::before{content:"SHINOBI CHRONICLES · RECORD";display:block;margin:0 0 9px;color:#64dae3;font:900 9px/1.2 inherit;letter-spacing:.16em;}
+#story-scene-presentation-layer[data-sc-cue-kind="record"] .sc-story-text{white-space:pre-wrap!important;max-height:46vh!important;overflow:auto!important;color:#e1e6e1!important;font-size:clamp(11px,.83vw,14px)!important;line-height:1.65!important;}
+#story-scene-presentation-layer[data-sc-cue-kind="record"] .sc-chronicle-primary{float:none!important;width:100%!important;height:40px!important;margin-top:24px!important;border:1px solid rgba(95,215,225,.42)!important;border-radius:10px!important;background:rgba(7,33,39,.72)!important;color:#78dfe7!important;font-size:9px!important;font-weight:900!important;letter-spacing:.1em!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-portrait{display:none!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-text{margin-top:6px!important;font-size:clamp(13px,1.05vw,17px)!important;line-height:1.42!important;}
 #story-scene-presentation-layer[data-sc-performance="true"]:not([data-sc-cue-kind="record"]) .sc-story-panel{max-height:none!important;overflow:visible!important;}
@@ -436,8 +446,12 @@ function installStyle(){
   document.head.appendChild(style);return true;
 }
 function actorMarkup(actor){
-  const image=actor.image?`<img src="${escapeHTML(actor.image)}" alt="">`:`<div class="sc-scene-board-33900__actor-silhouette" aria-hidden="true"></div>`;
-  return `<figure class="sc-scene-board-33900__actor ${actor.focus?"is-focus":""} ${actor.entering?"is-entering":""}" data-actor-id="${escapeHTML(actor.id||"")}"><div class="sc-scene-board-33900__actor-frame"></div>${image}<figcaption class="sc-scene-board-33900__actor-tag"><strong>${escapeHTML(actor.label||"UNKNOWN")}</strong>${actor.state?`<small>${escapeHTML(actor.state)}</small>`:""}</figcaption></figure>`;
+  const hasImage=!!actor.image;
+  const image=hasImage?`<img src="${escapeHTML(actor.image)}" alt="">`:`<div class="sc-scene-board-33900__actor-silhouette" aria-hidden="true"></div>`;
+  const identity=hasImage?"":`<strong>${escapeHTML(actor.label||"UNKNOWN")}</strong>`;
+  const state=actor.state?`<small>${escapeHTML(actor.state)}</small>`:"";
+  const tag=identity||state?`<figcaption class="sc-scene-board-33900__actor-tag">${identity}${state}</figcaption>`:"";
+  return `<figure class="sc-scene-board-33900__actor ${actor.focus?"is-focus":""} ${actor.entering?"is-entering":""}" data-actor-id="${escapeHTML(actor.id||"")}" data-actor-label="${escapeHTML(actor.label||"")}"><div class="sc-scene-board-33900__actor-frame"></div>${image}${tag}</figure>`;
 }
 function boardMarkup(projection){
   const actors=Array.isArray(projection.actors)?projection.actors.slice(0,3):[];
@@ -445,28 +459,59 @@ function boardMarkup(projection){
   return `<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">${escapeHTML(projection.location||"STORY SCENE")}</div>${projection.objective?`<div class="sc-scene-board-33900__objective"><b>OBJECTIVE</b>${escapeHTML(projection.objective)}</div>`:""}</div>${projection.reaction?`<div class="sc-scene-board-33900__reaction">${escapeHTML(projection.reaction)}</div>`:""}${projection.committed?`<div class="sc-scene-board-33900__receipt">CHRONICLE FACT COMMITTED</div>`:""}<div class="sc-scene-board-33900__actors" data-count="${actors.length}">${actors.map(actorMarkup).join("")}</div>${objects?`<div class="sc-scene-board-33900__objects sc-live-state-callouts-33900">${objects}</div>`:""}`;
 }
 function clearBoard(layer){if(!layer)return;try{delete layer.dataset.scSceneBoard;delete layer.dataset.scSceneMode;delete layer.dataset.scPerformance;}catch(_error){};for(const node of layer.querySelectorAll?layer.querySelectorAll(".sc-scene-board-33900"):[]){if(typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(node,"scene_board_teardown");if(node&&typeof node.remove==="function")node.remove();}}
+function syncSpeakerLinkedPanel33900(layer,speakerActor){
+  if(!layer)return false;
+  const layout=layer.querySelector&&layer.querySelector(".sc-chronicle-layout");
+  if(!layout||!layout.style)return false;
+  const clear=()=>{layout.style.removeProperty("--sc-cue-speech-x");layout.style.removeProperty("--sc-cue-speech-tail");};
+  if(!speakerActor||!speakerActor.id){clear();return false;}
+  const board=layer.querySelector&&layer.querySelector(".sc-scene-board-33900");
+  const actor=board?[...(board.querySelectorAll?board.querySelectorAll(".sc-scene-board-33900__actor"):[])].find(node=>String(node.dataset&&node.dataset.actorId||"")===String(speakerActor.id)):null;
+  const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||(layer.querySelector&&layer.querySelector(".sc-story-stage"))||layer;
+  if(!actor||!stage||typeof actor.getBoundingClientRect!=="function"||typeof stage.getBoundingClientRect!=="function"){clear();return false;}
+  const sr=stage.getBoundingClientRect(),ar=actor.getBoundingClientRect();
+  if(!(sr&&sr.width>0&&ar)){clear();return false;}
+  const actorCenter=ar.left+ar.width/2;
+  const x=Math.max(20,Math.min(80,((actorCenter-sr.left)/sr.width)*100));
+  layout.style.setProperty("--sc-cue-speech-x",x+"%");
+  const lr=layout.getBoundingClientRect();
+  const tail=lr&&lr.width>0?Math.max(14,Math.min(86,((actorCenter-lr.left)/lr.width)*100)):50;
+  layout.style.setProperty("--sc-cue-speech-tail",tail+"%");
+  return true;
+}
 function updatePerformancePanel(layer,runtime=currentRuntime()){
   if(!layer||!runtime)return false;const beat=currentBeat(runtime),p=performanceCursor(runtime,beat);
-  if(!p){delete layer.dataset.scPerformance;delete layer.dataset.scCueKind;delete layer.dataset.scCueSpeakerSide;return false;}
+  const kicker=layer.querySelector&&layer.querySelector(".sc-story-kicker");
+  if(!p){
+    delete layer.dataset.scPerformance;delete layer.dataset.scCueKind;delete layer.dataset.scCueSpeakerSide;delete layer.dataset.scCueSpeakerActorId;
+    if(kicker)kicker.style.removeProperty("display");
+    return false;
+  }
   layer.dataset.scPerformance="true";const cue=p.cue||{};
   layer.dataset.scCueKind=String(cue.kind||"narration");
   if(cue.kind==="dialogue"){
     const projection=resolveStorySceneBoardProjection(runtime.sceneId,beat&&beat.beatId,runtime);
     const actors=projection&&Array.isArray(projection.actors)?projection.actors:[];
-    const speaker=String(cue.speakerName||cue.speaker||"").toUpperCase();
-    const first=String(actors[0]&&actors[0].label||"").toUpperCase();
-    layer.dataset.scCueSpeakerSide=speaker&&first&&speaker===first?"player":"opposition";
-  }else delete layer.dataset.scCueSpeakerSide;
+    const speaker=String(cue.speakerName||cue.speaker||"").trim().toUpperCase();
+    const speakerIndex=actors.findIndex(actor=>String(actor&&actor.label||"").trim().toUpperCase()===speaker);
+    const speakerActor=speakerIndex>=0?actors[speakerIndex]:null;
+    layer.dataset.scCueSpeakerSide=speakerIndex===0?"player":"opposition";
+    if(speakerActor&&speakerActor.id)layer.dataset.scCueSpeakerActorId=String(speakerActor.id);else delete layer.dataset.scCueSpeakerActorId;
+    syncSpeakerLinkedPanel33900(layer,speakerActor);
+  }else{
+    delete layer.dataset.scCueSpeakerSide;delete layer.dataset.scCueSpeakerActorId;
+    syncSpeakerLinkedPanel33900(layer,null);
+  }
   const text=layer.querySelector&&layer.querySelector(".sc-story-text");const cueText=String(cue.text||"");if(text&&text.textContent!==cueText)text.textContent=cueText;
   const panel=layer.querySelector&&layer.querySelector(".sc-story-panel");
   let name=layer.querySelector&&layer.querySelector(".sc-story-name");
   const dialogueSpeaker=cue.kind==="dialogue"?String(cue.speakerName||cue.speaker||""):"";
-  const speakerLabel=dialogueSpeaker||(cue.kind==="record"?"SHINOBI RECORD":"NARRATION");
+  const speakerLabel=dialogueSpeaker||(cue.kind==="record"?"CHRONICLE RECEIPT":"NARRATION");
   if(!name&&panel){name=document.createElement("div");name.className="sc-story-name sc-performance-name-33900";}
   if(name&&panel&&!panel.contains(name)){const t=panel.querySelector(".sc-story-text");panel.insertBefore(name,t||null);}
   if(name){if(name.textContent!==speakerLabel)name.textContent=speakerLabel;name.style.display="block";}
-  const kicker=layer.querySelector&&layer.querySelector(".sc-story-kicker");const kickerText=String(cue.kind||"narration").toUpperCase();if(kicker&&kicker.textContent!==kickerText)kicker.textContent=kickerText;
-  const primary=layer.querySelector&&layer.querySelector(".sc-chronicle-primary");if(primary){if(primary.textContent!=="›")primary.textContent="›";primary.setAttribute("aria-label","Advance scene");primary.title="Advance scene";}
+  if(kicker)kicker.style.setProperty("display","none","important");
+  const primary=layer.querySelector&&layer.querySelector(".sc-chronicle-primary");if(primary){const label=cue.kind==="record"?"CONTINUE":"›";if(primary.textContent!==label)primary.textContent=label;primary.setAttribute("aria-label",cue.kind==="record"?"Continue":"Advance scene");primary.title=cue.kind==="record"?"Continue":"Advance scene";}
   return true;
 }
 function decorateStoryChoices33900(layer,runtime=currentRuntime()){
@@ -645,7 +690,10 @@ if(typeof document!=="undefined"){
 function runStorySceneBoard33900Diagnostics(){
   const checks={
     patchId:PATCH_ID==="story_scene_board_33900_2026_09_25_origin_benchmark",
-    sharedKakashiBenchmarkPanels:installStyle.toString().includes("border-radius:14px")&&installStyle.toString().includes('data-sc-cue-kind="dialogue"')&&installStyle.toString().includes("data-intent-icon"),
+    sharedKakashiBenchmarkPanels:installStyle.toString().includes("bottom:23.5%")&&installStyle.toString().includes('data-sc-cue-kind="dialogue"')&&installStyle.toString().includes("data-intent-icon"),
+    singlePerformanceLabel:String(updatePerformancePanel).includes('kicker.style.setProperty("display","none","important")')&&String(updatePerformancePanel).includes('cue.kind==="record"?"CHRONICLE RECEIPT":"NARRATION"'),
+    speakerOwnedDialogue:String(updatePerformancePanel).includes("speakerIndex=actors.findIndex")&&String(updatePerformancePanel).includes("scCueSpeakerActorId"),
+    bakedCardIdentityNotDuplicated:String(actorMarkup).includes('const identity=hasImage?"":')&&String(actorMarkup).includes("data-actor-label"),
     sharedChoiceIntentClassifier:typeof storyChoiceIntentIcon33900==="function"&&["HELP HER","KEEP GOING","ASK ABOUT THE ROUTE","CONFRONT HIM"].every(label=>storyChoiceIntentIcon33900({label})!=="•"),
     cueLevelBackdropOverride:resolveBoardBackdropPath.toString().includes("resolveBackdrop")&&resolveBoardBackdropPath.toString().includes("performanceCursor"),
     compactLiveStateCallout:installStyle.toString().includes("width:max-content")&&installStyle.toString().includes("height:auto!important")&&installStyle.toString().includes("align-items:flex-start")&&installStyle.toString().includes("left:3.2%;right:auto"),
