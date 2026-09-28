@@ -1180,6 +1180,10 @@ const IZUNO_BATTLE_ENVIRONMENT=IZUNO_BACKDROPS.alley.assetPath;
 const IZUNO_ACTORS=Object.freeze({
   wasabi:Object.freeze({id:"academy_izuno",label:"WASABI",image:"Assets/Academy Student/academy_izuno.png"}),
   instructor:Object.freeze({id:"wasabi_academy_instructor",label:"ACADEMY INSTRUCTOR",image:"NPC/izuno_instructor.png"}),
+  student1:Object.freeze({id:"wasabi_academy_student_01",label:"ACADEMY STUDENT",image:"NPC/academy_student_fem_1.png"}),
+  student2:Object.freeze({id:"wasabi_academy_student_02",label:"ACADEMY STUDENT 2",image:"NPC/izuno_student_2.png"}),
+  proctor:Object.freeze({id:"wasabi_origin_proctor",label:"PROCTOR",image:"NPC/izuno_proctor.png"}),
+  target:Object.freeze({id:"wasabi_origin_pursuit_target_01",label:"TARGET",image:"NPC/pursuit_target.png"}),
   rogue:Object.freeze({id:"wasabi_origin_rogue_genin_01",label:"ROGUE GENIN",image:"Enemies/rogue_genin.png"})
 });
 function izunoBackdropKey32900(beatId){
@@ -1233,7 +1237,18 @@ function izunoActorKeys32900(beatId){
 }
 function izunoActors32900(beatId,performance){
   const speaker=String(performance&&performance.cue&&(performance.cue.speakerName||performance.cue.speaker)||"").trim().toUpperCase();
-  return izunoActorKeys32900(beatId).map((key,index)=>{
+  const keys=izunoActorKeys32900(beatId);
+  const speakerKey={
+    "WASABI":"wasabi",
+    "ACADEMY INSTRUCTOR":"instructor",
+    "ACADEMY STUDENT":"student1",
+    "ACADEMY STUDENT 2":"student2",
+    "PROCTOR":"proctor",
+    "TARGET":"target",
+    "ROGUE GENIN":"rogue"
+  }[speaker]||null;
+  if(speakerKey&&!keys.includes(speakerKey))keys.push(speakerKey);
+  return keys.slice(0,3).map((key,index)=>{
     const row=IZUNO_ACTORS[key];
     return{...row,focus:speaker?String(row.label||"").toUpperCase()===speaker:index===0};
   });
