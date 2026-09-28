@@ -52,11 +52,15 @@ assert(kakashiRenderer.includes('.kv2-speech[data-speaker-side="opposition"]{bor
 assert(kakashiRenderer.includes('.kv2-speech[data-speaker-side="opposition"]::after{border-color:rgba(103,221,230,.5);'),"Kakashi opposition dialogue pointer is not cyan");
 assert(!kakashiRenderer.includes('.kv2-speech[data-speaker-side="opposition"]{border-color:rgba(218,176,77,.58);'),"gold/brown opposition dialogue outline returned in Kakashi");
 assert(sceneBoardDoc.includes("GLOBAL NARRATION / DIALOGUE FRAME COLOUR LOCK"),"global cyan Story frame lock missing");
+assert(board.includes('sc-performance-progress-33900')&&board.includes('CLICK ANYWHERE TO CONTINUE'),"shared narration is missing Kakashi progress/hint parity");
+assert(board.includes('[data-sc-cue-kind="narration"] .sc-chronicle-primary')&&board.includes('[data-sc-cue-kind="dialogue"] .sc-chronicle-primary')&&board.includes('display:none!important;'),"ordinary Story arrow button was not retired");
+assert(board.includes('font-size:clamp(12px,.94vw,15px)!important')&&board.includes('font-size:clamp(12px,.96vw,16px)!important'),"shared Story text typography no longer matches Kakashi baseline");
+assert(sceneBoardDoc.includes("no visible arrow/CONTINUE button for ordinary narration")&&sceneBoardDoc.includes("no visible arrow/CONTINUE button for ordinary dialogue"),"durable Kakashi box parity rule incomplete");
 assert(battle.includes('querySelector(".alpha-battle-pl-core")'),"radial PL refresh does not target inner core");
 assert(battle.includes('core.querySelector("strong")')||battle.includes('core?.querySelector("strong")'),"radial PL current value not refreshed inside core");
 assert(!game.includes("ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID"),"frozen game.js contains successor purse mutation");
 console.log(JSON.stringify({pass:true,issue:105,checks:{
   sevenNonKakashiBindings:true,kakashiExcluded:true,knownAssetsExact:true,missingAssetsNotGuessed:true,
   internalVoiceNotPhysical:true,loadOrder:true,sharedSceneBoard:true,clickAnywhere:true,
-  speakerLinkedDialogue:true,globalCyanStoryFrames:true,kakashiFrameParity:true,radialPLContainmentRefresh:true,frozenCorePreserved:true,browserGoldenClaimed:false
+  speakerLinkedDialogue:true,globalCyanStoryFrames:true,kakashiFrameParity:true,kakashiTextAndAdvanceParity:true,radialPLContainmentRefresh:true,frozenCorePreserved:true,browserGoldenClaimed:false
 }},null,2));
