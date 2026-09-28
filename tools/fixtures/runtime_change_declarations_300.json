@@ -766,6 +766,95 @@
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Consumes Writing #370 and Story_Narration_and_Dialogue_Box_Segmentation_Authority_2026-09-25. Ordinary narration/dialogue/internal voice is paginated at authored blank-line boundaries (with bounded narration sentence fallback) while preserving parent source-cue ordinal for backdrop timing. This extends the existing shared Story presentation owner; no runtime owner is retired or replaced. Semantic Story beats, choices, consequences, routes, save truth, Battle, rewards and document-like record surfaces remain unchanged."
+    },
+    {
+      "changeId": "issue-396-metal-controlled-spar-met03-runtime",
+      "classification": "NEW",
+      "responsibilityIds": [
+        "origin.academy_metal_lee.final_story_state",
+        "origin.academy_metal_lee.controlled_spar_battle",
+        "battle.return.story_scene.shared",
+        "battle.presentation.shared"
+      ],
+      "owner": "runtime/alpha-origin-scenes-32900-b.js + runtime/alpha-metal-origin-runtime-396.js",
+      "directCallers": [
+        "index.html",
+        "shared Story -> Battle -> Story bridge"
+      ],
+      "stateTouched": [
+        "activeStorySceneRuntime.localContext Metal spar/protective facts",
+        "playerData.activityHistory MET-01/MET-02/MET-03/MET-04",
+        "currentBattle.metal396",
+        "playerData.metal396BattleLaunches",
+        "shinobiTestState Metal scoped Battle envelope"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issues_396_399_400_runtime.js",
+        "tools/qa_issues_396_399_400_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Consumes issue #396 and durable Combat/Writing authority. Enables the previously fail-closed Academy Metal controlled spar against stable story participant metal_origin_inviting_genin at PL15, exact deterministic five-action AI, fixed 13-PL performance bands, and the non-Battle deterministic MET-03 resolver with exact intervention evidence. Existing shared Battle/Story infrastructure remains canonical; no second Origin owner, reward, PL scaling, injury inference, or collectible admission is created."
+    },
+    {
+      "changeId": "issue-399-iwabee-rogue-genin-disposition-runtime",
+      "classification": "NEW",
+      "responsibilityIds": [
+        "combat.rogue_genin.opposition_template.shared",
+        "origin.academy_iwabee.final_story_state",
+        "origin.academy_iwabee.rogue_battle",
+        "battle.return.story_scene.shared",
+        "battle.presentation.shared"
+      ],
+      "owner": "runtime/alpha-rogue-genin-opposition-399.js + runtime/alpha-iwabee-origin-runtime-399.js + runtime/alpha-origin-scenes-32900-b.js",
+      "directCallers": [
+        "index.html",
+        "shared Story -> Battle -> Story bridge"
+      ],
+      "stateTouched": [
+        "currentBattle.iwabee399",
+        "playerData.iwabee399BattleLaunches",
+        "shinobiTestState Iwabee scoped Battle envelope",
+        "activeStorySceneRuntime.localContext Iwabee Battle facts",
+        "playerData.activityHistory occ_origin_iwabee_rogue_genin_response_resolution World disposition/custody envelope"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issues_396_399_400_runtime.js",
+        "tools/qa_issues_396_399_400_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Consumes issue #399 World authority while preserving Combat/Registry separation. Iwabee's stable historical Rogue remains iwabee_origin_rogue_genin_01 and consumes reusable rogue_genin PL23 capability without identity collapse. Battle reports withdrawal facts only; the canonical Story owner commits exact escape, surrender or temporary-instructor-detention World disposition. No IWA-02 counterfeiting, hidden Battle modifier, second Battle, injury/death inference, material reward or collectible admission is introduced."
+    },
+    {
+      "changeId": "issue-400-origin-eight-palette-display-name-lock",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "combat.prepared_skill.definition.shared"
+      ],
+      "owner": "runtime/alpha-origin-skill-display-names-400.js",
+      "directCallers": [
+        "index.html",
+        "shared Battle prepared-Skill lookup and presentation"
+      ],
+      "stateTouched": [
+        "static authored displayName projection for forty existing Academy prepared Skills"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issues_396_399_400_runtime.js",
+        "tools/qa_issues_396_399_400_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_383_skill_lock.js",
+        "tools/qa_issue_383_skill_lock_browser.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Consumes issue #400 signed-off player-facing names for the eight remaining Academy Origin palettes. Stable machine IDs, palette ordering and all mechanics/numerics remain unchanged. Authored displayName is projected onto canonical shared Skill objects after #383, while Academy Menma and Academy Kakashi remain governed by their earlier lock."
     }
   ]
 }
