@@ -83,9 +83,14 @@ async function waitBeat(page,id){await page.waitForFunction(({scene,id})=>getAct
 async function advance(page){
   const before=await state(page);
   assert.notStrictEqual(before.mode,"choice","advance attempted on choice "+before.beatId);
-  let button=page.locator("#story-scene-presentation-layer .sc-chronicle-primary").first();
-  if(await button.count()===0)button=page.locator("#story-scene-presentation-layer .sc-story-actions > .sc-story-action:not(.sc-story-choice)").first();
-  await button.waitFor({state:"visible",timeout:8000});await button.click();
+  const root=page.locator("#story-scene-presentation-layer");
+  const button=root.locator(".sc-chronicle-primary").first();
+  if(await button.count()&&await button.isVisible())await button.click();
+  else{
+    const stage=root.locator(".sc-chronicle-stage,.sc-story-stage").first();
+    await stage.waitFor({state:"visible",timeout:8000});
+    await stage.click({position:{x:30,y:30}});
+  }
   await page.waitForFunction(old=>{
     const layer=document.getElementById("story-scene-presentation-layer");
     return getActiveStorySceneRuntime()?.beatId!==old.beat||layer?.querySelector(".sc-story-text")?.textContent?.trim()!==old.text;
