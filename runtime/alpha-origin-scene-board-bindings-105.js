@@ -97,7 +97,7 @@ function hinataActors(beatId,performance,beat){
     rows.push(actor("hinata_younger_student","YOUNGER STUDENT",null,sp,["YOUNG HYŪGA","YOUNGER HYŪGA"]));
   }else{
     rows.push(actor("hinata_academy_instructor","INSTRUCTOR",PATH.hinataInstructor,sp,["HYŪGA INSTRUCTOR","ACADEMY INSTRUCTOR"]));
-    rows.push(actor("hinata_sparring_partner","SPARRING PARTNER",PATH.hinataPartner,sp,["PARTNER","HYŪGA STUDENT"]));
+    rows.push(actor("hinata_sparring_partner","SPARRING PARTNER",PATH.hinataPartner,sp,["PARTNER","HYŪGA STUDENT","SPARRING STUDENT","HYŪGA SPARRING PARTNER"]));
   }
   return rows;
 }
