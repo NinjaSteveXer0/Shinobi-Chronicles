@@ -38,8 +38,8 @@ const MENMA_CLASSROOM_ENVIRONMENT_PATH="Scene backdrops/academy_classroom.png";
 const MENMA_FOREST_ROUTE_ENVIRONMENT_ID="konoha_forest_path_day";
 const MENMA_FOREST_ROUTE_ENVIRONMENT_PATH="Scene backdrops/whisper_woods_forest_route.png";
 const MENMA_CLEARING_ENVIRONMENT_ID="konoha_forest_clearing_day";
-const FUTURE_ENVIRONMENT_PATH="Scene backdrops/whisper_woods_forest_route.png";
-const FUTURE_ENVIRONMENT_ASSET_ID="whisper_woods_forest_route";
+const FUTURE_ENVIRONMENT_PATH="Menma Origin Backdrop/whisper_woods_rise.png";
+const FUTURE_ENVIRONMENT_ASSET_ID="whisper_woods_rise";
 const MENMA_STORY_BACKDROPS_36900=Object.freeze({
   [MENMA_CLASSROOM_ENVIRONMENT_ID]:MENMA_CLASSROOM_ENVIRONMENT_PATH,
   [MENMA_FOREST_ROUTE_ENVIRONMENT_ID]:MENMA_FOREST_ROUTE_ENVIRONMENT_PATH,
