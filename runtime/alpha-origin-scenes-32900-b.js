@@ -90,54 +90,291 @@ const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A)
   ],onCompleteConsequences:[X("academy_kurenai",[bell])]});
 })();
 
-// Iwabee — practical terrain reshaping and a genuine secondary Rogue occurrence.
+// Iwabee — WRITING_GOLDEN terrain / Rogue confrontation / World disposition.
 (()=>{
   const reshape="occ_origin_iwabee_training_ground_reshape_resolution",rogue="occ_origin_iwabee_rogue_genin_response_resolution",scene=A.sceneByVariant.academy_iwabee;
-  A.register({sceneId:scene,eventId:scene,title:"ACADEMY IWABEE",entryBeatId:"iwa_task",participants:[],beats:[
-    {beatId:"iwa_task",mode:"dialogue",speakerName:"INSTRUCTOR",text:"Make the area usable again.",nextBeatId:"iwa_reshape"},
-    {beatId:"iwa_reshape",mode:"choice",text:"Choose how Iwabee reshapes the damaged ground.",choices:[
-      C("raise_collapsed","Raise the collapsed section","iwa_expose",{iwabeeTerrainChoice:"raise_collapsed"}),
-      C("flatten_ground","Flatten the damaged ground","iwa_expose",{iwabeeTerrainChoice:"flatten_ground"}),
-      C("build_path","Build a stable path through it","iwa_expose",{iwabeeTerrainChoice:"build_path"}),
-      C("reinforce_weakest","Reinforce the weakest section","iwa_expose",{iwabeeTerrainChoice:"reinforce_weakest"})]},
-    {beatId:"iwa_expose",mode:"narration",text:"The factual terrain change exposes a Rogue Genin who was using the damaged area as concealment. The Rogue was not part of the Academy exercise.",onEnterConsequences:[
-      R("iwabee_reshape_32900","academy_iwabee",reshape,ctx=>({trainingGroundReshapeObjectiveCompletedByIwabee:true,terrainChoice:ctx.iwabeeTerrainChoice||null}),["IWA-01"])],nextBeatId:"iwa_response"},
-    {beatId:"iwa_response",mode:"choice",text:"Choose Iwabee's response to the secondary occurrence.",choices:[
-      C("confront_immediately","Confront him immediately","iwa_response",null,{availability:A.unavailableBattle(scene,"Direct Rogue Genin Battle requires its exact current Combat caller; this branch remains fail-closed.")}),
-      C("block_escape","Block his escape route with Earth Release","iwa_response",null,{availability:A.unavailableBattle(scene,"This route may surrender/capture or become a controlled Battle. Its exact World resolution is not guessed.")}),
-      C("call_instructor","Call the instructor","iwa_eval",{iwabeeRogueResponse:"call_instructor"}),
-      C("ignore_finish","Ignore him and finish the training objective","iwa_eval",{iwabeeRogueResponse:"ignore_finish"})]},
-    {beatId:"iwa_eval",mode:"dialogue",speakerName:"INSTRUCTOR",text:"You know what your problem is, Iwabee?",onEnterConsequences:[
-      R("iwabee_rogue_response_32900","academy_iwabee",rogue,ctx=>({rogueGeninParticipantRef:"iwabee_origin_rogue_genin_01",earthReleaseUsedToConstrainRogueGenin:false,response:ctx.iwabeeRogueResponse||null}),[],{participantRefs:["iwabee_origin_rogue_genin_01"]})],nextBeatId:"iwa_reply"},
-    {beatId:"iwa_reply",mode:"dialogue",speakerName:"IWABEE",text:"Yeah. Written tests.",nextBeatId:"iwa_truth"},
-    {beatId:"iwa_truth",mode:"dialogue",speakerName:"INSTRUCTOR",text:"No. You keep acting like the only things that count are the things you're bad at.",nextBeatId:"iwa_reflect"},
-    {beatId:"iwa_reflect",mode:"choice",text:"What does Iwabee make of the assessment?",choices:[
-      C("know_good_at","I know what I'm good at.","iwa_end"),C("better_rest","I still need to get better at the rest.","iwa_end"),
-      C("academy_tests_wrong","Maybe the Academy tests the wrong things.","iwa_end"),C("dont_care","I don't care what they think.","iwa_end")]},
-    {beatId:"iwa_end",mode:"narration",text:"The practical objective and the secondary occurrence remain separate facts. No personality lock follows.",exitScene:true}
+  const courtyard=Object.freeze({environmentId:"konoha_academy_courtyard_day"});
+  const ROGUE="iwabee_origin_rogue_genin_01",INSTRUCTOR="iwabee_origin_practical_instructor_01";
+  const reshapeCommit=R("iwabee_reshape_32900","academy_iwabee",reshape,
+    ctx=>({trainingGroundReshapeObjectiveCompletedByIwabee:true,terrainChoice:ctx.iwabeeTerrainChoice||null}),["IWA-01"]);
+  const worldFact=(route,extra={})=>({
+    rogueGeninParticipantRef:ROGUE,responseRoute:route,
+    earthReleaseUsedToConstrainRogueGenin:false,battleOccurrenceId:null,battleResult:null,
+    iwabeeBattleWithdrawn:false,rogueBattleWithdrawn:false,
+    rogueDisposition:null,custodyState:"NONE",custodyActorRef:null,
+    instructorIntervened:false,instructorIntervention:"NONE",
+    alternateEscapeRouteAvailableAfterConstraint:null,followupBattleOccurred:false,
+    trainingGroundReshapeObjectiveCompletedByIwabee:true,originFailure:false,injuryInferred:false,deathInferred:false,
+    ...extra
+  });
+  const confrontVictory=R("iwabee_rogue_confront_victory_399","academy_iwabee",rogue,ctx=>worldFact("CONFRONT_HIM",{
+    battleOccurrenceId:ctx.iwabeeRogueBattleOccurrenceId||null,battleResult:"victory",
+    iwabeeBattleWithdrawn:ctx.iwabeeBattleWithdrawn===true,rogueBattleWithdrawn:true,
+    rogueDisposition:"DETAINED_AFTER_ROGUE_BATTLE_WITHDRAWAL",
+    custodyState:"TEMPORARY_INSTRUCTOR_DETENTION",custodyActorRef:INSTRUCTOR,
+    instructorIntervened:true,instructorIntervention:"SECURE_WITHDRAWN_ROGUE"
+  }),[],{participantRefs:[ROGUE,INSTRUCTOR]});
+  const confrontDefeat=R("iwabee_rogue_confront_defeat_399","academy_iwabee",rogue,ctx=>worldFact("CONFRONT_HIM",{
+    battleOccurrenceId:ctx.iwabeeRogueBattleOccurrenceId||null,battleResult:"defeat",
+    iwabeeBattleWithdrawn:true,rogueBattleWithdrawn:ctx.iwabeeRogueBattleWithdrawn===true,
+    rogueDisposition:"ESCAPED_AFTER_IWABEE_WITHDRAWAL",
+    custodyState:"NONE",custodyActorRef:null,
+    instructorIntervened:true,instructorIntervention:"PROTECT_WITHDRAWN_STUDENT_NO_PURSUIT"
+  }),[],{participantRefs:[ROGUE,INSTRUCTOR]});
+  const blockCommit=R("iwabee_rogue_block_399","academy_iwabee",rogue,worldFact("BLOCK_ESCAPE_WITH_EARTH_RELEASE",{
+    earthReleaseUsedToConstrainRogueGenin:true,
+    rogueDisposition:"SURRENDERED_AFTER_EARTH_ROUTE_CONSTRAINT",
+    custodyState:"TEMPORARY_INSTRUCTOR_DETENTION",custodyActorRef:INSTRUCTOR,
+    instructorIntervened:true,instructorIntervention:"ACCEPT_SURRENDER_AND_SECURE",
+    alternateEscapeRouteAvailableAfterConstraint:false,followupBattleOccurred:false
+  }),["IWA-02"],{participantRefs:[ROGUE,INSTRUCTOR]});
+  const callCommit=R("iwabee_rogue_call_399","academy_iwabee",rogue,worldFact("CALL_INSTRUCTOR",{
+    rogueDisposition:"ESCAPED_AFTER_INSTRUCTOR_ESCALATION",
+    instructorIntervened:true,instructorIntervention:"SHIELD_STUDENTS_NO_PURSUIT"
+  }),[],{participantRefs:[ROGUE,INSTRUCTOR]});
+  const finishCommit=R("iwabee_rogue_finish_399","academy_iwabee",rogue,worldFact("FINISH_PRACTICAL",{
+    rogueDisposition:"ESCAPED_WHILE_IWABEE_FINISHED_PRACTICAL",
+    instructorIntervened:false,instructorIntervention:"NONE"
+  }),[],{participantRefs:[ROGUE]});
+  const battleLaunch=spec=>typeof globalThis.launchAcademyIwabeeRogueConfrontation399==="function"
+    ?globalThis.launchAcademyIwabeeRogueConfrontation399(spec)
+    :{success:false,reason:"iwabee_399_runtime_missing"};
+  const battleProject=()=>typeof globalThis.projectAcademyIwabeeRogueConfrontation399==="function"
+    ?globalThis.projectAcademyIwabeeRogueConfrontation399():null;
+
+  A.register({sceneId:scene,eventId:scene,title:"ACADEMY IWABEE",entryBeatId:"iwa_open_01",environmentRef:courtyard,participants:[],beats:[
+    {beatId:"iwa_open_01",mode:"narration",environmentRef:courtyard,text:"Iwabee drops the written exercise onto the bench harder than he needs to. Another red mark. Another page full of things he is supposed to prove before anybody lets him do the part he is actually good at.",nextBeatId:"iwa_open_02"},
+    {beatId:"iwa_open_02",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"Finished being angry at the paper?",nextBeatId:"iwa_open_03"},
+    {beatId:"iwa_open_03",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"No.",nextBeatId:"iwa_open_04"},
+    {beatId:"iwa_open_04",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"Good. You can be angry outside.",nextBeatId:"iwa_open_05"},
+    {beatId:"iwa_open_05",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"Make the area usable again.",nextBeatId:"iwa_open_06"},
+    {beatId:"iwa_open_06",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"That's it?",nextBeatId:"iwa_open_07"},
+    {beatId:"iwa_open_07",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"You wanted practical.",nextBeatId:"iwa_open_08"},
+    {beatId:"iwa_open_08",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"Finally.",nextBeatId:"iwa_reshape"},
+    {beatId:"iwa_reshape",mode:"choice",environmentRef:courtyard,text:"Choose how Iwabee reshapes the damaged ground.",choices:[
+      C("raise_collapsed","RAISE THE COLLAPSED SECTION","iwa_raise_01",{iwabeeTerrainChoice:"raise_collapsed"}),
+      C("flatten_ground","FLATTEN THE DAMAGED GROUND","iwa_flatten_01",{iwabeeTerrainChoice:"flatten_ground"}),
+      C("build_path","BUILD A STABLE PATH THROUGH IT","iwa_path_01",{iwabeeTerrainChoice:"build_path"}),
+      C("reinforce_weakest","REINFORCE THE WEAKEST SECTION","iwa_reinforce_01",{iwabeeTerrainChoice:"reinforce_weakest"})]},
+    {beatId:"iwa_raise_01",mode:"narration",environmentRef:courtyard,text:"Iwabee plants himself beside the sunken section and draws the earth upward. The collapsed ground rises in a rough slab until it sits level with the rest of the yard. Loose stone slides from the lifted edge. Something underneath it moves.",nextBeatId:"iwa_raise_02"},
+    {beatId:"iwa_raise_02",mode:"narration",environmentRef:courtyard,text:"Not something. Someone.",nextBeatId:"iwa_expose_01"},
+    {beatId:"iwa_flatten_01",mode:"narration",environmentRef:courtyard,text:"Iwabee drives the broken ridges down rather than rebuilding them. The surface settles beneath his control, spreading the rubble that had been piled along one side. A figure behind it suddenly has nowhere to hide.",nextBeatId:"iwa_expose_01"},
+    {beatId:"iwa_path_01",mode:"narration",environmentRef:courtyard,text:"Iwabee leaves the worst of the collapse alone and raises a solid strip of earth straight through it. The new path cuts cleanly through the debris. A pair of feet that absolutely should not be there are standing beside it. Iwabee looks up.",nextBeatId:"iwa_expose_01"},
+    {beatId:"iwa_reinforce_01",mode:"narration",environmentRef:courtyard,text:"Iwabee studies the damaged section long enough to find the point most likely to collapse again. He packs earth beneath it until the weakened edge locks into place. The shift pushes aside broken timber somebody had been using as cover. A young shinobi is crouched behind it.",nextBeatId:"iwa_expose_01"},
+    {beatId:"iwa_expose_01",mode:"narration",environmentRef:courtyard,text:"The stranger is wearing shinobi gear. Not Academy gear. His eyes go from Iwabee to the instructor, then immediately to the clearest route out of the yard.",onEnterConsequences:[reshapeCommit],nextBeatId:"iwa_expose_02"},
+    {beatId:"iwa_expose_02",mode:"dialogue",speakerName:"ROGUE GENIN",environmentRef:courtyard,text:"Move.",nextBeatId:"iwa_expose_03"},
+    {beatId:"iwa_expose_03",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"No.",nextBeatId:"iwa_response"},
+    {beatId:"iwa_response",mode:"choice",environmentRef:courtyard,text:"Choose Iwabee's response.",choices:[
+      C("confront","CONFRONT HIM","iwa_confront_01",{iwabeeRogueResponse:"confront"}),
+      C("block_escape","BLOCK HIS ESCAPE WITH EARTH RELEASE","iwa_block_01",{iwabeeRogueResponse:"block_escape"}),
+      C("call_instructor","CALL THE INSTRUCTOR","iwa_call_01",{iwabeeRogueResponse:"call_instructor"}),
+      C("finish_practical","FINISH THE PRACTICAL","iwa_finish_01",{iwabeeRogueResponse:"finish_practical"})]},
+    {beatId:"iwa_confront_01",mode:"narration",environmentRef:courtyard,text:"Iwabee steps between the Rogue Genin and the open side of the yard.",nextBeatId:"iwa_confront_02"},
+    {beatId:"iwa_confront_02",mode:"dialogue",speakerName:"ROGUE GENIN",environmentRef:courtyard,text:"You an Academy kid or a guard?",nextBeatId:"iwa_confront_03"},
+    {beatId:"iwa_confront_03",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"Right now?",nextBeatId:"iwa_confront_04"},
+    {beatId:"iwa_confront_04",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"I'm the one in your way.",nextBeatId:"iwa_confront_05"},
+    {beatId:"iwa_confront_05",mode:"narration",environmentRef:courtyard,text:"The Rogue Genin stops looking for a way around him.",nextBeatId:"iwa_confront_battle"},
+    {beatId:"iwa_confront_battle",mode:"battle_transition",environmentRef:courtyard,text:"Iwabee confronts the Rogue Genin.",battle:{
+      encounterId:"origin_academy_iwabee:rogue_genin_confrontation",launchResolver:battleLaunch,
+      victoryBeatId:"iwa_confront_return_01",defeatBeatId:"iwa_confront_loss_01",resultProjector:battleProject,actionLabel:"BEGIN PL BATTLE"}},
+    {beatId:"iwa_confront_return_01",mode:"narration",environmentRef:courtyard,text:"When the confrontation is over, the repaired section of training ground is still where Iwabee put it. Whatever became of the Rogue Genin is a second fact the instructor now has to deal with.",onEnterConsequences:[confrontVictory],nextBeatId:"iwa_eval_route_confront"},
+    {beatId:"iwa_confront_loss_01",mode:"narration",environmentRef:courtyard,text:"Iwabee's stance gives before the Rogue Genin's does. Not because the ground shifted. Not because somebody interrupted. This one is his.",nextBeatId:"iwa_confront_loss_02"},
+    {beatId:"iwa_confront_loss_02",mode:"narration",environmentRef:courtyard,text:"He forces himself upright again anyway. The Rogue is still standing. Another exchange is not happening.",nextBeatId:"iwa_confront_loss_03"},
+    {beatId:"iwa_confront_loss_03",mode:"dialogue",speakerName:"ROGUE GENIN",environmentRef:courtyard,text:"Stay down.",nextBeatId:"iwa_confront_loss_04"},
+    {beatId:"iwa_confront_loss_04",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"Wasn't planning to.",nextBeatId:"iwa_confront_loss_05"},
+    {beatId:"iwa_confront_loss_05",mode:"narration",environmentRef:courtyard,text:"Iwabee does not step forward. That is not the same thing as agreeing.",nextBeatId:"iwa_confront_loss_world_result"},
+    {beatId:"iwa_confront_loss_world_result",mode:"narration",environmentRef:courtyard,text:"The Rogue Genin's eyes flick toward the open edge of the yard. The instructor moves before Iwabee can. Not toward the Rogue. Between the Rogue and the student who has already been forced out of the fight.",onEnterConsequences:[confrontDefeat],nextBeatId:"iwa_confront_loss_world_result_02"},
+    {beatId:"iwa_confront_loss_world_result_02",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"Enough.",nextBeatId:"iwa_confront_loss_world_result_03"},
+    {beatId:"iwa_confront_loss_world_result_03",mode:"narration",environmentRef:courtyard,text:"The Rogue does not argue. He takes the opening and runs. The instructor lets him go long enough to make sure Iwabee stays standing. No one calls it a victory. No one needs to.",nextBeatId:"iwa_eval_route_confront_loss_01"},
+    {beatId:"iwa_block_01",mode:"narration",environmentRef:courtyard,text:"Iwabee does not chase him. He watches where the Rogue is looking. The moment the man commits to the open side of the yard, earth rises across it. Not an attack. A wall where there was an exit a second ago.",nextBeatId:"iwa_block_02"},
+    {beatId:"iwa_block_02",mode:"dialogue",speakerName:"ROGUE GENIN",environmentRef:courtyard,text:"Seriously?",nextBeatId:"iwa_block_03"},
+    {beatId:"iwa_block_03",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"You said move.",nextBeatId:"iwa_block_04"},
+    {beatId:"iwa_block_04",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"Try another direction.",nextBeatId:"iwa_block_return_01"},
+    {beatId:"iwa_block_return_01",mode:"narration",environmentRef:courtyard,text:"The Rogue looks at the new wall. Then at the instructor. Whatever calculation he makes ends there. He raises his hands. The instructor takes control of the situation while Iwabee looks from the barrier to the first section of ground he repaired. Two changes. One assignment.",onEnterConsequences:[blockCommit],nextBeatId:"iwa_eval_route_block"},
+    {beatId:"iwa_call_01",mode:"narration",environmentRef:courtyard,text:"Iwabee keeps his eyes on the Rogue Genin.",nextBeatId:"iwa_call_02"},
+    {beatId:"iwa_call_02",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"Sensei.",nextBeatId:"iwa_call_03"},
+    {beatId:"iwa_call_03",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"I see him.",nextBeatId:"iwa_call_04"},
+    {beatId:"iwa_call_04",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"Back up.",nextBeatId:"iwa_call_05"},
+    {beatId:"iwa_call_05",mode:"narration",environmentRef:courtyard,text:"The Rogue sees the instructor commit to shielding the students and takes the open route instead. By the time the instructor can safely move after him, he is gone.",onEnterConsequences:[callCommit],nextBeatId:"iwa_eval_route_call"},
+    {beatId:"iwa_finish_01",mode:"narration",environmentRef:courtyard,text:"Iwabee looks at the Rogue Genin. Then at the ground he was actually told to fix.",nextBeatId:"iwa_finish_02"},
+    {beatId:"iwa_finish_02",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"Not my assignment.",nextBeatId:"iwa_finish_03"},
+    {beatId:"iwa_finish_03",mode:"narration",environmentRef:courtyard,text:"Whatever happens behind him, the training ground is usable when he is finished. That part is not ambiguous.",nextBeatId:"iwa_finish_04"},
+    {beatId:"iwa_finish_04",mode:"narration",environmentRef:courtyard,text:"Behind him, footsteps break toward the open side of the yard. The Rogue is gone before Iwabee finishes the last section.",onEnterConsequences:[finishCommit],nextBeatId:"iwa_eval_route_finish"},
+    {beatId:"iwa_eval_route_confront",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"You saw another problem and went straight at it.",nextBeatId:"iwa_eval_route_confront_02"},
+    {beatId:"iwa_eval_route_confront_02",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"It was standing right there.",nextBeatId:"iwa_eval_route_confront_03"},
+    {beatId:"iwa_eval_route_confront_03",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"So was that.",nextBeatId:"iwa_eval_core_01"},
+    {beatId:"iwa_eval_route_confront_loss_01",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"You went straight at him.",nextBeatId:"iwa_eval_route_confront_loss_02"},
+    {beatId:"iwa_eval_route_confront_loss_02",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"And lost.",nextBeatId:"iwa_eval_route_confront_loss_03"},
+    {beatId:"iwa_eval_route_confront_loss_03",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"Yeah.",nextBeatId:"iwa_eval_route_confront_loss_04"},
+    {beatId:"iwa_eval_route_confront_loss_04",mode:"narration",environmentRef:courtyard,text:"The instructor looks past him at the section of training ground Iwabee repaired before any of this started.",nextBeatId:"iwa_eval_route_confront_loss_05"},
+    {beatId:"iwa_eval_route_confront_loss_05",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"Ground's still fixed.",nextBeatId:"iwa_eval_core_01"},
+    {beatId:"iwa_eval_route_block",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"You changed the ground twice.",nextBeatId:"iwa_eval_route_block_02"},
+    {beatId:"iwa_eval_route_block_02",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"Second one wasn't on the worksheet.",nextBeatId:"iwa_eval_route_block_03"},
+    {beatId:"iwa_eval_route_block_03",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"No.",nextBeatId:"iwa_eval_route_block_04"},
+    {beatId:"iwa_eval_route_block_04",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"Still useful.",nextBeatId:"iwa_eval_core_01"},
+    {beatId:"iwa_eval_route_call",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"You called me.",nextBeatId:"iwa_eval_route_call_02"},
+    {beatId:"iwa_eval_route_call_02",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"You're the instructor.",nextBeatId:"iwa_eval_route_call_03"},
+    {beatId:"iwa_eval_route_call_03",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"Good. You noticed.",nextBeatId:"iwa_eval_core_01"},
+    {beatId:"iwa_eval_route_finish",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"You finished the assignment.",nextBeatId:"iwa_eval_route_finish_02"},
+    {beatId:"iwa_eval_route_finish_02",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"That was the point.",nextBeatId:"iwa_eval_route_finish_03"},
+    {beatId:"iwa_eval_route_finish_03",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"It was one point.",nextBeatId:"iwa_eval_core_01"},
+    {beatId:"iwa_eval_core_01",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"You know what your problem is, Iwabee?",nextBeatId:"iwa_eval_core_02"},
+    {beatId:"iwa_eval_core_02",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"Yeah. Written tests.",nextBeatId:"iwa_eval_core_03"},
+    {beatId:"iwa_eval_core_03",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"No. You keep acting like the only things that count are the things you're bad at.",nextBeatId:"iwa_eval_core_04"},
+    {beatId:"iwa_eval_core_04",mode:"narration",environmentRef:courtyard,text:"Iwabee looks across the ground he reshaped. Nobody has to tell him whether that part worked.",nextBeatId:"iwa_reflect"},
+    {beatId:"iwa_reflect",mode:"choice",environmentRef:courtyard,text:"What does Iwabee make of it?",choices:[
+      C("know_good_at","I KNOW WHAT I'M GOOD AT.","iwa_reflect_good_01"),
+      C("better_rest","I STILL NEED TO GET BETTER AT THE REST.","iwa_reflect_rest_01"),
+      C("academy_tests_wrong","MAYBE THE ACADEMY TESTS THE WRONG THINGS.","iwa_reflect_tests_01"),
+      C("dont_care","I DON'T CARE WHAT THEY THINK.","iwa_reflect_care_01")]},
+    {beatId:"iwa_reflect_good_01",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"I know what I'm good at.",nextBeatId:"iwa_reflect_good_02"},
+    {beatId:"iwa_reflect_good_02",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"Then stop treating it like it doesn't count.",nextBeatId:"iwa_close_01"},
+    {beatId:"iwa_reflect_rest_01",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"I still need to get better at the rest.",nextBeatId:"iwa_reflect_rest_02"},
+    {beatId:"iwa_reflect_rest_02",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"Yeah.",nextBeatId:"iwa_reflect_rest_03"},
+    {beatId:"iwa_reflect_rest_03",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"Don't sound so happy about it.",nextBeatId:"iwa_close_01"},
+    {beatId:"iwa_reflect_tests_01",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"Maybe the Academy tests the wrong things.",nextBeatId:"iwa_reflect_tests_02"},
+    {beatId:"iwa_reflect_tests_02",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"Sometimes.",nextBeatId:"iwa_reflect_tests_03"},
+    {beatId:"iwa_reflect_tests_03",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"Doesn't make the other things disappear.",nextBeatId:"iwa_close_01"},
+    {beatId:"iwa_reflect_care_01",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"I don't care what they think.",nextBeatId:"iwa_reflect_care_02"},
+    {beatId:"iwa_reflect_care_02",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"Then make sure that's true.",nextBeatId:"iwa_close_01"},
+    {beatId:"iwa_close_01",mode:"narration",environmentRef:courtyard,text:"The written exercise is still waiting on the bench. The training ground is usable again. Both are true. Iwabee picks up the paper on his way out.",nextBeatId:"iwa_close_02"},
+    {beatId:"iwa_close_02",mode:"narration",environmentRef:courtyard,text:"YOUR CHRONICLE BEGINS",exitScene:true}
   ],onCompleteConsequences:[X("academy_iwabee",[reshape,rogue])]});
 })();
 
-// Metal Lee — private capability first; pressured performance and protection stay distinct.
+// Metal Lee — WRITING_GOLDEN private capability / spar / protective response.
 (()=>{
   const priv="occ_origin_metal_private_training_resolution",perf="occ_origin_metal_pressured_performance_resolution",protect="occ_origin_metal_protective_response_resolution",contact="occ_origin_metal_inviting_genin_prior_contact",scene=A.sceneByVariant.academy_metal_lee;
-  A.register({sceneId:scene,eventId:scene,title:"ACADEMY METAL LEE",entryBeatId:"met_private",participants:[],beats:[
-    {beatId:"met_private",mode:"narration",text:"Metal trains alone and legitimately demonstrates Taijutsu and Stamina capability before discovering he is being watched. Later public performance cannot erase that earlier evidence.",onEnterConsequences:[
-      R("metal_private_32900","academy_metal_lee",priv,{qualifyingPrivateTaijutsuOrConditioningWorkCompleted:true,observerDiscoveryOccurredAfterQualifyingPrivateWork:true},["MET-01"])],nextBeatId:"met_invite"},
-    {beatId:"met_invite",mode:"choice",speakerName:"GENIN",text:"An inviting Genin notices him. The performance context changes once Metal knows he is being watched.",onEnterConsequences:[
-      R("metal_contact_32900","academy_metal_lee",contact,{invitingGeninEncounterOccurred:true,invitingGeninParticipantRef:"metal_origin_inviting_genin"},["MET-04"],{participantRefs:["metal_origin_inviting_genin"]})],choices:[
-      C("spar","Spar","met_invite",null,{availability:A.unavailableBattle(scene,"The optional Metal spar needs its exact current controlled-Battle opponent/caller; it remains fail-closed rather than fabricating a Rogue Genin Battle.")}),
-      C("demonstrate","Demonstrate further on the training dummy","met_dummy",{metalBranch:"demonstrate"}),
-      C("back_out","Back out","met_backout",{metalBranch:"back_out"})]},
-    {beatId:"met_dummy",mode:"narration",text:"Under the audience's attention, the demonstration becomes rougher and an accidental training-dummy hazard threatens another student. Contextual performance is not underlying capability.",onEnterConsequences:[
-      R("metal_perf_32900","academy_metal_lee",perf,{pressuredPerformanceClass:"rough",context:"audience_pressure_demonstration"},["MET-02"])],nextBeatId:"met_protect"},
-    {beatId:"met_protect",mode:"choice",text:"The dummy hazard is real. Choose Metal's protective response.",choices:[
-      C("redirect_dummy","Redirect the dummy","met_end",{metalProtectiveResponse:"redirect_dummy"}),
-      C("take_impact","Take the impact","met_end",{metalProtectiveResponse:"take_impact"}),
-      C("destroy_dummy","Destroy the dummy","met_end",{metalProtectiveResponse:"destroy_dummy"})]},
-    {beatId:"met_backout",mode:"narration",text:"Backing out is one committed historical decision. It is not cowardice, incompetence, or a permanent anxiety state.",nextBeatId:"met_end"},
-    {beatId:"met_end",mode:"narration",text:"Private capability, pressured performance, protective response and observer interpretation remain separate facts.",onEnterConsequences:[
-      R("metal_protect_32900","academy_metal_lee",protect,ctx=>({protectiveResponseAttempted:!!ctx.metalProtectiveResponse,protectiveResponseKind:ctx.metalProtectiveResponse||null,protectiveResponseOutcome:"attempt_committed"}),ctx=>ctx.metalProtectiveResponse?["MET-03"]:[])],exitScene:true}
+  const courtyard=Object.freeze({environmentId:"konoha_academy_courtyard_day"}),GENIN="metal_origin_inviting_genin";
+  const privateCommit=R("metal_private_32900","academy_metal_lee",priv,ctx=>({qualifyingPrivateTaijutsuOrConditioningWorkCompleted:true,privateTrainingChoice:ctx.metalPrivateChoice||null,observerDiscoveryOccurredAfterQualifyingPrivateWork:true}),["MET-01"]);
+  const contactCommit=R("metal_contact_32900","academy_metal_lee",contact,{invitingGeninEncounterOccurred:true,invitingGeninParticipantRef:GENIN},["MET-04"],{participantRefs:[GENIN]});
+  const demoPerf=R("metal_demo_perf_32900","academy_metal_lee",perf,{pressuredPerformanceClass:"rough",context:"audience_pressure_demonstration",battleOccurrenceId:null},["MET-02"]);
+  const sparPerf=R("metal_spar_perf_396","academy_metal_lee",perf,ctx=>({pressuredPerformanceClass:ctx.metalSparPerformanceClass||"rough",context:"controlled_spar",battleOccurrenceId:ctx.metalSparBattleOccurrenceId||null,finalRemainingBattlePL:Number(ctx.metalSparFinalRemainingBattlePL)||0,startingUnderlyingMaximum:Number(ctx.metalSparStartingMaximum)||13}),["MET-02"]);
+  const battleLaunch=spec=>typeof globalThis.launchAcademyMetalControlledSpar396==="function"
+    ?globalThis.launchAcademyMetalControlledSpar396(spec)
+    :{success:false,reason:"metal_396_runtime_missing"};
+  const battleProject=()=>typeof globalThis.projectAcademyMetalControlledSpar396==="function"
+    ?globalThis.projectAcademyMetalControlledSpar396():null;
+  const protectiveResolver=(requestId,kind)=>({requestId,kind:"domain",resolve:()=>{
+    if(typeof globalThis.resolveAcademyMetalProtectiveResponse396!=="function")return{success:false,reason:"metal_396_protective_resolver_missing"};
+    const resolved=globalThis.resolveAcademyMetalProtectiveResponse396(kind);if(!resolved||resolved.success!==true)return resolved||{success:false,reason:"metal_protective_resolution_failed"};
+    const active=A.active();if(!active)return{success:false,reason:"metal_story_not_active"};
+    active.localContext={...(active.localContext||{}),
+      metalProtectiveResponse:kind,metalProtectiveOutcome:resolved.protectiveResponseOutcome,
+      metalProtectiveResolverStatKey:resolved.resolverStatKey,metalProtectiveResolverStatValue:resolved.resolverStatValue,
+      metalProtectiveInterventionOccurred:resolved.interventionOccurred,metalProtectiveInterveningParticipantRef:resolved.interveningParticipantRef};
+    const committed=A.commitOccurrence("academy_metal_lee",protect,{
+      protectiveResponseAttempted:true,protectiveResponseKind:kind,protectiveResponseOutcome:resolved.protectiveResponseOutcome,
+      resolverId:resolved.resolverId,hazardId:resolved.hazardId,
+      effectiveStatKey:resolved.resolverStatKey,effectiveStatValue:resolved.resolverStatValue,
+      successThreshold:resolved.successThreshold,partialThreshold:resolved.partialThreshold,
+      interventionOccurred:resolved.interventionOccurred,interveningParticipantRef:resolved.interveningParticipantRef,
+      injuryInferred:false,deathInferred:false
+    },["MET-03"],{participantRefs:resolved.interveningParticipantRef?[GENIN]:[]});
+    if(!committed||committed.success!==true)return committed||{success:false,reason:"metal_met03_commit_failed"};
+    const prefix=kind==="redirect_dummy"?"met_redirect":kind==="take_impact"?"met_impact":"met_destroy";
+    const target=prefix+"_"+resolved.protectiveResponseOutcome+"_01";
+    const routed=setStorySceneBeat(target,{render:false});
+    return{success:!!routed&&routed.success===true,type:"metal_protective_response_resolved",resolved,targetBeatId:target};
+  }});
+
+  A.register({sceneId:scene,eventId:scene,title:"ACADEMY METAL LEE",entryBeatId:"met_open_01",environmentRef:courtyard,participants:[],beats:[
+    {beatId:"met_open_01",mode:"narration",environmentRef:courtyard,text:"The training courtyard is quiet enough for Metal to hear the dummy frame creak before it turns. Good. Quiet is easier.",nextBeatId:"met_private_choice"},
+    {beatId:"met_private_choice",mode:"choice",environmentRef:courtyard,text:"Choose Metal's private training.",choices:[
+      C("spinning_kick","SPINNING KICK","met_private_spin_01",{metalPrivateChoice:"spinning_kick"}),
+      C("full_force_fist","FULL-FORCE FIST","met_private_fist_01",{metalPrivateChoice:"full_force_fist"}),
+      C("conditioned_endurance","CONDITIONED ENDURANCE","met_private_endurance_01",{metalPrivateChoice:"conditioned_endurance"})]},
+    {beatId:"met_private_spin_01",mode:"narration",environmentRef:courtyard,text:"Metal waits for the moving pad to cross his line, pivots with it, and drives a spinning kick through the centre. The pad snaps back on its rail. Metal lands exactly where he started.",nextBeatId:"met_watchers_01"},
+    {beatId:"met_private_fist_01",mode:"narration",environmentRef:courtyard,text:"Metal plants his feet and lets the dummy roll toward him. At the last moment he steps through the timing and drives a Full-Force Fist into the reinforced centre pad. The whole frame shudders. His stance does not.",nextBeatId:"met_watchers_01"},
+    {beatId:"met_private_endurance_01",mode:"narration",environmentRef:courtyard,text:"Metal starts the moving-dummy cycle again. Then again. Then faster. He keeps pace through every turn, breathing harder while the movement stays clean. When the mechanism finally slows, Metal is still moving.",nextBeatId:"met_watchers_01"},
+    {beatId:"met_watchers_01",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"Nice.",onEnterConsequences:[privateCommit,contactCommit],nextBeatId:"met_watchers_02"},
+    {beatId:"met_watchers_02",mode:"narration",environmentRef:courtyard,text:"There are people at the edge of the courtyard. More than one. They have been there long enough to know what he was doing. Metal straightens too quickly and nearly catches his heel on the training mark. He fixes it before anybody comments.",nextBeatId:"met_watchers_03"},
+    {beatId:"met_watchers_03",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"How long have you been standing there?",nextBeatId:"met_watchers_04"},
+    {beatId:"met_watchers_04",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"Long enough.",nextBeatId:"met_invite_01"},
+    {beatId:"met_invite_01",mode:"narration",environmentRef:courtyard,text:"The Genin steps away from the others, giving Metal space without leaving him alone.",nextBeatId:"met_invite_02"},
+    {beatId:"met_invite_02",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"Want to spar?",nextBeatId:"met_invite"},
+    {beatId:"met_invite",mode:"choice",environmentRef:courtyard,text:"Metal looks at the Genin. Then at everyone behind them.",choices:[
+      C("spar","SPAR","met_spar_01",{metalBranch:"spar"}),
+      C("demonstrate","KEEP WORKING THE DUMMY","met_dummy_01",{metalBranch:"demonstrate"}),
+      C("back_out","BACK OUT","met_backout_01",{metalBranch:"back_out"})]},
+    {beatId:"met_spar_01",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"Fine.",nextBeatId:"met_spar_02"},
+    {beatId:"met_spar_02",mode:"narration",environmentRef:courtyard,text:"Metal steps away from the apparatus. The Genin gives him room and settles opposite him.",nextBeatId:"met_spar_03"},
+    {beatId:"met_spar_03",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"Ready?",nextBeatId:"met_spar_04"},
+    {beatId:"met_spar_04",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"Obviously.",nextBeatId:"met_spar_05"},
+    {beatId:"met_spar_05",mode:"narration",environmentRef:courtyard,text:"Somebody behind the Genin shifts for a better view. Metal hears it. He wishes he hadn't.",nextBeatId:"met_spar_battle"},
+    {beatId:"met_spar_battle",mode:"battle_transition",environmentRef:courtyard,text:"Metal and the Genin begin the controlled spar.",battle:{
+      encounterId:"origin_academy_metal_lee:inviting_genin_spar",launchResolver:battleLaunch,
+      postBattleBeatId:"met_spar_rough_01",resultProjector:battleProject,actionLabel:"BEGIN PL BATTLE"}},
+    {beatId:"met_spar_strong_01",mode:"narration",environmentRef:courtyard,text:"When the spar ends, Metal is breathing hard but still standing cleanly enough that nobody can pretend the audience ruined him. Metal notices them anyway.",onEnterConsequences:[sparPerf],nextBeatId:"met_spar_strong_02"},
+    {beatId:"met_spar_strong_02",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"For somebody who looked like he wanted all of us to disappear, you did pretty well.",nextBeatId:"met_spar_strong_03"},
+    {beatId:"met_spar_strong_03",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"I did not want you to disappear.",nextBeatId:"met_spar_strong_04"},
+    {beatId:"met_spar_strong_04",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"Right.",nextBeatId:"met_close_01"},
+    {beatId:"met_spar_mixed_01",mode:"narration",environmentRef:courtyard,text:"The spar ends messier than Metal wanted. His breathing takes longer to settle, and he avoids looking at the people behind the Genin until avoiding them becomes obvious too.",onEnterConsequences:[sparPerf],nextBeatId:"met_spar_mixed_02"},
+    {beatId:"met_spar_mixed_02",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"You were fighting me and everybody behind me.",nextBeatId:"met_spar_mixed_03"},
+    {beatId:"met_spar_mixed_03",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"They were distracting.",nextBeatId:"met_spar_mixed_04"},
+    {beatId:"met_spar_mixed_04",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"Nobody said anything.",nextBeatId:"met_spar_mixed_05"},
+    {beatId:"met_spar_mixed_05",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"That was worse.",nextBeatId:"met_close_01"},
+    {beatId:"met_spar_rough_01",mode:"narration",environmentRef:courtyard,text:"By the end, Metal's movements barely resemble the ones he was making before he knew anyone was watching. That is the worst part. He remembers exactly how good they felt before.",onEnterConsequences:[sparPerf],nextBeatId:"met_spar_rough_02"},
+    {beatId:"met_spar_rough_02",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"You were better before you saw us.",nextBeatId:"met_spar_rough_03"},
+    {beatId:"met_spar_rough_03",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"You think I'm bad.",nextBeatId:"met_spar_rough_04"},
+    {beatId:"met_spar_rough_04",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"No.",nextBeatId:"met_spar_rough_05"},
+    {beatId:"met_spar_rough_05",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"I think you noticed us.",nextBeatId:"met_close_01"},
+    {beatId:"met_dummy_01",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"I don't need a spar. I can do it here.",nextBeatId:"met_dummy_02"},
+    {beatId:"met_dummy_02",mode:"narration",environmentRef:courtyard,text:"He turns back to the apparatus and starts the mechanism. One cycle goes cleanly. The next goes almost cleanly. Somebody whispers behind him.",nextBeatId:"met_dummy_03"},
+    {beatId:"met_dummy_03",mode:"narration",environmentRef:courtyard,text:"Metal's next step lands too far left. He corrects harder than he needs to, the dummy swings wider, and when he tries to catch the rhythm again the frame jumps its guide.",onEnterConsequences:[demoPerf],nextBeatId:"met_dummy_04"},
+    {beatId:"met_dummy_04",mode:"narration",environmentRef:courtyard,text:"The training dummy tears sideways toward another student. For the first time since he noticed the audience, Metal forgets they are there.",nextBeatId:"met_protect"},
+    {beatId:"met_protect",mode:"choice",environmentRef:courtyard,text:"The dummy hazard is real. Choose Metal's response.",choices:[
+      C("redirect_dummy","REDIRECT THE DUMMY","met_resolve_redirect",{metalProtectiveResponse:"redirect_dummy"}),
+      C("take_impact","TAKE THE IMPACT","met_resolve_impact",{metalProtectiveResponse:"take_impact"}),
+      C("destroy_dummy","DESTROY THE DUMMY","met_resolve_destroy",{metalProtectiveResponse:"destroy_dummy"})]},
+    {beatId:"met_resolve_redirect",mode:"narration",environmentRef:courtyard,text:"Metal moves.",onEnterConsequences:[protectiveResolver("metal_protect_redirect_396","redirect_dummy")]},
+    {beatId:"met_resolve_impact",mode:"narration",environmentRef:courtyard,text:"Metal moves.",onEnterConsequences:[protectiveResolver("metal_protect_impact_396","take_impact")]},
+    {beatId:"met_resolve_destroy",mode:"narration",environmentRef:courtyard,text:"Metal moves.",onEnterConsequences:[protectiveResolver("metal_protect_destroy_396","destroy_dummy")]},
+    {beatId:"met_redirect_success_01",mode:"narration",environmentRef:courtyard,text:"Metal reaches the dummy on the turn and kicks across its line instead of against it. The frame whips past the student and crashes into empty ground.",nextBeatId:"met_redirect_success_02"},
+    {beatId:"met_redirect_success_02",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"Nice save.",nextBeatId:"met_redirect_success_03"},
+    {beatId:"met_redirect_success_03",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"You okay?",nextBeatId:"met_hazard_after_success_01"},
+    {beatId:"met_redirect_partial_01",mode:"narration",environmentRef:courtyard,text:"Metal catches the frame badly but changes its path enough that the direct hit is gone. The Genin grabs the student and pulls them clear of the new line.",nextBeatId:"met_redirect_partial_02"},
+    {beatId:"met_redirect_partial_02",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"Close.",nextBeatId:"met_redirect_partial_03"},
+    {beatId:"met_redirect_partial_03",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"Too close.",nextBeatId:"met_hazard_after_partial_01"},
+    {beatId:"met_redirect_failure_01",mode:"narration",environmentRef:courtyard,text:"Metal hits the frame at the wrong angle. It barely moves. The Genin gets there first and drags the student clear before the dummy smashes through the empty marker behind them.",nextBeatId:"met_redirect_failure_02"},
+    {beatId:"met_redirect_failure_02",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"Are you hurt?",nextBeatId:"met_redirect_failure_03"},
+    {beatId:"met_redirect_failure_03",mode:"dialogue",speakerName:"STUDENT",environmentRef:courtyard,text:"No.",nextBeatId:"met_hazard_after_failure_01"},
+    {beatId:"met_impact_success_01",mode:"narration",environmentRef:courtyard,text:"Metal steps into the dummy's path and braces. The moving frame drives into him and stops short of the student behind him.",nextBeatId:"met_impact_success_02"},
+    {beatId:"met_impact_success_02",mode:"dialogue",speakerName:"STUDENT",environmentRef:courtyard,text:"Metal?",nextBeatId:"met_impact_success_03"},
+    {beatId:"met_impact_success_03",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"You okay?",nextBeatId:"met_hazard_after_success_01"},
+    {beatId:"met_impact_partial_01",mode:"narration",environmentRef:courtyard,text:"Metal gets between the dummy and the student, but the frame keeps driving him backward. The Genin catches the other side. Together they stop it.",nextBeatId:"met_impact_partial_02"},
+    {beatId:"met_impact_partial_02",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"Got it.",nextBeatId:"met_impact_partial_03"},
+    {beatId:"met_impact_partial_03",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"I had it.",nextBeatId:"met_impact_partial_04"},
+    {beatId:"met_impact_partial_04",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"Sure.",nextBeatId:"met_hazard_after_partial_01"},
+    {beatId:"met_impact_failure_01",mode:"narration",environmentRef:courtyard,text:"Metal moves to put himself in the path and comes up one step short. The Genin pulls the student sideways as the dummy tears through the space they were standing in.",nextBeatId:"met_impact_failure_02"},
+    {beatId:"met_impact_failure_02",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"You good?",nextBeatId:"met_impact_failure_03"},
+    {beatId:"met_impact_failure_03",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"Ask them.",nextBeatId:"met_hazard_after_failure_01"},
+    {beatId:"met_destroy_success_01",mode:"narration",environmentRef:courtyard,text:"Metal does not chase the whole frame. He targets the joint carrying its momentum and drives his strike through it. The dummy folds sideways and drops before it reaches the student.",nextBeatId:"met_destroy_success_02"},
+    {beatId:"met_destroy_success_02",mode:"narration",environmentRef:courtyard,text:"For a second, the courtyard is silent. Metal looks around at everybody staring.",nextBeatId:"met_destroy_success_03"},
+    {beatId:"met_destroy_success_03",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"What?",nextBeatId:"met_hazard_after_success_01"},
+    {beatId:"met_destroy_partial_01",mode:"narration",environmentRef:courtyard,text:"Metal's strike breaks one side of the moving frame. The rest keeps coming. The Genin drives into the damaged section and knocks it down before it reaches the student.",nextBeatId:"met_destroy_partial_02"},
+    {beatId:"met_destroy_partial_02",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"I weakened it.",nextBeatId:"met_destroy_partial_03"},
+    {beatId:"met_destroy_partial_03",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"I noticed.",nextBeatId:"met_hazard_after_partial_01"},
+    {beatId:"met_destroy_failure_01",mode:"narration",environmentRef:courtyard,text:"Metal commits to the strike. The joint slips past the point he aimed for. The Genin shoves the student clear and the dummy crashes into the empty rack behind them.",nextBeatId:"met_destroy_failure_02"},
+    {beatId:"met_destroy_failure_02",mode:"narration",environmentRef:courtyard,text:"Metal stares at the mark his fist left on the wrong part of the frame.",nextBeatId:"met_destroy_failure_03"},
+    {beatId:"met_destroy_failure_03",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"They're okay.",nextBeatId:"met_destroy_failure_04"},
+    {beatId:"met_destroy_failure_04",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"I know.",nextBeatId:"met_hazard_after_failure_01"},
+    {beatId:"met_hazard_after_success_01",mode:"narration",environmentRef:courtyard,text:"The courtyard is much quieter now. Metal checks the student once more before he remembers the audience exists.",nextBeatId:"met_hazard_after_success_02"},
+    {beatId:"met_hazard_after_success_02",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"You moved fast.",nextBeatId:"met_hazard_after_success_03"},
+    {beatId:"met_hazard_after_success_03",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"Had to.",nextBeatId:"met_close_01"},
+    {beatId:"met_hazard_after_partial_01",mode:"narration",environmentRef:courtyard,text:"The student is safe. The Genin is still standing beside Metal, one hand on whatever part of the dummy they had to stop together.",nextBeatId:"met_hazard_after_partial_02"},
+    {beatId:"met_hazard_after_partial_02",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"You didn't freeze.",nextBeatId:"met_hazard_after_partial_03"},
+    {beatId:"met_hazard_after_partial_03",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"Wasn't time.",nextBeatId:"met_close_01"},
+    {beatId:"met_hazard_after_failure_01",mode:"narration",environmentRef:courtyard,text:"The student is safe because somebody else finished what Metal tried to do. The Genin does not tell him it was fine. Metal does not ask them to.",nextBeatId:"met_hazard_after_failure_02"},
+    {beatId:"met_hazard_after_failure_02",mode:"dialogue",speakerName:"STUDENT",environmentRef:courtyard,text:"I'm okay.",nextBeatId:"met_close_01"},
+    {beatId:"met_backout_01",mode:"narration",environmentRef:courtyard,text:"Metal looks at the Genin, then at everybody behind them.",nextBeatId:"met_backout_02"},
+    {beatId:"met_backout_02",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"No.",nextBeatId:"met_backout_03"},
+    {beatId:"met_backout_03",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"Okay.",nextBeatId:"met_backout_04"},
+    {beatId:"met_backout_04",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"I didn't say I couldn't.",nextBeatId:"met_backout_05"},
+    {beatId:"met_backout_05",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"Didn't say you did.",nextBeatId:"met_close_01"},
+    {beatId:"met_close_01",mode:"narration",environmentRef:courtyard,text:"Eventually the courtyard starts to empty. The clean marks from Metal's private training are still there. So are the later ones. He looks at both before tightening his hand wraps.",nextBeatId:"met_close_02"},
+    {beatId:"met_close_02",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"Again.",nextBeatId:"met_close_03"},
+    {beatId:"met_close_03",mode:"narration",environmentRef:courtyard,text:"YOUR CHRONICLE BEGINS",exitScene:true}
   ],onCompleteConsequences:[X("academy_metal_lee",[priv,perf,protect,contact])]});
 })();
 })();
