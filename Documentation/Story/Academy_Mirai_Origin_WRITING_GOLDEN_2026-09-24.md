@@ -1215,7 +1215,7 @@ The instructor taps the covered market.
 
 **ACADEMY INSTRUCTOR:** “When?”
 
-Mirai knows what he means.
+Mirai knows what she means.
 
 She looks at the mark.
 
