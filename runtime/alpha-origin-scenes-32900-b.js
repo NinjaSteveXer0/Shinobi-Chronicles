@@ -274,8 +274,7 @@ const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A)
     if(!committed||committed.success!==true)return committed||{success:false,reason:"metal_met03_commit_failed"};
     const prefix=kind==="redirect_dummy"?"met_redirect":kind==="take_impact"?"met_impact":"met_destroy";
     const target=prefix+"_"+resolved.protectiveResponseOutcome+"_01";
-    const routed=setStorySceneBeat(target,{render:false});
-    return{success:!!routed&&routed.success===true,type:"metal_protective_response_resolved",resolved,targetBeatId:target};
+    return{success:true,type:"metal_protective_response_resolved",resolved,targetBeatId:target};
   }});
 
   A.register({sceneId:scene,eventId:scene,title:"ACADEMY METAL LEE",entryBeatId:"met_open_01",environmentRef:courtyard,participants:[],beats:[
@@ -304,7 +303,11 @@ const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A)
     {beatId:"met_spar_05",mode:"narration",environmentRef:courtyard,text:"Somebody behind the Genin shifts for a better view. Metal hears it. He wishes he hadn't.",nextBeatId:"met_spar_battle"},
     {beatId:"met_spar_battle",mode:"battle_transition",environmentRef:courtyard,text:"Metal and the Genin begin the controlled spar.",battle:{
       encounterId:"origin_academy_metal_lee:inviting_genin_spar",launchResolver:battleLaunch,
-      postBattleBeatId:"met_spar_rough_01",resultProjector:battleProject,actionLabel:"BEGIN PL BATTLE"}},
+      victoryBeatId:"met_spar_dispatch",defeatBeatId:"met_spar_dispatch",postBattleBeatId:"met_spar_dispatch",resultProjector:battleProject,actionLabel:"BEGIN PL BATTLE"}},
+    {beatId:"met_spar_dispatch",mode:"choice",environmentRef:courtyard,text:"Metal's spar result is being resolved.",choices:[
+      C("route_strong","CONTINUE","met_spar_strong_01",null,{availability:ctx=>({available:(ctx&&ctx.localContext||A.local()).metalSparPerformanceClass==="strong",knownBlocker:"Spar result is not strong."})}),
+      C("route_mixed","CONTINUE","met_spar_mixed_01",null,{availability:ctx=>({available:(ctx&&ctx.localContext||A.local()).metalSparPerformanceClass==="mixed",knownBlocker:"Spar result is not mixed."})}),
+      C("route_rough","CONTINUE","met_spar_rough_01",null,{availability:ctx=>({available:(ctx&&ctx.localContext||A.local()).metalSparPerformanceClass==="rough",knownBlocker:"Spar result is not rough."})})]},
     {beatId:"met_spar_strong_01",mode:"narration",environmentRef:courtyard,text:"When the spar ends, Metal is breathing hard but still standing cleanly enough that nobody can pretend the audience ruined him. Metal notices them anyway.",onEnterConsequences:[sparPerf],nextBeatId:"met_spar_strong_02"},
     {beatId:"met_spar_strong_02",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"For somebody who looked like he wanted all of us to disappear, you did pretty well.",nextBeatId:"met_spar_strong_03"},
     {beatId:"met_spar_strong_03",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"I did not want you to disappear.",nextBeatId:"met_spar_strong_04"},
@@ -327,9 +330,21 @@ const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A)
       C("redirect_dummy","REDIRECT THE DUMMY","met_resolve_redirect",{metalProtectiveResponse:"redirect_dummy"}),
       C("take_impact","TAKE THE IMPACT","met_resolve_impact",{metalProtectiveResponse:"take_impact"}),
       C("destroy_dummy","DESTROY THE DUMMY","met_resolve_destroy",{metalProtectiveResponse:"destroy_dummy"})]},
-    {beatId:"met_resolve_redirect",mode:"narration",environmentRef:courtyard,text:"Metal moves.",onEnterConsequences:[protectiveResolver("metal_protect_redirect_396","redirect_dummy")]},
-    {beatId:"met_resolve_impact",mode:"narration",environmentRef:courtyard,text:"Metal moves.",onEnterConsequences:[protectiveResolver("metal_protect_impact_396","take_impact")]},
-    {beatId:"met_resolve_destroy",mode:"narration",environmentRef:courtyard,text:"Metal moves.",onEnterConsequences:[protectiveResolver("metal_protect_destroy_396","destroy_dummy")]},
+    {beatId:"met_resolve_redirect",mode:"narration",environmentRef:courtyard,text:"Metal moves.",onEnterConsequences:[protectiveResolver("metal_protect_redirect_396","redirect_dummy")],nextBeatId:"met_redirect_dispatch"},
+    {beatId:"met_resolve_impact",mode:"narration",environmentRef:courtyard,text:"Metal moves.",onEnterConsequences:[protectiveResolver("metal_protect_impact_396","take_impact")],nextBeatId:"met_impact_dispatch"},
+    {beatId:"met_resolve_destroy",mode:"narration",environmentRef:courtyard,text:"Metal moves.",onEnterConsequences:[protectiveResolver("metal_protect_destroy_396","destroy_dummy")],nextBeatId:"met_destroy_dispatch"},
+    {beatId:"met_redirect_dispatch",mode:"choice",environmentRef:courtyard,text:"Metal's protective response is being resolved.",choices:[
+      C("route_success","CONTINUE","met_redirect_success_01",null,{availability:ctx=>({available:(ctx&&ctx.localContext||A.local()).metalProtectiveOutcome==="success",knownBlocker:"Protective result is not success."})}),
+      C("route_partial","CONTINUE","met_redirect_partial_01",null,{availability:ctx=>({available:(ctx&&ctx.localContext||A.local()).metalProtectiveOutcome==="partial",knownBlocker:"Protective result is not partial."})}),
+      C("route_failure","CONTINUE","met_redirect_failure_01",null,{availability:ctx=>({available:(ctx&&ctx.localContext||A.local()).metalProtectiveOutcome==="failure",knownBlocker:"Protective result is not failure."})})]},
+    {beatId:"met_impact_dispatch",mode:"choice",environmentRef:courtyard,text:"Metal's protective response is being resolved.",choices:[
+      C("route_success","CONTINUE","met_impact_success_01",null,{availability:ctx=>({available:(ctx&&ctx.localContext||A.local()).metalProtectiveOutcome==="success",knownBlocker:"Protective result is not success."})}),
+      C("route_partial","CONTINUE","met_impact_partial_01",null,{availability:ctx=>({available:(ctx&&ctx.localContext||A.local()).metalProtectiveOutcome==="partial",knownBlocker:"Protective result is not partial."})}),
+      C("route_failure","CONTINUE","met_impact_failure_01",null,{availability:ctx=>({available:(ctx&&ctx.localContext||A.local()).metalProtectiveOutcome==="failure",knownBlocker:"Protective result is not failure."})})]},
+    {beatId:"met_destroy_dispatch",mode:"choice",environmentRef:courtyard,text:"Metal's protective response is being resolved.",choices:[
+      C("route_success","CONTINUE","met_destroy_success_01",null,{availability:ctx=>({available:(ctx&&ctx.localContext||A.local()).metalProtectiveOutcome==="success",knownBlocker:"Protective result is not success."})}),
+      C("route_partial","CONTINUE","met_destroy_partial_01",null,{availability:ctx=>({available:(ctx&&ctx.localContext||A.local()).metalProtectiveOutcome==="partial",knownBlocker:"Protective result is not partial."})}),
+      C("route_failure","CONTINUE","met_destroy_failure_01",null,{availability:ctx=>({available:(ctx&&ctx.localContext||A.local()).metalProtectiveOutcome==="failure",knownBlocker:"Protective result is not failure."})})]},
     {beatId:"met_redirect_success_01",mode:"narration",environmentRef:courtyard,text:"Metal reaches the dummy on the turn and kicks across its line instead of against it. The frame whips past the student and crashes into empty ground.",nextBeatId:"met_redirect_success_02"},
     {beatId:"met_redirect_success_02",mode:"dialogue",speakerName:"GENIN",environmentRef:courtyard,text:"Nice save.",nextBeatId:"met_redirect_success_03"},
     {beatId:"met_redirect_success_03",mode:"dialogue",speakerName:"METAL",environmentRef:courtyard,text:"You okay?",nextBeatId:"met_hazard_after_success_01"},
