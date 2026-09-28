@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-28  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons / Tailed Beasts  
-**Status:** **COMBAT DESIGN CLOSED BY STEPHEN 2026-09-28 — CE #403 FAMILY-WIDE RECONCILIATION STILL ACTIVE**  
+**Status:** **COMBAT DESIGN CLOSED BY STEPHEN 2026-09-28 — CE BATCH-4 NON-COLLAPSE CONTRACT CONSUMED**  
 **Parent:** #235  
 **Canon/SC research:** `Documentation/Combat/SC_Combat_Kurama_Family_Canon_and_SC_Representation_Research_2026-09-27.md`  
 **Cross-system reconciliation:** #403  
@@ -721,6 +721,34 @@ Preserve:
 
 ---
 
+# M. CE Batch-4 non-collapse consumption
+
+Consumed durable CE authority:
+
+`Documentation/Coordination/Kurama_Persistent_Source_Relationship_Partition_and_Manifestation_Non_Collapse_Contract_2026-09-28.md`
+
+Commit:
+
+`01179c52712b6d413c1c2dee063813bd493a733c`
+
+Source 15 conforms without mechanics changes.
+
+Additional locked cross-family constraints:
+
+- `nine_tails` and `yang_kurama` reserve the same underlying **Yang** source and cannot run full relationship packages simultaneously;
+- Menma-specific `menma_nine_tails` / `menma_kurama` reserve the same underlying **Yin** source as generic `yin_kurama`;
+- `menma_kurama != yin_kurama` as exact representation/package;
+- `kurama_complete` replaces split-half current-state packaging and is never `Yang + Yin + Complete` stacking by default;
+- `breakout_kurama` is Forced Manifestation of the same persistent source, not a second Kurama or ordinary Summon;
+- `reborn_kurama` is a chronological reborn Hosted Entity state and does not silently duplicate an earlier living Kurama;
+- one exact partition cannot occupy incompatible current hosts without an authored transfer/extraction/resealing occurrence;
+- dedicated Jinchūriki/Hosted packages beat additive full-source stacking;
+- occurrence does not create obtainability/ownership/transfer rights.
+
+No Source 15 Skill or Enhancement is changed by this consumption.
+
+---
+
 # M. Anti-double-count
 
 Do not:
@@ -740,7 +768,7 @@ Do not:
 
 # N. Design state
 
-**Persistent Kurama / relationship / partition semantics:** conceptually closed by Stephen; CE #403 active for durable reusable reconciliation.  
+**Persistent Kurama / relationship / partition semantics:** CLOSED and consumed from `Documentation/Coordination/Kurama_Persistent_Source_Relationship_Partition_and_Manifestation_Non_Collapse_Contract_2026-09-28.md` (`01179c52712b6d413c1c2dee063813bd493a733c`).  
 **Current PL anchors:** nine_tails PL130 / yang_kurama PL125 preserved from durable Combat audit; live runtime rows absent; exact seven-Stat republication still unresolved.  
 **Kurama-family common capability layer:** CLOSED for Source 15 consumption; family-wide normalisation remains later Batch-4 work.  
 **Nine-Tails manifested:** Nine-Tail Isolation / Caged Source Refusal — CLOSED.  
@@ -754,4 +782,4 @@ Do not:
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
 
-**Stephen final sign-off received 2026-09-28. Source 15 Combat design is CLOSED. CE #403 remains the active family-wide reusable non-collapse reconciliation and does not reopen these signed mechanics unless it returns a real contradiction. Implementation/runtime/Golden remain unclaimed.**
+**Stephen final sign-off received 2026-09-28. Source 15 Combat design is CLOSED. CE Batch-4 non-collapse authority has been consumed and explicitly does not reopen Source 15. Implementation/runtime/Golden remain unclaimed.**
