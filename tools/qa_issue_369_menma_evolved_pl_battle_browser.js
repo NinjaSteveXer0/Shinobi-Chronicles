@@ -45,10 +45,13 @@ async function waitForStoryMotionToSettle(page){
 
 async function clickStoryPrimary(page){
   const root=page.locator("#story-scene-presentation-layer");
-  let button=root.locator(".sc-chronicle-primary").first();
-  if(await button.count()===0)button=root.locator(".sc-story-actions > .sc-story-action:not(.sc-story-choice)").first();
-  await button.waitFor({state:"visible",timeout:8000});
-  await button.click();
+  const button=root.locator(".sc-chronicle-primary").first();
+  if(await button.count()&&await button.isVisible())await button.click();
+  else{
+    const stage=root.locator(".sc-chronicle-stage,.sc-story-stage").first();
+    await stage.waitFor({state:"visible",timeout:8000});
+    await stage.click({position:{x:30,y:30}});
+  }
   await waitForStoryMotionToSettle(page);
 }
 
