@@ -79,7 +79,7 @@ assert(runtime.includes('men03Scope:"menma_active_only"')&&runtime.includes("fir
 assert(runtime.includes('tutorialResult:"not_completed"')&&runtime.includes("performanceBucket:null"),"party defeat must not fake LOW");
 assert(runtime.includes('PARTY_DEFEAT_RETURN_BEAT_ID="menma_party_defeat_return_01"')&&runtime.includes('beat.battle.defeatBeatId=PARTY_DEFEAT_RETURN_BEAT_ID'),"party defeat is not routed to the #386 Story continuation");
 for(let i=1;i<=24;i++)assert(runtime.includes('beatId:"menma_party_defeat_return_'+String(i).padStart(2,"0")+'"'),"#386 party-defeat beat missing "+i);
-assert(runtime.includes('FUTURE_ENTRY_BEAT_ID="menma_future_01"')&&runtime.includes('FUTURE_ENVIRONMENT_PATH="Scene backdrops/whisper_woods_forest_route.png"'),"#388 Scene-10 bridge missing");
+assert(runtime.includes('FUTURE_ENTRY_BEAT_ID="menma_future_01"')&&runtime.includes('FUTURE_ENVIRONMENT_PATH="Menma Origin Backdrop/whisper_woods_rise.png"'),"#388 Scene-10 bridge missing");
 assert(runtime.includes('nextBeatId:FUTURE_ENTRY_BEAT_ID'),"#386 party-defeat return does not continue to Scene 10");
 for(const label of ["MASTER WHAT THEY WON'T TEACH ME","BECOME TOO STRONG TO HOLD BACK","CREATE SOMETHING THAT'S MINE","FIND OUT HOW FAR I CAN GO"])assert(runtime.includes(label),"#388 future-ambition choice missing "+label);
 assert(runtime.includes('FUTURE_INTENT_OCCURRENCE_ID="occ_origin_menma_future_ambition_intent"')&&runtime.includes("progressionGranted:false"),"future ambition intent history is not fail-safe against implicit progression");
