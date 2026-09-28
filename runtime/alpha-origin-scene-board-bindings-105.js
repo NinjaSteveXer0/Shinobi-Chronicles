@@ -148,23 +148,53 @@ function buildHinataReceipt105(){return hinataReceiptLines105().join("\n");}
 
 function miraiBackdrop(beatId,runtime){
   const id=String(beatId||""),ctx=runtime&&runtime.localContext||{};
-  if(id==="mir_start")return BACKDROP.miraiCourtyard;
-  if(id==="mir_talk")return BACKDROP.miraiStreet;
-  if(id==="mir_inconsistent")return BACKDROP.miraiMarket;
-  if(id==="mir_deeper"){
-    return ctx.miraiSuspicionResponse==="change_route"?BACKDROP.miraiLane:BACKDROP.miraiMarket;
+  if(id==="mir_start"||id.startsWith("mir_assignment_"))return BACKDROP.miraiCourtyard;
+  if(id==="mir_talk"||id.startsWith("mir_walk_")||id.startsWith("mir_talk_")||id.startsWith("mir_prof_"))return BACKDROP.miraiStreet;
+  if(id==="mir_inconsistent"||id.startsWith("mir_market_"))return BACKDROP.miraiMarket;
+  if(id==="mir_deeper")return ctx.miraiSuspicionResponse==="change_route"?BACKDROP.miraiLane:BACKDROP.miraiMarket;
+  if(id.startsWith("mir_shortcut_")){
+    if(id.startsWith("mir_shortcut_stay_")||id.startsWith("mir_shortcut_forget_"))return BACKDROP.miraiStreet;
+    return BACKDROP.miraiLane;
   }
-  if(id==="mir_checkpoint"||id==="mir_verified"||id==="mir_eval"||id==="mir_end")return BACKDROP.miraiCheckpoint;
+  if(id.startsWith("mir_checkpoint_")||id.startsWith("mir_after_")||id.startsWith("mir_leaving_")||
+     id.startsWith("mir_reflect_")||id==="mir_reflection_choice"||id==="mir_close_01"||
+     id==="mir_checkpoint"||id==="mir_verified"||id==="mir_eval"||id==="mir_end")return BACKDROP.miraiCheckpoint;
   return BACKDROP.miraiStreet;
 }
 function miraiActors(beatId,performance,beat){
   const id=String(beatId||""),sp=speaker(performance,beat);
   const rows=[actor("academy_mirai","MIRAI",PATH.mirai,sp)];
-  if(["mir_eval","mir_end"].includes(id)){
-    rows.push(actor("mirai_academy_instructor","INSTRUCTOR",PATH.miraiInstructor,sp,["ACADEMY INSTRUCTOR"]));
-  }else{
-    rows.push(actor("mirai_traveller","TRAVELLER",PATH.traveller,sp,["TRAVELER","CIVILIAN","ESCORT"]));
+  const traveller=()=>actor("mirai_traveller","TRAVELLER",PATH.traveller,sp,["TRAVELER","CIVILIAN","ESCORT"]);
+  const instructor=()=>actor("mirai_academy_instructor","INSTRUCTOR",PATH.miraiInstructor,sp,["ACADEMY INSTRUCTOR"]);
+  const checkpoint=()=>actor("mirai_checkpoint_instructor","CHECKPOINT INSTRUCTOR",null,sp);
+
+  if(id.startsWith("mir_assignment_")){
+    rows.push(instructor(),traveller());
+    return rows;
   }
+  if(id.startsWith("mir_confront_")){
+    const match=id.match(/_(\d+)$/),n=match?Number(match[1]):0;
+    rows.push(n>=8?instructor():traveller());
+    return rows;
+  }
+  if(id.startsWith("mir_checkpoint_missed_")){
+    const match=id.match(/_(\d+)$/),n=match?Number(match[1]):0;
+    if(sp==="CHECKPOINT INSTRUCTOR")rows.push(checkpoint(),traveller());
+    else if(n>=10)rows.push(instructor(),traveller());
+    else rows.push(traveller());
+    return rows;
+  }
+  if(id.startsWith("mir_checkpoint_early_")||id.startsWith("mir_after_")||id.startsWith("mir_leaving_")){
+    rows.push(instructor(),traveller());
+    return rows;
+  }
+  if(id.startsWith("mir_reflect_")||id==="mir_reflection_choice"){
+    rows.push(instructor());
+    return rows;
+  }
+  if(id==="mir_close_01")return rows;
+  if(["mir_eval","mir_end"].includes(id))rows.push(instructor());
+  else rows.push(traveller());
   return rows;
 }
 
@@ -191,7 +221,7 @@ function menmaActors(beatId,performance,beat){
   }
   const rows=[actor("academy_menma","MENMA",PATH.menma,sp)];
   if(id.startsWith("menma_open_")||id.includes("academy")){
-    rows.push(actor("menma_academy_instructor","IRUKA",PATH.menmaInstructor,sp,["INSTRUCTOR","ACADEMY INSTRUCTOR"]));
+    rows.push(actor("menma_academy_instructor","INSTRUCTOR",PATH.menmaInstructor,sp,["ACADEMY INSTRUCTOR"]));
   }else if(id.startsWith("menma_enter_")||id.startsWith("menma_anko_")){
     rows.push(actor("sj_anko","ANKO",PATH.anko,sp));
     rows.push(actor("test_subject_altered_shinobi","ALTERED SHINOBI",PATH.altered,sp));
