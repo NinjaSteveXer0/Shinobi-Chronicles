@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-28  
 **Owner:** CE / Codex / Coordination  
-**Source:** #403 / Combat master #235  
+**Source:** #403 / #415 / Combat master #235  
 **Status:** **BINDING REUSABLE CROSS-SYSTEM CONTRACT — KURAMA BATCH 4 ACTIVE**
 
 ## 1. Purpose
@@ -11,7 +11,7 @@ Combat has entered Kurama-family RESET-v2 Batch 4.
 
 Current Shinobi Chronicles authority now contains several exact Kurama-family representations whose names, host histories, partition states and lifecycles overlap.
 
-This contract prevents those representations from collapsing into duplicate beasts, duplicate source packages, false ownership, false partnership, or stacked half/whole mechanics.
+This contract prevents those representations from collapsing into duplicate beasts, duplicate source packages, false ownership, false partnership, or stacked half/whole mechanics. It also closes the Kurama-specific case where one Character legitimately hosts both Yin and Yang partitions at the same time without those two hosted relationships automatically becoming Complete Kurama.
 
 It does **not** author:
 - new Combat Skills;
@@ -245,13 +245,54 @@ must not be treated as three independent Yin beasts.
 
 Any exact current-state use must preserve one underlying Yin partition reservation.
 
-### 4.3 Complete Kurama resolves the split state
+### 4.3 Same-host Yin + Yang coexistence is permitted when exact history authorises it
 
-Where `kurama_complete` is the current legitimate body state, the same Chronicle cannot also mechanically treat separate Yin and Yang halves as independently available current sources unless exact causal history has since split the whole again.
+A Character may simultaneously host the exact Yin and Yang Kurama partitions when exact causal/host authority establishes both relationships.
+
+This is a specific application of the existing multiple-Hosted-Entity rule:
+
+> **one host != one universal Hosted Entity slot**
+
+While the split persists:
+
+- Yin remains one separately addressable Hosted Entity/source relationship;
+- Yang remains one separately addressable Hosted Entity/source relationship;
+- both may be present in the same host;
+- each keeps exact partition reservation/provenance;
+- each may keep its own legal source package where current Combat authority allows it;
+- exact cooperative actions may require both partitions together;
+- neither partition receives an independent extra Battle turn merely because two sources are present.
+
+Hard non-collapse:
+
+> **same host + hosted Yin + hosted Yang != Complete Kurama**
+
+Dual hosting proves co-residence of both split partitions. It does not prove ontological reunion.
+
+This is Kurama-specific current authority. It does **not** create a generic rule that every Character may host arbitrary multiple Bijū without source-specific authorisation.
+
+### 4.4 Complete Kurama requires an exact reunion occurrence
+
+`kurama_complete` becomes the current source/body state only when an exact authorised reunion occurrence actually reunites Yin + Yang into the whole.
+
+Canonical transition:
+
+`hosted Yin + hosted Yang -> exact reunion occurrence -> kurama_complete`
+
+The left side does not collapse into the right side automatically.
+
+When `kurama_complete` is current:
+
+- the split Yin/Yang Hosted Entity states cease to be the current mechanical source model;
+- one Complete Kurama Entity/current source package replaces them;
+- split-half current packages cease unless exact Complete authority deliberately inherits a narrow common capability;
+- dual-partition cooperative techniques cease to be current because the two participating split sources no longer exist as separate current partitions;
+- historical Yin/Yang hosting, relationship and provenance remain true;
+- the same Chronicle cannot also mechanically treat those reunited halves as independently available current sources unless later causal history splits Complete Kurama again.
 
 Historical prior-state display does not create simultaneous mechanical availability.
 
-### 4.4 Reborn lifecycle is chronological, not duplication
+### 4.5 Reborn lifecycle is chronological, not duplication
 
 Kurama's reborn state must not create an additional simultaneous Kurama beside an earlier living Kurama in the same linear history.
 
@@ -289,6 +330,8 @@ Therefore:
 > representation asset != factual state
 
 A Character may possess legitimate access to Kurama chakra while still remaining in a Nine-Tails pre-partnership relationship state.
+
+A Character may also hold more than one separately authored Hosted Entity relationship at once. For the current Kurama case, exact Yin + Yang dual hosting is legal where history authorises both; this does not merge their source identities or grant separate host turns.
 
 ---
 
@@ -368,7 +411,28 @@ together by default.
 
 unless an exact contract authorises a specific shared/common capability.
 
-### 8.6 Family-common capability is separate from signature package
+### 8.6 Dual-source action does not create extra turns or reunion
+
+Where exact Combat authority authors a Yin + Yang cooperative technique:
+
+- the acting host still spends the normal action opportunity defined by that technique;
+- Yin and Yang may each contribute exact source packets/effects inside that one action;
+- separate source provenance is preserved;
+- both source predicates/availability requirements must be satisfied;
+- the technique does not merge the partitions;
+- the technique does not create `kurama_complete`;
+- the technique does not grant Yin and Yang separate turns;
+- the technique does not copy both full source packages onto the host.
+
+Current Combat-closed example:
+
+`kurama_twin_beast_bomb`
+
+uses one host action while Yin and Yang contribute separately authored packets. Its use consumes the relevant ordinary Tailed Beast Bomb availability for both participating halves under current Source-17 authority.
+
+After a legitimate reunion creates `kurama_complete`, split-source cooperative techniques are no longer current unless later history splits Complete Kurama again.
+
+### 8.7 Family-common capability is separate from signature package
 
 A legitimate family/common Kurama/Bijū capability may be shared across representations where Combat explicitly authors that common layer.
 
@@ -428,7 +492,8 @@ Owns:
 - host/history-specific representation distinction;
 - occurrence vs obtainability;
 - Forced Manifestation vs ordinary ownership;
-- anti-double-count / reservation grammar.
+- anti-double-count / reservation grammar;
+- same-host dual-partition coexistence vs actual reunion semantics.
 
 ### Combat / Skills / Items / Weapons / Summons / Tailed Beasts
 Owns:
@@ -502,8 +567,12 @@ Current Combat Batch 4 may consume this contract as follows:
 
 3. **Partition/body pair**
    - `yin_kurama`;
+   - `yang_kurama` where exact same-host dual-partition history applies;
    - `kurama_complete`;
-   - preserve half vs whole;
+   - same host may carry separately addressed Yin + Yang while split;
+   - dual-host split state != Complete;
+   - Complete requires an exact reunion occurrence;
+   - after reunion, split-half/Twin current packages cease unless later history splits Complete again;
    - no half + whole package stacking.
 
 4. **Adjacent lifecycle pair**
@@ -527,7 +596,9 @@ This contract does not answer:
 - exact generic loss-of-control trigger grammar;
 - exact Breakout post-emergence Combat/event behaviour;
 - exact source-specific future Skills/Enhancements not already closed;
-- generic Jinchūriki transfer/recovery system.
+- generic Jinchūriki transfer/recovery system;
+- exact Kurama reunion event/acquisition fiction, producer and Progression threshold;
+- generic permission for arbitrary multi-Bijū hosting beyond separately authored exact relationships.
 
 Those remain owner work only when an active consumer requires them.
 
@@ -548,6 +619,12 @@ Those remain owner work only when an active consumer requires them.
 > **Forced Manifestation != ordinary ownership/deployment.**
 
 > **Menma-specific Kurama representation != generic Yin Kurama.**
+
+> **Same host + hosted Yin + hosted Yang != Complete Kurama without an exact reunion occurrence.**
+
+> **Two hosted halves remain two separately addressable source relationships while split, but do not create extra turns.**
+
+> **A legitimate reunion replaces current split-half packages with one Complete Kurama current source package while preserving historical provenance.**
 
 > **Complete Kurama != Yang package + Yin package + Complete package.**
 
