@@ -1,0 +1,60 @@
+name: Issue 105 Origin Presentation Repair
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'runtime/alpha-origin-scene-board-bindings-105.js'
+      - 'runtime/alpha-story-scene-board-33900.js'
+      - 'runtime/alpha-battle-modern-33000.js'
+      - 'runtime/alpha-story-machine-resolver-343.js'
+      - 'runtime/academy-wasabi-writing-golden-343.js'
+      - 'runtime/alpha-origin-scenes-32900-a.js'
+      - 'runtime/alpha-origin-scenes-32900-b.js'
+      - 'runtime/alpha-origin-scenes-32900-c.js'
+      - 'tools/qa_issue_105_origin_presentation_repair.js'
+      - 'tools/qa_issue_105_origin_presentation_browser.js'
+      - '.github/workflows/issue-105-origin-presentation-repair.yml'
+permissions:
+  contents: read
+jobs:
+  origin-presentation-repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Source presentation contract
+        run: |
+          node --check runtime/alpha-origin-scene-board-bindings-105.js
+          node --check runtime/alpha-story-machine-resolver-343.js
+          node --check tools/qa_issue_105_origin_presentation_repair.js
+          node --check tools/qa_issue_105_origin_presentation_browser.js
+          node tools/qa_issue_105_origin_presentation_repair.js
+          node tools/qa_runtime_ownership_safety_300.js
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start local Alpha server
+        run: |
+          python3 -m http.server 8080 > /tmp/issue-105-presentation-http.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - name: Installed-browser no-legacy-fallback proof
+        env:
+          ISSUE_105_PRESENTATION_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_105_PRESENTATION_BROWSER_OUT: artifacts/issue-105-origin-presentation
+        run: xvfb-run -a node tools/qa_issue_105_origin_presentation_browser.js
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-105-origin-presentation-evidence
+          path: artifacts/issue-105-origin-presentation
+          if-no-files-found: warn
