@@ -27,7 +27,7 @@ It is:
 
 Fingerprint:
 
-> **PARTITION IDENTITY / COUNTERPART RECOGNITION / HALF-TO-HALF RESONANCE**
+> **CONCENTRATED CHAKRA / DEEP RESERVE / PRECISE NINE-TAIL PRESSURE**
 
 ## `kurama_complete`
 
@@ -80,22 +80,36 @@ These shared actions are not re-authored under different names merely to make th
 
 ---
 
-# D. Yin Kurama — deliberate no-fake-polarity rule
+# D. Yin Kurama — standalone source rule
 
-Current canon provides no reliable basis for inventing:
+Stephen vetoed the first Source-17 framing because it made Yin Kurama's bespoke value depend on supporting Yang Kurama.
 
+Corrected rule:
+
+> **partitioned != subordinate**
+
+Yin Kurama is a full, independently meaningful Kurama source while the split exists.
+
+Current canon demonstrates that the Yin half independently:
+- retains Kurama's personhood;
+- can cooperate with a host;
+- can support full Tailed Beast Mode;
+- can supply Tailed Beast Ball use;
+- can supply chakra-arm expression;
+- can lend/transfer chakra;
+- can accumulate additional chakra for later use.
+
+Source 17 therefore gives Yin its own complete combat identity even when Yang is absent.
+
+At the same time, SC does NOT claim:
+
+- Yin = evil;
 - Yin = Genjutsu;
 - Yin = defence;
-- Yin = evil;
 - Yin = shadow element;
-- Yin = healing;
-- arbitrary opposite-element mechanics against Yang.
+- Yin metaphysically causes "precision" or "reserve" mechanics.
 
-Therefore Source 17 does **not** create a fake standalone Yin combat school.
-
-Yin Kurama's exact bespoke value is the canon-supported partition relationship:
-
-> **Yin recognises Yang as the other half of the same self/source and can cooperate with it.**
+The following package is an **SC-authored exact representation identity grounded in Yin Kurama's demonstrated independent chakra control/accumulation**, not a claim that the word Yin canonically means those mechanics.
 
 ---
 
@@ -105,30 +119,30 @@ ID shorthand:
 
 `kurama_counterpart_recognition`
 
-This is **not a learned Skill**.
+This remains a natural Kurama-partition fact, but it is **not Yin Kurama's Enhancement, power budget or reason to exist**.
 
-Where the current Story/World/Battle context legitimately contains the exact other Kurama partition and no stronger concealment/source-separation rule prevents recognition:
+Where the exact other partition is legitimately present:
 
-- Yin Kurama may recognise the Yang partition as its counterpart;
-- Yang may likewise recognise Yin;
-- source recognition does not automatically tell every host/observer what happened;
-- recognition does not transfer ownership, control, Knowledge or partnership;
-- recognition does not merge the two packages;
-- the halves remain separately addressable while split.
+- Yin and Yang may recognise each other as counterparts;
+- they may communicate where a valid route exists;
+- recognition creates no automatic buff;
+- recognition does not merge packages;
+- recognition does not transfer PL, ownership or host access;
+- observer Knowledge remains bounded.
 
-Player-facing text should surface the recognition naturally when relevant rather than explain partition architecture.
+Yin's Battle package remains fully functional if Yang never appears.
 
 ---
 
-# F. Yin Kurama Enhancement — Partition Resonance
+# F. Yin Kurama Enhancement — Deep Reserve
 
 ID:
 
-`yin_kurama_partition_resonance`
+`yin_kurama_deep_reserve`
 
 Activation:
 
-**EXACT YIN PARTITION / ALLIED YANG COUNTERPART PRESENT**
+**EXACT YIN PARTITION**
 
 No generic Stat bonus.
 
@@ -138,64 +152,145 @@ Limit:
 
 Trigger:
 
-an allied exact Yang-partition Kurama source resolves a Kurama-family ATTACK that deals positive final Battle-PL damage to one hostile.
+after Yin Kurama resolves any legitimate action.
 
 Effect:
 
-- mark that exact hostile with `kurama_counterpart_resonance` through Yin Kurama's next legitimate action opportunity;
-- Yin Kurama's next Kurama-family direct ATTACK against that same hostile gains **+20% pre-Stamina Attack PL**;
-- the mark is consumed by that qualifying attack;
-- if Yin targets somebody else or does not make a qualifying attack during its next action opportunity, the mark expires;
-- no second packet;
-- no copied Skill;
-- no bonus action;
-- no PL/Stat transfer between halves.
+establish `yin_kurama_stored_chakra` through the end of Yin Kurama's next legitimate action opportunity.
+
+While the reserve is held, Yin may spend it in exactly one of two ways:
+
+## BRACE
+
+Trigger:
+
+Yin Kurama is targeted by one qualifying direct hostile Attack-PL packet before its next action.
 
 Player text:
 
-> **Your other half opens the target up. Yin Kurama's next attack against that enemy gains 20% ATK.**
+> **Spend the stored chakra to brace against the hit. Reduce that direct attack by 40%.**
+
+Effect:
+- reduce the qualifying packet **40% pre-Stamina**;
+- ordinary Stamina then resolves;
+- consume the reserve;
+- no counterattack;
+- no second capacity pool.
+
+## RELEASE
+
+Use:
+
+before Yin Kurama commits one direct Kurama-family ATTACK during its next action.
+
+Player text:
+
+> **Keep the stored chakra and release it through the next attack for +18 ATK.**
+
+Effect:
+- add **18 authored Attack PL** to that one direct attack before Stamina;
+- consume the reserve;
+- no second packet;
+- no target-count increase;
+- no bonus action.
+
+If neither branch is used by the end of Yin Kurama's next action opportunity, the reserve expires.
+
+Decision:
+
+> **Hold chakra between turns, then decide whether the reserve keeps Yin standing or makes the next hit heavier.**
 
 Identity:
 
-> **The halves cooperate because they recognise each other — not because Yin has an invented dark power.**
+**concentrated chakra held in reserve and deliberately committed**
 
-If no legitimate allied Yang counterpart is present, this exact Enhancement simply has no trigger.
-
-That is intentional.
-
-Yin Kurama remains a full Kurama-family source through the shared body/chakra layer; its *bespoke* mechanic is counterpart-dependent because that is the real partition-specific canon hook.
+This is independent of Yang Kurama.
 
 ---
 
-# G. Yin Kurama future Potential Skill seed
+# G. Yin Kurama manifested signature actions
 
-These are Beta-facing seeds, not prepared Alpha actions.
+## 1. `yin_kurama_nine_tail_convergence` — **Nine-Tail Convergence**
 
-## `skill_kurama_twin_beast_bomb` — **Twin Beast Bomb**
+Class:
 
-Potential classification:
+**ATTACK / NINE-TAIL FOCUS**
 
-**KURAMA PARTITION / COOPERATIVE YIN+YANG / ADVANCED**
+Target:
 
-Potential prerequisites:
-- exact legitimate Yin source;
-- exact legitimate Yang source;
-- both currently able and willing to cooperate;
-- separate future learned/access authority;
-- Battle state permits both causal sources.
+one hostile
 
-Concept direction:
-- combined Yin+Yang Tailed Beast Bomb;
-- one coordinated action contract, not two free turns;
-- no source PL addition;
-- exact ATK/targeting deferred to later common-capability reconciliation.
+ATK:
 
-## `skill_kurama_counterpart_guard` — **Counterpart Guard**
+**50**
 
-Potential direction:
-- one half responds to a direct threat against the other where both are legitimately present;
-- no automatic source fusion;
-- exact prevention/intercept numbers deferred.
+Player text:
+
+> **Bring all nine tails down on one enemy at once for 50 ATK.**
+
+Rules:
+- one direct packet;
+- ordinary Stamina mitigation;
+- no Stun;
+- no restraint;
+- no Formation reorder;
+- no second packet.
+
+Identity:
+
+Unlike Complete Kurama's formation-wide tail pressure, Yin compresses its tail attack onto one target.
+
+---
+
+## 2. `yin_kurama_compressed_chakra_burst` — **Compressed Chakra Burst**
+
+Class:
+
+**ATTACK / CONCENTRATED TAILED-BEAST CHAKRA**
+
+Limit:
+
+**once per Battle**
+
+Target:
+
+one hostile
+
+ATK:
+
+**52**
+
+Player text:
+
+> **Compress Kurama's chakra into one blast and drive 52 ATK into a single enemy.**
+
+Rules:
+- one direct packet;
+- ordinary Stamina mitigation;
+- no automatic Stun;
+- no displacement;
+- no terrain destruction;
+- not a second Tailed Beast Bomb action;
+- may receive Deep Reserve's RELEASE bonus if all normal predicates are met.
+
+Identity:
+
+**Yin Kurama can concentrate its own chakra into decisive single-target pressure without needing Yang present.**
+
+---
+
+# G2. Yin Kurama Potential Skill seed direction
+
+Future Yin-derived source branches may explore:
+
+- stored-chakra timing;
+- concentrated single-target pressure;
+- nine-tail convergence techniques;
+- longer-horizon reserve management;
+- chakra lending/accumulation where an exact host relationship separately permits it;
+- exact Yin+Yang cooperative techniques only as an optional advanced branch when both legitimate sources actually coexist.
+
+A future **Twin Beast Bomb** may exist as a Yin+Yang cooperative technique, but it is explicitly **not Yin Kurama's core identity** and does not replace Yin's standalone repertoire.
 
 Preserve:
 
@@ -425,6 +520,8 @@ Do not:
 - create a second Yin half from collectible ownership;
 - infer Menma history from generic Yin;
 - infer a dark/light combat school;
+- make Yin's core kit depend on Yang being present;
+- treat partitioned status as lesser/subordinate entity status;
 - transfer PL123 wholesale to a host.
 
 ## Complete Kurama
@@ -446,10 +543,11 @@ Shared family-common capabilities may still appear where explicitly authored wit
 **CE partition/body non-collapse:** CLOSED and consumed.  
 **Current staged PL anchors:** yin_kurama PL123 / kurama_complete PL138 preserved; exact seven-Stat republication not claimed here.  
 **Shared Kurama-family body/chakra layer:** CLOSED for Source-17 consumption.  
-**Yin fake-polarity exclusion:** PROPOSED.  
-**Counterpart Recognition:** PROPOSED inherent contextual capability.  
-**Yin Enhancement — Partition Resonance:** PROPOSED.  
-**Yin Potential Skill seeds — Twin Beast Bomb / Counterpart Guard:** PROPOSED seed only.  
+**Yin fake-polarity exclusion + standalone-source rule:** PROPOSED.  
+**Counterpart Recognition:** PROPOSED inherent contextual fact only; no buff / no Yin identity budget.  
+**Yin Enhancement — Deep Reserve:** PROPOSED.  
+**Yin manifested Skills — Nine-Tail Convergence / Compressed Chakra Burst:** PROPOSED.  
+**Yin Potential Skill direction:** PROPOSED seed only; future Twin Beast Bomb is optional Yin+Yang cooperation, not Yin's core identity.  
 **Complete Enhancement — Reunited Reservoir:** PROPOSED.  
 **Complete manifested Skills — Nine-Tail Rupture / Chakra Overrun / Reunited Guard:** PROPOSED.  
 **Generic host-assisted palette:** deliberately NOT authored; dedicated Jinchūriki/host packages own that surface.  
