@@ -194,14 +194,18 @@ function miraiActors(beatId,performance,beat){
   }
   if(id==="mir_close_01")return rows;
   if(["mir_eval","mir_end"].includes(id))rows.push(instructor());
-  else rows.push(traveller());
+  else{
+    rows.push(traveller());
+    if(id.startsWith("mir_market_")&&sp==="PORTER")rows.push(actor("mirai_porter","PORTER",null,sp));
+  }
   return rows;
 }
 
 function menmaBackdrop(beatId,beat){
   const id=String(beatId||"");
   if(id.startsWith("menma_future_"))return BACKDROP.menmaFuture;
-  if(id.startsWith("menma_after_")||id.startsWith("menma_part_")||id.startsWith("menma_party_defeat_return_"))return BACKDROP.menmaAfter;
+  if(id.startsWith("menma_party_defeat_return_"))return BACKDROP.menmaClearing;
+  if(id.startsWith("menma_after_")||id.startsWith("menma_part_"))return BACKDROP.menmaAfter;
   if(id.startsWith("menma_discovery_")||id.startsWith("menma_enter_")||id.startsWith("menma_anko_")||id.includes("battle"))return BACKDROP.menmaClearing;
   if(id.startsWith("menma_forest_")||id.startsWith("menma_fox_"))return BACKDROP.menmaForest;
   const ref=beat&&beat.environmentRef;
@@ -215,6 +219,7 @@ function menmaActors(beatId,performance,beat){
   const id=String(beatId||""),sp=speaker(performance,beat);
   if(id.startsWith("menma_discovery_")){
     return[
+      actor("academy_menma","MENMA",PATH.menma,sp),
       actor("sj_anko","ANKO",PATH.anko,sp),
       actor("test_subject_altered_shinobi","ALTERED SHINOBI",PATH.altered,sp)
     ];
