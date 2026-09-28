@@ -287,6 +287,16 @@ function patchKurenai33500(){
 function patchIwabee33500(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
   const def=editableScene33500(A.sceneByVariant.academy_iwabee);if(!def)return false;
+  // #399 / WRITING_GOLDEN owns the complete visible Iwabee route natively.
+  // The pre-#399 33500 compatibility shim must not re-register compressed
+  // iwa_expose / iwa_eval prose over the authoritative Story graph.
+  const goldenNative=!!(
+    beat33500(def,"iwa_open_01")&&
+    beat33500(def,"iwa_confront_battle")&&
+    beat33500(def,"iwa_confront_loss_01")&&
+    beat33500(def,"iwa_close_02")
+  );
+  if(goldenNative)return true;
   const expose=beat33500(def,"iwa_expose"),evalBeat=beat33500(def,"iwa_eval");
   if(!expose||!evalBeat)return false;
   expose.presentationResolver=()=>{
@@ -316,6 +326,16 @@ function patchIwabee33500(){
 function patchMetal33500(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
   const def=editableScene33500(A.sceneByVariant.academy_metal_lee);if(!def)return false;
+  // #396 / WRITING_GOLDEN owns the complete visible Metal route natively.
+  // Retire the pre-#396 compressed met_end / met_backout shim instead of
+  // overwriting controlled-spar and deterministic MET-03 outcome scenes.
+  const goldenNative=!!(
+    beat33500(def,"met_open_01")&&
+    beat33500(def,"met_spar_battle")&&
+    beat33500(def,"met_protect")&&
+    beat33500(def,"met_close_03")
+  );
+  if(goldenNative)return true;
   const end=beat33500(def,"met_end"),backout=beat33500(def,"met_backout");
   if(!end||!backout)return false;
   backout.text="Metal backs out of the public challenge. The private training he already completed still happened; choosing not to perform for the audience does not erase it.";
@@ -355,6 +375,8 @@ function runAlphaOriginBrowserRealisation33500Diagnostics(){
       hin.beatMap.has("hin_young_result")
     )),
     hinataGoldenNativeShimRetired:!!(hin&&hin.beatMap&&hin.beatMap.has("hin_ex1_choice"))?originPatches.hinata===true&&!patchedScenes.includes(A.sceneByVariant.academy_hinata):true,
+    iwabeeGoldenNativeShimRetired:originPatches.iwabee===true&&!patchedScenes.includes(A.sceneByVariant.academy_iwabee),
+    metalGoldenNativeShimRetired:originPatches.metal===true&&!patchedScenes.includes(A.sceneByVariant.academy_metal_lee),
     kurenaiFourOutcomeChoreographies:!!(kur&&kur.beatMap&&["kur_complete_loss_1","kur_partial_loss_result_2","kur_partial_win_result_3","kur_complete_win_result_6"].every(id=>kur.beatMap.has(id))),
     kurenaiResultIsDecisionAware:!!(kur&&kur.beatMap&&kur.beatMap.get("kur_result")&&typeof kur.beatMap.get("kur_result").presentationResolver==="function"),
     noMissionSemanticReuse:typeof globalThis.SC_ALPHA_MISSION_CHOICE_121==="undefined"||!patchedScenes.some(id=>String(id).startsWith("arc1_")),
