@@ -1582,24 +1582,32 @@
     {
       "symbol": "generateBattleRewards",
       "chain": [
-        "runtime/alpha-wasabi-rogue-battle-343.js"
+        "runtime/alpha-menma-origin-rewards-36200.js",
+        "runtime/alpha-wasabi-rogue-battle-343.js",
+        "runtime/alpha-kakashi-v2-rewards-36015.js"
       ],
-      "canonicalActiveOwner": "runtime/alpha-wasabi-rogue-battle-343.js",
-      "activationCondition": "Wasabi wrapper projects only the exact authorised STEP IN victory reward and delegates every other Battle.",
+      "canonicalActiveOwner": "runtime/alpha-kakashi-v2-rewards-36015.js",
+      "activationCondition": "Menma projects only the exact three-subject reward; Wasabi projects only the exact STEP IN reward; Kakashi V2 remains the final dynamic exact-Origin reward projection owner. Every wrapper delegates outside its scoped encounter.",
       "qaRefs": [
+        "tools/qa_issue_362_menma_three_subject_reward.js",
         "tools/qa_issue_343_wasabi_browser.js",
+        "tools/qa_kakashi_v2_browser.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
     },
     {
       "symbol": "claimCurrentBattleRewards",
       "chain": [
-        "runtime/alpha-wasabi-rogue-battle-343.js"
+        "runtime/alpha-menma-origin-rewards-36200.js",
+        "runtime/alpha-wasabi-rogue-battle-343.js",
+        "runtime/alpha-kakashi-v2-rewards-36015.js"
       ],
-      "canonicalActiveOwner": "runtime/alpha-wasabi-rogue-battle-343.js",
-      "activationCondition": "Wasabi wrapper commits only the exact authorised STEP IN victory reward and delegates every other Battle.",
+      "canonicalActiveOwner": "runtime/alpha-kakashi-v2-rewards-36015.js",
+      "activationCondition": "Menma, Wasabi and Kakashi wrappers commit only their exact authorised encounter rewards; Kakashi V2 is the final dynamic wrapper and all three delegate outside scope.",
       "qaRefs": [
+        "tools/qa_issue_362_menma_three_subject_reward.js",
         "tools/qa_issue_343_wasabi_browser.js",
+        "tools/qa_kakashi_v2_browser.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
     },
