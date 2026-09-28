@@ -16,10 +16,10 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-28-AS",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-28-AT",
     sourceBaselineCommit:"da811fbda363dc85fff848e2377f8c2fa38be73d",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
-    runtimeGeneration:"origin-metal-iwabee-skillnames-400-golden-shim-retirement",
+    runtimeGeneration:"origin-presentation-repair-105-wasabi-343",
     majorRuntimeFeatures:Object.freeze([
       "academy-kakashi-v2",
       "runtime-ownership-safety-300",
@@ -56,7 +56,14 @@
       "academy-iwabee-rogue-disposition-399",
       "academy-origin-eight-palette-display-names-400",
       "academy-metal-story-graph-route-closure-396",
-      "academy-metal-iwabee-golden-shim-retirement-33500"
+      "academy-metal-iwabee-golden-shim-retirement-33500",
+      "academy-origin-shared-scene-board-bindings-105",
+      "academy-wasabi-writing-golden-343",
+      "academy-wasabi-rogue-genin-battle-343",
+      "academy-wasabi-machine-resolver-adapter-343",
+      "academy-origin-starting-purse-409",
+      "shared-origin-story-presentation-parity-105",
+      "shared-radial-battle-pl-containment-105"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -89,10 +96,10 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-28-AS",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-28-AT",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
-      generationPresent:first.runtimeGeneration==="origin-metal-iwabee-skillnames-400-golden-shim-retirement",
+      generationPresent:first.runtimeGeneration==="origin-presentation-repair-105-wasabi-343",
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)
