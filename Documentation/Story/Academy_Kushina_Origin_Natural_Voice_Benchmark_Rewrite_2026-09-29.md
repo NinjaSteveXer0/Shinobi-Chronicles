@@ -677,7 +677,7 @@ Kushina bristles.
 
 **KUSHINA:** “I knew where it was supposed to go.”
 
-**GEROTORA:** “Apparently not.”
+**GEROTORA:** “Then you guessed wrong.”
 
 Kushina opens her mouth.
 
@@ -697,7 +697,7 @@ Kushina bristles.
 
 **KUSHINA:** “I knew where it was supposed to go.”
 
-**TOAD:** “Apparently not.”
+**TOAD:** “Then you guessed wrong.”
 
 Kushina crosses her arms.
 
