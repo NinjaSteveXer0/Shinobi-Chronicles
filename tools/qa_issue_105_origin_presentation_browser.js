@@ -300,7 +300,7 @@ async function proveMiraiDefeatContinuations(browser){
     }
     const transition=await page.evaluate(()=>globalThis.getStoryHardSceneTransitionState33900?.()||null);
     assert(transition&&transition.reason==="scene_board_authored_hard_cut","Mirai defeat did not invoke shared black wipe");
-    assert.strictEqual(transition.fromBeatId,test.lastBattleLocationBeatId,"Mirai defeat black wipe fired from wrong beat");
+    assert.strictEqual(transition.toBeatId,test.debriefBeatId,"Mirai defeat black wipe did not target the later Checkpoint Three debrief");
     await page.waitForFunction(()=>!globalThis.getStoryHardSceneTransitionState33900?.().active,null,{timeout:3000});
 
     row=await snapshot(page);
