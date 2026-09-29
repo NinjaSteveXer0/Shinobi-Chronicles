@@ -64,9 +64,11 @@ This rule does **not** prohibit specialists from using approved remote GitHub to
 
 Examples:
 
-- Character Creation / Visuals may publish an approved PNG to `visuals/asset-vault` through remote GitHub blob/tree/commit/ref tooling.
 - Writing may commit an approved Story authority document remotely.
 - CE may commit coordination authority remotely.
+- A designated GitHub-capable coordination bridge may publish an approved binary remotely to `visuals/asset-vault`.
+
+Character Creation / Visuals is **not assumed to possess binary GitHub publication capability**. If its active workspace cannot upload the approved PNG remotely, that is a tooling boundary, not a reason to hand Stephen local Git commands.
 
 Those operations do not grant the specialist authority to tell Stephen to switch, pull, push or otherwise reconcile his local working copy.
 
@@ -94,9 +96,11 @@ The dedicated `visuals/asset-vault` workflow remains active.
 
 Character Creation / Visuals must:
 
-- publish the exact approved PNG remotely to `visuals/asset-vault`;
-- create the implementation issue;
-- provide exact path + commit SHA.
+- own visual creation, Stephen approval state, intended permanent path and usage metadata;
+- create/route the asset-vault intake record when the approved binary is ready;
+- never publish by manipulating Stephen's local repository.
+
+If the active CC/V workspace cannot publish binary files remotely, publication passes to the designated **CE / Codex / Coordination remote asset-vault intake bridge**. The bridge publishes the exact approved PNG to `visuals/asset-vault` through remote GitHub tooling, records exact path + commit SHA, and creates/routes the implementation issue.
 
 Character Creation / Visuals must **not** tell Stephen to:
 
@@ -116,8 +120,9 @@ If a non-Coding specialist finds itself about to provide Stephen with a Git/Powe
 
 Instead:
 
-- complete the operation through approved remote GitHub tooling if it is within that specialist's ownership; or
-- route the exact local-workspace dependency to Coding / Runtime.
+- complete the operation through approved remote GitHub tooling if that capability genuinely exists in the active workspace; or
+- for approved visual binary publication, route to the CE / Codex / Coordination remote asset-vault intake bridge; or
+- route an actual local-workspace dependency to Coding / Runtime.
 
 Stephen is never the workaround for missing specialist tooling.
 
