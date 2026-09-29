@@ -167,6 +167,7 @@ assert(golden.includes('actionLabel:"Start PL Battle"')&&golden.includes('C("rev
 assert(binder.includes('if(id==="mir_confront_reveal_01")')&&binder.includes('rows.push(instructor())'),"Mirai post-Battle reveal does not switch Story actor to female instructor");
 assert(miraiBattle.includes('const CONFIG="academy_mirai_origin_disguised_instructor_battle"')&&miraiBattle.includes('const ENCOUNTER="origin_academy_mirai_disguised_instructor_assessment"'),"Mirai #338 config/encounter missing");
 assert(miraiBattle.includes('const CALLERS=Object.freeze([SHORTCUT_CALLER,CONFRONT_CALLER])')&&miraiBattle.includes('const FIXED_VICTORY_RYO=50'),"Mirai #338 callers/reward drift");
+assert((miraiBattle.match(/requiresExplicitPostClaimContinue=false/g)||[]).length===2&&!miraiBattle.includes("requiresExplicitPostClaimContinue=true"),"Mirai redundant post-claim Continue bridge returned");
 assert(miraiBattle.includes('observerPresentation:"male_traveller_escort_disguise"')&&miraiBattle.includes('underlyingIdentity:"female_academy_instructor"'),"Mirai #338 disguise identity separation missing");
 assert(miraiBattle.includes('const BATTLE_PORTRAIT="NPC portrait/mirai_instructor_disguised.png"')&&fs.existsSync("NPC portrait/mirai_instructor_disguised.png"),"Mirai approved disguised-instructor Battle portrait missing");
 assert(index.includes('<script src="runtime/alpha-mirai-origin-battle-338.js"></script>'),"Mirai #338 runtime is not production-loaded");
