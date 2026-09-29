@@ -107,7 +107,10 @@ function patchMirai(){
 }
 
 function patchKushina(){
-  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const def=editable(A.sceneByVariant.academy_kushina);if(!def)return false;
+  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
+  const live=definition(A.sceneByVariant.academy_kushina);
+  if(live&&live.entryBeatId==="kus_practical_01"&&beat(live,"kus_crisis")&&beat(live,"kus_contact_choice")&&beat(live,"kus_route_d_close_08"))return true;
+  const def=editable(A.sceneByVariant.academy_kushina);if(!def)return false;
   text(def,"kus_crisis","The practice formula should have gone dark three strokes ago. Instead, chakra crawls past the boundary line and snaps across the courtyard stone toward the student kneeling beside it. The instructor moves—but Kushina is closer.");
   label(def,"kus_crisis","correct_formula","Fix the formula before it tears itself apart.");
   label(def,"kus_crisis","protect_student","Get the student out first.");
