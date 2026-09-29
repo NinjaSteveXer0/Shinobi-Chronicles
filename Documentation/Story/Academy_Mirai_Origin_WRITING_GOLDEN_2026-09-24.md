@@ -8,6 +8,9 @@
 > **2026-09-29 focused successor:** `Documentation/Story/Academy_Mirai_Origin_Ending_Reflection_Rewrite_2026-09-29.md` @ `89e9c28eeb2a6f0144e04f5ec010ea18dbbc3e4a`.
 >
 > **2026-09-29 Battle-defeat successor:** `Documentation/Story/Academy_Mirai_PL_Battle_Defeat_Assessment_Termination_2026-09-29.md` @ `67d0c83e7bd75b523d4a3b010d36dfd2ab4ff126`.
+>
+> **2026-09-30 shortcut-Battle causality successor:** `Documentation/Story/Academy_Mirai_Shortcut_PL_Battle_Entry_and_Victory_Continuity_Correction_2026-09-30.md` @ `ddcaa21ec5a2e6d730dde37d16e21d93fe4f4631`.
+> The shortcut path may not jump directly from lane-following into Battle. The apparent Traveller must explicitly establish the controlled assessment condition before Battle, and shortcut victory must acknowledge the exchange before Scene 5 resumes.
 > Legitimate PL Battle defeat now **ends the active escort assessment at the Battle location**. Any later Checkpoint Three scene is a post-assessment debrief, not resumed escort gameplay.
 >
 > Scenes 1–8 remain frozen current GOLDEN content. The old universal final-reflection architecture is reopened because some options become factually false on routes where Mirai actually detected/verified the substitution.  
