@@ -90,8 +90,50 @@ assert(!golden.includes("mir_shortcut_follow_blocked"),"Mirai shortcut Battle re
 assert(golden.includes('beatId:"mir_shortcut_battle"')&&golden.includes('beatId:"mir_shortcut_battle_return"')&&golden.includes('MIRAI_SHORTCUT_CALLER="academy_mirai_origin_shortcut_battle"'),"Mirai shortcut #338 caller/return missing");
 assert(golden.includes('beatId:"mir_confront_battle"')&&golden.includes('beatId:"mir_confrontation_battle_return"')&&golden.includes('MIRAI_CONFRONT_CALLER="academy_mirai_origin_confrontation_battle"'),"Mirai confrontation #338 caller/return missing");
 assert(golden.includes('function miraiBattleAuthoredValue(key)')&&golden.includes('miraiBattleAuthoredValue("battleResult")==="defeat"')&&golden.includes('miraiBattleAuthoredValue("battleResult")==="victory"'),"Mirai #338 return routing does not consume the factual Battle result");
-assert(golden.includes('C("defeat","RESOLVE SHORTCUT DEFEAT","mir_shortcut_defeat_01"')&&golden.includes("Mirai's footing gives first.")&&golden.includes('text:"Why did you stop?"')&&golden.includes('text:"Because you did."')&&golden.includes('beatId:"mir_shortcut_defeat_route_router"')&&golden.includes('mir_road_post_defeat_talk_01'),"Mirai shortcut defeat continuation missing or drifted");
-assert(golden.includes('C("defeat","RESOLVE CONFRONTATION DEFEAT","mir_confrontation_defeat_01"')&&golden.includes("Mirai's guard breaks before the Traveller's does.")&&golden.includes('text:"You can\'t keep fighting."')&&golden.includes('text:"I can keep asking."')&&golden.includes('text:"Good."'),"Mirai confrontation defeat continuation missing or drifted");
+assert(
+  golden.includes('C("defeat","RESOLVE SHORTCUT DEFEAT","mir_shortcut_defeat_end_01"')&&
+  golden.includes("Mirai's guard gives first.")&&
+  golden.includes('text:"I\'m not done."')&&
+  golden.includes('text:"The exercise is.')&&
+  golden.includes('text:"Checkpoint Three. Safe."')&&
+  golden.includes('text:"I was supposed to get him there."')&&
+  golden.includes('text:"You were."')&&
+  golden.includes('mir_defeat_debrief_shortcut_01')&&
+  golden.includes('Q("mir_defeat_reflection_shortcut"')&&
+  !golden.includes("mir_shortcut_defeat_route_router")&&
+  !golden.includes("mir_road_post_defeat_talk_01"),
+  "Mirai shortcut defeat assessment-termination lane missing or stale Scene 5 continuation returned"
+);
+assert(
+  golden.includes('C("defeat","RESOLVE CONFRONTATION DEFEAT","mir_confront_defeat_end_01"')&&
+  golden.includes("Mirai's guard breaks before the Traveller's does.")&&
+  golden.includes('text:"You can\'t keep fighting."')&&
+  golden.includes('text:"I can keep asking."')&&
+  golden.includes('text:"Good."')&&
+  golden.includes('text:"Checkpoint Three. Safe."')&&
+  golden.includes('text:"So I was right."')&&
+  golden.includes('text:"About the switch.')&&
+  golden.includes('mir_defeat_debrief_confront_01')&&
+  golden.includes('Q("mir_defeat_reflection_confront"'),
+  "Mirai confrontation defeat assessment-termination lane missing or drifted"
+);
+assert(
+  golden.includes('miraiEscortAssessmentResult:"not_completed_battle_defeat"')&&
+  golden.includes('miraiEscortDutyActive:false')&&
+  golden.includes('miraiReachedCheckpointAsActiveEscort:false')&&
+  golden.includes('scenePurpose:"post_assessment_debrief"')&&
+  golden.includes('"mirai_battle_defeat_assessment_105"')&&
+  golden.includes('personTravellingWithMiraiReachedCheckpointProtected:false'),
+  "Mirai Battle defeat Story result does not terminate escort duty cleanly"
+);
+assert(
+  binder.includes('mir_shortcut_defeat_end_13:"wipe_right_to_left"')&&
+  binder.includes('mir_confront_defeat_end_12:"wipe_right_to_left"')&&
+  binder.includes("LATER — CHECKPOINT THREE")&&
+  binder.includes('id.startsWith("mir_defeat_debrief_")')&&
+  binder.includes('ctx.miraiEscortAssessmentResult==="not_completed_battle_defeat"'),
+  "Mirai defeat black-wipe/debrief/Receipt presentation missing"
+);
 assert(golden.includes('actionLabel:"Start PL Battle"')&&golden.includes('C("reveal","RESOLVE CONFRONTATION RETURN","mir_confront_reveal_01"')&&golden.includes('N("mir_confront_reveal_01","Smoke bursts across the road.')&&golden.includes('"mir_confront_08"'),"Mirai #338 Story CTA/Battle-to-reveal return drift");
 assert(binder.includes('if(id==="mir_confront_reveal_01")')&&binder.includes('rows.push(instructor())'),"Mirai post-Battle reveal does not switch Story actor to female instructor");
 assert(miraiBattle.includes('const CONFIG="academy_mirai_origin_disguised_instructor_battle"')&&miraiBattle.includes('const ENCOUNTER="origin_academy_mirai_disguised_instructor_assessment"'),"Mirai #338 config/encounter missing");
@@ -144,6 +186,6 @@ assert(!game.includes("ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID"),"frozen game
 assert(fingerprint.includes('buildId:"SC-ALPHA-RUNTIME-R303-2026-09-29-AZ"')&&fingerprint.includes('sourceBaselineCommit:"604daa50b3bc274fd6533fdeb8075806e614d30b"'),"#105 repair runtime fingerprint was not advanced from current live-main authority");
 console.log(JSON.stringify({pass:true,issue:105,checks:{
   sevenNonKakashiBindings:true,kakashiExcluded:true,hinataSparringSpeakerAlias:true,hinataFinalPairBound:true,hinataChronicleReceipt:true,miraiMenmaWritingGolden:true,legacyGoldenShimsRetired:true,knownAssetsExact:true,issue419AssetsConsumed:true,wasabiPursuitTargetActorProjection:true,missingAssetsNotGuessed:true,
-  menmaNineTailsDialoguePortrait:true,miraiBattle338:true,miraiTerminalRouterClean:true,miraiMenmaReceipts:true,kushinaBenchmarkWired:true,kushinaChronicleReceipt:true,kushinaGerotoraStaging:true,kushinaLegacyShimsRetired:true,menmaPostBattleSegmented:true,menmaRewardDiagnosticRemoved:true,globalReceiptInputLock:true,globalStartPLBattleCTA:true,loadOrder:true,sharedSceneBoard:true,clickAnywhere:true,
+  menmaNineTailsDialoguePortrait:true,miraiBattle338:true,miraiDefeatAssessmentTermination:true,miraiTerminalRouterClean:true,miraiMenmaReceipts:true,kushinaBenchmarkWired:true,kushinaChronicleReceipt:true,kushinaGerotoraStaging:true,kushinaLegacyShimsRetired:true,menmaPostBattleSegmented:true,menmaRewardDiagnosticRemoved:true,globalReceiptInputLock:true,globalStartPLBattleCTA:true,loadOrder:true,sharedSceneBoard:true,clickAnywhere:true,
   speakerLinkedDialogue:true,globalCyanStoryFrames:true,kakashiFrameParity:true,kakashiTextAndAdvanceParity:true,radialPLContainmentRefresh:true,frozenCorePreserved:true,browserGoldenClaimed:false
 }},null,2));
