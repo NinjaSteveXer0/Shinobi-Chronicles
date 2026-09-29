@@ -696,24 +696,20 @@ async function legitimatePartyDefeat(browser){
     await advanceStorySemanticBeat369(page,"menma_close_01");
     await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_receipt",null,{timeout:12000});
     const receipt=await page.evaluate(()=>{
-      const active=getActiveStorySceneRuntime?.()||null;
-      const direct=typeof getStorySceneDefinition==="function"?getStorySceneDefinition("origin_academy_menma_prologue"):null;
-      const activeDef=typeof getActiveStorySceneDefinition==="function"?getActiveStorySceneDefinition():null;
       const current=typeof getCurrentStorySceneBeat==="function"?getCurrentStorySceneBeat():null;
+      const root=document.getElementById("story-scene-presentation-layer");
       return{
-        activeBeatId:active?.beatId||null,
-        directHasReceipt:direct?.beatMap?.has("menma_receipt")===true,
-        activeHasReceipt:activeDef?.beatMap?.has("menma_receipt")===true,
-        directReceipt:direct?.beatMap?.get("menma_receipt")||null,
-        current,
-        mode:current?.mode||null,
-        text:document.querySelector("#story-scene-presentation-layer .sc-story-text")?.textContent?.trim()||"",
-        heading:document.querySelector("#story-scene-presentation-layer .sc-story-name")?.textContent?.trim()||"",
-        button:document.querySelector("#story-scene-presentation-layer .sc-chronicle-primary")?.textContent?.trim()||""
+        semanticBeatId:current?.beatId||null,
+        semanticExit:current?.exitScene===true,
+        cueKind:root?.dataset.scCueKind||null,
+        text:root?.querySelector(".sc-story-text")?.textContent?.trim()||"",
+        heading:root?.querySelector(".sc-story-name")?.textContent?.trim()||"",
+        button:root?.querySelector(".sc-chronicle-primary")?.textContent?.trim()||""
       };
     });
-    console.log("MENMA_RECEIPT_DEBUG "+JSON.stringify(receipt));
-    assert.strictEqual(receipt.mode,"record","#105 Menma Chronicle Receipt mode missing after #369 defeat return");
+    assert.strictEqual(receipt.semanticBeatId,"menma_receipt","#105 Menma Chronicle Receipt semantic beat missing after #369 defeat return");
+    assert.strictEqual(receipt.semanticExit,true,"#105 Menma Chronicle Receipt lost its terminal semantic boundary");
+    assert.strictEqual(receipt.cueKind,"record","#105 Menma Chronicle Receipt record presentation missing after #369 defeat return");
     assert.strictEqual(receipt.heading,"CHRONICLE RECEIPT","#105 Menma Chronicle Receipt heading missing after #369 defeat return");
     assert(receipt.text.includes("ACADEMY MENMA"),"#105 Menma Chronicle Receipt content missing after #369 defeat return");
     assert.strictEqual(receipt.button,"CONTINUE","#105 Menma Chronicle Receipt dedicated button missing");
