@@ -152,15 +152,20 @@ function patchHinata33500(){
 function patchIzuno33500(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
   const def=editableScene33500(A.sceneByVariant.academy_izuno);if(!def)return false;
-  // #343 native WRITING GOLDEN owns the complete Wasabi expression. The old
-  // 33500 compatibility shim must stand down rather than re-registering the
-  // compressed pre-GOLDEN graph over current authority.
+  // #343 owner-approved complete rewrite v2 owns the complete Wasabi expression.
+  // The old 33500 compatibility shim must stand down rather than re-registering
+  // the compressed pre-v2 graph over current authority.
   const goldenNative=!!(
     beat33500(def,"izu_initial_choice")&&
     beat33500(def,"izu_split_choice")&&
     beat33500(def,"izu_rogue_choice")&&
     beat33500(def,"izu_rogue_step_in_battle")&&
-    beat33500(def,"izu_reflect")
+    beat33500(def,"izu_reflect_river")&&
+    beat33500(def,"izu_reflect_intercept")&&
+    beat33500(def,"izu_reflect_false")&&
+    beat33500(def,"izu_reflect_step_in")&&
+    beat33500(def,"izu_reflect_call_for_help")&&
+    beat33500(def,"izu_reflect_keep_pursuing")
   );
   if(goldenNative)return true;
   const split=beat33500(def,"izu_split"),rogue=beat33500(def,"izu_rogue"),evalBeat=beat33500(def,"izu_eval");
