@@ -5,6 +5,19 @@
 **Status:** **OWNER-DIRECT CORRECTION — BINDING PREVIEW IMPLEMENTATION / MIRAI REMAINS AMBER**  
 **Production Origin:** `academy_mirai`
 
+> **2026-09-30 CAUSAL SUPERSESSION NOTE**
+>
+> Current universal post-Battle reveal authority:
+> `Documentation/Story/Academy_Mirai_PL_Battle_Reveal_Trigger_and_Post_Battle_Causality_2026-09-30.md`
+> @ `bd1ceddb8bc9044911d99cb31034235ac9f91bc3`.
+>
+> Exact shortcut Story:
+> `Documentation/Story/Academy_Mirai_Shortcut_Battle_Attack_Reveal_Exact_Story_2026-09-30.md`
+> @ `c39951560b02d82e5dadb422f4120816ca757b9b`.
+>
+> Preserve this file's defeat-specific depletion/debrief material where compatible.
+> Retire any explanation that the instructor reveals **because Mirai lost**. The Battle occurrence triggers the reveal on both victory and defeat.
+
 ## 1. Owner defect
 
 Stephen's installed-browser review proves the previous defeat continuation is still wrong.
