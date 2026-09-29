@@ -23,7 +23,13 @@ Preserve unchanged:
 - all existing MIR occurrence / Knowledge boundaries;
 - all existing backdrops / participants / Combat / rewards.
 
-Only the **post-checkpoint ending architecture** is rewritten.
+Only the **post-checkpoint ending architecture** is rewritten here.
+
+Battle-defeat continuation is separately governed by:
+`Documentation/Story/Academy_Mirai_PL_Battle_Defeat_Story_Continuations_2026-09-29.md`
+@ `061ca97c325aa330da5a7e177eaaffe3b2bb75cc`.
+
+That successor adds visible defeat scenes for both authorised PL Battle callers without changing this route-aware ending architecture.
 
 Reason:
 
