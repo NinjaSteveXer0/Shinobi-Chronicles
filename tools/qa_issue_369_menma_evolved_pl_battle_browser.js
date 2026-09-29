@@ -695,12 +695,24 @@ async function legitimatePartyDefeat(browser){
     assert.strictEqual(await page.evaluate(()=>getCurrentStorySceneBeat()?.text||null),"Menma runs toward Konoha.\n\nNot back to the morning he left.\n\nForward.");
     await advanceStorySemanticBeat369(page,"menma_close_01");
     await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_receipt",null,{timeout:12000});
-    const receipt=await page.evaluate(()=>({
-      mode:getCurrentStorySceneBeat()?.mode||null,
-      text:document.querySelector("#story-scene-presentation-layer .sc-story-text")?.textContent?.trim()||"",
-      heading:document.querySelector("#story-scene-presentation-layer .sc-story-name")?.textContent?.trim()||"",
-      button:document.querySelector("#story-scene-presentation-layer .sc-chronicle-primary")?.textContent?.trim()||""
-    }));
+    const receipt=await page.evaluate(()=>{
+      const active=getActiveStorySceneRuntime?.()||null;
+      const direct=typeof getStorySceneDefinition==="function"?getStorySceneDefinition("origin_academy_menma_prologue"):null;
+      const activeDef=typeof getActiveStorySceneDefinition==="function"?getActiveStorySceneDefinition():null;
+      const current=typeof getCurrentStorySceneBeat==="function"?getCurrentStorySceneBeat():null;
+      return{
+        activeBeatId:active?.beatId||null,
+        directHasReceipt:direct?.beatMap?.has("menma_receipt")===true,
+        activeHasReceipt:activeDef?.beatMap?.has("menma_receipt")===true,
+        directReceipt:direct?.beatMap?.get("menma_receipt")||null,
+        current,
+        mode:current?.mode||null,
+        text:document.querySelector("#story-scene-presentation-layer .sc-story-text")?.textContent?.trim()||"",
+        heading:document.querySelector("#story-scene-presentation-layer .sc-story-name")?.textContent?.trim()||"",
+        button:document.querySelector("#story-scene-presentation-layer .sc-chronicle-primary")?.textContent?.trim()||""
+      };
+    });
+    console.log("MENMA_RECEIPT_DEBUG "+JSON.stringify(receipt));
     assert.strictEqual(receipt.mode,"record","#105 Menma Chronicle Receipt mode missing after #369 defeat return");
     assert.strictEqual(receipt.heading,"CHRONICLE RECEIPT","#105 Menma Chronicle Receipt heading missing after #369 defeat return");
     assert(receipt.text.includes("ACADEMY MENMA"),"#105 Menma Chronicle Receipt content missing after #369 defeat return");
