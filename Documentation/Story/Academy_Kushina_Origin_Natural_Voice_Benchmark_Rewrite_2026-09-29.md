@@ -201,7 +201,7 @@ Kushina looks away.
 
 **KUSHINA:** “Yeah.”
 
-A beat.
+Kushina looks back at the torn practice line.
 
 **KUSHINA:** “Next time move when I yell.”
 
