@@ -2,8 +2,12 @@
 
 **Date:** 2026-09-29  
 **Owner:** Stephen / Writing — Konoha  
-**Status:** **OWNER-DIRECT EXPANSION — PREVIEW IMPLEMENTATION AUTHORIZED / NOT WRITING GOLDEN UNTIL OWNER BROWSER REVIEW**  
+**Status:** **SUPERSEDED AS COMPLETE STRUCTURAL AUTHORITY — RETAIN PROSE ONLY WHERE COMPATIBLE**  
 **Origin:** `academy_kurenai`
+
+> **2026-09-30 structural successor:** `Documentation/Story/Academy_Kurenai_Origin_Staged_Choice_and_Receipt_Restoration_2026-09-30.md` @ `e7ce02375db5288c50bec9e457cdaa7cc96e6075`.
+>
+> Owner browser review plus source archaeology proved that this expansion preserved a **collapsed one-choice interpretation** of the Bell Test and placed `YOUR CHRONICLE BEGINS` on the wrong side of the Chronicle Receipt. Its opening/aftermath prose may be reused where compatible, but its choice architecture and terminal ordering are superseded.
 
 ## 1. Intent
 
