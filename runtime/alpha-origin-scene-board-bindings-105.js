@@ -27,7 +27,7 @@ const PATH=Object.freeze({
   miraiCheckpointInstructor:"NPC/mirai_checkpoint_instructor.png",
   traveller:"NPC/traveller.png",
   menma:"Assets/Academy Student/academy_menma.png",
-  menmaNineTails:"Portraits/Tailed Beasts/menma_nine_tails.png",
+  menmaNineTails:"Assets/Tailed Beasts/menma_nine_tails.png",
   menmaInstructor:"NPC/menma_instructor.png",
   anko:"Assets/Special Jonin/sj_anko.png",
   altered:"Enemies/test_subject_altered_shinobi.png",
@@ -437,7 +437,7 @@ function diagnostics(){
     kakashiExcluded:!String(installDefinitions).includes("academy_kakashi"),
     knownHinataActors:PATH.hinata&&PATH.hinataInstructor&&PATH.hinataPartner,
     knownMiraiActors:PATH.mirai&&PATH.miraiInstructor&&PATH.traveller,
-    menmaNineTailsPortraitExact:PATH.menmaNineTails==="Portraits/Tailed Beasts/menma_nine_tails.png"&&String(menmaActors).includes("menma_nine_tails"),
+    menmaNineTailsPortraitExact:PATH.menmaNineTails==="Assets/Tailed Beasts/menma_nine_tails.png"&&String(menmaActors).includes("menma_nine_tails"),
     knownMenmaPhysicalActors:[PATH.menma,PATH.menmaInstructor,PATH.anko,PATH.altered].every(Boolean),
     knownKurenaiInstructor:PATH.kurenaiInstructor==="NPC/kurenai_instructor.png",
     issue419ActorPathsResolved:
