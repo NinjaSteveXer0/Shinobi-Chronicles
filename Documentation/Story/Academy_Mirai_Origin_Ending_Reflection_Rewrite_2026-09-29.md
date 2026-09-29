@@ -10,7 +10,7 @@
 This is a focused successor to the existing Mirai WRITING GOLDEN.
 
 Preserve unchanged:
-- Scenes 1–8;
+- Scenes 1–8, **except the shortcut-Battle entry/victory seam now superseded by** `Documentation/Story/Academy_Mirai_Shortcut_PL_Battle_Entry_and_Victory_Continuity_Correction_2026-09-30.md` @ `ddcaa21ec5a2e6d730dde37d16e21d93fe4f4631`;
 - Assignment;
 - real Traveller conversation;
 - covered-market substitution;
