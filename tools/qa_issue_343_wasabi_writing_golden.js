@@ -132,13 +132,18 @@ for(const [prefix,line] of [
   ["izu_rogue_step_in","So let's not waste time."],
   ["izu_rogue_call_help","INSTRUCTOR!"],
   ["izu_intercept","Oh, no. You don't get to leave now!"],
-  ["izu_close","Race you to the corner."],
-  ["izu_close","Finally."]
+  ["izu_close","How long do you think before she asks for a rematch?"],
+  ["izu_close","You know she's right there."],
+  ["izu_close","Tomorrow."],
+  ["izu_close","Then catch me and explain it."],
+  ["izu_close","You two are ridiculous!"],
+  ["izu_close","Then stop walking!"]
 ]) assert(cueTexts(prefix).includes(line),"missing v2 line "+prefix+" :: "+line);
 assert(storyCtx.SC_ACADEMY_WASABI_WRITING_GOLDEN_343.get("eval_rogue_call_help").some(c=>c.text==="You called me in."));
 assert(storyCtx.SC_ACADEMY_WASABI_WRITING_GOLDEN_343.get("eval_rogue_keep_pursuing").some(c=>c.text==="You kept moving."));
 assert(!catalogueSource.includes('"text": "You lost."'),"retired universal loss line returned");
 assert(!catalogueSource.includes("Next time I'm trusting the trail."),"retired universal reflection copy returned");
+assert(!catalogueSource.includes('"text": "Race you to the corner."')&&!catalogueSource.includes('"text": "The exercise is over."'),"retired unexplained Origin Close returned");
 
 // Frozen Story core is preserved. The scoped #343 adapter consumes hidden
 // deterministic resolver beats through existing Story choice authority.

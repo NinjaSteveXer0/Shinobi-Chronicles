@@ -307,6 +307,9 @@ async function finishFromCurrent(page,label,{reflectionBeat,reflection,choices,b
   await shot(page,label,"reflection");
   await choose(page,reflection,"izu_close_1");
   await assertBackdrop(page,BACKDROPS.mainStreet,label+" ORIGIN CLOSE");
+  const closeStart=await info(page);
+  assert.strictEqual(closeStart.text,"Wasabi leaves the training ground and finds the pursuit target walking ahead with one of the Academy students.",label+" Origin Close setup drift");
+  assert(!closeStart.text.includes("The exercise is over."),label+" retired Origin Close leaked");
   await continueTo(page,"izu_receipt");
   const receipt=await info(page);
   assert.strictEqual(receipt.cueKind,"record",label+" Chronicle Receipt presentation mode missing");

@@ -2775,97 +2775,164 @@ const SECTIONS=Object.freeze({
     "cues": [
       {
         "kind": "narration",
-        "text": "Wasabi leaves the training ground at a jog."
+        "text": "Wasabi leaves the training ground and finds the pursuit target walking ahead with one of the Academy students."
       },
       {
         "kind": "narration",
-        "text": "The pursuit target and one of the Academy students are ahead of her."
-      },
-      {
-        "kind": "narration",
-        "text": "The student looks back."
-      },
-      {
-        "kind": "narration",
-        "text": "Immediately regrets it."
-      },
-      {
-        "kind": "dialogue",
-        "speakerName": "ACADEMY STUDENT",
-        "text": "No."
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi speeds up."
-      },
-      {
-        "kind": "dialogue",
-        "speakerName": "ACADEMY STUDENT",
-        "text": "Wasabi."
-      },
-      {
-        "kind": "dialogue",
-        "speakerName": "WASABI",
-        "text": "What?"
-      },
-      {
-        "kind": "dialogue",
-        "speakerName": "ACADEMY STUDENT",
-        "text": "The exercise is over."
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi catches them."
-      },
-      {
-        "kind": "narration",
-        "text": "Runs backward for three steps so she can look at both of them."
-      },
-      {
-        "kind": "dialogue",
-        "speakerName": "WASABI",
-        "text": "Exactly."
+        "text": "The target glances back."
       },
       {
         "kind": "dialogue",
         "speakerName": "TARGET",
-        "text": "That doesn't answer anything."
+        "text": "How long do you think before she asks for a rematch?"
       },
       {
         "kind": "narration",
-        "text": "Wasabi turns forward again."
+        "text": "The Academy student looks over their shoulder."
       },
       {
-        "kind": "dialogue",
-        "speakerName": "WASABI",
-        "text": "Race you to the corner."
+        "kind": "narration",
+        "text": "Wasabi is already close enough to hear them."
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY STUDENT",
-        "text": "I didn't agree to that!"
-      },
-      {
-        "kind": "dialogue",
-        "speakerName": "TARGET",
-        "text": "Too late."
-      },
-      {
-        "kind": "narration",
-        "text": "The target starts running."
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi's grin flashes."
+        "text": "You know she's right there."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Finally."
+        "text": "I heard both of you."
       },
       {
         "kind": "narration",
-        "text": "She takes off after them."
+        "text": "The target turns around and keeps walking backward."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "TARGET",
+        "text": "So?"
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi catches up."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "So what?"
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "TARGET",
+        "text": "Rematch."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi pretends to think about it."
+      },
+      {
+        "kind": "narration",
+        "text": "For almost a whole second."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Tomorrow."
+      },
+      {
+        "kind": "narration",
+        "text": "The Academy student looks surprised."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY STUDENT",
+        "text": "Tomorrow?"
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi points toward the next corner."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "That's tomorrow."
+      },
+      {
+        "kind": "narration",
+        "text": "The target looks at the corner."
+      },
+      {
+        "kind": "narration",
+        "text": "Then at Wasabi."
+      },
+      {
+        "kind": "narration",
+        "text": "A grin starts."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "TARGET",
+        "text": "That's not how tomorrow works."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi takes one step ahead of them."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Then catch me and explain it."
+      },
+      {
+        "kind": "narration",
+        "text": "The target bolts after her."
+      },
+      {
+        "kind": "narration",
+        "text": "The Academy student stares at both of them."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY STUDENT",
+        "text": "You two are ridiculous!"
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi looks back without slowing."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Then stop walking!"
+      },
+      {
+        "kind": "narration",
+        "text": "The student groans."
+      },
+      {
+        "kind": "narration",
+        "text": "Then runs after them."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi faces forward again, grinning."
+      },
+      {
+        "kind": "narration",
+        "text": "No instructor."
+      },
+      {
+        "kind": "narration",
+        "text": "No route marker."
+      },
+      {
+        "kind": "narration",
+        "text": "No extraction line."
+      },
+      {
+        "kind": "narration",
+        "text": "Just one more race through Konoha."
       }
     ]
   },
@@ -2962,7 +3029,7 @@ function diagnostics(){
   falseTrailVoice:get("stronger").some(c=>c.speakerName==="WASABI"&&c.text==="That was good.")&&get("stronger").some(c=>c.speakerName==="WASABI"&&c.text==="Still annoying."),
   rogueDialoguePresent:get("rogue_step_in").some(c=>c.speakerName==="ROGUE GENIN"&&c.text==="And your target?")&&get("rogue_step_in").some(c=>c.speakerName==="WASABI"&&c.text==="So let's not waste time."),
   routeAwareAfter:get("after_river").some(c=>c.speakerName==="TARGET"&&c.text==="Rematch?")&&get("after_false").some(c=>c.text==="Because you're never getting me with the same trick twice."),
-  originCloseExact:get("origin_close").some(c=>c.speakerName==="WASABI"&&c.text==="Race you to the corner.")&&get("origin_close").some(c=>c.speakerName==="WASABI"&&c.text==="Finally.")
+  originCloseExact:get("origin_close").some(c=>c.speakerName==="TARGET"&&c.text==="How long do you think before she asks for a rematch?")&&get("origin_close").some(c=>c.speakerName==="WASABI"&&c.text==="Tomorrow.")&&get("origin_close").some(c=>c.speakerName==="WASABI"&&c.text==="Then catch me and explain it.")&&get("origin_close").some(c=>c.speakerName==="ACADEMY STUDENT"&&c.text==="You two are ridiculous!")&&get("origin_close").some(c=>c.speakerName==="WASABI"&&c.text==="Then stop walking!")
  };
  const failed=Object.entries(checks).filter(([,v])=>v!==true).map(([k])=>k);
  return{pass:failed.length===0,checks,failed,sectionCount:Object.keys(SECTIONS).length,browserGoldenClaimed:false};
