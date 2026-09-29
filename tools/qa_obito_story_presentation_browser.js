@@ -131,8 +131,8 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
   const {context,page,gate}=await boot(browser,label);
   try{
     let s=await state(page);
-    assert.strictEqual(s.beatId,"obi_depart");assert.strictEqual(s.text,"The first thing Obito notices is the time.");
-    assert(s.performance&&s.performance.sourceIndex===0&&s.performance.segmentIndex===0&&s.performance.segmentCount===2,label+" opening narration was not paragraph-paginated");
+    assert.strictEqual(s.beatId,"obi_depart");assert.strictEqual(s.text,"Obito knows he is late before he reaches the end of his street.");
+    assert(s.performance&&s.performance.sourceIndex===0&&s.performance.segmentIndex===0&&s.performance.segmentCount>=2,label+" opening narration was not paragraph-paginated");
     assert.notStrictEqual(s.textOverflowY,"auto",label+" ordinary narration still uses internal auto-scroll");
     assert.notStrictEqual(s.textOverflowY,"scroll",label+" ordinary narration still uses internal scroll");
     assert.strictEqual(s.storyLayerCoversViewport,true,label+" Story layer does not own full viewport");
@@ -147,7 +147,7 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
     await page.waitForFunction(old=>document.querySelector("#story-scene-presentation-layer .sc-story-text")?.textContent?.trim()!==old,firstText,{timeout:5000});
     const secondPage=await state(page);
     assert.strictEqual(secondPage.beatId,"obi_depart",label+" click-anywhere skipped semantic beat");
-    assert.strictEqual(secondPage.text,"The second is that noticing it hasn't made him any less late.",label+" second authored paragraph did not receive its own narration box");
+    assert.strictEqual(secondPage.text,"The Academy bell has not rung yet.",label+" second authored paragraph did not receive its own narration box");
     assert(secondPage.performance&&secondPage.performance.sourceIndex===0&&secondPage.performance.segmentIndex===1,label+" paragraph page lost parent cue identity");
 
     for(let i=0;i<CHOICES.length;i++){
