@@ -26,10 +26,10 @@ Preserve unchanged:
 Only the **post-checkpoint ending architecture** is rewritten here.
 
 Battle-defeat continuation is separately governed by:
-`Documentation/Story/Academy_Mirai_PL_Battle_Defeat_Story_Continuations_2026-09-29.md`
-@ `061ca97c325aa330da5a7e177eaaffe3b2bb75cc`.
+`Documentation/Story/Academy_Mirai_PL_Battle_Defeat_Assessment_Termination_2026-09-29.md`
+@ `67d0c83e7bd75b523d4a3b010d36dfd2ab4ff126`.
 
-That successor adds visible defeat scenes for both authorised PL Battle callers without changing this route-aware ending architecture.
+On Battle defeat, the active escort assessment ends at the Battle location. That successor owns defeat-specific debrief/reflection families and therefore takes precedence over the ordinary post-checkpoint reflection families for defeated routes.
 
 Reason:
 
