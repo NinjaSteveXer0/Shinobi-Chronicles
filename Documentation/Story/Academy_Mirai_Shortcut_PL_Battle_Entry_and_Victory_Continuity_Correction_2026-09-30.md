@@ -171,7 +171,7 @@ New routing:
 `victory`
 -> `mir_shortcut_victory_01`
 -> ...
--> `mir_shortcut_victory_08`
+-> `mir_shortcut_victory_11`
 -> Scene 5 — THE ROAD AFTER.
 
 ## `mir_shortcut_victory_01` — narration
@@ -204,9 +204,27 @@ Then at him.
 
 **TRAVELLER:** “Fair.”
 
-He picks up his bag.
+He reaches for his bag.
 
-## `mir_shortcut_victory_07` — narration
+Mirai does not move.
+
+## `mir_shortcut_victory_07` — dialogue — MIRAI
+
+**MIRAI:** “And the escort?”
+
+## `mir_shortcut_victory_08` — dialogue — TRAVELLER
+
+**TRAVELLER:** “My extra job is finished.”
+
+He settles the bag over one shoulder.
+
+**TRAVELLER:** “Yours isn't. Your instructor told you to get me to Checkpoint Three.”
+
+## `mir_shortcut_victory_09` — dialogue — MIRAI
+
+**MIRAI:** “Then we finish on my route.”
+
+## `mir_shortcut_victory_10` — narration
 
 Mirai walks first this time.
 
@@ -214,13 +232,13 @@ The Traveller follows.
 
 She does not give him the next turn to choose.
 
-## `mir_shortcut_victory_08` — narration
+## `mir_shortcut_victory_11` — narration
 
 They rejoin the checkpoint road beyond the storehouses.
 
 Checkpoint Three is still ahead.
 
-The escort continues.
+Mirai resumes the escort because the assignment is explicitly still active.
 
 ### Return
 
@@ -359,9 +377,10 @@ Fail if:
 - Mirai attacks without understanding why;
 - the Battle itself reveals instructor identity;
 - shortcut victory returns directly to ordinary Scene 5 with no Battle acknowledgement;
+- shortcut victory resumes escort duty without an explicit player-facing statement that the escort assignment is still active;
 - shortcut victory still displays `No attack comes.`;
 - shortcut defeat resumes the escort.
 
 ## Final lock
 
-> **The shortcut Battle must be dramatically caused before it is mechanically launched. The apparent Traveller deliberately tests Mirai because she followed the escort off the marked route; Mirai knows she is entering an assessment exchange, but she still does not know the Traveller is her disguised instructor.**
+> **The shortcut Battle must be dramatically caused before it is mechanically launched. The apparent Traveller deliberately tests Mirai because she followed the escort off the marked route; Mirai knows she is entering an assessment exchange, but she still does not know the Traveller is her disguised instructor. If Mirai wins, the Story must explicitly establish that the combat test is over but her escort assignment remains active before she resumes escort duty.**
