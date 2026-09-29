@@ -29,6 +29,10 @@ const metalActions=[
 metalActions.forEach(id=>assert(metal.includes(id),"missing Metal action "+id));
 assert(metal.includes('stats:Object.freeze({nin:12,tai:16,buki:11,fuin:6,kin:7,gen:8,stamina:15})'));
 assert(metal.includes('pl:15'));
+assert(metal.includes('const BATTLE_PORTRAIT="NPC portrait/metal_classmate_1.png"'));
+assert(metal.includes('const FIXED_VICTORY_RYO=50'));
+assert(metal.includes('const REWARD_SOURCE_ID="metal_origin_controlled_spar_battle_victory_ryo_01"'));
+assert(metal.includes('requiresExplicitPostClaimContinue=false'));
 assert(metal.includes('const START_MAX=13'));
 assert(metal.includes('ratio>0.50?"strong":ratio>=0.25?"mixed":"rough"'));
 assert(metal.includes('makeEnemyRatioGuardAction(id,0.25'));
@@ -83,6 +87,9 @@ assert(story.includes('beatId:"iwa_confront_loss_01"'));
 assert(story.includes('beatId:"met_spar_strong_01"'));
 assert(story.includes('beatId:"met_spar_mixed_01"'));
 assert(story.includes('beatId:"met_spar_rough_01"'));
+assert(story.includes('text:"She believes she has caught Kurenai."'));
+assert(story.includes('"Let the instructor think she caught you"'));
+assert(!story.includes('text:"He believes he has caught Kurenai."'));
 for(const prefix of ["met_redirect","met_impact","met_destroy"]){
   for(const outcome of ["success","partial","failure"])assert(story.includes('beatId:"'+prefix+"_"+outcome+'_01"'),"missing MET-03 outcome "+prefix+" "+outcome);
 }
