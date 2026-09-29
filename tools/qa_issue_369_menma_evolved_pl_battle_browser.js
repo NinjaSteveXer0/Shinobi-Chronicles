@@ -690,9 +690,29 @@ async function legitimatePartyDefeat(browser){
       await clickStoryPrimary(page);
     }
 
-    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_future_terminal",null,{timeout:12000});
-    assert.strictEqual(await page.evaluate(()=>getCurrentStorySceneBeat()?.text||null),"Menma runs toward Konoha.");
-    await page.screenshot({path:path.join(OUT,"party-defeat-future-terminal.png"),fullPage:false,timeout:12000}).catch(()=>{});
+    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_close_01",null,{timeout:12000});
+    assert.strictEqual(await page.evaluate(()=>getCurrentStorySceneBeat()?.text||null),"Menma runs toward Konoha.\n\nNot back to the morning he left.\n\nForward.");
+    await advanceStorySemanticBeat369(page,"menma_close_01");
+    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_receipt",null,{timeout:12000});
+    const receipt=await page.evaluate(()=>{
+      const current=typeof getCurrentStorySceneBeat==="function"?getCurrentStorySceneBeat():null;
+      const root=document.getElementById("story-scene-presentation-layer");
+      return{
+        semanticBeatId:current?.beatId||null,
+        semanticExit:current?.exitScene===true,
+        cueKind:root?.dataset.scCueKind||null,
+        text:root?.querySelector(".sc-story-text")?.textContent?.trim()||"",
+        heading:root?.querySelector(".sc-story-name")?.textContent?.trim()||"",
+        button:root?.querySelector(".sc-chronicle-primary")?.textContent?.trim()||""
+      };
+    });
+    assert.strictEqual(receipt.semanticBeatId,"menma_receipt","#105 Menma Chronicle Receipt semantic beat missing after #369 defeat return");
+    assert.strictEqual(receipt.semanticExit,true,"#105 Menma Chronicle Receipt lost its terminal semantic boundary");
+    assert.strictEqual(receipt.cueKind,"record","#105 Menma Chronicle Receipt record presentation missing after #369 defeat return");
+    assert.strictEqual(receipt.heading,"CHRONICLE RECEIPT","#105 Menma Chronicle Receipt heading missing after #369 defeat return");
+    assert(receipt.text.includes("ACADEMY MENMA"),"#105 Menma Chronicle Receipt content missing after #369 defeat return");
+    assert.strictEqual(receipt.button,"CONTINUE","#105 Menma Chronicle Receipt dedicated button missing");
+    await page.screenshot({path:path.join(OUT,"party-defeat-future-receipt.png"),fullPage:false,timeout:12000}).catch(()=>{});
     await clickStoryPrimary(page);
     await page.waitForFunction(()=>getActiveStorySceneRuntime()===null&&getAcademyTeamFormationSnapshot()?.required===true,null,{timeout:12000});
     const completion=await page.evaluate(()=>({
