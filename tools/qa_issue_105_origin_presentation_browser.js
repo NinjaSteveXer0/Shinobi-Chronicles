@@ -93,8 +93,22 @@ async function reloadAtExactBeat(page,beatId){
 
 async function proveMiraiBattle338(browser){
   const cases=[
-    {beatId:"mir_shortcut_battle",callerId:"academy_mirai_origin_shortcut_battle",returnBeatId:"mir_shortcut_battle_return"},
-    {beatId:"mir_confront_battle",callerId:"academy_mirai_origin_confrontation_battle",returnBeatId:"mir_confrontation_battle_return"}
+    {
+      kind:"shortcut",
+      startBeatId:"mir_shortcut_battle_pre_01",
+      battleBeatId:"mir_shortcut_battle",
+      callerId:"academy_mirai_origin_shortcut_battle",
+      victoryBeatId:"mir_shortcut_victory_01",
+      defeatBeatId:"mir_shortcut_defeat_end_01"
+    },
+    {
+      kind:"confrontation",
+      startBeatId:"mir_confront_battle",
+      battleBeatId:"mir_confront_battle",
+      callerId:"academy_mirai_origin_confrontation_battle",
+      victoryBeatId:"mir_confront_reveal_01",
+      defeatBeatId:"mir_confront_defeat_end_01"
+    }
   ];
   const receipts=[];
   for(const test of cases){
@@ -106,17 +120,36 @@ async function proveMiraiBattle338(browser){
     const setup=await page.evaluate(beatId=>{
       const select=selectChronicleOrigin("academy_mirai","issue_105_mirai_338");
       const launch=beginAlphaChronicleOriginPrologue();
+      const rt=globalThis.getActiveStorySceneRuntime?.();
+      if(rt&&String(beatId).startsWith("mir_shortcut_")){
+        rt.localContext=rt.localContext&&typeof rt.localContext==="object"?rt.localContext:{};
+        rt.localContext.mirTalked=true;
+        rt.localContext.mirShortcut="follow";
+      }
       const jump=globalThis.setStorySceneBeat?.(beatId);
       return{select,launch,jump};
-    },test.beatId);
+    },test.startBeatId);
     assert.strictEqual(setup.select?.success,true,"Mirai #338 select failed "+JSON.stringify(setup));
     assert.strictEqual(setup.launch?.success,true,"Mirai #338 Story launch failed "+JSON.stringify(setup));
     assert.strictEqual(setup.jump?.success,true,"Mirai #338 test beat unavailable "+JSON.stringify(setup));
     await release(page);
-    await page.waitForFunction(beatId=>globalThis.getActiveStorySceneRuntime?.()?.beatId===beatId,test.beatId,{timeout:8000});
+
+    if(test.kind==="shortcut"){
+      const buildup=await advanceUntilBeat(page,test.battleBeatId,100);
+      const buildupText=buildup.seen.map(x=>x.text).join("\n");
+      for(const line of [
+        "Because you followed me.",
+        "Your instructor gave me one extra job.",
+        "See what you do if the person you're escorting stops cooperating.",
+        "This is part of the assessment.",
+        "Then stop me."
+      ])assert(buildupText.includes(line),"Mirai shortcut pre-Battle causality line missing: "+line);
+    }
+    await page.waitForFunction(beatId=>globalThis.getActiveStorySceneRuntime?.()?.beatId===beatId,test.battleBeatId,{timeout:8000});
     const pre=await snapshot(page);
     assert.strictEqual(pre.mode,"battle_transition","Mirai #338 seam is not a Battle transition");
     assert.strictEqual(pre.primary,"Start PL Battle","Mirai #338 CTA drifted");
+
     const launched=await page.evaluate(()=>globalThis.launchStorySceneBattle?.());
     assert.strictEqual(launched?.success,true,"Mirai #338 Battle launch failed "+JSON.stringify(launched));
     const state=await page.evaluate(()=> {
@@ -126,8 +159,8 @@ async function proveMiraiBattle338(browser){
       const meta=typeof currentBattle==="object"&&currentBattle?currentBattle.mirai338:null;
       const rc=typeof currentBattle==="object"&&currentBattle?currentBattle.returnContext:null;
       return{
-        config:typeof currentBattle==="object"&&currentBattle?currentBattle.battleConfigId||null:null,
-        encounter:typeof currentBattle==="object"&&currentBattle?currentBattle.encounterId||null:null,
+        config:currentBattle?.battleConfigId||null,
+        encounter:currentBattle?.encounterId||null,
         playerId:player?.id||null,
         enemyId:enemy?.id||null,
         enemyName:profile?.name||null,
@@ -155,14 +188,48 @@ async function proveMiraiBattle338(browser){
     assert.strictEqual(state.observerPresentation,"male_traveller_escort_disguise","Mirai #338 disguise presentation drift");
     assert.strictEqual(state.underlyingIdentity,"female_academy_instructor","Mirai #338 underlying identity drift");
     assert.strictEqual(state.identityRevealedByBattle,false,"Mirai #338 Battle revealed hidden identity");
-    assert.strictEqual(state.sourceBeatId,test.beatId,"Mirai #338 return source drift");
-    assert.strictEqual(state.victoryBeatId,test.returnBeatId,"Mirai #338 victory return drift");
-    assert.strictEqual(state.defeatBeatId,test.returnBeatId,"Mirai #338 defeat return drift");
-    await gate.assertClean("academy_mirai-338-"+test.beatId);
-    receipts.push({beatId:test.beatId,callerId:state.callerId,returnBeatId:test.returnBeatId});
+    assert.strictEqual(state.sourceBeatId,test.battleBeatId,"Mirai #338 return source drift");
+    assert.strictEqual(state.victoryBeatId,test.victoryBeatId,"Mirai #338 victory direct return drift");
+    assert.strictEqual(state.defeatBeatId,test.defeatBeatId,"Mirai #338 defeat direct return drift");
+
+    if(test.kind==="shortcut"){
+      const rewardPresentation=await page.evaluate(()=>{
+        currentBattle.outcome={type:"victory"};
+        currentBattle.rewards={
+          generated:true,claimed:false,ryo:50,exp:0,items:[],rareDrops:[],
+          mirai338FixedReward:true,
+          requiresExplicitPostClaimContinue:false
+        };
+        const host=document.createElement("div");
+        host.innerHTML='<span class="victory-ryo-number">50</span><span class="victory-exp-number">0</span>';
+        const result=globalThis.runVictoryRevealAnimations?.(host,currentBattle.rewards);
+        return{
+          result,
+          ryo:host.querySelector(".victory-ryo-number")?.textContent||"",
+          animated:host.querySelector(".victory-ryo-number")?.dataset.rewardAnimated||""
+        };
+      });
+      assert.strictEqual(rewardPresentation.ryo,"50","Mirai Victory Ryō did not remain static at 50");
+      assert.strictEqual(rewardPresentation.animated,"false","Mirai Victory Ryō still advertises animation");
+      assert.strictEqual(rewardPresentation.result?.animated,false,"Mirai Victory reveal still animates fixed 50 Ryō");
+
+      await page.evaluate(beatId=>globalThis.setStorySceneBeat?.(beatId),test.victoryBeatId);
+      await release(page);
+      const winReturn=await snapshot(page);
+      assert.strictEqual(winReturn.beatId,"mir_shortcut_victory_01","Mirai shortcut victory did not enter authored post-Battle Story directly");
+      assert.strictEqual(winReturn.text,"The Traveller is the first to lower his guard.","Mirai shortcut victory continuity opening drift");
+      assert.notStrictEqual(winReturn.primary,"CONTINUE","Mirai win still exposes redundant post-Battle CONTINUE");
+      const road=await advanceUntilBeat(page,"mir_road_talk_memory_01",100);
+      const postBattleText=road.seen.map(x=>x.text).join("\n");
+      assert(postBattleText.includes("We're done with your route.")&&postBattleText.includes("The escort continues."),"Mirai shortcut victory bridge missing");
+      assert(!postBattleText.includes("No attack comes."),"Mirai shortcut victory still denies the Battle with 'No attack comes.'");
+    }
+
+    await gate.assertClean("academy_mirai-338-"+test.kind);
+    receipts.push({kind:test.kind,callerId:state.callerId,victoryBeatId:test.victoryBeatId,defeatBeatId:test.defeatBeatId});
     await context.close();
   }
-  return{cases:receipts,strictOneVsOne:true,observerSafeDisguise:true};
+  return{cases:receipts,strictOneVsOne:true,observerSafeDisguise:true,staticRyo50:true,directPostBattleReturns:true,shortcutBuildup:true};
 }
 
 
@@ -170,7 +237,6 @@ async function proveMiraiDefeatContinuations(browser){
   const cases=[
     {
       kind:"shortcut",
-      returnBeatId:"mir_shortcut_battle_return",
       firstBeatId:"mir_shortcut_defeat_end_01",
       lastBattleLocationBeatId:"mir_shortcut_defeat_end_13",
       debriefBeatId:"mir_defeat_debrief_shortcut_01",
@@ -179,7 +245,6 @@ async function proveMiraiDefeatContinuations(browser){
     },
     {
       kind:"confrontation",
-      returnBeatId:"mir_confrontation_battle_return",
       firstBeatId:"mir_confront_defeat_end_01",
       lastBattleLocationBeatId:"mir_confront_defeat_end_12",
       debriefBeatId:"mir_defeat_debrief_confront_01",
@@ -214,7 +279,7 @@ async function proveMiraiDefeatContinuations(browser){
           identityRevealedByBattle:false
         }};
       }
-      const jump=globalThis.setStorySceneBeat?.(spec.returnBeatId);
+      const jump=globalThis.setStorySceneBeat?.(spec.firstBeatId);
       const after=globalThis.getActiveStorySceneRuntime?.();
       const occ=globalThis.SC_ALPHA_ORIGIN_32900?.findOccurrence?.("occ_origin_mirai_checkpoint_escort_resolution")||null;
       return{
@@ -226,8 +291,8 @@ async function proveMiraiDefeatContinuations(browser){
     },test);
     assert.strictEqual(setup.select?.success,true,"Mirai defeat proof select failed "+JSON.stringify(setup));
     assert.strictEqual(setup.launch?.success,true,"Mirai defeat proof launch failed "+JSON.stringify(setup));
-    assert.strictEqual(setup.jump?.success,true,"Mirai defeat return resolver failed "+JSON.stringify(setup));
-    assert.strictEqual(setup.beatId,test.firstBeatId,"Mirai defeat resolver selected wrong beat "+JSON.stringify(setup));
+    assert.strictEqual(setup.jump?.success,true,"Mirai direct defeat Story return failed "+JSON.stringify(setup));
+    assert.strictEqual(setup.beatId,test.firstBeatId,"Mirai defeat did not land directly on authored defeat Story "+JSON.stringify(setup));
     assert.strictEqual(setup.local.miraiEscortAssessmentResult,"not_completed_battle_defeat","Mirai defeat did not record assessment failure");
     assert.strictEqual(setup.local.miraiEscortDutyActive,false,"Mirai defeat left escort duty active");
     assert.strictEqual(setup.local.miraiReachedCheckpointAsActiveEscort,false,"Mirai defeat falsely records active-escort checkpoint arrival");
@@ -242,6 +307,7 @@ async function proveMiraiDefeatContinuations(browser){
     assert.strictEqual(releasedBeatId,test.firstBeatId,"Mirai defeat beat changed during presentation release "+JSON.stringify({setup,releasedBeatId}));
     let row=await snapshot(page);
     assert.strictEqual(row.beatId,test.firstBeatId,"Mirai defeat did not enter authored assessment-termination cutscene");
+    assert.notStrictEqual(row.primary,"CONTINUE","Mirai loss still exposes redundant post-Battle CONTINUE");
 
     if(test.kind==="shortcut"){
       assert.strictEqual(row.text,"Mirai's guard gives first.","Mirai shortcut defeat opening drift");
