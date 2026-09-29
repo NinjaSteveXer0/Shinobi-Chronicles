@@ -45,6 +45,8 @@ assert(sceneB.includes('entryBeatId:"kus_practical_01"')&&sceneB.includes('C("pr
 assert(sceneB.includes('occ_origin_kushina_residual_seal_work_resolution')&&sceneB.includes('occ_origin_kushina_gerotora_first_contact')&&sceneB.includes('occ_origin_kushina_joint_residual_seal_closure'),"Kushina occurrence boundaries drifted");
 assert(golden.includes('const oldTutorial=cloneBeat(oldMenmaBeat("tutorial_battle"))')&&golden.includes('victoryBeatId:"menma_after_01"'),"Menma evolved Battle seam was not preserved into GOLDEN Story");
 assert(shim335.includes('beat33500(def,"mir_assignment_01")')&&shim336.includes('beat(def,"mir_assignment_01")'),"legacy Mirai expression shims do not stand down for GOLDEN graph");
+assert(shim335.includes('beat33500(def,"mir_reflection_router")')&&shim336.includes('beat(def,"mir_reflection_router")')&&shim337.includes('beat(d,"mir_reflection_router")'),"legacy Mirai shims do not recognise the route-aware GOLDEN ending");
+assert(shim335.includes('beat33500(def,"mir_reflection_missed")')&&shim336.includes('beat(def,"mir_reflection_missed")')&&shim337.includes('beat(d,"mir_reflection_missed")'),"legacy Mirai shim retirement is not pinned to all route-aware ending families");
 assert(shim337.includes('beat(d,"mir_assignment_01")')&&shim337.includes('d.entryBeatId==="menma_open_01"'),"33700 stale Mirai/Menma shims do not stand down for GOLDEN graph");
 assert(binder.includes('id.startsWith("mir_assignment_")')&&binder.includes('id.startsWith("mir_market_")')&&binder.includes('id.startsWith("mir_checkpoint_")'),"Mirai GOLDEN backdrop families are not bound");
 assert(binder.includes('rows.push(instructor(),traveller())')&&binder.includes('id.startsWith("mir_confront_")'),"Mirai GOLDEN actor/disguise projection missing");
