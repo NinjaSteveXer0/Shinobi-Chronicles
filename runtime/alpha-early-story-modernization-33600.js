@@ -120,7 +120,10 @@ function patchKushina(){
 }
 
 function patchKurenai(){
-  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const def=editable(A.sceneByVariant.academy_kurenai);if(!def)return false;
+  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
+  const live=A.sceneDefinitions&&A.sceneDefinitions[A.sceneByVariant.academy_kurenai];
+  if(live&&live.entryBeatId==="kur_pre_01"&&beat(live,"kur_approach")&&beat(live,"kur_leave_router"))return true;
+  const def=editable(A.sceneByVariant.academy_kurenai);if(!def)return false;
   text(def,"kur_bell","A brass bell hangs from the instructor's belt. No weapons. No spectators. One rule. “Take it.”");
   text(def,"kur_layer1","Kurenai watches the instructor's eyes instead of the bell. If he believes the first lie, the second one will not need to be bigger—only better placed.");
   label(def,"kur_layer1","false_kurenai","Give him a Kurenai he can see.");
