@@ -17,6 +17,7 @@ const catalogueSource=fs.readFileSync(CATALOGUE,"utf8");
 const battleSource=fs.readFileSync(BATTLE,"utf8");
 const coreSource=fs.readFileSync(CORE,"utf8");
 const resolverSource=fs.readFileSync(RESOLVER,"utf8");
+const boardSource=fs.readFileSync("runtime/alpha-story-scene-board-33900.js","utf8");
 const purseSource=fs.readFileSync(PURSE,"utf8");
 const doc=fs.readFileSync(DOC,"utf8");
 
@@ -153,6 +154,7 @@ assert(resolverSource.includes('available.length!==1')&&resolverSource.includes(
 assert(resolverSource.includes("applyStorySceneChoice(available[0].choiceId)"),"machine resolver bypasses existing Story choice authority");
 assert(resolverSource.includes("story_machine_resolver_player_choice_forbidden"),"machine resolver accepts player-forced internal branch");
 assert(resolverSource.includes("render:false"),"machine resolver can render its hidden branch surface");
+assert(boardSource.includes("function resolveMachineStoryChain33900(limit=8)")&&boardSource.includes('beat.machineResolved===true')&&boardSource.includes("globalThis.resolveMachineStoryBeat343"),"Scene Board does not consume hidden #343 resolver chains before exposing terminal narration");
 assert(!resolverSource.slice(resolverSource.indexOf("function resolveMachineStoryBeat343()"),resolverSource.indexOf("globalThis.resolveMachineStoryBeat343")).includes(".label"),"machine resolver infers semantics from labels");
 assert(!coreSource.includes("function resolveMachineStorySceneBeat()"),"frozen game.js was reopened for #343 machine resolver");
 

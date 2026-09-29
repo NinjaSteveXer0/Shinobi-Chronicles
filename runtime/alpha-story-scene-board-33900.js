@@ -679,10 +679,23 @@ function performSceneCut(){
   });
 }
 const PRE_ADVANCE=typeof advanceStoryScene==="function"?advanceStoryScene:null;
+function resolveMachineStoryChain33900(limit=8){
+  let result=null;
+  for(let i=0;i<limit;i+=1){
+    const runtime=currentRuntime(),beat=currentBeat(runtime);
+    if(!runtime||!beat||beat.machineResolved!==true)return result;
+    if(typeof globalThis.resolveMachineStoryBeat343!=="function")return{success:false,reason:"story_machine_resolver_343_missing"};
+    result=globalThis.resolveMachineStoryBeat343();
+    if(!result||result.success!==true)return result||{success:false,reason:"story_machine_resolver_343_no_result"};
+  }
+  return{success:false,reason:"story_machine_resolver_343_chain_guard"};
+}
 function advanceStoryScene33900(choiceId=null){
   if(!PRE_ADVANCE)return{success:false,reason:"story_advance_authority_missing"};
   if(choiceId!==null&&choiceId!==undefined)return PRE_ADVANCE.apply(this,arguments);
-  const runtime=currentRuntime(),beat=currentBeat(runtime),p=performanceCursor(runtime,beat);
+  const runtime=currentRuntime(),beat=currentBeat(runtime);
+  if(beat&&beat.machineResolved===true)return resolveMachineStoryChain33900();
+  const p=performanceCursor(runtime,beat);
   if(!runtime||!beat||!p)return PRE_ADVANCE.apply(this,arguments);
   if(getStoryHardSceneTransitionState33900().active)return{success:false,reason:"story_scene_transition_in_progress"};
   if(!p.atEnd){persistPerformanceCursor(runtime,beat,p.index+1);renderStorySceneBoard33900();return{success:true,type:"story_performance_cue_advanced",beatId:beat.beatId,cueIndex:p.index+1,semanticBeatUnchanged:true};}
@@ -691,6 +704,10 @@ function advanceStoryScene33900(choiceId=null){
   // #312: semantic Story advancement commits first. Choreography may illustrate
   // that committed transition afterwards, but animation completion never owns it.
   const result=PRE_ADVANCE.apply(this,arguments);
+  if(result&&result.success===true){
+    const machineResult=resolveMachineStoryChain33900();
+    if(machineResult&&machineResult.success===false)return machineResult;
+  }
   if(result&&result.success===true&&transition==="wipe_right_to_left")performSceneCut();
   return result;
 }
