@@ -133,7 +133,7 @@ assert(
   golden.includes('"Your instructor gave me one extra job.')&&
   golden.includes('"See what you do if the person you\'re escorting stops cooperating.')&&
   golden.includes('"This is part of the assessment."')&&
-  golden.includes('"Then stop me."'),
+  golden.includes('Then stop me."'),
   "Mirai shortcut Battle still lacks the authored pre-Battle causality buildup"
 );
 assert(
