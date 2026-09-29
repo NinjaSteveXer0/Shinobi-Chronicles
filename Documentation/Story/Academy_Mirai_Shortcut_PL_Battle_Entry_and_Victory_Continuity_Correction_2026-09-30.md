@@ -5,6 +5,26 @@
 **Status:** **OWNER BROWSER-DEFECT CORRECTION — BINDING PREVIEW IMPLEMENTATION / FINAL MIRAI WRITING RED FLAG**  
 **Production Origin:** `academy_mirai`
 
+> **SUPERSESSION NOTE — 2026-09-30 — BATTLE-TRIGGERED REVEAL**
+>
+> Stephen directly corrected this document's pre-Battle explanation and shortcut-victory concealment logic.
+>
+> Current successor:
+> `Documentation/Story/Academy_Mirai_PL_Battle_Reveal_Trigger_and_Post_Battle_Causality_2026-09-30.md`
+> @ `bd1ceddb8bc9044911d99cb31034235ac9f91bc3`
+>
+> The following rules in this file are **RETIRED**:
+> - `Your instructor gave me one extra job.`
+> - advance explanation that the apparent Traveller is an authorised assessment participant;
+> - Mirai calmly knowing before Battle that this is a controlled assessment exchange;
+> - shortcut victory preserving the disguise;
+> - shortcut victory resuming ordinary escort duty with the substitute.
+>
+> Current law:
+> **apparent Traveller attacks Mirai -> Mirai knows something is wrong -> PL Battle -> instructor reveals after Battle whether Mirai wins or loses.**
+>
+> This file remains useful only for route/backdrop/history context not contradicted by the successor.
+
 ## 1. Owner defect
 
 Stephen's installed-browser review found the last remaining Mirai Writing red flag:
