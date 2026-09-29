@@ -283,28 +283,190 @@ const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A)
   ],onCompleteConsequences:[X("academy_kushina",[seal,identity,cause,joint,contact])]});
 })();
 
-// Kurenai — text-choice Bell Test / Battle of Illusions. No Battle runtime.
+// Kurenai — benchmark Bell Test core + owner-approved expansion. No Battle runtime.
 (()=>{
   const bell="occ_origin_kurenai_bell_test_resolution",scene=A.sceneByVariant.academy_kurenai;
+  const courtyard=Object.freeze({environmentId:"konoha_academy_courtyard_day"});
+  const courtyardBackdrop="Scene backdrops/academy_training_ground_courtyard.png";
+  try{
+    const registerBackdrop=typeof registerSceneBackdropAssetPath==="function"
+      ?registerSceneBackdropAssetPath
+      :(typeof globalThis.registerSceneBackdropAssetPath==="function"?globalThis.registerSceneBackdropAssetPath:null);
+    if(registerBackdrop)registerBackdrop(courtyard.environmentId,courtyardBackdrop);
+  }catch(_error){}
   const result=R("kurenai_bell_result_32900","academy_kurenai",bell,
     ctx=>({bellTestOutcomeClass:ctx.kurenaiOutcome||"complete_loss",deceptionRoute:ctx.kurenaiRoute||null}),
     ctx=>(ctx.kurenaiOutcome||"complete_loss")==="complete_loss"?["KUR-01"]:["KUR-02"]);
-  A.register({sceneId:scene,eventId:scene,title:"ACADEMY KURENAI",entryBeatId:"kur_bell",participants:[],beats:[
-    {beatId:"kur_bell",mode:"dialogue",speakerName:"INSTRUCTOR",text:"Take the bell.",nextBeatId:"kur_layer1"},
-    {beatId:"kur_layer1",mode:"choice",text:"Choose the first deception layer.",choices:[
-      C("false_kurenai","False Kurenai","kur_loss_attack",{kurenaiRoute:"false_kurenai"}),
-      C("conceal_movement","Conceal real movement","kur_partial_loss_2",{kurenaiRoute:"conceal_movement"}),
-      C("distort_position","Distort distance / position","kur_partial_win_2",{kurenaiRoute:"distort_position"}),
-      C("fake_clumsy","Fake a clumsy / direct approach","kur_complete_2",{kurenaiRoute:"fake_clumsy"})]},
-    {beatId:"kur_loss_attack",mode:"choice",text:"The instructor reacts to the false image.",choices:[C("rush_bell","Rush the bell","kur_result",{kurenaiOutcome:"complete_loss"})]},
-    {beatId:"kur_partial_loss_2",mode:"choice",text:"The real movement stays concealed.",choices:[C("draw_attention","Draw attention away","kur_partial_loss_3")]},
-    {beatId:"kur_partial_loss_3",mode:"choice",text:"A bell appears reachable.",choices:[C("take_bell_now","Take the bell now","kur_result",{kurenaiOutcome:"partial_loss"})]},
-    {beatId:"kur_partial_win_2",mode:"choice",text:"Distance itself becomes unreliable.",choices:[C("rush_bell","Rush the bell","kur_partial_win_3")]},
-    {beatId:"kur_partial_win_3",mode:"choice",text:"The instructor begins to dismiss the attempt.",choices:[C("pretend_withdraw","Pretend to withdraw","kur_result",{kurenaiOutcome:"partial_win"})]},
-    {beatId:"kur_complete_2",mode:"choice",text:"The instructor believes the clumsy approach is real.",choices:[C("rush_bell","Rush the bell","kur_complete_3")]},
-    {beatId:"kur_complete_3",mode:"choice",text:"She believes she has caught Kurenai.",choices:[C("let_him_think_caught","Let the instructor think she caught you","kur_result",{kurenaiOutcome:"complete_win"})]},
-    {beatId:"kur_result",mode:"narration",text:"The illusion layers resolve from the committed deception sequence. No personality or alignment label is assigned.",onEnterConsequences:[result],nextBeatId:"kur_lesson"},
-    {beatId:"kur_lesson",mode:"dialogue",speakerName:"INSTRUCTOR",text:"I was assessing what you believed in, to separate the reality from illusion and the truth from fiction.",exitScene:true}
+  const N=(beatId,text,nextBeatId,extra={})=>({beatId,mode:"narration",environmentRef:courtyard,text,...(nextBeatId?{nextBeatId}:{}),...extra});
+  const D=(beatId,speakerName,text,nextBeatId,extra={})=>({beatId,mode:"dialogue",speakerName,environmentRef:courtyard,text,...(nextBeatId?{nextBeatId}:{}),...extra});
+  const Q=(beatId,text,choices)=>({beatId,mode:"choice",environmentRef:courtyard,text,choices});
+  const hidden=predicate=>()=>({available:!!predicate(),knownBlocker:null});
+
+  A.register({sceneId:scene,eventId:scene,title:"ACADEMY KURENAI",entryBeatId:"kur_pre_01",participants:[],beats:[
+    N("kur_pre_01","Most of the Academy has already emptied out.\n\nKurenai is still in the training courtyard.\n\nThe instructor is putting away practice markers near the far wall.\n\nA small bell hangs from one hand.\n\nKurenai notices it before the instructor notices her watching.","kur_pre_02"),
+    D("kur_pre_02","INSTRUCTOR","You can go home.","kur_pre_03"),
+    D("kur_pre_03","KURENAI","You said there might be another exercise.","kur_pre_04"),
+    N("kur_pre_04","The instructor looks at Kurenai.","kur_pre_04b"),
+    D("kur_pre_04b","INSTRUCTOR","I said there might be.","kur_pre_05"),
+    N("kur_pre_05","Kurenai looks at the bell.","kur_pre_05b"),
+    D("kur_pre_05b","KURENAI","And now you're holding that.","kur_pre_06"),
+    N("kur_pre_06","The instructor glances down at it.","kur_pre_06b"),
+    D("kur_pre_06b","INSTRUCTOR","You think the bell is the exercise?","kur_pre_07"),
+    D("kur_pre_07","KURENAI","I think you want me looking at it.","kur_pre_08"),
+    N("kur_pre_08","The instructor studies her for a moment.\n\nKurenai waits.\n\nShe does not ask if she is right.\n\nThe instructor finishes putting away the last marker.\n\nThen turns back toward the middle of the courtyard.","kur_pre_09"),
+    D("kur_pre_09","INSTRUCTOR","Come here.","kur_pre_10"),
+    N("kur_pre_10","Kurenai follows.\n\nThe instructor raises the bell between two fingers.\n\nIt barely moves.\n\nKurenai watches the bell first.\n\nThen the instructor's hand.\n\nThen her feet.","kur_open_02"),
+
+    D("kur_open_02","INSTRUCTOR","Take it.","kur_open_03"),
+    D("kur_open_03","KURENAI","That's all?","kur_open_04"),
+    D("kur_open_04","INSTRUCTOR","If you need more instructions, you may already have a problem.","kur_approach"),
+    Q("kur_approach","",[
+      C("false_kurenai","SEND A FALSE KURENAI","kur_false_01",{kurenaiRoute:"false_kurenai",kurenaiOutcome:"complete_loss"}),
+      C("conceal_movement","HIDE MY REAL MOVEMENT","kur_conceal_01",{kurenaiRoute:"conceal_movement",kurenaiOutcome:"partial_loss"}),
+      C("distort_position","DISTORT HER SENSE OF DISTANCE","kur_distance_01",{kurenaiRoute:"distort_position",kurenaiOutcome:"partial_win"}),
+      C("fake_clumsy","MAKE THE DIRECT APPROACH LOOK REAL","kur_complete_01",{kurenaiRoute:"fake_clumsy",kurenaiOutcome:"complete_win"})
+    ]),
+
+    N("kur_false_01","Kurenai moves first without moving at all.\n\nA second Kurenai breaks toward the bell.","kur_false_02"),
+    N("kur_false_02","The instructor does not follow it.\n\nHer eyes stay on the patch of empty ground where the real Kurenai thought she had disappeared.","kur_false_03"),
+    D("kur_false_03","INSTRUCTOR","Too early.","kur_false_04"),
+    N("kur_false_04","The false Kurenai reaches for the bell and comes apart before her fingers close.\n\nThe instructor turns just enough to meet the real approach waiting behind it.\n\nKurenai stops.\n\nThe bell never changes hands.","kur_eval_loss_01"),
+
+    N("kur_conceal_01","Kurenai leaves the instructor something obvious to watch.\n\nHer real movement goes the other way.","kur_conceal_02"),
+    N("kur_conceal_02","The instructor turns toward the distraction exactly when Kurenai wants her to.\n\nBy the time she looks back, Kurenai is behind her.\n\nThe bell jingles beside the instructor's ear.","kur_conceal_03"),
+    D("kur_conceal_03","KURENAI","Looking for this?","kur_conceal_04"),
+    N("kur_conceal_04","The instructor glances toward the bell in Kurenai's hand.\n\nThen smiles.\n\nThe sound cuts out.\n\nKurenai looks down.\n\nHer hand is empty.\n\nThe real bell is still hanging from the instructor's fingers.","kur_conceal_05"),
+    D("kur_conceal_05","INSTRUCTOR","Better.","kur_conceal_06"),
+    N("kur_conceal_06","That makes it worse.","kur_eval_partial_loss_01"),
+
+    N("kur_distance_01","Kurenai gives the instructor the correct direction and the wrong distance.\n\nEvery step toward her lands a little shorter than it should.","kur_distance_02"),
+    N("kur_distance_02","The instructor notices only when Kurenai is already close enough to touch the bell.\n\nShe takes it and retreats.","kur_distance_03"),
+    D("kur_distance_03","INSTRUCTOR","Head-on?","kur_distance_04"),
+    N("kur_distance_04","Kurenai lets the instructor think she is backing away.\n\nThe instructor's next step commits to where Kurenai should be.\n\nKurenai is somewhere else.\n\nFor the first time, the instructor's expression changes.\n\nOnly slightly.\n\nEnough.","kur_distance_05"),
+    N("kur_distance_05","Then breath touches the back of Kurenai's shoulder.\n\nThe instructor is behind her.\n\nTwo fingers hook the bell away before Kurenai can turn.","kur_distance_06"),
+    D("kur_distance_06","INSTRUCTOR","A strong attempt.","kur_distance_07"),
+    N("kur_distance_07","Kurenai looks at the empty cord in her hand.","kur_distance_08"),
+    D("kur_distance_08","KURENAI","You sound disappointed.","kur_distance_09"),
+    D("kur_distance_09","INSTRUCTOR","I said strong.","kur_eval_partial_win_01"),
+
+    N("kur_complete_01","Kurenai does something almost insulting.\n\nShe rushes the instructor.\n\nNo clever angle.\n\nNo hidden approach.\n\nNo subtlety.\n\nThe instructor's attention sharpens anyway.","kur_complete_02"),
+    N("kur_complete_02","The instructor catches Kurenai before she reaches the bell.\n\nHer hand closes around Kurenai's wrist.","kur_complete_03"),
+    D("kur_complete_03","INSTRUCTOR","Got you.","kur_complete_04"),
+    N("kur_complete_04","The yard bends.\n\nKurenai is standing behind the instructor with the bell between two fingers.","kur_complete_05"),
+    D("kur_complete_05","KURENAI","Have you?","kur_complete_06"),
+    N("kur_complete_06","The yard bends again.\n\nThe instructor is behind Kurenai now.\n\nThe bell is back in her hand.","kur_complete_07"),
+    D("kur_complete_07","INSTRUCTOR","Yes.","kur_complete_08"),
+    N("kur_complete_08","The yard folds one final time.\n\nThey are both standing where the exercise began.\n\nSame distance.\n\nSame posture.\n\nSame quiet courtyard.\n\nExcept Kurenai is holding the bell.\n\nShe looks down at it once.\n\nThen at the instructor.","kur_complete_09"),
+    D("kur_complete_09","KURENAI","You were saying?","kur_complete_10"),
+    N("kur_complete_10","The instructor exhales through her nose.\n\nNot quite a laugh.","kur_eval_win_01"),
+
+    D("kur_eval_loss_01","INSTRUCTOR","You gave me the illusion before you gave me a reason to believe it.","kur_eval_loss_02",{onEnterConsequences:[result]}),
+    N("kur_eval_loss_02","Kurenai looks once at the place her false approach disappeared.","kur_eval_loss_03"),
+    D("kur_eval_loss_03","KURENAI","I showed you the trick.","kur_eval_loss_04"),
+    D("kur_eval_loss_04","INSTRUCTOR","Exactly.","kur_eval_core_01"),
+
+    D("kur_eval_partial_loss_01","INSTRUCTOR","You made me believe you had the bell.","kur_eval_partial_loss_02",{onEnterConsequences:[result]}),
+    D("kur_eval_partial_loss_02","KURENAI","For a second.","kur_eval_partial_loss_03"),
+    D("kur_eval_partial_loss_03","INSTRUCTOR","And then you believed it too.","kur_eval_partial_loss_04"),
+    N("kur_eval_partial_loss_04","Kurenai's mouth tightens.\n\nFair.\n\nAnnoying.\n\nFair.","kur_eval_core_01"),
+
+    D("kur_eval_partial_win_01","INSTRUCTOR","You moved where I thought you couldn't.","kur_eval_partial_win_02",{onEnterConsequences:[result]}),
+    D("kur_eval_partial_win_02","KURENAI","Long enough to take it.","kur_eval_partial_win_03"),
+    D("kur_eval_partial_win_03","INSTRUCTOR","Not long enough to keep it.","kur_eval_partial_win_04"),
+    N("kur_eval_partial_win_04","Kurenai glances at the bell.","kur_eval_partial_win_05"),
+    D("kur_eval_partial_win_05","KURENAI","Next time.","kur_eval_core_01"),
+
+    N("kur_eval_win_01","The instructor looks at the bell in Kurenai's hand.\n\nThis time she does not reach for it.","kur_eval_win_02",{onEnterConsequences:[result]}),
+    D("kur_eval_win_02","INSTRUCTOR","You kept track of the real one.","kur_eval_win_03"),
+    D("kur_eval_win_03","KURENAI","So did you.","kur_eval_win_04"),
+    D("kur_eval_win_04","INSTRUCTOR","Eventually.","kur_eval_win_05"),
+    N("kur_eval_win_05","Kurenai smiles.","kur_eval_core_01"),
+
+    D("kur_eval_core_01","INSTRUCTOR","Genjutsu isn't only making somebody believe something false.","kur_eval_core_02"),
+    N("kur_eval_core_02","The instructor taps the bell once.","kur_eval_core_02b"),
+    D("kur_eval_core_02b","INSTRUCTOR","It's knowing what stays true after both of you start lying.","kur_eval_core_03"),
+    N("kur_eval_core_03","Kurenai looks at the bell.\n\nThen at the instructor.\n\nShe does not answer immediately.","kur_close_01"),
+    N("kur_close_01","The exercise is over.\n\nThe uncertainty takes a little longer to leave.","kur_after_router"),
+
+    {beatId:"kur_after_router",mode:"resolver",machineResolved:true,text:"",environmentRef:courtyard,choices:[
+      C("loss","RESOLVE COMPLETE LOSS AFTERMATH","kur_after_loss_01",null,{availability:hidden(()=>A.local().kurenaiOutcome==="complete_loss")}),
+      C("partial_loss","RESOLVE PARTIAL LOSS AFTERMATH","kur_after_partial_loss_01",null,{availability:hidden(()=>A.local().kurenaiOutcome==="partial_loss")}),
+      C("partial_win","RESOLVE PARTIAL WIN AFTERMATH","kur_after_partial_win_01",null,{availability:hidden(()=>A.local().kurenaiOutcome==="partial_win")}),
+      C("win","RESOLVE COMPLETE WIN AFTERMATH","kur_after_win_01",null,{availability:hidden(()=>A.local().kurenaiOutcome==="complete_win")})
+    ]},
+
+    N("kur_after_loss_01","The instructor starts gathering the last practice markers.\n\nKurenai stays where she is.\n\nHer eyes return to the patch of ground where the false Kurenai appeared.","kur_after_loss_02"),
+    D("kur_after_loss_02","INSTRUCTOR","Something else?","kur_after_loss_03"),
+    D("kur_after_loss_03","KURENAI","I want another try.","kur_after_loss_04"),
+    D("kur_after_loss_04","INSTRUCTOR","Today?","kur_after_loss_05"),
+    D("kur_after_loss_05","KURENAI","Yes.","kur_after_loss_06"),
+    N("kur_after_loss_06","The instructor looks toward the empty Academy building.","kur_after_loss_07"),
+    D("kur_after_loss_07","INSTRUCTOR","Tomorrow.","kur_after_loss_08"),
+    N("kur_after_loss_08","Kurenai does not look pleased.\n\nShe looks at the bell again.","kur_after_loss_09"),
+    D("kur_after_loss_09","KURENAI","Fine.","kur_after_loss_10"),
+    N("kur_after_loss_10","A beat.","kur_after_loss_11"),
+    D("kur_after_loss_11","KURENAI","Tomorrow.","kur_leave_01"),
+
+    N("kur_after_partial_loss_01","Kurenai looks at the hand that held the false bell.\n\nShe opens it.\n\nCloses it.","kur_after_partial_loss_02"),
+    D("kur_after_partial_loss_02","KURENAI","I thought I had it.","kur_after_partial_loss_03"),
+    N("kur_after_partial_loss_03","The instructor holds up the real bell.","kur_after_partial_loss_04"),
+    D("kur_after_partial_loss_04","INSTRUCTOR","You did.","kur_after_partial_loss_05"),
+    N("kur_after_partial_loss_05","Kurenai looks at the instructor.","kur_after_partial_loss_06"),
+    D("kur_after_partial_loss_06","INSTRUCTOR","Just not this one.","kur_after_partial_loss_07"),
+    N("kur_after_partial_loss_07","Kurenai exhales through her nose.\n\nAnnoyed.\n\nMostly with herself.","kur_after_partial_loss_08"),
+    D("kur_after_partial_loss_08","KURENAI","I stopped checking.","kur_after_partial_loss_09"),
+    N("kur_after_partial_loss_09","The instructor does not answer for her.\n\nKurenai looks at the bell once more.","kur_after_partial_loss_10"),
+    D("kur_after_partial_loss_10","KURENAI","I won't next time.","kur_leave_01"),
+
+    N("kur_after_partial_win_01","The instructor loops the bell cord around two fingers.\n\nKurenai watches it.","kur_after_partial_win_02"),
+    D("kur_after_partial_win_02","KURENAI","I did take it.","kur_after_partial_win_03"),
+    D("kur_after_partial_win_03","INSTRUCTOR","You did.","kur_after_partial_win_04"),
+    D("kur_after_partial_win_04","KURENAI","Then you took it back.","kur_after_partial_win_05"),
+    D("kur_after_partial_win_05","INSTRUCTOR","Also true.","kur_after_partial_win_06"),
+    N("kur_after_partial_win_06","Kurenai looks at the distance between them.\n\nThe same distance they started with.","kur_after_partial_win_07"),
+    D("kur_after_partial_win_07","KURENAI","Next time you don't get it back.","kur_after_partial_win_08"),
+    N("kur_after_partial_win_08","The instructor lifts an eyebrow.\n\nKurenai means it.","kur_leave_01"),
+
+    N("kur_after_win_01","Kurenai is still holding the bell.\n\nThe instructor holds out one hand.","kur_after_win_02"),
+    D("kur_after_win_02","INSTRUCTOR","Bell.","kur_after_win_03"),
+    N("kur_after_win_03","Kurenai looks down at it.\n\nThen hands it over.","kur_after_win_04"),
+    D("kur_after_win_04","KURENAI","Same exercise tomorrow?","kur_after_win_05"),
+    D("kur_after_win_05","INSTRUCTOR","Wouldn't be much of an exercise if I told you.","kur_after_win_06"),
+    N("kur_after_win_06","Kurenai smiles.\n\nSmall.\n\nSatisfied.","kur_after_win_07"),
+    D("kur_after_win_07","KURENAI","Good.","kur_leave_01"),
+
+    N("kur_leave_01","Kurenai picks up her bag.\n\nThe instructor returns the bell to the practice hook.\n\nFor the first time since the exercise started, neither of them is trying to fool the other.","kur_leave_02"),
+    N("kur_leave_02","Kurenai reaches the courtyard gate.\n\nStops.\n\nLooks back once.\n\nNot at the instructor.\n\nAt the bell.","kur_leave_router"),
+    {beatId:"kur_leave_router",mode:"resolver",machineResolved:true,text:"",environmentRef:courtyard,choices:[
+      C("loss","RESOLVE COMPLETE LOSS LEAVING","kur_leave_loss_01",null,{availability:hidden(()=>A.local().kurenaiOutcome==="complete_loss")}),
+      C("partial_loss","RESOLVE PARTIAL LOSS LEAVING","kur_leave_partial_loss_01",null,{availability:hidden(()=>A.local().kurenaiOutcome==="partial_loss")}),
+      C("partial_win","RESOLVE PARTIAL WIN LEAVING","kur_leave_partial_win_01",null,{availability:hidden(()=>A.local().kurenaiOutcome==="partial_win")}),
+      C("win","RESOLVE COMPLETE WIN LEAVING","kur_leave_win_01",null,{availability:hidden(()=>A.local().kurenaiOutcome==="complete_win")})
+    ]},
+
+    D("kur_leave_loss_01","KURENAI","Don't make it easier tomorrow.","kur_leave_loss_02"),
+    N("kur_leave_loss_02","The instructor looks over.","kur_leave_loss_03"),
+    D("kur_leave_loss_03","INSTRUCTOR","Wasn't planning to.","kur_leave_loss_04"),
+    N("kur_leave_loss_04","Kurenai nods.\n\nThen leaves.","kur_close_02"),
+
+    D("kur_leave_partial_loss_01","KURENAI","Tomorrow.","kur_leave_partial_loss_02"),
+    D("kur_leave_partial_loss_02","INSTRUCTOR","Tomorrow.","kur_leave_partial_loss_03"),
+    N("kur_leave_partial_loss_03","Kurenai leaves with her hands in her pockets.\n\nThe false bell is gone.\n\nShe remembers exactly how real it felt.","kur_close_02"),
+
+    D("kur_leave_partial_win_01","INSTRUCTOR","Still thinking about it?","kur_leave_partial_win_02"),
+    N("kur_leave_partial_win_02","Kurenai looks at the bell.","kur_leave_partial_win_03"),
+    D("kur_leave_partial_win_03","KURENAI","Yes.","kur_leave_partial_win_04"),
+    N("kur_leave_partial_win_04","Then she leaves.\n\nNo explanation needed.","kur_close_02"),
+
+    D("kur_leave_win_01","INSTRUCTOR","Kurenai.","kur_leave_win_02"),
+    N("kur_leave_win_02","She looks back.","kur_leave_win_03"),
+    D("kur_leave_win_03","INSTRUCTOR","Tomorrow.","kur_leave_win_04"),
+    N("kur_leave_win_04","Kurenai glances at the bell.","kur_leave_win_05"),
+    D("kur_leave_win_05","KURENAI","Change the trick.","kur_leave_win_06"),
+    N("kur_leave_win_06","The instructor smiles.\n\nKurenai leaves.","kur_close_02"),
+
+    N("kur_close_02","YOUR CHRONICLE BEGINS","kur_receipt"),
+    {beatId:"kur_receipt",mode:"record",environmentRef:courtyard,text:"",exitScene:true}
   ],onCompleteConsequences:[X("academy_kurenai",[bell])]});
 })();
 
