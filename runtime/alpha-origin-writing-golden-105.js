@@ -810,100 +810,164 @@ line("mir_checkpoint_missed",[
 ],MIRAI_ENV.checkpoint,"mir_after_missed_01");
 miraiBeats.find(row=>row.beatId==="mir_checkpoint_missed_01").onEnterConsequences=[mirCheckpoint];
 
-line("mir_after_verified",[
- {mode:"narration",text:"They don't sit around a desk.\n\nThe route map ends up spread across the top of a crate outside the checkpoint.\n\nMirai stands over it.\n\nThe instructor leans beside her.\n\nThe traveller sits nearby finishing his drink.\n\nThe instructor taps the covered market."},
+function miraiEndingFamily105(){
+ const local=A.local()||{};
+ const basis=local.mirVerificationBasis||null;
+ if(local.mirConfronted===true&&basis==="conversation_continuity")return"conversation";
+ if(local.mirConfronted===true&&basis==="changed_chakra")return"chakra";
+ if(local.mirConversationSuspicion===true||local.mirContinuityTested===true||basis!==null||local.mirStopped===true||local.mirChangedRoute===true)return"suspicion";
+ return"missed";
+}
+function miraiEndingFamilyAvailability105(family){
+ return ()=>({available:miraiEndingFamily105()===family,knownBlocker:null});
+}
+function miraiAfterCheckpointRouter105(beatId){
+ push({beatId,mode:"resolver",machineResolved:true,text:"",environmentRef:MIRAI_ENV.checkpoint,choices:[
+  C("conversation","RESOLVE CONVERSATION CATCH","mir_after_conversation_01",null,{availability:miraiEndingFamilyAvailability105("conversation")}),
+  C("chakra","RESOLVE CHAKRA CATCH","mir_after_chakra_01",null,{availability:miraiEndingFamilyAvailability105("chakra")}),
+  C("suspicion","RESOLVE SUSPICION","mir_after_suspicion_01",null,{availability:miraiEndingFamilyAvailability105("suspicion")}),
+  C("missed","RESOLVE MISSED SUBSTITUTION","mir_after_missed_route_01",null,{availability:miraiEndingFamilyAvailability105("missed")})
+ ]});
+}
+miraiAfterCheckpointRouter105("mir_after_verified_01");
+miraiAfterCheckpointRouter105("mir_after_missed_01");
+
+line("mir_after_conversation",[
+ {mode:"narration",text:"The route map ends up spread across a crate outside Checkpoint Three.\n\nThe real Traveller has his drink.\n\nThe Academy instructor stands beside the map.\n\nMirai remains standing.\n\nShe has spent enough of the day walking.\n\nThe instructor taps the covered market."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"When?"},
- {mode:"narration",text:"Mirai knows what she means.\n\nShe looks at the mark."},
- {mode:"dialogue",speaker:"MIRAI",text:"He got the details wrong."},
- {mode:"narration",text:"The traveller lifts his cup."},
- {mode:"dialogue",speaker:"TRAVELLER",text:"My details."},
+ {mode:"narration",text:"Mirai looks at the mark."},
+ {mode:"dialogue",speaker:"MIRAI",text:"After the market."},
+ {mode:"narration",text:"The Traveller raises his cup."},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"What gave her away?"},
  {mode:"narration",text:"Mirai looks at him."},
- {mode:"dialogue",speaker:"MIRAI",text:"Yes."},
- {mode:"narration",text:"He seems pleased to be included."},
- {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"One wrong answer?"},
- {mode:"narration",text:"Mirai shakes her head."},
- {mode:"dialogue",speaker:"MIRAI",text:"No."},
- {mode:"narration",text:"She looks back at the map."},
- {mode:"dialogue",speaker:"MIRAI",text:"One wrong answer made me ask another question."},
- {mode:"narration",text:"The instructor nods once.\n\nThat's enough."}
-],MIRAI_ENV.checkpoint,"mir_leaving_start");
-line("mir_after_missed",[
- {mode:"narration",text:"They don't sit around a desk.\n\nThe route map ends up spread across the top of a crate outside the checkpoint.\n\nMirai stands over it.\n\nThe instructor leans beside her.\n\nThe traveller sits nearby finishing his drink.\n\nMirai is already looking at the market when the instructor joins her."},
- {mode:"dialogue",speaker:"MIRAI",text:"I lost him here."},
- {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"For a few seconds."},
- {mode:"dialogue",speaker:"MIRAI",text:"It was enough."},
- {mode:"narration",text:"The instructor doesn't answer.\n\nMirai looks at the checkpoint.\n\nThen at the original traveller."},
- {mode:"dialogue",speaker:"MIRAI",text:"I still got you here."},
- {mode:"narration",text:"The traveller raises a finger."},
- {mode:"dialogue",speaker:"TRAVELLER",text:"Technically—"},
- {mode:"narration",text:"Mirai looks at him.\n\nHe lowers the finger."},
- {mode:"dialogue",speaker:"TRAVELLER",text:"Not helping."},
- {mode:"narration",text:"The instructor looks down at the map."},
- {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"You got the person beside you here without letting anything happen to them."},
- {mode:"narration",text:"Mirai looks at her."},
- {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"That's true."},
- {mode:"narration",text:"She waits.\n\nThe instructor leaves it there.\n\nNo lecture.\n\nMirai turns back to the road herself."}
+ {mode:"dialogue",speaker:"MIRAI",text:"You did."},
+ {mode:"narration",text:"He nearly looks offended."},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"I wasn't there."},
+ {mode:"dialogue",speaker:"MIRAI",text:"Exactly."},
+ {mode:"narration",text:"The instructor waits.\n\nMirai traces the route with one finger."},
+ {mode:"dialogue",speaker:"MIRAI",text:"She knew where we were going."},
+ {mode:"narration",text:"Then she taps the market."},
+ {mode:"dialogue",speaker:"MIRAI",text:"She didn't know what we'd talked about getting there."},
+ {mode:"narration",text:"The Traveller smiles into his cup."},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"So all that talking was useful."},
+ {mode:"narration",text:"Mirai gives him a look."},
+ {mode:"dialogue",speaker:"MIRAI",text:"Some of it."},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"I'll take it."},
+ {mode:"narration",text:"The instructor does not turn it into a lecture.\n\nMirai already knows what changed."}
 ],MIRAI_ENV.checkpoint,"mir_leaving_start");
 
-push(N("mir_leaving_start","The exercise ends.\n\nThe traveller heads toward East Market.\n\nAt the corner, he turns.","mir_leaving_choice_router",MIRAI_ENV.checkpoint));
+line("mir_after_chakra",[
+ {mode:"narration",text:"The route map ends up spread across a crate outside Checkpoint Three.\n\nThe real Traveller has his drink.\n\nThe Academy instructor stands beside the map.\n\nThe instructor taps the covered market."},
+ {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"When?"},
+ {mode:"narration",text:"Mirai looks at her."},
+ {mode:"dialogue",speaker:"MIRAI",text:"After the market."},
+ {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"What changed?"},
+ {mode:"narration",text:"Mirai thinks before answering."},
+ {mode:"dialogue",speaker:"MIRAI",text:"Your chakra."},
+ {mode:"narration",text:"The Traveller looks between them."},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"That's still unsettling."},
+ {mode:"narration",text:"Mirai ignores him."},
+ {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"Did that tell you who I was?"},
+ {mode:"dialogue",speaker:"MIRAI",text:"No."},
+ {mode:"narration",text:"The answer comes immediately.\n\nMirai looks back at the market mark."},
+ {mode:"dialogue",speaker:"MIRAI",text:"It told me you weren't him."},
+ {mode:"narration",text:"The instructor nods once.\n\nMirai does not need more than that."}
+],MIRAI_ENV.checkpoint,"mir_leaving_start");
+
+line("mir_after_suspicion",[
+ {mode:"narration",text:"The route map ends up spread across a crate outside Checkpoint Three.\n\nThe real Traveller has his drink.\n\nThe Academy instructor stands beside the map.\n\nThe instructor taps the last stretch of road."},
+ {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"You noticed something."},
+ {mode:"narration",text:"Mirai looks at the map."},
+ {mode:"dialogue",speaker:"MIRAI",text:"I noticed several things."},
+ {mode:"narration",text:"The Traveller shifts his cup between his hands.\n\nMirai continues before either adult can answer."},
+ {mode:"dialogue",speaker:"MIRAI",text:"None of them felt like enough by themselves."},
+ {mode:"narration",text:"The instructor looks at her."},
+ {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"So you kept going."},
+ {mode:"narration",text:"Mirai nods.\n\nNot automatically.\n\nBecause that is what she did."},
+ {mode:"dialogue",speaker:"MIRAI",text:"I wasn't going to turn suspicion into proof because I wanted an answer."},
+ {mode:"narration",text:"The instructor leaves that alone.\n\nThe real Traveller points toward the checkpoint."},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"You did get somebody here safely."},
+ {mode:"narration",text:"Mirai looks at him."},
+ {mode:"dialogue",speaker:"MIRAI",text:"The wrong somebody."},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"Still safely."},
+ {mode:"narration",text:"Mirai almost smiles.\n\nAlmost."}
+],MIRAI_ENV.checkpoint,"mir_leaving_start");
+
+line("mir_after_missed_route",[
+ {mode:"narration",text:"The route map ends up spread across a crate outside Checkpoint Three.\n\nThe real Traveller has his drink.\n\nThe Academy instructor stands beside the map.\n\nMirai is already looking at the covered market when the instructor joins her."},
+ {mode:"dialogue",speaker:"MIRAI",text:"I lost him there."},
+ {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"For a few seconds."},
+ {mode:"dialogue",speaker:"MIRAI",text:"It was enough."},
+ {mode:"narration",text:"The real Traveller lifts his cup."},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"I was fine."},
+ {mode:"narration",text:"Mirai looks at him."},
+ {mode:"dialogue",speaker:"MIRAI",text:"I know."},
+ {mode:"narration",text:"Then toward the instructor."},
+ {mode:"dialogue",speaker:"MIRAI",text:"I didn't know you weren't him."},
+ {mode:"narration",text:"The instructor does not soften the fact.\n\nDoes not sharpen it either.\n\nMirai looks down at the route map.\n\nEvery turn is exactly where it was supposed to be.\n\nThat is suddenly the least interesting thing on the page."}
+],MIRAI_ENV.checkpoint,"mir_leaving_start");
+
+push(N("mir_leaving_start","The exercise ends.\n\nThe Traveller heads toward East Market.\n\nAt the corner, he turns.","mir_leaving_choice_router",MIRAI_ENV.checkpoint));
 push({beatId:"mir_leaving_choice_router",mode:"resolver",machineResolved:true,text:"",environmentRef:MIRAI_ENV.checkpoint,choices:[
  C("talked","RESOLVE TALKED LEAVING","mir_leaving_talk_01",null,{availability:()=>({available:A.local().mirTalked===true,knownBlocker:null})}),
  C("professional","RESOLVE PROFESSIONAL LEAVING","mir_leaving_prof_01",null,{availability:()=>({available:A.local().mirTalked!==true,knownBlocker:null})})
 ]});
 line("mir_leaving_talk",[
- {mode:"narration",text:"The traveller pauses at the corner, remembering their earlier conversation."},
  {mode:"dialogue",speaker:"TRAVELLER",text:"If my sister offers you tea, say no."},
  {mode:"narration",text:"Mirai folds her arms."},
- {mode:"dialogue",speaker:"MIRAI",text:"I thought you liked your sister more than you disliked the tea."},
+ {mode:"dialogue",speaker:"MIRAI",text:"You still haven't proved plum tea is bad."},
  {mode:"narration",text:"He points at her."},
- {mode:"dialogue",speaker:"TRAVELLER",text:"See? That's exactly the kind of thing that got your instructor caught."},
- {mode:"narration",text:"Mirai looks toward the instructor.\n\nShe looks away.\n\nThe traveller laughs and disappears into the crowd."}
-],MIRAI_ENV.checkpoint,"mir_reflection_choice");
+ {mode:"dialogue",speaker:"TRAVELLER",text:"See? That's dangerous thinking."},
+ {mode:"narration",text:"Mirai watches him go.\n\nThe instructor starts gathering the route map.\n\nMirai reaches over and folds it first.\n\nShe hands it back."}
+],MIRAI_ENV.checkpoint,"mir_reflection_router");
 line("mir_leaving_prof",[
- {mode:"narration",text:"The traveller pauses at the corner and looks back at Mirai."},
- {mode:"narration",text:"The traveller points toward Mirai's pocket."},
+ {mode:"narration",text:"The Traveller points toward Mirai's pocket."},
  {mode:"dialogue",speaker:"TRAVELLER",text:"You keeping that?"},
  {mode:"narration",text:"Mirai checks the wrapped sweet."},
  {mode:"dialogue",speaker:"MIRAI",text:"Apparently."},
- {mode:"dialogue",speaker:"TRAVELLER",text:"Good. I was starting to think the whole walk was wasted."},
- {mode:"narration",text:"Mirai gives him a look.\n\nHe grins and leaves.\n\nMirai watches him go.\n\nThen looks back at the road they took."}
-],MIRAI_ENV.checkpoint,"mir_reflection_choice");
+ {mode:"dialogue",speaker:"TRAVELLER",text:"Good."},
+ {mode:"narration",text:"He starts away.\n\nThen looks back."},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"Next escort might talk more."},
+ {mode:"narration",text:"Mirai puts the sweet back into her pocket."},
+ {mode:"dialogue",speaker:"MIRAI",text:"They might."},
+ {mode:"narration",text:"That is not a promise.\n\nIt is more than she would have said this morning."}
+],MIRAI_ENV.checkpoint,"mir_reflection_router");
 
-push(Q("mir_reflection_choice","",[
- C("safe","“Getting them there safely still mattered.”","mir_reflect_safe_01",{mirReflection:"physical_protection_matters"}),
- C("identity","“If I don't know who I'm protecting, I haven't finished the job.”","mir_reflect_identity_01",{mirReflection:"verify_identity"}),
- C("evidence","“I need more than suspicion before I act.”","mir_reflect_evidence_01",{mirReflection:"need_evidence"}),
- C("person","“I was watching the route. I should've been watching the person.”","mir_reflect_person_01",{mirReflection:"watch_person"})
-],MIRAI_ENV.checkpoint));
-line("mir_reflect_safe",[
- {mode:"narration",text:"Mirai picks up the folded route map.\n\nThe substitute reached the checkpoint unharmed.\n\nThat happened.\n\nSo did everything else.\n\nShe tucks the map under her arm."},
- {mode:"dialogue",speaker:"MIRAI",text:"I still did part of the job."},
- {mode:"narration",text:"The instructor looks at her.\n\nMirai doesn't wait for agreement.\n\nShe already knows which part."}
-],MIRAI_ENV.checkpoint,"mir_close_01");
-line("mir_reflect_identity",[
- {mode:"narration",text:"Mirai looks toward the covered market.\n\nA few seconds.\n\nThat was all it took."},
- {mode:"dialogue",speaker:"MIRAI",text:"Next time I lose sight of someone…"},
- {mode:"narration",text:"She stops.\n\nChanges it."},
- {mode:"dialogue",speaker:"MIRAI",text:"Next time I get them back, I check."},
- {mode:"narration",text:"The instructor says nothing.\n\nMirai doesn't need her to."}
-],MIRAI_ENV.checkpoint,"mir_close_01");
-line("mir_reflect_evidence",[
- {mode:"narration",text:"Mirai thinks about every moment that could have meant something.\n\nThe shortcut.\n\nThe answers.\n\nThe chakra.\n\nOr none of them, depending on the road she took."},
- {mode:"dialogue",speaker:"MIRAI",text:"I don't want to accuse somebody because something feels strange."},
- {mode:"narration",text:"The instructor looks at her."},
- {mode:"dialogue",speaker:"MIRAI",text:"But I don't want to ignore it either."},
- {mode:"narration",text:"That is less comfortable than an easy rule.\n\nMirai accepts it anyway."}
-],MIRAI_ENV.checkpoint,"mir_close_01");
-line("mir_reflect_person",[
- {mode:"narration",text:"Mirai folds the route map smaller.\n\nThen smaller again."},
- {mode:"dialogue",speaker:"MIRAI",text:"I knew every turn."},
- {mode:"narration",text:"The instructor glances at her.\n\nMirai looks toward the traveller disappearing into the village."},
- {mode:"dialogue",speaker:"MIRAI",text:"Didn't know enough about him."},
- {mode:"narration",text:"She puts the map away.\n\nThe next escort will still have a route.\n\nMirai doubts she'll stare at it quite as much."}
-],MIRAI_ENV.checkpoint,"mir_close_01");
+push({beatId:"mir_reflection_router",mode:"resolver",machineResolved:true,text:"",environmentRef:MIRAI_ENV.checkpoint,choices:[
+ C("conversation","RESOLVE CONVERSATION REFLECTION","mir_reflection_conversation",null,{availability:miraiEndingFamilyAvailability105("conversation")}),
+ C("chakra","RESOLVE CHAKRA REFLECTION","mir_reflection_chakra",null,{availability:miraiEndingFamilyAvailability105("chakra")}),
+ C("suspicion","RESOLVE SUSPICION REFLECTION","mir_reflection_suspicion",null,{availability:miraiEndingFamilyAvailability105("suspicion")}),
+ C("missed","RESOLVE MISSED REFLECTION","mir_reflection_missed",null,{availability:miraiEndingFamilyAvailability105("missed")})
+]});
 push(
-  N("mir_close_01","Mirai leaves Checkpoint Three alone.\n\nThe village is exactly as busy as it was when she started.\n\nSame streets.\n\nSame roofs.\n\nSame market.\n\nShe passes the junction where the shortcut split away.\n\nKeeps walking.\n\nThis time, she doesn't take out the map.","mir_receipt",MIRAI_ENV.checkpoint),
-  {beatId:"mir_receipt",mode:"record",text:"",exitScene:true}
+ Q("mir_reflection_conversation","",[
+  C("route_changed","“The route stayed the same. The person didn't.”","mir_close_01",{mirReflection:"conversation_route_person_changed"}),
+  C("talking","“Talking to someone can tell me more than a map.”","mir_close_01",{mirReflection:"conversation_talking_matters"}),
+  C("contradiction","“I caught the contradiction. Next time I check sooner.”","mir_close_01",{mirReflection:"conversation_check_sooner"}),
+  C("mismatch","“Getting suspicious wasn't enough. I needed the mismatch.”","mir_close_01",{mirReflection:"conversation_needed_mismatch"})
+ ],MIRAI_ENV.checkpoint),
+ Q("mir_reflection_chakra","",[
+  C("stop","“Something changed. I stopped instead of explaining it away.”","mir_close_01",{mirReflection:"chakra_stopped_on_change"}),
+  C("verify","“Different chakra told me enough to verify.”","mir_close_01",{mirReflection:"chakra_verify"}),
+  C("wrong","“I knew what was wrong before I knew why.”","mir_close_01",{mirReflection:"chakra_wrong_before_why"}),
+  C("recheck","“Next time I check the person again after I lose sight of them.”","mir_close_01",{mirReflection:"chakra_recheck_after_lost_sight"})
+ ],MIRAI_ENV.checkpoint),
+ Q("mir_reflection_suspicion","",[
+  C("evidence","“I needed more than suspicion before I acted.”","mir_close_01",{mirReflection:"suspicion_needed_more"}),
+  C("notice","“I was right to notice it. I wasn't ready to prove it.”","mir_close_01",{mirReflection:"suspicion_not_ready_to_prove"}),
+  C("verify","“Next time I verify without giving away what I know.”","mir_close_01",{mirReflection:"suspicion_verify_quietly"}),
+  C("identity","“Finishing the route didn't answer who I was escorting.”","mir_close_01",{mirReflection:"suspicion_identity_unanswered"})
+ ],MIRAI_ENV.checkpoint),
+ Q("mir_reflection_missed","",[
+  C("person","“I watched the road better than I watched the person.”","mir_close_01",{mirReflection:"missed_watched_road"}),
+  C("lost_sight","“Losing sight of someone should change what I check next.”","mir_close_01",{mirReflection:"missed_lost_sight"}),
+  C("switch","“I completed the escort. I missed the switch.”","mir_close_01",{mirReflection:"missed_switch"}),
+  C("learn","“Next time I learn more than the route.”","mir_close_01",{mirReflection:"missed_learn_person"})
+ ],MIRAI_ENV.checkpoint)
+);
+push(
+ N("mir_close_01","Mirai leaves Checkpoint Three alone.\n\nAt the junction where the shortcut split away, she slows.\n\nThe road sign is still there.\n\nThe route is still obvious.\n\nMirai looks past it at the people moving through the street.\n\nThen keeps walking.\n\nShe does not take out the map.","mir_receipt",MIRAI_ENV.checkpoint),
+ {beatId:"mir_receipt",mode:"record",text:"",exitScene:true}
 );
 
 reg({
@@ -911,6 +975,13 @@ reg({
  entryBeatId:"mir_assignment_01",beats:miraiBeats,
  onCompleteConsequences:[X("academy_mirai",[MIR_SUB,MIR_CHAKRA,MIR_CHECKPOINT])]
 });
+
+function safelyUniversalMiraiReflection105(sceneDef){
+ try{
+  const beat=sceneDef&&sceneDef.beatMap instanceof Map?sceneDef.beatMap.get("mir_reflection_choice"):null;
+  return !!beat;
+ }catch(_error){return false;}
+}
 
 function diagnostics(){
  const mir=getStorySceneDefinition(MIRAI_SCENE),men=getStorySceneDefinition("origin_academy_menma_prologue");
@@ -921,6 +992,7 @@ function diagnostics(){
   miraiRealConversation:!!mirBeat("mir_walk_choice")&&!!mirBeat("mir_market_talk_01")&&!!mirBeat("mir_reflection_choice"),
   miraiBattleDependencyFailClosed:!!mirBeat("mir_shortcut_talk_choice")&&String(mirBeat("mir_shortcut_talk_choice").choices?.[0]?.availability||"").includes("Battle route"),
   miraiBattleDefeatContinuations:!!mirBeat("mir_shortcut_defeat_01")&&!!mirBeat("mir_shortcut_defeat_09")&&!!mirBeat("mir_confrontation_defeat_01")&&!!mirBeat("mir_confrontation_defeat_08"),
+  miraiRouteAwareEnding:!!mirBeat("mir_reflection_conversation")&&!!mirBeat("mir_reflection_chakra")&&!!mirBeat("mir_reflection_suspicion")&&!!mirBeat("mir_reflection_missed")&&!safelyUniversalMiraiReflection105(mir),
   menmaWritingGoldenEntry:!!men&&men.entryBeatId==="menma_open_01",
   menmaFullOpening:!!menBeat("menma_open_15")&&menBeat("menma_open_15").text==="I know.",
   menmaPreservedBattleSeam:!!menBeat("tutorial_battle"),
