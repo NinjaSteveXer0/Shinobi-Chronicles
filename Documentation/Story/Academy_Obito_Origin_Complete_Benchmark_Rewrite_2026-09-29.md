@@ -2,8 +2,12 @@
 
 **Date:** 2026-09-29  
 **Owner:** Stephen / Writing — Konoha  
-**Status:** **OWNER PREVIEW AUTHORIZED — SEND TO CODING / NOT WRITING GOLDEN UNTIL BROWSER REVIEW**  
+**Status:** **SUPERSEDED FOR PLAYER-FACING LENGTH / COMPRESSION — KEEP FOR SEMANTIC HISTORY**  
 **Production Origin:** `academy_obito`
+
+> **2026-09-29 compression successor:** `Documentation/Story/Academy_Obito_Origin_Compression_Rewrite_2026-09-29.md` @ `b706afab61c51199df44fd770a0440f4381ea361`.
+>
+> Owner installed-browser review found the current complete rewrite drastically over-segmented (including sequences of roughly 96 clicks followed by 44). Preserve this file for semantic/history reference; the compression successor owns current player-facing length and pacing.
 
 ## 1. Rewrite reason
 
