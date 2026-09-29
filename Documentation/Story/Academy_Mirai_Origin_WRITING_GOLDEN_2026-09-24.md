@@ -2,8 +2,12 @@
 
 **Date:** 2026-09-24  
 **Owner:** Stephen / Writing — Konoha  
-**Status:** **WRITING GOLDEN — PLAYER-FACING STORY APPROVED / STORY COMPLETE**  
-**Production Origin:** `academy_mirai`  
+**Status:** **WRITING GOLDEN THROUGH SCENE 8 — ENDING / REFLECTION REOPENED 2026-09-29**  
+**Production Origin:** `academy_mirai`
+
+> **2026-09-29 focused successor:** `Documentation/Story/Academy_Mirai_Origin_Ending_Reflection_Rewrite_2026-09-29.md` @ `89e9c28eeb2a6f0144e04f5ec010ea18dbbc3e4a`.
+>
+> Scenes 1–8 remain frozen current GOLDEN content. The old universal final-reflection architecture is reopened because some options become factually false on routes where Mirai actually detected/verified the substitution.  
 **Primary priority:** **FINISH SHINOBI CHRONICLES ALPHA**
 
 > **Status boundary:** Writing GOLDEN means the player-facing Story / narration / dialogue is Stephen-approved. It does **not** mean runtime implemented, installed-browser validated, or Browser Golden.
