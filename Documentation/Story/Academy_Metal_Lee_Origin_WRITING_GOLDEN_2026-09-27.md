@@ -9,8 +9,14 @@
 
 **Date:** 2026-09-27  
 **Owner:** Writing / Story — Konoha  
-**Status:** **WRITING GOLDEN — STEPHEN APPROVED 2026-09-27**  
+**Status:** **OWNER REOPENED 2026-09-29 — SUPERSEDED FOR CURRENT PLAYER-FACING VOICE / STORYTELLING**  
 **Origin:** `academy_metal_lee`
+
+> **2026-09-29 successor:** `Documentation/Story/Academy_Metal_Lee_Origin_Natural_Voice_Benchmark_Rewrite_2026-09-29.md` @ `30ab5a017db91cef0d23f144c48070ac5dd11e6e`.
+>
+> New binding voice anchor: `Documentation/Story/Academy_Metal_Lee_Character_Voice_and_Personality_Anchor_2026-09-29.md` @ `edfda2a0078e448cad60c8a3e0b025073b56f74f`.
+>
+> Owner review found the 2026-09-27 expression below the current dialogue/storytelling benchmark. Preserve this file for MET/Battle/resolver semantics only where not superseded; do not use its player-facing prose as final authority.
 
 ## Successor purpose
 
