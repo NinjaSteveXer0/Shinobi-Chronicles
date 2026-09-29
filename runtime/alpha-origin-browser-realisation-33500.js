@@ -397,8 +397,14 @@ function runAlphaOriginBrowserRealisation33500Diagnostics(){
     wasabiGoldenNativeShimRetired:!!(A&&storyDefinition33500(A.sceneByVariant.academy_izuno)?.beatMap?.has("izu_initial_choice"))?originPatches.izuno===true&&!patchedScenes.includes(A.sceneByVariant.academy_izuno):true,
     iwabeeGoldenNativeShimRetired:originPatches.iwabee===true&&!patchedScenes.includes(A.sceneByVariant.academy_iwabee),
     metalGoldenNativeShimRetired:originPatches.metal===true&&!patchedScenes.includes(A.sceneByVariant.academy_metal_lee),
-    kurenaiFourOutcomeChoreographies:!!(kur&&kur.beatMap&&["kur_complete_loss_1","kur_partial_loss_result_2","kur_partial_win_result_3","kur_complete_win_result_6"].every(id=>kur.beatMap.has(id))),
-    kurenaiResultIsDecisionAware:!!(kur&&kur.beatMap&&kur.beatMap.get("kur_result")&&typeof kur.beatMap.get("kur_result").presentationResolver==="function"),
+    kurenaiFourOutcomeChoreographies:!!(kur&&kur.beatMap&&(
+      ["kur_false_04","kur_conceal_06","kur_distance_09","kur_complete_10","kur_after_router","kur_leave_router"].every(id=>kur.beatMap.has(id))||
+      ["kur_complete_loss_1","kur_partial_loss_result_2","kur_partial_win_result_3","kur_complete_win_result_6"].every(id=>kur.beatMap.has(id))
+    )),
+    kurenaiResultIsDecisionAware:!!(kur&&kur.beatMap&&(
+      ((kur.beatMap.get("kur_approach")?.choices||[]).map(choice=>choice?.contextPatch?.kurenaiOutcome).filter(Boolean).sort().join("|")==="complete_loss|complete_win|partial_loss|partial_win")||
+      (kur.beatMap.get("kur_result")&&typeof kur.beatMap.get("kur_result").presentationResolver==="function")
+    )),
     noMissionSemanticReuse:typeof globalThis.SC_ALPHA_MISSION_CHOICE_121==="undefined"||!patchedScenes.some(id=>String(id).startsWith("arc1_")),
     browserGoldenClaimed:false
   };
