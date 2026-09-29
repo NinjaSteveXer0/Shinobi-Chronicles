@@ -57,6 +57,27 @@ add("Mirai never accuses them. She changes one question, then one route detail, 
 add("The instructor waits until Mirai has reconstructed the route herself. Protection and identification turned out to be two different jobs.","El instructor espera hasta que Mirai reconstruye la ruta por sí misma. Proteger e identificar resultaron ser dos trabajos distintos.");
 add("You kept your client alive. Next time, make sure the client is the person you were assigned.","Mantuviste con vida a tu cliente. La próxima vez, asegúrate de que sea la persona que te asignaron.");
 
+// Mirai final shortcut Battle causality / victory continuity.
+add("The Traveller stops at the next turn.\n\nNot because he is checking the way.\n\nHe turns around and waits for Mirai to catch up.","El Viajero se detiene en el siguiente giro.\n\nNo porque esté comprobando el camino.\n\nSe da la vuelta y espera a que Mirai lo alcance.");
+add("Why did you stop?","¿Por qué te detuviste?");
+add("Because you followed me.\n\nMirai looks back toward the turn behind them.","Porque me seguiste.\n\nMirai mira hacia el giro que dejaron atrás.");
+add("You said this was faster.","Dijiste que esto era más rápido.");
+add("I did.\n\nA beat.","Lo dije.\n\nUn instante.");
+add("Your instructor gave me one extra job.\n\nMirai's attention sharpens.","Tu instructora me dio una tarea extra.\n\nLa atención de Mirai se agudiza.");
+add("What job?","¿Qué tarea?");
+add("See what you do if the person you're escorting stops cooperating.\n\nThe Traveller sets down his bag.\n\nHis stance changes.\n\nNot dramatic.\n\nEnough.","Ver qué haces si la persona a la que escoltas deja de cooperar.\n\nEl Viajero deja la bolsa en el suelo.\n\nSu postura cambia.\n\nNada dramático.\n\nLo suficiente.");
+add("This is part of the assessment.","Esto forma parte de la evaluación.");
+add("Looks like it.\n\nMirai folds the route map and puts it away.\n\nThen raises her guard.","Eso parece.\n\nMirai dobla el mapa de la ruta y lo guarda.\n\nLuego levanta la guardia.");
+add("Fine.\n\nA beat.\n\nThen stop me.","Bien.\n\nUn instante.\n\nEntonces detenme.");
+add("The Traveller is the first to lower his guard.\n\nMirai does not lower hers immediately.","El Viajero es el primero en bajar la guardia.\n\nMirai no baja la suya de inmediato.");
+add("All right.","De acuerdo.");
+add("That was your extra job?","¿Esa era tu tarea extra?");
+add("See what you'd do.\n\nMirai looks toward the turn behind them.\n\nThen at him.","Ver qué harías.\n\nMirai mira hacia el giro que dejaron atrás.\n\nLuego lo mira a él.");
+add("We're done with your route.","Se acabó tu ruta.");
+add("Fair.\n\nHe picks up his bag.","Justo.\n\nÉl recoge su bolsa.");
+add("Mirai walks first this time.\n\nThe Traveller follows.\n\nShe does not give him the next turn to choose.","Esta vez Mirai camina delante.\n\nEl Viajero la sigue.\n\nElla no le deja elegir el siguiente giro.");
+add("They rejoin the checkpoint road beyond the storehouses.\n\nCheckpoint Three is still ahead.\n\nThe escort continues.","Vuelven a la carretera del punto de control más allá de los almacenes.\n\nEl Punto de Control Tres sigue por delante.\n\nLa escolta continúa.");
+
 // Kushina.
 add("The practice formula should have gone dark three strokes ago. Instead, chakra crawls past the boundary line and snaps across the courtyard stone toward the student kneeling beside it. The instructor moves—but Kushina is closer.","La fórmula de práctica debería haberse apagado hace tres trazos. En cambio, el chakra rebasa la línea de contención y salta por la piedra del patio hacia el estudiante arrodillado junto a ella. El instructor se mueve, pero Kushina está más cerca.");
 add("Fix the formula before it tears itself apart.","Arreglar la fórmula antes de que se desgarre por completo.");
