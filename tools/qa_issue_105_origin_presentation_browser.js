@@ -41,6 +41,12 @@ async function snapshot(page){
       backdrop:globalThis.resolveStorySceneBoardBackdropPath?.()||null,
       dedicated:stage?.dataset.scSceneBoardBackdrop||null,
       primary:root?.querySelector(".sc-chronicle-primary")?.textContent?.trim()||"",
+      primaryVisible:(()=>{
+        const node=root?.querySelector(".sc-chronicle-primary");
+        if(!node)return false;
+        const style=getComputedStyle(node);
+        return style.display!=="none"&&style.visibility!=="hidden"&&style.opacity!=="0"&&node.getClientRects().length>0;
+      })(),
       speaker:root?.querySelector(".sc-story-name")?.textContent?.trim()||"",
       hint:root?.querySelector(".sc-performance-hint-33900")?.textContent?.trim()||"",
       receiptVisible:root?.dataset.scCueKind==="record",
@@ -218,7 +224,7 @@ async function proveMiraiBattle338(browser){
       const winReturn=await snapshot(page);
       assert.strictEqual(winReturn.beatId,"mir_shortcut_victory_01","Mirai shortcut victory did not enter authored post-Battle Story directly");
       assert.strictEqual(winReturn.text,"The Traveller is the first to lower his guard.\n\nMirai does not lower hers immediately.","Mirai shortcut victory continuity opening drift");
-      assert.notStrictEqual(winReturn.primary,"CONTINUE","Mirai win still exposes redundant post-Battle CONTINUE");
+      assert.strictEqual(winReturn.primaryVisible,false,"Mirai win still exposes redundant post-Battle CONTINUE");
       const road=await advanceUntilBeat(page,"mir_road_talk_memory_01",100);
       const postBattleText=road.seen.map(x=>x.text).join("\n");
       assert(postBattleText.includes("We're done with your route.")&&postBattleText.includes("The escort continues."),"Mirai shortcut victory bridge missing");
@@ -307,7 +313,7 @@ async function proveMiraiDefeatContinuations(browser){
     assert.strictEqual(releasedBeatId,test.firstBeatId,"Mirai defeat beat changed during presentation release "+JSON.stringify({setup,releasedBeatId}));
     let row=await snapshot(page);
     assert.strictEqual(row.beatId,test.firstBeatId,"Mirai defeat did not enter authored assessment-termination cutscene");
-    assert.notStrictEqual(row.primary,"CONTINUE","Mirai loss still exposes redundant post-Battle CONTINUE");
+    assert.strictEqual(row.primaryVisible,false,"Mirai loss still exposes redundant post-Battle CONTINUE");
 
     if(test.kind==="shortcut"){
       assert.strictEqual(row.text,"Mirai's guard gives first.","Mirai shortcut defeat opening drift");
@@ -453,6 +459,7 @@ async function proveMiraiTerminalReceipt(browser){
   assert.strictEqual(receipt.cueKind,"record","Mirai Receipt is not a record cue");
   assert(receipt.text.includes("ACADEMY MIRAI")&&receipt.text.includes("REWARDS"),"Mirai Receipt content missing identity/reward summary");
   assert.strictEqual(receipt.primary,"CONTINUE","Mirai Receipt dedicated button missing");
+  assert.strictEqual(receipt.primaryVisible,true,"Mirai Receipt dedicated CONTINUE button is not visible");
   assert.strictEqual(receipt.hint,"USE CONTINUE TO CONFIRM","Mirai Receipt still instructs click-anywhere");
   const beforeReceipt=await snapshot(page);
   const stage=page.locator("#story-scene-presentation-layer .sc-chronicle-stage,#story-scene-presentation-layer .sc-story-stage").first();
