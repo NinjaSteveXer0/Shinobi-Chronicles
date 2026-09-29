@@ -22,12 +22,12 @@ if(!PRE_NORMALIZE||!PRE_SET||!PRE_ADVANCE){
 function isAuthoredResolverBeat(beat){
   if(!beat)return false;
   const beatId=String(beat.beatId||"");
-  // #343 is intentionally scoped to Wasabi/Izuno. Other Origins (notably
-  // frozen Kakashi V2) own their own machine-resolver presentation/locking.
-  if(!beatId.startsWith("izu_"))return false;
+  // Kakashi V2 owns its own machine-resolver choreography and transition lock.
+  // Shared Story resolvers must never pre-empt that frozen owner.
+  if(beatId.startsWith("v2_")||beat.uiHints&&beat.uiHints.kakashiMachineResolved===true)return false;
   if(beat.machineResolved===true&&(beat.mode==="resolver"||beat.machineResolver343===true))return true;
   const choices=Array.isArray(beat.choices)?beat.choices:[];
-  return beatId.endsWith("_resolver")&&String(beat.text||"")===""&&choices.length>0&&choices.every(choice=>String(choice&&choice.label||"")==="RESOLVE RESULT");
+  return beatId.endsWith("_resolver")&&String(beat.text||"")===""&&choices.length>0&&choices.every(choice=>String(choice&&choice.label||"").startsWith("RESOLVE "));
 }
 globalThis.isStoryMachineResolverBeat343=isAuthoredResolverBeat;
 

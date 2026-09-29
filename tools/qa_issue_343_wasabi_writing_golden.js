@@ -150,8 +150,8 @@ assert(!catalogueSource.includes('"text": "Race you to the corner."')&&!catalogu
 // deterministic resolver beats through existing Story choice authority.
 assert(resolverSource.includes('mode:"narration"')&&resolverSource.includes("machineResolver343=true"),"scoped resolver does not map authored machine beats to supported internal mode");
 assert(resolverSource.includes("function resolveMachineStoryBeat343()"),"scoped machine Story resolver missing");
-assert(resolverSource.includes('beatId.startsWith("izu_")')&&resolverSource.includes('endsWith("_resolver")')&&resolverSource.includes('"RESOLVE RESULT"')&&resolverSource.includes("isStoryMachineResolverBeat343"),"machine resolver lacks Wasabi-scoped normalized-beat signature fallback");
-assert(resolverSource.includes('if(!beatId.startsWith("izu_"))return false'),"#343 machine resolver can intercept another Origin");
+assert(resolverSource.includes('beatId.startsWith("v2_")')&&resolverSource.includes("kakashiMachineResolved")&&resolverSource.includes('endsWith("_resolver")')&&resolverSource.includes('startsWith("RESOLVE ")')&&resolverSource.includes("isStoryMachineResolverBeat343"),"shared machine resolver lacks normalized-beat fallback / Kakashi exclusion");
+assert(resolverSource.includes('beatId.startsWith("v2_")')&&resolverSource.includes("return false"),"shared machine resolver can intercept frozen Kakashi V2");
 assert(resolverSource.includes('available.length!==1')&&resolverSource.includes("story_machine_resolver_cardinality_invalid"),"machine resolver does not fail closed on non-single eligibility");
 assert(resolverSource.includes("applyStorySceneChoice(available[0].choiceId)"),"machine resolver bypasses existing Story choice authority");
 assert(resolverSource.includes("story_machine_resolver_player_choice_forbidden"),"machine resolver accepts player-forced internal branch");
