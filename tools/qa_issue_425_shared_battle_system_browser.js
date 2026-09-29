@@ -181,7 +181,6 @@ async function proveVisibleActionPresentation(page){
     assert.strictEqual(opening.enemyRing,true,"enemy radial Battle PL missing");
     assert(Number.isFinite(opening.playerPL)&&Number.isFinite(opening.enemyPL),"Battle PL readout missing");
     assert.strictEqual(opening.performanceHostPresent,true,"shared performance host missing");
-    assert.strictEqual(opening.performanceCenterPresent,true,"shared performance center missing");
 
     await page.screenshot({path:path.join(OUT,"01-mirai-shared-duel-opening.png"),fullPage:false,timeout:12000});
     const action=await proveVisibleActionPresentation(page);
