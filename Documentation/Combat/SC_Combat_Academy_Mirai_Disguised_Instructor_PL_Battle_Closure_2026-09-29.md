@@ -466,21 +466,91 @@ Caller ID:
 
 `academy_mirai_origin_shortcut_battle`
 
-Semantic entry:
+Binding Story causality successor:
 
-current Mirai shortcut branch after the apparent Escort leads Mirai into the storehouse-side lane.
+`Documentation/Story/Academy_Mirai_Shortcut_PL_Battle_Entry_and_Victory_Continuity_Correction_2026-09-30.md`
 
-### Victory return — unchanged
+commit:
+
+`ddcaa21ec5a2e6d730dde37d16e21d93fe4f4631`
+
+### Pre-Battle entry — successor
+
+The shortcut caller may launch this Battle only after Story has visibly established the controlled assessment trigger.
+
+Required Story sequence:
+
+```text
+The main road is gone behind them.
+-> mir_shortcut_battle_pre_01
+-> ... mir_shortcut_battle_pre_11
+-> exact CTA: Start PL Battle
+-> academy_mirai_origin_shortcut_battle
+-> academy_mirai_origin_disguised_instructor_battle
+```
+
+At Battle launch, Mirai may know:
+
+- the apparent Traveller claims the instructor gave him an extra assessment role;
+- the apparent Traveller is deliberately testing what Mirai does when the escort stops cooperating;
+- the apparent Traveller is combat-capable;
+- the exchange is part of the escort assessment.
+
+Mirai still does **not** know:
+
+- the apparent Traveller is the female Academy instructor;
+- the market substitution truth;
+- the real Traveller's current location.
+
+Preserve:
+
+```text
+assessmentParticipationKnown = true
+!= instructorIdentityKnown
+!= substitutionKnown
+```
+
+The Combat package does not create this Knowledge. Story establishes it before the Battle call.
+
+### Victory return — successor
+
+The former direct return:
+
+```text
+victory
+-> mir_shortcut_battle_return
+-> ordinary Scene 5
+```
+
+is superseded.
+
+Current exact victory return:
 
 ```text
 battleResult = "victory"
--> mir_shortcut_battle_return
+-> mir_shortcut_victory_01
+-> ... mir_shortcut_victory_08
 -> Scene 5 — THE ROAD AFTER
 ```
 
 Victory does **not** auto-reveal the disguise.
 
-Existing conversation / chakra / evidence flow remains Story-owned.
+The bridge establishes:
+
+- Traveller lowers guard first;
+- the assessment exchange is acknowledged;
+- Mirai takes route control back;
+- Mirai walks first;
+- both rejoin the checkpoint road;
+- the escort continues.
+
+On this exact post-Battle Scene-5 variant, retire:
+
+> **No attack comes.**
+
+because an attack/exchange has already occurred.
+
+Scene 5 resumes from the first compatible beat that does not deny the just-completed Battle.
 
 ### Defeat return — SUPERSEDED
 
@@ -752,27 +822,30 @@ Asset availability is presentation authority and does not reopen this Combat pac
 6. no hidden scaling/pre-damage occurs;
 7. victory pays exactly 50 Ryō once;
 8. defeat pays no Battle cash;
-9. shortcut **victory** returns to Scene 5 without identity auto-reveal;
-10. shortcut **defeat** starts at `mir_shortcut_defeat_end_01` and never returns to Scene 5;
-11. confrontation **victory** returns to the approved Scene-7A reveal;
-12. confrontation **defeat** starts at `mir_confront_defeat_end_01` before the authored reveal;
-13. either defeat commits `miraiEscortAssessmentResult = "not_completed_battle_defeat"`;
-14. either defeat commits `miraiEscortDutyActive = false`;
-15. either defeat commits `miraiReachedCheckpointAsActiveEscort = false`;
-16. either defeat reaches Checkpoint Three only after BLACK WIPE / **LATER — CHECKPOINT THREE** as a debrief;
-17. neither defeat can resume escort gameplay or record normal checkpoint escort success;
-18. Battle UI remains Traveller/Escort pre-reveal;
-19. `identityRevealedByBattle` remains false for every terminal Battle result;
-20. after Story reveal, female instructor presentation is restored;
-21. save/load preserves Battle state, AI cycle, terminal result and caller-specific successor;
-22. no stale compressed Mirai runtime overrides the current Story graph;
-23. global exact CTA remains **Start PL Battle**;
-24. defeat-specific Receipt/Origin completion remains Story-owned and cannot be bypassed by the old normal-escort continuation.
+9. shortcut Battle cannot launch until `mir_shortcut_battle_pre_01..11` has established the controlled assessment cause and exact **Start PL Battle** CTA;
+10. shortcut pre-Battle Story may establish assessment participation, but must not establish instructor identity or substitution Knowledge;
+11. shortcut **victory** routes through `mir_shortcut_victory_01..08` before Scene 5 and does not identity-reveal;
+12. shortcut victory Scene-5 variant must not display the stale `No attack comes.` line;
+13. shortcut **defeat** starts at `mir_shortcut_defeat_end_01` and never returns to Scene 5;
+14. confrontation **victory** returns to the approved Scene-7A reveal;
+15. confrontation **defeat** starts at `mir_confront_defeat_end_01` before the authored reveal;
+16. either defeat commits `miraiEscortAssessmentResult = "not_completed_battle_defeat"`;
+17. either defeat commits `miraiEscortDutyActive = false`;
+18. either defeat commits `miraiReachedCheckpointAsActiveEscort = false`;
+19. either defeat reaches Checkpoint Three only after BLACK WIPE / **LATER — CHECKPOINT THREE** as a debrief;
+20. neither defeat can resume escort gameplay or record normal checkpoint escort success;
+21. Battle UI remains Traveller/Escort pre-reveal;
+22. `identityRevealedByBattle` remains false for every terminal Battle result;
+23. after Story reveal, female instructor presentation is restored;
+24. save/load preserves Battle state, AI cycle, terminal result and caller-specific successor;
+25. no stale compressed Mirai runtime overrides the current Story graph;
+26. global exact CTA remains **Start PL Battle**;
+27. defeat-specific Receipt/Origin completion remains Story-owned and cannot be bypassed by the old normal-escort continuation.
 
 ---
 
 # 16. Final lock
 
-> **Academy Mirai's optional post-switch Battle is one controlled 1v1 PL Battle against stable participant `academy_mirai_origin_instructor`, internally the female Academy instructor while observer-facing presentation remains the male Traveller/Escort until Story reveals her. The instructor enters at full PL16 and follows the deterministic assessment loop Testing Strike ATK4 -> Substitution Guard 25% -> Turning Sweep ATK5 -> repeat. Mirai acts first and can legitimately win at full values using her existing prepared actions without hidden scaling. Victory and defeat remain Battle-depletion facts, not injury/death/custody or automatic identity verification. Shortcut victory still returns to Scene 5 without reveal. Shortcut defeat and confrontation defeat now terminate the active escort assessment at the Battle location, then Story deliberately reveals the instructor and later moves to Checkpoint Three for debrief only. Confrontation victory retains the existing Scene-7A reveal. Standard victory reward is 50 Ryō; defeat grants no Battle cash.**
+> **Academy Mirai's optional post-switch Battle is one controlled 1v1 PL Battle against stable participant `academy_mirai_origin_instructor`, internally the female Academy instructor while observer-facing presentation remains the male Traveller/Escort until Story reveals her. The instructor enters at full PL16 and follows the deterministic assessment loop Testing Strike ATK4 -> Substitution Guard 25% -> Turning Sweep ATK5 -> repeat. Mirai acts first and can legitimately win at full values using her existing prepared actions without hidden scaling. Victory and defeat remain Battle-depletion facts, not injury/death/custody or automatic identity verification. Shortcut victory now passes through the authored `mir_shortcut_victory_01..08` continuity bridge before Scene 5 and still does not reveal the disguise. Shortcut defeat and confrontation defeat now terminate the active escort assessment at the Battle location, then Story deliberately reveals the instructor and later moves to Checkpoint Three for debrief only. Confrontation victory retains the existing Scene-7A reveal. Standard victory reward is 50 Ryō; defeat grants no Battle cash.**
 
 **COMBAT DESIGN REMAINS CLOSED. DEFEAT STORY-RETURN CONTRACT UPDATED 2026-09-29 != IMPLEMENTED != RUNTIME VALIDATED != BROWSER GOLDEN.**
