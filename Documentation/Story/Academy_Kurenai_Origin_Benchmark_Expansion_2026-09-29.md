@@ -572,6 +572,40 @@ Do not:
 - turn the instructor into a tutorial lecturer;
 - turn Kurenai into a cryptic adult Genjutsu master.
 
+## Owner browser hard-failure invariant — 2026-09-30
+
+Owner installed-browser review found a branch that appeared to complete the Origin immediately after a Bell-Test choice.
+
+That behavior is **not authored**.
+
+For every one of the four Bell-Test approaches:
+
+- `SEND A FALSE KURENAI`;
+- `HIDE MY REAL MOVEMENT`;
+- `DISTORT HER SENSE OF DISTANCE`;
+- `MAKE THE DIRECT APPROACH LOOK REAL`;
+
+the Bell result may commit its factual `bellTestOutcomeClass`, but that commit is **not** Origin completion.
+
+Every route must visibly continue through:
+
+`route result`
+-> route-specific evaluation
+-> shared evaluation
+-> route-specific aftermath
+-> leaving scene
+-> `YOUR CHRONICLE BEGINS`
+-> Chronicle Receipt
+-> only then Origin completion.
+
+Hard fail if:
+- selecting any Bell option exits the Story;
+- committing `occ_origin_kurenai_bell_test_resolution` completes the Origin;
+- any route skips its authored aftermath/leaving sequence;
+- one outcome receives materially less Story solely because its Bell result committed earlier.
+
+> **Bell Test resolved != Origin completed.**
+
 ## Final lock
 
 > **Kurenai's existing Bell Test remains the core. The expanded Origin now gives the player time with Kurenai before the test, lets the exact result breathe afterward, and gives her a route-aware closing beat before the Chronicle Receipt.**
