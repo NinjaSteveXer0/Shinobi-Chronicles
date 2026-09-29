@@ -39,7 +39,10 @@ assert(binder.includes("function rehydrateActiveOriginPresentation105()")&&binde
 assert(binder.includes("pendingBattleRestore===true"),"GOLDEN reload rehydrate can outrank pending Battle restore");
 assert(golden.includes('const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A);'),"GOLDEN consumer methods are not bound to Origin runtime");
 assert(golden.includes('entryBeatId:"menma_open_01"')&&golden.includes('D("menma_open_15","MENMA","I know."'),"Menma full GOLDEN Academy opening missing");
-assert(golden.includes('entryBeatId:"mir_assignment_01"')&&golden.includes('Q("mir_walk_choice"')&&golden.includes('Q("mir_reflection_choice"'),"Mirai GOLDEN conversation graph missing");
+assert(golden.includes('entryBeatId:"mir_assignment_01"')&&golden.includes('Q("mir_walk_choice"')&&golden.includes('Q("mir_reflection_conversation"')&&golden.includes('Q("mir_reflection_chakra"')&&golden.includes('Q("mir_reflection_suspicion"')&&golden.includes('Q("mir_reflection_missed"'),"Mirai route-aware GOLDEN conversation graph missing");
+assert(!golden.includes('Q("mir_reflection_choice"'),"retired universal Mirai reflection surface returned");
+assert(sceneB.includes('entryBeatId:"kus_practical_01"')&&sceneB.includes('C("protect_student","GET THE STUDENT CLEAR"')&&sceneB.includes('C("correct_formula","CORRECT THE FORMULA"'),"Kushina benchmark rewrite entry/crisis choices missing");
+assert(sceneB.includes('occ_origin_kushina_residual_seal_work_resolution')&&sceneB.includes('occ_origin_kushina_gerotora_first_contact')&&sceneB.includes('occ_origin_kushina_joint_residual_seal_closure'),"Kushina occurrence boundaries drifted");
 assert(golden.includes('const oldTutorial=cloneBeat(oldMenmaBeat("tutorial_battle"))')&&golden.includes('victoryBeatId:"menma_after_01"'),"Menma evolved Battle seam was not preserved into GOLDEN Story");
 assert(shim335.includes('beat33500(def,"mir_assignment_01")')&&shim336.includes('beat(def,"mir_assignment_01")'),"legacy Mirai expression shims do not stand down for GOLDEN graph");
 assert(shim337.includes('beat(d,"mir_assignment_01")')&&shim337.includes('d.entryBeatId==="menma_open_01"'),"33700 stale Mirai/Menma shims do not stand down for GOLDEN graph");
