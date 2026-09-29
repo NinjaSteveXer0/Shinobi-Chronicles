@@ -1286,13 +1286,13 @@ Wasabi finally looks over.
 
 ### REFLECTION — RIVER
 
-**“The long way still got me there first.”**
+**“I caught them the hard way.”**
 
-**“Next time I want a better time.”**
+**“Next time I beat that time.”**
 
-**“Open ground suits me.”**
+**“Give them a bigger head start.”**
 
-**“If they run harder next time, so will I.”**
+**“I want the rematch.”**
 
 ---
 
@@ -1318,13 +1318,13 @@ Wasabi smiles.
 
 ### REFLECTION — INTERCEPT
 
-**“I don't have to stay behind them to catch them.”**
+**“Why chase from behind if I can get there first?”**
 
-**“The route can be faster than the trail.”**
+**“The route mattered more than the trail.”**
 
-**“Next time I trust the intercept sooner.”**
+**“I trusted my read. It worked.”**
 
-**“I want to see if they can beat that.”**
+**“Next time I cut them off sooner.”**
 
 ---
 
@@ -1358,13 +1358,13 @@ Wasabi grins despite herself.
 
 ### REFLECTION — FALSE TRAIL
 
-**“Next time I check the easy answer first.”**
+**“They got me with that one.”**
 
-**“They fooled me once. That's enough.”**
+**“I saw the trick. Just too late.”**
 
-**“Spotting the trick late is better than never spotting it.”**
+**“Next time I check what doesn't fit.”**
 
-**“Next time I make them work harder for it.”**
+**“They'll need a better trick next time.”**
 
 ---
 
@@ -1392,13 +1392,13 @@ The student smiles.
 
 ### REFLECTION — STEP IN
 
-**“I'd still step in.”**
+**“I'd step in again.”**
 
-**“Next time I end it faster.”**
+**“Next time I end the fight faster.”**
 
-**“The target got away. The rest still happened.”**
+**“The target got away. I still finished what I started.”**
 
-**“I need to know how much time a fight can cost me.”**
+**“I need to know how much time a fight really costs.”**
 
 ---
 
@@ -1422,13 +1422,13 @@ Wasabi looks back at the board.
 
 ### REFLECTION — CALL FOR HELP
 
-**“Calling out was faster than fighting.”**
+**“Calling the instructor was faster.”**
 
-**“Getting them moving mattered.”**
+**“I got the student moving.”**
 
-**“Next time I make the handoff quicker.”**
+**“Next time I hand it off sooner.”**
 
-**“I can watch the route and the people on it.”**
+**“I can watch the chase and the people in it.”**
 
 ---
 
@@ -1456,13 +1456,13 @@ That annoys her more than the result.
 
 ### REFLECTION — KEEP PURSUING
 
-**“I chose the target. I'd make that call again.”**
+**“I chose the target.”**
 
-**“Next time I decide faster.”**
+**“I waited too long before I moved.”**
 
-**“Hesitating cost more than the choice.”**
+**“Next time I decide immediately.”**
 
-**“I need to know what I can leave behind.”**
+**“Give me another shot at the chase.”**
 
 ---
 
