@@ -190,6 +190,28 @@ function buildKushinaReceipt105(){
   lines.push("","REWARDS",`• Origin Starting Purse: +${originStartingPurseAmount105()} Ryō.`);
   return lines.join("\n");
 }
+function buildKurenaiReceipt105(){
+  const runtime=A&&typeof A.active==="function"?A.active():null;
+  const ctx=runtime&&runtime.localContext&&typeof runtime.localContext==="object"?runtime.localContext:{};
+  const lines=["YOUR ORIGIN","ACADEMY KURENAI","","RECORDED IN YOUR CHRONICLE","","YOUR DECISIONS"];
+  const approach={
+    false_kurenai:"Sent a false Kurenai at the bell.",
+    conceal_movement:"Hid the movement that actually mattered.",
+    distort_position:"Distorted the instructor's sense of distance.",
+    fake_clumsy:"Made the direct approach look real."
+  }[ctx.kurenaiRoute];
+  if(approach)lines.push("• "+approach);
+  lines.push("","WHAT HAPPENED");
+  const outcome={
+    complete_loss:"• The instructor read the first deception before Kurenai could create a reversal.",
+    partial_loss:"• Kurenai deceived the instructor, then trusted the false bell herself.",
+    partial_win:"• Kurenai took the bell before the instructor recovered and took it back.",
+    complete_win:"• Kurenai held the real bell when the final illusion layer cleared."
+  }[ctx.kurenaiOutcome];
+  if(outcome)lines.push(outcome);
+  lines.push("","REWARDS",`• Origin Starting Purse: +${originStartingPurseAmount105()} Ryō.`);
+  return lines.join("\n");
+}
 function buildMiraiReceipt105(){
   const runtime=A&&typeof A.active==="function"?A.active():null;
   const ctx=runtime&&runtime.localContext&&typeof runtime.localContext==="object"?runtime.localContext:{};
@@ -402,7 +424,8 @@ function kushinaActors(beatId,performance,beat){
   return rows;
 }
 function kurenaiActors(beatId,performance,beat){
-  const sp=speaker(performance,beat);
+  const id=String(beatId||""),sp=speaker(performance,beat);
+  if(id==="kur_receipt")return[];
   return[
     actor("academy_kurenai","KURENAI",PATH.kurenai,sp),
     actor("kurenai_academy_instructor","INSTRUCTOR",PATH.kurenaiInstructor,sp,["ACADEMY INSTRUCTOR"])
@@ -540,8 +563,15 @@ function installDefinitions(){
     }
   });
   results.kurenai=registerDefinition(scene("academy_kurenai"),{
-    resolve:({beatId,performance,beat})=>projection("ACADEMY · BELL TEST",kurenaiActors(beatId,performance,beat)),
-    resolveBackdrop:()=>({assetPath:GENERIC_COURTYARD,assetId:"issue105_generic_courtyard"})
+    resolve:({beatId,performance,beat})=>String(beatId||"")==="kur_receipt"
+      ?{mode:"record",location:"YOUR ORIGIN",actors:[]}
+      :projection("ACADEMY · BELL TEST",kurenaiActors(beatId,performance,beat)),
+    resolveBackdrop:({beatId})=>String(beatId||"")==="kur_receipt"
+      ?null
+      :{assetPath:GENERIC_COURTYARD,assetId:"issue105_generic_courtyard"},
+    performanceSequences:{
+      kur_receipt:()=>[{kind:"record",text:buildKurenaiReceipt105()}]
+    }
   });
   results.iwabee=registerDefinition(scene("academy_iwabee"),{
     resolve:({beatId,performance,beat})=>projection("ACADEMY · PRACTICAL TRAINING GROUND",iwabeeActors(beatId,performance,beat)),
