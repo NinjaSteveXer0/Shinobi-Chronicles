@@ -403,6 +403,29 @@ async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedB
   assert(launched&&launched.success===true,JSON.stringify(launched));
   await page.waitForFunction(()=>!!(typeof currentBattle!=="undefined"&&currentBattle&&currentBattle.returnContext&&currentBattle.returnContext.type==="story_scene"),null,{timeout:12000});
   await page.waitForSelector(".alpha-code-battle-stage",{state:"visible",timeout:12000});
+  const sharedBattle=await page.evaluate(()=>{
+    const stage=document.querySelector(".alpha-code-battle-stage.battle2-modern");
+    const playerCount=(currentBattle?.deployment?.player?.slots||[]).filter(slot=>slot&&slot.participantId).length;
+    const enemyCount=(currentBattle?.deployment?.enemy?.slots||[]).filter(slot=>slot&&slot.participantId).length;
+    const peak=Math.max(playerCount,enemyCount);
+    return{
+      battleSystem:stage?.dataset.battleSystem||null,
+      formationStage:stage?.dataset.formationStage||null,
+      formationMode:stage?.dataset.formationMode||null,
+      menmaProof:stage?.dataset.evolvedPlProof||null,
+      playerCount,enemyCount,
+      expectedMode:peak<=1?"duel":peak>=4?"arc":"wedge",
+      framelessPlayer:stage?.querySelector(".battle-live-active-card-player")?.dataset.framelessBattlePortrait||null,
+      framelessEnemy:stage?.querySelector(".battle-live-active-card-enemy")?.dataset.framelessBattlePortrait||null
+    };
+  });
+  assert.strictEqual(sharedBattle.battleSystem,"shinobi_chronicles_shared","Kakashi Battle bypassed canonical shared Battle System: "+JSON.stringify(sharedBattle));
+  assert.strictEqual(sharedBattle.formationStage,"true","Kakashi Battle did not use shared Formation Stage");
+  assert.strictEqual(sharedBattle.menmaProof,null,"Kakashi Battle incorrectly depends on Menma proof marker");
+  assert.strictEqual(sharedBattle.formationMode,sharedBattle.expectedMode,"Kakashi adaptive formation drift: "+JSON.stringify(sharedBattle));
+  assert.strictEqual(sharedBattle.framelessPlayer,"true","Kakashi active portrait is not frameless in shared Battle System");
+  assert.strictEqual(sharedBattle.framelessEnemy,"true","Kakashi opposition active portrait is not frameless in shared Battle System");
+  if(sharedBattle.enemyCount===3)assert.strictEqual(sharedBattle.formationMode,"wedge","Kakashi failed-pickpocket 3v1 did not use shared SQUAD WEDGE");
   if(assertVisible){
     await page.waitForFunction(()=>{
       const visible=node=>!!node&&node.getClientRects().length>0&&getComputedStyle(node).display!=="none"&&getComputedStyle(node).visibility!=="hidden";
