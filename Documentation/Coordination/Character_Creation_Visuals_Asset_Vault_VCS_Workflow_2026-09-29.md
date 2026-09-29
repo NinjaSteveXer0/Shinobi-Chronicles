@@ -21,12 +21,18 @@ The asset-vault branch is the permanent visual-asset publication lane. It separa
 2. Stephen reviews the exact visual.
 3. **Nothing is uploaded or published until Stephen explicitly signs off / approves it.**
 4. After Stephen signs off, Character Creation / Visuals:
-   - places the exact approved PNG on `visuals/asset-vault`;
-   - uses the correct permanent project asset path;
+   - locks the exact approved PNG identity;
+   - specifies the correct permanent project asset path;
+   - specifies asset type, intended entity/character, implementation consumer and locked usage rules;
+   - creates/routes an **Asset Vault Intake** record to CE / Codex / Coordination when its active workspace cannot publish binary files remotely.
+5. The designated CE / Codex / Coordination remote intake bridge:
+   - receives the exact approved PNG;
+   - publishes that exact PNG to `visuals/asset-vault` through remote GitHub tooling;
    - commits only the approved asset file(s);
-   - does not include runtime, documentation, QA, HTML or unrelated files.
-5. Character Creation / Visuals immediately creates a GitHub implementation issue for the approved asset.
-6. The implementation issue records:
+   - does not include runtime, documentation, QA, HTML or unrelated files;
+   - records the exact repository path + commit SHA.
+6. After successful publication, the intake bridge creates the GitHub implementation issue for the approved asset.
+7. The implementation issue records:
    - exact asset name;
    - asset type: Character Card / NPC Card / Battle Portrait;
    - exact repository path;
@@ -34,7 +40,7 @@ The asset-vault branch is the permanent visual-asset publication lane. It separa
    - intended character/entity;
    - intended implementation consumer;
    - all locked presentation/usage rules.
-7. Character Creation / Visuals returns the issue number to Stephen in routing form, for example:
+8. The implementation issue is routed to the intended consumer in normal GitHub handoff form, for example:
 
 `Routing: SEND NOW → CODING / RUNTIME (#XXX)`
 
@@ -46,9 +52,10 @@ Owns:
 - approved Character Card intake;
 - approved NPC Card intake;
 - approved Battle Portrait intake;
-- publication of the exact approved PNG to `visuals/asset-vault`;
-- exact path/commit evidence;
-- creation of the implementation issue.
+- exact approved-image identity;
+- intended permanent repository path;
+- asset type / entity / consumer / usage metadata;
+- creation/routing of the Asset Vault Intake record when binary publication must be performed by the remote coordination bridge.
 
 Does **not**:
 - edit Coding/runtime files;
@@ -93,27 +100,27 @@ Therefore Character Creation / Visuals must **not** make Stephen perform normal 
 
 Those are not the normal asset-vault workflow.
 
-After Stephen approves an exact asset, CC/V owns the GitHub publication operation.
+After Stephen approves an exact asset, CC/V owns the **visual intake authority**, but not a capability its active workspace does not possess.
 
-If CC/V has access to the exact approved PNG bytes, it must publish the asset itself through the available GitHub tooling to `visuals/asset-vault`, commit only the approved asset file(s), and create the implementation issue.
+If CC/V can genuinely publish the binary remotely through approved GitHub tooling, it may do so.
 
-If CC/V **cannot access the exact approved PNG bytes**, it must stop and say so plainly.
+If CC/V cannot publish binary files remotely, it must **not** give Stephen Git / PowerShell / local-VCS instructions. Instead it creates/routes the Asset Vault Intake record to CE / Codex / Coordination.
 
-The permitted Stephen-side recovery action is limited to making the exact approved file accessible to CC/V — for example, uploading that exact approved PNG back into the Character Creation / Visuals chat when required.
+Because conversation workspaces cannot be assumed to transfer image bytes to one another automatically, Stephen may need to attach the exact approved PNG once to the CE / Codex / Coordination intake conversation. That is a binary-access workaround only; Stephen does not switch branches, stage, commit, push, merge, stash, reset or otherwise operate Git.
 
-Once the exact approved file is accessible, CC/V resumes ownership and performs the GitHub commit/issue workflow itself.
+The CE / Codex / Coordination intake bridge then performs the GitHub binary publication remotely.
 
 Canonical rule:
 
-> **Stephen may supply the exact approved file when tool access requires it. Stephen is not the Git transport layer.**
+> **Stephen may provide the exact approved PNG when cross-workspace binary access requires it. Stephen is never the Git transport layer.**
 
 ---
 
 ## Failure rule
 
-If Character Creation / Visuals cannot access the exact approved image file for upload:
+If Character Creation / Visuals cannot publish the exact approved image binary remotely:
 
-> **STOP AND TELL STEPHEN.**
+> **DO NOT FALL BACK TO LOCAL GIT. ROUTE TO THE REMOTE ASSET-VAULT INTAKE BRIDGE.**
 
 Do not:
 - reconstruct it;
@@ -145,6 +152,6 @@ This workflow governs **new approved visual-asset intake from 2026-09-29 onward*
 
 ## Production shorthand
 
-> **CREATE → OWNER APPROVAL → ASSET VAULT → IMPLEMENTATION ISSUE → CODING CONSUMES EXACT ASSET ONLY**
+> **CREATE → OWNER APPROVAL → REMOTE ASSET-VAULT INTAKE → IMPLEMENTATION ISSUE → CODING CONSUMES EXACT ASSET ONLY**
 
 This is the locked visual VCS workflow for Shinobi Chronicles.
