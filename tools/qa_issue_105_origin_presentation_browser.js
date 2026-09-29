@@ -547,7 +547,7 @@ async function proveMiraiTerminalReceipt(browser){
         assert(terminalText.includes("Change the trick."),"Kurenai complete-win leaving expansion missing");
         await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="kur_receipt"&&document.getElementById("story-scene-presentation-layer")?.dataset.scCueKind==="record",null,{timeout:8000});
         row=await snapshot(page);
-        assert.strictEqual(row.mode,"record","Kurenai terminal semantic beat is not Chronicle Receipt");
+        assert.strictEqual(row.beatId,"kur_receipt","Kurenai terminal runtime did not remain on Chronicle Receipt");
         assert.strictEqual(row.cueKind,"record","Kurenai terminal presentation is not Chronicle Receipt");
         assert.strictEqual(row.actors.length,0,"Kurenai Receipt still stages Story actors");
         assert(row.text.includes("ACADEMY KURENAI")&&row.text.includes("Made the direct approach look real."),"Kurenai Receipt route summary missing "+JSON.stringify(row));
