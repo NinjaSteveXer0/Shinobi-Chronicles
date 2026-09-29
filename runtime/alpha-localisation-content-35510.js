@@ -192,6 +192,20 @@ const PAIRS=Object.freeze([
   ["The illusion layers resolve from the committed deception sequence. No personality or alignment label is assigned.","Las capas de ilusión se resuelven a partir de la secuencia de engaño confirmada. No se asigna ninguna etiqueta de personalidad ni alineamiento."],
   ["I was assessing what you believed in, to separate the reality from illusion and the truth from fiction.","Estaba evaluando en qué creías, para separar la realidad de la ilusión y la verdad de la ficción."],
 
+  // Kurenai 2026-09-29 native expansion choice/resolver labels.
+  ["SEND A FALSE KURENAI","ENVIAR UNA KURENAI FALSA"],
+  ["HIDE MY REAL MOVEMENT","OCULTAR MI MOVIMIENTO REAL"],
+  ["DISTORT HER SENSE OF DISTANCE","DISTORSIONAR SU SENTIDO DE LA DISTANCIA"],
+  ["MAKE THE DIRECT APPROACH LOOK REAL","HACER QUE EL ATAQUE DIRECTO PAREZCA REAL"],
+  ["RESOLVE COMPLETE LOSS AFTERMATH","RESOLVER SECUELA DE DERROTA COMPLETA"],
+  ["RESOLVE PARTIAL LOSS AFTERMATH","RESOLVER SECUELA DE DERROTA PARCIAL"],
+  ["RESOLVE PARTIAL WIN AFTERMATH","RESOLVER SECUELA DE VICTORIA PARCIAL"],
+  ["RESOLVE COMPLETE WIN AFTERMATH","RESOLVER SECUELA DE VICTORIA COMPLETA"],
+  ["RESOLVE COMPLETE LOSS LEAVING","RESOLVER SALIDA TRAS DERROTA COMPLETA"],
+  ["RESOLVE PARTIAL LOSS LEAVING","RESOLVER SALIDA TRAS DERROTA PARCIAL"],
+  ["RESOLVE PARTIAL WIN LEAVING","RESOLVER SALIDA TRAS VICTORIA PARCIAL"],
+  ["RESOLVE COMPLETE WIN LEAVING","RESOLVER SALIDA TRAS VICTORIA COMPLETA"],
+
   // Iwabee.
   ["Make the area usable again.","Haz que el área vuelva a ser utilizable."],
   ["Choose how Iwabee reshapes the damaged ground.","Elige cómo Iwabee remodela el terreno dañado."],
