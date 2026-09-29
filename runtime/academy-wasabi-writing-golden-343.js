@@ -791,36 +791,32 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Her fingers miss the back of their shirt by less than a handspan."
+        "text": "Her hand catches the back of their shirt before they reach the line."
       },
       {
         "kind": "narration",
-        "text": "The target crosses."
+        "text": "The target skids to a stop short of extraction."
       },
       {
         "kind": "narration",
-        "text": "The proctor drops his arm between them."
+        "text": "Wasabi plants her feet and holds on."
       },
       {
         "kind": "dialogue",
         "speakerName": "PROCTOR",
-        "text": "Extraction."
+        "text": "Caught."
       },
       {
         "kind": "narration",
-        "text": "Wasabi skids to a stop."
+        "text": "Wasabi lets go and looks at the line."
       },
       {
         "kind": "narration",
-        "text": "Stares at the target."
+        "text": "Then at the target."
       },
       {
         "kind": "narration",
-        "text": "Then at the line."
-      },
-      {
-        "kind": "narration",
-        "text": "Then at the target again."
+        "text": "Her grin comes straight back."
       },
       {
         "kind": "dialogue",
@@ -1509,86 +1505,30 @@ const SECTIONS=Object.freeze({
     "cues": [
       {
         "kind": "narration",
-        "text": "Wasabi reaches extraction at full speed."
-      },
-      {
-        "kind": "narration",
-        "text": "The target is already across."
-      },
-      {
-        "kind": "narration",
-        "text": "By seconds."
-      },
-      {
-        "kind": "narration",
-        "text": "Maybe less."
-      },
-      {
-        "kind": "narration",
-        "text": "The instructor checks the time."
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi bends over, hands on her knees."
-      },
-      {
-        "kind": "narration",
-        "text": "Looks up."
-      },
-      {
-        "kind": "dialogue",
-        "speakerName": "WASABI",
-        "text": "How much?"
-      },
-      {
-        "kind": "narration",
-        "text": "The instructor tells her."
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi straightens immediately."
-      },
-      {
-        "kind": "dialogue",
-        "speakerName": "WASABI",
-        "text": "That's nothing."
+        "text": "The instructor checks the extraction line, then the target."
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY INSTRUCTOR",
-        "text": "It was enough."
+        "text": "You took the long way."
       },
       {
         "kind": "narration",
-        "text": "Wasabi stares at him."
-      },
-      {
-        "kind": "narration",
-        "text": "Then at the target."
+        "text": "Wasabi is still catching her breath."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Again."
+        "text": "Still caught them."
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY INSTRUCTOR",
-        "text": "No."
-      },
-      {
-        "kind": "dialogue",
-        "speakerName": "WASABI",
-        "text": "Why?"
-      },
-      {
-        "kind": "dialogue",
-        "speakerName": "ACADEMY INSTRUCTOR",
-        "text": "Because the exercise is over."
+        "text": "You did."
       },
       {
         "kind": "narration",
-        "text": "Wasabi looks deeply unconvinced by this technicality."
+        "text": "Wasabi's grin widens."
       }
     ]
   },
