@@ -8,7 +8,7 @@
 // Boundary:
 // - REPLACE stale compressed player-facing Story.
 // - Preserve Menma's existing Battle object / completion authority.
-// - Mirai Battle-only shortcut stays fail-closed while Combat #338 is open.
+// - Mirai consumes closed Combat #338 through the existing Story -> Battle -> same-Story bridge.
 // - No Kakashi ownership.
 // ============================================================================
 (function installOriginWritingGolden105(){
@@ -264,6 +264,30 @@ const MIRAI_ENV=Object.freeze({
 const MIR_SUB="occ_origin_mirai_substitution_verification_resolution";
 const MIR_CHAKRA="occ_origin_mirai_changed_chakra_observation";
 const MIR_CHECKPOINT="occ_origin_mirai_checkpoint_escort_resolution";
+const MIRAI_BATTLE_CONFIG="academy_mirai_origin_disguised_instructor_battle";
+const MIRAI_BATTLE_ENCOUNTER="origin_academy_mirai_disguised_instructor_assessment";
+const MIRAI_BATTLE_OPPONENT="academy_mirai_origin_instructor";
+const MIRAI_SHORTCUT_CALLER="academy_mirai_origin_shortcut_battle";
+const MIRAI_CONFRONT_CALLER="academy_mirai_origin_confrontation_battle";
+
+function miraiBattleSpec(callerId,returnBeatId){
+  return{
+    enemyId:MIRAI_BATTLE_OPPONENT,
+    encounterId:MIRAI_BATTLE_ENCOUNTER,
+    victoryBeatId:returnBeatId,
+    defeatBeatId:returnBeatId,
+    resultProjector:()=>typeof globalThis.projectAcademyMiraiDisguisedInstructorBattle338==="function"
+      ?globalThis.projectAcademyMiraiDisguisedInstructorBattle338()
+      :null,
+    actionLabel:"Start PL Battle",
+    launchResolver:({returnContext})=>{
+      if(typeof globalThis.launchAcademyMiraiDisguisedInstructorBattle338!=="function"){
+        return{success:false,reason:"mirai338_battle_adapter_missing"};
+      }
+      return globalThis.launchAcademyMiraiDisguisedInstructorBattle338({callerId,returnContext});
+    }
+  };
+}
 
 const miraiBeats=[];
 function push(...rows){miraiBeats.push(...rows);}
@@ -276,7 +300,7 @@ function line(prefix,rows,environment,next){
 }
 
 line("mir_assignment",[
- {mode:"narration",text:"Mirai arrives early.\n\nNot a little early.\n\nEarly enough that the checkpoint map is still rolled up on the instructor's desk.\n\nHe looks at her.\n\nThen at the empty yard behind her."},
+ {mode:"narration",text:"Mirai arrives early.\n\nNot a little early.\n\nEarly enough that the checkpoint map is still rolled up on the instructor's desk.\n\nShe looks at her.\n\nThen at the empty yard behind her."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"You're aware this doesn't start for another ten minutes."},
  {mode:"dialogue",speaker:"MIRAI",text:"Yes."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"Then why are you here?"},
@@ -407,12 +431,12 @@ line("mir_shortcut_prof",shortcutIntro,MIRAI_ENV.lane,"mir_shortcut_prof_choice"
 
 push(
  Q("mir_shortcut_talk_choice","",[
-  C("follow","FOLLOW HIM","mir_shortcut_follow_blocked",{mirShortcut:"follow"},{availability:battleUnavailable()}),
+  C("follow","FOLLOW HIM","mir_shortcut_follow_01",{mirShortcut:"follow"}),
   C("stay","STAY ON THE ROUTE","mir_shortcut_stay_talk_01",{mirShortcut:"stay"}),
   C("ask","ASK HOW HE KNOWS","mir_shortcut_ask_01",{mirShortcut:"ask"})
  ],MIRAI_ENV.lane),
  Q("mir_shortcut_prof_choice","",[
-  C("follow","FOLLOW HIM","mir_shortcut_follow_blocked",{mirShortcut:"follow"},{availability:battleUnavailable()}),
+  C("follow","FOLLOW HIM","mir_shortcut_follow_01",{mirShortcut:"follow"}),
   C("stay","STAY ON THE ROUTE","mir_shortcut_stay_prof_01",{mirShortcut:"stay"})
  ],MIRAI_ENV.lane)
 );
@@ -453,7 +477,7 @@ line("mir_shortcut_ask",[
 push(Q("mir_shortcut_ask_choice","",[
  C("only","“Only when things don't add up.”","mir_shortcut_only_01",{mirConversationSuspicion:true}),
  C("forget","“Forget it.”","mir_shortcut_forget_01"),
- C("follow","FOLLOW THE SHORTCUT","mir_shortcut_follow_blocked",{mirShortcut:"follow"},{availability:battleUnavailable()})
+ C("follow","FOLLOW THE SHORTCUT","mir_shortcut_follow_01",{mirShortcut:"follow"})
 ],MIRAI_ENV.lane));
 line("mir_shortcut_only",[
  {mode:"narration",text:"The smile fades a little."},
@@ -469,6 +493,37 @@ line("mir_shortcut_forget",[
  {mode:"dialogue",speaker:"MIRAI",text:"Come on."},
  {mode:"narration",text:"The traveller follows."}
 ],MIRAI_ENV.street,"mir_road_talk_01");
+
+line("mir_shortcut_follow",[
+ {mode:"narration",text:"Mirai turns into the side lane."},
+ {mode:"narration",text:"The traveller moves ahead."},
+ {mode:"narration",text:"Not far."},
+ {mode:"narration",text:"Just enough that he's choosing the turns now."},
+ {mode:"narration",text:"The lane cuts between old storehouses and narrow courtyards."},
+ {mode:"narration",text:"At the first split, he goes right without slowing."},
+ {mode:"narration",text:"At the next, left."},
+ {mode:"narration",text:"Mirai watches him disappear around the corner."},
+ {mode:"narration",text:"Then follows."},
+ {mode:"narration",text:"The main road is gone behind them."}
+],MIRAI_ENV.lane,"mir_shortcut_battle");
+push({
+ beatId:"mir_shortcut_battle",
+ mode:"battle_transition",
+ text:"",
+ environmentRef:MIRAI_ENV.lane,
+ battle:miraiBattleSpec(MIRAI_SHORTCUT_CALLER,"mir_shortcut_battle_return")
+});
+push({
+ beatId:"mir_shortcut_battle_return",
+ mode:"resolver",
+ machineResolved:true,
+ text:"",
+ environmentRef:MIRAI_ENV.lane,
+ choices:[
+  C("talked","RESOLVE TALKED ROAD","mir_road_talk_01",null,{availability:hiddenResolverAvailability(()=>A.local().mirTalked===true)}),
+  C("professional","RESOLVE PROFESSIONAL ROAD","mir_road_prof_01",null,{availability:hiddenResolverAvailability(()=>A.local().mirTalked!==true)})
+ ]
+});
 
 const roadCommon=[
  {mode:"narration",text:"The shortcut rejoins the checkpoint road beyond the market district.\n\nOr, if Mirai stayed on the marked route, the same stretch eventually opens ahead.\n\nCheckpoint Three isn't far now.\n\nThe traveller walks beside her.\n\nFor several minutes, nothing happens.\n\nNo one follows them.\n\nNo attack comes.\n\nNo one appears on a roof.\n\nThe traveller rubs at one shoulder beneath the bag strap."},
@@ -608,12 +663,31 @@ line("mir_confront",[
  {mode:"dialogue",speaker:"MIRAI",text:"Because I don't know who I'm walking with."},
  {mode:"narration",text:"Silence.\n\nA breeze catches the edge of a hanging shop cloth.\n\nThe traveller's eyes stay on hers.\n\nThen one hand rises.\n\nSmoke bursts across the road.\n\nMirai jumps back.\n\nThe Academy instructor stands where the traveller had been.\n\nFor one beat, Mirai just stares.\n\nThen—"},
  {mode:"dialogue",speaker:"MIRAI",text:"Where is he?"},
- {mode:"narration",text:"The instructor jerks his head toward the checkpoint."},
+ {mode:"narration",text:"The instructor jerks her head toward the checkpoint."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"Safe."},
- {mode:"narration",text:"Mirai looks past him.\n\nOnly when she sees the checkpoint building does she breathe again.\n\nThen she looks back."},
+ {mode:"narration",text:"Mirai looks past her.\n\nOnly when she sees the checkpoint building does she breathe again.\n\nThen she looks back."},
  {mode:"dialogue",speaker:"MIRAI",text:"You switched in the market."},
  {mode:"narration",text:"The instructor says nothing.\n\nMirai already has her answer."}
 ],MIRAI_ENV.street,"mir_checkpoint_early_01");
+const mirConfrontBattleLead=miraiBeats.find(row=>row.beatId==="mir_confront_07");
+if(mirConfrontBattleLead)mirConfrontBattleLead.nextBeatId="mir_confront_battle";
+push({
+ beatId:"mir_confront_battle",
+ mode:"battle_transition",
+ text:"",
+ environmentRef:MIRAI_ENV.street,
+ battle:miraiBattleSpec(MIRAI_CONFRONT_CALLER,"mir_confront_battle_return")
+});
+push({
+ beatId:"mir_confront_battle_return",
+ mode:"resolver",
+ machineResolved:true,
+ text:"",
+ environmentRef:MIRAI_ENV.street,
+ choices:[
+  C("reveal","RESOLVE CONFRONTATION RETURN","mir_confront_08",null,{availability:hiddenResolverAvailability(()=>true)})
+ ]
+});
 miraiBeats.find(row=>row.beatId==="mir_confront_12").onEnterConsequences=[mirVerify];
 
 line("mir_change",[
@@ -655,7 +729,7 @@ line("mir_checkpoint_early",[
  {mode:"dialogue",speaker:"MIRAI",text:"That's not what I asked."},
  {mode:"narration",text:"He lowers the cup."},
  {mode:"dialogue",speaker:"TRAVELLER",text:"Then yes."},
- {mode:"narration",text:"Mirai turns slowly toward the instructor.\n\nHe has the decency not to look amused."}
+ {mode:"narration",text:"Mirai turns slowly toward the instructor.\n\nShe has the decency not to look amused."}
 ],MIRAI_ENV.checkpoint,"mir_after_verified_01");
 
 line("mir_checkpoint_missed",[
@@ -669,7 +743,7 @@ line("mir_checkpoint_missed",[
  {mode:"dialogue",speaker:"MIRAI",text:"Told me what?"},
  {mode:"narration",text:"The traveller smiles.\n\nRaises one hand.\n\nSmoke erupts beside her.\n\nMirai jumps back.\n\nThe Academy instructor appears through it.\n\nMirai's face goes blank.\n\nA beat."},
  {mode:"dialogue",speaker:"MIRAI",text:"No."},
- {mode:"narration",text:"The instructor folds his arms.\n\nMirai points at him."},
+ {mode:"narration",text:"The instructor folds her arms.\n\nMirai points at her."},
  {mode:"dialogue",speaker:"MIRAI",text:"No."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"Mirai—"},
  {mode:"dialogue",speaker:"MIRAI",text:"Where is he?"},
@@ -681,10 +755,10 @@ line("mir_checkpoint_missed",[
  {mode:"dialogue",speaker:"MIRAI",text:"How long?"},
  {mode:"narration",text:"The instructor answers."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"Since the market."},
- {mode:"narration",text:"Mirai opens her eyes.\n\nLooks back toward the road.\n\nAll the way to the covered market.\n\nThen back to him."},
+ {mode:"narration",text:"Mirai opens her eyes.\n\nLooks back toward the road.\n\nAll the way to the covered market.\n\nThen back to her."},
  {mode:"dialogue",speaker:"MIRAI",text:"You walked beside me for half the village."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"Yes."},
- {mode:"narration",text:"Mirai stares at him."},
+ {mode:"narration",text:"Mirai stares at her."},
  {mode:"dialogue",speaker:"MIRAI",text:"I don't like you very much right now."},
  {mode:"narration",text:"The traveller chokes on his tea.\n\nThe instructor looks almost pleased."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"That's fair."}
@@ -694,7 +768,7 @@ miraiBeats.find(row=>row.beatId==="mir_checkpoint_missed_01").onEnterConsequence
 line("mir_after_verified",[
  {mode:"narration",text:"They don't sit around a desk.\n\nThe route map ends up spread across the top of a crate outside the checkpoint.\n\nMirai stands over it.\n\nThe instructor leans beside her.\n\nThe traveller sits nearby finishing his drink.\n\nThe instructor taps the covered market."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"When?"},
- {mode:"narration",text:"Mirai knows what he means.\n\nShe looks at the mark."},
+ {mode:"narration",text:"Mirai knows what she means.\n\nShe looks at the mark."},
  {mode:"dialogue",speaker:"MIRAI",text:"He got the details wrong."},
  {mode:"narration",text:"The traveller lifts his cup."},
  {mode:"dialogue",speaker:"TRAVELLER",text:"My details."},
@@ -721,9 +795,9 @@ line("mir_after_missed",[
  {mode:"dialogue",speaker:"TRAVELLER",text:"Not helping."},
  {mode:"narration",text:"The instructor looks down at the map."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"You got the person beside you here without letting anything happen to them."},
- {mode:"narration",text:"Mirai looks at him."},
+ {mode:"narration",text:"Mirai looks at her."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"That's true."},
- {mode:"narration",text:"She waits.\n\nHe leaves it there.\n\nNo lecture.\n\nMirai turns back to the road herself."}
+ {mode:"narration",text:"She waits.\n\nThe instructor leaves it there.\n\nNo lecture.\n\nMirai turns back to the road herself."}
 ],MIRAI_ENV.checkpoint,"mir_leaving_start");
 
 push(N("mir_leaving_start","The exercise ends.\n\nThe traveller heads toward East Market.\n\nAt the corner, he turns.","mir_leaving_choice_router",MIRAI_ENV.checkpoint));
@@ -738,7 +812,7 @@ line("mir_leaving_talk",[
  {mode:"dialogue",speaker:"MIRAI",text:"I thought you liked your sister more than you disliked the tea."},
  {mode:"narration",text:"He points at her."},
  {mode:"dialogue",speaker:"TRAVELLER",text:"See? That's exactly the kind of thing that got your instructor caught."},
- {mode:"narration",text:"Mirai looks toward the instructor.\n\nHe looks away.\n\nThe traveller laughs and disappears into the crowd."}
+ {mode:"narration",text:"Mirai looks toward the instructor.\n\nShe looks away.\n\nThe traveller laughs and disappears into the crowd."}
 ],MIRAI_ENV.checkpoint,"mir_reflection_choice");
 line("mir_leaving_prof",[
  {mode:"narration",text:"The traveller pauses at the corner and looks back at Mirai."},
@@ -766,7 +840,7 @@ line("mir_reflect_identity",[
  {mode:"dialogue",speaker:"MIRAI",text:"Next time I lose sight of someone…"},
  {mode:"narration",text:"She stops.\n\nChanges it."},
  {mode:"dialogue",speaker:"MIRAI",text:"Next time I get them back, I check."},
- {mode:"narration",text:"The instructor says nothing.\n\nMirai doesn't need him to."}
+ {mode:"narration",text:"The instructor says nothing.\n\nMirai doesn't need her to."}
 ],MIRAI_ENV.checkpoint,"mir_close_01");
 line("mir_reflect_evidence",[
  {mode:"narration",text:"Mirai thinks about every moment that could have meant something.\n\nThe shortcut.\n\nThe answers.\n\nThe chakra.\n\nOr none of them, depending on the road she took."},
