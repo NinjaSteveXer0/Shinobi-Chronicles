@@ -193,6 +193,7 @@ function buildKushinaReceipt105(){
 function buildMiraiReceipt105(){
   const runtime=A&&typeof A.active==="function"?A.active():null;
   const ctx=runtime&&runtime.localContext&&typeof runtime.localContext==="object"?runtime.localContext:{};
+  const defeated=ctx.miraiEscortAssessmentResult==="not_completed_battle_defeat";
   const lines=["YOUR ORIGIN","ACADEMY MIRAI","","RECORDED IN YOUR CHRONICLE","","YOUR DECISIONS"];
   if(ctx.mirTalked===true)lines.push("• Talked with the traveller during the escort.");
   else if(ctx.mirTalked===false)lines.push("• Kept attention on the escort.");
@@ -200,8 +201,17 @@ function buildMiraiReceipt105(){
   if(shortcut)lines.push("• "+shortcut);
   if(ctx.mirConfronted===true)lines.push("• Confronted the suspected substitute.");
   else if(ctx.mirChangedRoute===true)lines.push("• Changed the route.");
-  else if(ctx.mirContinued===true)lines.push("• Continued the escort to Checkpoint Three.");
-  const reflection={
+  else if(ctx.mirContinued===true&&!defeated)lines.push("• Continued the escort to Checkpoint Three.");
+  const reflection=defeated?{
+    shortcut_route_control:"Gave up control of the route before the fight started.",
+    shortcut_explain_first:"Should have made him explain the shortcut before following.",
+    shortcut_escort_over:"Accepted that losing the exchange ended the escort.",
+    shortcut_stop_earlier:"Will stop the problem before it becomes a fight next time.",
+    confront_right_to_stop:"Was right to stop the substitute.",
+    confront_seeing_not_enough:"Seeing the problem was not enough to win the exchange.",
+    confront_after_talking:"Needs an answer after talking stops working.",
+    confront_hold_road:"Caught the switch and still has to hold the road."
+  }[ctx.mirDefeatReflection]:{
     conversation_route_person_changed:"The route stayed the same. The person didn't.",
     conversation_talking_matters:"Talking to someone can tell her more than a map.",
     conversation_check_sooner:"Caught the contradiction and chose to check sooner next time.",
@@ -220,7 +230,15 @@ function buildMiraiReceipt105(){
     missed_learn_person:"Will learn more than the route next time."
   }[ctx.mirReflection];
   if(reflection)lines.push("• "+reflection);
-  lines.push("","WHAT HAPPENED","• Completed the Academy escort assessment.","• Reached Checkpoint Three and reviewed the route.");
+  lines.push("","WHAT HAPPENED");
+  if(defeated){
+    lines.push("• The escort assessment ended where Mirai was Battle-depleted.");
+    lines.push("• The real Traveller was already safe at Checkpoint Three.");
+    lines.push("• Mirai later returned to Checkpoint Three for the post-assessment debrief.");
+  }else{
+    lines.push("• Completed the Academy escort assessment.");
+    lines.push("• Reached Checkpoint Three and reviewed the route.");
+  }
   lines.push("","REWARDS",`• Origin Starting Purse: +${originStartingPurseAmount105()} Ryō.`);
   return lines.join("\n");
 }
@@ -257,6 +275,7 @@ function miraiBackdrop(beatId,runtime){
     if(id.startsWith("mir_shortcut_stay_")||id.startsWith("mir_shortcut_forget_"))return BACKDROP.miraiStreet;
     return BACKDROP.miraiLane;
   }
+  if(id.startsWith("mir_defeat_debrief_")||id.startsWith("mir_defeat_reflection_")||id.startsWith("mir_defeat_close_"))return BACKDROP.miraiCheckpoint;
   if(id.startsWith("mir_checkpoint_")||id.startsWith("mir_after_")||id.startsWith("mir_leaving_")||
      id.startsWith("mir_reflect_")||id.startsWith("mir_reflection_")||id==="mir_close_01"||
      id==="mir_checkpoint"||id==="mir_verified"||id==="mir_eval"||id==="mir_end")return BACKDROP.miraiCheckpoint;
@@ -271,6 +290,20 @@ function miraiActors(beatId,performance,beat){
   const checkpoint=()=>actor("mirai_checkpoint_instructor","CHECKPOINT INSTRUCTOR",PATH.miraiCheckpointInstructor,sp);
 
   if(id.startsWith("mir_assignment_")){
+    rows.push(instructor(),traveller());
+    return rows;
+  }
+  if(id.startsWith("mir_shortcut_defeat_end_")){
+    const match=id.match(/_(\d+)$/),n=match?Number(match[1]):0;
+    rows.push(n>=7?instructor():traveller());
+    return rows;
+  }
+  if(id.startsWith("mir_confront_defeat_end_")){
+    const match=id.match(/_(\d+)$/),n=match?Number(match[1]):0;
+    rows.push(n>=8?instructor():traveller());
+    return rows;
+  }
+  if(id.startsWith("mir_defeat_debrief_")||id.startsWith("mir_defeat_reflection_")||id.startsWith("mir_defeat_close_")){
     rows.push(instructor(),traveller());
     return rows;
   }
@@ -436,14 +469,47 @@ function installDefinitions(){
     }
   });
   results.mirai=registerDefinition(scene("academy_mirai"),{
-    resolve:({beatId,performance,beat})=>String(beatId||"")==="mir_receipt"
-      ?{mode:"record",location:"YOUR ORIGIN",actors:[]}
-      :projection("ACADEMY MIRAI · ESCORT ASSESSMENT",miraiActors(beatId,performance,beat)),
+    resolve:({beatId,performance,beat})=>{
+      const id=String(beatId||"");
+      if(id==="mir_receipt")return{mode:"record",location:"YOUR ORIGIN",actors:[]};
+      const defeatDebrief=id.startsWith("mir_defeat_debrief_")||id.startsWith("mir_defeat_reflection_")||id.startsWith("mir_defeat_close_");
+      return projection(defeatDebrief?"LATER · CHECKPOINT THREE":"ACADEMY MIRAI · ESCORT ASSESSMENT",miraiActors(beatId,performance,beat));
+    },
     resolveBackdrop:({beatId,runtime})=>String(beatId||"")==="mir_receipt"
       ?null
       :{assetPath:miraiBackdrop(beatId,runtime),assetId:"issue105_mirai"},
     performanceSequences:{
+      mir_shortcut_defeat_end_05:()=>[
+        {kind:"dialogue",speakerName:"TRAVELLER",text:"The exercise is."},
+        {kind:"narration",text:"Mirai freezes.\n\nNot because of the word.\n\nBecause of the voice behind it."}
+      ],
+      mir_confront_defeat_end_12:()=>[
+        {kind:"dialogue",speakerName:"ACADEMY INSTRUCTOR",text:"About the switch."},
+        {kind:"narration",text:"A beat."},
+        {kind:"dialogue",speakerName:"ACADEMY INSTRUCTOR",text:"You still lost the exchange."},
+        {kind:"narration",text:"Mirai looks away.\n\nShe knows."}
+      ],
+      mir_defeat_debrief_shortcut_01:()=>[
+        {kind:"narration",text:"LATER — CHECKPOINT THREE"},
+        {kind:"narration",text:"The real Traveller is sitting on the Checkpoint Three steps when Mirai arrives later with the instructor.\n\nHis travel bag is beside him.\n\nThe cup in his hands is almost empty."}
+      ],
+      mir_defeat_debrief_shortcut_11:()=>[
+        {kind:"dialogue",speakerName:"ACADEMY INSTRUCTOR",text:"No."},
+        {kind:"narration",text:"The instructor does not turn it into a speech.\n\nMirai already knows the result."}
+      ],
+      mir_defeat_debrief_confront_01:()=>[
+        {kind:"narration",text:"LATER — CHECKPOINT THREE"},
+        {kind:"narration",text:"The real Traveller is waiting at Checkpoint Three.\n\nMirai looks at him first.\n\nOnly after confirming he is fine does she turn back to the instructor."}
+      ],
+      mir_defeat_debrief_confront_07:()=>[
+        {kind:"dialogue",speakerName:"ACADEMY INSTRUCTOR",text:"I know."},
+        {kind:"narration",text:"Nothing more is added."}
+      ],
       mir_receipt:()=>[{kind:"record",text:buildMiraiReceipt105()}]
+    },
+    performanceTransitions:{
+      mir_shortcut_defeat_end_13:"wipe_right_to_left",
+      mir_confront_defeat_end_12:"wipe_right_to_left"
     }
   });
   results.menma=registerDefinition("origin_academy_menma_prologue",{
@@ -500,6 +566,13 @@ function diagnostics(){
     kakashiExcluded:!String(installDefinitions).includes("academy_kakashi"),
     knownHinataActors:PATH.hinata&&PATH.hinataInstructor&&PATH.hinataPartner,
     knownMiraiActors:PATH.mirai&&PATH.miraiInstructor&&PATH.traveller,
+    miraiDefeatPresentation:
+      String(miraiBackdrop).includes("mir_defeat_debrief_")&&
+      String(miraiActors).includes("mir_shortcut_defeat_end_")&&
+      String(miraiActors).includes("mir_confront_defeat_end_")&&
+      String(installDefinitions).includes('mir_shortcut_defeat_end_13:"wipe_right_to_left"')&&
+      String(installDefinitions).includes('mir_confront_defeat_end_12:"wipe_right_to_left"')&&
+      String(installDefinitions).includes("LATER — CHECKPOINT THREE"),
     menmaNineTailsPortraitExact:PATH.menmaNineTails==="Assets/Tailed Beasts/menma_nine_tails.png"&&String(menmaActors).includes("menma_nine_tails"),
     knownMenmaPhysicalActors:[PATH.menma,PATH.menmaInstructor,PATH.anko,PATH.altered].every(Boolean),
     knownKurenaiInstructor:PATH.kurenaiInstructor==="NPC/kurenai_instructor.png",
