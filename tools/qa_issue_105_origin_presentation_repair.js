@@ -43,7 +43,36 @@ assert(golden.includes('entryBeatId:"mir_assignment_01"')&&golden.includes('Q("m
 assert(!golden.includes('Q("mir_reflection_choice"'),"retired universal Mirai reflection surface returned");
 assert(sceneB.includes('entryBeatId:"kus_practical_01"')&&sceneB.includes('C("protect_student","GET THE STUDENT CLEAR"')&&sceneB.includes('C("correct_formula","CORRECT THE FORMULA"'),"Kushina benchmark rewrite entry/crisis choices missing");
 assert(sceneB.includes('occ_origin_kushina_residual_seal_work_resolution')&&sceneB.includes('occ_origin_kushina_gerotora_first_contact')&&sceneB.includes('occ_origin_kushina_joint_residual_seal_closure'),"Kushina occurrence boundaries drifted");
-assert(sceneB.includes('{beatId:"kus_receipt",mode:"record"')&&sceneB.includes('"kus_protect_close_04","Kushina laughs and leaves.","kus_receipt"')&&sceneB.includes('"kus_contain_close_09","She grins and does.","kus_receipt"')&&sceneB.includes('"kus_move_close_08","The classmate thinks about that. Then nods.\\n\\nThey leave the courtyard together.","kus_receipt"')&&sceneB.includes("\"kus_route_d_close_08\",\"KUSHINA\",\"That's what I said.\",\"kus_receipt\""),"Kushina authored endings do not all route through the Chronicle Receipt");
+assert(
+  sceneB.includes('{beatId:"kus_receipt",mode:"record"')&&
+  sceneB.includes('N("kus_protect_close_08","Kushina grins.\\n\\nThey leave the courtyard.","kus_receipt"')&&
+  sceneB.includes('N("kus_contain_close_11","She leaves.","kus_receipt"')&&
+  sceneB.includes('N("kus_move_close_10","They keep walking.","kus_receipt"')&&
+  sceneB.includes('N("kus_route_d_close_10","They leave together.","kus_receipt"'),
+  "Kushina natural-voice endings do not all route through the Chronicle Receipt"
+);
+assert(
+  sceneB.includes('D("kus_practical_03","KUSHINA","Because he made us redraw it."')&&
+  sceneB.includes('D("kus_gero_02","TOAD","Where am I?"')&&
+  sceneB.includes('D("kus_send_back_02","KUSHINA","Can you go back?"')&&
+  !sceneB.includes("That is not how that sentence works.")&&
+  !sceneB.includes("Would you prefer I complain?")&&
+  !sceneB.includes("You just threw a seal.")&&
+  !sceneB.includes("I'm thrilled."),
+  "Kushina natural-voice successor missing or retired banter returned"
+);
+assert(
+  sceneB.includes('D("iwa_open_02","INSTRUCTOR","Bad one?"')&&
+  sceneB.includes('D("iwa_confront_04","IWABEE","Make me."')&&
+  sceneB.includes('D("iwa_eval_core_09","INSTRUCTOR","Then work on the bad part without pretending the good part doesn\'t matter."')&&
+  sceneB.includes('C("academy_tests_wrong","THE ACADEMY CARES TOO MUCH ABOUT TESTS."')&&
+  sceneB.includes('C("prove_my_way","I\'LL PROVE I CAN DO IT MY WAY."')&&
+  !sceneB.includes("You keep acting like the only things that count are the things you're bad at.")&&
+  !sceneB.includes("Then make sure that's true.")&&
+  !sceneB.includes("Both are true.")&&
+  !sceneB.includes("It was one point."),
+  "Iwabee natural-voice successor missing or retired theme-explainer prose returned"
+);
 assert(binder.includes("function buildKushinaReceipt105()")&&binder.includes('kus_receipt:()=>[{kind:"record",text:buildKushinaReceipt105()}]'),"Kushina Chronicle Receipt projection missing");
 const kushinaActorBody=binder.slice(binder.indexOf("function kushinaActors("),binder.indexOf("function kurenaiActors("));
 assert(kushinaActorBody.includes('if(id==="kus_receipt")return[]'),"Kushina Receipt still stages Story actors");
@@ -186,6 +215,6 @@ assert(!game.includes("ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID"),"frozen game
 assert(fingerprint.includes('buildId:"SC-ALPHA-RUNTIME-R303-2026-09-29-AZ"')&&fingerprint.includes('sourceBaselineCommit:"604daa50b3bc274fd6533fdeb8075806e614d30b"'),"#105 repair runtime fingerprint was not advanced from current live-main authority");
 console.log(JSON.stringify({pass:true,issue:105,checks:{
   sevenNonKakashiBindings:true,kakashiExcluded:true,hinataSparringSpeakerAlias:true,hinataFinalPairBound:true,hinataChronicleReceipt:true,miraiMenmaWritingGolden:true,legacyGoldenShimsRetired:true,knownAssetsExact:true,issue419AssetsConsumed:true,wasabiPursuitTargetActorProjection:true,missingAssetsNotGuessed:true,
-  menmaNineTailsDialoguePortrait:true,miraiBattle338:true,miraiDefeatAssessmentTermination:true,miraiTerminalRouterClean:true,miraiMenmaReceipts:true,kushinaBenchmarkWired:true,kushinaChronicleReceipt:true,kushinaGerotoraStaging:true,kushinaLegacyShimsRetired:true,menmaPostBattleSegmented:true,menmaRewardDiagnosticRemoved:true,globalReceiptInputLock:true,globalStartPLBattleCTA:true,loadOrder:true,sharedSceneBoard:true,clickAnywhere:true,
+  menmaNineTailsDialoguePortrait:true,miraiBattle338:true,miraiDefeatAssessmentTermination:true,miraiTerminalRouterClean:true,miraiMenmaReceipts:true,kushinaBenchmarkWired:true,kushinaNaturalVoicePreview:true,iwabeeNaturalVoicePreview:true,kushinaChronicleReceipt:true,kushinaGerotoraStaging:true,kushinaLegacyShimsRetired:true,menmaPostBattleSegmented:true,menmaRewardDiagnosticRemoved:true,globalReceiptInputLock:true,globalStartPLBattleCTA:true,loadOrder:true,sharedSceneBoard:true,clickAnywhere:true,
   speakerLinkedDialogue:true,globalCyanStoryFrames:true,kakashiFrameParity:true,kakashiTextAndAdvanceParity:true,radialPLContainmentRefresh:true,frozenCorePreserved:true,browserGoldenClaimed:false
 }},null,2));
