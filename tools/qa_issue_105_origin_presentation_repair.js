@@ -154,7 +154,7 @@ assert(
   golden.includes('"That was your extra job?"')&&
   golden.includes('"We\'re done with your route."')&&
   golden.includes('"Mirai walks first this time.')&&
-  golden.includes('"The escort continues."')&&
+  golden.includes('The escort continues."')&&
   golden.includes('C("talked","RESOLVE POST-BATTLE TALKED ROAD","mir_road_talk_memory_01"')&&
   golden.includes('C("professional","RESOLVE POST-BATTLE PROFESSIONAL ROAD","mir_road_prof_detect_01"'),
   "Mirai shortcut victory continuity / post-Battle road routing missing"
