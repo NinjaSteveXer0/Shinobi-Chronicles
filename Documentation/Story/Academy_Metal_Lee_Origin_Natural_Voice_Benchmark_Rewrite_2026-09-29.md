@@ -382,7 +382,7 @@ Metal calls after them.
 
 The Genin looks back.
 
-**GENIN:** “Sure.”
+**GENIN:** “Yeah. Ask me tomorrow.”
 
 Metal nods like this was a completely ordinary question.
 
