@@ -66,14 +66,14 @@ async function boot(browser,label){
     ["wasabi_academy_instructor","NPC/izuno_instructor.png"]
   ],label+" HEAD START actor cards drift");
   assert(opening.actors.every(x=>x.tag===""),label+" baked actor identity was duplicated by coded tag "+JSON.stringify(opening.actors));
-  await continueTo(page,"izu_open_4");
+  await continueTo(page,"izu_open_5");
   let dialogue=await info(page);
   assert.strictEqual(dialogue.speaker,"WASABI",label+" Wasabi speaker attribution missing");
   assert.strictEqual(dialogue.speakerActorId,"academy_izuno",label+" Wasabi dialogue not anchored to Wasabi card");
   assert.strictEqual(dialogue.speakerSide,"player",label+" Wasabi dialogue side drift");
   assert.strictEqual(dialogue.actors.find(x=>x.id==="academy_izuno")?.focus,true,label+" Wasabi speaker card not focused");
   await assertStoryPresentationBenchmark(page,"dialogue",label+" Wasabi dialogue");
-  await continueTo(page,"izu_open_6");
+  await continueTo(page,"izu_open_7");
   dialogue=await info(page);
   assert.strictEqual(dialogue.speaker,"ACADEMY INSTRUCTOR",label+" Instructor speaker attribution missing");
   assert.strictEqual(dialogue.speakerActorId,"wasabi_academy_instructor",label+" Instructor dialogue not anchored to Instructor card");
