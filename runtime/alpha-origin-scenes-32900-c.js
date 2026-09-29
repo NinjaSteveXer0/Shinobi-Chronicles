@@ -1573,34 +1573,43 @@ function arrivalSequence(){
   const entitlement=currentEntitlement();
   return clone(PERFORMANCE["arrival_"+entitlement]||[{kind:"narration",text:"No formal training remains available when Obito arrives."}]);
 }
-function homeSequence(){
-  const count=countHelpFromFacts(),tail=count===5?PERFORMANCE.home_all_help:count===0?PERFORMANCE.home_no_help:PERFORMANCE.home_mixed;
-  return[...tail,...PERFORMANCE.home_common];
+function obitoJourneyTailSequence(){
+  const count=countHelpFromFacts();
+  return count===5?PERFORMANCE.home_all_help:count===0?PERFORMANCE.home_no_help:PERFORMANCE.home_mixed;
 }
-function boardActors(beatId){
+function endDaySequence(){
+  return[...PERFORMANCE.obi_end_day,...obitoJourneyTailSequence()];
+}
+function homeSequence(){
+  return[...PERFORMANCE.home_common];
+}
+function obitoPerformanceIndex331(performance){
+  return performance&&Number.isInteger(performance.sourceIndex)
+    ?performance.sourceIndex
+    :performance&&Number.isInteger(performance.index)?performance.index:0;
+}
+function boardActors(beatId,performance){
   const actors=[{id:"academy_obito",image:"Assets/Academy Student/academy_obito.png",label:"OBITO",focus:true}];
   if(beatId.includes("furniture"))actors.push({id:"obito_origin_furniture_civilian",label:"CIVILIAN",image:"NPC/furniture_civilian.png"});
   else if(beatId.includes("vegetables"))actors.push({id:"obito_origin_vegetable_vendor",label:"VENDOR",image:"NPC/vegetable_vendor.png"});
   else if(beatId.includes("equipment"))actors.push({id:"obito_origin_academy_equipment_custodian",label:"CUSTODIAN",image:"NPC/equipment_custodian.png"});
   else if(beatId.includes("delivery"))actors.push({id:"obito_origin_delivery_worker",label:"DELIVERY WORKER",image:"NPC/delivery_worker.png"});
   else if(beatId.includes("cart"))actors.push({id:"obito_origin_runaway_cart_civilian",label:"CIVILIAN",image:"NPC/runaway_cart_civillian.png"});
-  else if(beatId==="obi_arrival"||beatId==="obi_training")actors.push({id:"obito_origin_academy_instructor",label:"ACADEMY INSTRUCTOR",image:"NPC/obito_instructor.png"});
+  else if(beatId==="obi_arrival"||beatId==="obi_training"||(beatId==="obi_end_day"&&obitoPerformanceIndex331(performance)<7))actors.push({id:"obito_origin_academy_instructor",label:"ACADEMY INSTRUCTOR",image:"NPC/obito_instructor.png"});
   return actors;
 }
-function boardLocation(beatId){
+function boardLocation(beatId,performance){
   if(beatId==="obi_arrival"||beatId==="obi_training")return"ACADEMY TRAINING GROUND";
-  if(beatId==="obi_end_day")return"KONOHA · LATE AFTERNOON";
+  if(beatId==="obi_end_day")return obitoPerformanceIndex331(performance)<7?"ACADEMY TRAINING GROUND":"KONOHA · LATE AFTERNOON";
   if(beatId==="obi_home"||beatId==="obi_reflect"||beatId.startsWith("obi_ending_"))return"OBITO'S HOME";
-  if(beatId==="obi_close")return"KONOHA · DUSK";
+  if(beatId==="obi_close")return"OBITO'S HOME";
   return"KONOHA · MORNING";
 }
 function boardBackdropEnvironment331(beatId,performance){
   const id=String(beatId||"");
   if(id==="obi_end_day"){
-    const cueIndex=performance&&Number.isInteger(performance.sourceIndex)
-      ?performance.sourceIndex
-      :performance&&Number.isInteger(performance.index)?performance.index:0;
-    return cueIndex>=2?ENV.streetLate.environmentId:ENV.trainingLate.environmentId;
+    const cueIndex=obitoPerformanceIndex331(performance);
+    return cueIndex>=7?ENV.streetLate.environmentId:ENV.trainingLate.environmentId;
   }
   if(id==="obi_arrival"||id==="obi_training")return ENV.trainingDay.environmentId;
   if(id==="obi_home"||id==="obi_reflect"||id==="obi_close"||id.startsWith("obi_ending_"))return ENV.home.environmentId;
@@ -1611,13 +1620,13 @@ function boardBackdropEnvironment331(beatId,performance){
 }
 function registerFinalSceneBoard(){
   if(typeof globalThis.registerStorySceneBoardDefinition!=="function")return{success:false,reason:"story_scene_board_not_loaded"};
-  const sequences={...PERFORMANCE,obi_arrival:arrivalSequence,obi_training:trainingSequence,obi_home:homeSequence};
+  const sequences={...PERFORMANCE,obi_arrival:arrivalSequence,obi_training:trainingSequence,obi_end_day:endDaySequence,obi_home:homeSequence};
   const result=globalThis.registerStorySceneBoardDefinition(SCENE_ID,{
-    resolve:({beatId})=>({
+    resolve:({beatId,performance})=>({
       mode:"conversation",
-      location:boardLocation(beatId),
+      location:boardLocation(beatId,performance),
       objective:["obi_arrival","obi_training","obi_end_day","obi_home","obi_reflect","obi_close"].includes(beatId)||beatId.startsWith("obi_ending_")?null:"GET TO TRAINING",
-      actors:boardActors(beatId)
+      actors:boardActors(beatId,performance)
     }),
     performanceSequences:sequences,
     resolveBackdrop:({beatId,performance})=>{
@@ -1663,8 +1672,8 @@ function diagnostics(){
     furnitureResidentialBackdrop:BACKDROPS[ENV.residential.environmentId]==="Obito Origin Backdrop/quiet_residential_lane.png",
     academyApproachBackdrop:BACKDROPS[ENV.academyApproach.environmentId]==="Obito Origin Backdrop/academy_approach_sloped_lane.png",
     homeDedicatedBackdrop:BACKDROPS[ENV.home.environmentId]==="Obito Origin Backdrop/obito_home_interior.png",
-    endDayPresentationMovesYardToStreet:typeof boardBackdropEnvironment331==="function"&&boardBackdropEnvironment331("obi_end_day",{sourceIndex:0,index:0})===ENV.trainingLate.environmentId&&boardBackdropEnvironment331("obi_end_day",{sourceIndex:2,index:99})===ENV.streetLate.environmentId,
-    paragraphPaginationCannotShiftBackdrop:boardBackdropEnvironment331("obi_end_day",{sourceIndex:1,index:99})===ENV.trainingLate.environmentId,
+    endDayPresentationMovesYardToStreet:typeof boardBackdropEnvironment331==="function"&&boardBackdropEnvironment331("obi_end_day",{sourceIndex:0,index:0})===ENV.trainingLate.environmentId&&boardBackdropEnvironment331("obi_end_day",{sourceIndex:7,index:99})===ENV.streetLate.environmentId,
+    paragraphPaginationCannotShiftBackdrop:boardBackdropEnvironment331("obi_end_day",{sourceIndex:6,index:99})===ENV.trainingLate.environmentId,
     directBackdropPathProjection:typeof registerFinalSceneBoard==="function"&&registerFinalSceneBoard.toString().includes("return assetPath?{assetPath,environmentId}:null"),
     stableBeatBackdropProjection:boardBackdropEnvironment331("obi_depart")===ENV.mainStreet.environmentId&&boardBackdropEnvironment331("obi_furniture_choice")===ENV.residential.environmentId&&boardBackdropEnvironment331("obi_equipment_choice")===ENV.academyApproach.environmentId&&boardBackdropEnvironment331("obi_arrival")===ENV.trainingDay.environmentId&&boardBackdropEnvironment331("obi_home")===ENV.home.environmentId,
     closeRemainsHome:definition.beatMap instanceof Map?definition.beatMap.get("obi_close")&&definition.beatMap.get("obi_close").environmentRef===ENV.home:definition.beats.some(b=>b.beatId==="obi_close"&&b.environmentRef===ENV.home),
