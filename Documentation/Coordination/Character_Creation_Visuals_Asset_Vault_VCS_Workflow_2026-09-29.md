@@ -79,6 +79,26 @@ Stephen's explicit approval is the publication trigger.
 
 Stephen is not required to act as the transport layer between visual production and Coding once the approved asset has been committed and its implementation issue has been created.
 
+## Battle Portrait repository-root authority
+
+Current UI / Assets portrait authority explicitly supersedes historical `Assets/Portraits/...` references.
+
+For new production Battle/UI portraits, the authoritative repository root is:
+
+`Portraits/`
+
+The legacy/special `NPC portrait/` lane may remain for already-authorised historical assets, but it is not the default root for new Battle Portrait intake.
+
+For a Story-scoped / non-collectible participant that still requires a dedicated Battle portrait, use the exact Assets-ratified path under `Portraits/`; do not infer collectibility from the folder name and do not place the asset in `NPC/`.
+
+For the Academy Metal stable inviting Genin asset currently tracked by #424, coordination reconciles the permanent path as:
+
+`Portraits/Others/metal_classmate_1.png`
+
+This is a presentation-path decision only. It does not create collectible ownership or a new Registry identity.
+
+---
+
 ## Presentation boundaries
 
 - **Battle Portraits** are Battle/Arena assets only.
