@@ -261,7 +261,7 @@ function patchMirai33500(){
 // existing 32900 authority and commits only when kur_result is entered.
 function patchKurenai33500(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
-  const live=A.sceneDefinitions&&A.sceneDefinitions[A.sceneByVariant.academy_kurenai];
+  const live=storyDefinition33500(A.sceneByVariant.academy_kurenai);
   if(live&&live.entryBeatId==="kur_pre_01"&&beat33500(live,"kur_approach")&&beat33500(live,"kur_leave_router"))return true;
   const def=editableScene33500(A.sceneByVariant.academy_kurenai);if(!def)return false;
   const routes=[
