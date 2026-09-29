@@ -216,9 +216,19 @@ async function proveMiraiDefeatContinuations(browser){
       assert.strictEqual(because.speaker,"TRAVELLER","Shortcut defeat Traveller does not own reply");
       assert.strictEqual(because.text,"Because you did.","Shortcut defeat reply drift");
       const post=await advanceUntilBeat(page,"mir_road_post_defeat_talk_01",20);
-      assert(post.row.text.includes("Mirai keeps the Traveller in front of her now."),"Shortcut defeat post-Battle Scene 5 variant missing");
+      // The preceding hidden machine resolver can advance runtime state before
+      // the Scene Board's next paint. Wait for the player-facing cue, not only
+      // the runtime beat id, so this proof cannot race the presentation layer.
+      await page.waitForFunction(()=>{
+        const rt=globalThis.getActiveStorySceneRuntime?.();
+        const text=document.querySelector("#story-scene-presentation-layer .sc-story-text")?.textContent?.trim()||"";
+        return rt?.beatId==="mir_road_post_defeat_talk_01"&&text.includes("Mirai keeps the Traveller in front of her now.");
+      },null,{timeout:8000});
+      const postVisible=await snapshot(page);
+      assert(postVisible.text.includes("Mirai keeps the Traveller in front of her now."),"Shortcut defeat post-Battle Scene 5 variant missing");
       assert(!post.seen.some(x=>/Academy instructor stands where the traveller had been/i.test(x.text||"")),"Shortcut defeat revealed the instructor identity");
-      proofs.push({kind:test.kind,first:test.firstBeatId,postBeat:post.row.beatId,identityRevealBeforeResume:false});
+      assert(!postVisible.actors.some(a=>a.image==="NPC/mirai_instructor.png"),"Shortcut defeat revealed the female instructor before the normal evidence chain");
+      proofs.push({kind:test.kind,first:test.firstBeatId,postBeat:postVisible.beatId,identityRevealBeforeResume:false});
     }else{
       assert(row.text.includes("Mirai's guard breaks before the Traveller's does."),"Mirai confrontation defeat opening drift");
       const done=await advanceUntilBeat(page,"mir_confrontation_defeat_03",8);
