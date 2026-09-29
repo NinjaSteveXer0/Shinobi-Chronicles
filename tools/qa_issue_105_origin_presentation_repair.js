@@ -62,11 +62,11 @@ assert(
   "Kushina natural-voice successor missing or retired banter returned"
 );
 assert(
-  sceneB.includes('D("iwa_open_02","INSTRUCTOR","Bad one?"')&&
-  sceneB.includes('D("iwa_confront_04","IWABEE","Make me."')&&
-  sceneB.includes('D("iwa_eval_core_09","INSTRUCTOR","Then work on the bad part without pretending the good part doesn\'t matter."')&&
+  sceneB.includes('{beatId:"iwa_open_02",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"Bad one?"')&&
+  sceneB.includes('{beatId:"iwa_confront_04",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"Make me."')&&
+  sceneB.includes(`{beatId:"iwa_eval_core_09",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"Then work on the bad part without pretending the good part doesn't matter."` )&&
   sceneB.includes('C("academy_tests_wrong","THE ACADEMY CARES TOO MUCH ABOUT TESTS."')&&
-  sceneB.includes('C("prove_my_way","I\'LL PROVE I CAN DO IT MY WAY."')&&
+  sceneB.includes(`C("prove_my_way","I'LL PROVE I CAN DO IT MY WAY."` )&&
   !sceneB.includes("You keep acting like the only things that count are the things you're bad at.")&&
   !sceneB.includes("Then make sure that's true.")&&
   !sceneB.includes("Both are true.")&&
