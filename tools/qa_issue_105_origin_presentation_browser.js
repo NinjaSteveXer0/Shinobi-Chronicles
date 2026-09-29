@@ -262,7 +262,12 @@ async function proveMiraiDefeatContinuations(browser){
       assert.strictEqual(safe.row.speaker,"ACADEMY INSTRUCTOR","Shortcut defeat safe confirmation not instructor-owned");
       assert.strictEqual(safe.row.text,"Checkpoint Three. Safe.","Shortcut defeat safe confirmation drift");
       const ended=await advanceUntilBeat(page,"mir_shortcut_defeat_end_10",10);
-      assert(ended.seen.some(x=>x.text==="The assignment is not.")&&ended.seen.some(x=>x.text==="It ended here."),"Shortcut defeat does not state that the assignment ended at the Battle location");
+      const endedPages=[ended.row.text];
+      for(let i=0;i<8&&(await snapshot(page)).beatId==="mir_shortcut_defeat_end_10";i++){
+        const next=await advanceOne(page);
+        if(next.beatId==="mir_shortcut_defeat_end_10")endedPages.push(next.text);
+      }
+      assert(endedPages.includes("The assignment is not.")&&endedPages.includes("It ended here."),"Shortcut defeat does not state that the assignment ended at the Battle location "+JSON.stringify(endedPages));
     }else{
       assert.strictEqual(row.text,"Mirai's guard breaks before the Traveller's does.","Mirai confrontation defeat opening drift");
       const done=await advanceUntilBeat(page,"mir_confront_defeat_end_02",10);
