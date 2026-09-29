@@ -9,8 +9,12 @@
 
 **Date:** 2026-09-27  
 **Owner:** Writing / Story — Konoha  
-**Status:** **CORE BELL TEST PRESERVED — ORIGIN EXPANSION OPEN 2026-09-29 / NOT FROZEN**  
+**Status:** **WRITING RED — STAGED-CHOICE STRUCTURE MUST BE RESTORED / NOT FROZEN**  
 **Origin:** `academy_kurenai`
+
+> **2026-09-30 structural restoration authority:** `Documentation/Story/Academy_Kurenai_Origin_Staged_Choice_and_Receipt_Restoration_2026-09-30.md` @ `e7ce02375db5288c50bec9e457cdaa7cc96e6075`.
+>
+> The 2026-09-27 rewrite collapsed the durable staged deception architecture into one opening choice and is no longer current structural authority. The Bell Test must again use staged deception decisions; the Chronicle Receipt must precede `YOUR CHRONICLE BEGINS`.
 
 > **2026-09-29 expansion successor:** `Documentation/Story/Academy_Kurenai_Origin_Benchmark_Expansion_2026-09-29.md` @ `5748e7df05bd0044b74fb054fdb4472b6ff77919`.
 >
