@@ -786,6 +786,8 @@
         "playerData.activityHistory MET-01/MET-02/MET-03/MET-04",
         "currentBattle.metal396",
         "playerData.metal396BattleLaunches",
+        "playerData.ryo exact 50 Ryō Metal controlled-spar victory delta",
+        "playerData.activityHistory exact Metal controlled-spar reward receipt",
         "shinobiTestState Metal scoped Battle envelope"
       ],
       "productionLoader": "index.html",
@@ -796,7 +798,7 @@
       ],
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
-      "rationale": "Consumes issue #396 and durable Combat/Writing authority. Enables the previously fail-closed Academy Metal controlled spar against stable story participant metal_origin_inviting_genin at PL15, exact deterministic five-action AI, fixed 13-PL performance bands, and the non-Battle deterministic MET-03 resolver with exact intervention evidence. Existing shared Battle/Story infrastructure remains canonical; no second Origin owner, reward, PL scaling, injury inference, or collectible admission is created."
+      "rationale": "Consumes issue #396 and durable Combat/Writing authority. Enables the previously fail-closed Academy Metal controlled spar against stable story participant metal_origin_inviting_genin at PL15, exact deterministic five-action AI, fixed 13-PL performance bands, and the non-Battle deterministic MET-03 resolver with exact intervention evidence. Existing shared Battle/Story infrastructure remains canonical; the later Stephen-approved global Battle economy supersedes the original zero-reward Metal clause, so this one-opponent Academy victory now consumes the 50 Ryō standard anchor with an idempotent reward receipt and the approved metal_classmate_1 Battle portrait. No second Origin owner, PL scaling, injury inference, or collectible admission is created."
     },
     {
       "changeId": "issue-399-iwabee-rogue-genin-disposition-runtime",
