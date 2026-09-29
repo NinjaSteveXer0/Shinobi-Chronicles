@@ -20,8 +20,12 @@ if(!PRE_NORMALIZE||!PRE_SET||!PRE_ADVANCE){
 }
 
 function isAuthoredResolverBeat(beat){
-  return !!beat&&beat.machineResolved===true&&(beat.mode==="resolver"||beat.machineResolver343===true);
+  if(!beat)return false;
+  if(beat.machineResolved===true&&(beat.mode==="resolver"||beat.machineResolver343===true))return true;
+  const choices=Array.isArray(beat.choices)?beat.choices:[];
+  return String(beat.beatId||"").endsWith("_resolver")&&String(beat.text||"")===""&&choices.length>0&&choices.every(choice=>String(choice&&choice.label||"")==="RESOLVE RESULT");
 }
+globalThis.isStoryMachineResolverBeat343=isAuthoredResolverBeat;
 
 globalThis.normalizeStorySceneBeat=function normalizeStorySceneBeat343(beat,index=0){
   if(!beat||beat.mode!=="resolver"||beat.machineResolved!==true){

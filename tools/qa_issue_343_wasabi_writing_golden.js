@@ -150,11 +150,12 @@ assert(!catalogueSource.includes('"text": "Race you to the corner."')&&!catalogu
 // deterministic resolver beats through existing Story choice authority.
 assert(resolverSource.includes('mode:"narration"')&&resolverSource.includes("machineResolver343=true"),"scoped resolver does not map authored machine beats to supported internal mode");
 assert(resolverSource.includes("function resolveMachineStoryBeat343()"),"scoped machine Story resolver missing");
+assert(resolverSource.includes('endsWith("_resolver")')&&resolverSource.includes('"RESOLVE RESULT"')&&resolverSource.includes("isStoryMachineResolverBeat343"),"machine resolver lacks normalized-beat signature fallback");
 assert(resolverSource.includes('available.length!==1')&&resolverSource.includes("story_machine_resolver_cardinality_invalid"),"machine resolver does not fail closed on non-single eligibility");
 assert(resolverSource.includes("applyStorySceneChoice(available[0].choiceId)"),"machine resolver bypasses existing Story choice authority");
 assert(resolverSource.includes("story_machine_resolver_player_choice_forbidden"),"machine resolver accepts player-forced internal branch");
 assert(resolverSource.includes("render:false"),"machine resolver can render its hidden branch surface");
-assert(boardSource.includes("function resolveMachineStoryChain33900(limit=8)")&&boardSource.includes('beat.machineResolved===true')&&boardSource.includes("globalThis.resolveMachineStoryBeat343"),"Scene Board does not consume hidden #343 resolver chains before exposing terminal narration");
+assert(boardSource.includes("function resolveMachineStoryChain33900(limit=8)")&&boardSource.includes("globalThis.isStoryMachineResolverBeat343")&&boardSource.includes("globalThis.resolveMachineStoryBeat343"),"Scene Board does not consume hidden #343 resolver chains before exposing terminal narration");
 assert(!resolverSource.slice(resolverSource.indexOf("function resolveMachineStoryBeat343()"),resolverSource.indexOf("globalThis.resolveMachineStoryBeat343")).includes(".label"),"machine resolver infers semantics from labels");
 assert(!coreSource.includes("function resolveMachineStorySceneBeat()"),"frozen game.js was reopened for #343 machine resolver");
 

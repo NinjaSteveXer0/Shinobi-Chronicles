@@ -683,7 +683,11 @@ function resolveMachineStoryChain33900(limit=8){
   let result=null;
   for(let i=0;i<limit;i+=1){
     const runtime=currentRuntime(),beat=currentBeat(runtime);
-    if(!runtime||!beat||beat.machineResolved!==true)return result;
+    if(!runtime||!beat)return result;
+    const machine=typeof globalThis.isStoryMachineResolverBeat343==="function"
+      ?globalThis.isStoryMachineResolverBeat343(beat)
+      :beat.machineResolved===true;
+    if(!machine)return result;
     if(typeof globalThis.resolveMachineStoryBeat343!=="function")return{success:false,reason:"story_machine_resolver_343_missing"};
     result=globalThis.resolveMachineStoryBeat343();
     if(!result||result.success!==true)return result||{success:false,reason:"story_machine_resolver_343_no_result"};
@@ -694,7 +698,7 @@ function advanceStoryScene33900(choiceId=null){
   if(!PRE_ADVANCE)return{success:false,reason:"story_advance_authority_missing"};
   if(choiceId!==null&&choiceId!==undefined)return PRE_ADVANCE.apply(this,arguments);
   const runtime=currentRuntime(),beat=currentBeat(runtime);
-  if(beat&&beat.machineResolved===true)return resolveMachineStoryChain33900();
+  if(beat&&typeof globalThis.isStoryMachineResolverBeat343==="function"&&globalThis.isStoryMachineResolverBeat343(beat))return resolveMachineStoryChain33900();
   const p=performanceCursor(runtime,beat);
   if(!runtime||!beat||!p)return PRE_ADVANCE.apply(this,arguments);
   if(getStoryHardSceneTransitionState33900().active)return{success:false,reason:"story_scene_transition_in_progress"};
