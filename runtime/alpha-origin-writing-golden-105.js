@@ -661,7 +661,7 @@ line("mir_confront",[
  {mode:"dialogue",speaker:"TRAVELLER",text:"Because I forgot lunch?"},
  {mode:"narration",text:"Mirai keeps her hands loose at her sides."},
  {mode:"dialogue",speaker:"MIRAI",text:"Because I don't know who I'm walking with."},
- {mode:"narration",text:"Silence.\n\nA breeze catches the edge of a hanging shop cloth.\n\nThe traveller's eyes stay on hers.\n\nThen one hand rises.\n\nSmoke bursts across the road.\n\nMirai jumps back.\n\nThe Academy instructor stands where the traveller had been.\n\nFor one beat, Mirai just stares.\n\nThen—"},
+ {mode:"narration",text:"Silence.\n\nA breeze catches the edge of a hanging shop cloth.\n\nThe traveller's eyes stay on hers.\n\nThen one hand rises."},
  {mode:"dialogue",speaker:"MIRAI",text:"Where is he?"},
  {mode:"narration",text:"The instructor jerks her head toward the checkpoint."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"Safe."},
@@ -685,9 +685,10 @@ push({
  text:"",
  environmentRef:MIRAI_ENV.street,
  choices:[
-  C("reveal","RESOLVE CONFRONTATION RETURN","mir_confront_08",null,{availability:hiddenResolverAvailability(()=>true)})
+  C("reveal","RESOLVE CONFRONTATION RETURN","mir_confront_reveal_01",null,{availability:hiddenResolverAvailability(()=>true)})
  ]
 });
+push(N("mir_confront_reveal_01","Smoke bursts across the road.\n\nMirai jumps back.\n\nThe Academy instructor stands where the traveller had been.\n\nFor one beat, Mirai just stares.\n\nThen—","mir_confront_08",MIRAI_ENV.street));
 miraiBeats.find(row=>row.beatId==="mir_confront_12").onEnterConsequences=[mirVerify];
 
 line("mir_change",[

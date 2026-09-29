@@ -120,14 +120,14 @@ async function proveMiraiBattle338(browser){
     const launched=await page.evaluate(()=>globalThis.launchStorySceneBattle?.());
     assert.strictEqual(launched?.success,true,"Mirai #338 Battle launch failed "+JSON.stringify(launched));
     const state=await page.evaluate(()=> {
-      const enemy=globalThis.getBattleDeploymentParticipant?.("enemy",1)||null;
-      const player=globalThis.getBattleDeploymentParticipant?.("player",1)||null;
-      const profile=globalThis.enemyDatabase?.academy_mirai_origin_instructor||null;
-      const meta=globalThis.currentBattle?.mirai338||null;
-      const rc=globalThis.currentBattle?.returnContext||null;
+      const enemy=typeof getBattleDeploymentParticipant==="function"?getBattleDeploymentParticipant("enemy",1):null;
+      const player=typeof getBattleDeploymentParticipant==="function"?getBattleDeploymentParticipant("player",1):null;
+      const profile=typeof enemyDatabase==="object"&&enemyDatabase?enemyDatabase.academy_mirai_origin_instructor:null;
+      const meta=typeof currentBattle==="object"&&currentBattle?currentBattle.mirai338:null;
+      const rc=typeof currentBattle==="object"&&currentBattle?currentBattle.returnContext:null;
       return{
-        config:globalThis.currentBattle?.battleConfigId||null,
-        encounter:globalThis.currentBattle?.encounterId||null,
+        config:typeof currentBattle==="object"&&currentBattle?currentBattle.battleConfigId||null:null,
+        encounter:typeof currentBattle==="object"&&currentBattle?currentBattle.encounterId||null:null,
         playerId:player?.id||null,
         enemyId:enemy?.id||null,
         enemyName:profile?.name||null,

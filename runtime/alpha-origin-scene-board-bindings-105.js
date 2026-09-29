@@ -230,6 +230,10 @@ function miraiActors(beatId,performance,beat){
     rows.push(instructor(),traveller());
     return rows;
   }
+  if(id==="mir_confront_reveal_01"){
+    rows.push(instructor());
+    return rows;
+  }
   if(id.startsWith("mir_confront_")){
     const match=id.match(/_(\d+)$/),n=match?Number(match[1]):0;
     rows.push(n>=8?instructor():traveller());

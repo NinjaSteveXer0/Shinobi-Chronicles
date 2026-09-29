@@ -378,7 +378,7 @@ async function runNonBattle(browser,{label,opening,route,rogueChoice=null,checks
       await shot(page,label,"river-target-visible");
       await continueTo(page,"izu_finish_river_2");
       const riverFinish=await info(page);
-      assert.strictEqual(riverFinish.text,"The target is already across.",label+" river finish proof cue drift");
+      assert.strictEqual(riverFinish.text,"You took the long way.",label+" river direct-catch finish proof cue drift");
       assert.deepStrictEqual(riverFinish.actors.map(x=>[x.id,x.image]),[
         ["academy_izuno","Assets/Academy Student/academy_izuno.png"],
         ["wasabi_academy_instructor","NPC/izuno_instructor.png"],

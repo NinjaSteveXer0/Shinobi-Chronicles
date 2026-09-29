@@ -615,11 +615,12 @@ async function legitimatePartyDefeat(browser){
     }
 
     const futureBeats=[
-      ["menma_future_01","Menma is running again."],
-      ["menma_future_02","Through the trees, Konoha comes back into view. The Academy is somewhere beyond the rooftops."],
-      ["menma_future_03","Satisfied?"],
-      ["menma_future_04","No."],
-      ["menma_future_05","Good."]
+      ["menma_future_01","Menma runs again.\n\nThe forest that felt enormous when he left the Academy feels different now—not safer, not quieter. Just less like a boundary."],
+      ["menma_future_02","Satisfied?"],
+      ["menma_future_03","No."],
+      ["menma_future_03a","A low chuckle answers him."],
+      ["menma_future_04","Good."],
+      ["menma_future_05","Menma slows on a rise where Konoha shows through the trees. The Academy is somewhere beyond the rooftops, along with everything adults keep locking behind the word ready.\n\nHe looks at the village, then past it."]
     ];
     for(const [beatId,text] of futureBeats){
       await page.waitForFunction(id=>getActiveStorySceneRuntime()?.beatId===id,beatId,{timeout:12000});
