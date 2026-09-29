@@ -289,7 +289,7 @@ Actor projection changes now to:
 
 **ACADEMY INSTRUCTOR:** “About the switch.”
 
-A beat.
+Mirai's eyes drop to the ground between them.
 
 **ACADEMY INSTRUCTOR:** “You still lost the exchange.”
 
