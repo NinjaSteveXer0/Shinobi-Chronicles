@@ -81,21 +81,30 @@ Stephen is not required to act as the transport layer between visual production 
 
 ## Battle Portrait repository-root authority
 
-Current UI / Assets portrait authority explicitly supersedes historical `Assets/Portraits/...` references.
+Stephen clarified the current repository portrait taxonomy on 2026-09-29.
 
-For new production Battle/UI portraits, the authoritative repository root is:
+Shinobi Chronicles has **three distinct Battle Portrait lanes**:
 
-`Portraits/`
+- `Enemies Portraits/` — Battle portraits for enemy representations;
+- `NPC portrait/` — Battle portraits for NPC representations;
+- `Portraits/` — Battle portraits for standard Character Card / Registry-character representations that are neither enemies nor NPCs.
 
-The legacy/special `NPC portrait/` lane may remain for already-authorised historical assets, but it is not the default root for new Battle Portrait intake.
+These are parallel production roots. Do **not** collapse them into one universal `Portraits/` root.
 
-For a Story-scoped / non-collectible participant that still requires a dedicated Battle portrait, use the exact Assets-ratified path under `Portraits/`; do not infer collectibility from the folder name and do not place the asset in `NPC/`.
+Historical `Assets/Portraits/...` references remain superseded for current production wiring.
 
-For the Academy Metal stable inviting Genin asset currently tracked by #424, coordination reconciles the permanent path as:
+Asset class and participant role determine the portrait lane; collectibility, Registry identity, NPC status and enemy status must not be inferred from filename convenience.
 
-`Portraits/Others/metal_classmate_1.png`
+For the Academy Metal stable inviting Genin asset tracked by #424:
 
-This is a presentation-path decision only. It does not create collectible ownership or a new Registry identity.
+- participant: `metal_origin_inviting_genin`;
+- role: Story NPC / controlled-spar participant;
+- asset type: Battle Portrait;
+- exact permanent path:
+
+`NPC portrait/metal_classmate_1.png`
+
+This path decision does not create collectible ownership, acquisition, My Clan admission or a new Registry identity.
 
 ---
 
