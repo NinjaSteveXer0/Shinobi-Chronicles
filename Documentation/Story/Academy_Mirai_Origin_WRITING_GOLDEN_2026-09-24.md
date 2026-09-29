@@ -5,23 +5,25 @@
 **Status:** **WRITING GOLDEN THROUGH SCENE 8 — ENDING / REFLECTION REOPENED 2026-09-29**  
 **Production Origin:** `academy_mirai`
 
-> **CURRENT SUCCESSOR NOTE — 2026-09-30 — PL BATTLE REVEAL TRIGGER**
+> **CURRENT SUCCESSOR NOTE — 2026-09-30 — PL BATTLE ATTACK / REVEAL**
 >
-> For any authorised post-substitution Mirai-vs-apparent-Traveller PL Battle, current authority is:
+> Binding causal authority:
 > `Documentation/Story/Academy_Mirai_PL_Battle_Reveal_Trigger_and_Post_Battle_Causality_2026-09-30.md`
 > @ `bd1ceddb8bc9044911d99cb31034235ac9f91bc3`.
 >
-> The apparent Traveller attacking Mirai is itself the red flag. The Battle occurrence triggers the Story reveal sequence. **Victory reveals. Defeat reveals.** Battle result changes aftermath, not reveal eligibility.
+> Exact shortcut player-facing implementation:
+> `Documentation/Story/Academy_Mirai_Shortcut_Battle_Attack_Reveal_Exact_Story_2026-09-30.md`
+> @ `c39951560b02d82e5dadb422f4120816ca757b9b`.
 >
-> Any older clause preserving disguise after shortcut victory is superseded.
-
-> **2026-09-29 focused successor:** `Documentation/Story/Academy_Mirai_Origin_Ending_Reflection_Rewrite_2026-09-29.md` @ `89e9c28eeb2a6f0144e04f5ec010ea18dbbc3e4a`.
+> Current law:
+> **apparent Traveller attacks Mirai -> Mirai registers that something is wrong -> PL Battle -> Story reveal. Victory reveals. Defeat reveals.**
 >
-> **2026-09-29 Battle-defeat successor:** `Documentation/Story/Academy_Mirai_PL_Battle_Defeat_Assessment_Termination_2026-09-29.md` @ `67d0c83e7bd75b523d4a3b010d36dfd2ab4ff126`.
+> The attack itself is the red flag. Do not explain it away before Battle.
+> Once the instructor reveals, the substitute escort does not continue.
 >
-> **2026-09-30 shortcut-Battle causality successor:** `Documentation/Story/Academy_Mirai_Shortcut_PL_Battle_Entry_and_Victory_Continuity_Correction_2026-09-30.md` @ `4015744be8723d6bb12199b928b214193324f935`.
-> The shortcut path may not jump directly from lane-following into Battle. The apparent Traveller must explicitly establish the controlled assessment condition before Battle. On shortcut victory, the Story must also explicitly state that the combat test is finished **but Mirai's escort assignment remains active** before she resumes escort duty and Scene 5 continues.
-> Legitimate PL Battle defeat now **ends the active escort assessment at the Battle location**. Any later Checkpoint Three scene is a post-assessment debrief, not resumed escort gameplay.
+> **2026-09-29 focused ending/reflection successor:** `Documentation/Story/Academy_Mirai_Origin_Ending_Reflection_Rewrite_2026-09-29.md` @ `89e9c28eeb2a6f0144e04f5ec010ea18dbbc3e4a`.
+>
+> The 2026-09-29 defeat and earlier 2026-09-30 shortcut-continuity files remain historical/supporting authority only where they do not conflict with the Battle-triggered reveal successor. Any clause saying defeat alone causes reveal, shortcut victory preserves disguise, or shortcut victory resumes escorting the substitute is retired.
 >
 > Scenes 1–8 remain frozen current GOLDEN content. The old universal final-reflection architecture is reopened because some options become factually false on routes where Mirai actually detected/verified the substitution.  
 **Primary priority:** **FINISH SHINOBI CHRONICLES ALPHA**
