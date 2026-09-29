@@ -214,16 +214,20 @@
   function previewBattlePreparedSkill33000(skillId){
     const actor=getActiveBattleActor33000();
     if(!actor||!skillId||typeof getBattlePreparedSkillDefinition!=="function")return false;
-    // The shared Battle renderer owns SELECT -> TARGET/MODE -> USE/CANCEL.
-    // Once a Skill is selected, this presentation-only hover inspector must not
-    // replace that canonical control surface or it deletes the commit buttons.
-    try{
-      const state=syncBattleActionRegionState();
-      if(state&&state.selectedSkillId)return false;
-    }catch(_error){}
     const skill=getBattlePreparedSkillDefinition(actor,skillId);
     const panel=typeof document!=="undefined"?document.querySelector(".alpha-code-battle-stage .battle-live-skill-details"):null;
     if(!skill||!panel)return false;
+    // HOVER remains presentation-only even when a Skill is already selected.
+    // Preserve the canonical selected Skill TARGET/MODE/USE/CANCEL surface,
+    // temporarily show the hovered Skill guide, then restore the canonical DOM
+    // when the pointer leaves the Skill deck. This fixes repeat-Skill states
+    // without changing selection, target, mode, or commit semantics.
+    try{
+      const state=syncBattleActionRegionState();
+      if(state&&state.selectedSkillId&&!Object.prototype.hasOwnProperty.call(panel.dataset,"battle2SelectedSkillRestore")){
+        panel.dataset.battle2SelectedSkillRestore=panel.innerHTML;
+      }
+    }catch(_error){}
     panel.classList.add("battle2-inspector");
     panel.innerHTML=renderInspector33000(skill,actor);
     panel.dataset.previewSkillId=skill.id;
@@ -234,12 +238,16 @@
   function clearBattleSkillPreview33000(){
     const panel=typeof document!=="undefined"?document.querySelector(".alpha-code-battle-stage .battle-live-skill-details"):null;
     if(!panel)return false;
+    panel.classList.add("battle2-inspector");
+    if(Object.prototype.hasOwnProperty.call(panel.dataset,"battle2SelectedSkillRestore")){
+      panel.innerHTML=panel.dataset.battle2SelectedSkillRestore;
+      delete panel.dataset.battle2SelectedSkillRestore;
+      delete panel.dataset.previewSkillId;
+      return true;
+    }
     let selected=null,actor=getActiveBattleActor33000();
     try{const state=syncBattleActionRegionState();selected=actor&&state.selectedSkillId?getBattlePreparedSkillDefinition(actor,state.selectedSkillId):null;}catch(_error){}
-    panel.classList.add("battle2-inspector");
     if(selected){
-      // Base Battle render has already rebuilt this panel with its authoritative
-      // target/mode/USE/CANCEL controls. Preserve that DOM verbatim.
       delete panel.dataset.previewSkillId;
       return true;
     }
