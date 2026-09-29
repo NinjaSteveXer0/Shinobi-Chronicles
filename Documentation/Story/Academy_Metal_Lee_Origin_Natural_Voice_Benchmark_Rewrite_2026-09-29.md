@@ -424,7 +424,7 @@ Metal can still feel them there.
 
 **METAL:** “Yes.”
 
-A beat.
+Metal looks down at the sparring line.
 
 **METAL:** “I kept looking past you.”
 
@@ -766,7 +766,7 @@ Metal looks embarrassed.
 
 **METAL:** “I know.”
 
-A beat.
+Metal keeps his eyes on the bent frame.
 
 **METAL:** “I just wanted to make sure.”
 
