@@ -18,9 +18,9 @@ required_source=[
     'A toad is sitting in the middle of the Academy courtyard.',
     'D("kus_route_d_close_08","KUSHINA","That\'s what I said.","kus_receipt")',
     '{beatId:"kus_receipt",mode:"record",environmentRef:courtyard,text:"",exitScene:true}',
-    'N("kus_protect_close_04","Kushina laughs and leaves.","kus_receipt"',
-    'N("kus_contain_close_09","She grins and does.","kus_receipt"',
-    'N("kus_move_close_08","The classmate thinks about that. Then nods.\\n\\nThey leave the courtyard together.","kus_receipt"',
+    'N("kus_protect_close_08","Kushina grins.\\n\\nThey leave the courtyard.","kus_receipt"',
+    'N("kus_contain_close_11","She leaves.","kus_receipt"',
+    'N("kus_move_close_10","They keep walking.","kus_receipt"',
     'gerotoraFirstContactOccurred:true',
     'qualifyingFuinjutsuWorkCompleted:["correct_formula","contain_damaged_seal"].includes(ctx.kushinaCrisisChoice)',
     'Scene backdrops/academy_training_ground_courtyard.png'
@@ -28,6 +28,16 @@ required_source=[
 for token in required_source:
     if token not in source:
         errors.append('missing source token: '+token)
+
+
+for retired in [
+    'That is not how that sentence works.',
+    'Would you prefer I complain?',
+    'You just threw a seal.',
+    "I'm thrilled.",
+]:
+    if retired in source:
+        errors.append('retired Kushina dialogue returned: '+retired)
 
 if 'kus_ordinary_end' in source:
     errors.append('stale shared ordinary ending remains')

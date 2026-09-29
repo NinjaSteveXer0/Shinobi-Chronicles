@@ -97,7 +97,7 @@ try{
   assert("kushina_second_choice_is_rendered",render.beatId==="kus_contact_choice"&&render.buttons.length===4,render);
   clickChoice("ask_who");
   assert("kushina_identity_route_starts_natively",render.beatId==="kus_ask_who_01",render);
-  continueUntil("kus_ask_who_04");
+  continueUntil("kus_ask_who_03");
   assert("kushina_second_choice_has_visible_consequence",render.text==="Gerotora.",render);
 
   // Two materially different Kurenai player routes must produce visibly different DOM sequences.
@@ -134,7 +134,7 @@ try{
   beginOrigin("academy_izuno");continueUntil("izu_initial_choice");clickChoice("environmental_signs");continueUntil("izu_split_choice");clickChoice("stronger_trail");
   assert("wasabi_route_choice_has_visible_successor",render.beatId==="izu_stronger_1"&&render.text==="The inland trail looks perfect.",render);
   beginOrigin("academy_iwabee");continueUntil("iwa_reshape");clickChoice("build_path");
-  assert("iwabee_golden_terrain_choice_has_native_visible_successor",render.beatId==="iwa_path_01"&&render.text.includes("new path cuts cleanly"),render);
+  assert("iwabee_natural_voice_terrain_choice_has_native_visible_successor",render.beatId==="iwa_path_01"&&render.text.includes("The path locks into place."),render);
 
   // Academy Kakashi legacy Origin is intentionally absent during the V2 clean-room rebuild.
   selectOrigin("academy_kakashi");

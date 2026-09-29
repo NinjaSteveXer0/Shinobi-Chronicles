@@ -411,9 +411,14 @@ function kurenaiActors(beatId,performance,beat){
 function iwabeeActors(beatId,performance,beat){
   const id=String(beatId||""),sp=speaker(performance,beat);
   const rows=[actor("academy_iwabee","IWABEE",PATH.iwabee,sp)];
-  const roguePresent=id.includes("rogue")||id.includes("confront")||id.includes("earth")||id.includes("call_instructor")||id.includes("finish_practical");
-  if(roguePresent)rows.push(actor("iwabee_origin_rogue_genin_01","ROGUE GENIN",PATH.rogue,sp));
-  else rows.push(actor("iwabee_academy_instructor","INSTRUCTOR",PATH.iwabeeInstructor,sp,["ACADEMY INSTRUCTOR"]));
+  const instructor=()=>actor("iwabee_academy_instructor","INSTRUCTOR",PATH.iwabeeInstructor,sp,["ACADEMY INSTRUCTOR"]);
+  const rogue=()=>actor("iwabee_origin_rogue_genin_01","ROGUE GENIN",PATH.rogue,sp);
+  const roguePresent=
+    id.startsWith("iwa_expose_")||id==="iwa_response"||
+    id.startsWith("iwa_confront_")||id.startsWith("iwa_block_")||
+    id.startsWith("iwa_call_")||id.startsWith("iwa_finish_");
+  rows.push(instructor());
+  if(roguePresent)rows.push(rogue());
   return rows;
 }
 function metalActors(beatId,performance,beat){
