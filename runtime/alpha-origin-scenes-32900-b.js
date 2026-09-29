@@ -302,7 +302,7 @@ const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A)
     {beatId:"kur_partial_win_2",mode:"choice",text:"Distance itself becomes unreliable.",choices:[C("rush_bell","Rush the bell","kur_partial_win_3")]},
     {beatId:"kur_partial_win_3",mode:"choice",text:"The instructor begins to dismiss the attempt.",choices:[C("pretend_withdraw","Pretend to withdraw","kur_result",{kurenaiOutcome:"partial_win"})]},
     {beatId:"kur_complete_2",mode:"choice",text:"The instructor believes the clumsy approach is real.",choices:[C("rush_bell","Rush the bell","kur_complete_3")]},
-    {beatId:"kur_complete_3",mode:"choice",text:"He believes he has caught Kurenai.",choices:[C("let_him_think_caught","Let the instructor think he caught you","kur_result",{kurenaiOutcome:"complete_win"})]},
+    {beatId:"kur_complete_3",mode:"choice",text:"She believes she has caught Kurenai.",choices:[C("let_him_think_caught","Let the instructor think she caught you","kur_result",{kurenaiOutcome:"complete_win"})]},
     {beatId:"kur_result",mode:"narration",text:"The illusion layers resolve from the committed deception sequence. No personality or alignment label is assigned.",onEnterConsequences:[result],nextBeatId:"kur_lesson"},
     {beatId:"kur_lesson",mode:"dialogue",speakerName:"INSTRUCTOR",text:"I was assessing what you believed in, to separate the reality from illusion and the truth from fiction.",exitScene:true}
   ],onCompleteConsequences:[X("academy_kurenai",[bell])]});
