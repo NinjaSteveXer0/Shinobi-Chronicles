@@ -174,18 +174,18 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
     let end=await state(page);
     assert(end.backdrop.includes("training_grounds_late_afternoon.png"),label+" end-day should begin in training yard");
     assert(end.performance&&end.performance.sourceIndex===0,label+" end-day source cue should begin at 0");
-    for(let guard=0;guard<30&&end.beatId==="obi_end_day"&&end.performance&&end.performance.sourceIndex<2;guard++){
-      assert(end.backdrop.includes("training_grounds_late_afternoon.png"),label+" pagination changed backdrop before authored source cue 2");
+    for(let guard=0;guard<40&&end.beatId==="obi_end_day"&&end.performance&&end.performance.sourceIndex<7;guard++){
+      assert(end.backdrop.includes("training_grounds_late_afternoon.png"),label+" pagination changed backdrop before authored source cue 7");
       await advance(page);
       end=await state(page);
     }
     assert.strictEqual(end.beatId,"obi_end_day");
-    assert(end.performance&&end.performance.sourceIndex===2,label+" end-day never reached authored street source cue");
-    assert(end.backdrop.includes("konoha_street_late_afternoon.png"),label+" end-day did not move to street at authored source cue 2");
+    assert(end.performance&&end.performance.sourceIndex===7,label+" end-day never reached authored street source cue");
+    assert(end.backdrop.includes("konoha_street_late_afternoon.png"),label+" end-day did not move to street at authored source cue 7");
 
     await toBeat(page,"obi_home");await assertBackdrop(page,"obi_home",EXPECTED_BACKDROP.obi_home);
     await toBeat(page,"obi_reflect");s=await state(page);
-    assert.deepStrictEqual(s.choices.map(x=>x.label),["I'm not going to stop helping people.","I need to take training more seriously.","I need to get better at both.","Maybe I'm looking at this wrong. I need to figure out what matters most to me."]);
+    assert.deepStrictEqual(s.choices.map(x=>x.label),["I'm not going to stop helping people.","I need to take training more seriously.","I need to get better at both.","Maybe I'm looking at this wrong."]);
     assert(s.choices.every(x=>x.icon),label+" reflection choice icon missing");
     await screenshot(page,label+"-reflection");
     await choose(page,"I need to get better at both.","obi_ending_balance");
