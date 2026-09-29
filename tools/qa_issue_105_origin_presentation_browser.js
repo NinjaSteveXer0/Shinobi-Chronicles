@@ -217,7 +217,7 @@ async function proveMiraiBattle338(browser){
       await release(page);
       const winReturn=await snapshot(page);
       assert.strictEqual(winReturn.beatId,"mir_shortcut_victory_01","Mirai shortcut victory did not enter authored post-Battle Story directly");
-      assert.strictEqual(winReturn.text,"The Traveller is the first to lower his guard.","Mirai shortcut victory continuity opening drift");
+      assert.strictEqual(winReturn.text,"The Traveller is the first to lower his guard.\n\nMirai does not lower hers immediately.","Mirai shortcut victory continuity opening drift");
       assert.notStrictEqual(winReturn.primary,"CONTINUE","Mirai win still exposes redundant post-Battle CONTINUE");
       const road=await advanceUntilBeat(page,"mir_road_talk_memory_01",100);
       const postBattleText=road.seen.map(x=>x.text).join("\n");
