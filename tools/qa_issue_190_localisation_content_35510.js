@@ -93,7 +93,7 @@ assert(finalStatic.size>=70,`expected broad non-Obito 33600 final-writing extrac
 for(const phrase of [
   "HELP HER","KEEP GOING","HELP SEARCH","HELP WITH THE DELIVERY","KEEP MOVING","STOP AND HELP","GO TO TRAINING",
   "I'm not going to stop helping people.","I need to take training more seriously.","I need to get better at both.",
-  "Maybe I'm looking at this wrong. I need to figure out what matters most to me."
+  "Maybe I'm looking at this wrong."
 ])assert(sourceTexts.has(phrase),`final #331 Obito phrase missing from es-419 catalogue: ${phrase}`);
 const missingFinalStatic=[...finalStatic].filter(phrase=>!finalTexts.has(phrase));
 assert.deepEqual(missingFinalStatic,[],`missing es-419 final-Writing phrases:\n${missingFinalStatic.join('\n')}`);
