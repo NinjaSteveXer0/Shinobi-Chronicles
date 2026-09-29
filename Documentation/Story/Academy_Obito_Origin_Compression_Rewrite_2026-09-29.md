@@ -729,8 +729,6 @@ Obito puts his goggles back on.
 
 **OBITO:** “Then I leave earlier.”
 
-A beat.
-
 **OBITO:** “A lot earlier.”
 
 ---
