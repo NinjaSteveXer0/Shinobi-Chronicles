@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-29  
 **Owner:** Stephen / Writing — Konoha  
-**Status:** **OWNER-DIRECT REWRITE COMPLETE — REVIEW TARGET / NOT YET RE-PROMOTED TO WRITING GOLDEN**  
+**Status:** **OWNER PREVIEW AUTHORIZED — SEND TO CODING / NOT WRITING GOLDEN UNTIL BROWSER REVIEW**  
 **Production Origin:** `academy_mirai`
 
 ## Scope
