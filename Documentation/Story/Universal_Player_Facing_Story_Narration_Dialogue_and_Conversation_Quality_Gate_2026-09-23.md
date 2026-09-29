@@ -850,9 +850,10 @@ At minimum, Writing must fetch and read the current live versions of:
 
 1. this universal quality gate;
 2. `Documentation/Story/Writing_Anti_Flattening_Character_Voice_and_Conversation_Hard_Gate_2026-09-30.md`;
-3. the exact current Story authority for the active Origin/Arc/scene;
-4. the current character-specific voice/personality anchor(s) for every major named participant;
-5. any current scene-specific / benchmark / owner correction that directly governs the task.
+3. `Documentation/Coordination/Story_Common_Sense_Causality_Rational_Actor_and_Hotspot_Conversation_Gate_2026-09-30.md`;
+4. the exact current Story authority for the active Origin/Arc/scene;
+5. the current character-specific voice/personality anchor(s) for every major named participant;
+6. any current scene-specific / benchmark / owner correction that directly governs the task.
 
 Do not rely on Project memory or an old summary when a live durable source exists.
 
@@ -866,7 +867,17 @@ Before drafting, Writing must return a compact receipt containing:
 - **5 NON-NEGOTIABLE RULES FOR THIS TASK:** concrete rules derived from those sources;
 - **VOICE DIFFERENTIATORS:** one short line per major named participant stating what makes their speech/behaviour distinct in this scene;
 - **DRIFT RISKS:** the 2–4 most likely failure modes for this exact task;
-- final line: **WRITING PREFLIGHT: GREEN**.
+- **CAUSAL SPINE:**
+  - Trigger;
+  - Direct observers;
+  - Safe inference;
+  - Current participant wants;
+  - Premise invalidated? YES/NO + why;
+  - Why this action/conversation happens now;
+  - What changes afterward;
+- final lines:
+  - **CAUSAL PREFLIGHT: GREEN**
+  - **WRITING PREFLIGHT: GREEN**.
 
 If a required source cannot be found or conflicts with another current source, Writing must stop and resolve that before drafting.
 
@@ -883,6 +894,10 @@ The following do NOT count as preflight:
 - listing rules without exact live paths/SHAs.
 
 The receipt exists to prove actual live-source consumption.
+
+A preflight may not be GREEN when its causal spine contains an unexplained jump.
+
+If Writing cannot answer why a participant acts now, why the prior activity continues after a disruptive event, or what directly observed fact justified a reaction, it must stop before drafting.
 
 ### 28.4 Stephen gating phrase
 
