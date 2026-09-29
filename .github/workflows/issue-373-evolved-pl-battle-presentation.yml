@@ -6,11 +6,14 @@ on:
     paths:
       - 'runtime/alpha-battle-modern-33000.js'
       - 'runtime/alpha-menma-evolved-pl-battle-36900.js'
+      - 'runtime/alpha-mirai-origin-battle-338.js'
       - 'runtime/alpha-runtime-build-fingerprint-303.js'
       - 'tools/qa_issue_369_menma_evolved_pl_battle.js'
       - 'tools/qa_issue_369_menma_evolved_pl_battle_browser.js'
       - 'tools/qa_issue_373_evolved_pl_battle_presentation.js'
       - 'tools/qa_issue_373_evolved_pl_battle_presentation_browser.js'
+      - 'tools/qa_issue_425_shared_battle_system.js'
+      - 'tools/qa_issue_425_shared_battle_system_browser.js'
       - 'tools/qa_issue_303_runtime_build_fingerprint.js'
       - 'tools/qa_runtime_ownership_safety_300.js'
       - 'tools/fixtures/runtime_build_manifest_303.json'
@@ -45,8 +48,11 @@ jobs:
           node --check tools/qa_issue_369_menma_evolved_pl_battle_browser.js
           node --check tools/qa_issue_373_evolved_pl_battle_presentation.js
           node --check tools/qa_issue_373_evolved_pl_battle_presentation_browser.js
+          node --check tools/qa_issue_425_shared_battle_system.js
+          node --check tools/qa_issue_425_shared_battle_system_browser.js
           node tools/qa_issue_369_menma_evolved_pl_battle.js
           node tools/qa_issue_373_evolved_pl_battle_presentation.js
+          node tools/qa_issue_425_shared_battle_system.js
           node tools/qa_issue_303_runtime_build_fingerprint.js
           node tools/qa_runtime_ownership_safety_300.js
 
@@ -70,7 +76,9 @@ jobs:
         env:
           ISSUE_373_BASE_URL: http://127.0.0.1:8080/index.html
           ISSUE_373_BROWSER_OUT: artifacts/issue-373-evolved-pl-battle-presentation
-        run: xvfb-run -a node tools/qa_issue_373_evolved_pl_battle_presentation_browser.js
+        run: |
+          xvfb-run -a node tools/qa_issue_373_evolved_pl_battle_presentation_browser.js
+          ISSUE_425_BASE_URL=http://127.0.0.1:8080/index.html ISSUE_425_BROWSER_OUT=artifacts/issue-425-shared-battle-system xvfb-run -a node tools/qa_issue_425_shared_battle_system_browser.js
 
       - name: Preserve server log
         if: always()
@@ -83,5 +91,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: issue-373-evolved-pl-battle-presentation-evidence
-          path: artifacts/issue-373-evolved-pl-battle-presentation
+          path: |
+            artifacts/issue-373-evolved-pl-battle-presentation
+            artifacts/issue-425-shared-battle-system
           if-no-files-found: warn
