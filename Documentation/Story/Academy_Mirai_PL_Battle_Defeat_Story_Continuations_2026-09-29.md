@@ -2,8 +2,12 @@
 
 **Date:** 2026-09-29  
 **Owner:** Stephen / Writing — Konoha  
-**Status:** **OWNER BROWSER-DEFECT CORRECTION — PREVIEW IMPLEMENTATION AUTHORIZED**  
+**Status:** **SUPERSEDED — DO NOT IMPLEMENT CURRENT CONTINUATION ROUTING**  
 **Production Origin:** `academy_mirai`
+
+> **Superseded by:** `Documentation/Story/Academy_Mirai_PL_Battle_Defeat_Assessment_Termination_2026-09-29.md` @ `67d0c83e7bd75b523d4a3b010d36dfd2ab4ff126`.
+>
+> Owner browser review proved that acknowledging defeat but then resuming the escort still fails Story causality. On defeat, the assessment now ends at the Battle location; any later Checkpoint Three scene is debrief only.
 
 ## Defect
 
