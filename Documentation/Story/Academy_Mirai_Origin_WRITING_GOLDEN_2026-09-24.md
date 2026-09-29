@@ -7,6 +7,9 @@
 
 > **2026-09-29 focused successor:** `Documentation/Story/Academy_Mirai_Origin_Ending_Reflection_Rewrite_2026-09-29.md` @ `89e9c28eeb2a6f0144e04f5ec010ea18dbbc3e4a`.
 >
+> **2026-09-29 Battle-defeat successor:** `Documentation/Story/Academy_Mirai_PL_Battle_Defeat_Story_Continuations_2026-09-29.md` @ `061ca97c325aa330da5a7e177eaaffe3b2bb75cc`.
+> Legitimate PL Battle defeat must now render a visible caller-specific Story continuation before the Origin proceeds.
+>
 > Scenes 1–8 remain frozen current GOLDEN content. The old universal final-reflection architecture is reopened because some options become factually false on routes where Mirai actually detected/verified the substitution.  
 **Primary priority:** **FINISH SHINOBI CHRONICLES ALPHA**
 
