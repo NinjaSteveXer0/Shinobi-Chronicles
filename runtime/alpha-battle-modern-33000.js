@@ -672,23 +672,43 @@
     for(const button of primary)button.classList.toggle("is-selected",stage.dataset.formationTray===button.dataset.formationFamily.replace("summons","summon"));
     return primary.length===3;
   }
+  function sharedBattleEnvironmentPath33000(){
+    const battle=typeof currentBattle!=="undefined"?currentBattle:null;
+    if(!battle)return"";
+    return String(battle.presentationEnvironmentPath||battle.environmentPath||"").trim();
+  }
   function applyBattleEnvironment33000(stage){
     if(!stage)return null;
     const encounterId=String(currentBattle&&currentBattle.encounterId||"");
     const configId=String(currentBattle&&currentBattle.battleConfigId||"");
-    if(encounterId==="origin_academy_menma_prologue:three_test_subjects"&&configId==="academy_menma_origin_three_test_subjects_with_anko"){
-      stage.dataset.battleEnvironment="forest_clearing_day";
-      stage.dataset.evolvedPlProof="menma_three_subjects";
-      return{environmentPath:"Scene backdrops/forest_clearing_day.png",semanticWrite:false};
+    const menmaProof=encounterId==="origin_academy_menma_prologue:three_test_subjects"&&configId==="academy_menma_origin_three_test_subjects_with_anko";
+    const environmentPath=sharedBattleEnvironmentPath33000()||(menmaProof?"Scene backdrops/forest_clearing_day.png":"");
+    if(environmentPath){
+      stage.dataset.battleEnvironment=menmaProof?"forest_clearing_day":"authored";
+      stage.dataset.battleEnvironmentPath=environmentPath;
+      const cssPath=environmentPath.replace(/\\/g,"\\\\").replace(/"/g,'\\"');
+      stage.style.setProperty("background-image",`linear-gradient(180deg,rgba(1,8,9,.20),rgba(1,8,9,.48)),url("${cssPath}")`,"important");
+      stage.style.setProperty("background-size","cover","important");
+      stage.style.setProperty("background-position","center","important");
+      stage.style.setProperty("background-repeat","no-repeat","important");
+    }else{
+      delete stage.dataset.battleEnvironment;
+      delete stage.dataset.battleEnvironmentPath;
+      stage.style.removeProperty("background-image");
+      stage.style.removeProperty("background-size");
+      stage.style.removeProperty("background-position");
+      stage.style.removeProperty("background-repeat");
     }
-    delete stage.dataset.battleEnvironment;
-    delete stage.dataset.evolvedPlProof;
-    return null;
+    // Historical proof/debug marker only. It no longer gates the shared Battle shell.
+    if(menmaProof)stage.dataset.evolvedPlProof="menma_three_subjects";
+    else delete stage.dataset.evolvedPlProof;
+    return environmentPath?{environmentPath,semanticWrite:false,sharedBattleSystem:true,menmaProof}:null;
   }
   function installFormationStage33000(stage){
     if(!stage)return null;
     const player=deployedFormation33000("player"),enemy=deployedFormation33000("enemy"),mode=formationMode33000();
     stage.dataset.formationStage="true";
+    stage.dataset.battleSystem="shinobi_chronicles_shared";
     stage.dataset.formationMode=mode;
     stage.dataset.playerFormationCount=String(player.length);
     stage.dataset.enemyFormationCount=String(enemy.length);
@@ -1499,10 +1519,10 @@
     style.textContent=`
       .alpha-code-battle-stage.battle2-modern{background:radial-gradient(circle at 50% 25%,rgba(41,103,119,.20),transparent 27%),radial-gradient(circle at 18% 36%,rgba(40,188,204,.08),transparent 24%),radial-gradient(circle at 82% 36%,rgba(218,77,55,.08),transparent 24%),linear-gradient(180deg,#07121a 0%,#03080d 58%,#05080c 100%)!important}
       .alpha-code-battle-stage.battle2-modern[data-battle-environment="forest_clearing_day"]{background-image:linear-gradient(180deg,rgba(1,8,9,.20),rgba(1,8,9,.48)),url("Scene backdrops/forest_clearing_day.png")!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-active-card{border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-active-card-image{object-fit:contain!important;object-position:center bottom!important;background:transparent!important;filter:drop-shadow(0 18px 18px rgba(0,0,0,.58))!important}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-roster-slot.battle2-formation-support{background:transparent!important;border:0!important;box-shadow:none!important}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-roster-slot.battle2-formation-reserve{opacity:.48!important;transform:scale(.84)!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card{border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card-image{object-fit:contain!important;object-position:center bottom!important;background:transparent!important;filter:drop-shadow(0 18px 18px rgba(0,0,0,.58))!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.battle2-formation-support{background:transparent!important;border:0!important;box-shadow:none!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.battle2-formation-reserve{opacity:.48!important;transform:scale(.84)!important}
       .battle2-modern[data-presentation-queue-busy="true"] .battle-live-action-family-row,
       .battle2-modern[data-presentation-queue-busy="true"] .battle-live-skill-deck,
       .battle2-modern[data-presentation-queue-busy="true"] .battle-live-pouch{pointer-events:none!important;opacity:.38!important}
@@ -1594,10 +1614,9 @@
       .battle2-modern[data-formation-stage="true"] .battle2-formation-focus{opacity:1!important;filter:saturate(1.03) brightness(1.03) drop-shadow(0 22px 28px rgba(0,0,0,.42))!important}
       .battle2-modern[data-formation-stage="true"] .battle2-formation-recessed{opacity:.48!important;filter:saturate(.55) brightness(.64)!important;transform:scale(.88)!important}
       .battle2-modern[data-formation-stage="true"] .battle2-formation-selected-target{outline:1px solid rgba(96,221,230,.82)!important;outline-offset:4px!important;box-shadow:0 0 26px rgba(73,213,225,.18)!important}
-      /* Menma's repeat-Skill UX reselects the last Skill/default current enemy after a
-         successful action. Preserve that convenience and target semantics without
-         leaving a card-like cyan selection frame on the active opposition. */
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle2-formation-selected-target{outline:none!important;outline-offset:0!important;box-shadow:none!important}
+      /* Shared repeat-Skill UX may reselect the current target after an action.
+         Preserve target semantics without leaving a card-like cyan frame on the active opposition. */
+      .battle2-modern[data-formation-stage="true"] .battle2-formation-selected-target{outline:none!important;outline-offset:0!important;box-shadow:none!important}
       .battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.is-skill-target,.battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.is-item-target{pointer-events:auto!important;cursor:pointer!important}
 
       /* Duel: two combatants own the battlefield. No fake support furniture. */
@@ -1663,51 +1682,48 @@
       }
       .battle2-modern[data-formation-stage="true"] .battle2-performance-stage{transition:none!important;transform:none!important}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-stage.is-settled{transform:none!important}
-      .battle2-modern[data-formation-stage="true"] .battle2-performance-host{left:43%!important;right:43%!important;top:1.5%!important;height:4.8%!important}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-host{left:31%!important;right:31%!important;top:1.4%!important;height:8.2%!important}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-center{min-height:48px!important;padding:7px 16px!important;border:1px solid rgba(218,178,78,.34)!important;border-radius:9px!important;background:linear-gradient(90deg,rgba(2,8,12,.18),rgba(2,8,12,.88) 18%,rgba(2,8,12,.94) 82%,rgba(2,8,12,.18))!important;box-shadow:0 12px 28px rgba(0,0,0,.34)!important}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-center small{font-size:clamp(7px,.54vw,9px)!important;letter-spacing:.13em!important;color:#71dce5!important}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-center strong{margin-top:3px!important;font-size:clamp(14px,1.25vw,21px)!important;line-height:1.05!important;letter-spacing:.025em!important;color:#f3e7c9!important}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-target{display:block;margin-top:3px;color:#aabcc0;font-size:clamp(6px,.47vw,8px);font-weight:800;letter-spacing:.10em}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-host{left:31%!important;right:31%!important;top:1.4%!important;height:8.2%!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-center{min-height:48px!important;padding:7px 16px!important;border:1px solid rgba(218,178,78,.34)!important;border-radius:9px!important;background:linear-gradient(90deg,rgba(2,8,12,.18),rgba(2,8,12,.88) 18%,rgba(2,8,12,.94) 82%,rgba(2,8,12,.18))!important;box-shadow:0 12px 28px rgba(0,0,0,.34)!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-center small{font-size:clamp(7px,.54vw,9px)!important;letter-spacing:.13em!important;color:#71dce5!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-center strong{margin-top:3px!important;font-size:clamp(14px,1.25vw,21px)!important;line-height:1.05!important;letter-spacing:.025em!important;color:#f3e7c9!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-target{display:block;margin-top:3px;color:#aabcc0;font-size:clamp(6px,.47vw,8px);font-weight:800;letter-spacing:.10em}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-result-chip{min-width:126px!important;padding:8px 9px!important;background:linear-gradient(90deg,transparent,rgba(3,9,13,.90))!important}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-result-chip b{font-size:clamp(10px,.82vw,14px)!important}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-result-chip em{font-size:clamp(9px,.70vw,12px)!important;color:#f0e4ca!important}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-result-chip span{font-size:clamp(7px,.55vw,9px)!important;color:#a8b9bc!important}
 
-      /* #385-compatible Alpha readability pass: animate rendered imagery only,
-         never semantic state or layout ownership. Scoped to the Menma proof so
-         the frozen Kakashi Golden motion policy remains untouched. */
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-stage.is-playing .battle2-performance-center{
-        animation:menma385TechniqueBanner .30s cubic-bezier(.2,.75,.2,1) both!important
+      /* Shared Battle action readability: animate rendered imagery only; never semantic state or layout ownership. */
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-stage.is-playing .battle2-performance-center{
+        animation:battleShared385TechniqueBanner .30s cubic-bezier(.2,.75,.2,1) both!important
       }
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-result-chip{
-        animation:menma385ResultReadout .38s .78s cubic-bezier(.2,.75,.2,1) both!important
+      .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-result-chip{
+        animation:battleShared385ResultReadout .38s .78s cubic-bezier(.2,.75,.2,1) both!important
       }
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-active-card-player.battle2-performance-role-actor{--menma385-action-x:7%}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-active-card-enemy.battle2-performance-role-actor{--menma385-action-x:-7%}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-roster-player .battle2-performance-role-actor{--menma385-action-x:7%}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-roster-enemy .battle2-performance-role-actor{--menma385-action-x:-7%}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-active-card-player.battle2-performance-role-target{--menma385-impact-x:-3.5%}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-active-card-enemy.battle2-performance-role-target{--menma385-impact-x:3.5%}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-roster-player .battle2-performance-role-target{--menma385-impact-x:-3.5%}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-roster-enemy .battle2-performance-role-target{--menma385-impact-x:3.5%}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-role-actor .battle-live-active-card-image,
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-role-actor .battle-live-roster-portrait{
-        animation:menma385ActorAction .72s .28s cubic-bezier(.2,.72,.2,1) both!important
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card-player.battle2-performance-role-actor{--battleShared385-action-x:7%}
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card-enemy.battle2-performance-role-actor{--battleShared385-action-x:-7%}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-player .battle2-performance-role-actor{--battleShared385-action-x:7%}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-enemy .battle2-performance-role-actor{--battleShared385-action-x:-7%}
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card-player.battle2-performance-role-target{--battleShared385-impact-x:-3.5%}
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card-enemy.battle2-performance-role-target{--battleShared385-impact-x:3.5%}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-player .battle2-performance-role-target{--battleShared385-impact-x:-3.5%}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-enemy .battle2-performance-role-target{--battleShared385-impact-x:3.5%}
+      .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-actor .battle-live-active-card-image,
+      .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-actor .battle-live-roster-portrait{
+        animation:battleShared385ActorAction .72s .28s cubic-bezier(.2,.72,.2,1) both!important
       }
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-role-target .battle-live-active-card-image,
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-role-target .battle-live-roster-portrait{
-        animation:menma385TargetResponse .46s .70s cubic-bezier(.2,.75,.2,1) both!important
+      .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-target .battle-live-active-card-image,
+      .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-target .battle-live-roster-portrait{
+        animation:battleShared385TargetResponse .46s .70s cubic-bezier(.2,.75,.2,1) both!important
       }
-      @keyframes menma385TechniqueBanner{0%{opacity:0;transform:translateY(-8px) scale(.98)}100%{opacity:1;transform:translateY(0) scale(1)}}
-      @keyframes menma385ActorAction{0%,100%{transform:translateX(0) scale(1);filter:brightness(1)}48%{transform:translateX(var(--menma385-action-x,0)) scale(1.035);filter:brightness(1.12)}}
-      @keyframes menma385TargetResponse{0%,100%{transform:translateX(0) scale(1);filter:brightness(1)}45%{transform:translateX(var(--menma385-impact-x,0)) scale(.975);filter:brightness(1.22)}}
-      @keyframes menma385ResultReadout{0%{opacity:0;transform:translateY(-8px) scale(.96)}100%{opacity:1;transform:translateY(0) scale(1)}}
+      @keyframes battleShared385TechniqueBanner{0%{opacity:0;transform:translateY(-8px) scale(.98)}100%{opacity:1;transform:translateY(0) scale(1)}}
+      @keyframes battleShared385ActorAction{0%,100%{transform:translateX(0) scale(1);filter:brightness(1)}48%{transform:translateX(var(--battleShared385-action-x,0)) scale(1.035);filter:brightness(1.12)}}
+      @keyframes battleShared385TargetResponse{0%,100%{transform:translateX(0) scale(1);filter:brightness(1)}45%{transform:translateX(var(--battleShared385-impact-x,0)) scale(.975);filter:brightness(1.22)}}
+      @keyframes battleShared385ResultReadout{0%{opacity:0;transform:translateY(-8px) scale(.96)}100%{opacity:1;transform:translateY(0) scale(1)}}
       @media(prefers-reduced-motion:reduce){
-        .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-role-actor .battle-live-active-card-image,
-        .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-role-actor .battle-live-roster-portrait,
-        .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-role-target .battle-live-active-card-image,
-        .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-role-target .battle-live-roster-portrait{
+        .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-actor .battle-live-active-card-image,
+        .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-actor .battle-live-roster-portrait,
+        .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-target .battle-live-active-card-image,
+        .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-target .battle-live-roster-portrait{
           animation:none!important
         }
       }
@@ -1771,7 +1787,10 @@
       resultFeedbackAttachedToExactTarget:String(applyBattlePerformanceRoles33000).includes("targetNode.appendChild(chip)")&&String(battlePerformanceResultChip33000).includes("AUTHORITATIVE STATE UPDATED"),
       damageReadoutSeparatesDamageFromBattlePL:String(battlePerformanceResultChip33000).includes("DAMAGE")&&String(battlePerformanceResultChip33000).includes("PL ${p.beforePL} → ${p.afterPL}")&&!String(battlePerformanceResultChip33000).includes("`-${p.finalDamage} PL`"),
       zeroBattlePLReadsWithdrawal:String(resultClass33000).includes('return"WITHDRAWAL"')&&String(projectBattlePerformanceCompletion33000).includes('result==="WITHDRAWAL"'),
-      readableTechniqueBanner:String(battlePerformanceMarkup33000).includes("battle2-performance-target")&&styleText.includes("menma385TechniqueBanner")&&styleText.includes("font-size:clamp(14px,1.25vw,21px)"),
+      readableTechniqueBanner:String(battlePerformanceMarkup33000).includes("battle2-performance-target")&&styleText.includes("battleShared385TechniqueBanner")&&styleText.includes("font-size:clamp(14px,1.25vw,21px)"),
+      sharedBattleSystemMarker:String(installFormationStage33000).includes('battleSystem="shinobi_chronicles_shared"'),
+      sharedAuthoredEnvironmentProjection:String(sharedBattleEnvironmentPath33000).includes("presentationEnvironmentPath")&&String(sharedBattleEnvironmentPath33000).includes("environmentPath")&&String(applyBattleEnvironment33000).includes('background-image')&&String(applyBattleEnvironment33000).includes("sharedBattleSystem:true"),
+      menmaMarkerIsProofOnly:String(applyBattleEnvironment33000).includes("Historical proof/debug marker only")&&String(installFormationStage33000).includes("applyBattleEnvironment33000"),
       performanceSettleIsActionScoped:String(finishBattlePresentationReceipt33000).includes("active.key!==key")&&String(clearBattlePerformanceRoles33000).includes("battle2-performance-active"),
       orderedCommittedPlayback:String(syncBattlePresentationQueue33000).includes("collectBattlePerformanceProjections33000")&&String(playNextBattlePresentationReceipt33000).includes("playedKeys.add")&&String(projectBattlePerformanceCompletion33000).includes("immutableCommittedFacts:true")&&String(bindActiveBattlePresentation33000).includes("liveBattleStage33000"),
       reloadDoesNotDuplicatePresentation:String(resetPresentationQueueState33000).includes("playedKeys")&&String(presentationStorageKey33000).includes("battleId"),
@@ -1783,7 +1802,8 @@
       playerCardNamesSuppressed:styleText.includes(".battle-live-active-card-player .battle-live-active-nameplate{display:none!important}")&&styleText.includes(".battle-live-roster-player .battle-live-roster-name{display:none!important}"),
       confrontationPLLaneAligned:styleText.includes('data-formation-mode="duel"] .battle-live-power-player')&&styleText.includes("left:43.5%!important")&&styleText.includes("left:56.5%!important"),
       radialPLCorePreserved:String(projectFormationActivePortrait33000).includes('querySelector(".alpha-battle-pl-ring")')&&String(projectFormationActivePortrait33000).includes('querySelector(".alpha-battle-pl-core")')&&String(projectFormationActivePortrait33000).includes("--battle-pl-fill")&&String(projectFormationActivePortrait33000).includes("power.children"),
-      topHudStackSeparated:styleText.includes('data-formation-stage="true"] .battle2-performance-host{left:43%!important;right:43%!important;top:1.5%!important;height:4.8%!important}')&&styleText.includes('data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-host{left:31%!important;right:31%!important;top:1.4%!important;height:8.2%!important}')&&styleText.includes(".battle2-live-ticker{left:35%!important;top:8.4%!important;width:30%!important"),
+      topHudStackSeparated:styleText.includes('data-formation-stage="true"] .battle2-performance-host{left:31%!important;right:31%!important;top:1.4%!important;height:8.2%!important}')&&styleText.includes(".battle2-live-ticker{left:35%!important;top:8.4%!important;width:30%!important"),
+      sharedActionMotion:styleText.includes('data-formation-stage="true"].battle2-performance-active .battle2-performance-role-actor')&&styleText.includes("battleShared385ActorAction")&&styleText.includes("battleShared385TargetResponse"),
       storyCallerPresentationSuspension:typeof suspendCallerStoryPresentation33000==="function"&&String(suspendCallerStoryPresentation33000).includes("caller_owned_battle")&&String(enhanceBattle2DOM33000).includes("suspendCallerStoryPresentation33000")&&String(renderCombatOverlayModern33000).includes("enhanceBattle2DOM33000"),
       branchModesRemainExplicit:renderInspector33000.toString().includes("setSelectedBattleSkillMode"),
       browserGoldenClaimed:false
