@@ -86,17 +86,19 @@ try{
   assert("story_backdrop_stack_above_world",!!style&&style.textContent.includes("z-index:0!important")&&style.textContent.includes("z-index:2!important"));
   assert("browser_golden_not_claimed",diag.browserGoldenClaimed===false&&diag2.browserGoldenClaimed===false);
 
-  // Public Origin dispatcher -> rendered DOM choice -> public advance handler.
+  // Public Origin dispatcher -> native benchmark Kushina chain -> rendered choices.
   beginOrigin("academy_kushina");
+  assert("kushina_native_benchmark_entry",render.beatId==="kus_practical_01",render);
+  continueUntil("kus_crisis");
   assert("kushina_real_entry_choice",render.beatId==="kus_crisis"&&render.buttons.length===4,render);
   clickChoice("correct_formula");
-  assert("one_click_reaches_exact_next_beat",render.beatId==="kus_reverse"&&render.text.includes("reverse-summoning"),render);
-  clickContinue();
-  assert("continue_does_not_skip_multiple_beats",render.beatId==="kus_gero_1"&&render.text.includes("not where I was"),render);
-  clickContinue();clickContinue();clickContinue();
+  assert("one_click_reaches_exact_next_beat",render.beatId==="kus_reverse_01"&&render.text.includes("Kushina drops beside the scroll"),render);
+  continueUntil("kus_contact_choice");
   assert("kushina_second_choice_is_rendered",render.beatId==="kus_contact_choice"&&render.buttons.length===4,render);
   clickChoice("ask_who");
-  assert("kushina_second_choice_has_visible_consequence",render.beatId==="kus_contact_result"&&render.text.includes("gives his name: Gerotora"),render);
+  assert("kushina_identity_route_starts_natively",render.beatId==="kus_ask_who_01",render);
+  continueUntil("kus_ask_who_04");
+  assert("kushina_second_choice_has_visible_consequence",render.text==="Gerotora.",render);
 
   // Two materially different Kurenai player routes must produce visibly different DOM sequences.
   beginOrigin("academy_kurenai");clickContinue();clickChoice("false_kurenai");clickChoice("rush_bell");
