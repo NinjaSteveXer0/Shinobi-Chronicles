@@ -190,7 +190,7 @@ assert.deepStrictEqual(JSON.parse(JSON.stringify(interceptReq.__factResolver({ou
   interceptReachedByPrediction:true,pursuitOutcome:"intercept_before_extraction",academyTrackingRecommendation:true
 });
 assert.deepStrictEqual(JSON.parse(JSON.stringify(interceptReq.__rowIdsResolver({outcome:"intercept_before_extraction"}))),["IZU-02"]);
-assert.deepStrictEqual(JSON.parse(JSON.stringify(interceptReq.__rowIdsResolver({predictionApproach:true,outcome:"arrive_just_after_target"}))),[]);
+assert.deepStrictEqual(JSON.parse(JSON.stringify(interceptReq.__rowIdsResolver({predictionApproach:true,outcome:"direct_catch"}))),[]);
 
 // Rogue response remains separate from pursuit outcome.
 assert.deepStrictEqual(JSON.parse(JSON.stringify(choice("izu_rogue_choice","intervene").contextPatch)),{

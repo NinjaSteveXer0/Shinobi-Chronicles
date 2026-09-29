@@ -598,7 +598,7 @@ async function runBattleRoute(browser,outcome){
   try{
     results.push(await runNonBattle(browser,{
       label:"obvious-river",opening:"TAKE THE OBVIOUS TRAIL",route:"TAKE THE RIVER",
-      checks:async(_page,h)=>{assert.strictEqual(h.exact[TRACKING].length,1);assert.strictEqual(h.exact[TRACKING][0].fact?.pursuitOutcome,"arrive_just_after_target");assert.strictEqual(h.exact[RIVER].length,1);assert.strictEqual(h.exact[RIVER][0].fact?.sustainedEnduranceExertion,true);assert.strictEqual(h.developmentReceipts.filter(r=>r.sourceOccurrenceId===RIVER&&r.disciplineId==="stamina").length,1);assert.strictEqual(h.exact[ROGUE_OCC].length,0);}
+      checks:async(_page,h)=>{assert.strictEqual(h.exact[TRACKING].length,1);assert.strictEqual(h.exact[TRACKING][0].fact?.pursuitOutcome,"direct_catch");assert.strictEqual(h.exact[RIVER].length,1);assert.strictEqual(h.exact[RIVER][0].fact?.sustainedEnduranceExertion,true);assert.strictEqual(h.developmentReceipts.filter(r=>r.sourceOccurrenceId===RIVER&&r.disciplineId==="stamina").length,1);assert.strictEqual(h.exact[ROGUE_OCC].length,0);}
     }));
     results.push(await runNonBattle(browser,{
       label:"better-stronger",opening:"LOOK FOR SOMETHING BETTER",route:"FOLLOW THE STRONGER TRAIL",
