@@ -161,6 +161,40 @@ function projectRewards(rewards=null){
   out.requiresExplicitPostClaimContinue=false;out.mirai338FixedReward=true;out.mirai338RewardSourceId=REWARD_SOURCE_ID;out.battleOccurrenceId=meta().battleOccurrenceId;
   currentBattle.rewards=out;return out;
 }
+function isMirai338FixedVictoryRewardPresentation(rewards){
+  return !!(
+    isExact()&&
+    currentBattle&&currentBattle.outcome&&currentBattle.outcome.type==="victory"&&
+    currentBattle.rewards&&currentBattle.rewards.mirai338FixedReward===true&&
+    Number(rewards&&rewards.ryo)===FIXED_VICTORY_RYO
+  );
+}
+const PRE_VICTORY_REVEAL_338=typeof runVictoryRevealAnimations==="function"?runVictoryRevealAnimations:null;
+if(PRE_VICTORY_REVEAL_338){
+  const wrappedMirai338VictoryReveal=function(container,rewards){
+    if(isMirai338FixedVictoryRewardPresentation(rewards)){
+      const ryoElement=container&&container.querySelector?container.querySelector(".victory-ryo-number"):null;
+      const expElement=container&&container.querySelector?container.querySelector(".victory-exp-number"):null;
+      const ryoGranted=FIXED_VICTORY_RYO;
+      const expGranted=Math.max(0,Number(rewards&&rewards.exp)||0);
+      if(ryoElement){
+        ryoElement.textContent=String(ryoGranted);
+        ryoElement.dataset.rewardPresentation="fixed_earned_amount";
+        ryoElement.dataset.rewardAmount=String(ryoGranted);
+        ryoElement.dataset.rewardAnimated="false";
+      }
+      if(expElement){
+        expElement.textContent=String(expGranted);
+        expElement.dataset.rewardAmount=String(expGranted);
+      }
+      return{success:true,presentationOnly:true,rewardMode:"fixed_earned_amount",ryoGranted,expGranted,animated:false};
+    }
+    return PRE_VICTORY_REVEAL_338.apply(this,arguments);
+  };
+  globalThis.runVictoryRevealAnimations=wrappedMirai338VictoryReveal;
+  try{runVictoryRevealAnimations=wrappedMirai338VictoryReveal;}catch(_){}
+}
+
 const PRE_GENERATE=typeof generateBattleRewards==="function"?generateBattleRewards:null;
 if(PRE_GENERATE){
   globalThis.generateBattleRewards=function generateMirai338Rewards(){const base=PRE_GENERATE.apply(this,arguments);return isExact()?projectRewards(base):base;};
