@@ -127,10 +127,10 @@ try{
   beginOrigin("academy_mirai");clickContinue();clickChoice("ask_route");
   assert("mirai_prior_choice_changes_later_evidence",render.beatId==="mir_inconsistent"&&render.text.includes("route the escort described"),render);
 
-  // Wasabi still uses the bounded 33500 realization shim. Iwabee #399
-  // now carries its visible terrain successor natively in WRITING_GOLDEN.
+  // Wasabi #343 complete rewrite v2 owns the native visible route successor.
+  // 33500 must stand down and preserve that exact authored route presentation.
   beginOrigin("academy_izuno");continueUntil("izu_initial_choice");clickChoice("environmental_signs");continueUntil("izu_split_choice");clickChoice("stronger_trail");
-  assert("wasabi_route_choice_has_visible_successor",render.beatId==="izu_stronger_1"&&render.text.includes("new trail is better"),render);
+  assert("wasabi_route_choice_has_visible_successor",render.beatId==="izu_stronger_1"&&render.text==="The inland trail looks perfect.",render);
   beginOrigin("academy_iwabee");continueUntil("iwa_reshape");clickChoice("build_path");
   assert("iwabee_golden_terrain_choice_has_native_visible_successor",render.beatId==="iwa_path_01"&&render.text.includes("new path cuts cleanly"),render);
 
