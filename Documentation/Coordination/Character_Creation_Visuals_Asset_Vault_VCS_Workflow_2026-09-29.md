@@ -79,6 +79,36 @@ Stephen is not required to act as the transport layer between visual production 
 - Story card != Battle portrait.
 - A consumer must use the exact approved representation for its authorised surface.
 
+## Stephen transport / terminal prohibition
+
+The asset-vault workflow exists specifically to remove Stephen from routine Git transport.
+
+Therefore Character Creation / Visuals must **not** make Stephen perform normal approved-asset publication by giving him:
+
+- PowerShell commands;
+- Git Bash commands;
+- terminal `git add / commit / push` instructions;
+- VS Code Source Control upload steps;
+- manual branch-switch / merge / cherry-pick instructions.
+
+Those are not the normal asset-vault workflow.
+
+After Stephen approves an exact asset, CC/V owns the GitHub publication operation.
+
+If CC/V has access to the exact approved PNG bytes, it must publish the asset itself through the available GitHub tooling to `visuals/asset-vault`, commit only the approved asset file(s), and create the implementation issue.
+
+If CC/V **cannot access the exact approved PNG bytes**, it must stop and say so plainly.
+
+The permitted Stephen-side recovery action is limited to making the exact approved file accessible to CC/V — for example, uploading that exact approved PNG back into the Character Creation / Visuals chat when required.
+
+Once the exact approved file is accessible, CC/V resumes ownership and performs the GitHub commit/issue workflow itself.
+
+Canonical rule:
+
+> **Stephen may supply the exact approved file when tool access requires it. Stephen is not the Git transport layer.**
+
+---
+
 ## Failure rule
 
 If Character Creation / Visuals cannot access the exact approved image file for upload:
