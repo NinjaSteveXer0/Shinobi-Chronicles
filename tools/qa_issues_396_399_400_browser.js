@@ -154,7 +154,16 @@ async function runIwabeeBattle(browser,outcome){
         currentBattle.outcome={type:outcome,committed:true,completedAt:Date.now(),finishingShinobiId:outcome==="victory"?"academy_iwabee":null};
         currentBattle.battleOver=true;currentBattle.active=false;
         const resumed=resumeBattleCallerAfterCompletion(outcome);
-        if(outcome==="defeat")for(let i=0;i<5;i++)advanceStoryScene();
+        if(outcome==="defeat"){
+          // The frozen natural-voice Story can paginate one authored beat across
+          // multiple presentation cues. Advance the real Story until the
+          // canonical World consequence commits instead of assuming five clicks.
+          for(let i=0;i<24;i++){
+            const committed=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");
+            if(committed&&committed.fact&&committed.fact.rogueDisposition)break;
+            advanceStoryScene();
+          }
+        }
         const rt=getActiveStorySceneRuntime();
         const row=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");
         return{resumed,beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};
