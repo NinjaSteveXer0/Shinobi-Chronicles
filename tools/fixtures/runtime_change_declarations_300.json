@@ -941,9 +941,10 @@
         "origin.academy_kakashi.v2.story_dom",
         "origin.academy_izuno.final_story_state",
         "origin.academy_iwabee.final_story_state",
-        "origin.academy_metal_lee.final_story_state"
+        "origin.academy_metal_lee.final_story_state",
+        "origin.academy_mirai.disguised_instructor_battle"
       ],
-      "owner": "runtime/alpha-origin-writing-golden-105.js + runtime/alpha-origin-scene-board-bindings-105.js + runtime/alpha-story-scene-board-33900.js + runtime/alpha-journey-surface-32800.js + runtime/alpha-kakashi-v2-renderer-36030.js + runtime/alpha-origin-scenes-32900-a.js + runtime/alpha-origin-scenes-32900-b.js + runtime/alpha-menma-evolved-pl-battle-36900.js + runtime/alpha-menma-origin-rewards-36200.js + runtime/alpha-battle-modern-33000.js",
+      "owner": "runtime/alpha-origin-writing-golden-105.js + runtime/alpha-origin-scene-board-bindings-105.js + runtime/alpha-story-scene-board-33900.js + runtime/alpha-journey-surface-32800.js + runtime/alpha-kakashi-v2-renderer-36030.js + runtime/alpha-origin-scenes-32900-a.js + runtime/alpha-origin-scenes-32900-b.js + runtime/alpha-menma-evolved-pl-battle-36900.js + runtime/alpha-menma-origin-rewards-36200.js + runtime/alpha-battle-modern-33000.js + runtime/alpha-mirai-origin-battle-338.js",
       "directCallers": [
         "index.html",
         "runtime/alpha-traversal-bridge-33200.js"
@@ -955,7 +956,8 @@
         "Chronicle Receipt presentation cursor/input guard only",
         "Origin Story-to-PL-Battle actionLabel/presentation styling only",
         "Academy Menma Victory disclosure presentation only; fixed 100 Ryō reward semantics remain unchanged",
-        "presentation-only radial Battle PL DOM refresh"
+        "presentation-only radial Battle PL DOM refresh",
+        "Academy Mirai closed #338 disguised-instructor PL Battle package / exact two-caller same-Story return / 50 Ryō victory reward"
       ],
       "productionLoader": "index.html + runtime/alpha-traversal-bridge-33200.js",
       "qaRefs": [
@@ -973,7 +975,7 @@
       ],
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
-      "rationale": "Stephen's 2026-09-28/29 installed-browser review supersedes automation-only presentation confidence. The #105 successor now keeps Hinata/Wasabi/Kakashi content frozen while applying only the authorised global Receipt-input and Story-to-PL-Battle CTA rules, removes Mirai's internal #338 leak and redundant terminal Continue surfaces, consumes exact Menma Nine-Tails portrait/dialogue ownership, segments approved Menma aftermath/final Story, adds Mirai/Menma Origin Receipts, and removes only the player-facing Menma reward diagnostic. Battle cadence, Battle rewards, route facts, frozen Origin prose, and Combat-owned Mirai #338 mechanics are not redesigned."
+      "rationale": "Stephen's 2026-09-28/29 installed-browser review supersedes automation-only presentation confidence. The #105 successor keeps Hinata/Kakashi frozen while applying only authorised repairs and global presentation contracts. Mirai now consumes the closed Combat #338 disguised-instructor PL Battle package through the existing Story -> Battle -> same-Story seam: shortcut Battle returns to Scene 5 without reveal; confrontation Battle returns to the approved reveal; the observer-facing opponent remains the male Traveller/Escort disguise while the underlying Academy instructor is female; victory pays the closed 50 Ryō Battle reward. Menma and Izuno remain limited to the separately owner-authorised surgical corrections already recorded. No unrelated Battle cadence, reward, route, or frozen-Origin semantics are redesigned."
     }
   ]
 }

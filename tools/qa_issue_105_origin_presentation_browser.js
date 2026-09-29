@@ -91,6 +91,80 @@ async function reloadAtExactBeat(page,beatId){
   return after;
 }
 
+async function proveMiraiBattle338(browser){
+  const cases=[
+    {beatId:"mir_shortcut_battle",callerId:"academy_mirai_origin_shortcut_battle",returnBeatId:"mir_shortcut_battle_return"},
+    {beatId:"mir_confront_battle",callerId:"academy_mirai_origin_confrontation_battle",returnBeatId:"mir_confront_battle_return"}
+  ];
+  const receipts=[];
+  for(const test of cases){
+    const context=await browser.newContext({viewport:{width:1440,height:900}});
+    const page=await context.newPage();
+    const gate=await installBrowserRuntimeErrorGate(page);
+    await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});
+    await page.waitForFunction(()=>!!globalThis.SC_ACADEMY_MIRAI_DISGUISED_INSTRUCTOR_BATTLE_338&&!!globalThis.SC_ALPHA_ORIGIN_WRITING_GOLDEN_105&&!!globalThis.SC_STORY_SCENE_BOARD_33900,null,{timeout:30000});
+    const setup=await page.evaluate(beatId=>{
+      const select=selectChronicleOrigin("academy_mirai","issue_105_mirai_338");
+      const launch=beginAlphaChronicleOriginPrologue();
+      const jump=globalThis.setStorySceneBeat?.(beatId);
+      return{select,launch,jump};
+    },test.beatId);
+    assert.strictEqual(setup.select?.success,true,"Mirai #338 select failed "+JSON.stringify(setup));
+    assert.strictEqual(setup.launch?.success,true,"Mirai #338 Story launch failed "+JSON.stringify(setup));
+    assert.strictEqual(setup.jump?.success,true,"Mirai #338 test beat unavailable "+JSON.stringify(setup));
+    await release(page);
+    await page.waitForFunction(beatId=>globalThis.getActiveStorySceneRuntime?.()?.beatId===beatId,test.beatId,{timeout:8000});
+    const pre=await snapshot(page);
+    assert.strictEqual(pre.mode,"battle_transition","Mirai #338 seam is not a Battle transition");
+    assert.strictEqual(pre.primary,"Start PL Battle","Mirai #338 CTA drifted");
+    const launched=await page.evaluate(()=>globalThis.launchStorySceneBattle?.());
+    assert.strictEqual(launched?.success,true,"Mirai #338 Battle launch failed "+JSON.stringify(launched));
+    const state=await page.evaluate(()=> {
+      const enemy=globalThis.getBattleDeploymentParticipant?.("enemy",1)||null;
+      const player=globalThis.getBattleDeploymentParticipant?.("player",1)||null;
+      const profile=globalThis.enemyDatabase?.academy_mirai_origin_instructor||null;
+      const meta=globalThis.currentBattle?.mirai338||null;
+      const rc=globalThis.currentBattle?.returnContext||null;
+      return{
+        config:globalThis.currentBattle?.battleConfigId||null,
+        encounter:globalThis.currentBattle?.encounterId||null,
+        playerId:player?.id||null,
+        enemyId:enemy?.id||null,
+        enemyName:profile?.name||null,
+        enemyImage:profile?.image||null,
+        enemyPL:profile?.calibratedBasePL??null,
+        actionIds:(profile?.authoredBattleActions||[]).map(a=>a.id),
+        callerId:meta?.callerId||null,
+        observerPresentation:meta?.observerPresentation||null,
+        underlyingIdentity:meta?.underlyingIdentity||null,
+        identityRevealedByBattle:meta?.identityRevealedByBattle,
+        sourceBeatId:rc?.sourceBeatId||null,
+        victoryBeatId:rc?.victoryBeatId||null,
+        defeatBeatId:rc?.defeatBeatId||null
+      };
+    });
+    assert.strictEqual(state.config,"academy_mirai_origin_disguised_instructor_battle","Mirai #338 config drift");
+    assert.strictEqual(state.encounter,"origin_academy_mirai_disguised_instructor_assessment","Mirai #338 encounter drift");
+    assert.strictEqual(state.playerId,"academy_mirai","Mirai #338 player deployment drift");
+    assert.strictEqual(state.enemyId,"academy_mirai_origin_instructor","Mirai #338 opponent deployment drift");
+    assert.strictEqual(state.enemyName,"TRAVELLER","Mirai #338 leaked instructor identity before reveal");
+    assert.strictEqual(state.enemyImage,"NPC portrait/mirai_instructor_disguised.png","Mirai #338 Battle portrait drift");
+    assert.strictEqual(state.enemyPL,16,"Mirai #338 opponent PL drift");
+    assert.deepStrictEqual(state.actionIds,["academy_mirai_instructor_testing_strike","academy_mirai_instructor_substitution_guard","academy_mirai_instructor_turning_sweep"],"Mirai #338 action loop drift");
+    assert.strictEqual(state.callerId,test.callerId,"Mirai #338 caller identity drift");
+    assert.strictEqual(state.observerPresentation,"male_traveller_escort_disguise","Mirai #338 disguise presentation drift");
+    assert.strictEqual(state.underlyingIdentity,"female_academy_instructor","Mirai #338 underlying identity drift");
+    assert.strictEqual(state.identityRevealedByBattle,false,"Mirai #338 Battle revealed hidden identity");
+    assert.strictEqual(state.sourceBeatId,test.beatId,"Mirai #338 return source drift");
+    assert.strictEqual(state.victoryBeatId,test.returnBeatId,"Mirai #338 victory return drift");
+    assert.strictEqual(state.defeatBeatId,test.returnBeatId,"Mirai #338 defeat return drift");
+    await gate.assertClean("academy_mirai-338-"+test.beatId);
+    receipts.push({beatId:test.beatId,callerId:state.callerId,returnBeatId:test.returnBeatId});
+    await context.close();
+  }
+  return{cases:receipts,strictOneVsOne:true,observerSafeDisguise:true};
+}
+
 async function proveMiraiTerminalReceipt(browser){
   const context=await browser.newContext({viewport:{width:1440,height:900}});
   const page=await context.newPage();
@@ -115,8 +189,11 @@ async function proveMiraiTerminalReceipt(browser){
       const enabled=page.locator("#story-scene-presentation-layer .sc-story-choice:not(:disabled)");
       const count=await enabled.count();
       assert(count>0,"Mirai route has no enabled authored choice at "+row.beatId);
+      let selected=enabled.first();
+      if(row.choices.includes("STAY ON THE ROUTE"))selected=enabled.filter({hasText:"STAY ON THE ROUTE"}).first();
+      if(row.beatId==="mir_decision_choice")selected=enabled.filter({hasText:"ESCORT HIM THE REST OF THE WAY"}).first();
       const before=row.beatId;
-      await enabled.first().click();
+      await selected.click();
       await page.waitForFunction(old=>globalThis.getActiveStorySceneRuntime?.()?.beatId!==old,before,{timeout:8000});
     }else{
       await advanceOne(page);
@@ -230,7 +307,7 @@ async function proveMiraiTerminalReceipt(browser){
         assert.strictEqual(row.cueKind,"dialogue","Nine-Tails spoken line rendered as narration");
         assert.strictEqual(row.speaker,"NINE-TAILS","Nine-Tails did not own its dialogue box");
         const fox=row.actors.find(a=>a.id==="menma_nine_tails");
-        assert(fox&&fox.image==="Portraits/Tailed Beasts/menma_nine_tails.png","Menma Nine-Tails exact portrait missing "+JSON.stringify(row.actors));
+        assert(fox&&fox.image==="Assets/Tailed Beasts/menma_nine_tails.png","Menma Nine-Tails exact portrait missing "+JSON.stringify(row.actors));
         assert(!row.text.includes("SOURCE"),"internal SOURCE label leaked into Nine-Tails dialogue");
 
         await page.evaluate(()=>{
@@ -269,7 +346,8 @@ async function proveMiraiTerminalReceipt(browser){
       await gate.assertClean(variant);
       await context.close();
     }
+    const miraiBattle338=await proveMiraiBattle338(browser);
     const miraiTerminal=await proveMiraiTerminalReceipt(browser);
-    console.log(JSON.stringify({pass:true,issue:105,cases:CASES.map(x=>x[0]),legacyFallbackRejected:true,clickAnywhereProven:true,miraiWritingGoldenProven:true,menmaWritingGoldenOpeningProven:true,menmaNineTailsDialoguePortraitProven:true,menmaPostBattleSegmentationProven:true,miraiTerminal,goldenSaveReloadResumeProven:true,browserGoldenClaimed:false},null,2));
+    console.log(JSON.stringify({pass:true,issue:105,cases:CASES.map(x=>x[0]),legacyFallbackRejected:true,clickAnywhereProven:true,miraiWritingGoldenProven:true,miraiBattle338,menmaWritingGoldenOpeningProven:true,menmaNineTailsDialoguePortraitProven:true,menmaPostBattleSegmentationProven:true,miraiTerminal,goldenSaveReloadResumeProven:true,browserGoldenClaimed:false},null,2));
   }finally{await browser.close();}
 })().catch(err=>{console.error(err);process.exit(1);});

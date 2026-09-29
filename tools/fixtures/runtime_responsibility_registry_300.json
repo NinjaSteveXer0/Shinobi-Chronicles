@@ -1244,7 +1244,8 @@
         "completeChronicleOriginPrologue"
       ],
       "permittedAdapters": [
-        "academy_origin_scene_board_bindings_105"
+        "academy_origin_scene_board_bindings_105",
+        "academy_mirai_disguised_instructor_battle_adapter_338"
       ],
       "retiredOwners": [
         "runtime/alpha-origin-browser-realisation-33500.js::pre_golden_mirai_expression_shim",
@@ -1301,6 +1302,55 @@
         "tools/qa_issue_105_origin_presentation_repair.js",
         "tools/qa_issue_105_origin_presentation_browser.js",
         "tools/qa_issue_369_menma_evolved_pl_battle.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "origin.academy_mirai.disguised_instructor_battle",
+      "canonicalOwner": "runtime/alpha-mirai-origin-battle-338.js",
+      "ownerType": "origin_battle_adapter",
+      "directCallers": [
+        "runtime/alpha-origin-writing-golden-105.js",
+        "generateBattleRewards",
+        "claimCurrentBattleRewards"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime.pendingBattle / same-Story return context",
+        "currentBattle",
+        "shared enemy action scheduler and Stamina mitigation"
+      ],
+      "stateWrites": [
+        "currentBattle.mirai338 exact Battle metadata",
+        "playerData.mirai338BattleLaunches idempotence ledger",
+        "currentBattle.runtime.evidence via shared Battle evidence authority",
+        "shinobiTestState.mirai338 / mirai338BattleLaunches scoped adapter envelope",
+        "currentBattle.rewards fixed 50 Ryō victory projection and origin_battle_reward receipt",
+        "academy_mirai_origin_instructor exact pre-reveal observer-safe Battle presentation"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-battle-modern-33000.js",
+        "runtime/alpha-mirai-origin-battle-338.js"
+      ],
+      "extensionHooks": [
+        "launchAcademyMiraiDisguisedInstructorBattle338",
+        "projectAcademyMiraiDisguisedInstructorBattle338",
+        "claimAcademyMiraiDisguisedInstructorReward338"
+      ],
+      "permittedAdapters": [
+        "academy_mirai_disguised_instructor_battle_adapter_338"
+      ],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "currentBattle.mirai338",
+        "playerData.mirai338BattleLaunches",
+        "activeStorySceneRuntime.pendingBattle",
+        "shinobiTestState.mirai338 / mirai338BattleLaunches adapter envelope",
+        "playerData.activityHistory mirai_origin_disguised_instructor_battle_victory_ryo_01"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_105_origin_presentation_repair.js",
+        "tools/qa_issue_105_origin_presentation_browser.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
     }
@@ -1424,6 +1474,18 @@
       "retirementCondition": "Retire when each Origin semantic owner registers its complete final Scene Board projection directly.",
       "milestone": "Alpha Origin Browser Golden",
       "qaRef": "tools/qa_issue_105_origin_presentation_repair.js",
+      "temporary": false
+    },
+    {
+      "adapterId": "academy_mirai_disguised_instructor_battle_adapter_338",
+      "reason": "Translate Mirai's two authorised disguised-instructor Story Battle seams into the existing shared PL Battle runtime without exposing hidden identity.",
+      "owner": "runtime/alpha-mirai-origin-battle-338.js",
+      "sourceOwner": "runtime/alpha-origin-writing-golden-105.js",
+      "targetOwner": "runtime/alpha-battle-modern-33000.js",
+      "exactBehaviorBridged": "Shortcut and confrontation callers share one strict 1v1 PL Battle config, deterministic instructor action loop, observer-safe disguise presentation, exact 50 Ryō victory reward, save/reload envelope and same-Story return.",
+      "retirementCondition": "Review when shared Origin Story-to-Battle consumes the exact #338 Mirai contract natively.",
+      "milestone": "shared Origin runtime propagation review",
+      "qaRef": "tools/qa_issue_105_origin_presentation_browser.js",
       "temporary": false
     }
   ],
