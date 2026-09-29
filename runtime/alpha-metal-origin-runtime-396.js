@@ -19,6 +19,10 @@ const SCENE_ID="origin_academy_metal_lee_prologue";
 const MET02="occ_origin_metal_pressured_performance_resolution";
 const MET03="occ_origin_metal_protective_response_resolution";
 const ENVIRONMENT="Scene backdrops/academy_training_ground_courtyard.png";
+const BATTLE_PORTRAIT="NPC portrait/metal_classmate_1.png";
+const BATTLE_PORTRAIT_BLOB_SHA="583c814dfd016e05dbac3f77b1f922a174f818c6";
+const FIXED_VICTORY_RYO=50;
+const REWARD_SOURCE_ID="metal_origin_controlled_spar_battle_victory_ryo_01";
 const START_MAX=13;
 const FEINT_STATE="metal_origin_inviting_genin_feint_entry_ready";
 const AI_IDS=Object.freeze([
@@ -99,10 +103,10 @@ function registerProfile(){
   if(typeof enemyDatabase!=="object"||!enemyDatabase)return{success:false,reason:"enemy_database_missing"};
   enemyDatabase[GENIN]={
     id:GENIN,name:PROFILE.name,rank:PROFILE.rank,power:PROFILE.pl,calibratedBasePL:PROFILE.pl,
-    baseStats:{...PROFILE.stats},stats:{...PROFILE.stats},image:"",
+    baseStats:{...PROFILE.stats},stats:{...PROFILE.stats},image:BATTLE_PORTRAIT,
     oppositionTemplateId:GENIN,
-    rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},
-    provenance:{origin:"academy_metal_lee",historicalParticipantRef:GENIN,storyScoped:true,noRegistryAdmission:true,noCollectibleAdmission:true,noAutoScaling:true,noUIPortraitAuthority:true},
+    rewards:{ryo:{min:FIXED_VICTORY_RYO,max:FIXED_VICTORY_RYO},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},
+    provenance:{origin:"academy_metal_lee",historicalParticipantRef:GENIN,storyScoped:true,noRegistryAdmission:true,noCollectibleAdmission:true,noAutoScaling:true,battlePortraitPath:BATTLE_PORTRAIT,battlePortraitAuthorityBlobSha:BATTLE_PORTRAIT_BLOB_SHA},
     noSummon:true,noTransformation:true,noBossScaling:true
   };
   enemyDatabase[GENIN].authoredBattleActions=[
@@ -126,6 +130,46 @@ if(PRE_CHOOSE){
     return{success:true,action,eligibleActionIds:[action.id],randomnessAppliedAfterEligibility:false,equalSelectionWeight:false,deterministicCycle:true,metal396:true};
   };
   try{chooseEnemyAuthoredBattleAction=globalThis.chooseEnemyAuthoredBattleAction;}catch(_){}
+}
+
+function rewardHistory(){if(!playerData.activityHistory||!Array.isArray(playerData.activityHistory))playerData.activityHistory=[];return playerData.activityHistory;}
+function isExactRewardBattle(){return !!(currentBattle&&currentBattle.metal396&&currentBattle.battleConfigId===CONFIG&&currentBattle.encounterId===ENCOUNTER);}
+function projectRewards(rewards=null){
+  if(!isExactRewardBattle())return rewards;
+  const victory=currentBattle&&currentBattle.outcome&&currentBattle.outcome.type==="victory";
+  const out=rewards&&typeof rewards==="object"?rewards:{generated:true,claimed:false};
+  out.generated=true;out.claimed=out.claimed===true;out.ryo=victory?FIXED_VICTORY_RYO:0;out.exp=0;out.items=[];out.rareDrops=[];
+  out.requiresExplicitPostClaimContinue=false;out.metal396FixedReward=true;out.metal396RewardSourceId=REWARD_SOURCE_ID;out.battleOccurrenceId=meta().battleOccurrenceId;
+  currentBattle.rewards=out;return out;
+}
+const PRE_GENERATE=typeof generateBattleRewards==="function"?generateBattleRewards:null;
+if(PRE_GENERATE){
+  globalThis.generateBattleRewards=function generateMetal396Rewards(){
+    if(isExactRewardBattle())return projectRewards(currentBattle.rewards);
+    return PRE_GENERATE.apply(this,arguments);
+  };
+  try{generateBattleRewards=globalThis.generateBattleRewards;}catch(_){}
+}
+function existingRewardReceipt(){
+  const m=meta();if(!m)return null;
+  return rewardHistory().find(row=>row&&row.type==="origin_battle_reward"&&row.rewardSourceId===REWARD_SOURCE_ID&&row.battleOccurrenceId===m.battleOccurrenceId)||null;
+}
+function claimReward(){
+  const m=meta();if(!m)return{success:false,reason:"metal396_battle_not_active"};
+  if(!currentBattle.outcome||currentBattle.outcome.type!=="victory")return{success:false,reason:"metal396_victory_required"};
+  const prior=existingRewardReceipt();if(prior){if(currentBattle.rewards)currentBattle.rewards.claimed=true;return{success:true,idempotent:true,receipt:prior};}
+  if(!currentBattle.rewards||currentBattle.rewards.generated!==true)projectRewards(currentBattle.rewards);
+  if(currentBattle.rewards.claimed===true)return{success:false,reason:"metal396_reward_claim_state_without_receipt"};
+  playerData.ryo=Math.max(0,Number(playerData.ryo)||0)+FIXED_VICTORY_RYO;
+  const receipt={type:"origin_battle_reward",rewardSourceId:REWARD_SOURCE_ID,battleOccurrenceId:m.battleOccurrenceId,battleConfigId:CONFIG,encounterId:ENCOUNTER,actorVariantId:METAL,ryo:FIXED_VICTORY_RYO,exp:0,items:[],rareDrops:[],claimedAt:Date.now()};
+  rewardHistory().push(receipt);currentBattle.rewards.claimed=true;currentBattle.claimedAt=Date.now();
+  try{recordBattleChronicle();}catch(_){}
+  savePlayerData();saveTestState();return{success:true,idempotent:false,receipt:clone(receipt)};
+}
+const PRE_CLAIM=typeof claimCurrentBattleRewards==="function"?claimCurrentBattleRewards:null;
+if(PRE_CLAIM){
+  globalThis.claimCurrentBattleRewards=function claimMetal396Rewards(){if(isExactRewardBattle())return claimReward().success===true;return PRE_CLAIM.apply(this,arguments);};
+  try{claimCurrentBattleRewards=globalThis.claimCurrentBattleRewards;}catch(_){}
 }
 
 const PRE_SAVE=typeof saveTestState==="function"?saveTestState:null;
@@ -207,8 +251,8 @@ function launch(spec={}){
   currentBattle.enemyPower=15;currentBattle.enemyMaxPower=15;
   currentBattle.metal396={patchId:PATCH_ID,battleConfigId:CONFIG,battleOccurrenceId:battleId,sourceOccurrenceId:MET02,historicalParticipantRef:GENIN,startingUnderlyingMaximum:START_MAX,strictOneVsOne:true,deterministicAi:true};
   initializeBattleRemainingPLFromDeployment({preserveExistingEnemyPower:true});
-  if(currentBattle.rewards){currentBattle.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],metal396NoReward:true};}
-  const evidence=recordBattleEvidence({eventType:"academy_metal_controlled_spar_launched",committedOccurrence:true,actorRef:createBattleParticipantRef("player",METAL),targetRef:createBattleParticipantRef("enemy",GENIN),sourceRefs:[{type:"origin_source_occurrence",id:MET02,role:"pressured_performance_source"},{type:"historical_participant",id:GENIN,role:"spar_opponent"}],data:{battleOccurrenceId:battleId,battleConfigId:CONFIG,encounterId:ENCOUNTER,startingUnderlyingMaximum:START_MAX,opponentBasePL:15,noReward:true,metalActsFirst:true,deterministicAiCycle:[...AI_IDS]}});
+  if(currentBattle.rewards){currentBattle.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],requiresExplicitPostClaimContinue:false,metal396FixedReward:true,metal396RewardSourceId:REWARD_SOURCE_ID};}
+  const evidence=recordBattleEvidence({eventType:"academy_metal_controlled_spar_launched",committedOccurrence:true,actorRef:createBattleParticipantRef("player",METAL),targetRef:createBattleParticipantRef("enemy",GENIN),sourceRefs:[{type:"origin_source_occurrence",id:MET02,role:"pressured_performance_source"},{type:"historical_participant",id:GENIN,role:"spar_opponent"}],data:{battleOccurrenceId:battleId,battleConfigId:CONFIG,encounterId:ENCOUNTER,startingUnderlyingMaximum:START_MAX,opponentBasePL:15,victoryRewardRyo:FIXED_VICTORY_RYO,rewardSourceId:REWARD_SOURCE_ID,metalActsFirst:true,deterministicAiCycle:[...AI_IDS]}});
   store[battleId]={battleOccurrenceId:battleId,launchEvidenceId:evidence&&evidence.evidenceId||null,createdAt:Date.now()};
   savePlayerData();saveTestState();openOverlay("combat");
   return{success:true,battleId,encounterId:ENCOUNTER,battleConfigId:CONFIG,playerParticipantIds:[METAL],oppositionParticipantIds:[GENIN]};
@@ -294,14 +338,16 @@ function diagnostics(){
   const enemy=enemyDatabase&&enemyDatabase[GENIN],actions=enemy&&enemy.authoredBattleActions||[];
   const checks={
     exactProfile:!!enemy&&enemy.calibratedBasePL===15&&JSON.stringify(enemy.baseStats)===JSON.stringify({nin:12,tai:16,buki:11,fuin:6,kin:7,gen:8,stamina:15}),
-    storyScopedNonCollectible:!!enemy&&enemy.provenance.storyScoped===true&&enemy.provenance.noCollectibleAdmission===true&&enemy.provenance.noUIPortraitAuthority===true,
+    storyScopedNonCollectible:!!enemy&&enemy.provenance.storyScoped===true&&enemy.provenance.noCollectibleAdmission===true,
+    exactBattlePortrait:!!enemy&&enemy.image===BATTLE_PORTRAIT&&enemy.provenance.battlePortraitPath===BATTLE_PORTRAIT&&enemy.provenance.battlePortraitAuthorityBlobSha===BATTLE_PORTRAIT_BLOB_SHA,
     exactFiveActions:JSON.stringify(actions.map(a=>a.id))===JSON.stringify(AI_IDS),
     exactDisplayNames:JSON.stringify(actions.map(a=>a.displayName))===JSON.stringify(["Sparring Jab","Turning Kick","Guarded Stance","Feint Entry","Committed Lunge"]),
     deterministicCycle:!!PRE_CHOOSE&&AI_IDS.length===5&&actions.length===5&&actions.every((action,index)=>action&&action.id===AI_IDS[index]&&typeof action.evaluateAvailability==="function"),
     lungeSixSeven:actions[4]&&actions[4].contextualAttackPL&&actions[4].contextualAttackPL.normal===6&&actions[4].contextualAttackPL.afterFeint===7,
     guardTwentyFive:actions[2]&&actions[2].preventionRatio===0.25,
     fixedPerformanceBands:classify.toString().includes('ratio>0.50?"strong":ratio>=0.25?"mixed":"rough"')&&START_MAX===13,
-    noReward:enemy.rewards.ryo.min===0&&enemy.rewards.ryo.max===0&&enemy.rewards.exp.min===0&&enemy.rewards.exp.max===0,
+    fixedVictoryReward:enemy.rewards.ryo.min===FIXED_VICTORY_RYO&&enemy.rewards.ryo.max===FIXED_VICTORY_RYO&&enemy.rewards.exp.min===0&&enemy.rewards.exp.max===0&&FIXED_VICTORY_RYO===50,
+    rewardClaimWired:!!PRE_GENERATE&&!!PRE_CLAIM&&String(projectRewards).includes("requiresExplicitPostClaimContinue=false"),
     met03ExactResolver:resolveProtectiveResponse("redirect_dummy").resolverId==="academy_metal_lee_origin_protective_response_v1"&&resolveProtectiveResponse("take_impact").hazardId==="academy_metal_origin_training_dummy_hazard_v1",
     met03NoRandomness:!String(resolveProtectiveResponse).includes("Math.random"),
     met03ClosedVocabulary:!String(resolveProtectiveResponse).includes("attempt_committed")&&!String(resolveProtectiveResponse).includes('protectiveResponseKind:"intercept"')&&!String(resolveProtectiveResponse).includes('protectiveResponseOutcome:"protected"'),
@@ -317,6 +363,7 @@ const installed=registerProfile();if(!installed.success)throw new Error(installe
 globalThis.launchAcademyMetalControlledSpar396=launch;
 globalThis.projectAcademyMetalControlledSpar396=projectResult;
 globalThis.resolveAcademyMetalProtectiveResponse396=resolveProtectiveResponse;
+globalThis.claimAcademyMetalControlledSparReward396=claimReward;
 globalThis.runAcademyMetalOriginRuntime396Diagnostics=diagnostics;
-globalThis.SC_ACADEMY_METAL_ORIGIN_RUNTIME_396=Object.freeze({patchId:PATCH_ID,battleConfigId:CONFIG,encounterId:ENCOUNTER,participantRefs:Object.freeze({metal:METAL,genin:GENIN}),met02:MET02,met03:MET03,startingUnderlyingMaximum:START_MAX,environmentPath:ENVIRONMENT,browserGoldenClaimed:false});
+globalThis.SC_ACADEMY_METAL_ORIGIN_RUNTIME_396=Object.freeze({patchId:PATCH_ID,battleConfigId:CONFIG,encounterId:ENCOUNTER,participantRefs:Object.freeze({metal:METAL,genin:GENIN}),met02:MET02,met03:MET03,startingUnderlyingMaximum:START_MAX,environmentPath:ENVIRONMENT,battlePortrait:BATTLE_PORTRAIT,fixedVictoryRyo:FIXED_VICTORY_RYO,rewardSourceId:REWARD_SOURCE_ID,browserGoldenClaimed:false});
 })();
