@@ -1600,10 +1600,11 @@
         "runtime/alpha-wasabi-rogue-battle-343.js",
         "runtime/alpha-metal-origin-runtime-396.js",
         "runtime/alpha-iwabee-origin-runtime-399.js",
+        "runtime/alpha-mirai-origin-battle-338.js",
         "runtime/alpha-kakashi-v2-battle-36010.js"
       ],
       "canonicalActiveOwner": "runtime/alpha-kakashi-v2-battle-36010.js",
-      "activationCondition": "Origin wrappers act only inside their exact encounters and delegate otherwise; Kakashi V2 remains final exact-Origin owner.",
+      "activationCondition": "Scoped Origin wrappers act only inside their exact encounters and delegate otherwise; Mirai #338 owns only the disguised-instructor assessment loop, while Kakashi V2 remains the final exact-Origin owner.",
       "qaRefs": [
         "tools/qa_issue_343_wasabi_browser.js",
         "tools/qa_issues_396_399_400_browser.js",
@@ -1618,10 +1619,11 @@
         "runtime/alpha-metal-origin-runtime-396.js",
         "runtime/alpha-iwabee-origin-runtime-399.js",
         "runtime/alpha-arc1-reward-evaluation-35400.js",
-        "runtime/alpha-menma-evolved-pl-battle-36900.js"
+        "runtime/alpha-menma-evolved-pl-battle-36900.js",
+        "runtime/alpha-mirai-origin-battle-338.js"
       ],
-      "canonicalActiveOwner": "runtime/alpha-menma-evolved-pl-battle-36900.js",
-      "activationCondition": "Scoped Origin adapters append only their save envelopes; later shared/ Menma wrappers remain final and delegate.",
+      "canonicalActiveOwner": "runtime/alpha-mirai-origin-battle-338.js",
+      "activationCondition": "Scoped Origin adapters append only their own save envelopes; Mirai #338 is the final direct wrapper in production order and delegates to the complete predecessor chain before appending only its exact Battle envelope.",
       "qaRefs": [
         "tools/qa_issue_343_wasabi_browser.js",
         "tools/qa_issues_396_399_400_browser.js",
@@ -1635,10 +1637,11 @@
         "runtime/alpha-wasabi-rogue-battle-343.js",
         "runtime/alpha-metal-origin-runtime-396.js",
         "runtime/alpha-iwabee-origin-runtime-399.js",
-        "runtime/alpha-menma-evolved-pl-battle-36900.js"
+        "runtime/alpha-menma-evolved-pl-battle-36900.js",
+        "runtime/alpha-mirai-origin-battle-338.js"
       ],
-      "canonicalActiveOwner": "runtime/alpha-menma-evolved-pl-battle-36900.js",
-      "activationCondition": "Scoped Origin adapters restore only exact envelopes; Menma wrapper remains final and delegates.",
+      "canonicalActiveOwner": "runtime/alpha-mirai-origin-battle-338.js",
+      "activationCondition": "Scoped Origin adapters restore only their exact envelopes; Mirai #338 is the final direct wrapper in production order and delegates to the complete predecessor chain before restoring only its exact Battle envelope.",
       "qaRefs": [
         "tools/qa_issue_343_wasabi_browser.js",
         "tools/qa_issues_396_399_400_browser.js",
@@ -1680,10 +1683,11 @@
       "chain": [
         "runtime/alpha-menma-origin-rewards-36200.js",
         "runtime/alpha-wasabi-rogue-battle-343.js",
+        "runtime/alpha-mirai-origin-battle-338.js",
         "runtime/alpha-kakashi-v2-rewards-36015.js"
       ],
       "canonicalActiveOwner": "runtime/alpha-kakashi-v2-rewards-36015.js",
-      "activationCondition": "Menma projects only the exact three-subject reward; Wasabi projects only the exact STEP IN reward; Kakashi V2 remains the final dynamic exact-Origin reward projection owner. Every wrapper delegates outside its scoped encounter.",
+      "activationCondition": "Menma projects only the exact three-subject reward; Wasabi projects only the exact STEP IN reward; Mirai #338 projects only the disguised-instructor assessment reward; Kakashi V2 remains the final dynamic exact-Origin reward projection owner. Every wrapper delegates outside its scoped encounter.",
       "qaRefs": [
         "tools/qa_issue_362_menma_three_subject_reward.js",
         "tools/qa_issue_343_wasabi_browser.js",
@@ -1696,10 +1700,11 @@
       "chain": [
         "runtime/alpha-menma-origin-rewards-36200.js",
         "runtime/alpha-wasabi-rogue-battle-343.js",
+        "runtime/alpha-mirai-origin-battle-338.js",
         "runtime/alpha-kakashi-v2-rewards-36015.js"
       ],
       "canonicalActiveOwner": "runtime/alpha-kakashi-v2-rewards-36015.js",
-      "activationCondition": "Menma, Wasabi and Kakashi wrappers commit only their exact authorised encounter rewards; Kakashi V2 is the final dynamic wrapper and all three delegate outside scope.",
+      "activationCondition": "Menma, Wasabi, Mirai #338 and Kakashi wrappers commit only their exact authorised encounter rewards; Kakashi V2 is the final dynamic wrapper and all scoped wrappers delegate outside their encounters.",
       "qaRefs": [
         "tools/qa_issue_362_menma_three_subject_reward.js",
         "tools/qa_issue_343_wasabi_browser.js",
