@@ -120,7 +120,7 @@ function patchIzuno(){
 
 function patchMirai(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const d=editable(A.sceneByVariant.academy_mirai);if(!d)return false;
-  if(beat(d,"mir_assignment_01")&&beat(d,"mir_walk_choice")&&beat(d,"mir_reflection_choice"))return true;
+  if(beat(d,"mir_assignment_01")&&beat(d,"mir_walk_choice")&&beat(d,"mir_reflection_router")&&beat(d,"mir_reflection_conversation")&&beat(d,"mir_reflection_chakra")&&beat(d,"mir_reflection_suspicion")&&beat(d,"mir_reflection_missed"))return true;
   setText(d,"mir_start","The civilian bows too many times when the escort begins.\n\n\"Sorry. First time being assigned an Academy escort. I expected someone taller.\"\n\nMirai checks the road, then the travel papers, then gives them back.\n\n\"You got me. Try not to look devastated.\"\n\nThey start walking.","narration");
   setText(d,"mir_talk","Conversation fills the walk.");
   setLabel(d,"mir_talk","ask_origin","\"You said you're from outside Fire Country. Where?\"");
