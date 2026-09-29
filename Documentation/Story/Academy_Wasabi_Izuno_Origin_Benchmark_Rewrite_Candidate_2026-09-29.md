@@ -2,9 +2,13 @@
 
 **Date:** 2026-09-29  
 **Owner:** Writing / Story — Konoha  
-**Status:** **WRITING REVIEW CANDIDATE — OWNER-REQUESTED FULL PERSONALITY / BENCHMARK RE-AUDIT**  
+**Status:** **SUPERSEDED — COMPLETE REWRITE v2 PUBLISHED 2026-09-29**  
 **Production Origin:** `academy_izuno`  
-**Current production runtime:** remains separate until Stephen approves this exact revised expression.
+**Current production runtime:** this candidate is superseded and must not be implemented as final authority.
+
+> **Superseded by:** `Documentation/Story/Academy_Wasabi_Izuno_Origin_Complete_Rewrite_v2_2026-09-29.md` @ `6d76a5f7b15d9a9d822c53c767338bcc9f2ac365`.
+>
+> Reason: owner browser review proved the shared AFTER / universal reflection architecture still projected loss language after successful River completion.
 
 ## 1. Why this rewrite exists
 
