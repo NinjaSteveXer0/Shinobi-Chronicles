@@ -127,44 +127,65 @@ assert(binder.includes('menmaNineTails:"Assets/Tailed Beasts/menma_nine_tails.pn
 assert(golden.includes('row.mode="dialogue";row.speakerRef={sourceId:"nine_tails"'),"Menma Nine-Tails speech is not speaker-owned dialogue");
 assert(!golden.includes("Combat package (#338)")&&!golden.includes("waiting on the exact Academy instructor"),"Mirai leaks internal Combat/GitHub blocker text");
 assert(!golden.includes("mir_shortcut_follow_blocked"),"Mirai shortcut Battle remains blocked after #338 closure");
-assert(golden.includes('beatId:"mir_shortcut_battle"')&&golden.includes('beatId:"mir_shortcut_battle_return"')&&golden.includes('MIRAI_SHORTCUT_CALLER="academy_mirai_origin_shortcut_battle"'),"Mirai shortcut #338 caller/return missing");
-assert(golden.includes('beatId:"mir_confront_battle"')&&golden.includes('beatId:"mir_confrontation_battle_return"')&&golden.includes('MIRAI_CONFRONT_CALLER="academy_mirai_origin_confrontation_battle"'),"Mirai confrontation #338 caller/return missing");
-assert(golden.includes('function miraiBattleAuthoredValue(key)')&&golden.includes('miraiBattleAuthoredValue("battleResult")==="defeat"')&&golden.includes('miraiBattleAuthoredValue("battleResult")==="victory"'),"Mirai #338 return routing does not consume the factual Battle result");
 assert(
-  golden.includes('C("defeat","RESOLVE SHORTCUT DEFEAT","mir_shortcut_defeat_end_01"')&&
-  golden.includes("Mirai's guard gives first.")&&
-  golden.includes('text:"I\'m not done."')&&
-  golden.includes('text:"The exercise is.')&&
-  golden.includes('text:"Checkpoint Three. Safe."')&&
-  golden.includes('text:"I was supposed to get him there."')&&
-  golden.includes('text:"You were."')&&
-  golden.includes('mir_defeat_debrief_shortcut_01')&&
-  golden.includes('Q("mir_defeat_reflection_shortcut"')&&
-  !golden.includes("mir_shortcut_defeat_route_router")&&
-  !golden.includes("mir_road_post_defeat_talk_01"),
-  "Mirai shortcut defeat assessment-termination lane missing or stale Scene 5 continuation returned"
+  golden.includes('line("mir_shortcut_battle_pre"')&&
+  golden.includes('"Because you followed me.')&&
+  golden.includes('"Your instructor gave me one extra job.')&&
+  golden.includes('"See what you do if the person you\'re escorting stops cooperating.')&&
+  golden.includes('"This is part of the assessment."')&&
+  golden.includes('"Then stop me."'),
+  "Mirai shortcut Battle still lacks the authored pre-Battle causality buildup"
 );
 assert(
-  golden.includes('C("defeat","RESOLVE CONFRONTATION DEFEAT","mir_confront_defeat_end_01"')&&
-  golden.includes("Mirai's guard breaks before the Traveller's does.")&&
-  golden.includes('text:"You can\'t keep fighting."')&&
-  golden.includes('text:"I can keep asking."')&&
-  golden.includes('text:"Good."')&&
-  golden.includes('text:"Checkpoint Three. Safe."')&&
-  golden.includes('text:"So I was right."')&&
-  golden.includes('text:"About the switch.')&&
-  golden.includes('mir_defeat_debrief_confront_01')&&
-  golden.includes('Q("mir_defeat_reflection_confront"'),
-  "Mirai confrontation defeat assessment-termination lane missing or drifted"
+  golden.includes('beatId:"mir_shortcut_battle"')&&
+  golden.includes('battle:miraiBattleSpec(MIRAI_SHORTCUT_CALLER,"mir_shortcut_victory_01","mir_shortcut_defeat_end_01")')&&
+  golden.includes('MIRAI_SHORTCUT_CALLER="academy_mirai_origin_shortcut_battle"'),
+  "Mirai shortcut #338 direct victory/defeat return contract missing"
 );
 assert(
+  golden.includes('beatId:"mir_confront_battle"')&&
+  golden.includes('battle:miraiBattleSpec(MIRAI_CONFRONT_CALLER,"mir_confront_reveal_01","mir_confront_defeat_end_01")')&&
+  golden.includes('MIRAI_CONFRONT_CALLER="academy_mirai_origin_confrontation_battle"'),
+  "Mirai confrontation #338 direct victory/defeat return contract missing"
+);
+assert(!golden.includes('beatId:"mir_shortcut_battle_return"')&&!golden.includes('beatId:"mir_confrontation_battle_return"'),"Mirai post-Battle empty resolver/CONTINUE bridge returned");
+assert(
+  golden.includes('line("mir_shortcut_victory"')&&
+  golden.includes('"That was your extra job?"')&&
+  golden.includes('"We\'re done with your route."')&&
+  golden.includes('"Mirai walks first this time.')&&
+  golden.includes('"The escort continues."')&&
+  golden.includes('C("talked","RESOLVE POST-BATTLE TALKED ROAD","mir_road_talk_memory_01"')&&
+  golden.includes('C("professional","RESOLVE POST-BATTLE PROFESSIONAL ROAD","mir_road_prof_detect_01"'),
+  "Mirai shortcut victory continuity / post-Battle road routing missing"
+);
+assert(
+  golden.includes('miraiDefeatContextPatch("shortcut")')&&
+  golden.includes('miraiDefeatContextPatch("confrontation")')&&
   golden.includes('miraiEscortAssessmentResult:"not_completed_battle_defeat"')&&
   golden.includes('miraiEscortDutyActive:false')&&
   golden.includes('miraiReachedCheckpointAsActiveEscort:false')&&
   golden.includes('scenePurpose:"post_assessment_debrief"')&&
   golden.includes('"mirai_battle_defeat_assessment_105"')&&
   golden.includes('personTravellingWithMiraiReachedCheckpointProtected:false'),
-  "Mirai Battle defeat Story result does not terminate escort duty cleanly"
+  "Mirai direct defeat Story return does not preserve assessment-termination state"
+);
+assert(
+  golden.includes("Mirai's guard gives first.")&&
+  golden.includes('text:"I\'m not done."')&&
+  golden.includes('text:"The exercise is.')&&
+  golden.includes('mir_defeat_debrief_shortcut_01')&&
+  golden.includes('Q("mir_defeat_reflection_shortcut"')&&
+  !golden.includes("mir_road_post_defeat_talk_01"),
+  "Mirai shortcut defeat assessment-termination lane missing or stale Scene 5 continuation returned"
+);
+assert(
+  golden.includes("Mirai's guard breaks before the Traveller's does.")&&
+  golden.includes('text:"You can\'t keep fighting."')&&
+  golden.includes('text:"I can keep asking."')&&
+  golden.includes('mir_defeat_debrief_confront_01')&&
+  golden.includes('Q("mir_defeat_reflection_confront"'),
+  "Mirai confrontation defeat assessment-termination lane missing or drifted"
 );
 assert(
   binder.includes('mir_shortcut_defeat_end_13:"wipe_right_to_left"')&&
@@ -174,11 +195,12 @@ assert(
   binder.includes('ctx.miraiEscortAssessmentResult==="not_completed_battle_defeat"'),
   "Mirai defeat black-wipe/debrief/Receipt presentation missing"
 );
-assert(golden.includes('actionLabel:"Start PL Battle"')&&golden.includes('C("reveal","RESOLVE CONFRONTATION RETURN","mir_confront_reveal_01"')&&golden.includes('N("mir_confront_reveal_01","Smoke bursts across the road.')&&golden.includes('"mir_confront_08"'),"Mirai #338 Story CTA/Battle-to-reveal return drift");
+assert(golden.includes('actionLabel:"Start PL Battle"')&&golden.includes('N("mir_confront_reveal_01","Smoke bursts across the road.')&&golden.includes('"mir_confront_08"'),"Mirai #338 Story CTA/Battle-to-reveal return drift");
 assert(binder.includes('if(id==="mir_confront_reveal_01")')&&binder.includes('rows.push(instructor())'),"Mirai post-Battle reveal does not switch Story actor to female instructor");
 assert(miraiBattle.includes('const CONFIG="academy_mirai_origin_disguised_instructor_battle"')&&miraiBattle.includes('const ENCOUNTER="origin_academy_mirai_disguised_instructor_assessment"'),"Mirai #338 config/encounter missing");
 assert(miraiBattle.includes('const CALLERS=Object.freeze([SHORTCUT_CALLER,CONFRONT_CALLER])')&&miraiBattle.includes('const FIXED_VICTORY_RYO=50'),"Mirai #338 callers/reward drift");
-assert((miraiBattle.match(/requiresExplicitPostClaimContinue=false/g)||[]).length===2&&!miraiBattle.includes("requiresExplicitPostClaimContinue=true"),"Mirai redundant post-claim Continue bridge returned");
+assert((miraiBattle.match(/requiresExplicitPostClaimContinue=false/g)||[]).length===2&&!miraiBattle.includes("requiresExplicitPostClaimContinue=true"),"Mirai explicit post-claim Continue bridge returned");
+assert(miraiBattle.includes('function isMirai338FixedVictoryRewardPresentation(rewards)')&&miraiBattle.includes('ryoElement.textContent=String(ryoGranted)')&&miraiBattle.includes('rewardAnimated="false"')&&miraiBattle.includes('animated:false'),"Mirai 50 Ryō Victory presentation is not locked static");
 assert(miraiBattle.includes('observerPresentation:"male_traveller_escort_disguise"')&&miraiBattle.includes('underlyingIdentity:"female_academy_instructor"'),"Mirai #338 disguise identity separation missing");
 assert(miraiBattle.includes('const BATTLE_PORTRAIT="NPC portrait/mirai_instructor_disguised.png"')&&fs.existsSync("NPC portrait/mirai_instructor_disguised.png"),"Mirai approved disguised-instructor Battle portrait missing");
 assert(index.includes('<script src="runtime/alpha-mirai-origin-battle-338.js"></script>'),"Mirai #338 runtime is not production-loaded");
