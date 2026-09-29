@@ -989,8 +989,8 @@ function diagnostics(){
  const menBeat=id=>men&&men.beatMap instanceof Map?men.beatMap.get(id):null;
  const checks={
   miraiWritingGoldenEntry:!!mir&&mir.entryBeatId==="mir_assignment_01",
-  miraiRealConversation:!!mirBeat("mir_walk_choice")&&!!mirBeat("mir_market_talk_01")&&!!mirBeat("mir_reflection_choice"),
-  miraiBattleDependencyFailClosed:!!mirBeat("mir_shortcut_talk_choice")&&String(mirBeat("mir_shortcut_talk_choice").choices?.[0]?.availability||"").includes("Battle route"),
+  miraiRealConversation:!!mirBeat("mir_walk_choice")&&!!mirBeat("mir_market_talk_01")&&!!mirBeat("mir_reflection_router"),
+  miraiBattlePackageResolved:mirBeat("mir_shortcut_battle")?.mode==="battle_transition"&&mirBeat("mir_confront_battle")?.mode==="battle_transition"&&!!mirBeat("mir_shortcut_battle_return")&&!!mirBeat("mir_confrontation_battle_return"),
   miraiBattleDefeatContinuations:!!mirBeat("mir_shortcut_defeat_01")&&!!mirBeat("mir_shortcut_defeat_09")&&!!mirBeat("mir_confrontation_defeat_01")&&!!mirBeat("mir_confrontation_defeat_08"),
   miraiRouteAwareEnding:!!mirBeat("mir_reflection_conversation")&&!!mirBeat("mir_reflection_chakra")&&!!mirBeat("mir_reflection_suspicion")&&!!mirBeat("mir_reflection_missed")&&!safelyUniversalMiraiReflection105(mir),
   menmaWritingGoldenEntry:!!men&&men.entryBeatId==="menma_open_01",
