@@ -17,11 +17,12 @@ const battle=read("runtime/alpha-battle-modern-33000.js");
 const journey=read("runtime/alpha-journey-surface-32800.js");
 const menmaBattle=read("runtime/alpha-menma-evolved-pl-battle-36900.js");
 const menmaReward=read("runtime/alpha-menma-origin-rewards-36200.js");
+const miraiBattle=read("runtime/alpha-mirai-origin-battle-338.js");
 const index=read("index.html");
 const game=read("game.js");
 const fingerprint=read("runtime/alpha-runtime-build-fingerprint-303.js");
 
-for(const [name,src] of Object.entries({binder,sceneA,sceneB,sceneC,golden,shim335,shim336,shim337,board,battle,journey,menmaBattle,menmaReward,kakashiRenderer})){
+for(const [name,src] of Object.entries({binder,sceneA,sceneB,sceneC,golden,shim335,shim336,shim337,board,battle,journey,menmaBattle,menmaReward,miraiBattle,kakashiRenderer})){
   assert.doesNotThrow(()=>new Function(src),name+" syntax failure");
 }
 for(const token of [
@@ -77,6 +78,9 @@ assert(board.includes('.sc-chronicle-source-state{display:none!important;}'),"in
 assert(binder.includes("function menmaPerformanceSequences105()")&&binder.includes('speakerName?"dialogue"'),"Menma ending spoken cues are not protected as speaker-owned dialogue");
 assert(menmaBattle.includes("isMenmaWritingGolden105Scene38800")&&menmaBattle.includes("writingGoldenFuturePreserved"),"Menma evolved Battle adapter still overwrites the #105 Writing-Golden future/Receipt");
 assert(!golden.includes("Combat package (#338)")&&!golden.includes("waiting on the exact Academy instructor"),"Mirai leaks internal Combat/GitHub blocker text");
+assert(fs.existsSync("NPC portrait/mirai_instructor_disguised.png"),"approved Mirai disguised-instructor Battle portrait missing from candidate");
+assert(miraiBattle.includes('const BATTLE_PORTRAIT="NPC portrait/mirai_instructor_disguised.png"')&&miraiBattle.includes("image:BATTLE_PORTRAIT")&&miraiBattle.includes('battlePortraitAuthorityCommit:"38e4d0ebd89176d7d30aa2cc6044565711353ee6"'),"Mirai #338 runtime has not consumed the approved disguised-instructor Battle portrait authority");
+assert(!miraiBattle.includes("noBattlePortraitAuthority:true")&&!miraiBattle.includes("image:null,rewards"),"Mirai #338 runtime still carries the pre-asset no-portrait state");
 assert(golden.includes('beatId:"mir_leaving_choice_router",mode:"resolver",machineResolved:true')&&!golden.includes('beatId:"mir_leaving_router"'),"Mirai terminal still exposes the stale empty/fake Continue router");
 assert(golden.includes('beatId:"mir_receipt",mode:"record"')&&binder.includes('mir_receipt:()=>[{kind:"record",text:buildMiraiReceipt105()}]'),"Mirai Origin Chronicle Receipt missing");
 assert(golden.includes('beatId:"menma_receipt",mode:"record"')&&binder.includes('menma_receipt:()=>[{kind:"record",text:buildMenmaReceipt105()}]'),"Menma Origin Chronicle Receipt missing");
@@ -122,6 +126,6 @@ assert(!game.includes("ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID"),"frozen game
 assert(fingerprint.includes('buildId:"SC-ALPHA-RUNTIME-R303-2026-09-29-BE"')&&fingerprint.includes('sourceBaselineCommit:"9f90d86ff989caf59f96711e6067d497249f039e"'),"#105 repair runtime fingerprint was not advanced from current live-main authority");
 console.log(JSON.stringify({pass:true,issue:105,checks:{
   sevenNonKakashiBindings:true,kakashiExcluded:true,hinataSparringSpeakerAlias:true,hinataFinalPairBound:true,hinataChronicleReceipt:true,miraiMenmaWritingGolden:true,legacyGoldenShimsRetired:true,knownAssetsExact:true,issue419AssetsConsumed:true,wasabiPursuitTargetActorProjection:true,missingAssetsNotGuessed:true,
-  menmaNineTailsDialoguePortrait:true,miraiTerminalRouterClean:true,miraiMenmaReceipts:true,menmaPostBattleSegmented:true,menmaRewardDiagnosticRemoved:true,globalReceiptInputLock:true,globalStartPLBattleCTA:true,loadOrder:true,sharedSceneBoard:true,clickAnywhere:true,
+  menmaNineTailsDialoguePortrait:true,miraiBattlePortraitAuthority:true,miraiTerminalRouterClean:true,miraiMenmaReceipts:true,menmaPostBattleSegmented:true,menmaRewardDiagnosticRemoved:true,globalReceiptInputLock:true,globalStartPLBattleCTA:true,loadOrder:true,sharedSceneBoard:true,clickAnywhere:true,
   speakerLinkedDialogue:true,globalCyanStoryFrames:true,kakashiFrameParity:true,kakashiTextAndAdvanceParity:true,radialPLContainmentRefresh:true,frozenCorePreserved:true,browserGoldenClaimed:false
 }},null,2));

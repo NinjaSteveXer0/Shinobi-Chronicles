@@ -12,6 +12,7 @@ const ENCOUNTER="origin_academy_mirai_disguised_instructor_assessment";
 const SCENE_ID="origin_academy_mirai_prologue";
 const MIRAI="academy_mirai";
 const INSTRUCTOR="academy_mirai_origin_instructor";
+const BATTLE_PORTRAIT="NPC portrait/mirai_instructor_disguised.png";
 const SHORTCUT_CALLER="academy_mirai_origin_shortcut_battle";
 const CONFRONT_CALLER="academy_mirai_origin_confrontation_battle";
 const CALLERS=Object.freeze([SHORTCUT_CALLER,CONFRONT_CALLER]);
@@ -63,9 +64,9 @@ function registerProfile(){
     id:INSTRUCTOR,oppositionTemplateId:"academy_mirai_origin_disguised_instructor",
     name:"TRAVELLER",displayName:"TRAVELLER",apparentRole:"ESCORT",
     calibratedBasePL:PROFILE.pl,power:PROFILE.pl,baseStats:{...PROFILE.stats},stats:{...PROFILE.stats},
-    image:null,rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},
+    image:BATTLE_PORTRAIT,rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},
     authoredBattleActions:[testingStrike,substitutionGuard,turningSweep],
-    provenance:{stableParticipantId:INSTRUCTOR,underlyingIdentity:"female_academy_instructor",observerPresentation:"male_traveller_escort_disguise",noBattlePortraitAuthority:true,noRegistryAdmission:true}
+    provenance:{stableParticipantId:INSTRUCTOR,underlyingIdentity:"female_academy_instructor",observerPresentation:"male_traveller_escort_disguise",battlePortraitPath:BATTLE_PORTRAIT,battlePortraitAuthorityCommit:"38e4d0ebd89176d7d30aa2cc6044565711353ee6",noRegistryAdmission:true}
   };
   return{success:true};
 }
@@ -246,7 +247,7 @@ function diagnostics(){
   const enemy=enemyDatabase&&enemyDatabase[INSTRUCTOR],actions=enemy&&enemy.authoredBattleActions||[];
   const checks={
     exactProfile:!!enemy&&enemy.calibratedBasePL===16&&JSON.stringify(enemy.baseStats)===JSON.stringify(PROFILE.stats),
-    observerSafePresentation:!!enemy&&enemy.name==="TRAVELLER"&&enemy.image===null&&enemy.provenance.observerPresentation==="male_traveller_escort_disguise"&&enemy.provenance.underlyingIdentity==="female_academy_instructor",
+    observerSafePresentation:!!enemy&&enemy.name==="TRAVELLER"&&enemy.image===BATTLE_PORTRAIT&&enemy.provenance.observerPresentation==="male_traveller_escort_disguise"&&enemy.provenance.underlyingIdentity==="female_academy_instructor",
     exactDeterministicLoop:actions.map(a=>a.id).join("|")===ACTION_LOOP.join("|")&&String(globalThis.chooseEnemyAuthoredBattleAction).includes("deterministicAssessmentLoop:true"),
     exactGuard:String(globalThis.resolveBattlePreStaminaDefense).includes("0.75")&&String(globalThis.calculateBattleStaminaMitigationV1).includes("attack*staminaPivot"),
     exactCallers:CALLERS.join("|")==="academy_mirai_origin_shortcut_battle|academy_mirai_origin_confrontation_battle",
@@ -255,7 +256,7 @@ function diagnostics(){
     saveReloadEnvelope:!!PRE_SAVE&&!!PRE_RESTORE&&String(globalThis.saveTestState).includes("state.mirai338")&&String(globalThis.restoreTestState).includes("currentBattle.battleConfigId=CONFIG"),
     strictOneVsOne:String(strictDeployment).includes("createBattleDeploymentSlots([MIRAI])")&&String(strictDeployment).includes("createBattleDeploymentSlots([INSTRUCTOR])"),
     identityNeverRevealedByBattle:String(projectResult).includes("identityRevealedByBattle:false"),
-    noInventedBattlePortrait:enemy.image===null&&enemy.provenance.noBattlePortraitAuthority===true,
+    exactBattlePortrait:enemy.image===BATTLE_PORTRAIT&&enemy.provenance.battlePortraitPath===BATTLE_PORTRAIT&&enemy.provenance.battlePortraitAuthorityCommit==="38e4d0ebd89176d7d30aa2cc6044565711353ee6",
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
@@ -266,5 +267,5 @@ globalThis.launchAcademyMiraiDisguisedInstructorBattle338=launch;
 globalThis.projectAcademyMiraiDisguisedInstructorBattle338=projectResult;
 globalThis.claimAcademyMiraiDisguisedInstructorReward338=claimReward;
 globalThis.runAcademyMiraiDisguisedInstructorBattle338Diagnostics=diagnostics;
-globalThis.SC_ACADEMY_MIRAI_DISGUISED_INSTRUCTOR_BATTLE_338=Object.freeze({patchId:PATCH_ID,battleConfigId:CONFIG,encounterId:ENCOUNTER,stableParticipantId:INSTRUCTOR,callerIds:CALLERS,rewardSourceId:REWARD_SOURCE_ID,fixedVictoryRyo:FIXED_VICTORY_RYO,actionLoop:ACTION_LOOP,browserGoldenClaimed:false});
+globalThis.SC_ACADEMY_MIRAI_DISGUISED_INSTRUCTOR_BATTLE_338=Object.freeze({patchId:PATCH_ID,battleConfigId:CONFIG,encounterId:ENCOUNTER,stableParticipantId:INSTRUCTOR,battlePortrait:BATTLE_PORTRAIT,callerIds:CALLERS,rewardSourceId:REWARD_SOURCE_ID,fixedVictoryRyo:FIXED_VICTORY_RYO,actionLoop:ACTION_LOOP,browserGoldenClaimed:false});
 })();
