@@ -158,7 +158,7 @@ function projectRewards(rewards=null){
   const victory=currentBattle&&currentBattle.outcome&&currentBattle.outcome.type==="victory";
   const out=rewards&&typeof rewards==="object"?rewards:{generated:true,claimed:false};
   out.generated=true;out.claimed=out.claimed===true;out.ryo=victory?FIXED_VICTORY_RYO:0;out.exp=0;out.items=[];out.rareDrops=[];
-  out.requiresExplicitPostClaimContinue=true;out.mirai338FixedReward=true;out.mirai338RewardSourceId=REWARD_SOURCE_ID;out.battleOccurrenceId=meta().battleOccurrenceId;
+  out.requiresExplicitPostClaimContinue=false;out.mirai338FixedReward=true;out.mirai338RewardSourceId=REWARD_SOURCE_ID;out.battleOccurrenceId=meta().battleOccurrenceId;
   currentBattle.rewards=out;return out;
 }
 const PRE_GENERATE=typeof generateBattleRewards==="function"?generateBattleRewards:null;
@@ -237,7 +237,7 @@ function launch(spec={}){
   currentBattle.mirai338={patchId:PATCH_ID,battleConfigId:CONFIG,battleOccurrenceId:exactId,callerId,stableParticipantId:INSTRUCTOR,observerPresentation:"male_traveller_escort_disguise",underlyingIdentity:"female_academy_instructor",identityRevealedByBattle:false,aiCycleIndex:0,enemyActionsResolved:0,guardCreatedEnemyOpportunityIndex:null,strictOneVsOne:true,playerStarts:true,launchEvidenceId:null};
   const deployment=strictDeployment();if(!deployment.success)return deployment;
   currentBattle.battleLog=["TRAVELLER steps into Mirai's path.","MIRAI prepares for battle."];
-  if(currentBattle.rewards){currentBattle.rewards.ryo=0;currentBattle.rewards.exp=0;currentBattle.rewards.items=[];currentBattle.rewards.rareDrops=[];currentBattle.rewards.requiresExplicitPostClaimContinue=true;}
+  if(currentBattle.rewards){currentBattle.rewards.ryo=0;currentBattle.rewards.exp=0;currentBattle.rewards.items=[];currentBattle.rewards.rareDrops=[];currentBattle.rewards.requiresExplicitPostClaimContinue=false;}
   const evidence=recordBattleEvidence({eventType:"academy_mirai_disguised_instructor_battle_launched",committedOccurrence:true,actorRef:createBattleParticipantRef("player",MIRAI),targetRef:createBattleParticipantRef("enemy",INSTRUCTOR),sourceRefs:[{type:"story_scene",id:SCENE_ID,role:"battle_caller"}],data:{battleOccurrenceId:exactId,battleConfigId:CONFIG,encounterId:ENCOUNTER,callerId,strictOneVsOne:true,playerStarts:true,identityRevealedByBattle:false,victoryRewardRyo:FIXED_VICTORY_RYO}});
   if(!evidence)return{success:false,reason:"mirai338_launch_evidence_failed"};
   currentBattle.mirai338.launchEvidenceId=evidence.evidenceId;
