@@ -187,8 +187,8 @@ const PAIRS=Object.freeze([
   ["The instructor begins to dismiss the attempt.","El instructor empieza a descartar el intento."],
   ["Pretend to withdraw","Fingir una retirada"],
   ["The instructor believes the clumsy approach is real.","El instructor cree que el enfoque torpe es real."],
-  ["He believes he has caught Kurenai.","Cree que ha atrapado a Kurenai."],
-  ["Let the instructor think he caught you","Dejar que el instructor crea que te atrapó"],
+  ["She believes she has caught Kurenai.","Cree que ha atrapado a Kurenai."],
+  ["Let the instructor think she caught you","Dejar que la instructora crea que te atrapó"],
   ["The illusion layers resolve from the committed deception sequence. No personality or alignment label is assigned.","Las capas de ilusión se resuelven a partir de la secuencia de engaño confirmada. No se asigna ninguna etiqueta de personalidad ni alineamiento."],
   ["I was assessing what you believed in, to separate the reality from illusion and the truth from fiction.","Estaba evaluando en qué creías, para separar la realidad de la ilusión y la verdad de la ficción."],
 
