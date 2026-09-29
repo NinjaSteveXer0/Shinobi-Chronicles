@@ -101,15 +101,17 @@ try{
   assert("kushina_second_choice_has_visible_consequence",render.text==="Gerotora.",render);
 
   // Two materially different Kurenai player routes must produce visibly different DOM sequences.
-  beginOrigin("academy_kurenai");clickContinue();clickChoice("false_kurenai");clickChoice("rush_bell");
-  assert("kurenai_loss_has_distinct_visible_result",render.beatId==="kur_complete_loss_1"&&render.text.includes("does not obtain the bell"),render);
-  const lossText=render.text;
+  // The 2026-09-29 native successor owns one meaningful Bell choice after the authored opening.
+  beginOrigin("academy_kurenai");continueUntil("kur_approach");clickChoice("false_kurenai");
+  assert("kurenai_loss_route_starts_natively",render.beatId==="kur_false_01"&&render.text.includes("second Kurenai breaks toward the bell"),render);
+  const lossSequence=continueUntil("kur_eval_loss_01").map(x=>x.text);
+  assert("kurenai_loss_has_distinct_visible_result",lossSequence.some(t=>t.includes("bell never changes hands")),lossSequence);
 
-  beginOrigin("academy_kurenai");clickContinue();clickChoice("fake_clumsy");clickChoice("rush_bell");clickChoice("let_him_think_caught");
-  assert("kurenai_win_enters_full_authored_chain",render.beatId==="kur_complete_win_result_1",render);
-  const winSequence=[];for(let i=0;i<6;i++){winSequence.push(render.text);clickContinue();}
-  assert("kurenai_win_chain_contains_locked_dialogue",winSequence.some(t=>t.includes("Have you?"))&&winSequence.some(t=>t==="Yes.")&&winSequence.some(t=>t.includes("genuinely holding the bell")),winSequence);
-  assert("kurenai_choices_do_not_reconverge_to_same_text",lossText!==winSequence[0]);
+  beginOrigin("academy_kurenai");continueUntil("kur_approach");clickChoice("fake_clumsy");
+  assert("kurenai_win_enters_full_authored_chain",render.beatId==="kur_complete_01",render);
+  const winSequence=continueUntil("kur_eval_win_01").map(x=>x.text);
+  assert("kurenai_win_chain_contains_locked_dialogue",winSequence.some(t=>t==="Got you.")&&winSequence.some(t=>t==="Have you?")&&winSequence.some(t=>t==="Yes.")&&winSequence.some(t=>t==="You were saying?"),winSequence);
+  assert("kurenai_choices_do_not_reconverge_to_same_text",lossSequence[0]!==winSequence[0]);
 
   // Hinata GOLDEN: connected exchanges alter the opponent and mixed history selects the contextual evaluation.
   beginOrigin("academy_hinata");
