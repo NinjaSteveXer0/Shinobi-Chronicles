@@ -2,8 +2,12 @@
 
 **Date:** 2026-09-29  
 **Owner:** Stephen / Writing — Konoha  
-**Status:** **OWNER PREVIEW AUTHORIZED — SEND TO CODING / NOT WRITING GOLDEN UNTIL BROWSER REVIEW**  
+**Status:** **SUPERSEDED FOR CURRENT PLAYER-FACING VOICE — KEEP FOR SEMANTIC / STRUCTURE HISTORY**  
 **Production Origin:** `academy_kushina`
+
+> **2026-09-29 natural-voice successor:** `Documentation/Story/Academy_Kushina_Origin_Natural_Voice_Benchmark_Rewrite_2026-09-29.md` @ `4057718e6d52eb08d4ee2e238e6e3ca4e6f8069d`.
+>
+> Owner review found too much constructed banter / shared dry voice in this first complete rewrite. Preserve its KUS facts and structural archaeology; use the natural-voice successor for player-facing preview.
 
 ## 1. Archaeology boundary
 
