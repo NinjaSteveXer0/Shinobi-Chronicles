@@ -77,7 +77,7 @@ assert(golden.includes('row.mode="dialogue";row.speakerRef={sourceId:"nine_tails
 assert(!golden.includes("Combat package (#338)")&&!golden.includes("waiting on the exact Academy instructor"),"Mirai leaks internal Combat/GitHub blocker text");
 assert(!golden.includes("mir_shortcut_follow_blocked"),"Mirai shortcut Battle remains blocked after #338 closure");
 assert(golden.includes('beatId:"mir_shortcut_battle"')&&golden.includes('beatId:"mir_shortcut_battle_return"')&&golden.includes('MIRAI_SHORTCUT_CALLER="academy_mirai_origin_shortcut_battle"'),"Mirai shortcut #338 caller/return missing");
-assert(golden.includes('beatId:"mir_confront_battle"')&&golden.includes('beatId:"mir_confront_battle_return"')&&golden.includes('MIRAI_CONFRONT_CALLER="academy_mirai_origin_confrontation_battle"'),"Mirai confrontation #338 caller/return missing");
+assert(golden.includes('beatId:"mir_confront_battle"')&&golden.includes('beatId:"mir_confrontation_battle_return"')&&golden.includes('MIRAI_CONFRONT_CALLER="academy_mirai_origin_confrontation_battle"'),"Mirai confrontation #338 caller/return missing");
 assert(golden.includes('actionLabel:"Start PL Battle"')&&golden.includes('"mir_confront_08"'),"Mirai #338 Story CTA/reveal return drift");
 assert(miraiBattle.includes('const CONFIG="academy_mirai_origin_disguised_instructor_battle"')&&miraiBattle.includes('const ENCOUNTER="origin_academy_mirai_disguised_instructor_assessment"'),"Mirai #338 config/encounter missing");
 assert(miraiBattle.includes('const CALLERS=Object.freeze([SHORTCUT_CALLER,CONFRONT_CALLER])')&&miraiBattle.includes('const FIXED_VICTORY_RYO=50'),"Mirai #338 callers/reward drift");

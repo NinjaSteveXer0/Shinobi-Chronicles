@@ -94,7 +94,7 @@ async function reloadAtExactBeat(page,beatId){
 async function proveMiraiBattle338(browser){
   const cases=[
     {beatId:"mir_shortcut_battle",callerId:"academy_mirai_origin_shortcut_battle",returnBeatId:"mir_shortcut_battle_return"},
-    {beatId:"mir_confront_battle",callerId:"academy_mirai_origin_confrontation_battle",returnBeatId:"mir_confront_battle_return"}
+    {beatId:"mir_confront_battle",callerId:"academy_mirai_origin_confrontation_battle",returnBeatId:"mir_confrontation_battle_return"}
   ];
   const receipts=[];
   for(const test of cases){

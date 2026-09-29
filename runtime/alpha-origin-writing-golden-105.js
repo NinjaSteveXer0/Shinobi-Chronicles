@@ -676,10 +676,10 @@ push({
  mode:"battle_transition",
  text:"",
  environmentRef:MIRAI_ENV.street,
- battle:miraiBattleSpec(MIRAI_CONFRONT_CALLER,"mir_confront_battle_return")
+ battle:miraiBattleSpec(MIRAI_CONFRONT_CALLER,"mir_confrontation_battle_return")
 });
 push({
- beatId:"mir_confront_battle_return",
+ beatId:"mir_confrontation_battle_return",
  mode:"resolver",
  machineResolved:true,
  text:"",
