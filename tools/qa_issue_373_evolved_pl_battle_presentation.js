@@ -44,6 +44,7 @@ assert(battle.includes('rewardMode:"earned_delta"')&&battle.includes('ryoElement
 assert(battle.includes("battle2-formation-relay-in")&&battle.includes("menma373RelayPlayer")&&battle.includes("menma373RelayEnemy"),"scoped relay slide/scale motion missing");
 assert(battle.includes("refreshCommittedFormationPresentation33000")&&battle.includes("refreshBattleActionRegionPresentation"),"relay/yield does not refresh central confrontation DOM");
 assert(battle.includes("battle-live-active-nameplate")&&battle.includes("battle-live-power-"),"active identity/PL rebind support missing");
+assert(battle.includes("battle2SelectedSkillRestore")&&!battle.includes("if(state&&state.selectedSkillId)return false;"),"Skill hover is suppressed while repeat/selected Skill state is active");
 assert(battle.includes('data-evolved-pl-proof="menma_three_subjects"'),"Menma-scoped presentation selector missing");
 assert(battle.includes("${p.finalDamage} DAMAGE")&&battle.includes("PL ${p.beforePL} → ${p.afterPL}"),"damage and Remaining Battle PL are still conflated");
 assert(battle.includes('return"WITHDRAWAL"'),"0 Battle PL is not projected as withdrawal");
