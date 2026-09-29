@@ -711,6 +711,11 @@ function advanceStoryScene33900(choiceId=null){
   if(result&&result.success===true){
     const machineResult=resolveMachineStoryChain33900();
     if(machineResult&&machineResult.success===false)return machineResult;
+    // A hidden resolver may advance semantic Story state again after PRE_ADVANCE
+    // has already painted the resolver beat. Repaint the final authored target
+    // so the player never sees stale/blank resolver presentation or skips the
+    // first cue after that resolver chain.
+    if(machineResult&&machineResult.success===true)renderStorySceneBoard33900();
   }
   if(result&&result.success===true&&transition==="wipe_right_to_left")performSceneCut();
   return result;
