@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-29  
 **Owner:** Stephen / Writing — Konoha  
-**Status:** **OWNER-DIRECT COMPLETE REWRITE — REVIEW TARGET / NOT YET RE-PROMOTED TO WRITING GOLDEN**  
+**Status:** **OWNER PREVIEW AUTHORIZED — SEND TO CODING / NOT WRITING GOLDEN UNTIL BROWSER REVIEW**  
 **Production Origin:** `academy_kushina`
 
 ## 1. Archaeology boundary
