@@ -199,8 +199,10 @@ async function proveMiraiDefeatContinuations(browser){
     assert.strictEqual(setup.select?.success,true,"Mirai defeat proof select failed "+JSON.stringify(setup));
     assert.strictEqual(setup.launch?.success,true,"Mirai defeat proof launch failed "+JSON.stringify(setup));
     assert.strictEqual(setup.jump?.success,true,"Mirai defeat return resolver failed "+JSON.stringify(setup));
+    assert.strictEqual(setup.beatId,test.firstBeatId,"Mirai defeat resolver selected wrong beat "+JSON.stringify(setup));
     await release(page);
-    await page.waitForFunction(expected=>globalThis.getActiveStorySceneRuntime?.()?.beatId===expected,test.firstBeatId,{timeout:8000});
+    const releasedBeatId=await page.evaluate(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId||null);
+    assert.strictEqual(releasedBeatId,test.firstBeatId,"Mirai defeat beat changed during presentation release "+JSON.stringify({setup,releasedBeatId}));
     let row=await snapshot(page);
     assert.strictEqual(row.beatId,test.firstBeatId,"Mirai defeat did not enter authored cutscene");
     if(test.kind==="shortcut"){
