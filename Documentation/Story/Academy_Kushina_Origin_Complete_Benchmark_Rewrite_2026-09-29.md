@@ -240,8 +240,6 @@ The classmate bumps her shoulder on the way past.
 
 Kushina looks at them.
 
-A beat.
-
 **KUSHINA:** “Move faster next time.”
 
 The classmate grins.
@@ -603,8 +601,6 @@ The instructor says her name.
 She raises one hand without looking away from the toad.
 
 **KUSHINA:** “I'm not touching it.”
-
-A beat.
 
 **KUSHINA:** “Yet.”
 
