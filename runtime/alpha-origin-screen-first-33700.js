@@ -188,7 +188,7 @@ function patchKushina(){
 
 function patchKurenai(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
-  const live=A.sceneDefinitions&&A.sceneDefinitions[A.sceneByVariant.academy_kurenai];
+  const live=definition(A.sceneByVariant.academy_kurenai);
   if(live&&live.entryBeatId==="kur_pre_01"&&beat(live,"kur_approach")&&beat(live,"kur_leave_router"))return true;
   const d=editable(A.sceneByVariant.academy_kurenai);if(!d)return false;
   setText(d,"kur_bell","The instructor hooks a brass bell onto his belt.\n\n\"Take it.\"\n\nKurenai looks from the bell to his eyes. \"That's the whole instruction?\"\n\n\"If you need more, you've already made my job easier.\"\n\nThe bell rings once as he steps back.","narration");
