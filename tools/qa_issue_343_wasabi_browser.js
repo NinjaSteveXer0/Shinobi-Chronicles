@@ -391,7 +391,7 @@ async function runNonBattle(browser,{label,opening,route,rogueChoice=null,checks
       assert.deepStrictEqual(riverFinish.actors.map(x=>[x.id,x.image]),[
         ["academy_izuno","Assets/Academy Student/academy_izuno.png"],
         ["wasabi_origin_pursuit_target_01","NPC/pursuit_target.png"],
-        ["wasabi_origin_proctor","NPC/proctor.png"]
+        ["wasabi_origin_proctor","NPC/izuno_proctor.png"]
       ],label+" pursuit target missing from river extraction finish");
       await shot(page,label,"river-target-finish-visible");
     }
