@@ -228,8 +228,6 @@ She looks at the bell again.
 
 **KURENAI:** “Fine.”
 
-A beat.
-
 ### `kur_after_loss_08` — dialogue — KURENAI
 
 **KURENAI:** “Tomorrow.”
