@@ -9,8 +9,12 @@
 
 **Date:** 2026-09-27  
 **Owner:** Writing / Story — Konoha  
-**Status:** **WRITING GOLDEN — STEPHEN APPROVED 2026-09-27**  
+**Status:** **OWNER REOPENED 2026-09-29 — SUPERSEDED FOR CURRENT PLAYER-FACING VOICE**  
 **Origin:** `academy_iwabee`
+
+> **2026-09-29 natural-voice successor:** `Documentation/Story/Academy_Iwabee_Origin_Natural_Voice_Benchmark_Rewrite_2026-09-29.md` @ `7209383cebd82a0e4598a44f91e91c3a7cc76ad8`.
+>
+> Owner review found too much theme-explaining / unnatural dialogue in the approved 2026-09-27 expression. Preserve this file for IWA/Battle/route semantics; do not use its player-facing dialogue as current final authority.
 
 ## Successor purpose
 
