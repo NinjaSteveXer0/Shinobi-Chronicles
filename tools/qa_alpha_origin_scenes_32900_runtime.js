@@ -87,7 +87,7 @@ function run(origin,choices){
   if(!ctx.playerData.acquisition.chronicleOrigin.prologueCompleted)throw new Error(`${origin} did not complete`);
 }
 run('academy_hinata',['attack_immediately','press_draw_counter','trust_spar','stay_and_watch']);
-run('academy_izuno',['predict_destination','intercept_prediction','trust_notice']);
+run('academy_izuno',['predict_destination','intercept_prediction','intercept_read']);
 run('academy_mirai',['ask_route','test_question','investigate_quietly']);
 run('academy_kushina',['correct_formula','ask_who']);
 run('academy_kurenai',['fake_clumsy','rush_bell','let_him_think_caught']);
