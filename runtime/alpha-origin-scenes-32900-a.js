@@ -1162,7 +1162,7 @@ function registerHinataOriginPresentation32900(){
 }
 registerHinataOriginPresentation32900();
 A.register({sceneId:scene,eventId:scene,title:"ACADEMY HINATA",entryBeatId:id("hin_opening"),participants:[],beats,onCompleteConsequences:[X("academy_hinata",[spar,young])]});})();
-// Wasabi Izuno — #343 WRITING GOLDEN + authorised Rogue Genin Battle
+// Wasabi Izuno — #343 owner-approved complete rewrite v2 + authorised Rogue Genin Battle
 (()=>{const tracking="occ_origin_izuno_pursuit_tracking_resolution",intercept="occ_origin_izuno_intercept_prediction_resolution",coop="occ_origin_izuno_pursuit_cooperation_resolution",rogue="occ_origin_izuno_rogue_genin_interruption_resolution",river="occ_origin_izuno_river_endurance_resolution",scene=A.sceneByVariant.academy_izuno;
 const W=globalThis.SC_ACADEMY_WASABI_WRITING_GOLDEN_343;if(!W)throw new Error("academy_wasabi_writing_golden_343_required");
 const G=key=>W.get(key);
@@ -1200,7 +1200,7 @@ function izunoBackdropKey32900(beatId){
     id.startsWith("izu_rogue_keep_finish_")||
     id.startsWith("izu_eval_")||
     id.startsWith("izu_after_")||
-    id==="izu_reflect"
+    id.startsWith("izu_reflect")
   )return"training";
   if(id.startsWith("izu_close_"))return"mainStreet";
   if(id.startsWith("izu_rogue_"))return"alley";
@@ -1216,7 +1216,7 @@ function izunoSceneLabel32900(beatId){
   if(id.startsWith("izu_intercept_"))return"THE INTERCEPT";
   if(id.startsWith("izu_finish_")||id.startsWith("izu_rogue_call_help_finish_")||id.startsWith("izu_rogue_keep_finish_"))return"THE FINISH";
   if(id.startsWith("izu_eval_"))return"WHAT THE INSTRUCTOR SAW";
-  if(id.startsWith("izu_after_")||id==="izu_reflect")return"AFTER";
+  if(id.startsWith("izu_after_")||id.startsWith("izu_reflect"))return"AFTER";
   if(id.startsWith("izu_close_"))return"ORIGIN CLOSE";
   if(id.startsWith("izu_rogue_"))return"THE SHOUTING";
   return"ACADEMY WASABI IZUNO";
@@ -1231,10 +1231,14 @@ function izunoActorKeys32900(beatId){
   if(id==="izu_receipt")return[];
   if(id.startsWith("izu_open_"))return["wasabi","instructor"];
   if(id.startsWith("izu_river_"))return["wasabi","target"];
-  if(id.startsWith("izu_finish_river_"))return["wasabi","instructor","target"];
-  if(id.startsWith("izu_finish_false_"))return["wasabi","instructor"];
+  if(id.startsWith("izu_finish_river_")||id.startsWith("izu_finish_intercept_"))return["wasabi","target","proctor"];
+  if(id.startsWith("izu_finish_false_"))return["wasabi","instructor","target"];
+  if(id.startsWith("izu_finish_secondary_")||id.startsWith("izu_rogue_call_help_finish_")||id.startsWith("izu_rogue_keep_finish_"))return["wasabi","target"];
   if(id.startsWith("izu_eval_"))return["wasabi","instructor"];
-  if(id.startsWith("izu_rogue_")&&!id.startsWith("izu_rogue_step_in_battle"))return["wasabi","rogue"];
+  if(id.startsWith("izu_after_river_")||id.startsWith("izu_after_false_"))return["wasabi","target"];
+  if(id.startsWith("izu_after_direct_")||id.startsWith("izu_after_secondary_")||id.startsWith("izu_after_rogue_call_")||id.startsWith("izu_after_rogue_keep_"))return["wasabi","student1"];
+  if(id.startsWith("izu_close_"))return["wasabi","student1","target"];
+  if(id.startsWith("izu_rogue_")&&!id.startsWith("izu_rogue_step_in_battle"))return["wasabi","student1","rogue"];
   return["wasabi"];
 }
 function izunoActors32900(beatId,performance){
@@ -1282,10 +1286,30 @@ function wasabiReceiptLines32900(){
     keep_pursuing:"Kept pursuing the target."
   };
   const reflection={
-    trust_trail:"Next time, trust the trail.",
-    trust_notice:"Next time, trust what you notice.",
-    fastest_not_obvious:"The fastest path is not always the obvious one.",
-    catch_not_only:"Catching the target was not the only thing that mattered."
+    river_hard_way:"I caught them the hard way.",
+    river_beat_time:"Next time I beat that time.",
+    river_head_start:"Give them a bigger head start.",
+    river_rematch:"I want the rematch.",
+    intercept_first:"Why chase from behind if I can get there first?",
+    intercept_route:"The route mattered more than the trail.",
+    intercept_read:"I trusted my read. It worked.",
+    intercept_sooner:"Next time I cut them off sooner.",
+    false_got_me:"They got me with that one.",
+    false_saw_late:"I saw the trick. Just too late.",
+    false_check_fit:"Next time I check what doesn't fit.",
+    false_better_trick:"They'll need a better trick next time.",
+    step_again:"I'd step in again.",
+    step_faster:"Next time I end the fight faster.",
+    step_finished:"The target got away. I still finished what I started.",
+    step_time_cost:"I need to know how much time a fight really costs.",
+    call_faster:"Calling the instructor was faster.",
+    call_student_moving:"I got the student moving.",
+    call_handoff:"Next time I hand it off sooner.",
+    call_watch_both:"I can watch the chase and the people in it.",
+    keep_target:"I chose the target.",
+    keep_waited:"I waited too long before I moved.",
+    keep_decide:"Next time I decide immediately.",
+    keep_another_shot:"Give me another shot at the chase."
   };
   if(initial[c.initial])lines.push("• "+initial[c.initial]);
   if(route[c.route])lines.push("• "+route[c.route]);
@@ -1535,8 +1559,8 @@ seq("izu_eval_base",G("eval_base"),"izu_eval_route_resolver");
 beats.push({beatId:"izu_eval_route_resolver",mode:"resolver",machineResolved:true,text:"",choices:[
   C("eval_false","RESOLVE RESULT","izu_eval_false_1",null,{availability:avail(()=>local().outcome==="false_trail_discovered")}),
   C("eval_intercept","RESOLVE RESULT","izu_eval_intercept_1",null,{availability:avail(()=>local().outcome==="intercept_before_extraction")}),
-  C("eval_quick","RESOLVE RESULT","izu_eval_quick_1",null,{availability:avail(()=>local().outcome==="direct_catch")}),
-  C("eval_other","RESOLVE RESULT","izu_eval_coop_resolver",null,{availability:avail(()=>!["false_trail_discovered","intercept_before_extraction","direct_catch"].includes(local().outcome))})
+  C("eval_river","RESOLVE RESULT","izu_eval_quick_1",null,{availability:avail(()=>local().outcome==="direct_catch")}),
+  C("eval_rogue","RESOLVE RESULT","izu_eval_coop_resolver",null,{availability:avail(()=>local().outcome==="secondary_occurrence_costs_pursuit")})
 ]});
 seq("izu_eval_false",G("eval_false"),"izu_eval_coop_resolver");
 seq("izu_eval_intercept",G("eval_intercept"),"izu_eval_coop_resolver");
@@ -1552,27 +1576,71 @@ beats.push({beatId:"izu_eval_rogue_resolver",mode:"resolver",machineResolved:tru
   C("eval_rogue_keep","RESOLVE RESULT","izu_eval_rogue_keep_1",null,{availability:avail(()=>local().rogueGeninResponse==="keep_pursuing")}),
   C("eval_rogue_none","RESOLVE RESULT","izu_after_base_1",null,{availability:avail(()=>!local().rogueGeninResponse)})
 ]});
-seq("izu_eval_rogue_intervene",[...G("eval_rogue_base"),...G("eval_rogue_intervene")],"izu_after_base_1");
-seq("izu_eval_rogue_call",[...G("eval_rogue_base"),...G("eval_rogue_call_help")],"izu_after_base_1");
-seq("izu_eval_rogue_keep",[...G("eval_rogue_base"),...G("eval_rogue_keep_pursuing")],"izu_after_base_1");
+seq("izu_eval_rogue_intervene",G("eval_rogue_intervene"),"izu_eval_rogue_intervene_result_resolver");
+beats.push({beatId:"izu_eval_rogue_intervene_result_resolver",mode:"resolver",machineResolved:true,text:"",choices:[
+  C("eval_rogue_victory","RESOLVE RESULT","izu_eval_rogue_intervene_victory_1",null,{availability:avail(()=>local().rogueBattleResult==="victory")}),
+  C("eval_rogue_defeat","RESOLVE RESULT","izu_eval_rogue_intervene_defeat_1",null,{availability:avail(()=>local().rogueBattleResult==="defeat")})
+]});
+seq("izu_eval_rogue_intervene_victory",G("eval_rogue_intervene_victory"),"izu_eval_rogue_intervene_post_1");
+seq("izu_eval_rogue_intervene_defeat",G("eval_rogue_intervene_defeat"),"izu_eval_rogue_intervene_post_1");
+seq("izu_eval_rogue_intervene_post",G("eval_rogue_intervene_post"),"izu_after_base_1");
+seq("izu_eval_rogue_call",G("eval_rogue_call_help"),"izu_after_base_1");
+seq("izu_eval_rogue_keep",G("eval_rogue_keep_pursuing"),"izu_after_base_1");
 
 seq("izu_after_base",G("after_base"),"izu_after_result_resolver",{first:{onEnterConsequences:[trackingCommit,interceptCommit,coopCommit,rogueCommit,riverCommit,progressionCommit]}});
 beats.push({beatId:"izu_after_result_resolver",mode:"resolver",machineResolved:true,text:"",choices:[
-  C("after_river","RESOLVE RESULT","izu_after_river_1",null,{availability:avail(()=>local().outcome==="arrive_just_after_target")}),
+  C("after_river","RESOLVE RESULT","izu_after_river_1",null,{availability:avail(()=>local().outcome==="direct_catch")}),
   C("after_false","RESOLVE RESULT","izu_after_false_1",null,{availability:avail(()=>local().outcome==="false_trail_discovered")}),
-  C("after_secondary","RESOLVE RESULT","izu_after_secondary_1",null,{availability:avail(()=>local().outcome==="secondary_occurrence_costs_pursuit")}),
-  C("after_catch","RESOLVE RESULT","izu_after_direct_1",null,{availability:avail(()=>["intercept_before_extraction","direct_catch"].includes(local().outcome))})
+  C("after_intercept","RESOLVE RESULT","izu_after_direct_1",null,{availability:avail(()=>local().outcome==="intercept_before_extraction")}),
+  C("after_secondary","RESOLVE RESULT","izu_after_secondary_resolver",null,{availability:avail(()=>local().outcome==="secondary_occurrence_costs_pursuit")})
 ]});
-seq("izu_after_river",G("after_river"),"izu_after_end_1");
-seq("izu_after_false",G("after_false"),"izu_after_end_1");
-seq("izu_after_secondary",G("after_secondary"),"izu_after_end_1");
-seq("izu_after_direct",G("after_direct"),"izu_after_end_1");
-seq("izu_after_end",G("after_end"),"izu_reflect");
-beats.push({beatId:"izu_reflect",mode:"choice",text:"",choices:[
-  C("trust_trail","Next time I'm trusting the trail.","izu_close_1",{reflection:"trust_trail"}),
-  C("trust_notice","Next time I'm trusting what I notice.","izu_close_1",{reflection:"trust_notice"}),
-  C("fastest_not_obvious","Sometimes the fastest path isn't the obvious one.","izu_close_1",{reflection:"fastest_not_obvious"}),
-  C("catch_not_only","Catching them wasn't the only thing that mattered.","izu_close_1",{reflection:"catch_not_only"})
+seq("izu_after_river",G("after_river"),"izu_reflect_river");
+seq("izu_after_false",G("after_false"),"izu_reflect_false");
+seq("izu_after_direct",G("after_direct"),"izu_reflect_intercept");
+beats.push({beatId:"izu_after_secondary_resolver",mode:"resolver",machineResolved:true,text:"",choices:[
+  C("after_step","RESOLVE RESULT","izu_after_secondary_1",null,{availability:avail(()=>local().rogueGeninResponse==="intervene")}),
+  C("after_call","RESOLVE RESULT","izu_after_rogue_call_1",null,{availability:avail(()=>local().rogueGeninResponse==="call_for_help")}),
+  C("after_keep","RESOLVE RESULT","izu_after_rogue_keep_1",null,{availability:avail(()=>local().rogueGeninResponse==="keep_pursuing")})
+]});
+seq("izu_after_secondary",G("after_secondary"),"izu_reflect_step_in");
+seq("izu_after_rogue_call",G("after_rogue_call_help"),"izu_reflect_call_for_help");
+seq("izu_after_rogue_keep",G("after_rogue_keep_pursuing"),"izu_reflect_keep_pursuing");
+
+beats.push({beatId:"izu_reflect_river",mode:"choice",text:"",choices:[
+  C("river_hard_way","I caught them the hard way.","izu_close_1",{reflection:"river_hard_way"}),
+  C("river_beat_time","Next time I beat that time.","izu_close_1",{reflection:"river_beat_time"}),
+  C("river_head_start","Give them a bigger head start.","izu_close_1",{reflection:"river_head_start"}),
+  C("river_rematch","I want the rematch.","izu_close_1",{reflection:"river_rematch"})
+]});
+beats.push({beatId:"izu_reflect_intercept",mode:"choice",text:"",choices:[
+  C("intercept_first","Why chase from behind if I can get there first?","izu_close_1",{reflection:"intercept_first"}),
+  C("intercept_route","The route mattered more than the trail.","izu_close_1",{reflection:"intercept_route"}),
+  C("intercept_read","I trusted my read. It worked.","izu_close_1",{reflection:"intercept_read"}),
+  C("intercept_sooner","Next time I cut them off sooner.","izu_close_1",{reflection:"intercept_sooner"})
+]});
+beats.push({beatId:"izu_reflect_false",mode:"choice",text:"",choices:[
+  C("false_got_me","They got me with that one.","izu_close_1",{reflection:"false_got_me"}),
+  C("false_saw_late","I saw the trick. Just too late.","izu_close_1",{reflection:"false_saw_late"}),
+  C("false_check_fit","Next time I check what doesn't fit.","izu_close_1",{reflection:"false_check_fit"}),
+  C("false_better_trick","They'll need a better trick next time.","izu_close_1",{reflection:"false_better_trick"})
+]});
+beats.push({beatId:"izu_reflect_step_in",mode:"choice",text:"",choices:[
+  C("step_again","I'd step in again.","izu_close_1",{reflection:"step_again"}),
+  C("step_faster","Next time I end the fight faster.","izu_close_1",{reflection:"step_faster"}),
+  C("step_finished","The target got away. I still finished what I started.","izu_close_1",{reflection:"step_finished"}),
+  C("step_time_cost","I need to know how much time a fight really costs.","izu_close_1",{reflection:"step_time_cost"})
+]});
+beats.push({beatId:"izu_reflect_call_for_help",mode:"choice",text:"",choices:[
+  C("call_faster","Calling the instructor was faster.","izu_close_1",{reflection:"call_faster"}),
+  C("call_student_moving","I got the student moving.","izu_close_1",{reflection:"call_student_moving"}),
+  C("call_handoff","Next time I hand it off sooner.","izu_close_1",{reflection:"call_handoff"}),
+  C("call_watch_both","I can watch the chase and the people in it.","izu_close_1",{reflection:"call_watch_both"})
+]});
+beats.push({beatId:"izu_reflect_keep_pursuing",mode:"choice",text:"",choices:[
+  C("keep_target","I chose the target.","izu_close_1",{reflection:"keep_target"}),
+  C("keep_waited","I waited too long before I moved.","izu_close_1",{reflection:"keep_waited"}),
+  C("keep_decide","Next time I decide immediately.","izu_close_1",{reflection:"keep_decide"}),
+  C("keep_another_shot","Give me another shot at the chase.","izu_close_1",{reflection:"keep_another_shot"})
 ]});
 seq("izu_close",G("origin_close"),"izu_receipt");
 beats.push({beatId:"izu_receipt",mode:"record",text:"",exitScene:true,onEnterConsequences:[X("academy_izuno",[tracking,intercept,coop,rogue,river])]});

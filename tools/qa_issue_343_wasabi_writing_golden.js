@@ -9,7 +9,7 @@ const BATTLE="runtime/alpha-wasabi-rogue-battle-343.js";
 const CORE="game.js";
 const RESOLVER="runtime/alpha-story-machine-resolver-343.js";
 const PURSE="runtime/alpha-origin-starting-purse-409.js";
-const DOC="Documentation/Story/Academy_Wasabi_Izuno_Origin_WRITING_GOLDEN_2026-09-24.md";
+const DOC="Documentation/Story/Academy_Wasabi_Izuno_Origin_Complete_Rewrite_v2_2026-09-29.md";
 for(const p of [STORY,CATALOGUE,BATTLE,CORE,RESOLVER,PURSE,DOC])assert(fs.existsSync(p),"missing #343 authority/runtime file "+p);
 
 const storySource=fs.readFileSync(STORY,"utf8");
@@ -63,9 +63,13 @@ assert.deepStrictEqual(labels("izu_initial_choice"),[
 ]);
 assert.deepStrictEqual(labels("izu_split_choice"),["TAKE THE RIVER","FOLLOW THE STRONGER TRAIL","CHECK THE SHOUTING","CUT FOR THE INTERCEPT"]);
 assert.deepStrictEqual(labels("izu_rogue_choice"),["STEP IN","CALL FOR HELP","KEEP PURSUING"]);
-assert.deepStrictEqual(labels("izu_reflect"),[
-  "Next time I'm trusting the trail.","Next time I'm trusting what I notice.","Sometimes the fastest path isn't the obvious one.","Catching them wasn't the only thing that mattered."
-]);
+assert.strictEqual(byId.has("izu_reflect"),false,"retired universal Wasabi reflection beat returned");
+assert.deepStrictEqual(labels("izu_reflect_river"),["I caught them the hard way.","Next time I beat that time.","Give them a bigger head start.","I want the rematch."]);
+assert.deepStrictEqual(labels("izu_reflect_intercept"),["Why chase from behind if I can get there first?","The route mattered more than the trail.","I trusted my read. It worked.","Next time I cut them off sooner."]);
+assert.deepStrictEqual(labels("izu_reflect_false"),["They got me with that one.","I saw the trick. Just too late.","Next time I check what doesn't fit.","They'll need a better trick next time."]);
+assert.deepStrictEqual(labels("izu_reflect_step_in"),["I'd step in again.","Next time I end the fight faster.","The target got away. I still finished what I started.","I need to know how much time a fight really costs."]);
+assert.deepStrictEqual(labels("izu_reflect_call_for_help"),["Calling the instructor was faster.","I got the student moving.","Next time I hand it off sooner.","I can watch the chase and the people in it."]);
+assert.deepStrictEqual(labels("izu_reflect_keep_pursuing"),["I chose the target.","I waited too long before I moved.","Next time I decide immediately.","Give me another shot at the chase."]);
 
 // Writing-closed 2026-09-27 exact backdrop contract.
 for(const backdrop of [
@@ -95,7 +99,8 @@ for(const actorPath of [
 assert(wasabiSource.includes("function izunoActors32900"),"Wasabi actor projection resolver missing");
 assert(wasabiSource.includes('if(id.startsWith("izu_open_"))return["wasabi","instructor"]'),"HEAD START does not stage Wasabi + Instructor");
 assert(wasabiSource.includes('if(id.startsWith("izu_eval_"))return["wasabi","instructor"]'),"evaluation does not stage Wasabi + Instructor");
-assert(wasabiSource.includes('return["wasabi","rogue"]'),"Rogue interruption does not stage Wasabi + Rogue Genin");
+assert(wasabiSource.includes('return["wasabi","student1","rogue"]'),"Rogue interruption does not stage Wasabi + affected student + Rogue Genin");
+assert(wasabiSource.includes('if(id.startsWith("izu_finish_river_")||id.startsWith("izu_finish_intercept_"))return["wasabi","target","proctor"]'),"successful pursuit finish does not stage target + proctor");
 const receiptBeat=byId.get("izu_receipt");
 assert(receiptBeat&&receiptBeat.mode==="record"&&receiptBeat.exitScene===true,"mandatory Wasabi Chronicle Receipt beat missing");
 assert.strictEqual(tail("izu_close").nextBeatId,"izu_receipt","Origin Close bypasses mandatory Chronicle Receipt");
@@ -117,20 +122,23 @@ assert(wasabiSource.includes("commitRiverStamina40900")&&wasabiSource.includes("
 assert(purseSource.includes('SOURCE_ID="origin_completion_starting_purse_ryo_01"')&&purseSource.includes("const AMOUNT=100"),"#409 modular shared Origin purse missing");
 assert(!coreSource.includes("ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID"),"frozen game.js was reopened for #409 purse");
 
-// Approved voice/dialogue anchors from Writing GOLDEN.
+// Owner-approved complete rewrite v2 voice/dialogue anchors.
 for(const [prefix,line] of [
-  ["izu_open","That's not a time."],
-  ["izu_initial_obvious","Catch up and ask me!"],
-  ["izu_initial_better","Yeah. That's the problem."],
-  ["izu_initial_cooperate","You didn't pick me!"],
-  ["izu_initial_predict","We'll find out!"],
-  ["izu_rogue_step_in","So do you."],
+  ["izu_open","You started without me?"],
+  ["izu_initial_obvious","But I'm not standing here until I am!"],
+  ["izu_initial_better","A better answer!"],
+  ["izu_initial_cooperate","Since you both asked me!"],
+  ["izu_initial_predict","They can't lie about where they're going."],
+  ["izu_rogue_step_in","So let's not waste time."],
   ["izu_rogue_call_help","INSTRUCTOR!"],
-  ["izu_intercept","Hi."],
-  ["izu_close","The exercise is over!"]
-]) assert(cueTexts(prefix).includes(line),"missing GOLDEN line "+prefix+" :: "+line);
-assert(storyCtx.SC_ACADEMY_WASABI_WRITING_GOLDEN_343.get("eval_rogue_call_help").some(c=>c.text==="You handed it off."));
-assert(storyCtx.SC_ACADEMY_WASABI_WRITING_GOLDEN_343.get("eval_rogue_keep_pursuing").some(c=>c.text==="The instructor doesn't mention the Rogue Genin first."));
+  ["izu_intercept","Oh, no. You don't get to leave now!"],
+  ["izu_close","Race you to the corner."],
+  ["izu_close","Finally."]
+]) assert(cueTexts(prefix).includes(line),"missing v2 line "+prefix+" :: "+line);
+assert(storyCtx.SC_ACADEMY_WASABI_WRITING_GOLDEN_343.get("eval_rogue_call_help").some(c=>c.text==="You called me in."));
+assert(storyCtx.SC_ACADEMY_WASABI_WRITING_GOLDEN_343.get("eval_rogue_keep_pursuing").some(c=>c.text==="You kept moving."));
+assert(!catalogueSource.includes('"text": "You lost."'),"retired universal loss line returned");
+assert(!catalogueSource.includes("Next time I'm trusting the trail."),"retired universal reflection copy returned");
 
 // Frozen Story core is preserved. The scoped #343 adapter consumes hidden
 // deterministic resolver beats through existing Story choice authority.
@@ -191,6 +199,9 @@ assert.deepStrictEqual(JSON.parse(JSON.stringify(interceptReq.__factResolver({ou
 });
 assert.deepStrictEqual(JSON.parse(JSON.stringify(interceptReq.__rowIdsResolver({outcome:"intercept_before_extraction"}))),["IZU-02"]);
 assert.deepStrictEqual(JSON.parse(JSON.stringify(interceptReq.__rowIdsResolver({predictionApproach:true,outcome:"direct_catch"}))),[]);
+assert.strictEqual(choice("izu_split_choice","river_route").contextPatch.outcome,"direct_catch");
+assert.strictEqual(choice("izu_split_choice","intercept_prediction").contextPatch.outcome,"intercept_before_extraction");
+assert.strictEqual(choice("izu_split_choice","stronger_trail").contextPatch.outcome,"false_trail_discovered");
 
 // Rogue response remains separate from pursuit outcome.
 assert.deepStrictEqual(JSON.parse(JSON.stringify(choice("izu_rogue_choice","intervene").contextPatch)),{

@@ -301,11 +301,9 @@ async function history(page){
     };
   },{ids:[TRACKING,INTERCEPT,COOP,ROGUE_OCC,RIVER]});
 }
-async function finishFromCurrent(page,label,reflection="Sometimes the fastest path isn't the obvious one.",expect={battleRyo:0,river:false}){
-  await continueTo(page,"izu_reflect");
-  assert.deepStrictEqual((await info(page)).choices,[
-    "Next time I'm trusting the trail.","Next time I'm trusting what I notice.","Sometimes the fastest path isn't the obvious one.","Catching them wasn't the only thing that mattered."
-  ]);
+async function finishFromCurrent(page,label,{reflectionBeat,reflection,choices,battleRyo=0,river=false}){
+  await continueTo(page,reflectionBeat);
+  assert.deepStrictEqual((await info(page)).choices,choices,label+" route-relative reflection choices drift");
   await shot(page,label,"reflection");
   await choose(page,reflection,"izu_close_1");
   await assertBackdrop(page,BACKDROPS.mainStreet,label+" ORIGIN CLOSE");
@@ -318,8 +316,8 @@ async function finishFromCurrent(page,label,reflection="Sometimes the fastest pa
     assert(receipt.text.includes(heading),label+" Chronicle Receipt missing "+heading);
   }
   assert(receipt.text.includes("Origin Starting Purse: +100 Ryō."),label+" Chronicle Receipt missing committed starting purse");
-  assert.strictEqual(receipt.text.includes("Rogue Genin Battle Victory: +50 Ryō."),Number(expect.battleRyo)===50,label+" Battle reward Receipt projection drift");
-  assert.strictEqual(receipt.text.includes("Stamina Development: +1."),expect.river===true,label+" River development Receipt projection drift");
+  assert.strictEqual(receipt.text.includes("Rogue Genin Battle Victory: +50 Ryō."),Number(battleRyo)===50,label+" Battle reward Receipt projection drift");
+  assert.strictEqual(receipt.text.includes("Stamina Development: +1."),river===true,label+" River development Receipt projection drift");
   for(const forbidden of ["occ_origin_","sjctx","specialistLevel","independentSourceId","significance","Chronicle Engine"])assert(!receipt.text.includes(forbidden),label+" Receipt leaked hidden machinery "+forbidden);
   const committed=await history(page);
   assert.strictEqual(committed.prologueCompleted,true,label+" Origin completion did not commit before Receipt projection");
@@ -327,7 +325,7 @@ async function finishFromCurrent(page,label,reflection="Sometimes the fastest pa
   assert.strictEqual(purse.length,1,label+" starting purse missing/duplicated at Receipt");
   assert.strictEqual(purse[0].ryo,100,label+" starting purse amount drift");
   const battleCash=committed.rewardReceipts.filter(r=>r.rewardSourceId===BATTLE_REWARD_SOURCE);
-  assert.strictEqual(battleCash.length,Number(expect.battleRyo)===50?1:0,label+" Battle cash receipt count drift");
+  assert.strictEqual(battleCash.length,Number(battleRyo)===50?1:0,label+" Battle cash receipt count drift");
   assert(!committed.rewardReceipts.some(r=>r.actorVariantId===WASABI&&Number(r.ryo)===25),label+" retired +25 route cash returned");
   const beforeRepeat=committed.ryo;
   const repeat=await page.evaluate(()=>completeChronicleOriginPrologue("academy_izuno",[]));
@@ -335,7 +333,7 @@ async function finishFromCurrent(page,label,reflection="Sometimes the fastest pa
   assert.strictEqual(repeat.originStartingPurseIdempotent,true,label+" starting purse repeat not idempotent");
   assert.strictEqual(repeat.originStartingPurseRyoGranted,0,label+" starting purse repeated cash");
   assert.strictEqual((await history(page)).ryo,beforeRepeat,label+" repeated completion changed Ryō");
-  if(expect.river===true){
+  if(river===true){
     const riverRows=committed.developmentReceipts.filter(r=>r.subjectVariantId===WASABI&&r.sourceOccurrenceId===RIVER&&r.disciplineId==="stamina");
     assert.strictEqual(riverRows.length,1,label+" River Stamina receipt missing/duplicated");
     assert.strictEqual(riverRows[0].expGranted,1,label+" River Stamina amount drift");
@@ -354,6 +352,14 @@ async function finishFromCurrent(page,label,reflection="Sometimes the fastest pa
   assert(/YOUR CHRONICLE BEGINS/i.test(h.bodyText),label+" shared continuity missing");
   return h;
 }
+function reflectionFixture(route,rogueChoice=null){
+  if(route==="TAKE THE RIVER")return{reflectionBeat:"izu_reflect_river",choices:["I caught them the hard way.","Next time I beat that time.","Give them a bigger head start.","I want the rematch."],reflection:"I want the rematch.",river:true};
+  if(route==="CUT FOR THE INTERCEPT")return{reflectionBeat:"izu_reflect_intercept",choices:["Why chase from behind if I can get there first?","The route mattered more than the trail.","I trusted my read. It worked.","Next time I cut them off sooner."],reflection:"I trusted my read. It worked.",river:false};
+  if(route==="FOLLOW THE STRONGER TRAIL")return{reflectionBeat:"izu_reflect_false",choices:["They got me with that one.","I saw the trick. Just too late.","Next time I check what doesn't fit.","They'll need a better trick next time."],reflection:"They'll need a better trick next time.",river:false};
+  if(rogueChoice==="CALL FOR HELP")return{reflectionBeat:"izu_reflect_call_for_help",choices:["Calling the instructor was faster.","I got the student moving.","Next time I hand it off sooner.","I can watch the chase and the people in it."],reflection:"Next time I hand it off sooner.",river:false};
+  if(rogueChoice==="KEEP PURSUING")return{reflectionBeat:"izu_reflect_keep_pursuing",choices:["I chose the target.","I waited too long before I moved.","Next time I decide immediately.","Give me another shot at the chase."],reflection:"Next time I decide immediately.",river:false};
+  throw new Error("missing route-relative reflection fixture "+route+" / "+rogueChoice);
+}
 async function runNonBattle(browser,{label,opening,route,rogueChoice=null,checks}){
   const {context,page,runtimeErrorGate}=await boot(browser,label);
   try{
@@ -368,17 +374,17 @@ async function runNonBattle(browser,{label,opening,route,rogueChoice=null,checks
     assert(routeBackdrop,label+" route backdrop fixture missing");
     await assertBackdrop(page,routeBackdrop,label+" route "+route);
     if(route==="TAKE THE RIVER"){
-      await continueTo(page,"izu_river_17");
+      await continueTo(page,"izu_river_18");
       const riverTarget=await info(page);
-      assert.strictEqual(riverTarget.text,"Runs harder.",label+" river target proof cue drift");
+      assert.strictEqual(riverTarget.text,"The target appears ahead where the path curves back toward extraction.",label+" river target proof cue drift");
       assert.deepStrictEqual(riverTarget.actors.map(x=>[x.id,x.image]),[
         ["academy_izuno","Assets/Academy Student/academy_izuno.png"],
         ["wasabi_origin_pursuit_target_01","NPC/pursuit_target.png"]
       ],label+" pursuit target missing from live river chase");
       await shot(page,label,"river-target-visible");
-      await continueTo(page,"izu_finish_river_2");
+      await continueTo(page,"izu_finish_river_4");
       const riverFinish=await info(page);
-      assert.strictEqual(riverFinish.text,"You took the long way.",label+" river direct-catch finish proof cue drift");
+      assert.strictEqual(riverFinish.text,"You took the long route.",label+" river direct-catch finish proof cue drift");
       assert.deepStrictEqual(riverFinish.actors.map(x=>[x.id,x.image]),[
         ["academy_izuno","Assets/Academy Student/academy_izuno.png"],
         ["wasabi_academy_instructor","NPC/izuno_instructor.png"],
@@ -392,11 +398,12 @@ async function runNonBattle(browser,{label,opening,route,rogueChoice=null,checks
       await shot(page,label,"rogue-choice");
       await choose(page,rogueChoice);
     }
-    await continueTo(page,"izu_reflect");
+    const reflect=reflectionFixture(route,rogueChoice);
+    await continueTo(page,reflect.reflectionBeat);
     await assertBackdrop(page,BACKDROPS.training,label+" AFTER");
     const before=await history(page);
     await checks(page,before);
-    const completed=await finishFromCurrent(page,label,"Sometimes the fastest path isn't the obvious one.",{battleRyo:0,river:route==="TAKE THE RIVER"});
+    const completed=await finishFromCurrent(page,label,{...reflect,battleRyo:0});
     const errors=await runtimeErrorGate.assertClean(label);
     return{label,before,completed,errors};
   }finally{await context.close();}
@@ -574,7 +581,7 @@ async function runBattleRoute(browser,outcome){
     await clickContinue(page);
     await waitBeat(page,"izu_finish_secondary_1");
     await assertBackdrop(page,BACKDROPS.training,label+" Scene 5 convergence");
-    await continueTo(page,"izu_reflect");
+    await continueTo(page,"izu_reflect_step_in");
     await assertBackdrop(page,BACKDROPS.training,label+" AFTER");
     let h=await history(page);
     assert.strictEqual(h.exact[ROGUE_OCC].length,1,label+" IZU-04 missing/duplicated");
@@ -582,12 +589,12 @@ async function runBattleRoute(browser,outcome){
     assert.strictEqual(h.exact[ROGUE_OCC][0].fact?.rogueGeninInterruptionResolvedByWasabiAction,true);
     assert.deepStrictEqual(h.exact[ROGUE_OCC][0].fact?.battleOccurrenceIds,[battle.battleId]);
     await page.reload({waitUntil:"domcontentloaded",timeout:60000});
-    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.sceneId==="origin_academy_izuno_prologue"&&getActiveStorySceneRuntime()?.beatId==="izu_reflect",null,{timeout:20000});
+    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.sceneId==="origin_academy_izuno_prologue"&&getActiveStorySceneRuntime()?.beatId==="izu_reflect_step_in",null,{timeout:20000});
     await releaseFrontDoor(page);
     await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:12000});
     h=await history(page);
     assert.strictEqual(h.exact[ROGUE_OCC].length,1,label+" reload duplicated IZU-04");
-    const completed=await finishFromCurrent(page,label,"Catching them wasn't the only thing that mattered.",{battleRyo:outcome==="victory"?50:0,river:false});
+    const completed=await finishFromCurrent(page,label,{reflectionBeat:"izu_reflect_step_in",choices:["I'd step in again.","Next time I end the fight faster.","The target got away. I still finished what I started.","I need to know how much time a fight really costs."],reflection:"The target got away. I still finished what I started.",battleRyo:outcome==="victory"?50:0,river:false});
     const errors=await runtimeErrorGate.assertClean(label);
     return{label,battle,reloaded,returnedOutcome:outcome,completed,errors};
   }finally{await context.close();}

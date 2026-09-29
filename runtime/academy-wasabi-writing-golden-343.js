@@ -1,19 +1,19 @@
 // ============================================================================
-// ACADEMY WASABI IZUNO — WRITING-GOLDEN COMPILED CONTENT — #343
+// ACADEMY WASABI IZUNO — OWNER-APPROVED COMPLETE REWRITE v2 — #343
 //
-// Generated directly from the approved player-facing Writing-Golden Markdown.
+// Generated directly from Stephen-approved 2026-09-29 complete successor prose.
 // Author-only headings, CHOICE markers and Battle seam instructions are excluded.
 // Runtime route semantics remain owned by alpha-origin-scenes-32900-a.js.
 // ============================================================================
 (function installAcademyWasabiWritingGolden343(){
 "use strict";
 if(globalThis.SC_ACADEMY_WASABI_WRITING_GOLDEN_343)return;
-const SOURCE="Documentation/Story/Academy_Wasabi_Izuno_Origin_WRITING_GOLDEN_2026-09-24.md";
+const SOURCE="Documentation/Story/Academy_Wasabi_Izuno_Origin_Complete_Rewrite_v2_2026-09-29.md";
 const SECTIONS=Object.freeze({
   "scene1": {
     "sourceRange": [
-      57,
-      110
+      64,
+      126
     ],
     "cues": [
       {
@@ -22,56 +22,69 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Wasabi stares down the empty street."
+        "text": "Wasabi looks down the empty street."
       },
       {
         "kind": "narration",
         "text": "Then at the instructor."
       },
       {
+        "kind": "narration",
+        "text": "Then back at the empty street."
+      },
+      {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "You let them leave?"
+        "text": "You started without me?"
       },
       {
         "kind": "narration",
-        "text": "The instructor finishes tying the route marker around his wrist."
+        "text": "The instructor checks the route marker around his wrist."
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY INSTRUCTOR",
-        "text": "That is generally how a pursuit works."
+        "text": "I gave the target a head start."
       },
       {
         "kind": "narration",
-        "text": "Wasabi looks back toward the street."
+        "text": "Wasabi points after them."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "How long?"
+        "text": "How much?"
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY INSTRUCTOR",
-        "text": "Long enough."
+        "text": "Enough."
+      },
+      {
+        "kind": "narration",
+        "text": "Her hands go out."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "That's not a time."
+        "text": "That is not a time."
       },
       {
         "kind": "narration",
-        "text": "A couple of the other Academy students laugh."
+        "text": "A student behind her laughs."
       },
       {
         "kind": "narration",
-        "text": "Wasabi ignores them."
+        "text": "Wasabi looks over her shoulder."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "You can laugh when you're ahead of me."
       },
       {
         "kind": "narration",
-        "text": "Mostly."
+        "text": "The laugh stops."
       },
       {
         "kind": "narration",
@@ -80,29 +93,37 @@ const SECTIONS=Object.freeze({
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY INSTRUCTOR",
-        "text": "The target reaches extraction, you're done."
+        "text": "Your target is heading for extraction. Catch them before they reach it."
       },
       {
         "kind": "narration",
-        "text": "Wasabi rolls one shoulder."
+        "text": "Wasabi rocks forward onto the balls of her feet."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "And when I catch them?"
+        "text": "That's better."
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY INSTRUCTOR",
-        "text": "Then they're done."
+        "text": "I haven't said go yet."
       },
       {
         "kind": "narration",
-        "text": "That answer she likes."
+        "text": "Wasabi freezes."
       },
       {
         "kind": "narration",
-        "text": "The instructor drops his hand."
+        "text": "Barely."
+      },
+      {
+        "kind": "narration",
+        "text": "The instructor watches her for one more second."
+      },
+      {
+        "kind": "narration",
+        "text": "Drops his hand."
       },
       {
         "kind": "dialogue",
@@ -111,40 +132,37 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Wasabi is already moving."
+        "text": "Wasabi is gone."
       },
       {
         "kind": "narration",
-        "text": "Someone behind her shouts—"
+        "text": "Behind her—"
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY STUDENT",
-        "text": "He didn't mean before he finished—"
+        "text": "You were waiting for that?"
       },
       {
-        "kind": "narration",
-        "text": "Too late."
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Obviously!"
       }
     ]
   },
   "scene2": {
     "sourceRange": [
-      111,
-      160
+      128,
+      172
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "Wasabi hits the first roof at speed."
+        "text": "Wasabi takes the first wall instead of the street."
       },
       {
         "kind": "narration",
-        "text": "Tile."
-      },
-      {
-        "kind": "narration",
-        "text": "Wall."
+        "text": "Roof."
       },
       {
         "kind": "narration",
@@ -152,55 +170,56 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Street."
+        "text": "Fence."
       },
       {
         "kind": "narration",
-        "text": "She barely loses momentum."
+        "text": "Back to the roof."
       },
       {
         "kind": "narration",
-        "text": "Ahead, a figure disappears around the far corner."
-      },
-      {
-        "kind": "narration",
-        "text": "There."
+        "text": "Ahead, the pursuit target disappears around a corner."
       },
       {
         "kind": "narration",
         "text": "Wasabi grins."
       },
       {
-        "kind": "narration",
-        "text": "Then reaches the corner and finds three different ways the target could have gone."
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Found you."
       },
       {
         "kind": "narration",
-        "text": "One trail is obvious."
+        "text": "She hits the corner."
       },
       {
         "kind": "narration",
-        "text": "Fresh marks through dust lead hard to the right."
+        "text": "Stops."
       },
       {
         "kind": "narration",
-        "text": "A knocked basket rocks beside them."
+        "text": "The street offers too many answers."
       },
       {
         "kind": "narration",
-        "text": "Easy."
+        "text": "Fresh tracks cut right."
       },
       {
         "kind": "narration",
-        "text": "Almost too easy."
+        "text": "A basket is still rocking."
       },
       {
         "kind": "narration",
-        "text": "Another student lands behind Wasabi."
+        "text": "Mud marks the drainage edge."
       },
       {
         "kind": "narration",
-        "text": "Then another."
+        "text": "One roof tile sits crooked."
+      },
+      {
+        "kind": "narration",
+        "text": "Two Academy students land behind her."
       },
       {
         "kind": "dialogue",
@@ -209,52 +228,44 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Wasabi crouches for half a second."
+        "text": "Wasabi crouches."
       },
       {
         "kind": "narration",
-        "text": "Dust."
+        "text": "Looks at the tracks."
       },
       {
         "kind": "narration",
-        "text": "Roof edge."
+        "text": "Looks at the roof."
       },
       {
         "kind": "narration",
-        "text": "Drain channel."
+        "text": "Looks toward extraction."
       },
       {
         "kind": "narration",
-        "text": "The street is giving her several answers."
-      },
-      {
-        "kind": "narration",
-        "text": "The target is getting farther away while she looks at them."
+        "text": "Every second she spends thinking is another second the target gets."
       }
     ]
   },
   "initial_obvious": {
     "sourceRange": [
-      173,
-      220
+      186,
+      234
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "Wasabi doesn't waste another second."
+        "text": "Wasabi points right."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Right."
+        "text": "That way."
       },
       {
         "kind": "narration",
-        "text": "She launches down the street."
-      },
-      {
-        "kind": "narration",
-        "text": "One of the other students calls after her."
+        "text": "She takes off."
       },
       {
         "kind": "dialogue",
@@ -262,13 +273,22 @@ const SECTIONS=Object.freeze({
         "text": "You sure?"
       },
       {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "No!"
+      },
+      {
         "kind": "narration",
-        "text": "Wasabi doesn't turn."
+        "text": "The student nearly misses a step."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi vaults a crate."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Catch up and ask me!"
+        "text": "But I'm not standing here until I am!"
       },
       {
         "kind": "narration",
@@ -280,7 +300,7 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Displaced crates."
+        "text": "Moved boxes."
       },
       {
         "kind": "narration",
@@ -288,31 +308,15 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Wasabi takes the wall instead of going around it."
+        "text": "Then it splits."
       },
       {
         "kind": "narration",
-        "text": "Fast."
+        "text": "The freshest marks stop beside an empty alley."
       },
       {
         "kind": "narration",
-        "text": "Clear."
-      },
-      {
-        "kind": "narration",
-        "text": "Exactly what she wanted."
-      },
-      {
-        "kind": "narration",
-        "text": "Until the tracks split again."
-      },
-      {
-        "kind": "narration",
-        "text": "And the freshest set suddenly ends beside an empty alley."
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi stops."
+        "text": "Wasabi skids to a halt."
       },
       {
         "kind": "narration",
@@ -324,92 +328,93 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Back at the wall."
+        "text": "The student catches up."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY STUDENT",
+        "text": "Still confident?"
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi points at them."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "…Oh, you've got to be kidding me."
+        "text": "You are enjoying this too much."
+      },
+      {
+        "kind": "narration",
+        "text": "She crouches again."
+      },
+      {
+        "kind": "narration",
+        "text": "This time she takes longer than half a second."
       }
     ]
   },
   "initial_better": {
     "sourceRange": [
-      221,
-      268
+      236,
+      280
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "Wasabi starts right—"
+        "text": "Wasabi starts right."
       },
       {
         "kind": "narration",
-        "text": "stops herself."
+        "text": "Stops."
       },
       {
         "kind": "narration",
-        "text": "The obvious tracks are deep."
-      },
-      {
-        "kind": "narration",
-        "text": "Too deep."
-      },
-      {
-        "kind": "narration",
-        "text": "Someone running for extraction doesn't normally stamp the ground like they're signing their name."
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi turns back."
-      },
-      {
-        "kind": "narration",
-        "text": "One of the others nearly runs into her."
+        "text": "The student behind her almost runs into her."
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY STUDENT",
-        "text": "What are you doing?"
+        "text": "What now?"
       },
       {
         "kind": "narration",
-        "text": "Wasabi points toward the tracks."
+        "text": "Wasabi points at the tracks."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Those are rubbish."
+        "text": "They're too obvious."
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY STUDENT",
-        "text": "They look pretty real."
+        "text": "They're footprints."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Yeah. That's the problem."
+        "text": "Exactly. They're practically waving."
       },
       {
         "kind": "narration",
-        "text": "She drops from the street to the drainage edge."
+        "text": "She drops to the drainage edge."
       },
       {
         "kind": "narration",
-        "text": "A smear of mud marks the stone."
+        "text": "Mud is smeared across the stone."
       },
       {
         "kind": "narration",
-        "text": "Higher up, one roof tile has shifted sideways."
+        "text": "Higher up, a roof tile has shifted sideways."
       },
       {
         "kind": "narration",
-        "text": "Wasabi looks toward it."
+        "text": "Wasabi's eyes move between them."
       },
       {
         "kind": "narration",
-        "text": "Then farther ahead."
+        "text": "Then forward."
       },
       {
         "kind": "dialogue",
@@ -417,28 +422,43 @@ const SECTIONS=Object.freeze({
         "text": "There."
       },
       {
-        "kind": "narration",
-        "text": "She takes off."
+        "kind": "dialogue",
+        "speakerName": "ACADEMY STUDENT",
+        "text": "What did you see?"
       },
       {
         "kind": "narration",
-        "text": "The other student looks from her to the obvious trail."
+        "text": "Wasabi is already climbing."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "A better answer!"
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY STUDENT",
-        "text": "Wasabi!"
+        "text": "That explains nothing!"
       },
       {
         "kind": "narration",
-        "text": "Already gone."
+        "text": "Wasabi's hand appears above the roof edge."
+      },
+      {
+        "kind": "narration",
+        "text": "Points ahead."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Then keep up!"
       }
     ]
   },
   "initial_cooperate": {
     "sourceRange": [
-      269,
-      320
+      282,
+      350
     ],
     "cues": [
       {
@@ -447,54 +467,80 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Both look surprised."
+        "text": "Points to one."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "You. Roofs."
+        "text": "Roofs."
       },
       {
         "kind": "narration",
-        "text": "She points to the second."
+        "text": "Points to the other."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Check the street."
+        "text": "Street."
+      },
+      {
+        "kind": "narration",
+        "text": "The first student stares at her."
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY STUDENT",
-        "text": "And you?"
+        "text": "Since when are you in charge?"
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi starts up the wall."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "I'm doing both."
+        "text": "Since you both asked me!"
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY STUDENT 2",
+        "text": "What are you checking?"
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Everything you miss."
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY STUDENT",
-        "text": "That's not how—"
+        "text": "That's not a route."
       },
       {
         "kind": "narration",
-        "text": "Wasabi is already halfway up the wall."
+        "text": "Wasabi reaches the roof."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Then hurry!"
+        "text": "Then stop arguing and find one!"
       },
       {
         "kind": "narration",
-        "text": "For the next block, information starts coming from three directions."
+        "text": "They split."
+      },
+      {
+        "kind": "narration",
+        "text": "A block later—"
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY STUDENT",
         "text": "Nothing north!"
+      },
+      {
+        "kind": "narration",
+        "text": "From below—"
       },
       {
         "kind": "dialogue",
@@ -503,17 +549,39 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Wasabi stops on the roof ridge."
+        "text": "Wasabi stops on the ridge."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "How fresh?"
+        "text": "Fresh?"
+      },
+      {
+        "kind": "narration",
+        "text": "A pause."
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY STUDENT 2",
-        "text": "How am I supposed to know?"
+        "text": "How would I know?"
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi throws both hands out."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Touch them!"
+      },
+      {
+        "kind": "narration",
+        "text": "Another pause."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY STUDENT 2",
+        "text": "...Oh."
       },
       {
         "kind": "narration",
@@ -521,58 +589,50 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "dialogue",
-        "speakerName": "WASABI",
-        "text": "Why did I pick you?"
+        "speakerName": "ACADEMY STUDENT",
+        "text": "Great team."
       },
       {
         "kind": "dialogue",
-        "speakerName": "ACADEMY STUDENT 2",
-        "text": "You didn't pick me!"
+        "speakerName": "WASABI",
+        "text": "We're doing amazing."
       },
       {
         "kind": "narration",
-        "text": "Fair."
+        "text": "The student laughs."
       },
       {
         "kind": "narration",
-        "text": "Wasabi jumps down."
+        "text": "Wasabi does too."
       },
       {
         "kind": "narration",
-        "text": "All three move."
-      },
-      {
-        "kind": "narration",
-        "text": "Not as fast as Wasabi alone."
-      },
-      {
-        "kind": "narration",
-        "text": "But now she knows more than one street."
+        "text": "Then all three move."
       }
     ]
   },
   "initial_predict": {
     "sourceRange": [
-      321,
-      356
+      352,
+      388
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "Wasabi looks once at the footprints."
+        "text": "Wasabi looks at the tracks."
       },
       {
         "kind": "narration",
-        "text": "Then away."
+        "text": "Then past them."
       },
       {
         "kind": "narration",
-        "text": "One of the other students notices."
+        "text": "Toward the far side of the village."
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY STUDENT",
-        "text": "You're not following that?"
+        "text": "You're not following those?"
       },
       {
         "kind": "dialogue",
@@ -586,66 +646,84 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Wasabi looks toward the village beyond the roofs."
-      },
-      {
-        "kind": "narration",
-        "text": "The target isn't trying to vanish forever."
-      },
-      {
-        "kind": "narration",
-        "text": "They're trying to reach extraction."
-      },
-      {
-        "kind": "narration",
-        "text": "Which means every route eventually has to get them somewhere useful."
+        "text": "Wasabi points toward extraction."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Because I'm tired of running behind them."
+        "text": "Because they can lie about where they've been."
       },
       {
         "kind": "narration",
-        "text": "She changes direction."
+        "text": "She hops onto the wall."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "They can't lie about where they're going."
+      },
+      {
+        "kind": "narration",
+        "text": "The student looks at the trail."
+      },
+      {
+        "kind": "narration",
+        "text": "Then at Wasabi."
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY STUDENT",
-        "text": "That's the wrong way!"
+        "text": "That's the wrong direction."
       },
       {
         "kind": "narration",
-        "text": "Wasabi jumps onto the wall."
+        "text": "Wasabi grins."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "We'll find out!"
+        "text": "Only if I'm wrong."
       },
       {
         "kind": "narration",
-        "text": "And disappears over it."
+        "text": "She jumps."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY STUDENT",
+        "text": "That was not reassuring!"
       }
     ]
   },
   "scene3": {
     "sourceRange": [
-      357,
-      382
+      390,
+      412
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "The pursuit changes shape farther into the village."
+        "text": "The pursuit stretches farther into the village."
       },
       {
         "kind": "narration",
-        "text": "The clean streets give way to longer routes between walls, rooftops and the river."
+        "text": "The rooftops thin near the river."
       },
       {
         "kind": "narration",
-        "text": "Wasabi catches sight of movement ahead."
+        "text": "A stronger trail cuts inland."
+      },
+      {
+        "kind": "narration",
+        "text": "A shout breaks from another street."
+      },
+      {
+        "kind": "narration",
+        "text": "Extraction lies beyond all of it."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi catches a flash of movement ahead."
       },
       {
         "kind": "narration",
@@ -653,31 +731,15 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Maybe not."
+        "text": "Maybe bait."
       },
       {
         "kind": "narration",
-        "text": "Then the route opens."
+        "text": "Her foot taps once."
       },
       {
         "kind": "narration",
-        "text": "River to one side."
-      },
-      {
-        "kind": "narration",
-        "text": "A stronger trail farther inland."
-      },
-      {
-        "kind": "narration",
-        "text": "Shouting from another street."
-      },
-      {
-        "kind": "narration",
-        "text": "And beyond all of it, the line Wasabi has been building in her head toward extraction."
-      },
-      {
-        "kind": "narration",
-        "text": "She has time for one decision."
+        "text": "She has time for one call."
       },
       {
         "kind": "narration",
@@ -687,66 +749,92 @@ const SECTIONS=Object.freeze({
   },
   "river": {
     "sourceRange": [
-      395,
-      470
+      426,
+      542
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "Wasabi drops down toward the river path."
+        "text": "Wasabi drops to the river path."
       },
       {
         "kind": "narration",
-        "text": "It costs her height immediately."
+        "text": "The route costs her height immediately."
       },
       {
         "kind": "narration",
-        "text": "She hates that."
-      },
-      {
-        "kind": "narration",
-        "text": "The route bends wider than the streets above, but once she's on it there are fewer places for the target to disappear."
-      },
-      {
-        "kind": "narration",
-        "text": "Open water on one side."
-      },
-      {
-        "kind": "narration",
-        "text": "Wall on the other."
-      },
-      {
-        "kind": "narration",
-        "text": "Nothing fancy."
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi runs."
-      },
-      {
-        "kind": "narration",
-        "text": "And runs."
-      },
-      {
-        "kind": "narration",
-        "text": "And keeps running."
-      },
-      {
-        "kind": "narration",
-        "text": "The extraction marker eventually appears ahead."
-      },
-      {
-        "kind": "narration",
-        "text": "So does the target."
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi's grin returns."
+        "text": "She looks up at the rooftops she just gave away."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Got you."
+        "text": "You'd better be worth it."
+      },
+      {
+        "kind": "narration",
+        "text": "The river path bends wider than the streets above."
+      },
+      {
+        "kind": "narration",
+        "text": "Longer."
+      },
+      {
+        "kind": "narration",
+        "text": "Open."
+      },
+      {
+        "kind": "narration",
+        "text": "No alleys."
+      },
+      {
+        "kind": "narration",
+        "text": "No corners."
+      },
+      {
+        "kind": "narration",
+        "text": "No place for the target to vanish."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi leans forward."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Fine."
+      },
+      {
+        "kind": "narration",
+        "text": "Then she runs."
+      },
+      {
+        "kind": "narration",
+        "text": "The first stretch burns."
+      },
+      {
+        "kind": "narration",
+        "text": "The second hurts."
+      },
+      {
+        "kind": "narration",
+        "text": "By the third, all she can hear is water, sandals and breathing."
+      },
+      {
+        "kind": "narration",
+        "text": "She keeps going."
+      },
+      {
+        "kind": "narration",
+        "text": "The target appears ahead where the path curves back toward extraction."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi's whole face changes."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "HEY!"
       },
       {
         "kind": "narration",
@@ -754,20 +842,34 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Sees her."
+        "text": "Their eyes widen."
       },
       {
-        "kind": "narration",
-        "text": "Runs harder."
+        "kind": "dialogue",
+        "speakerName": "TARGET",
+        "text": "You took the river?"
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Oh, no you don't."
+        "text": "And you're still in front of me!"
       },
       {
         "kind": "narration",
-        "text": "The final stretch becomes exactly the race Wasabi wanted from the beginning."
+        "text": "The target runs harder."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi laughs."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Not for long!"
+      },
+      {
+        "kind": "narration",
+        "text": "The last stretch becomes a race."
       },
       {
         "kind": "narration",
@@ -783,73 +885,127 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "The target reaches for the extraction marker."
+        "text": "The target reaches the straight first."
       },
       {
         "kind": "narration",
-        "text": "Wasabi launches forward."
+        "text": "Wasabi starts closing."
       },
       {
         "kind": "narration",
-        "text": "Her hand catches the back of their shirt before they reach the line."
+        "text": "One stride."
       },
       {
         "kind": "narration",
-        "text": "The target skids to a stop short of extraction."
+        "text": "Then another."
       },
       {
         "kind": "narration",
-        "text": "Wasabi plants her feet and holds on."
+        "text": "The target looks back."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi gains again."
       },
       {
         "kind": "dialogue",
-        "speakerName": "PROCTOR",
-        "text": "Caught."
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi lets go and looks at the line."
-      },
-      {
-        "kind": "narration",
-        "text": "Then at the target."
-      },
-      {
-        "kind": "narration",
-        "text": "Her grin comes straight back."
+        "speakerName": "TARGET",
+        "text": "Seriously?!"
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "That counts?"
+        "text": "KEEP RUNNING!"
       },
       {
         "kind": "narration",
-        "text": "The target is bent over, trying to breathe."
+        "text": "The target reaches for the extraction marker."
       },
       {
         "kind": "narration",
-        "text": "They manage a thumbs-up."
+        "text": "Wasabi launches."
       },
       {
         "kind": "narration",
-        "text": "Wasabi looks personally offended by the thumb."
+        "text": "Her hand catches the back of their shirt before their foot crosses the line."
+      },
+      {
+        "kind": "narration",
+        "text": "Both nearly go down."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi plants one foot, slides, and hangs on."
+      },
+      {
+        "kind": "narration",
+        "text": "The proctor drops an arm."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PROCTOR",
+        "text": "Target secured."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi bends over, still holding the shirt."
+      },
+      {
+        "kind": "narration",
+        "text": "Raises one finger."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Again."
+      },
+      {
+        "kind": "narration",
+        "text": "The proctor stares at her."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PROCTOR",
+        "text": "Target secured."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi releases the target."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Thank you."
+      },
+      {
+        "kind": "narration",
+        "text": "The target is still trying to breathe."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "TARGET",
+        "text": "You're horrible."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi grins."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "You made me take the long way."
       }
     ]
   },
   "stronger": {
     "sourceRange": [
-      471,
-      534
+      544,
+      610
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "The new trail is better than the first one."
-      },
-      {
-        "kind": "narration",
-        "text": "Much better."
+        "text": "The inland trail looks perfect."
       },
       {
         "kind": "narration",
@@ -865,19 +1021,24 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Even a scrap caught against a fence."
+        "text": "A scrap caught against a fence."
       },
       {
         "kind": "narration",
-        "text": "Wasabi follows it faster with every sign."
+        "text": "Wasabi gets faster with every sign."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "There you are."
       },
       {
         "kind": "narration",
-        "text": "Then the trail turns into a narrow yard."
+        "text": "The trail turns into a narrow yard."
       },
       {
         "kind": "narration",
-        "text": "And stops."
+        "text": "And ends."
       },
       {
         "kind": "narration",
@@ -893,15 +1054,11 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Wasabi stands in the middle of it."
+        "text": "Wasabi stops."
       },
       {
         "kind": "narration",
-        "text": "Breathing hard."
-      },
-      {
-        "kind": "narration",
-        "text": "The scrap on the fence moves in the breeze."
+        "text": "The scrap moves in the breeze."
       },
       {
         "kind": "narration",
@@ -909,24 +1066,15 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Looks at it."
+        "text": "Turns it over."
       },
       {
         "kind": "narration",
-        "text": "Then looks back the way she came."
-      },
-      {
-        "kind": "dialogue",
-        "speakerName": "WASABI",
-        "text": "Seriously?"
+        "text": "A faint scrape sits on the wall behind her."
       },
       {
         "kind": "narration",
-        "text": "A faint scrape marks the wall behind her."
-      },
-      {
-        "kind": "narration",
-        "text": "Not toward the yard."
+        "text": "Not into the yard."
       },
       {
         "kind": "narration",
@@ -934,25 +1082,52 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Wasabi closes her eyes for one second."
-      },
-      {
-        "kind": "narration",
-        "text": "Then points the scrap accusingly at nobody."
+        "text": "Wasabi's shoulders drop."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Fine."
+        "text": "Oh, come on."
       },
       {
         "kind": "narration",
-        "text": "She drops it."
+        "text": "She points the scrap at the empty wall."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Good one."
+        "text": "You planted this."
+      },
+      {
+        "kind": "narration",
+        "text": "Nobody answers."
+      },
+      {
+        "kind": "narration",
+        "text": "She looks at it again."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "...Fine."
+      },
+      {
+        "kind": "narration",
+        "text": "A beat."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "That was good."
+      },
+      {
+        "kind": "narration",
+        "text": "She stuffs it into her pocket."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Still annoying."
       },
       {
         "kind": "narration",
@@ -960,18 +1135,14 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Much angrier."
-      },
-      {
-        "kind": "narration",
-        "text": "And considerably more careful."
+        "text": "This time she checks everything."
       }
     ]
   },
   "rogue_intro": {
     "sourceRange": [
-      535,
-      572
+      612,
+      654
     ],
     "cues": [
       {
@@ -980,15 +1151,24 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Stops."
+        "text": "A shout cuts across the next street."
       },
       {
         "kind": "narration",
-        "text": "The shout comes again."
+        "text": "She stops."
       },
       {
         "kind": "narration",
-        "text": "Closer than she thought."
+        "text": "Looks toward the target route."
+      },
+      {
+        "kind": "narration",
+        "text": "Looks toward the shout."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Seriously?"
       },
       {
         "kind": "narration",
@@ -996,7 +1176,7 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Around the next corner, an Academy student is backed against a wall."
+        "text": "Around the corner, an Academy student is backed against a wall."
       },
       {
         "kind": "narration",
@@ -1012,7 +1192,7 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "The student sees Wasabi."
+        "text": "The student sees her."
       },
       {
         "kind": "dialogue",
@@ -1021,7 +1201,7 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "The Rogue Genin looks over."
+        "text": "The Rogue Genin glances over."
       },
       {
         "kind": "dialogue",
@@ -1030,45 +1210,50 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Wasabi's eyes flick toward the road beyond him."
+        "text": "Wasabi's eyes narrow."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Didn't ask you."
       },
       {
         "kind": "narration",
-        "text": "The target is still out there."
+        "text": "Somewhere beyond him, the target is still moving."
       },
       {
         "kind": "narration",
-        "text": "The extraction clock is still moving."
-      },
-      {
-        "kind": "narration",
-        "text": "The Rogue Genin smiles."
+        "text": "The Rogue Genin notices where she looked."
       },
       {
         "kind": "dialogue",
         "speakerName": "ROGUE GENIN",
-        "text": "That's what you're doing, isn't it?"
+        "text": "You've got somewhere to be."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi's jaw tightens."
       }
     ]
   },
   "rogue_step_in": {
     "sourceRange": [
-      583,
-      604
+      666,
+      686
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "Wasabi walks toward him."
-      },
-      {
-        "kind": "narration",
-        "text": "The Academy student blinks."
+        "text": "Wasabi walks straight toward him."
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY STUDENT",
         "text": "Wasabi—"
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi points past herself."
       },
       {
         "kind": "dialogue",
@@ -1082,44 +1267,41 @@ const SECTIONS=Object.freeze({
       {
         "kind": "dialogue",
         "speakerName": "ROGUE GENIN",
-        "text": "You've got somewhere to be."
+        "text": "And your target?"
       },
       {
         "kind": "narration",
-        "text": "Wasabi keeps coming."
+        "text": "Wasabi stops between him and the student."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "So do you."
+        "text": "Still running."
       },
       {
         "kind": "narration",
-        "text": "His smile disappears."
+        "text": "Her stance settles."
       },
       {
-        "kind": "narration",
-        "text": "Wasabi plants herself between him and the other student."
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "So let's not waste time."
       }
     ]
   },
   "rogue_call_help": {
     "sourceRange": [
-      613,
-      640
+      696,
+      728
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "Wasabi backs toward the corner without taking her eyes off him."
+        "text": "Wasabi keeps her eyes on the Rogue Genin."
       },
       {
         "kind": "narration",
-        "text": "Then she shouts."
-      },
-      {
-        "kind": "narration",
-        "text": "Not politely."
+        "text": "Then shouts loud enough for half the street."
       },
       {
         "kind": "dialogue",
@@ -1128,43 +1310,61 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "The Rogue Genin's head snaps toward the sound."
+        "text": "The Rogue Genin's head turns."
       },
       {
         "kind": "narration",
-        "text": "The Academy student uses the moment to slip away from the wall."
+        "text": "The Academy student moves."
       },
       {
         "kind": "narration",
-        "text": "Wasabi catches their sleeve."
+        "text": "Too slowly."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi catches their sleeve and pulls them past her."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Move."
+        "text": "Run first."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY STUDENT",
+        "text": "I am running!"
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Faster!"
       },
       {
         "kind": "narration",
-        "text": "They move."
+        "text": "They clear the corner together."
       },
       {
         "kind": "narration",
-        "text": "Fast."
+        "text": "Wasabi lets go."
       },
       {
         "kind": "narration",
-        "text": "Wasabi doesn't stay to watch who arrives."
+        "text": "The student keeps moving."
       },
       {
         "kind": "narration",
-        "text": "She's already turning back toward the pursuit."
+        "text": "Wasabi looks toward extraction."
+      },
+      {
+        "kind": "narration",
+        "text": "Then starts after the target again."
       }
     ]
   },
   "rogue_keep_pursuing": {
     "sourceRange": [
-      641,
-      660
+      730,
+      762
     ],
     "cues": [
       {
@@ -1173,71 +1373,93 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "The Academy student sees her."
+        "text": "The student sees her."
       },
       {
         "kind": "narration",
-        "text": "For one second, so does the Rogue Genin."
+        "text": "The Rogue Genin sees her."
       },
       {
         "kind": "narration",
-        "text": "Then Wasabi looks toward extraction."
+        "text": "Movement flashes across the street beyond them."
       },
       {
         "kind": "narration",
-        "text": "Her jaw tightens."
+        "text": "The target."
       },
       {
         "kind": "narration",
-        "text": "She runs."
+        "text": "Still moving."
       },
       {
         "kind": "narration",
-        "text": "Behind her, somebody shouts her name."
+        "text": "Wasabi's hands curl into fists."
       },
       {
         "kind": "narration",
-        "text": "Wasabi doesn't look back."
+        "text": "The Rogue Genin smirks."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ROGUE GENIN",
+        "text": "Thought so."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi looks at him."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Shut up."
+      },
+      {
+        "kind": "narration",
+        "text": "She turns and runs."
+      },
+      {
+        "kind": "narration",
+        "text": "No speech."
+      },
+      {
+        "kind": "narration",
+        "text": "No excuse."
+      },
+      {
+        "kind": "narration",
+        "text": "Just the target ahead and the seconds already gone."
       }
     ]
   },
   "intercept": {
     "sourceRange": [
-      661,
-      728
+      764,
+      820
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "Wasabi abandons the pursuit line completely."
+        "text": "Wasabi stops chasing the trail."
       },
       {
         "kind": "narration",
-        "text": "The target can keep their head start."
+        "text": "Cuts across two streets."
       },
       {
         "kind": "narration",
-        "text": "Fine."
+        "text": "Behind the shops."
       },
       {
         "kind": "narration",
-        "text": "Let them."
+        "text": "Over a wall."
       },
       {
         "kind": "narration",
-        "text": "She crosses two streets."
+        "text": "Down a narrow lane."
       },
       {
         "kind": "narration",
-        "text": "Cuts behind a row of shops."
-      },
-      {
-        "kind": "narration",
-        "text": "Takes a wall instead of the stairs."
-      },
-      {
-        "kind": "narration",
-        "text": "Then stops."
+        "text": "Then she stops."
       },
       {
         "kind": "narration",
@@ -1245,23 +1467,11 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Wasabi looks down the empty lane ahead."
-      },
-      {
-        "kind": "narration",
         "text": "Nothing."
       },
       {
         "kind": "narration",
-        "text": "She looks back."
-      },
-      {
-        "kind": "narration",
-        "text": "Still nothing."
-      },
-      {
-        "kind": "narration",
-        "text": "Her foot starts tapping."
+        "text": "Her foot taps."
       },
       {
         "kind": "narration",
@@ -1278,15 +1488,11 @@ const SECTIONS=Object.freeze({
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Come on…"
+        "text": "Come on."
       },
       {
         "kind": "narration",
-        "text": "Nothing."
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi's expression darkens."
+        "text": "Still nothing."
       },
       {
         "kind": "dialogue",
@@ -1299,184 +1505,176 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "She freezes."
+        "text": "Wasabi freezes."
       },
       {
         "kind": "narration",
-        "text": "A figure appears at the far end of the lane."
+        "text": "The target appears at the far end of the lane."
       },
       {
         "kind": "narration",
-        "text": "The target."
+        "text": "They stop too."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "TARGET",
+        "text": "How did you—"
       },
       {
         "kind": "narration",
-        "text": "Their expression changes the instant they see her."
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi's doesn't."
-      },
-      {
-        "kind": "narration",
-        "text": "Except for the grin."
+        "text": "Wasabi's grin arrives immediately."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Hi."
+        "text": "You were always going to extraction."
       },
       {
         "kind": "narration",
-        "text": "The target turns."
+        "text": "The target turns around."
       },
       {
         "kind": "narration",
-        "text": "Wasabi moves."
+        "text": "Wasabi throws her hands out."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Oh, no. You don't get to leave now!"
       },
       {
         "kind": "narration",
-        "text": "This time they are the one running from behind."
+        "text": "She runs."
+      },
+      {
+        "kind": "narration",
+        "text": "This time, the target is the one trying to escape her."
       }
     ]
   },
-  "finish_direct": {
+  "finish_river": {
     "sourceRange": [
-      731,
-      774
+      824,
+      866
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "The target changes direction twice."
+        "text": "At the training ground, the target is still catching their breath."
       },
       {
         "kind": "narration",
-        "text": "Wasabi stays with them."
+        "text": "Wasabi is not doing much better."
       },
       {
         "kind": "narration",
-        "text": "Third turn."
-      },
-      {
-        "kind": "narration",
-        "text": "Roof."
-      },
-      {
-        "kind": "narration",
-        "text": "Drop."
-      },
-      {
-        "kind": "narration",
-        "text": "Street."
-      },
-      {
-        "kind": "narration",
-        "text": "The target lands badly."
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi doesn't."
-      },
-      {
-        "kind": "narration",
-        "text": "Her hand catches the back of their shirt."
-      },
-      {
-        "kind": "narration",
-        "text": "Both nearly go down."
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi plants one foot and holds on."
+        "text": "The proctor marks the result."
       },
       {
         "kind": "dialogue",
         "speakerName": "TARGET",
-        "text": "Hey!"
+        "text": "You took the long route."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi looks over."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Caught you."
+        "text": "And?"
       },
       {
         "kind": "dialogue",
         "speakerName": "TARGET",
-        "text": "You're choking me!"
+        "text": "You still caught me."
       },
       {
         "kind": "narration",
-        "text": "Wasabi releases the shirt."
+        "text": "Wasabi straightens."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Still caught you."
+        "text": "Exactly."
       },
       {
         "kind": "narration",
-        "text": "The proctor arriving behind them looks at both."
+        "text": "She leans toward the proctor's sheet."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "What's the time?"
+      },
+      {
+        "kind": "narration",
+        "text": "The proctor covers it with one hand."
       },
       {
         "kind": "dialogue",
         "speakerName": "PROCTOR",
-        "text": "Technically."
+        "text": "Later."
       },
       {
         "kind": "narration",
-        "text": "Wasabi points at him."
+        "text": "Wasabi looks offended."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Don't ruin this."
+        "text": "I just ran half the village."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PROCTOR",
+        "text": "I noticed."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Then I deserve the number."
+      },
+      {
+        "kind": "narration",
+        "text": "The target starts laughing."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi points at them."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "You lost speaking privileges."
       }
     ]
   },
   "finish_intercept": {
     "sourceRange": [
-      775,
-      804
+      868,
+      904
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "The target gets one clean step before Wasabi closes the distance."
+        "text": "The target tries left."
       },
       {
         "kind": "narration",
-        "text": "She cuts them off."
+        "text": "Wasabi is there."
       },
       {
         "kind": "narration",
-        "text": "They try the other side."
+        "text": "Right."
       },
       {
         "kind": "narration",
-        "text": "Wasabi is already there."
-      },
-      {
-        "kind": "dialogue",
-        "speakerName": "TARGET",
-        "text": "Move."
-      },
-      {
-        "kind": "dialogue",
-        "speakerName": "WASABI",
-        "text": "No."
+        "text": "Wasabi moves with them."
       },
       {
         "kind": "narration",
-        "text": "They look toward extraction."
-      },
-      {
-        "kind": "narration",
-        "text": "Then at Wasabi."
-      },
-      {
-        "kind": "narration",
-        "text": "Then toward the roofs."
+        "text": "The target looks toward the rooftops."
       },
       {
         "kind": "narration",
@@ -1488,79 +1686,73 @@ const SECTIONS=Object.freeze({
         "text": "Try it."
       },
       {
-        "kind": "narration",
-        "text": "They don't."
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi's grin widens."
-      }
-    ]
-  },
-  "finish_river": {
-    "sourceRange": [
-      805,
-      846
-    ],
-    "cues": [
-      {
-        "kind": "narration",
-        "text": "The instructor checks the extraction line, then the target."
-      },
-      {
         "kind": "dialogue",
-        "speakerName": "ACADEMY INSTRUCTOR",
-        "text": "You took the long way."
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi is still catching her breath."
+        "speakerName": "TARGET",
+        "text": "You're enjoying this."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Still caught them."
-      },
-      {
-        "kind": "dialogue",
-        "speakerName": "ACADEMY INSTRUCTOR",
-        "text": "You did."
+        "text": "Very much."
       },
       {
         "kind": "narration",
-        "text": "Wasabi's grin widens."
+        "text": "The target exhales."
+      },
+      {
+        "kind": "narration",
+        "text": "The proctor raises a hand."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "PROCTOR",
+        "text": "Target secured."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi steps aside at last."
+      },
+      {
+        "kind": "narration",
+        "text": "The target walks past her."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "TARGET",
+        "text": "You didn't even follow me."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Didn't need to."
+      },
+      {
+        "kind": "narration",
+        "text": "That answer she likes almost as much as the result."
       }
     ]
   },
   "finish_false": {
     "sourceRange": [
-      847,
-      888
+      906,
+      950
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "Wasabi arrives late."
+        "text": "The target is already at the training ground when Wasabi arrives."
       },
       {
         "kind": "narration",
-        "text": "Not disastrously late."
+        "text": "Wasabi walks the last few steps."
       },
       {
         "kind": "narration",
-        "text": "Late enough."
+        "text": "Does not run them."
       },
       {
         "kind": "narration",
-        "text": "The target is already waiting."
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi walks the final few steps instead of running them."
-      },
-      {
-        "kind": "narration",
-        "text": "The instructor looks at the dirt on her clothes."
+        "text": "The instructor notices the scrap sticking out of her pocket."
       },
       {
         "kind": "dialogue",
@@ -1569,35 +1761,35 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Wasabi hands him the scrap from the false trail."
+        "text": "Wasabi pulls it free."
+      },
+      {
+        "kind": "narration",
+        "text": "Points at the target."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "They cheated."
+        "text": "That happened."
       },
       {
         "kind": "narration",
-        "text": "The target looks offended."
+        "text": "The target looks at the scrap."
       },
       {
         "kind": "dialogue",
         "speakerName": "TARGET",
-        "text": "It was a pursuit exercise."
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi turns."
+        "text": "You found it."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "You planted a trail."
+        "text": "After I followed it into a dead yard."
       },
       {
         "kind": "dialogue",
         "speakerName": "TARGET",
-        "text": "You followed it."
+        "text": "So it worked."
       },
       {
         "kind": "narration",
@@ -1609,48 +1801,78 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "The target smiles."
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi points at them."
+        "text": "Looks at the scrap."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "I don't like you."
+        "text": "Fine."
+      },
+      {
+        "kind": "narration",
+        "text": "The target waits."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi hates that."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "It was good."
+      },
+      {
+        "kind": "narration",
+        "text": "The target smiles."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Don't make me say it twice."
       }
     ]
   },
   "finish_secondary": {
     "sourceRange": [
-      889,
-      908
+      952,
+      984
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "By the time Wasabi reaches extraction, the target is already there."
+        "text": "By the time Wasabi reaches the training ground, the target is already there."
       },
       {
         "kind": "narration",
-        "text": "Depending on what happened with the Rogue Genin, Wasabi may arrive dirty, bruised, furious, relieved—"
+        "text": "The exact way Wasabi arrives depends on the alley."
       },
       {
         "kind": "narration",
-        "text": "or simply late."
+        "text": "If she stepped in, the Battle is behind her."
       },
       {
         "kind": "narration",
-        "text": "The target looks toward the clock."
+        "text": "If she called for help, the other Academy student made it clear."
       },
       {
         "kind": "narration",
-        "text": "Then at her."
+        "text": "If she kept pursuing, she ran the rest of the route without stopping."
       },
       {
         "kind": "narration",
-        "text": "Wasabi sees the look."
+        "text": "The result is still the same."
+      },
+      {
+        "kind": "narration",
+        "text": "The target beat her to extraction."
+      },
+      {
+        "kind": "narration",
+        "text": "The target looks at the board."
+      },
+      {
+        "kind": "narration",
+        "text": "Then at Wasabi."
       },
       {
         "kind": "dialogue",
@@ -1658,82 +1880,118 @@ const SECTIONS=Object.freeze({
         "text": "Don't."
       },
       {
+        "kind": "dialogue",
+        "speakerName": "TARGET",
+        "text": "Didn't say anything."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Your face did."
+      },
+      {
         "kind": "narration",
-        "text": "The target wisely doesn't."
+        "text": "The target changes expression."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi narrows her eyes."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "That's worse."
       }
     ]
   },
   "eval_base": {
     "sourceRange": [
-      909,
-      926
+      986,
+      1008
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "The instructor doesn't gather everyone into a lecture."
+        "text": "Students return to the training ground in ones and twos."
       },
       {
         "kind": "narration",
-        "text": "He has been marking routes as students return."
+        "text": "The instructor marks times."
       },
       {
         "kind": "narration",
-        "text": "Who arrived."
+        "text": "Routes."
       },
       {
         "kind": "narration",
-        "text": "Who didn't."
+        "text": "What was noticed."
       },
       {
         "kind": "narration",
-        "text": "Who brought information back."
+        "text": "What was missed."
       },
       {
         "kind": "narration",
-        "text": "Who came back with somebody else."
+        "text": "Wasabi lasts three seconds before stepping closer."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Well?"
       },
       {
         "kind": "narration",
-        "text": "Wasabi waits until he reaches her."
+        "text": "The instructor looks up."
       },
       {
-        "kind": "narration",
-        "text": "Not patiently."
+        "kind": "dialogue",
+        "speakerName": "ACADEMY INSTRUCTOR",
+        "text": "I was getting there."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "You were taking your time."
       }
     ]
   },
   "eval_quick": {
     "sourceRange": [
-      927,
-      958
+      1010,
+      1050
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "The instructor looks at the recorded time."
+        "text": "The instructor taps the recorded time."
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY INSTRUCTOR",
-        "text": "Fast."
+        "text": "You took the longest clean route."
       },
       {
         "kind": "narration",
-        "text": "Wasabi's face says obviously."
+        "text": "Wasabi folds her arms."
       },
       {
-        "kind": "narration",
-        "text": "He sees that."
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "And caught them."
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY INSTRUCTOR",
-        "text": "You want the number?"
+        "text": "And caught them."
       },
       {
         "kind": "narration",
-        "text": "Now she's interested."
+        "text": "Wasabi's eyes drop to the time."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "How fast?"
       },
       {
         "kind": "narration",
@@ -1741,7 +1999,7 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Wasabi grins."
+        "text": "Immediately—"
       },
       {
         "kind": "dialogue",
@@ -1750,99 +2008,56 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "The instructor looks farther down the page."
+        "text": "The instructor closes the book."
       },
       {
         "kind": "narration",
-        "text": "Wasabi leans toward it."
-      },
-      {
-        "kind": "narration",
-        "text": "He closes the book."
+        "text": "Wasabi stares at him."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Hey!"
+        "text": "Why would you give me the number and then hide the important part?"
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY INSTRUCTOR",
-        "text": "You completed your exercise."
+        "text": "Because your exercise is finished."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi looks toward the target."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "That wasn't my question."
-      }
-    ]
-  },
-  "eval_false": {
-    "sourceRange": [
-      959,
-      982
-    ],
-    "cues": [
-      {
-        "kind": "narration",
-        "text": "The instructor turns the scrap over in his hand."
+        "text": "Rematch."
       },
       {
         "kind": "dialogue",
-        "speakerName": "ACADEMY INSTRUCTOR",
-        "text": "How long did you follow it?"
-      },
-      {
-        "kind": "narration",
-        "text": "Wasabi answers."
-      },
-      {
-        "kind": "narration",
-        "text": "Quietly."
-      },
-      {
-        "kind": "narration",
-        "text": "He looks up."
+        "speakerName": "TARGET",
+        "text": "No."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "I figured it out."
-      },
-      {
-        "kind": "dialogue",
-        "speakerName": "ACADEMY INSTRUCTOR",
-        "text": "You did."
+        "text": "Coward."
       },
       {
         "kind": "narration",
-        "text": "Wasabi waits for the rest."
-      },
-      {
-        "kind": "narration",
-        "text": "It doesn't come."
-      },
-      {
-        "kind": "dialogue",
-        "speakerName": "WASABI",
-        "text": "You're annoying."
-      },
-      {
-        "kind": "dialogue",
-        "speakerName": "ACADEMY INSTRUCTOR",
-        "text": "Also not part of the assessment."
+        "text": "The target laughs."
       }
     ]
   },
   "eval_intercept": {
     "sourceRange": [
-      983,
-      1010
+      1052,
+      1096
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "The instructor points toward the route map."
+        "text": "The instructor puts the route map between them."
       },
       {
         "kind": "dialogue",
@@ -1851,38 +2066,38 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "Wasabi traces the line she abandoned."
+        "text": "Wasabi traces the line she stopped following."
       },
       {
         "kind": "narration",
-        "text": "Then the cut she took instead."
+        "text": "Then the cut she took across the village."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "They had to come through here."
+        "text": "They were always coming through here."
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY INSTRUCTOR",
-        "text": "Had to?"
+        "text": "Always?"
       },
       {
         "kind": "narration",
-        "text": "Wasabi thinks."
+        "text": "Wasabi pauses."
       },
       {
         "kind": "narration",
-        "text": "Then moves her finger slightly."
+        "text": "Moves her finger slightly."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Fine. Probably."
+        "text": "Probably."
       },
       {
         "kind": "narration",
-        "text": "The instructor looks at her."
+        "text": "The instructor waits."
       },
       {
         "kind": "narration",
@@ -1895,24 +2110,135 @@ const SECTIONS=Object.freeze({
       },
       {
         "kind": "narration",
-        "text": "That earns the smallest hint of a smile."
+        "text": "The target passes behind them."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "TARGET",
+        "text": "Barely."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi spins."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "You got trapped in a lane!"
+      },
+      {
+        "kind": "narration",
+        "text": "The target keeps walking."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "TARGET",
+        "text": "Barely."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi looks back at the instructor."
+      },
+      {
+        "kind": "narration",
+        "text": "He is trying not to smile."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Don't."
+      }
+    ]
+  },
+  "eval_false": {
+    "sourceRange": [
+      1098,
+      1130
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "The instructor turns the scrap over in his hand."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY INSTRUCTOR",
+        "text": "When did you know?"
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi gives him the time."
+      },
+      {
+        "kind": "narration",
+        "text": "Quietly."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY INSTRUCTOR",
+        "text": "And then?"
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "I went back."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY INSTRUCTOR",
+        "text": "You recognised it."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi nods once."
+      },
+      {
+        "kind": "narration",
+        "text": "Then looks toward the target."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "After they made me look stupid."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "TARGET",
+        "text": "I never said that."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "You thought it loudly."
+      },
+      {
+        "kind": "narration",
+        "text": "The target laughs."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi snatches the scrap back from the instructor."
+      },
+      {
+        "kind": "narration",
+        "text": "She keeps it."
       }
     ]
   },
   "eval_cooperate": {
     "sourceRange": [
-      1011,
-      1038
+      1132,
+      1166
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "One of the other students arrives while the instructor is speaking to her."
+        "text": "One of the students arrives before the instructor finishes."
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY STUDENT",
-        "text": "She left us twice."
+        "text": "She abandoned us twice."
       },
       {
         "kind": "narration",
@@ -1921,17 +2247,27 @@ const SECTIONS=Object.freeze({
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "I came back."
+        "text": "I came back twice."
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY STUDENT",
-        "text": "Because you needed something."
+        "text": "Because you wanted our information."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Still came back."
+        "text": "Which you had because I told you where to look."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY STUDENT",
+        "text": "You yelled where to look."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Same result."
       },
       {
         "kind": "narration",
@@ -1940,11 +2276,11 @@ const SECTIONS=Object.freeze({
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY INSTRUCTOR",
-        "text": "Did the information help?"
+        "text": "Did it help?"
       },
       {
         "kind": "narration",
-        "text": "Both answer at once."
+        "text": "Both answer."
       },
       {
         "kind": "dialogue",
@@ -1963,108 +2299,416 @@ const SECTIONS=Object.freeze({
       {
         "kind": "narration",
         "text": "The student grins."
-      }
-    ]
-  },
-  "eval_rogue_base": {
-    "sourceRange": [
-      1039,
-      1044
-    ],
-    "cues": [
-      {
-        "kind": "narration",
-        "text": "The instructor looks at the extraction result."
       },
       {
         "kind": "narration",
-        "text": "Then at Wasabi."
-      }
-    ]
-  },
-  "eval_rogue_intervene": {
-    "sourceRange": [
-      1047,
-      1051
-    ],
-    "cues": [
-      {
-        "kind": "dialogue",
-        "speakerName": "ACADEMY INSTRUCTOR",
-        "text": "You knew the target was still moving."
-      },
-      {
-        "kind": "dialogue",
-        "speakerName": "WASABI",
-        "text": "Yeah."
+        "text": "Wasabi almost does too."
       }
     ]
   },
   "eval_rogue_call_help": {
-    "sourceRange": [1051,1055],
-    "cues": [
-      {"kind":"dialogue","speakerName":"ACADEMY INSTRUCTOR","text":"You handed it off."},
-      {"kind":"dialogue","speakerName":"WASABI","text":"Someone else was closer than the target was."}
-    ]
-  },
-  "eval_rogue_keep_pursuing": {
-    "sourceRange": [1057,1067],
-    "cues": [
-      {"kind":"narration","text":"The instructor doesn't mention the Rogue Genin first."},
-      {"kind":"narration","text":"Wasabi does."},
-      {"kind":"narration","text":"Or doesn't."},
-      {"kind":"narration","text":"Nothing is forced out of her."},
-      {"kind":"narration","text":"The result stays on the page either way."}
-    ]
-  },
-  "after_base": {
     "sourceRange": [
-      1071,
-      1094
+      1198,
+      1226
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "The other students begin dispersing."
+        "text": "The instructor looks toward the Academy student she pulled clear."
       },
       {
         "kind": "narration",
-        "text": "The target leaves with the proctor."
+        "text": "Then back to Wasabi."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY INSTRUCTOR",
+        "text": "You called me in."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "You were closer."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY INSTRUCTOR",
+        "text": "And the student?"
       },
       {
         "kind": "narration",
-        "text": "Wasabi is still looking at the time board."
+        "text": "Wasabi points without looking."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "There."
       },
       {
         "kind": "narration",
-        "text": "Another Academy student passes behind her."
+        "text": "The student raises a hand."
       },
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY STUDENT",
-        "text": "You lost."
+        "text": "Still alive."
       },
       {
         "kind": "narration",
-        "text": "Wasabi turns instantly."
+        "text": "Wasabi looks over."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "To who?"
+        "text": "You are being dramatic."
       },
       {
-        "kind": "narration",
-        "text": "The student laughs and keeps walking."
+        "kind": "dialogue",
+        "speakerName": "ACADEMY STUDENT",
+        "text": "You yelled at me to run."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "Hey!"
+        "text": "And it worked."
+      }
+    ]
+  },
+  "eval_rogue_keep_pursuing": {
+    "sourceRange": [
+      1228,
+      1252
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "The instructor looks at the target's extraction time."
       },
       {
         "kind": "narration",
-        "text": "No answer."
+        "text": "Then at Wasabi's."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY INSTRUCTOR",
+        "text": "You kept moving."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "After stopping."
+      },
+      {
+        "kind": "narration",
+        "text": "He does not correct her."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi looks at the difference between the times."
+      },
+      {
+        "kind": "narration",
+        "text": "Small."
+      },
+      {
+        "kind": "narration",
+        "text": "Still enough."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "I know."
+      },
+      {
+        "kind": "narration",
+        "text": "That is all she gives him."
+      },
+      {
+        "kind": "narration",
+        "text": "He leaves it there."
+      }
+    ]
+  },
+  "after_base": {
+    "sourceRange": [
+      1254,
+      1268
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "The exercise starts breaking apart around them."
+      },
+      {
+        "kind": "narration",
+        "text": "Students collect bags."
+      },
+      {
+        "kind": "narration",
+        "text": "The proctor unties route markers."
+      },
+      {
+        "kind": "narration",
+        "text": "The target hangs around long enough to see what Wasabi does with the result."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi goes straight to the board."
+      },
+      {
+        "kind": "narration",
+        "text": "Of course she does."
+      }
+    ]
+  },
+  "after_river": {
+    "sourceRange": [
+      1270,
+      1286
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "The target stops beside her."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "TARGET",
+        "text": "You know there were shorter routes."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi keeps looking at her time."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "You know there was a faster target."
+      },
+      {
+        "kind": "narration",
+        "text": "The target laughs."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi finally looks over."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "TARGET",
+        "text": "Rematch?"
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Now you're asking properly."
+      }
+    ]
+  },
+  "after_direct": {
+    "sourceRange": [
+      1300,
+      1318
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "An Academy student looks from the route map to Wasabi."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY STUDENT",
+        "text": "You barely chased them."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi looks offended."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "I chased them."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY STUDENT",
+        "text": "For about half the route."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "And where were they at the end?"
+      },
+      {
+        "kind": "narration",
+        "text": "The student glances toward the target."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi smiles."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Exactly."
+      }
+    ]
+  },
+  "after_false": {
+    "sourceRange": [
+      1332,
+      1358
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "The target taps the scrap sticking out of Wasabi's pocket."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi slaps their hand away."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "TARGET",
+        "text": "Keeping it?"
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Yes."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "TARGET",
+        "text": "Why?"
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi looks at the scrap."
+      },
+      {
+        "kind": "narration",
+        "text": "Then at them."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Because you're never getting me with the same trick twice."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "TARGET",
+        "text": "Wasn't planning to."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi's eyes narrow."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "That sounded like a threat."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "TARGET",
+        "text": "It was."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi grins despite herself."
+      }
+    ]
+  },
+  "after_secondary": {
+    "sourceRange": [
+      1372,
+      1392
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "The affected Academy student passes nearby."
+      },
+      {
+        "kind": "narration",
+        "text": "Looks at Wasabi."
+      },
+      {
+        "kind": "narration",
+        "text": "For a second, neither says anything."
+      },
+      {
+        "kind": "narration",
+        "text": "Then—"
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY STUDENT",
+        "text": "Thanks."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi scratches the side of her face."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Yeah. Well."
+      },
+      {
+        "kind": "narration",
+        "text": "She looks back at the result board."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "You owe me a faster route next time."
+      },
+      {
+        "kind": "narration",
+        "text": "The student smiles."
+      }
+    ]
+  },
+  "after_rogue_call_help": {
+    "sourceRange": [
+      1406,
+      1422
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "The affected student catches up while Wasabi is looking at the result board."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY STUDENT",
+        "text": "You nearly pulled my arm off."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi looks at them."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "You were moving too slowly."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY STUDENT",
+        "text": "I was being threatened."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Exactly. Bad time to walk."
+      },
+      {
+        "kind": "narration",
+        "text": "The student laughs."
       },
       {
         "kind": "narration",
@@ -2072,95 +2716,78 @@ const SECTIONS=Object.freeze({
       }
     ]
   },
-  "after_direct": {
+  "after_rogue_keep_pursuing": {
     "sourceRange": [
-      1095,
-      1096
+      1436,
+      1456
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "If she caught the target, she finds her time again."
-      }
-    ]
-  },
-  "after_river": {
-    "sourceRange": [
-      1097,
-      1098
-    ],
-    "cues": [
-      {
-        "kind": "narration",
-        "text": "If she missed them by seconds, she finds that time instead."
-      }
-    ]
-  },
-  "after_secondary": {
-    "sourceRange": [
-      1099,
-      1100
-    ],
-    "cues": [
-      {
-        "kind": "narration",
-        "text": "If the Rogue Genin cost her the pursuit, the number is worse."
-      }
-    ]
-  },
-  "after_false": {
-    "sourceRange": [
-      1101,
-      1102
-    ],
-    "cues": [
-      {
-        "kind": "narration",
-        "text": "If she followed the false trail, worse again."
-      }
-    ]
-  },
-  "after_end": {
-    "sourceRange": [
-      1103,
-      1106
-    ],
-    "cues": [
-      {
-        "kind": "narration",
-        "text": "Wasabi stares at it."
+        "text": "Wasabi stares at the two times on the board."
       },
       {
         "kind": "narration",
-        "text": "Then exhales."
+        "text": "The target's."
+      },
+      {
+        "kind": "narration",
+        "text": "Hers."
+      },
+      {
+        "kind": "narration",
+        "text": "An Academy student stops beside her."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY STUDENT",
+        "text": "Close."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Not close enough."
+      },
+      {
+        "kind": "narration",
+        "text": "The student waits."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi looks toward the route."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "I stopped before I decided."
+      },
+      {
+        "kind": "narration",
+        "text": "That annoys her more than the result."
       }
     ]
   },
   "origin_close": {
     "sourceRange": [
-      1119,
-      1152
+      1470,
+      1514
     ],
     "cues": [
       {
         "kind": "narration",
-        "text": "Wasabi leaves the practical ground at a jog."
+        "text": "Wasabi leaves the training ground at a jog."
       },
       {
         "kind": "narration",
-        "text": "Not because anybody told her to."
+        "text": "The pursuit target and one of the Academy students are ahead of her."
       },
       {
         "kind": "narration",
-        "text": "Walking suddenly feels too slow."
+        "text": "The student looks back."
       },
       {
         "kind": "narration",
-        "text": "At the end of the street, she spots one of the students from the exercise."
-      },
-      {
-        "kind": "narration",
-        "text": "They see her."
+        "text": "Immediately regrets it."
       },
       {
         "kind": "dialogue",
@@ -2172,13 +2799,9 @@ const SECTIONS=Object.freeze({
         "text": "Wasabi speeds up."
       },
       {
-        "kind": "narration",
-        "text": "The other student starts running."
-      },
-      {
         "kind": "dialogue",
         "speakerName": "ACADEMY STUDENT",
-        "text": "Wasabi!"
+        "text": "Wasabi."
       },
       {
         "kind": "dialogue",
@@ -2188,24 +2811,141 @@ const SECTIONS=Object.freeze({
       {
         "kind": "dialogue",
         "speakerName": "ACADEMY STUDENT",
-        "text": "The exercise is over!"
+        "text": "The exercise is over."
       },
       {
         "kind": "narration",
-        "text": "Wasabi catches them before the next corner."
+        "text": "Wasabi catches them."
+      },
+      {
+        "kind": "narration",
+        "text": "Runs backward for three steps so she can look at both of them."
       },
       {
         "kind": "dialogue",
         "speakerName": "WASABI",
-        "text": "I know."
+        "text": "Exactly."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "TARGET",
+        "text": "That doesn't answer anything."
       },
       {
         "kind": "narration",
-        "text": "She passes them anyway."
+        "text": "Wasabi turns forward again."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Race you to the corner."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY STUDENT",
+        "text": "I didn't agree to that!"
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "TARGET",
+        "text": "Too late."
       },
       {
         "kind": "narration",
-        "text": "And keeps going."
+        "text": "The target starts running."
+      },
+      {
+        "kind": "narration",
+        "text": "Wasabi's grin flashes."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Finally."
+      },
+      {
+        "kind": "narration",
+        "text": "She takes off after them."
+      }
+    ]
+  },
+  "eval_rogue_intervene": {
+    "sourceRange": [
+      1169,
+      1184
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "The instructor looks at the extraction mark."
+      },
+      {
+        "kind": "narration",
+        "text": "Then at Wasabi."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "ACADEMY INSTRUCTOR",
+        "text": "You knew the target was still moving."
+      },
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "Yes."
+      },
+      {
+        "kind": "narration",
+        "text": "No joke."
+      },
+      {
+        "kind": "narration",
+        "text": "She looks at the board."
+      },
+      {
+        "kind": "narration",
+        "text": "Then back at him."
+      }
+    ]
+  },
+  "eval_rogue_intervene_victory": {
+    "sourceRange": [
+      1186,
+      1186
+    ],
+    "cues": [
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "I finished the fight."
+      }
+    ]
+  },
+  "eval_rogue_intervene_defeat": {
+    "sourceRange": [
+      1190,
+      1190
+    ],
+    "cues": [
+      {
+        "kind": "dialogue",
+        "speakerName": "WASABI",
+        "text": "I didn't."
+      }
+    ]
+  },
+  "eval_rogue_intervene_post": {
+    "sourceRange": [
+      1192,
+      1195
+    ],
+    "cues": [
+      {
+        "kind": "narration",
+        "text": "Either fact stands on its own."
+      },
+      {
+        "kind": "narration",
+        "text": "The instructor does not turn it into a speech about what kind of person she is."
       }
     ]
   }
@@ -2214,19 +2954,20 @@ function cloneCue(cue){return cue?Object.freeze({...cue}):null;}
 function get(key){const row=SECTIONS[String(key||"")];return row&&Array.isArray(row.cues)?row.cues.map(cloneCue):[];}
 function diagnostics(){
  const checks={
-  sourceExact:SOURCE.endsWith("Academy_Wasabi_Izuno_Origin_WRITING_GOLDEN_2026-09-24.md"),
-  openingExact:get("scene1").some(c=>c.text==="The target is already gone.")&&get("scene1").some(c=>c.speakerName==="WASABI"&&c.text==="That\'s not a time."),
+  sourceExact:SOURCE.endsWith("Academy_Wasabi_Izuno_Origin_Complete_Rewrite_v2_2026-09-29.md"),
+  openingExact:get("scene1").some(c=>c.speakerName==="WASABI"&&c.text==="You started without me?")&&get("scene1").some(c=>c.speakerName==="WASABI"&&c.text==="Obviously!"),
   choicesExcluded:!JSON.stringify(SECTIONS).includes("TAKE THE OBVIOUS TRAIL")&&!JSON.stringify(SECTIONS).includes("STEP IN"),
-  battleScaffoldingExcluded:!JSON.stringify(SECTIONS).includes("PL BATTLE"),
-  rogueDialoguePresent:get("rogue_step_in").some(c=>c.speakerName==="ROGUE GENIN"&&c.text==="You\'ve got somewhere to be.")&&get("rogue_step_in").some(c=>c.speakerName==="WASABI"&&c.text==="So do you."),
-  conditionalRogueSplit:get("eval_rogue_intervene").some(c=>c.text==="You knew the target was still moving.")&&get("eval_rogue_call_help").some(c=>c.text==="You handed it off."),
-  conditionalAfterSplit:get("after_direct").some(c=>c.text==="If she caught the target, she finds her time again.")&&get("after_false").some(c=>c.text==="If she followed the false trail, worse again."),
-  originCloseExact:get("origin_close").some(c=>c.speakerName==="WASABI"&&c.text==="I know.")
+  battleScaffoldingExcluded:!JSON.stringify(SECTIONS).includes("PL BATTLE SEAM"),
+  riverDirectCatchVoice:get("river").some(c=>c.speakerName==="PROCTOR"&&c.text==="Target secured.")&&get("river").some(c=>c.speakerName==="WASABI"&&c.text==="Again."),
+  falseTrailVoice:get("stronger").some(c=>c.speakerName==="WASABI"&&c.text==="That was good.")&&get("stronger").some(c=>c.speakerName==="WASABI"&&c.text==="Still annoying."),
+  rogueDialoguePresent:get("rogue_step_in").some(c=>c.speakerName==="ROGUE GENIN"&&c.text==="And your target?")&&get("rogue_step_in").some(c=>c.speakerName==="WASABI"&&c.text==="So let's not waste time."),
+  routeAwareAfter:get("after_river").some(c=>c.speakerName==="TARGET"&&c.text==="Rematch?")&&get("after_false").some(c=>c.text==="Because you're never getting me with the same trick twice."),
+  originCloseExact:get("origin_close").some(c=>c.speakerName==="WASABI"&&c.text==="Race you to the corner.")&&get("origin_close").some(c=>c.speakerName==="WASABI"&&c.text==="Finally.")
  };
  const failed=Object.entries(checks).filter(([,v])=>v!==true).map(([k])=>k);
  return{pass:failed.length===0,checks,failed,sectionCount:Object.keys(SECTIONS).length,browserGoldenClaimed:false};
 }
 globalThis.getAcademyWasabiWritingGoldenCues343=get;
 globalThis.runAcademyWasabiWritingGolden343Diagnostics=diagnostics;
-globalThis.SC_ACADEMY_WASABI_WRITING_GOLDEN_343=Object.freeze({patchId:"academy_wasabi_writing_golden_343_2026_09_24",source:SOURCE,sections:SECTIONS,get,browserGoldenClaimed:false});
+globalThis.SC_ACADEMY_WASABI_WRITING_GOLDEN_343=Object.freeze({patchId:"academy_wasabi_complete_rewrite_v2_343_2026_09_29",source:SOURCE,sections:SECTIONS,get,ownerApproved:true,browserGoldenClaimed:false});
 })();
