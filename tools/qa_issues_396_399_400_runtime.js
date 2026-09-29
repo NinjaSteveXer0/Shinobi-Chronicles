@@ -87,9 +87,10 @@ assert(story.includes('beatId:"iwa_confront_loss_01"'));
 assert(story.includes('beatId:"met_spar_strong_01"'));
 assert(story.includes('beatId:"met_spar_mixed_01"'));
 assert(story.includes('beatId:"met_spar_rough_01"'));
-assert(story.includes('text:"She believes she has caught Kurenai."'));
-assert(story.includes('"Let the instructor think she caught you"'));
-assert(!story.includes('text:"He believes he has caught Kurenai."'));
+assert(story.includes('"DISTORT HER SENSE OF DISTANCE"'));
+assert(story.includes('D("kur_complete_03","INSTRUCTOR","Got you."'));
+assert(story.includes('N("kur_complete_06","The yard bends again.\\n\\nThe instructor is behind Kurenai now.\\n\\nThe bell is back in her hand."'));
+assert(!story.includes('"DISTORT HIS SENSE OF DISTANCE"'));
 for(const prefix of ["met_redirect","met_impact","met_destroy"]){
   for(const outcome of ["success","partial","failure"])assert(story.includes('beatId:"'+prefix+"_"+outcome+'_01"'),"missing MET-03 outcome "+prefix+" "+outcome);
 }
