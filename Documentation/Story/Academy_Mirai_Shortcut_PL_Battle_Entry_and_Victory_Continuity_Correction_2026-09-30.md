@@ -100,8 +100,6 @@ Mirai looks back toward the turn behind them.
 
 **TRAVELLER:** “I did.”
 
-A beat.
-
 ## `mir_shortcut_battle_pre_06` — dialogue — TRAVELLER
 
 **TRAVELLER:** “Your instructor gave me one extra job.”
@@ -139,8 +137,6 @@ Then raises her guard.
 ## `mir_shortcut_battle_pre_11` — dialogue — MIRAI
 
 **MIRAI:** “Fine.”
-
-A beat.
 
 **MIRAI:** “Then stop me.”
 
