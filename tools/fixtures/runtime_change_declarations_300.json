@@ -957,7 +957,8 @@
         "Origin Story-to-PL-Battle actionLabel/presentation styling only",
         "Academy Menma Victory disclosure presentation only; fixed 100 Ryō reward semantics remain unchanged",
         "presentation-only radial Battle PL DOM refresh",
-        "Academy Mirai closed #338 disguised-instructor PL Battle package / exact two-caller same-Story return / 50 Ryō victory reward"
+        "Academy Mirai closed #338 disguised-instructor PL Battle package / exact two-caller same-Story return / 50 Ryō victory reward",
+        "Menma Victory explanatory footer copy removed by scoped reward-presentation adapter; frozen game.js restored byte-for-byte"
       ],
       "productionLoader": "index.html + runtime/alpha-traversal-bridge-33200.js",
       "qaRefs": [
@@ -971,7 +972,8 @@
         "tools/qa_kakashi_v2_browser.js",
         "tools/qa_issue_312_browser.js",
         "tools/qa_runtime_ownership_safety_300.js",
-        "tools/qa_issue_303_runtime_build_fingerprint.js"
+        "tools/qa_issue_303_runtime_build_fingerprint.js",
+        "tools/qa_issue_141_pre_alpha_runtime_closure.py"
       ],
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",

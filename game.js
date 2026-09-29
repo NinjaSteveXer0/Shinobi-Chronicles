@@ -105223,7 +105223,6 @@ renderVictoryOverlay=function(container){
   }
   const projection=getAlphaVictoryPortrait(enemy,"enemy");
   const claimed=rewards.claimed===true;
-  const hideClaimContractMessage=String(currentBattle&&currentBattle.battleConfigId||"")==="academy_menma_origin_three_test_subjects_with_anko";
   const actionLabel=claimed?"CONTINUE":"CLAIM REWARDS";
   const actionHandler=claimed?"continueAfterVictory()":"claimVictoryRewardsFromOverlay()";
   const finalStrike=rewards.finishingShinobi||null;
@@ -105239,7 +105238,7 @@ renderVictoryOverlay=function(container){
       </section>
       <aside class="alpha-victory-chronicle"><span>CHRONICLE RECEIPT</span><dl><div><dt>MVP</dt><dd>${escapeAlphaActivityHTML(battleMVP&&battleMVP.name?battleMVP.name:"—")}</dd></div><div><dt>CONTRIBUTION</dt><dd>${battleMVP&&battleMVP.percentage!=null?`${escapeAlphaActivityHTML(String(battleMVP.percentage))}%`:"—"}</dd></div><div><dt>FINAL STRIKE</dt><dd>${escapeAlphaActivityHTML(finalStrike||"NOT EXPOSED")}</dd></div><div><dt>REWARDS</dt><dd>${claimed?"COMMITTED":"EARNED / UNCLAIMED"}</dd></div></dl></aside>
     </main>
-    <footer class="alpha-victory-footer">${hideClaimContractMessage?"":`<p>${claimed?"Rewards are committed. Continue to restore the owning Story / World caller.":"Claim commits the earned reward package and Battle Chronicle exactly once. It does not skip the caller return."}</p>`}<button type="button" class="victory-continue" onclick="${actionHandler}">${actionLabel}</button></footer>
+    <footer class="alpha-victory-footer"><p>${claimed?"Rewards are committed. Continue to restore the owning Story / World caller.":"Claim commits the earned reward package and Battle Chronicle exactly once. It does not skip the caller return."}</p><button type="button" class="victory-continue" onclick="${actionHandler}">${actionLabel}</button></footer>
   </section>`;
   requestAnimationFrame(()=>runVictoryRevealAnimations(container,rewards));
   return true;

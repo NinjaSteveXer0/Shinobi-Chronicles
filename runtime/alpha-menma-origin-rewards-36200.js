@@ -352,10 +352,19 @@ function appendVictoryDisclosure(container,projection){
 }
 
 const PRE_RENDER=typeof renderVictoryOverlay==="function"?renderVictoryOverlay:null;
+function removeMenmaVictoryContractCopy36200(container){
+  if(!container||!successorBattle())return false;
+  const copy=container.querySelector&&container.querySelector(".alpha-victory-footer p");
+  if(copy)copy.remove();
+  return true;
+}
 function renderVictoryOverlay36200(container){
   const projection=successorBattle()?ensureProjection():{handled:false};
   const result=PRE_RENDER?PRE_RENDER.apply(this,arguments):false;
-  try{appendVictoryDisclosure(container,projection);}catch(_error){}
+  try{
+    appendVictoryDisclosure(container,projection);
+    removeMenmaVictoryContractCopy36200(container);
+  }catch(_error){}
   return result;
 }
 if(PRE_RENDER){

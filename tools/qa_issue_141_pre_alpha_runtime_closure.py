@@ -51,6 +51,7 @@ EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-anbu-root-contained-155-knowledge-fix.js",
     "runtime/alpha-arc1-reward-evaluation-35400.js",
     "runtime/alpha-menma-evolved-pl-battle-36900.js",
+    "runtime/alpha-mirai-origin-battle-338.js",
     "runtime/alpha-origin-writing-golden-105.js",
     "runtime/alpha-origin-scene-board-bindings-105.js",
     "runtime/alpha-combat-skill-lock-38300.js",
