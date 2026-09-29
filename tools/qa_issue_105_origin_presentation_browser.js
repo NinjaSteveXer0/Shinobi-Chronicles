@@ -523,6 +523,30 @@ async function proveMiraiTerminalReceipt(browser){
         await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="menma_close_01",null,{timeout:8000});
         row=await snapshot(page);
         assert(row.text.includes("Menma runs toward Konoha."),"Menma final GOLDEN prose is not visible");
+      }else if(variant==="academy_kurenai"){
+        assert.strictEqual(row.beatId,"kur_pre_01","Kurenai did not start at expanded After Class opening");
+        assert(row.text.includes("Most of the Academy has already emptied out."),"Kurenai expanded opening prose missing "+JSON.stringify(row));
+        const instructor=row.actors.find(a=>a.id==="kurenai_academy_instructor");
+        assert(instructor&&instructor.image==="NPC/kurenai_instructor.png","Kurenai female instructor card missing "+JSON.stringify(row.actors));
+        const opening=await advanceUntilBeat(page,"kur_approach",80);
+        row=opening.row;
+        assert.deepStrictEqual(row.choices,["SEND A FALSE KURENAI","HIDE MY REAL MOVEMENT","DISTORT HER SENSE OF DISTANCE","MAKE THE DIRECT APPROACH LOOK REAL"],"Kurenai single meaningful Bell choice drift");
+        const direct=page.locator("#story-scene-presentation-layer .sc-story-choice").filter({hasText:"MAKE THE DIRECT APPROACH LOOK REAL"}).first();
+        await direct.click();
+        await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="kur_complete_01",null,{timeout:8000});
+        const aftermath=await advanceUntilBeat(page,"kur_after_win_01",120);
+        const coreText=aftermath.seen.map(x=>x.text).join("\n");
+        for(const line of ["Got you.","Have you?","You were saying?","Genjutsu isn't only making somebody believe something false.","It's knowing what stays true after both of you start lying."]){
+          assert(coreText.includes(line),"Kurenai preserved Bell Test/evaluation line missing: "+line);
+        }
+        const leave=await advanceUntilBeat(page,"kur_leave_win_01",100);
+        const leaveText=leave.seen.map(x=>x.text).join("\n");
+        assert(leaveText.includes("Same exercise tomorrow?")&&leaveText.includes("Change the trick."),"Kurenai complete-win aftermath/leave expansion missing");
+        const receipt=await advanceUntilBeat(page,"kur_receipt",80);
+        row=receipt.row;
+        assert.strictEqual(row.mode,"record","Kurenai terminal is not Chronicle Receipt");
+        assert.strictEqual(row.actors.length,0,"Kurenai Receipt still stages Story actors");
+        assert(row.text.includes("ACADEMY KURENAI")&&row.text.includes("Made the direct approach look real."),"Kurenai Receipt route summary missing "+JSON.stringify(row));
       }else if(row.mode!=="choice"){
         row=await advanceOne(page);
       }
@@ -533,6 +557,6 @@ async function proveMiraiTerminalReceipt(browser){
     const miraiBattle338=await proveMiraiBattle338(browser);
     const miraiDefeatContinuations=await proveMiraiDefeatContinuations(browser);
     const miraiTerminal=await proveMiraiTerminalReceipt(browser);
-    console.log(JSON.stringify({pass:true,issue:105,cases:CASES.map(x=>x[0]),legacyFallbackRejected:true,clickAnywhereProven:true,miraiWritingGoldenProven:true,miraiBattle338,miraiDefeatContinuations,menmaWritingGoldenOpeningProven:true,menmaNineTailsDialoguePortraitProven:true,menmaPostBattleSegmentationProven:true,miraiTerminal,goldenSaveReloadResumeProven:true,browserGoldenClaimed:false},null,2));
+    console.log(JSON.stringify({pass:true,issue:105,cases:CASES.map(x=>x[0]),legacyFallbackRejected:true,clickAnywhereProven:true,miraiWritingGoldenProven:true,miraiBattle338,miraiDefeatContinuations,menmaWritingGoldenOpeningProven:true,menmaNineTailsDialoguePortraitProven:true,menmaPostBattleSegmentationProven:true,kurenaiExpansionBrowserProven:true,miraiTerminal,goldenSaveReloadResumeProven:true,browserGoldenClaimed:false},null,2));
   }finally{await browser.close();}
 })().catch(err=>{console.error(err);process.exit(1);});
