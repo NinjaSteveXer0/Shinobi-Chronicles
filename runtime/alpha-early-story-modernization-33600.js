@@ -90,7 +90,7 @@ function patchIzuno(){
 
 function patchMirai(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const def=editable(A.sceneByVariant.academy_mirai);if(!def)return false;
-  if(beat(def,"mir_assignment_01")&&beat(def,"mir_walk_choice")&&beat(def,"mir_reflection_choice"))return true;
+  if(beat(def,"mir_assignment_01")&&beat(def,"mir_walk_choice")&&beat(def,"mir_reflection_router")&&beat(def,"mir_reflection_conversation")&&beat(def,"mir_reflection_chakra")&&beat(def,"mir_reflection_suspicion")&&beat(def,"mir_reflection_missed"))return true;
   text(def,"mir_start","The escort begins badly only in hindsight. The civilian is polite, knows the route, thanks Mirai for walking on the road-side of the path and asks ordinary questions about the Academy. Nothing about them demands suspicion.");
   text(def,"mir_talk","Conversation fills the walk. Mirai asks something ordinary—not because she is interrogating them, but because silence for the whole escort would be strange.");
   const inconsistent=beat(def,"mir_inconsistent");if(inconsistent)inconsistent.presentationResolver=()=>{const ctx=local();const detail={origin:"The clothing no longer fits the country they described.",route:"The route no longer fits the route they described.",family:"A family detail comes back differently.",trip:"A detail about the trip to Konoha comes back differently."}[ctx.talk]||"One small detail refuses to fit.";return{text:`Later, one small detail refuses to fit. Then another. ${detail} Nothing proves anything yet. It is simply wrong enough to stay in Mirai's head.`};};
