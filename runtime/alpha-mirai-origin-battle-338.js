@@ -16,6 +16,10 @@ const BATTLE_PORTRAIT="NPC portrait/mirai_instructor_disguised.png";
 const SHORTCUT_CALLER="academy_mirai_origin_shortcut_battle";
 const CONFRONT_CALLER="academy_mirai_origin_confrontation_battle";
 const CALLERS=Object.freeze([SHORTCUT_CALLER,CONFRONT_CALLER]);
+const BATTLE_ENVIRONMENT_BY_CALLER=Object.freeze({
+  [SHORTCUT_CALLER]:"Mirai Origin Backdrop/konoha_storehouse_side_lane.png",
+  [CONFRONT_CALLER]:"Mirai Origin Backdrop/konoha_main_street.png"
+});
 const FIXED_VICTORY_RYO=50;
 const REWARD_SOURCE_ID="mirai_origin_disguised_instructor_battle_victory_ryo_01";
 const GUARD_STATE="academy_mirai_instructor_substitution_guard_ready";
@@ -31,6 +35,14 @@ function isExact(){return !!meta()&&currentBattle&&currentBattle.encounterId===E
 function rewardHistory(){if(!playerData.activityHistory||!Array.isArray(playerData.activityHistory))playerData.activityHistory=[];return playerData.activityHistory;}
 function occurrenceId(callerId,sceneInstanceId){return "battle_occ_origin_mirai_disguised_instructor:"+String(callerId||"")+":"+String(sceneInstanceId||"");}
 function launchStore(){if(!playerData.mirai338BattleLaunches||typeof playerData.mirai338BattleLaunches!=="object")playerData.mirai338BattleLaunches={};return playerData.mirai338BattleLaunches;}
+function applyBattleEnvironment338(callerId){
+  const path=BATTLE_ENVIRONMENT_BY_CALLER[String(callerId||"")]||"";
+  if(!path||!currentBattle)return"";
+  currentBattle.environmentPath=path;
+  currentBattle.presentationEnvironmentPath=path;
+  if(currentBattle.mirai338&&typeof currentBattle.mirai338==="object")currentBattle.mirai338.environmentPath=path;
+  return path;
+}
 
 function wrapCycleAction(base,index,displayName){
   const raw=base.resolve;
@@ -247,6 +259,7 @@ if(PRE_RESTORE){
     const result=PRE_RESTORE.apply(this,arguments);
     if(saved&&saved.mirai338&&saved.mirai338.battleConfigId===CONFIG){
       currentBattle.mirai338=clone(saved.mirai338);currentBattle.battleConfigId=CONFIG;currentBattle.encounterId=ENCOUNTER;
+      applyBattleEnvironment338(currentBattle.mirai338&&currentBattle.mirai338.callerId);
       if(saved.mirai338BattleLaunches&&typeof saved.mirai338BattleLaunches==="object")playerData.mirai338BattleLaunches=clone(saved.mirai338BattleLaunches);
       try{if(currentBattle.active===true)openOverlay("combat");}catch(_){}
     }
@@ -262,13 +275,17 @@ function launch(spec={}){
   const sceneInstanceId=spec.returnContext.sceneInstanceId||null;if(!sceneInstanceId)return{success:false,reason:"mirai338_story_instance_missing"};
   const exactId=occurrenceId(callerId,sceneInstanceId),store=launchStore(),prior=store[exactId]||null;
   if(prior){
-    if(currentBattle&&currentBattle.battleId===exactId&&meta())return{success:true,idempotent:true,battleId:exactId,encounterId:ENCOUNTER,battleConfigId:CONFIG,callerId};
+    if(currentBattle&&currentBattle.battleId===exactId&&meta()){
+      const environmentPath=applyBattleEnvironment338(callerId);
+      return{success:true,idempotent:true,battleId:exactId,encounterId:ENCOUNTER,battleConfigId:CONFIG,callerId,environmentPath};
+    }
     return{success:false,reason:"mirai338_battle_occurrence_already_committed_without_runtime",battleId:exactId};
   }
   const launched=launchBattleWithReturnContext(INSTRUCTOR,ENCOUNTER,clone(spec.returnContext));
   if(!launched||launched.success!==true)return launched||{success:false,reason:"mirai338_battle_launch_failed"};
   currentBattle.battleId=exactId;currentBattle.battleConfigId=CONFIG;currentBattle.encounterId=ENCOUNTER;
   currentBattle.mirai338={patchId:PATCH_ID,battleConfigId:CONFIG,battleOccurrenceId:exactId,callerId,stableParticipantId:INSTRUCTOR,observerPresentation:"male_traveller_escort_disguise",underlyingIdentity:"female_academy_instructor",identityRevealedByBattle:false,aiCycleIndex:0,enemyActionsResolved:0,guardCreatedEnemyOpportunityIndex:null,strictOneVsOne:true,playerStarts:true,launchEvidenceId:null};
+  const environmentPath=applyBattleEnvironment338(callerId);
   const deployment=strictDeployment();if(!deployment.success)return deployment;
   currentBattle.battleLog=["TRAVELLER steps into Mirai's path.","MIRAI prepares for battle."];
   if(currentBattle.rewards){currentBattle.rewards.ryo=0;currentBattle.rewards.exp=0;currentBattle.rewards.items=[];currentBattle.rewards.rareDrops=[];currentBattle.rewards.requiresExplicitPostClaimContinue=false;}
@@ -277,7 +294,7 @@ function launch(spec={}){
   currentBattle.mirai338.launchEvidenceId=evidence.evidenceId;
   store[exactId]={battleOccurrenceId:exactId,battleConfigId:CONFIG,encounterId:ENCOUNTER,callerId,launchEvidenceId:evidence.evidenceId||null,createdAt:Date.now()};
   savePlayerData();saveTestState();openOverlay("combat");
-  return{success:true,battleId:exactId,encounterId:ENCOUNTER,battleConfigId:CONFIG,callerId,playerParticipantIds:[MIRAI],oppositionParticipantIds:[INSTRUCTOR]};
+  return{success:true,battleId:exactId,encounterId:ENCOUNTER,battleConfigId:CONFIG,callerId,environmentPath,playerParticipantIds:[MIRAI],oppositionParticipantIds:[INSTRUCTOR]};
 }
 
 function projectResult(){
@@ -294,6 +311,7 @@ function diagnostics(){
     exactDeterministicLoop:actions.map(a=>a.id).join("|")===ACTION_LOOP.join("|")&&String(globalThis.chooseEnemyAuthoredBattleAction).includes("deterministicAssessmentLoop:true"),
     exactGuard:String(globalThis.resolveBattlePreStaminaDefense).includes("0.75")&&String(globalThis.calculateBattleStaminaMitigationV1).includes("attack*staminaPivot"),
     exactCallers:CALLERS.join("|")==="academy_mirai_origin_shortcut_battle|academy_mirai_origin_confrontation_battle",
+    authoredBattleEnvironments:BATTLE_ENVIRONMENT_BY_CALLER[SHORTCUT_CALLER]==="Mirai Origin Backdrop/konoha_storehouse_side_lane.png"&&BATTLE_ENVIRONMENT_BY_CALLER[CONFRONT_CALLER]==="Mirai Origin Backdrop/konoha_main_street.png"&&String(applyBattleEnvironment338).includes("presentationEnvironmentPath"),
     exactOccurrence:occurrenceId(SHORTCUT_CALLER,"qa")==="battle_occ_origin_mirai_disguised_instructor:academy_mirai_origin_shortcut_battle:qa",
     exactReward:FIXED_VICTORY_RYO===50,
     saveReloadEnvelope:!!PRE_SAVE&&!!PRE_RESTORE&&String(globalThis.saveTestState).includes("state.mirai338")&&String(globalThis.restoreTestState).includes("currentBattle.battleConfigId=CONFIG"),
@@ -310,5 +328,5 @@ globalThis.launchAcademyMiraiDisguisedInstructorBattle338=launch;
 globalThis.projectAcademyMiraiDisguisedInstructorBattle338=projectResult;
 globalThis.claimAcademyMiraiDisguisedInstructorReward338=claimReward;
 globalThis.runAcademyMiraiDisguisedInstructorBattle338Diagnostics=diagnostics;
-globalThis.SC_ACADEMY_MIRAI_DISGUISED_INSTRUCTOR_BATTLE_338=Object.freeze({patchId:PATCH_ID,battleConfigId:CONFIG,encounterId:ENCOUNTER,stableParticipantId:INSTRUCTOR,battlePortrait:BATTLE_PORTRAIT,callerIds:CALLERS,rewardSourceId:REWARD_SOURCE_ID,fixedVictoryRyo:FIXED_VICTORY_RYO,actionLoop:ACTION_LOOP,browserGoldenClaimed:false});
+globalThis.SC_ACADEMY_MIRAI_DISGUISED_INSTRUCTOR_BATTLE_338=Object.freeze({patchId:PATCH_ID,battleConfigId:CONFIG,encounterId:ENCOUNTER,stableParticipantId:INSTRUCTOR,battlePortrait:BATTLE_PORTRAIT,callerIds:CALLERS,battleEnvironmentByCaller:BATTLE_ENVIRONMENT_BY_CALLER,rewardSourceId:REWARD_SOURCE_ID,fixedVictoryRyo:FIXED_VICTORY_RYO,actionLoop:ACTION_LOOP,browserGoldenClaimed:false});
 })();
