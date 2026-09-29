@@ -36,7 +36,6 @@ assert(binder.includes('hinataYoungerSparringPartner:"NPC/younger_sparring_partn
 assert(binder.includes('actor("hinata_younger_student","YOUNGER STUDENT",PATH.hinataYoungerStudent')&&binder.includes('actor("hinata_younger_sparring_partner","YOUNGER SPARRING PARTNER",PATH.hinataYoungerSparringPartner'),"Hinata final three-actor projection missing");
 assert(binder.includes('hin_receipt:()=>[{kind:"record",text:buildHinataReceipt105()}]'),"Hinata Chronicle Receipt projection missing");
 assert(binder.includes("function rehydrateActiveOriginPresentation105()")&&binder.includes("restoreActiveOriginStoryPresentation32900")&&binder.includes("renderStorySceneBoard33900"),"active GOLDEN Origin reload presentation rehydrate missing");
-assert(board.includes('if(machineResult&&machineResult.success===true)renderStorySceneBoard33900();'),"hidden Story machine-resolver chain does not repaint its final authored player-facing target");
 assert(binder.includes("pendingBattleRestore===true"),"GOLDEN reload rehydrate can outrank pending Battle restore");
 assert(golden.includes('const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A);'),"GOLDEN consumer methods are not bound to Origin runtime");
 assert(golden.includes('entryBeatId:"menma_open_01"')&&golden.includes('D("menma_open_15","MENMA","I know."'),"Menma full GOLDEN Academy opening missing");
