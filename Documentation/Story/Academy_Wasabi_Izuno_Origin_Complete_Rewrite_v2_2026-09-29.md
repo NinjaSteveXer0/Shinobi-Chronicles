@@ -1468,47 +1468,79 @@ That annoys her more than the result.
 
 # ORIGIN CLOSE
 
-Wasabi leaves the training ground at a jog.
+Wasabi leaves the training ground and finds the pursuit target walking ahead with one of the Academy students.
 
-The pursuit target and one of the Academy students are ahead of her.
+The target glances back.
 
-The student looks back.
+**TARGET:** “How long do you think before she asks for a rematch?”
 
-Immediately regrets it.
+The Academy student looks over their shoulder.
 
-**ACADEMY STUDENT:** “No.”
+Wasabi is already close enough to hear them.
 
-Wasabi speeds up.
+**ACADEMY STUDENT:** “You know she's right there.”
 
-**ACADEMY STUDENT:** “Wasabi.”
+**WASABI:** “I heard both of you.”
 
-**WASABI:** “What?”
+The target turns around and keeps walking backward.
 
-**ACADEMY STUDENT:** “The exercise is over.”
+**TARGET:** “So?”
 
-Wasabi catches them.
+Wasabi catches up.
 
-Runs backward for three steps so she can look at both of them.
+**WASABI:** “So what?”
 
-**WASABI:** “Exactly.”
+**TARGET:** “Rematch.”
 
-**TARGET:** “That doesn't answer anything.”
+Wasabi pretends to think about it.
 
-Wasabi turns forward again.
+For almost a whole second.
 
-**WASABI:** “Race you to the corner.”
+**WASABI:** “Tomorrow.”
 
-**ACADEMY STUDENT:** “I didn't agree to that!”
+The Academy student looks surprised.
 
-**TARGET:** “Too late.”
+**ACADEMY STUDENT:** “Tomorrow?”
 
-The target starts running.
+Wasabi points toward the next corner.
 
-Wasabi's grin flashes.
+**WASABI:** “That's tomorrow.”
 
-**WASABI:** “Finally.”
+The target looks at the corner.
 
-She takes off after them.
+Then at Wasabi.
+
+A grin starts.
+
+**TARGET:** “That's not how tomorrow works.”
+
+Wasabi takes one step ahead of them.
+
+**WASABI:** “Then catch me and explain it.”
+
+The target bolts after her.
+
+The Academy student stares at both of them.
+
+**ACADEMY STUDENT:** “You two are ridiculous!”
+
+Wasabi looks back without slowing.
+
+**WASABI:** “Then stop walking!”
+
+The student groans.
+
+Then runs after them.
+
+Wasabi faces forward again, grinning.
+
+No instructor.
+
+No route marker.
+
+No extraction line.
+
+Just one more race through Konoha.
 
 ---
 
