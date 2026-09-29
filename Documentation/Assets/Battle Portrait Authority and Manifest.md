@@ -39,11 +39,17 @@ The old 4 September 2026 102-era snapshot in this file is superseded as current 
 
 Its `Assets/Portraits/...` repository-root references are historical and must not be used for new production wiring.
 
-The current physical production portrait root is:
+Stephen clarified the current production portrait taxonomy on 2026-09-29. There is **not one universal portrait root**.
 
-`Portraits/`
+Current Battle/UI portrait lanes are:
 
-The current live source baseline has already moved beyond the old 102 gate. The ratified runtime portrait authority is **116/116**, with source diagnostics requiring every live portrait path to begin with `Portraits/` and the final fourteen admission rows already integrated.
+- `Enemies Portraits/` — enemy Battle portraits;
+- `NPC portrait/` — NPC Battle portraits;
+- `Portraits/` — Battle portraits for standard Character Card / Registry-character representations that are neither enemies nor NPCs.
+
+The existing 116/116 ratified Character-side portrait baseline described below remains under `Portraits/`; that baseline does **not** imply that every enemy or NPC Battle portrait must also be moved under `Portraits/`.
+
+Any diagnostic or future admission rule that assumes every Battle/UI portrait path begins with `Portraits/` must be interpreted only for the Character-side registry set it governs, not as a project-wide folder law.
 
 The complete final-116 Assets admission projection remains durably recorded in:
 
