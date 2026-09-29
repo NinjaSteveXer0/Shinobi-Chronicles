@@ -432,12 +432,12 @@ for(const label of [
   "TAKE THE OBVIOUS TRAIL","LOOK FOR SOMETHING BETTER","WORK WITH THE OTHERS","FORGET THE TRAIL — WHERE ARE THEY GOING?",
   "TAKE THE RIVER","FOLLOW THE STRONGER TRAIL","CHECK THE SHOUTING","CUT FOR THE INTERCEPT",
   "STEP IN","CALL FOR HELP","KEEP PURSUING",
-  "Next time I'm trusting the trail.","Next time I'm trusting what I notice.","Sometimes the fastest path isn't the obvious one.","Catching them wasn't the only thing that mattered."
-])assert(doc.includes("**"+label+"**")||doc.includes("**“"+label+"”**"),"runtime choice absent from Writing GOLDEN: "+label);
+  ...["I caught them the hard way.","Next time I beat that time.","Give them a bigger head start.","I want the rematch.","Why chase from behind if I can get there first?","The route mattered more than the trail.","I trusted my read. It worked.","Next time I cut them off sooner.","They got me with that one.","I saw the trick. Just too late.","Next time I check what doesn't fit.","They'll need a better trick next time.","I'd step in again.","Next time I end the fight faster.","The target got away. I still finished what I started.","I need to know how much time a fight really costs.","Calling the instructor was faster.","I got the student moving.","Next time I hand it off sooner.","I can watch the chase and the people in it.","I chose the target.","I waited too long before I moved.","Next time I decide immediately.","Give me another shot at the chase."]
+])assert(doc.includes("**"+label+"**")||doc.includes("**“"+label+"”**"),"runtime choice absent from approved Wasabi v2 Story: "+label);
 
 console.log(JSON.stringify({
   pass:true,issue:343,sceneId:def.sceneId,beatCount:beats.length,
-  exactWritingGoldenCatalogue:true,routeGraphClosed:true,
+  exactOwnerApprovedRewriteV2Catalogue:true,routeGraphClosed:true,
   sourceOccurrences:["IZU-01","IZU-02","IZU-03","IZU-04","RIVER-ENDURANCE"],
   rogueBattle:{strictOneVsOne:true,basePL:23,actions:["9","7","40% guard"],fixedVictoryRyo:50,idempotentOccurrence:true},
   moralityInference:false,browserGoldenClaimed:false

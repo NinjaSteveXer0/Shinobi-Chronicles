@@ -66,7 +66,7 @@ for(const asset of ["NPC/academy_student_fem_1.png","NPC/izuno_student_2.png","N
   assert(sceneA.includes(asset),"Wasabi native Scene Board did not consume #419 asset "+asset);
 }
 assert(sceneA.includes('if(id.startsWith("izu_river_"))return["wasabi","target"]'),"Wasabi River route does not stage the pursuit target actor");
-assert(sceneA.includes('if(id.startsWith("izu_finish_river_"))return["wasabi","instructor","target"]'),"Wasabi River extraction finish does not stage the pursuit target actor");
+assert(sceneA.includes('if(id.startsWith("izu_finish_river_")||id.startsWith("izu_finish_intercept_"))return["wasabi","target","proctor"]'),"Wasabi successful pursuit finish does not stage target + proctor");
 for(const asset of ["NPC/furniture_civilian.png","NPC/vegetable_vendor.png","NPC/equipment_custodian.png","NPC/delivery_worker.png","NPC/runaway_cart_civillian.png","NPC/obito_instructor.png"]){
   assert(sceneC.includes(asset),"Obito native Scene Board did not consume #419 asset "+asset);
 }
