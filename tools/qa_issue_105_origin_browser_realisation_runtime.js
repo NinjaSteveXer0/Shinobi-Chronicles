@@ -99,6 +99,8 @@ try{
   assert("kushina_identity_route_starts_natively",render.beatId==="kus_ask_who_01",render);
   continueUntil("kus_ask_who_04");
   assert("kushina_second_choice_has_visible_consequence",render.text==="Gerotora.",render);
+  continueUntil("kus_receipt");
+  assert("kushina_gerotora_route_reaches_chronicle_receipt",render.beatId==="kus_receipt",render);
 
   // Two materially different Kurenai player routes must produce visibly different DOM sequences.
   beginOrigin("academy_kurenai");clickContinue();clickChoice("false_kurenai");clickChoice("rush_bell");
