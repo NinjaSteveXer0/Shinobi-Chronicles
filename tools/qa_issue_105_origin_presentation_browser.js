@@ -245,13 +245,19 @@ async function proveMiraiDefeatContinuations(browser){
       assert.strictEqual(good.row.text,"Good.","Confrontation defeat Good. drift");
       const reveal=await advanceOne(page);
       assert.strictEqual(reveal.beatId,"mir_confront_reveal_01","Confrontation defeat did not enter existing reveal after cutscene");
-      assert(reveal.text.includes("Smoke bursts across the road."),"Confrontation defeat reveal timing drift");
+      assert.strictEqual(reveal.text,"Smoke bursts across the road.","Confrontation defeat reveal opening drift");
       assert(reveal.actors.some(a=>a.image==="NPC/mirai_instructor.png"),"Female Academy instructor card missing after confrontation defeat reveal");
-      const where=await advanceOne(page);
+      const revealPages=[reveal.text];
+      let where=reveal;
+      for(let i=0;i<8&&where.beatId==="mir_confront_reveal_01";i++){
+        where=await advanceOne(page);
+        if(where.beatId==="mir_confront_reveal_01")revealPages.push(where.text);
+      }
+      assert(revealPages.includes("The Academy instructor stands where the traveller had been."),"Confrontation defeat reveal identity page missing");
       assert.strictEqual(where.beatId,"mir_confront_08","Confrontation defeat reveal did not resume existing flow");
       assert.strictEqual(where.speaker,"MIRAI","Mirai does not own post-reveal question");
       assert.strictEqual(where.text,"Where is he?","Post-reveal Mirai question drift");
-      proofs.push({kind:test.kind,first:test.firstBeatId,revealBeat:reveal.beatId,whereBeat:where.beatId});
+      proofs.push({kind:test.kind,first:test.firstBeatId,revealBeat:reveal.beatId,revealPages:revealPages.length,whereBeat:where.beatId});
     }
     await gate.assertClean("academy_mirai-defeat-"+test.kind);
     await context.close();
