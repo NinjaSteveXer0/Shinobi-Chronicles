@@ -192,7 +192,16 @@ const PRE_SAVE=typeof saveTestState==="function"?saveTestState:null;
 if(PRE_SAVE){
   globalThis.saveTestState=function saveMirai338State(){
     const result=PRE_SAVE.apply(this,arguments);
-    try{const raw=sessionStorage.getItem("shinobiTestState");if(!raw)return result;const state=JSON.parse(raw);state.mirai338=currentBattle&&currentBattle.mirai338?clone(currentBattle.mirai338):null;state.mirai338BattleLaunches=playerData&&playerData.mirai338BattleLaunches?clone(playerData.mirai338BattleLaunches):{};state.battleConfigId=currentBattle&&currentBattle.battleConfigId||null;sessionStorage.setItem("shinobiTestState",JSON.stringify(state));}catch(_){}
+    if(!isExact())return result;
+    try{
+      const raw=sessionStorage.getItem("shinobiTestState");if(!raw)return result;
+      const state=JSON.parse(raw);
+      state.mirai338=clone(currentBattle.mirai338);
+      state.mirai338BattleLaunches=playerData&&playerData.mirai338BattleLaunches?clone(playerData.mirai338BattleLaunches):{};
+      state.battleConfigId=CONFIG;
+      state.encounterId=ENCOUNTER;
+      sessionStorage.setItem("shinobiTestState",JSON.stringify(state));
+    }catch(_){}
     return result;
   };
   try{saveTestState=globalThis.saveTestState;}catch(_){}
