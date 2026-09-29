@@ -1523,6 +1523,10 @@
       .battle2-modern[data-formation-stage="true"] .battle2-formation-focus{opacity:1!important;filter:saturate(1.03) brightness(1.03) drop-shadow(0 22px 28px rgba(0,0,0,.42))!important}
       .battle2-modern[data-formation-stage="true"] .battle2-formation-recessed{opacity:.48!important;filter:saturate(.55) brightness(.64)!important;transform:scale(.88)!important}
       .battle2-modern[data-formation-stage="true"] .battle2-formation-selected-target{outline:1px solid rgba(96,221,230,.82)!important;outline-offset:4px!important;box-shadow:0 0 26px rgba(73,213,225,.18)!important}
+      /* Menma's repeat-Skill UX reselects the last Skill/default current enemy after a
+         successful action. Preserve that convenience and target semantics without
+         leaving a card-like cyan selection frame on the active opposition. */
+      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle2-formation-selected-target{outline:none!important;outline-offset:0!important;box-shadow:none!important}
       .battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.is-skill-target,.battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.is-item-target{pointer-events:auto!important;cursor:pointer!important}
 
       /* Duel: two combatants own the battlefield. No fake support furniture. */
