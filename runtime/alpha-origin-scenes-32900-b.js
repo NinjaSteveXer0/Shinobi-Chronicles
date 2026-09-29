@@ -81,7 +81,7 @@ const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A)
     N("kus_protect_close_01","At the courtyard gate, Kushina looks back at the replaced practice scroll.\n\nThe classmate is already arguing with the next formula. Kushina calls across the yard.","kus_protect_close_02"),
     D("kus_protect_close_02","KUSHINA","Don't stare at it this time!","kus_protect_close_03"),
     D("kus_protect_close_03","CLASSMATE","Go home!","kus_protect_close_04"),
-    N("kus_protect_close_04","Kushina laughs and leaves.",null,{onEnterConsequences:[sealCommit],exitScene:true}),
+    N("kus_protect_close_04","Kushina laughs and leaves.","kus_receipt",{onEnterConsequences:[sealCommit]}),
 
     N("kus_contain_seal_01","Kushina drops beside the scroll.\n\nThe original pattern is already torn too badly to restore before the next pulse. She stops trying.\n\nHer fingers move to the damaged edge instead. New line. New boundary. Close the leak first.\n\nThe chakra hits the replacement boundary and pushes. Kushina pushes back. The classmate scrambles clear without being told.\n\nThe line seals. The loose chakra folds back inside it.\n\nStillness.\n\nThe instructor reaches them a moment later. He looks at the formula. Then at Kushina.","kus_contain_seal_02"),
     D("kus_contain_seal_02","INSTRUCTOR","That's not the original formula.","kus_contain_seal_03"),
@@ -111,7 +111,7 @@ const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A)
     N("kus_contain_close_06","She takes two steps. Looks back.","kus_contain_close_07"),
     D("kus_contain_close_07","KUSHINA","Mine worked.","kus_contain_close_08"),
     D("kus_contain_close_08","INSTRUCTOR","Go home, Kushina.","kus_contain_close_09"),
-    N("kus_contain_close_09","She grins and does.",null,{onEnterConsequences:[sealCommit],exitScene:true}),
+    N("kus_contain_close_09","She grins and does.","kus_receipt",{onEnterConsequences:[sealCommit]}),
 
     N("kus_move_object_01","The scroll jumps again. Kushina grabs it.\n\nThe instructor sees what she is doing.","kus_move_object_02"),
     D("kus_move_object_02","INSTRUCTOR","Kushina—","kus_move_object_03"),
@@ -146,7 +146,7 @@ const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A)
     D("kus_move_close_05","CLASSMATE","That's not what I asked.","kus_move_close_06"),
     N("kus_move_close_06","Kushina glances sideways.","kus_move_close_07"),
     D("kus_move_close_07","KUSHINA","It was enough.","kus_move_close_08"),
-    N("kus_move_close_08","The classmate thinks about that. Then nods.\n\nThey leave the courtyard together.",null,{onEnterConsequences:[sealCommit],exitScene:true}),
+    N("kus_move_close_08","The classmate thinks about that. Then nods.\n\nThey leave the courtyard together.","kus_receipt",{onEnterConsequences:[sealCommit]}),
 
     N("kus_reverse_01","Kushina drops beside the scroll.\n\nThe formula did not fail everywhere. One connection stopped closing where it should have. That is different. That is fixable.\n\nThe classmate backs away. Kushina redraws the damaged line.","kus_reverse_02",{onEnterConsequences:[sealCommit]}),
     D("kus_reverse_02","INSTRUCTOR","Careful.","kus_reverse_03"),
@@ -291,8 +291,8 @@ const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A)
     N("kus_route_d_close_05","The instructor answers without looking up.","kus_route_d_close_06"),
     D("kus_route_d_close_06","INSTRUCTOR","You are doing the assigned exercise.","kus_route_d_close_07"),
     N("kus_route_d_close_07","Kushina starts walking.","kus_route_d_close_08"),
-    D("kus_route_d_close_08","KUSHINA","That's what I said.","kus_route_d_close_09"),
-    N("kus_route_d_close_09","Kushina leaves the courtyard.",null,{exitScene:true})
+    D("kus_route_d_close_08","KUSHINA","That's what I said.","kus_receipt"),
+    {beatId:"kus_receipt",mode:"record",environmentRef:courtyard,text:"",exitScene:true}
   ],onCompleteConsequences:[X("academy_kushina",[seal,identity,cause,joint,contact])]});
 })();
 
