@@ -121,7 +121,7 @@ function patchKushina(){
 
 function patchKurenai(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
-  const live=A.sceneDefinitions&&A.sceneDefinitions[A.sceneByVariant.academy_kurenai];
+  const live=definition(A.sceneByVariant.academy_kurenai);
   if(live&&live.entryBeatId==="kur_pre_01"&&beat(live,"kur_approach")&&beat(live,"kur_leave_router"))return true;
   const def=editable(A.sceneByVariant.academy_kurenai);if(!def)return false;
   text(def,"kur_bell","A brass bell hangs from the instructor's belt. No weapons. No spectators. One rule. “Take it.”");
