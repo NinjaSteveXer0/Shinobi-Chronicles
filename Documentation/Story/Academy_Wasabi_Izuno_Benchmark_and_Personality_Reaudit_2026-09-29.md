@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-29  
 **Owner:** Writing / Story — Konoha  
-**Status:** **AUDIT COMPLETE — REWRITE CANDIDATE PUBLISHED / OWNER REVIEW PENDING**
+**Status:** **REOPENED AGAIN BY OWNER BROWSER REVIEW — COMPLETE REWRITE v2 NOW CURRENT REVIEW TARGET**
 
 ## Scope
 
@@ -218,3 +218,39 @@ The old 2026-09-24 WRITING GOLDEN file is now marked superseded/reopened for cur
 Do not call the current installed Wasabi prose Writing GOLDEN merely because Coding/Runtime was previously accepted.
 
 Coding Golden and Writing Golden remain separate.
+
+
+---
+
+# 2026-09-29 second owner browser finding
+
+Stephen tested the restored River success and proved the first rewrite architecture was still insufficient:
+
+- River could secure the target;
+- shared AFTER still contained `ACADEMY STUDENT: "You lost."`;
+- the universal four final reflections still framed the ending as a lesson from failure.
+
+This is a route-state continuity failure, not a River-only wording defect.
+
+The first rewrite candidate is superseded.
+
+Current review target:
+
+`Documentation/Story/Academy_Wasabi_Izuno_Origin_Complete_Rewrite_v2_2026-09-29.md`
+
+commit:
+`6d76a5f7b15d9a9d822c53c767338bcc9f2ac365`
+
+v2 correction:
+- full Story rewritten across Scenes 1–7;
+- same scene count / locations / actors / target / Rogue Genin / Battle;
+- River success retained;
+- Intercept success retained;
+- false-trail miss remains factually distinct;
+- Rogue interruption remains factually distinct from pursuit result;
+- Scene 6 debrief is route-relative;
+- Scene 7 aftermath is route-relative;
+- **six route/response-specific four-choice reflection sets replace the single universal failure-leaning set**;
+- River never enters a loss aftermath/reflection family.
+
+Current Writing status remains **RED / NOT GOLDEN** until Stephen signs off the exact v2 player-facing Story.
