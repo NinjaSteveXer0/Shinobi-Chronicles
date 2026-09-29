@@ -274,12 +274,12 @@ const MIRAI_BATTLE_OPPONENT="academy_mirai_origin_instructor";
 const MIRAI_SHORTCUT_CALLER="academy_mirai_origin_shortcut_battle";
 const MIRAI_CONFRONT_CALLER="academy_mirai_origin_confrontation_battle";
 
-function miraiBattleSpec(callerId,returnBeatId){
+function miraiBattleSpec(callerId,victoryBeatId,defeatBeatId=victoryBeatId){
   return{
     enemyId:MIRAI_BATTLE_OPPONENT,
     encounterId:MIRAI_BATTLE_ENCOUNTER,
-    victoryBeatId:returnBeatId,
-    defeatBeatId:returnBeatId,
+    victoryBeatId,
+    defeatBeatId,
     resultProjector:()=>typeof globalThis.projectAcademyMiraiDisguisedInstructorBattle338==="function"
       ?globalThis.projectAcademyMiraiDisguisedInstructorBattle338()
       :null,
@@ -289,6 +289,27 @@ function miraiBattleSpec(callerId,returnBeatId){
         return{success:false,reason:"mirai338_battle_adapter_missing"};
       }
       return globalThis.launchAcademyMiraiDisguisedInstructorBattle338({callerId,returnContext});
+    }
+  };
+}
+
+function miraiDefeatContextPatch(route){
+  return{
+    requestId:"mirai_battle_defeat_context_"+String(route||"unknown")+"_105",
+    kind:"domain",
+    resolve:()=>{
+      const runtime=A.active();
+      if(!runtime)return{success:false,reason:"mirai_story_runtime_missing"};
+      if(!runtime.localContext||typeof runtime.localContext!=="object")runtime.localContext={};
+      Object.assign(runtime.localContext,{
+        miraiEscortAssessmentResult:"not_completed_battle_defeat",
+        miraiEscortDutyActive:false,
+        miraiReachedCheckpointAsActiveEscort:false,
+        scenePurpose:"post_assessment_debrief",
+        miraiDefeatRoute:String(route||"unknown")
+      });
+      if(typeof savePlayerData==="function")savePlayerData();
+      return{success:true,route:String(route||"unknown"),assessmentTerminated:true};
     }
   };
 }
@@ -525,32 +546,53 @@ line("mir_shortcut_follow",[
  {mode:"narration",text:"Mirai watches him disappear around the corner."},
  {mode:"narration",text:"Then follows."},
  {mode:"narration",text:"The main road is gone behind them."}
+],MIRAI_ENV.lane,"mir_shortcut_battle_pre_01");
+
+line("mir_shortcut_battle_pre",[
+ {mode:"narration",text:"The Traveller stops at the next turn.\n\nNot because he is checking the way.\n\nHe turns around and waits for Mirai to catch up."},
+ {mode:"dialogue",speaker:"MIRAI",text:"Why did you stop?"},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"Because you followed me.\n\nMirai looks back toward the turn behind them."},
+ {mode:"dialogue",speaker:"MIRAI",text:"You said this was faster."},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"I did.\n\nA beat."},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"Your instructor gave me one extra job.\n\nMirai's attention sharpens."},
+ {mode:"dialogue",speaker:"MIRAI",text:"What job?"},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"See what you do if the person you're escorting stops cooperating.\n\nThe Traveller sets down his bag.\n\nHis stance changes.\n\nNot dramatic.\n\nEnough."},
+ {mode:"dialogue",speaker:"MIRAI",text:"This is part of the assessment."},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"Looks like it.\n\nMirai folds the route map and puts it away.\n\nThen raises her guard."},
+ {mode:"dialogue",speaker:"MIRAI",text:"Fine.\n\nA beat.\n\nThen stop me."}
 ],MIRAI_ENV.lane,"mir_shortcut_battle");
+
 push({
  beatId:"mir_shortcut_battle",
  mode:"battle_transition",
  text:"",
  environmentRef:MIRAI_ENV.lane,
- battle:miraiBattleSpec(MIRAI_SHORTCUT_CALLER,"mir_shortcut_battle_return")
+ battle:miraiBattleSpec(MIRAI_SHORTCUT_CALLER,"mir_shortcut_victory_01","mir_shortcut_defeat_end_01")
 });
+
+line("mir_shortcut_victory",[
+ {mode:"narration",text:"The Traveller is the first to lower his guard.\n\nMirai does not lower hers immediately."},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"All right."},
+ {mode:"dialogue",speaker:"MIRAI",text:"That was your extra job?"},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"See what you'd do.\n\nMirai looks toward the turn behind them.\n\nThen at him."},
+ {mode:"dialogue",speaker:"MIRAI",text:"We're done with your route."},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"Fair.\n\nHe picks up his bag."},
+ {mode:"narration",text:"Mirai walks first this time.\n\nThe Traveller follows.\n\nShe does not give him the next turn to choose."},
+ {mode:"narration",text:"They rejoin the checkpoint road beyond the storehouses.\n\nCheckpoint Three is still ahead.\n\nThe escort continues."}
+],MIRAI_ENV.lane,"mir_shortcut_victory_route");
+
 push({
- beatId:"mir_shortcut_battle_return",
+ beatId:"mir_shortcut_victory_route",
  mode:"resolver",
  machineResolved:true,
  text:"",
- environmentRef:MIRAI_ENV.lane,
+ environmentRef:MIRAI_ENV.street,
  choices:[
-  C("defeat","RESOLVE SHORTCUT DEFEAT","mir_shortcut_defeat_end_01",{
-    miraiEscortAssessmentResult:"not_completed_battle_defeat",
-    miraiEscortDutyActive:false,
-    miraiReachedCheckpointAsActiveEscort:false,
-    scenePurpose:"post_assessment_debrief",
-    miraiDefeatRoute:"shortcut"
-  },{availability:hiddenResolverAvailability(()=>miraiBattleAuthoredValue("battleResult")==="defeat")}),
-  C("talked","RESOLVE TALKED ROAD","mir_road_talk_01",null,{availability:hiddenResolverAvailability(()=>miraiBattleAuthoredValue("battleResult")==="victory"&&A.local().mirTalked===true)}),
-  C("professional","RESOLVE PROFESSIONAL ROAD","mir_road_prof_01",null,{availability:hiddenResolverAvailability(()=>miraiBattleAuthoredValue("battleResult")==="victory"&&A.local().mirTalked!==true)})
+  C("talked","RESOLVE POST-BATTLE TALKED ROAD","mir_road_talk_memory_01",null,{availability:hiddenResolverAvailability(()=>A.local().mirTalked===true)}),
+  C("professional","RESOLVE POST-BATTLE PROFESSIONAL ROAD","mir_road_prof_detect_01",null,{availability:hiddenResolverAvailability(()=>A.local().mirTalked!==true)})
  ]
 });
+
 line("mir_shortcut_defeat_end",[
  {mode:"narration",text:"Mirai's guard gives first.\n\nShe catches herself against the storehouse wall.\n\nThe Traveller stops.\n\nHe does not attack again."},
  {mode:"dialogue",speaker:"TRAVELLER",text:"Enough."},
@@ -566,7 +608,7 @@ line("mir_shortcut_defeat_end",[
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"You were."},
  {mode:"narration",text:"Mirai looks back at the instructor.\n\nNo excuse comes.\n\nThe instructor does not ask for one."}
 ],MIRAI_ENV.lane,"mir_defeat_debrief_shortcut_01");
-miraiBeats.find(row=>row.beatId==="mir_shortcut_defeat_end_01").onEnterConsequences=[mirDefeatAssessment];
+miraiBeats.find(row=>row.beatId==="mir_shortcut_defeat_end_01").onEnterConsequences=[miraiDefeatContextPatch("shortcut"),mirDefeatAssessment];
 
 line("mir_defeat_debrief_shortcut",[
  {mode:"narration",text:"The real Traveller is sitting on the Checkpoint Three steps when Mirai arrives later with the instructor.\n\nHis travel bag is beside him.\n\nThe cup in his hands is almost empty."},
@@ -739,24 +781,7 @@ push({
  mode:"battle_transition",
  text:"",
  environmentRef:MIRAI_ENV.street,
- battle:miraiBattleSpec(MIRAI_CONFRONT_CALLER,"mir_confrontation_battle_return")
-});
-push({
- beatId:"mir_confrontation_battle_return",
- mode:"resolver",
- machineResolved:true,
- text:"",
- environmentRef:MIRAI_ENV.street,
- choices:[
-  C("defeat","RESOLVE CONFRONTATION DEFEAT","mir_confront_defeat_end_01",{
-    miraiEscortAssessmentResult:"not_completed_battle_defeat",
-    miraiEscortDutyActive:false,
-    miraiReachedCheckpointAsActiveEscort:false,
-    scenePurpose:"post_assessment_debrief",
-    miraiDefeatRoute:"confrontation"
-  },{availability:hiddenResolverAvailability(()=>miraiBattleAuthoredValue("battleResult")==="defeat")}),
-  C("reveal","RESOLVE CONFRONTATION RETURN","mir_confront_reveal_01",null,{availability:hiddenResolverAvailability(()=>miraiBattleAuthoredValue("battleResult")==="victory")})
- ]
+ battle:miraiBattleSpec(MIRAI_CONFRONT_CALLER,"mir_confront_reveal_01","mir_confront_defeat_end_01")
 });
 line("mir_confront_defeat_end",[
  {mode:"narration",text:"Mirai's guard breaks before the Traveller's does.\n\nShe drops to one knee.\n\nThe exchange stops immediately."},
@@ -772,7 +797,7 @@ line("mir_confront_defeat_end",[
  {mode:"dialogue",speaker:"MIRAI",text:"So I was right."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"About the switch.\n\nA beat.\n\nYou still lost the exchange.\n\nMirai looks away.\n\nShe knows."}
 ],MIRAI_ENV.street,"mir_defeat_debrief_confront_01");
-miraiBeats.find(row=>row.beatId==="mir_confront_defeat_end_01").onEnterConsequences=[mirDefeatAssessment];
+miraiBeats.find(row=>row.beatId==="mir_confront_defeat_end_01").onEnterConsequences=[miraiDefeatContextPatch("confrontation"),mirDefeatAssessment];
 
 line("mir_defeat_debrief_confront",[
  {mode:"narration",text:"The real Traveller is waiting at Checkpoint Three.\n\nMirai looks at him first.\n\nOnly after confirming he is fine does she turn back to the instructor."},
