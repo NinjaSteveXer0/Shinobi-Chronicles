@@ -149,6 +149,19 @@ for(const phrase of finalDynamicRepresentatives){
   assert(translated&&translated!==phrase,`dynamic final-Writing phrase fell back to English: ${phrase}`);
   assert.equal(core.validateProtectedTerms(phrase,translated).success,true,`dynamic final-Writing glossary failure: ${phrase}`);
 }
+const kurenaiExpansionRequired=[
+  "Most of the Academy has already emptied out.\n\nKurenai is still in the training courtyard.\n\nThe instructor is putting away practice markers near the far wall.\n\nA small bell hangs from one hand.\n\nKurenai notices it before the instructor notices her watching.",
+  "SEND A FALSE KURENAI","HIDE MY REAL MOVEMENT","DISTORT HER SENSE OF DISTANCE","MAKE THE DIRECT APPROACH LOOK REAL",
+  "Genjutsu isn't only making somebody believe something false.",
+  "It's knowing what stays true after both of you start lying.",
+  "Same exercise tomorrow?","Change the trick."
+];
+for(const phrase of kurenaiExpansionRequired){
+  assert(finalTexts.has(phrase),`Kurenai expansion phrase missing from es-419 final-Writing catalogue: ${phrase}`);
+  const translated=core.translatePresentedText(phrase);
+  assert(translated&&translated!==phrase,`Kurenai expansion phrase fell back to English: ${phrase}`);
+  assert.equal(core.validateProtectedTerms(phrase,translated).success,true,`Kurenai expansion glossary failure: ${phrase}`);
+}
 core.setLocale('en',{persist:false,source:'qa'});
 assert.equal(core.translatePresentedText('Torneo de la aldea'),'Village Tournament');
 assert.equal(core.translatePresentedText('Mañana... lo haré mejor.'),"Tomorrow... I'll do it cleaner.");
