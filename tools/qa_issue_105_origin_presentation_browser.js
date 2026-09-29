@@ -257,10 +257,10 @@ async function proveMiraiBattle338(browser){
     assert.strictEqual(directReturn.primaryVisible,false,"Mirai "+terminalOutcome+" still exposes redundant post-Battle CONTINUE");
 
     if(test.kind==="shortcut"){
-      assert.strictEqual(directReturn.text,"The Traveller is the first to lower his guard.\n\nMirai does not lower hers immediately.","Mirai shortcut victory continuity opening drift");
+      assert.strictEqual(directReturn.text,"The Traveller is the first to lower his guard.","Mirai shortcut victory continuity opening drift");
       const road=await advanceUntilBeat(page,"mir_road_talk_memory_01",100);
       const postBattleText=road.seen.map(x=>x.text).join("\n");
-      assert(postBattleText.includes("We're done with your route.")&&postBattleText.includes("The escort continues."),"Mirai shortcut victory bridge missing");
+      assert(postBattleText.includes("Mirai does not lower hers immediately.")&&postBattleText.includes("We're done with your route.")&&postBattleText.includes("The escort continues."),"Mirai shortcut victory bridge missing");
       assert(!postBattleText.includes("No attack comes."),"Mirai shortcut victory still denies the Battle with 'No attack comes.'");
     }else{
       assert.strictEqual(directReturn.text,"Mirai's guard breaks before the Traveller's does.","Mirai confrontation defeat continuity opening drift");
