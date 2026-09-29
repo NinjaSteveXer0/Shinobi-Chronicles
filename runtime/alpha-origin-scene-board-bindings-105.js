@@ -170,10 +170,22 @@ function buildMiraiReceipt105(){
   else if(ctx.mirChangedRoute===true)lines.push("• Changed the route.");
   else if(ctx.mirContinued===true)lines.push("• Continued the escort to Checkpoint Three.");
   const reflection={
-    physical_protection_matters:"Getting the escort there safely still mattered.",
-    verify_identity:"Decided to verify who she was protecting.",
-    need_evidence:"Decided suspicion needs evidence.",
-    watch_person:"Decided to watch the person, not only the route."
+    conversation_route_person_changed:"The route stayed the same. The person didn't.",
+    conversation_talking_matters:"Talking to someone can tell her more than a map.",
+    conversation_check_sooner:"Caught the contradiction and chose to check sooner next time.",
+    conversation_needed_mismatch:"Needed the mismatch, not suspicion alone.",
+    chakra_stopped_on_change:"Stopped when something changed instead of explaining it away.",
+    chakra_verify:"Used changed chakra as enough reason to verify.",
+    chakra_wrong_before_why:"Knew something was wrong before knowing why.",
+    chakra_recheck_after_lost_sight:"Will recheck the person after losing sight of them.",
+    suspicion_needed_more:"Needed more than suspicion before acting.",
+    suspicion_not_ready_to_prove:"Noticed the problem without pretending it was proof.",
+    suspicion_verify_quietly:"Will verify without giving away what she knows.",
+    suspicion_identity_unanswered:"Finishing the route did not answer who she was escorting.",
+    missed_watched_road:"Watched the road better than the person.",
+    missed_lost_sight:"Losing sight of someone should change what she checks next.",
+    missed_switch:"Completed the escort and missed the switch.",
+    missed_learn_person:"Will learn more than the route next time."
   }[ctx.mirReflection];
   if(reflection)lines.push("• "+reflection);
   lines.push("","WHAT HAPPENED","• Completed the Academy escort assessment.","• Reached Checkpoint Three and reviewed the route.");
@@ -214,7 +226,7 @@ function miraiBackdrop(beatId,runtime){
     return BACKDROP.miraiLane;
   }
   if(id.startsWith("mir_checkpoint_")||id.startsWith("mir_after_")||id.startsWith("mir_leaving_")||
-     id.startsWith("mir_reflect_")||id==="mir_reflection_choice"||id==="mir_close_01"||
+     id.startsWith("mir_reflect_")||id.startsWith("mir_reflection_")||id==="mir_close_01"||
      id==="mir_checkpoint"||id==="mir_verified"||id==="mir_eval"||id==="mir_end")return BACKDROP.miraiCheckpoint;
   return BACKDROP.miraiStreet;
 }
@@ -250,8 +262,8 @@ function miraiActors(beatId,performance,beat){
     rows.push(instructor(),traveller());
     return rows;
   }
-  if(id.startsWith("mir_reflect_")||id==="mir_reflection_choice"){
-    rows.push(instructor());
+  if(id.startsWith("mir_reflect_")||id.startsWith("mir_reflection_")){
+    rows.push(instructor(),traveller());
     return rows;
   }
   if(id==="mir_close_01")return rows;
@@ -306,14 +318,21 @@ function menmaActors(beatId,performance,beat){
 function kushinaActors(beatId,performance,beat){
   const id=String(beatId||""),sp=speaker(performance,beat);
   const rows=[actor("academy_kushina","KUSHINA",PATH.kushina,sp)];
-  if(id.startsWith("kus_gero_")||id==="kus_contact_choice"||id.startsWith("kus_close")||id.startsWith("kus_answer")||id.startsWith("kus_last")){
-    rows.push(actor("key_gero","GEROTORA",PATH.gerotora,sp));
-  }else if(id.startsWith("kus_protect_student_")){
-    rows.push(actor("kushina_classmate","CLASSMATE",PATH.kushinaClassmate,sp,["STUDENT"]));
-    rows.push(actor("kushina_academy_instructor","INSTRUCTOR",PATH.kushinaInstructor,sp,["ACADEMY INSTRUCTOR"]));
-  }else{
-    rows.push(actor("kushina_academy_instructor","INSTRUCTOR",PATH.kushinaInstructor,sp,["ACADEMY INSTRUCTOR"]));
+  const instructor=()=>actor("kushina_academy_instructor","INSTRUCTOR",PATH.kushinaInstructor,sp,["ACADEMY INSTRUCTOR"]);
+  const classmate=()=>actor("kushina_classmate","CLASSMATE",PATH.kushinaClassmate,sp,["STUDENT"]);
+  const occurrence=A&&typeof A.findOccurrence==="function"?A.findOccurrence("occ_origin_kushina_gerotora_identity_disclosure"):null;
+  const identityKnown=!!(occurrence&&occurrence.fact&&occurrence.fact.gerotoraCommunicatedOwnIdentity===true);
+  const nameSpoken=id.startsWith("kus_ask_who_")&&Number((id.match(/_(\d+)$/)||[])[1]||0)>=4;
+  const geroLabel=identityKnown||nameSpoken||sp==="GEROTORA"?"GEROTORA":"TOAD";
+  const gero=()=>actor("key_gero",geroLabel,PATH.gerotora,sp,["GEROTORA","TOAD"]);
+  const geroPhase=id.startsWith("kus_reverse_")||id.startsWith("kus_gero_")||id==="kus_contact_choice"||
+    id.startsWith("kus_ask_")||id.startsWith("kus_help_")||id.startsWith("kus_send_")||
+    id.startsWith("kus_closure_")||id.startsWith("kus_after_gero_")||id.startsWith("kus_route_d_");
+  if(geroPhase){
+    rows.push(gero(),instructor(),classmate());
+    return rows;
   }
+  rows.push(instructor(),classmate());
   return rows;
 }
 function kurenaiActors(beatId,performance,beat){
