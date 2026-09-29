@@ -218,17 +218,52 @@ async function proveMiraiBattle338(browser){
       assert.strictEqual(rewardPresentation.ryo,"50","Mirai Victory Ryō did not remain static at 50");
       assert.strictEqual(rewardPresentation.animated,"false","Mirai Victory Ryō still advertises animation");
       assert.strictEqual(rewardPresentation.result?.animated,false,"Mirai Victory reveal still animates fixed 50 Ryō");
+    }
 
-      await page.evaluate(beatId=>globalThis.setStorySceneBeat?.(beatId),test.victoryBeatId);
-      await release(page);
-      const winReturn=await snapshot(page);
-      assert.strictEqual(winReturn.beatId,"mir_shortcut_victory_01","Mirai shortcut victory did not enter authored post-Battle Story directly");
-      assert.strictEqual(winReturn.text,"The Traveller is the first to lower his guard.\n\nMirai does not lower hers immediately.","Mirai shortcut victory continuity opening drift");
-      assert.strictEqual(winReturn.primaryVisible,false,"Mirai win still exposes redundant post-Battle CONTINUE");
+    const terminalOutcome=test.kind==="shortcut"?"victory":"defeat";
+    const expectedReturnBeat=terminalOutcome==="victory"?test.victoryBeatId:test.defeatBeatId;
+    const returned=await page.evaluate(({terminalOutcome,expectedReturnBeat})=>{
+      if(!currentBattle)return{success:false,reason:"battle_missing"};
+      currentBattle.battleOver=true;
+      currentBattle.outcome={type:terminalOutcome};
+      if(terminalOutcome==="victory"){
+        currentBattle.rewards={
+          generated:true,claimed:true,ryo:50,exp:0,items:[],rareDrops:[],
+          mirai338FixedReward:true,
+          requiresExplicitPostClaimContinue:false
+        };
+      }
+      try{globalThis.hardSettleBattlePresentationQueue33000?.("issue_105_mirai_direct_story_return");}catch(_error){}
+      const result=globalThis.resumeBattleCallerAfterCompletion?.(terminalOutcome);
+      return{
+        result,
+        overlay:typeof currentOverlayType==="undefined"?null:currentOverlayType,
+        beatId:globalThis.getActiveStorySceneRuntime?.()?.beatId||null,
+        expectedReturnBeat
+      };
+    },{terminalOutcome,expectedReturnBeat});
+    assert.strictEqual(returned.result?.success,true,"Mirai #338 caller return failed "+JSON.stringify(returned));
+    assert.strictEqual(returned.beatId,expectedReturnBeat,"Mirai #338 caller returned to wrong Story beat "+JSON.stringify(returned));
+
+    await page.waitForFunction(expected=>{
+      const rt=globalThis.getActiveStorySceneRuntime?.();
+      const root=document.getElementById("story-scene-presentation-layer");
+      const stage=root?.querySelector(".sc-chronicle-stage")||root?.querySelector(".sc-story-stage");
+      return rt?.beatId===expected&&!!stage&&getComputedStyle(stage).display!=="none"&&stage.getClientRects().length>0;
+    },expectedReturnBeat,{timeout:8000});
+
+    const directReturn=await snapshot(page);
+    assert.strictEqual(directReturn.beatId,expectedReturnBeat,"Mirai #338 direct post-Battle Story return drift");
+    assert.strictEqual(directReturn.primaryVisible,false,"Mirai "+terminalOutcome+" still exposes redundant post-Battle CONTINUE");
+
+    if(test.kind==="shortcut"){
+      assert.strictEqual(directReturn.text,"The Traveller is the first to lower his guard.\n\nMirai does not lower hers immediately.","Mirai shortcut victory continuity opening drift");
       const road=await advanceUntilBeat(page,"mir_road_talk_memory_01",100);
       const postBattleText=road.seen.map(x=>x.text).join("\n");
       assert(postBattleText.includes("We're done with your route.")&&postBattleText.includes("The escort continues."),"Mirai shortcut victory bridge missing");
       assert(!postBattleText.includes("No attack comes."),"Mirai shortcut victory still denies the Battle with 'No attack comes.'");
+    }else{
+      assert.strictEqual(directReturn.text,"Mirai's guard breaks before the Traveller's does.","Mirai confrontation defeat continuity opening drift");
     }
 
     await gate.assertClean("academy_mirai-338-"+test.kind);
