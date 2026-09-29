@@ -471,6 +471,16 @@ NPCs may talk to each other without routing every line through the protagonist.
 
 Silence can be meaningful.
 
+Do **not** write generic screenplay-pause filler such as:
+
+`A beat.`
+
+into player-facing Story.
+
+If silence matters, show the specific physical reaction, interruption, hesitation or change in attention that makes that silence belong to this character and this scene. If nothing meaningful happens in the pause, omit it.
+
+Do not replace `A beat.` with another repeated house tic such as `For a moment.`, `A pause.`, or `Silence.`.
+
 One person may dominate.
 
 Another may interrupt.
