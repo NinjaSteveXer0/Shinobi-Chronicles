@@ -1248,8 +1248,6 @@ He puts his goggles back on.
 
 **OBITO:** “Then I leave earlier.”
 
-A beat.
-
 **OBITO:** “A lot earlier.”
 
 That sounds possible.
