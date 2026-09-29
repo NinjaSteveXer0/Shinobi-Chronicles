@@ -828,3 +828,86 @@ It requires Story to feel authored as **experience**, not as documentation.
 > **All Shinobi Chronicles player-facing Story—every Origin, Arc, Canon route, Alternate route, Mission, Event, debrief, ending, narration, dialogue and conversation, including future village content—must dramatize semantic truth rather than explain the underlying rules. Author notes and machine-facing constraints remain separate from player-facing prose. Characters must behave as people with distinct voices, relationships, wants and reactions; narration must show physical/emotional experience rather than system logic; dialogue must respond to the scene rather than execute a repeated conversational algorithm; and the player must be trusted to infer meaning that the Story has already made legible.**
 
 > **If the scene reads like a specification with character names attached, it is not player-facing Writing complete.**
+
+---
+
+## 28. Mandatory Writing startup preflight
+
+Before any current or future Writing workspace drafts, rewrites, expands, compresses or materially edits player-facing Shinobi Chronicles Story, it must complete a source-first **WRITING PREFLIGHT**.
+
+This preflight is mandatory whenever:
+- a new Writing chat/workspace begins substantial work;
+- the task switches to a different Origin / Arc / character family;
+- Stephen says Writing has drifted;
+- a candidate is reopened for voice/personality repair;
+- the chat is uncertain which Story/voice authority is current.
+
+Writing must not draft first and audit later.
+
+### 28.1 Required live authority fetch
+
+At minimum, Writing must fetch and read the current live versions of:
+
+1. this universal quality gate;
+2. `Documentation/Story/Writing_Anti_Flattening_Character_Voice_and_Conversation_Hard_Gate_2026-09-30.md`;
+3. the exact current Story authority for the active Origin/Arc/scene;
+4. the current character-specific voice/personality anchor(s) for every major named participant;
+5. any current scene-specific / benchmark / owner correction that directly governs the task.
+
+Do not rely on Project memory or an old summary when a live durable source exists.
+
+### 28.2 Required preflight receipt
+
+Before drafting, Writing must return a compact receipt containing:
+
+- **CURRENT STORY AUTHORITY:** exact path + current SHA;
+- **VOICE ANCHORS:** exact path(s) + current SHA(s);
+- **QUALITY GATES:** exact path(s) + current SHA(s);
+- **5 NON-NEGOTIABLE RULES FOR THIS TASK:** concrete rules derived from those sources;
+- **VOICE DIFFERENTIATORS:** one short line per major named participant stating what makes their speech/behaviour distinct in this scene;
+- **DRIFT RISKS:** the 2–4 most likely failure modes for this exact task;
+- final line: **WRITING PREFLIGHT: GREEN**.
+
+If a required source cannot be found or conflicts with another current source, Writing must stop and resolve that before drafting.
+
+### 28.3 No performative acknowledgements
+
+The following do NOT count as preflight:
+
+- “I’ve read the rules.”
+- “I’ll follow #333.”
+- “Understood.”
+- generic paraphrase of Project instructions;
+- quoting only issue titles;
+- relying only on memory;
+- listing rules without exact live paths/SHAs.
+
+The receipt exists to prove actual live-source consumption.
+
+### 28.4 Stephen gating phrase
+
+Stephen may enforce this at any time with:
+
+> **WRITING PREFLIGHT FIRST. DO NOT DRAFT.**
+
+On receiving that instruction, Writing must return only the preflight receipt and must not author player-facing Story until Stephen continues the task.
+
+### 28.5 Preflight is not bureaucracy
+
+The receipt should be short.
+
+It is not permission for:
+- another archaeology sweep;
+- canon over-research;
+- long design analysis;
+- restating every Writing rule.
+
+The purpose is to force the active workspace to load the right rules and voices before prose generation.
+
+Canonical rule:
+
+> **No live authority receipt -> no draft.**
+
+And:
+
+> **If Writing cannot prove what rules and voices it is using, it is not ready to write.**
