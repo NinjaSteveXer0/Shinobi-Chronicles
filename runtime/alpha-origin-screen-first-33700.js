@@ -161,7 +161,10 @@ function patchMirai(){
 }
 
 function patchKushina(){
-  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const d=editable(A.sceneByVariant.academy_kushina);if(!d)return false;
+  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
+  const live=definition(A.sceneByVariant.academy_kushina);
+  if(live&&live.entryBeatId==="kus_practical_01"&&beat(live,"kus_crisis")&&beat(live,"kus_contact_choice")&&beat(live,"kus_route_d_close_08"))return true;
+  const d=editable(A.sceneByVariant.academy_kushina);if(!d)return false;
   setText(d,"kus_crisis","The practice scroll gives a sharp, ugly hiss.\n\nOne line of ink crawls past the instructor's guide marks. A classmate kneeling beside it freezes as chakra lifts the paper off the stone.\n\nKushina is moving before the instructor finishes shouting her name.");
   setLabel(d,"kus_crisis","correct_formula","Drop to the seal and correct the formula before it cascades.");
   setLabel(d,"kus_crisis","protect_student","Get the classmate out. The scroll can wait.");
