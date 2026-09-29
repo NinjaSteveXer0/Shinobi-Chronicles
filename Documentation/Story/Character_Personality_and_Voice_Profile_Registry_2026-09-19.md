@@ -606,6 +606,7 @@ Known current specific anchors include, among others:
 - Menma / Kurama characterisation authority;
 - Minato / Sasuke canon voice anchor;
 - `Documentation/Story/Academy_Wasabi_Izuno_Character_Voice_and_Personality_Anchor_2026-09-29.md` for Academy Wasabi Izuno;
+- `Documentation/Story/Academy_Metal_Lee_Character_Voice_and_Personality_Anchor_2026-09-29.md` for Academy Metal Lee;
 - Storywide Kakashi / Pakkun / ANBU / Minato benchmark material.
 
 This registry starts with the active Kakashi Origin cast because that is the current Alpha production lane.
