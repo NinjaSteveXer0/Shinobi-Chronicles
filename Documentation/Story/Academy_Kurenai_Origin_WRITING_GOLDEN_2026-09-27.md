@@ -9,8 +9,14 @@
 
 **Date:** 2026-09-27  
 **Owner:** Writing / Story — Konoha  
-**Status:** **WRITING GOLDEN — STEPHEN APPROVED 2026-09-27**  
+**Status:** **CORE BELL TEST PRESERVED — ORIGIN EXPANSION OPEN 2026-09-29 / NOT FROZEN**  
 **Origin:** `academy_kurenai`
+
+> **2026-09-29 expansion successor:** `Documentation/Story/Academy_Kurenai_Origin_Benchmark_Expansion_2026-09-29.md` @ `5748e7df05bd0044b74fb054fdb4472b6ff77919`.
+>
+> **Voice anchor:** `Documentation/Story/Academy_Kurenai_Character_Voice_and_Personality_Anchor_2026-09-29.md` @ `7669d8fd4406cb79347e4be26723c15e9159d7a0`.
+>
+> Stephen explicitly chose to preserve the developed Bell Test/evaluation and expand the Origin around it. The Bell Test remains current core authority; the old immediate post-evaluation transition is superseded by the expansion.
 
 ## Environment
 
