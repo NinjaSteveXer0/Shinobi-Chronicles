@@ -27,7 +27,7 @@ It is not allowed to become click attrition.
 
 The longest legitimate Obito route should target:
 
-> **approximately 35–45 total Story advances from entry through final Story close, excluding Chronicle Receipt interaction.**
+> **approximately 28–36 total player interactions from entry through final Story close, excluding Chronicle Receipt interaction.**
 
 This is a target, not permission to cut required facts.
 
@@ -882,9 +882,13 @@ Choice cards are separate interaction surfaces.
 
 All HELP + FULL available presentation is impossible because all HELP yields MINIMAL.
 
-Representative longest displayed route remains expected to stay around **35–45 total Story advances**, including choice selections, depending on shared Scene Board treatment.
+Representative routes should land around **30–34 total interactions** before Receipt when the compact beats are projected correctly.
 
-If implementation exceeds **50** advances on a legitimate single playthrough before Receipt, treat that as a compression regression requiring inspection.
+**40 interactions before Receipt is the hard ceiling.**
+
+If a legitimate single playthrough exceeds 40 interactions before Receipt, or if any one diversion requires more than 5 interactions including its choice, treat that as a compression regression.
+
+Do not split one authored compact beat into separate clicks merely because it contains several short sentences or a short exchange. Preserve one complete readable dramatic beat per Story box.
 
 ## 6. Preserve machine authority
 
