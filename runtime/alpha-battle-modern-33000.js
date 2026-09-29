@@ -211,7 +211,50 @@
       ${modeHtml}`;
   }
 
+  function syncBattleSkillInspectorOverflow33000(panel){
+    if(!panel)return false;
+    const apply=()=>{
+      const overflow=Number(panel.scrollHeight||0)>Number(panel.clientHeight||0)+2;
+      panel.dataset.battle2Scrollable=overflow?"true":"false";
+      if(overflow){
+        panel.setAttribute("tabindex","0");
+        panel.setAttribute("aria-label","Skill description. Scroll for more details.");
+      }else{
+        panel.removeAttribute("tabindex");
+        panel.removeAttribute("aria-label");
+      }
+    };
+    if(typeof requestAnimationFrame==="function")requestAnimationFrame(apply);else apply();
+    return true;
+  }
+  let battleSkillPreviewClearTimer33000=null;
+  function cancelBattleSkillPreviewClear33000(){
+    if(battleSkillPreviewClearTimer33000!==null){
+      clearTimeout(battleSkillPreviewClearTimer33000);
+      battleSkillPreviewClearTimer33000=null;
+    }
+  }
+  function battleSkillInspectorInteractionActive33000(){
+    if(typeof document==="undefined")return false;
+    const stage=document.querySelector(".alpha-code-battle-stage");
+    if(!stage)return false;
+    const deck=stage.querySelector(".battle-live-skill-deck");
+    const panel=stage.querySelector(".battle-live-skill-details");
+    const hovered=node=>{try{return !!(node&&node.matches(":hover"));}catch(_error){return false;}};
+    const focused=node=>!!(node&&document.activeElement&&(node===document.activeElement||node.contains(document.activeElement)));
+    return hovered(deck)||hovered(panel)||focused(deck)||focused(panel);
+  }
+  function scheduleBattleSkillPreviewClear33000(){
+    cancelBattleSkillPreviewClear33000();
+    battleSkillPreviewClearTimer33000=setTimeout(()=>{
+      battleSkillPreviewClearTimer33000=null;
+      if(battleSkillInspectorInteractionActive33000())return;
+      clearBattleSkillPreview33000();
+    },120);
+  }
+
   function previewBattlePreparedSkill33000(skillId){
+    cancelBattleSkillPreviewClear33000();
     const actor=getActiveBattleActor33000();
     if(!actor||!skillId||typeof getBattlePreparedSkillDefinition!=="function")return false;
     const skill=getBattlePreparedSkillDefinition(actor,skillId);
@@ -231,11 +274,14 @@
     panel.classList.add("battle2-inspector");
     panel.innerHTML=renderInspector33000(skill,actor);
     panel.dataset.previewSkillId=skill.id;
+    panel.scrollTop=0;
+    syncBattleSkillInspectorOverflow33000(panel);
     return true;
   }
   window.previewBattlePreparedSkill33000=previewBattlePreparedSkill33000;
 
   function clearBattleSkillPreview33000(){
+    cancelBattleSkillPreviewClear33000();
     const panel=typeof document!=="undefined"?document.querySelector(".alpha-code-battle-stage .battle-live-skill-details"):null;
     if(!panel)return false;
     panel.classList.add("battle2-inspector");
@@ -243,6 +289,7 @@
       panel.innerHTML=panel.dataset.battle2SelectedSkillRestore;
       delete panel.dataset.battle2SelectedSkillRestore;
       delete panel.dataset.previewSkillId;
+      syncBattleSkillInspectorOverflow33000(panel);
       return true;
     }
     let selected=null,actor=getActiveBattleActor33000();
@@ -252,6 +299,7 @@
       return true;
     }
     panel.innerHTML=`<div class="battle2-inspector-empty"><span>SKILL GUIDE</span><h2>Choose your next move</h2><p>Move your mouse over a Skill to learn what it does. Click the Skill when you are ready to use it.</p><div><b>HOVER</b> Learn &nbsp; · &nbsp; <b>CLICK</b> Use</div></div>`;
+    syncBattleSkillInspectorOverflow33000(panel);
     return true;
   }
   window.clearBattleSkillPreview33000=clearBattleSkillPreview33000;
@@ -310,7 +358,22 @@
       const small=card.querySelector("small");if(small)card.insertBefore(meta,small);else card.appendChild(meta);
     });
     const deck=stage.querySelector(".battle-live-skill-deck");
-    if(deck&&!deck.dataset.battle2LeaveBound){deck.dataset.battle2LeaveBound="true";deck.addEventListener("mouseleave",()=>clearBattleSkillPreview33000());}
+    const panel=stage.querySelector(".battle-live-skill-details");
+    if(deck&&!deck.dataset.battle2LeaveBound){
+      deck.dataset.battle2LeaveBound="true";
+      deck.addEventListener("mouseenter",cancelBattleSkillPreviewClear33000);
+      deck.addEventListener("mouseleave",scheduleBattleSkillPreviewClear33000);
+      deck.addEventListener("focusin",cancelBattleSkillPreviewClear33000);
+      deck.addEventListener("focusout",scheduleBattleSkillPreviewClear33000);
+    }
+    if(panel&&!panel.dataset.battle2InspectorHoverBound){
+      panel.dataset.battle2InspectorHoverBound="true";
+      panel.addEventListener("mouseenter",cancelBattleSkillPreviewClear33000);
+      panel.addEventListener("mouseleave",scheduleBattleSkillPreviewClear33000);
+      panel.addEventListener("focusin",cancelBattleSkillPreviewClear33000);
+      panel.addEventListener("focusout",scheduleBattleSkillPreviewClear33000);
+      syncBattleSkillInspectorOverflow33000(panel);
+    }
   }
 
   function installBattleTicker33000(stage){
@@ -1463,7 +1526,7 @@
       .battle2-modern .battle-dev-skill-card.is-selected{border-color:rgba(230,190,88,.64)!important;box-shadow:inset 0 -2px 0 rgba(230,190,88,.58)!important}
       .battle2-modern .battle-dev-skill-card .battle-dev-skill-discipline{color:#50d8e3!important;font-size:clamp(7px,.54vw,9px)!important;letter-spacing:.1em!important}.battle2-modern .battle-dev-skill-card strong{font-size:clamp(10px,.78vw,13px)!important;line-height:1.18!important;margin-top:8px!important}.battle2-modern .battle-dev-skill-card .battle-dev-skill-type{opacity:.58!important;font-size:clamp(7px,.49vw,8px)!important}.battle2-modern .battle-dev-skill-card small{bottom:8px!important;color:#71848c!important}
       .battle2-card-meta{display:flex!important;gap:5px!important;flex-wrap:wrap!important;margin-top:9px!important}.battle2-card-meta b,.battle2-card-meta em{font-style:normal!important;border:1px solid rgba(255,255,255,.10)!important;background:rgba(255,255,255,.025)!important;padding:3px 5px!important;color:#a8b8bd!important;font-size:clamp(6px,.44vw,7px)!important;letter-spacing:.07em!important}.battle2-card-meta em{color:#e1bf68!important;border-color:rgba(205,166,70,.22)!important}
-      .battle2-modern .battle-live-skill-details{left:64%!important;top:68%!important;width:32.6%!important;height:25%!important;padding:14px 16px!important;border:1px solid rgba(91,121,134,.28)!important;background:linear-gradient(155deg,rgba(5,14,20,.96),rgba(3,8,12,.98))!important;overflow:auto!important}
+      .battle2-modern .battle-live-skill-details{left:64%!important;top:68%!important;width:32.6%!important;height:25%!important;padding:14px 16px!important;border:1px solid rgba(91,121,134,.28)!important;background:linear-gradient(155deg,rgba(5,14,20,.96),rgba(3,8,12,.98))!important;overflow-x:hidden!important;overflow-y:scroll!important;scrollbar-gutter:stable!important;overscroll-behavior:contain!important;scrollbar-width:thin!important;scrollbar-color:rgba(87,214,225,.72) rgba(10,26,34,.72)!important}.battle2-modern .battle-live-skill-details::-webkit-scrollbar{width:9px}.battle2-modern .battle-live-skill-details::-webkit-scrollbar-track{background:rgba(10,26,34,.72);border-left:1px solid rgba(255,255,255,.05)}.battle2-modern .battle-live-skill-details::-webkit-scrollbar-thumb{background:rgba(87,214,225,.66);border:2px solid rgba(10,26,34,.82);border-radius:999px}.battle2-modern .battle-live-skill-details[data-battle2-scrollable="true"]{box-shadow:inset 0 -14px 18px -18px rgba(93,223,232,.72)!important}.battle2-modern .battle-live-skill-details[data-battle2-scrollable="true"] .battle2-inspector-head::after{content:"SCROLL ↓";margin-left:auto;color:#72dce5;font-size:clamp(6px,.43vw,7px);letter-spacing:.09em;white-space:nowrap}.battle2-modern .battle-live-skill-details:focus-visible{outline:1px solid rgba(93,220,231,.72)!important;outline-offset:-2px!important}
       .battle2-inspector-head{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#d8b65d;font-size:clamp(7px,.48vw,8px);font-weight:900;letter-spacing:.12em}.battle2-inspector-head b{color:#5dd9e3;font-size:inherit}.battle2-inspector h2{margin:9px 0 7px;color:#f0e2c1;font:900 clamp(16px,1.45vw,23px)/1.05 Georgia,serif}.battle2-badges{display:flex;flex-wrap:wrap;gap:5px}.battle2-badges span{padding:3px 6px;border:1px solid rgba(83,142,154,.28);background:rgba(30,89,100,.09);color:#75dbe2;font-size:clamp(6px,.45vw,8px);font-weight:800;letter-spacing:.08em}.battle2-summary{margin:10px 0 5px!important;color:#dce4e1!important;font-size:clamp(10px,.70vw,12px)!important;font-weight:700!important;line-height:1.42!important}.battle2-inspector ul{margin:5px 0 8px;padding-left:17px;color:#96a8ae;font-size:clamp(8px,.58vw,10px);line-height:1.48}.battle2-target{display:flex;justify-content:space-between;gap:12px;border-top:1px solid rgba(255,255,255,.07);padding-top:7px;color:#60757e;font-size:8px;letter-spacing:.09em}.battle2-target strong{color:#d4c49c}.battle2-mode-block{margin-top:9px;padding-top:8px;border-top:1px solid rgba(210,171,75,.16)}.battle2-mode-block>span{color:#e1bb58;font-size:8px;font-weight:900;letter-spacing:.1em}.battle2-mode-block>div{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}.battle2-mode-block button{min-height:29px;border:1px solid rgba(67,207,218,.4);background:rgba(13,53,61,.36);color:#79e0e7;font-size:8px;font-weight:800;cursor:pointer}.battle2-inspector-empty span{color:#d8b65d;font-size:8px;font-weight:900;letter-spacing:.13em}.battle2-inspector-empty h2{margin:10px 0;color:#f0e1bd;font:900 clamp(17px,1.4vw,23px)/1 Georgia,serif}.battle2-inspector-empty p{color:#a6b3b5;font-size:clamp(9px,.66vw,11px);line-height:1.5}.battle2-inspector-empty div{margin-top:12px;color:#607780;font-size:8px;letter-spacing:.08em}.battle2-inspector-empty b{color:#61dce5}
       .battle2-live-ticker{position:absolute;left:39%;top:49%;width:22%;min-height:8%;z-index:30;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:9px 11px;border:1px solid rgba(97,125,137,.25);background:linear-gradient(155deg,rgba(3,10,15,.95),rgba(5,15,20,.91));box-shadow:0 10px 28px rgba(0,0,0,.38)}.battle2-ticker-copy span{display:block;color:#d2ae52;font-size:clamp(6px,.45vw,8px);font-weight:900;letter-spacing:.12em}.battle2-ticker-copy strong{display:block;margin-top:4px;color:#c8d6d8;font-size:clamp(8px,.58vw,10px);line-height:1.35;font-weight:600}.battle2-log-toggle{border:1px solid rgba(75,205,217,.28);background:rgba(10,42,49,.32);color:#71dbe3;padding:6px 8px;font-size:7px;font-weight:900;letter-spacing:.07em;cursor:pointer}.battle2-status-chips{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:5px}.battle2-status-chips span{border:1px solid rgba(196,107,223,.32);background:rgba(88,31,108,.16);color:#dc94f0;padding:3px 6px;font-size:7px;font-weight:800;letter-spacing:.06em}
       .battle2-modern .battle-runtime-log{display:none!important;position:absolute!important;left:35%!important;top:13%!important;width:30%!important;height:43%!important;z-index:80!important;padding:16px!important;background:rgba(2,8,12,.985)!important;border:1px solid rgba(213,173,75,.42)!important;box-shadow:0 25px 70px rgba(0,0,0,.68)!important}.battle2-modern.battle2-log-open .battle-runtime-log{display:block!important}.battle2-modern.battle2-log-open .battle2-live-ticker{opacity:.20}.battle2-modern .battle-runtime-log-line{font-size:clamp(9px,.64vw,11px)!important;line-height:1.46!important;padding:7px 0!important}.battle2-modern .battle-runtime-panel-title{font-size:clamp(10px,.74vw,12px)!important;color:#e1bb5c!important}
