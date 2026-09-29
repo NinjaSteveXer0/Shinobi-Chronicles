@@ -541,8 +541,10 @@ async function proveMiraiTerminalReceipt(browser){
         }
         const leave=await advanceUntilBeat(page,"kur_leave_win_01",100);
         const leaveText=leave.seen.map(x=>x.text).join("\n");
-        assert(leaveText.includes("Same exercise tomorrow?")&&leaveText.includes("Change the trick."),"Kurenai complete-win aftermath/leave expansion missing");
+        assert(leaveText.includes("Same exercise tomorrow?"),"Kurenai complete-win aftermath expansion missing");
         const receipt=await advanceUntilBeat(page,"kur_receipt",80);
+        const terminalText=receipt.seen.map(x=>x.text).join("\n");
+        assert(terminalText.includes("Change the trick."),"Kurenai complete-win leaving expansion missing");
         row=receipt.row;
         assert.strictEqual(row.mode,"record","Kurenai terminal is not Chronicle Receipt");
         assert.strictEqual(row.actors.length,0,"Kurenai Receipt still stages Story actors");
