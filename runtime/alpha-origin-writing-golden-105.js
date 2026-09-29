@@ -48,6 +48,10 @@ function menmaBattleAuthoredValue(key){
 function hiddenResolverAvailability(predicate){
   return ()=>({available:!!predicate(),knownBlocker:null});
 }
+function miraiBattleAuthoredValue(key){
+  const runtime=A.active(),resume=runtime&&runtime.battleResume,authored=resume&&resume.authored;
+  return authored&&Object.prototype.hasOwnProperty.call(authored,key)?authored[key]:null;
+}
 
 // ---------------------------------------------------------------------------
 // MENMA — exact Writing-GOLDEN conversation around the preserved Battle seam.
@@ -520,10 +524,39 @@ push({
  text:"",
  environmentRef:MIRAI_ENV.lane,
  choices:[
-  C("talked","RESOLVE TALKED ROAD","mir_road_talk_01",null,{availability:hiddenResolverAvailability(()=>A.local().mirTalked===true)}),
-  C("professional","RESOLVE PROFESSIONAL ROAD","mir_road_prof_01",null,{availability:hiddenResolverAvailability(()=>A.local().mirTalked!==true)})
+  C("defeat","RESOLVE SHORTCUT DEFEAT","mir_shortcut_defeat_01",null,{availability:hiddenResolverAvailability(()=>miraiBattleAuthoredValue("battleResult")==="defeat")}),
+  C("talked","RESOLVE TALKED ROAD","mir_road_talk_01",null,{availability:hiddenResolverAvailability(()=>miraiBattleAuthoredValue("battleResult")==="victory"&&A.local().mirTalked===true)}),
+  C("professional","RESOLVE PROFESSIONAL ROAD","mir_road_prof_01",null,{availability:hiddenResolverAvailability(()=>miraiBattleAuthoredValue("battleResult")==="victory"&&A.local().mirTalked!==true)})
  ]
 });
+line("mir_shortcut_defeat",[
+ {mode:"narration",text:"Mirai's footing gives first.\n\nShe catches herself against the storehouse wall before she hits the ground.\n\nThe Traveller does not follow with another attack."},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"Enough."},
+ {mode:"narration",text:"Mirai looks up.\n\nHe has space to leave.\n\nHe does not take it.\n\nThat bothers her more than if he had run."},
+ {mode:"dialogue",speaker:"MIRAI",text:"Why did you stop?"},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"Because you did."},
+ {mode:"narration",text:"Mirai pushes herself upright.\n\nHer arms feel heavy.\n\nHer attention does not.\n\nShe looks back toward the way they entered the lane."},
+ {mode:"dialogue",speaker:"MIRAI",text:"We're going back to the main road."},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"Your mission."},
+ {mode:"narration",text:"Mirai lets him walk first.\n\nNot far.\n\nJust far enough that she can see both of his hands.\n\nThey return to the checkpoint road with more space between them than before."}
+],MIRAI_ENV.lane,"mir_shortcut_defeat_route_router");
+push({
+ beatId:"mir_shortcut_defeat_route_router",
+ mode:"resolver",
+ machineResolved:true,
+ text:"",
+ environmentRef:MIRAI_ENV.lane,
+ choices:[
+  C("talked","RESOLVE POST-DEFEAT TALKED ROAD","mir_road_post_defeat_talk_01",null,{availability:hiddenResolverAvailability(()=>A.local().mirTalked===true)}),
+  C("professional","RESOLVE POST-DEFEAT PROFESSIONAL ROAD","mir_road_post_defeat_prof_01",null,{availability:hiddenResolverAvailability(()=>A.local().mirTalked!==true)})
+ ]
+});
+line("mir_road_post_defeat_talk",[
+ {mode:"narration",text:"The shortcut rejoins the checkpoint road beyond the market district.\n\nMirai keeps the Traveller in front of her now.\n\nCheckpoint Three is not far."}
+],MIRAI_ENV.street,"mir_road_talk_02");
+line("mir_road_post_defeat_prof",[
+ {mode:"narration",text:"The shortcut rejoins the checkpoint road beyond the market district.\n\nMirai keeps the Traveller in front of her now.\n\nCheckpoint Three is not far."}
+],MIRAI_ENV.street,"mir_road_prof_02");
 
 const roadCommon=[
  {mode:"narration",text:"The shortcut rejoins the checkpoint road beyond the market district.\n\nOr, if Mirai stayed on the marked route, the same stretch eventually opens ahead.\n\nCheckpoint Three isn't far now.\n\nThe traveller walks beside her.\n\nFor several minutes, nothing happens.\n\nNo one follows them.\n\nNo attack comes.\n\nNo one appears on a roof.\n\nThe traveller rubs at one shoulder beneath the bag strap."},
@@ -685,9 +718,20 @@ push({
  text:"",
  environmentRef:MIRAI_ENV.street,
  choices:[
-  C("reveal","RESOLVE CONFRONTATION RETURN","mir_confront_reveal_01",null,{availability:hiddenResolverAvailability(()=>true)})
+  C("defeat","RESOLVE CONFRONTATION DEFEAT","mir_confrontation_defeat_01",null,{availability:hiddenResolverAvailability(()=>miraiBattleAuthoredValue("battleResult")==="defeat")}),
+  C("reveal","RESOLVE CONFRONTATION RETURN","mir_confront_reveal_01",null,{availability:hiddenResolverAvailability(()=>miraiBattleAuthoredValue("battleResult")==="victory")})
  ]
 });
+line("mir_confrontation_defeat",[
+ {mode:"narration",text:"Mirai's guard breaks before the Traveller's does.\n\nShe drops to one knee.\n\nThe exchange stops.\n\nImmediately."},
+ {mode:"narration",text:"Mirai looks up.\n\nThe Traveller is still standing exactly where she blocked the road.\n\nHe is not running for the checkpoint."},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"Done?"},
+ {mode:"dialogue",speaker:"MIRAI",text:"No.\n\nThe answer comes before she has fully caught her breath."},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"You can't keep fighting."},
+ {mode:"dialogue",speaker:"MIRAI",text:"I can keep asking."},
+ {mode:"narration",text:"The Traveller looks at her for a long second.\n\nThen his shoulders ease."},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"Good."}
+],MIRAI_ENV.street,"mir_confront_reveal_01");
 push(N("mir_confront_reveal_01","Smoke bursts across the road.\n\nMirai jumps back.\n\nThe Academy instructor stands where the traveller had been.\n\nFor one beat, Mirai just stares.\n\nThen—","mir_confront_08",MIRAI_ENV.street));
 miraiBeats.find(row=>row.beatId==="mir_confront_12").onEnterConsequences=[mirVerify];
 
@@ -876,6 +920,7 @@ function diagnostics(){
   miraiWritingGoldenEntry:!!mir&&mir.entryBeatId==="mir_assignment_01",
   miraiRealConversation:!!mirBeat("mir_walk_choice")&&!!mirBeat("mir_market_talk_01")&&!!mirBeat("mir_reflection_choice"),
   miraiBattleDependencyFailClosed:!!mirBeat("mir_shortcut_talk_choice")&&String(mirBeat("mir_shortcut_talk_choice").choices?.[0]?.availability||"").includes("Battle route"),
+  miraiBattleDefeatContinuations:!!mirBeat("mir_shortcut_defeat_01")&&!!mirBeat("mir_shortcut_defeat_09")&&!!mirBeat("mir_confrontation_defeat_01")&&!!mirBeat("mir_confrontation_defeat_08"),
   menmaWritingGoldenEntry:!!men&&men.entryBeatId==="menma_open_01",
   menmaFullOpening:!!menBeat("menma_open_15")&&menBeat("menma_open_15").text==="I know.",
   menmaPreservedBattleSeam:!!menBeat("tutorial_battle"),

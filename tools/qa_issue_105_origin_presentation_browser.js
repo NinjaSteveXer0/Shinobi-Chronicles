@@ -165,6 +165,90 @@ async function proveMiraiBattle338(browser){
   return{cases:receipts,strictOneVsOne:true,observerSafeDisguise:true};
 }
 
+
+async function proveMiraiDefeatContinuations(browser){
+  const cases=[
+    {kind:"shortcut",returnBeatId:"mir_shortcut_battle_return",firstBeatId:"mir_shortcut_defeat_01",callerId:"academy_mirai_origin_shortcut_battle"},
+    {kind:"confrontation",returnBeatId:"mir_confrontation_battle_return",firstBeatId:"mir_confrontation_defeat_01",callerId:"academy_mirai_origin_confrontation_battle"}
+  ];
+  const proofs=[];
+  for(const test of cases){
+    const context=await browser.newContext({viewport:{width:1440,height:900}});
+    const page=await context.newPage();
+    const gate=await installBrowserRuntimeErrorGate(page);
+    await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});
+    await page.waitForFunction(()=>!!globalThis.SC_ALPHA_ORIGIN_WRITING_GOLDEN_105&&!!globalThis.SC_STORY_MACHINE_RESOLVER_343&&!!globalThis.SC_STORY_SCENE_BOARD_33900,null,{timeout:30000});
+    const setup=await page.evaluate(spec=>{
+      const select=selectChronicleOrigin("academy_mirai","issue_105_mirai_defeat_continuation");
+      const launch=beginAlphaChronicleOriginPrologue();
+      const rt=globalThis.getActiveStorySceneRuntime?.();
+      if(rt){
+        rt.localContext=rt.localContext&&typeof rt.localContext==="object"?rt.localContext:{};
+        if(spec.kind==="shortcut")rt.localContext.mirTalked=true;
+        rt.battleResume={authored:{
+          battleResult:"defeat",
+          callerId:spec.callerId,
+          miraiBattlePLDepleted:true,
+          instructorBattlePLDepleted:false,
+          identityRevealedByBattle:false
+        }};
+      }
+      const jump=globalThis.setStorySceneBeat?.(spec.returnBeatId);
+      return{select,launch,jump,beatId:globalThis.getActiveStorySceneRuntime?.()?.beatId||null};
+    },test);
+    assert.strictEqual(setup.select?.success,true,"Mirai defeat proof select failed "+JSON.stringify(setup));
+    assert.strictEqual(setup.launch?.success,true,"Mirai defeat proof launch failed "+JSON.stringify(setup));
+    assert.strictEqual(setup.jump?.success,true,"Mirai defeat return resolver failed "+JSON.stringify(setup));
+    await release(page);
+    await page.waitForFunction(expected=>globalThis.getActiveStorySceneRuntime?.()?.beatId===expected,test.firstBeatId,{timeout:8000});
+    let row=await snapshot(page);
+    assert.strictEqual(row.beatId,test.firstBeatId,"Mirai defeat did not enter authored cutscene");
+    if(test.kind==="shortcut"){
+      assert(row.text.includes("Mirai's footing gives first."),"Mirai shortcut defeat opening drift");
+      const enough=await advanceUntilBeat(page,"mir_shortcut_defeat_02",8);
+      assert.strictEqual(enough.row.speaker,"TRAVELLER","Shortcut defeat Traveller does not own Enough.");
+      assert.strictEqual(enough.row.text,"Enough.","Shortcut defeat Enough. drift");
+      const why=await advanceUntilBeat(page,"mir_shortcut_defeat_04",8);
+      assert.strictEqual(why.row.speaker,"MIRAI","Shortcut defeat Mirai does not own question");
+      assert.strictEqual(why.row.text,"Why did you stop?","Shortcut defeat question drift");
+      const because=await advanceOne(page);
+      assert.strictEqual(because.beatId,"mir_shortcut_defeat_05","Shortcut defeat reply routing drift");
+      assert.strictEqual(because.speaker,"TRAVELLER","Shortcut defeat Traveller does not own reply");
+      assert.strictEqual(because.text,"Because you did.","Shortcut defeat reply drift");
+      const post=await advanceUntilBeat(page,"mir_road_post_defeat_talk_01",20);
+      assert(post.row.text.includes("Mirai keeps the Traveller in front of her now."),"Shortcut defeat post-Battle Scene 5 variant missing");
+      assert(!post.seen.some(x=>/Academy instructor stands where the traveller had been/i.test(x.text||"")),"Shortcut defeat revealed the instructor identity");
+      proofs.push({kind:test.kind,first:test.firstBeatId,postBeat:post.row.beatId,identityRevealBeforeResume:false});
+    }else{
+      assert(row.text.includes("Mirai's guard breaks before the Traveller's does."),"Mirai confrontation defeat opening drift");
+      const done=await advanceUntilBeat(page,"mir_confrontation_defeat_03",8);
+      assert.strictEqual(done.row.speaker,"TRAVELLER","Confrontation defeat Traveller does not own Done?");
+      assert.strictEqual(done.row.text,"Done?","Confrontation defeat Done? drift");
+      const no=await advanceOne(page);
+      assert.strictEqual(no.beatId,"mir_confrontation_defeat_04","Confrontation defeat No. routing drift");
+      assert.strictEqual(no.speaker,"MIRAI","Confrontation defeat Mirai does not own No.");
+      assert(no.text.startsWith("No."),"Confrontation defeat No. drift");
+      const keep=await advanceUntilBeat(page,"mir_confrontation_defeat_06",8);
+      assert.strictEqual(keep.row.text,"I can keep asking.","Confrontation defeat persistence line drift");
+      const good=await advanceUntilBeat(page,"mir_confrontation_defeat_08",8);
+      assert.strictEqual(good.row.speaker,"TRAVELLER","Confrontation defeat Traveller does not own Good.");
+      assert.strictEqual(good.row.text,"Good.","Confrontation defeat Good. drift");
+      const reveal=await advanceOne(page);
+      assert.strictEqual(reveal.beatId,"mir_confront_reveal_01","Confrontation defeat did not enter existing reveal after cutscene");
+      assert(reveal.text.includes("Smoke bursts across the road."),"Confrontation defeat reveal timing drift");
+      assert(reveal.actors.some(a=>a.image==="NPC/mirai_instructor.png"),"Female Academy instructor card missing after confrontation defeat reveal");
+      const where=await advanceOne(page);
+      assert.strictEqual(where.beatId,"mir_confront_08","Confrontation defeat reveal did not resume existing flow");
+      assert.strictEqual(where.speaker,"MIRAI","Mirai does not own post-reveal question");
+      assert.strictEqual(where.text,"Where is he?","Post-reveal Mirai question drift");
+      proofs.push({kind:test.kind,first:test.firstBeatId,revealBeat:reveal.beatId,whereBeat:where.beatId});
+    }
+    await gate.assertClean("academy_mirai-defeat-"+test.kind);
+    await context.close();
+  }
+  return{cases:proofs,battleDefeatIsMissionFailure:false,browserGoldenClaimed:false};
+}
+
 async function proveMiraiTerminalReceipt(browser){
   const context=await browser.newContext({viewport:{width:1440,height:900}});
   const page=await context.newPage();
@@ -347,7 +431,8 @@ async function proveMiraiTerminalReceipt(browser){
       await context.close();
     }
     const miraiBattle338=await proveMiraiBattle338(browser);
+    const miraiDefeatContinuations=await proveMiraiDefeatContinuations(browser);
     const miraiTerminal=await proveMiraiTerminalReceipt(browser);
-    console.log(JSON.stringify({pass:true,issue:105,cases:CASES.map(x=>x[0]),legacyFallbackRejected:true,clickAnywhereProven:true,miraiWritingGoldenProven:true,miraiBattle338,menmaWritingGoldenOpeningProven:true,menmaNineTailsDialoguePortraitProven:true,menmaPostBattleSegmentationProven:true,miraiTerminal,goldenSaveReloadResumeProven:true,browserGoldenClaimed:false},null,2));
+    console.log(JSON.stringify({pass:true,issue:105,cases:CASES.map(x=>x[0]),legacyFallbackRejected:true,clickAnywhereProven:true,miraiWritingGoldenProven:true,miraiBattle338,miraiDefeatContinuations,menmaWritingGoldenOpeningProven:true,menmaNineTailsDialoguePortraitProven:true,menmaPostBattleSegmentationProven:true,miraiTerminal,goldenSaveReloadResumeProven:true,browserGoldenClaimed:false},null,2));
   }finally{await browser.close();}
 })().catch(err=>{console.error(err);process.exit(1);});
