@@ -158,6 +158,38 @@ function originStartingPurseAmount105(){
   const amount=Number(globalThis.SC_ORIGIN_STARTING_PURSE_409&&globalThis.SC_ORIGIN_STARTING_PURSE_409.amount);
   return Number.isFinite(amount)&&amount>0?amount:100;
 }
+function buildKushinaReceipt105(){
+  const runtime=A&&typeof A.active==="function"?A.active():null;
+  const ctx=runtime&&runtime.localContext&&typeof runtime.localContext==="object"?runtime.localContext:{};
+  const lines=["YOUR ORIGIN","ACADEMY KUSHINA","","RECORDED IN YOUR CHRONICLE","","YOUR DECISIONS"];
+  const crisis={
+    protect_student:"Got the classmate clear before the next pulse.",
+    contain_damaged_seal:"Contained the damaged seal instead of restoring the original exercise.",
+    move_unstable_object:"Moved the unstable scroll into the cleared safety lane.",
+    correct_formula:"Corrected the damaged formula."
+  }[ctx.kushinaCrisisChoice];
+  if(crisis)lines.push("• "+crisis);
+  if(ctx.kushinaCrisisChoice==="correct_formula"){
+    const contact={
+      ask_what_happened:"Asked what had happened.",
+      ask_who:"Asked the toad who he was.",
+      help_close:"Helped close the residual connection.",
+      send_back:"Told the toad to go back before things got worse."
+    }[ctx.kushinaGerotoraChoice];
+    if(contact)lines.push("• "+contact);
+    lines.push("","WHAT HAPPENED","• The corrected formula accidentally opened a reverse-summoning connection.","• The residual connection was closed safely.");
+  }else{
+    const outcome={
+      protect_student:"• The classmate was moved clear and the instructor secured the damaged scroll.",
+      contain_damaged_seal:"• The leaking boundary was contained safely.",
+      move_unstable_object:"• The unstable scroll was moved to the safety lane and secured there."
+    }[ctx.kushinaCrisisChoice];
+    lines.push("","WHAT HAPPENED");
+    if(outcome)lines.push(outcome);
+  }
+  lines.push("","REWARDS",`• Origin Starting Purse: +${originStartingPurseAmount105()} Ryō.`);
+  return lines.join("\n");
+}
 function buildMiraiReceipt105(){
   const runtime=A&&typeof A.active==="function"?A.active():null;
   const ctx=runtime&&runtime.localContext&&typeof runtime.localContext==="object"?runtime.localContext:{};
@@ -317,6 +349,7 @@ function menmaActors(beatId,performance,beat){
 
 function kushinaActors(beatId,performance,beat){
   const id=String(beatId||""),sp=speaker(performance,beat);
+  if(id==="kus_receipt")return[];
   const rows=[actor("academy_kushina","KUSHINA",PATH.kushina,sp)];
   const instructor=()=>actor("kushina_academy_instructor","INSTRUCTOR",PATH.kushinaInstructor,sp,["ACADEMY INSTRUCTOR"]);
   const classmate=()=>actor("kushina_classmate","CLASSMATE",PATH.kushinaClassmate,sp,["STUDENT"]);
@@ -325,9 +358,9 @@ function kushinaActors(beatId,performance,beat){
   const nameSpoken=id.startsWith("kus_ask_who_")&&Number((id.match(/_(\d+)$/)||[])[1]||0)>=4;
   const geroLabel=identityKnown||nameSpoken||sp==="GEROTORA"?"GEROTORA":"TOAD";
   const gero=()=>actor("key_gero",geroLabel,PATH.gerotora,sp,["GEROTORA","TOAD"]);
-  const geroPhase=id.startsWith("kus_reverse_")||id.startsWith("kus_gero_")||id==="kus_contact_choice"||
+  const geroPhase=id.startsWith("kus_gero_")||id==="kus_contact_choice"||
     id.startsWith("kus_ask_")||id.startsWith("kus_help_")||id.startsWith("kus_send_")||
-    id.startsWith("kus_closure_")||id.startsWith("kus_after_gero_")||id.startsWith("kus_route_d_");
+    id.startsWith("kus_closure_");
   if(geroPhase){
     rows.push(gero(),instructor(),classmate());
     return rows;
@@ -425,8 +458,15 @@ function installDefinitions(){
     }
   });
   results.kushina=registerDefinition(scene("academy_kushina"),{
-    resolve:({beatId,performance,beat})=>projection("ACADEMY · FŪINJUTSU PRACTICAL",kushinaActors(beatId,performance,beat)),
-    resolveBackdrop:()=>({assetPath:GENERIC_COURTYARD,assetId:"issue105_generic_courtyard"})
+    resolve:({beatId,performance,beat})=>String(beatId||"")==="kus_receipt"
+      ?{mode:"record",location:"YOUR ORIGIN",actors:[]}
+      :projection("ACADEMY · FŪINJUTSU PRACTICAL",kushinaActors(beatId,performance,beat)),
+    resolveBackdrop:({beatId})=>String(beatId||"")==="kus_receipt"
+      ?null
+      :{assetPath:GENERIC_COURTYARD,assetId:"issue105_generic_courtyard"},
+    performanceSequences:{
+      kus_receipt:()=>[{kind:"record",text:buildKushinaReceipt105()}]
+    }
   });
   results.kurenai=registerDefinition(scene("academy_kurenai"),{
     resolve:({beatId,performance,beat})=>projection("ACADEMY · BELL TEST",kurenaiActors(beatId,performance,beat)),
