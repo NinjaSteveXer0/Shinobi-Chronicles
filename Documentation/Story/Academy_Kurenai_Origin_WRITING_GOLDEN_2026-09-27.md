@@ -9,7 +9,7 @@
 
 **Date:** 2026-09-27  
 **Owner:** Writing / Story — Konoha  
-**Status:** **WRITING RED — STAGED-CHOICE STRUCTURE MUST BE RESTORED / NOT FROZEN**  
+**Status:** **OWNER BROWSER AMBER — NOT FIXED / STAGED-CHOICE STRUCTURE STILL REQUIRED / NOT FROZEN**  
 **Origin:** `academy_kurenai`
 
 > **2026-09-30 structural restoration authority:** `Documentation/Story/Academy_Kurenai_Origin_Staged_Choice_and_Receipt_Restoration_2026-09-30.md` @ `e7ce02375db5288c50bec9e457cdaa7cc96e6075`.
