@@ -233,6 +233,48 @@ async function boot(page){
   assert.strictEqual(d.battle.pass,true,"33000 diagnostics RED "+JSON.stringify(d.battle));
   assert.strictEqual(d.menma.pass,true,"36900 diagnostics RED "+JSON.stringify(d.menma));
 
+  const descriptionCoverage=await page.evaluate(()=>{
+    const banned=/\b(authored|resolver|predicate|stateKey|semanticClass|informationBoundary|categorical evidence|transient state|scalar|packet|action opportunity|committed occurrence|caller-defined|source-owned)\b/i;
+    const samples=[
+      {id:"qa_direct",displayName:"Direct",resolutionKind:"direct_damage",authoredAttackPL:8},
+      {id:"qa_area",displayName:"Area",resolutionKind:"area_damage",authoredAttackPLPerTarget:5,maxTargets:3},
+      {id:"qa_guard",displayName:"Guard",resolutionKind:"ratio_guard_state",guard:{preventionRatio:.3,oneUse:true}},
+      {id:"qa_recovery",displayName:"Recovery",resolutionKind:"restore_underlying_battle_pl",restorationProfile:{authoredAmount:6}},
+      {id:"qa_control",displayName:"Control",resolutionKind:"dynamic_control",blockedActionTraits:["substantial_free_movement"]},
+      {id:"qa_setup",displayName:"Setup",resolutionKind:"transient_state",authoredAttackPLBonus:3},
+      {id:"qa_movement",displayName:"Movement",resolutionKind:"movement"},
+      {id:"qa_sensing",displayName:"Sensing",resolutionKind:"categorical_evidence",senseType:"chakra"},
+      {id:"qa_persistent",displayName:"Persistent",resolutionKind:"damage_with_persistent_state",authoredAttackPL:4,persistentEffectDescription:"The target takes 2 ATK at the start of its next turn."},
+      {id:"qa_branch",displayName:"Branch",resolutionKind:"branch_damage",modes:[
+        {id:"focus",displayName:"Focus",authoredAttackPL:9,maxTargets:1},
+        {id:"sweep",displayName:"Sweep",authoredAttackPL:5,maxTargets:3}
+      ]},
+      {id:"qa_capacity",displayName:"Capacity",resolutionKind:"temporary_battle_capacity",temporaryBattlePL:4}
+    ];
+    const sampleRows=samples.map(skill=>{
+      const info=getBattleSkillYouthSummary33000(skill);
+      const copy=[info.summary,...(info.details||[])].join(" ");
+      return{id:skill.id,coverage:info.descriptionCoverage||null,copy,banned:banned.test(copy)};
+    });
+    const paletteRows=[];
+    const palettes=globalThis.PRODUCTION_PREPARED_SKILL_PALETTES||{};
+    if(typeof globalThis.getClosureWaveBattleSkillDefinition==="function"){
+      for(const [owner,ids] of Object.entries(palettes)){
+        for(const id of ids||[]){
+          const skill=globalThis.getClosureWaveBattleSkillDefinition(id,owner);
+          if(!skill)continue;
+          const info=getBattleSkillYouthSummary33000(skill);
+          const copy=[info.summary,...(info.details||[])].join(" ");
+          paletteRows.push({owner,id,coverage:info.descriptionCoverage||null,copy,banned:banned.test(copy)});
+        }
+      }
+    }
+    return{sampleRows,paletteRows};
+  });
+  assert(descriptionCoverage.sampleRows.every(row=>row.coverage!=="needs_exact_override"&&!row.banned&&row.copy.trim()),"structured Skill description sample failed "+JSON.stringify(descriptionCoverage.sampleRows));
+  assert(descriptionCoverage.paletteRows.length>=40,"prepared Skill coverage scan did not see the production Academy palettes");
+  assert(descriptionCoverage.paletteRows.every(row=>row.coverage!=="needs_exact_override"&&!row.banned&&row.copy.trim()),"prepared/player-visible Skill reached description coverage failure "+JSON.stringify(descriptionCoverage.paletteRows.filter(row=>row.coverage==="needs_exact_override"||row.banned||!row.copy.trim())));
+
   // #373 real-player path proof. Onboarding, Story progression and the
   // Scene-7 Battle transition must all be driven through visible DOM controls;
   // no direct runtime selection, beat mutation or Story-advance fixture calls.
