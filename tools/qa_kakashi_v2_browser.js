@@ -433,6 +433,7 @@ async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedB
     },null,{timeout:12000});
   }
 
+  let victoryControlTiming=null;
   if(proveRewardClaim){
     assert.strictEqual(outcome,"victory","reward-claim proof is victory-only");
     const prepared=await page.evaluate(()=>{
@@ -458,8 +459,15 @@ async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedB
     },null,{timeout:10000});
     const claim=page.getByRole("button",{name:"CLAIM REWARDS"}).first();
     await claim.waitFor({state:"visible",timeout:10000});
+    const claimStarted=Date.now();
     await claim.click();
-    await page.waitForFunction(()=>currentBattle?.rewards?.claimed===true,null,{timeout:10000});
+    await page.waitForFunction(()=>{
+      if(currentBattle?.rewards?.claimed!==true)return false;
+      const buttons=[...document.querySelectorAll("button")].filter(node=>node.getClientRects().length>0);
+      return buttons.some(node=>/CONTINUE|RETURN TO STORY/i.test(node.textContent||""));
+    },null,{timeout:4000});
+    const claimResponseMs=Date.now()-claimStarted;
+    assert(claimResponseMs<3000,"Kakashi CLAIM REWARDS remained unresponsive for "+claimResponseMs+"ms");
     const committed=await page.evaluate(before=>{
       const pill=Array.isArray(playerData.inventory)
         ?playerData.inventory.filter(row=>row&&(row.id||row.itemId)==="field_recovery_pill").reduce((n,row)=>n+Math.max(1,Number(row.quantity)||1),0)
@@ -481,29 +489,59 @@ async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedB
     assert.deepStrictEqual(committed.replayAfter,committed.replayBefore,"MI reward replay duplicated material rewards");
   }
 
-  const resumed=await page.evaluate(({outcome,actions})=>{
-    const prior=globalThis.getBattleActionOpportunityIndex;
-    globalThis.getBattleActionOpportunityIndex=(side,participantId)=>{
-      if(side==="player"&&participantId==="academy_kakashi")return actions;
-      return typeof prior==="function"?prior(side,participantId):0;
-    };
-    try{
-      currentBattle.outcome={...(currentBattle.outcome||{}),type:outcome,completedAt:Date.now(),finishingShinobiId:outcome==="victory"?"academy_kakashi":null};
-      currentBattle.battleOver=true;
-      currentBattle.active=false;
-      return resumeBattleCallerAfterCompletion(outcome);
-    }finally{
-      globalThis.getBattleActionOpportunityIndex=prior;
-    }
-  },{outcome,actions});
-  assert(resumed&&resumed.success===true,JSON.stringify(resumed));
+  let resumed=null;
+  if(proveRewardClaim){
+    await page.evaluate(actions=>{
+      globalThis.__kakashiVictoryActionIndexPrior=getBattleActionOpportunityIndex;
+      globalThis.getBattleActionOpportunityIndex=(side,participantId)=>{
+        if(side==="player"&&participantId==="academy_kakashi")return actions;
+        return typeof globalThis.__kakashiVictoryActionIndexPrior==="function"
+          ?globalThis.__kakashiVictoryActionIndexPrior(side,participantId)
+          :0;
+      };
+      try{getBattleActionOpportunityIndex=globalThis.getBattleActionOpportunityIndex;}catch(_error){}
+    },actions);
+    const continueButton=page.locator("button").filter({hasText:/CONTINUE|RETURN TO STORY/i}).first();
+    await continueButton.waitFor({state:"visible",timeout:3000});
+    const continueStarted=Date.now();
+    await continueButton.click();
+    await page.waitForSelector("#kakashi-v2-scene-board",{state:"visible",timeout:4000});
+    const continueResponseMs=Date.now()-continueStarted;
+    assert(continueResponseMs<3000,"Kakashi post-claim CONTINUE remained unresponsive for "+continueResponseMs+"ms");
+    await page.evaluate(()=>{
+      if(globalThis.__kakashiVictoryActionIndexPrior){
+        globalThis.getBattleActionOpportunityIndex=globalThis.__kakashiVictoryActionIndexPrior;
+        try{getBattleActionOpportunityIndex=globalThis.getBattleActionOpportunityIndex;}catch(_error){}
+      }
+      delete globalThis.__kakashiVictoryActionIndexPrior;
+    });
+    victoryControlTiming={claimResponseMs,continueResponseMs};
+    resumed={success:true,viaVisibleVictoryContinue:true};
+  }else{
+    resumed=await page.evaluate(({outcome,actions})=>{
+      const prior=globalThis.getBattleActionOpportunityIndex;
+      globalThis.getBattleActionOpportunityIndex=(side,participantId)=>{
+        if(side==="player"&&participantId==="academy_kakashi")return actions;
+        return typeof prior==="function"?prior(side,participantId):0;
+      };
+      try{
+        currentBattle.outcome={...(currentBattle.outcome||{}),type:outcome,completedAt:Date.now(),finishingShinobiId:outcome==="victory"?"academy_kakashi":null};
+        currentBattle.battleOver=true;
+        currentBattle.active=false;
+        return resumeBattleCallerAfterCompletion(outcome);
+      }finally{
+        globalThis.getBattleActionOpportunityIndex=prior;
+      }
+    },{outcome,actions});
+    assert(resumed&&resumed.success===true,JSON.stringify(resumed));
+  }
   await page.waitForSelector("#kakashi-v2-scene-board",{state:"visible",timeout:12000});
   await page.evaluate(()=>resetAcademyKakashiV2Transition36040());
   await waitUnlocked(page,expectedBeat);
   if(expectedBeat)assert.strictEqual(await currentBeat(page),expectedBeat);
   const authored=await page.evaluate(()=>getActiveStorySceneRuntime()?.battleResume?.authored||null);
   assert(authored&&Number(authored.playerActionOpportunityCount)===actions,`Battle action count did not round-trip: expected ${actions}, got ${JSON.stringify(authored)}`);
-  return{battleBeat,outcome,actions,expectedBeat,resumed};
+  return{battleBeat,outcome,actions,expectedBeat,resumed,victoryControlTiming};
 }
 
 async function toScene02Root(page){
