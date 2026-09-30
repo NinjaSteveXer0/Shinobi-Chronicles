@@ -81,12 +81,16 @@ async function runMetalBattle(browser,remaining,expectedClass){
     const launch=await page.evaluate(()=>{
       const set=setStorySceneBeat("met_spar_battle",{render:false});
       const battle=launchStorySceneBattle();
-      return{set,battle,battleId:currentBattle?.battleId||null,enemy:currentBattle?.enemy?.id||null,portrait:currentBattle?.enemy?.image||null,meta:JSON.parse(JSON.stringify(currentBattle?.metal396||null))};
+      const stage=document.querySelector(".alpha-code-battle-stage.battle2-modern");
+      return{set,battle,battleId:currentBattle?.battleId||null,enemy:currentBattle?.enemy?.id||null,portrait:currentBattle?.enemy?.image||null,meta:JSON.parse(JSON.stringify(currentBattle?.metal396||null)),environmentPath:currentBattle?.presentationEnvironmentPath||currentBattle?.environmentPath||null,stageEnvironmentPath:stage?.dataset?.battleEnvironmentPath||null,stageBackground:stage?getComputedStyle(stage).backgroundImage:""};
     });
     assert.strictEqual(launch.set?.success,true,label+" set Battle beat");
     assert.strictEqual(launch.battle?.success,true,label+" Battle launch "+JSON.stringify(launch));
     assert.strictEqual(launch.enemy,"metal_origin_inviting_genin");
     assert.strictEqual(launch.portrait,"NPC portrait/metal_classmate_1.png");
+    assert.strictEqual(launch.environmentPath,"Scene backdrops/academy_training_ground_courtyard.png",label+" authored Battle environment drift");
+    assert.strictEqual(launch.stageEnvironmentPath,launch.environmentPath,label+" shared Battle stage did not consume Metal Story environment");
+    assert(launch.stageBackground.includes("academy_training_ground_courtyard.png"),label+" Metal Story environment is not visibly painted "+JSON.stringify(launch));
     assert.strictEqual(launch.meta?.startingUnderlyingMaximum,13);
     const finished=await page.evaluate(async ({remaining})=>{
       const prior=globalThis.getBattleRemainingPL;
@@ -146,11 +150,15 @@ async function runIwabeeBattle(browser,outcome){
     const launch=await page.evaluate(()=>{
       const set=setStorySceneBeat("iwa_confront_battle",{render:false});
       const battle=launchStorySceneBattle();
-      return{set,battle,battleId:currentBattle?.battleId||null,enemy:currentBattle?.enemy?.id||null,template:currentBattle?.oppositionTemplateId||null};
+      const stage=document.querySelector(".alpha-code-battle-stage.battle2-modern");
+      return{set,battle,battleId:currentBattle?.battleId||null,enemy:currentBattle?.enemy?.id||null,template:currentBattle?.oppositionTemplateId||null,environmentPath:currentBattle?.presentationEnvironmentPath||currentBattle?.environmentPath||null,stageEnvironmentPath:stage?.dataset?.battleEnvironmentPath||null,stageBackground:stage?getComputedStyle(stage).backgroundImage:""};
     });
     assert.strictEqual(launch.set?.success,true);
     assert.strictEqual(launch.battle?.success,true,label+" Battle launch "+JSON.stringify(launch));
     assert.strictEqual(launch.enemy,"iwabee_origin_rogue_genin_01");
+    assert.strictEqual(launch.environmentPath,"Scene backdrops/academy_training_ground_courtyard.png",label+" authored Battle environment drift");
+    assert.strictEqual(launch.stageEnvironmentPath,launch.environmentPath,label+" shared Battle stage did not consume Iwabee Story environment");
+    assert(launch.stageBackground.includes("academy_training_ground_courtyard.png"),label+" Iwabee Story environment is not visibly painted "+JSON.stringify(launch));
     assert.strictEqual(launch.template,"rogue_genin");
     const result=await page.evaluate(({outcome})=>{
       const prior=globalThis.getBattleRemainingPL;
