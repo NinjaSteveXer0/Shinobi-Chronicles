@@ -357,6 +357,10 @@ function applyBoardBackdrop(stage,runtime=currentRuntime()){
   if(path){if(stage.dataset)stage.dataset.scSceneBoardBackdrop="dedicated";stage.style.setProperty("--sc-scene-board-backdrop",cssUrlValue(path));return path;}
   if(stage.dataset)delete stage.dataset.scSceneBoardBackdrop;stage.style.removeProperty("--sc-scene-board-backdrop");return null;
 }
+function getActiveStorySceneBackdropPath33900(){
+  const runtime=currentRuntime();
+  return runtime?resolveBoardBackdropPath(runtime,currentBeat(runtime)):null;
+}
 
 // Owner lock 2026-09-28: narration/dialogue frame outlines are cyan for every speaker side.
 function installStyle(){
@@ -797,6 +801,7 @@ globalThis.registerStorySceneBoardDefinition=registerStorySceneBoardDefinition;
 globalThis.unregisterStorySceneBoardDefinition=unregisterStorySceneBoardDefinition;
 globalThis.resolveStorySceneBoardProjection=resolveStorySceneBoardProjection;
 globalThis.getActiveStorySceneBoardProjection=getActiveStorySceneBoardProjection;
+globalThis.getActiveStorySceneBackdropPath33900=getActiveStorySceneBackdropPath33900;
 globalThis.resolveStorySceneBoardBackdropPath=resolveBoardBackdropPath;
 globalThis.storyChoiceIntentIcon33900=storyChoiceIntentIcon33900;
 globalThis.renderStorySceneBoard33900=renderStorySceneBoard33900;
