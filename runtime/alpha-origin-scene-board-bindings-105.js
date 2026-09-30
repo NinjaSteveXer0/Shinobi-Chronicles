@@ -194,19 +194,28 @@ function buildKurenaiReceipt105(){
   const runtime=A&&typeof A.active==="function"?A.active():null;
   const ctx=runtime&&runtime.localContext&&typeof runtime.localContext==="object"?runtime.localContext:{};
   const lines=["YOUR ORIGIN","ACADEMY KURENAI","","RECORDED IN YOUR CHRONICLE","","YOUR DECISIONS"];
-  const approach={
-    false_kurenai:"Sent a false Kurenai at the bell.",
-    conceal_movement:"Hid the movement that actually mattered.",
+  const stage1={
+    false_kurenai:"Sent a false Kurenai.",
+    conceal_movement:"Hid her real movement.",
     distort_position:"Distorted the instructor's sense of distance.",
-    fake_clumsy:"Made the direct approach look real."
-  }[ctx.kurenaiRoute];
-  if(approach)lines.push("• "+approach);
+    fake_direct:"Made the direct approach look real."
+  }[ctx.kurenaiStage1];
+  const stage2={
+    rush_bell:"Rushed the bell after the instructor reacted.",
+    draw_attention:"Drew the instructor's attention away."
+  }[ctx.kurenaiStage2];
+  const stage3={
+    take_bell_now:"Tried to take the bell immediately.",
+    pretend_withdraw:"Pretended to withdraw before the final approach.",
+    let_instructor_think_caught:"Let the instructor think she had caught Kurenai."
+  }[ctx.kurenaiStage3];
+  for(const row of [stage1,stage2,stage3])if(row)lines.push("• "+row);
   lines.push("","WHAT HAPPENED");
   const outcome={
-    complete_loss:"• The instructor read the first deception before Kurenai could create a reversal.",
-    partial_loss:"• Kurenai deceived the instructor, then trusted the false bell herself.",
-    partial_win:"• Kurenai took the bell before the instructor recovered and took it back.",
-    complete_win:"• Kurenai held the real bell when the final illusion layer cleared."
+    complete_loss:"• The instructor kept the real bell through every layer.",
+    partial_loss:"• Kurenai created a convincing false success, but the instructor kept the real bell.",
+    partial_win:"• Kurenai took the bell before the instructor recovered it.",
+    complete_win:"• Kurenai finished the deception holding the real bell."
   }[ctx.kurenaiOutcome];
   if(outcome)lines.push(outcome);
   lines.push("","REWARDS",`• Origin Starting Purse: +${originStartingPurseAmount105()} Ryō.`);
@@ -238,6 +247,37 @@ function buildIwabeeReceipt105(){
   }[ctx.iwabeeReflection];
   if(reflection)lines.push("• "+reflection);
   lines.push("","WHAT HAPPENED","• The damaged practical ground was made usable.","• An unexpected Rogue Genin was exposed during the exercise.","","REWARDS","• Origin Starting Purse: +"+originStartingPurseAmount105()+" Ryō.");
+  return lines.join("\n");
+}
+
+function buildMetalReceipt105(){
+  const runtime=A&&typeof A.active==="function"?A.active():null;
+  const ctx=runtime&&runtime.localContext&&typeof runtime.localContext==="object"?runtime.localContext:{};
+  const lines=["YOUR ORIGIN","ACADEMY METAL LEE","","RECORDED IN YOUR CHRONICLE","","YOUR DECISIONS"];
+  const privateChoice={
+    spinning_kick:"Trained the spinning kick.",
+    full_force_fist:"Trained the full-force fist.",
+    conditioned_endurance:"Trained conditioned endurance."
+  }[ctx.metalPrivateChoice];
+  if(privateChoice)lines.push("• "+privateChoice);
+  const branch={
+    spar:"Accepted the Genin's controlled spar.",
+    demonstrate:"Kept working the training dummy.",
+    back_out:"Ended the public challenge and kept training privately."
+  }[ctx.metalBranch];
+  if(branch)lines.push("• "+branch);
+  if(ctx.metalBranch==="spar"&&ctx.metalSparPerformanceClass){
+    lines.push("• Spar performance: "+String(ctx.metalSparPerformanceClass).toUpperCase()+".");
+  }
+  const protect={
+    redirect_dummy:"Redirected the runaway dummy.",
+    take_impact:"Tried to take the impact for the student.",
+    destroy_dummy:"Tried to break the runaway dummy."
+  }[ctx.metalProtectiveResponse];
+  if(protect)lines.push("• "+protect);
+  lines.push("","WHAT HAPPENED","• Metal's private training remained part of his Chronicle even after people began watching.");
+  if(ctx.metalProtectiveOutcome)lines.push("• Protective response: "+String(ctx.metalProtectiveOutcome).toUpperCase()+".");
+  lines.push("","REWARDS",`• Origin Starting Purse: +${originStartingPurseAmount105()} Ryō.`);
   return lines.join("\n");
 }
 
@@ -488,6 +528,7 @@ function iwabeeActors(beatId,performance,beat){
 }
 function metalActors(beatId,performance,beat){
   const id=String(beatId||""),sp=speaker(performance,beat);
+  if(id==="met_receipt")return[];
   const rows=[actor("academy_metal_lee","METAL",PATH.metal,sp,["METAL LEE"])];
   if(!id.startsWith("met_open_")&&!id.startsWith("met_private_")){
     rows.push(actor("metal_origin_inviting_genin","GENIN",PATH.metalInvitingGenin,sp,["INVITING GENIN"]));
@@ -609,6 +650,12 @@ function installDefinitions(){
       :{assetPath:GENERIC_COURTYARD,assetId:"issue105_generic_courtyard"},
     performanceSequences:{
       kur_receipt:()=>[{kind:"record",text:buildKurenaiReceipt105()}]
+    },
+    performanceTransitions:{
+      kur_leave_loss_04:"wipe_right_to_left",
+      kur_leave_partial_loss_04:"wipe_right_to_left",
+      kur_leave_partial_win_04:"wipe_right_to_left",
+      kur_leave_win_07:"wipe_right_to_left"
     }
   });
   results.iwabee=registerDefinition(scene("academy_iwabee"),{
@@ -626,8 +673,18 @@ function installDefinitions(){
     }
   });
   results.metal=registerDefinition(scene("academy_metal_lee"),{
-    resolve:({beatId,performance,beat})=>projection("ACADEMY · TRAINING COURTYARD",metalActors(beatId,performance,beat)),
-    resolveBackdrop:()=>({assetPath:GENERIC_COURTYARD,assetId:"issue105_generic_courtyard"})
+    resolve:({beatId,performance,beat})=>String(beatId||"")==="met_receipt"
+      ?{mode:"record",location:"YOUR ORIGIN",actors:[]}
+      :projection("ACADEMY · TRAINING COURTYARD",metalActors(beatId,performance,beat)),
+    resolveBackdrop:({beatId})=>String(beatId||"")==="met_receipt"
+      ?null
+      :{assetPath:GENERIC_COURTYARD,assetId:"issue105_generic_courtyard"},
+    performanceSequences:{
+      met_receipt:()=>[{kind:"record",text:buildMetalReceipt105()}]
+    },
+    performanceTransitions:{
+      met_spar_strong_close_07:"wipe_right_to_left",\n      met_spar_mixed_close_05:"wipe_right_to_left",\n      met_spar_rough_close_01:"wipe_right_to_left",\n      met_redirect_success_close_09:"wipe_right_to_left",\n      met_redirect_partial_close_06:"wipe_right_to_left",\n      met_redirect_failure_close_09:"wipe_right_to_left",\n      met_impact_success_close_11:"wipe_right_to_left",\n      met_impact_partial_close_07:"wipe_right_to_left",\n      met_impact_failure_close_05:"wipe_right_to_left",\n      met_destroy_success_close_06:"wipe_right_to_left",\n      met_destroy_partial_close_11:"wipe_right_to_left",\n      met_destroy_failure_close_05:"wipe_right_to_left",\n      met_backout_close_01:"wipe_right_to_left"
+    }
   });
   const outcome={success:Object.values(results).every(r=>r&&r.success===true),results};
   if(outcome.success)scheduleActiveOriginPresentationRehydrate105();
