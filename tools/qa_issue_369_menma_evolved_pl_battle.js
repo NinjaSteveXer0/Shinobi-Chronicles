@@ -70,7 +70,7 @@ assert(runtime.includes('relayTo:next&&next.id||null'),"relay evidence missing e
 
 assert(runtime.includes("function shouldAuthorMenmaHandoff36900"),"legitimate Anko->Menma handoff predicate missing");
 assert(runtime.includes("st.resolvedHostileIds.includes(HOSTILE_IDS[0])")&&runtime.includes("st.resolvedHostileIds.includes(HOSTILE_IDS[1])"),"handoff does not require legitimate first-two hostile resolution");
-assert(runtime.includes('nextSide:"enemy"')&&runtime.includes("sideOrderReset:false"),"Anko->Menma yield resets side order or grants bonus input");
+assert(runtime.includes("pendingAnkoYieldAfterEnemyActionId")&&runtime.includes('yieldAnkoToMenmaActive36900("player")')&&runtime.includes("authored_guest_ally_yield_after_unstable_attack"),"Unstable must act against Anko before the authored Anko->Menma handoff");
 assert(runtime.includes("authoredYieldCancelled=true"),"Anko early withdrawal does not cancel authored yield");
 assert(runtime.includes('pending.side==="player"')&&runtime.includes("activePlayer()"),"ordinary allied relay path missing");
 assert(runtime.includes("menma_scene7_allied_side_exhausted"),"party defeat is not tied to allied exhaustion");
@@ -119,7 +119,7 @@ const checks={
   presentationGatedWithdrawal:true,
   sharedRelayQueue:true,
   legitimateAnkoToMenmaYield:true,
-  sideOrderPreserved:true,
+  unstableActsOnAnkoBeforeMenmaHandoff:true,
   emergencyAlliedRelay:true,
   partyDefeatOnExhaustion:true,
   men03MenmaActiveOnly:true,
