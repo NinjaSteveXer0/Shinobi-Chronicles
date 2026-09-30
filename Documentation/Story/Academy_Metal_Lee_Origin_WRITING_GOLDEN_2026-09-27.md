@@ -9,8 +9,12 @@
 
 **Date:** 2026-09-27  
 **Owner:** Writing / Story — Konoha  
-**Status:** **OWNER REOPENED 2026-09-29 — SUPERSEDED FOR CURRENT PLAYER-FACING VOICE / STORYTELLING**  
+**Status:** **OWNER BROWSER RED 2026-09-30 — WRITING REPAIR COMPLETE / CODING + OWNER RETEST REQUIRED / NOT FROZEN**  
 **Origin:** `academy_metal_lee`
+
+> **CURRENT PLAYER-FACING SUCCESSOR:** `Documentation/Story/Academy_Metal_Lee_Origin_Final_Browser_Repair_Rewrite_2026-09-30.md` @ `4445ba9c9938475db28f49a8a5f3862ff7edf679`.
+>
+> Current Coding must consume this successor rather than the older Metal dialogue still visible on PR #417. Preserve this file only for MET/Battle/resolver semantics where not superseded.
 
 > **2026-09-29 successor:** `Documentation/Story/Academy_Metal_Lee_Origin_Natural_Voice_Benchmark_Rewrite_2026-09-29.md` @ `30ab5a017db91cef0d23f144c48070ac5dd11e6e`.
 >
