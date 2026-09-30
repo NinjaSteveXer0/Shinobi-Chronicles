@@ -2,8 +2,12 @@
 
 **Date:** 2026-09-29  
 **Owner:** Stephen / Writing — Konoha  
-**Status:** **OWNER-REOPENED — PREVIEW REWRITE / NOT WRITING GOLDEN UNTIL OWNER BROWSER REVIEW**  
+**Status:** **SUPERSEDED 2026-09-30 — OWNER BROWSER RED / REPLACED BY FULL STORY REWRITE**  
 **Origin:** `academy_iwabee`
+
+> **2026-09-30 successor:** `Documentation/Story/Academy_Iwabee_Origin_Full_Story_Rewrite_2026-09-30.md` @ `0d8f64404631e1f2865bd192ce470c8690218317`.
+>
+> Stephen's installed-browser review reopened Iwabee as RED. Preserve this file only for historical/reference material not contradicted by the successor.
 
 ## Purpose
 
