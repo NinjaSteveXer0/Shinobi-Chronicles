@@ -696,7 +696,18 @@ function boardBackdropEnvironment331(beatId,performance){
 }
 function registerFinalSceneBoard(){
   if(typeof globalThis.registerStorySceneBoardDefinition!=="function")return{success:false,reason:"story_scene_board_not_loaded"};
-  const sequences={...PERFORMANCE,obi_arrival:arrivalSequence,obi_training:trainingSequence,obi_end_day:endDaySequence,obi_home:homeSequence};
+  const sequences={
+    ...PERFORMANCE,
+    obi_arrival:arrivalSequence,
+    obi_training:trainingSequence,
+    obi_end_day:endDaySequence,
+    obi_home:homeSequence,
+    obi_ending_helping:PERFORMANCE.ending_helping,
+    obi_ending_training:PERFORMANCE.ending_training,
+    obi_ending_balance:PERFORMANCE.ending_balance,
+    obi_ending_question:PERFORMANCE.ending_question,
+    obi_close:PERFORMANCE.obi_close
+  };
   const result=globalThis.registerStorySceneBoardDefinition(SCENE_ID,{
     resolve:({beatId,performance})=>({
       mode:"conversation",
@@ -756,6 +767,7 @@ function diagnostics(){
     noGenericBackdropFallback:Object.values(BACKDROPS).every(path=>!path.startsWith("Scene backdrops/")),
     compressionCardinality:PERFORMANCE.obi_depart.length===2&&["furniture","vegetables","equipment","delivery","cart"].every(key=>PERFORMANCE["obi_"+key+"_intro"].length===1&&PERFORMANCE["obi_"+key+"_help"].length===2&&PERFORMANCE["obi_"+key+"_continue"].length===1)&&["FULL","SUBSTANTIAL","REDUCED","MINIMAL"].every(key=>PERFORMANCE["arrival_"+key].length===1)&&PERFORMANCE.training_intro.length===0&&["stamina","bukijutsu","ninjutsu","taijutsu"].every(key=>PERFORMANCE["training_"+key].length===1)&&PERFORMANCE.obi_end_day.length===2&&PERFORMANCE.home_common.length===2&&["ending_helping","ending_training","ending_balance","ending_question"].every(key=>PERFORMANCE[key].length===2)&&PERFORMANCE.obi_close.length===1,
     compactCuesCannotAutoPaginate:Object.values(PERFORMANCE).flat().every(row=>!row||row.kind!=="narration"||(row.singlePage===true&&String(row.text||"").length<=360&&!/\\n\\s*\\n+/.test(String(row.text||"")))),
+    compactEndingBeatAliases:["obi_ending_helping","obi_ending_training","obi_ending_balance","obi_ending_question","obi_close"].every(id=>registerFinalSceneBoard.toString().includes(id+":")),
     noGenericBeatPause:!JSON.stringify(PERFORMANCE).includes("A beat."),
     chronicleBeginsNotPreReceipt:!JSON.stringify(PERFORMANCE).includes("YOUR CHRONICLE BEGINS"),
     browserGoldenClaimed:false
