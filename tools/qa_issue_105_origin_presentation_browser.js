@@ -642,33 +642,51 @@ async function proveMiraiTerminalReceipt(browser){
         row=await snapshot(page);
         assert(row.text.includes("Menma runs toward Konoha."),"Menma final GOLDEN prose is not visible");
       }else if(variant==="academy_kurenai"){
-        assert.strictEqual(row.beatId,"kur_pre_01","Kurenai did not start at expanded After Class opening");
-        assert(row.text.includes("Most of the Academy has already emptied out."),"Kurenai expanded opening prose missing "+JSON.stringify(row));
+        assert.strictEqual(row.beatId,"kur_pre_01","Kurenai did not start at final After Class opening");
+        assert(row.text.includes("Most of the Academy has emptied out."),"Kurenai final opening prose missing "+JSON.stringify(row));
         const instructor=row.actors.find(a=>a.id==="kurenai_academy_instructor");
         assert(instructor&&instructor.image==="NPC/kurenai_instructor.png","Kurenai female instructor card missing "+JSON.stringify(row.actors));
-        const opening=await advanceUntilBeat(page,"kur_approach",80);
-        row=opening.row;
-        assert.deepStrictEqual(row.choices,["SEND A FALSE KURENAI","HIDE MY REAL MOVEMENT","DISTORT HER SENSE OF DISTANCE","MAKE THE DIRECT APPROACH LOOK REAL"],"Kurenai single meaningful Bell choice drift");
-        const direct=page.locator("#story-scene-presentation-layer .sc-story-choice").filter({hasText:"MAKE THE DIRECT APPROACH LOOK REAL"}).first();
-        await direct.click();
-        await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="kur_complete_01",null,{timeout:8000});
-        const aftermath=await advanceUntilBeat(page,"kur_after_win_01",120);
-        const coreText=aftermath.seen.map(x=>x.text).join("\n");
-        for(const line of ["Got you.","Have you?","You were saying?","Genjutsu isn't only making somebody believe something false.","It's knowing what stays true after both of you start lying."]){
-          assert(coreText.includes(line),"Kurenai preserved Bell Test/evaluation line missing: "+line);
+
+        const stage1=await advanceUntilBeat(page,"kur_approach",80);
+        row=stage1.row;
+        assert.deepStrictEqual(row.choices,["Send a false Kurenai","Hide my real movement","Distort her sense of distance","Make the direct approach look real"],"Kurenai Stage-1 Bell choices drifted");
+        await page.locator("#story-scene-presentation-layer .sc-story-choice").filter({hasText:"Make the direct approach look real"}).first().click();
+        await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="kur_stage1_direct_01",null,{timeout:8000});
+
+        const stage2=await advanceUntilBeat(page,"kur_stage2_direct",40);
+        assert.deepStrictEqual(stage2.row.choices,["Rush the bell","Draw her attention away"],"Kurenai Stage-2 Bell choices drifted");
+        await page.locator("#story-scene-presentation-layer .sc-story-choice").filter({hasText:"Rush the bell"}).first().click();
+        await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="kur_stage2_direct_rush_01",null,{timeout:8000});
+
+        const stage3=await advanceUntilBeat(page,"kur_stage3_direct_rush",40);
+        assert.deepStrictEqual(stage3.row.choices,["Take the bell now","Pretend to withdraw","Let her think she caught me"],"Kurenai Stage-3 Bell choices drifted");
+        await page.locator("#story-scene-presentation-layer .sc-story-choice").filter({hasText:"Let her think she caught me"}).first().click();
+        await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="kur_resolve_direct_rush_caught",null,{timeout:8000});
+
+        const result=await advanceUntilBeat(page,"kur_result_complete_win_01",40);
+        const throughResult=result.seen.map(x=>x.text).join("\n");
+        assert(throughResult.includes("Kurenai leaves the instructor exactly one answer."),"Kurenai Stage-3 performance prose missing");
+
+        const leave=await advanceUntilBeat(page,"kur_leave_win_01",120);
+        const coreText=leave.seen.map(x=>x.text).join("\n");
+        for(const line of ["Got you.","Have you?","You were saying?","Making somebody see something false is the easy part.","The harder part is knowing what's still true while both of you are trying to change the answer."]){
+          assert(coreText.includes(line),"Kurenai final Bell Test/evaluation line missing: "+line);
         }
-        const leave=await advanceUntilBeat(page,"kur_leave_win_01",100);
-        const leaveText=leave.seen.map(x=>x.text).join("\n");
-        assert(leaveText.includes("Same exercise tomorrow?"),"Kurenai complete-win aftermath expansion missing");
+
         const receipt=await advanceUntilBeat(page,"kur_receipt",80);
         const terminalText=receipt.seen.map(x=>x.text).join("\n");
-        assert(terminalText.includes("Change the trick."),"Kurenai complete-win leaving expansion missing");
+        assert(terminalText.includes("Change the trick."),"Kurenai complete-win leaving close missing");
         await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="kur_receipt"&&document.getElementById("story-scene-presentation-layer")?.dataset.scCueKind==="record",null,{timeout:8000});
         row=await snapshot(page);
         assert.strictEqual(row.beatId,"kur_receipt","Kurenai terminal runtime did not remain on Chronicle Receipt");
         assert.strictEqual(row.cueKind,"record","Kurenai terminal presentation is not Chronicle Receipt");
         assert.strictEqual(row.actors.length,0,"Kurenai Receipt still stages Story actors");
-        assert(row.text.includes("ACADEMY KURENAI")&&row.text.includes("Made the direct approach look real."),"Kurenai Receipt route summary missing "+JSON.stringify(row));
+        assert(row.text.includes("ACADEMY KURENAI"),"Kurenai Receipt identity summary missing "+JSON.stringify(row));
+        const kurState=await page.evaluate(()=>({...globalThis.getActiveStorySceneRuntime?.()?.localContext}));
+        assert.strictEqual(kurState.kurenaiStage1,"fake_direct");
+        assert.strictEqual(kurState.kurenaiStage2,"rush_bell");
+        assert.strictEqual(kurState.kurenaiStage3,"let_instructor_think_caught");
+        assert.strictEqual(kurState.kurenaiOutcome,"complete_win");
       }else if(row.mode!=="choice"){
         row=await advanceOne(page);
       }
