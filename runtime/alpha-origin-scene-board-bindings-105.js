@@ -216,6 +216,7 @@ function buildMiraiReceipt105(){
   const runtime=A&&typeof A.active==="function"?A.active():null;
   const ctx=runtime&&runtime.localContext&&typeof runtime.localContext==="object"?runtime.localContext:{};
   const defeated=ctx.miraiEscortAssessmentResult==="not_completed_battle_defeat";
+  const shortcutBattleResult=ctx.miraiShortcutBattleResult||null;
   const lines=["YOUR ORIGIN","ACADEMY MIRAI","","RECORDED IN YOUR CHRONICLE","","YOUR DECISIONS"];
   if(ctx.mirTalked===true)lines.push("• Talked with the traveller during the escort.");
   else if(ctx.mirTalked===false)lines.push("• Kept attention on the escort.");
@@ -253,8 +254,14 @@ function buildMiraiReceipt105(){
   }[ctx.mirReflection];
   if(reflection)lines.push("• "+reflection);
   lines.push("","WHAT HAPPENED");
-  if(defeated){
+  if(shortcutBattleResult==="victory"){
+    lines.push("• Mirai won the controlled exchange against the disguised Academy instructor.");
+    lines.push("• The Battle triggered the instructor reveal before Checkpoint Three.");
+    lines.push("• The real Traveller was already safe at Checkpoint Three.");
+    lines.push("• Mirai later reached Checkpoint Three for the reveal aftermath and debrief.");
+  }else if(defeated){
     lines.push("• The escort assessment ended where Mirai was Battle-depleted.");
+    lines.push("• The Battle triggered the instructor reveal before Checkpoint Three.");
     lines.push("• The real Traveller was already safe at Checkpoint Three.");
     lines.push("• Mirai later returned to Checkpoint Three for the post-assessment debrief.");
   }else{
@@ -315,9 +322,14 @@ function miraiActors(beatId,performance,beat){
     rows.push(instructor(),traveller());
     return rows;
   }
-  if(id.startsWith("mir_shortcut_defeat_end_")){
+  if(id.startsWith("mir_shortcut_victory_reveal_")){
     const match=id.match(/_(\d+)$/),n=match?Number(match[1]):0;
     rows.push(n>=7?instructor():traveller());
+    return rows;
+  }
+  if(id.startsWith("mir_shortcut_defeat_reveal_")){
+    const match=id.match(/_(\d+)$/),n=match?Number(match[1]):0;
+    rows.push(n>=3?instructor():traveller());
     return rows;
   }
   if(id.startsWith("mir_confront_defeat_end_")){
@@ -500,17 +512,13 @@ function installDefinitions(){
     resolve:({beatId,performance,beat})=>{
       const id=String(beatId||"");
       if(id==="mir_receipt")return{mode:"record",location:"YOUR ORIGIN",actors:[]};
-      const defeatDebrief=id.startsWith("mir_defeat_debrief_")||id.startsWith("mir_defeat_reflection_")||id.startsWith("mir_defeat_close_");
-      return projection(defeatDebrief?"LATER · CHECKPOINT THREE":"ACADEMY MIRAI · ESCORT ASSESSMENT",miraiActors(beatId,performance,beat));
+      const laterCheckpoint=id.startsWith("mir_checkpoint_early_")||id.startsWith("mir_defeat_debrief_")||id.startsWith("mir_defeat_reflection_")||id.startsWith("mir_defeat_close_");
+      return projection(laterCheckpoint?"LATER · CHECKPOINT THREE":"ACADEMY MIRAI · ESCORT ASSESSMENT",miraiActors(beatId,performance,beat));
     },
     resolveBackdrop:({beatId,runtime})=>String(beatId||"")==="mir_receipt"
       ?null
       :{assetPath:miraiBackdrop(beatId,runtime),assetId:"issue105_mirai"},
     performanceSequences:{
-      mir_shortcut_defeat_end_05:()=>[
-        {kind:"dialogue",speakerName:"TRAVELLER",text:"The exercise is."},
-        {kind:"narration",text:"Mirai freezes.\n\nNot because of the word.\n\nBecause of the voice behind it."}
-      ],
       mir_confront_defeat_end_12:()=>[
         {kind:"dialogue",speakerName:"ACADEMY INSTRUCTOR",text:"About the switch."},
         {kind:"narration",text:"A beat."},
@@ -536,7 +544,8 @@ function installDefinitions(){
       mir_receipt:()=>[{kind:"record",text:buildMiraiReceipt105()}]
     },
     performanceTransitions:{
-      mir_shortcut_defeat_end_13:"wipe_right_to_left",
+      mir_shortcut_victory_reveal_13:"wipe_right_to_left",
+      mir_shortcut_defeat_reveal_09:"wipe_right_to_left",
       mir_confront_defeat_end_12:"wipe_right_to_left"
     }
   });
@@ -601,11 +610,13 @@ function diagnostics(){
     kakashiExcluded:!String(installDefinitions).includes("academy_kakashi"),
     knownHinataActors:PATH.hinata&&PATH.hinataInstructor&&PATH.hinataPartner,
     knownMiraiActors:PATH.mirai&&PATH.miraiInstructor&&PATH.traveller,
-    miraiDefeatPresentation:
+    miraiBattleRevealPresentation:
       String(miraiBackdrop).includes("mir_defeat_debrief_")&&
-      String(miraiActors).includes("mir_shortcut_defeat_end_")&&
+      String(miraiActors).includes("mir_shortcut_victory_reveal_")&&
+      String(miraiActors).includes("mir_shortcut_defeat_reveal_")&&
       String(miraiActors).includes("mir_confront_defeat_end_")&&
-      String(installDefinitions).includes('mir_shortcut_defeat_end_13:"wipe_right_to_left"')&&
+      String(installDefinitions).includes('mir_shortcut_victory_reveal_13:"wipe_right_to_left"')&&
+      String(installDefinitions).includes('mir_shortcut_defeat_reveal_09:"wipe_right_to_left"')&&
       String(installDefinitions).includes('mir_confront_defeat_end_12:"wipe_right_to_left"')&&
       String(installDefinitions).includes("LATER — CHECKPOINT THREE"),
     menmaNineTailsPortraitExact:PATH.menmaNineTails==="Assets/Tailed Beasts/menma_nine_tails.png"&&String(menmaActors).includes("menma_nine_tails"),
