@@ -982,7 +982,8 @@ const definition={
     storyBeat("obi_ending_training","ending_training","obi_close",{environmentRef:ENV.home,onEnterConsequences:[interpretationRequest]}),
     storyBeat("obi_ending_balance","ending_balance","obi_close",{environmentRef:ENV.home,onEnterConsequences:[interpretationRequest]}),
     storyBeat("obi_ending_question","ending_question","obi_close",{environmentRef:ENV.home,onEnterConsequences:[interpretationRequest]}),
-    {beatId:"obi_close",mode:"narration",text:cueFallback("obi_close"),environmentRef:ENV.home,exitScene:true}
+    {beatId:"obi_close",mode:"narration",text:cueFallback("obi_close"),environmentRef:ENV.home,nextBeatId:"obi_receipt"},
+    {beatId:"obi_receipt",mode:"record",text:"",exitScene:true}
   ],
   onCompleteConsequences:[X(ORIGIN_ID,[...diversions.map(x=>x.occurrenceId),entitlementOccurrenceId])]
 };
@@ -1016,17 +1017,59 @@ function obitoPerformanceIndex331(performance){
     ?performance.sourceIndex
     :performance&&Number.isInteger(performance.index)?performance.index:0;
 }
-function boardActors(beatId,performance){
-  const actors=[{id:"academy_obito",image:"Assets/Academy Student/academy_obito.png",label:"OBITO",focus:true}];
-  if(beatId.includes("furniture"))actors.push({id:"obito_origin_furniture_civilian",label:"CIVILIAN",image:"NPC/furniture_civilian.png"});
-  else if(beatId.includes("vegetables"))actors.push({id:"obito_origin_vegetable_vendor",label:"VENDOR",image:"NPC/vegetable_vendor.png"});
-  else if(beatId.includes("equipment"))actors.push({id:"obito_origin_academy_equipment_custodian",label:"CUSTODIAN",image:"NPC/equipment_custodian.png"});
-  else if(beatId.includes("delivery"))actors.push({id:"obito_origin_delivery_worker",label:"DELIVERY WORKER",image:"NPC/delivery_worker.png"});
-  else if(beatId.includes("cart"))actors.push({id:"obito_origin_runaway_cart_civilian",label:"CIVILIAN",image:"NPC/runaway_cart_civillian.png"});
-  else if(beatId==="obi_arrival"||beatId==="obi_training"||(beatId==="obi_end_day"&&obitoPerformanceIndex331(performance)<2))actors.push({id:"obito_origin_academy_instructor",label:"ACADEMY INSTRUCTOR",image:"NPC/obito_instructor.png"});
+function obitoPerformanceSpeaker331(performance){
+  return String(performance&&performance.cue&&(performance.cue.speakerName||performance.cue.speaker)||"").trim().toUpperCase();
+}
+function focusObitoSpeaker331(actors,performance){
+  if(!actors.length)return actors;
+  const speaker=obitoPerformanceSpeaker331(performance);
+  let matched=false;
+  for(const actor of actors){
+    actor.focus=!!speaker&&String(actor.label||"").trim().toUpperCase()===speaker;
+    if(actor.focus)matched=true;
+  }
+  if(!matched)actors[0].focus=true;
   return actors;
 }
+function originStartingPurseAmount331(){
+  const amount=Number(globalThis.SC_ORIGIN_STARTING_PURSE_409&&globalThis.SC_ORIGIN_STARTING_PURSE_409.amount);
+  return Number.isFinite(amount)&&amount>0?amount:100;
+}
+function buildObitoReceipt331(){
+  const journey=committedJourneyFacts(),ctx=local()||{};
+  const lines=["YOUR ORIGIN","ACADEMY OBITO","","RECORDED IN YOUR CHRONICLE","","YOUR DECISIONS"];
+  const labels={
+    furniture:{HELP:"Help her move it",CONTINUE:"Keep going"},
+    vegetables:{HELP:"Help gather the produce",CONTINUE:"Keep going"},
+    equipment:{HELP:"Help find the equipment",CONTINUE:"Keep going"},
+    delivery:{HELP:"Help right the delivery",CONTINUE:"Keep going"},
+    cart:{HELP:"Help stop the cart",CONTINUE:"Go to training"}
+  };
+  const names={furniture:"Furniture",vegetables:"Vegetables",equipment:"Academy equipment",delivery:"Delivery",cart:"Runaway cart"};
+  if(journey&&journey.success){
+    for(const row of journey.rows){
+      const label=labels[row.key]&&labels[row.key][row.selectedIntent];
+      if(label)lines.push("• "+names[row.key]+" — "+label+".");
+    }
+  }
+  const reflection=interpretationText[ctx.obitoFinalInterpretation];
+  if(reflection)lines.push("• Reflection — "+reflection);
+  lines.push("","WHAT HAPPENED","• Reached the Academy and completed the training that remained.","","REWARDS",`• Origin Starting Purse: +${originStartingPurseAmount331()} Ryō.`);
+  return lines.join("\n");
+}
+function boardActors(beatId,performance){
+  if(beatId==="obi_receipt")return[];
+  const actors=[{id:"academy_obito",image:"Assets/Academy Student/academy_obito.png",label:"OBITO",focus:false}];
+  if(beatId.includes("furniture"))actors.push({id:"obito_origin_furniture_civilian",label:"CIVILIAN",image:"NPC/furniture_civilian.png",focus:false});
+  else if(beatId.includes("vegetables"))actors.push({id:"obito_origin_vegetable_vendor",label:"VENDOR",image:"NPC/vegetable_vendor.png",focus:false});
+  else if(beatId.includes("equipment"))actors.push({id:"obito_origin_academy_equipment_custodian",label:"CUSTODIAN",image:"NPC/equipment_custodian.png",focus:false});
+  else if(beatId.includes("delivery"))actors.push({id:"obito_origin_delivery_worker",label:"DELIVERY WORKER",image:"NPC/delivery_worker.png",focus:false});
+  else if(beatId.includes("cart"))actors.push({id:"obito_origin_runaway_cart_civilian",label:"CIVILIAN",image:"NPC/runaway_cart_civillian.png",focus:false});
+  else if(beatId==="obi_arrival"||beatId==="obi_training"||(beatId==="obi_end_day"&&obitoPerformanceIndex331(performance)<2))actors.push({id:"obito_origin_academy_instructor",label:"ACADEMY INSTRUCTOR",image:"NPC/obito_instructor.png",focus:false});
+  return focusObitoSpeaker331(actors,performance);
+}
 function boardLocation(beatId,performance){
+  if(beatId==="obi_receipt")return"YOUR ORIGIN";
   if(beatId==="obi_arrival"||beatId==="obi_training")return"ACADEMY TRAINING GROUND";
   if(beatId==="obi_end_day")return obitoPerformanceIndex331(performance)<2?"ACADEMY TRAINING GROUND":"KONOHA · LATE AFTERNOON";
   if(beatId==="obi_home"||beatId==="obi_reflect"||beatId.startsWith("obi_ending_"))return"OBITO'S HOME";
@@ -1035,6 +1078,7 @@ function boardLocation(beatId,performance){
 }
 function boardBackdropEnvironment331(beatId,performance){
   const id=String(beatId||"");
+  if(id==="obi_receipt")return null;
   if(id==="obi_end_day"){
     const cueIndex=obitoPerformanceIndex331(performance);
     return cueIndex>=2?ENV.streetLate.environmentId:ENV.trainingLate.environmentId;
@@ -1069,15 +1113,18 @@ function registerFinalSceneBoard(){
     obi_ending_training:PERFORMANCE.ending_training,
     obi_ending_balance:PERFORMANCE.ending_balance,
     obi_ending_question:PERFORMANCE.ending_question,
-    obi_close:PERFORMANCE.obi_close
+    obi_close:PERFORMANCE.obi_close,
+    obi_receipt:()=>[{kind:"record",singlePage:true,text:buildObitoReceipt331()}]
   };
   const result=globalThis.registerStorySceneBoardDefinition(SCENE_ID,{
-    resolve:({beatId,performance})=>({
-      mode:"obito_origin",
-      location:boardLocation(beatId,performance),
-      objective:["obi_arrival","obi_training","obi_end_day","obi_home","obi_reflect","obi_close"].includes(beatId)||beatId.startsWith("obi_ending_")?null:"GET TO TRAINING",
-      actors:boardActors(beatId,performance)
-    }),
+    resolve:({beatId,performance})=>beatId==="obi_receipt"
+      ?{mode:"record",location:"YOUR ORIGIN",actors:[]}
+      :({
+        mode:"obito_origin",
+        location:boardLocation(beatId,performance),
+        objective:["obi_arrival","obi_training","obi_end_day","obi_home","obi_reflect","obi_close"].includes(beatId)||beatId.startsWith("obi_ending_")?null:"GET TO TRAINING",
+        actors:boardActors(beatId,performance)
+      }),
     performanceSequences:sequences,
     resolveBackdrop:({beatId,performance})=>{
       const environmentId=boardBackdropEnvironment331(beatId,performance);
@@ -1117,6 +1164,8 @@ function diagnostics(){
     noBattle:!JSON.stringify(definition).includes('"battle"')&&!JSON.stringify(definition).includes("PL BATTLE"),
     noSharinganGrant:!JSON.stringify(definition).includes("sharinganUnlocked")&&!JSON.stringify(definition).includes("grantSharingan"),
     sharedCompletion:definition.onCompleteConsequences.length===1,
+    chronicleReceiptBeforeCompletion:(definition.beatMap instanceof Map?definition.beatMap.get("obi_close"):definition.beats.find(b=>b.beatId==="obi_close"))?.nextBeatId==="obi_receipt"&&(definition.beatMap instanceof Map?definition.beatMap.get("obi_receipt"):definition.beats.find(b=>b.beatId==="obi_receipt"))?.mode==="record"&&(definition.beatMap instanceof Map?definition.beatMap.get("obi_receipt"):definition.beats.find(b=>b.beatId==="obi_receipt"))?.exitScene===true,
+    speakerLinkedActorFocus:boardActors("obi_arrival",{cue:{kind:"dialogue",speakerName:"ACADEMY INSTRUCTOR"},sourceIndex:2}).some(actor=>actor.id==="obito_origin_academy_instructor"&&actor.focus===true)&&!boardActors("obi_arrival",{cue:{kind:"dialogue",speakerName:"ACADEMY INSTRUCTOR"},sourceIndex:2}).some(actor=>actor.id==="academy_obito"&&actor.focus===true),
     dedicatedBackdropRegistry:Object.values(BACKDROPS).every(path=>path.startsWith("Obito Origin Backdrop/")),
     firstPageDedicatedBackdrop:BACKDROPS[ENV.mainStreet.environmentId]==="Obito Origin Backdrop/konoha_main_street.png",
     furnitureResidentialBackdrop:BACKDROPS[ENV.residential.environmentId]==="Obito Origin Backdrop/quiet_residential_lane.png",
