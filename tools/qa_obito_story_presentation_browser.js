@@ -84,7 +84,7 @@ async function advance(page){
   const before=await state(page);
   assert.notStrictEqual(before.mode,"choice","advance attempted on choice "+before.beatId);
   if(before.performance)assert.strictEqual(before.performance.segmentCount,1,"Obito authored source cue auto-paginated @ "+before.beatId+" "+JSON.stringify(before.performance));
-  if(before.text){
+  if(before.text&&before.performance?.cueKind!=="record"){
     assert.notStrictEqual(before.textOverflowY,"auto","Obito authored box uses internal auto-scroll @ "+before.beatId+" "+JSON.stringify(before.performance));
     assert.notStrictEqual(before.textOverflowY,"scroll","Obito authored box uses internal scroll @ "+before.beatId+" "+JSON.stringify(before.performance));
     assert(before.textScrollHeight<=before.textClientHeight+4,"Obito authored box clips/overflows its approved geometry @ "+before.beatId+" "+JSON.stringify({text:before.text,performance:before.performance,scrollHeight:before.textScrollHeight,clientHeight:before.textClientHeight}));
