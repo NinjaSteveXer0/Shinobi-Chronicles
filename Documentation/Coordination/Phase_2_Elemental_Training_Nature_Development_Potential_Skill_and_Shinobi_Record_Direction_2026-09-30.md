@@ -372,3 +372,335 @@ Energy may initially use owner/dev bypass.
 ## 20. Final direction
 
 > **Elemental development becomes its own persistent axis beside ordinary Stats. Ninjutsu alone does not equal Fire/Wind/Lightning/Earth/Water mastery; nature development alone does not auto-grant Skills; high component-element development does not manufacture a Bloodline. Dedicated hard elemental training, real Battle/World evidence, mentors and technique observation all feed one persistent Potential Skill pathway, while Shinobi Record tells the player what they legitimately know, can learn, are practising, have learned and have meaningfully achieved without leaking hidden content.**
+
+## 21. Mentor / higher-card training — two distinct pathways
+
+Stephen requires mentor training to operate in two complementary ways.
+
+### A. Ordinary current-roster mentor training
+
+A lower-stage/rank **card representation** may train with a higher-stage/rank card representation when both exact Characters/representations are legitimately available.
+
+This is **card/representation stage**, not automatic formal Promotion authority.
+
+Example direction only:
+
+Academy Menma + Special Jōnin Anko
+-> Ninjutsu / Taijutsu / relevant discipline training
+-> potential access to exact Anko-authentic curricula such as snake-binding techniques where all predicates are met.
+
+Mentor presence may affect:
+- available curriculum;
+- Technique Practice route;
+- activity difficulty ceiling;
+- quality/efficiency of legitimate development;
+- exact Skill eligibility;
+- Chronicle mentor/student history.
+
+Mentor presence does NOT mean:
+- trainee inherits mentor Stats;
+- every mentor Skill becomes learnable;
+- higher-card rarity grants generic bonus XP;
+- formal Rank is transferred;
+- relationship automatically rises merely because training occurred.
+
+The trainee earns development from the trainee's own legitimate actions.
+
+### B. Authored mentor / leader / Sannin side-mission chains
+
+World/Story may expose relationship/history-sensitive hotspot or side-mission chains in which the player deliberately seeks training under a major mentor, leader, Sannin, Hokage or other authorised specialist.
+
+Examples Stephen raised are design-space examples, not locked pairings:
+- Sakura under Orochimaru;
+- Sasuke under Jiraiya;
+- Naruto under Tsunade;
+- Naruto under Minato;
+- Sasuke under Itachi;
+- Sai under Danzō.
+
+The system must support unconventional pairings where Chronicle history makes them legitimate.
+
+The point is not to recreate canon teacher assignments.
+
+The point is:
+
+**who this Chronicle can persuade / impress / access / survive training under may change the Character's future technique routes.**
+
+These chains should normally be authored as:
+- relationship opportunity;
+- access/teacher negotiation;
+- training mission(s);
+- actual curriculum;
+- result/Technique Practice;
+- Chronicle consequence.
+
+World provides the opportunity.
+Progression owns development/training progress.
+Combat owns exact Skill mechanics.
+CE/Relationship state supplies factual eligibility/history.
+
+## 22. Relationship-gated technique training
+
+An exact mentor-taught Skill may use predicates such as:
+
+- sufficient relationship/shared-history state with the mentor;
+- mentor currently willing/available;
+- sufficient relevant Stat(s);
+- sufficient Nature Development;
+- sufficient Stamina/control;
+- prerequisite Skill(s);
+- required Bloodline/source capability;
+- exact prior observation/Knowledge;
+- exact curriculum or training mission completion.
+
+Illustrative Chidori-family grammar:
+
+Lightning Access
++ sufficient Lightning Development
++ sufficient Ninjutsu
++ sufficient Stamina/control
++ legitimate Kakashi/Sasuke teacher route
++ exact prerequisites
+-> Chidori Technique Practice becomes available.
+
+Illustrative Flying-Raijin-family grammar:
+
+legitimate Space-Time/marking prerequisites
++ sufficient Fūinjutsu/Ninjutsu/other authored Stats
++ legitimate Minato/other authorised source route
++ curriculum/history requirements
+-> Flying Raijin training route becomes available.
+
+These examples do not lock exact numbers.
+
+## 23. No slot-machine learning
+
+Once a Character is legitimately admitted to a Technique Practice route, ordinary learning progression should be deterministic/progress-bearing.
+
+Do NOT use:
+
+eligible -> spend Energy -> random unlock chance -> repeated complete failure with no persistent progress.
+
+Preferred:
+
+eligible
+-> each valid training occurrence commits exact Technique Practice evidence/progress
+-> authored failures may still teach/progress where materially meaningful
+-> threshold/resolver reached
+-> Skill Access commits.
+
+Randomness may select among already-eligible World/training opportunities where World authority permits.
+
+Randomness must not decide underlying eligibility.
+
+## 24. Resistance development — exposure-side only
+
+Stephen's current direction:
+
+Persistent elemental/poison resistance development should come from **receiving/exposure**, not from merely using an element/poison successfully.
+
+Valid evidence families may include:
+- receiving meaningful elemental damage/status;
+- surviving/mitigating a legitimate elemental effect;
+- receiving poison/toxin exposure;
+- a failed elemental training attempt that causes real controlled exposure such as burn/shock/frost/impact/etc.;
+- exact defensive conditioning designed around receiving/withstanding the hazard.
+
+Do not award elemental resistance because the Character cast Fire Release.
+
+Do not award poison resistance because the Character poisoned somebody else.
+
+### Anti-farm / safety boundary
+
+Resistance growth must still be capped by exact occurrence/challenge.
+
+No infinite gain from:
+- standing in trivial fire;
+- repeatedly applying negligible self-damage;
+- zero-damage immunity pings;
+- reopening the same failure result;
+- one poison tick producing unlimited receipts.
+
+The exposure must be materially challenging at the Character's current resistance/development level.
+
+## 25. Failure can create real Chronicle history
+
+Failed training is not wasted history.
+
+Meaningful failed Nature/Technique/Resistance training may commit facts such as:
+- failed Fire control attempt;
+- burn received during training;
+- returned after recovery;
+- changed method;
+- repeated same curriculum;
+- eventual breakthrough.
+
+Player-facing Chronicle should summarise meaningful patterns rather than list every repetition.
+
+A humorous NPC interpretation such as Stephen's "pyro-fucking-maniac" idea may exist as character-specific dialogue where appropriate, but CE stores the factual history, not a universal personality label.
+
+## 26. Attached-but-locked Bloodline / Hosted Entity sources
+
+Phase 2 must support persistent Characters whose source/capability is already **attached / possessed / historically true** while executable Access remains locked.
+
+Required distinction:
+
+possession/attachment
+!= current Access
+!= Skill Access
+!= Competence
+!= Power
+!= Mastery.
+
+This is required for Stephen's intended first serious Chronicle, including:
+- Menma with a Hosted Entity whose usable stages have requirements;
+- Hinata with legitimate Bloodline lineage/capability;
+- Mikoto with legitimate Bloodline lineage/capability.
+
+The underlying source should already be attached to the exact Character when that is authoritative truth.
+
+UI/Combat must not allow locked capabilities before their requirements are met.
+
+Meeting requirements unlocks the relevant access/stage; it does not retroactively create the Bloodline/Hosted Entity.
+
+## 27. Phase-2 Bloodline ladder closure requirement
+
+Stephen now makes closure of the advanced lineage ladder a Phase-2 requirement because persistent elemental training and attached-but-locked Bloodlines will begin consuming it.
+
+Before Phase-2 gameplay uses higher composite-lineage predicates, CE + Combat must close:
+
+1. the exact four-level lineage/development ladder;
+2. what is taxonomy vs development grade;
+3. the exact role/name of **Kekkei Chōetsu**;
+4. whether/where any tier above/beside Chōetsu exists;
+5. how ordinary Nature Development gates expressions without manufacturing possession;
+6. inheritance/attachment vs Access/evolution;
+7. Skill eligibility at each legitimate stage;
+8. PvP/whole-build counterplay requirements.
+
+Until that closure:
+
+- Kekkei Genkai remains a valid taxonomy/capability family;
+- Kekkei Tōta remains KEEP, with Dust Release as canon anchor;
+- Kekkei Chōetsu remains an approved SC design concept;
+- no runtime may invent a formula such as "four elements automatically equals Chōetsu."
+
+## 28. Rumours / hints as observer-relative progression intelligence
+
+Stephen requires NPC hints, rumours and play-derived observations to feed Shinobi Record.
+
+A rumour is not World Truth.
+
+Minimum semantic states should support:
+
+- **Rumour / Hint** — a claim or lead from a source;
+- **Observed Evidence** — something the Character actually witnessed;
+- **Known Training Source** — a legitimate teacher/location/curriculum has been identified;
+- **Eligibility Known** — the Character legitimately knows they currently satisfy enough conditions to pursue the route;
+- **Learned** — Skill Access committed;
+- **Disproven / Superseded** — a prior rumour was shown false/outdated where appropriate.
+
+Every rumour/hint should preserve provenance such as:
+- who/what source supplied it;
+- when/where;
+- exact wording/claim if needed;
+- whether that source is known to be reliable;
+- current confirmation state.
+
+Preserve:
+
+rumour != Knowledge of truth
+
+rumour in Shinobi Record != unlock
+
+NPC hint != hidden requirement leak automatically.
+
+## 29. Shinobi Record as the player's route memory
+
+Shinobi Record should eventually answer practical player questions without exposing production internals:
+
+- What have I actually learned?
+- What am I currently training?
+- What techniques have I seen?
+- What trainers/locations have I heard about?
+- Which opportunities do I know are available?
+- Which rumours are still unconfirmed?
+- What elemental development has this Character demonstrated?
+- What Bloodline/Hosted-Entity source is attached but currently inaccessible?
+- What meaningful failures/successes/breakthroughs have occurred?
+- Who trained me / gave me this lead / gave me this gift?
+
+It should NOT expose:
+- hidden exact thresholds the player has no source for;
+- secret trainers;
+- unknown Skill names;
+- undiscovered Bloodlines;
+- hidden event pools;
+- CE eligibility logic.
+
+## 30. Relationship hotspot integration
+
+Existing relationship ecology remains binding:
+
+**relationship content is not a universal friendship-XP system.**
+
+Hotspot conversations and relationship side missions may nevertheless create real positive or negative relationship consequences.
+
+Choices may change factual relationship dimensions/history such as:
+- practical trust;
+- personal openness;
+- respect;
+- resentment;
+- rivalry;
+- disappointment;
+- obligation/debt;
+- willingness to cooperate;
+- mentor/student willingness;
+- shared secret;
+- boundary respected/violated;
+- shared joke/private reference;
+- gift given/received/refused;
+- rescue/protection/failure history.
+
+One choice may improve one dimension while harming another.
+
+Do not flatten all of that into one scalar score unless a future explicit owner contract proves a separate need.
+
+## 31. Gifts
+
+A gift is a factual relationship/provenance event.
+
+Record:
+- giver;
+- recipient;
+- exact object/instance where relevant;
+- occurrence;
+- accepted/refused/returned state;
+- known motivation only where legitimate;
+- later ownership/custody through normal Inventory/Acquisition authority.
+
+A gift may affect later relationship opportunities where authored.
+
+Gift != automatic affection points.
+
+Gift presentation does not fabricate ownership.
+
+## 32. Relationship can unlock mentorship without becoming a stat gate alone
+
+Mentorship eligibility may consume relationship history.
+
+But:
+
+high relationship alone != Skill unlock.
+
+A mentor may like the Character and still refuse because:
+- Character lacks prerequisites;
+- technique is too dangerous;
+- institutional duty forbids it;
+- current Story state makes training impossible;
+- mentor does not possess/teach that technique;
+- relationship type is wrong despite high trust.
+
+Likewise a tense/rival relationship may still produce training if current history/personality supports it.
+
+CE should consume actual facts, not just "relationship high/low."
