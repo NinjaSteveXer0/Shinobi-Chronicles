@@ -2,8 +2,12 @@
 
 **Date:** 2026-09-30  
 **Owner:** Stephen / Writing — Konoha  
-**Status:** **OWNER BROWSER AMBER — NOT FIXED / STAGED-CHOICE RESTORATION STILL REQUIRED / NOT GOLDEN**  
+**Status:** **SUPERSEDED BY FINAL THREE-STAGE REWRITE — OWNER BROWSER AMBER / IMPLEMENTATION + RETEST REQUIRED**  
 **Origin:** `academy_kurenai`
+
+> **FINAL WRITING SUCCESSOR:** `Documentation/Story/Academy_Kurenai_Origin_Final_Staged_Bell_Test_Rewrite_2026-09-30.md` @ `b98c00693c88a7ba6050b20d39d8f1bc760ed158`.
+>
+> Writing has now supplied the exact three-stage production matrix and player-facing Story. This restoration document remains historical/source-archaeology context.
 
 ## 1. Owner browser evidence
 
