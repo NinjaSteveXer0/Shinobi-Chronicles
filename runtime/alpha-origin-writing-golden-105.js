@@ -601,17 +601,12 @@ push({
 line("mir_shortcut_victory_reveal",[
  {mode:"narration",text:"The Traveller's guard breaks first.\n\nMirai does not follow him when he gives ground.\n\nShe keeps her hands up."},
  {mode:"dialogue",speaker:"MIRAI",text:"Don't move."},
- {mode:"narration",text:"The Traveller stays where he is."},
  {mode:"dialogue",speaker:"MIRAI",text:"You pulled me off the route and attacked me."},
- {mode:"narration",text:"Her eyes stay on him."},
- {mode:"dialogue",speaker:"MIRAI",text:"Who are you?"},
  {mode:"narration",text:"Smoke rolls through the lane.\n\nThe man Mirai was escorting disappears inside it.\n\nWhen the smoke clears, her Academy instructor is standing in his place."},
  {mode:"dialogue",speaker:"MIRAI",text:"Where is he?"},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"Checkpoint Three. Safe."},
- {mode:"narration",text:"Mirai looks toward the end of the lane."},
  {mode:"dialogue",speaker:"MIRAI",text:"Since when?"},
- {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"The market."},
- {mode:"narration",text:"Mirai's expression hardens.\n\nShe understands what changed."}
+ {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"The market."}
 ],MIRAI_ENV.lane,"mir_checkpoint_early_01");
 miraiBeats.find(row=>row.beatId==="mir_shortcut_victory_reveal_01").onEnterConsequences=[
   miraiShortcutRevealContextPatch("victory"),
@@ -624,10 +619,8 @@ line("mir_shortcut_defeat_reveal",[
  {mode:"narration",text:"Smoke rolls through the lane.\n\nWhen it clears, the Academy instructor stands where the Traveller had been."},
  {mode:"dialogue",speaker:"MIRAI",text:"Where is he?"},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"Checkpoint Three. Safe."},
- {mode:"narration",text:"Mirai pushes herself upright."},
  {mode:"dialogue",speaker:"MIRAI",text:"Since when?"},
- {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"The market."},
- {mode:"narration",text:"Mirai looks back toward the road they left.\n\nShe lost the exchange.\n\nShe did not imagine the contradiction."}
+ {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"The market."}
 ],MIRAI_ENV.lane,"mir_defeat_debrief_shortcut_01");
 miraiBeats.find(row=>row.beatId==="mir_shortcut_defeat_reveal_01").onEnterConsequences=[
   miraiShortcutRevealContextPatch("defeat"),
