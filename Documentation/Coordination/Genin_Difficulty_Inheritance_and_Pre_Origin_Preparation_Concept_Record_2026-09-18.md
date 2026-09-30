@@ -41,21 +41,70 @@ This should preserve:
 
 The intended payoff is that a route that looked almost impossible on the first run can become realistically conquerable because of who the player developed and what history they chose to carry forward.
 
-## Pre-Origin preparation flow — future direction
+## Pre-Origin preparation flow — 2026-09-30 owner correction
 
-Stephen wants a preparation stage before the new-difficulty Origin begins.
+Stephen has corrected the ordering of the future-difficulty preparation flow.
 
-Target flow to reconcile:
+The older order in this concept — choosing the new Origin before reviewing inheritance — is superseded.
 
-**Select new difficulty -> Choose Origin Character -> Review / apply permitted carry-over inheritances -> Receive / choose a small basic starter-item allowance -> Open My Clan for pre-Story ninja setup -> Begin Origin**
+Current direction:
 
-This is a direction, not yet a fully closed transaction contract.
+**Select new difficulty -> Load / review permitted inheritance from the completed prior difficulty -> select the one Forbidden Ninja carry-over -> apply authorised inherited Weapons / Items / Equipment / other carry-over -> Choose the new Origin Character -> Open My Clan for pre-Story preparation -> Begin Origin**
+
+Reason:
+
+The player should know what legitimate carry-over they are bringing into the new run **before** choosing which Origin they want to attack with that inherited capability.
+
+This is still a direction, not yet a fully closed transaction contract.
+
+### Initial Academy Student new-Chronicle starter kit
+
+Stephen also requires the very first/new-player Chronicle to begin with a small basic **starting Weapon + Item** package so the opening game does not assume an empty inventory forever.
+
+Exact starter IDs/counts remain open and must come through real Acquisition/Inventory transactions.
+
+### Later-difficulty inherited inventory
+
+A later difficulty may carry authorised exact:
+
+- Weapons;
+- Items;
+- Equipment;
+- other explicitly inheritable inventory/state;
+
+from the completed prior difficulty.
+
+Carry-over must preserve exact object identity/provenance where the object is an instanced durable object.
+
+Do not remint inherited weapons/equipment as fresh history-less copies.
+
+## Forbidden Ninja carry-over — current owner direction
+
+One developed ninja from the completed prior difficulty may be selected as the **Forbidden Ninja** carry-over source.
+
+Current owner direction:
+
+- the Forbidden Ninja enters the new difficulty at **Level 1**;
+- the Forbidden Ninja's prior **Chronicle/history remains**;
+- legitimate inherited specialties/capabilities/history may still alter new-Origin possibilities where owning authority permits;
+- level reset must not erase historical facts;
+- exact relationship among Level reset, persistent Stats/development, PL, Skill Access, Mastery and inherited capability remains a future Progression/CE reconciliation and must not be guessed.
+
+Therefore preserve:
+
+`new-difficulty level reset != Chronicle erasure`
+
+and:
+
+`Chronicle persistence != automatic full mechanical carry-over`.
+
+The later implementation must make the carry-over package explicit rather than silently cloning the previous end-state.
 
 ## Inheritance review screen
 
-After selecting the Origin Character, show an explicit screen summarising what will carry into that Origin/new difficulty.
+Before the new Origin is chosen, show an explicit screen summarising what may carry into the new difficulty.
 
-The screen should make inheritance visible rather than silently mutating the character.
+The screen should make inheritance visible rather than silently mutating the new run.
 
 Potential categories, only where owning authority permits, include:
 
@@ -69,13 +118,17 @@ Potential categories, only where owning authority permits, include:
 
 Knowledge, Access, Competence, Power and Mastery must remain separate. Carry-over must not imply all five.
 
-## Starter items
+## Starter items / starting loadout
 
-The player should receive a small, friendly basic-item allowance before the new-difficulty Origin begins.
+The player should receive a small, friendly basic starting allowance appropriate to the run.
+
+For a first Academy Student Chronicle, this includes at least one basic starting Weapon + Item package once exact IDs are closed.
+
+For later difficulties, this starting allowance must be reconciled with inherited Weapons / Items / Equipment so the player is not accidentally duplicated, stripped or overgranted.
 
 Exact item identities/counts are not closed here.
 
-Items must come through authoritative inventory/acquisition transactions; the preparation screen does not fabricate ownership by presentation.
+Items must come through authoritative Inventory/Acquisition transactions; the preparation screen does not fabricate ownership by presentation.
 
 ## My Clan before Story
 
@@ -129,4 +182,4 @@ Do not pause current Academy Kakashi scene-by-scene Alpha completion to implemen
 
 ## Final record
 
-> **Later difficulty should let the player bring forward one meaningfully developed ninja/history source so previously brutal routes can become realistically achievable. The new run should visibly review inheritance, provide a small starter-item allowance, allow My Clan preparation, and then begin the Origin with those legitimate inherited capabilities reflected in resolver possibilities.**
+> **Later difficulty should first load and review legitimate carry-over from the completed prior run, including one Forbidden Ninja and authorised inherited inventory, then let the player choose the new Origin with that information in hand, prepare through My Clan, and begin the Origin with only the explicitly authorised inherited capability/history. The Forbidden Ninja restarts at Level 1 while its Chronicle persists; the exact mechanical carry-over package remains to be closed.**
