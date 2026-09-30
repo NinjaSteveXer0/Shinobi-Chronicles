@@ -242,7 +242,10 @@ function patchIwabee(){
 }
 
 function patchMetal(){
-  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const d=editable(A.sceneByVariant.academy_metal_lee);if(!d)return false;
+  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
+  const live=definition(A.sceneByVariant.academy_metal_lee);
+  if(live&&beat(live,"met_receipt")&&beat(live,"met_spar_strong_close_07")&&beat(live,"met_backout_close_01"))return true;
+  const d=editable(A.sceneByVariant.academy_metal_lee);if(!d)return false;
   const priv=beat(d,"met_private");if(!priv)return false;
   priv.text="Metal's heel hits the chalk mark exactly.\n\nAgain.\n\nThe wooden post shudders under his palm. No classmates. No instructor at his shoulder. Just his breathing and the soft scrape of sandals on packed dirt.\n\nHis next sequence is cleaner than the last.";
   delete priv.presentationResolver;priv.nextBeatId="met_private_choice";
