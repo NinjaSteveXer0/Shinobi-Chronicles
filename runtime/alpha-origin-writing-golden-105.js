@@ -375,7 +375,7 @@ function line(prefix,rows,environment,next){
 }
 
 line("mir_assignment",[
- {mode:"narration",text:"Mirai arrives early.\n\nNot a little early.\n\nEarly enough that the checkpoint map is still rolled up on the instructor's desk.\n\nShe looks at her.\n\nThen at the empty yard behind her."},
+ {mode:"narration",text:"Mirai arrives early.\n\nNot a little early.\n\nEarly enough that the checkpoint map is still rolled up on the instructor's desk.\n\nHe looks at her.\n\nThen at the empty yard behind her."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"You're aware this doesn't start for another ten minutes."},
  {mode:"dialogue",speaker:"MIRAI",text:"Yes."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"Then why are you here?"},
@@ -794,9 +794,9 @@ line("mir_confront",[
  {mode:"dialogue",speaker:"MIRAI",text:"Because I don't know who I'm walking with."},
  {mode:"narration",text:"Silence.\n\nA breeze catches the edge of a hanging shop cloth.\n\nThe traveller's eyes stay on hers.\n\nThen one hand rises."},
  {mode:"dialogue",speaker:"MIRAI",text:"Where is he?"},
- {mode:"narration",text:"The instructor jerks her head toward the checkpoint."},
+ {mode:"narration",text:"The instructor jerks his head toward the checkpoint."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"Safe."},
- {mode:"narration",text:"Mirai looks past her.\n\nOnly when she sees the checkpoint building does she breathe again.\n\nThen she looks back."},
+ {mode:"narration",text:"Mirai looks past him.\n\nOnly when she sees the checkpoint building does she breathe again.\n\nThen she looks back."},
  {mode:"dialogue",speaker:"MIRAI",text:"You switched in the market."},
  {mode:"narration",text:"The instructor says nothing.\n\nMirai already has her answer."}
 ],MIRAI_ENV.street,"mir_checkpoint_early_01");
@@ -821,7 +821,7 @@ line("mir_confront_defeat_end",[
  {mode:"dialogue",speaker:"MIRAI",text:"Where is he?"},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"Checkpoint Three. Safe."},
  {mode:"dialogue",speaker:"MIRAI",text:"So I was right."},
- {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"About the switch.\n\nA beat.\n\nYou still lost the exchange.\n\nMirai looks away.\n\nShe knows."}
+ {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"About the switch.\n\nYou still lost the exchange.\n\nMirai looks away.\n\nShe knows."}
 ],MIRAI_ENV.street,"mir_defeat_debrief_confront_01");
 miraiBeats.find(row=>row.beatId==="mir_confront_defeat_end_01").onEnterConsequences=[miraiDefeatContextPatch("confrontation"),mirDefeatAssessment];
 
@@ -883,7 +883,7 @@ line("mir_checkpoint_early",[
  {mode:"narration",text:"He looks offended."},
  {mode:"dialogue",speaker:"TRAVELLER",text:"Absolutely not."},
  {mode:"narration",text:"Mirai finally smiles.\n\nBehind her, the Academy instructor arrives.\n\nThe traveller glances between them."},
- {mode:"dialogue",speaker:"TRAVELLER",text:"Did she catch you?"},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"Did he catch you?"},
  {mode:"narration",text:"The instructor gives him a look."},
  {mode:"dialogue",speaker:"TRAVELLER",text:"I'm taking that as yes."},
  {mode:"narration",text:"Mirai's smile disappears."},
@@ -905,9 +905,9 @@ line("mir_checkpoint_missed",[
  {mode:"dialogue",speaker:"TRAVELLER",text:"Told you."},
  {mode:"narration",text:"Mirai's eyes narrow slightly."},
  {mode:"dialogue",speaker:"MIRAI",text:"Told me what?"},
- {mode:"narration",text:"The traveller smiles.\n\nRaises one hand.\n\nSmoke erupts beside her.\n\nMirai jumps back.\n\nThe Academy instructor appears through it.\n\nMirai's face goes blank.\n\nA beat."},
+ {mode:"narration",text:"The traveller smiles.\n\nRaises one hand.\n\nSmoke erupts beside him.\n\nMirai jumps back.\n\nThe Academy instructor appears through it.\n\nMirai's face goes blank.\n\nA beat."},
  {mode:"dialogue",speaker:"MIRAI",text:"No."},
- {mode:"narration",text:"The instructor folds her arms.\n\nMirai points at her."},
+ {mode:"narration",text:"The instructor folds his arms.\n\nMirai points at him."},
  {mode:"dialogue",speaker:"MIRAI",text:"No."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"Mirai—"},
  {mode:"dialogue",speaker:"MIRAI",text:"Where is he?"},
@@ -919,10 +919,10 @@ line("mir_checkpoint_missed",[
  {mode:"dialogue",speaker:"MIRAI",text:"How long?"},
  {mode:"narration",text:"The instructor answers."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"Since the market."},
- {mode:"narration",text:"Mirai opens her eyes.\n\nLooks back toward the road.\n\nAll the way to the covered market.\n\nThen back to her."},
+ {mode:"narration",text:"Mirai opens her eyes.\n\nLooks back toward the road.\n\nAll the way to the covered market.\n\nThen back to him."},
  {mode:"dialogue",speaker:"MIRAI",text:"You walked beside me for half the village."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"Yes."},
- {mode:"narration",text:"Mirai stares at her."},
+ {mode:"narration",text:"Mirai stares at him."},
  {mode:"dialogue",speaker:"MIRAI",text:"I don't like you very much right now."},
  {mode:"narration",text:"The traveller chokes on his tea.\n\nThe instructor looks almost pleased."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"That's fair."}
@@ -957,16 +957,16 @@ line("mir_after_conversation",[
  {mode:"narration",text:"Mirai looks at the mark."},
  {mode:"dialogue",speaker:"MIRAI",text:"After the market."},
  {mode:"narration",text:"The Traveller raises his cup."},
- {mode:"dialogue",speaker:"TRAVELLER",text:"What gave her away?"},
+ {mode:"dialogue",speaker:"TRAVELLER",text:"What gave him away?"},
  {mode:"narration",text:"Mirai looks at him."},
  {mode:"dialogue",speaker:"MIRAI",text:"You did."},
  {mode:"narration",text:"He nearly looks offended."},
  {mode:"dialogue",speaker:"TRAVELLER",text:"I wasn't there."},
  {mode:"dialogue",speaker:"MIRAI",text:"Exactly."},
  {mode:"narration",text:"The instructor waits.\n\nMirai traces the route with one finger."},
- {mode:"dialogue",speaker:"MIRAI",text:"She knew where we were going."},
+ {mode:"dialogue",speaker:"MIRAI",text:"He knew where we were going."},
  {mode:"narration",text:"Then she taps the market."},
- {mode:"dialogue",speaker:"MIRAI",text:"She didn't know what we'd talked about getting there."},
+ {mode:"dialogue",speaker:"MIRAI",text:"He didn't know what we'd talked about getting there."},
  {mode:"narration",text:"The Traveller smiles into his cup."},
  {mode:"dialogue",speaker:"TRAVELLER",text:"So all that talking was useful."},
  {mode:"narration",text:"Mirai gives him a look."},
@@ -978,7 +978,7 @@ line("mir_after_conversation",[
 line("mir_after_chakra",[
  {mode:"narration",text:"The route map ends up spread across a crate outside Checkpoint Three.\n\nThe real Traveller has his drink.\n\nThe Academy instructor stands beside the map.\n\nThe instructor taps the covered market."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"When?"},
- {mode:"narration",text:"Mirai looks at her."},
+ {mode:"narration",text:"Mirai looks at him."},
  {mode:"dialogue",speaker:"MIRAI",text:"After the market."},
  {mode:"dialogue",speaker:"ACADEMY INSTRUCTOR",text:"What changed?"},
  {mode:"narration",text:"Mirai thinks before answering."},
