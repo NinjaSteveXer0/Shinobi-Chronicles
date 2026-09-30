@@ -266,51 +266,6 @@
     };
   };
 
-  const priorContinueAfterVictory32600=continueAfterVictory;
-  continueAfterVictory=function continueAfterVictoryBrowser32600(){
-    const kakashiClaimed=!!(
-      currentOverlayType==="victory"&&
-      currentBattle&&
-      currentBattle.rewards&&
-      currentBattle.rewards.kakashiV2===true&&
-      currentBattle.rewards.claimed===true
-    );
-    if(!kakashiClaimed)return priorContinueAfterVictory32600.apply(this,arguments);
-
-    // Kakashi's Story return used to synchronously stringify the full player and
-    // Battle snapshots before the Story frame could repaint. Suppress only those
-    // two persistence calls for this one synchronous transition, restore the
-    // canonical functions immediately, then persist the final post-return state
-    // during browser idle. No semantic state mutation is skipped.
-    const priorPlayerSave=typeof globalThis.savePlayerData==="function"?globalThis.savePlayerData:null;
-    const priorTestSave=typeof globalThis.saveTestState==="function"?globalThis.saveTestState:null;
-    let suppressedPlayerSaves=0,suppressedTestSaves=0,result;
-    cancelScheduledKakashiVictoryPersistence32600();
-    try{
-      if(priorPlayerSave){
-        globalThis.savePlayerData=function(){suppressedPlayerSaves+=1;return true;};
-        try{savePlayerData=globalThis.savePlayerData;}catch(_error){}
-      }
-      if(priorTestSave){
-        globalThis.saveTestState=function(){suppressedTestSaves+=1;return true;};
-        try{saveTestState=globalThis.saveTestState;}catch(_error){}
-      }
-      result=priorContinueAfterVictory32600.apply(this,arguments);
-    }finally{
-      if(priorPlayerSave){
-        globalThis.savePlayerData=priorPlayerSave;
-        try{savePlayerData=globalThis.savePlayerData;}catch(_error){}
-      }
-      if(priorTestSave){
-        globalThis.saveTestState=priorTestSave;
-        try{saveTestState=globalThis.saveTestState;}catch(_error){}
-      }
-      scheduleKakashiVictoryPersistence32600("post_continue");
-    }
-    if(result&&typeof result==="object")return{...result,kakashiPostPaintPersistence:true,suppressedPlayerSaves,suppressedTestSaves};
-    return{success:true,kakashiPostPaintPersistence:true,suppressedPlayerSaves,suppressedTestSaves};
-  };
-
   // --------------------------------------------------------------------------
   // 3. COMBAT FEED LEGIBILITY — PRESENTATION ONLY
   // --------------------------------------------------------------------------
@@ -419,7 +374,6 @@
       explicitPostClaimContinueSupported:claimSource.includes("requiresExplicitPostClaimContinue")&&claimSource.includes("explicitPostClaimContinue:true"),
       explicitPostClaimDoesNotReopenVictory:claimSource.includes("victoryAlreadyRerenderedByClaimOwner:true"),
       ordinaryBattleStillUsesGenericContinue:claimSource.includes("callerResult=continueAfterVictory()"),
-      kakashiContinuePaintsBeforePersistence:String(continueAfterVictory).includes("kakashiPostPaintPersistence:true")&&String(continueAfterVictory).includes("scheduleKakashiVictoryPersistence32600")&&String(continueAfterVictory).includes("suppressedPlayerSaves"),
       feedStyleInstalled:typeof document==="undefined"||!!document.getElementById("alpha-battle-browser-32600-style"),
       browserGoldenNotClaimed:true
     };
