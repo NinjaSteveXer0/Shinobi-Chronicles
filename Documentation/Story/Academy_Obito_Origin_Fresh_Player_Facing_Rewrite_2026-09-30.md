@@ -3,10 +3,12 @@
 **Date:** 2026-09-30  
 **Owner:** Stephen / Writing — Konoha  
 **Origin:** `academy_obito`  
-**Status:** **OWNER-REQUIRED FRESH REWRITE — WRITING AUTHORITY FOR CODING PREVIEW / NOT BROWSER GOLDEN / NOT FROZEN**  
+**Status:** **OWNER BROWSER AMBER — PROSE/TEXT AMOUNT ACCEPTED; BOX SEGMENTATION REPAIR REQUIRED / NOT GOLDEN / NOT FROZEN**  
 **Source-first main observed before authoring:** `9751311d417ca46321799f088ef0c2f27ab89e16`
 
 This is a fresh Story rewrite, not a compression pass over the previous Obito prose.
+
+> **2026-09-30 OWNER SEGMENTATION SUCCESSOR:** The prose and total text amount in this document are accepted. Story-box segmentation is corrected by `Documentation/Story/Academy_Obito_Origin_Box_Segmentation_Parity_Correction_2026-09-30.md` @ `12cf6d76b168a046d890a269aad9a8276b3bad35`. Preserve the wording; split it into normal narration/dialogue boxes consistent with the other nine Academy Origins.
 
 The previous player-facing expression in:
 - `Documentation/Story/Academy_Obito_Origin_Compression_Rewrite_2026-09-29.md`
@@ -136,7 +138,7 @@ No hidden personality inference from HELP count.
 
 # 3. PLAYER-FACING STORY
 
-Each numbered cue below is one complete player-facing performance cue. Do not subdivide it merely because it contains several sentences.
+The wording below is accepted player-facing Story. Box boundaries are governed by the 2026-09-30 Obito segmentation-parity successor and the universal Story segmentation authority: narration paragraphs/dramatic beats and speaker turns must project as normal separate Story boxes rather than being forced together.
 
 ## SCENE 1 — MORNING RUN
 
@@ -880,8 +882,8 @@ Final Story -> BLACK WIPE -> Chronicle Receipt -> Receipt CONTINUE -> YOUR CHRON
 
 # 15. STATUS
 
-**ACADEMY OBITO = RED / NOT GOLDEN / NOT FROZEN until this successor is implemented and Stephen accepts it in the installed browser.**
+**ACADEMY OBITO = AMBER / NOT GOLDEN / NOT FROZEN. The prose and text amount are owner-accepted; only Story-box segmentation / dialogue-vs-narration projection remains open before Stephen's next installed-browser review.**
 
-Writing work required by the current owner correction is complete in this authority.
+No further Obito prose rewrite is authorised by the current owner correction.
 
-Coding implementation and owner browser validation remain outstanding.
+Coding must consume the segmentation-parity successor, then Stephen's installed-browser review remains the Golden gate.
