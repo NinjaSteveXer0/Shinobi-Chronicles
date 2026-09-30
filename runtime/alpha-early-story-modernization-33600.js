@@ -100,7 +100,7 @@ function patchMirai(){
   label(def,"mir_inconsistent","change_route","Change the route without warning and see how they react.");
   const deeper=beat(def,"mir_deeper");if(deeper)deeper.presentationResolver=()=>{const ctx=local();const reaction={test_question:"The new answer gives Mirai another detail to compare.",pretend_not_notice:"She keeps escort formation and waits for the next contradiction.",change_route:"The unannounced route change produces a reaction she can actually observe."}[ctx.miraiSuspicionResponse]||"Mirai keeps watching.";return{text:`Suspicion has become a pattern. It still is not proof. ${reaction}`};};
   text(def,"mir_checkpoint","At the checkpoint the transformation releases. The person Mirai protected is still standing exactly where she delivered them—safe, cooperative and not the person she thought she was escorting. For one ugly second, both facts are true at once.");
-  text(def,"mir_verified","Mirai never accuses them. She changes one question, then one route detail, then watches the answer arrive half a beat too late. By the time she acts, she has enough to expose the substitution without pretending she knows who is underneath it.");
+  text(def,"mir_verified","Mirai never accuses them. She changes one question, then one route detail, then watches the answer arrive slightly too late. By the time she acts, she has enough to expose the substitution without pretending she knows who is underneath it.");
   text(def,"mir_eval","The instructor waits until Mirai has reconstructed the route herself. Protection and identification turned out to be two different jobs.");
   text(def,"mir_end","You kept your client alive. Next time, make sure the client is the person you were assigned.");
   return commit(def);
