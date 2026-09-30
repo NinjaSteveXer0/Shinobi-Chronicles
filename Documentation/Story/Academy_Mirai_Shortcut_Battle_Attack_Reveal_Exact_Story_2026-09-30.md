@@ -145,7 +145,7 @@ When the smoke clears, her Academy instructor is standing in his place.
 Actor projection changes now:
 - remove apparent Traveller / Escort card;
 - project `NPC/mirai_instructor.png`;
-- female instructor presentation from this point onward.
+- male instructor presentation from this point onward.
 
 ## `mir_shortcut_victory_reveal_05` — dialogue — MIRAI
 
@@ -216,7 +216,7 @@ When it clears, the Academy instructor stands where the Traveller had been.
 Actor projection changes now:
 - remove apparent Traveller / Escort card;
 - project `NPC/mirai_instructor.png`;
-- female instructor presentation from this point onward.
+- male instructor presentation from this point onward.
 
 ## `mir_shortcut_defeat_reveal_04` — dialogue — MIRAI
 
@@ -372,7 +372,7 @@ PASS only if:
 victory
 -> Mirai challenges who this person is
 -> smoke
--> female instructor reveal
+-> male instructor reveal
 -> real Traveller confirmed safe at Checkpoint Three
 -> later checkpoint aftermath.
 
@@ -388,7 +388,7 @@ PASS only if:
 defeat
 -> Mirai challenges who this person is
 -> smoke
--> female instructor reveal
+-> male instructor reveal
 -> real Traveller confirmed safe at Checkpoint Three
 -> later defeat-specific checkpoint aftermath.
 
