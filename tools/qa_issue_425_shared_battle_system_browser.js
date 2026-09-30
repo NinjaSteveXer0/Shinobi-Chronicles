@@ -104,7 +104,14 @@ async function proveVisibleActionPresentation(page){
 
   const skillId=await card.getAttribute("data-skill-id");
   assert(skillId,"shared Mirai Skill card has no skill id");
-  const before=await page.evaluate(()=>Number(document.querySelector(".alpha-code-battle-stage")?.dataset.presentationSequenceOrdinal||0));
+  const before=await page.evaluate(()=>{
+    const stage=document.querySelector(".alpha-code-battle-stage");
+    return{
+      ordinal:Number(stage?.dataset.presentationSequenceOrdinal||0),
+      playerPL:Number(stage?.querySelector(".battle-live-power-player .alpha-battle-pl-core strong")?.textContent||NaN),
+      enemyPL:Number(stage?.querySelector(".battle-live-power-enemy .alpha-battle-pl-core strong")?.textContent||NaN)
+    };
+  });
 
   // After proving the visible card is wired to the production direct-click path,
   // commit the same prepared Skill through the canonical Combat API. This avoids
@@ -116,10 +123,10 @@ async function proveVisibleActionPresentation(page){
   },skillId);
   assert(committed&&committed.success===true,"Mirai shared-Battle Skill commit failed: "+skillId+" "+JSON.stringify(committed));
 
-  await page.waitForFunction(before=>{
+  await page.waitForFunction(beforeOrdinal=>{
     const stage=document.querySelector(".alpha-code-battle-stage");
-    return !!stage&&Number(stage.dataset.presentationSequenceOrdinal||0)>before;
-  },before,{timeout:12000});
+    return !!stage&&Number(stage.dataset.presentationSequenceOrdinal||0)>beforeOrdinal&&stage.dataset.presentationQueueBusy==="true";
+  },before.ordinal,{timeout:12000});
 
   const p=await page.evaluate(({before,skillId})=>{
     const stage=document.querySelector(".alpha-code-battle-stage");
@@ -132,6 +139,12 @@ async function proveVisibleActionPresentation(page){
     const actorNodes=stage?.querySelectorAll(".battle2-performance-role-actor").length||0;
     const targetNodes=stage?.querySelectorAll(".battle2-performance-role-target").length||0;
     const resultText=stage?.querySelector(".battle2-performance-result-chip")?.innerText?.replace(/\s+/g," ").trim()||"";
+    const playerPLText=stage?.querySelector(".battle-live-power-player .alpha-battle-pl-core strong")?.textContent?.trim()||"";
+    const enemyPLText=stage?.querySelector(".battle-live-power-enemy .alpha-battle-pl-core strong")?.textContent?.trim()||"";
+    const playerPL=playerPLText===""?NaN:Number(playerPLText);
+    const enemyPL=enemyPLText===""?NaN:Number(enemyPLText);
+    const presentationBeforePL=stage?.dataset.presentationBeforePl===""?null:Number(stage?.dataset.presentationBeforePl);
+    const presentationAfterPL=stage?.dataset.presentationAfterPl===""?null:Number(stage?.dataset.presentationAfterPl);
     const committedEvidence=evidence.some(row=>
       row&&
       row.actorRef?.participantId==="academy_mirai"&&
@@ -150,6 +163,7 @@ async function proveVisibleActionPresentation(page){
     );
     return{
       before,ordinal,actor,target,actionText,active,actorNodes,targetNodes,resultText,
+      playerPLText,enemyPLText,playerPL,enemyPL,presentationBeforePL,presentationAfterPL,
       committedEvidence,anyCompletedEvidence,
       evidence:evidence.slice(-12).map(row=>({
         eventType:row?.eventType||null,
@@ -159,12 +173,17 @@ async function proveVisibleActionPresentation(page){
         target:row?.targetRef?.participantId||null
       }))
     };
-  },{before,skillId});
+  },{before:before.ordinal,skillId});
 
-  assert(p.ordinal>before,"shared ordered action presentation did not advance");
+  assert(p.ordinal>before.ordinal,"shared ordered action presentation did not advance");
   assert.strictEqual(p.actor,"academy_mirai","shared action presentation actor drift");
   assert.strictEqual(p.target,"academy_mirai_origin_instructor","shared action presentation target drift");
   assert(p.actionText.length>0,"shared action presentation technique label missing");
+  assert.strictEqual(p.active,true,"shared action receipt settled before PL projection could be proven");
+  assert(p.playerPLText!==""&&Number.isFinite(p.playerPL),"player radial Battle PL numeral disappeared during Skill presentation");
+  assert(p.enemyPLText!==""&&Number.isFinite(p.enemyPL),"enemy radial Battle PL numeral disappeared during Skill presentation");
+  assert.strictEqual(p.playerPL,before.playerPL,"player radial Battle PL drifted during its own Skill presentation");
+  if(p.presentationAfterPL!==null)assert.strictEqual(p.enemyPL,p.presentationAfterPL,"active target radial did not show committed after-PL");
   assert(p.committedEvidence||p.anyCompletedEvidence,"real Mirai Skill action did not leave committed Battle evidence "+JSON.stringify(p.evidence));
 
   // Role classes/result chips are intentionally transient. If the receipt is
