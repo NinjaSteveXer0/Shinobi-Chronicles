@@ -423,9 +423,13 @@ async function launchBattle(page,label){
   await button.click();
   await page.waitForFunction(()=>currentBattle&&currentBattle.wasabi343&&currentBattle.active===true,null,{timeout:12000});
   await page.waitForSelector(".alpha-code-battle-stage",{state:"visible",timeout:12000});
-  const battle=await page.evaluate(()=>({
+  const battle=await page.evaluate(()=>{
+    const stage=document.querySelector(".alpha-code-battle-stage.battle2-modern");
+    return{
     battleId:currentBattle.battleId,encounterId:currentBattle.encounterId,
     environmentPath:currentBattle.environmentPath||null,presentationEnvironmentPath:currentBattle.presentationEnvironmentPath||null,
+    stageEnvironmentPath:stage?.dataset?.battleEnvironmentPath||null,
+    stageBackground:stage?getComputedStyle(stage).backgroundImage:"",
     returnContext:JSON.parse(JSON.stringify(currentBattle.returnContext||null)),
     playerSlots:(currentBattle.deployment?.player?.slots||[]).map(s=>s.participantId).filter(Boolean),
     enemySlots:(currentBattle.deployment?.enemy?.slots||[]).map(s=>s.participantId).filter(Boolean),
@@ -438,12 +442,14 @@ async function launchBattle(page,label){
       actions:(enemyDatabase["wasabi_origin_rogue_genin_01"]?.authoredBattleActions||[]).map(a=>({id:a.id,pl:a.authoredAttackPL??null,traits:a.traits||[]}))
     },
     buttons:[...document.querySelectorAll(".alpha-code-battle-stage button")].filter(n=>n.getClientRects().length>0).map(n=>n.textContent.trim())
-  }));
+  };});
   const instanceId=battle.returnContext?.sceneInstanceId||battle.returnContext?.storyInstanceId||battle.returnContext?.instanceId;
   assert.strictEqual(battle.battleId,"battle_occ_origin_izuno_rogue_genin_step_in:"+instanceId,label+" exact Battle occurrence");
   assert.strictEqual(battle.encounterId,"origin_academy_izuno_rogue_genin_step_in");
   assert.strictEqual(battle.environmentPath,BACKDROPS.alley,label+" Battle environment drift");
   assert.strictEqual(battle.presentationEnvironmentPath,BACKDROPS.alley,label+" Battle presentation environment drift");
+  assert.strictEqual(battle.stageEnvironmentPath,BACKDROPS.alley,label+" shared Battle stage did not consume authored environment");
+  assert(battle.stageBackground.includes(BACKDROPS.alley.split("/").pop()),label+" authored Battle backdrop is not visibly painted "+JSON.stringify({stageEnvironmentPath:battle.stageEnvironmentPath,stageBackground:battle.stageBackground}));
   assert.deepStrictEqual(battle.playerSlots,[WASABI]);assert.deepStrictEqual(battle.enemySlots,[ROGUE]);
   assert.strictEqual(battle.enemy.pl,23);assert.deepStrictEqual(battle.enemy.stats,{nin:23,tai:22,buki:21,fuin:10,kin:14,gen:15,stamina:24});
   assert.strictEqual(battle.enemy.template,"rogue_genin");
