@@ -9,8 +9,12 @@
 
 **Date:** 2026-09-27  
 **Owner:** Writing / Story — Konoha  
-**Status:** **OWNER BROWSER AMBER — NOT FIXED / STAGED-CHOICE STRUCTURE STILL REQUIRED / NOT FROZEN**  
+**Status:** **OWNER BROWSER AMBER — WRITING REPAIR COMPLETE / CODING IMPLEMENTATION + OWNER RETEST REQUIRED / NOT FROZEN**  
 **Origin:** `academy_kurenai`
+
+> **CURRENT PLAYER-FACING SUCCESSOR:** `Documentation/Story/Academy_Kurenai_Origin_Final_Staged_Bell_Test_Rewrite_2026-09-30.md` @ `b98c00693c88a7ba6050b20d39d8f1bc760ed158`.
+>
+> This successor restores three meaningful Bell-Test choice stages, keeps the female instructor, preserves the four outcome classes, and restores Receipt -> CONTINUE -> YOUR CHRONICLE BEGINS ordering. Do not use this older one-choice player-facing structure.
 
 > **2026-09-30 structural restoration authority:** `Documentation/Story/Academy_Kurenai_Origin_Staged_Choice_and_Receipt_Restoration_2026-09-30.md` @ `e7ce02375db5288c50bec9e457cdaa7cc96e6075`.
 >
