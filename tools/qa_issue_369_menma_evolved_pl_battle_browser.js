@@ -264,15 +264,21 @@ async function driveGuestAllyTeachingHandoff(page,label){
   await page.screenshot({path:path.join(OUT,label+"-anko-vs-brute-ready.png"),fullPage:false,timeout:12000});
 
   // Second genuine player choice. Dragon Flame legitimately withdraws Brute.
-  // Unstable relays, Anko yields without withdrawal, and enemy-side ordering is
-  // preserved: Unstable acts against Menma before Menma gets input.
+  // Owner correction: Unstable must spend the next enemy opportunity on Anko
+  // before the authored teaching handoff promotes Menma.
   await useSkill(page,"sj_anko_fire_style_dragon_flame");
   await page.waitForFunction(()=>getBattleRemainingPL("enemy","test_subject_brute")===0,null,{timeout:8000});
+  await page.waitForFunction(({ANKO,UNSTABLE})=>{
+    const ev=currentBattle?.runtime?.evidence||[];
+    return getBattleDeploymentParticipant("enemy",1)?.id===UNSTABLE&&
+      ev.some(r=>r?.eventType==="enemy_authored_action_completed"&&r?.actorRef?.participantId===UNSTABLE&&r?.targetRef?.participantId===ANKO);
+  },{ANKO,UNSTABLE:HOSTILES[2]},{timeout:12000});
   await waitPlayerReady(page,MENMA,HOSTILES[2]);
 
-  const handoff=await page.evaluate(()=>({
+  const handoff=await page.evaluate(({MENMA,ANKO})=>({
     state:getMenmaEvolvedPLBattleState36900(),
     readiness:getMenmaEvolvedPLBattleInputReadiness36900(),
+    menmaPL:getBattleRemainingPLRecord("player",MENMA),
     deployment:{
       player:currentBattle.deployment.player.slots.map(s=>s.participantId).filter(Boolean),
       enemy:currentBattle.deployment.enemy.slots.map(s=>s.participantId).filter(Boolean)
@@ -282,14 +288,15 @@ async function driveGuestAllyTeachingHandoff(page,label){
       evidenceId:r.evidenceId,eventType:r.eventType,actor:r.actorRef?.participantId||null,target:r.targetRef?.participantId||null,
       skillId:r.skillId||null,actionId:r.actionId||null,data:r.data||{}
     }))
-  }));
+  }),{MENMA,ANKO});
   assert.deepStrictEqual(handoff.deployment.player,[MENMA,ANKO],"authored Anko -> Menma yield drift");
   assert.deepStrictEqual(handoff.deployment.enemy,[HOSTILES[2]],"Brute -> Unstable relay drift");
   assert.strictEqual(handoff.state.ankoYielded,true,"authored Guest Ally yield not committed");
   assert.strictEqual(handoff.state.menmaEvidenceStarted,true,"MEN-03 window did not start when Menma became Active");
-  assert.strictEqual(handoff.readiness.ready,true,"Menma did not receive input after Unstable response");
-  assert(handoff.evidence.some(r=>r.eventType==="battle_formation_yield_committed"&&r.actor===ANKO&&r.target===MENMA&&r.data?.nextSide==="enemy"),"yield did not preserve enemy-next side order");
-  assert(handoff.evidence.some(r=>r.eventType==="enemy_authored_action_completed"&&r.actor===HOSTILES[2]&&r.target===MENMA),"Unstable did not act before Menma input");
+  assert.strictEqual(handoff.readiness.ready,true,"Menma did not receive input after Unstable attacked Anko");
+  assert.strictEqual(Number(handoff.menmaPL?.current??handoff.menmaPL?.remaining??0),Number(handoff.menmaPL?.maximum??0),"Menma did not enter against Unstable at full Battle PL");
+  assert(handoff.evidence.some(r=>r.eventType==="battle_formation_yield_committed"&&r.actor===ANKO&&r.target===MENMA&&r.data?.nextSide==="player"),"yield did not hand the next player opportunity to Menma");
+  assert(handoff.evidence.some(r=>r.eventType==="enemy_authored_action_completed"&&r.actor===HOSTILES[2]&&r.target===ANKO),"Unstable did not attack Anko before Menma input");
   assert.strictEqual(handoff.evidence.filter(r=>r.eventType==="menma_origin_phase_c_started"&&r.actor===MENMA).length,1,"MEN-03 start evidence duplicated/missing");
   assert.strictEqual(handoff.evidence.some(r=>r.eventType==="menma_origin_scripted_anko_takedown_completed"),false,"scripted Anko path leaked into successor");
   await page.screenshot({path:path.join(OUT,label+"-menma-vs-unstable-ready.png"),fullPage:false,timeout:12000});
@@ -365,18 +372,18 @@ async function guestAllyVictoryAndReload(browser){
     assert(terminal.evidence.some(r=>r.eventType==="skill_action_completed"&&r.actor===MENMA),"Menma victory action evidence missing");
 
     // Real Victory-surface proof for Stephen's two presentation blockers.
-    // This is an earned reward delta, not a wallet-total animation.
+    // This is a static earned amount, not a rolling wallet-total animation.
     await page.waitForFunction(()=>{
       const node=document.querySelector(".alpha-victory-code-screen .victory-ryo-number");
-      return node&&node.textContent.trim()==="+100"&&node.dataset.rewardPresentation==="earned_delta";
+      return node&&node.textContent.trim()==="100"&&node.dataset.rewardPresentation==="static_earned_amount";
     },null,{timeout:2000});
     const rewardPresentation=await page.evaluate(()=>({
       ryoText:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.textContent?.trim()||"",
       rewardMode:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.dataset?.rewardPresentation||null,
       action:document.querySelector(".alpha-victory-code-screen .victory-continue")?.textContent?.trim()||""
     }));
-    assert.strictEqual(rewardPresentation.ryoText,"+100","Victory reward did not present exact earned +100 Ryō");
-    assert.strictEqual(rewardPresentation.rewardMode,"earned_delta","Victory Ryō presentation is not reward-gained mode");
+    assert.strictEqual(rewardPresentation.ryoText,"100","Victory reward did not present exact static 100 Ryō");
+    assert.strictEqual(rewardPresentation.rewardMode,"static_earned_amount","Victory Ryō presentation is not static");
     assert.strictEqual(rewardPresentation.action,"CLAIM REWARDS","Victory claim action missing before reward commit");
 
     const beforeClaim=await page.evaluate(()=>Number(playerData.ryo)||0);
@@ -392,10 +399,10 @@ async function guestAllyVictoryAndReload(browser){
     // CONTINUE is inserted synchronously by the post-claim Victory re-render;
     // the presentation-only earned-delta decoration is applied on its scheduled
     // requestAnimationFrame. Keep the latency measurement above independent,
-    // then require the next visible frame to be the same +100 earned delta.
+    // then require the next visible frame to be the same static 100 Ryō amount.
     await page.waitForFunction(()=>{
       const node=document.querySelector(".alpha-victory-code-screen .victory-ryo-number");
-      return node&&node.textContent.trim()==="+100"&&node.dataset.rewardPresentation==="earned_delta";
+      return node&&node.textContent.trim()==="100"&&node.dataset.rewardPresentation==="static_earned_amount";
     },null,{timeout:1000});
 
     const afterClaim=await page.evaluate(()=>Number(playerData.ryo)||0);
@@ -408,8 +415,8 @@ async function guestAllyVictoryAndReload(browser){
       action:document.querySelector(".alpha-victory-code-screen .victory-continue")?.textContent?.trim()||""
     }));
     assert.deepStrictEqual(postClaimPresentation,{
-      ryoText:"+100",
-      rewardMode:"earned_delta",
+      ryoText:"100",
+      rewardMode:"static_earned_amount",
       action:"CONTINUE"
     },"post-claim Victory presentation drift");
 
@@ -759,7 +766,8 @@ async function legitimatePartyDefeat(browser){
         ordinaryEnemyResponsesEnabled:true,
         alteredThenBruteThenUnstableRelay:true,
         ankoYieldsToMenmaAfterLegitimateFirstTwo:true,
-        enemyActsBeforeMenmaAfterYield:true,
+        unstableAttacksAnkoBeforeMenmaHandoff:true,
+        menmaStartsUnstableFightAtFullPL:true,
         menmaEvidenceStartsAtFirstActiveMoment:true,
         menmaWithdrawalRelaysBackToEligibleAnko:true,
         partyDefeatRequiresAlliedExhaustion:true,
