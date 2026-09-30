@@ -217,8 +217,8 @@ assert(
   binder.includes('mir_shortcut_defeat_reveal_07:"wipe_right_to_left"')&&
   binder.includes('mir_confront_defeat_end_12:"wipe_right_to_left"')&&
   binder.includes("LATER — CHECKPOINT THREE")&&
-  golden.includes('mir_shortcut_victory_reveal_08')&&golden.includes('mir_shortcut_defeat_reveal_07')&&
-  !golden.includes('mir_shortcut_victory_reveal_09')&&!golden.includes('mir_shortcut_defeat_reveal_08')&&
+  golden.includes('line("mir_shortcut_victory_reveal",[')&&golden.includes('line("mir_shortcut_defeat_reveal",[')&&
+  golden.includes('],MIRAI_ENV.lane,"mir_checkpoint_early_01")')&&golden.includes('],MIRAI_ENV.lane,"mir_defeat_debrief_shortcut_01")')&&
   binder.includes('id.startsWith("mir_shortcut_victory_reveal_")')&&
   binder.includes('id.startsWith("mir_shortcut_defeat_reveal_")')&&
   binder.includes('ctx.miraiEscortAssessmentResult==="not_completed_battle_defeat"')&&
