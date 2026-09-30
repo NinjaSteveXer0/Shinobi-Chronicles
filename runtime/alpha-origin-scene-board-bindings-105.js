@@ -708,7 +708,19 @@ function installDefinitions(){
       met_receipt:()=>[{kind:"record",text:buildMetalReceipt105()}]
     },
     performanceTransitions:{
-      met_spar_strong_close_07:"wipe_right_to_left",\n      met_spar_mixed_close_05:"wipe_right_to_left",\n      met_spar_rough_close_01:"wipe_right_to_left",\n      met_redirect_success_close_09:"wipe_right_to_left",\n      met_redirect_partial_close_06:"wipe_right_to_left",\n      met_redirect_failure_close_09:"wipe_right_to_left",\n      met_impact_success_close_11:"wipe_right_to_left",\n      met_impact_partial_close_07:"wipe_right_to_left",\n      met_impact_failure_close_05:"wipe_right_to_left",\n      met_destroy_success_close_06:"wipe_right_to_left",\n      met_destroy_partial_close_11:"wipe_right_to_left",\n      met_destroy_failure_close_05:"wipe_right_to_left",\n      met_backout_close_01:"wipe_right_to_left"
+      met_spar_strong_close_07:"wipe_right_to_left",
+      met_spar_mixed_close_05:"wipe_right_to_left",
+      met_spar_rough_close_01:"wipe_right_to_left",
+      met_redirect_success_close_09:"wipe_right_to_left",
+      met_redirect_partial_close_06:"wipe_right_to_left",
+      met_redirect_failure_close_09:"wipe_right_to_left",
+      met_impact_success_close_11:"wipe_right_to_left",
+      met_impact_partial_close_07:"wipe_right_to_left",
+      met_impact_failure_close_05:"wipe_right_to_left",
+      met_destroy_success_close_06:"wipe_right_to_left",
+      met_destroy_partial_close_11:"wipe_right_to_left",
+      met_destroy_failure_close_05:"wipe_right_to_left",
+      met_backout_close_01:"wipe_right_to_left"
     }
   });
   const outcome={success:Object.values(results).every(r=>r&&r.success===true),results};
