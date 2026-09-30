@@ -191,8 +191,8 @@ async function proveVisibleActionPresentation(page){
   assert(p.bannerGeometry.top>=p.bannerGeometry.stageTop,"shared action banner clips above the Battle stage "+JSON.stringify(p.bannerGeometry));
   assert(p.bannerGeometry.top>=0,"shared action banner clips above the viewport "+JSON.stringify(p.bannerGeometry));
   assert(p.bannerGeometry.bottom<=p.bannerGeometry.viewportHeight,"shared action banner clips below the viewport "+JSON.stringify(p.bannerGeometry));
-  assert(p.bannerGeometry.width>=p.bannerGeometry.stageWidth*.20,"shared DUEL action banner is too narrow and forces excessive wrapping "+JSON.stringify(p.bannerGeometry));
-  assert(p.bannerGeometry.height<=p.bannerGeometry.stageHeight*.10,"shared action banner is too tall for the Battle stage "+JSON.stringify(p.bannerGeometry));
+  assert(p.bannerGeometry.width<=p.bannerGeometry.stageWidth*.14+.5,"shared DUEL action banner broke the frozen compact-center width "+JSON.stringify(p.bannerGeometry));
+  assert(p.bannerGeometry.height<=p.bannerGeometry.stageHeight*.08,"shared action banner is too tall for the Battle stage "+JSON.stringify(p.bannerGeometry));
   assert.strictEqual(p.active,true,"shared action receipt settled before PL projection could be proven");
   assert(p.playerPLText!==""&&Number.isFinite(p.playerPL),"player radial Battle PL numeral disappeared during Skill presentation");
   assert(p.enemyPLText!==""&&Number.isFinite(p.enemyPL),"enemy radial Battle PL numeral disappeared during Skill presentation");
