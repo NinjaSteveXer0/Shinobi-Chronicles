@@ -244,7 +244,7 @@ assert.deepStrictEqual(izu04.rowIds,["IZU-04"]);
 // Battle return records factual Battle result without turning victory into pursuit truth.
 commits.length=0;
 activeRt.localContext={rogueGeninResponse:"intervene",rogueResolved:false,outcome:"secondary_occurrence_costs_pursuit"};
-const battleReturn=byId.get("izu_rogue_step_in_return_1").onEnterConsequences[0];
+const battleReturn=byId.get("izu_finish_secondary_1").onEnterConsequences.find(x=>x&&x.requestId==="izu_rogue_step_in_return_343");
 const br=battleReturn.resolve({sceneContext:{battleResume:{authored:{
   battleOccurrenceId:"battle_occ_origin_izuno_rogue_genin_step_in:qa-wasabi-scene",
   sourceOccurrenceId:"occ_origin_izuno_rogue_genin_interruption_resolution",
