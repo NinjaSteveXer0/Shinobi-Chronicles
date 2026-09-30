@@ -393,7 +393,7 @@ function miraiActors(beatId,performance,beat){
   }
   if(id.startsWith("mir_shortcut_victory_reveal_")){
     const match=id.match(/_(\d+)$/),n=match?Number(match[1]):0;
-    rows.push(n>=7?instructor():traveller());
+    rows.push(n>=4?instructor():traveller());
     return rows;
   }
   if(id.startsWith("mir_shortcut_defeat_reveal_")){
@@ -590,6 +590,31 @@ function installDefinitions(){
       ?null
       :{assetPath:miraiBackdrop(beatId,runtime),assetId:"issue105_mirai"},
     performanceSequences:{
+      mir_shortcut_victory_reveal_02:()=>[
+        {kind:"dialogue",speakerName:"MIRAI",text:"Don't move."},
+        {kind:"narration",text:"The Traveller stays where he is."}
+      ],
+      mir_shortcut_victory_reveal_03:()=>[
+        {kind:"dialogue",speakerName:"MIRAI",text:"You pulled me off the route and attacked me."},
+        {kind:"narration",text:"Her eyes stay on him."},
+        {kind:"dialogue",speakerName:"MIRAI",text:"Who are you?"}
+      ],
+      mir_shortcut_victory_reveal_06:()=>[
+        {kind:"dialogue",speakerName:"ACADEMY INSTRUCTOR",text:"Checkpoint Three. Safe."},
+        {kind:"narration",text:"Mirai looks toward the end of the lane."}
+      ],
+      mir_shortcut_victory_reveal_08:()=>[
+        {kind:"dialogue",speakerName:"ACADEMY INSTRUCTOR",text:"The market."},
+        {kind:"narration",text:"Mirai's expression hardens.\n\nShe understands what changed."}
+      ],
+      mir_shortcut_defeat_reveal_05:()=>[
+        {kind:"dialogue",speakerName:"ACADEMY INSTRUCTOR",text:"Checkpoint Three. Safe."},
+        {kind:"narration",text:"Mirai pushes herself upright."}
+      ],
+      mir_shortcut_defeat_reveal_07:()=>[
+        {kind:"dialogue",speakerName:"ACADEMY INSTRUCTOR",text:"The market."},
+        {kind:"narration",text:"Mirai looks back toward the road they left.\n\nShe lost the exchange.\n\nShe did not imagine the contradiction."}
+      ],
       mir_confront_defeat_end_12:()=>[
         {kind:"dialogue",speakerName:"ACADEMY INSTRUCTOR",text:"About the switch."},
         {kind:"dialogue",speakerName:"ACADEMY INSTRUCTOR",text:"You still lost the exchange."},
@@ -614,8 +639,8 @@ function installDefinitions(){
       mir_receipt:()=>[{kind:"record",text:buildMiraiReceipt105()}]
     },
     performanceTransitions:{
-      mir_shortcut_victory_reveal_13:"wipe_right_to_left",
-      mir_shortcut_defeat_reveal_09:"wipe_right_to_left",
+      mir_shortcut_victory_reveal_08:"wipe_right_to_left",
+      mir_shortcut_defeat_reveal_07:"wipe_right_to_left",
       mir_confront_defeat_end_12:"wipe_right_to_left"
     }
   });
