@@ -71,103 +71,139 @@
       summary:"Move your mouse over a Skill to see what it does. Click the Skill when you are ready to use it.",
       details:[],kind:"TECHNIQUE",attackPL:null,tags:["HOVER TO LEARN","CLICK TO USE"]
     };
-
+  
     const exact={
-      academy_menma_chakra_knuckle:{
-        summary:"Hit one enemy with a chakra-powered punch.",
-        details:["Attack PL 6.","The enemy's Stamina can reduce the damage."],
-        tags:["DAMAGE","ONE ENEMY"]
-      },
-      academy_menma_crescent_kunai:{
-        summary:"Strike one enemy with a fast kunai attack.",
-        details:["Attack PL 5.","This is a simple direct attack."],
-        tags:["DAMAGE","ONE ENEMY"]
-      },
-      academy_menma_guard_breaker:{
-        summary:"Hit one enemy with a heavy attack that can pressure an active guard.",
-        details:["Attack PL 7.","It does not remove every kind of defence automatically."],
-        tags:["DAMAGE","GUARD PRESSURE"]
-      },
-      academy_menma_shadow_clone_feint:{
-        summary:"Trick the enemy with a shadow-clone feint.",
-        details:["This does not deal damage by itself.","It creates a temporary setup state for the Skill's authored follow-up effect."],
-        tags:["SETUP","NO DIRECT DAMAGE"]
-      },
-      academy_menma_shadowstep:{
-        summary:"Move to a different position when a real movement route is available.",
-        details:["This does not deal damage.","It is movement, not teleportation."],
-        tags:["MOVEMENT","CONTEXT REQUIRED"]
-      }
+      academy_hinata_gentle_palm:{summary:"Deals 5 ATK to one enemy.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_hinata_twin_palm_guard:{summary:"Reduce the next direct hit against you by 30%.",details:["Works once."],tags:["DEFENSE","GUARD"]},
+      academy_hinata_palm_counter:{summary:"Use a reactive palm counter when an enemy attack gives you an opening.",details:["No direct damage by itself."],tags:["COUNTER","CONTEXT REQUIRED"]},
+      academy_hinata_academy_shuriken:{summary:"Deals 4 ATK to one enemy with a shuriken throw.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_hinata_gentle_step:{summary:"Move to a new position when a real route is available.",details:["Movement, not teleportation."],tags:["MOVEMENT","CONTEXT REQUIRED"]},
+  
+      academy_izuno_pouncing_palm:{summary:"Deals 5 ATK to one enemy with a fast palm strike.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_izuno_shuriken_pounce:{summary:"Deals 5 ATK to one enemy with a moving shuriken attack.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_izuno_catstep_feint:{summary:"Use quick footwork to set up a feint when the situation allows it.",details:["No direct damage."],tags:["SETUP"]},
+      academy_izuno_wall_spring:{summary:"Spring off a nearby surface to move to a new position.",details:["Needs a real surface or route. Not teleportation."],tags:["MOVEMENT","CONTEXT REQUIRED"]},
+      academy_izuno_clone_pounce:{summary:"Use a clone-assisted feint against one enemy.",details:["No direct damage and no automatic deception."],tags:["SETUP","ONE ENEMY"]},
+  
+      academy_mirai_twin_kunai:{summary:"Deals 5 ATK to one enemy with a twin-kunai attack.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_mirai_wire_trip:{summary:"Bind one enemy with wire so moves needing free movement are blocked.",details:["Control, not a full Stun."],tags:["CONTROL","ONE ENEMY"]},
+      academy_mirai_false_footstep:{summary:"Use Genjutsu to confuse how your movement is read.",details:["It does not automatically fool the enemy."],tags:["SETUP","GENJUTSU"]},
+      academy_mirai_guarding_blade:{summary:"Reduce the next direct hit against you by 25%.",details:["Works once."],tags:["DEFENSE","GUARD"]},
+      academy_mirai_crossing_strike:{summary:"Deals 6 ATK to one enemy.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+  
+      academy_kushina_red_whirlwind:{summary:"Deals 6 ATK to one enemy with a forceful spinning attack.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_kushina_beginner_binding_formula:{summary:"Use a sealing formula to bind one enemy.",details:["Control, not a full Stun."],tags:["CONTROL","ONE ENEMY"]},
+      academy_kushina_iron_will_brace:{summary:"Reduce the next direct hit against you by 30%.",details:["Works once."],tags:["DEFENSE","GUARD"]},
+      academy_kushina_headstrong_counter:{summary:"Deals 6 ATK to one enemy.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_kushina_seal_tag_toss:{summary:"Place a seal tag on one enemy for a compatible follow-up.",details:["No direct damage."],tags:["SETUP","ONE ENEMY"]},
+  
+      academy_kurenai_false_opening:{summary:"Create a false opening around one enemy.",details:["Mirage Kunai can exploit it. No direct damage."],tags:["SETUP","ONE ENEMY"]},
+      academy_kurenai_feinting_kunai:{summary:"Deals 4 ATK, or 6 ATK after Petal Mirage.",details:["Using the opening consumes it. Stamina reduces damage."],tags:["DAMAGE","SETUP FOLLOW-UP"]},
+      academy_kurenai_false_step_genjutsu:{summary:"Use Genjutsu to make your movement harder to read.",details:["It does not automatically fool the enemy."],tags:["SETUP","GENJUTSU"]},
+      academy_kurenai_veiled_guard:{summary:"Reduce the next direct hit against you by 25%.",details:["Works once."],tags:["DEFENSE","GUARD"]},
+      academy_kurenai_genjutsu_release:{summary:"Attempt to break a compatible Genjutsu effect on yourself.",details:["Works only when there is a valid effect to release."],tags:["CONTROL","CLEANSE"]},
+  
+      academy_iwabee_iron_staff_smash:{summary:"Deals 6 ATK to one enemy with a heavy staff strike.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_iwabee_staff_sweep:{summary:"Deals 4 ATK to up to 2 enemies with a staff sweep.",details:["Stamina reduces each hit."],tags:["DAMAGE","AREA"]},
+      academy_iwabee_earth_style_rising_wall:{summary:"Reduce the next direct hit against you by 35%.",details:["Works once."],tags:["DEFENSE","GUARD"]},
+      academy_iwabee_stone_snare:{summary:"Trap one enemy with stone to restrict them.",details:["Control, not a full Stun."],tags:["CONTROL","ONE ENEMY"]},
+      academy_iwabee_grounded_stance:{summary:"Brace yourself against forced movement when there is something to resist.",details:["No direct damage."],tags:["DEFENSE","CONTEXT REQUIRED"]},
+  
+      academy_metal_lee_leaf_rising_kick:{summary:"Deals 6 ATK to one enemy with a rising kick.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_metal_lee_training_flurry:{summary:"Deals 5 ATK to one enemy with a rapid barrage.",details:["The barrage counts as one damage hit."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_metal_lee_pressure_rhythm:{summary:"Your next damaging Skill gains +2 ATK.",details:["The bonus is used by that attack."],tags:["SETUP"]},
+      academy_metal_lee_guarded_footwork:{summary:"Reduce the next direct hit against you by 25%.",details:["Works once."],tags:["DEFENSE","GUARD"]},
+      academy_metal_lee_conditioned_endurance:{summary:"Gain 4 temporary Battle PL for this Battle.",details:["Extra fighting capacity, not healing."],tags:["CAPACITY","TEMPORARY"]},
+  
+      academy_obito_fire_style_ember_burst:{summary:"Deals 5 ATK to one enemy with Fire Release.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_obito_headlong_rush:{summary:"Deals 6 ATK to one enemy with a headlong rush.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_obito_uchiha_shuriken_rush:{summary:"Deals 5 ATK to one enemy with a shuriken barrage.",details:["The barrage counts as one damage hit."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_obito_protective_intercept:{summary:"Protect one ally and reduce their next direct hit by 30%.",details:["Works once."],tags:["DEFENSE","ALLY"]},
+      academy_obito_determined_stand:{summary:"Gain 3 temporary Battle PL for this Battle.",details:["Extra fighting capacity, not healing."],tags:["CAPACITY","TEMPORARY"]},
+  
+      academy_menma_chakra_knuckle:{summary:"Deals 6 ATK to one enemy with a chakra-powered punch.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_menma_crescent_kunai:{summary:"Deals 5 ATK to one enemy with a fast kunai strike.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_menma_guard_breaker:{summary:"Deals 7 ATK to one enemy and can pressure a compatible guard.",details:["It does not break every defence automatically."],tags:["DAMAGE","GUARD PRESSURE"]},
+      academy_menma_shadow_clone_feint:{summary:"Create a shadow-clone feint for a later opening.",details:["No direct damage and no extra fighter."],tags:["SETUP"]},
+      academy_menma_shadowstep:{summary:"Move to a new position when a real route is available.",details:["Movement, not teleportation."],tags:["MOVEMENT","CONTEXT REQUIRED"]},
+  
+      academy_kakashi_kunai_quickdraw:{summary:"Deals 5 ATK to one enemy with a fast kunai strike.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_kakashi_clone_feint:{summary:"Use a clone feint to open the enemy up.",details:["Precision Strike can exploit it. No direct damage."],tags:["SETUP","ONE ENEMY"]},
+      academy_kakashi_opening_exploit:{summary:"Deals 5 ATK, or 11 ATK after Clone Switch.",details:["Using the opening consumes it. Stamina reduces damage."],tags:["DAMAGE","SETUP FOLLOW-UP"]},
+      academy_kakashi_wire_snare:{summary:"Bind one enemy with wire and restrict their movement.",details:["Control, not a full Stun."],tags:["CONTROL","ONE ENEMY"]},
+      academy_kakashi_substitution_jutsu:{summary:"Reduce one direct hit against you by 50%.",details:["Can be used once per Battle."],tags:["DEFENSE","ONCE PER BATTLE"]}
     };
     const fixed=exact[skill.id];
     if(fixed)return {
       title:skill.displayName||skill.id,
       summary:fixed.summary,
       details:fixed.details,
-      kind:skillKind33000(skill),attackPL:attackValue33000(skill),tags:fixed.tags
+      kind:skillKind33000(skill),attackPL:attackValue33000(skill),tags:fixed.tags,
+      exactPlayerFacingOverride:true,descriptionCoverage:"exact"
     };
-
+  
     const kind=String(skill.resolutionKind||"");
     const attack=attackValue33000(skill);
-    let summary="Use this authored Battle technique.";
+    let summary="";
     let details=[];
     let tags=[skillKind33000(skill)];
-
+    let descriptionCoverage="structured";
+  
     if(kind==="direct_damage"){
-      summary="Hit one enemy with a direct attack.";
-      details=[attack!==null?`Attack PL ${attack}.`:"Its Attack PL comes from the authored Skill.",skill.staminaMitigation===false?"This Skill ignores normal Stamina damage reduction.":"The target's Stamina can reduce the damage."];
+      summary=attack!==null?`Deals ${attack} ATK to one enemy.`:"Deals damage to one enemy.";
+      details=[skill.staminaMitigation===false?"This attack ignores normal Stamina reduction.":"Stamina reduces the damage."];
       tags=["DAMAGE","ONE ENEMY"];
     }else if(kind==="area_damage"){
       const targets=Math.max(1,Number(skill.maxTargets)||1);
-      summary=`Attack up to ${targets} active ${targets===1?"target":"targets"}.`;
-      details=[attack!==null?`Attack PL ${attack} for each target.`:"Each target uses the Skill's authored Attack PL.","Each target is resolved separately by the Battle rules."];
+      summary=attack!==null?`Deals ${attack} ATK to up to ${targets} ${targets===1?"enemy":"enemies"}.`:`Deals damage to up to ${targets} ${targets===1?"enemy":"enemies"}.`;
+      details=[skill.staminaMitigation===false?"These hits ignore normal Stamina reduction.":"Stamina reduces each hit."];
       tags=["DAMAGE","AREA"];
     }else if(kind==="ratio_guard_state"&&skill.guard){
       const pct=Math.round((Number(skill.guard.preventionRatio)||0)*100);
-      summary=`Get ready to block ${pct}% of the next qualifying direct hit.`;
-      details=[skill.guard.oneUse===false?"The guard stays active for as long as its authored rule allows.":"It works once, then the guard ends.","It only blocks attacks that qualify for this guard."];
+      summary=`Reduce the next direct hit against you by ${pct}%.`;
+      details=[skill.guard.oneUse===false?"The guard lasts for this Skill's stated duration.":"Works once."];
       tags=["DEFENSE","GUARD"];
     }else if(kind==="restore_underlying_battle_pl"&&skill.restorationProfile){
       const amount=Number(skill.restorationProfile.authoredAmount)||0;
       summary=`Restore ${amount} Battle PL to an eligible ally.`;
-      details=["This helps during the current battle.","It does not permanently increase the ally's Stats or Base PL."];
+      details=["This does not raise Base PL."];
       tags=["RECOVERY","ALLY"];
     }else if(kind==="dynamic_control"){
-      summary="Use a control technique to limit the target in the way this Skill allows.";
-      details=["The exact limit comes from this Skill's authored rule.","Control does not automatically mean a full stun."],tags=["CONTROL"];
+      summary="Restrict one enemy with this control Skill.";
+      details=["The Skill blocks only the actions named by its effect."];
+      tags=["CONTROL"];
     }else if(kind==="condition_remove"&&skill.conditionRemoval){
       const condition=String(skill.conditionRemoval.conditionType||"condition").replaceAll("_"," ");
       summary=`Remove an eligible ${condition} condition.`;
-      details=["This changes the current Battle state only.","It does not erase history that already happened."],tags=["CONTROL","CLEANSE"];
+      details=["This does not undo damage already taken."];
+      tags=["CONTROL","CLEANSE"];
     }else if(kind==="transient_state"){
-      summary="Create a temporary setup state for a later Battle effect.";
-      details=["This does not deal damage unless the Skill says it does.","The setup ends according to its authored Battle rule."],tags=["SETUP"];
+      const bonus=Number(skill.attackPLBonus??skill.authoredAttackPLBonus);
+      summary=Number.isFinite(bonus)&&bonus!==0?`Your next damaging Skill gains +${bonus} ATK.`:"Set up a later Battle move.";
+      details=[Number.isFinite(bonus)&&bonus!==0?"The bonus is used by that attack.":"No direct damage unless the Skill says otherwise."];
+      tags=["SETUP"];
     }else if(kind==="damage_with_persistent_state"){
-      summary="Hit the target and also create the Skill's authored ongoing state.";
-      details=[attack!==null?`Attack PL ${attack}.`:"The first hit uses the authored Attack PL.","Any later pressure happens only when the Skill's follow-up rule says it should."],tags=["DAMAGE","ONGOING EFFECT"];
+      summary=attack!==null?`Deals ${attack} ATK now and leaves an ongoing effect.`:"Deals damage now and leaves an ongoing effect.";
+      details=["The ongoing effect follows the Skill's visible condition."];
+      tags=["DAMAGE","ONGOING EFFECT"];
     }else if(kind==="branch_damage"){
-      summary="Choose a mode, then use the version of the attack you want.";
-      details=["Different modes can change the target or Attack PL.","Choosing a mode is the only extra confirmation this Skill needs."],tags=["DAMAGE","CHOOSE MODE"];
+      summary="Choose a mode, then use that version of the attack.";
+      details=["The mode shows its target and ATK before you commit."];
+      tags=["DAMAGE","CHOOSE MODE"];
     }else if(kind==="categorical_evidence"){
-      summary="Use a context Skill that changes what can be learned or acted on in this Battle.";
-      details=["It only gives the information or effect written into this Skill.","It does not reveal hidden facts automatically."],tags=["UTILITY","CONTEXT"];
+      summary="Study what you can actually detect in the current situation.";
+      details=["This does not reveal hidden identity automatically."];
+      tags=["UTILITY","CONTEXT"];
     }else{
-  /*
-  Safe generic presentation fallback.
-
-  Do not call any global or previously wrapped summary function here.
-  33000 is presentation-only, so an unknown Skill kind can use generic
-  explanatory copy without touching Battle resolution or availability.
-  */
-  summary="Use this authored Battle technique.";
-
-  details=[
-    "Availability, target and result still follow the normal Battle rules."
-  ];
-
-}
-
-    return {title:skill.displayName||skill.id,summary,details,kind:skillKind33000(skill),attackPL:attack,tags:[...new Set(tags)]};
+      summary="Special Skill. Read its named effect and conditions before using it.";
+      details=["This Skill needs an exact player-facing description before final release."];
+      descriptionCoverage="needs_exact_override";
+    }
+  
+    return {
+      title:skill.displayName||skill.id,summary,details,kind:skillKind33000(skill),attackPL:attack,
+      tags:[...new Set(tags)],exactPlayerFacingOverride:false,descriptionCoverage
+    };
   }
   window.getBattleSkillYouthSummary33000=getBattleSkillYouthSummary33000;
 
@@ -320,6 +356,8 @@
   }
 
   function latestBattleFeedText33000(stage){
+    const visibleReceipt=battlePresentationQueueState33000&&battlePresentationQueueState33000.active&&battlePresentationQueueState33000.active.receipt||null;
+    if(visibleReceipt)return `${visibleReceipt.actorName} — ${visibleReceipt.actionLabel}`;
     if(stage){
       const lines=[...stage.querySelectorAll(".battle-runtime-log-line")];
       if(lines.length){const latest=lines.find(node=>node.classList.contains("is-latest"))||lines[lines.length-1];if(latest&&latest.textContent.trim())return latest.textContent.trim();}
@@ -362,16 +400,16 @@
     if(deck&&!deck.dataset.battle2LeaveBound){
       deck.dataset.battle2LeaveBound="true";
       deck.addEventListener("mouseenter",cancelBattleSkillPreviewClear33000);
-      deck.addEventListener("mouseleave",scheduleBattleSkillPreviewClear33000);
+      deck.addEventListener("mouseleave",cancelBattleSkillPreviewClear33000);
       deck.addEventListener("focusin",cancelBattleSkillPreviewClear33000);
-      deck.addEventListener("focusout",scheduleBattleSkillPreviewClear33000);
+      deck.addEventListener("focusout",cancelBattleSkillPreviewClear33000);
     }
     if(panel&&!panel.dataset.battle2InspectorHoverBound){
       panel.dataset.battle2InspectorHoverBound="true";
       panel.addEventListener("mouseenter",cancelBattleSkillPreviewClear33000);
-      panel.addEventListener("mouseleave",scheduleBattleSkillPreviewClear33000);
+      panel.addEventListener("mouseleave",cancelBattleSkillPreviewClear33000);
       panel.addEventListener("focusin",cancelBattleSkillPreviewClear33000);
-      panel.addEventListener("focusout",scheduleBattleSkillPreviewClear33000);
+      panel.addEventListener("focusout",cancelBattleSkillPreviewClear33000);
       syncBattleSkillInspectorOverflow33000(panel);
     }
   }
@@ -567,21 +605,36 @@
     }
     return node;
   }
+  function presentationRemainingPL33000(side,participantId,canonical){
+    if(!canonical||!orderedPlaybackEnabled33000())return canonical;
+    try{syncBattlePresentationQueue33000();}catch(_error){}
+    const pending=[];
+    if(battlePresentationQueueState33000.active&&battlePresentationQueueState33000.active.receipt)pending.push(battlePresentationQueueState33000.active.receipt);
+    for(const row of battlePresentationQueueState33000.queue||[])if(row&&row.receipt)pending.push(row.receipt);
+    const target=pending.filter(receipt=>receipt&&receipt.targetRef&&
+      String(receipt.targetRef.side||"")===String(side||"")&&
+      String(receipt.targetRef.participantId||"")===String(participantId||"")&&
+      Number.isFinite(Number(receipt.beforePL)))
+      .sort((a,b)=>(Number(a.sequenceOrdinal)||0)-(Number(b.sequenceOrdinal)||0))[0]||null;
+    if(!target)return canonical;
+    return{remaining:Number(target.beforePL),maximum:Number(canonical.maximum)||Number(target.beforePL)||0,presentationStaged:true,actionId:target.actionId};
+  }
   function supportRemainingPL33000(side,participantId){
+    let canonical=null;
     try{
       if(typeof getBattleRemainingPLRecord==="function"){
         const record=getBattleRemainingPLRecord(side,participantId);
         if(record){
           const current=Number.isFinite(Number(record.current))?Number(record.current):Number(record.remaining);
-          if(Number.isFinite(current))return{remaining:current,maximum:Number(record.maximum)||current};
+          if(Number.isFinite(current))canonical={remaining:current,maximum:Number(record.maximum)||current};
         }
       }
-      if(typeof getBattleRemainingPL==="function"){
+      if(!canonical&&typeof getBattleRemainingPL==="function"){
         const remaining=Number(getBattleRemainingPL(side,participantId));
-        if(Number.isFinite(remaining))return{remaining,maximum:remaining};
+        if(Number.isFinite(remaining))canonical={remaining,maximum:remaining};
       }
     }catch(_error){}
-    return null;
+    return presentationRemainingPL33000(side,participantId,canonical);
   }
   function ensureFormationSupportMarkup33000(node){
     if(!node)return null;
@@ -1395,40 +1448,33 @@
     try{resumeBattleCallerAfterCompletion=wrappedResumeBattleCaller33000;}catch(_error){}
   }
 
-  // Menma's closed whole-encounter reward is a reward-gained presentation,
-  // not a wallet-total counter. The generic Victory reveal first paints the
-  // final number and then restarts a delayed 0 -> target animation, which reads
-  // as a meaningless 100 -> 100 roll on this exact reward. Keep generic Victory
-  // animation untouched; scope the correction to this authored reward only.
-  function isMenmaWholeEncounterRewardPresentation33000(rewards){
-    return !!(
-      currentBattle&&
-      String(currentBattle.battleConfigId||"")==="academy_menma_origin_three_test_subjects_with_anko"&&
-      currentBattle.rewards&&
-      currentBattle.rewards.menmaThreeSubjectReward===true&&
-      currentBattle.rewards.fixedWholeEncounterReward===true&&
-      Number(rewards&&rewards.ryo)===100
-    );
+  // Reward results are committed facts, not slot-machine counters. The shared
+  // Battle System projects the exact earned amount immediately for every Origin
+  // and future Battle that consumes this shell.
+  function isSharedStaticRewardPresentation33000(rewards){
+    return !!(currentBattle&&String(currentBattle.battleId||"").trim()&&rewards&&typeof rewards==="object");
   }
   const PRIOR_VICTORY_REVEAL_33000=typeof runVictoryRevealAnimations==="function"?runVictoryRevealAnimations:null;
   if(PRIOR_VICTORY_REVEAL_33000){
     const wrappedVictoryReveal33000=function(container,rewards){
-      if(isMenmaWholeEncounterRewardPresentation33000(rewards)){
+      if(isSharedStaticRewardPresentation33000(rewards)){
         const ryoElement=container&&container.querySelector?container.querySelector(".victory-ryo-number"):null;
         const expElement=container&&container.querySelector?container.querySelector(".victory-exp-number"):null;
         const ryoGranted=Math.max(0,Number(rewards&&rewards.ryo)||0);
         const expGranted=Math.max(0,Number(rewards&&rewards.exp)||0);
         if(ryoElement){
-          ryoElement.textContent="+"+String(ryoGranted);
-          ryoElement.dataset.rewardPresentation="earned_delta";
+          ryoElement.textContent=String(ryoGranted);
+          ryoElement.dataset.rewardPresentation="static_earned_amount";
           ryoElement.dataset.rewardAmount=String(ryoGranted);
+          ryoElement.dataset.rewardAnimated="false";
         }
         if(expElement){
           expElement.textContent=String(expGranted);
-          expElement.dataset.rewardPresentation="earned_amount";
+          expElement.dataset.rewardPresentation="static_earned_amount";
           expElement.dataset.rewardAmount=String(expGranted);
+          expElement.dataset.rewardAnimated="false";
         }
-        return{success:true,presentationOnly:true,rewardMode:"earned_delta",ryoGranted,expGranted,animated:false};
+        return{success:true,presentationOnly:true,rewardMode:"static_earned_amount",ryoGranted,expGranted,animated:false};
       }
       return PRIOR_VICTORY_REVEAL_33000.apply(this,arguments);
     };
