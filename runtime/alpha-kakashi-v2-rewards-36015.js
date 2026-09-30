@@ -256,20 +256,29 @@ if(PRE_OPEN_OVERLAY){
 function snapshotRewardMutation(){
   return{
     ryo:Number(ensurePlayer().ryo)||0,
+    exp:Number(ensurePlayer().exp)||0,
     inventory:clone(playerData.inventory||[]),
     activityHistory:clone(playerData.activityHistory||[]),
+    activityHistoryRuntime:typeof activityHistory!=="undefined"&&Array.isArray(activityHistory)?clone(activityHistory):null,
     store:clone(ensureStore()),
     claimed:!!(currentBattle&&currentBattle.rewards&&currentBattle.rewards.claimed),
-    claimedAt:currentBattle&&currentBattle.claimedAt||null
+    claimedAt:currentBattle&&currentBattle.claimedAt||null,
+    completionRecorded:!!(currentBattle&&currentBattle.completionRecorded===true)
   };
 }
 function restoreRewardMutation(snap){
   if(!snap)return;
-  playerData.ryo=snap.ryo;playerData.inventory=clone(snap.inventory);
+  playerData.ryo=snap.ryo;playerData.exp=snap.exp;playerData.inventory=clone(snap.inventory);
   playerData.activityHistory=clone(snap.activityHistory||[]);
+  if(snap.activityHistoryRuntime&&typeof activityHistory!=="undefined"&&Array.isArray(activityHistory)){
+    activityHistory.length=0;activityHistory.push(...clone(snap.activityHistoryRuntime));
+  }
   playerData[STORE_KEY]=clone(snap.store);
   if(currentBattle&&currentBattle.rewards)currentBattle.rewards.claimed=snap.claimed;
-  if(currentBattle)currentBattle.claimedAt=snap.claimedAt;
+  if(currentBattle){
+    currentBattle.claimedAt=snap.claimedAt;
+    currentBattle.completionRecorded=snap.completionRecorded;
+  }
 }
 function claimKakashiV2BattleRewards(){
   try{ensureKakashiV2BattleRewardProjection36015();}catch(_e){}
@@ -280,35 +289,36 @@ function claimKakashiV2BattleRewards(){
   // authority that this Battle reward was already claimed.
   if(battleRewardReceiptsComplete36015(plan)){
     rewards.claimed=true;
-    if(typeof savePlayerData==="function")savePlayerData();
-    return{handled:true,success:true,idempotent:true,alreadyCommitted:true};
+    return{handled:true,success:true,idempotent:true,alreadyCommitted:true,noPersistenceRewrite:true};
   }
   if(rewards.claimed===true)rewards.claimed=false;
 
   const snap=snapshotRewardMutation();
   try{
     const expectedRyo=Math.max(0,Number(rewards.ryo)||0);
+    const expectedExp=Math.max(0,Number(rewards.exp)||0);
     const beforeRyo=Number(playerData.ryo)||0;
+    const beforeExp=Number(playerData.exp)||0;
     const beforePill=inventoryQuantity36015("field_recovery_pill");
 
-    // Reuse the shared Battle claim owner first. Kakashi then verifies the
-    // exact material delta rather than trusting a generic claimed flag. This
-    // keeps an old/stale Victory state from making MI's cash or pill unclaimable.
-    if(PRE_CLAIM)PRE_CLAIM.call(globalThis);
+    // Kakashi's projected package is already exact and source-scoped. Applying
+    // it directly avoids routing through the generic claim owner, which used to
+    // perform its own player save + Battle session save before this adapter then
+    // persisted the Kakashi receipts and the outer Victory owner saved again.
+    // Material semantics are unchanged; this removes duplicate synchronous
+    // persistence from the button click.
+    playerData.ryo=beforeRyo+expectedRyo;
+    playerData.exp=beforeExp+expectedExp;
 
-    const afterGenericRyo=Number(playerData.ryo)||0;
-    const genericRyoGain=afterGenericRyo-beforeRyo;
-    if(genericRyoGain<0||genericRyoGain>expectedRyo){
-      throw new Error("shared_claim_ryo_delta_invalid:"+String(genericRyoGain));
+    for(const item of Array.isArray(rewards.items)?rewards.items:[]){
+      if(!addRewardItem36015(item))throw new Error("inventory_add_api_failed:"+String(item&&item.id||"unknown_item"));
     }
-    if(genericRyoGain<expectedRyo){
-      playerData.ryo=afterGenericRyo+(expectedRyo-genericRyoGain);
+    for(const item of Array.isArray(rewards.rareDrops)?rewards.rareDrops:[]){
+      if(!addRewardItem36015(item))throw new Error("inventory_add_api_failed:"+String(item&&item.id||"unknown_rare_item"));
     }
 
     if(plan.pill&&inventoryQuantity36015("field_recovery_pill")<=beforePill){
-      const pill=(Array.isArray(rewards.items)?rewards.items:[]).find(item=>item&&item.id==="field_recovery_pill")||
-        {id:"field_recovery_pill",name:"Field Recovery Pill",rarity:"Common"};
-      if(!addRewardItem36015(pill))throw new Error("inventory_add_api_failed:field_recovery_pill");
+      throw new Error("field_recovery_pill_not_committed");
     }
 
     rewards.claimed=true;
@@ -320,15 +330,18 @@ function claimKakashiV2BattleRewards(){
     if(plan.pill&&!fieldPillCommitted36015(plan.storyOccurrenceId)){
       writeReceipt({storyOccurrenceId:plan.storyOccurrenceId,sourceId:SOURCE.fieldPill,scopeRef:"origin",rewardClass:"inventory_item",itemId:"field_recovery_pill",quantity:1,battleOccurrenceId:plan.battleOccurrenceId,metadata:{timing:"immediate_solo_mi_victory",oncePerOrigin:true}});
     }
-    rewards.claimed=true;
-    if(!currentBattle.claimedAt)currentBattle.claimedAt=Date.now();
+
     const chronicleRecorded=typeof recordBattleChronicle==="function"?recordBattleChronicle():true;
-    // PRE_CLAIM already persisted the shared Battle state. Persist the
-    // Kakashi-specific receipt additions once through player data; the outer
-    // Victory Claim owner performs the final Battle-state save after this
-    // adapter returns.
+
+    // One persistent player save here; the outer Victory Claim owner performs
+    // the one session-state save and immediate re-render after this returns.
     if(typeof savePlayerData==="function")savePlayerData();
-    return{handled:true,success:true,chronicleRecorded,receiptRefs:Object.keys(ensureStore().receipts).filter(key=>key.startsWith(String(plan.storyOccurrenceId)+"|")),duplicateBattleStateSaveRemoved:true};
+    return{
+      handled:true,success:true,chronicleRecorded,
+      receiptRefs:Object.keys(ensureStore().receipts).filter(key=>key.startsWith(String(plan.storyOccurrenceId)+"|")),
+      directExactPackageClaim:true,
+      singlePlayerPersistenceWrite:true
+    };
   }catch(error){
     restoreRewardMutation(snap);
     return{handled:true,success:false,reason:"kakashi_v2_battle_reward_claim_failed",error:String(error&&error.message||error)};
