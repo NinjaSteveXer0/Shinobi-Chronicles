@@ -548,7 +548,7 @@ const G=Object.freeze({
     },
     {
       "mode": "narration",
-      "text": "Both turn toward him.\n\nA beat."
+      "text": "Both turn toward him."
     },
     {
       "mode": "dialogue",
