@@ -378,7 +378,7 @@ async function advanceTo(page,target,{max=18}={}){
   throw new Error(`advanceTo guard exceeded: target=${target}, current=${await currentBeat(page)}`);
 }
 
-async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedBeat=null,assertVisible=false}={}){
+async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedBeat=null,assertVisible=false,proveRewardClaim=false}={}){
   const battleBeat=await currentBeat(page);
   const meta=await page.evaluate(()=>{const b=getCurrentStorySceneBeat();return b?{mode:b.mode,encounterId:b.battle&&b.battle.encounterId||null}:null;});
   assert(meta&&meta.mode==="battle_transition",`expected Battle transition at ${battleBeat}: ${JSON.stringify(meta)}`);
@@ -432,6 +432,55 @@ async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedB
       return visible(document.querySelector(".alpha-code-battle-stage"))&&!visible(document.getElementById("kakashi-v2-scene-board"));
     },null,{timeout:12000});
   }
+
+  if(proveRewardClaim){
+    assert.strictEqual(outcome,"victory","reward-claim proof is victory-only");
+    const prepared=await page.evaluate(()=>{
+      const pillQty=()=>Array.isArray(playerData.inventory)
+        ?playerData.inventory.filter(row=>row&&(row.id||row.itemId)==="field_recovery_pill").reduce((n,row)=>n+Math.max(1,Number(row.quantity)||1),0)
+        :0;
+      const before={ryo:Number(playerData.ryo)||0,pill:pillQty()};
+      currentBattle.outcome={...(currentBattle.outcome||{}),type:"victory",completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};
+      currentBattle.battleOver=true;
+      currentBattle.active=false;
+      // Reproduce the owner regression: a stale generic claim bit must not make
+      // the exact MI cash/pill package unclaimable when no Kakashi receipts exist.
+      currentBattle.rewards={generated:false,claimed:true};
+      const rewards=generateBattleRewards(currentBattle.enemy,currentBattle.activePlayer);
+      openOverlay("victory");
+      return{before,rewards:JSON.parse(JSON.stringify(rewards||{})),config:currentBattle.kakashiV2?.battleConfigId||null};
+    });
+    assert.strictEqual(prepared.rewards.ryo,50,"MI Victory did not project 50 Ryō");
+    assert(prepared.rewards.items.some(item=>item&&item.id==="field_recovery_pill"),"MI Victory did not project Field Recovery Pill");
+    await page.waitForFunction(()=>{
+      const node=document.querySelector(".victory-ryo-number");
+      return node&&node.textContent.trim()==="50"&&node.dataset.rewardPresentation==="static_earned_amount";
+    },null,{timeout:10000});
+    const claim=page.getByRole("button",{name:"CLAIM REWARDS"}).first();
+    await claim.waitFor({state:"visible",timeout:10000});
+    await claim.click();
+    await page.waitForFunction(()=>currentBattle?.rewards?.claimed===true,null,{timeout:10000});
+    const committed=await page.evaluate(before=>{
+      const pill=Array.isArray(playerData.inventory)
+        ?playerData.inventory.filter(row=>row&&(row.id||row.itemId)==="field_recovery_pill").reduce((n,row)=>n+Math.max(1,Number(row.quantity)||1),0)
+        :0;
+      const after={ryo:Number(playerData.ryo)||0,pill};
+      const replayBefore={...after};
+      const replay=claimCurrentBattleRewards();
+      const replayAfter={
+        ryo:Number(playerData.ryo)||0,
+        pill:Array.isArray(playerData.inventory)
+          ?playerData.inventory.filter(row=>row&&(row.id||row.itemId)==="field_recovery_pill").reduce((n,row)=>n+Math.max(1,Number(row.quantity)||1),0)
+          :0
+      };
+      return{after,replay,replayBefore,replayAfter,claimed:currentBattle?.rewards?.claimed===true};
+    },prepared.before);
+    assert.strictEqual(committed.after.ryo,prepared.before.ryo+50,"MI Claim Rewards did not commit exact 50 Ryō");
+    assert.strictEqual(committed.after.pill,prepared.before.pill+1,"MI Claim Rewards did not commit the Field Recovery Pill");
+    assert.strictEqual(committed.claimed,true,"MI Claim Rewards did not mark the package claimed");
+    assert.deepStrictEqual(committed.replayAfter,committed.replayBefore,"MI reward replay duplicated material rewards");
+  }
+
   const resumed=await page.evaluate(({outcome,actions})=>{
     const prior=globalThis.getBattleActionOpportunityIndex;
     globalThis.getBattleActionOpportunityIndex=(side,participantId)=>{
@@ -1275,7 +1324,7 @@ async function browserRouteMatrix(browser){
     await chooseLabel(page,"WATCH THE HANDOFF","v2_watch_exchange");
     await chooseLabel(page,"INTERCEPT THE MASKED ATTACKER","v2_stop_assassin_setup");
     await advanceTo(page,"v2_battle_mi_stop");
-    await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_mi_stop_win"});
+    await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_mi_stop_win",proveRewardClaim:true});
     const labels=await page.evaluate(()=>getCurrentStorySceneBeat().choices.filter(c=>!c.availability||c.availability().available).map(c=>c.label));
     assert(!labels.includes("CHASE THE PACKAGE"),JSON.stringify(labels));
     assert(!labels.includes("CHASE THE MAN FROM THE PHOTO"),JSON.stringify(labels));
