@@ -53,6 +53,9 @@ assert(shared.includes('"duel"')&&shared.includes('"wedge"')&&shared.includes('"
 assert(shared.includes('"SKILLS"')&&shared.includes('"ITEMS"')&&shared.includes('"SUMMONS"'),"shared Battle action dock drifted");
 assert(shared.includes("alpha-battle-pl-ring")&&shared.includes("--battle-pl-fill"),"shared radial Battle PL projection missing");
 assert(shared.includes("installBattlePerformance33000(stage)"),"shared ordered action presentation is not installed for every Formation Stage");
+assert(shared.includes("function orderedPlaybackEnabled33000()"),"shared ordered playback owner missing");
+assert(shared.includes('return !!(currentBattle&&String(currentBattle.battleId||"").trim());'),"ordered Battle playback is not enabled by concrete Battle occurrence");
+assert(!shared.includes('String(currentBattle.battleConfigId||"")==="academy_menma_origin_three_test_subjects_with_anko"'),"ordered Battle playback is still gated to Menma");
 assert(shared.includes("suspendCallerStoryPresentation33000"),"shared Battle caller/Story suspension contract missing");
 
 assert(mirai.includes('const BATTLE_ENVIRONMENT_BY_CALLER=Object.freeze({'),"Mirai authored Battle environment mapping missing");
@@ -69,6 +72,7 @@ const checks={
   sharedActionDock:true,
   sharedRadialBattlePL:true,
   sharedOrderedActionPresentation:true,
+  orderedPlaybackGlobal:true,
   sharedAuthoredEnvironmentProjection:true,
   miraiDuelEnvironmentInputs:true,
   encounterSemanticsRemainLocal:true
