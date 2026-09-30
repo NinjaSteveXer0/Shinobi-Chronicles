@@ -405,14 +405,24 @@ async function guestAllyVictoryAndReload(browser){
       const node=document.querySelector(".alpha-victory-code-screen .victory-ryo-number");
       return node&&node.textContent.trim()==="100"&&node.dataset.rewardPresentation==="static_earned_amount";
     },null,{timeout:2000});
-    const rewardPresentation=await page.evaluate(()=>({
-      ryoText:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.textContent?.trim()||"",
-      rewardMode:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.dataset?.rewardPresentation||null,
-      action:document.querySelector(".alpha-victory-code-screen .victory-continue")?.textContent?.trim()||""
-    }));
+    const rewardPresentation=await page.evaluate(()=>{
+      const footer=document.querySelector(".alpha-victory-code-screen .alpha-victory-footer");
+      const copy=footer?.querySelector("p")||null;
+      const button=footer?.querySelector(".victory-continue")||null;
+      const fr=footer?.getBoundingClientRect()||null,br=button?.getBoundingClientRect()||null;
+      return{
+        ryoText:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.textContent?.trim()||"",
+        rewardMode:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.dataset?.rewardPresentation||null,
+        action:button?.textContent?.trim()||"",
+        footerCopy:copy?.textContent?.trim()||"",
+        claimOnSharedRight:!!(fr&&br&&br.left>=fr.left+fr.width*.5&&br.right<=fr.right+1)
+      };
+    });
     assert.strictEqual(rewardPresentation.ryoText,"100","Victory reward did not present exact static 100 Ryō");
     assert.strictEqual(rewardPresentation.rewardMode,"static_earned_amount","Victory Ryō presentation is not static");
     assert.strictEqual(rewardPresentation.action,"CLAIM REWARDS","Victory claim action missing before reward commit");
+    assert(rewardPresentation.footerCopy.length>0,"Menma Victory removed the shared footer contract copy");
+    assert.strictEqual(rewardPresentation.claimOnSharedRight,true,"Menma CLAIM REWARDS is not aligned to the shared right-side Victory control "+JSON.stringify(rewardPresentation));
 
     const beforeClaim=await page.evaluate(()=>Number(playerData.ryo)||0);
     const claimStarted=Date.now();
@@ -437,16 +447,24 @@ async function guestAllyVictoryAndReload(browser){
     assert.strictEqual(afterClaim,beforeClaim+100);
     assert.strictEqual(await page.evaluate(()=>claimCurrentBattleRewards()),false,"reward duplicated on second claim");
 
-    const postClaimPresentation=await page.evaluate(()=>({
-      ryoText:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.textContent?.trim()||"",
-      rewardMode:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.dataset?.rewardPresentation||null,
-      action:document.querySelector(".alpha-victory-code-screen .victory-continue")?.textContent?.trim()||""
-    }));
-    assert.deepStrictEqual(postClaimPresentation,{
-      ryoText:"100",
-      rewardMode:"static_earned_amount",
-      action:"CONTINUE"
-    },"post-claim Victory presentation drift");
+    const postClaimPresentation=await page.evaluate(()=>{
+      const footer=document.querySelector(".alpha-victory-code-screen .alpha-victory-footer");
+      const copy=footer?.querySelector("p")||null;
+      const button=footer?.querySelector(".victory-continue")||null;
+      const fr=footer?.getBoundingClientRect()||null,br=button?.getBoundingClientRect()||null;
+      return{
+        ryoText:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.textContent?.trim()||"",
+        rewardMode:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.dataset?.rewardPresentation||null,
+        action:button?.textContent?.trim()||"",
+        footerCopy:copy?.textContent?.trim()||"",
+        continueOnSharedRight:!!(fr&&br&&br.left>=fr.left+fr.width*.5&&br.right<=fr.right+1)
+      };
+    });
+    assert.strictEqual(postClaimPresentation.ryoText,"100","post-claim Victory Ryō drift");
+    assert.strictEqual(postClaimPresentation.rewardMode,"static_earned_amount","post-claim Victory reward mode drift");
+    assert.strictEqual(postClaimPresentation.action,"CONTINUE","post-claim Victory action drift");
+    assert(postClaimPresentation.footerCopy.length>0,"Menma post-claim Victory removed the shared footer contract copy");
+    assert.strictEqual(postClaimPresentation.continueOnSharedRight,true,"Menma CONTINUE is not aligned to the shared right-side Victory control "+JSON.stringify(postClaimPresentation));
 
     await gate.assertClean("issue-369-guest-ally-victory");
     return{
