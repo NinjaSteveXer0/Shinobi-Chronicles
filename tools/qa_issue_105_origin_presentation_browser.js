@@ -58,6 +58,7 @@ async function snapshot(page){
 async function advanceOne(page){
   const before=await snapshot(page);
   assert.notStrictEqual(before.mode,"choice","advanceOne called on choice "+before.beatId);
+  assert(!before.text.includes("\\n"),before.beatId+" "+before.cueKind+" leaked a literal newline escape "+JSON.stringify(before));
   const stage=page.locator("#story-scene-presentation-layer .sc-chronicle-stage,#story-scene-presentation-layer .sc-story-stage").first();
   await stage.waitFor({state:"visible",timeout:8000});
   await stage.click({position:{x:30,y:30}});
@@ -66,7 +67,9 @@ async function advanceOne(page){
     const text=root?.querySelector(".sc-story-text")?.textContent?.trim()||"";
     return !rt||rt.beatId!==old.beatId||text!==old.text;
   },{beatId:before.beatId,text:before.text},{timeout:8000});
-  return snapshot(page);
+  const after=await snapshot(page);
+  if(after.mode!=="choice")assert(!after.text.includes("\\n"),after.beatId+" "+after.cueKind+" leaked a literal newline escape "+JSON.stringify(after));
+  return after;
 }
 async function advanceUntilBeat(page,target,max=120){
   const seen=[];
@@ -583,7 +586,26 @@ async function proveMiraiTerminalReceipt(browser){
       assert(row.backdrop,variant+" has no resolved Story backdrop");
       assert.strictEqual(row.legacyContinue,false,variant+" legacy CONTINUE panel leaked into Scene Board");
 
-      if(variant==="academy_mirai"){
+      if(variant==="academy_iwabee"){
+        assert.strictEqual(row.beatId,"iwa_open_01","Iwabee did not start at current Story opening");
+        assert.strictEqual(row.cueKind,"narration","Iwabee opening is not narration");
+        assert(!row.text.includes("\\n"),"Iwabee narration leaked a literal newline escape "+JSON.stringify(row));
+        row=await advanceOne(page);
+        assert.strictEqual(row.beatId,"iwa_open_02","Iwabee opening did not advance to instructor dialogue");
+        assert.strictEqual(row.cueKind,"dialogue","Iwabee instructor line is not dialogue");
+        assert(!row.text.includes("\\n"),"Iwabee dialogue leaked a literal newline escape "+JSON.stringify(row));
+        await page.evaluate(()=>globalThis.setStorySceneBeat?.("iwa_confront_04"));
+        await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="iwa_confront_04",null,{timeout:8000});
+        row=await snapshot(page);
+        assert.strictEqual(row.cueKind,"narration","Iwabee reproduced defect beat is not narration");
+        assert.strictEqual(row.text,"The Rogue shifts his weight.","Iwabee first paragraph did not render cleanly");
+        row=await advanceOne(page);
+        assert.strictEqual(row.beatId,"iwa_confront_04","Iwabee paragraph pagination left the authored beat too early");
+        assert.strictEqual(row.text,"Iwabee sees it.","Iwabee second paragraph did not render cleanly");
+        row=await advanceOne(page);
+        assert.strictEqual(row.beatId,"iwa_confront_04","Iwabee paragraph pagination left the authored beat too early");
+        assert.strictEqual(row.text,"So does the instructor.","Iwabee third paragraph did not render cleanly");
+      }else if(variant==="academy_mirai"){
         assert.strictEqual(row.beatId,"mir_assignment_01","Mirai did not start at Writing-GOLDEN Assignment");
         assert(row.text.includes("Mirai arrives early"),"Mirai GOLDEN opening prose missing "+JSON.stringify(row));
         const assignmentWalk=await advanceUntilBeat(page,"mir_walk_choice",120);
