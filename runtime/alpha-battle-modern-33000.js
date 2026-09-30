@@ -1043,10 +1043,21 @@
   function sharedBattleEnvironmentPath33000(){
     const battle=typeof currentBattle!=="undefined"?currentBattle:null;
     if(!battle)return"";
+    const storyEnvironment=storyCallerBattleEnvironment33000();
+    const storyOwned=!!(
+      battle.returnContext&&
+      typeof battle.returnContext==="object"&&
+      battle.returnContext.type==="story_scene"
+    );
+    // A Story-owned Battle occurs at the exact authored Story location. Some
+    // encounter launchers still carry an older/static environment value, so
+    // letting Battle metadata win here can paint the wrong place (for example,
+    // a Kakashi pursuit Battle inheriting the Sakura-tree fight backdrop).
+    if(storyOwned&&storyEnvironment)return storyEnvironment;
     return String(
       battle.presentationEnvironmentPath||
       battle.environmentPath||
-      storyCallerBattleEnvironment33000()||
+      storyEnvironment||
       ""
     ).trim();
   }
@@ -1058,8 +1069,16 @@
     const environmentPath=sharedBattleEnvironmentPath33000()||(menmaProof?"Scene backdrops/forest_clearing_day.png":"");
     if(environmentPath){
       if(currentBattle){
-        if(!String(currentBattle.environmentPath||"").trim())currentBattle.environmentPath=environmentPath;
-        if(!String(currentBattle.presentationEnvironmentPath||"").trim())currentBattle.presentationEnvironmentPath=environmentPath;
+        const storyOwned=!!(
+          currentBattle.returnContext&&
+          typeof currentBattle.returnContext==="object"&&
+          currentBattle.returnContext.type==="story_scene"
+        );
+        // Rebind Story-owned Battles to the resolved current Story location even
+        // when stale encounter metadata is already populated. Non-Story Battles
+        // retain their encounter-authored environment as before.
+        if(storyOwned||!String(currentBattle.environmentPath||"").trim())currentBattle.environmentPath=environmentPath;
+        if(storyOwned||!String(currentBattle.presentationEnvironmentPath||"").trim())currentBattle.presentationEnvironmentPath=environmentPath;
       }
       stage.dataset.battleEnvironment=menmaProof?"forest_clearing_day":"authored";
       stage.dataset.battleEnvironmentPath=environmentPath;
