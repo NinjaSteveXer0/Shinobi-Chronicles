@@ -1897,7 +1897,7 @@
       formationDoesNotWriteSemantics:String(installFormationStage33000).includes("semanticWrite:false"),
       hoverLearns:source.includes("enhanceBattleSkillCards33000")&&previewBattlePreparedSkill33000.toString().includes("battle-live-skill-details"),
       clickStillUsesExistingCommitPath:typeof activateBattlePreparedSkillCard==="function",
-      youthReadingContract:YOUTH_READING_TARGET==="12-13"&&summary.includes("Hit one enemy")&&summary.includes("This does not deal damage"),
+      youthReadingContract:YOUTH_READING_TARGET==="12-13"&&summary.includes("Deals 5 ATK to one enemy.")&&summary.includes("This Skill needs an exact player-facing description before final release.")&&summary.includes("descriptionCoverage"),
       resolverNotReplaced:!source.includes("resolveBattle")&&!source.includes("applyBattleDamage")&&!source.includes("commitBattle"),
       compactTicker:typeof toggleBattle2CombatLog33000==="function"&&latestBattleFeedText33000.toString().includes("battle-runtime-log-line"),
       fullLogStillAvailable:toggleBattle2CombatLog33000.toString().includes("battle2-log-open"),
