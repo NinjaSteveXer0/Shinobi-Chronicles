@@ -356,7 +356,7 @@ assert.deepStrictEqual(Array.from(battleCtx.currentBattle.deployment.player.slot
 assert.deepStrictEqual(Array.from(battleCtx.currentBattle.deployment.enemy.slots||[],x=>x.participantId),["wasabi_origin_rogue_genin_01"]);
 assert.strictEqual(battleCtx.currentBattle.rewards.ryo,0);assert.strictEqual(battleCtx.currentBattle.rewards.exp,0);
 assert.strictEqual(Array.from(battleCtx.currentBattle.rewards.items||[]).length,0);assert.strictEqual(Array.from(battleCtx.currentBattle.rewards.rareDrops||[]).length,0);
-assert.strictEqual(battleCtx.currentBattle.rewards.requiresExplicitPostClaimContinue,true);
+assert.strictEqual(battleCtx.currentBattle.rewards.requiresExplicitPostClaimContinue,false);
 assert.strictEqual(battleCtx.currentBattle.wasabi343.strictOneVsOne,true);
 assert.strictEqual(battleCtx.currentBattle.environmentPath,"Izuno Origin Backdrop/konoha_alleyway_day.png");
 assert.strictEqual(battleCtx.currentBattle.presentationEnvironmentPath,"Izuno Origin Backdrop/konoha_alleyway_day.png");
@@ -388,7 +388,7 @@ battleCtx.currentBattle.outcome={type:"victory",finishingShinobiId:"academy_izun
 const generatedFixed=battleCtx.generateBattleRewards({rewards:{ryo:{min:99,max:99}}},{id:"academy_izuno",name:"Wasabi"});
 assert.strictEqual(generatedFixed.ryo,50);assert.strictEqual(generatedFixed.exp,0);
 assert.strictEqual(Array.from(generatedFixed.items||[]).length,0);assert.strictEqual(Array.from(generatedFixed.rareDrops||[]).length,0);
-assert.strictEqual(generatedFixed.requiresExplicitPostClaimContinue,true);
+assert.strictEqual(generatedFixed.requiresExplicitPostClaimContinue,false);
 assert.strictEqual(generatedFixed.wasabi343FixedReward,true);
 assert.strictEqual(generatedFixed.wasabi343RewardSourceId,"wasabi_origin_rogue_genin_battle_victory_ryo_01");
 const beforeClaimRyo=battleCtx.playerData.ryo;
