@@ -820,7 +820,9 @@
         "playerData.iwabee399BattleLaunches",
         "shinobiTestState Iwabee scoped Battle envelope",
         "activeStorySceneRuntime.localContext Iwabee Battle facts",
-        "playerData.activityHistory occ_origin_iwabee_rogue_genin_response_resolution World disposition/custody envelope"
+        "playerData.activityHistory occ_origin_iwabee_rogue_genin_response_resolution World disposition/custody envelope",
+        "playerData.ryo exact 50 Ryō Iwabee Rogue-Battle victory delta",
+        "playerData.activityHistory exact Iwabee Rogue-Battle reward receipt"
       ],
       "productionLoader": "index.html",
       "qaRefs": [
@@ -830,7 +832,7 @@
       ],
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
-      "rationale": "Consumes issue #399 World authority while preserving Combat/Registry separation. Iwabee's stable historical Rogue remains iwabee_origin_rogue_genin_01 and consumes reusable rogue_genin PL23 capability without identity collapse. Battle reports withdrawal facts only; the canonical Story owner commits exact escape, surrender or temporary-instructor-detention World disposition. No IWA-02 counterfeiting, hidden Battle modifier, second Battle, injury/death inference, material reward or collectible admission is introduced."
+      "rationale": "Consumes issue #399 World authority while preserving Combat/Registry separation. Iwabee's stable historical Rogue remains iwabee_origin_rogue_genin_01 and consumes reusable rogue_genin PL23 capability without identity collapse. Battle reports withdrawal facts only; the canonical Story owner commits exact escape, surrender or temporary-instructor-detention World disposition. Issue #440's later global Battle-economy authority supersedes the original zero-material-reward clause only for the embedded PL Battle: exact victory now pays 50 Ryō through an idempotent battle-occurrence reward receipt, defeat pays 0, and the non-Battle IWA-02 World occurrence still has no separate material payout. No IWA-02 counterfeiting, hidden Battle modifier, second Battle, injury/death inference, filler loot or collectible admission is created."
     },
     {
       "changeId": "issue-400-origin-eight-palette-display-name-lock",
@@ -980,6 +982,47 @@
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Stephen's 2026-09-28/29 installed-browser review supersedes automation-only presentation confidence. The #105 successor keeps Hinata/Kakashi frozen while applying only authorised repairs and global presentation contracts. Mirai now consumes the closed Combat #338 disguised-instructor PL Battle package through the existing Story -> Battle -> same-Story seam: shortcut Battle returns to Scene 5 without reveal; confrontation Battle returns to the approved reveal; the observer-facing opponent remains the male Traveller/Escort disguise while the underlying Academy instructor is female; victory pays the closed 50 Ryō Battle reward. Menma and Izuno remain limited to the separately owner-authorised surgical corrections already recorded. No unrelated Battle cadence, reward, route, or frozen-Origin semantics are redesigned."
+    },
+    {
+      "changeId": "issue-440-academy-origin-reward-spectrum-overlay",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "origin.academy_obito.final_story_state",
+        "origin.academy_hinata.final_story_state",
+        "origin.academy_mirai.final_story_state",
+        "origin.academy_metal_lee.final_story_state",
+        "origin.academy_metal_lee.controlled_spar_battle",
+        "origin.academy_iwabee.final_story_state",
+        "origin.academy_iwabee.rogue_battle",
+        "progression.special_jonin.contextual_evidence_producer.shared"
+      ],
+      "owner": "runtime/alpha-origin-scenes-32900-core.js + runtime/alpha-origin-reward-spectrum-440.js + runtime/alpha-origin-scene-board-bindings-105.js + runtime/alpha-origin-scenes-32900-c.js + runtime/alpha-metal-origin-runtime-396.js + runtime/alpha-iwabee-origin-runtime-399.js",
+      "directCallers": [
+        "index.html",
+        "SC_ALPHA_ORIGIN_32900.commitOccurrence",
+        "Origin Chronicle Receipt projection",
+        "shared Battle reward/claim surfaces"
+      ],
+      "stateTouched": [
+        "playerData activityHistory source-scoped discipline_development receipts for ratified Academy Origin actions",
+        "existing Character disciplineProgression EXP through canonical progression APIs only",
+        "playerData.specialJoninContextualEvidence through the canonical contextual evidence producer only",
+        "playerData.ryo exact Iwabee 50 Ryō Battle victory delta",
+        "playerData.activityHistory exact Iwabee Battle reward receipt",
+        "player-facing Origin Chronicle Receipt reward/development projection only",
+        "Obito existing formal-training Current-Stat package projection only; no second Discipline EXP"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_440_origin_reward_spectrum.js",
+        "tools/qa_issues_396_399_400_runtime.js",
+        "tools/qa_issues_396_399_400_browser.js",
+        "tools/qa_issue_105_origin_presentation_repair.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Consumes CE/World issue #440 plus Progression ratification #438 as a bounded reward/progression projection overlay on the already owner-accepted FROZEN GOLDEN Academy Origin package. Story prose, routes, choices, actors, backdrops, Battle mechanics/AI/PL and Receipt lifecycle remain frozen. The overlay projects only exact source-scoped non-Battle development, ratified Special Jōnin contextual evidence, visible Receipt reward/development lines, the existing Obito Current-Stat package without duplicate Discipline EXP, and the globally required Iwabee +50 Ryō PL-Battle victory reward. Kushina residual closure explicitly excludes reverse-summoning evidence. Kakashi and Wasabi reward packages remain excluded."
     }
   ]
 }
