@@ -86,9 +86,9 @@ assert(wasabiSource.includes("function izunoBackdropKey32900"),"Wasabi backdrop 
 assert(wasabiSource.includes('if(id.startsWith("izu_rogue_"))return"alley"'),"Scene 4C alley continuity missing");
 assert(wasabiSource.includes('id.startsWith("izu_finish_")'),"Scene 5 training convergence missing");
 assert(wasabiSource.includes("registerWasabiOriginPresentation32900();"),"Wasabi Scene Board backdrop registration missing");
-const returnBridge=byId.get("izu_rogue_step_in_return_1");
-assert(returnBridge&&returnBridge.mode==="post_battle","STEP IN does not return through dedicated post-Battle alley bridge");
-assert.strictEqual(returnBridge.nextBeatId,"izu_finish_secondary_1","STEP IN return skips Scene 5 secondary finish");
+assert.strictEqual(byId.has("izu_rogue_step_in_return_1"),false,"retired post-Battle CONTINUE bridge returned");
+const directBattleReturn=byId.get("izu_finish_secondary_1");
+assert(directBattleReturn&&Array.isArray(directBattleReturn.onEnterConsequences)&&directBattleReturn.onEnterConsequences.some(row=>row&&row.requestId==="izu_rogue_step_in_return_343"),"direct Battle -> Story return does not capture authored Battle result");
 assert.deepStrictEqual(JSON.parse(JSON.stringify(cueTexts("izu_finish_secondary"))),Array.from(storyCtx.SC_ACADEMY_WASABI_WRITING_GOLDEN_343.get("finish_secondary"),cue=>cue.text),"Scene 5 secondary finish prose drifted");
 
 // Stephen-installed-browser RED repair: actor projection + shared Receipt.
@@ -171,8 +171,8 @@ for(const b of beats){
     assert.strictEqual(b.battle.battleConfigId,"academy_izuno_origin_rogue_genin_step_in_battle");
     assert.strictEqual(b.battle.environmentPath,"Izuno Origin Backdrop/konoha_alleyway_day.png");
     assert.strictEqual(b.battle.backdrop,"Izuno Origin Backdrop/konoha_alleyway_day.png");
-    assert.strictEqual(b.battle.victoryBeatId,"izu_rogue_step_in_return_1");
-    assert.strictEqual(b.battle.defeatBeatId,"izu_rogue_step_in_return_1");
+    assert.strictEqual(b.battle.victoryBeatId,"izu_finish_secondary_1");
+    assert.strictEqual(b.battle.defeatBeatId,"izu_finish_secondary_1");
   }
 }
 assert.strictEqual(beats.filter(b=>b.battle).length,1,"Wasabi must have exactly one authorised Battle seam");
