@@ -40,15 +40,33 @@ assert(battle.includes("notifyTutorialPresentationSettled33000")&&battle.include
 assert(battle.includes("playedKeys")&&battle.includes("presentationStorageKey33000"),"reload-safe played receipt cursor missing");
 assert(battle.includes("deferredTerminalOverlay")&&battle.includes("deferredCallerResume"),"terminal navigation is not presentation-gated");
 assert(battle.includes("if(!pendingBattlePresentation33000())")&&battle.includes('return PRIOR_OPEN_OVERLAY_33000.apply(this,arguments);'),"settled terminal re-render is still forced through the watchdog delay");
-assert(battle.includes('rewardMode:"earned_delta"')&&battle.includes('ryoElement.dataset.rewardPresentation="earned_delta"')&&battle.includes('Number(rewards&&rewards.ryo)===100'),"Menma fixed 100 Ryō still uses the meaningless generic delayed count-up");
+assert(battle.includes('rewardMode:"static_earned_amount"')&&battle.includes('ryoElement.dataset.rewardPresentation="static_earned_amount"')&&battle.includes('isSharedStaticRewardPresentation33000'),"shared Victory rewards still use a rolling/count-up presentation");
 assert(battle.includes("battle2-formation-relay-in")&&battle.includes("menma373RelayPlayer")&&battle.includes("menma373RelayEnemy"),"scoped relay slide/scale motion missing");
 assert(battle.includes("refreshCommittedFormationPresentation33000")&&battle.includes("refreshBattleActionRegionPresentation"),"relay/yield does not refresh central confrontation DOM");
 assert(battle.includes("battle-live-active-nameplate")&&battle.includes("battle-live-power-"),"active identity/PL rebind support missing");
 assert(battle.includes("battle2SelectedSkillRestore")&&!battle.includes("if(state&&state.selectedSkillId)return false;"),"Skill hover is suppressed while repeat/selected Skill state is active");
-assert(battle.includes("scheduleBattleSkillPreviewClear33000")&&battle.includes("battleSkillInspectorInteractionActive33000")&&battle.includes("battle2InspectorHoverBound"),"Skill guide still disappears before the player can move into and inspect the description panel");
+assert(battle.includes('deck.addEventListener("mouseleave",cancelBattleSkillPreviewClear33000)')&&battle.includes('panel.addEventListener("mouseleave",cancelBattleSkillPreviewClear33000)')&&battle.includes("battle2InspectorHoverBound"),"Skill guide does not remain pinned long enough to move from a Skill card into the description panel");
 assert(battle.includes('data-battle2-scrollable="true"')&&battle.includes("scrollbar-gutter:stable")&&battle.includes('content:"SCROLL ↓"'),"Long Skill descriptions still hide overflow without a visible scroll affordance");
 assert(battle.includes('data-evolved-pl-proof="menma_three_subjects"'),"Menma-scoped presentation selector missing");
 assert(battle.includes("${p.finalDamage} DAMAGE")&&battle.includes("PL ${p.beforePL} → ${p.afterPL}"),"damage and Remaining Battle PL are still conflated");
+assert(battle.includes("presentationRemainingPL33000")&&battle.includes("presentationStaged:true"),"Battle PL presentation is not staged to the visible action receipt");
+assert(battle.includes('data-presentation-queue-busy="true"')&&battle.includes("pointer-events:none!important"),"player action input is not visibly locked while ordered Battle playback is active");
+const academyReadableIds=[
+  "academy_hinata_gentle_palm","academy_hinata_twin_palm_guard","academy_hinata_palm_counter","academy_hinata_academy_shuriken","academy_hinata_gentle_step",
+  "academy_izuno_pouncing_palm","academy_izuno_shuriken_pounce","academy_izuno_catstep_feint","academy_izuno_wall_spring","academy_izuno_clone_pounce",
+  "academy_mirai_twin_kunai","academy_mirai_wire_trip","academy_mirai_false_footstep","academy_mirai_guarding_blade","academy_mirai_crossing_strike",
+  "academy_kushina_red_whirlwind","academy_kushina_beginner_binding_formula","academy_kushina_iron_will_brace","academy_kushina_headstrong_counter","academy_kushina_seal_tag_toss",
+  "academy_kurenai_false_opening","academy_kurenai_feinting_kunai","academy_kurenai_false_step_genjutsu","academy_kurenai_veiled_guard","academy_kurenai_genjutsu_release",
+  "academy_iwabee_iron_staff_smash","academy_iwabee_staff_sweep","academy_iwabee_earth_style_rising_wall","academy_iwabee_stone_snare","academy_iwabee_grounded_stance",
+  "academy_metal_lee_leaf_rising_kick","academy_metal_lee_training_flurry","academy_metal_lee_pressure_rhythm","academy_metal_lee_guarded_footwork","academy_metal_lee_conditioned_endurance",
+  "academy_obito_fire_style_ember_burst","academy_obito_headlong_rush","academy_obito_uchiha_shuriken_rush","academy_obito_protective_intercept","academy_obito_determined_stand",
+  "academy_menma_chakra_knuckle","academy_menma_crescent_kunai","academy_menma_guard_breaker","academy_menma_shadow_clone_feint","academy_menma_shadowstep",
+  "academy_kakashi_kunai_quickdraw","academy_kakashi_clone_feint","academy_kakashi_opening_exploit","academy_kakashi_wire_snare","academy_kakashi_substitution_jutsu"
+];
+assert.strictEqual(academyReadableIds.length,50,"Academy readable Skill QA list drift");
+for(const id of academyReadableIds)assert(battle.includes(id+':{summary:'),"missing exact readable Skill description for "+id);
+for(const id of ["sj_anko_hidden_shadow_snake_hands","sj_anko_snake_bind","sj_anko_fire_style_dragon_flame","sj_anko_serpent_evasion"])assert(battle.includes(id+':{summary:'),"missing readable Anko Guest Ally Skill description for "+id);
+assert(!battle.includes('"Use this authored Battle technique."')&&!battle.includes('"Availability, target and result still follow the normal Battle rules."'),"retired developer-language Skill fallback returned");
 assert(battle.includes('return"WITHDRAWAL"'),"0 Battle PL is not projected as withdrawal");
 
 assert(menma.includes('player:{slots:createBattleDeploymentSlots([ANKO_ID,MENMA_ID])}'),"Guest Ally Anko does not open Active");
@@ -68,7 +86,7 @@ assert(menma.includes("presentation_pending_withdrawal"),"committed zero does no
 assert(menma.includes("advanceBattleParticipantAtZeroPL(pending.side,pending.participantId)"),"shared relay authority is not consumed after presentation settle");
 assert(menma.includes("function enemyEligibleActions")&&menma.includes("getEnemyAuthoredBattleActions")&&menma.includes("const enemy=activeEnemy(),target=activePlayer()"),"ordinary current-Active enemy cadence missing");
 assert(menma.includes("shouldAuthorMenmaHandoff36900")&&menma.includes("resolvedHostileIds.includes(HOSTILE_IDS[0])")&&menma.includes("resolvedHostileIds.includes(HOSTILE_IDS[1])"),"authored Anko -> Menma handoff is not gated by legitimate first-two withdrawals");
-assert(menma.includes('b.deployment.player={slots:createBattleDeploymentSlots([MENMA_ID,ANKO_ID])}')&&menma.includes('nextSide:"enemy"')&&menma.includes("sideOrderReset:false"),"Anko -> Menma yield does not preserve enemy-next ordering");
+assert(menma.includes('pendingAnkoYieldAfterEnemyActionId')&&menma.includes('yieldAnkoToMenmaActive36900("player")')&&menma.includes("authored_guest_ally_yield_after_unstable_attack"),"Unstable does not receive its authored attack on Anko before the Anko -> Menma handoff");
 assert(menma.includes('pending.side==="player"')&&menma.includes("startMenmaEvidenceWindow36900"),"ordinary allied withdrawal/relay path missing");
 assert(menma.includes('men03Scope:"menma_active_only"')&&menma.includes("firstLegitimateMenmaActiveMoment:true"),"MEN-03 does not start at Menma's first legitimate Active moment");
 assert(menma.includes('tutorialResult:"not_completed"')&&menma.includes("performanceBucket:null")&&menma.includes("allied_side_exhausted"),"party defeat can fabricate a completed MEN-03 bucket");
@@ -107,7 +125,7 @@ const checks={
   reloadDoesNotReplayReceipts:true,
   terminalNavigationWaitsForPlayback:true,
   settledTerminalRerenderBypassesWatchdog:true,
-  menmaRyoUsesEarnedDeltaPresentation:true,
+  sharedRewardValuesStatic:true,
   tutorialCanPauseAndResumePlayback:true,
   scopedRelaySlideScale:true,
   relayRefreshesCentralConfrontation:true,
