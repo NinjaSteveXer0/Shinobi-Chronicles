@@ -37,6 +37,12 @@ assert(core);assert(content);assert(finalWriting);
 assert.equal(content.diagnostics().pass,true);assert(content.pairCount>=180);
 assert.equal(finalWriting.diagnostics().pass,true);assert(finalWriting.pairCount>=200);
 const sourceTexts=new Set(Array.from(content.sourceTexts));
+const iwabeeCatalogueStart=contentSource.indexOf("// Academy Iwabee 2026-09-30 owner-preview rewrite.");
+const iwabeeCatalogueEnd=contentSource.indexOf("// Academy Kurenai + Metal 2026-09-30 owner-preview successors.",iwabeeCatalogueStart);
+assert(iwabeeCatalogueStart>=0&&iwabeeCatalogueEnd>iwabeeCatalogueStart,"current Iwabee localisation block missing");
+const iwabeeCatalogueSource=contentSource.slice(iwabeeCatalogueStart,iwabeeCatalogueEnd);
+const doubleEscapedNewline190=String.fromCharCode(92,92,110);
+assert(!iwabeeCatalogueSource.includes(doubleEscapedNewline190),"current Iwabee localisation block contains over-escaped newline tokens");
 const finalTexts=new Set(Array.from(finalWriting.sourceTexts));
 
 function collect(source,re,index=1,set=new Set()){
