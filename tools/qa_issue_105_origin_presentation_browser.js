@@ -197,7 +197,7 @@ async function proveMiraiBattle338(browser){
     assert.deepStrictEqual(state.actionIds,["academy_mirai_instructor_testing_strike","academy_mirai_instructor_substitution_guard","academy_mirai_instructor_turning_sweep"],"Mirai #338 action loop drift");
     assert.strictEqual(state.callerId,test.callerId,"Mirai #338 caller identity drift");
     assert.strictEqual(state.observerPresentation,"male_traveller_escort_disguise","Mirai #338 disguise presentation drift");
-    assert.strictEqual(state.underlyingIdentity,"female_academy_instructor","Mirai #338 underlying identity drift");
+    assert.strictEqual(state.underlyingIdentity,"male_academy_instructor","Mirai #338 underlying identity drift");
     assert.strictEqual(state.identityRevealedByBattle,false,"Mirai #338 Battle revealed hidden identity");
     assert.strictEqual(state.sourceBeatId,test.battleBeatId,"Mirai #338 return source drift");
     assert.strictEqual(state.victoryBeatId,test.victoryBeatId,"Mirai #338 victory direct return drift");
@@ -372,7 +372,7 @@ async function proveMiraiDefeatContinuations(browser){
       assert.strictEqual(who.row.speaker,"MIRAI","Shortcut defeat reveal question not Mirai-owned");
       assert.strictEqual(who.row.text,"Who are you?","Shortcut defeat reveal question drift");
       const reveal=await advanceUntilBeat(page,"mir_shortcut_defeat_reveal_03",10);
-      assert(reveal.row.actors.some(a=>a.image==="NPC/mirai_instructor.png"),"Shortcut defeat Story reveal did not project female instructor");
+      assert(reveal.row.actors.some(a=>a.image==="NPC/mirai_instructor.png"),"Shortcut defeat Story reveal did not project male instructor");
       const safe=await advanceUntilBeat(page,"mir_shortcut_defeat_reveal_05",10);
       assert.strictEqual(safe.row.speaker,"ACADEMY INSTRUCTOR","Shortcut defeat safe confirmation not instructor-owned");
       assert.strictEqual(safe.row.text,"Checkpoint Three. Safe.","Shortcut defeat safe confirmation drift");
@@ -399,7 +399,7 @@ async function proveMiraiDefeatContinuations(browser){
       assert.strictEqual(good.row.speaker,"TRAVELLER","Confrontation defeat Traveller does not own Good.");
       assert.strictEqual(good.row.text,"Good.","Confrontation defeat Good. drift");
       const reveal=await advanceUntilBeat(page,"mir_confront_defeat_end_08",10);
-      assert(reveal.row.actors.some(a=>a.image==="NPC/mirai_instructor.png"),"Confrontation defeat Story reveal did not project female instructor");
+      assert(reveal.row.actors.some(a=>a.image==="NPC/mirai_instructor.png"),"Confrontation defeat Story reveal did not project male instructor");
       const safe=await advanceUntilBeat(page,"mir_confront_defeat_end_10",10);
       assert.strictEqual(safe.row.text,"Checkpoint Three. Safe.","Confrontation defeat safe confirmation drift");
       const distinction=await advanceUntilBeat(page,"mir_confront_defeat_end_12",10);
@@ -424,7 +424,7 @@ async function proveMiraiDefeatContinuations(browser){
     assert.strictEqual(row.beatId,test.debriefBeatId,"Mirai defeat did not route directly to later Checkpoint Three debrief");
     assert.strictEqual(row.text,"LATER — CHECKPOINT THREE","Mirai defeat missing explicit LATER — CHECKPOINT THREE transition card");
     assert.strictEqual(row.backdrop,"Mirai Origin Backdrop/checkpoint_three_day.png","Mirai defeat debrief backdrop drift");
-    assert(row.actors.some(a=>a.image==="NPC/mirai_instructor.png"),"Mirai defeat debrief missing female instructor");
+    assert(row.actors.some(a=>a.image==="NPC/mirai_instructor.png"),"Mirai defeat debrief missing male instructor");
     assert(row.actors.some(a=>a.image==="NPC/traveller.png"),"Mirai defeat debrief missing real Traveller");
 
     const reflection=await advanceUntilBeat(page,test.reflectionBeatId,80);
