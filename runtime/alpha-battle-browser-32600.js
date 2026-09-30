@@ -73,6 +73,31 @@
       ? cloneBattleRuntimeValue(currentBattle.returnContext)
       : (currentBattle&&currentBattle.returnContext?currentBattle.returnContext:null);
 
+    const kakashiExplicitClaim=!!(
+      currentOverlayType==="victory"&&
+      currentBattle&&
+      currentBattle.rewards&&
+      currentBattle.rewards.kakashiV2===true&&
+      currentBattle.rewards.requiresExplicitPostClaimContinue===true
+    );
+    if(kakashiExplicitClaim){
+      const alreadyClaimed=currentBattle.rewards.claimed===true;
+      const claimed=alreadyClaimed?true:claimCurrentBattleRewards();
+      if(claimed!==true)return{success:false,reason:"victory_reward_claim_failed"};
+      // The Victory reopen is the sole Battle-session persistence owner here:
+      // openOverlay("victory") already calls saveTestState(). Avoid routing
+      // through the predecessor claim wrapper, which saves once and then opens
+      // Victory, causing the same session state to be stringified twice.
+      openOverlay("victory");
+      try{if(typeof refreshAlphaSurfaceTruthHUD==="function")refreshAlphaSurfaceTruthHUD();}catch(_error){}
+      return{
+        success:true,claimed:true,navigated:false,autoReturned:false,
+        explicitPostClaimContinue:true,
+        kakashiSingleSessionPersistence:true,
+        rewardCommitBeforeCallerRestore:true
+      };
+    }
+
     const claimResult=priorClaimVictoryAutoReturn.apply(this,arguments);
     if(!(claimResult&&claimResult.success===true))return claimResult;
 
@@ -266,6 +291,7 @@
       academyHasNoGenericRepeatLock:!genericRepeatLockPattern.test(academyAvailabilitySource),
       closureHasNoGenericRepeatLock:!genericRepeatLockPattern.test(closureAvailabilitySource),
       claimThenCallerRestore:claimSource.includes("priorClaimVictoryAutoReturn")&&claimSource.includes('resumeBattleCallerAfterCompletion("victory")'),
+      kakashiExplicitClaimUsesSingleSessionPersistence:claimSource.includes("kakashiSingleSessionPersistence:true")&&claimSource.includes('openOverlay("victory")')&&claimSource.includes("rewards.kakashiV2===true"),
       rewardCommitBeforeReturn:claimSource.indexOf("priorClaimVictoryAutoReturn")<claimSource.indexOf('resumeBattleCallerAfterCompletion("victory")'),
       callerContextPreserved:claimSource.includes("returnContextBefore")&&claimSource.includes("currentBattle.returnContext"),
       callerOwnedCannotGenericFallback:claimSource.includes("genericBattleFallbackSuppressed:true")&&claimSource.includes('openOverlay("victory")'),
