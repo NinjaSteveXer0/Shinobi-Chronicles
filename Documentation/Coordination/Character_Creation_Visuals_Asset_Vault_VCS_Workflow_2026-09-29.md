@@ -184,3 +184,73 @@ This workflow governs **new approved visual-asset intake from 2026-09-29 onward*
 > **CREATE → OWNER APPROVAL → REMOTE ASSET-VAULT INTAKE → IMPLEMENTATION ISSUE → CODING CONSUMES EXACT ASSET ONLY**
 
 This is the locked visual VCS workflow for Shinobi Chronicles.
+
+---
+
+## Tool-capability correction — 2026-09-30 — ChatGPT file-service -> GitHub binary bridge
+
+A real intake test with the approved **HOSTED ENTITY / ECHO ALPHA** Character Card proved an additional workspace limitation.
+
+Stephen attached the exact approved PNG to the CE / Coordination chat as a genuine raw file.
+
+CE could:
+- read the exact mounted bytes;
+- verify duplicate uploads were byte-identical;
+- calculate file hashes;
+- inspect GitHub branch/tree state.
+
+However the available GitHub connector can create binary blobs only from a content string supplied inside the connector call. The current Files/ChatGPT upload surface exposes the PNG as a file-service/mounted binary object and does **not** expose a native file-id -> GitHub-blob transfer action.
+
+Therefore:
+
+> **CE-chat attachment alone is not guaranteed to provide a usable remote GitHub binary publication bridge.**
+
+This does NOT re-authorise local Git/PowerShell.
+
+### Verified safe fallback
+
+When the active workspace lacks a direct file-service -> GitHub binary bridge:
+
+1. Stephen may attach the exact approved PNG to the designated GitHub Asset Vault Intake issue using the ordinary GitHub issue-attachment UI.
+2. This is **binary transport only**.
+3. Stephen does not:
+   - switch branches;
+   - stage;
+   - commit;
+   - push;
+   - pull;
+   - stash;
+   - reset;
+   - use PowerShell/Git/local VCS.
+4. The GitHub-hosted issue attachment supplies a GitHub user-content binary source that CE can consume through approved GitHub tooling.
+5. CE verifies the exact bytes/hashes where possible, then publishes the exact asset to `visuals/asset-vault`.
+6. CE records:
+   - permanent path;
+   - asset-vault commit SHA;
+   - exact implementation consumer;
+   - downstream Coding issue.
+7. Coding consumes only the exact path + commit.
+
+Canonical fallback:
+
+> **APPROVED PNG -> ASSET-VAULT INTAKE ISSUE ATTACHMENT -> CE REMOTE BINARY PUBLICATION -> CODING ISSUE**
+
+This fallback exists only because the active connector lacks direct ChatGPT-file -> GitHub binary transfer.
+
+It must not expand into Stephen becoming the Git transport layer.
+
+### Exact-byte rule remains absolute
+
+If CE cannot obtain the exact approved binary from either:
+- a supported direct file bridge; or
+- the GitHub-hosted intake attachment;
+
+CE must stop.
+
+Do not:
+- screenshot;
+- regenerate;
+- visually reconstruct;
+- re-encode from rendered UI;
+- substitute a similar asset;
+- claim an asset-vault commit that does not exist.
