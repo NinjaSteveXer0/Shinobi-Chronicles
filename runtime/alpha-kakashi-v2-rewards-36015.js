@@ -115,6 +115,17 @@ function soloCashSource36015(participantId){
   if(participantId===AMT)return SOURCE.amtCash;
   return null;
 }
+function fieldPillCommitted36015(storyOccurrenceId){
+  if(!storyOccurrenceId)return false;
+  if(committed(storyOccurrenceId,SOURCE.fieldPill,"origin"))return true;
+  // Compatibility reader for older candidate builds that accidentally scoped
+  // the once-per-Origin pill receipt to one Battle occurrence.
+  return Object.values(ensureStore().receipts||{}).some(row=>row&&
+    String(row.storyOccurrenceId||"")===String(storyOccurrenceId)&&
+    String(row.sourceId||"")===String(SOURCE.fieldPill)&&
+    row.committed===true
+  );
+}
 function battlePlan(){
   const battle=currentBattleState36015();
   const dep=battle&&battle.kakashiV2;
@@ -129,7 +140,7 @@ function battlePlan(){
   if(!exactKnownOpposition||count<1)return{configId,storyOccurrenceId,battleOccurrenceId,oppositionParticipantIds,cashSourceId:null,ryo:0,pill:false};
   if(count===1){
     const participantId=oppositionParticipantIds[0],cashSourceId=soloCashSource36015(participantId);
-    const pill=participantId===MI&&!committed(storyOccurrenceId,SOURCE.fieldPill,"origin");
+    const pill=participantId===MI&&!fieldPillCommitted36015(storyOccurrenceId);
     return{configId,storyOccurrenceId,battleOccurrenceId,oppositionParticipantIds,cashSourceId,ryo:cashSourceId?50:0,pill,parentSourceId:participantId===MI?"kak_origin_battle_mi_victory_reward_v1":null};
   }
   if(count===2)return{configId,storyOccurrenceId,battleOccurrenceId,oppositionParticipantIds,cashSourceId:SOURCE.twoVsOneCash,ryo:100,pill:false};
@@ -153,7 +164,7 @@ function hasBattleRewardReceipt36015(plan,sourceId,rewardClass){
 function battleRewardReceiptsComplete36015(plan){
   if(!plan)return false;
   const cashOk=!plan.cashSourceId||Number(plan.ryo)<=0||hasBattleRewardReceipt36015(plan,plan.cashSourceId,"battle_cash");
-  const pillOk=!plan.pill||hasBattleRewardReceipt36015(plan,SOURCE.fieldPill,"inventory_item");
+  const pillOk=!plan.pill||fieldPillCommitted36015(plan.storyOccurrenceId);
   return cashOk&&pillOk&&(Number(plan.ryo)>0||plan.pill===true);
 }
 function inventoryQuantity36015(itemId){
@@ -306,8 +317,8 @@ function claimKakashiV2BattleRewards(){
     if(plan.cashSourceId&&Number(plan.ryo)>0&&!hasBattleRewardReceipt36015(plan,plan.cashSourceId,"battle_cash")){
       writeReceipt({storyOccurrenceId:plan.storyOccurrenceId,sourceId:plan.cashSourceId,scopeRef:plan.battleOccurrenceId,rewardClass:"battle_cash",ryo:plan.ryo,battleOccurrenceId:plan.battleOccurrenceId,metadata:{battleConfigId:plan.configId}});
     }
-    if(plan.pill&&!hasBattleRewardReceipt36015(plan,SOURCE.fieldPill,"inventory_item")){
-      writeReceipt({storyOccurrenceId:plan.storyOccurrenceId,sourceId:SOURCE.fieldPill,scopeRef:plan.battleOccurrenceId,rewardClass:"inventory_item",itemId:"field_recovery_pill",quantity:1,battleOccurrenceId:plan.battleOccurrenceId,metadata:{timing:"immediate_solo_mi_victory"}});
+    if(plan.pill&&!fieldPillCommitted36015(plan.storyOccurrenceId)){
+      writeReceipt({storyOccurrenceId:plan.storyOccurrenceId,sourceId:SOURCE.fieldPill,scopeRef:"origin",rewardClass:"inventory_item",itemId:"field_recovery_pill",quantity:1,battleOccurrenceId:plan.battleOccurrenceId,metadata:{timing:"immediate_solo_mi_victory",oncePerOrigin:true}});
     }
     rewards.claimed=true;
     if(!currentBattle.claimedAt)currentBattle.claimedAt=Date.now();
