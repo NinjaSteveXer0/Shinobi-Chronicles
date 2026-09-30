@@ -26,16 +26,19 @@ Design closed alone does not promote a task above RED/AMBER if the player cannot
 
 # Gate 0 — Ten-Origin Golden Seal
 
-**Current:** AMBER — owner reports borderline 10/10, with final Battle-System bugs, Obito writing polish and Kurenai validation remaining.
+**Current: GOLDEN / COMPLETE — PHASE 2 ACTIVATED**
 
-Activation condition for Phase 2:
+Owner acceptance:
+- all 10 Academy Origins = FROZEN GOLDEN;
+- global Shinobi Chronicles Battle System = FROZEN GOLDEN;
+- exact owner-accepted PR #417 head: `1d3289dc82c0cd9e9b84976ef9d8738f347e3a20`;
+- final exact-head validation before owner acceptance: 21/21 workflows GREEN, 0 failed, 0 pending.
 
-- all 10 Academy Origins Stephen-GOLDEN;
-- canonical shared Battle System accepted across applicable Origins;
-- exact known-good candidate HEAD recorded;
-- Origin package frozen against unrelated rewrite.
+Durable receipt:
+`Documentation/Coordination/Phase_1_Completion_and_Frozen_Golden_Receipt_2026-10-01.md`
+@ `974a56cd6f57e7fbd3c925cb4e749a622aff4247`
 
-This is a gate, not one of the Phase-2 ten.
+The active Academy reward-spectrum refresh is a bounded semantic/reward overlay and does not revoke the Golden freeze.
 
 ---
 
@@ -235,8 +238,12 @@ First Alpha slice should prove:
 - one basic Weapon purchase;
 - one useful Item/consumable purchase;
 - one Equipment or material path where authorised;
-- Inventory ownership persists;
+- **one Character Card shop purchase through real Ryō + Acquisition**;
+- purchased Character becomes owned/available without silently replacing current team;
+- deliberate roster/team assignment then makes that Character available to team-aware Training/World surfaces where stage rules permit;
+- Inventory/ownership persists;
 - durable object purchase enters provenance correctly;
+- Character purchase updates Codex/discovered representation state where legitimate;
 - reward -> ownership -> inspect -> equip/prepare -> Battle use where applicable.
 
 Do not block the entire first spending loop on full Crafting implementation.
@@ -366,6 +373,8 @@ after First-Hour loop + development + World + economy + real Arc play are stable
 
 Coding must include:
 **UNLIMITED ENERGY — DEV/OWNER TEST MODE**
+
+The preferred Phase-2 architecture may expose this through the separately-scoped owner/developer redeem-code path, but it must remain distinct from public promotional/Mystery-Gift codes.
 
 Normal players never silently inherit the bypass.
 
