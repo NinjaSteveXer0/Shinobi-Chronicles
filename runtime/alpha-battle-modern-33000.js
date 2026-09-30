@@ -166,14 +166,33 @@
       tags=["DAMAGE","AREA"];
     }else if(kind==="ratio_guard_state"&&skill.guard){
       const pct=Math.round((Number(skill.guard.preventionRatio)||0)*100);
-      summary=`Reduce the next direct hit against you by ${pct}%.`;
+      const allyTarget=String(skill.targetMode||skill.guard.targetMode||"").toLowerCase().includes("ally");
+      summary=allyTarget
+        ?`Protect one ally and reduce their next direct hit by ${pct}%.`
+        :`Reduce the next direct hit against you by ${pct}%.`;
       details=[skill.guard.oneUse===false?"The guard lasts for this Skill's stated duration.":"Works once."];
-      tags=["DEFENSE","GUARD"];
+      tags=allyTarget?["DEFENSE","ALLY"]:["DEFENSE","GUARD"];
     }else if(kind==="restore_underlying_battle_pl"&&skill.restorationProfile){
       const amount=Number(skill.restorationProfile.authoredAmount)||0;
-      summary=`Restore ${amount} Battle PL to an eligible ally.`;
+      const selfTarget=String(skill.targetMode||skill.restorationProfile.targetMode||"").toLowerCase()==="self";
+      summary=`Restore ${amount} Battle PL to ${selfTarget?"yourself":"one eligible ally"}.`;
       details=["This does not raise Base PL."];
-      tags=["RECOVERY","ALLY"];
+      tags=selfTarget?["RECOVERY","SELF"]:["RECOVERY","ALLY"];
+    }else if(kind==="movement"||kind==="reposition"||String(skill.actionClass||"").toLowerCase().includes("movement")){
+      summary="Move to a new position when a real route is available.";
+      details=["Movement, not teleportation."];
+      tags=["MOVEMENT","CONTEXT REQUIRED"];
+    }else if(kind==="temporary_battle_capacity"){
+      const amount=Number(skill.temporaryBattlePL??skill.capacityProfile?.authoredAmount??skill.authoredAmount);
+      if(Number.isFinite(amount)&&amount>0){
+        summary=`Gain ${amount} temporary Battle PL for this Battle.`;
+        details=["Extra fighting capacity, not healing."];
+      }else{
+        summary="Special Battle-capacity Skill.";
+        details=["This Skill needs an exact player-facing description before final release."];
+        descriptionCoverage="needs_exact_override";
+      }
+      tags=["CAPACITY","TEMPORARY"];
     }else if(kind==="dynamic_control"){
       const blocked=[...(skill.blockedActionTraits||skill.controlProfile?.blockedActionTraits||skill.conditionProfile?.blockedActionTraits||[])].map(x=>String(x));
       if(blocked.includes("movement_dependent")||blocked.includes("substantial_free_movement")){
