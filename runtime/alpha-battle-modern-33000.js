@@ -983,10 +983,61 @@
     for(const button of primary)button.classList.toggle("is-selected",stage.dataset.formationTray===button.dataset.formationFamily.replace("summons","summon"));
     return primary.length===3;
   }
+  function storyCallerBattleEnvironment33000(){
+    const battle=typeof currentBattle!=="undefined"?currentBattle:null;
+    const rc=battle&&battle.returnContext&&typeof battle.returnContext==="object"?battle.returnContext:null;
+    if(!rc||rc.type!=="story_scene")return"";
+
+    const explicit=String(rc.presentationEnvironmentPath||rc.environmentPath||"").trim();
+    if(explicit)return explicit;
+
+    try{
+      if(
+        String(rc.sceneId||"")==="origin_academy_kakashi_anbu_retrieval"&&
+        typeof globalThis.getAcademyKakashiV2Presentation36020==="function"
+      ){
+        const projection=globalThis.getAcademyKakashiV2Presentation36020(String(rc.sourceBeatId||""));
+        const backdrop=String(projection&&projection.backdrop||"").trim();
+        if(backdrop)return backdrop;
+      }
+    }catch(_error){}
+
+    try{
+      const definition=typeof getStorySceneDefinition==="function"?getStorySceneDefinition(String(rc.sceneId||"")):null;
+      const beat=definition&&definition.beatMap&&typeof definition.beatMap.get==="function"
+        ?definition.beatMap.get(String(rc.sourceBeatId||""))
+        :null;
+      const authored=String(
+        beat&&beat.battle&&(beat.battle.presentationEnvironmentPath||beat.battle.environmentPath||beat.battle.backdrop)||
+        beat&&beat.presentationEnvironmentPath||
+        beat&&beat.environmentPath||
+        ""
+      ).trim();
+      if(authored)return authored;
+    }catch(_error){}
+
+    try{
+      const runtime=typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;
+      if(
+        runtime&&String(runtime.sceneId||"")===String(rc.sceneId||"")&&
+        typeof globalThis.getActiveStorySceneBoardProjection==="function"
+      ){
+        const projection=globalThis.getActiveStorySceneBoardProjection();
+        const backdrop=String(projection&&projection.backdrop||"").trim();
+        if(backdrop)return backdrop;
+      }
+    }catch(_error){}
+    return"";
+  }
   function sharedBattleEnvironmentPath33000(){
     const battle=typeof currentBattle!=="undefined"?currentBattle:null;
     if(!battle)return"";
-    return String(battle.presentationEnvironmentPath||battle.environmentPath||"").trim();
+    return String(
+      battle.presentationEnvironmentPath||
+      battle.environmentPath||
+      storyCallerBattleEnvironment33000()||
+      ""
+    ).trim();
   }
   function applyBattleEnvironment33000(stage){
     if(!stage)return null;
@@ -995,6 +1046,10 @@
     const menmaProof=encounterId==="origin_academy_menma_prologue:three_test_subjects"&&configId==="academy_menma_origin_three_test_subjects_with_anko";
     const environmentPath=sharedBattleEnvironmentPath33000()||(menmaProof?"Scene backdrops/forest_clearing_day.png":"");
     if(environmentPath){
+      if(currentBattle){
+        if(!String(currentBattle.environmentPath||"").trim())currentBattle.environmentPath=environmentPath;
+        if(!String(currentBattle.presentationEnvironmentPath||"").trim())currentBattle.presentationEnvironmentPath=environmentPath;
+      }
       stage.dataset.battleEnvironment=menmaProof?"forest_clearing_day":"authored";
       stage.dataset.battleEnvironmentPath=environmentPath;
       const cssPath=environmentPath.replace(/\\/g,"\\\\").replace(/"/g,'\\"');
