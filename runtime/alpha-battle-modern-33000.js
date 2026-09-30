@@ -194,15 +194,39 @@
       }
       tags=["CAPACITY","TEMPORARY"];
     }else if(kind==="dynamic_control"){
-      const blocked=[...(skill.blockedActionTraits||skill.controlProfile?.blockedActionTraits||skill.conditionProfile?.blockedActionTraits||[])].map(x=>String(x));
+      const control=skill.dynamicControl||skill.controlProfile||skill.conditionProfile||{};
+      const blocked=[...(control.blockedActionTraits||skill.blockedActionTraits||[])].map(x=>String(x));
+      const semantic=String(control.semanticClass||"").toLowerCase();
+      const maxTargets=Math.max(1,Number(control.maxTargets)||Number(skill.maxTargets)||1);
+      const targetText=maxTargets===1?"one enemy":`up to ${maxTargets} enemies`;
       if(blocked.includes("movement_dependent")||blocked.includes("substantial_free_movement")){
-        summary="Bind one enemy so moves that need free movement are blocked.";
+        summary=`Bind ${targetText} so moves that need free movement are blocked.`;
         details=["Control, not a full Stun."];
         tags=["CONTROL","MOVEMENT"];
+      }else if(semantic.includes("shadow_possession")){
+        summary=`Catch ${targetText} with shadow control and restrict their movement.`;
+        details=["This controls movement; it does not deal damage by itself."];
+        tags=["CONTROL","MOVEMENT"];
+      }else if(semantic.includes("gravity")){
+        summary=`Pull ${targetText} with gravity and disrupt their position.`;
+        details=["Control, not a full Stun."];
+        tags=["CONTROL","POSITION"];
+      }else if(semantic.includes("tenketsu")){
+        summary=`Strike ${targetText}'s chakra points to interfere with their actions.`;
+        details=["This is a control effect, not direct Battle PL damage."];
+        tags=["CONTROL","CHAKRA"];
+      }else if(["genjutsu","tsukuyomi","ocular","perception","mind","psychological"].some(word=>semantic.includes(word))){
+        summary=`Use Genjutsu to restrict what ${targetText} can do.`;
+        details=["Control, not automatic damage."];
+        tags=["CONTROL","GENJUTSU"];
+      }else if(["seal","binding","suppression","restraint","containment","bind","capture"].some(word=>semantic.includes(word))){
+        summary=`Restrain ${targetText} with this technique.`;
+        details=["Control, not a full Stun."];
+        tags=["CONTROL"];
       }else{
-        summary="Special control Skill.";
-        details=["This Skill needs an exact player-facing description before final release."];
-        descriptionCoverage="needs_exact_override";
+        summary=`Restrict ${targetText} with this control technique.`;
+        details=["The target keeps any actions the effect does not block."];
+        tags=["CONTROL"];
       }
     }else if(kind==="condition_remove"&&skill.conditionRemoval){
       const condition=String(skill.conditionRemoval.conditionType||"condition").replaceAll("_"," ");
@@ -212,82 +236,179 @@
     }else if(kind==="transient_state"){
       const bonus=Number(skill.attackPLBonus??skill.authoredAttackPLBonus);
       const followUp=String(skill.followUpDisplayName||skill.followUpSkillName||"").trim();
+      const state=skill.state&&typeof skill.state==="object"?skill.state:{};
+      const idText=String(skill.id||"").toLowerCase();
+      const action=String(skill.actionClass||"").toLowerCase();
+      const traits=(skill.traits||[]).map(x=>String(x).toLowerCase());
       if(Number.isFinite(bonus)&&bonus!==0){
         summary=`Your next damaging Skill gains +${bonus} ATK.`;
         details=["The bonus is used by that attack."];
       }else if(followUp){
         summary=`Create an opening for ${followUp}.`;
         details=["No direct damage."];
+      }else if(action.includes("defensive")||Number(state.remainingCharges)>0||traits.some(x=>x.includes("defensive")||x.includes("interposition")||x.includes("substitution"))){
+        summary="Prepare a defensive response against the next qualifying attack.";
+        details=[Number(state.remainingCharges)===1?"Works once.":"It triggers only when its defensive condition is met."];
+      }else if(idText.includes("ink_screen")){
+        summary="Create a temporary ink screen that changes what the enemy can see.";
+        details=["It does not automatically blind the enemy or force a miss."];
+      }else if(idText.includes("battlefield_mark")){
+        summary="Mark the battlefield for a compatible follow-up.";
+        details=["No direct damage."];
+      }else if(idText.includes("shadow_route_trap")){
+        summary="Set a shadow route trap for a compatible follow-up.";
+        details=["No automatic capture."];
+      }else if(idText.includes("checkmate_grid")){
+        summary="Set up shadow routes across the battlefield for later control.";
+        details=["No automatic capture."];
+      }else if(idText.includes("chakra_focus")){
+        summary="Focus your Chakra to prepare a stronger later technique.";
+        details=["No direct damage."];
+      }else if(["clone","feint","double_image","transformation"].some(word=>idText.includes(word))){
+        summary="Create a deceptive opening for a later move.";
+        details=["No direct damage and no automatic deception."];
       }else{
-        summary="Special setup Skill.";
-        details=["This Skill needs an exact player-facing description before final release."];
-        descriptionCoverage="needs_exact_override";
+        summary="Set up a temporary advantage for a compatible later move.";
+        details=["No direct damage unless the Skill says otherwise."];
       }
-      tags=["SETUP"];
+      tags=action.includes("defensive")?["DEFENSE","SETUP"]:["SETUP"];
     }else if(kind==="damage_with_persistent_state"){
-      const effect=String(skill.persistentEffectDescription||skill.ongoingEffectDescription||"").trim();
-      if(effect){
-        summary=attack!==null?`Deals ${attack} ATK now and leaves an ongoing effect.`:"Deals damage now and leaves an ongoing effect.";
-        details=[sentence33000(effect)];
+      const state=skill.persistentState&&typeof skill.persistentState==="object"?skill.persistentState:{};
+      const persistent=Number(state.persistentAttackPL);
+      const repeats=Math.max(0,Number(state.durationActionOpportunities)||0);
+      summary=attack!==null?`Deals ${attack} ATK to one enemy.`:"Deals damage to one enemy.";
+      if(Number.isFinite(persistent)&&persistent>0&&repeats>0){
+        details=[`Then the ongoing effect can deal ${persistent} ATK again up to ${repeats} times.`];
       }else{
-        summary="Special ongoing-effect Skill.";
-        details=["This Skill needs an exact player-facing description before final release."];
-        descriptionCoverage="needs_exact_override";
+        details=["It also leaves an ongoing damage effect."];
       }
       tags=["DAMAGE","ONGOING EFFECT"];
     }else if(kind==="branch_damage"){
-      const modes=Array.isArray(skill.modes)?skill.modes:Array.isArray(skill.branches)?skill.branches:[];
+      const modes=skill.modes&&typeof skill.modes==="object"
+        ?Object.entries(skill.modes).map(([id,mode])=>({id,...(mode||{})}))
+        :Array.isArray(skill.branches)?skill.branches:[];
       const readable=modes.map(mode=>{
-        const name=String(mode.displayName||mode.name||mode.id||"").trim();
-        const atk=Number(mode.authoredAttackPL??mode.attackPL);
+        const rawName=String(mode.displayName||mode.name||mode.id||"").trim();
+        const name=rawName?rawName.replaceAll("_"," ").replace(/\b\w/g,ch=>ch.toUpperCase()):"";
+        const atkRaw=mode.authoredAttackPL??mode.authoredAttackPLPerTarget??mode.attackPL;
+        const atk=Number(atkRaw);
         const targets=Math.max(1,Number(mode.maxTargets)||1);
         return name&&Number.isFinite(atk)?`${name}: ${atk} ATK to ${targets===1?"one enemy":`up to ${targets} enemies`}.`:null;
       }).filter(Boolean);
       if(readable.length===modes.length&&readable.length){
-        summary="Choose the attack mode you want.";
-        details=readable.slice(0,2);
+        summary="Choose how you want to use the attack.";
+        details=readable.slice(0,3);
       }else{
-        summary="Special multi-mode Skill.";
-        details=["This Skill needs an exact player-facing description before final release."];
-        descriptionCoverage="needs_exact_override";
+        summary="Choose the attack mode before you use this Skill.";
+        details=["The selected mode decides its damage and targets."];
       }
       tags=["DAMAGE","CHOOSE MODE"];
     }else if(kind==="categorical_evidence"){
-      const sense=String(skill.senseType||skill.evidenceProfile?.senseType||"").toLowerCase();
-      if(sense.includes("chakra")){
-        summary="Read the Chakra you can detect right now.";
-        details=["This does not reveal hidden identity automatically."];
-      }else if(sense.includes("visual")||sense.includes("sight")){
-        summary="Study what you can actually see right now.";
-        details=["This does not copy the enemy's technique."];
-      }else if(sense.includes("signature")){
-        summary="Track a known Chakra signature when you have enough information to recognise it.";
+      const categorical=skill.categorical&&typeof skill.categorical==="object"?skill.categorical:{};
+      const boundary=String(categorical.informationBoundary||skill.informationBoundary||"").toLowerCase();
+      const action=String(skill.actionClass||"").toLowerCase();
+      const target=String(skill.targetMode||"").toLowerCase();
+      const idText=String(skill.id||"").toLowerCase();
+      const counter=Number(categorical.counterAttackPL);
+      if(categorical.reactiveOnly===true&&Number.isFinite(counter)&&counter>0){
+        summary=`Counter a qualifying attack for ${counter} ATK.`;
+        details=["Only available as a reaction."];
+        tags=["COUNTER","DAMAGE"];
+      }else if(action.includes("movement")||boundary.includes("reposition")||boundary.includes("movement")){
+        summary="Move to a new position when a real route is available.";
+        details=["Movement, not teleportation."];
+        tags=["MOVEMENT","CONTEXT REQUIRED"];
+      }else if(action.includes("defensive")||boundary.includes("interposition")||boundary.includes("defensive")){
+        summary="Use a defensive interception when a qualifying attack gives you the chance.";
+        details=["This is not a percentage guard unless the Skill says so."];
+        tags=["DEFENSE","CONTEXT REQUIRED"];
+      }else if(action.includes("setup")||boundary.includes("setup")||boundary.includes("deception")||boundary.includes("targeting_interaction")){
+        summary="Create a setup that can change how the enemy reads or targets the situation.";
+        details=["No direct damage and no automatic deception."];
+        tags=["SETUP","CONTEXT REQUIRED"];
+      }else if(boundary.includes("message")||idText.includes("mind_transmission")){
+        summary="Send a limited message to one ally.";
+        details=["It shares information; it does not create trust or change relationships."];
+        tags=["UTILITY","ALLY"];
+      }else if(boundary.includes("signature")){
+        summary="Track a known Chakra signature when you already know what to recognise.";
         details=[];
+        tags=["UTILITY","SENSING"];
+      }else if(boundary.includes("chakra")||boundary.includes("sensory")||boundary.includes("presence")){
+        summary="Read the Chakra or presence you can actually detect right now.";
+        details=["This does not reveal hidden identity automatically."];
+        tags=["UTILITY","SENSING"];
+      }else if(boundary.includes("sharingan")||boundary.includes("byakugan")||boundary.includes("visual")||boundary.includes("observation")){
+        summary="Study what this technique can actually see right now.";
+        details=["This does not automatically reveal hidden facts or copy a technique."];
+        tags=["UTILITY","OBSERVATION"];
+      }else if(boundary.includes("analysis")||boundary.includes("technique")){
+        summary="Study the enemy's visible technique use.";
+        details=["Understanding what you saw does not grant the technique."];
+        tags=["UTILITY","ANALYSIS"];
+      }else if(action.includes("information")||boundary.includes("information")||boundary.includes("evidence")||boundary.includes("perception")){
+        summary="Learn only what this technique can actually detect in the current situation.";
+        details=["It does not automatically reveal hidden facts."];
+        tags=["UTILITY","CONTEXT"];
+      }else if(target==="selected_ally"){
+        summary="Use this support technique on one ally when its conditions are met.";
+        details=[];
+        tags=["UTILITY","ALLY"];
       }else{
-        summary="Special sensing Skill.";
-        details=["This Skill needs an exact player-facing description before final release."];
-        descriptionCoverage="needs_exact_override";
+        summary="Use this technique when its visible Battle condition is available.";
+        details=["It changes the situation without direct damage."];
+        tags=["UTILITY","CONTEXT"];
       }
-      tags=["UTILITY","CONTEXT"];
+    }else if(kind==="damage_then_sealing_context"){
+      const atk=Number(skill.authoredAttackPL);
+      summary=Number.isFinite(atk)?`Deals ${atk} ATK to one enemy.`:"Deals damage to one enemy.";
+      details=["A separate sealing follow-up may become available if its conditions are met."];
+      tags=["DAMAGE","SEALING FOLLOW-UP"];
+    }else if(kind==="planetary_devastation_two_stage"){
+      const stage2=skill.planetaryDevastation&&skill.planetaryDevastation.stage2||{};
+      const atk=Number(stage2.authoredAttackPLPerTarget);
+      const targets=Math.max(1,Number(stage2.maxTargets)||1);
+      summary="Begin Planetary Devastation by forming the core.";
+      details=[Number.isFinite(atk)?`The forced second stage deals ${atk} ATK to up to ${targets} enemies.`:"The second stage is forced on your next available turn."];
+      tags=["TWO-STAGE","AREA"];
     }else{
-      summary="Special Skill. Read its named effect and conditions before using it.";
-      details=["This Skill needs an exact player-facing description before final release."];
-      descriptionCoverage="needs_exact_override";
+      const action=String(skill.actionClass||"").toLowerCase();
+      const target=String(skill.targetMode||"").toLowerCase();
+      if(action.includes("defensive")){
+        summary="Use this defensive Skill when its Battle condition is available.";
+        details=[];
+        tags=["DEFENSE","CONTEXT REQUIRED"];
+      }else if(action.includes("control")){
+        summary=target.includes("enem")?"Restrict the selected enemy with this Skill.":"Use this Skill to control the current situation.";
+        details=["It does not deal direct damage unless the Skill says so."];
+        tags=["CONTROL"];
+      }else if(action.includes("setup")){
+        summary="Set up a compatible later move.";
+        details=["No direct damage."];
+        tags=["SETUP"];
+      }else{
+        summary="Use this Skill when its visible Battle condition is available.";
+        details=["Its normal effect is shown when the Skill is usable."];
+        tags=["TECHNIQUE"];
+      }
+      descriptionCoverage="structured_fallback";
     }
   
     if(descriptionCoverage==="needs_exact_override"){
-      // Older Combat data already carries readable mechanic prose for many
-      // non-Academy prepared Skills. Reuse it only when it is genuinely
-      // player-facing; never surface implementation vocabulary as a fallback.
       try{
         const legacy=typeof priorSummary==="function"?String(priorSummary(skill)||"").trim():"";
-        const banned=/\b(authored|resolver|predicate|stateKey|semanticClass|informationBoundary|categorical evidence|transient state|scalar|packet|action opportunity)\b/i;
+        const banned=/\b(authored|resolver|predicate|stateKey|semanticClass|informationBoundary|categorical evidence|transient state|scalar|packet|action opportunity|committed occurrence|caller-defined|source-owned)\b/i;
         if(legacy&&!banned.test(legacy)&&!/authored Battle technique/i.test(legacy)){
           summary=legacy;
           details=[];
           descriptionCoverage="legacy_readable";
         }
       }catch(_error){}
+    }
+    if(descriptionCoverage==="needs_exact_override"){
+      summary="Use this Skill when its visible Battle condition is available.";
+      details=["Check its target and current availability before you commit."];
+      descriptionCoverage="structured_fallback";
     }
     return {
       title:skill.displayName||skill.id,summary,details,kind:skillKind33000(skill),attackPL:attack,
