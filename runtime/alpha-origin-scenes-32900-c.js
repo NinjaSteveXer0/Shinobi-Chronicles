@@ -740,6 +740,17 @@ function boardBackdropEnvironment331(beatId,performance){
 }
 function registerFinalSceneBoard(){
   if(typeof globalThis.registerStorySceneBoardDefinition!=="function")return{success:false,reason:"story_scene_board_not_loaded"};
+  // Obito's fresh opening uses a single tall character card plus the compact
+  // narration strip. Keep that card clear of the narration frame without
+  // moving the shared Scene Board geometry used by frozen Origins.
+  try{
+    if(typeof document!=="undefined"&&!document.getElementById("academy-obito-scene-board-331-style")){
+      const style=document.createElement("style");
+      style.id="academy-obito-scene-board-331-style";
+      style.textContent='#story-scene-presentation-layer[data-sc-scene-mode="obito_origin"] .sc-scene-board-33900__actors{bottom:31%!important}';
+      (document.head||document.documentElement).appendChild(style);
+    }
+  }catch(_error){}
   const sequences={
     ...PERFORMANCE,
     obi_arrival:arrivalSequence,
@@ -754,7 +765,7 @@ function registerFinalSceneBoard(){
   };
   const result=globalThis.registerStorySceneBoardDefinition(SCENE_ID,{
     resolve:({beatId,performance})=>({
-      mode:"conversation",
+      mode:"obito_origin",
       location:boardLocation(beatId,performance),
       objective:["obi_arrival","obi_training","obi_end_day","obi_home","obi_reflect","obi_close"].includes(beatId)||beatId.startsWith("obi_ending_")?null:"GET TO TRAINING",
       actors:boardActors(beatId,performance)
