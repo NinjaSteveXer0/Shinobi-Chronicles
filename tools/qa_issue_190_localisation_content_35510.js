@@ -44,14 +44,16 @@ function collect(source,re,index=1,set=new Set()){
 }
 function collectOriginPresentation(source){
   const out=new Set();
-  collect(source,/(?:^|[,{])\s*title:"([^"]+)"/gm,1,out);
-  collect(source,/(?:^|[,{])\s*speakerName:"([^"]+)"/gm,1,out);
-  collect(source,/(?:^|[,{])\s*text:"([^"]+)"/gm,1,out);
-  collect(source,/C\("[^"]+","([^"]+)"/g,1,out);
-  collect(source,/A\.unavailableBattle\(scene,"([^"]+)"/g,1,out);
-  collect(source,/knownBlocker:"([^"]+)"/g,1,out);
-  collect(source,/beat\([^,]+,"([^"]+)"/g,1,out);
-  collect(source,/\["(?:furniture|vegetables|equipment|delivery|cart)_[^"]+","([^"]+)"\]/g,1,out);
+  const decoded=(raw)=>JSON.parse(`"${raw}"`);
+  const collectDecoded=(re,index=1)=>{let m;while((m=re.exec(source)))if(m[index])out.add(decoded(m[index]));};
+  collectDecoded(/(?:^|[,{])\s*title:"([^"]+)"/gm);
+  collectDecoded(/(?:^|[,{])\s*speakerName:"([^"]+)"/gm);
+  collectDecoded(/(?:^|[,{])\s*text:"([^"]+)"/gm);
+  collectDecoded(/C\("[^"]+","([^"]+)"/g);
+  collectDecoded(/A\.unavailableBattle\(scene,"([^"]+)"/g);
+  collectDecoded(/knownBlocker:"([^"]+)"/g);
+  collectDecoded(/beat\([^,]+,"([^"]+)"/g);
+  collectDecoded(/\["(?:furniture|vegetables|equipment|delivery|cart)_[^"]+","([^"]+)"\]/g);
   return out;
 }
 function collectFinalWritingStatic(source){
