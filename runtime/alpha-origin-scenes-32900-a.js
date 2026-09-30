@@ -1389,7 +1389,7 @@ function battleSpec(){
     encounterId:"origin_academy_izuno_rogue_genin_step_in",
     battleConfigId:"academy_izuno_origin_rogue_genin_step_in_battle",
     environmentPath:IZUNO_BATTLE_ENVIRONMENT,backdrop:IZUNO_BATTLE_ENVIRONMENT,
-    victoryBeatId:"izu_rogue_step_in_return_1",defeatBeatId:"izu_rogue_step_in_return_1",
+    victoryBeatId:"izu_finish_secondary_1",defeatBeatId:"izu_finish_secondary_1",
     resultProjector:()=>globalThis.projectAcademyWasabiRogueGeninBattle343?globalThis.projectAcademyWasabiRogueGeninBattle343():null,
     actionLabel:"Start PL Battle",
     launchResolver:({active:returnActive,returnContext})=>{
@@ -1548,8 +1548,7 @@ beats.push({beatId:"izu_rogue_choice",mode:"choice",text:"",choices:[
 ]});
 seq("izu_rogue_step_in",G("rogue_step_in"),"izu_rogue_step_in_battle");
 beats.push({beatId:"izu_rogue_step_in_battle",mode:"battle_transition",text:"",battle:battleSpec()});
-beats.push({beatId:"izu_rogue_step_in_return_1",mode:"post_battle",text:"",nextBeatId:"izu_finish_secondary_1",onEnterConsequences:[captureBattleReturn]});
-seq("izu_finish_secondary",G("finish_secondary"),"izu_eval_base_1");
+seq("izu_finish_secondary",G("finish_secondary"),"izu_eval_base_1",{first:{onEnterConsequences:[captureBattleReturn]}});
 seq("izu_rogue_call_help",G("rogue_call_help"),"izu_rogue_call_help_finish_1");
 seq("izu_rogue_call_help_finish",G("finish_secondary"),"izu_eval_base_1");
 seq("izu_rogue_keep_pursuing",G("rogue_keep_pursuing"),"izu_rogue_keep_finish_1");
