@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-30  
 **Owner:** Stephen / Writing — Konoha  
-**Status:** **WRITING RED — STRUCTURAL REGRESSION CONFIRMED / CURRENT ONE-CHOICE PREVIEW INVALID**  
+**Status:** **OWNER BROWSER AMBER — NOT FIXED / STAGED-CHOICE RESTORATION STILL REQUIRED / NOT GOLDEN**  
 **Origin:** `academy_kurenai`
 
 ## 1. Owner browser evidence
