@@ -100,6 +100,7 @@ async function info(page){
       speakerSide:root?.dataset.scCueSpeakerSide||null,speakerActorId:root?.dataset.scCueSpeakerActorId||null,
       performanceLabels,actors,
       choices:[...(root?.querySelectorAll(".sc-story-choice")||[])].filter(visible).map(n=>n.textContent.trim()),
+      primaryVisible:visible(root?.querySelector(".sc-chronicle-primary")),
       rootVisible:visible(root),battleVisible:visible(document.querySelector(".alpha-code-battle-stage"))
     };
   });
@@ -451,7 +452,7 @@ async function launchBattle(page,label){
   ]);
   assert.strictEqual(battle.rewards?.ryo,0);assert.strictEqual(battle.rewards?.exp,0);
   assert.deepStrictEqual(battle.rewards?.items||[],[]);assert.deepStrictEqual(battle.rewards?.rareDrops||[],[]);
-  assert.strictEqual(battle.rewards?.requiresExplicitPostClaimContinue,true,"CLAIM collapsed into CONTINUE");
+  assert.strictEqual(battle.rewards?.requiresExplicitPostClaimContinue,false,"terminal Wasabi Battle still requests a redundant post-Battle CONTINUE");
   assert(!battle.buttons.some(x=>/^WITHDRAW$/i.test(x)||/^SWITCH$/i.test(x)),"WITHDRAW/successor control visible in strict 1v1");
   await assertBattlePLRings(page,label+" initial Battle");
   await shot(page,label,"battle",".alpha-code-battle-stage");
@@ -560,9 +561,10 @@ async function terminateBattleToStory(page,outcome,label){
     assert.strictEqual(result.rewardAudit.receipts.length,0,label+" Defeat wrote Victory reward receipt");
   }
   await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:12000});
-  await waitBeat(page,"izu_rogue_step_in_return_1");
-  await assertBackdrop(page,BACKDROPS.alley,label+" post-Battle alley return");
+  await waitBeat(page,"izu_finish_secondary_1");
+  await assertBackdrop(page,BACKDROPS.training,label+" direct post-Battle Story return");
   const returned=await info(page);
+  assert.strictEqual(returned.primaryVisible,false,label+" redundant post-Battle CONTINUE is still visible");
   assert.strictEqual(returned.localContext.rogueGeninResponse,"intervene");
   assert.strictEqual(returned.localContext.rogueResolved,true);
   assert.strictEqual(returned.localContext.rogueBattleResult,outcome);
@@ -581,7 +583,6 @@ async function runBattleRoute(browser,outcome){
     const battle=await launchBattle(page,label);
     const reloaded=await reloadBattle(page,battle,label);
     await terminateBattleToStory(page,outcome,label);
-    await clickContinue(page);
     await waitBeat(page,"izu_finish_secondary_1");
     await assertBackdrop(page,BACKDROPS.training,label+" Scene 5 convergence");
     await continueTo(page,"izu_reflect_step_in");
@@ -634,7 +635,7 @@ async function runBattleRoute(browser,outcome){
       routeFamilies:["obvious_river","better_stronger","predict_intercept","cooperate_call_help","keep_pursuing","step_in_victory","step_in_defeat"],
       exactSourceOccurrences:[TRACKING,INTERCEPT,COOP,ROGUE_OCC,RIVER],
       strictOneVsOneBattle:true,battleSaveReload:true,bothBattleOutcomesReturn:true,
-      fixedBattleVictoryRyo:50,sharedOriginStartingPurseRyo:100,claimSeparateFromContinue:true,exactBackdropContract:true,postBattleAlleyReturn:true,exactBattleEnvironment:true,
+      fixedBattleVictoryRyo:50,sharedOriginStartingPurseRyo:100,directBattleToStoryReturn:true,postBattleContinueRemoved:true,exactBackdropContract:true,exactBattleEnvironment:true,
       acceptedProgressionMappings409:true,riverStaminaDevelopment:true,visibleWasabiInstructorCards:true,visiblePursuitTargetOnRiverAndFinish:true,speakerOwnedDialogue:true,speakerLinkedDialoguePointer:true,kakashiNarrationGeometry:true,singleNarrationLabel:true,originChronicleReceipt:true,kakashiReceiptGeometry:true,radialPLCoreCentered:true,
       rewardSpectrum409Consumed:true,originToChronicleBegins:true,browserGoldenClaimed:false
     };
