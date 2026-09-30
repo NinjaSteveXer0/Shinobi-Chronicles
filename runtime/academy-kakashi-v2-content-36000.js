@@ -2448,10 +2448,6 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "A beat."
-        },
-        {
-          "kind": "narration",
           "text": "Pakkun's voice is drier when he continues."
         },
         {
