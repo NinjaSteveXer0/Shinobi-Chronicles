@@ -78,7 +78,7 @@ function registerProfile(){
     calibratedBasePL:PROFILE.pl,power:PROFILE.pl,baseStats:{...PROFILE.stats},stats:{...PROFILE.stats},
     image:BATTLE_PORTRAIT,rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},
     authoredBattleActions:[testingStrike,substitutionGuard,turningSweep],
-    provenance:{stableParticipantId:INSTRUCTOR,underlyingIdentity:"female_academy_instructor",observerPresentation:"male_traveller_escort_disguise",battlePortraitPath:BATTLE_PORTRAIT,battlePortraitAuthorityCommit:"38e4d0ebd89176d7d30aa2cc6044565711353ee6",noRegistryAdmission:true}
+    provenance:{stableParticipantId:INSTRUCTOR,underlyingIdentity:"male_academy_instructor",observerPresentation:"male_traveller_escort_disguise",battlePortraitPath:BATTLE_PORTRAIT,battlePortraitAuthorityCommit:"38e4d0ebd89176d7d30aa2cc6044565711353ee6",noRegistryAdmission:true}
   };
   return{success:true};
 }
@@ -284,7 +284,7 @@ function launch(spec={}){
   const launched=launchBattleWithReturnContext(INSTRUCTOR,ENCOUNTER,clone(spec.returnContext));
   if(!launched||launched.success!==true)return launched||{success:false,reason:"mirai338_battle_launch_failed"};
   currentBattle.battleId=exactId;currentBattle.battleConfigId=CONFIG;currentBattle.encounterId=ENCOUNTER;
-  currentBattle.mirai338={patchId:PATCH_ID,battleConfigId:CONFIG,battleOccurrenceId:exactId,callerId,stableParticipantId:INSTRUCTOR,observerPresentation:"male_traveller_escort_disguise",underlyingIdentity:"female_academy_instructor",identityRevealedByBattle:false,aiCycleIndex:0,enemyActionsResolved:0,guardCreatedEnemyOpportunityIndex:null,strictOneVsOne:true,playerStarts:true,launchEvidenceId:null};
+  currentBattle.mirai338={patchId:PATCH_ID,battleConfigId:CONFIG,battleOccurrenceId:exactId,callerId,stableParticipantId:INSTRUCTOR,observerPresentation:"male_traveller_escort_disguise",underlyingIdentity:"male_academy_instructor",identityRevealedByBattle:false,aiCycleIndex:0,enemyActionsResolved:0,guardCreatedEnemyOpportunityIndex:null,strictOneVsOne:true,playerStarts:true,launchEvidenceId:null};
   const environmentPath=applyBattleEnvironment338(callerId);
   const deployment=strictDeployment();if(!deployment.success)return deployment;
   currentBattle.battleLog=["TRAVELLER steps into Mirai's path.","MIRAI prepares for battle."];
