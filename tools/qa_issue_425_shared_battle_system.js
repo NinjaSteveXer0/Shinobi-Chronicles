@@ -36,13 +36,13 @@ for(const selector of [
   '.battle2-modern[data-formation-stage="true"] .battle-live-active-card-image{object-fit:contain!important',
   '.battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.battle2-formation-support{background:transparent!important',
   '.battle2-modern[data-formation-stage="true"] .battle2-formation-selected-target{outline:none!important',
-  '.battle2-modern[data-formation-stage="true"] .battle2-performance-host{left:43%!important',
+  '.battle2-modern[data-formation-stage="true"] .battle2-performance-host{left:37.5%!important',
   '.battle2-modern[data-formation-stage="true"][data-formation-mode="wedge"] .battle2-performance-host',
-  '.battle2-modern[data-formation-stage="true"] .battle2-performance-center{min-height:48px!important'
+  '.battle2-modern[data-formation-stage="true"] .battle2-performance-center{min-height:36px!important'
 ]) assert(shared.includes(selector),"shared Formation Stage selector missing: "+selector);
 
-assert(shared.includes('left:31%!important;right:31%!important;top:1.4%!important;height:8.2%!important'),"shared WEDGE/ARC action receipt does not preserve Menma multi-participant readability");
-assert(shared.includes('left:43%!important;right:43%!important;top:1.5%!important;height:4.8%!important'),"shared DUEL action receipt no longer preserves compact #312 battlefield center");
+assert(shared.includes('left:31%!important;right:31%!important;top:2.4%!important;height:6.4%!important'),"shared WEDGE/ARC action banner compact geometry drifted");
+assert(shared.includes('left:37.5%!important;right:37.5%!important;top:2.8%!important;height:5.4%!important'),"shared DUEL action banner no longer preserves the owner-approved on-screen compact geometry");
 for(const token of ["battleShared385TechniqueBanner","battleShared385ActorAction","battleShared385TargetResponse","battleShared385ResultReadout"]){
   assert(shared.includes(token),"shared action-presentation motion missing: "+token);
 }
