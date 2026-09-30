@@ -434,6 +434,7 @@ async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedB
   }
 
   let victoryControlTiming=null;
+  let claimResponseMs=null;
   if(proveRewardClaim){
     assert.strictEqual(outcome,"victory","reward-claim proof is victory-only");
     const prepared=await page.evaluate(()=>{
@@ -466,7 +467,7 @@ async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedB
       const buttons=[...document.querySelectorAll("button")].filter(node=>node.getClientRects().length>0);
       return buttons.some(node=>/CONTINUE|RETURN TO STORY/i.test(node.textContent||""));
     },null,{timeout:4000});
-    const claimResponseMs=Date.now()-claimStarted;
+    claimResponseMs=Date.now()-claimStarted;
     assert(claimResponseMs<3000,"Kakashi CLAIM REWARDS remained unresponsive for "+claimResponseMs+"ms");
     const committed=await page.evaluate(before=>{
       const pill=Array.isArray(playerData.inventory)
