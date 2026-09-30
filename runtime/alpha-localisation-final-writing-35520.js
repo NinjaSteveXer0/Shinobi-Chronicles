@@ -62,13 +62,11 @@ add("The Traveller stops at the next turn.\n\nNot because he is checking the way
 add("Why did you stop?","¿Por qué te detuviste?");
 add("Because you followed me.\n\nMirai looks back toward the turn behind them.","Porque me seguiste.\n\nMirai mira hacia el giro que dejaron atrás.");
 add("You said this was faster.","Dijiste que esto era más rápido.");
-add("I did.\n\nA beat.","Lo dije.\n\nUn instante.");
 add("Your instructor gave me one extra job.\n\nMirai's attention sharpens.","Tu instructora me dio una tarea extra.\n\nLa atención de Mirai se agudiza.");
 add("What job?","¿Qué tarea?");
 add("See what you do if the person you're escorting stops cooperating.\n\nThe Traveller sets down his bag.\n\nHis stance changes.\n\nNot dramatic.\n\nEnough.","Ver qué haces si la persona a la que escoltas deja de cooperar.\n\nEl Viajero deja la bolsa en el suelo.\n\nSu postura cambia.\n\nNada dramático.\n\nLo suficiente.");
 add("This is part of the assessment.","Esto forma parte de la evaluación.");
 add("Looks like it.\n\nMirai folds the route map and puts it away.\n\nThen raises her guard.","Eso parece.\n\nMirai dobla el mapa de la ruta y lo guarda.\n\nLuego levanta la guardia.");
-add("Fine.\n\nA beat.\n\nThen stop me.","Bien.\n\nUn instante.\n\nEntonces detenme.");
 add("The Traveller is the first to lower his guard.\n\nMirai does not lower hers immediately.","El Viajero es el primero en bajar la guardia.\n\nMirai no baja la suya de inmediato.");
 add("All right.","De acuerdo.");
 add("That was your extra job?","¿Esa era tu tarea extra?");
@@ -138,7 +136,6 @@ add("The exercise is over.\n\nThe uncertainty takes a little longer to leave.","
 add("The instructor starts gathering the last practice markers.\n\nKurenai stays where she is.\n\nHer eyes return to the patch of ground where the false Kurenai appeared.","La instructora empieza a recoger los últimos marcadores de práctica.\n\nKurenai permanece donde está.\n\nSus ojos vuelven al lugar donde apareció la Kurenai falsa.");
 add("The instructor looks toward the empty Academy building.","La instructora mira hacia el edificio vacío de la Academia.");
 add("Kurenai does not look pleased.\n\nShe looks at the bell again.","Kurenai no parece contenta.\n\nVuelve a mirar la campana.");
-add("A beat.","Un instante.");
 add("Kurenai looks at the hand that held the false bell.\n\nShe opens it.\n\nCloses it.","Kurenai mira la mano que sostuvo la campana falsa.\n\nLa abre.\n\nLa cierra.");
 add("The instructor holds up the real bell.","La instructora levanta la campana real.");
 add("Kurenai looks at the instructor.","Kurenai mira a la instructora.");
