@@ -213,8 +213,8 @@ assert(
   "Mirai confrontation defeat assessment-termination lane missing or drifted"
 );
 assert(
-  binder.includes('mir_shortcut_victory_reveal_08:"wipe_right_to_left"')&&
-  binder.includes('mir_shortcut_defeat_reveal_07:"wipe_right_to_left"')&&
+  binder.includes('mir_shortcut_victory_reveal_13:"wipe_right_to_left"')&&
+  binder.includes('mir_shortcut_defeat_reveal_09:"wipe_right_to_left"')&&
   binder.includes('mir_confront_defeat_end_12:"wipe_right_to_left"')&&
   binder.includes("LATER — CHECKPOINT THREE")&&
   golden.includes('line("mir_shortcut_victory_reveal",[')&&golden.includes('line("mir_shortcut_defeat_reveal",[')&&
