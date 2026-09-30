@@ -257,11 +257,12 @@ async function boot(page){
       return{id:skill.id,coverage:info.descriptionCoverage||null,copy,banned:banned.test(copy)};
     });
     const paletteRows=[];
-    const palettes=globalThis.PRODUCTION_PREPARED_SKILL_PALETTES||{};
-    if(typeof globalThis.getClosureWaveBattleSkillDefinition==="function"){
+    const palettes=typeof PRODUCTION_PREPARED_SKILL_PALETTES!=="undefined"&&PRODUCTION_PREPARED_SKILL_PALETTES
+      ?PRODUCTION_PREPARED_SKILL_PALETTES:{};
+    if(typeof getClosureWaveBattleSkillDefinition==="function"){
       for(const [owner,ids] of Object.entries(palettes)){
         for(const id of ids||[]){
-          const skill=globalThis.getClosureWaveBattleSkillDefinition(id,owner);
+          const skill=getClosureWaveBattleSkillDefinition(id,owner);
           if(!skill)continue;
           const info=getBattleSkillYouthSummary33000(skill);
           const copy=[info.summary,...(info.details||[])].join(" ");
