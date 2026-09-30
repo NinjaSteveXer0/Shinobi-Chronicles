@@ -435,6 +435,7 @@ async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedB
 
   let victoryControlTiming=null;
   let claimResponseMs=null;
+  let claimPersistence=null;
   if(proveRewardClaim){
     assert.strictEqual(outcome,"victory","reward-claim proof is victory-only");
     const prepared=await page.evaluate(()=>{
@@ -460,15 +461,35 @@ async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedB
     },null,{timeout:10000});
     const claim=page.getByRole("button",{name:"CLAIM REWARDS"}).first();
     await claim.waitFor({state:"visible",timeout:10000});
+    await page.evaluate(()=>{
+      const probe={playerSaves:0,testSaves:0,priorPlayer:savePlayerData,priorTest:saveTestState};
+      globalThis.__kakashiClaimPersistenceProbe=probe;
+      globalThis.savePlayerData=function(){probe.playerSaves+=1;return probe.priorPlayer.apply(this,arguments);};
+      globalThis.saveTestState=function(){probe.testSaves+=1;return probe.priorTest.apply(this,arguments);};
+      try{savePlayerData=globalThis.savePlayerData;}catch(_error){}
+      try{saveTestState=globalThis.saveTestState;}catch(_error){}
+    });
     const claimStarted=Date.now();
     await claim.click();
     await page.waitForFunction(()=>{
       if(currentBattle?.rewards?.claimed!==true)return false;
       const button=document.querySelector(".alpha-victory-footer .victory-continue");
       return !!button&&button.getClientRects().length>0&&/CONTINUE/i.test(button.textContent||"");
-    },null,{timeout:4000});
+    },null,{timeout:2000});
     claimResponseMs=Date.now()-claimStarted;
-    assert(claimResponseMs<3000,"Kakashi CLAIM REWARDS remained unresponsive for "+claimResponseMs+"ms");
+    claimPersistence=await page.evaluate(()=>{
+      const probe=globalThis.__kakashiClaimPersistenceProbe;
+      if(!probe)return null;
+      const out={playerSaves:probe.playerSaves,testSaves:probe.testSaves};
+      globalThis.savePlayerData=probe.priorPlayer;
+      globalThis.saveTestState=probe.priorTest;
+      try{savePlayerData=globalThis.savePlayerData;}catch(_error){}
+      try{saveTestState=globalThis.saveTestState;}catch(_error){}
+      delete globalThis.__kakashiClaimPersistenceProbe;
+      return out;
+    });
+    assert(claimResponseMs<750,"Kakashi CLAIM REWARDS must respond in under 750ms, got "+claimResponseMs+"ms");
+    assert.deepStrictEqual(claimPersistence,{playerSaves:1,testSaves:1},"Kakashi Claim performed duplicate synchronous persistence "+JSON.stringify(claimPersistence));
     const committed=await page.evaluate(before=>{
       const pill=Array.isArray(playerData.inventory)
         ?playerData.inventory.filter(row=>row&&(row.id||row.itemId)==="field_recovery_pill").reduce((n,row)=>n+Math.max(1,Number(row.quantity)||1),0)
@@ -508,7 +529,7 @@ async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedB
     await continueButton.click();
     await page.waitForSelector("#kakashi-v2-scene-board",{state:"visible",timeout:4000});
     const continueResponseMs=Date.now()-continueStarted;
-    assert(continueResponseMs<3000,"Kakashi post-claim CONTINUE remained unresponsive for "+continueResponseMs+"ms");
+    assert(continueResponseMs<1000,"Kakashi post-claim CONTINUE must respond in under 1000ms, got "+continueResponseMs+"ms");
     await page.evaluate(()=>{
       if(globalThis.__kakashiVictoryActionIndexPrior){
         globalThis.getBattleActionOpportunityIndex=globalThis.__kakashiVictoryActionIndexPrior;
@@ -516,7 +537,7 @@ async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedB
       }
       delete globalThis.__kakashiVictoryActionIndexPrior;
     });
-    victoryControlTiming={claimResponseMs,continueResponseMs};
+    victoryControlTiming={claimResponseMs,continueResponseMs,claimPersistence};
     resumed={success:true,viaVisibleVictoryContinue:true};
   }else{
     resumed=await page.evaluate(({outcome,actions})=>{
