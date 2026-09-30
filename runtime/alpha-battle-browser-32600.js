@@ -412,13 +412,14 @@
       academyHasNoGenericRepeatLock:!genericRepeatLockPattern.test(academyAvailabilitySource),
       closureHasNoGenericRepeatLock:!genericRepeatLockPattern.test(closureAvailabilitySource),
       claimThenCallerRestore:claimSource.includes("priorClaimVictoryAutoReturn")&&claimSource.includes('resumeBattleCallerAfterCompletion("victory")'),
-      kakashiExplicitClaimPaintsBeforePersistence:claimSource.includes("kakashiVictoryPaintBeforePersistence:true")&&claimSource.includes("renderKakashiClaimedVictory32600")&&claimSource.includes("scheduleKakashiVictoryPersistence32600")&&!claimSource.includes('openOverlay("victory");\n      try{if(typeof refreshAlphaSurfaceTruthHUD'),
+      kakashiExplicitClaimPaintsBeforePersistence:claimSource.includes("kakashiVictoryPaintBeforePersistence:true")&&claimSource.includes("patchKakashiClaimedVictory32600")&&claimSource.includes("scheduleKakashiVictoryPersistence32600")&&!claimSource.includes('openOverlay("victory");\n      try{if(typeof refreshAlphaSurfaceTruthHUD'),
       rewardCommitBeforeReturn:claimSource.indexOf("priorClaimVictoryAutoReturn")<claimSource.indexOf('resumeBattleCallerAfterCompletion("victory")'),
       callerContextPreserved:claimSource.includes("returnContextBefore")&&claimSource.includes("currentBattle.returnContext"),
       callerOwnedCannotGenericFallback:claimSource.includes("genericBattleFallbackSuppressed:true")&&claimSource.includes('openOverlay("victory")'),
       explicitPostClaimContinueSupported:claimSource.includes("requiresExplicitPostClaimContinue")&&claimSource.includes("explicitPostClaimContinue:true"),
       explicitPostClaimDoesNotReopenVictory:claimSource.includes("victoryAlreadyRerenderedByClaimOwner:true"),
       ordinaryBattleStillUsesGenericContinue:claimSource.includes("callerResult=continueAfterVictory()"),
+      kakashiContinuePaintsBeforePersistence:String(continueAfterVictory).includes("kakashiPostPaintPersistence:true")&&String(continueAfterVictory).includes("scheduleKakashiVictoryPersistence32600")&&String(continueAfterVictory).includes("suppressedPlayerSaves"),
       feedStyleInstalled:typeof document==="undefined"||!!document.getElementById("alpha-battle-browser-32600-style"),
       browserGoldenNotClaimed:true
     };
