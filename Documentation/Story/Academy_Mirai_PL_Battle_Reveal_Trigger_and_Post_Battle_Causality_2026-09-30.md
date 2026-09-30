@@ -104,7 +104,7 @@ If Mirai wins:
 - the apparent Traveller can no longer simply resume the escort;
 - Mirai has just been attacked by the person she was protecting;
 - the contradiction must be addressed immediately;
-- the Academy instructor reveals herself after the Battle;
+- the Academy instructor reveals himself after the Battle;
 - the real Traveller's status/location is then clarified through Story;
 - subsequent continuation/debrief must be authored from the revealed truth.
 
@@ -121,7 +121,7 @@ If Mirai loses:
 
 - existing Battle-defeat meaning remains: Mirai is Battle-depleted / withdrawn;
 - the escort assessment cannot continue as normal;
-- the Academy instructor reveals herself after the Battle;
+- the Academy instructor reveals himself after the Battle;
 - the real Traveller's status/location is clarified;
 - defeat-specific debrief/continuation remains distinct from victory.
 
