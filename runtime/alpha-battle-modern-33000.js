@@ -56,6 +56,7 @@
     if(!skill)return null;
     if(Number.isFinite(Number(skill.authoredAttackPL)))return Number(skill.authoredAttackPL);
     if(Number.isFinite(Number(skill.authoredAttackPLPerTarget)))return Number(skill.authoredAttackPLPerTarget);
+    if(Number.isFinite(Number(skill.attackPL)))return Number(skill.attackPL);
     return null;
   }
 
@@ -131,7 +132,12 @@
       academy_kakashi_clone_feint:{summary:"Use a clone feint to open the enemy up.",details:["Precision Strike can exploit it. No direct damage."],tags:["SETUP","ONE ENEMY"]},
       academy_kakashi_opening_exploit:{summary:"Deals 5 ATK, or 11 ATK after Clone Switch.",details:["Using the opening consumes it. Stamina reduces damage."],tags:["DAMAGE","SETUP FOLLOW-UP"]},
       academy_kakashi_wire_snare:{summary:"Bind one enemy with wire and restrict their movement.",details:["Control, not a full Stun."],tags:["CONTROL","ONE ENEMY"]},
-      academy_kakashi_substitution_jutsu:{summary:"Reduce one direct hit against you by 50%.",details:["Can be used once per Battle."],tags:["DEFENSE","ONCE PER BATTLE"]}
+      academy_kakashi_substitution_jutsu:{summary:"Reduce one direct hit against you by 50%.",details:["Can be used once per Battle."],tags:["DEFENSE","ONCE PER BATTLE"]},
+
+      sj_anko_hidden_shadow_snake_hands:{summary:"Deals 20 ATK to one enemy with summoned snakes.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      sj_anko_snake_bind:{summary:"Bind one enemy so moves needing free movement are blocked.",details:["The bind lasts through one enemy action. Control, not a full Stun."],tags:["CONTROL","ONE ENEMY"]},
+      sj_anko_fire_style_dragon_flame:{summary:"Deals 24 ATK to one enemy with Fire Release.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      sj_anko_serpent_evasion:{summary:"Avoid the next qualifying direct attack against Anko.",details:["Works once. No accuracy roll is needed."],tags:["DEFENSE","EVADE"]}
     };
     const fixed=exact[skill.id];
     if(fixed)return {
@@ -169,9 +175,16 @@
       details=["This does not raise Base PL."];
       tags=["RECOVERY","ALLY"];
     }else if(kind==="dynamic_control"){
-      summary="Restrict one enemy with this control Skill.";
-      details=["The Skill blocks only the actions named by its effect."];
-      tags=["CONTROL"];
+      const blocked=[...(skill.blockedActionTraits||skill.controlProfile?.blockedActionTraits||skill.conditionProfile?.blockedActionTraits||[])].map(x=>String(x));
+      if(blocked.includes("movement_dependent")||blocked.includes("substantial_free_movement")){
+        summary="Bind one enemy so moves that need free movement are blocked.";
+        details=["Control, not a full Stun."];
+        tags=["CONTROL","MOVEMENT"];
+      }else{
+        summary="Special control Skill.";
+        details=["This Skill needs an exact player-facing description before final release."];
+        descriptionCoverage="needs_exact_override";
+      }
     }else if(kind==="condition_remove"&&skill.conditionRemoval){
       const condition=String(skill.conditionRemoval.conditionType||"condition").replaceAll("_"," ");
       summary=`Remove an eligible ${condition} condition.`;
@@ -179,20 +192,63 @@
       tags=["CONTROL","CLEANSE"];
     }else if(kind==="transient_state"){
       const bonus=Number(skill.attackPLBonus??skill.authoredAttackPLBonus);
-      summary=Number.isFinite(bonus)&&bonus!==0?`Your next damaging Skill gains +${bonus} ATK.`:"Set up a later Battle move.";
-      details=[Number.isFinite(bonus)&&bonus!==0?"The bonus is used by that attack.":"No direct damage unless the Skill says otherwise."];
+      const followUp=String(skill.followUpDisplayName||skill.followUpSkillName||"").trim();
+      if(Number.isFinite(bonus)&&bonus!==0){
+        summary=`Your next damaging Skill gains +${bonus} ATK.`;
+        details=["The bonus is used by that attack."];
+      }else if(followUp){
+        summary=`Create an opening for ${followUp}.`;
+        details=["No direct damage."];
+      }else{
+        summary="Special setup Skill.";
+        details=["This Skill needs an exact player-facing description before final release."];
+        descriptionCoverage="needs_exact_override";
+      }
       tags=["SETUP"];
     }else if(kind==="damage_with_persistent_state"){
-      summary=attack!==null?`Deals ${attack} ATK now and leaves an ongoing effect.`:"Deals damage now and leaves an ongoing effect.";
-      details=["The ongoing effect follows the Skill's visible condition."];
+      const effect=String(skill.persistentEffectDescription||skill.ongoingEffectDescription||"").trim();
+      if(effect){
+        summary=attack!==null?`Deals ${attack} ATK now and leaves an ongoing effect.`:"Deals damage now and leaves an ongoing effect.";
+        details=[sentence33000(effect)];
+      }else{
+        summary="Special ongoing-effect Skill.";
+        details=["This Skill needs an exact player-facing description before final release."];
+        descriptionCoverage="needs_exact_override";
+      }
       tags=["DAMAGE","ONGOING EFFECT"];
     }else if(kind==="branch_damage"){
-      summary="Choose a mode, then use that version of the attack.";
-      details=["The mode shows its target and ATK before you commit."];
+      const modes=Array.isArray(skill.modes)?skill.modes:Array.isArray(skill.branches)?skill.branches:[];
+      const readable=modes.map(mode=>{
+        const name=String(mode.displayName||mode.name||mode.id||"").trim();
+        const atk=Number(mode.authoredAttackPL??mode.attackPL);
+        const targets=Math.max(1,Number(mode.maxTargets)||1);
+        return name&&Number.isFinite(atk)?`${name}: ${atk} ATK to ${targets===1?"one enemy":`up to ${targets} enemies`}.`:null;
+      }).filter(Boolean);
+      if(readable.length===modes.length&&readable.length){
+        summary="Choose the attack mode you want.";
+        details=readable.slice(0,2);
+      }else{
+        summary="Special multi-mode Skill.";
+        details=["This Skill needs an exact player-facing description before final release."];
+        descriptionCoverage="needs_exact_override";
+      }
       tags=["DAMAGE","CHOOSE MODE"];
     }else if(kind==="categorical_evidence"){
-      summary="Study what you can actually detect in the current situation.";
-      details=["This does not reveal hidden identity automatically."];
+      const sense=String(skill.senseType||skill.evidenceProfile?.senseType||"").toLowerCase();
+      if(sense.includes("chakra")){
+        summary="Read the Chakra you can detect right now.";
+        details=["This does not reveal hidden identity automatically."];
+      }else if(sense.includes("visual")||sense.includes("sight")){
+        summary="Study what you can actually see right now.";
+        details=["This does not copy the enemy's technique."];
+      }else if(sense.includes("signature")){
+        summary="Track a known Chakra signature when you have enough information to recognise it.";
+        details=[];
+      }else{
+        summary="Special sensing Skill.";
+        details=["This Skill needs an exact player-facing description before final release."];
+        descriptionCoverage="needs_exact_override";
+      }
       tags=["UTILITY","CONTEXT"];
     }else{
       summary="Special Skill. Read its named effect and conditions before using it.";
