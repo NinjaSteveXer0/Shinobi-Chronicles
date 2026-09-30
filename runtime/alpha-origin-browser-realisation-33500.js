@@ -396,10 +396,18 @@ function runAlphaOriginBrowserRealisation33500Diagnostics(){
     iwabeeGoldenNativeShimRetired:originPatches.iwabee===true&&!patchedScenes.includes(A.sceneByVariant.academy_iwabee),
     metalGoldenNativeShimRetired:originPatches.metal===true&&!patchedScenes.includes(A.sceneByVariant.academy_metal_lee),
     kurenaiFourOutcomeChoreographies:!!(kur&&kur.beatMap&&(
+      ["kur_result_complete_loss_01","kur_result_partial_loss_01","kur_result_partial_win_01","kur_result_complete_win_01","kur_leave_router"].every(id=>kur.beatMap.has(id))||
       ["kur_false_04","kur_conceal_06","kur_distance_09","kur_complete_10","kur_after_router","kur_leave_router"].every(id=>kur.beatMap.has(id))||
       ["kur_complete_loss_1","kur_partial_loss_result_2","kur_partial_win_result_3","kur_complete_win_result_6"].every(id=>kur.beatMap.has(id))
     )),
     kurenaiResultIsDecisionAware:!!(kur&&kur.beatMap&&(
+      (
+        (kur.beatMap.get("kur_approach")?.choices||[]).length===4&&
+        (kur.beatMap.get("kur_approach")?.choices||[]).every(choice=>!!choice?.contextPatch?.kurenaiStage1)&&
+        ["kur_stage2_false","kur_stage2_conceal","kur_stage2_distort","kur_stage2_direct"].every(id=>(kur.beatMap.get(id)?.choices||[]).length===2)&&
+        ["kur_stage3_false_rush","kur_stage3_false_draw","kur_stage3_conceal_rush","kur_stage3_conceal_draw","kur_stage3_distort_rush","kur_stage3_distort_draw","kur_stage3_direct_rush","kur_stage3_direct_draw"]
+          .every(id=>(kur.beatMap.get(id)?.choices||[]).length===3)
+      )||
       ((kur.beatMap.get("kur_approach")?.choices||[]).map(choice=>choice?.contextPatch?.kurenaiOutcome).filter(Boolean).sort().join("|")==="complete_loss|complete_win|partial_loss|partial_win")||
       (kur.beatMap.get("kur_result")&&typeof kur.beatMap.get("kur_result").presentationResolver==="function")
     )),
