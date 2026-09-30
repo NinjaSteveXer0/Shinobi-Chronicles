@@ -7,8 +7,8 @@ game=(ROOT/'game.js').read_text(encoding='utf-8')
 patch=(ROOT/'runtime/alpha-menma-tutorial-111.js').read_text(encoding='utf-8')
 index=(ROOT/'index.html').read_text(encoding='utf-8')
 
-EXPECTED_BLOB='05e014efc8a77705c53f0ec9d8f143703ad91da8'
-# #322 intentionally extends only loadPlayerData persistence for canonical Story/evidence roots; all Menma assertions below remain binding.
+EXPECTED_BLOB='b767c519827e998910fa1b09cea2298e8bc59099'
+# #409 authorises the shared Origin-completion purse seam in game.js. Rebaseline only the audited blob; every Menma-specific assertion below remains binding.
 def git_blob_sha(text:str)->str:
     raw=text.encode('utf-8')
     return hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()

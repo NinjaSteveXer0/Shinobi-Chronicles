@@ -20,8 +20,8 @@ V2_NEW=[
 ]
 LEADERS=['jonin_hanabi','jonin_inojin','jonin_konohamaru','jonin_kushina','jonin_sasuke','jonin_shikaku','jonin_shino','sj_anko','sj_ebisu','sj_genma','sj_ibiki','sj_kiba','sj_nono']
 checks={}
-# #322 intentionally extends only loadPlayerData persistence for canonical Story/evidence roots; all roster assertions below remain binding.
-checks['audited_game_blob_preserved']=git_blob_sha(game)=='05e014efc8a77705c53f0ec9d8f143703ad91da8'
+# #409 intentionally extends the shared Origin-completion reward seam in game.js for the one-shot 100-Ryō starting purse; all roster assertions below remain binding.
+checks['audited_game_blob_preserved']=git_blob_sha(game)=='b767c519827e998910fa1b09cea2298e8bc59099'
 core_pos=index.find('runtime/alpha-world-konoha-112-core.js')
 fix_pos=index.find('runtime/alpha-world-konoha-112-fix.js')
 roster_pos=index.find('runtime/alpha-genin-roster-63.js')

@@ -84,6 +84,9 @@ function patchHinata(){
 
 function patchIzuno(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const d=editable(A.sceneByVariant.academy_izuno);if(!d)return false;
+  // #343 native WRITING GOLDEN owns Wasabi's player-facing expression.
+  // Retire this stale pre-GOLDEN screen-first layer instead of re-registering it.
+  if(beat(d,"izu_initial_choice")&&beat(d,"izu_split_choice")&&beat(d,"izu_rogue_choice")&&beat(d,"izu_rogue_step_in_battle")&&beat(d,"izu_reflect"))return true;
   setText(d,"izu_start","The instructor drops a wooden marker into Wasabi's palm.\n\n\"Target leaves now. Extraction gate closes when they reach it.\"\n\nA figure disappears over the Academy wall.\n\nWasabi is already leaning forward. \"You could've just said go.\"","narration");
   setText(d,"izu_initial","At the wall, the obvious trail bends left. Dust hangs in the alley. A roof tile on the right is freshly chipped.");
   setLabel(d,"izu_initial","obvious_trail","Take the trail before it cools.");

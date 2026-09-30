@@ -152,6 +152,17 @@ function patchHinata33500(){
 function patchIzuno33500(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
   const def=editableScene33500(A.sceneByVariant.academy_izuno);if(!def)return false;
+  // #343 native WRITING GOLDEN owns the complete Wasabi expression. The old
+  // 33500 compatibility shim must stand down rather than re-registering the
+  // compressed pre-GOLDEN graph over current authority.
+  const goldenNative=!!(
+    beat33500(def,"izu_initial_choice")&&
+    beat33500(def,"izu_split_choice")&&
+    beat33500(def,"izu_rogue_choice")&&
+    beat33500(def,"izu_rogue_step_in_battle")&&
+    beat33500(def,"izu_reflect")
+  );
+  if(goldenNative)return true;
   const split=beat33500(def,"izu_split"),rogue=beat33500(def,"izu_rogue"),evalBeat=beat33500(def,"izu_eval");
   if(!split||!rogue||!evalBeat)return false;
 
@@ -355,6 +366,7 @@ function runAlphaOriginBrowserRealisation33500Diagnostics(){
       hin.beatMap.has("hin_young_result")
     )),
     hinataGoldenNativeShimRetired:!!(hin&&hin.beatMap&&hin.beatMap.has("hin_ex1_choice"))?originPatches.hinata===true&&!patchedScenes.includes(A.sceneByVariant.academy_hinata):true,
+    wasabiGoldenNativeShimRetired:!!(A&&storyDefinition33500(A.sceneByVariant.academy_izuno)?.beatMap?.has("izu_initial_choice"))?originPatches.izuno===true&&!patchedScenes.includes(A.sceneByVariant.academy_izuno):true,
     kurenaiFourOutcomeChoreographies:!!(kur&&kur.beatMap&&["kur_complete_loss_1","kur_partial_loss_result_2","kur_partial_win_result_3","kur_complete_win_result_6"].every(id=>kur.beatMap.has(id))),
     kurenaiResultIsDecisionAware:!!(kur&&kur.beatMap&&kur.beatMap.get("kur_result")&&typeof kur.beatMap.get("kur_result").presentationResolver==="function"),
     noMissionSemanticReuse:typeof globalThis.SC_ALPHA_MISSION_CHOICE_121==="undefined"||!patchedScenes.some(id=>String(id).startsWith("arc1_")),

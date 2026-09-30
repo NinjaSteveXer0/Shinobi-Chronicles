@@ -766,6 +766,93 @@
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Consumes Writing #370 and Story_Narration_and_Dialogue_Box_Segmentation_Authority_2026-09-25. Ordinary narration/dialogue/internal voice is paginated at authored blank-line boundaries (with bounded narration sentence fallback) while preserving parent source-cue ordinal for backdrop timing. This extends the existing shared Story presentation owner; no runtime owner is retired or replaced. Semantic Story beats, choices, consequences, routes, save truth, Battle, rewards and document-like record surfaces remain unchanged."
+    },
+    {
+      "changeId": "academy-wasabi-writing-golden-rogue-battle-343",
+      "classification": "REPLACES",
+      "responsibilityIds": [
+        "story.machine_resolver.shared",
+        "story.scene.presentation.shared",
+        "origin.academy_izuno.final_story_state",
+        "origin.academy_izuno.rogue_battle"
+      ],
+      "owner": "game.js shared Story machine-resolver seam + runtime/alpha-origin-scenes-32900-a.js + runtime/alpha-wasabi-rogue-battle-343.js",
+      "directCallers": [
+        "runtime/alpha-origin-scenes-32900-a.js",
+        "game.js",
+        "runtime/alpha-origin-scenes-32900-integrator.js",
+        "runtime/alpha-story-scene-board-33900.js",
+        "runtime/alpha-battle-modern-33000.js"
+      ],
+      "stateTouched": [
+        "activeStorySceneRuntime machine-resolver normalization / exact-one internal branch advance",
+        "activeStorySceneRuntime.localContext Academy Wasabi pursuit/route/Rogue response facts",
+        "playerData.activityHistory occ_origin_izuno_* factual source occurrences",
+        "currentBattle.wasabi343 strict Rogue Genin Battle metadata",
+        "playerData.wasabi343BattleLaunches idempotence receipts",
+        "shinobiTestState.wasabi343 / wasabi343BattleId / wasabi343BattleActive / wasabi343BattleLaunches scoped adapter envelope",
+        "currentBattle.wasabi343 / battleConfigId restore projection",
+        "Story Scene Board exact Wasabi scene/route backdrop + physical actor-card projection",
+        "shared Story performance DOM speaker-owned dialogue / single-label narration projection",
+        "read-only Wasabi Origin Chronicle Receipt before shared Origin completion",
+        "currentBattle.environmentPath / presentationEnvironmentPath exact Scene-4C alley continuity"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_343_wasabi_writing_golden.js",
+        "tools/qa_alpha_origin_scenes_32900_runtime.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_343_wasabi_browser.js"
+      ],
+      "replaces": [
+        "runtime/alpha-origin-scenes-32900-a.js::pre343_compressed_academy_izuno",
+        "runtime/alpha-origin-scenes-32900-a.js::pre343 STEP IN battle fail-closed placeholder",
+        "runtime/alpha-origin-browser-realisation-33500.js::patchIzuno33500",
+        "runtime/alpha-early-story-modernization-33600.js::patchIzuno",
+        "runtime/alpha-origin-screen-first-33700.js::patchIzuno"
+      ],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Issue #343 consumes the approved Academy Wasabi Writing-Golden Story, the closed Rogue Genin Combat package, the Writing-closed exact backdrop binding, and Stephen's installed-browser RED evidence. It preserves IZU-01/02/03/04 source addresses, separates the secondary Rogue occurrence from the pursuit result, restores STEP IN through the shared Story-to-Battle return seam, enforces strict 1v1 deployment and zero Battle entitlement, persists only the #343 adapter envelope through the established saveTestState/restoreTestState session extension seam, binds the seven exact dedicated Story backdrops, stages the already-authoritative Wasabi/Instructor/Rogue cards without guessing the not-yet-visible pursuit-target path, aligns generic shared Story dialogue with the Kakashi speaker-owned presentation rule, removes duplicate narration labelling, inserts the mandatory read-only Origin Chronicle Receipt before shared Origin completion, preserves the alley through STEP IN Battle and post-Battle return before Scene 5 training convergence, retires stale pre-GOLDEN Wasabi expression patches (33500/33600/33700), and does not invent World-owned route reward values while #404 is open."
+    },
+    {
+      "changeId": "issue-409-wasabi-reward-spectrum-progression",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "origin.completion.shared",
+        "origin.academy_izuno.final_story_state",
+        "origin.academy_izuno.rogue_battle",
+        "progression.special_jonin.contextual_evidence_producer.shared"
+      ],
+      "owner": "game.js + runtime/alpha-origin-scenes-32900-a.js + runtime/alpha-wasabi-rogue-battle-343.js + runtime/alpha-special-jonin-evidence-producer-34700.js",
+      "directCallers": [
+        "runtime/alpha-origin-scenes-32900-core.js",
+        "runtime/alpha-origin-scenes-32900-a.js",
+        "generateBattleRewards",
+        "claimCurrentBattleRewards",
+        "index.html"
+      ],
+      "stateTouched": [
+        "playerData.ryo shared Origin completion starting purse + exact idempotent origin_completion_reward receipt",
+        "playerData.activityHistory occ_origin_izuno_river_endurance_resolution and discipline_development receipt",
+        "playerData.characters academy_izuno Stamina discipline progression through existing discipline ledger",
+        "playerData.specialJoninContextualEvidence exact #408 accepted Wasabi mappings",
+        "currentBattle.rewards fixed Wasabi STEP IN victory projection",
+        "playerData.ryo + playerData.activityHistory exact Wasabi origin_battle_reward receipt",
+        "Wasabi Chronicle Receipt committed material reward/development projection"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_343_wasabi_writing_golden.js",
+        "tools/qa_issue_343_wasabi_browser.js",
+        "tools/qa_alpha_origin_scenes_32900_runtime.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_303_runtime_build_fingerprint.js",
+        "tools/qa_issue_111_menma_tutorial.py",
+        "tools/qa_issue_141_pre_alpha_runtime_closure.py"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Consumes GitHub #409 / World #404 / Progression #408 without reopening #343. Adds the shared one-shot 100 Ryō Origin completion purse at the sealed Active-Konoha continuity boundary, replaces Wasabi STEP IN zero entitlement with exact 50 Ryō victory-only cash, records the accepted significance-1 Special Jōnin evidence mappings from committed Wasabi source occurrences, grants the River route exactly +1 Stamina Discipline Development EXP once, and projects only committed material rewards/development on the Chronicle Receipt. No +25 route cash, generic Investigation/Specialisation XP, direct PL/Rank reward, or hidden CE machinery is player-facing."
     }
   ]
 }

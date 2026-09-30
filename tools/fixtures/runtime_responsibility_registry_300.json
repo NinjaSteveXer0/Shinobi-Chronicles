@@ -26,7 +26,8 @@
       "canonicalOwner": "runtime/alpha-story-scene-board-33900.js",
       "ownerType": "shared_presentation_infrastructure",
       "directCallers": [
-        "runtime/alpha-traversal-bridge-33200.js"
+        "runtime/alpha-traversal-bridge-33200.js",
+        "runtime/alpha-origin-scenes-32900-a.js"
       ],
       "stateReads": [
         "activeStorySceneRuntime.sceneId",
@@ -58,7 +59,9 @@
         "tools/qa_runtime_ownership_safety_300.js",
         "tools/qa_issue_312_story_battle_benchmark.js",
         "tools/qa_issue_312_browser.js",
-        "tools/qa_obito_story_presentation_browser.js"
+        "tools/qa_obito_story_presentation_browser.js",
+        "tools/qa_issue_343_wasabi_writing_golden.js",
+        "tools/qa_issue_343_wasabi_browser.js"
       ]
     },
     {
@@ -185,7 +188,8 @@
         "resumeBattleCallerAfterCompletion"
       ],
       "permittedAdapters": [
-        "academy_kakashi_v2_battle_adapter_36010"
+        "academy_kakashi_v2_battle_adapter_36010",
+        "academy_wasabi_rogue_battle_adapter_343"
       ],
       "retiredOwners": [],
       "saveSchemaRefs": [
@@ -468,7 +472,8 @@
         "activeStorySceneRuntime"
       ],
       "stateWrites": [
-        "Origin completion/history state"
+        "Origin completion/history state",
+        "playerData.ryo + idempotent origin_completion_reward starting-purse receipt"
       ],
       "productionLoadPath": [
         "index.html",
@@ -482,7 +487,8 @@
         "runtime/alpha-kakashi-terminal-debrief-35100.js"
       ],
       "saveSchemaRefs": [
-        "playerData Origin completion/history"
+        "playerData Origin completion/history",
+        "playerData.activityHistory origin_completion_reward / origin_completion_starting_purse_ryo_01"
       ],
       "qaRefs": [
         "tools/qa_kakashi_v2_clean_room.js",
@@ -548,7 +554,8 @@
         "hardSettleBattlePresentationQueue33000"
       ],
       "permittedAdapters": [
-        "academy_kakashi_v2_battle_adapter_36010"
+        "academy_kakashi_v2_battle_adapter_36010",
+        "academy_wasabi_rogue_battle_adapter_343"
       ],
       "retiredOwners": [],
       "saveSchemaRefs": [
@@ -652,7 +659,8 @@
       "canonicalOwner": "runtime/alpha-special-jonin-evidence-producer-34700.js",
       "ownerType": "shared_progression_evidence_producer",
       "directCallers": [
-        "runtime/alpha-kakashi-v2-core-36020.js"
+        "runtime/alpha-kakashi-v2-core-36020.js",
+        "runtime/alpha-origin-scenes-32900-a.js"
       ],
       "stateReads": [
         "playerData.activityHistory committed factual source occurrences",
@@ -662,7 +670,8 @@
         "playerData.specialJoninContextualEvidence"
       ],
       "productionLoadPath": [
-        "runtime/alpha-traversal-bridge-33200.js",
+        "index.html",
+        "game.js",
         "runtime/alpha-special-jonin-evidence-producer-34700.js"
       ],
       "extensionHooks": [
@@ -678,7 +687,8 @@
       "qaRefs": [
         "tools/qa_issue_322_kakashi_dispositions.js",
         "tools/qa_runtime_ownership_safety_300.js",
-        "tools/qa_save_compatibility_311.js"
+        "tools/qa_save_compatibility_311.js",
+        "tools/qa_issue_343_wasabi_browser.js"
       ]
     },
     {
@@ -848,6 +858,150 @@
         "tools/qa_issue_383_skill_lock_browser.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
+    },
+    {
+      "responsibilityId": "origin.academy_izuno.final_story_state",
+      "canonicalOwner": "runtime/alpha-origin-scenes-32900-a.js",
+      "ownerType": "origin_semantic_owner",
+      "directCallers": [
+        "runtime/alpha-origin-scenes-32900-integrator.js",
+        "runtime/alpha-story-scene-board-33900.js"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime.localContext",
+        "playerData.activityHistory Academy Wasabi source occurrences",
+        "playerData acquisition / Origin completion state"
+      ],
+      "stateWrites": [
+        "activeStorySceneRuntime.localContext Wasabi pursuit/route/Rogue response facts",
+        "playerData.activityHistory exact IZU-01/02/03/04 + River endurance occurrences",
+        "Story Scene Board exact Wasabi backdrop + physical actor-card projection registry",
+        "Wasabi Origin Chronicle Receipt projection from committed rewards/development after shared completion commit",
+        "academy_izuno Stamina discipline progression through existing discipline ledger + exact discipline_development receipt"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/academy-wasabi-writing-golden-343.js",
+        "runtime/alpha-origin-scenes-32900-a.js"
+      ],
+      "extensionHooks": [
+        "SC_ALPHA_ORIGIN_32900.register",
+        "registerStorySceneBoardDefinition",
+        "registerSceneBackdropAssetPath",
+        "completeChronicleOriginPrologue"
+      ],
+      "permittedAdapters": [
+        "academy_wasabi_rogue_battle_adapter_343"
+      ],
+      "retiredOwners": [
+        "runtime/alpha-origin-scenes-32900-a.js::pre343_compressed_academy_izuno",
+        "runtime/alpha-origin-browser-realisation-33500.js::patchIzuno33500",
+        "runtime/alpha-early-story-modernization-33600.js::patchIzuno",
+        "runtime/alpha-origin-screen-first-33700.js::patchIzuno"
+      ],
+      "saveSchemaRefs": [
+        "activeStorySceneRuntime.localContext Wasabi pursuit facts",
+        "playerData.activityHistory occ_origin_izuno_*",
+        "activeStorySceneRuntime.localContext Wasabi decision/outcome fields read by Receipt presentation",
+        "playerData.activityHistory occ_origin_izuno_river_endurance_resolution / discipline_development"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_343_wasabi_writing_golden.js",
+        "tools/qa_alpha_origin_scenes_32900_runtime.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_343_wasabi_browser.js"
+      ]
+    },
+    {
+      "responsibilityId": "origin.academy_izuno.rogue_battle",
+      "canonicalOwner": "runtime/alpha-wasabi-rogue-battle-343.js",
+      "ownerType": "origin_battle_adapter",
+      "directCallers": [
+        "runtime/alpha-origin-scenes-32900-a.js",
+        "generateBattleRewards",
+        "claimCurrentBattleRewards"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime.pendingBattle",
+        "currentBattle",
+        "shared enemy action scheduler"
+      ],
+      "stateWrites": [
+        "currentBattle.wasabi343",
+        "playerData.wasabi343BattleLaunches",
+        "currentBattle.runtime.evidence via shared Battle evidence authority",
+        "shinobiTestState.wasabi343 / wasabi343BattleId / wasabi343BattleActive / wasabi343BattleLaunches scoped adapter envelope",
+        "currentBattle.battleConfigId reconstruction for restored #343 encounter",
+        "currentBattle.environmentPath / presentationEnvironmentPath exact Wasabi alley Battle environment",
+        "currentBattle.rewards fixed Wasabi STEP IN victory projection + playerData.ryo origin_battle_reward receipt"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-battle-modern-33000.js",
+        "runtime/alpha-wasabi-rogue-battle-343.js"
+      ],
+      "extensionHooks": [
+        "launchAcademyWasabiRogueGeninBattle343",
+        "projectAcademyWasabiRogueGeninBattle343",
+        "claimAcademyWasabiRogueVictoryReward343"
+      ],
+      "permittedAdapters": [
+        "academy_wasabi_rogue_battle_adapter_343"
+      ],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "currentBattle.wasabi343",
+        "playerData.wasabi343BattleLaunches",
+        "activeStorySceneRuntime.pendingBattle",
+        "shinobiTestState.wasabi343 adapter envelope",
+        "currentBattle.wasabi343 restored Battle metadata",
+        "shinobiTestState.wasabi343BattleId / wasabi343BattleActive / wasabi343BattleLaunches",
+        "playerData.activityHistory origin_battle_reward / wasabi_origin_rogue_genin_battle_victory_ryo_01"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_343_wasabi_writing_golden.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_343_wasabi_browser.js"
+      ]
+    },
+    {
+      "responsibilityId": "story.machine_resolver.shared",
+      "canonicalOwner": "game.js",
+      "ownerType": "shared_semantic_runtime",
+      "directCallers": [
+        "runtime/alpha-origin-scenes-32900-a.js",
+        "renderStoryScenePresentationLayer"
+      ],
+      "stateReads": [
+        "activeStorySceneRuntime current beat",
+        "authored Story choice availability",
+        "activeStorySceneRuntime.localContext"
+      ],
+      "stateWrites": [
+        "activeStorySceneRuntime.beatId through existing setStorySceneBeat/applyStorySceneChoice authority",
+        "activeStorySceneRuntime.committedChoiceKeys for the selected internal authored branch",
+        "activeStorySceneRuntime.localContext only through existing authored choice contextPatch"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "game.js"
+      ],
+      "extensionHooks": [
+        "resolveMachineStorySceneBeat",
+        "advanceStoryScene",
+        "normalizeStorySceneBeat"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "playerData.storySceneRuntime.active"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_343_wasabi_writing_golden.js",
+        "tools/qa_issue_343_wasabi_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_188_story_decision_runtime.js"
+      ]
     }
   ],
   "adapters": [
@@ -885,6 +1039,18 @@
       "retirementCondition": "Review when the canonical shared Skill definitions in game.js directly encode the 2026-09-26 signed-off names and Kakashi enhanced packet without requiring an authority-consumption wrapper.",
       "milestone": "shared Combat content consolidation",
       "qaRef": "tools/qa_issue_383_skill_lock.js",
+      "temporary": false
+    },
+    {
+      "adapterId": "academy_wasabi_rogue_battle_adapter_343",
+      "reason": "Translate the authorised Academy Wasabi STEP IN Story seam and historical Rogue Genin participant into the existing shared Battle runtime without creating a second Battle or World occurrence.",
+      "owner": "runtime/alpha-wasabi-rogue-battle-343.js",
+      "sourceOwner": "runtime/alpha-origin-scenes-32900-a.js",
+      "targetOwner": "runtime/alpha-battle-modern-33000.js",
+      "exactBehaviorBridged": "Strict Wasabi-vs-Rogue deployment, exact Rogue action palette, shared Story caller return and observer-safe Battle result projection.",
+      "retirementCondition": "Review when the shared Origin Story-to-Battle adapter natively supports the exact Wasabi historical-opposition and strict-deployment contract.",
+      "milestone": "shared Origin runtime propagation review",
+      "qaRef": "tools/qa_issue_343_wasabi_browser.js",
       "temporary": false
     }
   ],
@@ -967,6 +1133,21 @@
       "semanticId": "academy_menma.three_subject.battle.semantic_loop",
       "owner": "runtime/alpha-menma-evolved-pl-battle-36900.js",
       "responsibilityId": "origin.academy_menma.three_subject.battle_semantics"
+    },
+    {
+      "semanticId": "academy_izuno.final.story",
+      "owner": "runtime/alpha-origin-scenes-32900-a.js",
+      "responsibilityId": "origin.academy_izuno.final_story_state"
+    },
+    {
+      "semanticId": "academy_izuno.rogue_battle.launch",
+      "owner": "runtime/alpha-wasabi-rogue-battle-343.js",
+      "responsibilityId": "origin.academy_izuno.rogue_battle"
+    },
+    {
+      "semanticId": "story.machine_resolver.advance",
+      "owner": "game.js",
+      "responsibilityId": "story.machine_resolver.shared"
     }
   ],
   "globalWrapperChains": [
@@ -1047,6 +1228,36 @@
       "stateRef": "playerData.activityHistory menma three-subject battle occurrence receipt",
       "owner": "runtime/alpha-menma-evolved-pl-battle-36900.js",
       "responsibilityId": "origin.academy_menma.three_subject.battle_semantics"
+    },
+    {
+      "stateRef": "activeStorySceneRuntime.localContext Academy Wasabi pursuit and Rogue-response facts",
+      "owner": "runtime/alpha-origin-scenes-32900-a.js",
+      "responsibilityId": "origin.academy_izuno.final_story_state"
+    },
+    {
+      "stateRef": "currentBattle.wasabi343 / playerData.wasabi343BattleLaunches",
+      "owner": "runtime/alpha-wasabi-rogue-battle-343.js",
+      "responsibilityId": "origin.academy_izuno.rogue_battle"
+    },
+    {
+      "stateRef": "activeStorySceneRuntime machine-resolver beat/choice transition",
+      "owner": "game.js",
+      "responsibilityId": "story.machine_resolver.shared"
+    },
+    {
+      "stateRef": "playerData.ryo / origin_completion_reward starting purse",
+      "owner": "game.js",
+      "responsibilityId": "origin.completion.shared"
+    },
+    {
+      "stateRef": "academy_izuno Stamina discipline progression / discipline_development receipt",
+      "owner": "runtime/alpha-origin-scenes-32900-a.js",
+      "responsibilityId": "origin.academy_izuno.final_story_state"
+    },
+    {
+      "stateRef": "currentBattle.rewards / playerData.ryo Wasabi STEP IN victory reward",
+      "owner": "runtime/alpha-wasabi-rogue-battle-343.js",
+      "responsibilityId": "origin.academy_izuno.rogue_battle"
     }
   ]
 }
