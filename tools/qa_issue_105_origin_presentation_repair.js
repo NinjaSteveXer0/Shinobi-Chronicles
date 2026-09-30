@@ -12,6 +12,10 @@ const shim336=read("runtime/alpha-early-story-modernization-33600.js");
 const shim337=read("runtime/alpha-origin-screen-first-33700.js");
 const board=read("runtime/alpha-story-scene-board-33900.js");
 const kakashiRenderer=read("runtime/alpha-kakashi-v2-renderer-36030.js");
+const kakashiContent=read("runtime/academy-kakashi-v2-content-36000.js");
+const kakashiWriting=read("runtime/academy-kakashi-v2-writing-golden-36100.js");
+const wasabiWriting=read("runtime/academy-wasabi-writing-golden-343.js");
+const localisationFinal=read("runtime/alpha-localisation-final-writing-35520.js");
 const sceneBoardDoc=read("Documentation/UI/Chronicle Interaction Interactive Scene Board Addendum 2026-09-13.md");
 const battle=read("runtime/alpha-battle-modern-33000.js");
 const journey=read("runtime/alpha-journey-surface-32800.js");
@@ -22,7 +26,7 @@ const index=read("index.html");
 const game=read("game.js");
 const fingerprint=read("runtime/alpha-runtime-build-fingerprint-303.js");
 
-for(const [name,src] of Object.entries({binder,sceneA,sceneB,sceneC,golden,shim335,shim336,shim337,board,battle,journey,menmaBattle,menmaReward,miraiBattle,kakashiRenderer})){
+for(const [name,src] of Object.entries({binder,sceneA,sceneB,sceneC,golden,shim335,shim336,shim337,board,battle,journey,menmaBattle,menmaReward,miraiBattle,kakashiRenderer,kakashiContent,kakashiWriting,wasabiWriting,localisationFinal})){
   assert.doesNotThrow(()=>new Function(src),name+" syntax failure");
 }
 for(const token of [
@@ -30,6 +34,16 @@ for(const token of [
   'scene("academy_kushina")','scene("academy_kurenai")','scene("academy_iwabee")','scene("academy_metal_lee")'
 ]) assert(binder.includes(token),"missing #105 Scene Board binding "+token);
 assert(!binder.includes('scene("academy_kakashi")'),"Kakashi Golden Story was bound by #105 adapter");
+for(const [owner,src] of Object.entries({
+  kushina:sceneB,
+  kakashiContent,
+  kakashiWriting,
+  wasabiWriting,
+  localisationFinal
+})){
+  assert(!src.includes("A beat."),owner+" still contains generic player-facing A beat filler");
+  assert(!src.includes("A beat of surprise."),owner+" still contains A beat narration filler");
+}
 assert(binder.includes('"SPARRING STUDENT","HYŪGA SPARRING PARTNER"'),"Hinata sparring partner is missing authored speaker aliases");
 assert(binder.includes('hinataYoungerStudent:"NPC/younger_student.png"'),"Hinata younger-student exact path missing");
 assert(binder.includes('hinataYoungerSparringPartner:"NPC/younger_sparring_partner.png"'),"Hinata younger sparring-partner exact path missing");
