@@ -62,17 +62,25 @@ assert(
   "Kushina natural-voice successor missing or retired banter returned"
 );
 assert(
-  sceneB.includes('{beatId:"iwa_open_02",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"Bad one?"')&&
-  sceneB.includes('{beatId:"iwa_confront_04",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"Make me."')&&
-  sceneB.includes(`{beatId:"iwa_eval_core_09",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"Then work on the bad part without pretending the good part doesn't matter."` )&&
-  sceneB.includes('C("academy_tests_wrong","THE ACADEMY CARES TOO MUCH ABOUT TESTS."')&&
-  sceneB.includes(`C("prove_my_way","I'LL PROVE I CAN DO IT MY WAY."` )&&
-  !sceneB.includes("You keep acting like the only things that count are the things you're bad at.")&&
-  !sceneB.includes("Then make sure that's true.")&&
-  !sceneB.includes("Both are true.")&&
-  !sceneB.includes("It was one point."),
-  "Iwabee natural-voice successor missing or retired theme-explainer prose returned"
+  sceneB.includes('{beatId:"iwa_open_02",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"You planning to argue with the paper?"')&&
+  sceneB.includes('C("raise_collapsed","Raise the collapsed section"')&&
+  sceneB.includes('C("confront","Confront him"')&&
+  sceneB.includes('{beatId:"iwa_confront_07",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"Take yours."')&&
+  sceneB.includes('C("academy_tests_wrong","“The Academy leans too hard on written tests.”"')&&
+  sceneB.includes('C("prove_my_way","“I\\'ll prove I can do it my way.”"')&&
+  sceneB.includes('{beatId:"iwa_close_06",mode:"narration",environmentRef:courtyard,text:"Iwabee leaves the yard.",nextBeatId:"iwa_receipt"}')&&
+  sceneB.includes('{beatId:"iwa_receipt",mode:"record",environmentRef:courtyard,text:"",exitScene:true}')&&
+  !sceneB.includes('text:"YOUR CHRONICLE BEGINS",exitScene:true')&&
+  !sceneB.includes('C("confront","CONFRONT HIM"')&&
+  !sceneB.includes('C("raise_collapsed","RAISE THE COLLAPSED SECTION"')&&
+  !sceneB.includes("Then work on the bad part without pretending the good part doesn't matter.")&&
+  !sceneB.includes("You ruin everything."),
+  "Iwabee 2026-09-30 full Story rewrite / sentence-case choices / Receipt order missing or stale prose returned"
 );
+assert(binder.includes("function buildIwabeeReceipt105()")&&binder.includes('iwa_receipt:()=>[{kind:"record",text:buildIwabeeReceipt105()}]'),"Iwabee Chronicle Receipt projection missing");
+const iwabeeActorBody=binder.slice(binder.indexOf("function iwabeeActors("),binder.indexOf("function metalActors("));
+assert(iwabeeActorBody.includes('if(id==="iwa_receipt")return[]'),"Iwabee Receipt still stages Story actors");
+assert(binder.includes('iwa_close_06:"wipe_right_to_left"'),"Iwabee final Story -> Receipt black wipe transition missing");
 assert(binder.includes("function buildKushinaReceipt105()")&&binder.includes('kus_receipt:()=>[{kind:"record",text:buildKushinaReceipt105()}]'),"Kushina Chronicle Receipt projection missing");
 const kushinaActorBody=binder.slice(binder.indexOf("function kushinaActors("),binder.indexOf("function kurenaiActors("));
 assert(kushinaActorBody.includes('if(id==="kus_receipt")return[]'),"Kushina Receipt still stages Story actors");
