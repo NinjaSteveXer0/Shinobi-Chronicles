@@ -53,6 +53,7 @@ EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-menma-evolved-pl-battle-36900.js",
     "runtime/alpha-mirai-origin-battle-338.js",
     "runtime/alpha-origin-writing-golden-105.js",
+    "runtime/alpha-origin-reward-spectrum-440.js",
     "runtime/alpha-origin-scene-board-bindings-105.js",
     "runtime/alpha-combat-skill-lock-38300.js",
     "runtime/alpha-origin-skill-display-names-400.js",
