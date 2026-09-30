@@ -464,8 +464,8 @@ async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedB
     await claim.click();
     await page.waitForFunction(()=>{
       if(currentBattle?.rewards?.claimed!==true)return false;
-      const buttons=[...document.querySelectorAll("button")].filter(node=>node.getClientRects().length>0);
-      return buttons.some(node=>/CONTINUE|RETURN TO STORY/i.test(node.textContent||""));
+      const button=document.querySelector(".alpha-victory-footer .victory-continue");
+      return !!button&&button.getClientRects().length>0&&/CONTINUE/i.test(button.textContent||"");
     },null,{timeout:4000});
     claimResponseMs=Date.now()-claimStarted;
     assert(claimResponseMs<3000,"Kakashi CLAIM REWARDS remained unresponsive for "+claimResponseMs+"ms");
@@ -502,7 +502,7 @@ async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedB
       };
       try{getBattleActionOpportunityIndex=globalThis.getBattleActionOpportunityIndex;}catch(_error){}
     },actions);
-    const continueButton=page.locator("button").filter({hasText:/CONTINUE|RETURN TO STORY/i}).first();
+    const continueButton=page.locator(".alpha-victory-footer .victory-continue").first();
     await continueButton.waitFor({state:"visible",timeout:3000});
     const continueStarted=Date.now();
     await continueButton.click();
