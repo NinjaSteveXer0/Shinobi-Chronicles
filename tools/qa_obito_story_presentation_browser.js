@@ -65,7 +65,7 @@ async function state(page){
       registryEnvironmentRef:registryBeat?.environmentRef||null,
       resolvedBackdrop:resolvedBackdrop||null,
       backdrop:stage?.style.getPropertyValue("--sc-scene-board-backdrop")||"",dedicated:stage?.dataset.scSceneBoardBackdrop||null,
-      actors:[...(layer?.querySelectorAll(".sc-scene-board-33900__actor")||[])].map(n=>({id:n.dataset.actorId,img:n.querySelector("img")?.getAttribute("src")||""})),
+      actors:[...(layer?.querySelectorAll(".sc-scene-board-33900__actor")||[])].map(n=>({id:n.dataset.actorId,img:n.querySelector("img")?.getAttribute("src")||"",focused:n.classList.contains("is-focus")})),
       objective:layer?.querySelector(".sc-scene-board-33900__objective")?.textContent?.replace(/\s+/g," ").trim()||"",
       choices:[...(layer?.querySelectorAll(".sc-story-choice")||[])].filter(visible).map(n=>({label:n.textContent.trim(),icon:n.getAttribute("data-intent-icon")||""})),
       panelRadius:panel?parseFloat(getComputedStyle(panel).borderRadius):0,
@@ -190,6 +190,14 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
     assert.strictEqual(diversionRows.length,5,label+" diversion occurrence cardinality");
     assert.strictEqual(diversionRows.reduce((sum,r)=>sum+Number(r.fact?.journeyDelayMinutes||0),0),expectedDelay,label+" journey delay changed");
 
+    await advance(page);
+    await advance(page);
+    const instructorDialogue=await state(page);
+    assert.strictEqual(instructorDialogue.beatId,"obi_arrival",label+" instructor dialogue left arrival beat");
+    assert(instructorDialogue.performance&&instructorDialogue.performance.sourceIndex===2&&instructorDialogue.performance.cueKind==="dialogue"&&instructorDialogue.performance.cueSpeaker==="ACADEMY INSTRUCTOR",label+" arrival instructor cue drift");
+    assert.strictEqual(instructorDialogue.actors.find(a=>a.id==="obito_origin_academy_instructor")?.focused,true,label+" speaking instructor remains greyed out");
+    assert.strictEqual(instructorDialogue.actors.find(a=>a.id==="academy_obito")?.focused,false,label+" Obito stayed focused while instructor was speaking");
+
     await toBeat(page,"obi_end_day");
     let end=await state(page);
     assert(end.backdrop.includes("training_grounds_late_afternoon.png"),label+" fresh end-day should begin in training yard");
@@ -212,6 +220,15 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
     await screenshot(page,label+"-reflection");
     await choose(page,"I need to get better at both.","obi_ending_balance");
     await toBeat(page,"obi_close");await assertBackdrop(page,"obi_close",EXPECTED_BACKDROP.obi_home);
+    await toBeat(page,"obi_receipt");
+    const receipt=await state(page);
+    assert.strictEqual(receipt.mode,"record",label+" Obito Chronicle Receipt is not a record beat");
+    assert(receipt.performance&&receipt.performance.cueKind==="record",label+" Obito Chronicle Receipt performance cue missing");
+    assert(receipt.text.includes("YOUR ORIGIN")&&receipt.text.includes("ACADEMY OBITO")&&receipt.text.includes("RECORDED IN YOUR CHRONICLE"),label+" Obito Chronicle Receipt header missing");
+    assert(receipt.text.includes("YOUR DECISIONS")&&receipt.text.includes("WHAT HAPPENED")&&receipt.text.includes("REWARDS"),label+" Obito Chronicle Receipt sections missing");
+    assert(receipt.text.includes("Origin Starting Purse: +100 Ryō."),label+" Obito Chronicle Receipt starting purse missing");
+    assert.strictEqual(receipt.actors.length,0,label+" Chronicle Receipt should not retain Story actors");
+    await screenshot(page,label+"-receipt");
     await finishActiveStory(page);
     await page.waitForFunction(()=>ensurePlayerAcquisitionState().chronicleOrigin?.prologueCompleted===true,null,{timeout:12000});
     const completion=await page.evaluate(()=>({
@@ -225,13 +242,15 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
     const errors=await gate.assertClean(label);
     const interactions=page.__obitoInteractionCount||0;
     assert.strictEqual(interactions,expectedInteractions,label+" measured interaction count drift: "+interactions);
-    assert(interactions>=57&&interactions<=63,label+" route outside exact authored-box parity range: "+interactions);
-    assert(interactions<=70,label+" route breached authored-box pre-Receipt ceiling: "+interactions);
+    assert(interactions>=58&&interactions<=64,label+" route outside exact authored-box + Receipt parity range: "+interactions);
+    assert(interactions<=71,label+" route breached authored-box + Receipt ceiling: "+interactions);
     assert.strictEqual(completion.obito.checks.freshRewriteCardinality,true,label+" fresh rewrite cardinality diagnostic failed");
     assert.strictEqual(completion.obito.checks.freshCuesPinnedToSinglePerformancePage,true,label+" fresh rewrite single-page cue diagnostic failed");
     assert.strictEqual(completion.obito.checks.authoredBoxesDoNotStackParagraphs,true,label+" authored Obito boxes were recombined");
     assert.strictEqual(completion.obito.checks.narrationHasNoSpeakerPrefixes,true,label+" literal speaker-prefixed narration remains");
     assert.strictEqual(completion.obito.checks.requiredDialogueIsSpeakerOwned,true,label+" required Obito/instructor dialogue is not speaker-owned");
+    assert.strictEqual(completion.obito.checks.speakerLinkedActorFocus,true,label+" Obito speaker-linked actor focus diagnostic failed");
+    assert.strictEqual(completion.obito.checks.chronicleReceiptBeforeCompletion,true,label+" Obito Chronicle Receipt diagnostic failed");
     assert.strictEqual(completion.obito.checks.noGenericBeatPause,true,label+" generic A beat pause returned");
     assert.strictEqual(completion.obito.checks.chronicleBeginsNotPreReceipt,true,label+" YOUR CHRONICLE BEGINS leaked before shared Receipt");
     return{label,expectedDelay,expectedEntitlement,interactions,errors};
@@ -242,11 +261,11 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
   const browser=await chromium.launch({headless:false});
   try{
     const results=[];
-    results.push(await runRoute(browser,{label:"all-continue",helpSet:new Set(),expectedDelay:0,expectedEntitlement:"FULL",expectedInteractions:63}));
-    results.push(await runRoute(browser,{label:"substantial-furniture-only",helpSet:new Set([0]),expectedDelay:7,expectedEntitlement:"SUBSTANTIAL",expectedInteractions:61}));
-    results.push(await runRoute(browser,{label:"reduced-furniture-equipment",helpSet:new Set([0,2]),expectedDelay:15,expectedEntitlement:"REDUCED",expectedInteractions:59}));
-    results.push(await runRoute(browser,{label:"all-help",helpSet:new Set([0,1,2,3,4]),expectedDelay:35,expectedEntitlement:"MINIMAL",expectedInteractions:57}));
-    const summary={pass:true,kind:"obito_story_presentation_installed_browser",routes:results.map(r=>({label:r.label,delay:r.expectedDelay,entitlement:r.expectedEntitlement,interactions:r.interactions})),maxDiversionInteractionsIncludingChoiceAndOutcome:6,hardCeiling:70,authoredBoxRange:[57,63],browserGoldenClaimed:false};
+    results.push(await runRoute(browser,{label:"all-continue",helpSet:new Set(),expectedDelay:0,expectedEntitlement:"FULL",expectedInteractions:64}));
+    results.push(await runRoute(browser,{label:"substantial-furniture-only",helpSet:new Set([0]),expectedDelay:7,expectedEntitlement:"SUBSTANTIAL",expectedInteractions:62}));
+    results.push(await runRoute(browser,{label:"reduced-furniture-equipment",helpSet:new Set([0,2]),expectedDelay:15,expectedEntitlement:"REDUCED",expectedInteractions:60}));
+    results.push(await runRoute(browser,{label:"all-help",helpSet:new Set([0,1,2,3,4]),expectedDelay:35,expectedEntitlement:"MINIMAL",expectedInteractions:58}));
+    const summary={pass:true,kind:"obito_story_presentation_installed_browser",routes:results.map(r=>({label:r.label,delay:r.expectedDelay,entitlement:r.expectedEntitlement,interactions:r.interactions})),maxDiversionInteractionsIncludingChoiceAndOutcome:6,hardCeiling:71,authoredBoxPlusReceiptRange:[58,64],browserGoldenClaimed:false};
     fs.writeFileSync(path.join(OUT,"summary.json"),JSON.stringify(summary,null,2)+"\n");
     console.log(JSON.stringify(summary,null,2));
   }finally{await browser.close();}
