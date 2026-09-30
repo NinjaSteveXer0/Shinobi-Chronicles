@@ -2,9 +2,13 @@
 
 **Date:** 2026-09-29  
 **Owner:** Stephen / Writing — Konoha  
-**Status:** **OWNER-DIRECT STORY / PARTICIPANT IDENTITY CORRECTION — BINDING**  
+**Status:** **SUPERSEDED 2026-09-30 — FEMALE IDENTITY DRIFT RETIRED**  
 **Production Origin:** `academy_mirai`  
 **Stable instructor participant:** `academy_mirai_origin_instructor`
+
+> **SUPERSEDED BY:** `Documentation/Story/Academy_Mirai_Instructor_Male_Identity_Correction_2026-09-30.md` @ `aea28230f79602830d82fe313143a7e7332395fe`.
+>
+> Stephen directly corrected Mirai's instructor to **male**. Do not consume the female-gender conclusions below as current authority.
 
 ## Correction
 
