@@ -282,7 +282,7 @@
       try{
         const legacy=typeof priorSummary==="function"?String(priorSummary(skill)||"").trim():"";
         const banned=/\b(authored|resolver|predicate|stateKey|semanticClass|informationBoundary|categorical evidence|transient state|scalar|packet|action opportunity)\b/i;
-        if(legacy&&!banned.test(legacy)&&!legacy.includes("Use this authored Battle technique.")){
+        if(legacy&&!banned.test(legacy)&&!/authored Battle technique/i.test(legacy)){
           summary=legacy;
           details=[];
           descriptionCoverage="legacy_readable";
