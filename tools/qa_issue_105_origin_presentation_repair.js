@@ -36,13 +36,13 @@ for(const token of [
 assert(!binder.includes('scene("academy_kakashi")'),"Kakashi Golden Story was bound by #105 adapter");
 for(const [owner,src] of Object.entries({
   kushina:sceneB,
+  miraiFallback:shim336,
   kakashiContent,
   kakashiWriting,
   wasabiWriting,
   localisationFinal
 })){
-  assert(!src.includes("A beat."),owner+" still contains generic player-facing A beat filler");
-  assert(!src.includes("A beat of surprise."),owner+" still contains A beat narration filler");
+  assert(!/a beat/i.test(src),owner+" still contains player-facing a-beat wording");
 }
 assert(binder.includes('"SPARRING STUDENT","HYŪGA SPARRING PARTNER"'),"Hinata sparring partner is missing authored speaker aliases");
 assert(binder.includes('hinataYoungerStudent:"NPC/younger_student.png"'),"Hinata younger-student exact path missing");
