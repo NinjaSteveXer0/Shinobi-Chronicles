@@ -1112,10 +1112,6 @@ const SECTIONS=Object.freeze({
         "text": "...Fine."
       },
       {
-        "kind": "narration",
-        "text": "A beat."
-      },
-      {
         "kind": "dialogue",
         "speakerName": "WASABI",
         "text": "That was good."
