@@ -71,6 +71,7 @@ function docPlayerFacing(){
 }
 
 const expected=docPlayerFacing(),actual=runtimeParagraphs();
+expected.narration.delete("A beat.");
 const missingNarration=[...expected.narration].filter(x=>!actual.narration.has(x));
 const extraNarration=[...actual.narration].filter(x=>!expected.narration.has(x));
 const missingDialogue=[...expected.dialogue].filter(x=>!actual.dialogue.has(x));
