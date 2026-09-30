@@ -389,3 +389,201 @@ Raw IDs may remain in diagnostics/dev mode only.
 ## 20. Final direction
 
 > Shinobi Record becomes the player's observer-safe memory, investigation notebook, Chronicle history, development planner and collection Codex. Relationship progression is driven by distinct meaningful shared-history evidence and explicit opportunity predicates, not repeated conversation counts or one universal friendship bar. The Record shows what the player legitimately knows about people, opportunities and development while keeping hidden truths genuinely hidden.
+
+## 21. Chronicle social-history view — do not label it “Relationships”
+
+Stephen prefers relationship history to live inside **CHRONICLE**, not as a gamified friendship screen.
+
+Recommended Chronicle sub-view:
+
+**PEOPLE IN YOUR CHRONICLE**
+
+or equivalent final UI title.
+
+This view is not a relationship score list.
+
+It answers:
+
+- Who has materially shared history with this Character?
+- What happened between them?
+- What do I legitimately know about where that stands?
+- What important promises, debts, secrets, gifts, rivalries, training or conflict exist?
+
+### Candidate filters
+
+- Teammates
+- Mentors / Trainers
+- Allies / Contacts
+- Rivals
+- Family
+- Former Opponents
+- Institutional Contacts
+- Other Recurring People
+
+These are presentation filters, not permanent relationship labels.
+
+One person may appear in more than one context over time.
+
+## 22. Person shared-history dossier
+
+Opening one person from PEOPLE IN YOUR CHRONICLE should show a compact history such as:
+
+- first known meeting;
+- major shared Story/World occurrences;
+- training/mentor history;
+- rescues/protection;
+- conflicts/betrayals;
+- promises/debts;
+- gifts exchanged;
+- secrets shared;
+- meaningful successes/failures;
+- known current impression;
+- known current willingness/refusal states;
+- latest significant interaction.
+
+Do not show raw relationship vectors or hidden NPC thoughts.
+
+## 23. Recent Chronicle events
+
+The main Chronicle page should expose a **Recent Chronicle Events** feed.
+
+This is the player-readable front door.
+
+A button such as:
+
+**VIEW FULL CHRONICLE**
+
+opens the full searchable/filterable historical ledger.
+
+Recent feed should prioritise significance, not mere recency spam.
+
+A defining event from yesterday may remain above ten trivial contacts from today.
+
+## 24. Interaction significance is an engine input
+
+Stephen explicitly identifies interaction significance as key.
+
+Every relationship/shared-history occurrence eligible to affect future opportunities should have an authored/derived significance class.
+
+Suggested reusable classes remain:
+
+- contact;
+- minor;
+- meaningful;
+- major;
+- defining.
+
+But significance is not a numerical friendship award.
+
+It determines:
+- whether the event becomes durable relationship/shared-history evidence;
+- whether repeated events saturate;
+- how strongly the event may satisfy later qualitative predicates;
+- whether it is prominent in Chronicle presentation.
+
+## 25. Repetition saturation
+
+Identical or near-identical low-stakes interactions should saturate.
+
+Example:
+
+- first useful training chat may establish contact/context;
+- repeating the same chat twenty times does not create twenty meaningful trust receipts;
+- a later chat after a major mission, failure, secret or betrayal may become materially different and therefore significant again.
+
+Canonical rule:
+
+**new occurrence identity != new interpersonal meaning automatically**
+
+## 26. Relationship-gate accumulation model
+
+Future eligibility should be driven by **evidence sets**, not point totals.
+
+Example conceptual state for Kakashi:
+
+- contact established;
+- field capability witnessed;
+- professional respect established;
+- safety concern active;
+- one secret kept;
+- one promise broken;
+- mentor interest present;
+- mentor willingness conditional.
+
+A later opportunity may ask for:
+
+`professional_respect_established`
+AND `mentor_interest`
+AND `field_capability_witnessed`
+AND NOT `mentor_refused`
+AND required development/capability predicates.
+
+No hidden “relationship score 73” is required.
+
+## 27. Character Codex as a photo album
+
+Stephen's preferred Codex presentation is visual-first.
+
+For Characters:
+
+**stable person entry -> photo/card album of discovered representations**
+
+Example layout:
+
+MIKOTO UCHIHA
+- Genin Mikoto
+- Sharingan Mikoto
+- future Chūnin Mikoto
+- future Jōnin Mikoto
+- future ANBU Mikoto
+
+Only legitimately discovered/unlocked representations appear.
+
+The player may:
+- preview full card art;
+- inspect stage/role label;
+- inspect known capability state;
+- inspect known provenance/discovery;
+- jump to shared Chronicle history.
+
+Do not present undiscovered cards as grey silhouettes/count denominators unless exact Codex authority intentionally allows that teaser.
+
+## 28. Codex representation families
+
+Character album groupings may include:
+
+- rank/stage representations;
+- Bloodline/ocular activated representations;
+- Hosted Entity representations;
+- Transformations;
+- alternate-timeline identities only when they are genuinely the same stable Chronicle person;
+- costumes/presentation variants only where separately authorised.
+
+Preserve:
+
+`same album != same capability state`
+
+`same character name != same stable person automatically`
+
+`representation discovery != capability unlock`.
+
+## 29. Codex and Chronicle cross-links
+
+Character Codex should answer:
+
+**What versions of this person have I discovered?**
+
+Chronicle should answer:
+
+**What happened between us?**
+
+Intelligence should answer:
+
+**What do I know about them?**
+
+Development should answer:
+
+**What can they teach / what capability path is known?**
+
+These pages should cross-link rather than duplicate full datasets.
+
