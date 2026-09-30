@@ -285,3 +285,28 @@ After awakening:
 - Codex may reveal the Sharingan representation if one exists;
 - Battle package remains separately governed.
 
+
+## 21. Initial awakening state is authored per Character/representation
+
+Do not assume every Uchiha begins a new Chronicle with Sharingan unawakened merely because the selected Character Card does not visually show Sharingan.
+
+Each persistent Character/entry representation must have an authoritative initial capability history such as:
+
+- lineage/potential present + not yet awakened;
+- lineage/potential present + already awakened;
+- awakening state unknown to the current observer;
+- no relevant capability.
+
+Only Characters whose current Chronicle truth is **not yet awakened** require an awakening opportunity before contextual Sharingan use exists.
+
+If a later-stage representation such as a Chūnin/Jōnin/ANBU/other Uchiha is authored as already having awakened Sharingan before the playable Chronicle begins, do not manufacture a redundant awakening hotspot.
+
+Therefore:
+
+`normal card art != unawakened automatically`
+
+and:
+
+`Sharingan-labelled card art != awakening authority automatically`.
+
+The stable capability/history state is authoritative.
