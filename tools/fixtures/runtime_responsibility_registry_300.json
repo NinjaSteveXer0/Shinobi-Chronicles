@@ -1749,16 +1749,19 @@
         "runtime/alpha-menma-origin-rewards-36200.js",
         "runtime/alpha-wasabi-rogue-battle-343.js",
         "runtime/alpha-metal-origin-runtime-396.js",
+        "runtime/alpha-iwabee-origin-runtime-399.js",
         "runtime/alpha-mirai-origin-battle-338.js",
         "runtime/alpha-kakashi-v2-rewards-36015.js"
       ],
       "canonicalActiveOwner": "runtime/alpha-kakashi-v2-rewards-36015.js",
-      "activationCondition": "Menma projects only the exact three-subject reward; Wasabi projects only the exact STEP IN reward; Metal projects only the exact controlled-spar 50 Ryō victory reward; Mirai #338 projects only the disguised-instructor assessment reward; Kakashi V2 remains the final dynamic exact-Origin reward projection owner. Every wrapper delegates outside its scoped encounter.",
+      "activationCondition": "Menma projects only the exact three-subject reward; Wasabi projects only the exact STEP IN reward; Metal projects only the exact controlled-spar 50 Ryō victory reward; Iwabee projects only the exact Rogue-Genin confrontation 50 Ryō victory reward; Mirai #338 projects only the disguised-instructor assessment reward; Kakashi V2 remains the final dynamic exact-Origin reward projection owner. Every wrapper delegates outside its scoped encounter.",
       "qaRefs": [
         "tools/qa_issue_362_menma_three_subject_reward.js",
         "tools/qa_issue_343_wasabi_browser.js",
         "tools/qa_kakashi_v2_browser.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issues_396_399_400_runtime.js",
+        "tools/qa_issues_396_399_400_browser.js"
       ]
     },
     {
@@ -1767,16 +1770,19 @@
         "runtime/alpha-menma-origin-rewards-36200.js",
         "runtime/alpha-wasabi-rogue-battle-343.js",
         "runtime/alpha-metal-origin-runtime-396.js",
+        "runtime/alpha-iwabee-origin-runtime-399.js",
         "runtime/alpha-mirai-origin-battle-338.js",
         "runtime/alpha-kakashi-v2-rewards-36015.js"
       ],
       "canonicalActiveOwner": "runtime/alpha-kakashi-v2-rewards-36015.js",
-      "activationCondition": "Menma, Wasabi, Metal, Mirai #338 and Kakashi wrappers commit only their exact authorised encounter rewards; Kakashi V2 is the final dynamic wrapper and all scoped wrappers delegate outside their encounters.",
+      "activationCondition": "Menma, Wasabi, Metal, Iwabee, Mirai #338 and Kakashi wrappers commit only their exact authorised encounter rewards; Kakashi V2 is the final dynamic wrapper and all scoped wrappers delegate outside their encounters.",
       "qaRefs": [
         "tools/qa_issue_362_menma_three_subject_reward.js",
         "tools/qa_issue_343_wasabi_browser.js",
         "tools/qa_kakashi_v2_browser.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issues_396_399_400_runtime.js",
+        "tools/qa_issues_396_399_400_browser.js"
       ]
     },
     {
