@@ -1165,7 +1165,7 @@ function diagnostics(){
     noSharinganGrant:!JSON.stringify(definition).includes("sharinganUnlocked")&&!JSON.stringify(definition).includes("grantSharingan"),
     sharedCompletion:definition.onCompleteConsequences.length===1,
     chronicleReceiptBeforeCompletion:(definition.beatMap instanceof Map?definition.beatMap.get("obi_close"):definition.beats.find(b=>b.beatId==="obi_close"))?.nextBeatId==="obi_receipt"&&(definition.beatMap instanceof Map?definition.beatMap.get("obi_receipt"):definition.beats.find(b=>b.beatId==="obi_receipt"))?.mode==="record"&&(definition.beatMap instanceof Map?definition.beatMap.get("obi_receipt"):definition.beats.find(b=>b.beatId==="obi_receipt"))?.exitScene===true,
-    speakerLinkedActorFocus:boardActors("obi_arrival",{cue:{kind:"dialogue",speakerName:"ACADEMY INSTRUCTOR"},sourceIndex:2}).some(actor=>actor.id==="obito_origin_academy_instructor"&&actor.focus===true)&&!boardActors("obi_arrival",{cue:{kind:"dialogue",speakerName:"ACADEMY INSTRUCTOR"},sourceIndex:2}).some(actor=>actor.id==="academy_obito"&&actor.focus===true),
+    speakerLinkedActorFocus:boardActors("obi_arrival",{cue:PERFORMANCE.arrival_FULL[2],sourceIndex:2}).some(actor=>actor.id==="obito_origin_academy_instructor"&&actor.focus===true)&&!boardActors("obi_arrival",{cue:PERFORMANCE.arrival_FULL[2],sourceIndex:2}).some(actor=>actor.id==="academy_obito"&&actor.focus===true),
     dedicatedBackdropRegistry:Object.values(BACKDROPS).every(path=>path.startsWith("Obito Origin Backdrop/")),
     firstPageDedicatedBackdrop:BACKDROPS[ENV.mainStreet.environmentId]==="Obito Origin Backdrop/konoha_main_street.png",
     furnitureResidentialBackdrop:BACKDROPS[ENV.residential.environmentId]==="Obito Origin Backdrop/quiet_residential_lane.png",
