@@ -116,7 +116,7 @@ async function runMetalBattle(browser,remaining,expectedClass){
         const walletAfterFirst=Math.max(0,Number(playerData.ryo)||0);
         const secondClaim=claimCurrentBattleRewards();
         const walletAfterSecond=Math.max(0,Number(playerData.ryo)||0);
-        const rewardReceipts=(playerData.activityHistory||[]).filter(x=>x&&x.rewardSourceId==="metal_origin_controlled_spar_battle_victory_ryo_01");
+        const rewardReceipts=(playerData.activityHistory||[]).filter(x=>x&&x.rewardSourceId==="metal_origin_controlled_spar_victory_ryo_01");
         const resumed=resumeBattleCallerAfterCompletion("victory");
         const rt=getActiveStorySceneRuntime();
         const row=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_metal_pressured_performance_resolution");
@@ -170,6 +170,13 @@ async function runIwabeeBattle(browser,outcome){
       try{
         currentBattle.outcome={type:outcome,committed:true,completedAt:Date.now(),finishingShinobiId:outcome==="victory"?"academy_iwabee":null};
         currentBattle.battleOver=true;currentBattle.active=false;
+        const walletBefore=Math.max(0,Number(playerData.ryo)||0);
+        const rewards=generateBattleRewards();
+        const firstClaim=outcome==="victory"?claimCurrentBattleRewards():null;
+        const walletAfterFirst=Math.max(0,Number(playerData.ryo)||0);
+        const secondClaim=outcome==="victory"?claimCurrentBattleRewards():null;
+        const walletAfterSecond=Math.max(0,Number(playerData.ryo)||0);
+        const rewardReceipts=(playerData.activityHistory||[]).filter(x=>x&&x.rewardSourceId==="iwabee_origin_rogue_genin_battle_victory_ryo_01");
         const resumed=resumeBattleCallerAfterCompletion(outcome);
         if(outcome==="defeat"){
           // The frozen natural-voice Story can paginate one authored beat across
@@ -183,11 +190,21 @@ async function runIwabeeBattle(browser,outcome){
         }
         const rt=getActiveStorySceneRuntime();
         const row=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");
-        return{resumed,beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};
+        return{rewards:JSON.parse(JSON.stringify(rewards||null)),firstClaim,secondClaim,walletDeltaFirst:walletAfterFirst-walletBefore,walletDeltaSecond:walletAfterSecond-walletBefore,rewardReceiptCount:rewardReceipts.length,rewardReceipt:JSON.parse(JSON.stringify(rewardReceipts[0]||null)),resumed,beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};
       }finally{globalThis.getBattleRemainingPL=prior;}
     },{outcome});
     assert.strictEqual(result.resumed?.success,true,label+" caller resume");
+    assert.strictEqual(result.rewards?.ryo,outcome==="victory"?50:0,label+" Battle reward projection");
+    assert.strictEqual(result.rewards?.exp,0,label+" Battle reward EXP");
     if(outcome==="victory"){
+      assert.strictEqual(result.firstClaim,true,label+" first reward claim");
+      assert.strictEqual(result.secondClaim,true,label+" idempotent reward re-claim");
+      assert.strictEqual(result.walletDeltaFirst,50,label+" wallet reward delta");
+      assert.strictEqual(result.walletDeltaSecond,50,label+" duplicate claim duplicated Ryō");
+      assert.strictEqual(result.rewardReceiptCount,1,label+" duplicate Iwabee reward receipt");
+      assert.strictEqual(result.rewardReceipt?.ryo,50,label+" Iwabee reward receipt Ryō");
+      assert.strictEqual(result.rewardReceipt?.rewardSourceId,"iwabee_origin_rogue_genin_battle_victory_ryo_01",label+" Iwabee reward source");
+
       assert.strictEqual(result.fact?.rogueDisposition,"DETAINED_AFTER_ROGUE_BATTLE_WITHDRAWAL");
       assert.strictEqual(result.fact?.custodyState,"TEMPORARY_INSTRUCTOR_DETENTION");
       assert.strictEqual(result.fact?.instructorIntervention,"SECURE_WITHDRAWN_ROGUE");
