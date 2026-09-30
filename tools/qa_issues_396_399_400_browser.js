@@ -100,6 +100,13 @@ async function runMetalBattle(browser,remaining,expectedClass){
         currentBattle.battleOver=true;currentBattle.active=false;
         const walletBefore=Math.max(0,Number(playerData.ryo)||0);
         const rewards=generateBattleRewards();
+        try{openOverlay("victory");}catch(_error){}
+        const ryoNode=document.querySelector(".victory-ryo-number");
+        const victoryProjection=ryoNode?{
+          text:String(ryoNode.textContent||"").trim(),
+          presentation:ryoNode.dataset.rewardPresentation||null,
+          animated:ryoNode.dataset.rewardAnimated||null
+        }:null;
         const firstClaim=claimCurrentBattleRewards();
         const walletAfterFirst=Math.max(0,Number(playerData.ryo)||0);
         const secondClaim=claimCurrentBattleRewards();
@@ -108,12 +115,13 @@ async function runMetalBattle(browser,remaining,expectedClass){
         const resumed=resumeBattleCallerAfterCompletion("victory");
         const rt=getActiveStorySceneRuntime();
         const row=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_metal_pressured_performance_resolution");
-        return{rewards:JSON.parse(JSON.stringify(rewards||null)),firstClaim,secondClaim,walletDeltaFirst:walletAfterFirst-walletBefore,walletDeltaSecond:walletAfterSecond-walletBefore,rewardReceiptCount:rewardReceipts.length,rewardReceipt:JSON.parse(JSON.stringify(rewardReceipts[0]||null)),resumed,beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};
+        return{rewards:JSON.parse(JSON.stringify(rewards||null)),victoryProjection,firstClaim,secondClaim,walletDeltaFirst:walletAfterFirst-walletBefore,walletDeltaSecond:walletAfterSecond-walletBefore,rewardReceiptCount:rewardReceipts.length,rewardReceipt:JSON.parse(JSON.stringify(rewardReceipts[0]||null)),resumed,beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};
       }finally{globalThis.getBattleRemainingPL=prior;}
     },{remaining});
     assert.strictEqual(finished.rewards?.ryo,50,label+" reward projection");
     assert.strictEqual(finished.rewards?.exp,0,label+" reward EXP");
     assert.strictEqual(finished.rewards?.requiresExplicitPostClaimContinue,false,label+" redundant post-claim Continue returned");
+    assert.deepStrictEqual(finished.victoryProjection,{text:"50",presentation:"static_earned_amount",animated:"false"},label+" Victory Ryō is not a static earned amount");
     assert.strictEqual(finished.firstClaim,true,label+" first reward claim");
     assert.strictEqual(finished.secondClaim,true,label+" idempotent reward re-claim");
     assert.strictEqual(finished.walletDeltaFirst,50,label+" wallet reward delta");
