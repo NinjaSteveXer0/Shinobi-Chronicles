@@ -12,27 +12,53 @@ const FINAL_STORY_AUTHORITY="Academy_Obito_Origin_Fresh_Player_Facing_Rewrite_20
 const PERFORMANCE={
   "obi_depart": [
     {
-      "cueId": "obi_depart_fresh_01",
+      "cueId": "obi_depart_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito tears into the morning street with one hand still pulling his goggles into place.\n\nThe Academy bell carries over the roofs.\n\nHis foot catches the edge of a paving stone. He turns the stumble into three faster steps and keeps going.\n\nThe Hokage Monument appears between the buildings ahead."
+      "text": "Obito tears into the morning street with one hand still pulling his goggles into place. The Academy bell carries over the roofs."
     },
     {
-      "cueId": "obi_depart_fresh_02",
+      "cueId": "obi_depart_fresh_box_02",
       "kind": "narration",
       "singlePage": true,
-      "text": "OBITO: “No. Not today. I'm making it.”\n\nHe points toward the Monument as he runs.\n\nOBITO: “And I'm getting up there too. Just not before training.”"
+      "text": "His foot catches the edge of a paving stone. He turns the stumble into three faster steps and keeps going. The Hokage Monument appears between the buildings ahead."
+    },
+    {
+      "cueId": "obi_depart_fresh_box_03",
+      "kind": "dialogue",
+      "speakerName": "OBITO",
+      "singlePage": true,
+      "text": "No. Not today. I'm making it."
+    },
+    {
+      "cueId": "obi_depart_fresh_box_04",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "He points toward the Monument as he runs."
+    },
+    {
+      "cueId": "obi_depart_fresh_box_05",
+      "kind": "dialogue",
+      "speakerName": "OBITO",
+      "singlePage": true,
+      "text": "And I'm getting up there too. Just not before training."
     }
   ],
   "obi_furniture_intro": [
     {
-      "cueId": "obi_furniture_fresh_intro_01",
+      "cueId": "obi_furniture_intro_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "A wardrobe blocks half a residential lane.\n\nOne corner is jammed in a doorway while a woman braces the other side with her shoulder. Every shove makes the furniture lean farther toward the street.\n\nObito slows before he means to."
+      "text": "A wardrobe blocks half a residential lane. One corner is jammed in a doorway while a woman braces the other side with her shoulder. Every shove makes the furniture lean farther toward the street."
     },
     {
-      "cueId": "obi_furniture_fresh_intro_02",
+      "cueId": "obi_furniture_intro_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "Obito slows before he means to."
+    },
+    {
+      "cueId": "obi_furniture_intro_fresh_box_03",
       "kind": "dialogue",
       "speakerName": "CIVILIAN",
       "singlePage": true,
@@ -41,29 +67,47 @@ const PERFORMANCE={
   ],
   "obi_furniture_help": [
     {
-      "cueId": "obi_furniture_fresh_help",
+      "cueId": "obi_furniture_help_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito drops his bag and gets under the lower edge before the woman can organise him.\n\nHe changes the angle, counts them into one hard lift and nearly follows the wardrobe through the doorway when it finally clears.\n\nHis grin lasts until the Academy bell reaches the lane again.\n\nHe snatches up his bag and bolts."
+      "text": "Obito drops his bag and gets under the lower edge before the woman can organise him. He changes the angle, counts them into one hard lift and nearly follows the wardrobe through the doorway when it finally clears."
+    },
+    {
+      "cueId": "obi_furniture_help_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "His grin lasts until the Academy bell reaches the lane again. He snatches up his bag and bolts."
     }
   ],
   "obi_furniture_continue": [
     {
-      "cueId": "obi_furniture_fresh_continue",
+      "cueId": "obi_furniture_continue_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito's hands rise before he catches himself.\n\nHe forces them back to his sides, slips around the wardrobe and calls an apology over his shoulder without stopping.\n\nBy the end of the lane he is running hard enough that turning back would take a decision of its own."
+      "text": "Obito's hands rise before he catches himself. He forces them back to his sides, slips around the wardrobe and calls an apology over his shoulder without stopping."
+    },
+    {
+      "cueId": "obi_furniture_continue_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "By the end of the lane he is running hard enough that turning back would take a decision of its own."
     }
   ],
   "obi_vegetables_intro": [
     {
-      "cueId": "obi_vegetables_fresh_intro_01",
+      "cueId": "obi_vegetables_intro_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Something round clips Obito's sandal.\n\nA daikon rolls past him, followed by two onions and a tomato escaping from a split market basket.\n\nThe vegetable vendor is already on one knee, catching what she can before the lane carries the rest away."
+      "text": "Something round clips Obito's sandal. A daikon rolls past him, followed by two onions and a tomato escaping from a split market basket."
     },
     {
-      "cueId": "obi_vegetables_fresh_intro_02",
+      "cueId": "obi_vegetables_intro_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "The vegetable vendor is already on one knee, catching what she can before the lane carries the rest away."
+    },
+    {
+      "cueId": "obi_vegetables_intro_fresh_box_03",
       "kind": "dialogue",
       "speakerName": "VENDOR",
       "singlePage": true,
@@ -72,29 +116,47 @@ const PERFORMANCE={
   ],
   "obi_vegetables_help": [
     {
-      "cueId": "obi_vegetables_fresh_help",
+      "cueId": "obi_vegetables_help_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito lunges after the produce as if the vegetables have personally challenged him.\n\nHe traps an onion with his heel, catches the tomato before it reaches a cart wheel and sends the daikon back into the basket from farther away than necessary.\n\nThe vendor gives him one sharp nod.\n\nObito is already running again."
+      "text": "Obito lunges after the produce as if the vegetables have personally challenged him. He traps an onion with his heel, catches the tomato before it reaches a cart wheel and sends the daikon back into the basket from farther away than necessary."
+    },
+    {
+      "cueId": "obi_vegetables_help_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "The vendor gives him one sharp nod. Obito is already running again."
     }
   ],
   "obi_vegetables_continue": [
     {
-      "cueId": "obi_vegetables_fresh_continue",
+      "cueId": "obi_vegetables_continue_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "The daikon rolls beyond him.\n\nObito watches it for one extra step, jaw tight, then keeps his eyes on the road.\n\nBehind him, the vendor is still moving quickly enough to make it obvious she has not stopped working just because he did not."
+      "text": "The daikon rolls beyond him. Obito watches it for one extra step, jaw tight, then keeps his eyes on the road."
+    },
+    {
+      "cueId": "obi_vegetables_continue_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "Behind him, the vendor is still moving quickly enough to make it obvious she has not stopped working just because he did not."
     }
   ],
   "obi_equipment_intro": [
     {
-      "cueId": "obi_equipment_fresh_intro_01",
+      "cueId": "obi_equipment_intro_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Near the Academy approach, an equipment custodian has two training bundles open on the pavement and an empty strap in his hands.\n\nObito recognises the Academy markings immediately.\n\nThe custodian is checking the road behind him instead of the bundles now."
+      "text": "Near the Academy approach, an equipment custodian has two training bundles open on the pavement and an empty strap in his hands. Obito recognises the Academy markings immediately."
     },
     {
-      "cueId": "obi_equipment_fresh_intro_02",
+      "cueId": "obi_equipment_intro_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "The custodian is checking the road behind him instead of the bundles now."
+    },
+    {
+      "cueId": "obi_equipment_intro_fresh_box_03",
       "kind": "dialogue",
       "speakerName": "CUSTODIAN",
       "singlePage": true,
@@ -103,29 +165,47 @@ const PERFORMANCE={
   ],
   "obi_equipment_help": [
     {
-      "cueId": "obi_equipment_fresh_help",
+      "cueId": "obi_equipment_help_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito doubles back along the route the custodian points out.\n\nA strip of Academy cloth shows beneath a low delivery platform where the missing bundle slid out of sight.\n\nHe drops flat, drags it free and thrusts it at the custodian with a look that clearly expects this to count for something.\n\nThen he notices the Academy roof beyond the lane and takes off before he can start arguing his case."
+      "text": "Obito doubles back along the route the custodian points out. A strip of Academy cloth shows beneath a low delivery platform where the missing bundle slid out of sight."
+    },
+    {
+      "cueId": "obi_equipment_help_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "He drops flat, drags it free and thrusts it at the custodian with a look that clearly expects this to count for something. Then he notices the Academy roof beyond the lane and takes off before he can start arguing his case."
     }
   ],
   "obi_equipment_continue": [
     {
-      "cueId": "obi_equipment_fresh_continue",
+      "cueId": "obi_equipment_continue_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito recognises how easily he could start searching.\n\nThat is exactly why he does not.\n\nHe shakes his head, points himself toward the Academy again and runs while the custodian keeps working the route behind him."
+      "text": "Obito recognises how easily he could start searching. That is exactly why he does not."
+    },
+    {
+      "cueId": "obi_equipment_continue_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "He shakes his head, points himself toward the Academy again and runs while the custodian keeps working the route behind him."
     }
   ],
   "obi_delivery_intro": [
     {
-      "cueId": "obi_delivery_fresh_intro_01",
+      "cueId": "obi_delivery_intro_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "A handcart has tipped onto its side across the main street.\n\nCrates have spilled into the lane. The delivery worker is already braced against the frame, trying to lever the cart upright without sending the load over with it.\n\nThere is just enough room to pass on the right."
+      "text": "A handcart has tipped onto its side across the main street. Crates have spilled into the lane. The delivery worker is already braced against the frame, trying to lever the cart upright without sending the load over with it."
     },
     {
-      "cueId": "obi_delivery_fresh_intro_02",
+      "cueId": "obi_delivery_intro_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "There is just enough room to pass on the right."
+    },
+    {
+      "cueId": "obi_delivery_intro_fresh_box_03",
       "kind": "dialogue",
       "speakerName": "DELIVERY WORKER",
       "singlePage": true,
@@ -134,29 +214,47 @@ const PERFORMANCE={
   ],
   "obi_delivery_help": [
     {
-      "cueId": "obi_delivery_fresh_help",
+      "cueId": "obi_delivery_help_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito ignores the open lane, drops his bag and gets his shoulder under the lower rail.\n\nThe worker starts to wave him off, sees the leverage and changes position instead.\n\nTogether they heave the cart upright.\n\nBefore the last crate settles, the worker jerks a thumb toward the Academy.\n\nObito grabs his bag and runs."
+      "text": "Obito ignores the open lane, drops his bag and gets his shoulder under the lower rail. The worker starts to wave him off, sees the leverage and changes position instead."
+    },
+    {
+      "cueId": "obi_delivery_help_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "Together they heave the cart upright. Before the last crate settles, the worker jerks a thumb toward the Academy. Obito grabs his bag and runs."
     }
   ],
   "obi_delivery_continue": [
     {
-      "cueId": "obi_delivery_fresh_continue",
+      "cueId": "obi_delivery_continue_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito takes the open side exactly as the worker told him to.\n\nFor once, the problem has room around it and somebody already handling it.\n\nHe uses the gap.\n\nThe scrape of the cart fades behind him as the Academy gets closer."
+      "text": "Obito takes the open side exactly as the worker told him to. For once, the problem has room around it and somebody already handling it."
+    },
+    {
+      "cueId": "obi_delivery_continue_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "He uses the gap. The scrape of the cart fades behind him as the Academy gets closer."
     }
   ],
   "obi_cart_intro": [
     {
-      "cueId": "obi_cart_fresh_intro_01",
+      "cueId": "obi_cart_intro_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "The Academy gate is finally in sight when a handcart breaks loose higher on the slope.\n\nIts owner sprints after it, but the cart is gaining speed.\n\nObito can reach the gate in seconds.\n\nHe can also reach the rear rail before the cart hits the turn."
+      "text": "The Academy gate is finally in sight when a handcart breaks loose higher on the slope. Its owner sprints after it, but the cart is gaining speed."
     },
     {
-      "cueId": "obi_cart_fresh_intro_02",
+      "cueId": "obi_cart_intro_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "Obito can reach the gate in seconds. He can also reach the rear rail before the cart hits the turn."
+    },
+    {
+      "cueId": "obi_cart_intro_fresh_box_03",
       "kind": "dialogue",
       "speakerName": "CIVILIAN",
       "singlePage": true,
@@ -165,219 +263,429 @@ const PERFORMANCE={
   ],
   "obi_cart_help": [
     {
-      "cueId": "obi_cart_fresh_help",
+      "cueId": "obi_cart_help_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito catches the rear rail with both hands.\n\nHis sandals skid, the cart drags him two ugly steps downhill, and then the owner reaches the other side.\n\nTogether they wrench it straight and stop it before the turn.\n\nThe Academy bell rings.\n\nObito's head snaps toward the gate.\n\nHe lets go and runs."
+      "text": "Obito catches the rear rail with both hands. His sandals skid, the cart drags him two ugly steps downhill, and then the owner reaches the other side."
+    },
+    {
+      "cueId": "obi_cart_help_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "Together they wrench it straight and stop it before the turn. The Academy bell rings. Obito's head snaps toward the gate. He lets go and runs."
     }
   ],
   "obi_cart_continue": [
     {
-      "cueId": "obi_cart_fresh_continue",
+      "cueId": "obi_cart_continue_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito turns for the Academy gate.\n\nThe cart rattles down the slope behind him while its owner keeps chasing.\n\nHe does not look back again.\n\nThe training yard is directly ahead now."
+      "text": "Obito turns for the Academy gate. The cart rattles down the slope behind him while its owner keeps chasing."
+    },
+    {
+      "cueId": "obi_cart_continue_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "He does not look back again. The training yard is directly ahead now."
     }
   ],
   "arrival_FULL": [
     {
-      "cueId": "obi_arrival_full_fresh_01",
+      "cueId": "arrival_FULL_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito reaches the training ground while the class is still forming up.\n\nHe slows inside the gate, checks the untouched equipment racks and realises he has not actually missed anything.\n\nThe relief comes out as a grin he cannot hide."
+      "text": "Obito reaches the training ground while the class is still forming up. He slows inside the gate, checks the untouched equipment racks and realises he has not actually missed anything."
     },
     {
-      "cueId": "obi_arrival_full_fresh_02",
+      "cueId": "arrival_FULL_fresh_box_02",
       "kind": "narration",
       "singlePage": true,
-      "text": "ACADEMY INSTRUCTOR: “Line up. You can celebrate after conditioning.”\n\nObito is in line before the sentence finishes."
+      "text": "The relief comes out as a grin he cannot hide."
+    },
+    {
+      "cueId": "arrival_FULL_fresh_box_03",
+      "kind": "dialogue",
+      "speakerName": "ACADEMY INSTRUCTOR",
+      "singlePage": true,
+      "text": "Line up. You can celebrate after conditioning."
+    },
+    {
+      "cueId": "arrival_FULL_fresh_box_04",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "Obito is in line before the sentence finishes."
     }
   ],
   "arrival_SUBSTANTIAL": [
     {
-      "cueId": "obi_arrival_substantial_fresh_01",
+      "cueId": "arrival_SUBSTANTIAL_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito reaches the yard as the conditioning group breaks formation.\n\nStudents are catching their breath while the weapons racks come forward.\n\nHe looks from the finished circuit to the next drill and straightens."
+      "text": "Obito reaches the yard as the conditioning group breaks formation. Students are catching their breath while the weapons racks come forward."
     },
     {
-      "cueId": "obi_arrival_substantial_fresh_02",
+      "cueId": "arrival_SUBSTANTIAL_fresh_box_02",
       "kind": "narration",
       "singlePage": true,
-      "text": "ACADEMY INSTRUCTOR: “Conditioning's over. Weapons line.”\n\nObito moves before there is anything else to say."
+      "text": "He looks from the finished circuit to the next drill and straightens."
+    },
+    {
+      "cueId": "arrival_SUBSTANTIAL_fresh_box_03",
+      "kind": "dialogue",
+      "speakerName": "ACADEMY INSTRUCTOR",
+      "singlePage": true,
+      "text": "Conditioning's over. Weapons line."
+    },
+    {
+      "cueId": "arrival_SUBSTANTIAL_fresh_box_04",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "Obito moves before there is anything else to say."
     }
   ],
   "arrival_REDUCED": [
     {
-      "cueId": "obi_arrival_reduced_fresh_01",
+      "cueId": "arrival_REDUCED_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "The weapons are already being returned when Obito reaches the yard.\n\nScuffed target marks and tired arms tell him exactly how much of the session happened without him.\n\nHe drops his bag beside the line."
+      "text": "The weapons are already being returned when Obito reaches the yard. Scuffed target marks and tired arms tell him exactly how much of the session happened without him."
     },
     {
-      "cueId": "obi_arrival_reduced_fresh_02",
+      "cueId": "arrival_REDUCED_fresh_box_02",
       "kind": "narration",
       "singlePage": true,
-      "text": "ACADEMY INSTRUCTOR: “Ninjutsu line. Move.”\n\nObito moves."
+      "text": "He drops his bag beside the line."
+    },
+    {
+      "cueId": "arrival_REDUCED_fresh_box_03",
+      "kind": "dialogue",
+      "speakerName": "ACADEMY INSTRUCTOR",
+      "singlePage": true,
+      "text": "Ninjutsu line. Move."
+    },
+    {
+      "cueId": "arrival_REDUCED_fresh_box_04",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "Obito moves."
     }
   ],
   "arrival_MINIMAL": [
     {
-      "cueId": "obi_arrival_minimal_fresh_01",
+      "cueId": "arrival_MINIMAL_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito reaches the gate to find the class pairing off for the closing drill.\n\nThe equipment is away. The Ninjutsu markers are already dark from use.\n\nHis face falls once.\n\nThen he pulls his bag off his shoulder."
+      "text": "Obito reaches the gate to find the class pairing off for the closing drill. The equipment is away. The Ninjutsu markers are already dark from use."
     },
     {
-      "cueId": "obi_arrival_minimal_fresh_02",
+      "cueId": "arrival_MINIMAL_fresh_box_02",
       "kind": "narration",
       "singlePage": true,
-      "text": "ACADEMY INSTRUCTOR: “Last block. Taijutsu.”\n\nObito drops the bag and steps onto the yard."
+      "text": "His face falls once. Then he pulls his bag off his shoulder."
+    },
+    {
+      "cueId": "arrival_MINIMAL_fresh_box_03",
+      "kind": "dialogue",
+      "speakerName": "ACADEMY INSTRUCTOR",
+      "singlePage": true,
+      "text": "Last block. Taijutsu."
+    },
+    {
+      "cueId": "arrival_MINIMAL_fresh_box_04",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "Obito drops the bag and steps onto the yard."
     }
   ],
-  "training_intro": [],
   "training_stamina": [
     {
-      "cueId": "obi_training_stamina_fresh",
+      "cueId": "training_stamina_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito attacks the first conditioning lap as if finishing first will erase the fact that he nearly arrived late.\n\nBy the next circuit his breathing exposes the plan.\n\nThe instructor signals him to settle the pace.\n\nObito hates the correction, follows it anyway, and finishes stronger than he started."
+      "text": "Obito attacks the first conditioning lap as if finishing first will erase the fact that he nearly arrived late. By the next circuit his breathing exposes the plan."
+    },
+    {
+      "cueId": "training_stamina_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "The instructor signals him to settle the pace. Obito hates the correction, follows it anyway, and finishes stronger than he started."
     }
   ],
   "training_bukijutsu": [
     {
-      "cueId": "obi_training_bukijutsu_fresh",
+      "cueId": "training_bukijutsu_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito's first wooden throw is all force and poor placement.\n\nHe stares at where it lands, resets his feet and this time lets the weapon go cleanly instead of trying to overpower the target.\n\nThe next strike sits much closer to centre.\n\nHe reaches for another before anyone praises him."
+      "text": "Obito's first wooden throw is all force and poor placement. He stares at where it lands, resets his feet and this time lets the weapon go cleanly instead of trying to overpower the target."
+    },
+    {
+      "cueId": "training_bukijutsu_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "The next strike sits much closer to centre. He reaches for another before anyone praises him."
     }
   ],
   "training_ninjutsu": [
     {
-      "cueId": "obi_training_ninjutsu_fresh",
+      "cueId": "training_ninjutsu_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "The first Academy-scale Fire attempt flares too fast and collapses.\n\nObito's embarrassment is immediate; being Uchiha makes the weak flame sting more, not less.\n\nHe starts again with less force.\n\nThe second flame holds.\n\nSmall, controlled and real.\n\nHis grin appears before the heat is gone."
+      "text": "The first Academy-scale Fire attempt flares too fast and collapses. Obito's embarrassment is immediate; being Uchiha makes the weak flame sting more, not less."
+    },
+    {
+      "cueId": "training_ninjutsu_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "He starts again with less force. The second flame holds. Small, controlled and real. His grin appears before the heat is gone."
     }
   ],
   "training_taijutsu": [
     {
-      "cueId": "obi_training_taijutsu_fresh",
+      "cueId": "training_taijutsu_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito commits too early in the first exchange and gets sent into the dirt.\n\nHe is back on his feet immediately.\n\nThe second time he waits.\n\nWhen the opening comes, he steps inside it instead of charging through it and completes the exchange cleanly.\n\nThe final whistle catches him still ready for another round."
+      "text": "Obito commits too early in the first exchange and gets sent into the dirt. He is back on his feet immediately."
+    },
+    {
+      "cueId": "training_taijutsu_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "The second time he waits. When the opening comes, he steps inside it instead of charging through it and completes the exchange cleanly. The final whistle catches him still ready for another round."
     }
   ],
   "obi_end_day": [
     {
-      "cueId": "obi_end_day_fresh_01",
+      "cueId": "obi_end_day_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "The yard empties around Obito.\n\nHe ties his bag more slowly than he usually does, arms heavy from whatever training he managed to reach.\n\nThere is no lecture waiting for him.\n\nThe drills are simply over."
+      "text": "The yard empties around Obito. He ties his bag more slowly than he usually does, arms heavy from whatever training he managed to reach."
     },
     {
-      "cueId": "obi_end_day_fresh_02",
+      "cueId": "obi_end_day_fresh_box_02",
       "kind": "narration",
       "singlePage": true,
-      "text": "On the walk home, Konoha feels quieter than it did that morning.\n\nObito passes corners that look ordinary again.\n\nHe remembers them anyway."
+      "text": "There is no lecture waiting for him. The drills are simply over."
+    },
+    {
+      "cueId": "obi_end_day_fresh_box_03",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "On the walk home, Konoha feels quieter than it did that morning. Obito passes corners that look ordinary again. He remembers them anyway."
     }
   ],
   "home_common": [
     {
-      "cueId": "obi_home_common_fresh",
+      "cueId": "home_common_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito drops his bag by the wall and pulls off his goggles.\n\nThrough the window, the Hokage Monument sits above the village exactly where it was this morning.\n\nHe looks at it, then at his tired hands.\n\nNobody is waiting for an answer from him now."
+      "text": "Obito drops his bag by the wall and pulls off his goggles. Through the window, the Hokage Monument sits above the village exactly where it was this morning."
+    },
+    {
+      "cueId": "home_common_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "He looks at it, then at his tired hands. Nobody is waiting for an answer from him now."
     }
   ],
   "home_all_help": [
     {
-      "cueId": "obi_home_all_help_fresh",
+      "cueId": "home_all_help_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "He stopped every time.\n\nThe wardrobe, the produce, the missing equipment, the delivery, the cart — each one took a piece of the morning, and most of the training was gone when he finally arrived.\n\nObito rubs his palms together and keeps thinking."
+      "text": "He stopped every time. The wardrobe, the produce, the missing equipment, the delivery, the cart — each one took a piece of the morning, and most of the training was gone when he finally arrived."
+    },
+    {
+      "cueId": "home_all_help_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "Obito rubs his palms together and keeps thinking."
     }
   ],
   "home_no_help": [
     {
-      "cueId": "obi_home_no_help_fresh",
+      "cueId": "home_no_help_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "He kept moving every time and reached the whole training session.\n\nThat part feels good.\n\nThe five places where he chose not to stop still come back clearly enough that he cannot simply fall asleep and call the day finished."
+      "text": "He kept moving every time and reached the whole training session. That part feels good."
+    },
+    {
+      "cueId": "home_no_help_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "The five places where he chose not to stop still come back clearly enough that he cannot simply fall asleep and call the day finished."
     }
   ],
   "home_mixed": [
     {
-      "cueId": "obi_home_mixed_fresh",
+      "cueId": "home_mixed_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Some problems stopped him. Some did not.\n\nAt the time, each choice ended as soon as he started running again.\n\nSitting here, Obito finds himself replaying both kinds."
+      "text": "Some problems stopped him. Some did not. At the time, each choice ended as soon as he started running again."
+    },
+    {
+      "cueId": "home_mixed_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "Sitting here, Obito finds himself replaying both kinds."
     }
   ],
   "ending_helping": [
     {
-      "cueId": "obi_ending_helping_fresh_01",
+      "cueId": "ending_helping_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito reaches for his goggles and turns them over once in his hands.\n\nMissing training annoyed him.\n\nSo did the idea of teaching himself to stop seeing people just because he was in a hurry.\n\nHe puts the goggles back on."
+      "text": "Obito reaches for his goggles and turns them over once in his hands. Missing training annoyed him."
     },
     {
-      "cueId": "obi_ending_helping_fresh_02",
+      "cueId": "ending_helping_fresh_box_02",
       "kind": "narration",
       "singlePage": true,
-      "text": "OBITO: “I'm not going to stop helping people.”\n\nHis mouth twists.\n\nOBITO: “Tomorrow I just leave earlier. A lot earlier.”"
+      "text": "So did the idea of teaching himself to stop seeing people just because he was in a hurry. He puts the goggles back on."
+    },
+    {
+      "cueId": "ending_helping_fresh_box_03",
+      "kind": "dialogue",
+      "speakerName": "OBITO",
+      "singlePage": true,
+      "text": "I'm not going to stop helping people."
+    },
+    {
+      "cueId": "ending_helping_fresh_box_04",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "His mouth twists."
+    },
+    {
+      "cueId": "ending_helping_fresh_box_05",
+      "kind": "dialogue",
+      "speakerName": "OBITO",
+      "singlePage": true,
+      "text": "Tomorrow I just leave earlier. A lot earlier."
     }
   ],
   "ending_training": [
     {
-      "cueId": "obi_ending_training_fresh_01",
+      "cueId": "ending_training_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito looks at the Monument again.\n\nWanting to become Hokage is easy when he is shouting it at a mountain.\n\nThe training yard was less impressed.\n\nHe pulls his bag closer and starts checking it for tomorrow."
+      "text": "Obito looks at the Monument again. Wanting to become Hokage is easy when he is shouting it at a mountain."
     },
     {
-      "cueId": "obi_ending_training_fresh_02",
+      "cueId": "ending_training_fresh_box_02",
       "kind": "narration",
       "singlePage": true,
-      "text": "OBITO: “I need to take training more seriously.”\n\nHe tightens one loose strap.\n\nOBITO: “Next time, I get there.”"
+      "text": "The training yard was less impressed. He pulls his bag closer and starts checking it for tomorrow."
+    },
+    {
+      "cueId": "ending_training_fresh_box_03",
+      "kind": "dialogue",
+      "speakerName": "OBITO",
+      "singlePage": true,
+      "text": "I need to take training more seriously."
+    },
+    {
+      "cueId": "ending_training_fresh_box_04",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "He tightens one loose strap."
+    },
+    {
+      "cueId": "ending_training_fresh_box_05",
+      "kind": "dialogue",
+      "speakerName": "OBITO",
+      "singlePage": true,
+      "text": "Next time, I get there."
     }
   ],
   "ending_balance": [
     {
-      "cueId": "obi_ending_balance_fresh_01",
+      "cueId": "ending_balance_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito counts the morning back on his fingers, gets halfway through and gives up on the fingers.\n\nThe village will keep having problems.\n\nTraining will keep starting without asking where he is.\n\nHe frowns at both facts as if they have teamed up against him."
+      "text": "Obito counts the morning back on his fingers, gets halfway through and gives up on the fingers. The village will keep having problems."
     },
     {
-      "cueId": "obi_ending_balance_fresh_02",
+      "cueId": "ending_balance_fresh_box_02",
       "kind": "narration",
       "singlePage": true,
-      "text": "OBITO: “I need to get better at both.”\n\nHe points at himself.\n\nOBITO: “Earlier start. Better judgement. Easy.”\n\nHis expression says he knows it will not be easy."
+      "text": "Training will keep starting without asking where he is. He frowns at both facts as if they have teamed up against him."
+    },
+    {
+      "cueId": "ending_balance_fresh_box_03",
+      "kind": "dialogue",
+      "speakerName": "OBITO",
+      "singlePage": true,
+      "text": "I need to get better at both."
+    },
+    {
+      "cueId": "ending_balance_fresh_box_04",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "He points at himself."
+    },
+    {
+      "cueId": "ending_balance_fresh_box_05",
+      "kind": "dialogue",
+      "speakerName": "OBITO",
+      "singlePage": true,
+      "text": "Earlier start. Better judgement. Easy."
+    },
+    {
+      "cueId": "ending_balance_fresh_box_06",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "His expression says he knows it will not be easy."
     }
   ],
   "ending_question": [
     {
-      "cueId": "obi_ending_question_fresh_01",
+      "cueId": "ending_question_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Obito looks up at the Hokage Monument.\n\nUsually he imagines his own face there before anything else.\n\nTonight he studies the faces that are already carved into the mountain.\n\nThe question bothers him enough that he does not try to outrun it."
+      "text": "Obito looks up at the Hokage Monument. Usually he imagines his own face there before anything else."
     },
     {
-      "cueId": "obi_ending_question_fresh_02",
+      "cueId": "ending_question_fresh_box_02",
       "kind": "narration",
       "singlePage": true,
-      "text": "OBITO: “Maybe I'm looking at this wrong.”\n\nHe pulls his goggles back on.\n\nOBITO: “Fine. Then I'll figure out what matters most.”"
+      "text": "Tonight he studies the faces that are already carved into the mountain. The question bothers him enough that he does not try to outrun it."
+    },
+    {
+      "cueId": "ending_question_fresh_box_03",
+      "kind": "dialogue",
+      "speakerName": "OBITO",
+      "singlePage": true,
+      "text": "Maybe I'm looking at this wrong."
+    },
+    {
+      "cueId": "ending_question_fresh_box_04",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "He pulls his goggles back on."
+    },
+    {
+      "cueId": "ending_question_fresh_box_05",
+      "kind": "dialogue",
+      "speakerName": "OBITO",
+      "singlePage": true,
+      "text": "Fine. Then I'll figure out what matters most."
     }
   ],
   "obi_close": [
     {
-      "cueId": "obi_close_fresh",
+      "cueId": "obi_close_fresh_box_01",
       "kind": "narration",
       "singlePage": true,
-      "text": "Before bed, Obito leaves his bag packed beside the door instead of wherever it lands.\n\nOutside, Konoha settles beneath the Monument.\n\nTomorrow the village will still be there.\n\nSo will training.\n\nObito intends to meet both of them awake."
+      "text": "Before bed, Obito leaves his bag packed beside the door instead of wherever it lands. Outside, Konoha settles beneath the Monument."
+    },
+    {
+      "cueId": "obi_close_fresh_box_02",
+      "kind": "narration",
+      "singlePage": true,
+      "text": "Tomorrow the village will still be there. So will training. Obito intends to meet both of them awake."
     }
-  ]
+  ],
+  "training_intro": []
 };
 
 const ENV=Object.freeze({
@@ -715,7 +1023,7 @@ function boardActors(beatId,performance){
   else if(beatId.includes("equipment"))actors.push({id:"obito_origin_academy_equipment_custodian",label:"CUSTODIAN",image:"NPC/equipment_custodian.png"});
   else if(beatId.includes("delivery"))actors.push({id:"obito_origin_delivery_worker",label:"DELIVERY WORKER",image:"NPC/delivery_worker.png"});
   else if(beatId.includes("cart"))actors.push({id:"obito_origin_runaway_cart_civilian",label:"CIVILIAN",image:"NPC/runaway_cart_civillian.png"});
-  else if(beatId==="obi_arrival"||beatId==="obi_training"||(beatId==="obi_end_day"&&obitoPerformanceIndex331(performance)<1))actors.push({id:"obito_origin_academy_instructor",label:"ACADEMY INSTRUCTOR",image:"NPC/obito_instructor.png"});
+  else if(beatId==="obi_arrival"||beatId==="obi_training"||(beatId==="obi_end_day"&&obitoPerformanceIndex331(performance)<2))actors.push({id:"obito_origin_academy_instructor",label:"ACADEMY INSTRUCTOR",image:"NPC/obito_instructor.png"});
   return actors;
 }
 function boardLocation(beatId,performance){
@@ -729,7 +1037,7 @@ function boardBackdropEnvironment331(beatId,performance){
   const id=String(beatId||"");
   if(id==="obi_end_day"){
     const cueIndex=obitoPerformanceIndex331(performance);
-    return cueIndex>=1?ENV.streetLate.environmentId:ENV.trainingLate.environmentId;
+    return cueIndex>=2?ENV.streetLate.environmentId:ENV.trainingLate.environmentId;
   }
   if(id==="obi_arrival"||id==="obi_training")return ENV.trainingDay.environmentId;
   if(id==="obi_home"||id==="obi_reflect"||id==="obi_close"||id.startsWith("obi_ending_"))return ENV.home.environmentId;
@@ -814,21 +1122,30 @@ function diagnostics(){
     furnitureResidentialBackdrop:BACKDROPS[ENV.residential.environmentId]==="Obito Origin Backdrop/quiet_residential_lane.png",
     academyApproachBackdrop:BACKDROPS[ENV.academyApproach.environmentId]==="Obito Origin Backdrop/academy_approach_sloped_lane.png",
     homeDedicatedBackdrop:BACKDROPS[ENV.home.environmentId]==="Obito Origin Backdrop/obito_home_interior.png",
-    endDayPresentationMovesYardToStreet:typeof boardBackdropEnvironment331==="function"&&boardBackdropEnvironment331("obi_end_day",{sourceIndex:0,index:0})===ENV.trainingLate.environmentId&&boardBackdropEnvironment331("obi_end_day",{sourceIndex:1,index:99})===ENV.streetLate.environmentId,
-    paragraphPaginationCannotShiftBackdrop:boardBackdropEnvironment331("obi_end_day",{sourceIndex:0,index:99})===ENV.trainingLate.environmentId,
+    endDayPresentationMovesYardToStreet:typeof boardBackdropEnvironment331==="function"&&boardBackdropEnvironment331("obi_end_day",{sourceIndex:0,index:0})===ENV.trainingLate.environmentId&&boardBackdropEnvironment331("obi_end_day",{sourceIndex:2,index:99})===ENV.streetLate.environmentId,
+    paragraphPaginationCannotShiftBackdrop:boardBackdropEnvironment331("obi_end_day",{sourceIndex:0,index:99})===ENV.trainingLate.environmentId&&boardBackdropEnvironment331("obi_end_day",{sourceIndex:1,index:99})===ENV.trainingLate.environmentId,
     directBackdropPathProjection:typeof registerFinalSceneBoard==="function"&&registerFinalSceneBoard.toString().includes("return assetPath?{assetPath,environmentId}:null"),
     stableBeatBackdropProjection:boardBackdropEnvironment331("obi_depart")===ENV.mainStreet.environmentId&&boardBackdropEnvironment331("obi_furniture_choice")===ENV.residential.environmentId&&boardBackdropEnvironment331("obi_equipment_choice")===ENV.academyApproach.environmentId&&boardBackdropEnvironment331("obi_arrival")===ENV.trainingDay.environmentId&&boardBackdropEnvironment331("obi_home")===ENV.home.environmentId,
     closeRemainsHome:definition.beatMap instanceof Map?definition.beatMap.get("obi_close")&&definition.beatMap.get("obi_close").environmentRef===ENV.home:definition.beats.some(b=>b.beatId==="obi_close"&&b.environmentRef===ENV.home),
     noGenericBackdropFallback:Object.values(BACKDROPS).every(path=>!path.startsWith("Scene backdrops/")),
-    freshRewriteCardinality:PERFORMANCE.obi_depart.length===2&&
-      ["furniture","vegetables","equipment","delivery","cart"].every(key=>PERFORMANCE["obi_"+key+"_intro"].length===2&&PERFORMANCE["obi_"+key+"_help"].length===1&&PERFORMANCE["obi_"+key+"_continue"].length===1)&&
-      ["FULL","SUBSTANTIAL","REDUCED","MINIMAL"].every(key=>PERFORMANCE["arrival_"+key].length===2)&&
+    freshRewriteCardinality:PERFORMANCE.obi_depart.length===5&&
+      ["furniture","vegetables","equipment","delivery","cart"].every(key=>PERFORMANCE["obi_"+key+"_intro"].length===3&&PERFORMANCE["obi_"+key+"_help"].length===2&&PERFORMANCE["obi_"+key+"_continue"].length===2)&&
+      ["FULL","SUBSTANTIAL","REDUCED","MINIMAL"].every(key=>PERFORMANCE["arrival_"+key].length===4)&&
       PERFORMANCE.training_intro.length===0&&
-      ["stamina","bukijutsu","ninjutsu","taijutsu"].every(key=>PERFORMANCE["training_"+key].length===1)&&
-      PERFORMANCE.obi_end_day.length===2&&PERFORMANCE.home_common.length===1&&
-      PERFORMANCE.home_all_help.length===1&&PERFORMANCE.home_no_help.length===1&&PERFORMANCE.home_mixed.length===1&&
-      ["ending_helping","ending_training","ending_balance","ending_question"].every(key=>PERFORMANCE[key].length===2)&&PERFORMANCE.obi_close.length===1,
+      ["stamina","bukijutsu","ninjutsu","taijutsu"].every(key=>PERFORMANCE["training_"+key].length===2)&&
+      PERFORMANCE.obi_end_day.length===3&&PERFORMANCE.home_common.length===2&&
+      PERFORMANCE.home_all_help.length===2&&PERFORMANCE.home_no_help.length===2&&PERFORMANCE.home_mixed.length===2&&
+      PERFORMANCE.ending_helping.length===5&&PERFORMANCE.ending_training.length===5&&
+      PERFORMANCE.ending_balance.length===6&&PERFORMANCE.ending_question.length===5&&PERFORMANCE.obi_close.length===2,
     freshCuesPinnedToSinglePerformancePage:Object.values(PERFORMANCE).flat().every(row=>!row||row.singlePage===true),
+    authoredBoxesDoNotStackParagraphs:Object.values(PERFORMANCE).flat().every(row=>!row||!String(row.text||"").includes("\\n\\n")),
+    narrationHasNoSpeakerPrefixes:Object.values(PERFORMANCE).flat().every(row=>!row||row.kind!=="narration"||!/^(OBITO|ACADEMY INSTRUCTOR|CIVILIAN|VENDOR|CUSTODIAN|DELIVERY WORKER):/.test(String(row.text||""))),
+    requiredDialogueIsSpeakerOwned:PERFORMANCE.obi_depart[2]?.kind==="dialogue"&&PERFORMANCE.obi_depart[2]?.speakerName==="OBITO"&&
+      ["FULL","SUBSTANTIAL","REDUCED","MINIMAL"].every(key=>PERFORMANCE["arrival_"+key][2]?.kind==="dialogue"&&PERFORMANCE["arrival_"+key][2]?.speakerName==="ACADEMY INSTRUCTOR")&&
+      PERFORMANCE.ending_helping[2]?.speakerName==="OBITO"&&PERFORMANCE.ending_helping[4]?.speakerName==="OBITO"&&
+      PERFORMANCE.ending_training[2]?.speakerName==="OBITO"&&PERFORMANCE.ending_training[4]?.speakerName==="OBITO"&&
+      PERFORMANCE.ending_balance[2]?.speakerName==="OBITO"&&PERFORMANCE.ending_balance[4]?.speakerName==="OBITO"&&
+      PERFORMANCE.ending_question[2]?.speakerName==="OBITO"&&PERFORMANCE.ending_question[4]?.speakerName==="OBITO",
     exactFreshChoiceLabels:[
       "Help her move it","Keep going","Help gather the produce","Help find the equipment",
       "Help right the delivery","Help stop the cart","Go to training"
