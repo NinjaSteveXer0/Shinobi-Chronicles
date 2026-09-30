@@ -344,7 +344,7 @@ function miraiActors(beatId,performance,beat){
   if(id==="mir_receipt")return[];
   const rows=[actor("academy_mirai","MIRAI",PATH.mirai,sp)];
   const traveller=()=>actor("mirai_traveller","TRAVELLER",PATH.traveller,sp,["TRAVELER","CIVILIAN","ESCORT"]);
-  const instructor=()=>actor("mirai_academy_instructor","INSTRUCTOR",PATH.miraiInstructor,sp,["ACADEMY INSTRUCTOR"]);
+  const instructor=()=>actor("academy_mirai_origin_instructor","INSTRUCTOR",PATH.miraiInstructor,sp,["ACADEMY INSTRUCTOR"]);
   const checkpoint=()=>actor("mirai_checkpoint_instructor","CHECKPOINT INSTRUCTOR",PATH.miraiCheckpointInstructor,sp);
 
   if(id.startsWith("mir_assignment_")){
@@ -551,7 +551,6 @@ function installDefinitions(){
     performanceSequences:{
       mir_confront_defeat_end_12:()=>[
         {kind:"dialogue",speakerName:"ACADEMY INSTRUCTOR",text:"About the switch."},
-        {kind:"narration",text:"A beat."},
         {kind:"dialogue",speakerName:"ACADEMY INSTRUCTOR",text:"You still lost the exchange."},
         {kind:"narration",text:"Mirai looks away.\n\nShe knows."}
       ],
