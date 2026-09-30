@@ -57,7 +57,7 @@ Owner browser assessment determines Golden.
 
 ---
 
-## 2. Persistent Development + Current-Team Truth
+## 2. Persistent Development + Current-Team Truth + Skill Learning + Development Chronicle
 
 **Current: RED**
 
@@ -76,11 +76,23 @@ Stephen also reports Exams/Practical do not consistently consume the actual curr
 
 Required:
 - one authoritative current committed squad projection consumed by team-aware screens;
+- single-subject Exams/Practical by default;
+- AI-controlled participants develop from their own legitimate actions;
 - persistent development loop;
-- exact growth/threshold rules from Progression;
+- exact EXP -> Stat growth/threshold rules from Progression;
+- visible activity-development ceilings;
+- no hidden Energy expenditure for zero development;
+- exact authorised Skill/Technique learning routes from development/training;
+- meaningful development Chronicle/history projection without repetition spam;
 - no direct hidden PL grants;
 - save/load proof;
 - owner-visible Stat/PL change.
+
+Current candidate trial:
+`Documentation/Coordination/Persistent_Development_Current_Team_Skill_Learning_and_Chronicle_Trial_v1_2026-09-30.md`
+@ `5a2e9cfcbd398943cfc637070ae52203559590b7`
+
+Progression queue: #434.
 
 This is foundational before serious Main Story balance testing.
 
