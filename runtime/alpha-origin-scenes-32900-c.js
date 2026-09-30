@@ -1055,6 +1055,7 @@ function buildObitoReceipt331(){
   const reflection=interpretationText[ctx.obitoFinalInterpretation];
   if(reflection)lines.push("• Reflection — "+reflection);
   lines.push("","WHAT HAPPENED","• Reached the Academy and completed the training that remained.","","REWARDS",`• Origin Starting Purse: +${originStartingPurseAmount331()} Ryō.`);
+  if(typeof globalThis.appendAcademyOriginRewardReceipt440==="function")globalThis.appendAcademyOriginRewardReceipt440(lines,ORIGIN_ID);
   return lines.join("\n");
 }
 function boardActors(beatId,performance){
