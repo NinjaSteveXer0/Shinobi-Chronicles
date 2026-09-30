@@ -1064,6 +1064,12 @@
       stage.dataset.battleEnvironment=menmaProof?"forest_clearing_day":"authored";
       stage.dataset.battleEnvironmentPath=environmentPath;
       const cssPath=environmentPath.replace(/\\/g,"\\\\").replace(/"/g,'\\"');
+      // Use the full background shorthand inline, not only background-image.
+      // The shared Battle stylesheet owns a !important fallback background
+      // shorthand; setting only the longhand left non-Menma Story Battles at
+      // the dark fallback in owner-browser rendering. The inline shorthand is
+      // the final presentation owner whenever an authored environment exists.
+      stage.style.setProperty("background",`linear-gradient(180deg,rgba(1,8,9,.20),rgba(1,8,9,.48)),url("${cssPath}") center / cover no-repeat`,"important");
       stage.style.setProperty("background-image",`linear-gradient(180deg,rgba(1,8,9,.20),rgba(1,8,9,.48)),url("${cssPath}")`,"important");
       stage.style.setProperty("background-size","cover","important");
       stage.style.setProperty("background-position","center","important");
@@ -1071,6 +1077,7 @@
     }else{
       delete stage.dataset.battleEnvironment;
       delete stage.dataset.battleEnvironmentPath;
+      stage.style.removeProperty("background");
       stage.style.removeProperty("background-image");
       stage.style.removeProperty("background-size");
       stage.style.removeProperty("background-position");
