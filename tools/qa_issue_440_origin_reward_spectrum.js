@@ -17,6 +17,7 @@ function boot(seed={}){
   const chars={};
   const active={sceneId:'test',instanceId:'test:1',localContext:{}};
   const evidence=[];
+  let runtimeCtx=null;
   const A={
     sceneByVariant:{},
     clone:v=>v&&typeof v==='object'?JSON.parse(JSON.stringify(v)):v,
@@ -32,7 +33,10 @@ function boot(seed={}){
           fact:this.clone(fact),data:this.clone(fact),timestamp:Date.now()};
         playerData.activityHistory.push(row);
       }
-      return{success:true,occurrenceId,record:this.clone(row),receipts:[]};
+      const rewardSpectrum440=runtimeCtx&&typeof runtimeCtx.projectAcademyOriginRewardOccurrence440==='function'
+        ?runtimeCtx.projectAcademyOriginRewardOccurrence440(originId,occurrenceId,this.clone(row),this.clone(this.local()))
+        :null;
+      return{success:true,occurrenceId,record:this.clone(row),receipts:[],rewardSpectrum440};
     }
   };
   const getChar=id=>{
@@ -55,7 +59,7 @@ function boot(seed={}){
       return{success:true,idempotent:!!evidence.find((x,i)=>x.key===key&&i<evidence.indexOf(row)),evidence:JSON.parse(JSON.stringify(row))};
     }
   };
-  ctx.globalThis=ctx;vm.createContext(ctx);vm.runInContext(overlaySource,ctx,{filename:overlayPath});
+  ctx.globalThis=ctx;runtimeCtx=ctx;vm.createContext(ctx);vm.runInContext(overlaySource,ctx,{filename:overlayPath});
   return{ctx,A,playerData,chars,evidence,active};
 }
 function exp(state,id,discipline){return Number(state.chars[id]?.disciplineProgression?.[discipline]?.exp)||0;}
