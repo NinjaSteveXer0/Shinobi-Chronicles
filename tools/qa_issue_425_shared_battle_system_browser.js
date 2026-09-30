@@ -131,7 +131,10 @@ async function proveVisibleActionPresentation(page){
   const p=await page.evaluate(({before,skillId})=>{
     const stage=document.querySelector(".alpha-code-battle-stage");
     const evidence=(currentBattle?.runtime?.evidence||[]).filter(Boolean);
-    const actionText=stage?.querySelector(".battle2-performance-center strong")?.textContent?.trim()||"";
+    const banner=stage?.querySelector(".battle2-performance-center")||null;
+    const actionText=banner?.querySelector("strong")?.textContent?.trim()||"";
+    const bannerRect=banner?.getBoundingClientRect()||null;
+    const stageRect=stage?.getBoundingClientRect()||null;
     const ordinal=Number(stage?.dataset.presentationSequenceOrdinal||0);
     const actor=stage?.dataset.presentationActorId||null;
     const target=stage?.dataset.presentationTargetId||null;
@@ -164,6 +167,11 @@ async function proveVisibleActionPresentation(page){
     return{
       before,ordinal,actor,target,actionText,active,actorNodes,targetNodes,resultText,
       playerPLText,enemyPLText,playerPL,enemyPL,presentationBeforePL,presentationAfterPL,
+      bannerGeometry:bannerRect&&stageRect?{
+        top:bannerRect.top,bottom:bannerRect.bottom,width:bannerRect.width,height:bannerRect.height,
+        stageTop:stageRect.top,stageWidth:stageRect.width,stageHeight:stageRect.height,
+        viewportHeight:innerHeight
+      }:null,
       committedEvidence,anyCompletedEvidence,
       evidence:evidence.slice(-12).map(row=>({
         eventType:row?.eventType||null,
@@ -179,6 +187,12 @@ async function proveVisibleActionPresentation(page){
   assert.strictEqual(p.actor,"academy_mirai","shared action presentation actor drift");
   assert.strictEqual(p.target,"academy_mirai_origin_instructor","shared action presentation target drift");
   assert(p.actionText.length>0,"shared action presentation technique label missing");
+  assert(p.bannerGeometry,"shared action presentation banner geometry missing");
+  assert(p.bannerGeometry.top>=p.bannerGeometry.stageTop,"shared action banner clips above the Battle stage "+JSON.stringify(p.bannerGeometry));
+  assert(p.bannerGeometry.top>=0,"shared action banner clips above the viewport "+JSON.stringify(p.bannerGeometry));
+  assert(p.bannerGeometry.bottom<=p.bannerGeometry.viewportHeight,"shared action banner clips below the viewport "+JSON.stringify(p.bannerGeometry));
+  assert(p.bannerGeometry.width>=p.bannerGeometry.stageWidth*.20,"shared DUEL action banner is too narrow and forces excessive wrapping "+JSON.stringify(p.bannerGeometry));
+  assert(p.bannerGeometry.height<=p.bannerGeometry.stageHeight*.10,"shared action banner is too tall for the Battle stage "+JSON.stringify(p.bannerGeometry));
   assert.strictEqual(p.active,true,"shared action receipt settled before PL projection could be proven");
   assert(p.playerPLText!==""&&Number.isFinite(p.playerPL),"player radial Battle PL numeral disappeared during Skill presentation");
   assert(p.enemyPLText!==""&&Number.isFinite(p.enemyPL),"enemy radial Battle PL numeral disappeared during Skill presentation");
@@ -258,6 +272,7 @@ async function proveVisibleActionPresentation(page){
         exactSkillsItemsSummonsDock:true,
         skillInspector:true,
         orderedActionPresentation:true,
+        actionBannerFullyOnScreen:true,
         hiddenIdentityPreserved:true,
         browserErrorGateClean:true
       },
