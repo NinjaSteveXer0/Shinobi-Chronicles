@@ -45,7 +45,7 @@ It supersedes older Mirai player-facing prose / choreography expression, includi
 The older authorities remain useful only for semantic/source history not contradicted by this file.
 
 This Writing GOLDEN consumes:
-- `Documentation/Story/Academy_Mirai_Instructor_Female_Identity_Correction_2026-09-29.md` — Mirai's Academy instructor is female; the temporary male Traveller disguise changes presentation only;
+- `Documentation/Story/Academy_Mirai_Instructor_Male_Identity_Correction_2026-09-30.md` — Mirai's Academy instructor is male; the apparent Traveller is also male in presentation, so the substitution changes identity rather than gender;
 
 - `Documentation/Story/Universal_Player_Facing_Story_Narration_Dialogue_and_Conversation_Quality_Gate_2026-09-23.md`;
 - `Documentation/Story/Academy_Mirai_Character_Voice_and_Personality_Anchor_2026-09-23.md`;
@@ -67,7 +67,7 @@ Core protected distinctions:
 
 The optional Mirai PL Battle opponent is now Story-closed:
 
-> **The apparent Escort is the Battle opponent — because the person currently presenting as the male Escort is actually the female Academy instructor in disguise after switching places with the real Escort during the covered-market separation.**
+> **The apparent Escort is the Battle opponent — because the person currently presenting as the male Escort is actually Mirai's male Academy instructor in disguise after switching places with the real Escort during the covered-market separation.**
 
 Preserve:
 
