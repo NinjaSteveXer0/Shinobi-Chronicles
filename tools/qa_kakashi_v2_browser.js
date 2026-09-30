@@ -408,11 +408,19 @@ async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedB
     const playerCount=(currentBattle?.deployment?.player?.slots||[]).filter(slot=>slot&&slot.participantId).length;
     const enemyCount=(currentBattle?.deployment?.enemy?.slots||[]).filter(slot=>slot&&slot.participantId).length;
     const peak=Math.max(playerCount,enemyCount);
+    const sourceBeatId=currentBattle?.returnContext?.sourceBeatId||null;
+    const expectedEnvironment=sourceBeatId&&typeof getAcademyKakashiV2Presentation36020==="function"
+      ?String(getAcademyKakashiV2Presentation36020(sourceBeatId)?.backdrop||"")
+      :"";
     return{
       battleSystem:stage?.dataset.battleSystem||null,
       formationStage:stage?.dataset.formationStage||null,
       formationMode:stage?.dataset.formationMode||null,
       menmaProof:stage?.dataset.evolvedPlProof||null,
+      environmentPath:stage?.dataset.battleEnvironmentPath||null,
+      environmentMode:stage?.dataset.battleEnvironment||null,
+      expectedEnvironment,
+      backgroundImage:stage?getComputedStyle(stage).backgroundImage:"",
       playerCount,enemyCount,
       expectedMode:peak<=1?"duel":peak>=4?"arc":"wedge",
       framelessPlayer:stage?.querySelector(".battle-live-active-card-player")?.dataset.framelessBattlePortrait||null,
@@ -425,6 +433,10 @@ async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedB
   assert.strictEqual(sharedBattle.formationMode,sharedBattle.expectedMode,"Kakashi adaptive formation drift: "+JSON.stringify(sharedBattle));
   assert.strictEqual(sharedBattle.framelessPlayer,"true","Kakashi active portrait is not frameless in shared Battle System");
   assert.strictEqual(sharedBattle.framelessEnemy,"true","Kakashi opposition active portrait is not frameless in shared Battle System");
+  assert(sharedBattle.expectedEnvironment,"Kakashi Battle beat has no authored Story backdrop "+JSON.stringify(sharedBattle));
+  assert.strictEqual(sharedBattle.environmentPath,sharedBattle.expectedEnvironment,"Kakashi shared Battle did not inherit its exact Story location "+JSON.stringify(sharedBattle));
+  assert.strictEqual(sharedBattle.environmentMode,"authored","Kakashi shared Battle environment is not marked authored "+JSON.stringify(sharedBattle));
+  assert(sharedBattle.backgroundImage.includes(sharedBattle.expectedEnvironment.split("/").pop()),"Kakashi authored Story backdrop is not visibly painted in Battle "+JSON.stringify(sharedBattle));
   if(sharedBattle.enemyCount===3)assert.strictEqual(sharedBattle.formationMode,"wedge","Kakashi failed-pickpocket 3v1 did not use shared SQUAD WEDGE");
   if(assertVisible){
     await page.waitForFunction(()=>{
@@ -462,34 +474,78 @@ async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedB
     const claim=page.getByRole("button",{name:"CLAIM REWARDS"}).first();
     await claim.waitFor({state:"visible",timeout:10000});
     await page.evaluate(()=>{
-      const probe={playerSaves:0,testSaves:0,priorPlayer:savePlayerData,priorTest:saveTestState};
+      const root=document.getElementById("overlay-content-container");
+      const probe={
+        playerSaves:0,testSaves:0,
+        priorPlayer:savePlayerData,priorTest:saveTestState,
+        priorClaim:claimVictoryRewardsFromOverlay,
+        claimStartedAt:null,continueRenderedAt:null,firstSaveAt:null,
+        observer:null
+      };
+      const markContinue=()=>{
+        const button=document.querySelector(".alpha-victory-footer .victory-continue");
+        if(probe.continueRenderedAt===null&&button&&/CONTINUE/i.test(button.textContent||"")){
+          probe.continueRenderedAt=performance.now();
+        }
+      };
+      probe.observer=new MutationObserver(markContinue);
+      if(root)probe.observer.observe(root,{subtree:true,childList:true,characterData:true});
       globalThis.__kakashiClaimPersistenceProbe=probe;
-      globalThis.savePlayerData=function(){probe.playerSaves+=1;return probe.priorPlayer.apply(this,arguments);};
-      globalThis.saveTestState=function(){probe.testSaves+=1;return probe.priorTest.apply(this,arguments);};
+      globalThis.savePlayerData=function(){
+        if(probe.firstSaveAt===null)probe.firstSaveAt=performance.now();
+        probe.playerSaves+=1;
+        return probe.priorPlayer.apply(this,arguments);
+      };
+      globalThis.saveTestState=function(){
+        if(probe.firstSaveAt===null)probe.firstSaveAt=performance.now();
+        probe.testSaves+=1;
+        return probe.priorTest.apply(this,arguments);
+      };
+      globalThis.claimVictoryRewardsFromOverlay=function(){
+        probe.claimStartedAt=performance.now();
+        return probe.priorClaim.apply(this,arguments);
+      };
       try{savePlayerData=globalThis.savePlayerData;}catch(_error){}
       try{saveTestState=globalThis.saveTestState;}catch(_error){}
+      try{claimVictoryRewardsFromOverlay=globalThis.claimVictoryRewardsFromOverlay;}catch(_error){}
     });
-    const claimStarted=Date.now();
     await claim.click();
     await page.waitForFunction(()=>{
-      if(currentBattle?.rewards?.claimed!==true)return false;
+      const probe=globalThis.__kakashiClaimPersistenceProbe;
+      if(!probe||probe.continueRenderedAt===null||currentBattle?.rewards?.claimed!==true)return false;
       const button=document.querySelector(".alpha-victory-footer .victory-continue");
       return !!button&&button.getClientRects().length>0&&/CONTINUE/i.test(button.textContent||"");
-    },null,{timeout:2000});
-    claimResponseMs=Date.now()-claimStarted;
+    },null,{timeout:1000});
+    await page.waitForFunction(()=>{
+      const probe=globalThis.__kakashiClaimPersistenceProbe;
+      return !!probe&&probe.playerSaves===1&&probe.testSaves===1;
+    },null,{timeout:4000});
     claimPersistence=await page.evaluate(()=>{
       const probe=globalThis.__kakashiClaimPersistenceProbe;
       if(!probe)return null;
-      const out={playerSaves:probe.playerSaves,testSaves:probe.testSaves};
+      const out={
+        playerSaves:probe.playerSaves,
+        testSaves:probe.testSaves,
+        visualResponseMs:probe.claimStartedAt!==null&&probe.continueRenderedAt!==null?probe.continueRenderedAt-probe.claimStartedAt:null,
+        continueRenderedAt:probe.continueRenderedAt,
+        firstSaveAt:probe.firstSaveAt,
+        paintedBeforePersistence:probe.continueRenderedAt!==null&&probe.firstSaveAt!==null&&probe.continueRenderedAt<=probe.firstSaveAt
+      };
+      try{probe.observer?.disconnect();}catch(_error){}
       globalThis.savePlayerData=probe.priorPlayer;
       globalThis.saveTestState=probe.priorTest;
+      globalThis.claimVictoryRewardsFromOverlay=probe.priorClaim;
       try{savePlayerData=globalThis.savePlayerData;}catch(_error){}
       try{saveTestState=globalThis.saveTestState;}catch(_error){}
+      try{claimVictoryRewardsFromOverlay=globalThis.claimVictoryRewardsFromOverlay;}catch(_error){}
       delete globalThis.__kakashiClaimPersistenceProbe;
       return out;
     });
-    assert(claimResponseMs<750,"Kakashi CLAIM REWARDS must respond in under 750ms, got "+claimResponseMs+"ms");
-    assert.deepStrictEqual(claimPersistence,{playerSaves:1,testSaves:1},"Kakashi Claim performed duplicate synchronous persistence "+JSON.stringify(claimPersistence));
+    claimResponseMs=claimPersistence&&Number(claimPersistence.visualResponseMs);
+    assert(Number.isFinite(claimResponseMs)&&claimResponseMs<300,"Kakashi CLAIM -> CONTINUE visual response must paint in under 300ms, got "+claimResponseMs+"ms");
+    assert.strictEqual(claimPersistence.paintedBeforePersistence,true,"Kakashi Victory UI did not paint before persistence "+JSON.stringify(claimPersistence));
+    assert.strictEqual(claimPersistence.playerSaves,1,"Kakashi Claim player persistence count drifted "+JSON.stringify(claimPersistence));
+    assert.strictEqual(claimPersistence.testSaves,1,"Kakashi Claim session persistence count drifted "+JSON.stringify(claimPersistence));
     const committed=await page.evaluate(before=>{
       const pill=Array.isArray(playerData.inventory)
         ?playerData.inventory.filter(row=>row&&(row.id||row.itemId)==="field_recovery_pill").reduce((n,row)=>n+Math.max(1,Number(row.quantity)||1),0)
