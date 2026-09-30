@@ -34,6 +34,8 @@ This is **not a compression pass**.
 This is **not permission to shorten the Origin again**.
 
 This is a **segmentation-only correction**.
+> **IMPLEMENTATION-READY WRITING SUCCESSOR:** The exact box-by-box source now lives inside `Documentation/Story/Academy_Obito_Origin_Fresh_Player_Facing_Rewrite_2026-09-30.md` @ `57d481dac5bee86f0a1125ccf9c263c44e7aaa0b`, Sections 3–10. That explicit map supersedes any earlier request for Coding to infer box boundaries from paragraph breaks.
+
 
 ---
 
