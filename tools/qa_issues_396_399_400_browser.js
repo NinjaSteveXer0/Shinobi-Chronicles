@@ -378,7 +378,7 @@ async function runIwabeeWorldBranch(browser,beatId,expected){
       instructorIntervention:"SHIELD_STUDENTS_NO_PURSUIT",
       earthReleaseUsedToConstrainRogueGenin:false
     }));
-    results.push(await runIwabeeWorldBranch(browser,"iwa_finish_04",{
+    results.push(await runIwabeeWorldBranch(browser,"iwa_finish_05",{
       rogueDisposition:"ESCAPED_WHILE_IWABEE_FINISHED_PRACTICAL",
       academyInstructorRef:"iwabee_origin_practical_instructor_01",
       custodyState:"NONE",
