@@ -1991,13 +1991,13 @@
       }
       .battle2-modern[data-formation-stage="true"] .battle2-performance-stage{transition:none!important;transform:none!important}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-stage.is-settled{transform:none!important}
-      .battle2-modern[data-formation-stage="true"] .battle2-performance-host{left:43%!important;right:43%!important;top:1.5%!important;height:4.8%!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-host{left:37.5%!important;right:37.5%!important;top:2.8%!important;height:5.4%!important}
       .battle2-modern[data-formation-stage="true"][data-formation-mode="wedge"] .battle2-performance-host,
-      .battle2-modern[data-formation-stage="true"][data-formation-mode="arc"] .battle2-performance-host{left:31%!important;right:31%!important;top:1.4%!important;height:8.2%!important}
-      .battle2-modern[data-formation-stage="true"] .battle2-performance-center{min-height:48px!important;padding:7px 16px!important;border:1px solid rgba(218,178,78,.34)!important;border-radius:9px!important;background:linear-gradient(90deg,rgba(2,8,12,.18),rgba(2,8,12,.88) 18%,rgba(2,8,12,.94) 82%,rgba(2,8,12,.18))!important;box-shadow:0 12px 28px rgba(0,0,0,.34)!important}
-      .battle2-modern[data-formation-stage="true"] .battle2-performance-center small{font-size:clamp(7px,.54vw,9px)!important;letter-spacing:.13em!important;color:#71dce5!important}
-      .battle2-modern[data-formation-stage="true"] .battle2-performance-center strong{margin-top:3px!important;font-size:clamp(14px,1.25vw,21px)!important;line-height:1.05!important;letter-spacing:.025em!important;color:#f3e7c9!important}
-      .battle2-modern[data-formation-stage="true"] .battle2-performance-target{display:block;margin-top:3px;color:#aabcc0;font-size:clamp(6px,.47vw,8px);font-weight:800;letter-spacing:.10em}
+      .battle2-modern[data-formation-stage="true"][data-formation-mode="arc"] .battle2-performance-host{left:31%!important;right:31%!important;top:2.4%!important;height:6.4%!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-center{min-height:36px!important;padding:4px 12px!important;border:1px solid rgba(218,178,78,.34)!important;border-radius:8px!important;background:linear-gradient(90deg,rgba(2,8,12,.18),rgba(2,8,12,.88) 18%,rgba(2,8,12,.94) 82%,rgba(2,8,12,.18))!important;box-shadow:0 9px 22px rgba(0,0,0,.30)!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-center small{font-size:clamp(6px,.48vw,8px)!important;letter-spacing:.12em!important;color:#71dce5!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-center strong{margin-top:2px!important;font-size:clamp(12px,1.02vw,17px)!important;line-height:1!important;letter-spacing:.02em!important;color:#f3e7c9!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-target{display:block;margin-top:2px;color:#aabcc0;font-size:clamp(5px,.42vw,7px);font-weight:800;letter-spacing:.09em}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-result-chip{min-width:126px!important;padding:8px 9px!important;background:linear-gradient(90deg,transparent,rgba(3,9,13,.90))!important}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-result-chip b{font-size:clamp(10px,.82vw,14px)!important}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-result-chip em{font-size:clamp(9px,.70vw,12px)!important;color:#f0e4ca!important}
