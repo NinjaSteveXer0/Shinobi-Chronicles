@@ -81,12 +81,16 @@
     // RETURN TO STORY. This flag is reward-authority owned; generic Battles keep
     // the established auto-return behaviour below.
     if(currentBattle&&currentBattle.rewards&&currentBattle.rewards.requiresExplicitPostClaimContinue===true){
-      try{openOverlay("victory");}catch(_error){}
+      // The predecessor Claim owner has already committed rewards and
+      // synchronously re-rendered the same Victory surface. Reopening Victory
+      // here duplicated the full renderer/terminal-overlay path and could make
+      // Kakashi's Claim/Continue controls appear unresponsive.
       return{
         ...claimResult,
         navigated:false,
         autoReturned:false,
         explicitPostClaimContinue:true,
+        victoryAlreadyRerenderedByClaimOwner:true,
         rewardCommitBeforeCallerRestore:true
       };
     }
@@ -266,6 +270,7 @@
       callerContextPreserved:claimSource.includes("returnContextBefore")&&claimSource.includes("currentBattle.returnContext"),
       callerOwnedCannotGenericFallback:claimSource.includes("genericBattleFallbackSuppressed:true")&&claimSource.includes('openOverlay("victory")'),
       explicitPostClaimContinueSupported:claimSource.includes("requiresExplicitPostClaimContinue")&&claimSource.includes("explicitPostClaimContinue:true"),
+      explicitPostClaimDoesNotReopenVictory:claimSource.includes("victoryAlreadyRerenderedByClaimOwner:true"),
       ordinaryBattleStillUsesGenericContinue:claimSource.includes("callerResult=continueAfterVictory()"),
       feedStyleInstalled:typeof document==="undefined"||!!document.getElementById("alpha-battle-browser-32600-style"),
       browserGoldenNotClaimed:true
