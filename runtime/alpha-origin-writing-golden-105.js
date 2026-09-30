@@ -905,7 +905,7 @@ line("mir_checkpoint_missed",[
  {mode:"dialogue",speaker:"TRAVELLER",text:"Told you."},
  {mode:"narration",text:"Mirai's eyes narrow slightly."},
  {mode:"dialogue",speaker:"MIRAI",text:"Told me what?"},
- {mode:"narration",text:"The traveller smiles.\n\nRaises one hand.\n\nSmoke erupts beside him.\n\nMirai jumps back.\n\nThe Academy instructor appears through it.\n\nMirai's face goes blank.\n\nA beat."},
+ {mode:"narration",text:"The traveller smiles.\n\nRaises one hand.\n\nSmoke erupts beside her.\n\nMirai jumps back.\n\nThe Academy instructor appears through it.\n\nMirai's face goes blank."},
  {mode:"dialogue",speaker:"MIRAI",text:"No."},
  {mode:"narration",text:"The instructor folds his arms.\n\nMirai points at him."},
  {mode:"dialogue",speaker:"MIRAI",text:"No."},
