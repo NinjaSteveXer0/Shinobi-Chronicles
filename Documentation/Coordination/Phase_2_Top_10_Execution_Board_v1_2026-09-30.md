@@ -5,6 +5,14 @@
 **Status:** **ACTIVE PLANNING BOARD — ACTIVATES AFTER 10/10 ORIGIN GOLDEN/FREEZE**  
 **Primary rule:** Finish the current Origin/Battle Golden loop before switching the project wholesale into Phase 2.
 
+**Phase-2 safety constitution:**  
+`Documentation/Coordination/Phase_2_Persistent_Chronicle_Safety_Constitution_2026-10-01.md`  
+@ `7ae187e5815e4e441bc1e7d7e59f9962c87be71f`
+
+**Persistent-state infrastructure queue:** #undefined
+
+No persistent Phase-2 subsystem may bypass the Constitution's state-owner / save-schema / migration / observer-safety / browser-trial gates.
+
 ## Status language
 
 - **RED** — absent, broken, materially incomplete, or not yet usable.
