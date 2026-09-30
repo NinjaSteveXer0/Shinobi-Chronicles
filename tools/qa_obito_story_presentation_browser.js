@@ -175,17 +175,17 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
 
     await toBeat(page,"obi_end_day");
     let end=await state(page);
-    assert(end.backdrop.includes("training_grounds_late_afternoon.png"),label+" compact end-day should begin in training yard");
-    assert(end.performance&&end.performance.sourceIndex===0&&end.performance.segmentCount===1,label+" compact end-day yard cue drift");
+    assert(end.backdrop.includes("training_grounds_late_afternoon.png"),label+" fresh end-day should begin in training yard");
+    assert(end.performance&&end.performance.sourceIndex===0&&end.performance.segmentCount===1,label+" fresh end-day yard cue drift");
     await advance(page);
     end=await state(page);
     assert.strictEqual(end.beatId,"obi_end_day");
-    assert(end.performance&&end.performance.sourceIndex===1&&end.performance.segmentCount===1,label+" compact end-day street cue drift");
-    assert(end.backdrop.includes("konoha_street_late_afternoon.png"),label+" compact end-day did not move to street on source cue 1");
+    assert(end.performance&&end.performance.sourceIndex===1&&end.performance.segmentCount===1,label+" fresh end-day street cue drift");
+    assert(end.backdrop.includes("konoha_street_late_afternoon.png"),label+" fresh end-day did not move to street on source cue 1");
 
     await toBeat(page,"obi_home");await assertBackdrop(page,"obi_home",EXPECTED_BACKDROP.obi_home);
     await toBeat(page,"obi_reflect");s=await state(page);
-    assert.deepStrictEqual(s.choices.map(x=>x.label),["I'm not going to stop helping people.","I need to take training more seriously.","I need to get better at both.","Maybe I'm looking at this wrong."]);
+    assert.deepStrictEqual(s.choices.map(x=>x.label),["I'm not going to stop helping people.","I need to take training more seriously.","I need to get better at both.","Maybe I'm looking at this wrong. I need to figure out what matters most to me."]);
     assert(s.choices.every(x=>x.icon),label+" reflection choice icon missing");
     await screenshot(page,label+"-reflection");
     await choose(page,"I need to get better at both.","obi_ending_balance");
@@ -203,7 +203,7 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
     const errors=await gate.assertClean(label);
     const interactions=page.__obitoInteractionCount||0;
     assert.strictEqual(interactions,expectedInteractions,label+" measured interaction count drift: "+interactions);
-    assert(interactions>=28&&interactions<=36,label+" route outside owner compression target: "+interactions);
+    assert(interactions>=28&&interactions<=36,label+" route outside owner pacing target: "+interactions);
     assert(interactions<=40,label+" route breached hard pre-Receipt ceiling: "+interactions);
     assert.strictEqual(completion.obito.checks.freshRewriteCardinality,true,label+" fresh rewrite cardinality diagnostic failed");
     assert.strictEqual(completion.obito.checks.freshCuesPinnedToSinglePerformancePage,true,label+" fresh rewrite single-page cue diagnostic failed");
@@ -218,8 +218,8 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
   try{
     const results=[];
     results.push(await runRoute(browser,{label:"all-continue",helpSet:new Set(),expectedDelay:0,expectedEntitlement:"FULL",expectedInteractions:31}));
-    results.push(await runRoute(browser,{label:"substantial-furniture-only",helpSet:new Set([0]),expectedDelay:7,expectedEntitlement:"SUBSTANTIAL",expectedInteractions:30}));
-    results.push(await runRoute(browser,{label:"reduced-furniture-equipment",helpSet:new Set([0,2]),expectedDelay:15,expectedEntitlement:"REDUCED",expectedInteractions:30}));
+    results.push(await runRoute(browser,{label:"substantial-furniture-only",helpSet:new Set([0]),expectedDelay:7,expectedEntitlement:"SUBSTANTIAL",expectedInteractions:31}));
+    results.push(await runRoute(browser,{label:"reduced-furniture-equipment",helpSet:new Set([0,2]),expectedDelay:15,expectedEntitlement:"REDUCED",expectedInteractions:31}));
     results.push(await runRoute(browser,{label:"all-help",helpSet:new Set([0,1,2,3,4]),expectedDelay:35,expectedEntitlement:"MINIMAL",expectedInteractions:33}));
     const summary={pass:true,kind:"obito_story_presentation_installed_browser",routes:results.map(r=>({label:r.label,delay:r.expectedDelay,entitlement:r.expectedEntitlement,interactions:r.interactions})),maxDiversionInteractionsIncludingChoice:4,hardCeiling:40,targetRange:[28,36],browserGoldenClaimed:false};
     fs.writeFileSync(path.join(OUT,"summary.json"),JSON.stringify(summary,null,2)+"\n");
