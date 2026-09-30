@@ -249,15 +249,6 @@ function projectOccurrence440(originId,sourceOccurrenceId,record=null,contextOve
   return{success:true,skipped:true,reason:"no_reward_spectrum_projection_for_occurrence"};
 }
 
-const PRE_COMMIT=A.commitOccurrence.bind(A);
-A.commitOccurrence=function commitOccurrenceWithRewardSpectrum440(originId,occurrenceId,fact={},rowIds=[],options={}){
-  const contextBefore=clone(A.local());
-  const result=PRE_COMMIT(originId,occurrenceId,fact,rowIds,options);
-  if(!result||result.success!==true)return result;
-  const overlay=projectOccurrence440(originId,occurrenceId,result.record,contextBefore);
-  return{...result,rewardSpectrum440:overlay};
-};
-
 function reconcileCommitted440(){
   const results=[];
   for(const row of history()){
