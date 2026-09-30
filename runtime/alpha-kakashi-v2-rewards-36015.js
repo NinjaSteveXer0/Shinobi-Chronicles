@@ -276,30 +276,32 @@ function claimKakashiV2BattleRewards(){
 
   const snap=snapshotRewardMutation();
   try{
-    let materialClaimed=false;
-    // Reuse the shared Battle reward claim path first. It already knows the
-    // live Inventory API and Victory-overlay lifecycle used by every Battle.
-    if(PRE_CLAIM){
-      const beforeRyo=Number(playerData.ryo)||0;
-      const beforePill=inventoryQuantity36015("field_recovery_pill");
-      const generic=PRE_CLAIM.call(globalThis);
-      const afterRyo=Number(playerData.ryo)||0;
-      const afterPill=inventoryQuantity36015("field_recovery_pill");
-      materialClaimed=generic===true||rewards.claimed===true||
-        afterRyo!==beforeRyo||afterPill!==beforePill;
+    const expectedRyo=Math.max(0,Number(rewards.ryo)||0);
+    const beforeRyo=Number(playerData.ryo)||0;
+    const beforePill=inventoryQuantity36015("field_recovery_pill");
+
+    // Reuse the shared Battle claim owner first. Kakashi then verifies the
+    // exact material delta rather than trusting a generic claimed flag. This
+    // keeps an old/stale Victory state from making MI's cash or pill unclaimable.
+    if(PRE_CLAIM)PRE_CLAIM.call(globalThis);
+
+    const afterGenericRyo=Number(playerData.ryo)||0;
+    const genericRyoGain=afterGenericRyo-beforeRyo;
+    if(genericRyoGain<0||genericRyoGain>expectedRyo){
+      throw new Error("shared_claim_ryo_delta_invalid:"+String(genericRyoGain));
+    }
+    if(genericRyoGain<expectedRyo){
+      playerData.ryo=afterGenericRyo+(expectedRyo-genericRyoGain);
     }
 
-    // Fail-soft fallback for isolated/test contexts where the shared claim
-    // owner is unavailable. Verify item quantity so signature drift cannot
-    // silently make the MI pill unclaimable.
-    if(!materialClaimed){
-      playerData.ryo=(Number(playerData.ryo)||0)+(Number(rewards.ryo)||0);
-      for(const item of Array.isArray(rewards.items)?rewards.items:[]){
-        if(!addRewardItem36015(item))throw new Error("inventory_add_api_failed:"+String(item.id||"unknown"));
-      }
-      rewards.claimed=true;
-      currentBattle.claimedAt=Date.now();
+    if(plan.pill&&inventoryQuantity36015("field_recovery_pill")<=beforePill){
+      const pill=(Array.isArray(rewards.items)?rewards.items:[]).find(item=>item&&item.id==="field_recovery_pill")||
+        {id:"field_recovery_pill",name:"Field Recovery Pill",rarity:"Common"};
+      if(!addRewardItem36015(pill))throw new Error("inventory_add_api_failed:field_recovery_pill");
     }
+
+    rewards.claimed=true;
+    if(!currentBattle.claimedAt)currentBattle.claimedAt=Date.now();
 
     if(plan.cashSourceId&&Number(plan.ryo)>0&&!hasBattleRewardReceipt36015(plan,plan.cashSourceId,"battle_cash")){
       writeReceipt({storyOccurrenceId:plan.storyOccurrenceId,sourceId:plan.cashSourceId,scopeRef:plan.battleOccurrenceId,rewardClass:"battle_cash",ryo:plan.ryo,battleOccurrenceId:plan.battleOccurrenceId,metadata:{battleConfigId:plan.configId}});
