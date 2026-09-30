@@ -62,6 +62,8 @@ assert(
   "Kushina natural-voice successor missing or retired banter returned"
 );
 const iwabeeSource=sceneB.slice(sceneB.indexOf("// Iwabee —"),sceneB.indexOf("// Metal Lee —"));
+const doubleEscapedNewline105=String.fromCharCode(92,92,110);
+assert(!iwabeeSource.includes(doubleEscapedNewline105),"Iwabee player-facing Story source contains double-escaped newline tokens");
 assert(
   iwabeeSource.includes('{beatId:"iwa_open_02",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"You planning to argue with the paper?"')&&
   iwabeeSource.includes('C("raise_collapsed","Raise the collapsed section"')&&
