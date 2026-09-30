@@ -162,7 +162,7 @@ When it clears, the Academy instructor is standing where he was.
 Actor projection changes now:
 - remove apparent Traveller / Escort card;
 - project `NPC/mirai_instructor.png`;
-- female presentation / she-her from this beat onward.
+- male presentation / he-him from this beat onward.
 
 ## `mir_shortcut_defeat_end_08` — dialogue — MIRAI
 
@@ -330,7 +330,7 @@ The escort attempt is already over.
 
 Physical actors:
 - Mirai;
-- female Academy instructor;
+- male Academy instructor;
 - real male Traveller.
 
 The real Traveller was already safe here.
@@ -415,7 +415,7 @@ They do not alter the factual defeat.
 
 Physical actors:
 - Mirai;
-- female Academy instructor;
+- male Academy instructor;
 - real male Traveller.
 
 ## `mir_defeat_debrief_confront_01` — narration
@@ -576,7 +576,7 @@ Required:
 Battle defeat
 -> visible defeat scene in storehouse lane
 -> instructor says exercise is over
--> female instructor reveal
+-> male instructor reveal
 -> Mirai learns real Traveller is safe at Checkpoint Three
 -> **BLACK WIPE**
 -> **LATER — CHECKPOINT THREE**
