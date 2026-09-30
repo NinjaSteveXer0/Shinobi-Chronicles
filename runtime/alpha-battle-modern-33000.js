@@ -275,6 +275,20 @@
       descriptionCoverage="needs_exact_override";
     }
   
+    if(descriptionCoverage==="needs_exact_override"){
+      // Older Combat data already carries readable mechanic prose for many
+      // non-Academy prepared Skills. Reuse it only when it is genuinely
+      // player-facing; never surface implementation vocabulary as a fallback.
+      try{
+        const legacy=typeof priorSummary==="function"?String(priorSummary(skill)||"").trim():"";
+        const banned=/\b(authored|resolver|predicate|stateKey|semanticClass|informationBoundary|categorical evidence|transient state|scalar|packet|action opportunity)\b/i;
+        if(legacy&&!banned.test(legacy)&&!legacy.includes("Use this authored Battle technique.")){
+          summary=legacy;
+          details=[];
+          descriptionCoverage="legacy_readable";
+        }
+      }catch(_error){}
+    }
     return {
       title:skill.displayName||skill.id,summary,details,kind:skillKind33000(skill),attackPL:attack,
       tags:[...new Set(tags)],exactPlayerFacingOverride:false,descriptionCoverage
