@@ -648,6 +648,17 @@
   const PRIOR_OPEN_SUMMONS_33000=typeof openBattleSummonActionFamily==="function"?openBattleSummonActionFamily:null;
   const PRIOR_CLOSE_ITEMS_33000=typeof closeBattleItemActionFamily==="function"?closeBattleItemActionFamily:null;
   const PRIOR_CLOSE_SUMMONS_33000=typeof closeBattleSummonActionFamily==="function"?closeBattleSummonActionFamily:null;
+  const PRIOR_REFRESH_ACTION_REGION_33000=typeof refreshBattleActionRegionPresentation==="function"?refreshBattleActionRegionPresentation:null;
+
+  if(PRIOR_REFRESH_ACTION_REGION_33000){
+    const wrappedRefreshBattleActionRegion33000=function(){
+      const result=PRIOR_REFRESH_ACTION_REGION_33000.apply(this,arguments);
+      try{refreshFormationPLProjection33000();}catch(_error){}
+      return result;
+    };
+    globalThis.refreshBattleActionRegionPresentation=wrappedRefreshBattleActionRegion33000;
+    try{refreshBattleActionRegionPresentation=wrappedRefreshBattleActionRegion33000;}catch(_error){}
+  }
 
   function refreshFormationActionPresentation33000(){
     try{if(typeof refreshBattleActionRegionPresentation==="function")refreshBattleActionRegionPresentation();}catch(_error){}
@@ -815,19 +826,39 @@
     }
     return node;
   }
+  function finitePresentationPL33000(value){
+    if(value===null||value===undefined||value==="")return null;
+    const number=Number(value);
+    return Number.isFinite(number)?number:null;
+  }
+  function presentationReceiptTargets33000(receipt,side,participantId){
+    return !!(receipt&&receipt.targetRef&&
+      String(receipt.targetRef.side||"")===String(side||"")&&
+      String(receipt.targetRef.participantId||"")===String(participantId||""));
+  }
   function presentationRemainingPL33000(side,participantId,canonical){
     if(!canonical||!orderedPlaybackEnabled33000())return canonical;
     try{syncBattlePresentationQueue33000();}catch(_error){}
-    const pending=[];
-    if(battlePresentationQueueState33000.active&&battlePresentationQueueState33000.active.receipt)pending.push(battlePresentationQueueState33000.active.receipt);
-    for(const row of battlePresentationQueueState33000.queue||[])if(row&&row.receipt)pending.push(row.receipt);
-    const target=pending.filter(receipt=>receipt&&receipt.targetRef&&
-      String(receipt.targetRef.side||"")===String(side||"")&&
-      String(receipt.targetRef.participantId||"")===String(participantId||"")&&
-      Number.isFinite(Number(receipt.beforePL)))
+
+    const active=battlePresentationQueueState33000.active&&battlePresentationQueueState33000.active.receipt||null;
+    if(presentationReceiptTargets33000(active,side,participantId)){
+      const after=finitePresentationPL33000(active.afterPL);
+      if(after!==null){
+        return{remaining:after,maximum:Number(canonical.maximum)||Math.max(0,after),presentationStaged:true,presentationPhase:"active_after",actionId:active.actionId};
+      }
+      const before=finitePresentationPL33000(active.beforePL);
+      if(before!==null){
+        return{remaining:before,maximum:Number(canonical.maximum)||Math.max(0,before),presentationStaged:true,presentationPhase:"active_before",actionId:active.actionId};
+      }
+    }
+
+    const target=(battlePresentationQueueState33000.queue||[])
+      .map(row=>row&&row.receipt||null)
+      .filter(receipt=>presentationReceiptTargets33000(receipt,side,participantId)&&finitePresentationPL33000(receipt.beforePL)!==null)
       .sort((a,b)=>(Number(a.sequenceOrdinal)||0)-(Number(b.sequenceOrdinal)||0))[0]||null;
     if(!target)return canonical;
-    return{remaining:Number(target.beforePL),maximum:Number(canonical.maximum)||Number(target.beforePL)||0,presentationStaged:true,actionId:target.actionId};
+    const before=finitePresentationPL33000(target.beforePL);
+    return{remaining:before,maximum:Number(canonical.maximum)||Math.max(0,before),presentationStaged:true,presentationPhase:"queued_before",actionId:target.actionId};
   }
   function supportRemainingPL33000(side,participantId){
     let canonical=null;
@@ -846,6 +877,23 @@
     }catch(_error){}
     return presentationRemainingPL33000(side,participantId,canonical);
   }
+  function refreshFormationPLProjection33000(stage=null){
+    stage=liveBattleStage33000(stage);
+    if(!stage||stage.dataset.formationStage!=="true")return{success:false,reason:"formation_stage_missing"};
+    const player=deployedFormation33000("player"),enemy=deployedFormation33000("enemy");
+    const playerActive=player.find(row=>row.slot===1)||player[0]||null;
+    const enemyActive=enemy.find(row=>row.slot===1)||enemy[0]||null;
+    if(playerActive)projectFormationActivePortrait33000(stage,"player",playerActive);
+    if(enemyActive)projectFormationActivePortrait33000(stage,"enemy",enemyActive);
+    return{
+      success:true,
+      playerId:playerActive&&playerActive.participantId||null,
+      enemyId:enemyActive&&enemyActive.participantId||null,
+      presentationOnly:true,
+      semanticWrite:false
+    };
+  }
+  globalThis.refreshFormationPLProjection33000=refreshFormationPLProjection33000;
   function ensureFormationSupportMarkup33000(node){
     if(!node)return null;
     let img=node.querySelector(".battle-live-roster-portrait");
@@ -1363,6 +1411,7 @@
     if(lane){lane.classList.add("is-playing");lane.classList.remove("is-settled");}
     setPresentationQueueBusy33000(stage,true);
     applyBattlePerformanceRoles33000(stage,active.receipt);
+    try{refreshFormationPLProjection33000(stage);}catch(_error){}
     stage.dataset.presentationSequenceOrdinal=String(active.receipt.sequenceOrdinal||0);
     stage.dataset.presentationActionRole=String(active.receipt.actionRole||"ACTIVE");
     stage.dataset.presentationActorId=String(active.receipt.actorRef&&active.receipt.actorRef.participantId||"");
@@ -2056,6 +2105,10 @@
       performanceSettleIsActionScoped:String(finishBattlePresentationReceipt33000).includes("active.key!==key")&&String(clearBattlePerformanceRoles33000).includes("battle2-performance-active"),
       orderedCommittedPlayback:String(syncBattlePresentationQueue33000).includes("collectBattlePerformanceProjections33000")&&String(playNextBattlePresentationReceipt33000).includes("playedKeys.add")&&String(projectBattlePerformanceCompletion33000).includes("immutableCommittedFacts:true")&&String(bindActiveBattlePresentation33000).includes("liveBattleStage33000"),
       orderedPlaybackGlobal:String(orderedPlaybackEnabled33000).includes("battleId")&&!String(orderedPlaybackEnabled33000).includes("academy_menma_origin_three_test_subjects_with_anko"),
+      nullPLMetadataIsNotZero:String(finitePresentationPL33000).includes("value===null")&&String(finitePresentationPL33000).includes('value===""'),
+      activeReceiptShowsCommittedAfterPL:String(presentationRemainingPL33000).includes("active_after")&&String(presentationRemainingPL33000).includes("active.afterPL"),
+      partialActionRefreshRestoresRadialPL:!!PRIOR_REFRESH_ACTION_REGION_33000&&String(refreshBattleActionRegionPresentation).includes("refreshFormationPLProjection33000"),
+      activeReceiptRefreshesRadialPL:String(bindActiveBattlePresentation33000).includes("refreshFormationPLProjection33000"),
       reloadDoesNotDuplicatePresentation:String(resetPresentationQueueState33000).includes("playedKeys")&&String(presentationStorageKey33000).includes("battleId"),
       terminalNavigationDeferred:!!PRIOR_OPEN_OVERLAY_33000&&!!PRIOR_RESUME_BATTLE_CALLER_33000&&String(flushDeferredTerminalOverlay33000).includes("pendingBattlePresentation33000")&&String(flushDeferredBattleCallerResume33000).includes("pendingBattlePresentation33000")&&String(finishBattlePresentationReceipt33000).includes("flushDeferredTerminalOverlay33000")&&String(finishBattlePresentationReceipt33000).includes("flushDeferredBattleCallerResume33000"),
       menmaEnvironmentBound:String(applyBattleEnvironment33000).includes("forest_clearing_day")&&styleText.includes('data-battle-environment="forest_clearing_day"'),
