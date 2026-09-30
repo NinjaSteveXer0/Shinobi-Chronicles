@@ -784,7 +784,11 @@
     receiptSettlementInProgress:false
   };
   function orderedPlaybackEnabled33000(){
-    return !!(currentBattle&&String(currentBattle.battleConfigId||"")==="academy_menma_origin_three_test_subjects_with_anko");
+    // Canonical Shinobi Chronicles Battle presentation is global. Menma is the
+    // benchmark encounter, not an enablement gate. Keep playback alive through
+    // terminal resolution while a concrete Battle occurrence still owns the
+    // current Battle state.
+    return !!(currentBattle&&String(currentBattle.battleId||"").trim());
   }
   function presentationStorageKey33000(battleId){
     return "sc_battle_presentation_33000:"+String(battleId||"");
@@ -1795,6 +1799,7 @@
       menmaMarkerIsProofOnly:String(applyBattleEnvironment33000).includes("Historical proof/debug marker only")&&String(installFormationStage33000).includes("applyBattleEnvironment33000"),
       performanceSettleIsActionScoped:String(finishBattlePresentationReceipt33000).includes("active.key!==key")&&String(clearBattlePerformanceRoles33000).includes("battle2-performance-active"),
       orderedCommittedPlayback:String(syncBattlePresentationQueue33000).includes("collectBattlePerformanceProjections33000")&&String(playNextBattlePresentationReceipt33000).includes("playedKeys.add")&&String(projectBattlePerformanceCompletion33000).includes("immutableCommittedFacts:true")&&String(bindActiveBattlePresentation33000).includes("liveBattleStage33000"),
+      orderedPlaybackGlobal:String(orderedPlaybackEnabled33000).includes("battleId")&&!String(orderedPlaybackEnabled33000).includes("academy_menma_origin_three_test_subjects_with_anko"),
       reloadDoesNotDuplicatePresentation:String(resetPresentationQueueState33000).includes("playedKeys")&&String(presentationStorageKey33000).includes("battleId"),
       terminalNavigationDeferred:!!PRIOR_OPEN_OVERLAY_33000&&!!PRIOR_RESUME_BATTLE_CALLER_33000&&String(flushDeferredTerminalOverlay33000).includes("pendingBattlePresentation33000")&&String(flushDeferredBattleCallerResume33000).includes("pendingBattlePresentation33000")&&String(finishBattlePresentationReceipt33000).includes("flushDeferredTerminalOverlay33000")&&String(finishBattlePresentationReceipt33000).includes("flushDeferredBattleCallerResume33000"),
       menmaEnvironmentBound:String(applyBattleEnvironment33000).includes("forest_clearing_day")&&styleText.includes('data-battle-environment="forest_clearing_day"'),
