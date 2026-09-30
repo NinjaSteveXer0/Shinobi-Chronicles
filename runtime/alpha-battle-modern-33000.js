@@ -1003,6 +1003,17 @@
     }catch(_error){}
 
     try{
+      const runtime=typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;
+      if(
+        runtime&&String(runtime.sceneId||"")===String(rc.sceneId||"")&&
+        typeof globalThis.getActiveStorySceneBackdropPath33900==="function"
+      ){
+        const path=String(globalThis.getActiveStorySceneBackdropPath33900()||"").trim();
+        if(path)return path;
+      }
+    }catch(_error){}
+
+    try{
       const definition=typeof getStorySceneDefinition==="function"?getStorySceneDefinition(String(rc.sceneId||"")):null;
       const beat=definition&&definition.beatMap&&typeof definition.beatMap.get==="function"
         ?definition.beatMap.get(String(rc.sourceBeatId||""))
