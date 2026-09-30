@@ -345,16 +345,14 @@ function patchIwabee33500(){
 function patchMetal33500(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
   const def=editableScene33500(A.sceneByVariant.academy_metal_lee);if(!def)return false;
-  // #396 / WRITING_GOLDEN owns the complete visible Metal route natively.
-  // Retire the pre-#396 compressed met_end / met_backout shim instead of
-  // overwriting controlled-spar and deterministic MET-03 outcome scenes.
-  const goldenNative=!!(
-    beat33500(def,"met_open_01")&&
-    beat33500(def,"met_spar_battle")&&
-    beat33500(def,"met_protect")&&
-    beat33500(def,"met_close_03")
+  // 2026-09-30 Metal successor owns the complete visible route natively.
+  // Never let the older compressed presentation shim overwrite it.
+  const finalNative=!!(
+    beat33500(def,"met_open_01")&&beat33500(def,"met_spar_battle")&&
+    beat33500(def,"met_protect")&&beat33500(def,"met_receipt")&&
+    beat33500(def,"met_spar_strong_close_07")&&beat33500(def,"met_backout_close_01")
   );
-  if(goldenNative)return true;
+  if(finalNative)return true;
   const end=beat33500(def,"met_end"),backout=beat33500(def,"met_backout");
   if(!end||!backout)return false;
   backout.text="Metal backs out of the public challenge. The private training he already completed still happened; choosing not to perform for the audience does not erase it.";
