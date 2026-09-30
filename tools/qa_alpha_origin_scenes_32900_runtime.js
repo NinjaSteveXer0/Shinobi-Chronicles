@@ -92,7 +92,7 @@ run('academy_mirai',['ask_route','test_question','investigate_quietly']);
 run('academy_kushina',['correct_formula','ask_who']);
 run('academy_kurenai',['false_kurenai','rush_bell','take_bell_now']);
 run('academy_iwabee',['build_path','call_instructor','better_rest']);
-run('academy_metal_lee',['conditioned_endurance','demonstrate','redirect_dummy','route_partial']);
+run('academy_metal_lee',['conditioned_endurance','demonstrate','redirect_dummy']);
 run('academy_obito',['furniture_continue_final','vegetables_continue_final','equipment_continue_final','delivery_continue_final','cart_continue_final','reflection_keep_helping']);
 const diag=ctx.runAlphaOriginScene32900Diagnostics();
 ctx.playerData.acquisition={chronicleOriginVariantId:'academy_kakashi',chronicleOrigin:{prologueCompleted:false}};
