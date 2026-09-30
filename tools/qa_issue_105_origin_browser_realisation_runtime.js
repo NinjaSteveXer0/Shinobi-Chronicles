@@ -100,16 +100,22 @@ try{
   continueUntil("kus_ask_who_03");
   assert("kushina_second_choice_has_visible_consequence",render.text==="Gerotora.",render);
 
-  // Two materially different Kurenai player routes must produce visibly different DOM sequences.
-  // The 2026-09-29 native successor owns one meaningful Bell choice after the authored opening.
+  // Two materially different Kurenai routes must traverse the final three-stage Bell Test
+  // and resolve to visibly different authored result classes.
   beginOrigin("academy_kurenai");continueUntil("kur_approach");clickChoice("false_kurenai");
-  assert("kurenai_loss_route_starts_natively",render.beatId==="kur_false_01"&&render.text.includes("second Kurenai breaks toward the bell"),render);
-  const lossSequence=continueUntil("kur_eval_loss_01").map(x=>x.text);
-  assert("kurenai_loss_has_distinct_visible_result",lossSequence.some(t=>t.includes("bell never changes hands")),lossSequence);
+  assert("kurenai_loss_stage1_starts_natively",render.beatId==="kur_stage1_false_01"&&render.text.includes("second Kurenai breaks toward the bell"),render);
+  continueUntil("kur_stage2_false");clickChoice("rush_bell");
+  continueUntil("kur_stage3_false_rush");clickChoice("take_bell_now");
+  assert("kurenai_loss_enters_complete_loss_result",render.beatId==="kur_resolve_false_rush_take",render);
+  const lossSequence=continueUntil("kur_eval_complete_loss_01").map(x=>x.text);
+  assert("kurenai_loss_has_distinct_visible_result",lossSequence.some(t=>t.includes("hand closes on empty air"))&&lossSequence.some(t=>t==="Too early."),lossSequence);
 
-  beginOrigin("academy_kurenai");continueUntil("kur_approach");clickChoice("fake_clumsy");
-  assert("kurenai_win_enters_full_authored_chain",render.beatId==="kur_complete_01",render);
-  const winSequence=continueUntil("kur_eval_win_01").map(x=>x.text);
+  beginOrigin("academy_kurenai");continueUntil("kur_approach");clickChoice("fake_direct");
+  assert("kurenai_win_stage1_starts_natively",render.beatId==="kur_stage1_direct_01",render);
+  continueUntil("kur_stage2_direct");clickChoice("rush_bell");
+  continueUntil("kur_stage3_direct_rush");clickChoice("let_instructor_think_caught");
+  assert("kurenai_win_enters_complete_win_result",render.beatId==="kur_resolve_direct_rush_caught",render);
+  const winSequence=continueUntil("kur_eval_complete_win_01").map(x=>x.text);
   assert("kurenai_win_chain_contains_locked_dialogue",winSequence.some(t=>t==="Got you.")&&winSequence.some(t=>t==="Have you?")&&winSequence.some(t=>t==="Yes.")&&winSequence.some(t=>t==="You were saying?"),winSequence);
   assert("kurenai_choices_do_not_reconverge_to_same_text",lossSequence[0]!==winSequence[0]);
 
