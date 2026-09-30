@@ -149,6 +149,10 @@ Do not build one bespoke UI architecture per location.
 
 **Current: AMBER**
 
+Current Phase-2 Shinobi Record information architecture / relationship gate direction:
+`Documentation/Coordination/Shinobi_Record_Phase_2_Information_Architecture_and_Relationship_Gate_Model_2026-10-01.md`
+@ `e3713898f49ea155730f92ddfc6f9f2db7e4ffd5`
+
 Shinobi Record shell exists and is functional but needs optimisation.
 
 Stephen's Ninja ID reference + CE merge direction:
