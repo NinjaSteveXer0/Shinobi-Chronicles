@@ -80,7 +80,12 @@ function splitLongNarrationParagraph33900(text){
 function expandStoryPerformanceSequence33900(sequence){
   const out=[];
   for(const [sourceIndex,rawCue] of (Array.isArray(sequence)?sequence:[]).entries()){
+    const authoredSinglePage=!!(rawCue&&typeof rawCue==="object"&&rawCue.singlePage===true);
     const cue=rawCue&&typeof rawCue==="object"?clone(rawCue):{kind:"narration",text:String(rawCue??"")};
+    // Preserve presentation-only authored metadata even when a shared semantic
+    // clone helper strips unknown fields. This flag controls click pagination,
+    // not Story truth.
+    if(authoredSinglePage)cue.singlePage=true;
     const kind=String(cue.kind||"narration");
     const text=String(cue.text||"");
     let pages=[text];
@@ -780,7 +785,7 @@ function runStorySceneBoard33900Diagnostics(){
       String(markStoryPresentationHidden33900).includes("scPresentationHidden")&&
       String(markStoryPresentationHidden33900).includes('setProperty("display","none","important")')&&
       installStyle.toString().includes("data-sc-presentation-hidden"),
-    authoredSinglePageCueContract:String(expandStoryPerformanceSequence33900).includes("cue.singlePage===true"),
+    authoredSinglePageCueContract:String(expandStoryPerformanceSequence33900).includes("authoredSinglePage")&&String(expandStoryPerformanceSequence33900).includes("cue.singlePage=true")&&String(expandStoryPerformanceSequence33900).includes("cue.singlePage===true"),
     wrapsExistingStoryRenderer:!!PRE_RENDER,
     browserGoldenClaimed:false
   };
