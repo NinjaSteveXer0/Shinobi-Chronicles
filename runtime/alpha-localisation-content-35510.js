@@ -901,6 +901,24 @@ const PAIRS=Object.freeze([
   ["For an instant, his hand moves toward the nearest bin.\\\\n\\\\nHe stops himself before the page leaves his fingers.\\\\n\\\\nIwabee folds it properly and puts it back in the bag.","For an instant, his hand moves toward the nearest bin.\\n\\nHe stops himself before the page leaves his fingers.\\n\\nIwabee folds it properly and puts it back in the bag."],
   ["Behind him, the practical ground is still level.\\\\n\\\\nThe instructor is already putting the last marker away.\\\\n\\\\nIwabee looks over his shoulder.","Behind him, the practical ground is still level.\\n\\nThe instructor is already putting the last marker away.\\n\\nIwabee looks over his shoulder."],
 
+  // Academy Kurenai + Metal 2026-09-30 owner-preview successors. #190 remains pre-public; English passthrough only.
+  ["Let her think she caught me","Let her think she caught me"],
+  ["Send a false Kurenai","Send a false Kurenai"],
+  ["Hide my real movement","Hide my real movement"],
+  ["Distort her sense of distance","Distort her sense of distance"],
+  ["Make the direct approach look real","Make the direct approach look real"],
+  ["Draw her attention away","Draw her attention away"],
+  ["Spinning kick","Spinning kick"],
+  ["Full-force fist","Full-force fist"],
+  ["Conditioned endurance","Conditioned endurance"],
+  ["Keep working the dummy","Keep working the dummy"],
+  ["RESOLVE STRONG","RESOLVE STRONG"],
+  ["RESOLVE MIXED","RESOLVE MIXED"],
+  ["RESOLVE ROUGH","RESOLVE ROUGH"],
+  ["RESOLVE SUCCESS","RESOLVE SUCCESS"],
+  ["RESOLVE PARTIAL","RESOLVE PARTIAL"],
+  ["RESOLVE FAILURE","RESOLVE FAILURE"],
+
 ]);
 
 const en={},es={};
