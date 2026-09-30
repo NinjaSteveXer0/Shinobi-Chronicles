@@ -576,6 +576,7 @@ async function proveMiraiTerminalReceipt(browser){
       }else{
         assert.strictEqual(row.performance,"true",variant+" did not enter shared performance presentation");
         assert(["narration","dialogue","record"].includes(row.cueKind),variant+" shared cue kind missing "+JSON.stringify(row));
+        assert(!row.text.includes("\\n"),variant+" "+row.cueKind+" leaked a literal newline escape "+JSON.stringify(row));
       }
       assert(row.actors.length>=1,variant+" has no visible Scene Board actors");
       assert(row.actors.some(a=>a.image===protagonist),variant+" protagonist card missing "+JSON.stringify(row.actors));
