@@ -154,7 +154,10 @@ function patchIwabee(){
 }
 
 function patchMetal(){
-  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const def=editable(A.sceneByVariant.academy_metal_lee);if(!def)return false;
+  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
+  const live=definition(A.sceneByVariant.academy_metal_lee);
+  if(live&&beat(live,"met_receipt")&&beat(live,"met_spar_strong_close_07")&&beat(live,"met_backout_close_01"))return true;
+  const def=editable(A.sceneByVariant.academy_metal_lee);if(!def)return false;
   text(def,"met_private","Metal is good when nobody is watching. His feet land where he wants them. His breathing stays measured. The training post shudders on the final strike and Metal immediately resets his stance to do it again. Then someone claps from behind him.");
   text(def,"met_invite","The Genin who saw him grins like the answer is obvious. “Again.”");
   label(def,"met_invite","spar","Spar. If they're watching anyway, make it count.");
