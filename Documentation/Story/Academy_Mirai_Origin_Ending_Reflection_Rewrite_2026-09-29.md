@@ -18,7 +18,7 @@ Preserve unchanged:
 - contradiction / chakra evidence;
 - optional disguised-instructor Battle;
 - confrontation / route-change / complete-escort decisions;
-- female Academy instructor identity;
+- male Academy instructor identity;
 - real Traveller remains male;
 - all existing MIR occurrence / Knowledge boundaries;
 - all existing backdrops / participants / Combat / rewards.
