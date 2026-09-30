@@ -243,6 +243,34 @@ async function driveGuestAllyTeachingHandoff(page,label){
   // the ordinary enemy-side response.
   await useSkill(page,"sj_anko_hidden_shadow_snake_hands");
   await page.waitForFunction(()=>getBattleRemainingPL("enemy","test_subject_altered_shinobi")===0,null,{timeout:8000});
+
+  // Owner regression: Menma's Formation Stage previously relayed a zero-PL
+  // target before the committed reduction was ever visible in the radial.
+  await page.waitForFunction(({ANKO,ALTERED})=>{
+    const stage=document.querySelector(".alpha-code-battle-stage");
+    return !!stage&&stage.dataset.presentationQueueBusy==="true"&&
+      stage.dataset.presentationActorId===ANKO&&stage.dataset.presentationTargetId===ALTERED;
+  },{ANKO,ALTERED:HOSTILES[0]},{timeout:8000});
+  const visibleZero=await page.evaluate(ALTERED=>{
+    const stage=document.querySelector(".alpha-code-battle-stage");
+    const ring=stage?.querySelector(".battle-live-power-enemy .alpha-battle-pl-ring");
+    const text=ring?.querySelector(".alpha-battle-pl-core strong")?.textContent?.trim()||"";
+    return{
+      activeEnemy:getBattleDeploymentParticipant("enemy",1)?.id||null,
+      text,
+      value:text===""?NaN:Number(text),
+      fill:ring?.style.getPropertyValue("--battle-pl-fill")||"",
+      afterPL:stage?.dataset.presentationAfterPl===""?null:Number(stage?.dataset.presentationAfterPl),
+      target:stage?.dataset.presentationTargetId||null
+    };
+  },HOSTILES[0]);
+  assert.strictEqual(visibleZero.activeEnemy,HOSTILES[0],"Menma zero-PL target relayed before its visible receipt settled");
+  assert.strictEqual(visibleZero.target,HOSTILES[0],"Menma visible zero-PL proof targeted the wrong enemy");
+  assert.notStrictEqual(visibleZero.text,"","Menma enemy radial PL numeral disappeared on hit");
+  assert.strictEqual(visibleZero.afterPL,0,"Menma committed zero-PL receipt did not expose afterPL 0");
+  assert.strictEqual(visibleZero.value,0,"Menma enemy radial did not visibly decrease to 0 before relay");
+  assert(/^0(?:\.0+)?%$/.test(visibleZero.fill),"Menma zero-PL radial fill did not visibly empty: "+visibleZero.fill);
+
   await waitPlayerReady(page,ANKO,HOSTILES[1]);
 
   const afterAltered=await page.evaluate(()=>({
