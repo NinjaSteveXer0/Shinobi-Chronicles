@@ -60,7 +60,7 @@ assert(!orderedPlaybackSource.includes("academy_menma_origin_three_test_subjects
 assert(shared.includes("suspendCallerStoryPresentation33000"),"shared Battle caller/Story suspension contract missing");
 assert(shared.includes("function storyCallerBattleEnvironment33000()"),"shared Story-caller Battle environment fallback missing");
 assert(shared.includes("getAcademyKakashiV2Presentation36020"),"shared Battle environment fallback does not consume Kakashi authored Story presentation");
-assert(shared.includes("getActiveStorySceneBoardProjection"),"shared Battle environment fallback does not consume shared Story Board backdrop");
+assert(shared.includes("getActiveStorySceneBackdropPath33900"),"shared Battle environment fallback does not consume the exact active Story Board backdrop path");
 assert(shared.includes("currentBattle.presentationEnvironmentPath=environmentPath"),"shared Battle does not persist resolved Story environment onto current Battle presentation truth");
 
 assert(mirai.includes('const BATTLE_ENVIRONMENT_BY_CALLER=Object.freeze({'),"Mirai authored Battle environment mapping missing");
