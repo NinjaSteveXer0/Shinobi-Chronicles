@@ -212,7 +212,7 @@ function projectWasabi343Rewards(finishingShinobi=null){
   currentBattle.rewards={
     generated:victory,claimed:existing.claimed===true,ryo:victory?FIXED_VICTORY_RYO:0,exp:0,items:[],rareDrops:[],
     finishingShinobi:finishingShinobi&&finishingShinobi.name||existing.finishingShinobi||null,mvp:existing.mvp||null,
-    requiresExplicitPostClaimContinue:true,wasabi343FixedReward:true,wasabi343RewardSourceId:REWARD_SOURCE_ID,
+    requiresExplicitPostClaimContinue:false,wasabi343FixedReward:true,wasabi343RewardSourceId:REWARD_SOURCE_ID,
     wasabi343VictoryEntitlement:victory,wasabi343BattleOccurrenceId:String(currentBattle.wasabi343.battleOccurrenceId||currentBattle.battleId||"")
   };
   return{handled:true,victory,rewards:currentBattle.rewards};
@@ -361,7 +361,7 @@ function launch(spec={}){
   };
   if(currentBattle.rewards){
     currentBattle.rewards.ryo=0;currentBattle.rewards.exp=0;currentBattle.rewards.items=[];currentBattle.rewards.rareDrops=[];
-    currentBattle.rewards.requiresExplicitPostClaimContinue=true;
+    currentBattle.rewards.requiresExplicitPostClaimContinue=false;
     currentBattle.rewards.wasabi343FixedReward=true;
     currentBattle.rewards.wasabi343RewardSourceId=REWARD_SOURCE_ID;
     currentBattle.rewards.wasabi343VictoryRyo=FIXED_VICTORY_RYO;
@@ -410,7 +410,7 @@ function diagnostics(){
     genericEnemyLootSuppressed:enemy.rewards.ryo.min===0&&enemy.rewards.ryo.max===0&&enemy.rewards.exp.min===0&&enemy.rewards.exp.max===0&&enemy.rewards.commonDrops.length===0&&enemy.rewards.rareDrops.length===0,
     exactVictoryReward:REWARD_SOURCE_ID==="wasabi_origin_rogue_genin_battle_victory_ryo_01"&&FIXED_VICTORY_RYO===50&&String(projectWasabi343Rewards).includes("victory?FIXED_VICTORY_RYO:0"),
     stableRewardReceipt:String(claimWasabi343VictoryReward).includes('type:"origin_battle_reward"')&&String(claimWasabi343VictoryReward).includes("battleOccurrenceId"),
-    claimSeparateFromContinue:!!PRE_GENERATE_REWARDS&&!!PRE_CLAIM_REWARDS&&String(projectWasabi343Rewards).includes("requiresExplicitPostClaimContinue:true")&&String(launch).includes("requiresExplicitPostClaimContinue=true"),
+    directStoryReturnAfterTerminalBattle:!!PRE_GENERATE_REWARDS&&!!PRE_CLAIM_REWARDS&&String(projectWasabi343Rewards).includes("requiresExplicitPostClaimContinue:false")&&String(launch).includes("requiresExplicitPostClaimContinue=false"),
     observerSafeResult:Object.keys(projectResult.call({})||{}).length===0?true:String(projectResult).includes("rogueGeninBattlePLDepleted")&&!String(projectResult).includes("stats"),
     noStoryTruth:String(launch).includes("sourceOccurrenceId")&&!String(launch).includes("consumeStaticOriginSourceOccurrence")
   };
