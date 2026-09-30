@@ -60,7 +60,7 @@ function proveObitoExactBoxMap(){
   const rows=Object.values(actual).flat();
   assert(rows.length===98,"Obito exact authored box count drift",{actual:rows.length});
   assert(rows.every(row=>row.singlePage===true),"Obito authored box is not pinned to one Story cue");
-  assert(rows.every(row=>!String(row.text||"").includes("\\n\\n")),"Obito authored boxes were recombined with paragraph stacking");
+  assert(rows.every(row=>!String(row.text||"").includes("\n\n")),"Obito authored boxes were recombined with paragraph stacking");
   assert(rows.every(row=>row.kind!=="narration"||!/^(OBITO|ACADEMY INSTRUCTOR|CIVILIAN|VENDOR|CUSTODIAN|DELIVERY WORKER):/.test(String(row.text||""))),"speaker-labelled dialogue leaked into narration");
   return{boxes:rows.length,keys:Object.keys(actual).length};
 }
