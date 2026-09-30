@@ -101,11 +101,11 @@ async function proveMiraiBattle338(browser){
   const cases=[
     {
       kind:"shortcut",
-      startBeatId:"mir_shortcut_battle_pre_01",
+      startBeatId:"mir_shortcut_attack_01",
       battleBeatId:"mir_shortcut_battle",
       callerId:"academy_mirai_origin_shortcut_battle",
-      victoryBeatId:"mir_shortcut_victory_01",
-      defeatBeatId:"mir_shortcut_defeat_end_01"
+      victoryBeatId:"mir_shortcut_victory_reveal_01",
+      defeatBeatId:"mir_shortcut_defeat_reveal_01"
     },
     {
       kind:"confrontation",
@@ -144,12 +144,17 @@ async function proveMiraiBattle338(browser){
       const buildup=await advanceUntilBeat(page,test.battleBeatId,100);
       const buildupText=buildup.seen.map(x=>x.text).join("\n");
       for(const line of [
-        "Because you followed me.",
+        "The Traveller slows near the next turn.",
+        "What is it?",
+        "He moves first.",
+        "What are you doing?",
+        "The person Mirai is supposed to protect is attacking her."
+      ])assert(buildupText.includes(line),"Mirai shortcut attack-trigger buildup line missing: "+line);
+      for(const retired of [
         "Your instructor gave me one extra job.",
         "See what you do if the person you're escorting stops cooperating.",
-        "This is part of the assessment.",
-        "Then stop me."
-      ])assert(buildupText.includes(line),"Mirai shortcut pre-Battle causality line missing: "+line);
+        "This is part of the assessment."
+      ])assert(!buildupText.includes(retired),"Mirai shortcut still pre-explains the assessment before Battle: "+retired);
     }
     await page.waitForFunction(beatId=>globalThis.getActiveStorySceneRuntime?.()?.beatId===beatId,test.battleBeatId,{timeout:8000});
     const pre=await snapshot(page);
@@ -257,11 +262,22 @@ async function proveMiraiBattle338(browser){
     assert.strictEqual(directReturn.primaryVisible,false,"Mirai "+terminalOutcome+" still exposes redundant post-Battle CONTINUE");
 
     if(test.kind==="shortcut"){
-      assert.strictEqual(directReturn.text,"The Traveller is the first to lower his guard.","Mirai shortcut victory continuity opening drift");
-      const road=await advanceUntilBeat(page,"mir_road_talk_memory_01",100);
-      const postBattleText=road.seen.map(x=>x.text).join("\n");
-      assert(postBattleText.includes("Mirai does not lower hers immediately.")&&postBattleText.includes("We're done with your route.")&&postBattleText.includes("The escort continues."),"Mirai shortcut victory bridge missing");
-      assert(!postBattleText.includes("No attack comes."),"Mirai shortcut victory still denies the Battle with 'No attack comes.'");
+      assert.strictEqual(directReturn.text,"The Traveller's guard breaks first.","Mirai shortcut victory reveal opening drift");
+      const checkpoint=await advanceUntilBeat(page,"mir_checkpoint_early_01",120);
+      const postBattleText=checkpoint.seen.map(x=>x.text).join("\n");
+      for(const line of ["Don't move.","You pulled me off the route and attacked me.","Who are you?","Where is he?","Checkpoint Three. Safe.","Since when?","The market."]){
+        assert(postBattleText.includes(line),"Mirai shortcut victory reveal missing: "+line);
+      }
+      assert(!postBattleText.includes("The escort continues."),"Mirai shortcut victory resumed the substitute escort");
+      assert(!postBattleText.includes("We're done with your route."),"retired shortcut-victory continuation survived");
+      const revealState=await page.evaluate(()=>({
+        local:{...(globalThis.getActiveStorySceneRuntime?.()?.localContext||{})},
+        verification:globalThis.SC_ALPHA_ORIGIN_32900?.findOccurrence?.("occ_origin_mirai_substitution_verification_resolution")||null
+      }));
+      assert.strictEqual(revealState.local.mirVerificationBasis,"battle_triggered_instructor_reveal","Mirai shortcut victory local verification basis drift");
+      assert.strictEqual(revealState.local.miraiEscortDutyActive,false,"Mirai shortcut victory left substitute escort active");
+      assert.strictEqual(revealState.verification?.fact?.verificationBasis,"battle_triggered_instructor_reveal","Mirai shortcut victory MIR-01 verification basis drift");
+      assert.strictEqual(revealState.verification?.fact?.substitutionVerifiedBeforeCheckpoint,true,"Mirai shortcut victory did not commit MIR-01 verification");
     }else{
       assert.strictEqual(directReturn.text,"Mirai's guard breaks before the Traveller's does.","Mirai confrontation defeat continuity opening drift");
     }
@@ -270,7 +286,7 @@ async function proveMiraiBattle338(browser){
     receipts.push({kind:test.kind,callerId:state.callerId,victoryBeatId:test.victoryBeatId,defeatBeatId:test.defeatBeatId});
     await context.close();
   }
-  return{cases:receipts,strictOneVsOne:true,observerSafeDisguise:true,staticRyo50:true,directPostBattleReturns:true,shortcutBuildup:true};
+  return{cases:receipts,strictOneVsOne:true,observerSafeDisguise:true,staticRyo50:true,directPostBattleReturns:true,shortcutAttackTrigger:true,storyRevealAfterBattle:true};
 }
 
 
@@ -278,8 +294,8 @@ async function proveMiraiDefeatContinuations(browser){
   const cases=[
     {
       kind:"shortcut",
-      firstBeatId:"mir_shortcut_defeat_end_01",
-      lastBattleLocationBeatId:"mir_shortcut_defeat_end_13",
+      firstBeatId:"mir_shortcut_defeat_reveal_01",
+      lastBattleLocationBeatId:"mir_shortcut_defeat_reveal_09",
       debriefBeatId:"mir_defeat_debrief_shortcut_01",
       reflectionBeatId:"mir_defeat_reflection_shortcut",
       callerId:"academy_mirai_origin_shortcut_battle"
@@ -351,30 +367,24 @@ async function proveMiraiDefeatContinuations(browser){
     assert.strictEqual(row.primaryVisible,false,"Mirai loss still exposes redundant post-Battle CONTINUE");
 
     if(test.kind==="shortcut"){
-      assert.strictEqual(row.text,"Mirai's guard gives first.","Mirai shortcut defeat opening drift");
-      const enough=await advanceUntilBeat(page,"mir_shortcut_defeat_end_02",10);
-      assert.strictEqual(enough.row.speaker,"TRAVELLER","Shortcut defeat Traveller does not own Enough.");
-      assert.strictEqual(enough.row.text,"Enough.","Shortcut defeat Enough. drift");
-      const notDone=await advanceUntilBeat(page,"mir_shortcut_defeat_end_04",14);
-      assert.strictEqual(notDone.row.speaker,"MIRAI","Shortcut defeat Mirai does not own persistence line");
-      assert.strictEqual(notDone.row.text,"I'm not done.","Shortcut defeat persistence line drift");
-      const exercise=await advanceUntilBeat(page,"mir_shortcut_defeat_end_05",8);
-      assert.strictEqual(exercise.row.speaker,"TRAVELLER","Shortcut defeat Traveller does not end the exercise");
-      assert.strictEqual(exercise.row.text,"The exercise is.","Shortcut defeat assessment termination line drift");
-      const smoke=await advanceUntilBeat(page,"mir_shortcut_defeat_end_06",10);
-      assert(!smoke.row.actors.some(a=>a.image==="NPC/mirai_instructor.png"),"Shortcut defeat revealed instructor before Story smoke/reveal beat");
-      const reveal=await advanceUntilBeat(page,"mir_shortcut_defeat_end_07",10);
+      assert.strictEqual(row.text,"Mirai's guard gives first.","Mirai shortcut defeat reveal opening drift");
+      const who=await advanceUntilBeat(page,"mir_shortcut_defeat_reveal_02",10);
+      assert.strictEqual(who.row.speaker,"MIRAI","Shortcut defeat reveal question not Mirai-owned");
+      assert.strictEqual(who.row.text,"Who are you?","Shortcut defeat reveal question drift");
+      const reveal=await advanceUntilBeat(page,"mir_shortcut_defeat_reveal_03",10);
       assert(reveal.row.actors.some(a=>a.image==="NPC/mirai_instructor.png"),"Shortcut defeat Story reveal did not project female instructor");
-      const safe=await advanceUntilBeat(page,"mir_shortcut_defeat_end_09",10);
+      const safe=await advanceUntilBeat(page,"mir_shortcut_defeat_reveal_05",10);
       assert.strictEqual(safe.row.speaker,"ACADEMY INSTRUCTOR","Shortcut defeat safe confirmation not instructor-owned");
       assert.strictEqual(safe.row.text,"Checkpoint Three. Safe.","Shortcut defeat safe confirmation drift");
-      const ended=await advanceUntilBeat(page,"mir_shortcut_defeat_end_10",10);
-      const endedPages=[ended.row.text];
-      for(let i=0;i<8&&(await snapshot(page)).beatId==="mir_shortcut_defeat_end_10";i++){
-        const next=await advanceOne(page);
-        if(next.beatId==="mir_shortcut_defeat_end_10")endedPages.push(next.text);
-      }
-      assert(endedPages.includes("The assignment is not.")&&endedPages.includes("It ended here."),"Shortcut defeat does not state that the assignment ended at the Battle location "+JSON.stringify(endedPages));
+      const since=await advanceUntilBeat(page,"mir_shortcut_defeat_reveal_07",10);
+      assert.strictEqual(since.row.speaker,"MIRAI","Shortcut defeat Since when? not Mirai-owned");
+      assert.strictEqual(since.row.text,"Since when?","Shortcut defeat switch-time question drift");
+      const market=await advanceUntilBeat(page,"mir_shortcut_defeat_reveal_08",10);
+      assert.strictEqual(market.row.speaker,"ACADEMY INSTRUCTOR","Shortcut defeat switch-time answer not instructor-owned");
+      assert.strictEqual(market.row.text,"The market.","Shortcut defeat switch-time answer drift");
+      const verify=await page.evaluate(()=>globalThis.SC_ALPHA_ORIGIN_32900?.findOccurrence?.("occ_origin_mirai_substitution_verification_resolution")||null);
+      assert.strictEqual(verify?.fact?.verificationBasis,"battle_triggered_instructor_reveal","Shortcut defeat MIR-01 verification basis drift");
+      assert.strictEqual(verify?.fact?.substitutionVerifiedBeforeCheckpoint,true,"Shortcut defeat did not commit MIR-01 verification");
     }else{
       assert.strictEqual(row.text,"Mirai's guard breaks before the Traveller's does.","Mirai confrontation defeat opening drift");
       const done=await advanceUntilBeat(page,"mir_confront_defeat_end_02",10);
