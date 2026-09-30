@@ -323,9 +323,12 @@ function claimKakashiV2BattleRewards(){
     rewards.claimed=true;
     if(!currentBattle.claimedAt)currentBattle.claimedAt=Date.now();
     const chronicleRecorded=typeof recordBattleChronicle==="function"?recordBattleChronicle():true;
+    // PRE_CLAIM already persisted the shared Battle state. Persist the
+    // Kakashi-specific receipt additions once through player data; the outer
+    // Victory Claim owner performs the final Battle-state save after this
+    // adapter returns.
     if(typeof savePlayerData==="function")savePlayerData();
-    if(typeof saveTestState==="function")saveTestState();
-    return{handled:true,success:true,chronicleRecorded,receiptRefs:Object.keys(ensureStore().receipts).filter(key=>key.startsWith(String(plan.storyOccurrenceId)+"|"))};
+    return{handled:true,success:true,chronicleRecorded,receiptRefs:Object.keys(ensureStore().receipts).filter(key=>key.startsWith(String(plan.storyOccurrenceId)+"|")),duplicateBattleStateSaveRemoved:true};
   }catch(error){
     restoreRewardMutation(snap);
     return{handled:true,success:false,reason:"kakashi_v2_battle_reward_claim_failed",error:String(error&&error.message||error)};
