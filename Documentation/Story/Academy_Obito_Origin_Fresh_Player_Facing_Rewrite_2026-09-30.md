@@ -8,7 +8,7 @@
 
 This is a fresh Story rewrite, not a compression pass over the previous Obito prose.
 
-> **2026-09-30 OWNER SEGMENTATION SUCCESSOR:** The prose and total text amount in this document are accepted. Story-box segmentation is corrected by `Documentation/Story/Academy_Obito_Origin_Box_Segmentation_Parity_Correction_2026-09-30.md` @ `12cf6d76b168a046d890a269aad9a8276b3bad35`. Preserve the wording; split it into normal narration/dialogue boxes consistent with the other nine Academy Origins.
+> **2026-09-30 OWNER SEGMENTATION CORRECTION:** The prose and total text amount are accepted. Sections 3–10 of this document now contain the exact player-facing box boundaries. `Documentation/Story/Academy_Obito_Origin_Box_Segmentation_Parity_Correction_2026-09-30.md` remains the supporting presentation rule. Coding must consume the explicit boxes below rather than infer its own pagination.
 
 The previous player-facing expression in:
 - `Documentation/Story/Academy_Obito_Origin_Compression_Rewrite_2026-09-29.md`
@@ -136,43 +136,56 @@ No hidden personality inference from HELP count.
 
 ---
 
-# 3. PLAYER-FACING STORY
+# 3. PLAYER-FACING STORY — EXACT DISPLAY-BOX AUTHORITY
 
-The wording below is accepted player-facing Story. Box boundaries are governed by the 2026-09-30 Obito segmentation-parity successor and the universal Story segmentation authority: narration paragraphs/dramatic beats and speaker turns must project as normal separate Story boxes rather than being forced together.
+The wording below is the accepted Obito Story. **The box boundaries below are now part of the Writing itself.**
+
+Coding must not reconstruct larger pages from adjacent boxes.
+
+A single box may contain several sentences when they form one natural readable beat. This is deliberately **not** sentence-per-click pagination.
+
+There must be:
+- no `\n\n` paragraph stacking inside one ordinary Obito Story box;
+- no speaker-labelled dialogue embedded inside narration boxes;
+- no automatic recombination of adjacent boxes.
 
 ## SCENE 1 — MORNING RUN
 
-### `obi_depart` — Cue 1 — NARRATION
+### `obi_depart` — Box 1 — NARRATION
 
-Obito tears into the morning street with one hand still pulling his goggles into place.
+Obito tears into the morning street with one hand still pulling his goggles into place. The Academy bell carries over the roofs.
 
-The Academy bell carries over the roofs.
+### `obi_depart` — Box 2 — NARRATION
 
-His foot catches the edge of a paving stone. He turns the stumble into three faster steps and keeps going.
+His foot catches the edge of a paving stone. He turns the stumble into three faster steps and keeps going. The Hokage Monument appears between the buildings ahead.
 
-The Hokage Monument appears between the buildings ahead.
-
-### `obi_depart` — Cue 2 — OBITO
+### `obi_depart` — Box 3 — OBITO
 
 **OBITO:** “No. Not today. I'm making it.”
 
+### `obi_depart` — Box 4 — NARRATION
+
 He points toward the Monument as he runs.
+
+### `obi_depart` — Box 5 — OBITO
 
 **OBITO:** “And I'm getting up there too. Just not before training.”
 
 ---
 
+# 4. FIVE DIVERSION SCENES
+
 ## SCENE 2 — FURNITURE
 
-### `obi_furniture_intro` — Cue 1 — NARRATION
+### `obi_furniture_intro` — Box 1 — NARRATION
 
-A wardrobe blocks half a residential lane.
+A wardrobe blocks half a residential lane. One corner is jammed in a doorway while a woman braces the other side with her shoulder. Every shove makes the furniture lean farther toward the street.
 
-One corner is jammed in a doorway while a woman braces the other side with her shoulder. Every shove makes the furniture lean farther toward the street.
+### `obi_furniture_intro` — Box 2 — NARRATION
 
 Obito slows before he means to.
 
-### `obi_furniture_intro` — Cue 2 — CIVILIAN
+### `obi_furniture_intro` — Box 3 — CIVILIAN
 
 **CIVILIAN:** “If you're going to stand there, pick a side.”
 
@@ -181,21 +194,19 @@ Obito slows before he means to.
 - `furniture_help` — **Help her move it**
 - `furniture_continue_final` — **Keep going**
 
-### `obi_furniture_help` — Consequence — NARRATION
+### `obi_furniture_help` — Box 1 — NARRATION
 
-Obito drops his bag and gets under the lower edge before the woman can organise him.
+Obito drops his bag and gets under the lower edge before the woman can organise him. He changes the angle, counts them into one hard lift and nearly follows the wardrobe through the doorway when it finally clears.
 
-He changes the angle, counts them into one hard lift and nearly follows the wardrobe through the doorway when it finally clears.
+### `obi_furniture_help` — Box 2 — NARRATION
 
-His grin lasts until the Academy bell reaches the lane again.
+His grin lasts until the Academy bell reaches the lane again. He snatches up his bag and bolts.
 
-He snatches up his bag and bolts.
+### `obi_furniture_continue` — Box 1 — NARRATION
 
-### `obi_furniture_continue` — Consequence — NARRATION
+Obito's hands rise before he catches himself. He forces them back to his sides, slips around the wardrobe and calls an apology over his shoulder without stopping.
 
-Obito's hands rise before he catches himself.
-
-He forces them back to his sides, slips around the wardrobe and calls an apology over his shoulder without stopping.
+### `obi_furniture_continue` — Box 2 — NARRATION
 
 By the end of the lane he is running hard enough that turning back would take a decision of its own.
 
@@ -203,15 +214,15 @@ By the end of the lane he is running hard enough that turning back would take a 
 
 ## SCENE 3 — VEGETABLES
 
-### `obi_vegetables_intro` — Cue 1 — NARRATION
+### `obi_vegetables_intro` — Box 1 — NARRATION
 
-Something round clips Obito's sandal.
+Something round clips Obito's sandal. A daikon rolls past him, followed by two onions and a tomato escaping from a split market basket.
 
-A daikon rolls past him, followed by two onions and a tomato escaping from a split market basket.
+### `obi_vegetables_intro` — Box 2 — NARRATION
 
 The vegetable vendor is already on one knee, catching what she can before the lane carries the rest away.
 
-### `obi_vegetables_intro` — Cue 2 — VENDOR
+### `obi_vegetables_intro` — Box 3 — VENDOR
 
 **VENDOR:** “If you're keeping that one, you still have to pay for it.”
 
@@ -220,21 +231,19 @@ The vegetable vendor is already on one knee, catching what she can before the la
 - `vegetables_help` — **Help gather the produce**
 - `vegetables_continue_final` — **Keep going**
 
-### `obi_vegetables_help` — Consequence — NARRATION
+### `obi_vegetables_help` — Box 1 — NARRATION
 
-Obito lunges after the produce as if the vegetables have personally challenged him.
+Obito lunges after the produce as if the vegetables have personally challenged him. He traps an onion with his heel, catches the tomato before it reaches a cart wheel and sends the daikon back into the basket from farther away than necessary.
 
-He traps an onion with his heel, catches the tomato before it reaches a cart wheel and sends the daikon back into the basket from farther away than necessary.
+### `obi_vegetables_help` — Box 2 — NARRATION
 
-The vendor gives him one sharp nod.
+The vendor gives him one sharp nod. Obito is already running again.
 
-Obito is already running again.
+### `obi_vegetables_continue` — Box 1 — NARRATION
 
-### `obi_vegetables_continue` — Consequence — NARRATION
+The daikon rolls beyond him. Obito watches it for one extra step, jaw tight, then keeps his eyes on the road.
 
-The daikon rolls beyond him.
-
-Obito watches it for one extra step, jaw tight, then keeps his eyes on the road.
+### `obi_vegetables_continue` — Box 2 — NARRATION
 
 Behind him, the vendor is still moving quickly enough to make it obvious she has not stopped working just because he did not.
 
@@ -242,15 +251,15 @@ Behind him, the vendor is still moving quickly enough to make it obvious she has
 
 ## SCENE 4 — ACADEMY EQUIPMENT
 
-### `obi_equipment_intro` — Cue 1 — NARRATION
+### `obi_equipment_intro` — Box 1 — NARRATION
 
-Near the Academy approach, an equipment custodian has two training bundles open on the pavement and an empty strap in his hands.
+Near the Academy approach, an equipment custodian has two training bundles open on the pavement and an empty strap in his hands. Obito recognises the Academy markings immediately.
 
-Obito recognises the Academy markings immediately.
+### `obi_equipment_intro` — Box 2 — NARRATION
 
 The custodian is checking the road behind him instead of the bundles now.
 
-### `obi_equipment_intro` — Cue 2 — CUSTODIAN
+### `obi_equipment_intro` — Box 3 — CUSTODIAN
 
 **CUSTODIAN:** “If you saw a bundle of practice weapons on this road, now would be an excellent time to remember.”
 
@@ -259,21 +268,19 @@ The custodian is checking the road behind him instead of the bundles now.
 - `equipment_help` — **Help find the equipment**
 - `equipment_continue_final` — **Keep going**
 
-### `obi_equipment_help` — Consequence — NARRATION
+### `obi_equipment_help` — Box 1 — NARRATION
 
-Obito doubles back along the route the custodian points out.
+Obito doubles back along the route the custodian points out. A strip of Academy cloth shows beneath a low delivery platform where the missing bundle slid out of sight.
 
-A strip of Academy cloth shows beneath a low delivery platform where the missing bundle slid out of sight.
+### `obi_equipment_help` — Box 2 — NARRATION
 
-He drops flat, drags it free and thrusts it at the custodian with a look that clearly expects this to count for something.
+He drops flat, drags it free and thrusts it at the custodian with a look that clearly expects this to count for something. Then he notices the Academy roof beyond the lane and takes off before he can start arguing his case.
 
-Then he notices the Academy roof beyond the lane and takes off before he can start arguing his case.
+### `obi_equipment_continue` — Box 1 — NARRATION
 
-### `obi_equipment_continue` — Consequence — NARRATION
+Obito recognises how easily he could start searching. That is exactly why he does not.
 
-Obito recognises how easily he could start searching.
-
-That is exactly why he does not.
+### `obi_equipment_continue` — Box 2 — NARRATION
 
 He shakes his head, points himself toward the Academy again and runs while the custodian keeps working the route behind him.
 
@@ -281,15 +288,15 @@ He shakes his head, points himself toward the Academy again and runs while the c
 
 ## SCENE 5 — OVERTURNED DELIVERY
 
-### `obi_delivery_intro` — Cue 1 — NARRATION
+### `obi_delivery_intro` — Box 1 — NARRATION
 
-A handcart has tipped onto its side across the main street.
+A handcart has tipped onto its side across the main street. Crates have spilled into the lane. The delivery worker is already braced against the frame, trying to lever the cart upright without sending the load over with it.
 
-Crates have spilled into the lane. The delivery worker is already braced against the frame, trying to lever the cart upright without sending the load over with it.
+### `obi_delivery_intro` — Box 2 — NARRATION
 
 There is just enough room to pass on the right.
 
-### `obi_delivery_intro` — Cue 2 — DELIVERY WORKER
+### `obi_delivery_intro` — Box 3 — DELIVERY WORKER
 
 **DELIVERY WORKER:** “Lane's open. Don't make this harder.”
 
@@ -298,43 +305,35 @@ There is just enough room to pass on the right.
 - `delivery_help` — **Help right the delivery**
 - `delivery_continue_final` — **Keep going**
 
-### `obi_delivery_help` — Consequence — NARRATION
+### `obi_delivery_help` — Box 1 — NARRATION
 
-Obito ignores the open lane, drops his bag and gets his shoulder under the lower rail.
+Obito ignores the open lane, drops his bag and gets his shoulder under the lower rail. The worker starts to wave him off, sees the leverage and changes position instead.
 
-The worker starts to wave him off, sees the leverage and changes position instead.
+### `obi_delivery_help` — Box 2 — NARRATION
 
-Together they heave the cart upright.
+Together they heave the cart upright. Before the last crate settles, the worker jerks a thumb toward the Academy. Obito grabs his bag and runs.
 
-Before the last crate settles, the worker jerks a thumb toward the Academy.
+### `obi_delivery_continue` — Box 1 — NARRATION
 
-Obito grabs his bag and runs.
+Obito takes the open side exactly as the worker told him to. For once, the problem has room around it and somebody already handling it.
 
-### `obi_delivery_continue` — Consequence — NARRATION
+### `obi_delivery_continue` — Box 2 — NARRATION
 
-Obito takes the open side exactly as the worker told him to.
-
-For once, the problem has room around it and somebody already handling it.
-
-He uses the gap.
-
-The scrape of the cart fades behind him as the Academy gets closer.
+He uses the gap. The scrape of the cart fades behind him as the Academy gets closer.
 
 ---
 
 ## SCENE 6 — RUNAWAY CART
 
-### `obi_cart_intro` — Cue 1 — NARRATION
+### `obi_cart_intro` — Box 1 — NARRATION
 
-The Academy gate is finally in sight when a handcart breaks loose higher on the slope.
+The Academy gate is finally in sight when a handcart breaks loose higher on the slope. Its owner sprints after it, but the cart is gaining speed.
 
-Its owner sprints after it, but the cart is gaining speed.
+### `obi_cart_intro` — Box 2 — NARRATION
 
-Obito can reach the gate in seconds.
+Obito can reach the gate in seconds. He can also reach the rear rail before the cart hits the turn.
 
-He can also reach the rear rail before the cart hits the turn.
-
-### `obi_cart_intro` — Cue 2 — CIVILIAN
+### `obi_cart_intro` — Box 3 — CIVILIAN
 
 **CIVILIAN:** “Grab the brake!”
 
@@ -343,219 +342,213 @@ He can also reach the rear rail before the cart hits the turn.
 - `cart_help` — **Help stop the cart**
 - `cart_continue_final` — **Go to training**
 
-### `obi_cart_help` — Consequence — NARRATION
+### `obi_cart_help` — Box 1 — NARRATION
 
-Obito catches the rear rail with both hands.
+Obito catches the rear rail with both hands. His sandals skid, the cart drags him two ugly steps downhill, and then the owner reaches the other side.
 
-His sandals skid, the cart drags him two ugly steps downhill, and then the owner reaches the other side.
+### `obi_cart_help` — Box 2 — NARRATION
 
-Together they wrench it straight and stop it before the turn.
+Together they wrench it straight and stop it before the turn. The Academy bell rings. Obito's head snaps toward the gate. He lets go and runs.
 
-The Academy bell rings.
+### `obi_cart_continue` — Box 1 — NARRATION
 
-Obito's head snaps toward the gate.
+Obito turns for the Academy gate. The cart rattles down the slope behind him while its owner keeps chasing.
 
-He lets go and runs.
+### `obi_cart_continue` — Box 2 — NARRATION
 
-### `obi_cart_continue` — Consequence — NARRATION
-
-Obito turns for the Academy gate.
-
-The cart rattles down the slope behind him while its owner keeps chasing.
-
-He does not look back again.
-
-The training yard is directly ahead now.
+He does not look back again. The training yard is directly ahead now.
 
 ---
 
-# 4. ROUTE-REACTIVE ARRIVAL
+# 5. ROUTE-REACTIVE ARRIVAL
 
 The arrival sequence is selected only from the committed journey-time entitlement.
 
 ## `arrival_FULL`
 
-### Cue 1 — NARRATION
+### Box 1 — NARRATION
 
-Obito reaches the training ground while the class is still forming up.
+Obito reaches the training ground while the class is still forming up. He slows inside the gate, checks the untouched equipment racks and realises he has not actually missed anything.
 
-He slows inside the gate, checks the untouched equipment racks and realises he has not actually missed anything.
+### Box 2 — NARRATION
 
 The relief comes out as a grin he cannot hide.
 
-### Cue 2 — ACADEMY INSTRUCTOR
+### Box 3 — ACADEMY INSTRUCTOR
 
 **ACADEMY INSTRUCTOR:** “Line up. You can celebrate after conditioning.”
+
+### Box 4 — NARRATION
 
 Obito is in line before the sentence finishes.
 
 ## `arrival_SUBSTANTIAL`
 
-### Cue 1 — NARRATION
+### Box 1 — NARRATION
 
-Obito reaches the yard as the conditioning group breaks formation.
+Obito reaches the yard as the conditioning group breaks formation. Students are catching their breath while the weapons racks come forward.
 
-Students are catching their breath while the weapons racks come forward.
+### Box 2 — NARRATION
 
 He looks from the finished circuit to the next drill and straightens.
 
-### Cue 2 — ACADEMY INSTRUCTOR
+### Box 3 — ACADEMY INSTRUCTOR
 
 **ACADEMY INSTRUCTOR:** “Conditioning's over. Weapons line.”
+
+### Box 4 — NARRATION
 
 Obito moves before there is anything else to say.
 
 ## `arrival_REDUCED`
 
-### Cue 1 — NARRATION
+### Box 1 — NARRATION
 
-The weapons are already being returned when Obito reaches the yard.
+The weapons are already being returned when Obito reaches the yard. Scuffed target marks and tired arms tell him exactly how much of the session happened without him.
 
-Scuffed target marks and tired arms tell him exactly how much of the session happened without him.
+### Box 2 — NARRATION
 
 He drops his bag beside the line.
 
-### Cue 2 — ACADEMY INSTRUCTOR
+### Box 3 — ACADEMY INSTRUCTOR
 
 **ACADEMY INSTRUCTOR:** “Ninjutsu line. Move.”
+
+### Box 4 — NARRATION
 
 Obito moves.
 
 ## `arrival_MINIMAL`
 
-### Cue 1 — NARRATION
+### Box 1 — NARRATION
 
-Obito reaches the gate to find the class pairing off for the closing drill.
+Obito reaches the gate to find the class pairing off for the closing drill. The equipment is away. The Ninjutsu markers are already dark from use.
 
-The equipment is away. The Ninjutsu markers are already dark from use.
+### Box 2 — NARRATION
 
-His face falls once.
+His face falls once. Then he pulls his bag off his shoulder.
 
-Then he pulls his bag off his shoulder.
-
-### Cue 2 — ACADEMY INSTRUCTOR
+### Box 3 — ACADEMY INSTRUCTOR
 
 **ACADEMY INSTRUCTOR:** “Last block. Taijutsu.”
+
+### Box 4 — NARRATION
 
 Obito drops the bag and steps onto the yard.
 
 ---
 
-# 5. ROUTE-REACTIVE FORMAL TRAINING
+# 6. ROUTE-REACTIVE FORMAL TRAINING
 
 Play only blocks authorised by the committed entitlement, in exact order.
 
 There is no generic `training_intro` speech before these blocks. The arrival already establishes what remains.
 
-## `training_stamina` — FULL only — one beat
+## `training_stamina` — FULL only
 
-Obito attacks the first conditioning lap as if finishing first will erase the fact that he nearly arrived late.
+### Box 1 — NARRATION
 
-By the next circuit his breathing exposes the plan.
+Obito attacks the first conditioning lap as if finishing first will erase the fact that he nearly arrived late. By the next circuit his breathing exposes the plan.
 
-The instructor signals him to settle the pace.
+### Box 2 — NARRATION
 
-Obito hates the correction, follows it anyway, and finishes stronger than he started.
+The instructor signals him to settle the pace. Obito hates the correction, follows it anyway, and finishes stronger than he started.
 
-## `training_bukijutsu` — FULL / SUBSTANTIAL — one beat
+## `training_bukijutsu` — FULL / SUBSTANTIAL
 
-Obito's first wooden throw is all force and poor placement.
+### Box 1 — NARRATION
 
-He stares at where it lands, resets his feet and this time lets the weapon go cleanly instead of trying to overpower the target.
+Obito's first wooden throw is all force and poor placement. He stares at where it lands, resets his feet and this time lets the weapon go cleanly instead of trying to overpower the target.
 
-The next strike sits much closer to centre.
+### Box 2 — NARRATION
 
-He reaches for another before anyone praises him.
+The next strike sits much closer to centre. He reaches for another before anyone praises him.
 
-## `training_ninjutsu` — FULL / SUBSTANTIAL / REDUCED — one beat
+## `training_ninjutsu` — FULL / SUBSTANTIAL / REDUCED
 
-The first Academy-scale Fire attempt flares too fast and collapses.
+### Box 1 — NARRATION
 
-Obito's embarrassment is immediate; being Uchiha makes the weak flame sting more, not less.
+The first Academy-scale Fire attempt flares too fast and collapses. Obito's embarrassment is immediate; being Uchiha makes the weak flame sting more, not less.
 
-He starts again with less force.
+### Box 2 — NARRATION
 
-The second flame holds.
+He starts again with less force. The second flame holds. Small, controlled and real. His grin appears before the heat is gone.
 
-Small, controlled and real.
+## `training_taijutsu` — ALL entitlements
 
-His grin appears before the heat is gone.
+### Box 1 — NARRATION
 
-## `training_taijutsu` — ALL entitlements — one beat
+Obito commits too early in the first exchange and gets sent into the dirt. He is back on his feet immediately.
 
-Obito commits too early in the first exchange and gets sent into the dirt.
+### Box 2 — NARRATION
 
-He is back on his feet immediately.
-
-The second time he waits.
-
-When the opening comes, he steps inside it instead of charging through it and completes the exchange cleanly.
-
-The final whistle catches him still ready for another round.
+The second time he waits. When the opening comes, he steps inside it instead of charging through it and completes the exchange cleanly. The final whistle catches him still ready for another round.
 
 ---
 
-# 6. END OF DAY
+# 7. END OF DAY
 
-## `obi_end_day` — Cue 1 — NARRATION
+## `obi_end_day`
 
-The yard empties around Obito.
+### Box 1 — NARRATION
 
-He ties his bag more slowly than he usually does, arms heavy from whatever training he managed to reach.
+The yard empties around Obito. He ties his bag more slowly than he usually does, arms heavy from whatever training he managed to reach.
 
-There is no lecture waiting for him.
+### Box 2 — NARRATION
 
-The drills are simply over.
+There is no lecture waiting for him. The drills are simply over.
 
-## `obi_end_day` — Cue 2 — NARRATION
+### Box 3 — NARRATION
 
-On the walk home, Konoha feels quieter than it did that morning.
-
-Obito passes corners that look ordinary again.
-
-He remembers them anyway.
+On the walk home, Konoha feels quieter than it did that morning. Obito passes corners that look ordinary again. He remembers them anyway.
 
 ---
 
-# 7. HOME — FACTUAL ROUTE REACTION ONLY
+# 8. HOME — FACTUAL ROUTE REACTION ONLY
 
-## `home_common` — Cue 1 — NARRATION
+## `home_common`
 
-Obito drops his bag by the wall and pulls off his goggles.
+### Box 1 — NARRATION
 
-Through the window, the Hokage Monument sits above the village exactly where it was this morning.
+Obito drops his bag by the wall and pulls off his goggles. Through the window, the Hokage Monument sits above the village exactly where it was this morning.
 
-He looks at it, then at his tired hands.
+### Box 2 — NARRATION
 
-Nobody is waiting for an answer from him now.
+He looks at it, then at his tired hands. Nobody is waiting for an answer from him now.
 
-## `home_all_help` — Cue 2 — NARRATION
+## `home_all_help`
 
-He stopped every time.
+### Box 1 — NARRATION
 
-The wardrobe, the produce, the missing equipment, the delivery, the cart — each one took a piece of the morning, and most of the training was gone when he finally arrived.
+He stopped every time. The wardrobe, the produce, the missing equipment, the delivery, the cart — each one took a piece of the morning, and most of the training was gone when he finally arrived.
+
+### Box 2 — NARRATION
 
 Obito rubs his palms together and keeps thinking.
 
-## `home_no_help` — Cue 2 — NARRATION
+## `home_no_help`
 
-He kept moving every time and reached the whole training session.
+### Box 1 — NARRATION
 
-That part feels good.
+He kept moving every time and reached the whole training session. That part feels good.
+
+### Box 2 — NARRATION
 
 The five places where he chose not to stop still come back clearly enough that he cannot simply fall asleep and call the day finished.
 
-## `home_mixed` — Cue 2 — NARRATION
+## `home_mixed`
 
-Some problems stopped him. Some did not.
+### Box 1 — NARRATION
 
-At the time, each choice ended as soon as he started running again.
+Some problems stopped him. Some did not. At the time, each choice ended as soon as he started running again.
+
+### Box 2 — NARRATION
 
 Sitting here, Obito finds himself replaying both kinds.
 
 ---
 
-# 8. FINAL SELF-INTERPRETATION CHOICE
+# 9. FINAL SELF-INTERPRETATION CHOICE
 
 The field history does not select this choice.
 
@@ -568,109 +561,113 @@ Present exactly:
 
 ---
 
-# 9. FINAL INTERPRETATION BRANCHES
+# 10. FINAL INTERPRETATION BRANCHES + STORY CLOSE
 
 ## `ending_helping`
 
-### Cue 1 — NARRATION
+### Box 1 — NARRATION
 
-Obito reaches for his goggles and turns them over once in his hands.
+Obito reaches for his goggles and turns them over once in his hands. Missing training annoyed him.
 
-Missing training annoyed him.
+### Box 2 — NARRATION
 
-So did the idea of teaching himself to stop seeing people just because he was in a hurry.
+So did the idea of teaching himself to stop seeing people just because he was in a hurry. He puts the goggles back on.
 
-He puts the goggles back on.
-
-### Cue 2 — OBITO
+### Box 3 — OBITO
 
 **OBITO:** “I'm not going to stop helping people.”
 
+### Box 4 — NARRATION
+
 His mouth twists.
+
+### Box 5 — OBITO
 
 **OBITO:** “Tomorrow I just leave earlier. A lot earlier.”
 
 ## `ending_training`
 
-### Cue 1 — NARRATION
+### Box 1 — NARRATION
 
-Obito looks at the Monument again.
+Obito looks at the Monument again. Wanting to become Hokage is easy when he is shouting it at a mountain.
 
-Wanting to become Hokage is easy when he is shouting it at a mountain.
+### Box 2 — NARRATION
 
-The training yard was less impressed.
+The training yard was less impressed. He pulls his bag closer and starts checking it for tomorrow.
 
-He pulls his bag closer and starts checking it for tomorrow.
-
-### Cue 2 — OBITO
+### Box 3 — OBITO
 
 **OBITO:** “I need to take training more seriously.”
 
+### Box 4 — NARRATION
+
 He tightens one loose strap.
+
+### Box 5 — OBITO
 
 **OBITO:** “Next time, I get there.”
 
 ## `ending_balance`
 
-### Cue 1 — NARRATION
+### Box 1 — NARRATION
 
-Obito counts the morning back on his fingers, gets halfway through and gives up on the fingers.
+Obito counts the morning back on his fingers, gets halfway through and gives up on the fingers. The village will keep having problems.
 
-The village will keep having problems.
+### Box 2 — NARRATION
 
-Training will keep starting without asking where he is.
+Training will keep starting without asking where he is. He frowns at both facts as if they have teamed up against him.
 
-He frowns at both facts as if they have teamed up against him.
-
-### Cue 2 — OBITO
+### Box 3 — OBITO
 
 **OBITO:** “I need to get better at both.”
 
+### Box 4 — NARRATION
+
 He points at himself.
 
+### Box 5 — OBITO
+
 **OBITO:** “Earlier start. Better judgement. Easy.”
+
+### Box 6 — NARRATION
 
 His expression says he knows it will not be easy.
 
 ## `ending_question`
 
-### Cue 1 — NARRATION
+### Box 1 — NARRATION
 
-Obito looks up at the Hokage Monument.
+Obito looks up at the Hokage Monument. Usually he imagines his own face there before anything else.
 
-Usually he imagines his own face there before anything else.
+### Box 2 — NARRATION
 
-Tonight he studies the faces that are already carved into the mountain.
+Tonight he studies the faces that are already carved into the mountain. The question bothers him enough that he does not try to outrun it.
 
-The question bothers him enough that he does not try to outrun it.
-
-### Cue 2 — OBITO
+### Box 3 — OBITO
 
 **OBITO:** “Maybe I'm looking at this wrong.”
 
+### Box 4 — NARRATION
+
 He pulls his goggles back on.
+
+### Box 5 — OBITO
 
 **OBITO:** “Fine. Then I'll figure out what matters most.”
 
----
+## `obi_close`
 
-# 10. FINAL STORY CLOSE
+### Box 1 — NARRATION
 
-## `obi_close` — one beat — NARRATION
+Before bed, Obito leaves his bag packed beside the door instead of wherever it lands. Outside, Konoha settles beneath the Monument.
 
-Before bed, Obito leaves his bag packed beside the door instead of wherever it lands.
+### Box 2 — NARRATION
 
-Outside, Konoha settles beneath the Monument.
-
-Tomorrow the village will still be there.
-
-So will training.
-
-Obito intends to meet both of them awake.
+Tomorrow the village will still be there. So will training. Obito intends to meet both of them awake.
 
 **END PLAYER-FACING STORY.**
 
-The global terminal sequence begins after this cue; no terminal slogan belongs inside the Story cue itself.
+The global terminal sequence begins after Box 2 of `obi_close`; no terminal slogan belongs inside the Story cue itself.
 
 ---
 
@@ -852,9 +849,7 @@ Every incident is physically present before the choice. HELP performs a material
 
 ## Whole-Origin pacing test
 
-GREEN.
-
-The five repeated decisions remain the spine, but each incident receives one setup, one distinct social contact, one choice and one short consequence. No civilian incident becomes a mini-Origin. Opening, arrival, training, home and ending have room to breathe without recreating the 96-click / 44-click failure.
+AMBER — owner accepted the prose amount but rejected the old per-box density. Sections 3–10 now define the corrected box rhythm explicitly: natural multi-sentence beats, no paragraph-stack pages, no sentence-per-click atomisation.
 
 ## Choice consistency test
 
