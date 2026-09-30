@@ -203,6 +203,23 @@ async function proveMiraiBattle338(browser){
     assert.strictEqual(state.victoryBeatId,test.victoryBeatId,"Mirai #338 victory direct return drift");
     assert.strictEqual(state.defeatBeatId,test.defeatBeatId,"Mirai #338 defeat direct return drift");
 
+    const identityReload=await page.evaluate(()=>{
+      saveTestState();
+      const saved=JSON.parse(sessionStorage.getItem("shinobiTestState")||"null");
+      if(currentBattle?.mirai338)currentBattle.mirai338.underlyingIdentity="qa_tampered_identity";
+      restoreTestState();
+      return{
+        savedIdentity:saved?.mirai338?.underlyingIdentity||null,
+        restoredIdentity:currentBattle?.mirai338?.underlyingIdentity||null,
+        observerPresentation:currentBattle?.mirai338?.observerPresentation||null,
+        identityRevealedByBattle:currentBattle?.mirai338?.identityRevealedByBattle
+      };
+    });
+    assert.strictEqual(identityReload.savedIdentity,"male_academy_instructor","Mirai male instructor identity was not persisted in the Battle save envelope");
+    assert.strictEqual(identityReload.restoredIdentity,"male_academy_instructor","Mirai male instructor identity did not survive save/load");
+    assert.strictEqual(identityReload.observerPresentation,"male_traveller_escort_disguise","Mirai observer-safe disguise drifted on save/load");
+    assert.strictEqual(identityReload.identityRevealedByBattle,false,"Mirai save/load exposed hidden identity inside Battle");
+
     if(test.kind==="shortcut"){
       const rewardPresentation=await page.evaluate(()=>{
         currentBattle.outcome={type:"victory"};
