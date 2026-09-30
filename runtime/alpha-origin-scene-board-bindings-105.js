@@ -393,7 +393,7 @@ function miraiActors(beatId,performance,beat){
   }
   if(id.startsWith("mir_shortcut_victory_reveal_")){
     const match=id.match(/_(\d+)$/),n=match?Number(match[1]):0;
-    rows.push(n>=4?instructor():traveller());
+    rows.push(n>=7?instructor():traveller());
     return rows;
   }
   if(id.startsWith("mir_shortcut_defeat_reveal_")){
