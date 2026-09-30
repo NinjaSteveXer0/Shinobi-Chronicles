@@ -9,8 +9,12 @@
 
 **Date:** 2026-09-27  
 **Owner:** Writing / Story — Konoha  
-**Status:** **OWNER REOPENED 2026-09-29 — SUPERSEDED FOR CURRENT PLAYER-FACING VOICE**  
+**Status:** **OWNER BROWSER RED 2026-09-30 — NOT GOLDEN / FULL STORY REWRITE ACTIVE**  
 **Origin:** `academy_iwabee`
+
+> **CURRENT PLAYER-FACING SUCCESSOR:** `Documentation/Story/Academy_Iwabee_Origin_Full_Story_Rewrite_2026-09-30.md` @ `0d8f64404631e1f2865bd192ce470c8690218317`.
+>
+> Preserve this older file only for machine/route semantics where not superseded. Do not use its player-facing Story as current authority.
 
 > **2026-09-29 natural-voice successor:** `Documentation/Story/Academy_Iwabee_Origin_Natural_Voice_Benchmark_Rewrite_2026-09-29.md` @ `7209383cebd82a0e4598a44f91e91c3a7cc76ad8`.
 >
