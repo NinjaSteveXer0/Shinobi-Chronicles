@@ -9,11 +9,11 @@ const SCENE_ID="origin_academy_obito_journey_to_training";
 fs.mkdirSync(OUT,{recursive:true});
 
 const CHOICES=[
-  ["obi_furniture_choice","HELP HER","KEEP GOING"],
-  ["obi_vegetables_choice","HELP HER","KEEP GOING"],
-  ["obi_equipment_choice","HELP SEARCH","KEEP GOING"],
-  ["obi_delivery_choice","HELP WITH THE DELIVERY","KEEP MOVING"],
-  ["obi_cart_choice","STOP AND HELP","GO TO TRAINING"]
+  ["obi_furniture_choice","Help her move it","Keep going"],
+  ["obi_vegetables_choice","Help gather the produce","Keep going"],
+  ["obi_equipment_choice","Help find the equipment","Keep going"],
+  ["obi_delivery_choice","Help right the delivery","Keep going"],
+  ["obi_cart_choice","Help stop the cart","Go to training"]
 ];
 const EXPECTED_BACKDROP={
   obi_depart:"Obito Origin Backdrop/konoha_main_street.png",
@@ -136,7 +136,7 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
   try{
     let s=await state(page);
     assert.strictEqual(s.beatId,"obi_depart");
-    assert(s.text.includes("Obito is already running when the Academy bell starts carrying across Konoha."),label+" compact opening cue 1 missing");
+    assert(s.text.includes("Obito tears into the morning street with one hand still pulling his goggles into place."),label+" fresh opening cue 1 missing");
     assert(s.performance&&s.performance.sourceIndex===0&&s.performance.segmentIndex===0&&s.performance.segmentCount===1,label+" compact opening cue 1 auto-paginated");
     assert.notStrictEqual(s.textOverflowY,"auto",label+" ordinary narration still uses internal auto-scroll");
     assert.notStrictEqual(s.textOverflowY,"scroll",label+" ordinary narration still uses internal scroll");
@@ -150,7 +150,7 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
     await advance(page);
     const secondPage=await state(page);
     assert.strictEqual(secondPage.beatId,"obi_depart",label+" compact opening click skipped semantic beat");
-    assert(secondPage.text.includes("He points at the Monument without slowing."),label+" compact opening cue 2 missing");
+    assert(secondPage.text.includes("No. Not today. I\'m making it.")&&secondPage.text.includes("And I\'m getting up there too. Just not before training."),label+" fresh opening cue 2 missing");
     assert(secondPage.performance&&secondPage.performance.sourceIndex===1&&secondPage.performance.segmentIndex===0&&secondPage.performance.segmentCount===1,label+" compact opening cue 2 auto-paginated");
 
     for(let i=0;i<CHOICES.length;i++){
@@ -205,8 +205,8 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
     assert.strictEqual(interactions,expectedInteractions,label+" measured interaction count drift: "+interactions);
     assert(interactions>=28&&interactions<=36,label+" route outside owner compression target: "+interactions);
     assert(interactions<=40,label+" route breached hard pre-Receipt ceiling: "+interactions);
-    assert.strictEqual(completion.obito.checks.compressionCardinality,true,label+" compact source cardinality diagnostic failed");
-    assert.strictEqual(completion.obito.checks.compactCuesCannotAutoPaginate,true,label+" compact source cue pagination diagnostic failed");
+    assert.strictEqual(completion.obito.checks.freshRewriteCardinality,true,label+" fresh rewrite cardinality diagnostic failed");
+    assert.strictEqual(completion.obito.checks.freshCuesPinnedToSinglePerformancePage,true,label+" fresh rewrite single-page cue diagnostic failed");
     assert.strictEqual(completion.obito.checks.noGenericBeatPause,true,label+" generic A beat pause returned");
     assert.strictEqual(completion.obito.checks.chronicleBeginsNotPreReceipt,true,label+" YOUR CHRONICLE BEGINS leaked before shared Receipt");
     return{label,expectedDelay,expectedEntitlement,interactions,errors};
@@ -217,10 +217,10 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
   const browser=await chromium.launch({headless:false});
   try{
     const results=[];
-    results.push(await runRoute(browser,{label:"all-continue",helpSet:new Set(),expectedDelay:0,expectedEntitlement:"FULL",expectedInteractions:30}));
+    results.push(await runRoute(browser,{label:"all-continue",helpSet:new Set(),expectedDelay:0,expectedEntitlement:"FULL",expectedInteractions:31}));
     results.push(await runRoute(browser,{label:"substantial-furniture-only",helpSet:new Set([0]),expectedDelay:7,expectedEntitlement:"SUBSTANTIAL",expectedInteractions:30}));
     results.push(await runRoute(browser,{label:"reduced-furniture-equipment",helpSet:new Set([0,2]),expectedDelay:15,expectedEntitlement:"REDUCED",expectedInteractions:30}));
-    results.push(await runRoute(browser,{label:"all-help",helpSet:new Set([0,1,2,3,4]),expectedDelay:35,expectedEntitlement:"MINIMAL",expectedInteractions:32}));
+    results.push(await runRoute(browser,{label:"all-help",helpSet:new Set([0,1,2,3,4]),expectedDelay:35,expectedEntitlement:"MINIMAL",expectedInteractions:33}));
     const summary={pass:true,kind:"obito_story_presentation_installed_browser",routes:results.map(r=>({label:r.label,delay:r.expectedDelay,entitlement:r.expectedEntitlement,interactions:r.interactions})),maxDiversionInteractionsIncludingChoice:4,hardCeiling:40,targetRange:[28,36],browserGoldenClaimed:false};
     fs.writeFileSync(path.join(OUT,"summary.json"),JSON.stringify(summary,null,2)+"\n");
     console.log(JSON.stringify(summary,null,2));
