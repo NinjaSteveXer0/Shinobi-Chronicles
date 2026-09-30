@@ -58,6 +58,10 @@ assert(orderedPlaybackSource,"shared ordered playback owner missing");
 assert(orderedPlaybackSource.includes('return !!(currentBattle&&String(currentBattle.battleId||"").trim());'),"ordered Battle playback is not enabled by concrete Battle occurrence");
 assert(!orderedPlaybackSource.includes("academy_menma_origin_three_test_subjects_with_anko"),"ordered Battle playback is still gated to Menma");
 assert(shared.includes("suspendCallerStoryPresentation33000"),"shared Battle caller/Story suspension contract missing");
+assert(shared.includes("function storyCallerBattleEnvironment33000()"),"shared Story-caller Battle environment fallback missing");
+assert(shared.includes("getAcademyKakashiV2Presentation36020"),"shared Battle environment fallback does not consume Kakashi authored Story presentation");
+assert(shared.includes("getActiveStorySceneBoardProjection"),"shared Battle environment fallback does not consume shared Story Board backdrop");
+assert(shared.includes("currentBattle.presentationEnvironmentPath=environmentPath"),"shared Battle does not persist resolved Story environment onto current Battle presentation truth");
 
 assert(mirai.includes('const BATTLE_ENVIRONMENT_BY_CALLER=Object.freeze({'),"Mirai authored Battle environment mapping missing");
 assert(mirai.includes('[SHORTCUT_CALLER]:"Mirai Origin Backdrop/konoha_storehouse_side_lane.png"'),"Mirai shortcut Battle environment missing");
@@ -75,6 +79,7 @@ const checks={
   sharedOrderedActionPresentation:true,
   orderedPlaybackGlobal:true,
   sharedAuthoredEnvironmentProjection:true,
+  sharedStoryCallerEnvironmentFallback:true,
   miraiDuelEnvironmentInputs:true,
   encounterSemanticsRemainLocal:true
 };
