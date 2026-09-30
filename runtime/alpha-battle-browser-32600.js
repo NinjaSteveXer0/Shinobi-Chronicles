@@ -69,19 +69,56 @@
   // caller return context.
   const priorClaimVictoryAutoReturn=claimVictoryRewardsFromOverlay;
   let kakashiVictoryPersistencePending32600=null;
-  function renderKakashiClaimedVictory32600(){
-    if(typeof document==="undefined"||typeof renderVictoryOverlay!=="function")return false;
-    const container=document.getElementById("overlay-content-container");
-    if(!container)return false;
-    renderVictoryOverlay(container);
+  function patchKakashiClaimedVictory32600(){
+    if(typeof document==="undefined")return false;
+    const screen=document.querySelector(".alpha-victory-code-screen");
+    if(!screen)return false;
+
+    const claimState=screen.querySelector(".alpha-victory-claim-state");
+    if(claimState){
+      claimState.textContent="CLAIMED";
+      claimState.classList.add("is-claimed");
+    }
+
+    const receiptRows=[...(screen.querySelectorAll(".alpha-victory-chronicle dl div")||[])];
+    for(const row of receiptRows){
+      const label=row.querySelector("dt");
+      const value=row.querySelector("dd");
+      if(label&&value&&String(label.textContent||"").trim().toUpperCase()==="REWARDS")value.textContent="COMMITTED";
+    }
+
+    const footer=screen.querySelector(".alpha-victory-footer");
+    const copy=footer&&footer.querySelector("p");
+    const button=footer&&footer.querySelector(".victory-continue");
+    if(copy)copy.textContent="Rewards are committed. Continue to restore the owning Story / World caller.";
+    if(button){
+      button.textContent="CONTINUE";
+      button.setAttribute("onclick","continueAfterVictory()");
+      button.disabled=false;
+      button.removeAttribute("aria-disabled");
+      button.style.pointerEvents="auto";
+    }
+    screen.classList.add("is-claimed-live");
     const overlay=document.getElementById("screen-overlay");
     if(overlay)overlay.classList.add("alpha-victory-open");
+    return !!button;
+  }
+  function cancelScheduledKakashiVictoryPersistence32600(){
+    const pending=kakashiVictoryPersistencePending32600;
+    if(!pending)return false;
+    if(pending.idleHandle!=null&&typeof cancelIdleCallback==="function"){
+      try{cancelIdleCallback(pending.idleHandle);}catch(_error){}
+    }
+    if(pending.timerHandle!=null){
+      try{clearTimeout(pending.timerHandle);}catch(_error){}
+    }
+    if(pending.status==="scheduled")pending.status="cancelled";
     return true;
   }
-  function scheduleKakashiVictoryPersistence32600(){
+  function scheduleKakashiVictoryPersistence32600(reason="claim"){
     const battleId=String(currentBattle&&currentBattle.battleId||"");
-    if(kakashiVictoryPersistencePending32600&&kakashiVictoryPersistencePending32600.battleId===battleId)return false;
-    const pending={battleId,status:"scheduled",playerSaved:false,sessionSaved:false,error:null};
+    cancelScheduledKakashiVictoryPersistence32600();
+    const pending={battleId,reason,status:"scheduled",playerSaved:false,sessionSaved:false,error:null,idleHandle:null,timerHandle:null};
     kakashiVictoryPersistencePending32600=pending;
     const persist=()=>{
       if(kakashiVictoryPersistencePending32600!==pending)return;
@@ -95,9 +132,16 @@
       }
       try{if(typeof refreshAlphaSurfaceTruthHUD==="function")refreshAlphaSurfaceTruthHUD();}catch(_error){}
     };
-    const afterPaint=()=>setTimeout(persist,0);
+    const afterPaint=()=>{
+      if(kakashiVictoryPersistencePending32600!==pending)return;
+      if(typeof requestIdleCallback==="function"){
+        pending.idleHandle=requestIdleCallback(persist,{timeout:1600});
+      }else{
+        pending.timerHandle=setTimeout(persist,120);
+      }
+    };
     if(typeof requestAnimationFrame==="function")requestAnimationFrame(afterPaint);
-    else setTimeout(persist,0);
+    else afterPaint();
     return true;
   }
   claimVictoryRewardsFromOverlay=function claimVictoryRewardsFromOverlayBrowser32600(){
@@ -116,12 +160,12 @@
       const alreadyClaimed=currentBattle.rewards.claimed===true;
       const claimed=alreadyClaimed?true:claimCurrentBattleRewards();
       if(claimed!==true)return{success:false,reason:"victory_reward_claim_failed"};
-      // Repaint CLAIM -> CONTINUE synchronously from the already-open Victory
-      // surface. Do not call openOverlay("victory") here: openOverlay persists
-      // session state before rendering and Stephen's full save can make the
-      // button look frozen. Persist exactly once after the browser has painted.
-      if(!renderKakashiClaimedVictory32600())return{success:false,reason:"kakashi_victory_rerender_failed"};
-      scheduleKakashiVictoryPersistence32600();
+      // Patch only the already-visible Victory controls. Re-running the entire
+      // Victory renderer on Stephen's full Chronicle state was still capable of
+      // making the click look dead. Material rewards are already committed in
+      // memory; paint CLAIM -> CONTINUE first, then persist during browser idle.
+      if(!patchKakashiClaimedVictory32600())return{success:false,reason:"kakashi_victory_control_patch_failed"};
+      scheduleKakashiVictoryPersistence32600("claim");
       return{
         success:true,claimed:true,navigated:false,autoReturned:false,
         explicitPostClaimContinue:true,
@@ -220,6 +264,51 @@
       navigationError,
       rewardCommitBeforeCallerRestore:true
     };
+  };
+
+  const priorContinueAfterVictory32600=continueAfterVictory;
+  continueAfterVictory=function continueAfterVictoryBrowser32600(){
+    const kakashiClaimed=!!(
+      currentOverlayType==="victory"&&
+      currentBattle&&
+      currentBattle.rewards&&
+      currentBattle.rewards.kakashiV2===true&&
+      currentBattle.rewards.claimed===true
+    );
+    if(!kakashiClaimed)return priorContinueAfterVictory32600.apply(this,arguments);
+
+    // Kakashi's Story return used to synchronously stringify the full player and
+    // Battle snapshots before the Story frame could repaint. Suppress only those
+    // two persistence calls for this one synchronous transition, restore the
+    // canonical functions immediately, then persist the final post-return state
+    // during browser idle. No semantic state mutation is skipped.
+    const priorPlayerSave=typeof globalThis.savePlayerData==="function"?globalThis.savePlayerData:null;
+    const priorTestSave=typeof globalThis.saveTestState==="function"?globalThis.saveTestState:null;
+    let suppressedPlayerSaves=0,suppressedTestSaves=0,result;
+    cancelScheduledKakashiVictoryPersistence32600();
+    try{
+      if(priorPlayerSave){
+        globalThis.savePlayerData=function(){suppressedPlayerSaves+=1;return true;};
+        try{savePlayerData=globalThis.savePlayerData;}catch(_error){}
+      }
+      if(priorTestSave){
+        globalThis.saveTestState=function(){suppressedTestSaves+=1;return true;};
+        try{saveTestState=globalThis.saveTestState;}catch(_error){}
+      }
+      result=priorContinueAfterVictory32600.apply(this,arguments);
+    }finally{
+      if(priorPlayerSave){
+        globalThis.savePlayerData=priorPlayerSave;
+        try{savePlayerData=globalThis.savePlayerData;}catch(_error){}
+      }
+      if(priorTestSave){
+        globalThis.saveTestState=priorTestSave;
+        try{saveTestState=globalThis.saveTestState;}catch(_error){}
+      }
+      scheduleKakashiVictoryPersistence32600("post_continue");
+    }
+    if(result&&typeof result==="object")return{...result,kakashiPostPaintPersistence:true,suppressedPlayerSaves,suppressedTestSaves};
+    return{success:true,kakashiPostPaintPersistence:true,suppressedPlayerSaves,suppressedTestSaves};
   };
 
   // --------------------------------------------------------------------------
