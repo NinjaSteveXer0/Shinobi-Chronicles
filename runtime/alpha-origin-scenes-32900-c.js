@@ -1028,7 +1028,7 @@ function boardActors(beatId,performance){
 }
 function boardLocation(beatId,performance){
   if(beatId==="obi_arrival"||beatId==="obi_training")return"ACADEMY TRAINING GROUND";
-  if(beatId==="obi_end_day")return obitoPerformanceIndex331(performance)<1?"ACADEMY TRAINING GROUND":"KONOHA · LATE AFTERNOON";
+  if(beatId==="obi_end_day")return obitoPerformanceIndex331(performance)<2?"ACADEMY TRAINING GROUND":"KONOHA · LATE AFTERNOON";
   if(beatId==="obi_home"||beatId==="obi_reflect"||beatId.startsWith("obi_ending_"))return"OBITO'S HOME";
   if(beatId==="obi_close")return"OBITO'S HOME";
   return"KONOHA · MORNING";
@@ -1138,7 +1138,7 @@ function diagnostics(){
       PERFORMANCE.ending_helping.length===5&&PERFORMANCE.ending_training.length===5&&
       PERFORMANCE.ending_balance.length===6&&PERFORMANCE.ending_question.length===5&&PERFORMANCE.obi_close.length===2,
     freshCuesPinnedToSinglePerformancePage:Object.values(PERFORMANCE).flat().every(row=>!row||row.singlePage===true),
-    authoredBoxesDoNotStackParagraphs:Object.values(PERFORMANCE).flat().every(row=>!row||!String(row.text||"").includes("\\n\\n")),
+    authoredBoxesDoNotStackParagraphs:Object.values(PERFORMANCE).flat().every(row=>!row||!String(row.text||"").includes("\n\n")),
     narrationHasNoSpeakerPrefixes:Object.values(PERFORMANCE).flat().every(row=>!row||row.kind!=="narration"||!/^(OBITO|ACADEMY INSTRUCTOR|CIVILIAN|VENDOR|CUSTODIAN|DELIVERY WORKER):/.test(String(row.text||""))),
     requiredDialogueIsSpeakerOwned:PERFORMANCE.obi_depart[2]?.kind==="dialogue"&&PERFORMANCE.obi_depart[2]?.speakerName==="OBITO"&&
       ["FULL","SUBSTANTIAL","REDUCED","MINIMAL"].every(key=>PERFORMANCE["arrival_"+key][2]?.kind==="dialogue"&&PERFORMANCE["arrival_"+key][2]?.speakerName==="ACADEMY INSTRUCTOR")&&
