@@ -24,6 +24,8 @@ const ENCOUNTER="origin_academy_iwabee:rogue_genin_confrontation";
 const SOURCE="occ_origin_iwabee_rogue_genin_response_resolution";
 const SCENE_ID="origin_academy_iwabee_prologue";
 const ENVIRONMENT="Scene backdrops/academy_training_ground_courtyard.png";
+const FIXED_VICTORY_RYO=50;
+const REWARD_SOURCE_ID="iwabee_origin_rogue_genin_battle_victory_ryo_01";
 const PROFILE=Object.freeze({
   id:ROGUE,name:"ROGUE GENIN",rank:"Rogue Genin",pl:23,
   stats:Object.freeze({nin:23,tai:22,buki:21,fuin:10,kin:14,gen:15,stamina:24}),
@@ -45,7 +47,7 @@ function registerProfile(){
     id:ROGUE,name:PROFILE.name,rank:PROFILE.rank,power:PROFILE.pl,calibratedBasePL:PROFILE.pl,
     baseStats:{...PROFILE.stats},stats:{...PROFILE.stats},image:PROFILE.image,
     oppositionTemplateId:TEMPLATE,
-    rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},
+    rewards:{ryo:{min:FIXED_VICTORY_RYO,max:FIXED_VICTORY_RYO},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},
     provenance:{origin:"academy_iwabee",historicalParticipantRef:ROGUE,oppositionTemplateId:TEMPLATE,storyScoped:true,noRegistryAdmission:true,noCollectibleAdmission:true,noAutoScaling:true},
     noSummon:true,noTransformation:true,noBossScaling:true
   };
@@ -65,6 +67,46 @@ if(PRE_CHOOSE){
     return PRE_CHOOSE.apply(this,arguments);
   };
   try{chooseEnemyAuthoredBattleAction=globalThis.chooseEnemyAuthoredBattleAction;}catch(_){}
+}
+
+function rewardHistory(){if(!playerData.activityHistory||!Array.isArray(playerData.activityHistory))playerData.activityHistory=[];return playerData.activityHistory;}
+function isExactRewardBattle(){return !!(currentBattle&&currentBattle.iwabee399&&currentBattle.battleConfigId===CONFIG&&currentBattle.encounterId===ENCOUNTER);}
+function projectRewards(rewards=null){
+  if(!isExactRewardBattle())return rewards;
+  const victory=currentBattle&&currentBattle.outcome&&currentBattle.outcome.type==="victory";
+  const out=rewards&&typeof rewards==="object"?rewards:{generated:true,claimed:false};
+  out.generated=true;out.claimed=out.claimed===true;out.ryo=victory?FIXED_VICTORY_RYO:0;out.exp=0;out.items=[];out.rareDrops=[];
+  out.requiresExplicitPostClaimContinue=false;out.iwabee399FixedReward=true;out.iwabee399RewardSourceId=REWARD_SOURCE_ID;out.battleOccurrenceId=meta().battleOccurrenceId;
+  currentBattle.rewards=out;return out;
+}
+const PRE_GENERATE=typeof generateBattleRewards==="function"?generateBattleRewards:null;
+if(PRE_GENERATE){
+  globalThis.generateBattleRewards=function generateIwabee399Rewards(){
+    if(isExactRewardBattle())return projectRewards(currentBattle.rewards);
+    return PRE_GENERATE.apply(this,arguments);
+  };
+  try{generateBattleRewards=globalThis.generateBattleRewards;}catch(_){}
+}
+function existingRewardReceipt(){
+  const m=meta();if(!m)return null;
+  return rewardHistory().find(row=>row&&row.type==="origin_battle_reward"&&row.rewardSourceId===REWARD_SOURCE_ID&&row.battleOccurrenceId===m.battleOccurrenceId)||null;
+}
+function claimReward(){
+  const m=meta();if(!m)return{success:false,reason:"iwabee399_battle_not_active"};
+  if(!currentBattle.outcome||currentBattle.outcome.type!=="victory")return{success:false,reason:"iwabee399_victory_required"};
+  const prior=existingRewardReceipt();if(prior){if(currentBattle.rewards)currentBattle.rewards.claimed=true;return{success:true,idempotent:true,receipt:prior};}
+  if(!currentBattle.rewards||currentBattle.rewards.generated!==true)projectRewards(currentBattle.rewards);
+  if(currentBattle.rewards.claimed===true)return{success:false,reason:"iwabee399_reward_claim_state_without_receipt"};
+  playerData.ryo=Math.max(0,Number(playerData.ryo)||0)+FIXED_VICTORY_RYO;
+  const receipt={type:"origin_battle_reward",rewardSourceId:REWARD_SOURCE_ID,battleOccurrenceId:m.battleOccurrenceId,battleConfigId:CONFIG,encounterId:ENCOUNTER,actorVariantId:IWABEE,ryo:FIXED_VICTORY_RYO,exp:0,items:[],rareDrops:[],claimedAt:Date.now()};
+  rewardHistory().push(receipt);currentBattle.rewards.claimed=true;currentBattle.claimedAt=Date.now();
+  try{recordBattleChronicle();}catch(_){}
+  savePlayerData();saveTestState();return{success:true,idempotent:false,receipt:clone(receipt)};
+}
+const PRE_CLAIM=typeof claimCurrentBattleRewards==="function"?claimCurrentBattleRewards:null;
+if(PRE_CLAIM){
+  globalThis.claimCurrentBattleRewards=function claimIwabee399Rewards(){if(isExactRewardBattle())return claimReward().success===true;return PRE_CLAIM.apply(this,arguments);};
+  try{claimCurrentBattleRewards=globalThis.claimCurrentBattleRewards;}catch(_){}
 }
 
 const PRE_SAVE=typeof saveTestState==="function"?saveTestState:null;
@@ -147,12 +189,12 @@ function launch(spec={}){
   currentBattle.enemyPower=23;currentBattle.enemyMaxPower=23;
   currentBattle.iwabee399={patchId:PATCH_ID,battleConfigId:CONFIG,battleOccurrenceId:battleId,sourceOccurrenceId:SOURCE,historicalParticipantRef:ROGUE,oppositionTemplateId:TEMPLATE,strictOneVsOne:true,feintUsed:false,feintCreatedEnemyOpportunityIndex:null,noHiddenScaling:true};
   initializeBattleRemainingPLFromDeployment({preserveExistingEnemyPower:true});
-  if(currentBattle.rewards){currentBattle.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],iwabee399NoReward:true};}
+  if(currentBattle.rewards){currentBattle.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],requiresExplicitPostClaimContinue:false,iwabee399FixedReward:true,iwabee399RewardSourceId:REWARD_SOURCE_ID};}
   const evidence=recordBattleEvidence({
     eventType:"academy_iwabee_rogue_genin_battle_launched",committedOccurrence:true,
     actorRef:createBattleParticipantRef("player",IWABEE),targetRef:createBattleParticipantRef("enemy",ROGUE),
     sourceRefs:[{type:"origin_source_occurrence",id:SOURCE,role:"world_response_source"},{type:"historical_participant",id:ROGUE,role:"opposition_participant"},{type:"opposition_template",id:TEMPLATE,role:"capability_source"}],
-    data:{battleOccurrenceId:battleId,battleConfigId:CONFIG,encounterId:ENCOUNTER,iwabeeBasePL:13,rogueBasePL:23,noAutoScaling:true,noHiddenHandicap:true,noReward:true,battleResultDoesNotEstablishDisposition:true}
+    data:{battleOccurrenceId:battleId,battleConfigId:CONFIG,encounterId:ENCOUNTER,iwabeeBasePL:13,rogueBasePL:23,noAutoScaling:true,noHiddenHandicap:true,victoryRewardRyo:FIXED_VICTORY_RYO,rewardSourceId:REWARD_SOURCE_ID,battleResultDoesNotEstablishDisposition:true}
   });
   store[battleId]={battleOccurrenceId:battleId,launchEvidenceId:evidence&&evidence.evidenceId||null,createdAt:Date.now()};
   savePlayerData();saveTestState();openOverlay("combat");
@@ -196,7 +238,8 @@ function diagnostics(){
     sharedActionPackage:JSON.stringify(actions.map(a=>a.id))===JSON.stringify(["enemy_rogue_genin_kunai_rush","enemy_rogue_genin_shuriken_spread","enemy_rogue_genin_substitution_feint"])&&typeof buildReusableRogueGeninOppositionActions399==="function",
     noAutoScaling:enemy.provenance.noAutoScaling===true,
     strictOneVsOne:String(strictDeployment).includes("createBattleDeploymentSlots([IWABEE])")&&String(strictDeployment).includes("createBattleDeploymentSlots([ROGUE])"),
-    noReward:enemy.rewards.ryo.min===0&&enemy.rewards.ryo.max===0&&enemy.rewards.exp.min===0&&enemy.rewards.exp.max===0,
+    fixedVictoryReward:enemy.rewards.ryo.min===FIXED_VICTORY_RYO&&enemy.rewards.ryo.max===FIXED_VICTORY_RYO&&enemy.rewards.exp.min===0&&enemy.rewards.exp.max===0&&FIXED_VICTORY_RYO===50,
+    stableRewardReceipt:String(claimReward).includes('type:"origin_battle_reward"')&&String(claimReward).includes("battleOccurrenceId")&&REWARD_SOURCE_ID==="iwabee_origin_rogue_genin_battle_victory_ryo_01",
     observerSafeBattleResult:String(projectResult).includes("iwabeeBattleWithdrawn")&&String(projectResult).includes("rogueBattleWithdrawn")&&!String(projectResult).includes("custody"),
     noIWA02FromBattle:!String(launch).includes("IWA-02")&&!String(projectResult).includes("earthReleaseUsedToConstrainRogueGenin"),
     saveReload:!!PRE_SAVE&&!!PRE_RESTORE&&typeof globalThis.saveTestState==="function"&&typeof globalThis.restoreTestState==="function",
@@ -210,5 +253,5 @@ const installed=registerProfile();if(!installed.success)throw new Error(installe
 globalThis.launchAcademyIwabeeRogueConfrontation399=launch;
 globalThis.projectAcademyIwabeeRogueConfrontation399=projectResult;
 globalThis.runAcademyIwabeeOriginRuntime399Diagnostics=diagnostics;
-globalThis.SC_ACADEMY_IWABEE_ORIGIN_RUNTIME_399=Object.freeze({patchId:PATCH_ID,battleConfigId:CONFIG,encounterId:ENCOUNTER,sourceOccurrenceId:SOURCE,participantRefs:Object.freeze({iwabee:IWABEE,rogueGenin:ROGUE}),oppositionTemplateId:TEMPLATE,environmentPath:ENVIRONMENT,browserGoldenClaimed:false});
+globalThis.SC_ACADEMY_IWABEE_ORIGIN_RUNTIME_399=Object.freeze({patchId:PATCH_ID,battleConfigId:CONFIG,encounterId:ENCOUNTER,sourceOccurrenceId:SOURCE,participantRefs:Object.freeze({iwabee:IWABEE,rogueGenin:ROGUE}),oppositionTemplateId:TEMPLATE,environmentPath:ENVIRONMENT,fixedVictoryRyo:FIXED_VICTORY_RYO,rewardSourceId:REWARD_SOURCE_ID,browserGoldenClaimed:false});
 })();
