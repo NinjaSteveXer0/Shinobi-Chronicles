@@ -84,15 +84,15 @@ assert(story.includes('earthReleaseUsedToConstrainRogueGenin:true'));
 assert(story.includes('alternateEscapeRouteAvailable:false'));
 assert(story.includes('followupBattleOccurred:false'));
 assert(story.includes('beatId:"iwa_confront_loss_01"'));
-assert(story.includes('beatId:"met_spar_strong_01"'));
-assert(story.includes('beatId:"met_spar_mixed_01"'));
-assert(story.includes('beatId:"met_spar_rough_01"'));
-assert(story.includes('"DISTORT HER SENSE OF DISTANCE"'));
-assert(story.includes('D("kur_complete_03","INSTRUCTOR","Got you."'));
-assert(story.includes('N("kur_complete_06","The yard bends again.\\n\\nThe instructor is behind Kurenai now.\\n\\nThe bell is back in her hand."'));
-assert(!story.includes('"DISTORT HIS SENSE OF DISTANCE"'));
+assert(story.includes('N("met_spar_strong_01"'));
+assert(story.includes('N("met_spar_mixed_01"'));
+assert(story.includes('N("met_spar_rough_01"'));
+assert(story.includes('"Distort her sense of distance"'));
+assert(story.includes('D("kur_result_complete_win_02","INSTRUCTOR","Got you."'));
+assert(story.includes('N("kur_result_complete_win_05","The yard bends again.\\n\\nThe instructor is behind Kurenai.\\n\\nThe bell is back in her hand."'));
+assert(!story.includes('"Distort his sense of distance"')&&!story.includes('"DISTORT HIS SENSE OF DISTANCE"'));
 for(const prefix of ["met_redirect","met_impact","met_destroy"]){
-  for(const outcome of ["success","partial","failure"])assert(story.includes('beatId:"'+prefix+"_"+outcome+'_01"'),"missing MET-03 outcome "+prefix+" "+outcome);
+  for(const outcome of ["success","partial","failure"])assert(story.includes('N("'+prefix+"_"+outcome+'_01"'),"missing MET-03 outcome "+prefix+" "+outcome);
 }
 
 const namePairs={
