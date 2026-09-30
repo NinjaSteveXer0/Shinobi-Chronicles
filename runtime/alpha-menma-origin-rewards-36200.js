@@ -352,18 +352,22 @@ function appendVictoryDisclosure(container,projection){
 }
 
 const PRE_RENDER=typeof renderVictoryOverlay==="function"?renderVictoryOverlay:null;
-function removeMenmaVictoryContractCopy36200(container){
+function normalizeMenmaVictoryFooter36200(container){
   if(!container||!successorBattle())return false;
-  const copy=container.querySelector&&container.querySelector(".alpha-victory-footer p");
-  if(copy)copy.remove();
-  return true;
+  const footer=container.querySelector&&container.querySelector(".alpha-victory-footer");
+  const button=footer&&footer.querySelector?footer.querySelector(".victory-continue"):null;
+  if(button){
+    button.style.removeProperty("margin-right");
+    button.style.setProperty("margin-left","auto");
+  }
+  return !!footer;
 }
 function renderVictoryOverlay36200(container){
   const projection=successorBattle()?ensureProjection():{handled:false};
   const result=PRE_RENDER?PRE_RENDER.apply(this,arguments):false;
   try{
     appendVictoryDisclosure(container,projection);
-    removeMenmaVictoryContractCopy36200(container);
+    normalizeMenmaVictoryFooter36200(container);
   }catch(_error){}
   return result;
 }
@@ -424,6 +428,7 @@ function diagnostics(){
     genericRewardsSuppressed:generateBattleRewards36200.toString().indexOf("successorBattle")<generateBattleRewards36200.toString().indexOf("PRE_GENERATE"),
     noFixedLootOrExp:ensureProjection.toString().includes("exp:0")&&ensureProjection.toString().includes("items:[]")&&ensureProjection.toString().includes("rareDrops:[]"),
     durableReceiptUsesActivityHistory:writeRewardReceipt.toString().includes("history()")&&writeRewardReceipt.toString().includes("battleOccurrenceId"),
+    sharedVictoryFooterPreserved:!String(renderVictoryOverlay36200).includes("removeMenmaVictoryContractCopy36200")&&String(normalizeMenmaVictoryFooter36200).includes('margin-left')&&String(normalizeMenmaVictoryFooter36200).includes('auto'),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
