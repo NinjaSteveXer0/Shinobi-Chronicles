@@ -61,20 +61,21 @@ assert(
   !sceneB.includes("I'm thrilled."),
   "Kushina natural-voice successor missing or retired banter returned"
 );
+const iwabeeSource=sceneB.slice(sceneB.indexOf("// Iwabee —"),sceneB.indexOf("// Metal Lee —"));
 assert(
-  sceneB.includes('{beatId:"iwa_open_02",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"You planning to argue with the paper?"')&&
-  sceneB.includes('C("raise_collapsed","Raise the collapsed section"')&&
-  sceneB.includes('C("confront","Confront him"')&&
-  sceneB.includes('{beatId:"iwa_confront_07",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"Take yours."')&&
-  sceneB.includes('C("academy_tests_wrong","“The Academy leans too hard on written tests.”"')&&
-  sceneB.includes("C(\"prove_my_way\",\"“I'll prove I can do it my way.”\"")&&
-  sceneB.includes('{beatId:"iwa_close_06",mode:"narration",environmentRef:courtyard,text:"Iwabee leaves the yard.",nextBeatId:"iwa_receipt"}')&&
-  sceneB.includes('{beatId:"iwa_receipt",mode:"record",environmentRef:courtyard,text:"",exitScene:true}')&&
-  !sceneB.includes('text:"YOUR CHRONICLE BEGINS",exitScene:true')&&
-  !sceneB.includes('C("confront","CONFRONT HIM"')&&
-  !sceneB.includes('C("raise_collapsed","RAISE THE COLLAPSED SECTION"')&&
-  !sceneB.includes("Then work on the bad part without pretending the good part doesn't matter.")&&
-  !sceneB.includes("You ruin everything."),
+  iwabeeSource.includes('{beatId:"iwa_open_02",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"You planning to argue with the paper?"')&&
+  iwabeeSource.includes('C("raise_collapsed","Raise the collapsed section"')&&
+  iwabeeSource.includes('C("confront","Confront him"')&&
+  iwabeeSource.includes('{beatId:"iwa_confront_07",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"Take yours."')&&
+  iwabeeSource.includes('C("academy_tests_wrong","“The Academy leans too hard on written tests.”"')&&
+  iwabeeSource.includes("C(\"prove_my_way\",\"“I'll prove I can do it my way.”\"")&&
+  iwabeeSource.includes('{beatId:"iwa_close_06",mode:"narration",environmentRef:courtyard,text:"Iwabee leaves the yard.",nextBeatId:"iwa_receipt"}')&&
+  iwabeeSource.includes('{beatId:"iwa_receipt",mode:"record",environmentRef:courtyard,text:"",exitScene:true}')&&
+  !iwabeeSource.includes('text:"YOUR CHRONICLE BEGINS",exitScene:true')&&
+  !iwabeeSource.includes('C("confront","CONFRONT HIM"')&&
+  !iwabeeSource.includes('C("raise_collapsed","RAISE THE COLLAPSED SECTION"')&&
+  !iwabeeSource.includes("Then work on the bad part without pretending the good part doesn't matter.")&&
+  !iwabeeSource.includes("You ruin everything."),
   "Iwabee 2026-09-30 full Story rewrite / sentence-case choices / Receipt order missing or stale prose returned"
 );
 assert(binder.includes("function buildIwabeeReceipt105()")&&binder.includes('iwa_receipt:()=>[{kind:"record",text:buildIwabeeReceipt105()}]'),"Iwabee Chronicle Receipt projection missing");
