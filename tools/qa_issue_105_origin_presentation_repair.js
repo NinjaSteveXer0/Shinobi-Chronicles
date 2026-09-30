@@ -67,7 +67,7 @@ assert(
   sceneB.includes('C("confront","Confront him"')&&
   sceneB.includes('{beatId:"iwa_confront_07",mode:"dialogue",speakerName:"IWABEE",environmentRef:courtyard,text:"Take yours."')&&
   sceneB.includes('C("academy_tests_wrong","“The Academy leans too hard on written tests.”"')&&
-  sceneB.includes('C("prove_my_way","“I\\'ll prove I can do it my way.”"')&&
+  sceneB.includes("C(\"prove_my_way\",\"“I'll prove I can do it my way.”\"")&&
   sceneB.includes('{beatId:"iwa_close_06",mode:"narration",environmentRef:courtyard,text:"Iwabee leaves the yard.",nextBeatId:"iwa_receipt"}')&&
   sceneB.includes('{beatId:"iwa_receipt",mode:"record",environmentRef:courtyard,text:"",exitScene:true}')&&
   !sceneB.includes('text:"YOUR CHRONICLE BEGINS",exitScene:true')&&
