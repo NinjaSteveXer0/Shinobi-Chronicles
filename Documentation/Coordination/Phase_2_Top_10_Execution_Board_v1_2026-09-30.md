@@ -92,7 +92,13 @@ Current candidate trial:
 `Documentation/Coordination/Persistent_Development_Current_Team_Skill_Learning_and_Chronicle_Trial_v1_2026-09-30.md`
 @ `5a2e9cfcbd398943cfc637070ae52203559590b7`
 
+Elemental / mentor / rumour / relationship expansion:
+`Documentation/Coordination/Phase_2_Elemental_Training_Nature_Development_Potential_Skill_and_Shinobi_Record_Direction_2026-09-30.md`
+@ `dd80d0e7a2f497005f861395974e7fdcffdf4b37`
+
 Progression queue: #434.
+Potential Skill framework: #382.
+Four-level Bloodline/lineage closure queue: #435.
 
 This is foundational before serious Main Story balance testing.
 
