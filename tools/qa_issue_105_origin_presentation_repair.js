@@ -128,17 +128,18 @@ assert(golden.includes('row.mode="dialogue";row.speakerRef={sourceId:"nine_tails
 assert(!golden.includes("Combat package (#338)")&&!golden.includes("waiting on the exact Academy instructor"),"Mirai leaks internal Combat/GitHub blocker text");
 assert(!golden.includes("mir_shortcut_follow_blocked"),"Mirai shortcut Battle remains blocked after #338 closure");
 assert(
-  golden.includes('line("mir_shortcut_battle_pre"')&&
-  golden.includes('"Because you followed me.')&&
-  golden.includes('"Your instructor gave me one extra job.')&&
-  golden.includes('"See what you do if the person you\'re escorting stops cooperating.')&&
-  golden.includes('"This is part of the assessment."')&&
-  golden.includes('Then stop me."'),
-  "Mirai shortcut Battle still lacks the authored pre-Battle causality buildup"
+  golden.includes('line("mir_shortcut_attack"')&&
+  golden.includes('text:"What is it?"')&&
+  golden.includes('text:"What are you doing?"')&&
+  golden.includes("The person Mirai is supposed to protect is attacking her.")&&
+  !golden.includes("Your instructor gave me one extra job.")&&
+  !golden.includes("See what you do if the person you're escorting stops cooperating.")&&
+  !golden.includes("This is part of the assessment."),
+  "Mirai shortcut Battle does not use the Battle-triggered reveal attack setup"
 );
 assert(
   golden.includes('beatId:"mir_shortcut_battle"')&&
-  golden.includes('battle:miraiBattleSpec(MIRAI_SHORTCUT_CALLER,"mir_shortcut_victory_01","mir_shortcut_defeat_end_01")')&&
+  golden.includes('battle:miraiBattleSpec(MIRAI_SHORTCUT_CALLER,"mir_shortcut_victory_reveal_01","mir_shortcut_defeat_reveal_01")')&&
   golden.includes('MIRAI_SHORTCUT_CALLER="academy_mirai_origin_shortcut_battle"'),
   "Mirai shortcut #338 direct victory/defeat return contract missing"
 );
@@ -150,14 +151,16 @@ assert(
 );
 assert(!golden.includes('beatId:"mir_shortcut_battle_return"')&&!golden.includes('beatId:"mir_confrontation_battle_return"'),"Mirai post-Battle empty resolver/CONTINUE bridge returned");
 assert(
-  golden.includes('line("mir_shortcut_victory"')&&
-  golden.includes('"That was your extra job?"')&&
-  golden.includes('"We\'re done with your route."')&&
-  golden.includes('"Mirai walks first this time.')&&
-  golden.includes('The escort continues."')&&
-  golden.includes('C("talked","RESOLVE POST-BATTLE TALKED ROAD","mir_road_talk_memory_01"')&&
-  golden.includes('C("professional","RESOLVE POST-BATTLE PROFESSIONAL ROAD","mir_road_prof_detect_01"'),
-  "Mirai shortcut victory continuity / post-Battle road routing missing"
+  golden.includes('line("mir_shortcut_victory_reveal"')&&
+  golden.includes("Don't move.")&&
+  golden.includes('text:"You pulled me off the route and attacked me."')&&
+  golden.includes('text:"Who are you?"')&&
+  golden.includes('text:"Checkpoint Three. Safe."')&&
+  golden.includes('text:"Since when?"')&&
+  golden.includes('text:"The market."')&&
+  golden.includes('verificationBasis:"battle_triggered_instructor_reveal"')&&
+  !golden.includes("The escort continues."),
+  "Mirai shortcut victory does not reveal the instructor and terminate substitute escort continuity"
 );
 assert(
   golden.includes('miraiDefeatContextPatch("shortcut")')&&
@@ -171,13 +174,16 @@ assert(
   "Mirai direct defeat Story return does not preserve assessment-termination state"
 );
 assert(
+  golden.includes('line("mir_shortcut_defeat_reveal"')&&
   golden.includes("Mirai's guard gives first.")&&
-  golden.includes('text:"I\'m not done."')&&
-  golden.includes('text:"The exercise is.')&&
+  golden.includes('text:"Who are you?"')&&
+  golden.includes('text:"Checkpoint Three. Safe."')&&
+  golden.includes('text:"Since when?"')&&
+  golden.includes('text:"The market."')&&
   golden.includes('mir_defeat_debrief_shortcut_01')&&
   golden.includes('Q("mir_defeat_reflection_shortcut"')&&
   !golden.includes("mir_road_post_defeat_talk_01"),
-  "Mirai shortcut defeat assessment-termination lane missing or stale Scene 5 continuation returned"
+  "Mirai shortcut defeat reveal / assessment-termination lane missing"
 );
 assert(
   golden.includes("Mirai's guard breaks before the Traveller's does.")&&
