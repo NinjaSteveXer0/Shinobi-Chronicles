@@ -295,7 +295,7 @@ async function proveMiraiDefeatContinuations(browser){
     {
       kind:"shortcut",
       firstBeatId:"mir_shortcut_defeat_reveal_01",
-      lastBattleLocationBeatId:"mir_shortcut_defeat_reveal_09",
+      lastBattleLocationBeatId:"mir_shortcut_defeat_reveal_07",
       debriefBeatId:"mir_defeat_debrief_shortcut_01",
       reflectionBeatId:"mir_defeat_reflection_shortcut",
       callerId:"academy_mirai_origin_shortcut_battle"
