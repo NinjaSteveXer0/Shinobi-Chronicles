@@ -22,7 +22,8 @@ const ENVIRONMENT="Scene backdrops/academy_training_ground_courtyard.png";
 const BATTLE_PORTRAIT="NPC portrait/metal_classmate_1.png";
 const BATTLE_PORTRAIT_BLOB_SHA="583c814dfd016e05dbac3f77b1f922a174f818c6";
 const FIXED_VICTORY_RYO=50;
-const REWARD_SOURCE_ID="metal_origin_controlled_spar_battle_victory_ryo_01";
+const REWARD_SOURCE_ID="metal_origin_controlled_spar_victory_ryo_01";
+const LEGACY_REWARD_SOURCE_ID="metal_origin_controlled_spar_battle_victory_ryo_01";
 const START_MAX=13;
 const FEINT_STATE="metal_origin_inviting_genin_feint_entry_ready";
 const AI_IDS=Object.freeze([
@@ -152,7 +153,7 @@ if(PRE_GENERATE){
 }
 function existingRewardReceipt(){
   const m=meta();if(!m)return null;
-  return rewardHistory().find(row=>row&&row.type==="origin_battle_reward"&&row.rewardSourceId===REWARD_SOURCE_ID&&row.battleOccurrenceId===m.battleOccurrenceId)||null;
+  return rewardHistory().find(row=>row&&row.type==="origin_battle_reward"&&[REWARD_SOURCE_ID,LEGACY_REWARD_SOURCE_ID].includes(row.rewardSourceId)&&row.battleOccurrenceId===m.battleOccurrenceId)||null;
 }
 function claimReward(){
   const m=meta();if(!m)return{success:false,reason:"metal396_battle_not_active"};
@@ -365,5 +366,5 @@ globalThis.projectAcademyMetalControlledSpar396=projectResult;
 globalThis.resolveAcademyMetalProtectiveResponse396=resolveProtectiveResponse;
 globalThis.claimAcademyMetalControlledSparReward396=claimReward;
 globalThis.runAcademyMetalOriginRuntime396Diagnostics=diagnostics;
-globalThis.SC_ACADEMY_METAL_ORIGIN_RUNTIME_396=Object.freeze({patchId:PATCH_ID,battleConfigId:CONFIG,encounterId:ENCOUNTER,participantRefs:Object.freeze({metal:METAL,genin:GENIN}),met02:MET02,met03:MET03,startingUnderlyingMaximum:START_MAX,environmentPath:ENVIRONMENT,battlePortrait:BATTLE_PORTRAIT,fixedVictoryRyo:FIXED_VICTORY_RYO,rewardSourceId:REWARD_SOURCE_ID,browserGoldenClaimed:false});
+globalThis.SC_ACADEMY_METAL_ORIGIN_RUNTIME_396=Object.freeze({patchId:PATCH_ID,battleConfigId:CONFIG,encounterId:ENCOUNTER,participantRefs:Object.freeze({metal:METAL,genin:GENIN}),met02:MET02,met03:MET03,startingUnderlyingMaximum:START_MAX,environmentPath:ENVIRONMENT,battlePortrait:BATTLE_PORTRAIT,fixedVictoryRyo:FIXED_VICTORY_RYO,rewardSourceId:REWARD_SOURCE_ID,legacyRewardSourceId:LEGACY_REWARD_SOURCE_ID,browserGoldenClaimed:false});
 })();
