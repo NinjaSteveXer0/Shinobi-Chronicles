@@ -26,7 +26,7 @@ assert.strictEqual(menmaMarkerCount,4,"historical Menma proof marker still owns 
 
 assert(shared.includes('stage.dataset.battleSystem="shinobi_chronicles_shared"'),"shared Battle-System stage marker missing");
 assert(shared.includes("function sharedBattleEnvironmentPath33000()"),"shared authored Battle environment projector missing");
-assert(shared.includes("battle.presentationEnvironmentPath||battle.environmentPath"),"shared Battle environment does not consume authored encounter input");
+assert(shared.includes("battle.presentationEnvironmentPath")&&shared.includes("battle.environmentPath"),"shared Battle environment does not consume authored encounter input");
 assert(shared.includes("stage.dataset.battleEnvironmentPath=environmentPath"),"shared Battle environment path is not exposed to presentation");
 assert(shared.includes("sharedBattleSystem:true"),"shared Battle environment projection is not marked shared/presentation-only");
 assert(shared.includes("Historical proof/debug marker only. It no longer gates the shared Battle shell."),"Menma marker is not explicitly demoted to proof/debug only");
