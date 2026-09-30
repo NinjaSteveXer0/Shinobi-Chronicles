@@ -327,6 +327,16 @@ async function boot(page){
       assert(ankoDeck.skillDeckText.includes(label),"Anko Guest Ally palette missing "+label);
     }
     assert(!ankoDeck.skillDeckText.includes("Twin Snakes Mutual Death"),"forbidden Anko Kinjutsu leaked into Origin palette");
+    const learnCard=page.locator('.battle-live-skill-deck [data-skill-id="sj_anko_hidden_shadow_snake_hands"]').first();
+    const learnPanel=page.locator(".battle-live-skill-details").first();
+    await learnCard.hover();
+    await page.waitForTimeout(80);
+    const learnedBefore=await learnPanel.innerText();
+    assert(learnedBefore.includes("Deals 20 ATK to one enemy"),"Anko Skill guide is not using youth-readable exact copy");
+    await learnPanel.hover();
+    await page.waitForTimeout(220);
+    const learnedAfter=await learnPanel.innerText();
+    assert.strictEqual(learnedAfter,learnedBefore,"Skill description disappeared while moving from the hovered Skill card into the description panel");
     await page.screenshot({path:path.join(OUT,"01-anko-guest-ally-input.png"),fullPage:false,timeout:12000});
 
     // The player deliberately chooses the high-damage legal technique. The
@@ -383,12 +393,15 @@ async function boot(page){
     assert(ankoBrute.resultText.includes("PL 13 → 0"),"Brute PL transition missing");
     await page.screenshot({path:path.join(OUT,"04-player-chosen-anko-brute.png"),fullPage:false,timeout:12000});
 
-    // CE #385 requires enemy-next after the authored yield. Therefore Unstable
-    // must visibly act against newly Active Menma before Menma's dock unlocks.
-    const unstableFirst=await waitForActionPresentation(page,{actor:UNSTABLE,target:MENMA,afterOrdinal:ankoBrute.ordinal});
+    // Owner correction: Unstable gets the enemy-side opportunity against Anko
+    // BEFORE the authored teaching handoff. Menma must not absorb this hit.
+    const unstableFirst=await waitForActionPresentation(page,{actor:UNSTABLE,target:ANKO,afterOrdinal:ankoBrute.ordinal});
     assert.strictEqual(unstableFirst.role,"ACTIVE");
-    assert(unstableFirst.ordinal>ankoBrute.ordinal,"Unstable did not act after Anko -> Menma yield");
-    await page.screenshot({path:path.join(OUT,"05-unstable-first-vs-menma.png"),fullPage:false,timeout:12000});
+    assert(unstableFirst.ordinal>ankoBrute.ordinal,"Unstable did not act after Brute withdrawal");
+    const unstableVsAnkoStage=await stageSnapshot(page);
+    assert.strictEqual(unstableVsAnkoStage.activePlayerId,ANKO,"Anko yielded before Unstable's visible attack settled");
+    assert.strictEqual(unstableVsAnkoStage.presentation.target,ANKO,"Unstable presentation targeted Menma instead of Anko");
+    await page.screenshot({path:path.join(OUT,"05-unstable-first-vs-anko.png"),fullPage:false,timeout:12000});
     await waitForPresentationIdle(page);
 
     await page.waitForFunction(({MENMA,UNSTABLE})=>
@@ -398,12 +411,17 @@ async function boot(page){
       {MENMA,UNSTABLE},{timeout:15000});
 
     const c=await stageSnapshot(page);
+    const menmaPL=await page.evaluate(MENMA=>{
+      const record=getBattleRemainingPLRecord("player",MENMA);
+      return{remaining:Number(record?.current??record?.remaining??0),maximum:Number(record?.maximum??0)};
+    },MENMA);
     assert.strictEqual(c.activePlayerId,MENMA);
     assert.strictEqual(c.activeEnemyId,UNSTABLE);
     assert.strictEqual(c.activePlayerDomName,c.activePlayerExpectedName,"Menma handoff left stale player identity");
     assert.strictEqual(c.activeEnemyDomName,c.activeEnemyExpectedName,"Unstable relay left stale enemy identity");
     assert.strictEqual(c.playerDomPL,c.playerExpectedPL,"Menma handoff left stale player PL");
     assert.strictEqual(c.enemyDomPL,c.enemyExpectedPL,"Unstable relay left stale enemy PL");
+    assert.strictEqual(menmaPL.remaining,menmaPL.maximum,"Menma did not enter against Unstable with a full Battle PL bar");
     assert.strictEqual(c.autonomousPhaseText,"","Menma input still displayed autonomous/scripted lock copy");
     await openSkillsTray(page);
     const menmaDeck=await stageSnapshot(page);
@@ -411,18 +429,23 @@ async function boot(page){
     const ankoSupport=c.playerSupports.find(x=>x.id===ANKO);
     assert(ankoSupport&&c.authorityPortraits.anko&&ankoSupport.src===c.authorityPortraits.anko,"Anko did not remain visible Benched after yield");
     assert(c.transition&&c.transition.type==="authored_active_yield","Anko -> Menma authored yield transition missing");
-    assert.strictEqual(c.transition.nextSide,"enemy","authored yield reset side order");
-    await page.screenshot({path:path.join(OUT,"06-menma-input-after-unstable.png"),fullPage:false,timeout:12000});
+    assert.strictEqual(c.transition.nextSide,"player","Menma did not receive the next player turn after Unstable attacked Anko");
+    await page.screenshot({path:path.join(OUT,"06-menma-input-full-pl.png"),fullPage:false,timeout:12000});
 
     // Menma now uses the exact same visible controls the player learned with
     // Anko. Presentation must remain sequential: Menma, then Unstable.
     await useVisibleSkill(page,"academy_menma_chakra_knuckle","Driving Chakra Fist");
     const menmaTurn=await waitForActionPresentation(page,{actor:MENMA,target:UNSTABLE,label:"Driving Chakra Fist",afterOrdinal:unstableFirst.ordinal});
     assert.strictEqual(menmaTurn.role,"ACTIVE");
+    const duringMenma=await stageSnapshot(page);
+    assert.strictEqual(duringMenma.enemyDomPL,menmaTurn.beforePL,"enemy radial PL changed before Menma's action animation settled");
     await page.screenshot({path:path.join(OUT,"07-menma-action.png"),fullPage:false,timeout:12000});
 
     const enemyTurn=await waitForActionPresentation(page,{actor:UNSTABLE,target:MENMA,afterOrdinal:menmaTurn.ordinal});
     assert(enemyTurn.ordinal>menmaTurn.ordinal,"Unstable presentation did not follow Menma sequentially");
+    const duringEnemy=await stageSnapshot(page);
+    assert.strictEqual(duringEnemy.enemyDomPL,menmaTurn.afterPL,"enemy radial PL did not update after Menma's action animation settled");
+    assert.strictEqual(duringEnemy.playerDomPL,enemyTurn.beforePL,"player radial PL changed before Unstable's action animation settled");
     await page.screenshot({path:path.join(OUT,"08-unstable-response.png"),fullPage:false,timeout:12000});
 
     await waitForPresentationIdle(page);
@@ -437,7 +460,8 @@ async function boot(page){
     assert.strictEqual(final.state.phase,"player","nonterminal exchange did not return to player side");
     assert.strictEqual(final.readiness.ready,true,"Menma input not restored after sequential enemy response");
     assert(final.evidence.some(r=>r.eventType==="enemy_authored_action_completed"&&r.actor===BRUTE&&r.target===ANKO),"Brute did not receive its legitimate ordinary response");
-    assert(final.evidence.some(r=>r.eventType==="enemy_authored_action_completed"&&r.actor===UNSTABLE&&r.target===MENMA),"Unstable did not receive its legitimate ordinary response");
+    assert(final.evidence.some(r=>r.eventType==="enemy_authored_action_completed"&&r.actor===UNSTABLE&&r.target===ANKO),"Unstable did not attack Anko before Menma took Active");
+    assert(final.evidence.some(r=>r.eventType==="enemy_authored_action_completed"&&r.actor===UNSTABLE&&r.target===MENMA),"Unstable did not receive its later ordinary response after Menma acted");
     assert(final.evidence.some(r=>r.eventType==="skill_action_completed"&&r.actor===ANKO&&r.skillId==="sj_anko_hidden_shadow_snake_hands"),"player-chosen Anko action evidence missing");
     assert(final.evidence.some(r=>r.eventType==="skill_action_completed"&&r.actor===ANKO&&r.skillId==="sj_anko_fire_style_dragon_flame"),"second player-chosen Anko action evidence missing");
     assert(final.evidence.some(r=>r.eventType==="menma_origin_phase_c_started"&&r.actor===MENMA),"MEN-03 active-window evidence never started");
@@ -475,9 +499,12 @@ async function boot(page){
         battlePlBeforeAfterVisible:true,
         zeroPlReadsWithdrawal:true,
         ankoYieldsToMenmaAfterLegitimateFirstTwo:true,
-        enemySideOrderPreservedAcrossYield:true,
-        unstableActsBeforeMenmaInput:true,
+        unstableAttacksAnkoBeforeMenmaHandoff:true,
+        menmaEntersWithFullBattlePL:true,
+        unstableActsOnAnkoBeforeMenmaInput:true,
         centralIdentityAndPLRefreshAfterRelay:true,
+        plNumbersChangeAfterVisibleActionSettlement:true,
+        skillHoverCanMoveIntoDescriptionPanel:true,
         menmaActionDockRebinds:true,
         ankoRemainsBenched:true,
         menmaThenUnstableSequentialPlayback:true,
