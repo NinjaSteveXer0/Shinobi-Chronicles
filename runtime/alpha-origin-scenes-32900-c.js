@@ -421,7 +421,7 @@ const interpretationText=Object.freeze({
   KEEP_HELPING:"I'm not going to stop helping people.",
   TAKE_TRAINING_SERIOUSLY:"I need to take training more seriously.",
   FIND_BALANCE:"I need to get better at both.",
-  QUESTION_FRAME:"Maybe I'm looking at this wrong."
+  QUESTION_FRAME:"Maybe I'm looking at this wrong. I need to figure out what matters most to me."
 });
 const LEGACY_IDS=Object.freeze([
   "furniture_carry_full","furniture_stabilize","furniture_continue",
