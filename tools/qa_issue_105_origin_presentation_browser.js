@@ -590,8 +590,10 @@ async function proveMiraiTerminalReceipt(browser){
         assert.strictEqual(row.beatId,"iwa_open_01","Iwabee did not start at current Story opening");
         assert.strictEqual(row.cueKind,"narration","Iwabee opening is not narration");
         assert(!row.text.includes("\\n"),"Iwabee narration leaked a literal newline escape "+JSON.stringify(row));
-        row=await advanceOne(page);
-        assert.strictEqual(row.beatId,"iwa_open_02","Iwabee opening did not advance to instructor dialogue");
+        const openingDialogue=await advanceUntilBeat(page,"iwa_open_02",10);
+        row=openingDialogue.row;
+        assert(openingDialogue.seen.some(cue=>cue.beatId==="iwa_open_01"&&cue.text==="The page slides into the instructor's hand."),"Iwabee opening second paragraph did not render cleanly");
+        assert(openingDialogue.seen.some(cue=>cue.beatId==="iwa_open_01"&&cue.text==="A thick red score sits across the top."),"Iwabee opening third paragraph did not render cleanly");
         assert.strictEqual(row.cueKind,"dialogue","Iwabee instructor line is not dialogue");
         assert(!row.text.includes("\\n"),"Iwabee dialogue leaked a literal newline escape "+JSON.stringify(row));
         await page.evaluate(()=>globalThis.setStorySceneBeat?.("iwa_confront_04"));
