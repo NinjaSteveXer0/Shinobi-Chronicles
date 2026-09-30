@@ -261,7 +261,7 @@ const order=[
  "runtime/academy-wasabi-writing-golden-343.js","runtime/alpha-origin-scenes-32900-a.js",
  "runtime/alpha-battle-modern-33000.js","runtime/alpha-wasabi-rogue-battle-343.js",
  "runtime/alpha-menma-evolved-pl-battle-36900.js","runtime/alpha-mirai-origin-battle-338.js","runtime/alpha-origin-writing-golden-105.js",
- "runtime/alpha-origin-scene-board-bindings-105.js"
+ "runtime/alpha-origin-reward-spectrum-440.js","runtime/alpha-origin-scene-board-bindings-105.js"
 ].map(x=>index.indexOf(x));
 assert(order.every(x=>x>=0),"#105 production loader missing module");
 assert(order.every((x,i)=>i===0||x>order[i-1]),"#105 production load order drift");
