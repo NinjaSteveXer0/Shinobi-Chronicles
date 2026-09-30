@@ -194,12 +194,15 @@ assert(
   "Mirai confrontation defeat assessment-termination lane missing or drifted"
 );
 assert(
-  binder.includes('mir_shortcut_defeat_end_13:"wipe_right_to_left"')&&
+  binder.includes('mir_shortcut_victory_reveal_13:"wipe_right_to_left"')&&
+  binder.includes('mir_shortcut_defeat_reveal_09:"wipe_right_to_left"')&&
   binder.includes('mir_confront_defeat_end_12:"wipe_right_to_left"')&&
   binder.includes("LATER — CHECKPOINT THREE")&&
-  binder.includes('id.startsWith("mir_defeat_debrief_")')&&
-  binder.includes('ctx.miraiEscortAssessmentResult==="not_completed_battle_defeat"'),
-  "Mirai defeat black-wipe/debrief/Receipt presentation missing"
+  binder.includes('id.startsWith("mir_shortcut_victory_reveal_")')&&
+  binder.includes('id.startsWith("mir_shortcut_defeat_reveal_")')&&
+  binder.includes('ctx.miraiEscortAssessmentResult==="not_completed_battle_defeat"')&&
+  binder.includes('const shortcutBattleResult=ctx.miraiShortcutBattleResult||null'),
+  "Mirai Battle-triggered reveal black-wipe/debrief/Receipt presentation missing"
 );
 assert(golden.includes('actionLabel:"Start PL Battle"')&&golden.includes('N("mir_confront_reveal_01","Smoke bursts across the road.')&&golden.includes('"mir_confront_08"'),"Mirai #338 Story CTA/Battle-to-reveal return drift");
 assert(binder.includes('if(id==="mir_confront_reveal_01")')&&binder.includes('rows.push(instructor())'),"Mirai post-Battle reveal does not switch Story actor to female instructor");
