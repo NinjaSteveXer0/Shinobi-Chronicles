@@ -307,14 +307,14 @@ function diagnostics(){
   const enemy=enemyDatabase&&enemyDatabase[INSTRUCTOR],actions=enemy&&enemy.authoredBattleActions||[];
   const checks={
     exactProfile:!!enemy&&enemy.calibratedBasePL===16&&JSON.stringify(enemy.baseStats)===JSON.stringify(PROFILE.stats),
-    observerSafePresentation:!!enemy&&enemy.name==="TRAVELLER"&&enemy.image===BATTLE_PORTRAIT&&enemy.provenance.observerPresentation==="male_traveller_escort_disguise"&&enemy.provenance.underlyingIdentity==="female_academy_instructor",
+    observerSafePresentation:!!enemy&&enemy.name==="TRAVELLER"&&enemy.image===BATTLE_PORTRAIT&&enemy.provenance.observerPresentation==="male_traveller_escort_disguise"&&enemy.provenance.underlyingIdentity==="male_academy_instructor",
     exactDeterministicLoop:actions.map(a=>a.id).join("|")===ACTION_LOOP.join("|")&&String(globalThis.chooseEnemyAuthoredBattleAction).includes("deterministicAssessmentLoop:true"),
     exactGuard:String(globalThis.resolveBattlePreStaminaDefense).includes("0.75")&&String(globalThis.calculateBattleStaminaMitigationV1).includes("attack*staminaPivot"),
     exactCallers:CALLERS.join("|")==="academy_mirai_origin_shortcut_battle|academy_mirai_origin_confrontation_battle",
     authoredBattleEnvironments:BATTLE_ENVIRONMENT_BY_CALLER[SHORTCUT_CALLER]==="Mirai Origin Backdrop/konoha_storehouse_side_lane.png"&&BATTLE_ENVIRONMENT_BY_CALLER[CONFRONT_CALLER]==="Mirai Origin Backdrop/konoha_main_street.png"&&String(applyBattleEnvironment338).includes("presentationEnvironmentPath"),
     exactOccurrence:occurrenceId(SHORTCUT_CALLER,"qa")==="battle_occ_origin_mirai_disguised_instructor:academy_mirai_origin_shortcut_battle:qa",
     exactReward:FIXED_VICTORY_RYO===50,
-    saveReloadEnvelope:!!PRE_SAVE&&!!PRE_RESTORE&&String(globalThis.saveTestState).includes("state.mirai338")&&String(globalThis.restoreTestState).includes("currentBattle.battleConfigId=CONFIG"),
+    saveReloadEnvelope:!!PRE_SAVE&&!!PRE_RESTORE&&String(globalThis.saveTestState).includes("state.mirai338")&&String(globalThis.restoreTestState).includes("currentBattle.battleConfigId=CONFIG")&&String(globalThis.restoreTestState).includes("currentBattle.mirai338=clone(saved.mirai338)")&&String(launchAcademyMiraiDisguisedInstructorBattle338).includes('underlyingIdentity:"male_academy_instructor"'),
     strictOneVsOne:String(strictDeployment).includes("createBattleDeploymentSlots([MIRAI])")&&String(strictDeployment).includes("createBattleDeploymentSlots([INSTRUCTOR])"),
     identityNeverRevealedByBattle:String(projectResult).includes("identityRevealedByBattle:false"),
     exactBattlePortrait:enemy.image===BATTLE_PORTRAIT&&enemy.provenance.battlePortraitPath===BATTLE_PORTRAIT&&enemy.provenance.battlePortraitAuthorityCommit==="38e4d0ebd89176d7d30aa2cc6044565711353ee6",
