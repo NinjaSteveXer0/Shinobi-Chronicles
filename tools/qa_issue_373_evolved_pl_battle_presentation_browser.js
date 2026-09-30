@@ -481,14 +481,14 @@ async function boot(page){
     const menmaTurn=await waitForActionPresentation(page,{actor:MENMA,target:UNSTABLE,label:"Driving Chakra Fist",afterOrdinal:unstableFirst.ordinal});
     assert.strictEqual(menmaTurn.role,"ACTIVE");
     const duringMenma=await stageSnapshot(page);
-    assert.strictEqual(duringMenma.enemyDomPL,menmaTurn.beforePL,"enemy radial PL changed before Menma's action animation settled");
+    assert.strictEqual(duringMenma.enemyDomPL,menmaTurn.afterPL,"enemy radial PL did not show Menma's committed hit during the action presentation");
     await page.screenshot({path:path.join(OUT,"07-menma-action.png"),fullPage:false,timeout:12000});
 
     const enemyTurn=await waitForActionPresentation(page,{actor:UNSTABLE,target:MENMA,afterOrdinal:menmaTurn.ordinal});
     assert(enemyTurn.ordinal>menmaTurn.ordinal,"Unstable presentation did not follow Menma sequentially");
     const duringEnemy=await stageSnapshot(page);
     assert.strictEqual(duringEnemy.enemyDomPL,menmaTurn.afterPL,"enemy radial PL did not update after Menma's action animation settled");
-    assert.strictEqual(duringEnemy.playerDomPL,enemyTurn.beforePL,"player radial PL changed before Unstable's action animation settled");
+    assert.strictEqual(duringEnemy.playerDomPL,enemyTurn.afterPL,"player radial PL did not show Unstable's committed hit during the action presentation");
     await page.screenshot({path:path.join(OUT,"08-unstable-response.png"),fullPage:false,timeout:12000});
 
     await waitForPresentationIdle(page);
