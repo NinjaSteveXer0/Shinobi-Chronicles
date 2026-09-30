@@ -140,6 +140,38 @@ function battlePlan(){
   return{configId,storyOccurrenceId,battleOccurrenceId,oppositionParticipantIds,cashSourceId:null,ryo:0,pill:false};
 }
 
+function hasBattleRewardReceipt36015(plan,sourceId,rewardClass){
+  if(!plan||!sourceId)return false;
+  return Object.values(ensureStore().receipts||{}).some(row=>row&&
+    String(row.storyOccurrenceId||"")===String(plan.storyOccurrenceId||"")&&
+    String(row.sourceId||"")===String(sourceId)&&
+    String(row.scopeRef||row.battleOccurrenceId||"")===String(plan.battleOccurrenceId||"")&&
+    (!rewardClass||String(row.rewardClass||"")===String(rewardClass))&&
+    row.committed!==false
+  );
+}
+function battleRewardReceiptsComplete36015(plan){
+  if(!plan)return false;
+  const cashOk=!plan.cashSourceId||Number(plan.ryo)<=0||hasBattleRewardReceipt36015(plan,plan.cashSourceId,"battle_cash");
+  const pillOk=!plan.pill||hasBattleRewardReceipt36015(plan,SOURCE.fieldPill,"inventory_item");
+  return cashOk&&pillOk&&(Number(plan.ryo)>0||plan.pill===true);
+}
+function inventoryQuantity36015(itemId){
+  const rows=Array.isArray(playerData&&playerData.inventory)?playerData.inventory:[];
+  return rows.filter(row=>row&&String(row.id||row.itemId||"")===String(itemId||""))
+    .reduce((sum,row)=>sum+Math.max(1,Number(row.quantity)||1),0);
+}
+function addRewardItem36015(item){
+  if(!item||!item.id||typeof addItemToInventory!=="function")return false;
+  const before=inventoryQuantity36015(item.id);
+  const snapshot=clone(playerData.inventory||[]);
+  try{addItemToInventory(item);}catch(_error){}
+  if(inventoryQuantity36015(item.id)>before)return true;
+  playerData.inventory=snapshot;
+  try{addItemToInventory(item.id,1);}catch(_error){}
+  return inventoryQuantity36015(item.id)>before;
+}
+
 function ensureKakashiV2BattleRewardProjection36015(finishingShinobi=null){
   const plan=battlePlan();
   if(!plan)return{handled:false};
@@ -158,7 +190,7 @@ function ensureKakashiV2BattleRewardProjection36015(finishingShinobi=null){
   const items=plan.pill?[{id:"field_recovery_pill",name:"Field Recovery Pill",rarity:"Common"}]:[];
   currentBattle.rewards={
     generated:true,
-    claimed:existing.claimed===true,
+    claimed:battleRewardReceiptsComplete36015(plan),
     ryo:Number(plan.ryo)||0,
     exp:0,
     items,
@@ -214,6 +246,7 @@ function snapshotRewardMutation(){
   return{
     ryo:Number(ensurePlayer().ryo)||0,
     inventory:clone(playerData.inventory||[]),
+    activityHistory:clone(playerData.activityHistory||[]),
     store:clone(ensureStore()),
     claimed:!!(currentBattle&&currentBattle.rewards&&currentBattle.rewards.claimed),
     claimedAt:currentBattle&&currentBattle.claimedAt||null
@@ -222,6 +255,7 @@ function snapshotRewardMutation(){
 function restoreRewardMutation(snap){
   if(!snap)return;
   playerData.ryo=snap.ryo;playerData.inventory=clone(snap.inventory);
+  playerData.activityHistory=clone(snap.activityHistory||[]);
   playerData[STORE_KEY]=clone(snap.store);
   if(currentBattle&&currentBattle.rewards)currentBattle.rewards.claimed=snap.claimed;
   if(currentBattle)currentBattle.claimedAt=snap.claimedAt;
@@ -230,21 +264,51 @@ function claimKakashiV2BattleRewards(){
   try{ensureKakashiV2BattleRewardProjection36015();}catch(_e){}
   const rewards=currentBattle&&currentBattle.rewards,plan=rewards&&rewards.kakashiV2RewardPlan;
   if(!rewards||rewards.generated!==true||!plan)return{handled:false};
-  if(rewards.claimed===true)return{handled:true,success:false,reason:"battle_rewards_already_claimed"};
+
+  // Exact source receipts, not an inherited generic boolean, are the durable
+  // authority that this Battle reward was already claimed.
+  if(battleRewardReceiptsComplete36015(plan)){
+    rewards.claimed=true;
+    if(typeof savePlayerData==="function")savePlayerData();
+    return{handled:true,success:true,idempotent:true,alreadyCommitted:true};
+  }
+  if(rewards.claimed===true)rewards.claimed=false;
+
   const snap=snapshotRewardMutation();
   try{
-    playerData.ryo=(Number(playerData.ryo)||0)+(Number(rewards.ryo)||0);
-    for(const item of Array.isArray(rewards.items)?rewards.items:[]){
-      if(typeof addItemToInventory!=="function")throw new Error("inventory_add_api_missing");
-      addItemToInventory(item);
+    let materialClaimed=false;
+    // Reuse the shared Battle reward claim path first. It already knows the
+    // live Inventory API and Victory-overlay lifecycle used by every Battle.
+    if(PRE_CLAIM){
+      const beforeRyo=Number(playerData.ryo)||0;
+      const beforePill=inventoryQuantity36015("field_recovery_pill");
+      const generic=PRE_CLAIM.call(globalThis);
+      const afterRyo=Number(playerData.ryo)||0;
+      const afterPill=inventoryQuantity36015("field_recovery_pill");
+      materialClaimed=generic===true||rewards.claimed===true||
+        afterRyo!==beforeRyo||afterPill!==beforePill;
     }
-    if(plan.cashSourceId&&Number(plan.ryo)>0){
+
+    // Fail-soft fallback for isolated/test contexts where the shared claim
+    // owner is unavailable. Verify item quantity so signature drift cannot
+    // silently make the MI pill unclaimable.
+    if(!materialClaimed){
+      playerData.ryo=(Number(playerData.ryo)||0)+(Number(rewards.ryo)||0);
+      for(const item of Array.isArray(rewards.items)?rewards.items:[]){
+        if(!addRewardItem36015(item))throw new Error("inventory_add_api_failed:"+String(item.id||"unknown"));
+      }
+      rewards.claimed=true;
+      currentBattle.claimedAt=Date.now();
+    }
+
+    if(plan.cashSourceId&&Number(plan.ryo)>0&&!hasBattleRewardReceipt36015(plan,plan.cashSourceId,"battle_cash")){
       writeReceipt({storyOccurrenceId:plan.storyOccurrenceId,sourceId:plan.cashSourceId,scopeRef:plan.battleOccurrenceId,rewardClass:"battle_cash",ryo:plan.ryo,battleOccurrenceId:plan.battleOccurrenceId,metadata:{battleConfigId:plan.configId}});
     }
-    if(plan.pill){
-      writeReceipt({storyOccurrenceId:plan.storyOccurrenceId,sourceId:SOURCE.fieldPill,scopeRef:"origin",rewardClass:"inventory_item",itemId:"field_recovery_pill",quantity:1,battleOccurrenceId:plan.battleOccurrenceId,metadata:{timing:"immediate_solo_mi_victory"}});
+    if(plan.pill&&!hasBattleRewardReceipt36015(plan,SOURCE.fieldPill,"inventory_item")){
+      writeReceipt({storyOccurrenceId:plan.storyOccurrenceId,sourceId:SOURCE.fieldPill,scopeRef:plan.battleOccurrenceId,rewardClass:"inventory_item",itemId:"field_recovery_pill",quantity:1,battleOccurrenceId:plan.battleOccurrenceId,metadata:{timing:"immediate_solo_mi_victory"}});
     }
-    rewards.claimed=true;currentBattle.claimedAt=Date.now();
+    rewards.claimed=true;
+    if(!currentBattle.claimedAt)currentBattle.claimedAt=Date.now();
     const chronicleRecorded=typeof recordBattleChronicle==="function"?recordBattleChronicle():true;
     if(typeof savePlayerData==="function")savePlayerData();
     if(typeof saveTestState==="function")saveTestState();
