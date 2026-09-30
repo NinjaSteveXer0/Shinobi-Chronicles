@@ -2,8 +2,12 @@
 
 **Date:** 2026-09-29  
 **Owner:** Stephen / Writing — Konoha  
-**Status:** **OWNER-REOPENED — PREVIEW REWRITE / NOT WRITING GOLDEN UNTIL OWNER BROWSER REVIEW**  
+**Status:** **SUPERSEDED 2026-09-30 — OWNER BROWSER RED / REPLACED BY FINAL BROWSER-REPAIR REWRITE**  
 **Origin:** `academy_metal_lee`
+
+> **2026-09-30 successor:** `Documentation/Story/Academy_Metal_Lee_Origin_Final_Browser_Repair_Rewrite_2026-09-30.md` @ `4445ba9c9938475db28f49a8a5f3862ff7edf679`.
+>
+> The natural-voice rebuild remains useful history, but its ALL-CAPS choice presentation and per-route pre-Receipt `YOUR CHRONICLE BEGINS` terminals are superseded.
 
 ## 1. Purpose
 
