@@ -212,6 +212,35 @@ function buildKurenaiReceipt105(){
   lines.push("","REWARDS",`• Origin Starting Purse: +${originStartingPurseAmount105()} Ryō.`);
   return lines.join("\n");
 }
+function buildIwabeeReceipt105(){
+  const runtime=A&&typeof A.active==="function"?A.active():null;
+  const ctx=runtime&&runtime.localContext&&typeof runtime.localContext==="object"?runtime.localContext:{};
+  const lines=["YOUR ORIGIN","ACADEMY IWABEE","","RECORDED IN YOUR CHRONICLE","","YOUR DECISIONS"];
+  const terrain={
+    raise_collapsed:"Raised the collapsed section.",
+    flatten_ground:"Flattened the damaged ground.",
+    build_path:"Built a stable path through the damage.",
+    reinforce_weakest:"Reinforced the weakest section."
+  }[ctx.iwabeeTerrainChoice];
+  if(terrain)lines.push("• "+terrain);
+  const rogue={
+    confront:"Confronted the Rogue Genin.",
+    block_escape:"Blocked the Rogue Genin's escape.",
+    call_instructor:"Called the instructor.",
+    finish_practical:"Finished the practical."
+  }[ctx.iwabeeRogueResponse];
+  if(rogue)lines.push("• "+rogue);
+  const reflection={
+    know_good_at:"Said he knows what he can do.",
+    better_rest:"Said he needs to get better at the rest.",
+    academy_tests_wrong:"Said the Academy leans too hard on written tests.",
+    prove_my_way:"Said he will prove he can do it his way."
+  }[ctx.iwabeeReflection];
+  if(reflection)lines.push("• "+reflection);
+  lines.push("","WHAT HAPPENED","• The damaged practical ground was made usable.","• An unexpected Rogue Genin was exposed during the exercise.","","REWARDS","• Origin Starting Purse: +"+originStartingPurseAmount105()+" Ryō.");
+  return lines.join("\n");
+}
+
 function buildMiraiReceipt105(){
   const runtime=A&&typeof A.active==="function"?A.active():null;
   const ctx=runtime&&runtime.localContext&&typeof runtime.localContext==="object"?runtime.localContext:{};
@@ -445,6 +474,7 @@ function kurenaiActors(beatId,performance,beat){
 }
 function iwabeeActors(beatId,performance,beat){
   const id=String(beatId||""),sp=speaker(performance,beat);
+  if(id==="iwa_receipt")return[];
   const rows=[actor("academy_iwabee","IWABEE",PATH.iwabee,sp)];
   const instructor=()=>actor("iwabee_academy_instructor","INSTRUCTOR",PATH.iwabeeInstructor,sp,["ACADEMY INSTRUCTOR"]);
   const rogue=()=>actor("iwabee_origin_rogue_genin_01","ROGUE GENIN",PATH.rogue,sp);
@@ -583,8 +613,18 @@ function installDefinitions(){
     }
   });
   results.iwabee=registerDefinition(scene("academy_iwabee"),{
-    resolve:({beatId,performance,beat})=>projection("ACADEMY · PRACTICAL TRAINING GROUND",iwabeeActors(beatId,performance,beat)),
-    resolveBackdrop:()=>({assetPath:GENERIC_COURTYARD,assetId:"issue105_generic_courtyard"})
+    resolve:({beatId,performance,beat})=>String(beatId||"")==="iwa_receipt"
+      ?{mode:"record",location:"YOUR ORIGIN",actors:[]}
+      :projection("ACADEMY · PRACTICAL TRAINING GROUND",iwabeeActors(beatId,performance,beat)),
+    resolveBackdrop:({beatId})=>String(beatId||"")==="iwa_receipt"
+      ?null
+      :{assetPath:GENERIC_COURTYARD,assetId:"issue105_generic_courtyard"},
+    performanceSequences:{
+      iwa_receipt:()=>[{kind:"record",text:buildIwabeeReceipt105()}]
+    },
+    performanceTransitions:{
+      iwa_close_06:"wipe_right_to_left"
+    }
   });
   results.metal=registerDefinition(scene("academy_metal_lee"),{
     resolve:({beatId,performance,beat})=>projection("ACADEMY · TRAINING COURTYARD",metalActors(beatId,performance,beat)),
