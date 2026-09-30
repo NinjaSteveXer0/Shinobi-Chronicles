@@ -83,6 +83,7 @@ async function waitBeat(page,id){await page.waitForFunction(({scene,id})=>getAct
 async function advance(page){
   const before=await state(page);
   assert.notStrictEqual(before.mode,"choice","advance attempted on choice "+before.beatId);
+  if(before.performance)assert.strictEqual(before.performance.segmentCount,1,"Obito compact source cue auto-paginated @ "+before.beatId+" "+JSON.stringify(before.performance));
   const root=page.locator("#story-scene-presentation-layer");
   const button=root.locator(".sc-chronicle-primary").first();
   if(await button.count()&&await button.isVisible())await button.click();
@@ -95,6 +96,7 @@ async function advance(page){
     const layer=document.getElementById("story-scene-presentation-layer");
     return getActiveStorySceneRuntime()?.beatId!==old.beat||layer?.querySelector(".sc-story-text")?.textContent?.trim()!==old.text;
   },{beat:before.beatId,text:before.text},{timeout:8000});
+  page.__obitoInteractionCount=(page.__obitoInteractionCount||0)+1;
 }
 async function toBeat(page,target,max=220){
   for(let i=0;i<max;i++){const s=await state(page);if(s.beatId===target)return s;if(s.mode==="choice")throw new Error("unexpected choice "+s.beatId+" before "+target);await advance(page);}
@@ -118,6 +120,7 @@ async function choose(page,label,next){
   const choiceNode=page.locator("#story-scene-presentation-layer .sc-story-choice").filter({hasText:label});
   assert.strictEqual(await choiceNode.count(),1,"choice DOM cardinality drift "+label+" @ "+s.beatId);
   await choiceNode.first().click();
+  page.__obitoInteractionCount=(page.__obitoInteractionCount||0)+1;
   if(next)await waitBeat(page,next);
 }
 async function assertBackdrop(page,beat,pathExpected){
@@ -127,12 +130,14 @@ async function assertBackdrop(page,beat,pathExpected){
 }
 async function screenshot(page,label){await page.locator("#story-scene-presentation-layer").screenshot({path:path.join(OUT,label+".png"),timeout:12000});}
 
-async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement}){
+async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement,expectedInteractions}){
   const {context,page,gate}=await boot(browser,label);
+  page.__obitoInteractionCount=0;
   try{
     let s=await state(page);
-    assert.strictEqual(s.beatId,"obi_depart");assert.strictEqual(s.text,"Obito knows he is late before he reaches the end of his street.");
-    assert(s.performance&&s.performance.sourceIndex===0&&s.performance.segmentIndex===0&&s.performance.segmentCount>=2,label+" opening narration was not paragraph-paginated");
+    assert.strictEqual(s.beatId,"obi_depart");
+    assert(s.text.includes("Obito is already running when the Academy bell starts carrying across Konoha."),label+" compact opening cue 1 missing");
+    assert(s.performance&&s.performance.sourceIndex===0&&s.performance.segmentIndex===0&&s.performance.segmentCount===1,label+" compact opening cue 1 auto-paginated");
     assert.notStrictEqual(s.textOverflowY,"auto",label+" ordinary narration still uses internal auto-scroll");
     assert.notStrictEqual(s.textOverflowY,"scroll",label+" ordinary narration still uses internal scroll");
     assert.strictEqual(s.storyLayerCoversViewport,true,label+" Story layer does not own full viewport");
@@ -142,13 +147,11 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
     assert(s.panelRadius>=10,label+" narration panel is not benchmark-rounded");
     assert.strictEqual(s.panelActorOverlapArea,0,label+" opening panel overlaps Obito card");
     await assertBackdrop(page,"obi_depart",EXPECTED_BACKDROP.obi_depart);
-    const firstText=s.text;
-    await page.locator("#story-scene-presentation-layer").click({position:{x:100,y:100}});
-    await page.waitForFunction(old=>document.querySelector("#story-scene-presentation-layer .sc-story-text")?.textContent?.trim()!==old,firstText,{timeout:5000});
+    await advance(page);
     const secondPage=await state(page);
-    assert.strictEqual(secondPage.beatId,"obi_depart",label+" click-anywhere skipped semantic beat");
-    assert.strictEqual(secondPage.text,"The Academy bell has not rung yet.",label+" second authored paragraph did not receive its own narration box");
-    assert(secondPage.performance&&secondPage.performance.sourceIndex===0&&secondPage.performance.segmentIndex===1,label+" paragraph page lost parent cue identity");
+    assert.strictEqual(secondPage.beatId,"obi_depart",label+" compact opening click skipped semantic beat");
+    assert(secondPage.text.includes("He points at the Monument without slowing."),label+" compact opening cue 2 missing");
+    assert(secondPage.performance&&secondPage.performance.sourceIndex===1&&secondPage.performance.segmentIndex===0&&secondPage.performance.segmentCount===1,label+" compact opening cue 2 auto-paginated");
 
     for(let i=0;i<CHOICES.length;i++){
       const [beat,help,keep]=CHOICES[i];await toBeat(page,beat);
@@ -172,16 +175,13 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
 
     await toBeat(page,"obi_end_day");
     let end=await state(page);
-    assert(end.backdrop.includes("training_grounds_late_afternoon.png"),label+" end-day should begin in training yard");
-    assert(end.performance&&end.performance.sourceIndex===0,label+" end-day source cue should begin at 0");
-    for(let guard=0;guard<40&&end.beatId==="obi_end_day"&&end.performance&&end.performance.sourceIndex<7;guard++){
-      assert(end.backdrop.includes("training_grounds_late_afternoon.png"),label+" pagination changed backdrop before authored source cue 7");
-      await advance(page);
-      end=await state(page);
-    }
+    assert(end.backdrop.includes("training_grounds_late_afternoon.png"),label+" compact end-day should begin in training yard");
+    assert(end.performance&&end.performance.sourceIndex===0&&end.performance.segmentCount===1,label+" compact end-day yard cue drift");
+    await advance(page);
+    end=await state(page);
     assert.strictEqual(end.beatId,"obi_end_day");
-    assert(end.performance&&end.performance.sourceIndex===7,label+" end-day never reached authored street source cue");
-    assert(end.backdrop.includes("konoha_street_late_afternoon.png"),label+" end-day did not move to street at authored source cue 7");
+    assert(end.performance&&end.performance.sourceIndex===1&&end.performance.segmentCount===1,label+" compact end-day street cue drift");
+    assert(end.backdrop.includes("konoha_street_late_afternoon.png"),label+" compact end-day did not move to street on source cue 1");
 
     await toBeat(page,"obi_home");await assertBackdrop(page,"obi_home",EXPECTED_BACKDROP.obi_home);
     await toBeat(page,"obi_reflect");s=await state(page);
@@ -201,7 +201,15 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
     assert.strictEqual(completion.obito.pass,true,JSON.stringify(completion.obito));
     assert.strictEqual(completion.board.pass,true,JSON.stringify(completion.board));
     const errors=await gate.assertClean(label);
-    return{label,expectedDelay,expectedEntitlement,errors};
+    const interactions=page.__obitoInteractionCount||0;
+    assert.strictEqual(interactions,expectedInteractions,label+" measured interaction count drift: "+interactions);
+    assert(interactions>=28&&interactions<=36,label+" route outside owner compression target: "+interactions);
+    assert(interactions<=40,label+" route breached hard pre-Receipt ceiling: "+interactions);
+    assert.strictEqual(completion.obito.checks.compressionCardinality,true,label+" compact source cardinality diagnostic failed");
+    assert.strictEqual(completion.obito.checks.compactCuesCannotAutoPaginate,true,label+" compact source cue pagination diagnostic failed");
+    assert.strictEqual(completion.obito.checks.noGenericBeatPause,true,label+" generic A beat pause returned");
+    assert.strictEqual(completion.obito.checks.chronicleBeginsNotPreReceipt,true,label+" YOUR CHRONICLE BEGINS leaked before shared Receipt");
+    return{label,expectedDelay,expectedEntitlement,interactions,errors};
   }finally{await context.close();}
 }
 
@@ -209,10 +217,11 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
   const browser=await chromium.launch({headless:false});
   try{
     const results=[];
-    results.push(await runRoute(browser,{label:"zero-help",helpSet:new Set(),expectedDelay:0,expectedEntitlement:"FULL"}));
-    results.push(await runRoute(browser,{label:"mixed-help",helpSet:new Set([0,2]),expectedDelay:15,expectedEntitlement:"REDUCED"}));
-    results.push(await runRoute(browser,{label:"five-help",helpSet:new Set([0,1,2,3,4]),expectedDelay:35,expectedEntitlement:"MINIMAL"}));
-    const summary={pass:true,kind:"obito_story_presentation_installed_browser",routes:results.map(r=>({label:r.label,delay:r.expectedDelay,entitlement:r.expectedEntitlement})),browserGoldenClaimed:false};
+    results.push(await runRoute(browser,{label:"all-continue",helpSet:new Set(),expectedDelay:0,expectedEntitlement:"FULL",expectedInteractions:30}));
+    results.push(await runRoute(browser,{label:"substantial-furniture-only",helpSet:new Set([0]),expectedDelay:7,expectedEntitlement:"SUBSTANTIAL",expectedInteractions:30}));
+    results.push(await runRoute(browser,{label:"reduced-furniture-equipment",helpSet:new Set([0,2]),expectedDelay:15,expectedEntitlement:"REDUCED",expectedInteractions:30}));
+    results.push(await runRoute(browser,{label:"all-help",helpSet:new Set([0,1,2,3,4]),expectedDelay:35,expectedEntitlement:"MINIMAL",expectedInteractions:32}));
+    const summary={pass:true,kind:"obito_story_presentation_installed_browser",routes:results.map(r=>({label:r.label,delay:r.expectedDelay,entitlement:r.expectedEntitlement,interactions:r.interactions})),maxDiversionInteractionsIncludingChoice:4,hardCeiling:40,targetRange:[28,36],browserGoldenClaimed:false};
     fs.writeFileSync(path.join(OUT,"summary.json"),JSON.stringify(summary,null,2)+"\n");
     console.log(JSON.stringify(summary,null,2));
   }finally{await browser.close();}
