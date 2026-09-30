@@ -510,6 +510,16 @@ Do not award elemental resistance because the Character cast Fire Release.
 
 Do not award poison resistance because the Character poisoned somebody else.
 
+### Exposure significance
+
+Stephen explicitly distinguishes **controlled training failure** from **hostile real exposure**.
+
+- a failed elemental-training attempt that produces controlled burn/shock/etc. should normally create only **minor resistance-development evidence**;
+- an enemy genuinely trying to burn/shock/poison/otherwise injure the Character may create materially larger resistance-development evidence when the received effect is significant;
+- exact numeric weights remain Progression / Combat authority and must be browser tuned.
+
+The system must therefore read exposure severity/context rather than treating every fire tick as equivalent.
+
 ### Anti-farm / safety boundary
 
 Resistance growth must still be capped by exact occurrence/challenge.
@@ -522,6 +532,12 @@ No infinite gain from:
 - one poison tick producing unlimited receipts.
 
 The exposure must be materially challenging at the Character's current resistance/development level.
+
+Canonical shorthand:
+
+**controlled training failure = minor evidence**
+
+**hostile/material exposure = stronger evidence where legitimately challenging**
 
 ## 25. Failure can create real Chronicle history
 
