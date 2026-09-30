@@ -150,6 +150,7 @@ function hinataReceiptLines105(){
   const purse=history.find(row=>row&&String(row.rewardSourceId||row.sourceId||"")==="origin_completion_starting_purse_ryo_01"&&(row.originVariantId==="academy_hinata"||row.actorVariantId==="academy_hinata"));
   lines.push("","REWARDS");
   if(purse)lines.push("• Origin Starting Purse: +100 Ryō.");
+  appendRewardSpectrum105(lines,"academy_hinata");
   return lines;
 }
 function buildHinataReceipt105(){return hinataReceiptLines105().join("\n");}
@@ -157,6 +158,10 @@ function buildHinataReceipt105(){return hinataReceiptLines105().join("\n");}
 function originStartingPurseAmount105(){
   const amount=Number(globalThis.SC_ORIGIN_STARTING_PURSE_409&&globalThis.SC_ORIGIN_STARTING_PURSE_409.amount);
   return Number.isFinite(amount)&&amount>0?amount:100;
+}
+function appendRewardSpectrum105(lines,originId,options={}){
+  if(typeof globalThis.appendAcademyOriginRewardReceipt440==="function")globalThis.appendAcademyOriginRewardReceipt440(lines,originId,options);
+  return lines;
 }
 function buildKushinaReceipt105(){
   const runtime=A&&typeof A.active==="function"?A.active():null;
@@ -188,6 +193,7 @@ function buildKushinaReceipt105(){
     if(outcome)lines.push(outcome);
   }
   lines.push("","REWARDS",`• Origin Starting Purse: +${originStartingPurseAmount105()} Ryō.`);
+  appendRewardSpectrum105(lines,"academy_kushina");
   return lines.join("\n");
 }
 function buildKurenaiReceipt105(){
@@ -219,6 +225,7 @@ function buildKurenaiReceipt105(){
   }[ctx.kurenaiOutcome];
   if(outcome)lines.push(outcome);
   lines.push("","REWARDS",`• Origin Starting Purse: +${originStartingPurseAmount105()} Ryō.`);
+  appendRewardSpectrum105(lines,"academy_kurenai");
   return lines.join("\n");
 }
 function buildIwabeeReceipt105(){
@@ -247,6 +254,7 @@ function buildIwabeeReceipt105(){
   }[ctx.iwabeeReflection];
   if(reflection)lines.push("• "+reflection);
   lines.push("","WHAT HAPPENED","• The damaged practical ground was made usable.","• An unexpected Rogue Genin was exposed during the exercise.","","REWARDS","• Origin Starting Purse: +"+originStartingPurseAmount105()+" Ryō.");
+  appendRewardSpectrum105(lines,"academy_iwabee");
   return lines.join("\n");
 }
 
@@ -278,6 +286,7 @@ function buildMetalReceipt105(){
   lines.push("","WHAT HAPPENED","• Metal's private training remained part of his Chronicle even after people began watching.");
   if(ctx.metalProtectiveOutcome)lines.push("• Protective response: "+String(ctx.metalProtectiveOutcome).toUpperCase()+".");
   lines.push("","REWARDS",`• Origin Starting Purse: +${originStartingPurseAmount105()} Ryō.`);
+  appendRewardSpectrum105(lines,"academy_metal_lee");
   return lines.join("\n");
 }
 
@@ -338,6 +347,7 @@ function buildMiraiReceipt105(){
     lines.push("• Reached Checkpoint Three and reviewed the route.");
   }
   lines.push("","REWARDS",`• Origin Starting Purse: +${originStartingPurseAmount105()} Ryō.`);
+  appendRewardSpectrum105(lines,"academy_mirai");
   return lines.join("\n");
 }
 function buildMenmaReceipt105(){
@@ -360,6 +370,7 @@ function buildMenmaReceipt105(){
   lines.push("","REWARDS");
   if(battleReward)lines.push("• PL Battle Victory: +100 Ryō.");
   lines.push(`• Origin Starting Purse: +${originStartingPurseAmount105()} Ryō.`);
+  appendRewardSpectrum105(lines,"academy_menma",{battleAlreadyShown:true});
   return lines.join("\n");
 }
 
