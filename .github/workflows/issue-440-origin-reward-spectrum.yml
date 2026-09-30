@@ -21,6 +21,7 @@ jobs:
           node-version: 22
       - name: Source syntax
         run: |
+          node --check runtime/alpha-origin-scenes-32900-core.js
           node --check runtime/alpha-origin-reward-spectrum-440.js
           node --check runtime/alpha-iwabee-origin-runtime-399.js
           node --check runtime/alpha-metal-origin-runtime-396.js
