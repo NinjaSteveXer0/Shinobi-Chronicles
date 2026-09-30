@@ -74,6 +74,10 @@ async function state(page){
       textScrollHeight:layer?.querySelector(".sc-story-text")?.scrollHeight||0,
       textClientHeight:layer?.querySelector(".sc-story-text")?.clientHeight||0,
       performance:typeof getStoryScenePerformance33900==="function"?(()=>{const p=getStoryScenePerformance33900();return p?{index:p.index,sourceIndex:p.sourceIndex,segmentIndex:p.segmentIndex,segmentCount:p.segmentCount,cueKind:p.cue?.kind||null,cueSpeaker:p.cue?.speakerName||p.cue?.speaker||null}:null;})():null,
+      renderedCueKind:layer?.dataset.scCueKind||null,
+      speakerLabel:layer?.querySelector(".sc-story-name")?.textContent?.trim()||"",
+      primaryLabel:layer?.querySelector(".sc-chronicle-primary")?.textContent?.trim()||"",
+      sceneBoardVisible:visible(layer?.querySelector(".sc-scene-board-33900")),
       storyLayerBackground:layer?getComputedStyle(layer).backgroundColor:"",
       storyLayerCoversViewport:!!layer&&(()=>{const r=layer.getBoundingClientRect();return r.left<=0&&r.top<=0&&r.right>=innerWidth&&r.bottom>=innerHeight;})()
     };
@@ -222,8 +226,14 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
     await toBeat(page,"obi_close");await assertBackdrop(page,"obi_close",EXPECTED_BACKDROP.obi_home);
     await toBeat(page,"obi_receipt");
     const receipt=await state(page);
-    assert.strictEqual(receipt.mode,"record",label+" Obito Chronicle Receipt is not a record beat");
-    assert(receipt.performance&&receipt.performance.cueKind==="record",label+" Obito Chronicle Receipt performance cue missing");
+    // Shared Scene Board presentation authority is the rendered performance cue.
+    // Some legacy Story semantic readers normalize an empty-text terminal beat as dialogue;
+    // the player-facing Chronicle Receipt contract is the rendered record cue/surface.
+    assert(receipt.performance&&receipt.performance.cueKind==="record",label+" Obito Chronicle Receipt performance cue missing "+JSON.stringify(receipt));
+    assert.strictEqual(receipt.renderedCueKind,"record",label+" Obito Chronicle Receipt did not render record presentation");
+    assert.strictEqual(receipt.speakerLabel,"CHRONICLE RECEIPT",label+" Obito Chronicle Receipt heading missing");
+    assert.strictEqual(receipt.primaryLabel,"CONTINUE",label+" Obito Chronicle Receipt CONTINUE control missing");
+    assert.strictEqual(receipt.sceneBoardVisible,false,label+" Story Scene Board remained visible behind Chronicle Receipt");
     assert(receipt.text.includes("YOUR ORIGIN")&&receipt.text.includes("ACADEMY OBITO")&&receipt.text.includes("RECORDED IN YOUR CHRONICLE"),label+" Obito Chronicle Receipt header missing");
     assert(receipt.text.includes("YOUR DECISIONS")&&receipt.text.includes("WHAT HAPPENED")&&receipt.text.includes("REWARDS"),label+" Obito Chronicle Receipt sections missing");
     assert(receipt.text.includes("Origin Starting Purse: +100 Ryō."),label+" Obito Chronicle Receipt starting purse missing");
