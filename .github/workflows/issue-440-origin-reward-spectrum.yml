@@ -32,3 +32,5 @@ jobs:
         run: node tools/qa_issue_440_origin_reward_spectrum.js
       - name: Metal Iwabee runtime reward regression
         run: node tools/qa_issues_396_399_400_runtime.js
+      - name: Runtime ownership safety
+        run: node tools/qa_runtime_ownership_safety_300.js
