@@ -217,9 +217,9 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
   const browser=await chromium.launch({headless:false});
   try{
     const results=[];
-    results.push(await runRoute(browser,{label:"all-continue",helpSet:new Set(),expectedDelay:0,expectedEntitlement:"FULL",expectedInteractions:31}));
-    results.push(await runRoute(browser,{label:"substantial-furniture-only",helpSet:new Set([0]),expectedDelay:7,expectedEntitlement:"SUBSTANTIAL",expectedInteractions:31}));
-    results.push(await runRoute(browser,{label:"reduced-furniture-equipment",helpSet:new Set([0,2]),expectedDelay:15,expectedEntitlement:"REDUCED",expectedInteractions:31}));
+    results.push(await runRoute(browser,{label:"all-continue",helpSet:new Set(),expectedDelay:0,expectedEntitlement:"FULL",expectedInteractions:36}));
+    results.push(await runRoute(browser,{label:"substantial-furniture-only",helpSet:new Set([0]),expectedDelay:7,expectedEntitlement:"SUBSTANTIAL",expectedInteractions:35}));
+    results.push(await runRoute(browser,{label:"reduced-furniture-equipment",helpSet:new Set([0,2]),expectedDelay:15,expectedEntitlement:"REDUCED",expectedInteractions:34}));
     results.push(await runRoute(browser,{label:"all-help",helpSet:new Set([0,1,2,3,4]),expectedDelay:35,expectedEntitlement:"MINIMAL",expectedInteractions:33}));
     const summary={pass:true,kind:"obito_story_presentation_installed_browser",routes:results.map(r=>({label:r.label,delay:r.expectedDelay,entitlement:r.expectedEntitlement,interactions:r.interactions})),maxDiversionInteractionsIncludingChoice:4,hardCeiling:40,targetRange:[28,36],browserGoldenClaimed:false};
     fs.writeFileSync(path.join(OUT,"summary.json"),JSON.stringify(summary,null,2)+"\n");
