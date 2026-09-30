@@ -333,14 +333,16 @@ function claimKakashiV2BattleRewards(){
 
     const chronicleRecorded=typeof recordBattleChronicle==="function"?recordBattleChronicle():true;
 
-    // One persistent player save here; the outer Victory Claim owner performs
-    // the one session-state save and immediate re-render after this returns.
-    if(typeof savePlayerData==="function")savePlayerData();
+    // Keep this exact source-scoped commit in memory until the Victory owner
+    // has repainted CLAIM -> CONTINUE. Stephen's production save is materially
+    // larger than clean-room CI state; synchronously stringifying it here made
+    // the button appear frozen even though the reward mutation was correct.
+    // alpha-battle-browser-32600 owns the single post-paint player/session save.
     return{
       handled:true,success:true,chronicleRecorded,
       receiptRefs:Object.keys(ensureStore().receipts).filter(key=>key.startsWith(String(plan.storyOccurrenceId)+"|")),
       directExactPackageClaim:true,
-      singlePlayerPersistenceWrite:true
+      deferredPersistenceUntilVictoryPaint:true
     };
   }catch(error){
     restoreRewardMutation(snap);
@@ -460,7 +462,7 @@ function diagnostics(){
     victoryProjectionSelfHeals:String(ensureKakashiV2BattleRewardProjection36015).includes("authoritativeProjectionRepaired")&&String(renderVictoryOverlay36015).includes("ensureKakashiV2BattleRewardProjection36015"),
     victoryOpenProjectsBeforeGenericRender:String(openOverlay36015).includes('"victory"')&&String(openOverlay36015).indexOf("ensureKakashiV2BattleRewardProjection36015")<String(openOverlay36015).indexOf("PRE_OPEN_OVERLAY"),
     exactMIBattleProjection:String(ensureKakashiV2BattleRewardProjection36015).includes("Field Recovery Pill")&&String(battlePlan).includes("participantId===MI")&&String(battlePlan).includes("ryo:cashSourceId?50:0")&&String(soloCashSource36015).includes("participantId===MI"),
-    kakashiClaimBypassesDuplicateGenericPersistence:!String(claimKakashiV2BattleRewards).includes("PRE_CLAIM.call")&&String(claimKakashiV2BattleRewards).includes("directExactPackageClaim:true")&&String(claimKakashiV2BattleRewards).includes("singlePlayerPersistenceWrite:true"),
+    kakashiClaimBypassesDuplicateGenericPersistence:!String(claimKakashiV2BattleRewards).includes("PRE_CLAIM.call")&&String(claimKakashiV2BattleRewards).includes("directExactPackageClaim:true")&&String(claimKakashiV2BattleRewards).includes("deferredPersistenceUntilVictoryPaint:true")&&!String(claimKakashiV2BattleRewards).includes('savePlayerData==="function")savePlayerData()'),
     idempotentKakashiClaimDoesNotRewritePlayerSave:String(claimKakashiV2BattleRewards).includes("noPersistenceRewrite:true"),
     browserGoldenClaimed:false
   };
