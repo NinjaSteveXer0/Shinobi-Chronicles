@@ -26,6 +26,45 @@ for(const file of [
 ])vm.runInContext(fs.readFileSync(file,"utf8"),ctx,{filename:file});
 const sceneId=ctx.SC_ALPHA_ORIGIN_32900.sceneByVariant.academy_obito, keys=["furniture","vegetables","equipment","delivery","cart"], delays=[7,5,8,9,6], help=["furniture_help","vegetables_help","equipment_help","delivery_help","cart_help"], cont=["furniture_continue_final","vegetables_continue_final","equipment_continue_final","delivery_continue_final","cart_continue_final"], reflections=["reflection_keep_helping","reflection_take_training_seriously","reflection_find_balance","reflection_question_frame"];
 const expected=d=>d<=5?"FULL":d<=14?"SUBSTANTIAL":d<=24?"REDUCED":d<=35?"MINIMAL":"NONE"; const assert=(v,m,x)=>{if(!v)throw Error(m+(x?": "+JSON.stringify(x):""));};
+function parseObitoWritingBoxes(){
+  const doc=fs.readFileSync(path.join(ROOT,"Documentation","Story","Academy_Obito_Origin_Fresh_Player_Facing_Rewrite_2026-09-30.md"),"utf8");
+  const src=doc.slice(doc.indexOf("# 3."),doc.indexOf("# 11."));
+  const lines=src.split(/\r?\n/),perf={};let currentKey=null;
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i],section=line.match(/^## \`([^\`]+)\`/);
+    if(section)currentKey=section[1];
+    const explicit=line.match(/^### \`([^\`]+)\` — Box \d+ — (.+)$/),implicit=line.match(/^### Box \d+ — (.+)$/);
+    if(!explicit&&!implicit)continue;
+    const key=explicit?explicit[1]:currentKey,role=(explicit?explicit[2]:implicit[1]).trim();
+    assert(key,"Writing box missing performance key",{line});
+    i++;while(i<lines.length&&!lines[i].trim())i++;
+    const body=[];while(i<lines.length&&lines[i].trim()){body.push(lines[i].trim());i++;}i--;
+    let kind="narration",speakerName=null,text=body.join(" ");
+    if(role!=="NARRATION"){
+      kind="dialogue";speakerName=role;
+      const match=text.match(/^\*\*[^*]+:\*\*\s*[“"](.*)[”"]$/);
+      assert(match,"Writing dialogue box parse failed",{key,text});text=match[1];
+    }
+    (perf[key]||(perf[key]=[])).push({kind,speakerName,text});
+  }
+  perf.training_intro=[];
+  return perf;
+}
+function proveObitoExactBoxMap(){
+  const runtimeSource=fs.readFileSync(path.join(ROOT,"runtime","alpha-origin-scenes-32900-c.js"),"utf8");
+  const match=runtimeSource.match(/const PERFORMANCE=(\{[\s\S]*?\});\n\nconst ENV=/);
+  assert(match,"Obito PERFORMANCE block is no longer strict JSON");
+  const actual=JSON.parse(match[1]),expected=parseObitoWritingBoxes();
+  const normalize=map=>Object.fromEntries(Object.entries(map).map(([key,rows])=>[key,rows.map(row=>({kind:row.kind,speakerName:row.speakerName||null,text:row.text}))]));
+  assert(JSON.stringify(normalize(actual))===JSON.stringify(expected),"Obito runtime box map differs from exact Writing Sections 3–10");
+  const rows=Object.values(actual).flat();
+  assert(rows.length===98,"Obito exact authored box count drift",{actual:rows.length});
+  assert(rows.every(row=>row.singlePage===true),"Obito authored box is not pinned to one Story cue");
+  assert(rows.every(row=>!String(row.text||"").includes("\\n\\n")),"Obito authored boxes were recombined with paragraph stacking");
+  assert(rows.every(row=>row.kind!=="narration"||!/^(OBITO|ACADEMY INSTRUCTOR|CIVILIAN|VENDOR|CUSTODIAN|DELIVERY WORKER):/.test(String(row.text||""))),"speaker-labelled dialogue leaked into narration");
+  return{boxes:rows.length,keys:Object.keys(actual).length};
+}
+const exactBoxProof=proveObitoExactBoxMap();
 function reset(){playerData.activityHistory=[];ctx.activityHistory=activityHistory=playerData.activityHistory;playerData.acquisition={chronicleOriginVariantId:"academy_obito",chronicleOrigin:{prologueCompleted:false}};active=null;receipts=[];completions=[];}
 function toChoice(){let g=0;while(active&&!(beat().choices||[]).length){assert(advanceStoryScene().success,"advance failed",beat());if(++g>80)throw Error("guard");}}
 function run(mask,reflection=reflections[0]){reset();assert(ctx.beginAlphaChronicleOriginPrologue().success,"start failed");for(let i=0;i<5;i++){toChoice();assert(advanceStoryScene(mask&(1<<i)?help[i]:cont[i]).success,"diversion choice failed");}toChoice();assert(beat().beatId==="obi_reflect","reflection missing",beat());assert(advanceStoryScene(reflection).success,"reflection failed");while(active)assert(advanceStoryScene().success,"terminal failed",beat());const delay=delays.reduce((s,d,i)=>s+((mask&(1<<i))?d:0),0),ent=playerData.activityHistory.find(r=>r.sourceOccurrenceId===entitlementId),divs=playerData.activityHistory.filter(r=>diversionSet.has(r.sourceOccurrenceId)),self=playerData.activityHistory.find(r=>r.historyKey==="academy_obito_final_self_interpretation");return{mask,delay,expected:expected(delay),ent,divs,self,receipts:clone(receipts),completions:clone(completions)};}
