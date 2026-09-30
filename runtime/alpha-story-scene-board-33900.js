@@ -85,9 +85,16 @@ function expandStoryPerformanceSequence33900(sequence){
     const text=String(cue.text||"");
     let pages=[text];
     if(STORY_SEGMENTABLE_CUE_KINDS_33900.has(kind)){
-      const paragraphs=text.split(/\n\s*\n+/).map(row=>row.trim()).filter(Boolean);
-      pages=paragraphs.length?paragraphs:[text.trim()];
-      if(kind!=="dialogue")pages=pages.flatMap(splitLongNarrationParagraph33900);
+      // Some authored performance cues intentionally define one complete Story
+      // box. Respect that explicit presentation contract instead of re-splitting
+      // the cue by paragraph/character heuristics.
+      if(cue.singlePage===true){
+        pages=[text.trim()];
+      }else{
+        const paragraphs=text.split(/\n\s*\n+/).map(row=>row.trim()).filter(Boolean);
+        pages=paragraphs.length?paragraphs:[text.trim()];
+        if(kind!=="dialogue")pages=pages.flatMap(splitLongNarrationParagraph33900);
+      }
     }
     const cleanPages=pages.filter(page=>String(page||"").trim().length>0);
     const finalPages=cleanPages.length?cleanPages:[text];
@@ -773,6 +780,7 @@ function runStorySceneBoard33900Diagnostics(){
       String(markStoryPresentationHidden33900).includes("scPresentationHidden")&&
       String(markStoryPresentationHidden33900).includes('setProperty("display","none","important")')&&
       installStyle.toString().includes("data-sc-presentation-hidden"),
+    authoredSinglePageCueContract:String(expandStoryPerformanceSequence33900).includes("cue.singlePage===true"),
     wrapsExistingStoryRenderer:!!PRE_RENDER,
     browserGoldenClaimed:false
   };
