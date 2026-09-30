@@ -4,6 +4,8 @@
 **Owner:** PL / Registry / Rank  
 **Status:** **BINDING REGISTRY / PL CLOSURE — ISSUE #337 CONSUMED / RETURN TO COMBAT REQUIRED**  
 **Source handoff:** GitHub issue #337  
+**Identity correction authority:** `Documentation/Story/Academy_Mirai_Instructor_Male_Identity_Correction_2026-09-30.md`  
+**2026-09-30 correction:** Earlier female-gender statements in this Registry closure are superseded; `academy_mirai_origin_instructor` is male. Stats / PL / Rank / participant identity remain unchanged.  
 **Writing authority:** `Documentation/Story/Academy_Mirai_Origin_WRITING_GOLDEN_2026-09-24.md`  
 **CE reconciliation:** `Documentation/Coordination/Academy_Mirai_WRITING_GOLDEN_Disguised_Instructor_Implementation_Reconciliation_2026-09-24.md`  
 **Source baseline inspected:** `95a66452f6df82eee3431d83e27a9bba74e213ae`  
@@ -15,7 +17,7 @@ Academy Mirai's optional post-switch PL Battle uses one exact Registry-addressab
 
 `academy_mirai_origin_instructor`
 
-This is the same historical **female** person who:
+This is the same historical **male** person who:
 
 - appears as the Academy instructor before the escort begins;
 - switches places with the real Traveller during the covered-market separation;
@@ -55,7 +57,7 @@ Exact representation classification:
 
 Underlying gender / ordinary self-presentation:
 
-**Female**
+**Male**
 
 Temporary post-switch observer-facing disguise presentation:
 
@@ -328,4 +330,4 @@ Do not route Coding until Combat has closed that package.
 
 ## 11. Final lock
 
-> **Academy Mirai Origin's disguised instructor is one exact Registry-addressable female Story participant: `academy_mirai_origin_instructor`. Her temporary male Traveller disguise changes observer-facing presentation, not identity. This controlled-assessment profile has Base Stats `17/14/10/6/7/12/15`, Base PL16, and ordinary Battle-entry Current/Remaining PL16. Formal Rank is unknown and must not be inferred from the instructor role. The row is non-collectible and does not change live production cardinality. Future naming or a fuller unrestricted representation must link back to the same persistent person rather than rewriting this Academy assessment profile.**
+> **Academy Mirai Origin's disguised instructor is one exact Registry-addressable male Story participant: `academy_mirai_origin_instructor`. His temporary male Traveller disguise changes observer-facing presentation, not identity. This controlled-assessment profile has Base Stats `17/14/10/6/7/12/15`, Base PL16, and ordinary Battle-entry Current/Remaining PL16. Formal Rank is unknown and must not be inferred from the instructor role. The row is non-collectible and does not change live production cardinality. Future naming or a fuller unrestricted representation must link back to the same persistent person rather than rewriting this Academy assessment profile.**
