@@ -88,7 +88,7 @@ async function runMetalBattle(browser,remaining,expectedClass){
     assert.strictEqual(launch.enemy,"metal_origin_inviting_genin");
     assert.strictEqual(launch.portrait,"NPC portrait/metal_classmate_1.png");
     assert.strictEqual(launch.meta?.startingUnderlyingMaximum,13);
-    const finished=await page.evaluate(({remaining})=>{
+    const finished=await page.evaluate(async ({remaining})=>{
       const prior=globalThis.getBattleRemainingPL;
       globalThis.getBattleRemainingPL=(side,id)=>{
         if(side==="player"&&id==="academy_metal_lee")return remaining;
@@ -101,6 +101,7 @@ async function runMetalBattle(browser,remaining,expectedClass){
         const walletBefore=Math.max(0,Number(playerData.ryo)||0);
         const rewards=generateBattleRewards();
         try{openOverlay("victory");}catch(_error){}
+        await new Promise(resolve=>setTimeout(resolve,120));
         const ryoNode=document.querySelector(".victory-ryo-number");
         const victoryProjection=ryoNode?{
           text:String(ryoNode.textContent||"").trim(),
