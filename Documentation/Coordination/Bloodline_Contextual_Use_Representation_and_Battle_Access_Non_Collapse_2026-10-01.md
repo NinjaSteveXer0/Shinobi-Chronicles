@@ -167,3 +167,121 @@ It must not leak hidden awakening requirements or future states.
 ## 14. Final lock
 
 > A Character may factually possess a Bloodline/Hosted source, be able to use part of it contextually in Story/World, still have Battle benefits locked, and use a normal Character Card representation. Sharingan additionally requires a real awakening occurrence before contextual use exists; once awakened, that history persists across later representations and does not require a Sharingan-labelled version of every rank card.
+
+## 15. Sharingan awakening is a Chronicle event, not a card acquisition event
+
+For Uchiha who have not yet awakened Sharingan in the current Chronicle:
+
+`Uchiha lineage/potential -> eligible awakening opportunities -> awakening occurrence -> persistent awakened state`
+
+The event/opportunity must have explicit eligibility.
+
+Possible predicates may include:
+- exact emotional/Story pressure;
+- prior relationship/shared-history;
+- current danger/loss/protection event;
+- current stage/representation legality;
+- prior capability evidence;
+- event-specific authored conditions.
+
+Do not reduce awakening to:
+- owning an Uchiha card;
+- reaching a generic level;
+- opening a menu;
+- equipping a Sharingan card;
+- random chance without a legitimate event.
+
+The awakening occurrence is the historical fact.
+
+The visual representation may react to that fact.
+
+## 16. Awakening opportunity != guaranteed awakening
+
+A hotspot/Story/World event may make Sharingan awakening **possible** without guaranteeing it.
+
+Preserve:
+
+`event eligibility != event success`
+
+`event appearance != awakening`
+
+`awakening possibility != Battle package access`
+
+The exact resolver decides whether the awakening occurs.
+
+If awakening does not occur, the event still remains Chronicle history.
+
+## 17. Mikoto / Genin Sasuke paired-representation exception
+
+Because exact paired assets already exist for:
+
+- Genin Mikoto;
+- Sharingan Mikoto;
+- Genin Sasuke;
+- Sharingan Sasuke;
+
+these Characters may visibly swap to the Sharingan representation after a legitimate awakening occurrence.
+
+This is presentation following semantic truth.
+
+Do not reverse the causality.
+
+Correct:
+
+`awakening commits -> persistent Sharingan state -> Sharingan representation may become selectable/active`
+
+Incorrect:
+
+`Sharingan card selected/acquired -> awakening inferred`
+
+## 18. Other Uchiha do not require duplicate Sharingan cards
+
+Current production assets include single-stage/role representations for examples such as:
+
+- Chūnin Fugaku;
+- Itachi;
+- Shisui;
+- Academy Obito;
+- later Sasuke stages.
+
+For these Characters, Sharingan awakening/use does not require a separate Sharingan-labelled Character Card unless Stephen later creates one for visual/collection reasons.
+
+The same persistent Character can:
+- use a normal card representation;
+- have awakened Sharingan history;
+- use Sharingan contextually where legal;
+- still have Battle access independently gated.
+
+## 19. Hotspot awakening opportunities
+
+Phase 2 World/CE should support authored Uchiha awakening opportunities.
+
+These are not generic “unlock quests.”
+
+They are Chronicle-sensitive events whose eligibility may consume:
+- who is present;
+- what the Uchiha has already experienced;
+- who they care about;
+- what they know;
+- what danger/loss/conflict is occurring;
+- prior failures/successes;
+- exact Story/world timing.
+
+CE may select among already-eligible awakening opportunities.
+
+CE may not invent an awakening solely because an Uchiha Character exists.
+
+## 20. Shinobi Record projection of awakening
+
+Before awakening:
+- Uchiha lineage/potential may be known where legitimate;
+- Sharingan itself may remain only a rumour/potential;
+- no contextual-use capability is shown as available.
+
+After awakening:
+- Chronicle records the awakening occurrence;
+- Development/Bloodline section records awakened state;
+- Intelligence may record what the Character/observer learned;
+- Codex may reveal the Sharingan representation if one exists;
+- Battle package remains separately governed.
+
