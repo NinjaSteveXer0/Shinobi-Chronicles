@@ -994,10 +994,9 @@
         "origin.academy_metal_lee.controlled_spar_battle",
         "origin.academy_iwabee.final_story_state",
         "origin.academy_iwabee.rogue_battle",
-        "progression.special_jonin.contextual_evidence_producer.shared",
-        "progression.discipline_development.ledger.shared"
+        "progression.special_jonin.contextual_evidence_producer.shared"
       ],
-      "owner": "runtime/alpha-discipline-development-ledger-442.js + runtime/alpha-origin-scenes-32900-core.js + runtime/alpha-origin-reward-spectrum-440.js + runtime/alpha-origin-scene-board-bindings-105.js + runtime/alpha-origin-scenes-32900-c.js + runtime/alpha-metal-origin-runtime-396.js + runtime/alpha-iwabee-origin-runtime-399.js",
+      "owner": "runtime/alpha-origin-scenes-32900-core.js + runtime/alpha-origin-reward-spectrum-440.js + runtime/alpha-origin-scene-board-bindings-105.js + runtime/alpha-origin-scenes-32900-c.js + runtime/alpha-metal-origin-runtime-396.js + runtime/alpha-iwabee-origin-runtime-399.js",
       "directCallers": [
         "index.html",
         "SC_ALPHA_ORIGIN_32900.commitOccurrence",
@@ -1006,7 +1005,7 @@
       ],
       "stateTouched": [
         "playerData activityHistory source-scoped discipline_development receipts for ratified Academy Origin actions",
-        "exact owned Character disciplineProgression EXP through the shared production Discipline Development ledger API",
+        "existing Character disciplineProgression EXP through canonical progression APIs only",
         "playerData.specialJoninContextualEvidence through the canonical contextual evidence producer only",
         "playerData.ryo exact Iwabee 50 Ryō Battle victory delta",
         "playerData.activityHistory exact Iwabee Battle reward receipt",
@@ -1019,44 +1018,11 @@
         "tools/qa_issues_396_399_400_runtime.js",
         "tools/qa_issues_396_399_400_browser.js",
         "tools/qa_issue_105_origin_presentation_repair.js",
-        "tools/qa_runtime_ownership_safety_300.js",
-        "tools/qa_issue_442_origin_development_receipts_browser.js"
-      ],
-      "replaces": [],
-      "contractChangeReason": "AUTHORITY_CHANGED",
-      "rationale": "Consumes CE/World issue #440 plus Progression ratification #438 as a bounded reward/progression projection overlay on the already owner-accepted FROZEN GOLDEN Academy Origin package. Story prose, routes, choices, actors, backdrops, Battle mechanics/AI/PL and Receipt lifecycle remain frozen. The overlay projects only exact source-scoped non-Battle development, ratified Special Jōnin contextual evidence, visible Receipt reward/development lines, the existing Obito Current-Stat package without duplicate Discipline EXP, and the globally required Iwabee +50 Ryō PL-Battle victory reward. Kushina residual closure explicitly excludes reverse-summoning evidence. Kakashi and Wasabi reward packages remain excluded."
-    },
-    {
-      "changeId": "issue-442-origin-development-receipt-runtime-repair",
-      "classification": "EXTENDS",
-      "responsibilityIds": [
-        "progression.discipline_development.ledger.shared",
-        "origin.academy_izuno.final_story_state"
-      ],
-      "owner": "runtime/alpha-discipline-development-ledger-442.js + runtime/alpha-origin-reward-spectrum-440.js",
-      "directCallers": [
-        "index.html",
-        "SC_ALPHA_ORIGIN_32900.commitOccurrence",
-        "runtime/alpha-origin-scenes-32900-a.js",
-        "Origin Chronicle Receipt reward projection"
-      ],
-      "stateTouched": [
-        "playerData.acquisition.ownedCharactersByVariantId[*].disciplineProgression persistent EXP only",
-        "playerData.activityHistory source-scoped discipline_development receipts",
-        "player-facing Origin Chronicle Receipt Development lines"
-      ],
-      "productionLoader": "index.html",
-      "qaRefs": [
-        "tools/qa_issue_440_origin_reward_spectrum.js",
-        "tools/qa_issue_442_origin_development_receipts_browser.js",
-        "tools/qa_issue_343_wasabi_browser.js",
-        "tools/qa_issue_105_origin_presentation_browser.js",
-        "tools/qa_save_compatibility_311.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ],
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
-      "rationale": "Repairs the confirmed installed-browser gap where #440 and Wasabi development callers referenced progression APIs that did not exist in production. Adds the smallest binding Progression adapter needed to persist seven-discipline Development EXP on the exact owned Character instance without inventing EXP-to-Stat/mastery conversion, and corrects Kurenai Bell-Test +1 resisted / +2 effective classification under the existing cap 3. Story prose/routes/outcomes, Battle mechanics, PL, starting purse and Receipt lifecycle remain frozen."
+      "rationale": "Consumes CE/World issue #440 plus Progression ratification #438 as a bounded reward/progression projection overlay on the already owner-accepted FROZEN GOLDEN Academy Origin package. Story prose, routes, choices, actors, backdrops, Battle mechanics/AI/PL and Receipt lifecycle remain frozen. The overlay projects only exact source-scoped non-Battle development, ratified Special Jōnin contextual evidence, visible Receipt reward/development lines, the existing Obito Current-Stat package without duplicate Discipline EXP, and the globally required Iwabee +50 Ryō PL-Battle victory reward. Kushina residual closure explicitly excludes reverse-summoning evidence. Kakashi and Wasabi reward packages remain excluded."
     }
   ]
 }
