@@ -49,6 +49,14 @@ function decorate(serviceId){
   const data=screenData(serviceId);
   if(!data||!Array.isArray(data.disciplines))return false;
 
+  const note=root.querySelector(".alpha-activity-authority-note span");
+  if(note&&serviceId==="practical"){
+    note.textContent="Complete Practical exercises to build the selected discipline. Development is applied to the shinobi you choose.";
+  }
+  if(note&&serviceId==="exams"){
+    note.textContent="Shinobi Exams test individual disciplines. Successful execution can build that shinobi's development; Rank Promotion remains separate.";
+  }
+
   const byId=new Map(data.disciplines.filter(Boolean).map(row=>[String(row.id),row]));
   const buttons=[...root.querySelectorAll(".alpha-activity-discipline")];
   buttons.forEach((button,index)=>{
