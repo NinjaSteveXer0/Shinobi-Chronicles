@@ -1099,7 +1099,7 @@
         "playerData.activityHistory exact IZU-01/02/03/04 + River endurance occurrences",
         "Story Scene Board exact Wasabi backdrop + physical actor-card projection registry",
         "Wasabi Origin Chronicle Receipt projection from committed rewards/development after shared completion commit",
-        "academy_izuno exact Stamina discipline_development receipt through shared progression ledger API"
+        "academy_izuno Stamina discipline progression through existing discipline ledger + exact discipline_development receipt"
       ],
       "productionLoadPath": [
         "index.html",
@@ -1113,8 +1113,7 @@
         "completeChronicleOriginPrologue"
       ],
       "permittedAdapters": [
-        "academy_wasabi_rogue_battle_adapter_343",
-        "discipline_development_ledger_442"
+        "academy_wasabi_rogue_battle_adapter_343"
       ],
       "retiredOwners": [
         "runtime/alpha-origin-scenes-32900-a.js::pre343_compressed_academy_izuno",
@@ -1357,44 +1356,6 @@
         "tools/qa_issue_105_origin_presentation_browser.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
-    },
-    {
-      "responsibilityId": "progression.discipline_development.ledger.shared",
-      "canonicalOwner": "runtime/alpha-discipline-development-ledger-442.js",
-      "ownerType": "shared_progression_state_adapter",
-      "directCallers": [
-        "runtime/alpha-origin-reward-spectrum-440.js",
-        "runtime/alpha-origin-scenes-32900-a.js"
-      ],
-      "stateReads": [
-        "playerData.acquisition.ownedCharactersByVariantId exact owned Character instances",
-        "existing per-Character disciplineProgression ledgers when present"
-      ],
-      "stateWrites": [
-        "playerData.acquisition.ownedCharactersByVariantId[variantId].disciplineProgression canonical seven-discipline EXP ledgers only"
-      ],
-      "productionLoadPath": [
-        "index.html",
-        "game.js",
-        "runtime/alpha-discipline-development-ledger-442.js"
-      ],
-      "extensionHooks": [
-        "getPlayerCharacter",
-        "getCharacterDisciplineProgression",
-        "processDisciplineLevelUps",
-        "getDisciplineDevelopmentSnapshot442"
-      ],
-      "permittedAdapters": [],
-      "retiredOwners": [],
-      "saveSchemaRefs": [
-        "playerData.acquisition.ownedCharactersByVariantId[*].disciplineProgression"
-      ],
-      "qaRefs": [
-        "tools/qa_issue_440_origin_reward_spectrum.js",
-        "tools/qa_issue_442_origin_development_receipts_browser.js",
-        "tools/qa_save_compatibility_311.js",
-        "tools/qa_runtime_ownership_safety_300.js"
-      ]
     }
   ],
   "adapters": [
@@ -1528,18 +1489,6 @@
       "retirementCondition": "Review when shared Origin Story-to-Battle consumes the exact #338 Mirai contract natively.",
       "milestone": "shared Origin runtime propagation review",
       "qaRef": "tools/qa_issue_105_origin_presentation_browser.js",
-      "temporary": false
-    },
-    {
-      "adapterId": "discipline_development_ledger_442",
-      "reason": "Provide the missing production Discipline Development ledger API used by already-authorised Origin development callers without inventing EXP-to-Stat/mastery conversion.",
-      "owner": "runtime/alpha-discipline-development-ledger-442.js",
-      "sourceOwner": "runtime/alpha-origin-reward-spectrum-440.js",
-      "targetOwner": "game.js",
-      "exactBehaviorBridged": "Exact seven-discipline persistent EXP ledger lookup/creation and no-op conversion boundary for authorised callers; existing source owners still decide when/how much development is earned.",
-      "retirementCondition": "Retire or delegate when canonical game.js/Progression runtime directly provides the same persistent Discipline Development APIs with equivalent save semantics.",
-      "milestone": "shared Progression runtime consolidation",
-      "qaRef": "tools/qa_issue_440_origin_reward_spectrum.js",
       "temporary": false
     }
   ],
@@ -1941,7 +1890,7 @@
       "responsibilityId": "origin.academy_izuno.rogue_battle"
     },
     {
-      "stateRef": "academy_izuno exact Stamina discipline_development receipt",
+      "stateRef": "academy_izuno Stamina discipline progression / discipline_development receipt",
       "owner": "runtime/alpha-origin-scenes-32900-a.js",
       "responsibilityId": "origin.academy_izuno.final_story_state"
     },
@@ -1964,11 +1913,6 @@
       "stateRef": "activeStorySceneRuntime.localContext Academy Menma GOLDEN Story choices",
       "owner": "runtime/alpha-origin-writing-golden-105.js",
       "responsibilityId": "origin.academy_menma.final_story_state"
-    },
-    {
-      "stateRef": "playerData.acquisition.ownedCharactersByVariantId[*].disciplineProgression",
-      "owner": "runtime/alpha-discipline-development-ledger-442.js",
-      "responsibilityId": "progression.discipline_development.ledger.shared"
     }
   ]
 }
