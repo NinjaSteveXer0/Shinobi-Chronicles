@@ -186,6 +186,47 @@ function commit(ctx,amount,n,{source="story",causalRootId=null,receiptId=null,te
   assert.equal(c.stats.nin,11);assert.equal(s.playerData.characters.academy_menma.stats.nin,11);
   assert.equal(s.calculateCurrentPL(c),Math.round(formula(c.stats)));
 }
+// Existing +1 / +2 / +3 action-derived values remain valid and exact.
+{
+  const s=boot({stat:10});
+  const one=commit(s,1,"class-one");
+  const two=commit(s,2,"class-two");
+  const three=commit(s,3,"class-three");
+  assert.equal(one.grantedExp,1);assert.equal(two.grantedExp,2);assert.equal(three.grantedExp,3);
+  assert.equal(s.getDisciplineDevelopmentSnapshot448("academy_menma","nin").developmentExp,6);
+}
+// A persistent teammate develops from their own qualifying action; no passive copy to protagonist.
+{
+  const s=boot({stat:10});
+  const before=s.getDisciplineDevelopmentSnapshot448("academy_menma","nin").developmentExp;
+  const r=s.commitDisciplineDevelopment448("academy_hinata","nin",2,{source:"battle",sourceOccurrenceId:"hinata-ai-action",progressionSlotId:"nin",causalRootId:"hinata-ai-action",receiptId:"hinata-ai-action"});
+  assert.equal(r.success,true);assert.equal(r.grantedExp,2);
+  assert.equal(s.getDisciplineDevelopmentSnapshot448("academy_hinata","nin").developmentExp,2);
+  assert.equal(s.getDisciplineDevelopmentSnapshot448("academy_menma","nin").developmentExp,before);
+}
+// A real Stat breakthrough may legitimately leave rounded Current PL unchanged; no fake direct PL gain.
+{
+  const s=boot({stat:10});
+  const c=s.getPlayerCharacter("academy_menma");
+  const gen=s.getCharacterDisciplineProgression(c.id,"gen");gen.exp=8;
+  const before=s.calculateCurrentPL(c);
+  const r=s.commitDisciplineDevelopment448(c.id,"gen",2,{source:"story",sourceOccurrenceId:"gen-break",progressionSlotId:"gen",causalRootId:"gen-break",receiptId:"gen-break"});
+  assert.equal(r.statBefore,7);assert.equal(r.statAfter,8);assert.equal(r.statPointsGained,1);
+  assert.equal(r.currentPLBefore,before);assert.equal(r.currentPLAfter,before,"Stat breakthrough fabricated rounded PL gain");
+  assert.equal(s.calculateCurrentPL(c),before);
+}
+// Failed persistence rolls back EXP, Stat, history and in-memory save projection atomically.
+{
+  const s=boot({stat:10});
+  const c=s.getPlayerCharacter("academy_menma");
+  const before={stat:c.stats.nin,exp:s.getCharacterDisciplineProgression(c.id,"nin").exp,history:s.activityHistory.length,saved:JSON.parse(JSON.stringify(s.playerData.characters[c.id]))};
+  s.savePlayerData=()=>{throw new Error("qa448-forced-save-failure");};
+  const r=s.commitDisciplineDevelopment448(c.id,"nin",3,{source:"story",sourceOccurrenceId:"rollback",progressionSlotId:"nin",causalRootId:"rollback",receiptId:"rollback"});
+  assert.equal(r.success,false);assert.equal(r.reason,"atomic_persistence_failed");
+  assert.equal(c.stats.nin,before.stat);assert.equal(s.getCharacterDisciplineProgression(c.id,"nin").exp,before.exp);
+  assert.equal(s.activityHistory.length,before.history);
+  assert.deepStrictEqual(JSON.parse(JSON.stringify(s.playerData.characters[c.id])),before.saved);
+}
 {
   const s=boot();
   const d=s.runPhase2DisciplineStatGrowth448Diagnostics();
