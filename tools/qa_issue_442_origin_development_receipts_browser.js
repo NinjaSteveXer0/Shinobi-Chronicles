@@ -49,13 +49,15 @@ async function directDevelopment(browser,{variant,occurrence,fact,discipline,exp
       const commit=SC_ALPHA_ORIGIN_32900.commitOccurrence(variant,occurrence,fact,[],{});
       const lines=["REWARDS"];appendAcademyOriginRewardReceipt440(lines,variant);
       const character=getPlayerCharacter(variant);
-      const progression=getCharacterDisciplineProgression(variant,discipline);
+      const runtimeDisciplineId=getAcademyOriginRuntimeDisciplineId440(discipline);
+      const progression=getCharacterDisciplineProgression(variant,runtimeDisciplineId);
       const receipts=(playerData.activityHistory||[]).filter(row=>row?.type==="discipline_development"&&row.subjectVariantId===variant);
       return{
         commit,lines,receipts,ryo:Number(playerData.ryo)||0,
         characterId:character?.id||null,
+        runtimeDisciplineId,
         progression:progression?JSON.parse(JSON.stringify(progression)):null,
-        savedProgression:playerData.characters?.[variant]?.disciplineProgression?.[discipline]||null
+        savedProgression:playerData.characters?.[variant]?.disciplineProgression?.[runtimeDisciplineId]||null
       };
     },{variant,occurrence,fact,discipline});
     assert.strictEqual(result.commit?.success,true,label+" occurrence commit failed "+JSON.stringify(result.commit));
@@ -135,7 +137,7 @@ async function proveKurenaiInstalledReceipt(browser){
         text,
         local:{...(getActiveStorySceneRuntime?.()?.localContext||{})},
         receipts,
-        progression:JSON.parse(JSON.stringify(getCharacterDisciplineProgression("academy_kurenai","genjutsu"))),
+        progression:JSON.parse(JSON.stringify(getCharacterDisciplineProgression("academy_kurenai","gen"))),
         purseReceipts:(playerData.activityHistory||[]).filter(row=>row?.type==="origin_completion_reward"||row?.rewardSourceId==="origin_completion_starting_purse_ryo_01").length
       };
     });
@@ -162,7 +164,7 @@ async function proveKurenaiInstalledReceipt(browser){
     await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="kur_receipt"&&document.getElementById("story-scene-presentation-layer")?.dataset.scCueKind==="record",null,{timeout:15000});
     const reloaded=await page.evaluate(()=>({
       text:document.querySelector("#story-scene-presentation-layer .sc-story-text")?.textContent?.trim()||"",
-      exp:Number(getCharacterDisciplineProgression("academy_kurenai","genjutsu")?.exp)||0,
+      exp:Number(getCharacterDisciplineProgression("academy_kurenai","gen")?.exp)||0,
       count:(playerData.activityHistory||[]).filter(row=>row?.type==="discipline_development"&&row.subjectVariantId==="academy_kurenai").length
     }));
     assert.strictEqual(reloaded.exp,3,"reload lost Kurenai Genjutsu EXP");
