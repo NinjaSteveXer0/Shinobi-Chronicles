@@ -110,8 +110,9 @@ function foundationSnapshot(characterId,disciplineId,source){
   if(!DISCIPLINES.includes(disciplineId))return{allowed:false,reason:"invalid_discipline"};
   if(foundationSource(source)){
     const team=currentTeam();
-    if(team&&!team.teamVariantIds.includes(subject.registryId))return{allowed:false,reason:"subject_not_in_committed_current_team"};
-    if(team&&!subject.ownedCharacterId)return{allowed:false,reason:"stable_owned_character_identity_missing"};
+    if(!team)return{allowed:false,reason:"committed_current_team_unavailable"};
+    if(!team.teamVariantIds.includes(subject.registryId))return{allowed:false,reason:"subject_not_in_committed_current_team"};
+    if(!subject.ownedCharacterId)return{allowed:false,reason:"stable_owned_character_identity_missing"};
     const stat=currentStat(characterId,disciplineId);
     if(stat>=FOUNDATION_CEILING)return{
       allowed:false,reason:"activity_development_ceiling_reached",currentStat:stat,
@@ -212,6 +213,9 @@ function commitDevelopment(characterId,disciplineId,requestedExp,metadata={}){
   if(granted<=0)return{success:true,committed:false,duplicate:false,reason:"causal_cap_reached",requestedExp:amount,grantedExp:0,snapshot:snapshot(characterId,disciplineId,source)};
 
   const statBefore=exactStats(subject.character),progressionBefore=clone(row),historyLength=history().length;
+  const pd=currentPlayerData();
+  const savedCharacterKey=subject.character.id;
+  const savedCharacterBefore=pd&&pd.characters&&pd.characters[savedCharacterKey]?clone(pd.characters[savedCharacterKey]):null;
   const plBefore=currentPL(subject.character),expBefore=row.exp;
   try{
     row.exp+=granted;
@@ -250,6 +254,11 @@ function commitDevelopment(characterId,disciplineId,requestedExp,metadata={}){
     subject.character.stats={...subject.character.stats,...statBefore};
     Object.keys(row).forEach(key=>delete row[key]);Object.assign(row,progressionBefore);
     history().splice(historyLength);
+    if(pd&&pd.characters){
+      if(savedCharacterBefore)pd.characters[savedCharacterKey]=savedCharacterBefore;
+      else delete pd.characters[savedCharacterKey];
+    }
+    if(pd)pd.activityHistory=history();
     return{success:false,committed:false,reason:"atomic_persistence_failed",error:String(error&&error.message||error)};
   }
 }
@@ -416,14 +425,16 @@ function restoreCanonicalStats448(){
   return changed;
 }
 function migrateExistingLedgers448(){
+  // Compatibility reader already preserves the canonical saved EXP and Current
+  // Stats. Re-evaluating the curve is deterministic: only an actually satisfied
+  // threshold mutates state. No transient "migration complete" flag is required
+  // (the legacy progression normalizer would otherwise strip it on every load).
   let changed=restoreCanonicalStats448();
   for(const character of runtimeTeam()){
     if(!character||!character.id)continue;
     for(const id of DISCIPLINES){
       const row=progression(character.id,id);if(!row)continue;
-      if(row.curveMigrationResolved===CURVE_ID)continue;
       const resolved=resolveBreakthroughs(character.id,id,{transactionId:"migration::"+CURVE_ID+"::"+character.id+"::"+id,sourceDevelopmentReceiptRefs:[]});
-      row.curveMigrationResolved=CURVE_ID;changed=true;
       if(resolved.statPointsGained>0)changed=true;
     }
   }
