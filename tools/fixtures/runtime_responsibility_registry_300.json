@@ -1384,10 +1384,7 @@
         "processDisciplineLevelUps",
         "getDisciplineDevelopmentSnapshot442"
       ],
-      "permittedAdapters": [
-        "academy_origin_reward_spectrum_440",
-        "academy_wasabi_river_endurance_40900"
-      ],
+      "permittedAdapters": [],
       "retiredOwners": [],
       "saveSchemaRefs": [
         "playerData.acquisition.ownedCharactersByVariantId[*].disciplineProgression"
@@ -1537,8 +1534,8 @@
       "adapterId": "discipline_development_ledger_442",
       "reason": "Provide the missing production Discipline Development ledger API used by already-authorised Origin development callers without inventing EXP-to-Stat/mastery conversion.",
       "owner": "runtime/alpha-discipline-development-ledger-442.js",
-      "sourceOwner": "Documentation/Progression/Action Derived Discipline and Fieldcraft Development Contract 2026-09-15.md",
-      "targetOwner": "playerData.acquisition.ownedCharactersByVariantId exact owned Character persistence",
+      "sourceOwner": "runtime/alpha-origin-reward-spectrum-440.js",
+      "targetOwner": "game.js",
       "exactBehaviorBridged": "Exact seven-discipline persistent EXP ledger lookup/creation and no-op conversion boundary for authorised callers; existing source owners still decide when/how much development is earned.",
       "retirementCondition": "Retire or delegate when canonical game.js/Progression runtime directly provides the same persistent Discipline Development APIs with equivalent save semantics.",
       "milestone": "shared Progression runtime consolidation",
