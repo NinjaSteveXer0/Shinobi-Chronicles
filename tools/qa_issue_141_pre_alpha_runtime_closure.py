@@ -23,7 +23,6 @@ EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-runtime-build-fingerprint-303.js",
     "game.js",
     "runtime/alpha-chronicle-state-manifest-43600.js",
-    "runtime/alpha-discipline-stat-growth-44800.js",
     "runtime/alpha-origin-starting-purse-409.js",
     "runtime/alpha-special-jonin-evidence-producer-34700.js",
     "runtime/alpha-menma-tutorial-111.js",
@@ -62,6 +61,7 @@ EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-pl-battle-tutorial-38500.js",
     "runtime/alpha-first-konoha-tutorial-35000.js",
     "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
+    "runtime/alpha-discipline-stat-growth-44800.js",
 ]
 
 PYTHON_GATES = [
