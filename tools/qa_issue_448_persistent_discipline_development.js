@@ -160,6 +160,12 @@ assert.strictEqual(character.stats.nin,15);
 assert.strictEqual(character.disciplineProgression.nin.exp,1,"legitimate overflow was clipped at activity ceiling");
 assert.strictEqual(ceiling.ceilingReached,true);
 assert(playerData.phase2ChronicleState.disciplineDevelopment.ceilingReceipts.some(row=>row.sourceDevelopmentReceiptId==="qa448-ceiling"));
+const ceilingReplay=ctx.commitFoundationDisciplineDevelopment44800({
+  serviceId:"exam",characterId:"academy_test",disciplineId:"nin",developmentExp:2,
+  receiptId:"qa448-ceiling",expectedTeamAssignmentId:"team-1"
+});
+assert.strictEqual(ceilingReplay.success,true,"ceiling-causing receipt did not replay idempotently");
+assert.strictEqual(ceilingReplay.idempotent,true,"ceiling-causing receipt replay was not a no-op");
 
 const blocked=ctx.commitFoundationDisciplineDevelopment44800({
   serviceId:"exam",characterId:"academy_test",disciplineId:"nin",developmentExp:1,
