@@ -289,6 +289,16 @@ The event becomes real production content if successful.
 
 ## 8. Promotion + Genin Roster End-to-End Golden
 
+**Phase-2 Promotion play-model direction:**
+`Documentation/Coordination/Academy_to_Genin_CE_World_Promotion_Assessment_Phase_2_Direction_2026-10-01.md`
+@ `6436135cabbe0a54e36ec8dfbe0ca9ffe510a0ac`
+
+**Global participant-first gate:**
+`Documentation/Coordination/Universal_Participant_First_Team_Intent_Preview_and_Chronicle_Choice_Gate_2026-10-01.md`
+@ `d4ec33e2920275ea80a59548abc980de6325129c`
+
+**Rank resolver dependency:** #445 — variable hidden Promotion requirement packages.
+
 **Current: AMBER**
 
 Substantial implementation already exists:
