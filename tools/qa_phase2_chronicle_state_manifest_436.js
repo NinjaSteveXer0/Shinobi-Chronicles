@@ -47,7 +47,7 @@ const teamSave={
   const c=boot(teamSave);
   const manifest=plain(c.getChronicleStateManifest43600());
   assert.strictEqual(manifest.manifestId,"sc.phase2.chronicle_state_manifest.v1");
-  assert.deepStrictEqual(manifest.domains.map(x=>x.stateDomainId),["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","shinobiRecordProjection"]);
+  assert.deepStrictEqual(manifest.domains.map(x=>x.stateDomainId),["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","disciplineDevelopment","shinobiRecordProjection"]);
   for(const row of manifest.domains){
     for(const key of ["stateDomainId","semanticOwner","canonicalWritePath","stableIdentityKey","savePath","schemaVersion","sourceOccurrenceIdFormat","idempotenceKeyFormat","derivedFields","projectionConsumers","migrationRule","resetRule","difficultyScope","inheritanceRule","devOverridePolicy","qaRefs"]){
       assert(Object.prototype.hasOwnProperty.call(row,key),"domain "+row.stateDomainId+" missing "+key);
@@ -67,7 +67,9 @@ const teamSave={
 
   assert.strictEqual(c.getChronicleTutorialProgress43600(),null,"read-only tutorial getter fabricated state");
   const root=c.ensurePhase2ChronicleState43600({save:true});
-  assert(root&&root.schemaVersion===1);
+  assert(root&&root.schemaVersion===2);
+  assert.strictEqual(root.disciplineDevelopment.curveId,"discipline_stat_curve_v1");
+  assert.strictEqual(root.disciplineDevelopment.profileId,"academy_foundation_discipline_activity_v1");
   assert.strictEqual(c.saveCount,1,"first scaffold write must save exactly once");
   const saved=JSON.stringify(c.playerData.phase2ChronicleState);
   c.ensurePhase2ChronicleState43600({save:true});
