@@ -272,10 +272,12 @@ function addDisciplineExp448(characterId,disciplineId,amount,source){
   });
   return !!result.success;
 }
-function processCompatibility(characterId,disciplineId){
+function processCompatibility(characterId,disciplineId,options={}){
   const subject=stableSubject(characterId),row=progression(characterId,disciplineId);if(!subject||!row)return null;
   const before=currentStat(characterId,disciplineId);
-  const resolved=resolveBreakthroughs(characterId,disciplineId,{transactionId:"compat::"+Date.now(),sourceDevelopmentReceiptRefs:[],progressionRow:row});
+  const refs=Array.isArray(options&&options.sourceDevelopmentReceiptRefs)?options.sourceDevelopmentReceiptRefs.filter(Boolean):[];
+  const transactionId=options&&options.transactionId?String(options.transactionId):"compat::"+Date.now();
+  const resolved=resolveBreakthroughs(characterId,disciplineId,{transactionId,sourceDevelopmentReceiptRefs:refs,progressionRow:row});
   if(resolved.statPointsGained>0&&typeof globalThis.savePlayerData==="function")globalThis.savePlayerData();
   return{levelsGained:resolved.statPointsGained,level:row.level||1,exp:row.exp,expToNext:thresholdForStat(currentStat(characterId,disciplineId)),statPointsGained:resolved.statPointsGained,stat:currentStat(characterId,disciplineId),previousStat:before};
 }
