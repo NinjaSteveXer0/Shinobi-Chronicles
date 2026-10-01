@@ -45,6 +45,15 @@ function boot(seed={}){
   };
   seeded.activityHistory=Array.isArray(seeded.activityHistory)?seeded.activityHistory:[];
   seeded.characters=seeded.characters&&typeof seeded.characters==="object"?seeded.characters:{};
+  // game.js restores canonical Discipline ledgers before #448 loads, while its
+  // legacy Stats rebuild is intentionally simulated by keeping runtime stats at
+  // runtimeStat until the #448 activation receipt rehydrates saved Current Stats.
+  if(seed.playerData){
+    for(const character of characters){
+      const saved=seeded.characters[character.id];
+      if(saved&&saved.disciplineProgression)character.disciplineProgression=plain(saved.disciplineProgression);
+    }
+  }
   const ctx={
     console:{log(){},warn(){},error(){},info(){},table(){}},
     Math,Object,Array,Number,String,Boolean,Set,Map,Date,JSON,
@@ -244,7 +253,7 @@ assert(GAME.includes("if (\n      !result ||\n      result.completed !==\n      
   const ch=first.byId.academy_menma;
   ch.stats.fuin=10;ch.disciplineProgression.fuin.exp=9;
   const tx=first.ctx.commitDisciplineDevelopment44800({
-    characterId:ch.id,disciplineId:"fuin",requestedExp:1,grantedExp:1,
+    characterId:ch.id,disciplineId:"fuin",requestedExp:2,grantedExp:2,
     source:"origin_development",sourceOccurrenceId:"qa448_reload",progressionSlotId:"reload"
   });
   assert.strictEqual(tx.success,true);
@@ -255,7 +264,7 @@ assert(GAME.includes("if (\n      !result ||\n      result.completed !==\n      
   const second=boot({playerData:saved,runtimeStat:10});
   const restored=second.byId.academy_menma;
   assert.strictEqual(restored.stats.fuin,11,"reload reverted canonical Current Stat to legacy Base/level reconstruction");
-  assert.strictEqual(restored.disciplineProgression.fuin.exp,0,"reload lost canonical Discipline EXP remainder");
+  assert.strictEqual(restored.disciplineProgression.fuin.exp,1,"reload lost canonical Discipline EXP remainder");
   assert.strictEqual(Math.round(second.ctx.calculateCurrentRawPL(restored)),Math.round(rawPL(restored.stats)),"reload PL drifted from canonical Stats");
   const receiptCountAfter=second.ctx.activityHistory.filter(row=>row&&row.type==="discipline_stat_breakthrough"&&row.disciplineId==="fuin").length;
   assert.strictEqual(receiptCountAfter,receiptCount,"reload duplicated breakthrough receipt");
