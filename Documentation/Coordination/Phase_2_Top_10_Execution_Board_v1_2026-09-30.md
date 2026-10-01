@@ -297,7 +297,13 @@ The event becomes real production content if successful.
 `Documentation/Coordination/Universal_Participant_First_Team_Intent_Preview_and_Chronicle_Choice_Gate_2026-10-01.md`
 @ `d4ec33e2920275ea80a59548abc980de6325129c`
 
-**Rank resolver dependency:** #445 — variable hidden Promotion requirement packages.
+**Persistent participant Chronicles / off-screen autonomy / Chronicle Pulse:**
+`Documentation/Coordination/Persistent_Participant_Chronicles_Offscreen_Autonomy_and_Chronicle_Pulse_2026-10-01.md`
+@ `54fd5e942c7b7b547b5f6b4c2fdd3bb31ac02b32`
+
+**Rank resolver:** #445 CLOSED — Option A variable Academy package model.
+
+**Rank persistence amendment:** #447 SEND NOW — seed package from immutable New Game/Chronicle state and hard-lock for playthrough.
 
 **Current: AMBER**
 
