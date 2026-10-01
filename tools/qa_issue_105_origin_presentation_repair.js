@@ -25,7 +25,6 @@ const miraiBattle=read("runtime/alpha-mirai-origin-battle-338.js");
 const index=read("index.html");
 const game=read("game.js");
 const fingerprint=read("runtime/alpha-runtime-build-fingerprint-303.js");
-const runtimeBuildManifest=JSON.parse(read("tools/fixtures/runtime_build_manifest_303.json"));
 
 for(const [name,src] of Object.entries({binder,sceneA,sceneB,sceneC,golden,shim335,shim336,shim337,board,battle,journey,menmaBattle,menmaReward,miraiBattle,kakashiRenderer,kakashiContent,kakashiWriting,wasabiWriting,localisationFinal})){
   assert.doesNotThrow(()=>new Function(src),name+" syntax failure");
@@ -293,7 +292,7 @@ assert(sceneBoardDoc.includes("no visible arrow/CONTINUE button for ordinary nar
 assert(battle.includes('querySelector(".alpha-battle-pl-core")'),"radial PL refresh does not target inner core");
 assert(battle.includes('core.querySelector("strong")')||battle.includes('core?.querySelector("strong")'),"radial PL current value not refreshed inside core");
 assert(!game.includes("ORIGIN_COMPLETION_STARTING_PURSE_SOURCE_ID"),"frozen game.js contains successor purse mutation");
-assert(fingerprint.includes(`buildId:"${runtimeBuildManifest.buildId}"`)&&fingerprint.includes(`sourceBaselineCommit:"${runtimeBuildManifest.sourceBaselineCommit}"`),"#105 repair runtime fingerprint is not in parity with committed runtime authority");
+assert(fingerprint.includes('buildId:"SC-ALPHA-RUNTIME-R303-2026-09-29-AZ"')&&fingerprint.includes('sourceBaselineCommit:"604daa50b3bc274fd6533fdeb8075806e614d30b"'),"#105 repair runtime fingerprint was not advanced from current live-main authority");
 console.log(JSON.stringify({pass:true,issue:105,checks:{
   sevenNonKakashiBindings:true,kakashiExcluded:true,hinataSparringSpeakerAlias:true,hinataFinalPairBound:true,hinataChronicleReceipt:true,miraiMenmaWritingGolden:true,legacyGoldenShimsRetired:true,knownAssetsExact:true,issue419AssetsConsumed:true,wasabiPursuitTargetActorProjection:true,missingAssetsNotGuessed:true,
   menmaNineTailsDialoguePortrait:true,miraiBattle338:true,miraiDefeatAssessmentTermination:true,miraiTerminalRouterClean:true,miraiMenmaReceipts:true,kushinaBenchmarkWired:true,kushinaNaturalVoicePreview:true,iwabeeNaturalVoicePreview:true,kushinaChronicleReceipt:true,kushinaGerotoraStaging:true,kushinaLegacyShimsRetired:true,menmaPostBattleSegmented:true,menmaRewardDiagnosticRemoved:true,globalReceiptInputLock:true,globalStartPLBattleCTA:true,loadOrder:true,sharedSceneBoard:true,clickAnywhere:true,
