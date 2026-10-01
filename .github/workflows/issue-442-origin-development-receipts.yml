@@ -62,8 +62,8 @@ jobs:
       - name: Wasabi benchmark Receipt regression
         run: xvfb-run -a node tools/qa_issue_343_wasabi_browser.js
 
-      - name: Kakashi Receipt regression
-        run: xvfb-run -a node tools/qa_kakashi_v2_browser.js
+      - name: Kakashi frozen reward and Receipt contract
+        run: node tools/qa_kakashi_v2_clean_room.js
 
       - name: Metal Iwabee Battle reward regression
         run: xvfb-run -a node tools/qa_issues_396_399_400_browser.js
