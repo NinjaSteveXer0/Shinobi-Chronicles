@@ -6,6 +6,16 @@
 **Research basis:** AIIDE 2011 Intelligent Narrative Technologies workshop, Vol. 7 No. 2 / AAAI Technical Report WS-11-18  
 **Primary priority:** **FINISH SHINOBI CHRONICLES ALPHA**
 
+> **2026-09-30 common-sense causality successor**
+>
+> Consume:
+> `Documentation/Coordination/Story_Common_Sense_Causality_Rational_Actor_and_Hotspot_Conversation_Gate_2026-09-30.md`
+> @ `9f8edc1659a9aa3d48e793a35133d185526e9440`.
+>
+> For CE-generated hotspot conversations and adaptive Story continuation, the mandatory causal chain is:
+> `trigger -> perception -> safe inference -> intention -> action -> consequence -> changed next situation`.
+> Knowledge limits may withhold hidden answers but may not erase directly observed contradictions.
+
 ## 1. Purpose
 
 This document turns useful external interactive-narrative research into explicit Chronicle Engine doctrine without importing a drama-manager architecture or widening Alpha scope.

@@ -9,8 +9,18 @@
 
 **Date:** 2026-09-27  
 **Owner:** Writing / Story — Konoha  
-**Status:** **WRITING GOLDEN — STEPHEN APPROVED 2026-09-27**  
+**Status:** **OWNER BROWSER RED 2026-09-30 — WRITING REPAIR COMPLETE / CODING + OWNER RETEST REQUIRED / NOT FROZEN**  
 **Origin:** `academy_metal_lee`
+
+> **CURRENT PLAYER-FACING SUCCESSOR:** `Documentation/Story/Academy_Metal_Lee_Origin_Final_Browser_Repair_Rewrite_2026-09-30.md` @ `4445ba9c9938475db28f49a8a5f3862ff7edf679`.
+>
+> Current Coding must consume this successor rather than the older Metal dialogue still visible on PR #417. Preserve this file only for MET/Battle/resolver semantics where not superseded.
+
+> **2026-09-29 successor:** `Documentation/Story/Academy_Metal_Lee_Origin_Natural_Voice_Benchmark_Rewrite_2026-09-29.md` @ `30ab5a017db91cef0d23f144c48070ac5dd11e6e`.
+>
+> New binding voice anchor: `Documentation/Story/Academy_Metal_Lee_Character_Voice_and_Personality_Anchor_2026-09-29.md` @ `edfda2a0078e448cad60c8a3e0b025073b56f74f`.
+>
+> Owner review found the 2026-09-27 expression below the current dialogue/storytelling benchmark. Preserve this file for MET/Battle/resolver semantics only where not superseded; do not use its player-facing prose as final authority.
 
 ## Successor purpose
 

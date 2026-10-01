@@ -2,8 +2,21 @@
 
 **Date:** 2026-09-24  
 **Owner:** Stephen / Writing — Konoha  
-**Status:** **WRITING GOLDEN — PLAYER-FACING STORY APPROVED / STORY COMPLETE**  
+**Status:** **SUPERSEDED FOR CURRENT PLAYER-FACING EXPRESSION — OWNER REOPENED 2026-09-29**  
 **Production Origin:** `academy_izuno`
+
+> **2026-09-29 supersession notice:** Stephen reopened Academy Wasabi Izuno after installed-browser review. This file remains historical authority for the prior approved expression, but it is no longer the current final player-facing Writing target.
+>
+> Binding River outcome correction:
+> `Documentation/Story/Academy_Wasabi_Izuno_River_Route_Owner_Correction_2026-09-29.md`
+>
+> Current full benchmark rewrite candidate:
+> `Documentation/Story/Academy_Wasabi_Izuno_Origin_Benchmark_Rewrite_Candidate_2026-09-29.md`
+>
+> Current Wasabi voice/personality authority:
+> `Documentation/Story/Academy_Wasabi_Izuno_Character_Voice_and_Personality_Anchor_2026-09-29.md`
+>
+> The wider revised prose is pending Stephen review/sign-off. Coding must not treat this 2026-09-24 prose as the final current Writing target merely because it was previously GOLDEN.
 
 > **Status boundary:** Writing GOLDEN means the player-facing Story / narration / dialogue is Stephen-approved. It does not mean runtime implemented, installed-browser validated, or Browser Golden.
 

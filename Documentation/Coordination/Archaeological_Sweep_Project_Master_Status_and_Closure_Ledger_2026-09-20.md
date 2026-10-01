@@ -381,6 +381,144 @@ Canonical rule:
 
 ---
 
+## 14. 29 September 2026 project-wide archaeological sweep checkpoint
+
+CE / Codex / Coordination consumed Stephen's 29 September 2026 full Archaeological Sweep and reconciled it against current live GitHub rather than accepting its fast-moving implementation statuses as timeless truth.
+
+### 14.1 Archaeology verdict survives
+
+The September 29 sweep independently reconfirms the standing master ruling:
+
+> **SUBSTANTIALLY RECOVERED / NOT FULLY CLOSED**
+
+No new hidden Chronicle Engine / Shinobi Chronicles architecture body was identified.
+
+The only substantial genuine archaeology recovery lane remains:
+
+- **World / Missions / Events / Rewards historical detailed quest-seed rows 001–500**
+- live tracker: **#223**
+- current classification: **KNOWN LOST / UNVERIFIED DETAIL pending exact recovery or formal exhaustion**
+
+No replacement rows may be regenerated and labelled as historical recovery.
+
+### 14.2 What the 29 September sweep does NOT reopen
+
+The sweep classifies nearly all other old chat/workspace lineages as one of:
+
+- archive-safe provenance;
+- succession genealogy;
+- current live production work;
+- owner/browser acceptance;
+- newer design evolution;
+- current asset/compliance work.
+
+Therefore old Coding generations, old Origin prose, historical Registry counts, retired Battle assumptions, old visual dimensions and superseded issue-body claims must not be resurrected over current authority.
+
+Canonical order remains:
+
+`live GitHub/source -> latest durable authority -> latest owner/specialist decisions -> archaeology/memory`.
+
+### 14.3 Fast-moving production status is checkpoint-only
+
+The September 29 sweep recorded a contemporary PR #417 / #105 checkpoint, but that is not permanent archaeology truth.
+
+At CE reconciliation time after receipt of the sweep:
+
+- live `main` = `1145033cf1050b4d2eed1c215bcf42b4de31b710`;
+- PR #417 remains **OPEN / DRAFT / NOT MERGED / mergeable**;
+- current PR #417 head has already advanced beyond the audit's recorded `1d17354896d2fbc6e666286df07381325a73547f` to `80fa9caaf4e6d23dbceb90ded1eb60a1993ccaac`;
+- PR #417 now contains more commits/files than the audit snapshot.
+
+Therefore exact PR heads, workflow counts, changed-file counts and implementation checkpoints in archaeological reports are **dated production snapshots only**.
+
+They may be useful provenance, but live GitHub must always be re-read before acting.
+
+### 14.4 Current Origin freeze / acceptance partition reinforced
+
+The sweep correctly distinguishes owner-installed-browser authority from automation-only GREEN.
+
+Current durable owner-level protections reinforced by the audit:
+
+- **Kakashi — GOLDEN / FROZEN**;
+- **Hinata — GOLDEN / FROZEN**;
+- **Menma — GOLDEN / FROZEN** as of owner installed-browser approval on 2026-09-29.
+
+Frozen means Origin-local Story/presentation must not be reopened absent a reproduced owner-visible regression. Explicitly authorised shared/global Battle/UI changes may still flow through without reopening frozen Origin content.
+
+The remaining Origins must not be silently upgraded from Writing/source/CI status into Browser Golden.
+
+At this checkpoint:
+
+- Wasabi/Izuno has newer route-aware v2 Story implementation authority and remains owner-browser gated;
+- Mirai remains NOT GOLDEN, with defeat-continuation authority now durable and browser proof still required;
+- Kushina has a newer complete benchmark rewrite authorised for preview, not Golden;
+- Obito has a newer complete benchmark rewrite authorised for preview, not Golden;
+- Kurenai, Iwabee and Metal retain their current Writing/runtime authorities, but this archaeological sweep does not itself establish a new Browser-Golden freeze.
+
+### 14.5 Battle hover defect partition — do not collapse
+
+The sweep usefully separates two distinct Battle UI issues:
+
+1. **selected/repeat Skill suppresses hover preview**
+   - repaired on PR #417;
+   - shared QA authority was corrected to permit temporary hover preview while restoring canonical selected-Skill state afterward;
+   - owner installed-browser retest remains the acceptance gate.
+
+2. **long Skill description exists but inaccessible text is hidden by unclear/invisible scrolling**
+   - separate issue **#421**;
+   - remains **OPEN / QUEUED pre-Alpha polish**;
+   - presentation-only;
+   - fixing hover selection behavior does not close #421.
+
+These two defects must remain separately tracked.
+
+### 14.6 Visual asset archaeology vs current production intake
+
+The archaeological sweep correctly identifies the permanent new CC/V intake lane:
+
+`visuals/asset-vault`
+
+For new approved Character Cards, NPC Cards and Battle Portraits:
+
+`CREATE -> STEPHEN APPROVAL -> ASSET VAULT -> IMPLEMENTATION ISSUE -> CODING CONSUMES EXACT ASSET ONLY`.
+
+This supersedes older hand-carried/manual-main visual intake habits for new approved visual assets.
+
+Historical assets already durably committed before the workflow remain valid unless separately superseded/rejected.
+
+Current Character Creation / Visuals compliance work such as #233 is **live production/audit work, not archaeological recovery**.
+
+### 14.7 Live-production dangers reinforced by archaeology
+
+The September 29 audit highlights the actual present risks:
+
+- stale issue bodies being treated as current authority;
+- CI/automation GREEN being promoted to Browser Golden;
+- old Origin prose leaking back into repaired runtime;
+- broad integration work touching frozen Origins;
+- current asset gaps being mistaken for lost archaeology;
+- retired Battle/Registry semantics resurfacing from old recovery material.
+
+These are production-governance risks, not evidence of a new archaeological hole.
+
+### 14.8 Routing result
+
+No new cross-workspace handoff is created from this sweep.
+
+Reason:
+
+- the only substantial archaeology gap already has the correct live queue: **#223**;
+- PR #417 / #105 and current Origin preview/browser work are already active production lanes;
+- #421 already separately tracks long-description accessibility;
+- #233 already tracks current Character Card/Battle Portrait compliance;
+- #235 already tracks current Summons/Tailed-Beast calibration.
+
+Therefore the sweep is consumed as:
+
+**REINFORCEMENT / CURRENT-STATUS RECONCILIATION — NO NEW ACTIONABLE HANDOFF.**
+
+---
+
 # Final project archaeology ruling
 
 > **There is no evidence of another large hidden architecture tranche. The project is archaeologically stable enough to finish Alpha from current GitHub authority. The two previously protected successor-receipt gaps are now resolved. The one substantial archaeology lane still open is World/Missions detailed 001–500 content. Until that content is recovered or formally exhausted as unrecoverable, the Archaeological Sweep project remains SUBSTANTIALLY RECOVERED / NOT FULLY CLOSED.**

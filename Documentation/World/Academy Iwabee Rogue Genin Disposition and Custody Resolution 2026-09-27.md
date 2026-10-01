@@ -297,13 +297,25 @@ Story must not infer:
 
 ## 10. Reward
 
-**Fixed Rogue-response material reward: NONE.**
+**Non-Battle Rogue-response material reward: NONE.**
 
-No Ryō, Item, Weapon, loot, generic Character EXP or consolation payout is authored by this occurrence.
+The later Stephen-approved global Battle-money rule supersedes the old implication that the embedded direct PL Battle itself can pay nothing.
 
-This is not a punishment. The meaningful route outputs are:
+For new executions:
 
-- IWA-01 practical completion;
+- non-Battle Rogue-response choices do not mint route cash;
+- a legitimate victory in `academy_iwabee_origin_rogue_confrontation` pays **50 Ryō** from `iwabee_origin_rogue_genin_battle_victory_ryo_01`;
+- Battle defeat pays 0 Battle Ryō;
+- the universal sealed-Origin Starting Purse remains a separate **100 Ryō** source;
+- no Item, Weapon, loot or generic Character EXP is added by this disposition occurrence.
+
+Current successor reward-spectrum authority:
+
+`Documentation/World/Academy Origins Reward Spectrum Respec Wave 2 2026-10-01.md`
+
+This is not a punishment. The meaningful non-cash route outputs remain:
+
+- IWA-01 practical completion and Earth-Release development;
 - IWA-02 adaptive Earth-Release evidence when the escape constraint is used;
 - exact Rogue disposition/history;
 - instructor observer/history;

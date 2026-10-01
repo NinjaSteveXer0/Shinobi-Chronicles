@@ -237,7 +237,150 @@ Retirement proof is broad enough to prove the responsibility is safely migrated,
 
 ---
 
-## 12. Final lock
+## 12. Owner-Reported Surgical Patch Fast Lane
+
+When Stephen reports a **small, bounded set of exact defects** on an otherwise working player path and explicitly limits the requested scope — for example, “these are the only four changes” — Coding must enter **OWNER-REPORTED SURGICAL PATCH MODE**.
+
+This is a repair lane, not a subsystem reopening.
+
+### 12.1 Entry conditions
+
+Use Surgical Patch Mode when all of the following are true:
+
+- Stephen has identified a small concrete defect set;
+- the affected Story/runtime/presentation semantics are already closed;
+- the path is already substantially working or previously GREEN/GOLDEN outside the named defects;
+- the task does not require a new cross-owner design decision;
+- the requested changes can reasonably be treated as one bounded repair tranche.
+
+If targeted evidence later proves that one defect crosses an unknown ownership boundary, Coding may expand only along that proven dependency edge. It must not begin with broad archaeology.
+
+### 12.2 Named-defect scope lock
+
+The named defects are the work.
+
+If Stephen says:
+> **these are the only changes**
+
+Coding must not use that tranche to:
+- redesign neighbouring behavior;
+- polish unrelated presentation;
+- reopen closed Story, Combat, World, Registry, Reward or Progression semantics;
+- “clean up” adjacent code merely because it is visible;
+- rewrite already-GREEN Origin content;
+- turn optional polish into a blocker.
+
+Unrelated defects discovered during the tranche should be recorded separately unless they directly block one of the named repairs.
+
+### 12.3 One tranche -> one candidate -> one owner retest
+
+The default delivery shape is:
+
+`named defect set`
+-> `implement all bounded fixes`
+-> `focused validation`
+-> `one appropriate regression pass`
+-> `one coherent commit / candidate HEAD`
+-> `Stephen pulls once`
+-> `Stephen retests once`
+
+Do not require Stephen to pull and retest after each tiny fix unless installed-browser evidence from an earlier fix is genuinely required before the remaining repairs can be implemented safely.
+
+Canonical rule:
+
+> **Small owner-reported defect sets should normally produce one candidate and one owner retest, not a chain of micro-pulls.**
+
+### 12.4 Preserve the active implementation lane
+
+For a surgical tranche, Coding should continue from the current active branch / PR / canonical owner.
+
+Do not create a new clean-room branch, replacement runtime family, new PR, or architecture pass merely because a small defect was reported.
+
+A new lane is justified only when concrete evidence shows the current lane cannot safely own the repair.
+
+### 12.5 Targeted inspection only
+
+For each named defect:
+
+1. identify the exact current owner;
+2. inspect that owner and the exact affected block;
+3. inspect a direct caller/loader/binding only when needed to prove consumption;
+4. make the repair;
+5. stop expanding once the defect is causally explained and fixed.
+
+Broad repository archaeology remains LEVEL D and is prohibited by default in Surgical Patch Mode.
+
+The burden is on scope expansion:
+
+> **Coding starts surgical and expands only when it can point to concrete evidence that the defect crosses the current boundary.**
+
+### 12.6 Validation batching
+
+During implementation:
+- use the narrowest relevant test/check for each repair;
+- fix failures locally;
+- do not rerun expensive unrelated suites after every micro-change.
+
+After the complete surgical tranche is implemented:
+- run the one relevant broader regression / Golden-safety gate appropriate to the changed responsibility;
+- run additional broad gates only when the change is genuinely cross-cutting or the active milestone requires them.
+
+`#105`, `#141`, full Golden matrices and similar broad gates remain required at their proper acceptance milestone. They are not a reason to re-run the whole project between every text/UI correction.
+
+### 12.7 No unnecessary documentation ceremony
+
+When the change is implementation-only and existing design authority is already closed:
+
+- the source commit;
+- owning issue comment;
+- exact test/regression evidence
+
+are sufficient durable implementation evidence.
+
+Do not create a new large reconciliation/design document merely to record that the browser was made to match already-closed authority.
+
+Create or amend durable design authority only when semantics, ownership, reusable doctrine, or a real cross-system contract actually changes.
+
+### 12.8 Golden/frozen protection
+
+A frozen or Golden surface remains frozen.
+
+If the active repair targets Menma, Wasabi, Mirai, etc., Coding must not alter Hinata/Kakashi/another frozen Origin's authored content merely because shared code is nearby.
+
+Shared runtime may change only when necessary for the named repairs, and the relevant frozen regression must remain GREEN.
+
+### 12.9 Compact completion report
+
+When the tranche is ready for Stephen, the preferred report is compact:
+
+> **Fixed X/X named defects — files changed: [exact files] — commit/candidate: [SHA] — focused QA GREEN — required regression GREEN — pull [SHA] and retest [exact path].**
+
+Do not replace that with a long archaeology report unless an actual unexpected ownership problem materially changed the task.
+
+### 12.10 Example
+
+Stephen reports on Menma:
+
+- wrong Nine-Tails representation;
+- actor dialogue being projected through narration;
+- missing Chronicle Receipt;
+- one unnecessary victory-screen sentence;
+- **these are the only four changes.**
+
+Expected Coding behavior:
+
+`4 defects in`
+-> `repair the 4 exact owners/bindings`
+-> `focused QA`
+-> `one relevant regression pass`
+-> `one candidate SHA`
+-> `Stephen tests once`.
+
+Do not reopen Menma Story architecture, Battle design, reward semantics, other Origins, or unrelated shared presentation unless the targeted repair produces concrete evidence that one of those owners is actually causal.
+
+---
+
+## 13. Final lock
 
 > **Coding starts narrow. Read only the files that own or directly consume the requested behavior. Expand one dependency edge at a time and only on evidence. A known `style.css` task stays in `style.css` unless the browser or source proves a direct external dependency. A long Coding session means sustained execution on the active problem—not scanning the entire repository.**
 

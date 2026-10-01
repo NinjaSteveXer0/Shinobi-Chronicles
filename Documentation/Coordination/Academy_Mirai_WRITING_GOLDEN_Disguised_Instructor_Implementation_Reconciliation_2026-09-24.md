@@ -28,11 +28,13 @@ The optional Mirai PL Battle opponent is the **apparent Escort after the covered
 
 World Truth:
 
-> The Academy instructor switched places with the real Escort during the covered-market separation and is currently presenting as the Escort.
+> The **female Academy instructor** switched places with the real Escort during the covered-market separation and is currently presenting as the **male Traveller / Escort**.
 
 Preserve:
 
 - real Escort != Academy instructor;
+- Academy instructor underlying identity = **female**;
+- temporary apparent Traveller / Escort presentation = **male disguise presentation only**;
 - real Escort is safe after the switch;
 - apparent Escort after the switch = disguised Academy instructor;
 - a PL Battle against the apparent Escort is therefore a PL Battle against that instructor;
@@ -235,4 +237,4 @@ Before Browser Golden:
 
 ## 12. Final lock
 
-> **Academy Mirai's optional post-switch PL Battle is against the same Academy instructor who is currently disguised as the apparent Escort. Registry/PL must first establish the one stable combatant identity and calibration; Combat then defines the executable Battle package; Coding then replaces the superseded Mirai runtime with the exact WRITING GOLDEN content. Hidden World identity must remain distinct from Mirai Knowledge and player-facing presentation until the authored reveal.**
+> **Academy Mirai's optional post-switch PL Battle is against the same female Academy instructor who is currently disguised as the apparent male Escort. Registry/PL must preserve that one stable combatant identity and calibration; Combat defines the executable Battle package; Coding consumes the exact current WRITING GOLDEN content. Hidden World identity must remain distinct from Mirai Knowledge and player-facing presentation until the authored reveal.**

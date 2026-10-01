@@ -10,6 +10,10 @@
 **Sequence:** `origin_academy_obito_journey_to_training`  
 **Primary priority:** **FINISH SHINOBI CHRONICLES ALPHA**
 
+> **2026-09-29 successor:** `Documentation/Story/Academy_Obito_Origin_Complete_Benchmark_Rewrite_2026-09-29.md` @ `c584212e2ff824ddaa4676b4b6268c50d00f7b4e`.
+>
+> Owner audit found late-Origin meta/lesson-explanation prose that no longer passes the current #333 benchmark. Preserve this file for semantic/history archaeology; do not treat its player-facing expression as current final authority.
+
 ---
 
 ## 1. Final Writing decision

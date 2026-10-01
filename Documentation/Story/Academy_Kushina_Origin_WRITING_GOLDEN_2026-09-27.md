@@ -9,8 +9,12 @@
 
 **Date:** 2026-09-27  
 **Owner:** Writing / Story — Konoha  
-**Status:** **WRITING GOLDEN — STEPHEN APPROVED 2026-09-27**  
+**Status:** **OWNER REOPENED 2026-09-29 — SUPERSEDED FOR CURRENT PLAYER-FACING EXPRESSION**  
 **Origin:** `academy_kushina`
+
+> **2026-09-29 successor:** `Documentation/Story/Academy_Kushina_Origin_Complete_Benchmark_Rewrite_2026-09-29.md` @ `2f6de97178240e03e2a925570143c4ead25e0f89`.
+>
+> Owner review confirmed the compact 2026-09-27 expression omitted too much of the intended lived Story. The successor preserves all durable KUS semantics while rebuilding full setup, interaction, route-specific aftermath and closure. This file remains historical authority only where not superseded.
 
 ## Successor purpose
 

@@ -471,6 +471,16 @@ NPCs may talk to each other without routing every line through the protagonist.
 
 Silence can be meaningful.
 
+Do **not** write generic screenplay-pause filler such as:
+
+`A beat.`
+
+into player-facing Story.
+
+If silence matters, show the specific physical reaction, interruption, hesitation or change in attention that makes that silence belong to this character and this scene. If nothing meaningful happens in the pause, omit it.
+
+Do not replace `A beat.` with another repeated house tic such as `For a moment.`, `A pause.`, or `Silence.`.
+
 One person may dominate.
 
 Another may interrupt.
@@ -818,3 +828,101 @@ It requires Story to feel authored as **experience**, not as documentation.
 > **All Shinobi Chronicles player-facing Story—every Origin, Arc, Canon route, Alternate route, Mission, Event, debrief, ending, narration, dialogue and conversation, including future village content—must dramatize semantic truth rather than explain the underlying rules. Author notes and machine-facing constraints remain separate from player-facing prose. Characters must behave as people with distinct voices, relationships, wants and reactions; narration must show physical/emotional experience rather than system logic; dialogue must respond to the scene rather than execute a repeated conversational algorithm; and the player must be trusted to infer meaning that the Story has already made legible.**
 
 > **If the scene reads like a specification with character names attached, it is not player-facing Writing complete.**
+
+---
+
+## 28. Mandatory Writing startup preflight
+
+Before any current or future Writing workspace drafts, rewrites, expands, compresses or materially edits player-facing Shinobi Chronicles Story, it must complete a source-first **WRITING PREFLIGHT**.
+
+This preflight is mandatory whenever:
+- a new Writing chat/workspace begins substantial work;
+- the task switches to a different Origin / Arc / character family;
+- Stephen says Writing has drifted;
+- a candidate is reopened for voice/personality repair;
+- the chat is uncertain which Story/voice authority is current.
+
+Writing must not draft first and audit later.
+
+### 28.1 Required live authority fetch
+
+At minimum, Writing must fetch and read the current live versions of:
+
+1. this universal quality gate;
+2. `Documentation/Story/Writing_Anti_Flattening_Character_Voice_and_Conversation_Hard_Gate_2026-09-30.md`;
+3. `Documentation/Coordination/Story_Common_Sense_Causality_Rational_Actor_and_Hotspot_Conversation_Gate_2026-09-30.md`;
+4. the exact current Story authority for the active Origin/Arc/scene;
+5. the current character-specific voice/personality anchor(s) for every major named participant;
+6. any current scene-specific / benchmark / owner correction that directly governs the task.
+
+Do not rely on Project memory or an old summary when a live durable source exists.
+
+### 28.2 Required preflight receipt
+
+Before drafting, Writing must return a compact receipt containing:
+
+- **CURRENT STORY AUTHORITY:** exact path + current SHA;
+- **VOICE ANCHORS:** exact path(s) + current SHA(s);
+- **QUALITY GATES:** exact path(s) + current SHA(s);
+- **5 NON-NEGOTIABLE RULES FOR THIS TASK:** concrete rules derived from those sources;
+- **VOICE DIFFERENTIATORS:** one short line per major named participant stating what makes their speech/behaviour distinct in this scene;
+- **DRIFT RISKS:** the 2–4 most likely failure modes for this exact task;
+- **CAUSAL SPINE:**
+  - Trigger;
+  - Direct observers;
+  - Safe inference;
+  - Current participant wants;
+  - Premise invalidated? YES/NO + why;
+  - Why this action/conversation happens now;
+  - What changes afterward;
+- final lines:
+  - **CAUSAL PREFLIGHT: GREEN**
+  - **WRITING PREFLIGHT: GREEN**.
+
+If a required source cannot be found or conflicts with another current source, Writing must stop and resolve that before drafting.
+
+### 28.3 No performative acknowledgements
+
+The following do NOT count as preflight:
+
+- “I’ve read the rules.”
+- “I’ll follow #333.”
+- “Understood.”
+- generic paraphrase of Project instructions;
+- quoting only issue titles;
+- relying only on memory;
+- listing rules without exact live paths/SHAs.
+
+The receipt exists to prove actual live-source consumption.
+
+A preflight may not be GREEN when its causal spine contains an unexplained jump.
+
+If Writing cannot answer why a participant acts now, why the prior activity continues after a disruptive event, or what directly observed fact justified a reaction, it must stop before drafting.
+
+### 28.4 Stephen gating phrase
+
+Stephen may enforce this at any time with:
+
+> **WRITING PREFLIGHT FIRST. DO NOT DRAFT.**
+
+On receiving that instruction, Writing must return only the preflight receipt and must not author player-facing Story until Stephen continues the task.
+
+### 28.5 Preflight is not bureaucracy
+
+The receipt should be short.
+
+It is not permission for:
+- another archaeology sweep;
+- canon over-research;
+- long design analysis;
+- restating every Writing rule.
+
+The purpose is to force the active workspace to load the right rules and voices before prose generation.
+
+Canonical rule:
+
+> **No live authority receipt -> no draft.**
+
+And:
+
+> **If Writing cannot prove what rules and voices it is using, it is not ready to write.**

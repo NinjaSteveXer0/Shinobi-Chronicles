@@ -9,8 +9,22 @@
 
 **Date:** 2026-09-27  
 **Owner:** Writing / Story — Konoha  
-**Status:** **WRITING GOLDEN — STEPHEN APPROVED 2026-09-27**  
+**Status:** **OWNER BROWSER AMBER — WRITING REPAIR COMPLETE / CODING IMPLEMENTATION + OWNER RETEST REQUIRED / NOT FROZEN**  
 **Origin:** `academy_kurenai`
+
+> **CURRENT PLAYER-FACING SUCCESSOR:** `Documentation/Story/Academy_Kurenai_Origin_Final_Staged_Bell_Test_Rewrite_2026-09-30.md` @ `b98c00693c88a7ba6050b20d39d8f1bc760ed158`.
+>
+> This successor restores three meaningful Bell-Test choice stages, keeps the female instructor, preserves the four outcome classes, and restores Receipt -> CONTINUE -> YOUR CHRONICLE BEGINS ordering. Do not use this older one-choice player-facing structure.
+
+> **2026-09-30 structural restoration authority:** `Documentation/Story/Academy_Kurenai_Origin_Staged_Choice_and_Receipt_Restoration_2026-09-30.md` @ `e7ce02375db5288c50bec9e457cdaa7cc96e6075`.
+>
+> The 2026-09-27 rewrite collapsed the durable staged deception architecture into one opening choice and is no longer current structural authority. The Bell Test must again use staged deception decisions; the Chronicle Receipt must precede `YOUR CHRONICLE BEGINS`.
+
+> **2026-09-29 expansion successor:** `Documentation/Story/Academy_Kurenai_Origin_Benchmark_Expansion_2026-09-29.md` @ `5748e7df05bd0044b74fb054fdb4472b6ff77919`.
+>
+> **Voice anchor:** `Documentation/Story/Academy_Kurenai_Character_Voice_and_Personality_Anchor_2026-09-29.md` @ `7669d8fd4406cb79347e4be26723c15e9159d7a0`.
+>
+> Stephen explicitly chose to preserve the developed Bell Test/evaluation and expand the Origin around it. The Bell Test remains current core authority; the old immediate post-evaluation transition is superseded by the expansion.
 
 ## Environment
 
