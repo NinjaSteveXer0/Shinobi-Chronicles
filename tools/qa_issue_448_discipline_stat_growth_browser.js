@@ -112,7 +112,25 @@ async function inspectMyClan(page,characterId){
     assert(!/\/\s*50\b/.test(exam.text),"fixed 50 denominator fossil still visible");
     await page.screenshot({path:path.join(OUT,"01-exam-dynamic-development.png"),fullPage:true});
 
-    // Real existing Exam batch path, deterministic QA RNG: five effective passes x +2 => Stat 10 -> 11.
+    // A committed material failure still develops +1 under the shared action-derived law.
+    const materialFailure=await page.evaluate(()=>{
+      const old=Math.random;Math.random=()=>0;
+      try{
+        const c=getPlayerCharacter("academy_menma");
+        const before=getDisciplineDevelopmentSnapshot448(c.id,"nin","exam");
+        const result=executeKonohaExamAttempt(c.id,"nin");
+        const after=getDisciplineDevelopmentSnapshot448(c.id,"nin","exam");
+        return{before,result:JSON.parse(JSON.stringify(result)),after};
+      }finally{Math.random=old;}
+    });
+    assert.strictEqual(materialFailure.result.completed,true,"material Exam failure did not commit as an attempt");
+    assert.strictEqual(materialFailure.result.success,false,"deterministic material-failure path unexpectedly passed");
+    assert.strictEqual(materialFailure.result.developmentExp,1,"material Exam failure did not award +1 Development");
+    assert.strictEqual(materialFailure.result.rewardExp,1,"material Exam failure result did not project +1 Development");
+    assert.strictEqual(materialFailure.after.currentStat,10);
+    assert.strictEqual(materialFailure.after.developmentExp,1);
+
+    // Real existing Exam batch path: five effective passes x +2 crosses Stat 10 -> 11 and preserves overflow.
     const batch=await page.evaluate(()=>{
       const old=Math.random;Math.random=()=>0.999999;
       try{
@@ -126,8 +144,9 @@ async function inspectMyClan(page,characterId){
     assert.strictEqual(batch.results.length,5);
     assert(batch.results.every(row=>row&&row.success===true&&row.completed===true),"deterministic Exam QA path did not produce five effective executions");
     assert.strictEqual(batch.before.snapshot.currentStat,10);
+    assert.strictEqual(batch.before.snapshot.developmentExp,1,"material-failure Development did not feed the shared ledger");
     assert.strictEqual(batch.after.snapshot.currentStat,11);
-    assert.strictEqual(batch.after.snapshot.developmentExp,0);
+    assert.strictEqual(batch.after.snapshot.developmentExp,1);
     assert.strictEqual(batch.after.snapshot.developmentRequired,15);
     assert(batch.results.every(row=>Number(row.rewardExp)===2),"Foundation action did not use +2 effective-execution development");
     const teamNoPassive=await page.evaluate(()=>({
@@ -173,7 +192,7 @@ async function inspectMyClan(page,characterId){
       };
     });
     assert.strictEqual(afterReload.snapshot.currentStat,11);
-    assert.strictEqual(afterReload.snapshot.developmentExp,0);
+    assert.strictEqual(afterReload.snapshot.developmentExp,1);
     assert.strictEqual(afterReload.pl,beforeReload.pl);
     assert.strictEqual(afterReload.saved.stats.nin,11);
     assert.strictEqual(afterReload.developmentReceipts,beforeReload.developmentReceipts,"reload duplicated/lost development receipts");
@@ -242,6 +261,7 @@ async function inspectMyClan(page,characterId){
       realExamActionToStatBreakthrough:true,
       realPracticalActionToDevelopment:true,
       reloadReceiptIdempotence:true,
+      developmentPerMaterialFailure:1,
       developmentPerEffectiveFoundationAction:2,
       dynamicThresholdUI:true,numericMasteryRetired:true,
       myClanCanonicalProjection:true,saveReload:true,
