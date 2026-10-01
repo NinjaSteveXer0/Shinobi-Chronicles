@@ -156,3 +156,45 @@ Before broad authoring prove one real Academy -> Genin assessment with real play
 ## Final direction
 
 > Academy -> Genin Promotion becomes the player's first formal CE-driven World assessment: a real multi-scene mission in the world, played with the real Chronicle team. Team-mates decide for themselves before important protagonist choices, CE realises the scenario from current history, Rank evaluates hidden institutional evidence, unsuccessful attempts remain meaningful history, and every earned reward/consequence is projected truthfully in the Promotion Chronicle Receipt.
+
+## 22. Owner clarification — New Game seeded, playthrough-locked requirement truth
+
+Stephen strengthens the requirement-package persistence rule:
+
+> **Undiscovered Promotion requirements do not reroll. The underlying package is fixed by the new Chronicle/playthrough and remains locked for that playthrough. Discovery changes presentation only.**
+
+Preferred runtime semantics:
+
+`immutableChronicleSeed + stableCharacterId + rankTransitionId -> deterministic package candidate -> commit once -> immutable for playthrough`
+
+This allows the package to be effectively determined at New Game without requiring every possible Character/Rank package to be physically materialised into the save immediately.
+
+For a Character acquired later, the same immutable Chronicle seed must still deterministically produce the package that belongs to that Character in this playthrough.
+
+Forbidden reroll triggers:
+- retry;
+- alternate assessment;
+- changing current team;
+- leaving/re-entering Arena;
+- save/load;
+- browser refresh;
+- UI reopen;
+- failure/withdrawal;
+- discovery of a requirement;
+- satisfying a requirement;
+- Rank screen inspection.
+
+A different package requires a genuinely new Chronicle/New Game or another explicit post-completion restart mode authorised by Chronicle-start authority.
+
+Requirement reveal state is separate:
+
+`hidden unsatisfied`
+`hidden satisfied`
+`revealed unsatisfied`
+`revealed satisfied`
+
+Only the final two expose player-facing requirement text.
+
+Revealed+satisfied uses the approved light-green/checkmarked success treatment or final UI equivalent.
+
+This persistence timing is a new owner clarification after Rank #445 and requires Rank authority amendment before Coding consumes it.
