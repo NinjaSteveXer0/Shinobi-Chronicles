@@ -52,16 +52,42 @@ function validCommittedTeamReceipt(receipt){
   return !!(receipt&&receipt.commitId&&receipt.originVariantId&&ids.length===3&&new Set(ids).size===3&&ids[0]===receipt.originVariantId);
 }
 function getCurrentTeam(save=currentPlayerData()){
-  const formation=formationFrom(save),receipt=formationReceiptFrom(save);
-  if(!formation||formation.completed!==true||!validCommittedTeamReceipt(receipt))return null;
+  const a=acquisitionFrom(save),formation=formationFrom(save),receipt=formationReceiptFrom(save);
+  if(!a||!formation||formation.completed!==true||!receipt)return null;
+
+  if(validCommittedTeamReceipt(receipt)){
+    return Object.freeze({
+      schemaVersion:1,
+      assignmentId:String(receipt.commitId),
+      stage:"academy",
+      originVariantId:String(receipt.originVariantId),
+      teamVariantIds:Object.freeze([...receipt.teamVariantIds]),
+      sourcePath:"playerData.acquisition.academyTeamFormation.confirmationReceipt.teamVariantIds",
+      committed:true,
+      legacyProjection:false
+    });
+  }
+
+  // Representative pre-Phase-2 saves may carry the older committed Team
+  // Formation shape: protagonist identity + exactly two selected teammates +
+  // a confirmation receipt, without the later receipt.teamVariantIds payload.
+  // These are existing committed facts, so deriving the three-person Academy
+  // assignment is deterministic migration, not fabricated retroactive history.
+  const origin=a.chronicleOriginVariantId;
+  const selected=Array.isArray(formation.selectedTeammateIds)?formation.selectedTeammateIds.filter(Boolean):[];
+  const uniqueSelected=[...new Set(selected)];
+  if(!origin||!receipt.receiptId||uniqueSelected.length!==2||uniqueSelected.includes(origin))return null;
+  const ids=[origin,...uniqueSelected];
+  if(new Set(ids).size!==3)return null;
   return Object.freeze({
     schemaVersion:1,
-    assignmentId:String(receipt.commitId),
+    assignmentId:String(receipt.receiptId),
     stage:"academy",
-    originVariantId:String(receipt.originVariantId),
-    teamVariantIds:Object.freeze([...receipt.teamVariantIds]),
-    sourcePath:"playerData.acquisition.academyTeamFormation.confirmationReceipt",
-    committed:true
+    originVariantId:String(origin),
+    teamVariantIds:Object.freeze(ids),
+    sourcePath:"playerData.acquisition.chronicleOriginVariantId + academyTeamFormation.selectedTeammateIds + confirmationReceipt.receiptId",
+    committed:true,
+    legacyProjection:true
   });
 }
 function defaultTutorialProgress(teamRef=null){
@@ -160,14 +186,14 @@ const DOMAINS=Object.freeze([
     stateDomainId:"currentTeam",
     semanticOwner:"Acquisition / Team Formation",
     canonicalWritePath:"confirmAcademyTeamFormation",
-    stableIdentityKey:"academyTeamFormation.confirmationReceipt.commitId",
-    savePath:"playerData.acquisition.academyTeamFormation.confirmationReceipt.teamVariantIds",
+    stableIdentityKey:"academyTeamFormation.confirmationReceipt.commitId || confirmationReceipt.receiptId (legacy)",
+    savePath:"playerData.acquisition.academyTeamFormation (modern receipt teamVariantIds; deterministic legacy selectedTeammateIds projection)",
     schemaVersion:1,
-    sourceOccurrenceIdFormat:"academy_team_formation::<commitId>",
-    idempotenceKeyFormat:"academyTeamFormation.confirmationReceipt.commitId",
+    sourceOccurrenceIdFormat:"academy_team_formation::<commitId|legacyReceiptId>",
+    idempotenceKeyFormat:"academyTeamFormation.confirmationReceipt.commitId || receiptId",
     derivedFields:Object.freeze(["stage","originVariantId"]),
     projectionConsumers:Object.freeze(["Training","Practical","Exams","World","Battle deployment selection","Shinobi Record"]),
-    migrationRule:"derive_only_from_committed_team_formation_receipt",
+    migrationRule:"prefer modern committed receipt; otherwise derive only from completed formation + committed origin + exactly two selected teammates + legacy receiptId",
     resetRule:"only_explicit_new_chronicle_or_authorised_roster_transition",
     difficultyScope:"academy_active_genin_aware",
     inheritanceRule:"promotion_transition_must_explicitly_replace_assignment",
