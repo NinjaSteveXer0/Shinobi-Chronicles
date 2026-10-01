@@ -62,11 +62,17 @@ async function examSnapshot(page){
 }
 async function inspectMyClan(page,characterId){
   return page.evaluate(characterId=>{
-    openOverlay("clan");
-    selectMyClanCharacterForInspection(characterId);
-    setMyClanInspectionTab("stats");
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+    const roster=getClanManageableRosterCharacters().map(row=>row.id);
+    const opened=openOverlay("clan");
+    const selected=selectMyClanCharacterForInspection(characterId);
+    const tab=selected?.success===true?setMyClanInspectionTab("stats"):null;
     const panel=document.querySelector(".my-clan-inspection-panel");
-    return{html:panel?.innerHTML||"",text:panel?.innerText||"",characterStats:{...getPlayerCharacter(characterId).stats},pl:calculateCurrentPL(getPlayerCharacter(characterId))};
+    return{
+      opened:opened||null,selected,tab,roster,
+      html:panel?.innerHTML||"",text:panel?.innerText||"",
+      characterStats:{...getPlayerCharacter(characterId).stats},pl:calculateCurrentPL(getPlayerCharacter(characterId))
+    };
   },characterId);
 }
 
@@ -134,6 +140,9 @@ async function inspectMyClan(page,characterId){
 
     // My Clan reads the same Character Current Stats and formula PL — no local shadow cache.
     const clan=await inspectMyClan(page,"academy_menma");
+    assert.strictEqual(clan.selected?.success,true,"My Clan could not inspect persistent subject: "+JSON.stringify(clan));
+    assert(clan.roster.includes("academy_menma"),"My Clan manageable roster lost persistent subject: "+JSON.stringify(clan));
+    assert.strictEqual(clan.tab,"stats");
     assert.strictEqual(clan.characterStats.nin,11);
     assert(clan.text.includes("NINJUTSU"),"My Clan Stats tab missing Ninjutsu");
     assert(new RegExp("NINJUTSU\\s*11").test(clan.text.replace(/\s+/g," ")),"My Clan did not project Current Ninjutsu 11");
