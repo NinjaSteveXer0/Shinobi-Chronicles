@@ -62,16 +62,16 @@ jobs:
         run: node tools/qa_issue_105_origin_presentation_browser.js
 
       - name: Menma Battle reward regression
-        run: node tools/qa_issue_362_menma_reward_browser.js
+        run: xvfb-run -a node tools/qa_issue_362_menma_reward_browser.js
 
       - name: Wasabi benchmark Receipt regression
-        run: node tools/qa_issue_343_wasabi_browser.js
+        run: xvfb-run -a node tools/qa_issue_343_wasabi_browser.js
 
       - name: Kakashi Receipt regression
-        run: node tools/qa_kakashi_v2_browser.js
+        run: xvfb-run -a node tools/qa_kakashi_v2_browser.js
 
       - name: Metal Iwabee Battle reward regression
-        run: node tools/qa_issues_396_399_400_browser.js
+        run: xvfb-run -a node tools/qa_issues_396_399_400_browser.js
 
       - name: Upload browser evidence
         if: always()
