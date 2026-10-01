@@ -19,6 +19,8 @@ const FOUNDATION_ACTION_EXP=2; // effective execution under the existing +1/+2/+
 const DISCIPLINES=Object.freeze(["nin","tai","gen","buki","fuin","kin","stamina"]);
 const FOUNDATION_SOURCES=Object.freeze(new Set(["exam","practical"]));
 const lastResultBySubjectDiscipline=new Map();
+let foundationOccurrenceSequence=0;
+let activeFoundationOccurrence=null;
 
 const priorDeveloped=typeof globalThis.getDevelopedCharacterStats==="function"?globalThis.getDevelopedCharacterStats:null;
 const priorTrainingData=typeof globalThis.getTrainingActionData==="function"?globalThis.getTrainingActionData:null;
@@ -31,6 +33,10 @@ const priorExamData=typeof globalThis.getKonohaExamUIScreenData==="function"?glo
 const priorPracticalData=typeof globalThis.getKonohaPracticalUIScreenData==="function"?globalThis.getKonohaPracticalUIScreenData:null;
 const priorRows=typeof globalThis.renderAlphaActivityDisciplineRows==="function"?globalThis.renderAlphaActivityDisciplineRows:null;
 const priorPracticalNotifications=typeof globalThis.buildKonohaPracticalSpecialNotifications==="function"?globalThis.buildKonohaPracticalSpecialNotifications:null;
+const priorExamAttempt=typeof globalThis.executeKonohaExamAttempt==="function"?globalThis.executeKonohaExamAttempt:null;
+const priorPracticalAttempt=typeof globalThis.executeKonohaPracticalAttempt==="function"?globalThis.executeKonohaPracticalAttempt:null;
+const priorExamBatchNotification=typeof globalThis.buildKonohaExamBatchResultNotification==="function"?globalThis.buildKonohaExamBatchResultNotification:null;
+const priorPracticalBatchNotification=typeof globalThis.buildKonohaPracticalBatchResultNotification==="function"?globalThis.buildKonohaPracticalBatchResultNotification:null;
 const priorRestore=typeof globalThis.syncCharacterProgressionFromSave==="function"?globalThis.syncCharacterProgressionFromSave:null;
 
 function clone(value){try{return value&&typeof value==="object"?JSON.parse(JSON.stringify(value)):value;}catch(_error){return value;}}
@@ -109,6 +115,8 @@ function foundationSnapshot(characterId,disciplineId,source){
   if(!subject)return{allowed:false,reason:"persistent_subject_missing"};
   if(!DISCIPLINES.includes(disciplineId))return{allowed:false,reason:"invalid_discipline"};
   if(foundationSource(source)){
+    const discipline=typeof globalThis.getShinobiDiscipline==="function"?globalThis.getShinobiDiscipline(disciplineId):null;
+    if(!discipline||discipline.trainingSource!==source)return{allowed:false,reason:"discipline_not_registered_for_activity"};
     const team=currentTeam();
     if(!team)return{allowed:false,reason:"committed_current_team_unavailable"};
     if(!team.teamVariantIds.includes(subject.registryId))return{allowed:false,reason:"subject_not_in_committed_current_team"};
@@ -214,7 +222,7 @@ function commitDevelopment(characterId,disciplineId,requestedExp,metadata={}){
 
   const statBefore=exactStats(subject.character),progressionBefore=clone(row),historyLength=history().length;
   const pd=currentPlayerData();
-  const savedCharacterKey=subject.character.id;
+  const savedCharacterKey=subject.progressionCharacterId||subject.character.id;
   const savedCharacterBefore=pd&&pd.characters&&pd.characters[savedCharacterKey]?clone(pd.characters[savedCharacterKey]):null;
   const plBefore=currentPL(subject.character),expBefore=row.exp;
   try{
@@ -262,15 +270,90 @@ function commitDevelopment(characterId,disciplineId,requestedExp,metadata={}){
     return{success:false,committed:false,reason:"atomic_persistence_failed",error:String(error&&error.message||error)};
   }
 }
+function makeFoundationOccurrence(source,characterId,disciplineId,teamAssignmentId){
+  const subject=stableSubject(characterId);
+  return{
+    source,
+    characterId,
+    disciplineId,
+    teamAssignmentId:teamAssignmentId||null,
+    sourceOccurrenceId:[
+      "academy_foundation",
+      source,
+      safeId(subject&&subject.ownedCharacterId||characterId),
+      disciplineId,
+      Date.now(),
+      ++foundationOccurrenceSequence
+    ].join("::"),
+    lastTransaction:null
+  };
+}
 function addDisciplineExp448(characterId,disciplineId,amount,source){
   const requested=foundationSource(source)?FOUNDATION_ACTION_EXP:Math.max(0,Math.floor(Number(amount)||0));
   const preflight=foundationSnapshot(characterId,disciplineId,source);
   if(!preflight.allowed)return false;
+  const occurrence=activeFoundationOccurrence&&
+    activeFoundationOccurrence.source===source&&
+    activeFoundationOccurrence.characterId===characterId&&
+    activeFoundationOccurrence.disciplineId===disciplineId
+      ?activeFoundationOccurrence
+      :makeFoundationOccurrence(source,characterId,disciplineId,preflight.teamAssignmentId);
   const result=commitDevelopment(characterId,disciplineId,requested,{
     source,activityId:source,activityProfileId:preflight.activityProfileId,
-    teamAssignmentId:preflight.teamAssignmentId,developmentClass:"effective_execution"
+    teamAssignmentId:occurrence.teamAssignmentId,
+    sourceOccurrenceId:occurrence.sourceOccurrenceId,
+    causalRootId:occurrence.sourceOccurrenceId,
+    progressionSlotId:source+"_attempt",
+    developmentClass:"effective_execution"
   });
-  return !!result.success;
+  occurrence.lastTransaction=result&&result.success===true?clone(result):null;
+  return !!(result&&result.success===true);
+}
+function enrichFoundationAttemptResult(result,tx){
+  if(!result||!tx||tx.success!==true)return result;
+  result.developmentExp=Number(tx.grantedExp)||0;
+  result.rewardExp=Number(tx.grantedExp)||0;
+  result.expGained=Number(tx.grantedExp)||0;
+  result.previousStat=Number(tx.statBefore);
+  result.newStat=Number(tx.statAfter);
+  result.statPointsGained=Number(tx.statPointsGained)||0;
+  result.previousExp=Number(tx.expBefore);
+  result.currentExp=Number(tx.expAfter);
+  result.disciplineExpBefore=Number(tx.expBefore);
+  result.disciplineExpAfter=Number(tx.expAfter);
+  result.currentPLBefore=tx.currentPLBefore;
+  result.currentPLAfter=tx.currentPLAfter;
+  return result;
+}
+function executeFoundationAttempt448(source,prior,characterId,disciplineId){
+  const pre=foundationSnapshot(characterId,disciplineId,source);
+  if(!pre.allowed)return{success:false,completed:false,blocked:true,reason:pre.reason,phase2Preflight:clone(pre)};
+  if(typeof prior!=="function")return{success:false,completed:false,reason:source+"_attempt_owner_missing"};
+  const occurrence=makeFoundationOccurrence(source,characterId,disciplineId,pre.teamAssignmentId);
+  activeFoundationOccurrence=occurrence;
+  let result;
+  try{result=prior(characterId,disciplineId);}
+  finally{activeFoundationOccurrence=null;}
+  if(!result||result.completed!==true)return result;
+  let tx=occurrence.lastTransaction;
+  if(result.success!==true){
+    tx=commitDevelopment(characterId,disciplineId,1,{
+      source,activityId:source,activityProfileId:pre.activityProfileId,
+      teamAssignmentId:occurrence.teamAssignmentId,
+      sourceOccurrenceId:occurrence.sourceOccurrenceId,
+      causalRootId:occurrence.sourceOccurrenceId,
+      progressionSlotId:source+"_attempt",
+      developmentClass:"material_attempt"
+    });
+    if(!tx||tx.success!==true)return{...result,success:false,completed:false,reason:"material_failure_development_commit_failed",phase2Transaction:clone(tx)};
+  }
+  return enrichFoundationAttemptResult(result,tx);
+}
+function examAttempt448(characterId,disciplineId){
+  return executeFoundationAttempt448("exam",priorExamAttempt,characterId,disciplineId);
+}
+function practicalAttempt448(characterId,disciplineId){
+  return executeFoundationAttempt448("practical",priorPracticalAttempt,characterId,disciplineId);
 }
 function processCompatibility(characterId,disciplineId,options={}){
   const subject=stableSubject(characterId),row=progression(characterId,disciplineId);if(!subject||!row)return null;
@@ -393,6 +476,34 @@ function practicalBatch448(){
   state.resultVisible=false;recordKonohaPracticalSpecialNotifications(characterId);renderKonohaPracticalVisualScreen();
   return{success:successfulAttempts>0,characterId,disciplineId,requestedAttempts:requested,completedAttempts:results.length,successfulAttempts,failedAttempts,results};
 }
+function foundationBatchNotification448(source,characterId){
+  const state=source==="exam"
+    ?(typeof KONOHA_EXAM_ATTEMPT_STATE!=="undefined"?KONOHA_EXAM_ATTEMPT_STATE:null)
+    :(typeof getKonohaPracticalAttemptState==="function"?getKonohaPracticalAttemptState():null);
+  const results=state&&Array.isArray(state.lastBatch)?state.lastBatch:[];
+  const meta=state&&state.lastBatchMeta||null;
+  if(!meta||meta.characterId!==characterId||results.length===0)return null;
+  const completed=results.filter(row=>row&&row.completed===true);
+  if(completed.length===0)return null;
+  const passed=completed.filter(row=>row.success===true),failed=completed.filter(row=>row.success!==true);
+  const title=completed.length===1?(passed.length===1?"PASS":"FAIL"):(passed.length+" PASS · "+failed.length+" FAIL");
+  const type=failed.length===0?"result-pass":(passed.length===0?"result-fail":"result-mixed");
+  const totalDevelopment=completed.reduce((sum,row)=>sum+(Number(row.developmentExp)||0),0);
+  const disciplineId=meta.disciplineId||completed[0]?.disciplineId;
+  const discipline=typeof globalThis.getShinobiDiscipline==="function"?globalThis.getShinobiDiscipline(disciplineId):null;
+  const label=String(discipline&&discipline.name||disciplineId||"DISCIPLINE").toUpperCase();
+  const first=completed[0],last=completed[completed.length-1],detail=["+"+totalDevelopment+" "+label+" DEVELOPMENT"];
+  if(Number(last?.newStat)>Number(first?.previousStat))detail.push("CURRENT STAT "+Number(first.previousStat)+" → "+Number(last.newStat));
+  const beforePL=Number(meta.beforePL&&meta.beforePL.displayedPL),afterPL=Number(meta.afterPL&&meta.afterPL.displayedPL);
+  if(Number.isFinite(beforePL)&&Number.isFinite(afterPL)&&afterPL>beforePL)detail.push("POWER LEVEL "+beforePL+" → "+afterPL);
+  if(meta.stoppedAtCeiling===true)detail.push("FOUNDATION DEVELOPMENT COMPLETE AT STAT "+FOUNDATION_CEILING);
+  return{
+    id:source+"-result-"+characterId+"-"+disciplineId+"-"+Date.now(),
+    characterId,type,significance:"activity-result",title,detail:detail.join(" · "),timestamp:Date.now()
+  };
+}
+function examBatchNotification448(characterId){return foundationBatchNotification448("exam",characterId);}
+function practicalBatchNotification448(characterId){return foundationBatchNotification448("practical",characterId);}
 function practicalNotifications448(characterId){
   const state=getKonohaPracticalAttemptState(),notifications=[];
   const batch=typeof buildKonohaPracticalBatchResultNotification==="function"?buildKonohaPracticalBatchResultNotification(characterId):null;
@@ -412,7 +523,8 @@ function restoreCanonicalStats448(){
   let changed=false;
   for(const character of runtimeTeam()){
     if(!character||!character.id)continue;
-    const saved=pd.characters[character.id]||pd.characters[getRegistryId(character)];
+    const owned=ownedRecordFor(character);
+    const saved=pd.characters[owned&&owned.progressionCharacterId]||pd.characters[character.id]||pd.characters[getRegistryId(character)];
     if(!saved||!saved.stats)continue;
     character.stats=character.stats||{};
     for(const id of DISCIPLINES){
@@ -467,6 +579,10 @@ globalThis.renderAlphaActivityDisciplineRows=rows448;try{renderAlphaActivityDisc
 globalThis.getKonohaExamUIScreenData=examData448;try{getKonohaExamUIScreenData=examData448;}catch(_error){}
 globalThis.getKonohaPracticalUIScreenData=practicalData448;try{getKonohaPracticalUIScreenData=practicalData448;}catch(_error){}
 globalThis.addDisciplineExp=addDisciplineExp448;try{addDisciplineExp=addDisciplineExp448;}catch(_error){}
+if(priorExamAttempt){globalThis.executeKonohaExamAttempt=examAttempt448;try{executeKonohaExamAttempt=examAttempt448;}catch(_error){}}
+if(priorPracticalAttempt){globalThis.executeKonohaPracticalAttempt=practicalAttempt448;try{executeKonohaPracticalAttempt=practicalAttempt448;}catch(_error){}}
+if(priorExamBatchNotification){globalThis.buildKonohaExamBatchResultNotification=examBatchNotification448;try{buildKonohaExamBatchResultNotification=examBatchNotification448;}catch(_error){}}
+if(priorPracticalBatchNotification){globalThis.buildKonohaPracticalBatchResultNotification=practicalBatchNotification448;try{buildKonohaPracticalBatchResultNotification=practicalBatchNotification448;}catch(_error){}}
 globalThis.processDisciplineLevelUps=processCompatibility;try{processDisciplineLevelUps=processCompatibility;}catch(_error){}
 globalThis.applyPendingDisciplineStatGrowth=noLegacyPendingGrowth;try{applyPendingDisciplineStatGrowth=noLegacyPendingGrowth;}catch(_error){}
 if(priorPerform){globalThis.performDisciplineTraining=perform448;try{performDisciplineTraining=perform448;}catch(_error){}}
@@ -485,6 +601,7 @@ function diagnostics(){
     exactCurve21:thresholdForStat(21)===20,
     foundationCeiling:FOUNDATION_CEILING===15,
     foundationProfile:FOUNDATION_PROFILE_ID==="academy_foundation_discipline_activity_v1",
+    materialFailureGrant:String(executeFoundationAttempt448).includes('commitDevelopment(characterId,disciplineId,1'),
     effectiveExecutionGrant:FOUNDATION_ACTION_EXP===2,
     noFractionalPL:String(exactDevelopedStats).includes("exactStats")&&!String(exactDevelopedStats).includes("progressFraction"),
     noNumericMasteryUI:String(rows448).includes("CURRENT STAT")&&!String(rows448).includes("MASTERY"),
