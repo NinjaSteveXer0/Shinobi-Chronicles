@@ -214,6 +214,8 @@ function commitDevelopment({serviceId,characterId,disciplineId,developmentExp,re
 
   const id=identity(characterId);const state=root();const progression=getCharacterDisciplineProgression(characterId,disciplineId);
   if(!id||!state||!progression)return{success:false,reason:"development_transaction_state_missing"};
+  const migration=migrateOrRehydrateCharacter(id.character);
+  if(!migration||migration.success!==true)return{success:false,reason:migration&&migration.reason||"persistent_stat_migration_failed"};
   const finalReceiptId=receiptId||allocateReceiptId(serviceId,id,disciplineId);
   if(!finalReceiptId)return{success:false,reason:"development_receipt_identity_failed"};
   if(state.processedReceiptIds.includes(finalReceiptId)){
