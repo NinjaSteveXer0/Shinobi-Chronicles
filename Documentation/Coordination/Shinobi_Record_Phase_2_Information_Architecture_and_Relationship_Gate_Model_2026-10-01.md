@@ -587,3 +587,55 @@ Development should answer:
 
 These pages should cross-link rather than duplicate full datasets.
 
+
+## 30. Participant Chronicle scope + living-world projection
+
+Consume:
+
+`Documentation/Coordination/Persistent_Participant_Chronicles_Offscreen_Autonomy_and_Chronicle_Pulse_2026-10-01.md`
+
+The Chronicle section should support actor/scope filtering without creating a gamified Relationship tab.
+
+Recommended scope filters include:
+- My Chronicle;
+- Current Team;
+- People in My Chronicle;
+- Teammates;
+- Mentors / Trainers;
+- Allies / Contacts;
+- Rivals / Enemies;
+- Family;
+- Institutional Contacts;
+- Other recurring people.
+
+A selected person should show only:
+- shared occurrences the protagonist participated in;
+- known events learned through legitimate sources;
+- observer-safe autonomous decisions/stances;
+- known gifts/promises/debts/secrets/training;
+- known current impression/stance.
+
+Do not expose the selected person's entire private Chronicle.
+
+## 31. Recent Chronicle decisions
+
+The main Chronicle view should support a significance-ranked recent-events feed that may include participant-attributed actions.
+
+Examples:
+- Menma chose to pursue the courier.
+- Hinata argued for the eastern trail.
+- Kakashi secured the dispatch.
+- The examiner recorded the Promotion result.
+
+One factual occurrence may project several participant-attributed lines, but those projections must share the same causal occurrence rather than becoming separate contradictory history owners.
+
+## 32. Off-screen Chronicle discovery
+
+A persistent NPC may experience a legitimate off-screen Chronicle event without the protagonist knowing it happened.
+
+When the protagonist later learns that fact through a legitimate source, Shinobi Record should add the new Knowledge/history projection with provenance.
+
+Therefore:
+
+`NPC Chronicle truth != protagonist Knowledge != Record projection`.
+
