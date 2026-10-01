@@ -41,7 +41,9 @@ jobs:
         run: node tools/qa_save_compatibility_311.js
 
       - name: Pre-Alpha runtime closure
-        run: python tools/qa_issue_141_pre_alpha_runtime_closure.py
+        run: |
+          python -m pip install pillow
+          python tools/qa_issue_141_pre_alpha_runtime_closure.py
 
       - name: Install Playwright Chromium
         run: |
