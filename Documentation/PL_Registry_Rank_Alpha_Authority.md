@@ -263,11 +263,13 @@ These are evidence domains, not Stats and not hidden PL modifiers.
 
 ### Rank pass/fail interpretation — PHASE-2 VARIABLE PACKAGE RULE
 
-Binding successor:
+Binding successors:
 
 `Documentation/Rank/Academy to Genin Variable Promotion Requirement Packages 2026-10-01.md`
 
-For newly committed Phase-2 CE-driven Promotion lineages, a valid **PASS** requires all of the following:
+`Documentation/Rank/Academy to Genin Promotion Package New Game Seed Amendment 2026-10-01.md`
+
+For Phase-2 CE-driven Academy -> Genin Promotion, a valid **PASS** requires all of the following:
 
 1. `missionObjectiveCompleted=true`;
 2. qualifying evidence for **mission comprehension**;
@@ -283,7 +285,7 @@ The package selects exactly two from:
 
 The initial Rank-authored pool contains all six two-domain combinations. This preserves exactly **four distinct readiness domains** per Academy -> Genin package and does not add a fifth criterion on top of the former `any two of four` rule.
 
-Package ID is selected once from a prevalidated scenario-compatible pool, persists across normal retries and alternate authorised scenarios in the same Promotion lineage, and must not reroll on UI/save-load. A different scenario is valid only if it supports the already-committed package.
+Package identity is rooted in the immutable New Game / Chronicle playthrough and is stable per `stableCharacterId + rankTransitionId`. For Academy -> Genin, the semantic derivation key is `immutableChronicleSeed + stableCharacterId + academy_to_genin -> promotionRequirementPackageId`. Runtime may materialise/cache it only when first needed, but materialisation time does not create a new roll. A different scenario is valid only if it supports the already-fixed package.
 
 Requirement truth and player Knowledge remain separate. Hidden requirements may project as `??????`; a satisfied requirement may remain hidden until legitimate discovery/disclosure. Diagnostics may inspect exact package/domain truth without leaking it to player UI.
 
@@ -316,7 +318,11 @@ Failure:
 
 Re-attempt is permitted after the previous attempt has resolved and the assessment is available again. There is no universal cooldown unless an exact future authority explicitly authors one.
 
-For Phase-2 variable requirements, normal retry does **not** reroll the committed `promotionRequirementPackageId`. The package persists across the Promotion requirement lineage; alternate authorised scenarios must support that already-committed package. Supersession requires explicit institutional/new-lineage authority with provenance.
+For Phase-2 variable requirements, normal retry does **not** reroll `promotionRequirementPackageId`. Neither do failure, withdrawal, alternate scenario, team/assignment changes, discovery, satisfaction, examiner disclosure, UI reopen, save/load, browser refresh or Record inspection.
+
+The package is hard-locked for the entire Chronicle playthrough per stable Character + Rank transition. Alternate authorised scenarios must support that already-fixed package.
+
+A different package requires a genuinely new Chronicle/New Game with a new authoritative Chronicle seed, or a separately authorised post-completion restart/new-Chronicle mode that explicitly creates a new Chronicle root. Ordinary in-play institutional supersession is not authorised for Academy -> Genin.
 
 ### Presentation / CE boundary
 
