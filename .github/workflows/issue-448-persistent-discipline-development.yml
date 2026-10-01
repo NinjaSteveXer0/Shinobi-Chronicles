@@ -1,0 +1,80 @@
+name: Issue 448 Persistent Discipline Development
+
+on:
+  push:
+    branches:
+      - coding/phase-2-discipline-development-448
+    paths:
+      - 'index.html'
+      - 'runtime/alpha-chronicle-state-manifest-43600.js'
+      - 'runtime/alpha-phase2-discipline-development-44800.js'
+      - 'runtime/alpha-phase2-konoha-player-surfaces-43110.js'
+      - 'tools/fixtures/runtime_change_declarations_300.json'
+      - 'tools/fixtures/runtime_responsibility_registry_300.json'
+      - 'tools/qa_issue_448_persistent_discipline_development.js'
+      - 'tools/qa_issue_448_persistent_discipline_development_browser.js'
+      - 'tools/qa_phase2_konoha_player_surfaces_431.js'
+      - 'tools/qa_phase2_chronicle_state_manifest_436.js'
+      - 'tools/qa_save_compatibility_311.js'
+      - 'tools/qa_issue_141_pre_alpha_runtime_closure.py'
+      - '.github/workflows/issue-448-persistent-discipline-development.yml'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  persistent-discipline-development:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Source syntax
+        run: |
+          node --check runtime/alpha-chronicle-state-manifest-43600.js
+          node --check runtime/alpha-phase2-discipline-development-44800.js
+          node --check tools/qa_issue_448_persistent_discipline_development.js
+          node --check tools/qa_issue_448_persistent_discipline_development_browser.js
+          python -m json.tool tools/fixtures/runtime_change_declarations_300.json > /dev/null
+          python -m json.tool tools/fixtures/runtime_responsibility_registry_300.json > /dev/null
+      - name: Focused #448 transaction QA
+        run: node tools/qa_issue_448_persistent_discipline_development.js
+      - name: Chronicle State Manifest regression
+        run: node tools/qa_phase2_chronicle_state_manifest_436.js
+      - name: Existing save compatibility
+        run: node tools/qa_save_compatibility_311.js
+      - name: Runtime ownership safety
+        run: node tools/qa_runtime_ownership_safety_300.js
+      - name: Pre-Alpha runtime closure
+        run: python tools/qa_issue_141_pre_alpha_runtime_closure.py
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start local Alpha server
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > issue-448-server.log 2>&1 &
+          echo $! > issue-448-server.pid
+          sleep 2
+      - name: Installed-browser #448 persistent development
+        run: node tools/qa_issue_448_persistent_discipline_development_browser.js
+      - name: Current-team Practical / Exams regression
+        run: node tools/qa_phase2_konoha_player_surfaces_431.js
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-448-persistent-discipline-development
+          path: |
+            artifacts/issue-448-persistent-discipline-development
+            artifacts/phase2-konoha-player-surfaces
+            issue-448-server.log
+          if-no-files-found: ignore
