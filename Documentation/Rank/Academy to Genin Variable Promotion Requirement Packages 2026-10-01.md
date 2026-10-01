@@ -5,7 +5,8 @@
 **Status:** **BINDING RANK AUTHORITY — ISSUE #445 CLOSURE**  
 **Assessment family:** `academy_to_genin_field_readiness_assessment`  
 **Upstream CE direction:** `Documentation/Coordination/Academy_to_Genin_CE_World_Promotion_Assessment_Phase_2_Direction_2026-10-01.md`  
-**Difficulty boundary:** `Documentation/Rank/Promotion Difficulty Boundary Academy to Genin Exception 2026-09-11.md`
+**Difficulty boundary:** `Documentation/Rank/Promotion Difficulty Boundary Academy to Genin Exception 2026-09-11.md`  
+**New-Game seed amendment:** `Documentation/Rank/Academy to Genin Promotion Package New Game Seed Amendment 2026-10-01.md`
 
 ## 1. Rank decision
 
@@ -59,53 +60,74 @@ No Academy package may currently require:
 - a future Rank/role/title;
 - post-Genin-only ownership, Skill, Bloodline, item, location or system access.
 
-## 3. Package selection and scenario compatibility
+## 3. Package derivation and scenario compatibility — amended by #447
 
-Package selection occurs only at a legitimate committed assessment-lineage boundary.
+Package identity is rooted in the immutable New Game / Chronicle playthrough.
 
-The authoritative state must include:
+Binding semantic key:
 
-- `promotionRequirementLineageId`;
+`immutableChronicleSeed + stableCharacterId + rankTransitionId -> promotionRequirementPackageId`
+
+For Academy -> Genin:
+
+`rankTransitionId = academy_to_genin`
+
+The exact hashing/PRNG implementation belongs to Coding, but the result must be deterministic over the immutable Chronicle root, stable Character identity, exact Rank transition, and Rank-authored package-pool/version authority.
+
+The package is therefore **effectively determined from New Game**, even if runtime materialises/caches the record only when that Character/transition first needs it.
+
+Materialisation time != semantic determination time.
+
+The authoritative state must include or be able to deterministically recover:
+
+- `immutableChronicleSeed` or its authoritative stable reference;
+- `stableCharacterId`;
+- `rankTransitionId`;
 - `promotionRequirementPackageId`;
 - `promotionRequirementPackageVersion`;
-- `assessmentSubjectOwnedCharacterId`;
-- `assessmentScenarioId`;
+- `assessmentSubjectOwnedCharacterId` where an owned assessment subject exists;
+- `assessmentScenarioId` for the current attempt;
 - package/scenario compatibility provenance;
-- selection/commit provenance.
+- derivation/materialisation provenance.
 
-Selection may be randomised only among packages that are prevalidated as compatible with the committed Academy assessment scenario and current institutional rules.
+A Character acquired later in the same playthrough derives from the same immutable Chronicle seed. Acquisition time does not create a new package roll.
 
-Randomness chooses only among already-valid packages. Randomness does not decide whether an impossible requirement becomes valid.
+Every authorised scenario offered to that Character/transition must support the already-fixed package. Scenario choice does not participate in package selection and cannot reroll it.
 
-The selection method/seed implementation belongs to CE/Coding, but after the package ID is committed it is persistent authority.
+## 4. Playthrough lock / retry / alternate scenario — amended by #447
 
-UI reopen, save/load, browser refresh, rerender, retry button inspection or Records inspection must never reroll it.
+The package belongs to the **Chronicle playthrough + stable Character + Rank transition**.
 
-## 4. Retry, alternate scenario and supersession
+It is immutable for that playthrough.
 
-The committed package belongs to the **Promotion requirement lineage**, not to one screen visit and not to one Battle.
-
-It persists across:
+The following do not reroll it:
 
 - retry of the same assessment scenario;
-- a new occurrence of that assessment after a resolved unsuccessful attempt;
-- selection of a different authorised Academy -> Genin scenario within the same Promotion lineage.
+- a new occurrence after an unsuccessful attempt;
+- failure;
+- withdrawal;
+- selection of a different authorised Academy -> Genin scenario;
+- team changes;
+- assignment changes;
+- requirement discovery;
+- requirement satisfaction;
+- examiner disclosure;
+- UI reopen/rerender;
+- save/load;
+- browser refresh;
+- Records or Promotion-screen inspection.
 
-When the player chooses a different authorised scenario, that scenario must support the already-committed package.
+When the player chooses a different authorised scenario, that scenario must support the already-fixed package.
 
-If a scenario does not support the current package, it is not a valid alternate for that lineage.
+If a scenario does not support that package, it is not a valid alternate for that Character/transition in that playthrough.
 
-Changing scenario therefore does **not** grant a package reroll.
+A new package may arise only from:
+- a genuinely new Chronicle / New Game with a new authoritative Chronicle seed; or
+- a separately authorised post-completion restart/new-Chronicle mode that explicitly creates a new Chronicle root.
 
-A package may be superseded only by an explicit institutional/new-lineage authority that:
-- is not player-triggered rerolling;
-- records the prior package/lineage historically;
-- records the exact supersession reason;
-- occurs only after any active attempt has resolved;
-- preserves all already-committed Chronicle/evidence/history;
-- passes current Rank compatibility validation.
+The earlier allowance for an ordinary in-play institutional/new-lineage package supersession is superseded for Academy -> Genin.
 
-A content/version migration may explicitly remap an obsolete package to a valid successor, but must record provenance and must not be used as save-scum reroll.
+A content/version migration may map an obsolete package/version only for compatibility. It must preserve semantic identity where possible and must never expose a reroll path.
 
 ## 5. Reveal-state semantics
 
@@ -171,6 +193,9 @@ Diagnostics may inspect exact machine truth without projecting it to the player.
 At minimum diagnostics should be able to report:
 
 - `promotionRequirementLineageId`;
+- authoritative Chronicle-seed reference;
+- `stableCharacterId`;
+- `rankTransitionId`;
 - `promotionRequirementPackageId`;
 - `promotionRequirementPackageVersion`;
 - `assessmentSubjectOwnedCharacterId`;
@@ -257,4 +282,4 @@ Historical attempts resolved under the prior fixed resolver remain historical tr
 
 ## Final lock
 
-> **Academy -> Genin uses a persisted hidden Rank package that selects exactly two of the four existing secondary Field Readiness domains. Mission comprehension and judgement under pressure remain mandatory; the formal mission objective and safety/integrity rule remain fixed. The package is selected once from a prevalidated scenario-compatible six-package pool, persists across retries and alternate authorised scenarios, cannot be save-scummed, may remain partly or wholly hidden from the player, and may be superseded only by explicit institutional/new-lineage authority. This preserves the existing four-domain Academy difficulty while allowing different Chronicles to face different exact Promotion requirements.**
+> **Academy -> Genin uses a hidden Rank package that selects exactly two of the four existing secondary Field Readiness domains. Mission comprehension and judgement under pressure remain mandatory; the formal mission objective and safety/integrity rule remain fixed. Package identity is rooted in the immutable New-Game Chronicle and is stable per Character + Rank transition for that entire playthrough. Runtime may materialise it later, but retry, failure, withdrawal, alternate scenario, team changes, discovery, satisfaction, UI and save/load never reroll it. Hidden/revealed and satisfied/unsatisfied are independent states. A different package requires a genuinely new Chronicle/New Game or separately authorised post-completion new-Chronicle root.**
