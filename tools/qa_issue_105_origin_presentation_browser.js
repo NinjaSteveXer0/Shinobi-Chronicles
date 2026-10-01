@@ -486,6 +486,98 @@ async function proveMiraiDefeatContinuations(browser){
   return{cases:proofs,battleDefeatIsMissionFailure:false,escortAssessmentEndsOnDefeat:true,browserGoldenClaimed:false};
 }
 
+async function auditSharedReceiptSpectrum(page,variant,label){
+  const audit=await page.evaluate(variant=>{
+    const root=document.getElementById("story-scene-presentation-layer");
+    const text=root?.querySelector(".sc-story-text")?.textContent?.trim()||"";
+    const projection=typeof globalThis.getAcademyOriginRewardReceiptProjection440==="function"
+      ?globalThis.getAcademyOriginRewardReceiptProjection440(variant)
+      :{development:[],battleRewards:[],currentStats:null};
+    const rows=Array.isArray(playerData?.activityHistory)?playerData.activityHistory:[];
+    return{
+      text,
+      projection:JSON.parse(JSON.stringify(projection||{})),
+      developmentReceiptIds:rows.filter(row=>row?.type==="discipline_development"&&row.subjectVariantId===variant).map(row=>row.receiptId).filter(Boolean).sort(),
+      purseCount:rows.filter(row=>row?.type==="origin_completion_reward"&&row.rewardSourceId==="origin_completion_starting_purse_ryo_01"&&row.originVariantId===variant).length
+    };
+  },variant);
+  assert(audit.text.includes("REWARDS"),label+" final Receipt missing REWARDS");
+  assert.strictEqual((audit.text.match(/Origin Starting Purse: \+100 Ryō\./g)||[]).length,1,label+" starting purse line missing/duplicated");
+  for(const row of audit.projection.development||[]){
+    if(Number(row.expGranted)<=0)continue;
+    const visible=row.disciplineLabel+" Development: +"+Number(row.expGranted);
+    assert(audit.text.includes(visible),label+" missing earned development line "+visible+" :: "+audit.text);
+    if(row.reason)assert(audit.text.includes(row.reason),label+" missing development cause "+row.reason);
+  }
+  for(const row of audit.projection.battleRewards||[]){
+    if(Number(row.ryo)<=0)continue;
+    assert(audit.text.includes("+"+Number(row.ryo)+" Ryō."),label+" missing earned Battle Ryō +"+row.ryo);
+  }
+  assert(!/qualificationId|significance|sourceOccurrenceId|progressionSlotId|Chronicle Engine/.test(audit.text),label+" leaked internal reward machinery");
+  return audit;
+}
+async function proveSimpleSharedReceipt(browser,{variant,label,receiptBeat,title,choicePlan,expectedDevelopment=[]}){
+  const context=await browser.newContext({viewport:{width:1440,height:900}});
+  const page=await context.newPage();
+  const gate=await installBrowserRuntimeErrorGate(page);
+  try{
+    await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});
+    await page.waitForFunction(()=>!!globalThis.SC_ALPHA_ORIGIN_SCENE_BOARD_BINDINGS_105&&!!globalThis.SC_ALPHA_ORIGIN_32900&&!!globalThis.SC_ACADEMY_ORIGIN_REWARD_SPECTRUM_440,null,{timeout:30000});
+    const start=await page.evaluate(({variant,label})=>({select:selectChronicleOrigin(variant,label),launch:beginAlphaChronicleOriginPrologue()}),{variant,label});
+    assert.strictEqual(start.select?.success,true,label+" select failed "+JSON.stringify(start));
+    assert.strictEqual(start.launch?.success,true,label+" launch failed "+JSON.stringify(start));
+    await release(page);
+    let receipt=null;
+    for(let i=0;i<700;i++){
+      const row=await snapshot(page);
+      if(row.beatId===receiptBeat){receipt=row;break;}
+      if(row.mode==="choice"){
+        const wanted=choicePlan[row.beatId];
+        assert(wanted,label+" unexpected choice beat "+row.beatId+" "+JSON.stringify(row.choices));
+        const choice=page.locator("#story-scene-presentation-layer .sc-story-choice:not(:disabled)").filter({hasText:wanted}).first();
+        assert(await choice.count(),label+" planned choice not visible at "+row.beatId+": "+wanted);
+        const before=row.beatId;
+        await choice.click();
+        await page.waitForFunction(old=>globalThis.getActiveStorySceneRuntime?.()?.beatId!==old,before,{timeout:8000});
+      }else{
+        await advanceOne(page);
+      }
+    }
+    assert(receipt,label+" did not reach "+receiptBeat);
+    assert.strictEqual(receipt.cueKind,"record",label+" final Receipt is not a record cue");
+    assert(receipt.text.includes(title),label+" final Receipt missing "+title);
+    const before=await auditSharedReceiptSpectrum(page,variant,label);
+    for(const expected of expectedDevelopment){
+      const matches=(before.projection.development||[]).filter(row=>row.disciplineLabel===expected.discipline&&Number(row.expGranted)===expected.exp);
+      assert(matches.length>=expected.count,label+" expected development projection missing "+JSON.stringify(expected)+" :: "+JSON.stringify(before.projection));
+    }
+    await page.locator("#story-scene-presentation-layer").screenshot({path:path.join(OUT,label+"-receipt.png")});
+
+    await page.reload({waitUntil:"domcontentloaded",timeout:60000});
+    await page.waitForFunction(()=>!!globalThis.SC_ALPHA_ORIGIN_SCENE_BOARD_BINDINGS_105&&!!globalThis.SC_ACADEMY_ORIGIN_REWARD_SPECTRUM_440,null,{timeout:30000});
+    await release(page);
+    await page.waitForFunction(receiptBeat=>globalThis.getActiveStorySceneRuntime?.()?.beatId===receiptBeat&&document.getElementById("story-scene-presentation-layer")?.dataset.scCueKind==="record",receiptBeat,{timeout:15000});
+    const after=await auditSharedReceiptSpectrum(page,variant,label+":reload");
+    assert.strictEqual(after.text,before.text,label+" Receipt text changed after reload");
+    assert.deepStrictEqual(after.developmentReceiptIds,before.developmentReceiptIds,label+" reload duplicated/lost development receipts");
+
+    const button=page.locator("#story-scene-presentation-layer .sc-chronicle-primary").first();
+    await button.click();
+    await page.waitForFunction(()=>ensurePlayerAcquisitionState().chronicleOrigin?.prologueCompleted===true,null,{timeout:12000});
+    const completed=await page.evaluate(variant=>{
+      const rows=Array.isArray(playerData?.activityHistory)?playerData.activityHistory:[];
+      return{
+        purseCount:rows.filter(row=>row?.type==="origin_completion_reward"&&row.rewardSourceId==="origin_completion_starting_purse_ryo_01"&&row.originVariantId===variant).length,
+        developmentReceiptIds:rows.filter(row=>row?.type==="discipline_development"&&row.subjectVariantId===variant).map(row=>row.receiptId).filter(Boolean).sort()
+      };
+    },variant);
+    assert.strictEqual(completed.purseCount,1,label+" completion starting purse missing/duplicated");
+    assert.deepStrictEqual(completed.developmentReceiptIds,before.developmentReceiptIds,label+" completion duplicated/lost development receipts");
+    await gate.assertClean(label);
+    return{variant,receiptBeat,development:before.projection.development||[],battleRewards:before.projection.battleRewards||[],reloadStable:true,purseCommittedOnce:true};
+  }finally{await context.close();}
+}
+
 async function proveMiraiTerminalReceipt(browser){
   const context=await browser.newContext({viewport:{width:1440,height:900}});
   const page=await context.newPage();
@@ -526,6 +618,7 @@ async function proveMiraiTerminalReceipt(browser){
   assert.strictEqual(receipt.primary,"CONTINUE","Mirai Receipt dedicated button missing");
   assert.strictEqual(receipt.primaryVisible,true,"Mirai Receipt dedicated CONTINUE button is not visible");
   assert.strictEqual(receipt.hint,"USE CONTINUE TO CONFIRM","Mirai Receipt still instructs click-anywhere");
+  const miraiRewardAudit=await auditSharedReceiptSpectrum(page,"academy_mirai","academy-mirai-full-story-receipt");
   const beforeReceipt=await snapshot(page);
   const stage=page.locator("#story-scene-presentation-layer .sc-chronicle-stage,#story-scene-presentation-layer .sc-story-stage").first();
   await stage.click({position:{x:28,y:28}});
@@ -552,6 +645,9 @@ async function proveMiraiTerminalReceipt(browser){
   }));
   assert.notStrictEqual(completion.active,"mir_receipt","Receipt button failed to advance");
   assert.strictEqual(completion.semanticAdvanceCount,1,"Receipt button did not invoke exactly one semantic Story advance");
+  await page.waitForFunction(()=>ensurePlayerAcquisitionState().chronicleOrigin?.prologueCompleted===true,null,{timeout:12000});
+  const miraiPurseCount=await page.evaluate(()=>getActivityHistory().filter(row=>row?.type==="origin_completion_reward"&&row.rewardSourceId==="origin_completion_starting_purse_ryo_01"&&row.originVariantId==="academy_mirai").length);
+  assert.strictEqual(miraiPurseCount,1,"Mirai completion starting purse missing/duplicated");
   await page.locator("body").screenshot({path:path.join(OUT,"academy_mirai-terminal-receipt.png")});
   await gate.assertClean("academy_mirai-terminal-receipt");
   await context.close();
@@ -739,6 +835,26 @@ async function proveMiraiTerminalReceipt(browser){
     const miraiBattle338=await proveMiraiBattle338(browser);
     const miraiDefeatContinuations=await proveMiraiDefeatContinuations(browser);
     const miraiTerminal=await proveMiraiTerminalReceipt(browser);
-    console.log(JSON.stringify({pass:true,issue:105,cases:CASES.map(x=>x[0]),legacyFallbackRejected:true,clickAnywhereProven:true,miraiWritingGoldenProven:true,miraiBattle338,miraiDefeatContinuations,menmaWritingGoldenOpeningProven:true,menmaNineTailsDialoguePortraitProven:true,menmaPostBattleSegmentationProven:true,kurenaiExpansionBrowserProven:true,miraiTerminal,goldenSaveReloadResumeProven:true,browserGoldenClaimed:false},null,2));
+    const kushinaFullReceipt=await proveSimpleSharedReceipt(browser,{
+      variant:"academy_kushina",label:"issue442-full-kushina",receiptBeat:"kus_receipt",title:"ACADEMY KUSHINA",
+      choicePlan:{kus_crisis:"CONTAIN THE DAMAGED SEAL"},
+      expectedDevelopment:[{discipline:"Fūinjutsu",exp:2,count:1}]
+    });
+    const iwabeeFullReceipt=await proveSimpleSharedReceipt(browser,{
+      variant:"academy_iwabee",label:"issue442-full-iwabee",receiptBeat:"iwa_receipt",title:"ACADEMY IWABEE",
+      choicePlan:{iwa_reshape:"Raise the collapsed section",iwa_response:"Block his escape",iwa_reflect:"I know what I can do."},
+      expectedDevelopment:[{discipline:"Ninjutsu",exp:2,count:2}]
+    });
+    const metalFullReceipt=await proveSimpleSharedReceipt(browser,{
+      variant:"academy_metal_lee",label:"issue442-full-metal",receiptBeat:"met_receipt",title:"ACADEMY METAL LEE",
+      choicePlan:{met_private_choice:"Spinning kick",met_invite:"Back out"},
+      expectedDevelopment:[{discipline:"Taijutsu",exp:2,count:1}]
+    });
+    const kurenaiFullReceipt=await proveSimpleSharedReceipt(browser,{
+      variant:"academy_kurenai",label:"issue442-full-kurenai",receiptBeat:"kur_receipt",title:"ACADEMY KURENAI",
+      choicePlan:{kur_approach:"Send a false Kurenai",kur_stage2_false:"Rush the bell",kur_stage3_false_rush:"Pretend to withdraw"},
+      expectedDevelopment:[{discipline:"Genjutsu",exp:1,count:3}]
+    });
+    console.log(JSON.stringify({pass:true,issue:105,cases:CASES.map(x=>x[0]),legacyFallbackRejected:true,clickAnywhereProven:true,miraiWritingGoldenProven:true,miraiBattle338,miraiDefeatContinuations,menmaWritingGoldenOpeningProven:true,menmaNineTailsDialoguePortraitProven:true,menmaPostBattleSegmentationProven:true,kurenaiExpansionBrowserProven:true,miraiTerminal,kushinaFullReceipt,iwabeeFullReceipt,metalFullReceipt,kurenaiFullReceipt,goldenSaveReloadResumeProven:true,browserGoldenClaimed:false},null,2));
   }finally{await browser.close();}
 })().catch(err=>{console.error(err);process.exit(1);});
