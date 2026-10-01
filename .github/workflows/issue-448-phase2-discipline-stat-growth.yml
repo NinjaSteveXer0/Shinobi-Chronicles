@@ -6,6 +6,8 @@ on:
       - coding/phase-2-discipline-stat-growth-448
     paths:
       - 'index.html'
+      - 'game.js'
+      - 'runtime/alpha-origin-reward-spectrum-440.js'
       - 'runtime/alpha-discipline-stat-growth-44800.js'
       - 'runtime/alpha-chronicle-state-manifest-43600.js'
       - 'tools/fixtures/runtime_change_declarations_300.json'
@@ -38,6 +40,7 @@ jobs:
       - name: Source syntax
         run: |
           node --check runtime/alpha-discipline-stat-growth-44800.js
+          node --check runtime/alpha-origin-reward-spectrum-440.js
           node --check runtime/alpha-chronicle-state-manifest-43600.js
           node --check tools/qa_issue_448_discipline_stat_growth.js
           node --check tools/qa_issue_448_discipline_stat_growth_browser.js
