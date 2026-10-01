@@ -1023,6 +1023,60 @@
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Consumes CE/World issue #440 plus Progression ratification #438 as a bounded reward/progression projection overlay on the already owner-accepted FROZEN GOLDEN Academy Origin package. Story prose, routes, choices, actors, backdrops, Battle mechanics/AI/PL and Receipt lifecycle remain frozen. The overlay projects only exact source-scoped non-Battle development, ratified Special Jōnin contextual evidence, visible Receipt reward/development lines, the existing Obito Current-Stat package without duplicate Discipline EXP, and the globally required Iwabee +50 Ryō PL-Battle victory reward. Kushina residual closure explicitly excludes reverse-summoning evidence. Kakashi and Wasabi reward packages remain excluded."
+    },
+    {
+      "changeId": "issue-436-phase2-chronicle-state-manifest",
+      "classification": "NEW",
+      "responsibilityIds": [
+        "phase2.chronicle_state_manifest.shared"
+      ],
+      "owner": "runtime/alpha-chronicle-state-manifest-43600.js",
+      "directCallers": [
+        "index.html",
+        "runtime/alpha-first-konoha-tutorial-35000.js"
+      ],
+      "stateTouched": [
+        "playerData.phase2ChronicleState.tutorialProgress",
+        "read-only projections of committed current team, Chronicle identity and Ryō"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_phase2_chronicle_state_manifest_436.js",
+        "tools/qa_save_compatibility_311.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "PHASE_2_ACTIVATION",
+      "rationale": "Consumes the binding Phase-2 Persistent Chronicle Safety Constitution. Establishes a centrally testable manifest for only the first live Phase-2 domains, derives currentTeam from the existing committed Academy Team Formation receipt rather than duplicating it, preserves existing Ryō and Origin identity writers, adds bounded tutorialProgress persistence, and provides pure deterministic migration/compatibility helpers."
+    },
+    {
+      "changeId": "issue-431-konoha-sandbox-guided-onboarding-trial",
+      "classification": "REPLACES",
+      "responsibilityIds": [
+        "phase2.konoha_onboarding.trial"
+      ],
+      "owner": "runtime/alpha-first-konoha-tutorial-35000.js",
+      "directCallers": [
+        "index.html",
+        "existing Team Formation continuation and live Konoha surfaces"
+      ],
+      "stateTouched": [
+        "playerData.acquisition.onboardingStatus trial correction to academy_free_play",
+        "academyTeamFormation.continuationCompleted / continuedAt",
+        "tutorialProgress through #436 canonical writer",
+        "presentation-only public Konoha recommendation highlights and coachmarks"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_first_konoha_tutorial_35000.js",
+        "tools/qa_phase2_chronicle_state_manifest_436.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [
+        "runtime/alpha-first-konoha-tutorial-35000.js::issue209_mandatory_orientation_permission_gate"
+      ],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Consumes the owner-approved First Konoha Sandbox Guided Onboarding Trial. The old #209 mandatory General Training Ground orientation no longer gates Academy free play. After exact committed Team Formation the player enters genuine Konoha sandbox; optional guidance uses one opening popup, public-location recommendations, contextual first-use tips, Arena route explanation and Promotion-vs-Explore choice. It creates no Stats/PL/Rank/rewards/World events and remains TRIAL pending Stephen browser acceptance."
     }
   ]
 }
