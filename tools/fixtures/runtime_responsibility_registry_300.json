@@ -1532,6 +1532,18 @@
       "milestone": "shared Origin runtime propagation review",
       "qaRef": "tools/qa_issue_105_origin_presentation_browser.js",
       "temporary": false
+    },
+    {
+      "adapterId": "discipline_development_ledger_442",
+      "reason": "Provide the missing production Discipline Development ledger API used by already-authorised Origin development callers without inventing EXP-to-Stat/mastery conversion.",
+      "owner": "runtime/alpha-discipline-development-ledger-442.js",
+      "sourceOwner": "Documentation/Progression/Action Derived Discipline and Fieldcraft Development Contract 2026-09-15.md",
+      "targetOwner": "playerData.acquisition.ownedCharactersByVariantId exact owned Character persistence",
+      "exactBehaviorBridged": "Exact seven-discipline persistent EXP ledger lookup/creation and no-op conversion boundary for authorised callers; existing source owners still decide when/how much development is earned.",
+      "retirementCondition": "Retire or delegate when canonical game.js/Progression runtime directly provides the same persistent Discipline Development APIs with equivalent save semantics.",
+      "milestone": "shared Progression runtime consolidation",
+      "qaRef": "tools/qa_issue_440_origin_reward_spectrum.js",
+      "temporary": false
     }
   ],
   "surfaceContracts": [
