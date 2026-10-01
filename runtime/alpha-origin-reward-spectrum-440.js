@@ -392,6 +392,10 @@ function getReceiptProjection440(originId){
 }
 function appendReceiptLines440(lines,originId,{battleAlreadyShown=false}={}){
   if(!Array.isArray(lines))return lines;
+  // Chronicle Receipt is the final player-facing reward boundary. Repair any already-committed
+  // source facts before projection so restored/older saves cannot display a stale partial spectrum.
+  // The underlying writers are source-scoped and idempotent, so rerender cannot double-grant.
+  reconcileCommitted440();
   const projection=getReceiptProjection440(originId);
   if(!battleAlreadyShown){
     for(const reward of projection.battleRewards)if(reward.ryo>0)lines.push("• PL Battle Victory: +"+reward.ryo+" Ryō.");
@@ -426,6 +430,7 @@ function diagnostics(){
     sourceScopedDevelopmentIdentity:String(developmentReceiptId).includes("progressionSlotId")&&String(commitDevelopment440).includes("causalRootId===sourceOccurrenceId"),
     noDirectPLOrStatGrant:String(commitDevelopment440).includes("directPLGrant:0")&&String(commitDevelopment440).includes("directStatGrant:false"),
     receiptHidesSpecialistInternals:!String(appendReceiptLines440).includes("qualificationId")&&!String(appendReceiptLines440).includes("significance"),
+    receiptReconcilesCommittedFacts:String(appendReceiptLines440).includes("reconcileCommitted440()"),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);

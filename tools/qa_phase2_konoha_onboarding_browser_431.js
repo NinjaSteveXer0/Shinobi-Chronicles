@@ -104,10 +104,32 @@ async function clickGuide(page,label){
     await page.evaluate(()=>openKonohaPracticalFromVillage());
     await expectGuide(page,"PRACTICAL TRAINING");
     await clickGuide(page,"CONTINUE");
+    const practicalSurface=await page.evaluate(()=>({
+      selectable:getKonohaSelectableCharacters().map(row=>row.id),
+      selected:getKonohaActivityUISessionState().characterId,
+      text:document.getElementById("konoha-activity-screen")?.innerText||"",
+      tones:[...document.querySelectorAll("#konoha-activity-screen .alpha-activity-discipline")].map(node=>node.dataset.disciplineId||null).filter(Boolean)
+    }));
+    assert.deepStrictEqual(practicalSurface.selectable,start.team.teamVariantIds,"Practical selector leaked outside committed currentTeam");
+    assert(start.team.teamVariantIds.includes(practicalSurface.selected),"Practical selected a non-team shinobi");
+    assert(!/runtime-owned|live progression authority|PRACTICAL AUTHORITY|No weapon EXP/i.test(practicalSurface.text),"Practical still exposes developer-facing runtime copy");
+    assert.deepStrictEqual([...new Set(practicalSurface.tones)].sort(),["buki","fuin","gen","kin","nin","stamina","tai"].sort(),"Practical discipline colour identities missing");
+    await page.screenshot({path:path.join(OUT,"03-practical-current-team.png"),fullPage:true});
 
     await page.evaluate(()=>openKonohaExamFromVillage());
     await expectGuide(page,"SHINOBI EXAMS");
     await clickGuide(page,"CONTINUE");
+    const examSurface=await page.evaluate(()=>({
+      selectable:getKonohaSelectableCharacters().map(row=>row.id),
+      selected:getKonohaActivityUISessionState().characterId,
+      text:document.getElementById("konoha-activity-screen")?.innerText||"",
+      tones:[...document.querySelectorAll("#konoha-activity-screen .alpha-activity-discipline")].map(node=>node.dataset.disciplineId||null).filter(Boolean)
+    }));
+    assert.deepStrictEqual(examSurface.selectable,start.team.teamVariantIds,"Exam selector leaked outside committed currentTeam");
+    assert(start.team.teamVariantIds.includes(examSurface.selected),"Exam selected a non-team shinobi");
+    assert(!/runtime-owned|EXAM AUTHORITY|does not itself grant Promotion or Rank/i.test(examSurface.text),"Exam still exposes developer-facing runtime copy");
+    assert.deepStrictEqual([...new Set(examSurface.tones)].sort(),["buki","fuin","gen","kin","nin","stamina","tai"].sort(),"Exam discipline colour identities missing");
+    await page.screenshot({path:path.join(OUT,"04-exams-current-team.png"),fullPage:true});
 
     await page.evaluate(()=>openOverlay("arena"));
     const arena=await expectGuide(page,"KONOHA ARENA");
@@ -177,6 +199,9 @@ async function clickGuide(page,label){
       openingPopupOnce:true,
       optionalRouteHighlights:true,
       contextualFirstUseTips:true,
+      practicalAndExamUseCommittedTeam:true,
+      activityCopyPlayerFacing:true,
+      disciplineColourIdentities:true,
       arenaFourLanes:true,
       keepExploringReturnsVillage:true,
       promotionUsesExistingSurface:true,
