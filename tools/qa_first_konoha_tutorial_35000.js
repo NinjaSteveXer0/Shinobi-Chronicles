@@ -120,6 +120,7 @@ assert.strictEqual(keep.success,true);
 assert.strictEqual(villageCalls,1,"KEEP EXPLORING did not return to Konoha");
 assert.strictEqual(promotionCalls,0,"KEEP EXPLORING started Promotion");
 assert.strictEqual(plain("getChronicleTutorialProgress43600({create:false}).arenaCompletionChoiceSeen"),true);
+assert.strictEqual(plain("getChronicleTutorialProgress43600({create:false}).recommendedRouteEnabled"),false,"recommended route remained enabled after YOUR NEXT STEP");
 
 assert.strictEqual(plain("playerData.ryo"),beforeRyo,"tutorial changed Ryō");
 assert.strictEqual(plain('JSON.stringify(getPlayerCharacter("academy_menma")&&getPlayerCharacter("academy_menma").stats||{})'),beforeStats,"tutorial changed Stats");
@@ -130,7 +131,7 @@ run("savePlayerData();playerData=loadPlayerData();","reload.js");
 const afterReload=plain("getChronicleTutorialProgress43600({create:false})");
 assert(afterReload,"Phase-2 tutorial progress dropped by save/load");
 for(const key of ["sandboxPopupSeen","trainingTipSeen","practicalTipSeen","examsTipSeen","arenaTipSeen","arenaCompletionChoiceSeen","shinobiRecordTipSeen"])assert.strictEqual(afterReload[key],true,"reload lost "+key);
-assert.strictEqual(afterReload.recommendedRouteEnabled,true);
+assert.strictEqual(afterReload.recommendedRouteEnabled,false);
 assert.strictEqual(plain("showKonohaSandboxOpening35000()"),false,"opening popup repeated after reload");
 assert.deepStrictEqual(plain("getChronicleCurrentTeam43600().teamVariantIds"),committedTeam.teamVariantIds,"reload changed current team");
 
