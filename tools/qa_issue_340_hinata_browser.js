@@ -257,6 +257,15 @@ async function finishRoute(page,{label,youngLabel,youngId,expectedResponses}){
   assert(receipt.text.includes("WHAT HAPPENED"),label+" Chronicle Receipt missing outcome summary");
   assert(receipt.text.includes("REWARDS"),label+" Chronicle Receipt missing rewards section");
   assert(receipt.text.includes("Origin Starting Purse: +100 Ryō."),label+" Chronicle Receipt missing starting purse");
+  const rewardAudit=await page.evaluate(()=>({
+    projection:getAcademyOriginRewardReceiptProjection440("academy_hinata"),
+    developmentReceiptIds:getActivityHistory().filter(row=>row?.type==="discipline_development"&&row.subjectVariantId==="academy_hinata").map(row=>row.receiptId).filter(Boolean).sort()
+  }));
+  assert((rewardAudit.projection?.development||[]).length>0,label+" Hinata earned development projection missing");
+  for(const row of rewardAudit.projection.development||[]){
+    assert(receipt.text.includes(row.disciplineLabel+" Development: +"+Number(row.expGranted)),label+" Chronicle Receipt missing "+row.disciplineLabel+" Development +"+row.expGranted);
+    if(row.reason)assert(receipt.text.includes(row.reason),label+" Chronicle Receipt missing development cause "+row.reason);
+  }
   assert.deepStrictEqual(receipt.actorIds,[],label+" Chronicle Receipt must not retain Story actors");
   await shot(page,label,"chronicle-receipt");
   await clickContinue(page);
@@ -271,6 +280,8 @@ async function finishRoute(page,{label,youngLabel,youngId,expectedResponses}){
   assert.strictEqual(evidence.young.fact?.selfTaijutsuLearningOccurred,youngId==="stay_and_watch",label+" self-learning fact");
   assert.strictEqual(evidence.young.fact?.youngerStudentParticipantRef,null,label+" participant placeholder must remain null");
   assert.strictEqual(evidence.prologueCompleted,true,label+" Origin not completed");
+  const purseCount=await page.evaluate(()=>getActivityHistory().filter(row=>row?.type==="origin_completion_reward"&&row.rewardSourceId==="origin_completion_starting_purse_ryo_01"&&row.originVariantId==="academy_hinata").length);
+  assert.strictEqual(purseCount,1,label+" Hinata completion starting purse missing/duplicated");
   assert.strictEqual(evidence.teamFormationRequired,true,label+" Academy Team Formation not required");
   assert.strictEqual(evidence.activeStory,null,label+" Story runtime still active after completion");
   assert(/YOUR CHRONICLE BEGINS/i.test(evidence.bodyText),label+" shared continuity surface missing");
