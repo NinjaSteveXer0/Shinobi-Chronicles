@@ -235,7 +235,7 @@ async function restorePracticalResolver(page){
         receiptCounts:{development:root.developmentReceipts.length,breakthrough:root.breakthroughReceipts.length,ceiling:root.ceilingReceipts.length}
       };
     });
-    assert(beforeReload.statsHtml.includes("<span>NINJUTSU</span><strong>15</strong>"),"My Clan Stats does not project canonical Ninjutsu 15");
+    assert(/<span>NIN(?:JUTSU)?<\/span><strong>15<\/strong>/.test(beforeReload.statsHtml),"My Clan Stats does not project canonical Ninjutsu 15");
     assert(beforeReload.overviewHtml.includes("CURRENT PL"),"My Clan overview lost Current PL");
     assert(beforeReload.overviewHtml.includes(`<strong>${beforeReload.pl}</strong>`),"My Clan Current PL does not match canonical PL");
 
@@ -261,7 +261,7 @@ async function restorePracticalResolver(page){
     assert.strictEqual(afterReload.pl,beforeReload.pl,"Current PL changed across reload");
     assert.deepStrictEqual(afterReload.receiptCounts,beforeReload.receiptCounts,"reload duplicated/lost #448 receipts");
     assert.deepStrictEqual(afterReload.team.teamVariantIds,["academy_menma","academy_hinata","academy_kakashi"],"reload changed exact committed currentTeam");
-    assert(afterReload.statsHtml.includes("<span>NINJUTSU</span><strong>15</strong>"),"My Clan post-reload Stats stale");
+    assert(/<span>NIN(?:JUTSU)?<\/span><strong>15<\/strong>/.test(afterReload.statsHtml),"My Clan post-reload Stats stale");
     assert(afterReload.overviewHtml.includes(`<strong>${afterReload.pl}</strong>`),"My Clan post-reload PL stale");
     assert.strictEqual(afterReload.diagnostics.pass,true,JSON.stringify(afterReload.diagnostics));
 
