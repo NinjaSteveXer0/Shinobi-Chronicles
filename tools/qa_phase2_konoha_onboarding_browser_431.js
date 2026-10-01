@@ -16,6 +16,16 @@ async function waitTrial(page){
     typeof globalThis.continueAcademyTeamFormationJourney==="function"
   ),null,{timeout:30000});
 }
+async function releaseFrontDoor(page){
+  await page.evaluate(()=>{
+    try{if(typeof releaseAlphaFrontDoor33300==="function")releaseAlphaFrontDoor33300();}catch(_error){}
+    const game=document.querySelector(".game-container");
+    if(game){game.removeAttribute("data-alpha-front-door-locked");game.inert=false;}
+    for(const id of ["sc-alpha-front-door-33300","sc-alpha-front-door-33400"]){
+      const node=document.getElementById(id);if(node)node.remove();
+    }
+  });
+}
 async function snapshot(page){
   return page.evaluate(()=>({
     team:globalThis.getChronicleCurrentTeam43600?JSON.parse(JSON.stringify(getChronicleCurrentTeam43600())):null,
@@ -46,6 +56,7 @@ async function clickGuide(page,label){
   try{
     await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});
     await waitTrial(page);
+    await releaseFrontDoor(page);
 
     const start=await page.evaluate(()=>{
       playerData=createDefaultPlayerData();
@@ -123,6 +134,7 @@ async function clickGuide(page,label){
 
     await page.reload({waitUntil:"domcontentloaded",timeout:60000});
     await waitTrial(page);
+    await releaseFrontDoor(page);
     const afterReload=await snapshot(page);
     assert.deepStrictEqual(afterReload.team.teamVariantIds,start.team.teamVariantIds,"reload changed committed currentTeam");
     assert.strictEqual(afterReload.progress.sandboxPopupSeen,true);
