@@ -1077,6 +1077,33 @@
       ],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Consumes the owner-approved First Konoha Sandbox Guided Onboarding Trial. The old #209 mandatory General Training Ground orientation no longer gates Academy free play. After exact committed Team Formation the player enters genuine Konoha sandbox; optional guidance uses one opening popup, public-location recommendations, contextual first-use tips, Arena route explanation and Promotion-vs-Explore choice. It creates no Stats/PL/Rank/rewards/World events and remains TRIAL pending Stephen browser acceptance."
+    },
+    {
+      "changeId": "issue-431-phase2-konoha-player-facing-activity-surfaces",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "phase2.konoha_player_surfaces.trial"
+      ],
+      "owner": "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
+      "directCallers": [
+        "index.html",
+        "existing Practical / Shinobi Exams render and roster query hooks"
+      ],
+      "stateTouched": [
+        "read-only committed currentTeam projection from #436",
+        "presentation-only Practical / Exams selectable-character projection",
+        "presentation-only Discipline accent attributes/styles",
+        "presentation-only Practical / Exams player copy"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_phase2_konoha_player_surfaces_431.js",
+        "tools/qa_phase2_konoha_onboarding_browser_431.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "OWNER_BROWSER_REPAIR",
+      "rationale": "Owner Phase-2 browser testing found fixture/demo Naruto and Sasuke leaking into normal Practical / Exams and developer-facing copy on those surfaces. This bounded late adapter uses the already committed Academy currentTeam for Practical / Exams only, preserves Training Grounds as the wider owned-roster surface, and applies presentation-only Discipline accents and natural player language without changing progression, rewards, Rank, Promotion, Battle or ownership semantics."
     }
   ]
 }
