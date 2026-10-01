@@ -118,6 +118,7 @@ async function proveKurenaiInstalledReceipt(browser){
   try{
     const launch=await page.evaluate(()=>beginAlphaChronicleOriginPrologue());
     assert.strictEqual(launch?.success,true,"Kurenai launch failed");
+    await release(page);
     await page.waitForFunction(()=>document.getElementById("story-scene-presentation-layer")?.dataset.scSceneBoard==="true",null,{timeout:15000});
 
     await advanceUntil(page,"kur_approach");
