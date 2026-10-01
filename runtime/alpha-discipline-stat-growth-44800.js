@@ -426,7 +426,7 @@ function processCompatibility(characterId,disciplineId,options={}){
   const refs=Array.isArray(options&&options.sourceDevelopmentReceiptRefs)?options.sourceDevelopmentReceiptRefs.filter(Boolean):[];
   const transactionId=options&&options.transactionId?String(options.transactionId):"compat::"+Date.now();
   const resolved=resolveBreakthroughs(characterId,disciplineId,{transactionId,sourceDevelopmentReceiptRefs:refs,progressionRow:row});
-  if(resolved.statPointsGained>0&&typeof globalThis.savePlayerData==="function")globalThis.savePlayerData();
+  if(resolved.statPointsGained>0&&options.deferSave!==true&&typeof globalThis.savePlayerData==="function")globalThis.savePlayerData();
   return{levelsGained:resolved.statPointsGained,level:row.level||1,exp:row.exp,expToNext:thresholdForStat(currentStat(characterId,disciplineId)),statPointsGained:resolved.statPointsGained,stat:currentStat(characterId,disciplineId),previousStat:before};
 }
 function noLegacyPendingGrowth(characterId,disciplineId){
