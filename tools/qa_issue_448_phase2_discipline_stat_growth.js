@@ -214,6 +214,9 @@ assert(GAME.includes("if (\n      !result ||\n      result.completed !==\n      
   const ch=byId.academy_menma;
   ctx.openKonohaActivityUIScreen("exams",ch.id);
   ch.stats.nin=14;ch.disciplineProgression.nin.exp=14;
+  // This is an explicit persisted QA setup. Activated characters correctly
+  // rehydrate canonical saved Current Stats before committing a transaction.
+  ctx.savePlayerData();
   const first=ctx.executeKonohaExamAttempt(ch.id,"nin");
   assert.strictEqual(first.completed,true);
   assert.strictEqual(ch.stats.nin,15,"final eligible Foundation repetition did not reach ceiling");
