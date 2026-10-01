@@ -317,6 +317,11 @@ function executeFoundationAttempt(serviceId,characterId,disciplineId){
     ?(typeof createKonohaExamAttemptContext==="function"?createKonohaExamAttemptContext(characterId,disciplineId):null)
     :(typeof createKonohaPracticalAttemptContext==="function"?createKonohaPracticalAttemptContext(characterId,disciplineId):null);
   if(!context)return{success:false,completed:false,reason:`${serviceId}_context_invalid`};
+  // Numeric Mastery is retired by #448. Existing Exam/Practical pass/fail
+  // ownership is preserved, but the legacy level input is neutralised to its
+  // baseline so it can no longer become a second persistent progression axis.
+  context.disciplineLevel=1;
+  context.disciplineExp=before.exp;
   const resolution=serviceId==="exam"
     ?(typeof resolveKonohaExamAttempt==="function"?resolveKonohaExamAttempt(context):null)
     :(typeof resolveKonohaPracticalAttempt==="function"?resolveKonohaPracticalAttempt(context):null);
@@ -518,6 +523,7 @@ function diagnostics(){
     foundationCeilingExact:DEVELOPMENT_CEILING_STAT===15,
     registeredActivitiesExact:JSON.stringify(SUPPORTED_SERVICES)===JSON.stringify(["exam","practical"]),
     actionDerivedLaw:executeFoundationAttempt.toString().includes("resolution.passed===true?2:1"),
+    numericMasteryRetired:executeFoundationAttempt.toString().includes("context.disciplineLevel=1"),
     exactCurrentPLStatsOnly:exactDevelopedStats44800.toString().includes("exactStats(character)"),
     noTechniquePracticeWriter:!String(commitDevelopment).includes("techniquePractice"),
     staleTeamGuard:commitDevelopment.toString().includes("stale_team_assignment"),
