@@ -253,7 +253,7 @@ const MANIFEST=Object.freeze({
   phase:"Phase 2",
   rootSavePath:"playerData.phase2ChronicleState",
   rootSchemaVersion:ROOT_SCHEMA_VERSION,
-  compatibilityReader:"loadPlayerData remains pure; migration helper does not write",
+  compatibilityReader:"pure load adapter reattaches persisted Phase-2 root without writing; migration helper remains pure",
   migrationHook:"migratePhase2ChronicleState43600",
   persistenceHook:"ensurePhase2ChronicleState43600",
   devOverridePolicy:"explicit_dev_owner_mode_only; never substitute ordinary player Chronicle state",
