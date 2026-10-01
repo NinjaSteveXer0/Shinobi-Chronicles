@@ -9,7 +9,7 @@
 `Documentation/Coordination/Phase_2_Persistent_Chronicle_Safety_Constitution_2026-10-01.md`  
 @ `7ae187e5815e4e441bc1e7d7e59f9962c87be71f`
 
-**Persistent-state infrastructure queue:** #undefined
+**Persistent-state infrastructure queue:** #436
 
 No persistent Phase-2 subsystem may bypass the Constitution's state-owner / save-schema / migration / observer-safety / browser-trial gates.
 
@@ -31,14 +31,15 @@ Design closed alone does not promote a task above RED/AMBER if the player cannot
 Owner acceptance:
 - all 10 Academy Origins = FROZEN GOLDEN;
 - global Shinobi Chronicles Battle System = FROZEN GOLDEN;
-- exact owner-accepted PR #417 head: `1d3289dc82c0cd9e9b84976ef9d8738f347e3a20`;
+- final owner-accepted Phase-1 PR #417 head: `2b665913d2817840a076cb5cb6b2811b250ca025`;
+- pre-reward-overlay Golden baseline: `1d3289dc82c0cd9e9b84976ef9d8738f347e3a20`;
 - final exact-head validation before owner acceptance: 21/21 workflows GREEN, 0 failed, 0 pending.
 
 Durable receipt:
 `Documentation/Coordination/Phase_1_Completion_and_Frozen_Golden_Receipt_2026-10-01.md`
 @ `974a56cd6f57e7fbd3c925cb4e749a622aff4247`
 
-The active Academy reward-spectrum refresh is a bounded semantic/reward overlay and does not revoke the Golden freeze.
+The Academy reward-spectrum refresh is complete and owner-accepted at the final Phase-1 head. It is now part of the frozen package.
 
 ---
 
