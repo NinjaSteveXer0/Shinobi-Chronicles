@@ -104,6 +104,48 @@ function commitDevelopment440({subjectVariantId,sourceOccurrenceId,progressionSl
     timestamp:Date.now()
   };
   if(grant<=0){rows.push(record);if(typeof savePlayerData==="function")savePlayerData();return{success:true,idempotent:false,receipt:clone(record),expGranted:0};}
+
+  // Phase-2 #448 owns the shared EXP -> Current-Stat transaction when loaded.
+  // The Origin overlay keeps its source/cap/reason authority and supplies the
+  // exact source-scoped receipt; #448 performs the canonical persistent write.
+  if(typeof globalThis.commitDisciplineDevelopment44800==="function"){
+    const runtimeDisciplineId=runtimeDisciplineId440(disciplineId);
+    const tx=globalThis.commitDisciplineDevelopment44800({
+      characterId:subjectVariantId,
+      disciplineId:runtimeDisciplineId,
+      requestedExp:grant,
+      grantedExp:grant,
+      source:"origin_development",
+      sourceOccurrenceId,
+      causalRootId:sourceOccurrenceId,
+      progressionSlotId,
+      causalCap:cap,
+      developmentClass:record.developmentClass,
+      playerFacingReason:record.playerFacingReason,
+      developmentReceipt:record
+    });
+    if(!tx||tx.success!==true){
+      return{success:false,reason:"phase2_discipline_development_commit_failed",transaction:clone(tx),subjectVariantId,disciplineId,progressionSlotId};
+    }
+    return{
+      success:true,
+      idempotent:tx.idempotent===true,
+      receipt:clone(tx.receipt||record),
+      expGranted:tx.idempotent===true?0:grant,
+      levelResult:{
+        levelsGained:0,
+        level:1,
+        exp:Number(tx.expRemaining)||0,
+        expToNext:Number(tx.expToNext)||0,
+        statPointsGained:Math.max(0,(Number(tx.currentStatAfter)||0)-(Number(tx.currentStatBefore)||0)),
+        stat:Number(tx.currentStatAfter)||0,
+        breakthroughs:clone(tx.breakthroughs||[]),
+        curveId:tx.curveId||"discipline_stat_curve_v1"
+      },
+      phase2Transaction:clone(tx)
+    };
+  }
+
   if(typeof getCharacterDisciplineProgression!=="function"||typeof processDisciplineLevelUps!=="function"||typeof getPlayerCharacter!=="function"){
     return{success:true,skipped:true,reason:"discipline_progression_api_unavailable",receipt:null,expGranted:0};
   }
