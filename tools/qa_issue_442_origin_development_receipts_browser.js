@@ -45,17 +45,17 @@ async function freshOrigin(browser,variant,label){
 async function directDevelopment(browser,{variant,occurrence,fact,discipline,expectedExp,expectedLine,label}){
   const {context,page,gate}=await freshOrigin(browser,variant,label);
   try{
-    const result=await page.evaluate(({variant,occurrence,fact})=>{
+    const result=await page.evaluate(({variant,occurrence,fact,discipline})=>{
       const commit=SC_ALPHA_ORIGIN_32900.commitOccurrence(variant,occurrence,fact,[],{});
       const lines=["REWARDS"];appendAcademyOriginRewardReceipt440(lines,variant);
       const character=getPlayerCharacter(variant);
-      const progression=getCharacterDisciplineProgression(variant,arguments[0]?.discipline||null);
+      const progression=getCharacterDisciplineProgression(variant,discipline);
       const receipts=(playerData.activityHistory||[]).filter(row=>row?.type==="discipline_development"&&row.subjectVariantId===variant);
       return{
         commit,lines,receipts,ryo:Number(playerData.ryo)||0,
         characterId:character?.id||null,
         progression:progression?JSON.parse(JSON.stringify(progression)):null,
-        savedProgression:playerData.characters?.[variant]?.disciplineProgression?.[arguments[0]?.discipline||""]||null
+        savedProgression:playerData.characters?.[variant]?.disciplineProgression?.[discipline]||null
       };
     },{variant,occurrence,fact,discipline});
     assert.strictEqual(result.commit?.success,true,label+" occurrence commit failed "+JSON.stringify(result.commit));
