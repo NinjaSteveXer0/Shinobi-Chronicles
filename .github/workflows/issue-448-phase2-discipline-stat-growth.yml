@@ -1,0 +1,98 @@
+name: Issue 448 Phase 2 Discipline Stat Growth
+
+on:
+  push:
+    branches:
+      - coding/phase2-discipline-stat-growth-448
+    paths:
+      - 'index.html'
+      - 'game.js'
+      - 'runtime/alpha-chronicle-state-manifest-43600.js'
+      - 'runtime/alpha-phase2-discipline-development-44800.js'
+      - 'runtime/alpha-phase2-discipline-development-ui-44810.js'
+      - 'runtime/alpha-origin-reward-spectrum-440.js'
+      - 'tools/fixtures/runtime_change_declarations_300.json'
+      - 'tools/fixtures/runtime_responsibility_registry_300.json'
+      - 'tools/qa_issue_448_phase2_discipline_stat_growth.js'
+      - 'tools/qa_issue_448_phase2_discipline_stat_growth_browser.js'
+      - 'tools/qa_phase2_chronicle_state_manifest_436.js'
+      - 'tools/qa_issue_141_pre_alpha_runtime_closure.py'
+      - '.github/workflows/issue-448-phase2-discipline-stat-growth.yml'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  phase2-discipline-stat-growth:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Source syntax
+        run: |
+          node --check runtime/alpha-phase2-discipline-development-44800.js
+          node --check runtime/alpha-phase2-discipline-development-ui-44810.js
+          node --check runtime/alpha-chronicle-state-manifest-43600.js
+          node --check runtime/alpha-origin-reward-spectrum-440.js
+          node --check tools/qa_issue_448_phase2_discipline_stat_growth.js
+          node --check tools/qa_issue_448_phase2_discipline_stat_growth_browser.js
+          node --check tools/qa_phase2_chronicle_state_manifest_436.js
+
+      - name: Phase-2 Discipline development transaction
+        run: node tools/qa_issue_448_phase2_discipline_stat_growth.js
+
+      - name: Chronicle State Manifest
+        run: node tools/qa_phase2_chronicle_state_manifest_436.js
+
+      - name: Runtime ownership safety
+        run: node tools/qa_runtime_ownership_safety_300.js
+
+      - name: Save compatibility
+        run: node tools/qa_save_compatibility_311.js
+
+      - name: Origin reward spectrum regression
+        run: node tools/qa_issue_440_origin_reward_spectrum.js
+
+      - name: Frozen Kakashi reward and Story contract
+        run: node tools/qa_kakashi_v2_clean_room.js
+
+      - name: Pre-Alpha runtime closure
+        run: python tools/qa_issue_141_pre_alpha_runtime_closure.py
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > issue448-server.log 2>&1 &
+          echo $! > issue448-server.pid
+          sleep 2
+
+      - name: Installed-browser Discipline Stat growth trial
+        run: node tools/qa_issue_448_phase2_discipline_stat_growth_browser.js
+
+      - name: Installed-browser Origin Receipt regression
+        run: node tools/qa_issue_442_origin_development_receipts_browser.js
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-448-phase2-discipline-stat-growth
+          path: |
+            artifacts/issue-448-discipline-development
+            artifacts/issue-442-origin-development-receipts
+            issue448-server.log
+          if-no-files-found: ignore
