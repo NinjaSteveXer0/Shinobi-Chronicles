@@ -13,8 +13,11 @@ if(globalThis.SC_CHRONICLE_STATE_MANIFEST_43600)return;
 
 const PATCH_ID="phase2_chronicle_state_manifest_43600_2026_10_01";
 const ROOT_KEY="phase2ChronicleState";
-const ROOT_SCHEMA_VERSION=1;
+const ROOT_SCHEMA_VERSION=2;
 const TUTORIAL_SCHEMA_VERSION=1;
+const DISCIPLINE_DEVELOPMENT_SCHEMA_VERSION=1;
+const DISCIPLINE_DEVELOPMENT_CURVE_ID="discipline_stat_curve_v1";
+const DISCIPLINE_DEVELOPMENT_PROFILE_ID="academy_foundation_discipline_activity_v1";
 const SAVE_KEY="shinobiChroniclesPlayerSave";
 const priorLoadPlayerData=typeof globalThis.loadPlayerData==="function"?globalThis.loadPlayerData:null;
 
@@ -116,6 +119,33 @@ function defaultTutorialProgress(teamRef=null){
     updatedAt:null
   };
 }
+function defaultDisciplineDevelopment(){
+  return{
+    schemaVersion:DISCIPLINE_DEVELOPMENT_SCHEMA_VERSION,
+    curveId:DISCIPLINE_DEVELOPMENT_CURVE_ID,
+    profileId:DISCIPLINE_DEVELOPMENT_PROFILE_ID,
+    nextSequence:1,
+    migratedProgressionCharacterIds:{},
+    processedReceiptIds:[],
+    developmentReceipts:[],
+    breakthroughReceipts:[],
+    ceilingReceipts:[]
+  };
+}
+function normalizeDisciplineDevelopment(source){
+  const row=source&&typeof source==="object"?clone(source):{};
+  return{
+    schemaVersion:DISCIPLINE_DEVELOPMENT_SCHEMA_VERSION,
+    curveId:DISCIPLINE_DEVELOPMENT_CURVE_ID,
+    profileId:DISCIPLINE_DEVELOPMENT_PROFILE_ID,
+    nextSequence:Math.max(1,Math.floor(Number(row.nextSequence)||1)),
+    migratedProgressionCharacterIds:row.migratedProgressionCharacterIds&&typeof row.migratedProgressionCharacterIds==="object"?clone(row.migratedProgressionCharacterIds):{},
+    processedReceiptIds:[...new Set(Array.isArray(row.processedReceiptIds)?row.processedReceiptIds.filter(Boolean):[])],
+    developmentReceipts:Array.isArray(row.developmentReceipts)?row.developmentReceipts.filter(Boolean).map(clone):[],
+    breakthroughReceipts:Array.isArray(row.breakthroughReceipts)?row.breakthroughReceipts.filter(Boolean).map(clone):[],
+    ceilingReceipts:Array.isArray(row.ceilingReceipts)?row.ceilingReceipts.filter(Boolean).map(clone):[]
+  };
+}
 function legacyTutorialProjection(save,progress){
   const receipt=formationReceiptFrom(save),legacy=receipt&&receipt.firstKonohaTutorial&&typeof receipt.firstKonohaTutorial==="object"?receipt.firstKonohaTutorial:null;
   const legacyCompleted=!!(legacy&&legacy.completed===true&&legacy.completionReceipt);
@@ -141,7 +171,8 @@ function migratePhase2ChronicleState(save){
     schemaVersion:ROOT_SCHEMA_VERSION,
     tutorialProgress:existing.tutorialProgress&&typeof existing.tutorialProgress==="object"
       ?{...defaultTutorialProgress(team&&team.assignmentId),...existing.tutorialProgress,schemaVersion:TUTORIAL_SCHEMA_VERSION}
-      :legacyTutorialProjection(source,defaultTutorialProgress(team&&team.assignmentId))
+      :legacyTutorialProjection(source,defaultTutorialProgress(team&&team.assignmentId)),
+    disciplineDevelopment:normalizeDisciplineDevelopment(existing.disciplineDevelopment)
   };
   if(team&&root.tutorialProgress.academyTeamFormationReceiptRef!==team.assignmentId){
     // A different committed Academy-team assignment is a different onboarding
@@ -264,6 +295,24 @@ const DOMAINS=Object.freeze([
     qaRefs:Object.freeze(["tools/qa_phase2_chronicle_state_manifest_436.js","tools/qa_save_compatibility_311.js"])
   }),
   Object.freeze({
+    stateDomainId:"disciplineDevelopment",
+    semanticOwner:"Progression / Development + PL/Registry Current-Stat authority",
+    canonicalWritePath:"commitFoundationDisciplineDevelopment44800 -> playerData.characters[progressionCharacterId].stats / disciplineProgression.exp",
+    stableIdentityKey:"ownedCharacterId + progressionCharacterId",
+    savePath:"playerData.characters[progressionCharacterId].stats + disciplineProgression.exp; receipts at playerData.phase2ChronicleState.disciplineDevelopment",
+    schemaVersion:DISCIPLINE_DEVELOPMENT_SCHEMA_VERSION,
+    sourceOccurrenceIdFormat:"discipline-development::<service>::<ownedCharacterId>::<disciplineId>::<sequence>",
+    idempotenceKeyFormat:"disciplineDevelopment.processedReceiptIds",
+    derivedFields:Object.freeze(["Current PL from canonical seven Current Stats","dynamic EXP threshold from current persistent Stat"]),
+    projectionConsumers:Object.freeze(["Practical","Exams","My Clan","Shinobi Record","Current PL"]),
+    migrationRule:"first #448 load seeds canonical saved Current Stats from the fully reconciled runtime; later loads rehydrate those persisted Stats without legacy level-derived mutation",
+    resetRule:"new_chronicle_or_explicit_authorised_progression_reset_only",
+    difficultyScope:"academy_foundation_trial",
+    inheritanceRule:"persistent_character_development_survives_representation_and_team_slot_changes",
+    devOverridePolicy:"normal player activity must resolve exact committed-team persistent subject; no fixture roster substitution",
+    qaRefs:Object.freeze(["tools/qa_issue_448_persistent_discipline_development.js","tools/qa_issue_448_persistent_discipline_development_browser.js","tools/qa_save_compatibility_311.js"])
+  }),
+  Object.freeze({
     stateDomainId:"shinobiRecordProjection",
     semanticOwner:"Shinobi Record presentation",
     canonicalWritePath:"NONE_DERIVED_PROJECTION_ONLY",
@@ -304,7 +353,9 @@ function diagnostics(){
   const checks={
     minimumFields:DOMAINS.every(row=>required.every(key=>Object.prototype.hasOwnProperty.call(row,key))),
     uniqueDomains:unique.size===DOMAINS.length,
-    initialDomains:["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","shinobiRecordProjection"].every(id=>unique.has(id)),
+    initialDomains:["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","disciplineDevelopment","shinobiRecordProjection"].every(id=>unique.has(id)),
+    disciplineDevelopmentRegistered:DOMAINS.find(row=>row.stateDomainId==="disciplineDevelopment")?.canonicalWritePath.includes("commitFoundationDisciplineDevelopment44800")===true,
+    disciplineDevelopmentDeterministicSchema:migrated[ROOT_KEY]?.disciplineDevelopment?.curveId===DISCIPLINE_DEVELOPMENT_CURVE_ID&&migrated[ROOT_KEY]?.disciplineDevelopment?.profileId===DISCIPLINE_DEVELOPMENT_PROFILE_ID,
     currentTeamDerivedNotDuplicated:DOMAINS.find(row=>row.stateDomainId==="currentTeam")?.canonicalWritePath==="confirmAcademyTeamFormation"&&!String(DOMAINS.find(row=>row.stateDomainId==="currentTeam")?.savePath||"").includes("phase2ChronicleState.currentTeam"),
     ryoExistingOwnerPreserved:DOMAINS.find(row=>row.stateDomainId==="currentRyo")?.savePath==="playerData.ryo",
     recordProjectionNoWriter:DOMAINS.find(row=>row.stateDomainId==="shinobiRecordProjection")?.canonicalWritePath==="NONE_DERIVED_PROJECTION_ONLY",
