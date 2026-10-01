@@ -100848,7 +100848,7 @@ function renderMyClanInspectionContent(character){
   const slot=getMyClanStagedSlotNumber(character.id);
   const affiliation=getMyClanCharacterAffiliation(character)||"—";
   const tab=CLAN_UI_STATE.inspectionTab||"overview";
-  const statSource=character.baseStats||character.stats||{};
+  const statSource=character.stats||character.baseStats||{};
   const statLabels=[["nin","NIN"],["tai","TAI"],["gen","GEN"],["buki","BUKI"],["fuin","FŪIN"],["kin","KIN"],["stamina","STAMINA"]];
   const editable=canEditClanFormation().allowed===true;
   let tabContent="";
