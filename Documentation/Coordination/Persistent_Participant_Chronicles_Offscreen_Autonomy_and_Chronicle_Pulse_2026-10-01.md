@@ -248,3 +248,219 @@ Before broad off-screen simulation, prove a bounded benchmark:
 ## 16. Final lock
 
 > Every persistent person may build a Chronicle, including autonomous team-mates and off-screen recurring actors. Shared events remain one factual occurrence with participant-specific Chronicle projections. World advancement occurs at semantic Chronicle Pulse boundaries, not arbitrary UI activity or raw click counts, and off-screen truth is not automatically player Knowledge.
+## 17. Canonical personal Chronicle vs active simulation vs player projection
+
+Do not collapse these three layers:
+
+### A. Canonical personal Chronicle
+Authoritative references to the factual occurrences that affected this stable person.
+
+This layer is durable and non-lossy.
+
+### B. Active CE simulation window
+The bounded subset of actors currently eligible for Chronicle Pulse evaluation.
+
+This layer is stop/start and performance-sensitive.
+
+### C. Shinobi Record projection
+The observer-safe subset of that person's history that the protagonist currently knows or can legitimately infer.
+
+This layer is presentation/Knowledge-sensitive.
+
+Canonical law:
+
+`personal Chronicle truth != active simulation window != protagonist Record projection`.
+
+## 18. No fixed-slot deletion of factual history
+
+Do NOT store a Character's actual Chronicle as a fixed-size rolling list where new events delete old events.
+
+A UI may show:
+- 5 recent events;
+- 10 key events;
+- a significance-ranked summary;
+- a paginated history;
+- compacted summaries.
+
+But those are projections/indexes.
+
+The underlying occurrence references/provenance remain durable.
+
+This is mandatory for Legendary Weapon provenance, Bloodline awakening, Hosted Entity attachment/history, Rank Promotion, resurrection/death/restoration, major relationship history, institutional appointments, betrayals/debts/secrets, Story divergence and other causal facts future systems may consume.
+
+UI compaction must never become semantic deletion.
+
+## 19. Legacy / baseline history vs this Chronicle's recorded history
+
+A persistent Character may have authoritative history that predates the current playable Chronicle.
+
+Preserve two distinct layers:
+
+### Legacy / baseline history
+Authored prior history, expected/canon trajectory, institutional reputation, known past achievements/relationships, or other pre-playthrough facts supplied by current authority.
+
+### Recorded Chronicle history
+What this specific playthrough has actually committed after the Chronicle root/new-game boundary.
+
+Example:
+Minato does not become historically defined by his first CE event in this playthrough.
+
+If current authority says he is a Third Shinobi World War hero with prior relationships/achievements, those are baseline history.
+
+If this playthrough later creates an argument, mission, death, resurrection, new student or political decision, those are Recorded Chronicle events.
+
+Canonical rule:
+
+`legacy/baseline history != recorded playthrough history`.
+
+Recorded History still overrides expected history when a legitimate divergence occurs.
+
+## 20. Legendary / historical Character entry
+
+For major historical Characters such as a Hokage, Sannin, war hero or other heavily authored person:
+
+CE must not fabricate their historical identity from scratch on first encounter.
+
+Their entry state should consume authoritative baseline history.
+
+If an extraordinary occurrence brings a dead/historical Character into active play:
+
+`authoritative prior history -> exact resurrection/return/divergence occurrence -> new active personal Chronicle`.
+
+The resurrection/return event becomes the causal bridge.
+
+CE may then continue generating eligible new events from the changed current state.
+
+It may not erase or replace the prior life with a handful of new Pulse events.
+
+## 21. Latent / hidden personal Chronicle
+
+A persistent actor may have Chronicle truth before the protagonist meets them.
+
+This should be represented as hidden world/person history, not immediately projected into Shinobi Record.
+
+Possible sources:
+- authored baseline history;
+- prior World/Story occurrence in which the actor legitimately participated;
+- an off-screen Chronicle Pulse occurrence;
+- institutional/public event;
+- another participant's autonomous action.
+
+When the protagonist later meets or learns about that actor, the game reveals only the subset justified by current Knowledge.
+
+## 22. First encounter does not dump private biography
+
+Meeting a Character for the first time may reveal observed identity/role, public reputation the protagonist legitimately knows, immediately observable condition, facts directly disclosed, shared current occurrence, or public/locally known history where current Knowledge supports it.
+
+It does NOT automatically reveal all hidden Pulse events, private relationships, secret missions, hidden Skills/Bloodlines, crimes, private motives, unreported provenance or every event since New Game.
+
+Further dialogue, investigation, Intelligence, witnesses or later shared history may reveal more.
+
+## 23. Dossier activation
+
+On first legitimate encounter with a persistent person, Shinobi Record may create a person dossier projection.
+
+That dossier is not the creation of the person's history.
+
+It is the protagonist's first indexed view into already-existing world/person truth.
+
+Suggested dossier layers:
+- WHO I KNOW THEM AS
+- PUBLIC / KNOWN BACKGROUND
+- SHARED CHRONICLE
+- RECENT KNOWN EVENTS
+- KNOWN IMPRESSION / STANCE
+- KNOWN TRAINING / CAPABILITY / AFFILIATION
+- RUMOURS / UNCONFIRMED INFORMATION
+
+All fields remain observer-safe.
+
+## 24. Minor/faceless NPC rule
+
+Not every occurrence-local civilian/vendor needs a full hidden life simulation from New Game.
+
+A minor/faceless NPC may remain occurrence-local until reused as the same historical person, named, given durable ownership/provenance, becomes a recurring relationship/contact, becomes relevant to Story/World, or acquires another reason to persist.
+
+Only then should runtime promote the actor into a persistent-person identity with personal Chronicle continuity.
+
+Do not simulate thousands of disposable NPC biographies merely because they could theoretically exist.
+
+## 25. Market Vendor example
+
+If Menma first meets a persistent Market Vendor:
+- the current encounter creates shared Chronicle history;
+- public/observable background may become known;
+- older hidden events remain hidden unless a legitimate source reveals them.
+
+If that same vendor had already participated in a committed World occurrence before Menma met them, that event remains real history.
+
+Dialogue may later reveal they supplied a convoy, survived an earlier attack, know a recurring traveller, lost an item, or witnessed another event only where those facts actually exist and the current interaction legitimately discloses them.
+
+CE must not fabricate retroactive key events merely to make the dossier look fuller.
+
+## 26. Active-window start / pause / resume
+
+A persistent actor may enter an active simulation window when they are a current participant, join the current team, an unresolved World/Story chain targets them, a relationship/mentor/rival route is active, their location/institution is under active Chronicle pressure, or another authorised event makes them relevant.
+
+They may leave active evaluation when no due windows remain.
+
+Pausing does not delete history.
+
+Resuming does not require CE to simulate every unseen day.
+
+Instead CE continues from the last committed state plus any authorised intervening world-state changes.
+
+## 27. No retroactive filler catch-up
+
+When a dormant actor becomes active again, do NOT generate a pile of invented filler events merely to account for elapsed time.
+
+Allowed:
+- resolve pending authored consequences;
+- consume world-state changes that genuinely affected them;
+- commit one or more legitimate bridging occurrences where authority requires them.
+
+Not allowed:
+- generate random fights/romances/promotions/jobs just to fill an elapsed-time gap.
+
+Sparse event history is valid.
+
+## 28. Public / institutional history can become known without direct meeting
+
+Some actor history may enter Shinobi Record before personal contact if the protagonist legitimately learns it through Academy teaching, official records, Bingo/mission data, public reputation, family/clan knowledge, intelligence reports, or Story exposition from a legitimate source.
+
+Therefore:
+`person not yet met != no Knowledge of person`.
+
+Likewise:
+`person met != full Knowledge of person`.
+
+## 29. Chronicle Pulse visibility rule
+
+A Chronicle Pulse updates world/person truth first.
+
+It updates Shinobi Record only if the resulting fact is already observer-visible through a legitimate channel.
+
+Examples:
+- teammate acts beside Menma -> immediate known history;
+- known NPC is publicly promoted and Menma receives an official notice -> Record may update;
+- known rival secretly meets an enemy -> no Record update until discovered;
+- unknown actor privately changes location -> hidden world truth only.
+
+Thus Stephen's two-part model becomes:
+1. Pulse commits eligible actor/world history.
+2. Knowledge/provenance decides whether that history projects into Shinobi Record now, later, or never.
+
+## 30. Presentation compaction
+
+For readability, Shinobi Record may rank or compress old low-significance events into summaries such as:
+- Worked together on 4 routine patrols
+- Trained together repeatedly during Academy free play
+- Several minor disagreements during field assignments
+
+But every summary must preserve source occurrence references.
+
+Major/defining events should not be silently compressed into bland aggregate text when their identity matters.
+
+Compaction is reversible presentation.
+
+It is not semantic history deletion.
