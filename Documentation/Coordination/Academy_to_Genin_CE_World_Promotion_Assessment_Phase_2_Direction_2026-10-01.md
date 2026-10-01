@@ -198,3 +198,49 @@ Only the final two expose player-facing requirement text.
 Revealed+satisfied uses the approved light-green/checkmarked success treatment or final UI equivalent.
 
 This persistence timing is a new owner clarification after Rank #445 and requires Rank authority amendment before Coding consumes it.
+## 23. Rank package contract consumed — #445 + #447
+
+Binding Rank authority is now closed and consumed:
+`Documentation/Rank/Academy to Genin Variable Promotion Requirement Packages 2026-10-01.md`
+plus the New Game seed amendment.
+
+Academy -> Genin exact institutional resolver:
+- mission objective complete;
+- mission_comprehension;
+- judgement_under_pressure;
+- exactly two secondary domains from the committed package;
+- no safety/integrity abort/disqualification.
+
+Initial package pool is exactly:
+- academy_genin_fr_pkg_information_team_v1
+- academy_genin_fr_pkg_information_combat_v1
+- academy_genin_fr_pkg_information_objective_v1
+- academy_genin_fr_pkg_team_combat_v1
+- academy_genin_fr_pkg_team_objective_v1
+- academy_genin_fr_pkg_combat_objective_v1
+
+Package identity:
+`immutableChronicleSeed + stableCharacterId + academy_to_genin -> promotionRequirementPackageId`.
+
+The package is effectively determined from New Game, stable for that Character + transition for the entire playthrough, and never rerolled by retry, alternate scenario, failure, withdrawal, team changes, discovery, satisfaction, UI, save/load or refresh.
+
+Every Promotion scenario must declare which package IDs it supports and must offer reasonable legitimate opportunities for every required domain in a supported package.
+
+Scenario selection cannot participate in package selection.
+
+## 24. Four hidden readiness slots
+
+UI should preserve four readiness requirement slots plus the disclosed mission objective and safety/integrity state.
+
+Two fixed readiness concepts and the two package-selected secondary requirements may remain hidden until legitimate reveal authority applies.
+
+Requirement truth and Knowledge are independent:
+- hidden + unsatisfied;
+- hidden + satisfied;
+- revealed + unsatisfied;
+- revealed + satisfied.
+
+Hidden projects as ??????.
+Revealed+satisfied may use light-green text/checkmark.
+
+Do not expose package ID, hidden domain identity, evidence weights or pass probability to normal player UI.

@@ -639,3 +639,30 @@ Therefore:
 
 `NPC Chronicle truth != protagonist Knowledge != Record projection`.
 
+## 33. Person dossier history layers
+
+When a person becomes known enough to have a Shinobi Record dossier, separate:
+- LEGACY / KNOWN BACKGROUND — authorised pre-playthrough history the protagonist legitimately knows;
+- SHARED CHRONICLE — occurrences the protagonist and that person experienced together;
+- OTHER KNOWN CHRONICLE EVENTS — legitimate events learned through reports, witnesses, Intelligence, institutions or later disclosure;
+- RUMOURS / UNCONFIRMED — claims not yet established as fact.
+
+Do not flatten baseline history and new CE history into one undifferentiated recent-event list.
+
+For major historical Characters, the Record should make it possible to understand who they were before the current Chronicle, subject to protagonist Knowledge.
+
+## 34. Dossier creation != history creation
+
+First encounter may activate a person dossier, but the person's history may already exist.
+
+Meeting does not cause retroactive CE history generation and does not automatically reveal private history.
+
+Record projection follows current Knowledge.
+
+## 35. Recent/key-event limits are presentation only
+
+UI may cap recent/key-event cards for readability, but this does not delete canonical occurrence references.
+
+Use pagination, filters, significance ranking and reversible summaries instead of semantic eviction.
+
+Never evict causally important history such as provenance, Promotion, awakening, death/restoration, major relationship history or Story divergence merely because a display slot is full.
