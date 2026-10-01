@@ -249,6 +249,41 @@ function commitDevelopment(characterId,disciplineId,requestedExp,metadata={}){
         developmentCeilingStat:FOUNDATION_CEILING,sourceDevelopmentReceiptRef:receiptId,commitState:"committed",timestamp:Date.now()
       });
     }
+    if(metadata.attemptContext&&metadata.resolution&&foundationSource(source)){
+      const attemptContext=metadata.attemptContext,resolution=metadata.resolution;
+      const discipline=typeof globalThis.getShinobiDiscipline==="function"?globalThis.getShinobiDiscipline(disciplineId):null;
+      pushHistory({
+        historyScope:typeof globalThis.getCurrentChronicleOccurrenceHistoryScope==="function"
+          ?globalThis.getCurrentChronicleOccurrenceHistoryScope("activity"):null,
+        sourceOccurrenceId,
+        causalRootId,
+        activity:source,
+        character:characterId,
+        completed:true,
+        success:resolution.passed===true,
+        outcome:resolution.outcome||((resolution.passed===true)?"pass":"fail"),
+        [source==="exam"?"exam":"practical"]:{
+          disciplineId,
+          disciplineName:String(discipline&&discipline.name||disciplineId),
+          disciplineLevel:1,
+          statValue:Number(attemptContext.statValue)||0
+        },
+        rewards:{exp:0,ryo:0,items:[],progression:[{type:"discipline",id:disciplineId,amount:granted}]},
+        development:{
+          receiptId,
+          ownedCharacterId:subject.ownedCharacterId||null,
+          progressionCharacterId:subject.progressionCharacterId,
+          curveId:CURVE_ID,
+          activityProfileId:FOUNDATION_PROFILE_ID,
+          developmentExp:granted,
+          developmentClass:String(metadata.developmentClass||"effective_execution"),
+          statBefore:statBefore[disciplineId],
+          statAfter:currentStat(characterId,disciplineId),
+          breakthroughCount:resolved.statPointsGained
+        },
+        timestamp:Date.now()
+      });
+    }
     if(typeof globalThis.savePlayerData==="function")globalThis.savePlayerData();
     const result={
       success:true,committed:true,duplicate:false,receipt:clone(developmentReceipt),requestedExp:amount,grantedExp:granted,
@@ -328,26 +363,54 @@ function enrichFoundationAttemptResult(result,tx){
 function executeFoundationAttempt448(source,prior,characterId,disciplineId){
   const pre=foundationSnapshot(characterId,disciplineId,source);
   if(!pre.allowed)return{success:false,completed:false,blocked:true,reason:pre.reason,phase2Preflight:clone(pre)};
-  if(typeof prior!=="function")return{success:false,completed:false,reason:source+"_attempt_owner_missing"};
+  const context=source==="exam"
+    ?(typeof globalThis.createKonohaExamAttemptContext==="function"?globalThis.createKonohaExamAttemptContext(characterId,disciplineId):null)
+    :(typeof globalThis.createKonohaPracticalAttemptContext==="function"?globalThis.createKonohaPracticalAttemptContext(characterId,disciplineId):null);
+  if(!context)return{success:false,completed:false,reason:source+"_context_invalid"};
+  // Numeric Mastery is retired. Preserve the established pass/fail resolver,
+  // but neutralise its legacy level contribution to a fixed baseline.
+  context.disciplineLevel=1;
+  context.disciplineExp=Number(progression(characterId,disciplineId)?.exp)||0;
+  const resolution=source==="exam"
+    ?(typeof globalThis.resolveKonohaExamAttempt==="function"?globalThis.resolveKonohaExamAttempt(context):null)
+    :(typeof globalThis.resolveKonohaPracticalAttempt==="function"?globalThis.resolveKonohaPracticalAttempt(context):null);
+  if(!resolution)return{success:false,completed:false,reason:source+"_resolution_failed"};
   const occurrence=makeFoundationOccurrence(source,characterId,disciplineId,pre.teamAssignmentId);
-  activeFoundationOccurrence=occurrence;
-  let result;
-  try{result=prior(characterId,disciplineId);}
-  finally{activeFoundationOccurrence=null;}
-  if(!result||result.completed!==true)return result;
-  let tx=occurrence.lastTransaction;
-  if(result.success!==true){
-    tx=commitDevelopment(characterId,disciplineId,1,{
-      source,activityId:source,activityProfileId:pre.activityProfileId,
-      teamAssignmentId:occurrence.teamAssignmentId,
-      sourceOccurrenceId:occurrence.sourceOccurrenceId,
-      causalRootId:occurrence.sourceOccurrenceId,
-      progressionSlotId:source+"_attempt",
-      developmentClass:"material_attempt"
-    });
-    if(!tx||tx.success!==true)return{...result,success:false,completed:false,reason:"material_failure_development_commit_failed",phase2Transaction:clone(tx)};
-  }
-  return enrichFoundationAttemptResult(result,tx);
+  const developmentExp=resolution.passed===true?2:1;
+  const tx=commitDevelopment(characterId,disciplineId,developmentExp,{
+    source,activityId:source,activityProfileId:pre.activityProfileId,
+    teamAssignmentId:occurrence.teamAssignmentId,
+    sourceOccurrenceId:occurrence.sourceOccurrenceId,
+    causalRootId:occurrence.sourceOccurrenceId,
+    progressionSlotId:source+"_attempt",
+    developmentClass:resolution.passed===true?"effective_execution":"material_attempt",
+    attemptContext:context,
+    resolution
+  });
+  if(!tx||tx.success!==true)return{
+    success:false,completed:false,reason:"foundation_development_transaction_failed",
+    phase2Transaction:clone(tx),outcome:resolution.outcome
+  };
+  const character=getCharacter(characterId);
+  const discipline=typeof globalThis.getShinobiDiscipline==="function"?globalThis.getShinobiDiscipline(disciplineId):null;
+  return enrichFoundationAttemptResult({
+    success:resolution.passed===true,
+    completed:true,
+    outcome:resolution.outcome||((resolution.passed===true)?"pass":"fail"),
+    characterId,
+    characterName:character&&character.name||characterId,
+    disciplineId,
+    disciplineName:discipline&&discipline.name||disciplineId,
+    source,
+    developmentExp,
+    rewardExp:developmentExp,
+    expGained:developmentExp,
+    previousLevel:1,newLevel:1,levelsGained:0,leveledUp:false,
+    difficulty:resolution.difficulty,
+    score:resolution.score,
+    historyPressure:resolution.history,
+    history:resolution.history
+  },tx);
 }
 function examAttempt448(characterId,disciplineId){
   return executeFoundationAttempt448("exam",priorExamAttempt,characterId,disciplineId);
