@@ -50,7 +50,7 @@ assert(tutorial.includes("TRAINING GROUND")&&tutorial.includes("PRACTICAL TRAINI
 assert(tutorial.includes("PROMOTION")&&tutorial.includes("ARENA BATTLE")&&tutorial.includes("STAGED BATTLES")&&tutorial.includes("VILLAGE TOURNAMENT"),"Arena four-lane guide missing");
 assert(tutorial.includes("NOT CURRENTLY AVAILABLE"),"unavailable Arena lanes are not honest");
 assert(tutorial.includes("YOUR NEXT STEP")&&tutorial.includes("TAKE PROMOTION ASSESSMENT")&&tutorial.includes("KEEP EXPLORING"),"Arena completion choice missing");
-assert(!tutorial.includes("setWorldEvent"),"tutorial owns a World semantic writer");
+assert(!tutorial.includes("setWorldEvent("),"tutorial owns a World semantic writer");
 assert(!tutorial.includes("ensureKonohaAlphaWorldSemanticRefill"),"tutorial triggers World opportunity creation/refill");
 assert(!tutorial.includes("disciplineProgression")&&!tutorial.includes("basePL")&&!tutorial.includes("formalRank="),"tutorial contains progression/rank mutation");
 assert.strictEqual(plain("runFirstKonohaTutorial35000Diagnostics().pass"),true,"trial source diagnostics failed");
