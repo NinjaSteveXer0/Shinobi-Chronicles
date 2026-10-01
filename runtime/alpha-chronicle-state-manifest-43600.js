@@ -297,7 +297,7 @@ const DOMAINS=Object.freeze([
     difficultyScope:"all",
     inheritanceRule:"Current Stat belongs to exact persistent Character",
     devOverridePolicy:"no My-Clan-local Stats cache and no direct PL grant",
-    qaRefs:Object.freeze(["tools/qa_issue_448_discipline_stat_growth.js","tools/qa_issue_448_discipline_stat_growth_browser.js","tools/qa_pl_formula_v1.js"])
+    qaRefs:Object.freeze(["tools/qa_issue_448_discipline_stat_growth.js","tools/qa_issue_448_discipline_stat_growth_browser.js","tools/qa_save_compatibility_311.js"])
   }),
   Object.freeze({
     stateDomainId:"shinobiRecordProjection",
