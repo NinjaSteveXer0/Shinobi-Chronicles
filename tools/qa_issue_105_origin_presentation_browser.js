@@ -532,10 +532,19 @@ async function proveSimpleSharedReceipt(browser,{variant,label,receiptBeat,title
       const row=await snapshot(page);
       if(row.beatId===receiptBeat){receipt=row;break;}
       if(row.mode==="choice"){
-        const wanted=choicePlan[row.beatId];
-        assert(wanted,label+" unexpected choice beat "+row.beatId+" "+JSON.stringify(row.choices));
-        const choice=page.locator("#story-scene-presentation-layer .sc-story-choice:not(:disabled)").filter({hasText:wanted}).first();
-        assert(await choice.count(),label+" planned choice not visible at "+row.beatId+": "+wanted);
+        const wantedChoiceId=choicePlan[row.beatId];
+        assert(wantedChoiceId,label+" unexpected choice beat "+row.beatId+" "+JSON.stringify(row.choices));
+        const choiceMeta=await page.evaluate(choiceId=>{
+          const beat=globalThis.getCurrentStorySceneBeat?.();
+          const choices=Array.isArray(beat?.choices)?beat.choices:[];
+          const index=choices.findIndex(choice=>choice?.choiceId===choiceId);
+          return{index,label:index>=0?choices[index]?.label||null:null,choiceIds:choices.map(choice=>choice?.choiceId||null)};
+        },wantedChoiceId);
+        assert(choiceMeta.index>=0,label+" planned Story choiceId missing at "+row.beatId+": "+wantedChoiceId+" :: "+JSON.stringify(choiceMeta));
+        const choices=page.locator("#story-scene-presentation-layer .sc-story-choice");
+        assert(await choices.count()>choiceMeta.index,label+" planned Story choice has no rendered UI button at "+row.beatId+": "+wantedChoiceId);
+        const choice=choices.nth(choiceMeta.index);
+        assert(await choice.isEnabled(),label+" planned Story choice UI is disabled at "+row.beatId+": "+wantedChoiceId);
         const before=row.beatId;
         await choice.click();
         await page.waitForFunction(old=>globalThis.getActiveStorySceneRuntime?.()?.beatId!==old,before,{timeout:8000});
@@ -837,22 +846,22 @@ async function proveMiraiTerminalReceipt(browser){
     const miraiTerminal=await proveMiraiTerminalReceipt(browser);
     const kushinaFullReceipt=await proveSimpleSharedReceipt(browser,{
       variant:"academy_kushina",label:"issue442-full-kushina",receiptBeat:"kus_receipt",title:"ACADEMY KUSHINA",
-      choicePlan:{kus_crisis:"CONTAIN THE DAMAGED SEAL"},
+      choicePlan:{kus_crisis:"contain_damaged_seal"},
       expectedDevelopment:[{discipline:"Fūinjutsu",exp:2,count:1}]
     });
     const iwabeeFullReceipt=await proveSimpleSharedReceipt(browser,{
       variant:"academy_iwabee",label:"issue442-full-iwabee",receiptBeat:"iwa_receipt",title:"ACADEMY IWABEE",
-      choicePlan:{iwa_reshape:"Raise the collapsed section",iwa_response:"Block his escape",iwa_reflect:"I know what I can do."},
+      choicePlan:{iwa_reshape:"raise_collapsed",iwa_response:"block_escape",iwa_reflect:"know_good_at"},
       expectedDevelopment:[{discipline:"Ninjutsu",exp:2,count:2}]
     });
     const metalFullReceipt=await proveSimpleSharedReceipt(browser,{
       variant:"academy_metal_lee",label:"issue442-full-metal",receiptBeat:"met_receipt",title:"ACADEMY METAL LEE",
-      choicePlan:{met_private_choice:"Spinning kick",met_invite:"Back out"},
+      choicePlan:{met_private_choice:"spinning_kick",met_invite:"back_out"},
       expectedDevelopment:[{discipline:"Taijutsu",exp:2,count:1}]
     });
     const kurenaiFullReceipt=await proveSimpleSharedReceipt(browser,{
       variant:"academy_kurenai",label:"issue442-full-kurenai",receiptBeat:"kur_receipt",title:"ACADEMY KURENAI",
-      choicePlan:{kur_approach:"Send a false Kurenai",kur_stage2_false:"Rush the bell",kur_stage3_false_rush:"Pretend to withdraw"},
+      choicePlan:{kur_approach:"false_kurenai",kur_stage2_false:"rush_bell",kur_stage3_false_rush:"pretend_withdraw"},
       expectedDevelopment:[{discipline:"Genjutsu",exp:1,count:3}]
     });
     console.log(JSON.stringify({pass:true,issue:105,cases:CASES.map(x=>x[0]),legacyFallbackRejected:true,clickAnywhereProven:true,miraiWritingGoldenProven:true,miraiBattle338,miraiDefeatContinuations,menmaWritingGoldenOpeningProven:true,menmaNineTailsDialoguePortraitProven:true,menmaPostBattleSegmentationProven:true,kurenaiExpansionBrowserProven:true,miraiTerminal,kushinaFullReceipt,iwabeeFullReceipt,metalFullReceipt,kurenaiFullReceipt,goldenSaveReloadResumeProven:true,browserGoldenClaimed:false},null,2));
