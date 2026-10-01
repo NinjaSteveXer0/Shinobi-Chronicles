@@ -11,6 +11,12 @@
 
 **Persistent-state infrastructure queue:** #436
 
+**Konoha First-Hour Coding execution queue:** #449
+
+Implementation sequencing authority:
+`Documentation/Coordination/Phase_2_Konoha_Implementation_Priority_Order_2026-10-01.md`
+@ `fb2a194bd72fb19385ed7807d2458d36bfa961a6`
+
 No persistent Phase-2 subsystem may bypass the Constitution's state-owner / save-schema / migration / observer-safety / browser-trial gates.
 
 ## Status language

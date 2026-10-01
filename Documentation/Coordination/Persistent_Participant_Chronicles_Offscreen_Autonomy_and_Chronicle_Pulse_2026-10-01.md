@@ -464,3 +464,90 @@ Major/defining events should not be silently compressed into bland aggregate tex
 Compaction is reversible presentation.
 
 It is not semantic history deletion.
+## 31. POST-ALPHA / FULL RELEASE — rare autonomous life-path escalation
+
+Stephen proposes that a persistent NPC's hidden Chronicle may, over a long legitimate chain, escalate far beyond their original mundane role.
+
+Illustrative example only:
+Market Vendor -> domestic conflict -> leaves home -> discovers a discarded Kunai -> begins legitimate training -> develops proficiency -> political conditions radicalise them -> seeks institutional shinobi admission -> later challenges an overwhelming opponent -> dies/withdraws/loses -> exact Kunai remains in world with extraordinary provenance.
+
+This is APPROVED AS A FULL-RELEASE CE DIRECTION, not an Alpha implementation requirement.
+
+## 32. Escalation must be causal, rare and owner-governed
+
+CE may connect eligible opportunities across time, but CE does not seize specialist authority.
+
+Any chain must satisfy exact domain owners:
+- Acquisition/World for finding/obtaining the object;
+- Progression for persistent training and proficiency development;
+- PL/Registry/Rank for formal admission/Rank/Promotion facts;
+- Combat for actual Battle outcome;
+- World/Story for political/contextual pressure;
+- relationship/Knowledge for motivation and available information;
+- provenance/object-instance authority for the exact weapon history;
+- death/custody/withdrawal only through exact authorised resolver semantics.
+
+Therefore a vendor cannot jump from civilian to master combatant because a Chronicle Pulse rolled a rare number.
+
+## 33. Rare path activation
+
+Such deep autonomous paths should normally require a persistent promoted actor identity plus several meaningful causal conditions, for example:
+- recurring Character status rather than faceless occurrence-local NPC;
+- repeated Chronicle participation;
+- legitimate capability/training access;
+- sufficient time/world-state change;
+- meaningful motive/pressure;
+- institutional access where required;
+- no contradictory custody/death/location state.
+
+The path may stop permanently at any intermediate point.
+
+Most Market Vendors should remain Market Vendors.
+
+## 34. Off-screen PL Battle opportunities
+
+Full Release may permit due persistent actors to enter legitimate off-screen PL Battle occurrences.
+
+Safeguards:
+- Battle eligibility must be real;
+- opponent/location/context must exist;
+- Combat owns resolution;
+- Battle PL 0 remains withdrawal unless another exact lethal resolver exists;
+- no automatic death merely because a combatant is weaker;
+- rewards/loot/provenance follow owning systems;
+- protagonist does not automatically learn the Battle happened.
+
+An off-screen Battle may later become known through evidence, witnesses, reports, aftermath or recovered objects.
+
+## 35. Provenance as a discovery channel
+
+An exact durable object may preserve evidence of an NPC Chronicle even when the player never met the owner.
+
+Example:
+Menma later finds the vendor's exact Kunai.
+
+Observer-safe provenance might reveal staged facts such as:
+- found/claimed at a Training Ground;
+- used repeatedly in personal practice;
+- carried during a failed political challenge;
+- recovered from the aftermath of an overwhelming Battle.
+
+Player-facing titles such as `Zero to Attempted Hero` are presentation/achievement/provenance naming work and must not replace factual provenance rows.
+
+The object becomes a bridge from hidden world history to discoverable Chronicle history.
+
+## 36. No automatic biography inflation
+
+Rare escalation must remain rare.
+
+Chronicle Pulse should favour:
+- unresolved existing motives;
+- existing capability trajectory;
+- active institutions/conflicts;
+- known causal pressure;
+- opportunity continuity;
+over random dramatic novelty.
+
+Do not generate coups, marriages, promotions, legendary fights or political appointments merely to make background actors interesting.
+
+The power of this system comes from an absurd outcome being traceable through a plausible chain, not from absurdity being common.
