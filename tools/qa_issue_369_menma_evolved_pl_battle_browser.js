@@ -45,10 +45,13 @@ async function waitForStoryMotionToSettle(page){
 
 async function clickStoryPrimary(page){
   const root=page.locator("#story-scene-presentation-layer");
-  let button=root.locator(".sc-chronicle-primary").first();
-  if(await button.count()===0)button=root.locator(".sc-story-actions > .sc-story-action:not(.sc-story-choice)").first();
-  await button.waitFor({state:"visible",timeout:8000});
-  await button.click();
+  const button=root.locator(".sc-chronicle-primary").first();
+  if(await button.count()&&await button.isVisible())await button.click();
+  else{
+    const stage=root.locator(".sc-chronicle-stage,.sc-story-stage").first();
+    await stage.waitFor({state:"visible",timeout:8000});
+    await stage.click({position:{x:30,y:30}});
+  }
   await waitForStoryMotionToSettle(page);
 }
 
@@ -240,6 +243,34 @@ async function driveGuestAllyTeachingHandoff(page,label){
   // the ordinary enemy-side response.
   await useSkill(page,"sj_anko_hidden_shadow_snake_hands");
   await page.waitForFunction(()=>getBattleRemainingPL("enemy","test_subject_altered_shinobi")===0,null,{timeout:8000});
+
+  // Owner regression: Menma's Formation Stage previously relayed a zero-PL
+  // target before the committed reduction was ever visible in the radial.
+  await page.waitForFunction(({ANKO,ALTERED})=>{
+    const stage=document.querySelector(".alpha-code-battle-stage");
+    return !!stage&&stage.dataset.presentationQueueBusy==="true"&&
+      stage.dataset.presentationActorId===ANKO&&stage.dataset.presentationTargetId===ALTERED;
+  },{ANKO,ALTERED:HOSTILES[0]},{timeout:8000});
+  const visibleZero=await page.evaluate(ALTERED=>{
+    const stage=document.querySelector(".alpha-code-battle-stage");
+    const ring=stage?.querySelector(".battle-live-power-enemy .alpha-battle-pl-ring");
+    const text=ring?.querySelector(".alpha-battle-pl-core strong")?.textContent?.trim()||"";
+    return{
+      activeEnemy:getBattleDeploymentParticipant("enemy",1)?.id||null,
+      text,
+      value:text===""?NaN:Number(text),
+      fill:ring?.style.getPropertyValue("--battle-pl-fill")||"",
+      afterPL:stage?.dataset.presentationAfterPl===""?null:Number(stage?.dataset.presentationAfterPl),
+      target:stage?.dataset.presentationTargetId||null
+    };
+  },HOSTILES[0]);
+  assert.strictEqual(visibleZero.activeEnemy,HOSTILES[0],"Menma zero-PL target relayed before its visible receipt settled");
+  assert.strictEqual(visibleZero.target,HOSTILES[0],"Menma visible zero-PL proof targeted the wrong enemy");
+  assert.notStrictEqual(visibleZero.text,"","Menma enemy radial PL numeral disappeared on hit");
+  assert.strictEqual(visibleZero.afterPL,0,"Menma committed zero-PL receipt did not expose afterPL 0");
+  assert.strictEqual(visibleZero.value,0,"Menma enemy radial did not visibly decrease to 0 before relay");
+  assert(/^0(?:\.0+)?%$/.test(visibleZero.fill),"Menma zero-PL radial fill did not visibly empty: "+visibleZero.fill);
+
   await waitPlayerReady(page,ANKO,HOSTILES[1]);
 
   const afterAltered=await page.evaluate(()=>({
@@ -261,15 +292,21 @@ async function driveGuestAllyTeachingHandoff(page,label){
   await page.screenshot({path:path.join(OUT,label+"-anko-vs-brute-ready.png"),fullPage:false,timeout:12000});
 
   // Second genuine player choice. Dragon Flame legitimately withdraws Brute.
-  // Unstable relays, Anko yields without withdrawal, and enemy-side ordering is
-  // preserved: Unstable acts against Menma before Menma gets input.
+  // Owner correction: Unstable must spend the next enemy opportunity on Anko
+  // before the authored teaching handoff promotes Menma.
   await useSkill(page,"sj_anko_fire_style_dragon_flame");
   await page.waitForFunction(()=>getBattleRemainingPL("enemy","test_subject_brute")===0,null,{timeout:8000});
+  await page.waitForFunction(({ANKO,UNSTABLE})=>{
+    const ev=currentBattle?.runtime?.evidence||[];
+    return getBattleDeploymentParticipant("enemy",1)?.id===UNSTABLE&&
+      ev.some(r=>r?.eventType==="enemy_authored_action_completed"&&r?.actorRef?.participantId===UNSTABLE&&r?.targetRef?.participantId===ANKO);
+  },{ANKO,UNSTABLE:HOSTILES[2]},{timeout:12000});
   await waitPlayerReady(page,MENMA,HOSTILES[2]);
 
-  const handoff=await page.evaluate(()=>({
+  const handoff=await page.evaluate(({MENMA,ANKO})=>({
     state:getMenmaEvolvedPLBattleState36900(),
     readiness:getMenmaEvolvedPLBattleInputReadiness36900(),
+    menmaPL:getBattleRemainingPLRecord("player",MENMA),
     deployment:{
       player:currentBattle.deployment.player.slots.map(s=>s.participantId).filter(Boolean),
       enemy:currentBattle.deployment.enemy.slots.map(s=>s.participantId).filter(Boolean)
@@ -279,14 +316,15 @@ async function driveGuestAllyTeachingHandoff(page,label){
       evidenceId:r.evidenceId,eventType:r.eventType,actor:r.actorRef?.participantId||null,target:r.targetRef?.participantId||null,
       skillId:r.skillId||null,actionId:r.actionId||null,data:r.data||{}
     }))
-  }));
+  }),{MENMA,ANKO});
   assert.deepStrictEqual(handoff.deployment.player,[MENMA,ANKO],"authored Anko -> Menma yield drift");
   assert.deepStrictEqual(handoff.deployment.enemy,[HOSTILES[2]],"Brute -> Unstable relay drift");
   assert.strictEqual(handoff.state.ankoYielded,true,"authored Guest Ally yield not committed");
   assert.strictEqual(handoff.state.menmaEvidenceStarted,true,"MEN-03 window did not start when Menma became Active");
-  assert.strictEqual(handoff.readiness.ready,true,"Menma did not receive input after Unstable response");
-  assert(handoff.evidence.some(r=>r.eventType==="battle_formation_yield_committed"&&r.actor===ANKO&&r.target===MENMA&&r.data?.nextSide==="enemy"),"yield did not preserve enemy-next side order");
-  assert(handoff.evidence.some(r=>r.eventType==="enemy_authored_action_completed"&&r.actor===HOSTILES[2]&&r.target===MENMA),"Unstable did not act before Menma input");
+  assert.strictEqual(handoff.readiness.ready,true,"Menma did not receive input after Unstable attacked Anko");
+  assert.strictEqual(Number(handoff.menmaPL?.current??handoff.menmaPL?.remaining??0),Number(handoff.menmaPL?.maximum??0),"Menma did not enter against Unstable at full Battle PL");
+  assert(handoff.evidence.some(r=>r.eventType==="battle_formation_yield_committed"&&r.actor===ANKO&&r.target===MENMA&&r.data?.nextSide==="player"),"yield did not hand the next player opportunity to Menma");
+  assert(handoff.evidence.some(r=>r.eventType==="enemy_authored_action_completed"&&r.actor===HOSTILES[2]&&r.target===ANKO),"Unstable did not attack Anko before Menma input");
   assert.strictEqual(handoff.evidence.filter(r=>r.eventType==="menma_origin_phase_c_started"&&r.actor===MENMA).length,1,"MEN-03 start evidence duplicated/missing");
   assert.strictEqual(handoff.evidence.some(r=>r.eventType==="menma_origin_scripted_anko_takedown_completed"),false,"scripted Anko path leaked into successor");
   await page.screenshot({path:path.join(OUT,label+"-menma-vs-unstable-ready.png"),fullPage:false,timeout:12000});
@@ -362,19 +400,29 @@ async function guestAllyVictoryAndReload(browser){
     assert(terminal.evidence.some(r=>r.eventType==="skill_action_completed"&&r.actor===MENMA),"Menma victory action evidence missing");
 
     // Real Victory-surface proof for Stephen's two presentation blockers.
-    // This is an earned reward delta, not a wallet-total animation.
+    // This is a static earned amount, not a rolling wallet-total animation.
     await page.waitForFunction(()=>{
       const node=document.querySelector(".alpha-victory-code-screen .victory-ryo-number");
-      return node&&node.textContent.trim()==="+100"&&node.dataset.rewardPresentation==="earned_delta";
+      return node&&node.textContent.trim()==="100"&&node.dataset.rewardPresentation==="static_earned_amount";
     },null,{timeout:2000});
-    const rewardPresentation=await page.evaluate(()=>({
-      ryoText:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.textContent?.trim()||"",
-      rewardMode:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.dataset?.rewardPresentation||null,
-      action:document.querySelector(".alpha-victory-code-screen .victory-continue")?.textContent?.trim()||""
-    }));
-    assert.strictEqual(rewardPresentation.ryoText,"+100","Victory reward did not present exact earned +100 Ryō");
-    assert.strictEqual(rewardPresentation.rewardMode,"earned_delta","Victory Ryō presentation is not reward-gained mode");
+    const rewardPresentation=await page.evaluate(()=>{
+      const footer=document.querySelector(".alpha-victory-code-screen .alpha-victory-footer");
+      const copy=footer?.querySelector("p")||null;
+      const button=footer?.querySelector(".victory-continue")||null;
+      const fr=footer?.getBoundingClientRect()||null,br=button?.getBoundingClientRect()||null;
+      return{
+        ryoText:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.textContent?.trim()||"",
+        rewardMode:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.dataset?.rewardPresentation||null,
+        action:button?.textContent?.trim()||"",
+        footerCopy:copy?.textContent?.trim()||"",
+        claimOnSharedRight:!!(fr&&br&&br.left>=fr.left+fr.width*.5&&br.right<=fr.right+1)
+      };
+    });
+    assert.strictEqual(rewardPresentation.ryoText,"100","Victory reward did not present exact static 100 Ryō");
+    assert.strictEqual(rewardPresentation.rewardMode,"static_earned_amount","Victory Ryō presentation is not static");
     assert.strictEqual(rewardPresentation.action,"CLAIM REWARDS","Victory claim action missing before reward commit");
+    assert(rewardPresentation.footerCopy.length>0,"Menma Victory removed the shared footer contract copy");
+    assert.strictEqual(rewardPresentation.claimOnSharedRight,true,"Menma CLAIM REWARDS is not aligned to the shared right-side Victory control "+JSON.stringify(rewardPresentation));
 
     const beforeClaim=await page.evaluate(()=>Number(playerData.ryo)||0);
     const claimStarted=Date.now();
@@ -389,26 +437,34 @@ async function guestAllyVictoryAndReload(browser){
     // CONTINUE is inserted synchronously by the post-claim Victory re-render;
     // the presentation-only earned-delta decoration is applied on its scheduled
     // requestAnimationFrame. Keep the latency measurement above independent,
-    // then require the next visible frame to be the same +100 earned delta.
+    // then require the next visible frame to be the same static 100 Ryō amount.
     await page.waitForFunction(()=>{
       const node=document.querySelector(".alpha-victory-code-screen .victory-ryo-number");
-      return node&&node.textContent.trim()==="+100"&&node.dataset.rewardPresentation==="earned_delta";
+      return node&&node.textContent.trim()==="100"&&node.dataset.rewardPresentation==="static_earned_amount";
     },null,{timeout:1000});
 
     const afterClaim=await page.evaluate(()=>Number(playerData.ryo)||0);
     assert.strictEqual(afterClaim,beforeClaim+100);
     assert.strictEqual(await page.evaluate(()=>claimCurrentBattleRewards()),false,"reward duplicated on second claim");
 
-    const postClaimPresentation=await page.evaluate(()=>({
-      ryoText:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.textContent?.trim()||"",
-      rewardMode:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.dataset?.rewardPresentation||null,
-      action:document.querySelector(".alpha-victory-code-screen .victory-continue")?.textContent?.trim()||""
-    }));
-    assert.deepStrictEqual(postClaimPresentation,{
-      ryoText:"+100",
-      rewardMode:"earned_delta",
-      action:"CONTINUE"
-    },"post-claim Victory presentation drift");
+    const postClaimPresentation=await page.evaluate(()=>{
+      const footer=document.querySelector(".alpha-victory-code-screen .alpha-victory-footer");
+      const copy=footer?.querySelector("p")||null;
+      const button=footer?.querySelector(".victory-continue")||null;
+      const fr=footer?.getBoundingClientRect()||null,br=button?.getBoundingClientRect()||null;
+      return{
+        ryoText:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.textContent?.trim()||"",
+        rewardMode:document.querySelector(".alpha-victory-code-screen .victory-ryo-number")?.dataset?.rewardPresentation||null,
+        action:button?.textContent?.trim()||"",
+        footerCopy:copy?.textContent?.trim()||"",
+        continueOnSharedRight:!!(fr&&br&&br.left>=fr.left+fr.width*.5&&br.right<=fr.right+1)
+      };
+    });
+    assert.strictEqual(postClaimPresentation.ryoText,"100","post-claim Victory Ryō drift");
+    assert.strictEqual(postClaimPresentation.rewardMode,"static_earned_amount","post-claim Victory reward mode drift");
+    assert.strictEqual(postClaimPresentation.action,"CONTINUE","post-claim Victory action drift");
+    assert(postClaimPresentation.footerCopy.length>0,"Menma post-claim Victory removed the shared footer contract copy");
+    assert.strictEqual(postClaimPresentation.continueOnSharedRight,true,"Menma CONTINUE is not aligned to the shared right-side Victory control "+JSON.stringify(postClaimPresentation));
 
     await gate.assertClean("issue-369-guest-ally-victory");
     return{
@@ -612,11 +668,12 @@ async function legitimatePartyDefeat(browser){
     }
 
     const futureBeats=[
-      ["menma_future_01","Menma is running again."],
-      ["menma_future_02","Through the trees, Konoha comes back into view. The Academy is somewhere beyond the rooftops."],
-      ["menma_future_03","Satisfied?"],
-      ["menma_future_04","No."],
-      ["menma_future_05","Good."]
+      ["menma_future_01","Menma runs again.\n\nThe forest that felt enormous when he left the Academy feels different now—not safer, not quieter. Just less like a boundary."],
+      ["menma_future_02","Satisfied?"],
+      ["menma_future_03","No."],
+      ["menma_future_03a","A low chuckle answers him."],
+      ["menma_future_04","Good."],
+      ["menma_future_05","Menma slows on a rise where Konoha shows through the trees. The Academy is somewhere beyond the rooftops, along with everything adults keep locking behind the word ready.\n\nHe looks at the village, then past it."]
     ];
     for(const [beatId,text] of futureBeats){
       await page.waitForFunction(id=>getActiveStorySceneRuntime()?.beatId===id,beatId,{timeout:12000});
@@ -627,7 +684,7 @@ async function legitimatePartyDefeat(browser){
           const layer=document.getElementById("story-scene-presentation-layer");
           const stage=layer?.querySelector(".sc-chronicle-stage")||layer?.querySelector(".sc-story-stage");
           return stage?.dataset.scSceneBoardBackdrop==="dedicated"&&
-            String(stage?.style.getPropertyValue("--sc-scene-board-backdrop")||"").includes("whisper_woods_forest_route.png");
+            String(stage?.style.getPropertyValue("--sc-scene-board-backdrop")||"").includes("whisper_woods_rise.png");
         },null,{timeout:5000});
         const futureBackdrop=await page.evaluate(()=>{
           const layer=document.getElementById("story-scene-presentation-layer");
@@ -638,9 +695,9 @@ async function legitimatePartyDefeat(browser){
             dedicated:stage?.dataset.scSceneBoardBackdrop||null
           };
         });
-        assert.strictEqual(futureBackdrop.resolved,"Scene backdrops/whisper_woods_forest_route.png","#388 Scene-10 Scene Board resolver drift");
+        assert.strictEqual(futureBackdrop.resolved,"Menma Origin Backdrop/whisper_woods_rise.png","#388 Scene-10 Scene Board resolver drift");
         assert.strictEqual(futureBackdrop.dedicated,"dedicated","#388 Scene-10 dedicated backdrop flag missing");
-        assert(futureBackdrop.css.includes("whisper_woods_forest_route.png"),"#388 Scene-10 live Scene Board backdrop CSS drift "+JSON.stringify(futureBackdrop));
+        assert(futureBackdrop.css.includes("whisper_woods_rise.png"),"#388 Scene-10 live Scene Board backdrop CSS drift "+JSON.stringify(futureBackdrop));
       }
       await advanceStorySemanticBeat369(page,beatId);
     }
@@ -686,9 +743,29 @@ async function legitimatePartyDefeat(browser){
       await clickStoryPrimary(page);
     }
 
-    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_future_terminal",null,{timeout:12000});
-    assert.strictEqual(await page.evaluate(()=>getCurrentStorySceneBeat()?.text||null),"Menma runs toward Konoha.");
-    await page.screenshot({path:path.join(OUT,"party-defeat-future-terminal.png"),fullPage:false,timeout:12000}).catch(()=>{});
+    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_close_01",null,{timeout:12000});
+    assert.strictEqual(await page.evaluate(()=>getCurrentStorySceneBeat()?.text||null),"Menma runs toward Konoha.\n\nNot back to the morning he left.\n\nForward.");
+    await advanceStorySemanticBeat369(page,"menma_close_01");
+    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_receipt",null,{timeout:12000});
+    const receipt=await page.evaluate(()=>{
+      const current=typeof getCurrentStorySceneBeat==="function"?getCurrentStorySceneBeat():null;
+      const root=document.getElementById("story-scene-presentation-layer");
+      return{
+        semanticBeatId:current?.beatId||null,
+        semanticExit:current?.exitScene===true,
+        cueKind:root?.dataset.scCueKind||null,
+        text:root?.querySelector(".sc-story-text")?.textContent?.trim()||"",
+        heading:root?.querySelector(".sc-story-name")?.textContent?.trim()||"",
+        button:root?.querySelector(".sc-chronicle-primary")?.textContent?.trim()||""
+      };
+    });
+    assert.strictEqual(receipt.semanticBeatId,"menma_receipt","#105 Menma Chronicle Receipt semantic beat missing after #369 defeat return");
+    assert.strictEqual(receipt.semanticExit,true,"#105 Menma Chronicle Receipt lost its terminal semantic boundary");
+    assert.strictEqual(receipt.cueKind,"record","#105 Menma Chronicle Receipt record presentation missing after #369 defeat return");
+    assert.strictEqual(receipt.heading,"CHRONICLE RECEIPT","#105 Menma Chronicle Receipt heading missing after #369 defeat return");
+    assert(receipt.text.includes("ACADEMY MENMA"),"#105 Menma Chronicle Receipt content missing after #369 defeat return");
+    assert.strictEqual(receipt.button,"CONTINUE","#105 Menma Chronicle Receipt dedicated button missing");
+    await page.screenshot({path:path.join(OUT,"party-defeat-future-receipt.png"),fullPage:false,timeout:12000}).catch(()=>{});
     await clickStoryPrimary(page);
     await page.waitForFunction(()=>getActiveStorySceneRuntime()===null&&getAcademyTeamFormationSnapshot()?.required===true,null,{timeout:12000});
     const completion=await page.evaluate(()=>({
@@ -735,7 +812,8 @@ async function legitimatePartyDefeat(browser){
         ordinaryEnemyResponsesEnabled:true,
         alteredThenBruteThenUnstableRelay:true,
         ankoYieldsToMenmaAfterLegitimateFirstTwo:true,
-        enemyActsBeforeMenmaAfterYield:true,
+        unstableAttacksAnkoBeforeMenmaHandoff:true,
+        menmaStartsUnstableFightAtFullPL:true,
         menmaEvidenceStartsAtFirstActiveMoment:true,
         menmaWithdrawalRelaysBackToEligibleAnko:true,
         partyDefeatRequiresAlliedExhaustion:true,

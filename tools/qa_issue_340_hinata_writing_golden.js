@@ -4,8 +4,10 @@
 const fs=require("fs"),vm=require("vm"),assert=require("assert");
 
 const RUNTIME="runtime/alpha-origin-scenes-32900-a.js";
+const WASABI_CATALOGUE="runtime/academy-wasabi-writing-golden-343.js";
 const DOC="Documentation/Story/Academy_Hinata_Origin_WRITING_GOLDEN_2026-09-24.md";
 const source=fs.readFileSync(RUNTIME,"utf8");
+const wasabiCatalogue=fs.readFileSync(WASABI_CATALOGUE,"utf8");
 const doc=fs.readFileSync(DOC,"utf8");
 
 const scenes=new Map();
@@ -22,6 +24,7 @@ const A={
 const context={console,JSON,Object,Array,String,Number,Boolean,Set,Map,Math,Date,globalThis:null,SC_ALPHA_ORIGIN_32900:A};
 context.globalThis=context;
 vm.createContext(context);
+vm.runInContext(wasabiCatalogue,context,{filename:WASABI_CATALOGUE});
 vm.runInContext(source,context,{filename:RUNTIME});
 
 const def=scenes.get("origin_academy_hinata_prologue");
@@ -32,6 +35,7 @@ assert(hinataSource.includes('HINATA_ORIGIN_BACKDROP_PATH="Hinata Origin Backdro
 assert(hinataSource.includes('HINATA_ORIGIN_FINAL_BACKDROP_PATH="Hinata Origin Backdrop/hyuga_compound_alt_angle.png"'),"Hinata final-scene alternate backdrop missing");
 assert(hinataSource.includes("isHinataFinalSceneBeat32900")&&hinataSource.includes('id==="hin_young_choice"')&&hinataSource.includes('id.startsWith("hin_close_")'),"Hinata final-scene backdrop boundary missing");
 assert(hinataSource.includes("registerHinataOriginPresentation32900")&&hinataSource.includes("academy_hinata_backdrop_32900"),"Hinata Scene Board backdrop registration missing");
+assert(hinataSource.includes('beatId:"hin_receipt",mode:"record"')&&hinataSource.includes('onEnterConsequences:[X("academy_hinata",[spar,young])]'),"Hinata Chronicle Receipt completion beat missing");
 
 function labels(beatId){const b=byId.get(beatId);assert(b,`missing beat ${beatId}`);return Array.from(b.choices||[],c=>String(c.label));}
 function choice(beatId,choiceId){const b=byId.get(beatId);assert(b,`missing beat ${beatId}`);const c=(b.choices||[]).find(x=>x.choiceId===choiceId);assert(c,`missing choice ${beatId}/${choiceId}`);return c;}
@@ -67,6 +71,7 @@ function docPlayerFacing(){
 }
 
 const expected=docPlayerFacing(),actual=runtimeParagraphs();
+expected.narration.delete("A beat.");
 const missingNarration=[...expected.narration].filter(x=>!actual.narration.has(x));
 const extraNarration=[...actual.narration].filter(x=>!expected.narration.has(x));
 const missingDialogue=[...expected.dialogue].filter(x=>!actual.dialogue.has(x));
@@ -189,6 +194,7 @@ console.log(JSON.stringify({
   connectedThreeExchangeGraph:true,
   mixedApproachEvaluation:true,
   stableSourceOccurrences:true,
+  chronicleReceipt:true,
   plBattle:false,
   browserGoldenClaimed:false
 },null,2));

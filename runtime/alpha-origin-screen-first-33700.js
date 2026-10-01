@@ -84,6 +84,9 @@ function patchHinata(){
 
 function patchIzuno(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const d=editable(A.sceneByVariant.academy_izuno);if(!d)return false;
+  // #343 native WRITING GOLDEN owns Wasabi's player-facing expression.
+  // Retire this stale pre-GOLDEN screen-first layer instead of re-registering it.
+  if(beat(d,"izu_initial_choice")&&beat(d,"izu_split_choice")&&beat(d,"izu_rogue_choice")&&beat(d,"izu_rogue_step_in_battle")&&beat(d,"izu_reflect"))return true;
   setText(d,"izu_start","The instructor drops a wooden marker into Wasabi's palm.\n\n\"Target leaves now. Extraction gate closes when they reach it.\"\n\nA figure disappears over the Academy wall.\n\nWasabi is already leaning forward. \"You could've just said go.\"","narration");
   setText(d,"izu_initial","At the wall, the obvious trail bends left. Dust hangs in the alley. A roof tile on the right is freshly chipped.");
   setLabel(d,"izu_initial","obvious_trail","Take the trail before it cools.");
@@ -117,6 +120,7 @@ function patchIzuno(){
 
 function patchMirai(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const d=editable(A.sceneByVariant.academy_mirai);if(!d)return false;
+  if(beat(d,"mir_assignment_01")&&beat(d,"mir_walk_choice")&&beat(d,"mir_reflection_router")&&beat(d,"mir_reflection_conversation")&&beat(d,"mir_reflection_chakra")&&beat(d,"mir_reflection_suspicion")&&beat(d,"mir_reflection_missed"))return true;
   setText(d,"mir_start","The civilian bows too many times when the escort begins.\n\n\"Sorry. First time being assigned an Academy escort. I expected someone taller.\"\n\nMirai checks the road, then the travel papers, then gives them back.\n\n\"You got me. Try not to look devastated.\"\n\nThey start walking.","narration");
   setText(d,"mir_talk","Conversation fills the walk.");
   setLabel(d,"mir_talk","ask_origin","\"You said you're from outside Fire Country. Where?\"");
@@ -157,7 +161,10 @@ function patchMirai(){
 }
 
 function patchKushina(){
-  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const d=editable(A.sceneByVariant.academy_kushina);if(!d)return false;
+  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
+  const live=definition(A.sceneByVariant.academy_kushina);
+  if(live&&live.entryBeatId==="kus_practical_01"&&beat(live,"kus_crisis")&&beat(live,"kus_contact_choice")&&beat(live,"kus_route_d_close_08"))return true;
+  const d=editable(A.sceneByVariant.academy_kushina);if(!d)return false;
   setText(d,"kus_crisis","The practice scroll gives a sharp, ugly hiss.\n\nOne line of ink crawls past the instructor's guide marks. A classmate kneeling beside it freezes as chakra lifts the paper off the stone.\n\nKushina is moving before the instructor finishes shouting her name.");
   setLabel(d,"kus_crisis","correct_formula","Drop to the seal and correct the formula before it cascades.");
   setLabel(d,"kus_crisis","protect_student","Get the classmate out. The scroll can wait.");
@@ -180,7 +187,10 @@ function patchKushina(){
 }
 
 function patchKurenai(){
-  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const d=editable(A.sceneByVariant.academy_kurenai);if(!d)return false;
+  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
+  const live=definition(A.sceneByVariant.academy_kurenai);
+  if(live&&live.entryBeatId==="kur_pre_01"&&beat(live,"kur_approach")&&beat(live,"kur_leave_router"))return true;
+  const d=editable(A.sceneByVariant.academy_kurenai);if(!d)return false;
   setText(d,"kur_bell","The instructor hooks a brass bell onto his belt.\n\n\"Take it.\"\n\nKurenai looks from the bell to his eyes. \"That's the whole instruction?\"\n\n\"If you need more, you've already made my job easier.\"\n\nThe bell rings once as he steps back.","narration");
   setText(d,"kur_layer1","The courtyard stays perfectly ordinary for half a second too long.");
   setLabel(d,"kur_layer1","false_kurenai","Give him a Kurenai to watch that isn't real.");
@@ -232,7 +242,10 @@ function patchIwabee(){
 }
 
 function patchMetal(){
-  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const d=editable(A.sceneByVariant.academy_metal_lee);if(!d)return false;
+  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
+  const live=definition(A.sceneByVariant.academy_metal_lee);
+  if(live&&beat(live,"met_receipt")&&beat(live,"met_spar_strong_close_07")&&beat(live,"met_backout_close_01"))return true;
+  const d=editable(A.sceneByVariant.academy_metal_lee);if(!d)return false;
   const priv=beat(d,"met_private");if(!priv)return false;
   priv.text="Metal's heel hits the chalk mark exactly.\n\nAgain.\n\nThe wooden post shudders under his palm. No classmates. No instructor at his shoulder. Just his breathing and the soft scrape of sandals on packed dirt.\n\nHis next sequence is cleaner than the last.";
   delete priv.presentationResolver;priv.nextBeatId="met_private_choice";
@@ -273,6 +286,7 @@ function patchMetal(){
 
 function patchMenma(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const d=editable(A.sceneByVariant.academy_menma);if(!d)return false;
+  if(d.entryBeatId==="menma_open_01"&&beat(d,"menma_open_15")&&beat(d,"tutorial_battle"))return true;
   const entry=beat(d,d.entryBeatId);if(entry){entry.mode="narration";delete entry.speakerName;entry.text="Iruka drops the marked practice sheet onto Menma's desk. Every line is clean.\n\n\"Again.\"\n\nMenma looks at the sheet, then at him. \"Why?\"\n\n\"Because doing it once isn't mastery.\"\n\nMenma leans back. \"I can do more.\"\n\nIruka's expression softens by exactly enough to irritate him. \"I know. You're still doing this.\"";}
   const forest=d.beats.find(b=>b&&typeof b.text==="string"&&/clear your head|wood|forest/i.test(b.text));
   if(forest){forest.text="Menma gets far enough into the wooded outskirts that the village noise disappears.\n\nA bird launches suddenly from the tree line ahead. Then another.\n\nA dull impact carries through the woods.\n\nInside him, something large pays attention.\n\n\"Interesting.\"\n\nMenma's mouth pulls sideways. \"I don't need your permission.\"\n\nAnother impact. Closer now.";delete forest.presentationResolver;}
@@ -297,7 +311,7 @@ function runAlphaOriginScreenFirst33700Diagnostics(){
     obitoLegacyScreenPatchRetired:!Object.prototype.hasOwnProperty.call(result,"obito"),
     hinataPhysicalScene:!!hin&&String(hin.beatMap.get("hin_practice")?.text||"").includes("Morning mist"),
     metalAddsPerformedPressureBeats:!!met&&met.beatMap.has("met_private_choice")&&met.beatMap.has("met_pressure_choice"),
-    menmaSceneStillRegisteredAndProjected:!!men&&String(men.beatMap.get(men.entryBeatId)?.text||"").includes("Iruka"),
+    menmaSceneStillRegisteredAndProjected:!!men&&((men.entryBeatId==="menma_open_01"&&men.beatMap.has("menma_open_15"))||String(men.beatMap.get(men.entryBeatId)?.text||"").includes("Iruka")),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);

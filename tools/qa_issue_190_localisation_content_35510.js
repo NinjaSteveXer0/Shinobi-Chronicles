@@ -37,6 +37,12 @@ assert(core);assert(content);assert(finalWriting);
 assert.equal(content.diagnostics().pass,true);assert(content.pairCount>=180);
 assert.equal(finalWriting.diagnostics().pass,true);assert(finalWriting.pairCount>=200);
 const sourceTexts=new Set(Array.from(content.sourceTexts));
+const iwabeeCatalogueStart=contentSource.indexOf("// Academy Iwabee 2026-09-30 owner-preview rewrite.");
+const iwabeeCatalogueEnd=contentSource.indexOf("// Academy Kurenai + Metal 2026-09-30 owner-preview successors.",iwabeeCatalogueStart);
+assert(iwabeeCatalogueStart>=0&&iwabeeCatalogueEnd>iwabeeCatalogueStart,"current Iwabee localisation block missing");
+const iwabeeCatalogueSource=contentSource.slice(iwabeeCatalogueStart,iwabeeCatalogueEnd);
+const doubleEscapedNewline190=String.fromCharCode(92,92,110);
+assert(!iwabeeCatalogueSource.includes(doubleEscapedNewline190),"current Iwabee localisation block contains over-escaped newline tokens");
 const finalTexts=new Set(Array.from(finalWriting.sourceTexts));
 
 function collect(source,re,index=1,set=new Set()){
@@ -44,14 +50,16 @@ function collect(source,re,index=1,set=new Set()){
 }
 function collectOriginPresentation(source){
   const out=new Set();
-  collect(source,/(?:^|[,{])\s*title:"([^"]+)"/gm,1,out);
-  collect(source,/(?:^|[,{])\s*speakerName:"([^"]+)"/gm,1,out);
-  collect(source,/(?:^|[,{])\s*text:"([^"]+)"/gm,1,out);
-  collect(source,/C\("[^"]+","([^"]+)"/g,1,out);
-  collect(source,/A\.unavailableBattle\(scene,"([^"]+)"/g,1,out);
-  collect(source,/knownBlocker:"([^"]+)"/g,1,out);
-  collect(source,/beat\([^,]+,"([^"]+)"/g,1,out);
-  collect(source,/\["(?:furniture|vegetables|equipment|delivery|cart)_[^"]+","([^"]+)"\]/g,1,out);
+  const decoded=(raw)=>JSON.parse(`"${raw}"`);
+  const collectDecoded=(re,index=1)=>{let m;while((m=re.exec(source)))if(m[index])out.add(decoded(m[index]));};
+  collectDecoded(/(?:^|[,{])\s*title:"([^"]+)"/gm);
+  collectDecoded(/(?:^|[,{])\s*speakerName:"([^"]+)"/gm);
+  collectDecoded(/(?:^|[,{])\s*text:"([^"]+)"/gm);
+  collectDecoded(/C\("[^"]+","([^"]+)"/g);
+  collectDecoded(/A\.unavailableBattle\(scene,"([^"]+)"/g);
+  collectDecoded(/knownBlocker:"([^"]+)"/g);
+  collectDecoded(/beat\([^,]+,"([^"]+)"/g);
+  collectDecoded(/\["(?:furniture|vegetables|equipment|delivery|cart)_[^"]+","([^"]+)"\]/g);
   return out;
 }
 function collectFinalWritingStatic(source){
@@ -93,7 +101,7 @@ assert(finalStatic.size>=70,`expected broad non-Obito 33600 final-writing extrac
 for(const phrase of [
   "HELP HER","KEEP GOING","HELP SEARCH","HELP WITH THE DELIVERY","KEEP MOVING","STOP AND HELP","GO TO TRAINING",
   "I'm not going to stop helping people.","I need to take training more seriously.","I need to get better at both.",
-  "Maybe I'm looking at this wrong. I need to figure out what matters most to me."
+  "Maybe I'm looking at this wrong."
 ])assert(sourceTexts.has(phrase),`final #331 Obito phrase missing from es-419 catalogue: ${phrase}`);
 const missingFinalStatic=[...finalStatic].filter(phrase=>!finalTexts.has(phrase));
 assert.deepEqual(missingFinalStatic,[],`missing es-419 final-Writing phrases:\n${missingFinalStatic.join('\n')}`);
@@ -148,6 +156,19 @@ for(const phrase of finalDynamicRepresentatives){
   const translated=core.translatePresentedText(phrase);
   assert(translated&&translated!==phrase,`dynamic final-Writing phrase fell back to English: ${phrase}`);
   assert.equal(core.validateProtectedTerms(phrase,translated).success,true,`dynamic final-Writing glossary failure: ${phrase}`);
+}
+const kurenaiExpansionRequired=[
+  "Most of the Academy has already emptied out.\n\nKurenai is still in the training courtyard.\n\nThe instructor is putting away practice markers near the far wall.\n\nA small bell hangs from one hand.\n\nKurenai notices it before the instructor notices her watching.",
+  "SEND A FALSE KURENAI","HIDE MY REAL MOVEMENT","DISTORT HER SENSE OF DISTANCE","MAKE THE DIRECT APPROACH LOOK REAL",
+  "Genjutsu isn't only making somebody believe something false.",
+  "It's knowing what stays true after both of you start lying.",
+  "Same exercise tomorrow?","Change the trick."
+];
+for(const phrase of kurenaiExpansionRequired){
+  assert(finalTexts.has(phrase),`Kurenai expansion phrase missing from es-419 final-Writing catalogue: ${phrase}`);
+  const translated=core.translatePresentedText(phrase);
+  assert(translated&&translated!==phrase,`Kurenai expansion phrase fell back to English: ${phrase}`);
+  assert.equal(core.validateProtectedTerms(phrase,translated).success,true,`Kurenai expansion glossary failure: ${phrase}`);
 }
 core.setLocale('en',{persist:false,source:'qa'});
 assert.equal(core.translatePresentedText('Torneo de la aldea'),'Village Tournament');

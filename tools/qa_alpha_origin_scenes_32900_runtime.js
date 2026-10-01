@@ -1,7 +1,14 @@
 'use strict';
 const fs=require('fs'),vm=require('vm'),path=require('path');
 const ROOT=path.resolve(__dirname,'..');
-const files=['core','a','b','c','integrator'].map(n=>path.join(ROOT,'runtime',`alpha-origin-scenes-32900-${n}.js`));
+const files=[
+  path.join(ROOT,'runtime','alpha-origin-scenes-32900-core.js'),
+  path.join(ROOT,'runtime','academy-wasabi-writing-golden-343.js'),
+  path.join(ROOT,'runtime','alpha-origin-scenes-32900-a.js'),
+  path.join(ROOT,'runtime','alpha-origin-scenes-32900-b.js'),
+  path.join(ROOT,'runtime','alpha-origin-scenes-32900-c.js'),
+  path.join(ROOT,'runtime','alpha-origin-scenes-32900-integrator.js')
+];
 const scenes=new Map([['origin_academy_menma_prologue',{sceneId:'origin_academy_menma_prologue',beats:[{beatId:'menma'}],beatMap:new Map([['menma',{beatId:'menma'}]])}]]);
 const receipts=[];const completions=[];let active=null;
 const expectedSource={
@@ -28,20 +35,64 @@ cloneProgressionData:v=>v===undefined?undefined:JSON.parse(JSON.stringify(v)),sa
 unregisterStoryScene:id=>scenes.delete(id),registerStoryScene:def=>{def.beatMap=new Map((def.beats||[]).map(b=>[b.beatId,b]));scenes.set(def.sceneId,def);return{success:true,sceneId:def.sceneId};},getStorySceneDefinition:id=>scenes.get(id)||null,getActiveStorySceneRuntime:()=>active,
 ensurePlayerAcquisitionState:()=>ctx.playerData.acquisition,openOverlay:()=>true,renderAlphaTailedBeastMissionCommand:()=>({success:true}),beginAlphaChronicleOriginPrologue:()=>({success:false,reason:'legacy'}),
 completeChronicleOriginPrologue:(id,evidence)=>{ctx.playerData.acquisition.chronicleOrigin.prologueCompleted=true;completions.push({id,evidence});return{success:true,id,evidence};},
+resolveAcademyMetalProtectiveResponse396:(kind)=>{
+  const table={
+    redirect_dummy:{statKey:"tai",value:13,successMin:14,partialMin:11},
+    take_impact:{statKey:"stamina",value:14,successMin:14,partialMin:11},
+    destroy_dummy:{statKey:"tai",value:13,successMin:15,partialMin:12}
+  };
+  const row=table[kind];if(!row)return{success:false,reason:"metal_test_response_unknown"};
+  const outcome=row.value>=row.successMin?"success":row.value>=row.partialMin?"partial":"failure";
+  const intervention=outcome==="success"?null:"metal_origin_inviting_genin";
+  return{success:true,resolverId:"academy_metal_lee_origin_protective_response_v1",hazardId:"academy_metal_origin_training_dummy_hazard_v1",attempted:true,protectiveResponseKind:kind,protectiveResponseOutcome:outcome,resolverStatKey:row.statKey,resolverStatValue:row.value,successThreshold:row.successMin,partialThreshold:row.partialMin,interventionRequired:!!intervention,interventionParticipantRef:intervention};
+},
 consumeStaticOriginSourceOccurrence:(row,record)=>{const expected=expectedSource[row];if(row==='OBI-01'){if(!obitoSources.has(record.sourceOccurrenceId))return{success:false,reason:'source_occurrence_id_not_authoritative'};}else if(expected!==record.sourceOccurrenceId)return{success:false,reason:'source_occurrence_id_not_authoritative'};if(!qualifies(row,record.fact||{}))return{success:false,reason:'qualification_predicate_not_satisfied'};const key=`${row}:${record.sourceOccurrenceId}`;const old=receipts.find(r=>r.key===key);if(old)return{success:true,idempotent:true,rowId:row};receipts.push({key,rowId:row,sourceOccurrenceId:record.sourceOccurrenceId,fact:record.fact});return{success:true,rowId:row};},
 startStoryScene:(sceneId,opts)=>{const def=scenes.get(sceneId);if(!def)return{success:false,reason:'story_scene_not_registered'};active={sceneId,instanceId:`inst_${sceneId}`,beatId:def.entryBeatId,localContext:JSON.parse(JSON.stringify(opts.context||{})),processed:new Set()};enter();return{success:true,sceneId,beatId:active.beatId};}
 };ctx.globalThis=ctx;vm.createContext(ctx);files.forEach(f=>vm.runInContext(fs.readFileSync(f,'utf8'),ctx,{filename:f}));
 function resolveReq(req,key){if(!req)return;const once=`${active.instanceId}:${active.beatId}:${key}:${req.requestId}`;if(active.processed.has(once))return;const out=req.resolve();if(!out||out.success!==true)throw new Error(`${req.requestId} failed: ${JSON.stringify(out)}`);active.processed.add(once);}
 function enter(){const def=scenes.get(active.sceneId),beat=def.beatMap.get(active.beatId);(beat.onEnterConsequences||[]).forEach((r,i)=>resolveReq(r,`enter${i}`));}
 function step(choiceId){const def=scenes.get(active.sceneId),beat=def.beatMap.get(active.beatId);if(choiceId){const c=(beat.choices||[]).find(x=>x.choiceId===choiceId);if(!c)throw new Error(`choice ${choiceId} missing @ ${active.sceneId}/${active.beatId}`);if(typeof c.availability==='function'){const a=c.availability();if(!a.available)throw new Error(`choice unavailable ${choiceId}: ${a.knownBlocker}`);}if(c.contextPatch)Object.assign(active.localContext,JSON.parse(JSON.stringify(c.contextPatch)));active.beatId=c.nextBeatId||beat.nextBeatId;enter();return;}if(beat.nextBeatId){active.beatId=beat.nextBeatId;enter();return;}if(beat.exitScene){(def.onCompleteConsequences||[]).forEach((r,i)=>resolveReq(r,`complete${i}`));active=null;return;}throw new Error(`no transition @ ${active.sceneId}/${active.beatId}`);}
-function run(origin,choices){ctx.playerData.activityHistory=[];ctx.activityHistory=ctx.playerData.activityHistory;ctx.playerData.acquisition={chronicleOriginVariantId:origin,chronicleOrigin:{prologueCompleted:false}};active=null;const started=ctx.beginAlphaChronicleOriginPrologue();if(!started.success)throw new Error(`${origin} start failed ${JSON.stringify(started)}`);for(const c of choices){while(active){const b=scenes.get(active.sceneId).beatMap.get(active.beatId);if((b.choices||[]).length)break;if(b.nextBeatId)step(null);else break;}step(c);}while(active){const beat=scenes.get(active.sceneId).beatMap.get(active.beatId);if(beat.exitScene)step(null);else if(beat.nextBeatId&&!beat.choices?.length)step(null);else throw new Error(`path stopped @ ${origin}/${active.beatId}`);}if(!ctx.playerData.acquisition.chronicleOrigin.prologueCompleted)throw new Error(`${origin} did not complete`);}
+function advanceMachineResolvers(){
+  while(active){
+    const b=scenes.get(active.sceneId).beatMap.get(active.beatId);
+    if(!b||b.machineResolved!==true)break;
+    const available=(b.choices||[]).filter(ch=>!ch.availability||ch.availability().available);
+    if(available.length!==1)throw new Error(`machine resolver cardinality ${available.length} @ ${active.sceneId}/${active.beatId}`);
+    step(available[0].choiceId);
+  }
+}
+function run(origin,choices){
+  ctx.playerData.activityHistory=[];ctx.activityHistory=ctx.playerData.activityHistory;
+  ctx.playerData.acquisition={chronicleOriginVariantId:origin,chronicleOrigin:{prologueCompleted:false}};
+  active=null;
+  const started=ctx.beginAlphaChronicleOriginPrologue();
+  if(!started.success)throw new Error(`${origin} start failed ${JSON.stringify(started)}`);
+  for(const c of choices){
+    while(active){
+      advanceMachineResolvers();if(!active)break;
+      const b=scenes.get(active.sceneId).beatMap.get(active.beatId);
+      if((b.choices||[]).length)break;
+      if(b.nextBeatId)step(null);else break;
+    }
+    advanceMachineResolvers();
+    step(c);
+  }
+  while(active){
+    advanceMachineResolvers();if(!active)break;
+    const beat=scenes.get(active.sceneId).beatMap.get(active.beatId);
+    if(beat.exitScene)step(null);
+    else if(beat.nextBeatId&&!beat.choices?.length)step(null);
+    else throw new Error(`path stopped @ ${origin}/${active.beatId}`);
+  }
+  if(!ctx.playerData.acquisition.chronicleOrigin.prologueCompleted)throw new Error(`${origin} did not complete`);
+}
 run('academy_hinata',['attack_immediately','press_draw_counter','trust_spar','stay_and_watch']);
-run('academy_izuno',['predict_destination','intercept_prediction','trust_notice']);
+run('academy_izuno',['predict_destination','intercept_prediction','intercept_read']);
 run('academy_mirai',['ask_route','test_question','investigate_quietly']);
 run('academy_kushina',['correct_formula','ask_who']);
-run('academy_kurenai',['fake_clumsy','rush_bell','let_him_think_caught']);
+run('academy_kurenai',['fake_direct','rush_bell','take_bell_now']);
 run('academy_iwabee',['build_path','call_instructor','better_rest']);
-run('academy_metal_lee',['demonstrate','redirect_dummy']);
+run('academy_metal_lee',['conditioned_endurance','demonstrate','redirect_dummy']);
 run('academy_obito',['furniture_continue_final','vegetables_continue_final','equipment_continue_final','delivery_continue_final','cart_continue_final','reflection_keep_helping']);
 const diag=ctx.runAlphaOriginScene32900Diagnostics();
 ctx.playerData.acquisition={chronicleOriginVariantId:'academy_kakashi',chronicleOrigin:{prologueCompleted:false}};

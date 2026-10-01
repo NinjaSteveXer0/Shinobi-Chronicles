@@ -133,10 +133,17 @@ async function inspect(page,label){
     const dialogue=root&&root.querySelector(".kv2-dialogue");
     const speech=root&&root.querySelector(".kv2-speech");
     const receipt=root&&root.querySelector(".kv2-receipt");
+    const dialogueCss=dialogue?getComputedStyle(dialogue):null;
+    const speechCss=speech?getComputedStyle(speech):null;
+    const speechTailCss=speech?getComputedStyle(speech,"::after"):null;
     return{
       beatId:getActiveStorySceneRuntime()?.beatId||null,
       preset:root?.dataset.preset||null,
       cueKind:root?.dataset.cueKind||null,
+      hasChoices:root?.dataset.hasChoices==="true",
+      narrationBorderColor:dialogueCss?.borderColor||"",
+      speechBorderColor:speechCss?.borderColor||"",
+      speechTailBorderTopColor:speechTailCss?.borderTopColor||"",
       geometry:runAcademyKakashiV2Geometry36030(),
       renderer:runAcademyKakashiV2Renderer36030Diagnostics(),
       transition:runAcademyKakashiV2Transition36040Diagnostics(),
@@ -163,8 +170,16 @@ async function inspect(page,label){
   }else{
     assert(row.geometry.pass,label+" geometry: "+JSON.stringify(row.geometry));
     assert.strictEqual(row.visibleNarrationSurfaces+row.visibleSpeechSurfaces,1,label+" exactly one narration/speech surface must be visible");
-    if(row.cueKind==="dialogue")assert.strictEqual(row.visibleSpeechSurfaces,1,label+" dialogue must use actor-linked speech surface");
-    else assert.strictEqual(row.visibleNarrationSurfaces,1,label+" narration must use compact narration surface");
+    if(row.cueKind==="dialogue"){
+      assert.strictEqual(row.visibleSpeechSurfaces,1,label+" dialogue must use actor-linked speech surface");
+      if(!row.hasChoices){
+        assert(row.speechBorderColor.includes("103, 221, 230"),label+" dialogue outline is not canonical cyan: "+JSON.stringify(row));
+        assert(row.speechTailBorderTopColor.includes("103, 221, 230"),label+" dialogue pointer outline is not canonical cyan: "+JSON.stringify(row));
+      }
+    }else{
+      assert.strictEqual(row.visibleNarrationSurfaces,1,label+" narration must use compact narration surface");
+      if(row.cueKind==="narration"&&!row.hasChoices)assert(row.narrationBorderColor.includes("93, 215, 225"),label+" narration outline is not canonical cyan: "+JSON.stringify(row));
+    }
   }
   return row;
 }
@@ -363,44 +378,248 @@ async function advanceTo(page,target,{max=18}={}){
   throw new Error(`advanceTo guard exceeded: target=${target}, current=${await currentBeat(page)}`);
 }
 
-async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedBeat=null,assertVisible=false}={}){
+async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedBeat=null,assertVisible=false,proveRewardClaim=false}={}){
   const battleBeat=await currentBeat(page);
   const meta=await page.evaluate(()=>{const b=getCurrentStorySceneBeat();return b?{mode:b.mode,encounterId:b.battle&&b.battle.encounterId||null}:null;});
   assert(meta&&meta.mode==="battle_transition",`expected Battle transition at ${battleBeat}: ${JSON.stringify(meta)}`);
   await fastDrain(page);
+  const battleCta=await page.evaluate(()=>{
+    const root=document.getElementById("kakashi-v2-scene-board");
+    const buttons=[...(root?.querySelectorAll(".kv2-actions button")||[])].filter(node=>node.getClientRects().length>0);
+    const button=buttons[0]||null,style=button?getComputedStyle(button):null;
+    return{
+      count:buttons.length,
+      text:button?.textContent?.trim()||"",
+      battleClass:button?.classList.contains("kv2-battle")===true,
+      background:style?.backgroundImage||"",
+      rootBattleOnly:root?.dataset.battleActionOnly||""
+    };
+  });
+  assert.strictEqual(battleCta.count,1,`Kakashi Battle seam must expose one CTA: ${JSON.stringify(battleCta)}`);
+  assert.strictEqual(battleCta.text,"Start PL Battle","Kakashi global Battle CTA text drift");
+  assert.strictEqual(battleCta.battleClass,true,"Kakashi Battle CTA class missing");
+  assert(/rgb\(168, 34, 34\)|rgb\(93, 13, 13\)/.test(battleCta.background),`Kakashi Battle CTA is not the approved red treatment: ${battleCta.background}`);
   const launched=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040());
   assert(launched&&launched.success===true,JSON.stringify(launched));
   await page.waitForFunction(()=>!!(typeof currentBattle!=="undefined"&&currentBattle&&currentBattle.returnContext&&currentBattle.returnContext.type==="story_scene"),null,{timeout:12000});
   await page.waitForSelector(".alpha-code-battle-stage",{state:"visible",timeout:12000});
+  const sharedBattle=await page.evaluate(()=>{
+    const stage=document.querySelector(".alpha-code-battle-stage.battle2-modern");
+    const playerCount=(currentBattle?.deployment?.player?.slots||[]).filter(slot=>slot&&slot.participantId).length;
+    const enemyCount=(currentBattle?.deployment?.enemy?.slots||[]).filter(slot=>slot&&slot.participantId).length;
+    const peak=Math.max(playerCount,enemyCount);
+    const sourceBeatId=currentBattle?.returnContext?.sourceBeatId||null;
+    const expectedEnvironment=sourceBeatId&&typeof getAcademyKakashiV2Presentation36020==="function"
+      ?String(getAcademyKakashiV2Presentation36020(sourceBeatId)?.backdrop||"")
+      :"";
+    return{
+      battleSystem:stage?.dataset.battleSystem||null,
+      formationStage:stage?.dataset.formationStage||null,
+      formationMode:stage?.dataset.formationMode||null,
+      menmaProof:stage?.dataset.evolvedPlProof||null,
+      environmentPath:stage?.dataset.battleEnvironmentPath||null,
+      environmentMode:stage?.dataset.battleEnvironment||null,
+      expectedEnvironment,
+      backgroundImage:stage?getComputedStyle(stage).backgroundImage:"",
+      playerCount,enemyCount,
+      expectedMode:peak<=1?"duel":peak>=4?"arc":"wedge",
+      framelessPlayer:stage?.querySelector(".battle-live-active-card-player")?.dataset.framelessBattlePortrait||null,
+      framelessEnemy:stage?.querySelector(".battle-live-active-card-enemy")?.dataset.framelessBattlePortrait||null
+    };
+  });
+  assert.strictEqual(sharedBattle.battleSystem,"shinobi_chronicles_shared","Kakashi Battle bypassed canonical shared Battle System: "+JSON.stringify(sharedBattle));
+  assert.strictEqual(sharedBattle.formationStage,"true","Kakashi Battle did not use shared Formation Stage");
+  assert.strictEqual(sharedBattle.menmaProof,null,"Kakashi Battle incorrectly depends on Menma proof marker");
+  assert.strictEqual(sharedBattle.formationMode,sharedBattle.expectedMode,"Kakashi adaptive formation drift: "+JSON.stringify(sharedBattle));
+  assert.strictEqual(sharedBattle.framelessPlayer,"true","Kakashi active portrait is not frameless in shared Battle System");
+  assert.strictEqual(sharedBattle.framelessEnemy,"true","Kakashi opposition active portrait is not frameless in shared Battle System");
+  assert(sharedBattle.expectedEnvironment,"Kakashi Battle beat has no authored Story backdrop "+JSON.stringify(sharedBattle));
+  assert.strictEqual(sharedBattle.environmentPath,sharedBattle.expectedEnvironment,"Kakashi shared Battle did not inherit its exact Story location "+JSON.stringify(sharedBattle));
+  assert.strictEqual(sharedBattle.environmentMode,"authored","Kakashi shared Battle environment is not marked authored "+JSON.stringify(sharedBattle));
+  assert(sharedBattle.backgroundImage.includes(sharedBattle.expectedEnvironment.split("/").pop()),"Kakashi authored Story backdrop is not visibly painted in Battle "+JSON.stringify(sharedBattle));
+  if(sharedBattle.enemyCount===3)assert.strictEqual(sharedBattle.formationMode,"wedge","Kakashi failed-pickpocket 3v1 did not use shared SQUAD WEDGE");
   if(assertVisible){
     await page.waitForFunction(()=>{
       const visible=node=>!!node&&node.getClientRects().length>0&&getComputedStyle(node).display!=="none"&&getComputedStyle(node).visibility!=="hidden";
       return visible(document.querySelector(".alpha-code-battle-stage"))&&!visible(document.getElementById("kakashi-v2-scene-board"));
     },null,{timeout:12000});
   }
-  const resumed=await page.evaluate(({outcome,actions})=>{
-    const prior=globalThis.getBattleActionOpportunityIndex;
-    globalThis.getBattleActionOpportunityIndex=(side,participantId)=>{
-      if(side==="player"&&participantId==="academy_kakashi")return actions;
-      return typeof prior==="function"?prior(side,participantId):0;
-    };
-    try{
-      currentBattle.outcome={...(currentBattle.outcome||{}),type:outcome,completedAt:Date.now(),finishingShinobiId:outcome==="victory"?"academy_kakashi":null};
+
+  let victoryControlTiming=null;
+  let claimResponseMs=null;
+  let claimPersistence=null;
+  if(proveRewardClaim){
+    assert.strictEqual(outcome,"victory","reward-claim proof is victory-only");
+    const prepared=await page.evaluate(()=>{
+      const pillQty=()=>Array.isArray(playerData.inventory)
+        ?playerData.inventory.filter(row=>row&&(row.id||row.itemId)==="field_recovery_pill").reduce((n,row)=>n+Math.max(1,Number(row.quantity)||1),0)
+        :0;
+      const before={ryo:Number(playerData.ryo)||0,pill:pillQty()};
+      currentBattle.outcome={...(currentBattle.outcome||{}),type:"victory",completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};
       currentBattle.battleOver=true;
       currentBattle.active=false;
-      return resumeBattleCallerAfterCompletion(outcome);
-    }finally{
-      globalThis.getBattleActionOpportunityIndex=prior;
-    }
-  },{outcome,actions});
-  assert(resumed&&resumed.success===true,JSON.stringify(resumed));
+      // Reproduce the owner regression: a stale generic claim bit must not make
+      // the exact MI cash/pill package unclaimable when no Kakashi receipts exist.
+      currentBattle.rewards={generated:false,claimed:true};
+      const rewards=generateBattleRewards(currentBattle.enemy,currentBattle.activePlayer);
+      openOverlay("victory");
+      return{before,rewards:JSON.parse(JSON.stringify(rewards||{})),config:currentBattle.kakashiV2?.battleConfigId||null};
+    });
+    assert.strictEqual(prepared.rewards.ryo,50,"MI Victory did not project 50 Ryō");
+    assert(prepared.rewards.items.some(item=>item&&item.id==="field_recovery_pill"),"MI Victory did not project Field Recovery Pill");
+    await page.waitForFunction(()=>{
+      const node=document.querySelector(".victory-ryo-number");
+      return node&&node.textContent.trim()==="50"&&node.dataset.rewardPresentation==="static_earned_amount";
+    },null,{timeout:10000});
+    const claim=page.getByRole("button",{name:"CLAIM REWARDS"}).first();
+    await claim.waitFor({state:"visible",timeout:10000});
+    await page.evaluate(()=>{
+      const root=document.getElementById("overlay-content-container");
+      const probe={
+        playerSaves:0,testSaves:0,
+        priorPlayer:savePlayerData,priorTest:saveTestState,
+        priorClaim:claimVictoryRewardsFromOverlay,
+        claimStartedAt:null,continueRenderedAt:null,firstSaveAt:null,
+        observer:null
+      };
+      const markContinue=()=>{
+        const button=document.querySelector(".alpha-victory-footer .victory-continue");
+        if(probe.continueRenderedAt===null&&button&&/CONTINUE/i.test(button.textContent||"")){
+          probe.continueRenderedAt=performance.now();
+        }
+      };
+      probe.observer=new MutationObserver(markContinue);
+      if(root)probe.observer.observe(root,{subtree:true,childList:true,characterData:true});
+      globalThis.__kakashiClaimPersistenceProbe=probe;
+      globalThis.savePlayerData=function(){
+        if(probe.firstSaveAt===null)probe.firstSaveAt=performance.now();
+        probe.playerSaves+=1;
+        return probe.priorPlayer.apply(this,arguments);
+      };
+      globalThis.saveTestState=function(){
+        if(probe.firstSaveAt===null)probe.firstSaveAt=performance.now();
+        probe.testSaves+=1;
+        return probe.priorTest.apply(this,arguments);
+      };
+      globalThis.claimVictoryRewardsFromOverlay=function(){
+        probe.claimStartedAt=performance.now();
+        return probe.priorClaim.apply(this,arguments);
+      };
+      try{savePlayerData=globalThis.savePlayerData;}catch(_error){}
+      try{saveTestState=globalThis.saveTestState;}catch(_error){}
+      try{claimVictoryRewardsFromOverlay=globalThis.claimVictoryRewardsFromOverlay;}catch(_error){}
+    });
+    await claim.click();
+    await page.waitForFunction(()=>{
+      const probe=globalThis.__kakashiClaimPersistenceProbe;
+      if(!probe||probe.continueRenderedAt===null||currentBattle?.rewards?.claimed!==true)return false;
+      const button=document.querySelector(".alpha-victory-footer .victory-continue");
+      return !!button&&button.getClientRects().length>0&&/CONTINUE/i.test(button.textContent||"");
+    },null,{timeout:1000});
+    await page.waitForFunction(()=>{
+      const probe=globalThis.__kakashiClaimPersistenceProbe;
+      return !!probe&&probe.playerSaves===1&&probe.testSaves===1;
+    },null,{timeout:4000});
+    claimPersistence=await page.evaluate(()=>{
+      const probe=globalThis.__kakashiClaimPersistenceProbe;
+      if(!probe)return null;
+      const out={
+        playerSaves:probe.playerSaves,
+        testSaves:probe.testSaves,
+        visualResponseMs:probe.claimStartedAt!==null&&probe.continueRenderedAt!==null?probe.continueRenderedAt-probe.claimStartedAt:null,
+        continueRenderedAt:probe.continueRenderedAt,
+        firstSaveAt:probe.firstSaveAt,
+        paintedBeforePersistence:probe.continueRenderedAt!==null&&probe.firstSaveAt!==null&&probe.continueRenderedAt<=probe.firstSaveAt
+      };
+      try{probe.observer?.disconnect();}catch(_error){}
+      globalThis.savePlayerData=probe.priorPlayer;
+      globalThis.saveTestState=probe.priorTest;
+      globalThis.claimVictoryRewardsFromOverlay=probe.priorClaim;
+      try{savePlayerData=globalThis.savePlayerData;}catch(_error){}
+      try{saveTestState=globalThis.saveTestState;}catch(_error){}
+      try{claimVictoryRewardsFromOverlay=globalThis.claimVictoryRewardsFromOverlay;}catch(_error){}
+      delete globalThis.__kakashiClaimPersistenceProbe;
+      return out;
+    });
+    claimResponseMs=claimPersistence&&Number(claimPersistence.visualResponseMs);
+    assert(Number.isFinite(claimResponseMs)&&claimResponseMs<300,"Kakashi CLAIM -> CONTINUE visual response must paint in under 300ms, got "+claimResponseMs+"ms");
+    assert.strictEqual(claimPersistence.paintedBeforePersistence,true,"Kakashi Victory UI did not paint before persistence "+JSON.stringify(claimPersistence));
+    assert.strictEqual(claimPersistence.playerSaves,1,"Kakashi Claim player persistence count drifted "+JSON.stringify(claimPersistence));
+    assert.strictEqual(claimPersistence.testSaves,1,"Kakashi Claim session persistence count drifted "+JSON.stringify(claimPersistence));
+    const committed=await page.evaluate(before=>{
+      const pill=Array.isArray(playerData.inventory)
+        ?playerData.inventory.filter(row=>row&&(row.id||row.itemId)==="field_recovery_pill").reduce((n,row)=>n+Math.max(1,Number(row.quantity)||1),0)
+        :0;
+      const after={ryo:Number(playerData.ryo)||0,pill};
+      const replayBefore={...after};
+      const replay=claimCurrentBattleRewards();
+      const replayAfter={
+        ryo:Number(playerData.ryo)||0,
+        pill:Array.isArray(playerData.inventory)
+          ?playerData.inventory.filter(row=>row&&(row.id||row.itemId)==="field_recovery_pill").reduce((n,row)=>n+Math.max(1,Number(row.quantity)||1),0)
+          :0
+      };
+      return{after,replay,replayBefore,replayAfter,claimed:currentBattle?.rewards?.claimed===true};
+    },prepared.before);
+    assert.strictEqual(committed.after.ryo,prepared.before.ryo+50,"MI Claim Rewards did not commit exact 50 Ryō");
+    assert.strictEqual(committed.after.pill,prepared.before.pill+1,"MI Claim Rewards did not commit the Field Recovery Pill");
+    assert.strictEqual(committed.claimed,true,"MI Claim Rewards did not mark the package claimed");
+    assert.deepStrictEqual(committed.replayAfter,committed.replayBefore,"MI reward replay duplicated material rewards");
+  }
+
+  let resumed=null;
+  if(proveRewardClaim){
+    await page.evaluate(actions=>{
+      globalThis.__kakashiVictoryActionIndexPrior=getBattleActionOpportunityIndex;
+      globalThis.getBattleActionOpportunityIndex=(side,participantId)=>{
+        if(side==="player"&&participantId==="academy_kakashi")return actions;
+        return typeof globalThis.__kakashiVictoryActionIndexPrior==="function"
+          ?globalThis.__kakashiVictoryActionIndexPrior(side,participantId)
+          :0;
+      };
+      try{getBattleActionOpportunityIndex=globalThis.getBattleActionOpportunityIndex;}catch(_error){}
+    },actions);
+    const continueButton=page.locator(".alpha-victory-footer .victory-continue").first();
+    await continueButton.waitFor({state:"visible",timeout:3000});
+    const continueStarted=Date.now();
+    await continueButton.click();
+    await page.waitForSelector("#kakashi-v2-scene-board",{state:"visible",timeout:4000});
+    const continueResponseMs=Date.now()-continueStarted;
+    assert(continueResponseMs<1000,"Kakashi post-claim CONTINUE must respond in under 1000ms, got "+continueResponseMs+"ms");
+    await page.evaluate(()=>{
+      if(globalThis.__kakashiVictoryActionIndexPrior){
+        globalThis.getBattleActionOpportunityIndex=globalThis.__kakashiVictoryActionIndexPrior;
+        try{getBattleActionOpportunityIndex=globalThis.getBattleActionOpportunityIndex;}catch(_error){}
+      }
+      delete globalThis.__kakashiVictoryActionIndexPrior;
+    });
+    victoryControlTiming={claimResponseMs,continueResponseMs,claimPersistence};
+    resumed={success:true,viaVisibleVictoryContinue:true};
+  }else{
+    resumed=await page.evaluate(({outcome,actions})=>{
+      const prior=globalThis.getBattleActionOpportunityIndex;
+      globalThis.getBattleActionOpportunityIndex=(side,participantId)=>{
+        if(side==="player"&&participantId==="academy_kakashi")return actions;
+        return typeof prior==="function"?prior(side,participantId):0;
+      };
+      try{
+        currentBattle.outcome={...(currentBattle.outcome||{}),type:outcome,completedAt:Date.now(),finishingShinobiId:outcome==="victory"?"academy_kakashi":null};
+        currentBattle.battleOver=true;
+        currentBattle.active=false;
+        return resumeBattleCallerAfterCompletion(outcome);
+      }finally{
+        globalThis.getBattleActionOpportunityIndex=prior;
+      }
+    },{outcome,actions});
+    assert(resumed&&resumed.success===true,JSON.stringify(resumed));
+  }
   await page.waitForSelector("#kakashi-v2-scene-board",{state:"visible",timeout:12000});
   await page.evaluate(()=>resetAcademyKakashiV2Transition36040());
   await waitUnlocked(page,expectedBeat);
   if(expectedBeat)assert.strictEqual(await currentBeat(page),expectedBeat);
   const authored=await page.evaluate(()=>getActiveStorySceneRuntime()?.battleResume?.authored||null);
   assert(authored&&Number(authored.playerActionOpportunityCount)===actions,`Battle action count did not round-trip: expected ${actions}, got ${JSON.stringify(authored)}`);
-  return{battleBeat,outcome,actions,expectedBeat,resumed};
+  return{battleBeat,outcome,actions,expectedBeat,resumed,victoryControlTiming};
 }
 
 async function toScene02Root(page){
@@ -528,6 +747,14 @@ async function validateTerminalCadence(page,label,expectedTotalRyo=null){
   const receipt=await waitReceiptProjection(page,label+":receipt");
   assert(receipt.receiptText.includes("FIRST ACTION"),label+" Chronicle Receipt facts missing after projection settled");
   assert(!receipt.receiptText.includes("Origin occurrence sealed"),label+" stale raw Origin close leaked into Receipt");
+  const receiptButton=page.locator("#kakashi-v2-scene-board .kv2-receipt [data-kv2-advance]").first();
+  assert.strictEqual((await receiptButton.textContent()||"").trim(),"CONTINUE",label+" Receipt dedicated continuation button missing");
+  await page.locator("#kakashi-v2-scene-board").click({position:{x:20,y:20}});
+  await page.waitForTimeout(120);
+  assert.strictEqual(await currentBeat(page),"v2_receipt",label+" stage click bypassed Chronicle Receipt");
+  await page.keyboard.press("Space");
+  await page.waitForTimeout(120);
+  assert.strictEqual(await currentBeat(page),"v2_receipt",label+" global keyboard advance bypassed Chronicle Receipt");
 
   const rewardProof=await page.evaluate(()=>{
     const rt=getActiveStorySceneRuntime(),s=getAcademyKakashiV2State36020();
@@ -1213,7 +1440,7 @@ async function browserRouteMatrix(browser){
     await chooseLabel(page,"WATCH THE HANDOFF","v2_watch_exchange");
     await chooseLabel(page,"INTERCEPT THE MASKED ATTACKER","v2_stop_assassin_setup");
     await advanceTo(page,"v2_battle_mi_stop");
-    await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_mi_stop_win"});
+    await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_mi_stop_win",proveRewardClaim:true});
     const labels=await page.evaluate(()=>getCurrentStorySceneBeat().choices.filter(c=>!c.availability||c.availability().available).map(c=>c.label));
     assert(!labels.includes("CHASE THE PACKAGE"),JSON.stringify(labels));
     assert(!labels.includes("CHASE THE MAN FROM THE PHOTO"),JSON.stringify(labels));

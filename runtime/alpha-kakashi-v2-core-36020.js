@@ -72,7 +72,13 @@ function addBeat(id,{mode="narration",cues=[],backdrop=B.sakura,location="KONOHA
   const row={beatId:id,mode,text:"",choices,nextBeatId,exitScene,machineResolved:machineResolved===true,uiHints:machineResolved===true?{kakashiMachineResolved:true}:{}};
   if(onEnter)row.onEnterConsequences=[{requestId:`kakashi_v2_enter_${id}`,kind:"domain",resolve:ctx=>onEnter(ctx)}];
   if(onAdvance)row.onAdvanceConsequences=[{requestId:`kakashi_v2_advance_${id}`,kind:"domain",resolve:ctx=>onAdvance(ctx)}];
-  if(battle)row.battle=battle;
+  if(battle){
+    row.battle={
+      ...battle,
+      environmentPath:String(battle.environmentPath||backdrop||""),
+      backdrop:String(battle.backdrop||backdrop||"")
+    };
+  }
   beats.push(row);return row;
 }
 function active(){return typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;}
@@ -1624,6 +1630,7 @@ function diagnostics(){
   tenBattleConfigsAvailable:!!globalThis.SC_ACADEMY_KAKASHI_V2_BATTLE_36010&&Object.keys(globalThis.SC_ACADEMY_KAKASHI_V2_BATTLE_36010.configs||{}).length===10,
   currentLethalLabels:JSON.stringify(beats).includes("KILL HER")&&JSON.stringify(beats).includes("KILL HIM")&&JSON.stringify(beats).includes("KILL THEM")&&!JSON.stringify(beats).includes("ATTEMPT"+" TO KILL"),
   stopAssassinUsesDirectMiConfig:!!def&&def.beatMap.get("v2_battle_mi_stop")?.battle?.encounterId==="academy_kakashi_origin_battle_mi_1v1",
+  everyKakashiBattleCarriesStoryBackdrop:!!def&&beats.filter(b=>b.mode==="battle_transition").every(b=>!!String(b.battle&&b.battle.environmentPath||"").trim()&&b.battle.environmentPath===manifest[b.beatId].backdrop),
   stopAssassinPackageOnlyCatchup:!!def&&def.beatMap.get("v2_mi_stop_win")?.choices?.some(c=>c.label==="CHASE THE PACKAGE")&&!def.beatMap.get("v2_mi_stop_win")?.choices?.some(c=>c.label==="CHASE THE MAN FROM THE PHOTO"),
   stopAssassinThreeActionGate:STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS===3,
   stableFactualResolver:Object.keys(factualDefs).length>=7,

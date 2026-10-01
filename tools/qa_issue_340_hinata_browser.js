@@ -93,6 +93,11 @@ async function info(page){
       localContext:rt&&rt.localContext?JSON.parse(JSON.stringify(rt.localContext)):{},
       text:root?.querySelector(".sc-story-text")?.textContent?.trim()||"",
       speaker:root?.querySelector(".sc-story-name")?.textContent?.trim()||"",
+      cueKind:root?.dataset.scCueKind||null,
+      cueSpeakerActorId:root?.dataset.scCueSpeakerActorId||null,
+      focusedActorIds:[...(root?.querySelectorAll(".sc-scene-board-33900__actor.is-focus")||[])].map(n=>n.dataset.actorId||"").filter(Boolean),
+      actorIds:[...(root?.querySelectorAll(".sc-scene-board-33900__actor")||[])].map(n=>n.dataset.actorId||"").filter(Boolean),
+      actorImages:Object.fromEntries([...(root?.querySelectorAll(".sc-scene-board-33900__actor")||[])].map(n=>[n.dataset.actorId||"",n.querySelector("img")?.getAttribute("src")||null]).filter(row=>row[0])),
       choices:[...(root?.querySelectorAll(".sc-story-choice")||[])].filter(visible).map(n=>n.textContent.trim()),
       primaryCount:[...(root?.querySelectorAll(".sc-chronicle-primary,.sc-story-actions > .sc-story-action:not(.sc-story-choice)")||[])].filter(visible).length,
       backdropPath:typeof resolveStorySceneBoardBackdropPath==="function"?resolveStorySceneBoardBackdropPath():null,
@@ -123,10 +128,13 @@ async function clickContinue(page){
   assert.notStrictEqual(before.mode,"choice","continue called on choice "+before.beatId);
   assert.strictEqual(before.battleVisible,false,"Battle visible before continue "+before.beatId);
   const root=page.locator("#story-scene-presentation-layer");
-  let button=root.locator(".sc-chronicle-primary").first();
-  if(await button.count()===0)button=root.locator(".sc-story-actions > .sc-story-action:not(.sc-story-choice)").first();
-  await button.waitFor({state:"visible",timeout:8000});
-  await button.click();
+  const button=root.locator(".sc-chronicle-primary").first();
+  if(await button.count()&&await button.isVisible())await button.click();
+  else{
+    const stage=root.locator(".sc-chronicle-stage,.sc-story-stage").first();
+    await stage.waitFor({state:"visible",timeout:8000});
+    await stage.click({position:{x:30,y:30}});
+  }
   if(before.beatId){
     await page.waitForFunction(old=>{
       const rt=getActiveStorySceneRuntime();
@@ -146,6 +154,31 @@ async function continueTo(page,target,{max=180,collect=null}={}){
     await clickContinue(page);
   }
   throw new Error("continueTo guard exceeded "+target);
+}
+
+async function assertOpeningSpeakerOwnership(page){
+  let sawPartner=false,sawHinataReply=false;
+  for(let i=0;i<80;i++){
+    const row=await assertSceneHealthy(page,"opening-speaker-ownership");
+    if(row.mode==="choice")break;
+    if(row.text==="Ready?"){
+      assert.strictEqual(row.speaker,"SPARRING STUDENT","Ready? speaker label drift");
+      assert.strictEqual(row.cueSpeakerActorId,"hinata_sparring_partner","Ready? did not bind to sparring partner");
+      assert.deepStrictEqual(row.focusedActorIds,["hinata_sparring_partner"],"Ready? focused the wrong Character Card");
+      sawPartner=true;
+    }
+    if(row.text==="Yes."){
+      assert.strictEqual(row.speaker,"HINATA","Yes. speaker label drift");
+      assert.strictEqual(row.cueSpeakerActorId,"academy_hinata","Yes. did not bind back to Hinata");
+      assert.deepStrictEqual(row.focusedActorIds,["academy_hinata"],"Yes. focused the wrong Character Card");
+      sawHinataReply=true;
+      break;
+    }
+    await clickContinue(page);
+  }
+  assert.strictEqual(sawPartner,true,"opening never proved SPARRING STUDENT ownership");
+  assert.strictEqual(sawHinataReply,true,"opening never proved Hinata reply ownership");
+  return true;
 }
 
 async function choiceLabels(page){
@@ -199,6 +232,9 @@ async function historyEvidence(page){
 async function finishRoute(page,{label,youngLabel,youngId,expectedResponses}){
   const finalScene=await continueTo(page,"hin_young_choice");
   assert(finalScene.backdropPath&&finalScene.backdropPath.includes("Hinata Origin Backdrop/hyuga_compound_alt_angle.png"),label+" final Hinata scene did not switch to alternate Hyūga angle");
+  assert.deepStrictEqual(finalScene.actorIds,["academy_hinata","hinata_younger_student","hinata_younger_sparring_partner"],label+" final Hinata scene cast drift");
+  assert.strictEqual(finalScene.actorImages.hinata_younger_student,"NPC/younger_student.png",label+" younger student card path drift");
+  assert.strictEqual(finalScene.actorImages.hinata_younger_sparring_partner,"NPC/younger_sparring_partner.png",label+" younger sparring partner card path drift");
   const youngerLabels=await choiceLabels(page);
   assert.deepStrictEqual(youngerLabels,["SHOW HER ONCE","TELL HER WHAT YOU SAW","LEAVE THEM TO THEIR PRACTICE","WATCH ONE MORE EXCHANGE"],label+" younger choice surface");
   await shot(page,label,"younger-choice");
@@ -211,6 +247,18 @@ async function finishRoute(page,{label,youngLabel,youngId,expectedResponses}){
   assert(closeTexts.includes("I'll try again."),label+" missing I'll try again.");
   assert(closeTerminal.backdropPath&&closeTerminal.backdropPath.includes("Hinata Origin Backdrop/hyuga_compound_alt_angle.png"),label+" closing scene lost alternate Hyūga angle");
   await shot(page,label,"closing");
+  await clickContinue(page);
+  const receipt=await continueTo(page,"hin_receipt",{max:4});
+  assert.strictEqual(receipt.cueKind,"record",label+" Hinata Chronicle Receipt presentation cue missing");
+  assert.strictEqual(receipt.speaker,"CHRONICLE RECEIPT",label+" Chronicle Receipt label missing");
+  assert(receipt.text.includes("ACADEMY HINATA"),label+" Chronicle Receipt missing Origin title");
+  assert(receipt.text.includes("RECORDED IN YOUR CHRONICLE"),label+" Chronicle Receipt missing Chronicle heading");
+  assert(receipt.text.includes("YOUR DECISIONS"),label+" Chronicle Receipt missing decisions");
+  assert(receipt.text.includes("WHAT HAPPENED"),label+" Chronicle Receipt missing outcome summary");
+  assert(receipt.text.includes("REWARDS"),label+" Chronicle Receipt missing rewards section");
+  assert(receipt.text.includes("Origin Starting Purse: +100 Ryō."),label+" Chronicle Receipt missing starting purse");
+  assert.deepStrictEqual(receipt.actorIds,[],label+" Chronicle Receipt must not retain Story actors");
+  await shot(page,label,"chronicle-receipt");
   await clickContinue(page);
   await page.waitForFunction(()=>ensurePlayerAcquisitionState().chronicleOrigin?.prologueCompleted===true,null,{timeout:12000});
   await page.waitForFunction(()=>/YOUR CHRONICLE BEGINS/i.test(document.body.innerText||""),null,{timeout:12000});
@@ -235,6 +283,7 @@ async function runWait(browser){
   const label="wait-show";
   const {context,page,runtimeErrorGate}=await boot(browser,label);
   try{
+    await assertOpeningSpeakerOwnership(page);
     let backdropCheck=await continueTo(page,"hin_ex1_choice");
     assert(backdropCheck.backdropPath&&backdropCheck.backdropPath.includes("Hinata Origin Backdrop/hyuga_compound.png"),label+" primary Hyūga backdrop missing before final scene");
     assert.deepStrictEqual(await choiceLabels(page),["WAIT FOR HIM TO COMMIT","STEP IN FIRST","BREAK AWAY AND RESET"]);

@@ -152,6 +152,22 @@ function patchHinata33500(){
 function patchIzuno33500(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
   const def=editableScene33500(A.sceneByVariant.academy_izuno);if(!def)return false;
+  // #343 owner-approved complete rewrite v2 owns the complete Wasabi expression.
+  // The old 33500 compatibility shim must stand down rather than re-registering
+  // the compressed pre-v2 graph over current authority.
+  const goldenNative=!!(
+    beat33500(def,"izu_initial_choice")&&
+    beat33500(def,"izu_split_choice")&&
+    beat33500(def,"izu_rogue_choice")&&
+    beat33500(def,"izu_rogue_step_in_battle")&&
+    beat33500(def,"izu_reflect_river")&&
+    beat33500(def,"izu_reflect_intercept")&&
+    beat33500(def,"izu_reflect_false")&&
+    beat33500(def,"izu_reflect_step_in")&&
+    beat33500(def,"izu_reflect_call_for_help")&&
+    beat33500(def,"izu_reflect_keep_pursuing")
+  );
+  if(goldenNative)return true;
   const split=beat33500(def,"izu_split"),rogue=beat33500(def,"izu_rogue"),evalBeat=beat33500(def,"izu_eval");
   if(!split||!rogue||!evalBeat)return false;
 
@@ -200,6 +216,7 @@ function patchIzuno33500(){
 function patchMirai33500(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
   const def=editableScene33500(A.sceneByVariant.academy_mirai);if(!def)return false;
+  if(beat33500(def,"mir_assignment_01")&&beat33500(def,"mir_walk_choice")&&beat33500(def,"mir_reflection_router")&&beat33500(def,"mir_reflection_conversation")&&beat33500(def,"mir_reflection_chakra")&&beat33500(def,"mir_reflection_suspicion")&&beat33500(def,"mir_reflection_missed"))return true;
   const inconsistent=beat33500(def,"mir_inconsistent");
   const deeper=beat33500(def,"mir_deeper");
   const evalBeat=beat33500(def,"mir_eval");
@@ -244,6 +261,8 @@ function patchMirai33500(){
 // existing 32900 authority and commits only when kur_result is entered.
 function patchKurenai33500(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
+  const live=storyDefinition33500(A.sceneByVariant.academy_kurenai);
+  if(live&&live.entryBeatId==="kur_pre_01"&&beat33500(live,"kur_approach")&&beat33500(live,"kur_leave_router"))return true;
   const def=editableScene33500(A.sceneByVariant.academy_kurenai);if(!def)return false;
   const routes=[
     ["kur_loss_attack","rush_bell","kur_complete_loss_1"],
@@ -287,6 +306,16 @@ function patchKurenai33500(){
 function patchIwabee33500(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
   const def=editableScene33500(A.sceneByVariant.academy_iwabee);if(!def)return false;
+  // #399 / WRITING_GOLDEN owns the complete visible Iwabee route natively.
+  // The pre-#399 33500 compatibility shim must not re-register compressed
+  // iwa_expose / iwa_eval prose over the authoritative Story graph.
+  const goldenNative=!!(
+    beat33500(def,"iwa_open_01")&&
+    beat33500(def,"iwa_confront_battle")&&
+    beat33500(def,"iwa_confront_loss_01")&&
+    beat33500(def,"iwa_close_02")
+  );
+  if(goldenNative)return true;
   const expose=beat33500(def,"iwa_expose"),evalBeat=beat33500(def,"iwa_eval");
   if(!expose||!evalBeat)return false;
   expose.presentationResolver=()=>{
@@ -316,6 +345,14 @@ function patchIwabee33500(){
 function patchMetal33500(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
   const def=editableScene33500(A.sceneByVariant.academy_metal_lee);if(!def)return false;
+  // 2026-09-30 Metal successor owns the complete visible route natively.
+  // Never let the older compressed presentation shim overwrite it.
+  const finalNative=!!(
+    beat33500(def,"met_open_01")&&beat33500(def,"met_spar_battle")&&
+    beat33500(def,"met_protect")&&beat33500(def,"met_receipt")&&
+    beat33500(def,"met_spar_strong_close_07")&&beat33500(def,"met_backout_close_01")
+  );
+  if(finalNative)return true;
   const end=beat33500(def,"met_end"),backout=beat33500(def,"met_backout");
   if(!end||!backout)return false;
   backout.text="Metal backs out of the public challenge. The private training he already completed still happened; choosing not to perform for the audience does not erase it.";
@@ -355,8 +392,25 @@ function runAlphaOriginBrowserRealisation33500Diagnostics(){
       hin.beatMap.has("hin_young_result")
     )),
     hinataGoldenNativeShimRetired:!!(hin&&hin.beatMap&&hin.beatMap.has("hin_ex1_choice"))?originPatches.hinata===true&&!patchedScenes.includes(A.sceneByVariant.academy_hinata):true,
-    kurenaiFourOutcomeChoreographies:!!(kur&&kur.beatMap&&["kur_complete_loss_1","kur_partial_loss_result_2","kur_partial_win_result_3","kur_complete_win_result_6"].every(id=>kur.beatMap.has(id))),
-    kurenaiResultIsDecisionAware:!!(kur&&kur.beatMap&&kur.beatMap.get("kur_result")&&typeof kur.beatMap.get("kur_result").presentationResolver==="function"),
+    wasabiGoldenNativeShimRetired:!!(A&&storyDefinition33500(A.sceneByVariant.academy_izuno)?.beatMap?.has("izu_initial_choice"))?originPatches.izuno===true&&!patchedScenes.includes(A.sceneByVariant.academy_izuno):true,
+    iwabeeGoldenNativeShimRetired:originPatches.iwabee===true&&!patchedScenes.includes(A.sceneByVariant.academy_iwabee),
+    metalGoldenNativeShimRetired:originPatches.metal===true&&!patchedScenes.includes(A.sceneByVariant.academy_metal_lee),
+    kurenaiFourOutcomeChoreographies:!!(kur&&kur.beatMap&&(
+      ["kur_result_complete_loss_01","kur_result_partial_loss_01","kur_result_partial_win_01","kur_result_complete_win_01","kur_leave_router"].every(id=>kur.beatMap.has(id))||
+      ["kur_false_04","kur_conceal_06","kur_distance_09","kur_complete_10","kur_after_router","kur_leave_router"].every(id=>kur.beatMap.has(id))||
+      ["kur_complete_loss_1","kur_partial_loss_result_2","kur_partial_win_result_3","kur_complete_win_result_6"].every(id=>kur.beatMap.has(id))
+    )),
+    kurenaiResultIsDecisionAware:!!(kur&&kur.beatMap&&(
+      (
+        (kur.beatMap.get("kur_approach")?.choices||[]).length===4&&
+        (kur.beatMap.get("kur_approach")?.choices||[]).every(choice=>!!choice?.contextPatch?.kurenaiStage1)&&
+        ["kur_stage2_false","kur_stage2_conceal","kur_stage2_distort","kur_stage2_direct"].every(id=>(kur.beatMap.get(id)?.choices||[]).length===2)&&
+        ["kur_stage3_false_rush","kur_stage3_false_draw","kur_stage3_conceal_rush","kur_stage3_conceal_draw","kur_stage3_distort_rush","kur_stage3_distort_draw","kur_stage3_direct_rush","kur_stage3_direct_draw"]
+          .every(id=>(kur.beatMap.get(id)?.choices||[]).length===3)
+      )||
+      ((kur.beatMap.get("kur_approach")?.choices||[]).map(choice=>choice?.contextPatch?.kurenaiOutcome).filter(Boolean).sort().join("|")==="complete_loss|complete_win|partial_loss|partial_win")||
+      (kur.beatMap.get("kur_result")&&typeof kur.beatMap.get("kur_result").presentationResolver==="function")
+    )),
     noMissionSemanticReuse:typeof globalThis.SC_ALPHA_MISSION_CHOICE_121==="undefined"||!patchedScenes.some(id=>String(id).startsWith("arc1_")),
     browserGoldenClaimed:false
   };

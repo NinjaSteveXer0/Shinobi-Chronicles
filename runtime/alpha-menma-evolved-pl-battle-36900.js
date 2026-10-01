@@ -13,8 +13,10 @@
 // Anko opens Active as a player-controlled Guest Ally. Her four legal Origin
 // Skills are genuine player choices. Ordinary Active-vs-Active cadence applies.
 // Enemy relay remains Altered -> Brute -> Unstable. If Anko legitimately resolves
-// Altered + Brute while still eligible/Active, she yields to Menma after the
-// Brute withdrawal and Unstable relay. Side alternation does not reset.
+// Altered + Brute while still eligible/Active, Unstable takes its first enemy
+// opportunity against Anko. Only after that visible action settles does Anko
+// yield Active to Menma. Menma therefore enters on the next player turn at his
+// untouched Battle PL; side alternation does not reset.
 //
 // Zero-PL formation mutation is presentation-gated so the outgoing participant
 // remains visible for the immutable action receipt. Presentation never chooses
@@ -38,8 +40,8 @@ const MENMA_CLASSROOM_ENVIRONMENT_PATH="Scene backdrops/academy_classroom.png";
 const MENMA_FOREST_ROUTE_ENVIRONMENT_ID="konoha_forest_path_day";
 const MENMA_FOREST_ROUTE_ENVIRONMENT_PATH="Scene backdrops/whisper_woods_forest_route.png";
 const MENMA_CLEARING_ENVIRONMENT_ID="konoha_forest_clearing_day";
-const FUTURE_ENVIRONMENT_PATH="Scene backdrops/whisper_woods_forest_route.png";
-const FUTURE_ENVIRONMENT_ASSET_ID="whisper_woods_forest_route";
+const FUTURE_ENVIRONMENT_PATH="Menma Origin Backdrop/whisper_woods_rise.png";
+const FUTURE_ENVIRONMENT_ASSET_ID="whisper_woods_rise";
 const MENMA_STORY_BACKDROPS_36900=Object.freeze({
   [MENMA_CLASSROOM_ENVIRONMENT_ID]:MENMA_CLASSROOM_ENVIRONMENT_PATH,
   [MENMA_FOREST_ROUTE_ENVIRONMENT_ID]:MENMA_FOREST_ROUTE_ENVIRONMENT_PATH,
@@ -166,7 +168,7 @@ function createState(sceneId=null){
     playerOpportunityOrdinal:1,enemyOpportunityOrdinal:0,
     committedOpportunities:{},rngChoices:{},
     ankoBoundTargetIds:[],ankoSerpentEvasionSpent:false,
-    pendingZero:null,pendingAuthoredYieldActionId:null,
+    pendingZero:null,pendingAuthoredYieldActionId:null,pendingAnkoYieldAfterEnemyActionId:null,
     resolvedHostileIds:[],withdrawalOrder:[],
     menmaWithdrawn:false,ankoWithdrawn:false,ankoYielded:false,authoredYieldCancelled:false,
     menmaEvidenceStarted:false,terminalResult:null,lastSemanticEvent:null
@@ -199,7 +201,7 @@ function normalizeState(raw,sceneId=null){
       (resolved.has(HOSTILE_IDS[0])&&resolved.has(HOSTILE_IDS[1])&&(oldPhase==="phase_c_player"||oldPhase==="phase_c_enemy"));
     next.menmaEvidenceStarted=next.ankoYielded||raw.menmaEvidenceStarted===true;
     next.authoredYieldCancelled=raw.ankoWithdrawn===true&&!next.ankoYielded;
-    next.pendingZero=null;next.pendingAuthoredYieldActionId=null;
+    next.pendingZero=null;next.pendingAuthoredYieldActionId=null;next.pendingAnkoYieldAfterEnemyActionId=null;
     next.phase=oldPhase==="phase_c_enemy"?"enemy":"player";
     next.inputLocked=false;
   }
@@ -654,15 +656,16 @@ function shouldAuthorMenmaHandoff36900(){
   if(!st.resolvedHostileIds.includes(HOSTILE_IDS[0])||!st.resolvedHostileIds.includes(HOSTILE_IDS[1]))return false;
   return Number(getBattleRemainingPL("player",ANKO_ID))>0&&Number(getBattleRemainingPL("player",MENMA_ID))>0;
 }
-function yieldAnkoToMenmaActive36900(){
+function yieldAnkoToMenmaActive36900(nextSide="enemy"){
   const b=battle(),st=ensureState();if(!b||!st||!shouldAuthorMenmaHandoff36900())return false;
+  const normalizedNextSide=nextSide==="player"?"player":"enemy";
   const deployment=b.deployment;
   b.deployment.player={slots:createBattleDeploymentSlots([MENMA_ID,ANKO_ID])};
   if(typeof clearBattleActionSelectionForActorChange==="function")clearBattleActionSelectionForActorChange();
   if(typeof syncBattleActivePlayerFromDeployment==="function")syncBattleActivePlayerFromDeployment();
   else b.activePlayer=getBattleParticipantByIdentity("player",MENMA_ID);
   b.characterId=MENMA_ID;
-  st.ankoYielded=true;st.phase="enemy";st.inputLocked=true;
+  st.ankoYielded=true;st.phase=normalizedNextSide;st.inputLocked=normalizedNextSide!=="player";
   deployment.transitionCounter=(Number(deployment.transitionCounter)||0)+1;
   deployment.lastTransition={
     id:"menma_guest_yield_"+String(deployment.transitionCounter),type:"authored_active_yield",side:"player",
@@ -671,12 +674,12 @@ function yieldAnkoToMenmaActive36900(){
       {participantId:ANKO_ID,fromSlot:1,toSlot:2,movementType:"authored_yield_to_bench"},
       {participantId:MENMA_ID,fromSlot:2,toSlot:1,movementType:"authored_bench_promotion"}
     ],
-    sideOrderReset:false,nextSide:"enemy",createdAt:Date.now()
+    sideOrderReset:false,nextSide:normalizedNextSide,createdAt:Date.now()
   };
   recordBattleEvidence({
     eventType:"battle_formation_yield_committed",committedOccurrence:true,
     actorRef:createBattleParticipantRef("player",ANKO_ID),targetRef:createBattleParticipantRef("player",MENMA_ID),
-    data:{yieldFrom:ANKO_ID,promoteTo:MENMA_ID,ankoRemainsDeployed:true,actionOpportunityConsumed:false,sideOrderReset:false,nextSide:"enemy"}
+    data:{yieldFrom:ANKO_ID,promoteTo:MENMA_ID,ankoRemainsDeployed:true,actionOpportunityConsumed:false,sideOrderReset:false,nextSide:normalizedNextSide}
   });
   startMenmaEvidenceWindow36900("authored_guest_ally_yield");
   persistBattleSnapshot();
@@ -809,15 +812,31 @@ function settleEnemyOpportunity36900(){
     }
     if(!st.pendingZero&&!battle().battleOver)advanceAfterEnemyOpportunity36900();
   }finally{st.processing=false;}
+  const presentationActionId=result&&result.envelope&&result.envelope.actionId||result&&result.actionId||null;
   persistBattleSnapshot();
-  return result||{success:false,reason:"enemy_resolution_missing"};
+  return result?{...result,presentationActionId}:{success:false,reason:"enemy_resolution_missing",presentationActionId};
 }
 
 // Called by 33000 only after the exact committed action has visibly settled.
 function advanceAfterPresentation(receipt){
   const st=ensureState();if(!st||!receipt||!receipt.actionId)return{success:false,reason:"presentation_receipt_missing"};
+  const delayedId=String(st.pendingAnkoYieldAfterEnemyActionId||"");
+  const receiptId=String(receipt.actionId||"");
   const pending=st.pendingZero;
-  if(!pending||String(pending.actionId||"")!==String(receipt.actionId||""))return{success:false,reason:"no_matching_pending_zero"};
+  if(delayedId&&delayedId===receiptId){
+    st.pendingAnkoYieldAfterEnemyActionId=null;
+    // If Unstable depleted Anko, the ordinary zero-PL relay below owns the
+    // switch to Menma. Otherwise this is the authored teaching handoff.
+    if(!(pending&&String(pending.actionId||"")===receiptId)&&st.ankoWithdrawn!==true){
+      const yielded=yieldAnkoToMenmaActive36900("player");
+      if(yielded){
+        startMenmaEvidenceWindow36900("authored_guest_ally_yield_after_unstable_attack");
+        persistBattleSnapshot();
+        return{success:true,authoredYield:true,nextSide:"player",activePlayerId:activePlayer()&&activePlayer().id||null,activeEnemyId:activeEnemy()&&activeEnemy().id||null};
+      }
+    }
+  }
+  if(!pending||String(pending.actionId||"")!==receiptId)return{success:false,reason:"no_matching_pending_zero"};
   st.pendingZero=null;
 
   const transition=typeof advanceBattleParticipantAtZeroPL==="function"
@@ -837,12 +856,18 @@ function advanceAfterPresentation(receipt){
     }
 
     // The player-side action that caused this withdrawal has been consumed.
-    // Enemy remains next even when the authored Anko -> Menma handoff occurs.
+    // When Brute relays to Unstable, preserve Anko as Active for Unstable's
+    // first enemy opportunity. The authored Anko -> Menma teaching handoff is
+    // deferred until that exact enemy action is visibly settled.
     st.phase="enemy";st.enemyOpportunityOrdinal+=1;st.inputLocked=true;
-    yieldAnkoToMenmaActive36900();
+    const deferAnkoYield=shouldAuthorMenmaHandoff36900();
     persistBattleSnapshot();
     const enemyResult=settleEnemyOpportunity36900();
-    return{success:true,relay:transition,enemyResult,activePlayerId:activePlayer()&&activePlayer().id||null,activeEnemyId:next.id};
+    if(deferAnkoYield&&enemyResult&&enemyResult.success===true&&enemyResult.presentationActionId){
+      st.pendingAnkoYieldAfterEnemyActionId=String(enemyResult.presentationActionId);
+      persistBattleSnapshot();
+    }
+    return{success:true,relay:transition,enemyResult,authoredYieldDeferred:deferAnkoYield,activePlayerId:activePlayer()&&activePlayer().id||null,activeEnemyId:next.id};
   }
 
   if(pending.side==="player"){
@@ -1315,6 +1340,34 @@ function ensureMenmaDefeatFutureSceneBoard38800(){
   }
   return{success:true,queued:true};
 }
+const MENMA_WRITING_GOLDEN_FUTURE_INTENT_BY_CHOICE_38800=Object.freeze({
+  master:"master_what_they_wont_teach_me",
+  strong:"become_too_strong_to_hold_back",
+  create:"create_something_thats_mine",
+  limit:"find_out_how_far_i_can_go"
+});
+function isMenmaWritingGolden105Scene38800(scene){
+  return !!scene&&!!scene.beatMap&&
+    scene.beatMap.has("menma_future_choice")&&
+    scene.beatMap.has("menma_close_01")&&
+    scene.beatMap.has("menma_receipt");
+}
+function bindMenmaWritingGoldenFutureIntent38800(scene){
+  const beat=scene&&scene.beatMap&&scene.beatMap.get("menma_future_choice");
+  if(!beat||!Array.isArray(beat.choices)||beat.choices.length!==4)return false;
+  for(const choice of beat.choices){
+    const intent=MENMA_WRITING_GOLDEN_FUTURE_INTENT_BY_CHOICE_38800[String(choice&&choice.choiceId||"")]||null;
+    if(!intent)return false;
+    const requestId="menma_future_ambition_intent_"+intent+"_38800";
+    choice.contextPatch={...(choice.contextPatch||{}),menmaFutureAmbitionIntent:intent};
+    const prior=Array.isArray(choice.consequenceRequests)?choice.consequenceRequests.filter(row=>row&&row.requestId!==requestId):[];
+    choice.consequenceRequests=[...prior,{
+      requestId,kind:"domain",
+      resolve:()=>commitMenmaFutureAmbitionIntent38800(intent)
+    }];
+  }
+  return true;
+}
 function installMenmaDefeatStoryBridge38800(scene){
   if(!scene||!scene.beatMap||typeof scene.beatMap.set!=="function")return{success:false,reason:"menma_story_scene_missing"};
   if(typeof normalizeStorySceneBeat!=="function")return{success:false,reason:"story_beat_normalizer_missing"};
@@ -1323,8 +1376,11 @@ function installMenmaDefeatStoryBridge38800(scene){
       registerSceneBackdropAssetPath(environmentId,assetPath);
     }
   }
-  const rows=menmaDefeatAndFutureStoryBeats38800();
+  const writingGolden=isMenmaWritingGolden105Scene38800(scene);
+  const authoredRows=menmaDefeatAndFutureStoryBeats38800();
+  const rows=writingGolden?authoredRows.filter(row=>String(row&&row.beatId||"").startsWith("menma_party_defeat_return_")):authoredRows;
   if(!rows.every(row=>upsertMenmaStoryBeat38800(scene,row)))return{success:false,reason:"menma_story_bridge_normalization_failed"};
+  if(writingGolden&&!bindMenmaWritingGoldenFutureIntent38800(scene))return{success:false,reason:"menma_writing_golden_future_intent_bind_failed"};
   const sceneBoard=ensureMenmaDefeatFutureSceneBoard38800();
   return{
     success:true,
@@ -1355,6 +1411,7 @@ function applyMenmaSuccessorBattleAuthority(scene){
   beat.battle.objectiveText=PLAYER_OBJECTIVE_TEXT;beat.battle.objectiveLabel=PLAYER_OBJECTIVE_TEXT;
   beat.battle.environmentPath=BATTLE_ENVIRONMENT_PATH;beat.battle.backdrop=BATTLE_ENVIRONMENT_PATH;
   beat.battle.defeatBeatId=PARTY_DEFEAT_RETURN_BEAT_ID;
+  beat.battle.actionLabel="Start PL Battle";
   beat.battle.launchResolver=launchMenmaEvolvedPLBattle36900;
   for(const row of scene.beatMap.values())migrateMenmaSuccessorDisplayValue(row);
   MENMA_SUCCESSOR_PATCHED_SCENES_38800.add(scene);
@@ -1419,16 +1476,28 @@ function diagnostics(){
     presentationGatesWithdrawal:String(advanceAfterPresentation).includes("advanceBattleParticipantAtZeroPL")&&String(handleBattleParticipantAtZeroPL).includes("presentation_pending_withdrawal"),
     exactEnemyRelay:HOSTILE_IDS.join("|")==="test_subject_altered_shinobi|test_subject_brute|test_subject_unstable",
     authoredYieldAfterLegitimateFirstTwo:String(shouldAuthorMenmaHandoff36900).includes("resolvedHostileIds.includes(HOSTILE_IDS[0])")&&String(shouldAuthorMenmaHandoff36900).includes("resolvedHostileIds.includes(HOSTILE_IDS[1])"),
-    authoredYieldPreservesSideOrder:String(yieldAnkoToMenmaActive36900).includes('nextSide:"enemy"')&&String(yieldAnkoToMenmaActive36900).includes("sideOrderReset:false"),
+    authoredYieldAfterUnstableActs:String(advanceAfterPresentation).includes("pendingAnkoYieldAfterEnemyActionId")&&String(yieldAnkoToMenmaActive36900).includes('nextSide="enemy"')&&String(yieldAnkoToMenmaActive36900).includes("normalizedNextSide"),
     ordinaryAlliedRelay:String(advanceAfterPresentation).includes('pending.side==="player"')&&String(advanceAfterPresentation).includes("activePlayer()"),
     partyDefeatOnlyOnAlliedExhaustion:String(advanceAfterPresentation).includes('if(!next)')&&String(completeMenmaSuccessorDefeat).includes("allied_side_exhausted"),
     men03StartsAtMenmaActive:String(startMenmaEvidenceWindow36900).includes("firstLegitimateMenmaActiveMoment:true")&&String(startMenmaEvidenceWindow36900).includes('men03Scope:"menma_active_only"'),
     phaseFailureNoFakeLow:String(completeMenmaSuccessorDefeat).includes('tutorialResult:"not_completed"')&&String(completeMenmaSuccessorDefeat).includes("performanceBucket:null"),
     partyDefeatReturnsToWritingBeat:!!beat&&beat.battle&&beat.battle.defeatBeatId===PARTY_DEFEAT_RETURN_BEAT_ID,
     partyDefeatWritingChainComplete:Array.from({length:24},(_,index)=>scene&&scene.beatMap&&scene.beatMap.has(`menma_party_defeat_return_${String(index+1).padStart(2,"0")}`)).every(Boolean)&&scene.beatMap.get("menma_party_defeat_return_24")?.nextBeatId===FUTURE_ENTRY_BEAT_ID,
-    futureAmbitionBridgeInstalled:scene&&scene.beatMap&&scene.beatMap.has(FUTURE_ENTRY_BEAT_ID)&&scene.beatMap.has("menma_future_choice")&&scene.beatMap.get("menma_future_terminal")?.exitScene===true,
+    futureAmbitionBridgeInstalled:scene&&scene.beatMap&&scene.beatMap.has(FUTURE_ENTRY_BEAT_ID)&&scene.beatMap.has("menma_future_choice")&&(
+      isMenmaWritingGolden105Scene38800(scene)
+        ?scene.beatMap.get("menma_receipt")?.exitScene===true
+        :scene.beatMap.get("menma_future_terminal")?.exitScene===true
+    ),
     futureAmbitionChoiceExact:scene&&scene.beatMap&&scene.beatMap.get("menma_future_choice")?.choices?.map(choice=>choice.label).join("|")==="MASTER WHAT THEY WON'T TEACH ME|BECOME TOO STRONG TO HOLD BACK|CREATE SOMETHING THAT'S MINE|FIND OUT HOW FAR I CAN GO",
     futureAmbitionHistoryIntent:String(commitMenmaFutureAmbitionIntent38800).includes("FUTURE_INTENT_OCCURRENCE_ID")&&!String(commitMenmaFutureAmbitionIntent38800).includes("currentPL")&&!String(commitMenmaFutureAmbitionIntent38800).includes("BasePL"),
+    writingGoldenFuturePreserved:!isMenmaWritingGolden105Scene38800(scene)||(
+      scene.beatMap.get("menma_future_02")?.mode==="dialogue"&&
+      scene.beatMap.get("menma_future_02")?.speakerName==="NINE-TAILS"&&
+      scene.beatMap.get("menma_close_01")?.nextBeatId==="menma_receipt"
+    ),
+    writingGoldenFutureIntentBound:!isMenmaWritingGolden105Scene38800(scene)||scene.beatMap.get("menma_future_choice")?.choices?.every(choice=>
+      Array.isArray(choice.consequenceRequests)&&choice.consequenceRequests.some(row=>String(row&&row.requestId||"").startsWith("menma_future_ambition_intent_"))
+    ),
     rewardAdapterPresent:!!globalThis.SC_ACADEMY_MENMA_THREE_SUBJECT_REWARD_36200,
     plIdentityPreserved:source.includes('plIdentity:"Battle PL"')&&!source.includes("hit"+"Points")&&!source.includes("health"+"Meter"),
     kakashiUntouched:!source.includes("academy_"+"kakashi"),

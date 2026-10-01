@@ -55,7 +55,7 @@
       #story-scene-presentation-layer[data-mode="battle_transition"] .sc-story-panel{min-height:0;padding:28px!important;border-color:rgba(214,169,58,.5);background:linear-gradient(150deg,rgba(7,16,22,.98),rgba(3,8,13,.98))}
       #story-scene-presentation-layer[data-mode="battle_transition"] .sc-story-kicker{color:#d4aa43}
       #story-scene-presentation-layer[data-mode="battle_transition"] .sc-story-text{font-family:Georgia,serif;font-size:25px;line-height:1.35;color:#f0dfb6}
-      #story-scene-presentation-layer[data-mode="battle_transition"] .sc-story-action{min-height:44px;background:linear-gradient(180deg,#6b5119,#3d2c0e);border-color:rgba(214,169,58,.62);color:#f7df8a;font-weight:900}
+      #story-scene-presentation-layer[data-mode="battle_transition"] .sc-story-action{display:block;width:min(220px,82%);min-height:42px;margin:16px auto 0;padding:10px 16px;border:1px solid rgba(244,82,82,.78);border-radius:6px;background:linear-gradient(180deg,#a82222,#5d0d0d);color:#fff;font-weight:900;text-align:center;letter-spacing:.06em;box-shadow:0 8px 24px rgba(109,8,8,.26)}
       @media(max-width:900px){.alpha328-event{width:min(430px,92vw);right:4%;top:9%}.alpha328-journey__body{grid-template-columns:1fr}.alpha328-rail{grid-template-columns:1fr 1fr}.alpha328-arena__grid{grid-template-columns:1fr}}
     `;
     document.head.appendChild(style);

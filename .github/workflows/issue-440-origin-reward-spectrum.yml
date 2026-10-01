@@ -1,0 +1,36 @@
+name: Issue 440 Origin Reward Spectrum
+
+on:
+  push:
+    branches:
+      - coding/issue-105-origin-presentation-repair-current
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  reward-spectrum:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Source syntax
+        run: |
+          node --check runtime/alpha-origin-scenes-32900-core.js
+          node --check runtime/alpha-origin-reward-spectrum-440.js
+          node --check runtime/alpha-iwabee-origin-runtime-399.js
+          node --check runtime/alpha-metal-origin-runtime-396.js
+          node --check runtime/alpha-origin-scene-board-bindings-105.js
+          node --check runtime/alpha-origin-scenes-32900-c.js
+          node --check tools/qa_issue_440_origin_reward_spectrum.js
+      - name: Reward spectrum source and idempotence QA
+        run: node tools/qa_issue_440_origin_reward_spectrum.js
+      - name: Metal Iwabee runtime reward regression
+        run: node tools/qa_issues_396_399_400_runtime.js
+      - name: Runtime ownership safety
+        run: node tools/qa_runtime_ownership_safety_300.js

@@ -28,7 +28,7 @@ function battle(){
     enemy:{id:"test_subject_altered_shinobi",name:"Altered Shinobi",rewards:{ryo:{min:999,max:999},exp:{min:999,max:999},commonDrops:[],rareDrops:[]}},
     encounterEnemy:{id:"test_subject_altered_shinobi",name:"Altered Shinobi"},
     outcome:{type:"victory",committed:true,finishingShinobiId:"academy_menma",completedAt:1000},
-    returnContext:{type:"story_scene",sceneId:SCENE,sceneInstanceId:INSTANCE,sourceBeatId:"tutorial_battle",victoryBeatId:"post_battle_opening",defeatBeatId:"tutorial_not_completed"},
+    returnContext:{type:"story_scene",sceneId:SCENE,sceneInstanceId:INSTANCE,sourceBeatId:"tutorial_battle",victoryBeatId:"menma_after_01",defeatBeatId:"tutorial_not_completed"},
     completedAt:1000,claimedAt:null,completionRecorded:false,
     rewards:{generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],finishingShinobi:null,mvp:null},
     contributions:{}

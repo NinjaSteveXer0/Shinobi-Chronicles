@@ -89,7 +89,7 @@ async function setupBattle(page,resolved,{terminal=false,menmaWithdrawn=false,re
       : null;
     currentBattle.returnContext={
       type:"story_scene",sceneId:SCENE,sceneInstanceId:rt.instanceId,
-      sourceBeatId:"tutorial_battle",victoryBeatId:"post_battle_opening",defeatBeatId:"tutorial_not_completed",
+      sourceBeatId:"tutorial_battle",victoryBeatId:"menma_after_01",defeatBeatId:"tutorial_not_completed",
       postBattleBeatId:null,exposeFinisher:false
     };
     currentBattle.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],finishingShinobi:null,mvp:null};
@@ -171,10 +171,14 @@ async function rewardState(page){
     assert.deepStrictEqual(generated.rareDrops,[]);
 
     await page.evaluate(()=>openOverlay("victory"));
+    await page.waitForSelector(".alpha-victory-code-screen",{state:"visible",timeout:8000});
     await page.waitForSelector(".menma-three-subject-reward-36200",{state:"visible",timeout:8000});
-    const disclosure=await page.locator(".menma-three-subject-reward-36200").textContent();
-    assert(/\+100 RYŌ/.test(disclosure),"Victory did not disclose +100 Ryō");
-    assert(/No generic Character EXP/.test(disclosure),"Victory did not separate generic EXP");
+    const rewardLine=(await page.locator(".menma-three-subject-reward-36200").textContent()||"").trim();
+    const visiblePageText=await page.locator("body").innerText();
+    assert.strictEqual(rewardLine,"+100 RYŌ","Victory reward line drifted from the actual committed reward");
+    assert(!/FIXED ENCOUNTER REWARD/i.test(visiblePageText),"Victory leaked internal fixed-reward diagnostic");
+    assert(!/No generic Character EXP/i.test(visiblePageText),"Victory leaked internal EXP contract prose");
+    assert(!/No items\/materials/i.test(visiblePageText),"Victory leaked internal loot contract prose");
     await page.screenshot({path:path.join(OUT,"menma-three-subject-victory-before-claim.png"),fullPage:false,timeout:12000});
 
     const claim=page.getByRole("button",{name:"CLAIM REWARDS",exact:true});
@@ -212,7 +216,7 @@ async function rewardState(page){
         currentBattle.active=false;currentBattle.battleOver=true;currentBattle.battleId="battle_issue_362_"+rt.instanceId;
         currentBattle.encounterId=ENCOUNTER;currentBattle.characterId="academy_menma";currentBattle.enemy=enemy;currentBattle.encounterEnemy=enemy;
         currentBattle.outcome={type:"victory",committed:true,completedAt:Date.now(),finishingShinobiId:"academy_menma",menmaWithdrawn:false};
-        currentBattle.returnContext={type:"story_scene",sceneId:SCENE,sceneInstanceId:rt.instanceId,sourceBeatId:"tutorial_battle",victoryBeatId:"post_battle_opening",defeatBeatId:"tutorial_not_completed",postBattleBeatId:null,exposeFinisher:false};
+        currentBattle.returnContext={type:"story_scene",sceneId:SCENE,sceneInstanceId:rt.instanceId,sourceBeatId:"tutorial_battle",victoryBeatId:"menma_after_01",defeatBeatId:"tutorial_not_completed",postBattleBeatId:null,exposeFinisher:false};
         currentBattle.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],finishingShinobi:null,mvp:null};
       },{ENCOUNTER,SCENE});
     }
@@ -226,10 +230,10 @@ async function rewardState(page){
 
     // CLAIM is complete before Story return; CONTINUE resumes exact Menma Story.
     const returned=await page.evaluate(()=>continueAfterVictory());
-    await page.waitForFunction(scene=>getActiveStorySceneRuntime()?.sceneId===scene&&getActiveStorySceneRuntime()?.beatId==="post_battle_opening",SCENE,{timeout:10000});
+    await page.waitForFunction(scene=>getActiveStorySceneRuntime()?.sceneId===scene&&getActiveStorySceneRuntime()?.beatId==="menma_after_01",SCENE,{timeout:10000});
     state=await rewardState(page);
     assert.strictEqual(state.activeStory.sceneId,SCENE);
-    assert.strictEqual(state.activeStory.beatId,"post_battle_opening");
+    assert.strictEqual(state.activeStory.beatId,"menma_after_01");
     assert.strictEqual(state.ryo,startingRyo+100,"Story return retriggered reward");
     assert.strictEqual(state.exactReceipts.length,1,"Story return duplicated reward receipt");
     await page.screenshot({path:path.join(OUT,"menma-story-return-after-reward.png"),fullPage:false,timeout:12000});
@@ -238,7 +242,7 @@ async function rewardState(page){
     const summary={
       pass:true,issue:362,kind:"installed_browser_menma_three_subject_reward",
       battleOccurrenceId:full.occurrenceId,rewardSourceId:SOURCE_ID,ryoGranted:100,
-      checks:{oneHostileZero:true,twoHostilesZero:true,defeatAllMetadataZero:true,menmaWithdrawnVictoryProjects100:true,fullVictoryExact100:true,reopenNoDuplicate:true,refreshNoDuplicate:true,storyReturnExact:true,retired50SourceAbsent:true},
+      checks:{oneHostileZero:true,twoHostilesZero:true,defeatAllMetadataZero:true,menmaWithdrawnVictoryProjects100:true,fullVictoryExact100:true,playerFacingInternalDiagnosticAbsent:true,reopenNoDuplicate:true,refreshNoDuplicate:true,storyReturnExact:true,retired50SourceAbsent:true},
       runtimeErrors:errors,browserGoldenClaimed:false
     };
     fs.writeFileSync(path.join(OUT,"summary.json"),JSON.stringify(summary,null,2)+"\n");

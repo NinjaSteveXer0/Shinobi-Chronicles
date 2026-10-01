@@ -56,6 +56,7 @@
     if(!skill)return null;
     if(Number.isFinite(Number(skill.authoredAttackPL)))return Number(skill.authoredAttackPL);
     if(Number.isFinite(Number(skill.authoredAttackPLPerTarget)))return Number(skill.authoredAttackPLPerTarget);
+    if(Number.isFinite(Number(skill.attackPL)))return Number(skill.attackPL);
     return null;
   }
 
@@ -71,103 +72,348 @@
       summary:"Move your mouse over a Skill to see what it does. Click the Skill when you are ready to use it.",
       details:[],kind:"TECHNIQUE",attackPL:null,tags:["HOVER TO LEARN","CLICK TO USE"]
     };
-
+  
     const exact={
-      academy_menma_chakra_knuckle:{
-        summary:"Hit one enemy with a chakra-powered punch.",
-        details:["Attack PL 6.","The enemy's Stamina can reduce the damage."],
-        tags:["DAMAGE","ONE ENEMY"]
-      },
-      academy_menma_crescent_kunai:{
-        summary:"Strike one enemy with a fast kunai attack.",
-        details:["Attack PL 5.","This is a simple direct attack."],
-        tags:["DAMAGE","ONE ENEMY"]
-      },
-      academy_menma_guard_breaker:{
-        summary:"Hit one enemy with a heavy attack that can pressure an active guard.",
-        details:["Attack PL 7.","It does not remove every kind of defence automatically."],
-        tags:["DAMAGE","GUARD PRESSURE"]
-      },
-      academy_menma_shadow_clone_feint:{
-        summary:"Trick the enemy with a shadow-clone feint.",
-        details:["This does not deal damage by itself.","It creates a temporary setup state for the Skill's authored follow-up effect."],
-        tags:["SETUP","NO DIRECT DAMAGE"]
-      },
-      academy_menma_shadowstep:{
-        summary:"Move to a different position when a real movement route is available.",
-        details:["This does not deal damage.","It is movement, not teleportation."],
-        tags:["MOVEMENT","CONTEXT REQUIRED"]
-      }
+      academy_hinata_gentle_palm:{summary:"Deals 5 ATK to one enemy.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_hinata_twin_palm_guard:{summary:"Reduce the next direct hit against you by 30%.",details:["Works once."],tags:["DEFENSE","GUARD"]},
+      academy_hinata_palm_counter:{summary:"Use a reactive palm counter when an enemy attack gives you an opening.",details:["No direct damage by itself."],tags:["COUNTER","CONTEXT REQUIRED"]},
+      academy_hinata_academy_shuriken:{summary:"Deals 4 ATK to one enemy with a shuriken throw.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_hinata_gentle_step:{summary:"Move to a new position when a real route is available.",details:["Movement, not teleportation."],tags:["MOVEMENT","CONTEXT REQUIRED"]},
+  
+      academy_izuno_pouncing_palm:{summary:"Deals 5 ATK to one enemy with a fast palm strike.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_izuno_shuriken_pounce:{summary:"Deals 5 ATK to one enemy with a moving shuriken attack.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_izuno_catstep_feint:{summary:"Use quick footwork to set up a feint when the situation allows it.",details:["No direct damage."],tags:["SETUP"]},
+      academy_izuno_wall_spring:{summary:"Spring off a nearby surface to move to a new position.",details:["Needs a real surface or route. Not teleportation."],tags:["MOVEMENT","CONTEXT REQUIRED"]},
+      academy_izuno_clone_pounce:{summary:"Use a clone-assisted feint against one enemy.",details:["No direct damage and no automatic deception."],tags:["SETUP","ONE ENEMY"]},
+  
+      academy_mirai_twin_kunai:{summary:"Deals 5 ATK to one enemy with a twin-kunai attack.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_mirai_wire_trip:{summary:"Bind one enemy with wire so moves needing free movement are blocked.",details:["Control, not a full Stun."],tags:["CONTROL","ONE ENEMY"]},
+      academy_mirai_false_footstep:{summary:"Use Genjutsu to confuse how your movement is read.",details:["It does not automatically fool the enemy."],tags:["SETUP","GENJUTSU"]},
+      academy_mirai_guarding_blade:{summary:"Reduce the next direct hit against you by 25%.",details:["Works once."],tags:["DEFENSE","GUARD"]},
+      academy_mirai_crossing_strike:{summary:"Deals 6 ATK to one enemy.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+  
+      academy_kushina_red_whirlwind:{summary:"Deals 6 ATK to one enemy with a forceful spinning attack.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_kushina_beginner_binding_formula:{summary:"Use a sealing formula to bind one enemy.",details:["Control, not a full Stun."],tags:["CONTROL","ONE ENEMY"]},
+      academy_kushina_iron_will_brace:{summary:"Reduce the next direct hit against you by 30%.",details:["Works once."],tags:["DEFENSE","GUARD"]},
+      academy_kushina_headstrong_counter:{summary:"Deals 6 ATK to one enemy.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_kushina_seal_tag_toss:{summary:"Place a seal tag on one enemy for a compatible follow-up.",details:["No direct damage."],tags:["SETUP","ONE ENEMY"]},
+  
+      academy_kurenai_false_opening:{summary:"Create a false opening around one enemy.",details:["Mirage Kunai can exploit it. No direct damage."],tags:["SETUP","ONE ENEMY"]},
+      academy_kurenai_feinting_kunai:{summary:"Deals 4 ATK, or 6 ATK after Petal Mirage.",details:["Using the opening consumes it. Stamina reduces damage."],tags:["DAMAGE","SETUP FOLLOW-UP"]},
+      academy_kurenai_false_step_genjutsu:{summary:"Use Genjutsu to make your movement harder to read.",details:["It does not automatically fool the enemy."],tags:["SETUP","GENJUTSU"]},
+      academy_kurenai_veiled_guard:{summary:"Reduce the next direct hit against you by 25%.",details:["Works once."],tags:["DEFENSE","GUARD"]},
+      academy_kurenai_genjutsu_release:{summary:"Attempt to break a compatible Genjutsu effect on yourself.",details:["Works only when there is a valid effect to release."],tags:["CONTROL","CLEANSE"]},
+  
+      academy_iwabee_iron_staff_smash:{summary:"Deals 6 ATK to one enemy with a heavy staff strike.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_iwabee_staff_sweep:{summary:"Deals 4 ATK to up to 2 enemies with a staff sweep.",details:["Stamina reduces each hit."],tags:["DAMAGE","AREA"]},
+      academy_iwabee_earth_style_rising_wall:{summary:"Reduce the next direct hit against you by 35%.",details:["Works once."],tags:["DEFENSE","GUARD"]},
+      academy_iwabee_stone_snare:{summary:"Trap one enemy with stone to restrict them.",details:["Control, not a full Stun."],tags:["CONTROL","ONE ENEMY"]},
+      academy_iwabee_grounded_stance:{summary:"Brace yourself against forced movement when there is something to resist.",details:["No direct damage."],tags:["DEFENSE","CONTEXT REQUIRED"]},
+  
+      academy_metal_lee_leaf_rising_kick:{summary:"Deals 6 ATK to one enemy with a rising kick.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_metal_lee_training_flurry:{summary:"Deals 5 ATK to one enemy with a rapid barrage.",details:["The barrage counts as one damage hit."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_metal_lee_pressure_rhythm:{summary:"Your next damaging Skill gains +2 ATK.",details:["The bonus is used by that attack."],tags:["SETUP"]},
+      academy_metal_lee_guarded_footwork:{summary:"Reduce the next direct hit against you by 25%.",details:["Works once."],tags:["DEFENSE","GUARD"]},
+      academy_metal_lee_conditioned_endurance:{summary:"Gain 4 temporary Battle PL for this Battle.",details:["Extra fighting capacity, not healing."],tags:["CAPACITY","TEMPORARY"]},
+  
+      academy_obito_fire_style_ember_burst:{summary:"Deals 5 ATK to one enemy with Fire Release.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_obito_headlong_rush:{summary:"Deals 6 ATK to one enemy with a headlong rush.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_obito_uchiha_shuriken_rush:{summary:"Deals 5 ATK to one enemy with a shuriken barrage.",details:["The barrage counts as one damage hit."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_obito_protective_intercept:{summary:"Protect one ally and reduce their next direct hit by 30%.",details:["Works once."],tags:["DEFENSE","ALLY"]},
+      academy_obito_determined_stand:{summary:"Gain 3 temporary Battle PL for this Battle.",details:["Extra fighting capacity, not healing."],tags:["CAPACITY","TEMPORARY"]},
+  
+      academy_menma_chakra_knuckle:{summary:"Deals 6 ATK to one enemy with a chakra-powered punch.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_menma_crescent_kunai:{summary:"Deals 5 ATK to one enemy with a fast kunai strike.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_menma_guard_breaker:{summary:"Deals 7 ATK to one enemy and can pressure a compatible guard.",details:["It does not break every defence automatically."],tags:["DAMAGE","GUARD PRESSURE"]},
+      academy_menma_shadow_clone_feint:{summary:"Create a shadow-clone feint for a later opening.",details:["No direct damage and no extra fighter."],tags:["SETUP"]},
+      academy_menma_shadowstep:{summary:"Move to a new position when a real route is available.",details:["Movement, not teleportation."],tags:["MOVEMENT","CONTEXT REQUIRED"]},
+  
+      academy_kakashi_kunai_quickdraw:{summary:"Deals 5 ATK to one enemy with a fast kunai strike.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      academy_kakashi_clone_feint:{summary:"Use a clone feint to open the enemy up.",details:["Precision Strike can exploit it. No direct damage."],tags:["SETUP","ONE ENEMY"]},
+      academy_kakashi_opening_exploit:{summary:"Deals 5 ATK, or 11 ATK after Clone Switch.",details:["Using the opening consumes it. Stamina reduces damage."],tags:["DAMAGE","SETUP FOLLOW-UP"]},
+      academy_kakashi_wire_snare:{summary:"Bind one enemy with wire and restrict their movement.",details:["Control, not a full Stun."],tags:["CONTROL","ONE ENEMY"]},
+      academy_kakashi_substitution_jutsu:{summary:"Reduce one direct hit against you by 50%.",details:["Can be used once per Battle."],tags:["DEFENSE","ONCE PER BATTLE"]},
+
+      sj_anko_hidden_shadow_snake_hands:{summary:"Deals 20 ATK to one enemy with summoned snakes.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      sj_anko_snake_bind:{summary:"Bind one enemy so moves needing free movement are blocked.",details:["The bind lasts through one enemy action. Control, not a full Stun."],tags:["CONTROL","ONE ENEMY"]},
+      sj_anko_fire_style_dragon_flame:{summary:"Deals 24 ATK to one enemy with Fire Release.",details:["Stamina reduces the damage."],tags:["DAMAGE","ONE ENEMY"]},
+      sj_anko_serpent_evasion:{summary:"Avoid the next qualifying direct attack against Anko.",details:["Works once. No accuracy roll is needed."],tags:["DEFENSE","EVADE"]}
     };
     const fixed=exact[skill.id];
     if(fixed)return {
       title:skill.displayName||skill.id,
       summary:fixed.summary,
       details:fixed.details,
-      kind:skillKind33000(skill),attackPL:attackValue33000(skill),tags:fixed.tags
+      kind:skillKind33000(skill),attackPL:attackValue33000(skill),tags:fixed.tags,
+      exactPlayerFacingOverride:true,descriptionCoverage:"exact"
     };
-
+  
     const kind=String(skill.resolutionKind||"");
     const attack=attackValue33000(skill);
-    let summary="Use this authored Battle technique.";
+    let summary="";
     let details=[];
     let tags=[skillKind33000(skill)];
-
+    let descriptionCoverage="structured";
+  
     if(kind==="direct_damage"){
-      summary="Hit one enemy with a direct attack.";
-      details=[attack!==null?`Attack PL ${attack}.`:"Its Attack PL comes from the authored Skill.",skill.staminaMitigation===false?"This Skill ignores normal Stamina damage reduction.":"The target's Stamina can reduce the damage."];
+      summary=attack!==null?`Deals ${attack} ATK to one enemy.`:"Deals damage to one enemy.";
+      details=[skill.staminaMitigation===false?"This attack ignores normal Stamina reduction.":"Stamina reduces the damage."];
       tags=["DAMAGE","ONE ENEMY"];
     }else if(kind==="area_damage"){
       const targets=Math.max(1,Number(skill.maxTargets)||1);
-      summary=`Attack up to ${targets} active ${targets===1?"target":"targets"}.`;
-      details=[attack!==null?`Attack PL ${attack} for each target.`:"Each target uses the Skill's authored Attack PL.","Each target is resolved separately by the Battle rules."];
+      summary=attack!==null?`Deals ${attack} ATK to up to ${targets} ${targets===1?"enemy":"enemies"}.`:`Deals damage to up to ${targets} ${targets===1?"enemy":"enemies"}.`;
+      details=[skill.staminaMitigation===false?"These hits ignore normal Stamina reduction.":"Stamina reduces each hit."];
       tags=["DAMAGE","AREA"];
     }else if(kind==="ratio_guard_state"&&skill.guard){
       const pct=Math.round((Number(skill.guard.preventionRatio)||0)*100);
-      summary=`Get ready to block ${pct}% of the next qualifying direct hit.`;
-      details=[skill.guard.oneUse===false?"The guard stays active for as long as its authored rule allows.":"It works once, then the guard ends.","It only blocks attacks that qualify for this guard."];
-      tags=["DEFENSE","GUARD"];
+      const allyTarget=String(skill.targetMode||skill.guard.targetMode||"").toLowerCase().includes("ally");
+      summary=allyTarget
+        ?`Protect one ally and reduce their next direct hit by ${pct}%.`
+        :`Reduce the next direct hit against you by ${pct}%.`;
+      details=[skill.guard.oneUse===false?"The guard lasts for this Skill's stated duration.":"Works once."];
+      tags=allyTarget?["DEFENSE","ALLY"]:["DEFENSE","GUARD"];
     }else if(kind==="restore_underlying_battle_pl"&&skill.restorationProfile){
       const amount=Number(skill.restorationProfile.authoredAmount)||0;
-      summary=`Restore ${amount} Battle PL to an eligible ally.`;
-      details=["This helps during the current battle.","It does not permanently increase the ally's Stats or Base PL."];
-      tags=["RECOVERY","ALLY"];
+      const selfTarget=String(skill.targetMode||skill.restorationProfile.targetMode||"").toLowerCase()==="self";
+      summary=`Restore ${amount} Battle PL to ${selfTarget?"yourself":"one eligible ally"}.`;
+      details=["This does not raise Base PL."];
+      tags=selfTarget?["RECOVERY","SELF"]:["RECOVERY","ALLY"];
+    }else if(kind==="movement"||kind==="reposition"||String(skill.actionClass||"").toLowerCase().includes("movement")){
+      summary="Move to a new position when a real route is available.";
+      details=["Movement, not teleportation."];
+      tags=["MOVEMENT","CONTEXT REQUIRED"];
+    }else if(kind==="temporary_battle_capacity"){
+      const amount=Number(skill.temporaryBattlePL??skill.capacityProfile?.authoredAmount??skill.authoredAmount);
+      if(Number.isFinite(amount)&&amount>0){
+        summary=`Gain ${amount} temporary Battle PL for this Battle.`;
+        details=["Extra fighting capacity, not healing."];
+      }else{
+        summary="Special Battle-capacity Skill.";
+        details=["This Skill needs an exact player-facing description before final release."];
+        descriptionCoverage="needs_exact_override";
+      }
+      tags=["CAPACITY","TEMPORARY"];
     }else if(kind==="dynamic_control"){
-      summary="Use a control technique to limit the target in the way this Skill allows.";
-      details=["The exact limit comes from this Skill's authored rule.","Control does not automatically mean a full stun."],tags=["CONTROL"];
+      const control=skill.dynamicControl||skill.controlProfile||skill.conditionProfile||{};
+      const blocked=[...(control.blockedActionTraits||skill.blockedActionTraits||[])].map(x=>String(x));
+      const semantic=String(control.semanticClass||"").toLowerCase();
+      const maxTargets=Math.max(1,Number(control.maxTargets)||Number(skill.maxTargets)||1);
+      const targetText=maxTargets===1?"one enemy":`up to ${maxTargets} enemies`;
+      if(blocked.includes("movement_dependent")||blocked.includes("substantial_free_movement")){
+        summary=`Bind ${targetText} so moves that need free movement are blocked.`;
+        details=["Control, not a full Stun."];
+        tags=["CONTROL","MOVEMENT"];
+      }else if(semantic.includes("shadow_possession")){
+        summary=`Catch ${targetText} with shadow control and restrict their movement.`;
+        details=["This controls movement; it does not deal damage by itself."];
+        tags=["CONTROL","MOVEMENT"];
+      }else if(semantic.includes("gravity")){
+        summary=`Pull ${targetText} with gravity and disrupt their position.`;
+        details=["Control, not a full Stun."];
+        tags=["CONTROL","POSITION"];
+      }else if(semantic.includes("tenketsu")){
+        summary=`Strike ${targetText}'s chakra points to interfere with their actions.`;
+        details=["This is a control effect, not direct Battle PL damage."];
+        tags=["CONTROL","CHAKRA"];
+      }else if(["genjutsu","tsukuyomi","ocular","perception","mind","psychological"].some(word=>semantic.includes(word))){
+        summary=`Use Genjutsu to restrict what ${targetText} can do.`;
+        details=["Control, not automatic damage."];
+        tags=["CONTROL","GENJUTSU"];
+      }else if(["seal","binding","suppression","restraint","containment","bind","capture"].some(word=>semantic.includes(word))){
+        summary=`Restrain ${targetText} with this technique.`;
+        details=["Control, not a full Stun."];
+        tags=["CONTROL"];
+      }else{
+        summary=`Restrict ${targetText} with this control technique.`;
+        details=["The target keeps any actions the effect does not block."];
+        tags=["CONTROL"];
+      }
     }else if(kind==="condition_remove"&&skill.conditionRemoval){
       const condition=String(skill.conditionRemoval.conditionType||"condition").replaceAll("_"," ");
       summary=`Remove an eligible ${condition} condition.`;
-      details=["This changes the current Battle state only.","It does not erase history that already happened."],tags=["CONTROL","CLEANSE"];
+      details=["This does not undo damage already taken."];
+      tags=["CONTROL","CLEANSE"];
     }else if(kind==="transient_state"){
-      summary="Create a temporary setup state for a later Battle effect.";
-      details=["This does not deal damage unless the Skill says it does.","The setup ends according to its authored Battle rule."],tags=["SETUP"];
+      const bonus=Number(skill.attackPLBonus??skill.authoredAttackPLBonus);
+      const followUp=String(skill.followUpDisplayName||skill.followUpSkillName||"").trim();
+      const state=skill.state&&typeof skill.state==="object"?skill.state:{};
+      const idText=String(skill.id||"").toLowerCase();
+      const action=String(skill.actionClass||"").toLowerCase();
+      const traits=(skill.traits||[]).map(x=>String(x).toLowerCase());
+      if(Number.isFinite(bonus)&&bonus!==0){
+        summary=`Your next damaging Skill gains +${bonus} ATK.`;
+        details=["The bonus is used by that attack."];
+      }else if(followUp){
+        summary=`Create an opening for ${followUp}.`;
+        details=["No direct damage."];
+      }else if(action.includes("defensive")||Number(state.remainingCharges)>0||traits.some(x=>x.includes("defensive")||x.includes("interposition")||x.includes("substitution"))){
+        summary="Prepare a defensive response against the next qualifying attack.";
+        details=[Number(state.remainingCharges)===1?"Works once.":"It triggers only when its defensive condition is met."];
+      }else if(idText.includes("ink_screen")){
+        summary="Create a temporary ink screen that changes what the enemy can see.";
+        details=["It does not automatically blind the enemy or force a miss."];
+      }else if(idText.includes("battlefield_mark")){
+        summary="Mark the battlefield for a compatible follow-up.";
+        details=["No direct damage."];
+      }else if(idText.includes("shadow_route_trap")){
+        summary="Set a shadow route trap for a compatible follow-up.";
+        details=["No automatic capture."];
+      }else if(idText.includes("checkmate_grid")){
+        summary="Set up shadow routes across the battlefield for later control.";
+        details=["No automatic capture."];
+      }else if(idText.includes("chakra_focus")){
+        summary="Focus your Chakra to prepare a stronger later technique.";
+        details=["No direct damage."];
+      }else if(["clone","feint","double_image","transformation"].some(word=>idText.includes(word))){
+        summary="Create a deceptive opening for a later move.";
+        details=["No direct damage and no automatic deception."];
+      }else{
+        summary="Set up a temporary advantage for a compatible later move.";
+        details=["No direct damage unless the Skill says otherwise."];
+      }
+      tags=action.includes("defensive")?["DEFENSE","SETUP"]:["SETUP"];
     }else if(kind==="damage_with_persistent_state"){
-      summary="Hit the target and also create the Skill's authored ongoing state.";
-      details=[attack!==null?`Attack PL ${attack}.`:"The first hit uses the authored Attack PL.","Any later pressure happens only when the Skill's follow-up rule says it should."],tags=["DAMAGE","ONGOING EFFECT"];
+      const state=skill.persistentState&&typeof skill.persistentState==="object"?skill.persistentState:{};
+      const persistent=Number(state.persistentAttackPL);
+      const repeats=Math.max(0,Number(state.durationActionOpportunities)||0);
+      summary=attack!==null?`Deals ${attack} ATK to one enemy.`:"Deals damage to one enemy.";
+      if(Number.isFinite(persistent)&&persistent>0&&repeats>0){
+        details=[`Then the ongoing effect can deal ${persistent} ATK again up to ${repeats} times.`];
+      }else{
+        details=["It also leaves an ongoing damage effect."];
+      }
+      tags=["DAMAGE","ONGOING EFFECT"];
     }else if(kind==="branch_damage"){
-      summary="Choose a mode, then use the version of the attack you want.";
-      details=["Different modes can change the target or Attack PL.","Choosing a mode is the only extra confirmation this Skill needs."],tags=["DAMAGE","CHOOSE MODE"];
+      const modes=skill.modes&&typeof skill.modes==="object"
+        ?Object.entries(skill.modes).map(([id,mode])=>({id,...(mode||{})}))
+        :Array.isArray(skill.branches)?skill.branches:[];
+      const readable=modes.map(mode=>{
+        const rawName=String(mode.displayName||mode.name||mode.id||"").trim();
+        const name=rawName?rawName.replaceAll("_"," ").replace(/\b\w/g,ch=>ch.toUpperCase()):"";
+        const atkRaw=mode.authoredAttackPL??mode.authoredAttackPLPerTarget??mode.attackPL;
+        const atk=Number(atkRaw);
+        const targets=Math.max(1,Number(mode.maxTargets)||1);
+        return name&&Number.isFinite(atk)?`${name}: ${atk} ATK to ${targets===1?"one enemy":`up to ${targets} enemies`}.`:null;
+      }).filter(Boolean);
+      if(readable.length===modes.length&&readable.length){
+        summary="Choose how you want to use the attack.";
+        details=readable.slice(0,3);
+      }else{
+        summary="Choose the attack mode before you use this Skill.";
+        details=["The selected mode decides its damage and targets."];
+      }
+      tags=["DAMAGE","CHOOSE MODE"];
     }else if(kind==="categorical_evidence"){
-      summary="Use a context Skill that changes what can be learned or acted on in this Battle.";
-      details=["It only gives the information or effect written into this Skill.","It does not reveal hidden facts automatically."],tags=["UTILITY","CONTEXT"];
+      const categorical=skill.categorical&&typeof skill.categorical==="object"?skill.categorical:{};
+      const boundary=String(categorical.informationBoundary||skill.informationBoundary||"").toLowerCase();
+      const action=String(skill.actionClass||"").toLowerCase();
+      const target=String(skill.targetMode||"").toLowerCase();
+      const idText=String(skill.id||"").toLowerCase();
+      const counter=Number(categorical.counterAttackPL);
+      if(categorical.reactiveOnly===true&&Number.isFinite(counter)&&counter>0){
+        summary=`Counter a qualifying attack for ${counter} ATK.`;
+        details=["Only available as a reaction."];
+        tags=["COUNTER","DAMAGE"];
+      }else if(action.includes("movement")||boundary.includes("reposition")||boundary.includes("movement")){
+        summary="Move to a new position when a real route is available.";
+        details=["Movement, not teleportation."];
+        tags=["MOVEMENT","CONTEXT REQUIRED"];
+      }else if(action.includes("defensive")||boundary.includes("interposition")||boundary.includes("defensive")){
+        summary="Use a defensive interception when a qualifying attack gives you the chance.";
+        details=["This is not a percentage guard unless the Skill says so."];
+        tags=["DEFENSE","CONTEXT REQUIRED"];
+      }else if(action.includes("setup")||boundary.includes("setup")||boundary.includes("deception")||boundary.includes("targeting_interaction")){
+        summary="Create a setup that can change how the enemy reads or targets the situation.";
+        details=["No direct damage and no automatic deception."];
+        tags=["SETUP","CONTEXT REQUIRED"];
+      }else if(boundary.includes("message")||idText.includes("mind_transmission")){
+        summary="Send a limited message to one ally.";
+        details=["It shares information; it does not create trust or change relationships."];
+        tags=["UTILITY","ALLY"];
+      }else if(boundary.includes("signature")){
+        summary="Track a known Chakra signature when you already know what to recognise.";
+        details=[];
+        tags=["UTILITY","SENSING"];
+      }else if(boundary.includes("chakra")||boundary.includes("sensory")||boundary.includes("presence")){
+        summary="Read the Chakra or presence you can actually detect right now.";
+        details=["This does not reveal hidden identity automatically."];
+        tags=["UTILITY","SENSING"];
+      }else if(boundary.includes("sharingan")||boundary.includes("byakugan")||boundary.includes("visual")||boundary.includes("observation")){
+        summary="Study what this technique can actually see right now.";
+        details=["This does not automatically reveal hidden facts or copy a technique."];
+        tags=["UTILITY","OBSERVATION"];
+      }else if(boundary.includes("analysis")||boundary.includes("technique")){
+        summary="Study the enemy's visible technique use.";
+        details=["Understanding what you saw does not grant the technique."];
+        tags=["UTILITY","ANALYSIS"];
+      }else if(action.includes("information")||boundary.includes("information")||boundary.includes("evidence")||boundary.includes("perception")){
+        summary="Learn only what this technique can actually detect in the current situation.";
+        details=["It does not automatically reveal hidden facts."];
+        tags=["UTILITY","CONTEXT"];
+      }else if(target==="selected_ally"){
+        summary="Use this support technique on one ally when its conditions are met.";
+        details=[];
+        tags=["UTILITY","ALLY"];
+      }else{
+        summary="Use this technique when its visible Battle condition is available.";
+        details=["It changes the situation without direct damage."];
+        tags=["UTILITY","CONTEXT"];
+      }
+    }else if(kind==="damage_then_sealing_context"){
+      const atk=Number(skill.authoredAttackPL);
+      summary=Number.isFinite(atk)?`Deals ${atk} ATK to one enemy.`:"Deals damage to one enemy.";
+      details=["A separate sealing follow-up may become available if its conditions are met."];
+      tags=["DAMAGE","SEALING FOLLOW-UP"];
+    }else if(kind==="planetary_devastation_two_stage"){
+      const stage2=skill.planetaryDevastation&&skill.planetaryDevastation.stage2||{};
+      const atk=Number(stage2.authoredAttackPLPerTarget);
+      const targets=Math.max(1,Number(stage2.maxTargets)||1);
+      summary="Begin Planetary Devastation by forming the core.";
+      details=[Number.isFinite(atk)?`The forced second stage deals ${atk} ATK to up to ${targets} enemies.`:"The second stage is forced on your next available turn."];
+      tags=["TWO-STAGE","AREA"];
     }else{
-  /*
-  Safe generic presentation fallback.
-
-  Do not call any global or previously wrapped summary function here.
-  33000 is presentation-only, so an unknown Skill kind can use generic
-  explanatory copy without touching Battle resolution or availability.
-  */
-  summary="Use this authored Battle technique.";
-
-  details=[
-    "Availability, target and result still follow the normal Battle rules."
-  ];
-
-}
-
-    return {title:skill.displayName||skill.id,summary,details,kind:skillKind33000(skill),attackPL:attack,tags:[...new Set(tags)]};
+      const action=String(skill.actionClass||"").toLowerCase();
+      const target=String(skill.targetMode||"").toLowerCase();
+      if(action.includes("defensive")){
+        summary="Use this defensive Skill when its Battle condition is available.";
+        details=[];
+        tags=["DEFENSE","CONTEXT REQUIRED"];
+      }else if(action.includes("control")){
+        summary=target.includes("enem")?"Restrict the selected enemy with this Skill.":"Use this Skill to control the current situation.";
+        details=["It does not deal direct damage unless the Skill says so."];
+        tags=["CONTROL"];
+      }else if(action.includes("setup")){
+        summary="Set up a compatible later move.";
+        details=["No direct damage."];
+        tags=["SETUP"];
+      }else{
+        summary="Use this Skill when its visible Battle condition is available.";
+        details=["Its normal effect is shown when the Skill is usable."];
+        tags=["TECHNIQUE"];
+      }
+      descriptionCoverage="structured_fallback";
+    }
+  
+    if(descriptionCoverage==="needs_exact_override"){
+      try{
+        const legacy=typeof priorSummary==="function"?String(priorSummary(skill)||"").trim():"";
+        const banned=/\b(authored|resolver|predicate|stateKey|semanticClass|informationBoundary|categorical evidence|transient state|scalar|packet|action opportunity|committed occurrence|caller-defined|source-owned)\b/i;
+        if(legacy&&!banned.test(legacy)&&!/authored Battle technique/i.test(legacy)){
+          summary=legacy;
+          details=[];
+          descriptionCoverage="legacy_readable";
+        }
+      }catch(_error){}
+    }
+    if(descriptionCoverage==="needs_exact_override"){
+      summary="Use this Skill when its visible Battle condition is available.";
+      details=["Check its target and current availability before you commit."];
+      descriptionCoverage="structured_fallback";
+    }
+    return {
+      title:skill.displayName||skill.id,summary,details,kind:skillKind33000(skill),attackPL:attack,
+      tags:[...new Set(tags)],exactPlayerFacingOverride:false,descriptionCoverage
+    };
   }
   window.getBattleSkillYouthSummary33000=getBattleSkillYouthSummary33000;
 
@@ -211,39 +457,95 @@
       ${modeHtml}`;
   }
 
+  function syncBattleSkillInspectorOverflow33000(panel){
+    if(!panel)return false;
+    const apply=()=>{
+      const overflow=Number(panel.scrollHeight||0)>Number(panel.clientHeight||0)+2;
+      panel.dataset.battle2Scrollable=overflow?"true":"false";
+      if(overflow){
+        panel.setAttribute("tabindex","0");
+        panel.setAttribute("aria-label","Skill description. Scroll for more details.");
+      }else{
+        panel.removeAttribute("tabindex");
+        panel.removeAttribute("aria-label");
+      }
+    };
+    if(typeof requestAnimationFrame==="function")requestAnimationFrame(apply);else apply();
+    return true;
+  }
+  let battleSkillPreviewClearTimer33000=null;
+  function cancelBattleSkillPreviewClear33000(){
+    if(battleSkillPreviewClearTimer33000!==null){
+      clearTimeout(battleSkillPreviewClearTimer33000);
+      battleSkillPreviewClearTimer33000=null;
+    }
+  }
+  function battleSkillInspectorInteractionActive33000(){
+    if(typeof document==="undefined")return false;
+    const stage=document.querySelector(".alpha-code-battle-stage");
+    if(!stage)return false;
+    const deck=stage.querySelector(".battle-live-skill-deck");
+    const panel=stage.querySelector(".battle-live-skill-details");
+    const hovered=node=>{try{return !!(node&&node.matches(":hover"));}catch(_error){return false;}};
+    const focused=node=>!!(node&&document.activeElement&&(node===document.activeElement||node.contains(document.activeElement)));
+    return hovered(deck)||hovered(panel)||focused(deck)||focused(panel);
+  }
+  function scheduleBattleSkillPreviewClear33000(){
+    cancelBattleSkillPreviewClear33000();
+    battleSkillPreviewClearTimer33000=setTimeout(()=>{
+      battleSkillPreviewClearTimer33000=null;
+      if(battleSkillInspectorInteractionActive33000())return;
+      clearBattleSkillPreview33000();
+    },120);
+  }
+
   function previewBattlePreparedSkill33000(skillId){
+    cancelBattleSkillPreviewClear33000();
     const actor=getActiveBattleActor33000();
     if(!actor||!skillId||typeof getBattlePreparedSkillDefinition!=="function")return false;
-    // The shared Battle renderer owns SELECT -> TARGET/MODE -> USE/CANCEL.
-    // Once a Skill is selected, this presentation-only hover inspector must not
-    // replace that canonical control surface or it deletes the commit buttons.
-    try{
-      const state=syncBattleActionRegionState();
-      if(state&&state.selectedSkillId)return false;
-    }catch(_error){}
     const skill=getBattlePreparedSkillDefinition(actor,skillId);
     const panel=typeof document!=="undefined"?document.querySelector(".alpha-code-battle-stage .battle-live-skill-details"):null;
     if(!skill||!panel)return false;
+    // HOVER remains presentation-only even when a Skill is already selected.
+    // Preserve the canonical selected Skill TARGET/MODE/USE/CANCEL surface,
+    // temporarily show the hovered Skill guide, then restore the canonical DOM
+    // when the pointer leaves the Skill deck. This fixes repeat-Skill states
+    // without changing selection, target, mode, or commit semantics.
+    try{
+      const state=syncBattleActionRegionState();
+      if(state&&state.selectedSkillId&&!Object.prototype.hasOwnProperty.call(panel.dataset,"battle2SelectedSkillRestore")){
+        panel.dataset.battle2SelectedSkillRestore=panel.innerHTML;
+      }
+    }catch(_error){}
     panel.classList.add("battle2-inspector");
     panel.innerHTML=renderInspector33000(skill,actor);
     panel.dataset.previewSkillId=skill.id;
+    panel.scrollTop=0;
+    syncBattleSkillInspectorOverflow33000(panel);
     return true;
   }
   window.previewBattlePreparedSkill33000=previewBattlePreparedSkill33000;
 
   function clearBattleSkillPreview33000(){
+    cancelBattleSkillPreviewClear33000();
     const panel=typeof document!=="undefined"?document.querySelector(".alpha-code-battle-stage .battle-live-skill-details"):null;
     if(!panel)return false;
+    panel.classList.add("battle2-inspector");
+    if(Object.prototype.hasOwnProperty.call(panel.dataset,"battle2SelectedSkillRestore")){
+      panel.innerHTML=panel.dataset.battle2SelectedSkillRestore;
+      delete panel.dataset.battle2SelectedSkillRestore;
+      delete panel.dataset.previewSkillId;
+      syncBattleSkillInspectorOverflow33000(panel);
+      return true;
+    }
     let selected=null,actor=getActiveBattleActor33000();
     try{const state=syncBattleActionRegionState();selected=actor&&state.selectedSkillId?getBattlePreparedSkillDefinition(actor,state.selectedSkillId):null;}catch(_error){}
-    panel.classList.add("battle2-inspector");
     if(selected){
-      // Base Battle render has already rebuilt this panel with its authoritative
-      // target/mode/USE/CANCEL controls. Preserve that DOM verbatim.
       delete panel.dataset.previewSkillId;
       return true;
     }
     panel.innerHTML=`<div class="battle2-inspector-empty"><span>SKILL GUIDE</span><h2>Choose your next move</h2><p>Move your mouse over a Skill to learn what it does. Click the Skill when you are ready to use it.</p><div><b>HOVER</b> Learn &nbsp; · &nbsp; <b>CLICK</b> Use</div></div>`;
+    syncBattleSkillInspectorOverflow33000(panel);
     return true;
   }
   window.clearBattleSkillPreview33000=clearBattleSkillPreview33000;
@@ -264,6 +566,8 @@
   }
 
   function latestBattleFeedText33000(stage){
+    const visibleReceipt=battlePresentationQueueState33000&&battlePresentationQueueState33000.active&&battlePresentationQueueState33000.active.receipt||null;
+    if(visibleReceipt)return `${visibleReceipt.actorName} — ${visibleReceipt.actionLabel}`;
     if(stage){
       const lines=[...stage.querySelectorAll(".battle-runtime-log-line")];
       if(lines.length){const latest=lines.find(node=>node.classList.contains("is-latest"))||lines[lines.length-1];if(latest&&latest.textContent.trim())return latest.textContent.trim();}
@@ -302,7 +606,22 @@
       const small=card.querySelector("small");if(small)card.insertBefore(meta,small);else card.appendChild(meta);
     });
     const deck=stage.querySelector(".battle-live-skill-deck");
-    if(deck&&!deck.dataset.battle2LeaveBound){deck.dataset.battle2LeaveBound="true";deck.addEventListener("mouseleave",()=>clearBattleSkillPreview33000());}
+    const panel=stage.querySelector(".battle-live-skill-details");
+    if(deck&&!deck.dataset.battle2LeaveBound){
+      deck.dataset.battle2LeaveBound="true";
+      deck.addEventListener("mouseenter",cancelBattleSkillPreviewClear33000);
+      deck.addEventListener("mouseleave",cancelBattleSkillPreviewClear33000);
+      deck.addEventListener("focusin",cancelBattleSkillPreviewClear33000);
+      deck.addEventListener("focusout",cancelBattleSkillPreviewClear33000);
+    }
+    if(panel&&!panel.dataset.battle2InspectorHoverBound){
+      panel.dataset.battle2InspectorHoverBound="true";
+      panel.addEventListener("mouseenter",cancelBattleSkillPreviewClear33000);
+      panel.addEventListener("mouseleave",cancelBattleSkillPreviewClear33000);
+      panel.addEventListener("focusin",cancelBattleSkillPreviewClear33000);
+      panel.addEventListener("focusout",cancelBattleSkillPreviewClear33000);
+      syncBattleSkillInspectorOverflow33000(panel);
+    }
   }
 
   function installBattleTicker33000(stage){
@@ -329,6 +648,17 @@
   const PRIOR_OPEN_SUMMONS_33000=typeof openBattleSummonActionFamily==="function"?openBattleSummonActionFamily:null;
   const PRIOR_CLOSE_ITEMS_33000=typeof closeBattleItemActionFamily==="function"?closeBattleItemActionFamily:null;
   const PRIOR_CLOSE_SUMMONS_33000=typeof closeBattleSummonActionFamily==="function"?closeBattleSummonActionFamily:null;
+  const PRIOR_REFRESH_ACTION_REGION_33000=typeof refreshBattleActionRegionPresentation==="function"?refreshBattleActionRegionPresentation:null;
+
+  if(PRIOR_REFRESH_ACTION_REGION_33000){
+    const wrappedRefreshBattleActionRegion33000=function(){
+      const result=PRIOR_REFRESH_ACTION_REGION_33000.apply(this,arguments);
+      try{refreshFormationPLProjection33000();}catch(_error){}
+      return result;
+    };
+    globalThis.refreshBattleActionRegionPresentation=wrappedRefreshBattleActionRegion33000;
+    try{refreshBattleActionRegionPresentation=wrappedRefreshBattleActionRegion33000;}catch(_error){}
+  }
 
   function refreshFormationActionPresentation33000(){
     try{if(typeof refreshBattleActionRegionPresentation==="function")refreshBattleActionRegionPresentation();}catch(_error){}
@@ -447,54 +777,123 @@
       power.dataset.battlePlCurrent=String(pl.remaining);
       power.dataset.battlePlMaximum=String(pl.maximum);
 
-      let strong=power.querySelector("strong");
-      let span=power.querySelector("span");
-      let bar=power.querySelector("i");
-
-      // Relay refresh can inherit a modernized PL-ring shell whose legacy
-      // current-value node has been removed. Recreate only missing
-      // presentation children; never touch Battle PL state here.
-      if(!strong){
-        strong=document.createElement("strong");
-        strong.className="battle2-formation-pl-current";
-        strong.dataset.battlePlCurrentValue="true";
-        power.prepend(strong);
+      // The 32500 browser owner projects the active actor's PL as a radial
+      // <span>. Never treat that ring as the legacy maximum-value <span>.
+      // Update its nested core in place so the current PL stays inside the
+      // circle and the conic fill remains tied to authoritative Battle PL.
+      const ring=power.querySelector(".alpha-battle-pl-ring");
+      const core=ring&&ring.querySelector(".alpha-battle-pl-core");
+      if(ring&&core){
+        const currentNode=core.querySelector("strong");
+        const maximumNode=core.querySelector("small");
+        const labelNode=core.querySelector("em");
+        const percent=pl.maximum?Math.max(0,Math.min(100,pl.remaining/pl.maximum*100)):0;
+        ring.style.setProperty("--battle-pl-fill",percent.toFixed(2)+"%");
+        if(currentNode){
+          currentNode.dataset.battlePlCurrentValue="true";
+          currentNode.textContent=String(pl.remaining);
+        }
+        if(maximumNode)maximumNode.textContent="/ "+String(pl.maximum);
+        if(labelNode)labelNode.textContent="BATTLE PL";
       }else{
-        strong.dataset.battlePlCurrentValue="true";
+        // Legacy non-radial fallback. Restrict lookup to direct children so a
+        // future nested presentation shell cannot be mistaken for these nodes.
+        let strong=[...power.children].find(node=>node.tagName==="STRONG")||null;
+        let span=[...power.children].find(node=>node.tagName==="SPAN")||null;
+        let bar=[...power.children].find(node=>node.tagName==="I")||null;
+        if(!strong){
+          strong=document.createElement("strong");
+          strong.className="battle2-formation-pl-current";
+          strong.dataset.battlePlCurrentValue="true";
+          power.prepend(strong);
+        }else{
+          strong.dataset.battlePlCurrentValue="true";
+        }
+        if(!span){
+          span=document.createElement("span");
+          span.className="battle2-formation-pl-maximum";
+          strong.insertAdjacentElement("afterend",span);
+        }
+        if(!bar){
+          bar=document.createElement("i");
+          bar.className="battle2-formation-pl-bar";
+          power.appendChild(bar);
+        }
+        strong.textContent=String(pl.remaining);
+        span.textContent="/ "+String(pl.maximum)+" BATTLE PL";
+        bar.style.width=String(pl.maximum?Math.max(0,Math.min(100,pl.remaining/pl.maximum*100)):0)+"%";
       }
-      if(!span){
-        span=document.createElement("span");
-        span.className="battle2-formation-pl-maximum";
-        strong.insertAdjacentElement("afterend",span);
-      }
-      if(!bar){
-        bar=document.createElement("i");
-        bar.className="battle2-formation-pl-bar";
-        power.appendChild(bar);
-      }
-
-      strong.textContent=String(pl.remaining);
-      span.textContent="/ "+String(pl.maximum)+" BATTLE PL";
-      bar.style.width=String(pl.maximum?Math.max(0,Math.min(100,pl.remaining/pl.maximum*100)):0)+"%";
     }
     return node;
   }
+  function finitePresentationPL33000(value){
+    if(value===null||value===undefined||value==="")return null;
+    const number=Number(value);
+    return Number.isFinite(number)?number:null;
+  }
+  function presentationReceiptTargets33000(receipt,side,participantId){
+    return !!(receipt&&receipt.targetRef&&
+      String(receipt.targetRef.side||"")===String(side||"")&&
+      String(receipt.targetRef.participantId||"")===String(participantId||""));
+  }
+  function presentationRemainingPL33000(side,participantId,canonical){
+    if(!canonical||!orderedPlaybackEnabled33000())return canonical;
+    try{syncBattlePresentationQueue33000();}catch(_error){}
+
+    const active=battlePresentationQueueState33000.active&&battlePresentationQueueState33000.active.receipt||null;
+    if(presentationReceiptTargets33000(active,side,participantId)){
+      const after=finitePresentationPL33000(active.afterPL);
+      if(after!==null){
+        return{remaining:after,maximum:Number(canonical.maximum)||Math.max(0,after),presentationStaged:true,presentationPhase:"active_after",actionId:active.actionId};
+      }
+      const before=finitePresentationPL33000(active.beforePL);
+      if(before!==null){
+        return{remaining:before,maximum:Number(canonical.maximum)||Math.max(0,before),presentationStaged:true,presentationPhase:"active_before",actionId:active.actionId};
+      }
+    }
+
+    const target=(battlePresentationQueueState33000.queue||[])
+      .map(row=>row&&row.receipt||null)
+      .filter(receipt=>presentationReceiptTargets33000(receipt,side,participantId)&&finitePresentationPL33000(receipt.beforePL)!==null)
+      .sort((a,b)=>(Number(a.sequenceOrdinal)||0)-(Number(b.sequenceOrdinal)||0))[0]||null;
+    if(!target)return canonical;
+    const before=finitePresentationPL33000(target.beforePL);
+    return{remaining:before,maximum:Number(canonical.maximum)||Math.max(0,before),presentationStaged:true,presentationPhase:"queued_before",actionId:target.actionId};
+  }
   function supportRemainingPL33000(side,participantId){
+    let canonical=null;
     try{
       if(typeof getBattleRemainingPLRecord==="function"){
         const record=getBattleRemainingPLRecord(side,participantId);
         if(record){
           const current=Number.isFinite(Number(record.current))?Number(record.current):Number(record.remaining);
-          if(Number.isFinite(current))return{remaining:current,maximum:Number(record.maximum)||current};
+          if(Number.isFinite(current))canonical={remaining:current,maximum:Number(record.maximum)||current};
         }
       }
-      if(typeof getBattleRemainingPL==="function"){
+      if(!canonical&&typeof getBattleRemainingPL==="function"){
         const remaining=Number(getBattleRemainingPL(side,participantId));
-        if(Number.isFinite(remaining))return{remaining,maximum:remaining};
+        if(Number.isFinite(remaining))canonical={remaining,maximum:remaining};
       }
     }catch(_error){}
-    return null;
+    return presentationRemainingPL33000(side,participantId,canonical);
   }
+  function refreshFormationPLProjection33000(stage=null){
+    stage=liveBattleStage33000(stage);
+    if(!stage||stage.dataset.formationStage!=="true")return{success:false,reason:"formation_stage_missing"};
+    const player=deployedFormation33000("player"),enemy=deployedFormation33000("enemy");
+    const playerActive=player.find(row=>row.slot===1)||player[0]||null;
+    const enemyActive=enemy.find(row=>row.slot===1)||enemy[0]||null;
+    if(playerActive)projectFormationActivePortrait33000(stage,"player",playerActive);
+    if(enemyActive)projectFormationActivePortrait33000(stage,"enemy",enemyActive);
+    return{
+      success:true,
+      playerId:playerActive&&playerActive.participantId||null,
+      enemyId:enemyActive&&enemyActive.participantId||null,
+      presentationOnly:true,
+      semanticWrite:false
+    };
+  }
+  globalThis.refreshFormationPLProjection33000=refreshFormationPLProjection33000;
   function ensureFormationSupportMarkup33000(node){
     if(!node)return null;
     let img=node.querySelector(".battle-live-roster-portrait");
@@ -584,23 +983,135 @@
     for(const button of primary)button.classList.toggle("is-selected",stage.dataset.formationTray===button.dataset.formationFamily.replace("summons","summon"));
     return primary.length===3;
   }
+  function storyCallerBattleEnvironment33000(){
+    const battle=typeof currentBattle!=="undefined"?currentBattle:null;
+    const rc=battle&&battle.returnContext&&typeof battle.returnContext==="object"?battle.returnContext:null;
+    if(!rc||rc.type!=="story_scene")return"";
+
+    const explicit=String(rc.presentationEnvironmentPath||rc.environmentPath||"").trim();
+    if(explicit)return explicit;
+
+    try{
+      if(
+        String(rc.sceneId||"")==="origin_academy_kakashi_anbu_retrieval"&&
+        typeof globalThis.getAcademyKakashiV2Presentation36020==="function"
+      ){
+        const projection=globalThis.getAcademyKakashiV2Presentation36020(String(rc.sourceBeatId||""));
+        const backdrop=String(projection&&projection.backdrop||"").trim();
+        if(backdrop)return backdrop;
+      }
+    }catch(_error){}
+
+    try{
+      const runtime=typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;
+      if(
+        runtime&&String(runtime.sceneId||"")===String(rc.sceneId||"")&&
+        typeof globalThis.getActiveStorySceneBackdropPath33900==="function"
+      ){
+        const path=String(globalThis.getActiveStorySceneBackdropPath33900()||"").trim();
+        if(path)return path;
+      }
+    }catch(_error){}
+
+    try{
+      const definition=typeof getStorySceneDefinition==="function"?getStorySceneDefinition(String(rc.sceneId||"")):null;
+      const beat=definition&&definition.beatMap&&typeof definition.beatMap.get==="function"
+        ?definition.beatMap.get(String(rc.sourceBeatId||""))
+        :null;
+      const authored=String(
+        beat&&beat.battle&&(beat.battle.presentationEnvironmentPath||beat.battle.environmentPath||beat.battle.backdrop)||
+        beat&&beat.presentationEnvironmentPath||
+        beat&&beat.environmentPath||
+        ""
+      ).trim();
+      if(authored)return authored;
+    }catch(_error){}
+
+    try{
+      const runtime=typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;
+      if(
+        runtime&&String(runtime.sceneId||"")===String(rc.sceneId||"")&&
+        typeof globalThis.getActiveStorySceneBoardProjection==="function"
+      ){
+        const projection=globalThis.getActiveStorySceneBoardProjection();
+        const backdrop=String(projection&&projection.backdrop||"").trim();
+        if(backdrop)return backdrop;
+      }
+    }catch(_error){}
+    return"";
+  }
+  function sharedBattleEnvironmentPath33000(){
+    const battle=typeof currentBattle!=="undefined"?currentBattle:null;
+    if(!battle)return"";
+    const storyEnvironment=storyCallerBattleEnvironment33000();
+    const storyOwned=!!(
+      battle.returnContext&&
+      typeof battle.returnContext==="object"&&
+      battle.returnContext.type==="story_scene"
+    );
+    // A Story-owned Battle occurs at the exact authored Story location. Some
+    // encounter launchers still carry an older/static environment value, so
+    // letting Battle metadata win here can paint the wrong place (for example,
+    // a Kakashi pursuit Battle inheriting the Sakura-tree fight backdrop).
+    if(storyOwned&&storyEnvironment)return storyEnvironment;
+    return String(
+      battle.presentationEnvironmentPath||
+      battle.environmentPath||
+      storyEnvironment||
+      ""
+    ).trim();
+  }
   function applyBattleEnvironment33000(stage){
     if(!stage)return null;
     const encounterId=String(currentBattle&&currentBattle.encounterId||"");
     const configId=String(currentBattle&&currentBattle.battleConfigId||"");
-    if(encounterId==="origin_academy_menma_prologue:three_test_subjects"&&configId==="academy_menma_origin_three_test_subjects_with_anko"){
-      stage.dataset.battleEnvironment="forest_clearing_day";
-      stage.dataset.evolvedPlProof="menma_three_subjects";
-      return{environmentPath:"Scene backdrops/forest_clearing_day.png",semanticWrite:false};
+    const menmaProof=encounterId==="origin_academy_menma_prologue:three_test_subjects"&&configId==="academy_menma_origin_three_test_subjects_with_anko";
+    const environmentPath=sharedBattleEnvironmentPath33000()||(menmaProof?"Scene backdrops/forest_clearing_day.png":"");
+    if(environmentPath){
+      if(currentBattle){
+        const storyOwned=!!(
+          currentBattle.returnContext&&
+          typeof currentBattle.returnContext==="object"&&
+          currentBattle.returnContext.type==="story_scene"
+        );
+        // Rebind Story-owned Battles to the resolved current Story location even
+        // when stale encounter metadata is already populated. Non-Story Battles
+        // retain their encounter-authored environment as before.
+        if(storyOwned||!String(currentBattle.environmentPath||"").trim())currentBattle.environmentPath=environmentPath;
+        if(storyOwned||!String(currentBattle.presentationEnvironmentPath||"").trim())currentBattle.presentationEnvironmentPath=environmentPath;
+      }
+      stage.dataset.battleEnvironment=menmaProof?"forest_clearing_day":"authored";
+      stage.dataset.battleEnvironmentPath=environmentPath;
+      const cssPath=environmentPath.replace(/\\/g,"\\\\").replace(/"/g,'\\"');
+      // Use the full background shorthand inline, not only background-image.
+      // The shared Battle stylesheet owns a !important fallback background
+      // shorthand; setting only the longhand left non-Menma Story Battles at
+      // the dark fallback in owner-browser rendering. The inline shorthand is
+      // the final presentation owner whenever an authored environment exists.
+      stage.style.setProperty("background",`linear-gradient(180deg,rgba(1,8,9,.20),rgba(1,8,9,.48)),url("${cssPath}") center / cover no-repeat`,"important");
+      stage.style.setProperty("background-image",`linear-gradient(180deg,rgba(1,8,9,.20),rgba(1,8,9,.48)),url("${cssPath}")`,"important");
+      stage.style.setProperty("background-size","cover","important");
+      stage.style.setProperty("background-position","center","important");
+      stage.style.setProperty("background-repeat","no-repeat","important");
+    }else{
+      delete stage.dataset.battleEnvironment;
+      delete stage.dataset.battleEnvironmentPath;
+      stage.style.removeProperty("background");
+      stage.style.removeProperty("background-image");
+      stage.style.removeProperty("background-size");
+      stage.style.removeProperty("background-position");
+      stage.style.removeProperty("background-repeat");
     }
-    delete stage.dataset.battleEnvironment;
-    delete stage.dataset.evolvedPlProof;
-    return null;
+    // Historical proof/debug marker only. It no longer gates the shared Battle shell.
+    if(menmaProof)stage.dataset.evolvedPlProof="menma_three_subjects";
+    else delete stage.dataset.evolvedPlProof;
+    return environmentPath?{environmentPath,semanticWrite:false,sharedBattleSystem:true,menmaProof}:null;
   }
   function installFormationStage33000(stage){
     if(!stage)return null;
     const player=deployedFormation33000("player"),enemy=deployedFormation33000("enemy"),mode=formationMode33000();
     stage.dataset.formationStage="true";
+    stage.dataset.battleSystem="shinobi_chronicles_shared";
     stage.dataset.formationMode=mode;
     stage.dataset.playerFormationCount=String(player.length);
     stage.dataset.enemyFormationCount=String(enemy.length);
@@ -676,7 +1187,11 @@
     receiptSettlementInProgress:false
   };
   function orderedPlaybackEnabled33000(){
-    return !!(currentBattle&&String(currentBattle.battleConfigId||"")==="academy_menma_origin_three_test_subjects_with_anko");
+    // Canonical Shinobi Chronicles Battle presentation is global. Menma is the
+    // benchmark encounter, not an enablement gate. Keep playback alive through
+    // terminal resolution while a concrete Battle occurrence still owns the
+    // current Battle state.
+    return !!(currentBattle&&String(currentBattle.battleId||"").trim());
   }
   function presentationStorageKey33000(battleId){
     return "sc_battle_presentation_33000:"+String(battleId||"");
@@ -988,6 +1503,7 @@
     if(lane){lane.classList.add("is-playing");lane.classList.remove("is-settled");}
     setPresentationQueueBusy33000(stage,true);
     applyBattlePerformanceRoles33000(stage,active.receipt);
+    try{refreshFormationPLProjection33000(stage);}catch(_error){}
     stage.dataset.presentationSequenceOrdinal=String(active.receipt.sequenceOrdinal||0);
     stage.dataset.presentationActionRole=String(active.receipt.actionRole||"ACTIVE");
     stage.dataset.presentationActorId=String(active.receipt.actorRef&&active.receipt.actorRef.participantId||"");
@@ -1283,40 +1799,33 @@
     try{resumeBattleCallerAfterCompletion=wrappedResumeBattleCaller33000;}catch(_error){}
   }
 
-  // Menma's closed whole-encounter reward is a reward-gained presentation,
-  // not a wallet-total counter. The generic Victory reveal first paints the
-  // final number and then restarts a delayed 0 -> target animation, which reads
-  // as a meaningless 100 -> 100 roll on this exact reward. Keep generic Victory
-  // animation untouched; scope the correction to this authored reward only.
-  function isMenmaWholeEncounterRewardPresentation33000(rewards){
-    return !!(
-      currentBattle&&
-      String(currentBattle.battleConfigId||"")==="academy_menma_origin_three_test_subjects_with_anko"&&
-      currentBattle.rewards&&
-      currentBattle.rewards.menmaThreeSubjectReward===true&&
-      currentBattle.rewards.fixedWholeEncounterReward===true&&
-      Number(rewards&&rewards.ryo)===100
-    );
+  // Reward results are committed facts, not slot-machine counters. The shared
+  // Battle System projects the exact earned amount immediately for every Origin
+  // and future Battle that consumes this shell.
+  function isSharedStaticRewardPresentation33000(rewards){
+    return !!(currentBattle&&String(currentBattle.battleId||"").trim()&&rewards&&typeof rewards==="object");
   }
   const PRIOR_VICTORY_REVEAL_33000=typeof runVictoryRevealAnimations==="function"?runVictoryRevealAnimations:null;
   if(PRIOR_VICTORY_REVEAL_33000){
     const wrappedVictoryReveal33000=function(container,rewards){
-      if(isMenmaWholeEncounterRewardPresentation33000(rewards)){
+      if(isSharedStaticRewardPresentation33000(rewards)){
         const ryoElement=container&&container.querySelector?container.querySelector(".victory-ryo-number"):null;
         const expElement=container&&container.querySelector?container.querySelector(".victory-exp-number"):null;
         const ryoGranted=Math.max(0,Number(rewards&&rewards.ryo)||0);
         const expGranted=Math.max(0,Number(rewards&&rewards.exp)||0);
         if(ryoElement){
-          ryoElement.textContent="+"+String(ryoGranted);
-          ryoElement.dataset.rewardPresentation="earned_delta";
+          ryoElement.textContent=String(ryoGranted);
+          ryoElement.dataset.rewardPresentation="static_earned_amount";
           ryoElement.dataset.rewardAmount=String(ryoGranted);
+          ryoElement.dataset.rewardAnimated="false";
         }
         if(expElement){
           expElement.textContent=String(expGranted);
-          expElement.dataset.rewardPresentation="earned_amount";
+          expElement.dataset.rewardPresentation="static_earned_amount";
           expElement.dataset.rewardAmount=String(expGranted);
+          expElement.dataset.rewardAnimated="false";
         }
-        return{success:true,presentationOnly:true,rewardMode:"earned_delta",ryoGranted,expGranted,animated:false};
+        return{success:true,presentationOnly:true,rewardMode:"static_earned_amount",ryoGranted,expGranted,animated:false};
       }
       return PRIOR_VICTORY_REVEAL_33000.apply(this,arguments);
     };
@@ -1411,10 +1920,10 @@
     style.textContent=`
       .alpha-code-battle-stage.battle2-modern{background:radial-gradient(circle at 50% 25%,rgba(41,103,119,.20),transparent 27%),radial-gradient(circle at 18% 36%,rgba(40,188,204,.08),transparent 24%),radial-gradient(circle at 82% 36%,rgba(218,77,55,.08),transparent 24%),linear-gradient(180deg,#07121a 0%,#03080d 58%,#05080c 100%)!important}
       .alpha-code-battle-stage.battle2-modern[data-battle-environment="forest_clearing_day"]{background-image:linear-gradient(180deg,rgba(1,8,9,.20),rgba(1,8,9,.48)),url("Scene backdrops/forest_clearing_day.png")!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-active-card{border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-active-card-image{object-fit:contain!important;object-position:center bottom!important;background:transparent!important;filter:drop-shadow(0 18px 18px rgba(0,0,0,.58))!important}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-roster-slot.battle2-formation-support{background:transparent!important;border:0!important;box-shadow:none!important}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-roster-slot.battle2-formation-reserve{opacity:.48!important;transform:scale(.84)!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card{border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card-image{object-fit:contain!important;object-position:center bottom!important;background:transparent!important;filter:drop-shadow(0 18px 18px rgba(0,0,0,.58))!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.battle2-formation-support{background:transparent!important;border:0!important;box-shadow:none!important}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.battle2-formation-reserve{opacity:.48!important;transform:scale(.84)!important}
       .battle2-modern[data-presentation-queue-busy="true"] .battle-live-action-family-row,
       .battle2-modern[data-presentation-queue-busy="true"] .battle-live-skill-deck,
       .battle2-modern[data-presentation-queue-busy="true"] .battle-live-pouch{pointer-events:none!important;opacity:.38!important}
@@ -1438,7 +1947,7 @@
       .battle2-modern .battle-dev-skill-card.is-selected{border-color:rgba(230,190,88,.64)!important;box-shadow:inset 0 -2px 0 rgba(230,190,88,.58)!important}
       .battle2-modern .battle-dev-skill-card .battle-dev-skill-discipline{color:#50d8e3!important;font-size:clamp(7px,.54vw,9px)!important;letter-spacing:.1em!important}.battle2-modern .battle-dev-skill-card strong{font-size:clamp(10px,.78vw,13px)!important;line-height:1.18!important;margin-top:8px!important}.battle2-modern .battle-dev-skill-card .battle-dev-skill-type{opacity:.58!important;font-size:clamp(7px,.49vw,8px)!important}.battle2-modern .battle-dev-skill-card small{bottom:8px!important;color:#71848c!important}
       .battle2-card-meta{display:flex!important;gap:5px!important;flex-wrap:wrap!important;margin-top:9px!important}.battle2-card-meta b,.battle2-card-meta em{font-style:normal!important;border:1px solid rgba(255,255,255,.10)!important;background:rgba(255,255,255,.025)!important;padding:3px 5px!important;color:#a8b8bd!important;font-size:clamp(6px,.44vw,7px)!important;letter-spacing:.07em!important}.battle2-card-meta em{color:#e1bf68!important;border-color:rgba(205,166,70,.22)!important}
-      .battle2-modern .battle-live-skill-details{left:64%!important;top:68%!important;width:32.6%!important;height:25%!important;padding:14px 16px!important;border:1px solid rgba(91,121,134,.28)!important;background:linear-gradient(155deg,rgba(5,14,20,.96),rgba(3,8,12,.98))!important;overflow:auto!important}
+      .battle2-modern .battle-live-skill-details{left:64%!important;top:68%!important;width:32.6%!important;height:25%!important;padding:14px 16px!important;border:1px solid rgba(91,121,134,.28)!important;background:linear-gradient(155deg,rgba(5,14,20,.96),rgba(3,8,12,.98))!important;overflow-x:hidden!important;overflow-y:scroll!important;scrollbar-gutter:stable!important;overscroll-behavior:contain!important;scrollbar-width:thin!important;scrollbar-color:rgba(87,214,225,.72) rgba(10,26,34,.72)!important}.battle2-modern .battle-live-skill-details::-webkit-scrollbar{width:9px}.battle2-modern .battle-live-skill-details::-webkit-scrollbar-track{background:rgba(10,26,34,.72);border-left:1px solid rgba(255,255,255,.05)}.battle2-modern .battle-live-skill-details::-webkit-scrollbar-thumb{background:rgba(87,214,225,.66);border:2px solid rgba(10,26,34,.82);border-radius:999px}.battle2-modern .battle-live-skill-details[data-battle2-scrollable="true"]{box-shadow:inset 0 -14px 18px -18px rgba(93,223,232,.72)!important}.battle2-modern .battle-live-skill-details[data-battle2-scrollable="true"] .battle2-inspector-head::after{content:"SCROLL ↓";margin-left:auto;color:#72dce5;font-size:clamp(6px,.43vw,7px);letter-spacing:.09em;white-space:nowrap}.battle2-modern .battle-live-skill-details:focus-visible{outline:1px solid rgba(93,220,231,.72)!important;outline-offset:-2px!important}
       .battle2-inspector-head{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#d8b65d;font-size:clamp(7px,.48vw,8px);font-weight:900;letter-spacing:.12em}.battle2-inspector-head b{color:#5dd9e3;font-size:inherit}.battle2-inspector h2{margin:9px 0 7px;color:#f0e2c1;font:900 clamp(16px,1.45vw,23px)/1.05 Georgia,serif}.battle2-badges{display:flex;flex-wrap:wrap;gap:5px}.battle2-badges span{padding:3px 6px;border:1px solid rgba(83,142,154,.28);background:rgba(30,89,100,.09);color:#75dbe2;font-size:clamp(6px,.45vw,8px);font-weight:800;letter-spacing:.08em}.battle2-summary{margin:10px 0 5px!important;color:#dce4e1!important;font-size:clamp(10px,.70vw,12px)!important;font-weight:700!important;line-height:1.42!important}.battle2-inspector ul{margin:5px 0 8px;padding-left:17px;color:#96a8ae;font-size:clamp(8px,.58vw,10px);line-height:1.48}.battle2-target{display:flex;justify-content:space-between;gap:12px;border-top:1px solid rgba(255,255,255,.07);padding-top:7px;color:#60757e;font-size:8px;letter-spacing:.09em}.battle2-target strong{color:#d4c49c}.battle2-mode-block{margin-top:9px;padding-top:8px;border-top:1px solid rgba(210,171,75,.16)}.battle2-mode-block>span{color:#e1bb58;font-size:8px;font-weight:900;letter-spacing:.1em}.battle2-mode-block>div{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}.battle2-mode-block button{min-height:29px;border:1px solid rgba(67,207,218,.4);background:rgba(13,53,61,.36);color:#79e0e7;font-size:8px;font-weight:800;cursor:pointer}.battle2-inspector-empty span{color:#d8b65d;font-size:8px;font-weight:900;letter-spacing:.13em}.battle2-inspector-empty h2{margin:10px 0;color:#f0e1bd;font:900 clamp(17px,1.4vw,23px)/1 Georgia,serif}.battle2-inspector-empty p{color:#a6b3b5;font-size:clamp(9px,.66vw,11px);line-height:1.5}.battle2-inspector-empty div{margin-top:12px;color:#607780;font-size:8px;letter-spacing:.08em}.battle2-inspector-empty b{color:#61dce5}
       .battle2-live-ticker{position:absolute;left:39%;top:49%;width:22%;min-height:8%;z-index:30;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:9px 11px;border:1px solid rgba(97,125,137,.25);background:linear-gradient(155deg,rgba(3,10,15,.95),rgba(5,15,20,.91));box-shadow:0 10px 28px rgba(0,0,0,.38)}.battle2-ticker-copy span{display:block;color:#d2ae52;font-size:clamp(6px,.45vw,8px);font-weight:900;letter-spacing:.12em}.battle2-ticker-copy strong{display:block;margin-top:4px;color:#c8d6d8;font-size:clamp(8px,.58vw,10px);line-height:1.35;font-weight:600}.battle2-log-toggle{border:1px solid rgba(75,205,217,.28);background:rgba(10,42,49,.32);color:#71dbe3;padding:6px 8px;font-size:7px;font-weight:900;letter-spacing:.07em;cursor:pointer}.battle2-status-chips{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:5px}.battle2-status-chips span{border:1px solid rgba(196,107,223,.32);background:rgba(88,31,108,.16);color:#dc94f0;padding:3px 6px;font-size:7px;font-weight:800;letter-spacing:.06em}
       .battle2-modern .battle-runtime-log{display:none!important;position:absolute!important;left:35%!important;top:13%!important;width:30%!important;height:43%!important;z-index:80!important;padding:16px!important;background:rgba(2,8,12,.985)!important;border:1px solid rgba(213,173,75,.42)!important;box-shadow:0 25px 70px rgba(0,0,0,.68)!important}.battle2-modern.battle2-log-open .battle-runtime-log{display:block!important}.battle2-modern.battle2-log-open .battle2-live-ticker{opacity:.20}.battle2-modern .battle-runtime-log-line{font-size:clamp(9px,.64vw,11px)!important;line-height:1.46!important;padding:7px 0!important}.battle2-modern .battle-runtime-panel-title{font-size:clamp(10px,.74vw,12px)!important;color:#e1bb5c!important}
@@ -1506,6 +2015,9 @@
       .battle2-modern[data-formation-stage="true"] .battle2-formation-focus{opacity:1!important;filter:saturate(1.03) brightness(1.03) drop-shadow(0 22px 28px rgba(0,0,0,.42))!important}
       .battle2-modern[data-formation-stage="true"] .battle2-formation-recessed{opacity:.48!important;filter:saturate(.55) brightness(.64)!important;transform:scale(.88)!important}
       .battle2-modern[data-formation-stage="true"] .battle2-formation-selected-target{outline:1px solid rgba(96,221,230,.82)!important;outline-offset:4px!important;box-shadow:0 0 26px rgba(73,213,225,.18)!important}
+      /* Shared repeat-Skill UX may reselect the current target after an action.
+         Preserve target semantics without leaving a card-like cyan frame on the active opposition. */
+      .battle2-modern[data-formation-stage="true"] .battle2-formation-selected-target{outline:none!important;outline-offset:0!important;box-shadow:none!important}
       .battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.is-skill-target,.battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.is-item-target{pointer-events:auto!important;cursor:pointer!important}
 
       /* Duel: two combatants own the battlefield. No fake support furniture. */
@@ -1571,51 +2083,50 @@
       }
       .battle2-modern[data-formation-stage="true"] .battle2-performance-stage{transition:none!important;transform:none!important}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-stage.is-settled{transform:none!important}
-      .battle2-modern[data-formation-stage="true"] .battle2-performance-host{left:43%!important;right:43%!important;top:1.5%!important;height:4.8%!important}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-host{left:31%!important;right:31%!important;top:1.4%!important;height:8.2%!important}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-center{min-height:48px!important;padding:7px 16px!important;border:1px solid rgba(218,178,78,.34)!important;border-radius:9px!important;background:linear-gradient(90deg,rgba(2,8,12,.18),rgba(2,8,12,.88) 18%,rgba(2,8,12,.94) 82%,rgba(2,8,12,.18))!important;box-shadow:0 12px 28px rgba(0,0,0,.34)!important}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-center small{font-size:clamp(7px,.54vw,9px)!important;letter-spacing:.13em!important;color:#71dce5!important}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-center strong{margin-top:3px!important;font-size:clamp(14px,1.25vw,21px)!important;line-height:1.05!important;letter-spacing:.025em!important;color:#f3e7c9!important}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-target{display:block;margin-top:3px;color:#aabcc0;font-size:clamp(6px,.47vw,8px);font-weight:800;letter-spacing:.10em}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-host{left:43%!important;right:43%!important;top:2%!important;height:5%!important}
+      .battle2-modern[data-formation-stage="true"][data-formation-mode="wedge"] .battle2-performance-host,
+      .battle2-modern[data-formation-stage="true"][data-formation-mode="arc"] .battle2-performance-host{left:31%!important;right:31%!important;top:2%!important;height:5.5%!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-center{min-height:30px!important;padding:2px 8px!important;border:1px solid rgba(218,178,78,.34)!important;border-radius:7px!important;background:linear-gradient(90deg,rgba(2,8,12,.18),rgba(2,8,12,.88) 18%,rgba(2,8,12,.94) 82%,rgba(2,8,12,.18))!important;box-shadow:0 8px 18px rgba(0,0,0,.28)!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-center small{font-size:clamp(5px,.42vw,7px)!important;letter-spacing:.11em!important;color:#71dce5!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-center strong{margin-top:1px!important;font-size:clamp(10px,.80vw,13px)!important;line-height:.98!important;letter-spacing:.015em!important;color:#f3e7c9!important}
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-target{display:block;margin-top:1px;color:#aabcc0;font-size:clamp(5px,.38vw,6px);font-weight:800;letter-spacing:.08em}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-result-chip{min-width:126px!important;padding:8px 9px!important;background:linear-gradient(90deg,transparent,rgba(3,9,13,.90))!important}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-result-chip b{font-size:clamp(10px,.82vw,14px)!important}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-result-chip em{font-size:clamp(9px,.70vw,12px)!important;color:#f0e4ca!important}
       .battle2-modern[data-formation-stage="true"] .battle2-performance-result-chip span{font-size:clamp(7px,.55vw,9px)!important;color:#a8b9bc!important}
 
-      /* #385-compatible Alpha readability pass: animate rendered imagery only,
-         never semantic state or layout ownership. Scoped to the Menma proof so
-         the frozen Kakashi Golden motion policy remains untouched. */
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-stage.is-playing .battle2-performance-center{
-        animation:menma385TechniqueBanner .30s cubic-bezier(.2,.75,.2,1) both!important
+      /* Shared Battle action readability: animate rendered imagery only; never semantic state or layout ownership. */
+      .battle2-modern[data-formation-stage="true"] .battle2-performance-stage.is-playing .battle2-performance-center{
+        animation:battleShared385TechniqueBanner .30s cubic-bezier(.2,.75,.2,1) both!important
       }
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-result-chip{
-        animation:menma385ResultReadout .38s .78s cubic-bezier(.2,.75,.2,1) both!important
+      .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-result-chip{
+        animation:battleShared385ResultReadout .38s .78s cubic-bezier(.2,.75,.2,1) both!important
       }
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-active-card-player.battle2-performance-role-actor{--menma385-action-x:7%}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-active-card-enemy.battle2-performance-role-actor{--menma385-action-x:-7%}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-roster-player .battle2-performance-role-actor{--menma385-action-x:7%}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-roster-enemy .battle2-performance-role-actor{--menma385-action-x:-7%}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-active-card-player.battle2-performance-role-target{--menma385-impact-x:-3.5%}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-active-card-enemy.battle2-performance-role-target{--menma385-impact-x:3.5%}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-roster-player .battle2-performance-role-target{--menma385-impact-x:-3.5%}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"] .battle-live-roster-enemy .battle2-performance-role-target{--menma385-impact-x:3.5%}
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-role-actor .battle-live-active-card-image,
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-role-actor .battle-live-roster-portrait{
-        animation:menma385ActorAction .72s .28s cubic-bezier(.2,.72,.2,1) both!important
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card-player.battle2-performance-role-actor{--battleShared385-action-x:7%}
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card-enemy.battle2-performance-role-actor{--battleShared385-action-x:-7%}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-player .battle2-performance-role-actor{--battleShared385-action-x:7%}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-enemy .battle2-performance-role-actor{--battleShared385-action-x:-7%}
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card-player.battle2-performance-role-target{--battleShared385-impact-x:-3.5%}
+      .battle2-modern[data-formation-stage="true"] .battle-live-active-card-enemy.battle2-performance-role-target{--battleShared385-impact-x:3.5%}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-player .battle2-performance-role-target{--battleShared385-impact-x:-3.5%}
+      .battle2-modern[data-formation-stage="true"] .battle-live-roster-enemy .battle2-performance-role-target{--battleShared385-impact-x:3.5%}
+      .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-actor .battle-live-active-card-image,
+      .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-actor .battle-live-roster-portrait{
+        animation:battleShared385ActorAction .72s .28s cubic-bezier(.2,.72,.2,1) both!important
       }
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-role-target .battle-live-active-card-image,
-      .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-role-target .battle-live-roster-portrait{
-        animation:menma385TargetResponse .46s .70s cubic-bezier(.2,.75,.2,1) both!important
+      .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-target .battle-live-active-card-image,
+      .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-target .battle-live-roster-portrait{
+        animation:battleShared385TargetResponse .46s .70s cubic-bezier(.2,.75,.2,1) both!important
       }
-      @keyframes menma385TechniqueBanner{0%{opacity:0;transform:translateY(-8px) scale(.98)}100%{opacity:1;transform:translateY(0) scale(1)}}
-      @keyframes menma385ActorAction{0%,100%{transform:translateX(0) scale(1);filter:brightness(1)}48%{transform:translateX(var(--menma385-action-x,0)) scale(1.035);filter:brightness(1.12)}}
-      @keyframes menma385TargetResponse{0%,100%{transform:translateX(0) scale(1);filter:brightness(1)}45%{transform:translateX(var(--menma385-impact-x,0)) scale(.975);filter:brightness(1.22)}}
-      @keyframes menma385ResultReadout{0%{opacity:0;transform:translateY(-8px) scale(.96)}100%{opacity:1;transform:translateY(0) scale(1)}}
+      @keyframes battleShared385TechniqueBanner{0%{opacity:0;transform:translateY(-8px) scale(.98)}100%{opacity:1;transform:translateY(0) scale(1)}}
+      @keyframes battleShared385ActorAction{0%,100%{transform:translateX(0) scale(1);filter:brightness(1)}48%{transform:translateX(var(--battleShared385-action-x,0)) scale(1.035);filter:brightness(1.12)}}
+      @keyframes battleShared385TargetResponse{0%,100%{transform:translateX(0) scale(1);filter:brightness(1)}45%{transform:translateX(var(--battleShared385-impact-x,0)) scale(.975);filter:brightness(1.22)}}
+      @keyframes battleShared385ResultReadout{0%{opacity:0;transform:translateY(-8px) scale(.96)}100%{opacity:1;transform:translateY(0) scale(1)}}
       @media(prefers-reduced-motion:reduce){
-        .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-role-actor .battle-live-active-card-image,
-        .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-role-actor .battle-live-roster-portrait,
-        .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-role-target .battle-live-active-card-image,
-        .battle2-modern[data-evolved-pl-proof="menma_three_subjects"].battle2-performance-active .battle2-performance-role-target .battle-live-roster-portrait{
+        .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-actor .battle-live-active-card-image,
+        .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-actor .battle-live-roster-portrait,
+        .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-target .battle-live-active-card-image,
+        .battle2-modern[data-formation-stage="true"].battle2-performance-active .battle2-performance-role-target .battle-live-roster-portrait{
           animation:none!important
         }
       }
@@ -1662,7 +2173,7 @@
       formationDoesNotWriteSemantics:String(installFormationStage33000).includes("semanticWrite:false"),
       hoverLearns:source.includes("enhanceBattleSkillCards33000")&&previewBattlePreparedSkill33000.toString().includes("battle-live-skill-details"),
       clickStillUsesExistingCommitPath:typeof activateBattlePreparedSkillCard==="function",
-      youthReadingContract:YOUTH_READING_TARGET==="12-13"&&summary.includes("Hit one enemy")&&summary.includes("This does not deal damage"),
+      youthReadingContract:YOUTH_READING_TARGET==="12-13"&&summary.includes("Deals 5 ATK to one enemy.")&&summary.includes("This Skill needs an exact player-facing description before final release.")&&summary.includes("descriptionCoverage"),
       resolverNotReplaced:!source.includes("resolveBattle")&&!source.includes("applyBattleDamage")&&!source.includes("commitBattle"),
       compactTicker:typeof toggleBattle2CombatLog33000==="function"&&latestBattleFeedText33000.toString().includes("battle-runtime-log-line"),
       fullLogStillAvailable:toggleBattle2CombatLog33000.toString().includes("battle2-log-open"),
@@ -1679,9 +2190,18 @@
       resultFeedbackAttachedToExactTarget:String(applyBattlePerformanceRoles33000).includes("targetNode.appendChild(chip)")&&String(battlePerformanceResultChip33000).includes("AUTHORITATIVE STATE UPDATED"),
       damageReadoutSeparatesDamageFromBattlePL:String(battlePerformanceResultChip33000).includes("DAMAGE")&&String(battlePerformanceResultChip33000).includes("PL ${p.beforePL} → ${p.afterPL}")&&!String(battlePerformanceResultChip33000).includes("`-${p.finalDamage} PL`"),
       zeroBattlePLReadsWithdrawal:String(resultClass33000).includes('return"WITHDRAWAL"')&&String(projectBattlePerformanceCompletion33000).includes('result==="WITHDRAWAL"'),
-      readableTechniqueBanner:String(battlePerformanceMarkup33000).includes("battle2-performance-target")&&styleText.includes("menma385TechniqueBanner")&&styleText.includes("font-size:clamp(14px,1.25vw,21px)"),
+      readableTechniqueBanner:String(battlePerformanceMarkup33000).includes("battle2-performance-target")&&styleText.includes("battleShared385TechniqueBanner")&&styleText.includes("font-size:clamp(10px,.80vw,13px)"),
+      sharedBattleSystemMarker:String(installFormationStage33000).includes('battleSystem="shinobi_chronicles_shared"'),
+      sharedAuthoredEnvironmentProjection:String(sharedBattleEnvironmentPath33000).includes("presentationEnvironmentPath")&&String(sharedBattleEnvironmentPath33000).includes("environmentPath")&&String(applyBattleEnvironment33000).includes('background-image')&&String(applyBattleEnvironment33000).includes("sharedBattleSystem:true"),
+      storyCallerBackdropInheritance:String(sharedBattleEnvironmentPath33000).includes("storyCallerBattleEnvironment33000")&&String(storyCallerBattleEnvironment33000).includes("getActiveStorySceneBackdropPath33900")&&String(storyCallerBattleEnvironment33000).includes("getAcademyKakashiV2Presentation36020"),
+      menmaMarkerIsProofOnly:String(applyBattleEnvironment33000).includes("Historical proof/debug marker only")&&String(installFormationStage33000).includes("applyBattleEnvironment33000"),
       performanceSettleIsActionScoped:String(finishBattlePresentationReceipt33000).includes("active.key!==key")&&String(clearBattlePerformanceRoles33000).includes("battle2-performance-active"),
       orderedCommittedPlayback:String(syncBattlePresentationQueue33000).includes("collectBattlePerformanceProjections33000")&&String(playNextBattlePresentationReceipt33000).includes("playedKeys.add")&&String(projectBattlePerformanceCompletion33000).includes("immutableCommittedFacts:true")&&String(bindActiveBattlePresentation33000).includes("liveBattleStage33000"),
+      orderedPlaybackGlobal:String(orderedPlaybackEnabled33000).includes("battleId")&&!String(orderedPlaybackEnabled33000).includes("academy_menma_origin_three_test_subjects_with_anko"),
+      nullPLMetadataIsNotZero:String(finitePresentationPL33000).includes("value===null")&&String(finitePresentationPL33000).includes('value===""'),
+      activeReceiptShowsCommittedAfterPL:String(presentationRemainingPL33000).includes("active_after")&&String(presentationRemainingPL33000).includes("active.afterPL"),
+      partialActionRefreshRestoresRadialPL:!!PRIOR_REFRESH_ACTION_REGION_33000&&String(refreshBattleActionRegionPresentation).includes("refreshFormationPLProjection33000"),
+      activeReceiptRefreshesRadialPL:String(bindActiveBattlePresentation33000).includes("refreshFormationPLProjection33000"),
       reloadDoesNotDuplicatePresentation:String(resetPresentationQueueState33000).includes("playedKeys")&&String(presentationStorageKey33000).includes("battleId"),
       terminalNavigationDeferred:!!PRIOR_OPEN_OVERLAY_33000&&!!PRIOR_RESUME_BATTLE_CALLER_33000&&String(flushDeferredTerminalOverlay33000).includes("pendingBattlePresentation33000")&&String(flushDeferredBattleCallerResume33000).includes("pendingBattlePresentation33000")&&String(finishBattlePresentationReceipt33000).includes("flushDeferredTerminalOverlay33000")&&String(finishBattlePresentationReceipt33000).includes("flushDeferredBattleCallerResume33000"),
       menmaEnvironmentBound:String(applyBattleEnvironment33000).includes("forest_clearing_day")&&styleText.includes('data-battle-environment="forest_clearing_day"'),
@@ -1690,7 +2210,9 @@
       stableFormationMotion:styleText.includes("Final Kakashi Golden / Formation Stage motion policy")&&styleText.includes("transition:none!important;animation:none!important;will-change:auto!important")&&styleText.includes(".battle2-performance-result-chip"),
       playerCardNamesSuppressed:styleText.includes(".battle-live-active-card-player .battle-live-active-nameplate{display:none!important}")&&styleText.includes(".battle-live-roster-player .battle-live-roster-name{display:none!important}"),
       confrontationPLLaneAligned:styleText.includes('data-formation-mode="duel"] .battle-live-power-player')&&styleText.includes("left:43.5%!important")&&styleText.includes("left:56.5%!important"),
-      topHudStackSeparated:styleText.includes('data-formation-stage="true"] .battle2-performance-host{left:43%!important;right:43%!important;top:1.5%!important;height:4.8%!important}')&&styleText.includes('data-evolved-pl-proof="menma_three_subjects"] .battle2-performance-host{left:31%!important;right:31%!important;top:1.4%!important;height:8.2%!important}')&&styleText.includes(".battle2-live-ticker{left:35%!important;top:8.4%!important;width:30%!important"),
+      radialPLCorePreserved:String(projectFormationActivePortrait33000).includes('querySelector(".alpha-battle-pl-ring")')&&String(projectFormationActivePortrait33000).includes('querySelector(".alpha-battle-pl-core")')&&String(projectFormationActivePortrait33000).includes("--battle-pl-fill")&&String(projectFormationActivePortrait33000).includes("power.children"),
+      topHudStackSeparated:styleText.includes('data-formation-stage="true"] .battle2-performance-host{left:43%!important;right:43%!important;top:2%!important;height:5%!important}')&&styleText.includes('data-formation-mode="wedge"] .battle2-performance-host')&&styleText.includes('left:31%!important;right:31%!important;top:2%!important;height:5.5%!important')&&styleText.includes(".battle2-live-ticker{left:35%!important;top:8.4%!important;width:30%!important"),
+      sharedActionMotion:styleText.includes('data-formation-stage="true"].battle2-performance-active .battle2-performance-role-actor')&&styleText.includes("battleShared385ActorAction")&&styleText.includes("battleShared385TargetResponse"),
       storyCallerPresentationSuspension:typeof suspendCallerStoryPresentation33000==="function"&&String(suspendCallerStoryPresentation33000).includes("caller_owned_battle")&&String(enhanceBattle2DOM33000).includes("suspendCallerStoryPresentation33000")&&String(renderCombatOverlayModern33000).includes("enhanceBattle2DOM33000"),
       branchModesRemainExplicit:renderInspector33000.toString().includes("setSelectedBattleSkillMode"),
       browserGoldenClaimed:false

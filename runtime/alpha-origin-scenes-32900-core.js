@@ -37,7 +37,10 @@ const A={
       if(typeof consumeStaticOriginSourceOccurrence!=="function")return{success:false,reason:"origin_consequence_consumer_missing",occurrenceId,rowId};
       const result=consumeStaticOriginSourceOccurrence(rowId,record);if(!result||result.success!==true)return{success:false,reason:result&&result.reason||"origin_consequence_consume_failed",occurrenceId,rowId,result};receipts.push(result);
     }
-    return{success:true,occurrenceId,record:this.clone(record),receipts};
+    const rewardSpectrum440=typeof globalThis.projectAcademyOriginRewardOccurrence440==="function"
+      ?globalThis.projectAcademyOriginRewardOccurrence440(originId,occurrenceId,this.clone(record),this.clone(this.local()))
+      :null;
+    return{success:true,occurrenceId,record:this.clone(record),receipts,rewardSpectrum440};
   },
   commitRequest(requestId,originId,occurrenceId,factResolver,rowIdsResolver,optionsResolver){
     return{requestId,kind:"domain",resolve:()=>{const ctx=this.clone(this.local());return this.commitOccurrence(originId,occurrenceId,

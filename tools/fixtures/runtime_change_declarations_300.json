@@ -766,6 +766,263 @@
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Consumes Writing #370 and Story_Narration_and_Dialogue_Box_Segmentation_Authority_2026-09-25. Ordinary narration/dialogue/internal voice is paginated at authored blank-line boundaries (with bounded narration sentence fallback) while preserving parent source-cue ordinal for backdrop timing. This extends the existing shared Story presentation owner; no runtime owner is retired or replaced. Semantic Story beats, choices, consequences, routes, save truth, Battle, rewards and document-like record surfaces remain unchanged."
+    },
+    {
+      "changeId": "issue-396-metal-controlled-spar-met03-runtime",
+      "classification": "NEW",
+      "responsibilityIds": [
+        "origin.academy_metal_lee.final_story_state",
+        "origin.academy_metal_lee.controlled_spar_battle",
+        "battle.return.story_scene.shared",
+        "battle.presentation.shared"
+      ],
+      "owner": "runtime/alpha-origin-scenes-32900-b.js + runtime/alpha-metal-origin-runtime-396.js",
+      "directCallers": [
+        "index.html",
+        "shared Story -> Battle -> Story bridge"
+      ],
+      "stateTouched": [
+        "activeStorySceneRuntime.localContext Metal spar/protective facts",
+        "playerData.activityHistory MET-01/MET-02/MET-03/MET-04",
+        "currentBattle.metal396",
+        "playerData.metal396BattleLaunches",
+        "playerData.ryo exact 50 Ryō Metal controlled-spar victory delta",
+        "playerData.activityHistory exact Metal controlled-spar reward receipt",
+        "shinobiTestState Metal scoped Battle envelope"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issues_396_399_400_runtime.js",
+        "tools/qa_issues_396_399_400_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Consumes issue #396 and durable Combat/Writing authority. Enables the previously fail-closed Academy Metal controlled spar against stable story participant metal_origin_inviting_genin at PL15, exact deterministic five-action AI, fixed 13-PL performance bands, and the non-Battle deterministic MET-03 resolver with exact intervention evidence. Existing shared Battle/Story infrastructure remains canonical; the later Stephen-approved global Battle economy supersedes the original zero-reward Metal clause, so this one-opponent Academy victory now consumes the 50 Ryō standard anchor with an idempotent reward receipt and the approved metal_classmate_1 Battle portrait. No second Origin owner, PL scaling, injury inference, or collectible admission is created."
+    },
+    {
+      "changeId": "issue-399-iwabee-rogue-genin-disposition-runtime",
+      "classification": "NEW",
+      "responsibilityIds": [
+        "combat.rogue_genin.opposition_template.shared",
+        "origin.academy_iwabee.final_story_state",
+        "origin.academy_iwabee.rogue_battle",
+        "battle.return.story_scene.shared",
+        "battle.presentation.shared"
+      ],
+      "owner": "runtime/alpha-rogue-genin-opposition-399.js + runtime/alpha-iwabee-origin-runtime-399.js + runtime/alpha-origin-scenes-32900-b.js",
+      "directCallers": [
+        "index.html",
+        "shared Story -> Battle -> Story bridge"
+      ],
+      "stateTouched": [
+        "currentBattle.iwabee399",
+        "playerData.iwabee399BattleLaunches",
+        "shinobiTestState Iwabee scoped Battle envelope",
+        "activeStorySceneRuntime.localContext Iwabee Battle facts",
+        "playerData.activityHistory occ_origin_iwabee_rogue_genin_response_resolution World disposition/custody envelope",
+        "playerData.ryo exact 50 Ryō Iwabee Rogue-Battle victory delta",
+        "playerData.activityHistory exact Iwabee Rogue-Battle reward receipt"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issues_396_399_400_runtime.js",
+        "tools/qa_issues_396_399_400_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Consumes issue #399 World authority while preserving Combat/Registry separation. Iwabee's stable historical Rogue remains iwabee_origin_rogue_genin_01 and consumes reusable rogue_genin PL23 capability without identity collapse. Battle reports withdrawal facts only; the canonical Story owner commits exact escape, surrender or temporary-instructor-detention World disposition. Issue #440's later global Battle-economy authority supersedes the original zero-material-reward clause only for the embedded PL Battle: exact victory now pays 50 Ryō through an idempotent battle-occurrence reward receipt, defeat pays 0, and the non-Battle IWA-02 World occurrence still has no separate material payout. No IWA-02 counterfeiting, hidden Battle modifier, second Battle, injury/death inference, filler loot or collectible admission is created."
+    },
+    {
+      "changeId": "issue-400-origin-eight-palette-display-name-lock",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "combat.prepared_skill.definition.shared"
+      ],
+      "owner": "runtime/alpha-origin-skill-display-names-400.js",
+      "directCallers": [
+        "index.html",
+        "shared Battle prepared-Skill lookup and presentation"
+      ],
+      "stateTouched": [
+        "static authored displayName projection for forty existing Academy prepared Skills"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issues_396_399_400_runtime.js",
+        "tools/qa_issues_396_399_400_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_383_skill_lock.js",
+        "tools/qa_issue_383_skill_lock_browser.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Consumes issue #400 signed-off player-facing names for the eight remaining Academy Origin palettes. Stable machine IDs, palette ordering and all mechanics/numerics remain unchanged. Authored displayName is projected onto canonical shared Skill objects after #383, while Academy Menma and Academy Kakashi remain governed by their earlier lock."
+    },
+    {
+      "changeId": "academy-wasabi-writing-golden-rogue-battle-343-modular-2026-09-28",
+      "classification": "REPLACES",
+      "responsibilityIds": [
+        "story.machine_resolver.shared",
+        "story.scene.presentation.shared",
+        "origin.academy_izuno.final_story_state",
+        "origin.academy_izuno.rogue_battle",
+        "battle.return.story_scene.shared"
+      ],
+      "owner": "runtime/alpha-story-machine-resolver-343.js + runtime/alpha-origin-scenes-32900-a.js + runtime/alpha-wasabi-rogue-battle-343.js",
+      "directCallers": [
+        "index.html",
+        "runtime/alpha-origin-scenes-32900-a.js",
+        "runtime/alpha-origin-scenes-32900-integrator.js",
+        "runtime/alpha-story-scene-board-33900.js",
+        "runtime/alpha-battle-modern-33000.js"
+      ],
+      "stateTouched": [
+        "activeStorySceneRuntime machine resolver exact-one authored branch routing",
+        "activeStorySceneRuntime.localContext Academy Wasabi pursuit/route/Rogue response facts",
+        "playerData.activityHistory occ_origin_izuno_* factual sources",
+        "currentBattle.wasabi343 / playerData.wasabi343BattleLaunches",
+        "Wasabi Scene Board exact dedicated backdrops and known physical actor cards"
+      ],
+      "productionLoader": "index.html + runtime/alpha-traversal-bridge-33200.js",
+      "qaRefs": [
+        "tools/qa_issue_343_wasabi_writing_golden.js",
+        "tools/qa_issue_343_wasabi_browser.js",
+        "tools/qa_alpha_origin_scenes_32900_runtime.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [
+        "runtime/alpha-origin-scenes-32900-a.js::pre343_compressed_academy_izuno",
+        "runtime/alpha-origin-browser-realisation-33500.js::patchIzuno33500",
+        "runtime/alpha-early-story-modernization-33600.js::patchIzuno",
+        "runtime/alpha-origin-screen-first-33700.js::patchIzuno"
+      ],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Consumes the already-approved #343 Wasabi Writing-Golden and Rogue Battle contract on the #414 successor while preserving frozen game.js. Machine-resolver support is moved to a scoped adapter that delegates through existing Story choice authority. Stephen's installed-browser review showed #414 omitted this presentation lane."
+    },
+    {
+      "changeId": "issue-409-origin-starting-purse-modular-2026-09-28",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "origin.completion.shared",
+        "origin.academy_izuno.final_story_state",
+        "origin.academy_izuno.rogue_battle",
+        "progression.special_jonin.contextual_evidence_producer.shared"
+      ],
+      "owner": "runtime/alpha-origin-starting-purse-409.js + runtime/alpha-origin-scenes-32900-a.js + runtime/alpha-wasabi-rogue-battle-343.js + runtime/alpha-special-jonin-evidence-producer-34700.js",
+      "directCallers": [
+        "index.html",
+        "completeChronicleOriginPrologue",
+        "runtime/alpha-origin-scenes-32900-a.js",
+        "claimCurrentBattleRewards"
+      ],
+      "stateTouched": [
+        "playerData.ryo one-shot Origin starting purse + origin_completion_reward receipt",
+        "academy_izuno Stamina discipline progression",
+        "playerData.specialJoninContextualEvidence",
+        "Wasabi exact Battle victory reward"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_343_wasabi_writing_golden.js",
+        "tools/qa_issue_343_wasabi_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Preserves the closed #409 reward spectrum while obeying the frozen-core requirement: the one-shot 100 Ryō Origin purse is an explicit permitted wrapper around successful canonical Origin completion rather than a game.js mutation."
+    },
+    {
+      "changeId": "issue-105-ten-origin-presentation-repair-2026-09-28",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "story.scene.presentation.shared",
+        "battle.presentation.shared",
+        "origin.academy_mirai.final_story_state",
+        "origin.academy_menma.final_story_state",
+        "origin.academy_menma.three_subject.reward_commit",
+        "origin.academy_kakashi.v2.story_dom",
+        "origin.academy_izuno.final_story_state",
+        "origin.academy_iwabee.final_story_state",
+        "origin.academy_metal_lee.final_story_state",
+        "origin.academy_mirai.disguised_instructor_battle"
+      ],
+      "owner": "runtime/alpha-origin-writing-golden-105.js + runtime/alpha-origin-scene-board-bindings-105.js + runtime/alpha-story-scene-board-33900.js + runtime/alpha-journey-surface-32800.js + runtime/alpha-kakashi-v2-renderer-36030.js + runtime/alpha-origin-scenes-32900-a.js + runtime/alpha-origin-scenes-32900-b.js + runtime/alpha-menma-evolved-pl-battle-36900.js + runtime/alpha-menma-origin-rewards-36200.js + runtime/alpha-battle-modern-33000.js + runtime/alpha-mirai-origin-battle-338.js",
+      "directCallers": [
+        "index.html",
+        "runtime/alpha-traversal-bridge-33200.js"
+      ],
+      "stateTouched": [
+        "Academy Mirai approved GOLDEN Story graph / local Story choices and deterministic terminal routing",
+        "Academy Menma approved GOLDEN Story graph around the preserved evolved PL Battle seam",
+        "Scene Board speaker/actor/backdrop/Receipt presentation using exact approved assets",
+        "Chronicle Receipt presentation cursor/input guard only",
+        "Origin Story-to-PL-Battle actionLabel/presentation styling only",
+        "Academy Menma Victory disclosure presentation only; fixed 100 Ryō reward semantics remain unchanged",
+        "presentation-only radial Battle PL DOM refresh",
+        "Academy Mirai closed #338 disguised-instructor PL Battle package / exact two-caller same-Story return / 50 Ryō victory reward",
+        "Menma Victory explanatory footer copy removed by scoped reward-presentation adapter; frozen game.js restored byte-for-byte"
+      ],
+      "productionLoader": "index.html + runtime/alpha-traversal-bridge-33200.js",
+      "qaRefs": [
+        "tools/qa_issue_105_origin_presentation_repair.js",
+        "tools/qa_issue_105_origin_presentation_browser.js",
+        "tools/qa_issue_362_menma_three_subject_reward.js",
+        "tools/qa_issue_362_menma_reward_browser.js",
+        "tools/qa_issue_369_menma_evolved_pl_battle_browser.js",
+        "tools/qa_issue_340_hinata_browser.js",
+        "tools/qa_issue_343_wasabi_browser.js",
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_issue_312_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_303_runtime_build_fingerprint.js",
+        "tools/qa_issue_141_pre_alpha_runtime_closure.py"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Stephen's 2026-09-28/29 installed-browser review supersedes automation-only presentation confidence. The #105 successor keeps Hinata/Kakashi frozen while applying only authorised repairs and global presentation contracts. Mirai now consumes the closed Combat #338 disguised-instructor PL Battle package through the existing Story -> Battle -> same-Story seam: shortcut Battle returns to Scene 5 without reveal; confrontation Battle returns to the approved reveal; the observer-facing opponent remains the male Traveller/Escort disguise while the underlying Academy instructor is female; victory pays the closed 50 Ryō Battle reward. Menma and Izuno remain limited to the separately owner-authorised surgical corrections already recorded. No unrelated Battle cadence, reward, route, or frozen-Origin semantics are redesigned."
+    },
+    {
+      "changeId": "issue-440-academy-origin-reward-spectrum-overlay",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "origin.academy_obito.final_story_state",
+        "origin.academy_hinata.final_story_state",
+        "origin.academy_mirai.final_story_state",
+        "origin.academy_metal_lee.final_story_state",
+        "origin.academy_metal_lee.controlled_spar_battle",
+        "origin.academy_iwabee.final_story_state",
+        "origin.academy_iwabee.rogue_battle",
+        "progression.special_jonin.contextual_evidence_producer.shared"
+      ],
+      "owner": "runtime/alpha-origin-scenes-32900-core.js + runtime/alpha-origin-reward-spectrum-440.js + runtime/alpha-origin-scene-board-bindings-105.js + runtime/alpha-origin-scenes-32900-c.js + runtime/alpha-metal-origin-runtime-396.js + runtime/alpha-iwabee-origin-runtime-399.js",
+      "directCallers": [
+        "index.html",
+        "SC_ALPHA_ORIGIN_32900.commitOccurrence",
+        "Origin Chronicle Receipt projection",
+        "shared Battle reward/claim surfaces"
+      ],
+      "stateTouched": [
+        "playerData activityHistory source-scoped discipline_development receipts for ratified Academy Origin actions",
+        "existing Character disciplineProgression EXP through canonical progression APIs only",
+        "playerData.specialJoninContextualEvidence through the canonical contextual evidence producer only",
+        "playerData.ryo exact Iwabee 50 Ryō Battle victory delta",
+        "playerData.activityHistory exact Iwabee Battle reward receipt",
+        "player-facing Origin Chronicle Receipt reward/development projection only",
+        "Obito existing formal-training Current-Stat package projection only; no second Discipline EXP"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_440_origin_reward_spectrum.js",
+        "tools/qa_issues_396_399_400_runtime.js",
+        "tools/qa_issues_396_399_400_browser.js",
+        "tools/qa_issue_105_origin_presentation_repair.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Consumes CE/World issue #440 plus Progression ratification #438 as a bounded reward/progression projection overlay on the already owner-accepted FROZEN GOLDEN Academy Origin package. Story prose, routes, choices, actors, backdrops, Battle mechanics/AI/PL and Receipt lifecycle remain frozen. The overlay projects only exact source-scoped non-Battle development, ratified Special Jōnin contextual evidence, visible Receipt reward/development lines, the existing Obito Current-Stat package without duplicate Discipline EXP, and the globally required Iwabee +50 Ryō PL-Battle victory reward. Kushina residual closure explicitly excludes reverse-summoning evidence. Kakashi and Wasabi reward packages remain excluded."
     }
   ]
 }

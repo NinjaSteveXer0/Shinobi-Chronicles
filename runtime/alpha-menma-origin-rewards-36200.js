@@ -339,26 +339,36 @@ if(PRE_CLAIM){
 }
 
 function appendVictoryDisclosure(container,projection){
-  if(!container||!projection||projection.handled!==true)return false;
+  if(!container||!projection||projection.handled!==true||projection.ready!==true)return false;
   const existing=container.querySelector&&container.querySelector(".menma-three-subject-reward-36200");
   if(existing)existing.remove();
-  const note=document.createElement("div");
-  note.className="menma-three-subject-reward-36200";
-  note.style.cssText="margin:8px auto 0;max-width:720px;padding:8px 12px;border:1px solid rgba(214,169,58,.45);border-radius:10px;background:rgba(4,12,17,.88);color:#d9e1df;font-size:10px;line-height:1.45;text-align:center;letter-spacing:.02em;";
-  if(projection.ready===true){
-    note.textContent="FIXED ENCOUNTER REWARD · +100 RYŌ · No items/materials · No generic Character EXP. Menma action-derived discipline/Stamina development, if any, is recorded separately from this cash reward.";
-  }else{
-    note.textContent="REWARD PENDING AUTHORITATIVE THREE-SUBJECT BATTLE RECEIPT · No partial payout is available.";
-  }
-  container.appendChild(note);
+  const reward=document.createElement("div");
+  reward.className="menma-three-subject-reward-36200";
+  reward.setAttribute("aria-label","Battle reward");
+  reward.style.cssText="margin:10px auto 0;max-width:360px;padding:9px 14px;border:1px solid rgba(214,169,58,.52);border-radius:10px;background:rgba(4,12,17,.88);color:#f2d77b;font-size:13px;line-height:1.3;text-align:center;font-weight:900;letter-spacing:.05em;";
+  reward.textContent="+100 RYŌ";
+  container.appendChild(reward);
   return true;
 }
 
 const PRE_RENDER=typeof renderVictoryOverlay==="function"?renderVictoryOverlay:null;
+function normalizeMenmaVictoryFooter36200(container){
+  if(!container||!successorBattle())return false;
+  const footer=container.querySelector&&container.querySelector(".alpha-victory-footer");
+  const button=footer&&footer.querySelector?footer.querySelector(".victory-continue"):null;
+  if(button){
+    button.style.removeProperty("margin-right");
+    button.style.setProperty("margin-left","auto");
+  }
+  return !!footer;
+}
 function renderVictoryOverlay36200(container){
   const projection=successorBattle()?ensureProjection():{handled:false};
   const result=PRE_RENDER?PRE_RENDER.apply(this,arguments):false;
-  try{appendVictoryDisclosure(container,projection);}catch(_error){}
+  try{
+    appendVictoryDisclosure(container,projection);
+    normalizeMenmaVictoryFooter36200(container);
+  }catch(_error){}
   return result;
 }
 if(PRE_RENDER){
@@ -418,6 +428,7 @@ function diagnostics(){
     genericRewardsSuppressed:generateBattleRewards36200.toString().indexOf("successorBattle")<generateBattleRewards36200.toString().indexOf("PRE_GENERATE"),
     noFixedLootOrExp:ensureProjection.toString().includes("exp:0")&&ensureProjection.toString().includes("items:[]")&&ensureProjection.toString().includes("rareDrops:[]"),
     durableReceiptUsesActivityHistory:writeRewardReceipt.toString().includes("history()")&&writeRewardReceipt.toString().includes("battleOccurrenceId"),
+    sharedVictoryFooterPreserved:!String(renderVictoryOverlay36200).includes("removeMenmaVictoryContractCopy36200")&&String(normalizeMenmaVictoryFooter36200).includes('margin-left')&&String(normalizeMenmaVictoryFooter36200).includes('auto'),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);

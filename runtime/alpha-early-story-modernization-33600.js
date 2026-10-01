@@ -68,6 +68,9 @@ function patchHinata(){
 
 function patchIzuno(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const def=editable(A.sceneByVariant.academy_izuno);if(!def)return false;
+  // #343 native WRITING GOLDEN owns Wasabi's player-facing expression.
+  // Retire this stale pre-GOLDEN prose layer instead of re-registering over it.
+  if(beat(def,"izu_initial_choice")&&beat(def,"izu_split_choice")&&beat(def,"izu_rogue_choice")&&beat(def,"izu_rogue_step_in_battle")&&beat(def,"izu_reflect"))return true;
   text(def,"izu_start","The Academy target gets a head start and vanishes into the village training routes. A flare at the extraction point marks the only thing Wasabi knows for certain: if it goes up before she gets there, she was too slow—or followed the wrong story.");
   text(def,"izu_initial","The obvious trail is almost too obvious. Scuffed dirt points east. A snapped reed points toward the drainage path. Two other students are already arguing over which one matters.");
   label(def,"izu_initial","obvious_trail","Take the trail at face value and move.");
@@ -87,6 +90,7 @@ function patchIzuno(){
 
 function patchMirai(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const def=editable(A.sceneByVariant.academy_mirai);if(!def)return false;
+  if(beat(def,"mir_assignment_01")&&beat(def,"mir_walk_choice")&&beat(def,"mir_reflection_router")&&beat(def,"mir_reflection_conversation")&&beat(def,"mir_reflection_chakra")&&beat(def,"mir_reflection_suspicion")&&beat(def,"mir_reflection_missed"))return true;
   text(def,"mir_start","The escort begins badly only in hindsight. The civilian is polite, knows the route, thanks Mirai for walking on the road-side of the path and asks ordinary questions about the Academy. Nothing about them demands suspicion.");
   text(def,"mir_talk","Conversation fills the walk. Mirai asks something ordinary—not because she is interrogating them, but because silence for the whole escort would be strange.");
   const inconsistent=beat(def,"mir_inconsistent");if(inconsistent)inconsistent.presentationResolver=()=>{const ctx=local();const detail={origin:"The clothing no longer fits the country they described.",route:"The route no longer fits the route they described.",family:"A family detail comes back differently.",trip:"A detail about the trip to Konoha comes back differently."}[ctx.talk]||"One small detail refuses to fit.";return{text:`Later, one small detail refuses to fit. Then another. ${detail} Nothing proves anything yet. It is simply wrong enough to stay in Mirai's head.`};};
@@ -96,14 +100,17 @@ function patchMirai(){
   label(def,"mir_inconsistent","change_route","Change the route without warning and see how they react.");
   const deeper=beat(def,"mir_deeper");if(deeper)deeper.presentationResolver=()=>{const ctx=local();const reaction={test_question:"The new answer gives Mirai another detail to compare.",pretend_not_notice:"She keeps escort formation and waits for the next contradiction.",change_route:"The unannounced route change produces a reaction she can actually observe."}[ctx.miraiSuspicionResponse]||"Mirai keeps watching.";return{text:`Suspicion has become a pattern. It still is not proof. ${reaction}`};};
   text(def,"mir_checkpoint","At the checkpoint the transformation releases. The person Mirai protected is still standing exactly where she delivered them—safe, cooperative and not the person she thought she was escorting. For one ugly second, both facts are true at once.");
-  text(def,"mir_verified","Mirai never accuses them. She changes one question, then one route detail, then watches the answer arrive half a beat too late. By the time she acts, she has enough to expose the substitution without pretending she knows who is underneath it.");
+  text(def,"mir_verified","Mirai never accuses them. She changes one question, then one route detail, then watches the answer arrive slightly too late. By the time she acts, she has enough to expose the substitution without pretending she knows who is underneath it.");
   text(def,"mir_eval","The instructor waits until Mirai has reconstructed the route herself. Protection and identification turned out to be two different jobs.");
   text(def,"mir_end","You kept your client alive. Next time, make sure the client is the person you were assigned.");
   return commit(def);
 }
 
 function patchKushina(){
-  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const def=editable(A.sceneByVariant.academy_kushina);if(!def)return false;
+  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
+  const live=definition(A.sceneByVariant.academy_kushina);
+  if(live&&live.entryBeatId==="kus_practical_01"&&beat(live,"kus_crisis")&&beat(live,"kus_contact_choice")&&beat(live,"kus_route_d_close_08"))return true;
+  const def=editable(A.sceneByVariant.academy_kushina);if(!def)return false;
   text(def,"kus_crisis","The practice formula should have gone dark three strokes ago. Instead, chakra crawls past the boundary line and snaps across the courtyard stone toward the student kneeling beside it. The instructor moves—but Kushina is closer.");
   label(def,"kus_crisis","correct_formula","Fix the formula before it tears itself apart.");
   label(def,"kus_crisis","protect_student","Get the student out first.");
@@ -113,7 +120,10 @@ function patchKushina(){
 }
 
 function patchKurenai(){
-  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const def=editable(A.sceneByVariant.academy_kurenai);if(!def)return false;
+  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
+  const live=definition(A.sceneByVariant.academy_kurenai);
+  if(live&&live.entryBeatId==="kur_pre_01"&&beat(live,"kur_approach")&&beat(live,"kur_leave_router"))return true;
+  const def=editable(A.sceneByVariant.academy_kurenai);if(!def)return false;
   text(def,"kur_bell","A brass bell hangs from the instructor's belt. No weapons. No spectators. One rule. “Take it.”");
   text(def,"kur_layer1","Kurenai watches the instructor's eyes instead of the bell. If he believes the first lie, the second one will not need to be bigger—only better placed.");
   label(def,"kur_layer1","false_kurenai","Give him a Kurenai he can see.");
@@ -144,7 +154,10 @@ function patchIwabee(){
 }
 
 function patchMetal(){
-  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const def=editable(A.sceneByVariant.academy_metal_lee);if(!def)return false;
+  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;
+  const live=definition(A.sceneByVariant.academy_metal_lee);
+  if(live&&beat(live,"met_receipt")&&beat(live,"met_spar_strong_close_07")&&beat(live,"met_backout_close_01"))return true;
+  const def=editable(A.sceneByVariant.academy_metal_lee);if(!def)return false;
   text(def,"met_private","Metal is good when nobody is watching. His feet land where he wants them. His breathing stays measured. The training post shudders on the final strike and Metal immediately resets his stance to do it again. Then someone claps from behind him.");
   text(def,"met_invite","The Genin who saw him grins like the answer is obvious. “Again.”");
   label(def,"met_invite","spar","Spar. If they're watching anyway, make it count.");

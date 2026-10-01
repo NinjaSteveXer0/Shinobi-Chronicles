@@ -108,7 +108,10 @@ assert(rendererSource.includes('if(preset==="anbu_handoff")')&&rendererSource.in
   for(const [configId,oppositionParticipantIds,expectedRyo,expectedPill] of battleRewardMatrix){
     const battleId="qa_"+configId;
     context.currentBattle={
-      battleId,encounterId:configId,outcome:{type:"victory"},rewards:{generated:false,claimed:false},
+      battleId,encounterId:configId,outcome:{type:"victory"},
+      // Regression: the first MI screen may arrive with a stale generic claimed
+      // bit even though no Kakashi source receipts/material rewards exist.
+      rewards:{generated:false,claimed:configId==="academy_kakashi_origin_battle_seq_mi"},
       kakashiV2:{battleConfigId:configId,battleOccurrenceId:battleId,storyOccurrenceId:"qa_origin",oppositionParticipantIds:[...oppositionParticipantIds]}
     };
     const immediate=context.generateBattleRewards({rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]}},{name:"Kakashi"});
@@ -117,6 +120,9 @@ assert(rendererSource.includes('if(preset==="anbu_handoff")')&&rendererSource.in
     const itemIds=Array.from(immediate.items||[]).map(x=>x.id);
     assert.deepStrictEqual(itemIds,expectedPill?["field_recovery_pill"]:[],configId+" Item projection mismatch");
     assert.strictEqual(context.claimCurrentBattleRewards(),true,configId+" claim failed");
+    if(configId==="academy_kakashi_origin_battle_seq_mi"){
+      assert.strictEqual(context.currentBattle.rewards.claimed,true,"stale MI generic claim bit was not repaired into a real committed claim");
+    }
     expectedBattleRyo+=expectedRyo;
     assert.strictEqual(context.playerData.ryo,expectedBattleRyo,configId+" cash claim did not commit exactly once");
   }

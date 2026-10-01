@@ -68,10 +68,111 @@
   // generic Battle fallback is reserved for Battles that genuinely have no
   // caller return context.
   const priorClaimVictoryAutoReturn=claimVictoryRewardsFromOverlay;
+  let kakashiVictoryPersistencePending32600=null;
+  function patchKakashiClaimedVictory32600(){
+    if(typeof document==="undefined")return false;
+    const screen=document.querySelector(".alpha-victory-code-screen");
+    if(!screen)return false;
+
+    const claimState=screen.querySelector(".alpha-victory-claim-state");
+    if(claimState){
+      claimState.textContent="CLAIMED";
+      claimState.classList.add("is-claimed");
+    }
+
+    const receiptRows=[...(screen.querySelectorAll(".alpha-victory-chronicle dl div")||[])];
+    for(const row of receiptRows){
+      const label=row.querySelector("dt");
+      const value=row.querySelector("dd");
+      if(label&&value&&String(label.textContent||"").trim().toUpperCase()==="REWARDS")value.textContent="COMMITTED";
+    }
+
+    const footer=screen.querySelector(".alpha-victory-footer");
+    const copy=footer&&footer.querySelector("p");
+    const button=footer&&footer.querySelector(".victory-continue");
+    if(copy)copy.textContent="Rewards are committed. Continue to restore the owning Story / World caller.";
+    if(button){
+      button.textContent="CONTINUE";
+      button.setAttribute("onclick","continueAfterVictory()");
+      button.disabled=false;
+      button.removeAttribute("aria-disabled");
+      button.style.pointerEvents="auto";
+    }
+    screen.classList.add("is-claimed-live");
+    const overlay=document.getElementById("screen-overlay");
+    if(overlay)overlay.classList.add("alpha-victory-open");
+    return !!button;
+  }
+  function cancelScheduledKakashiVictoryPersistence32600(){
+    const pending=kakashiVictoryPersistencePending32600;
+    if(!pending)return false;
+    if(pending.idleHandle!=null&&typeof cancelIdleCallback==="function"){
+      try{cancelIdleCallback(pending.idleHandle);}catch(_error){}
+    }
+    if(pending.timerHandle!=null){
+      try{clearTimeout(pending.timerHandle);}catch(_error){}
+    }
+    if(pending.status==="scheduled")pending.status="cancelled";
+    return true;
+  }
+  function scheduleKakashiVictoryPersistence32600(reason="claim"){
+    const battleId=String(currentBattle&&currentBattle.battleId||"");
+    cancelScheduledKakashiVictoryPersistence32600();
+    const pending={battleId,reason,status:"scheduled",playerSaved:false,sessionSaved:false,error:null,idleHandle:null,timerHandle:null};
+    kakashiVictoryPersistencePending32600=pending;
+    const persist=()=>{
+      if(kakashiVictoryPersistencePending32600!==pending)return;
+      pending.status="persisting";
+      try{
+        if(typeof savePlayerData==="function"){savePlayerData();pending.playerSaved=true;}
+        if(typeof saveTestState==="function"){saveTestState();pending.sessionSaved=true;}
+        pending.status="persisted";
+      }catch(error){
+        pending.status="error";pending.error=String(error&&error.message||error);
+      }
+      try{if(typeof refreshAlphaSurfaceTruthHUD==="function")refreshAlphaSurfaceTruthHUD();}catch(_error){}
+    };
+    const afterPaint=()=>{
+      if(kakashiVictoryPersistencePending32600!==pending)return;
+      if(typeof requestIdleCallback==="function"){
+        pending.idleHandle=requestIdleCallback(persist,{timeout:1600});
+      }else{
+        pending.timerHandle=setTimeout(persist,120);
+      }
+    };
+    if(typeof requestAnimationFrame==="function")requestAnimationFrame(afterPaint);
+    else afterPaint();
+    return true;
+  }
   claimVictoryRewardsFromOverlay=function claimVictoryRewardsFromOverlayBrowser32600(){
     const returnContextBefore=currentBattle&&currentBattle.returnContext&&typeof cloneBattleRuntimeValue==="function"
       ? cloneBattleRuntimeValue(currentBattle.returnContext)
       : (currentBattle&&currentBattle.returnContext?currentBattle.returnContext:null);
+
+    const kakashiExplicitClaim=!!(
+      currentOverlayType==="victory"&&
+      currentBattle&&
+      currentBattle.rewards&&
+      currentBattle.rewards.kakashiV2===true&&
+      currentBattle.rewards.requiresExplicitPostClaimContinue===true
+    );
+    if(kakashiExplicitClaim){
+      const alreadyClaimed=currentBattle.rewards.claimed===true;
+      const claimed=alreadyClaimed?true:claimCurrentBattleRewards();
+      if(claimed!==true)return{success:false,reason:"victory_reward_claim_failed"};
+      // Patch only the already-visible Victory controls. Re-running the entire
+      // Victory renderer on Stephen's full Chronicle state was still capable of
+      // making the click look dead. Material rewards are already committed in
+      // memory; paint CLAIM -> CONTINUE first, then persist during browser idle.
+      if(!patchKakashiClaimedVictory32600())return{success:false,reason:"kakashi_victory_control_patch_failed"};
+      scheduleKakashiVictoryPersistence32600("claim");
+      return{
+        success:true,claimed:true,navigated:false,autoReturned:false,
+        explicitPostClaimContinue:true,
+        kakashiVictoryPaintBeforePersistence:true,
+        rewardCommitBeforeCallerRestore:true
+      };
+    }
 
     const claimResult=priorClaimVictoryAutoReturn.apply(this,arguments);
     if(!(claimResult&&claimResult.success===true))return claimResult;
@@ -81,12 +182,16 @@
     // RETURN TO STORY. This flag is reward-authority owned; generic Battles keep
     // the established auto-return behaviour below.
     if(currentBattle&&currentBattle.rewards&&currentBattle.rewards.requiresExplicitPostClaimContinue===true){
-      try{openOverlay("victory");}catch(_error){}
+      // The predecessor Claim owner has already committed rewards and
+      // synchronously re-rendered the same Victory surface. Reopening Victory
+      // here duplicated the full renderer/terminal-overlay path and could make
+      // Kakashi's Claim/Continue controls appear unresponsive.
       return{
         ...claimResult,
         navigated:false,
         autoReturned:false,
         explicitPostClaimContinue:true,
+        victoryAlreadyRerenderedByClaimOwner:true,
         rewardCommitBeforeCallerRestore:true
       };
     }
@@ -262,10 +367,12 @@
       academyHasNoGenericRepeatLock:!genericRepeatLockPattern.test(academyAvailabilitySource),
       closureHasNoGenericRepeatLock:!genericRepeatLockPattern.test(closureAvailabilitySource),
       claimThenCallerRestore:claimSource.includes("priorClaimVictoryAutoReturn")&&claimSource.includes('resumeBattleCallerAfterCompletion("victory")'),
+      kakashiExplicitClaimPaintsBeforePersistence:claimSource.includes("kakashiVictoryPaintBeforePersistence:true")&&claimSource.includes("patchKakashiClaimedVictory32600")&&claimSource.includes("scheduleKakashiVictoryPersistence32600")&&!claimSource.includes('openOverlay("victory");\n      try{if(typeof refreshAlphaSurfaceTruthHUD'),
       rewardCommitBeforeReturn:claimSource.indexOf("priorClaimVictoryAutoReturn")<claimSource.indexOf('resumeBattleCallerAfterCompletion("victory")'),
       callerContextPreserved:claimSource.includes("returnContextBefore")&&claimSource.includes("currentBattle.returnContext"),
       callerOwnedCannotGenericFallback:claimSource.includes("genericBattleFallbackSuppressed:true")&&claimSource.includes('openOverlay("victory")'),
       explicitPostClaimContinueSupported:claimSource.includes("requiresExplicitPostClaimContinue")&&claimSource.includes("explicitPostClaimContinue:true"),
+      explicitPostClaimDoesNotReopenVictory:claimSource.includes("victoryAlreadyRerenderedByClaimOwner:true"),
       ordinaryBattleStillUsesGenericContinue:claimSource.includes("callerResult=continueAfterVictory()"),
       feedStyleInstalled:typeof document==="undefined"||!!document.getElementById("alpha-battle-browser-32600-style"),
       browserGoldenNotClaimed:true

@@ -548,7 +548,7 @@ const G=Object.freeze({
     },
     {
       "mode": "narration",
-      "text": "Both turn toward him.\n\nA beat."
+      "text": "Both turn toward him."
     },
     {
       "mode": "dialogue",
@@ -1124,7 +1124,8 @@ const youngCommit=R("hin_young_32900","academy_hinata",young,c=>({
   selfTaijutsuLearningOccurred:c.young==="stay_and_watch",
   youngerStudentParticipantRef:null
 }),c=>c.young==="stay_and_watch"?["HIN-02"]:["show_movement","explain_error"].includes(c.young)?["HIN-03"]:[]);
-seq("hin_close",G.close,null,{first:{onEnterConsequences:[youngCommit]},last:{exitScene:true}});
+seq("hin_close",G.close,"hin_receipt",{first:{onEnterConsequences:[youngCommit]}});
+beats.push({beatId:"hin_receipt",mode:"record",text:"",exitScene:true,onEnterConsequences:[X("academy_hinata",[spar,young])]});
 
 const HINATA_ORIGIN_BACKDROP_ID="hinata_origin_hyuga_compound";
 const HINATA_ORIGIN_BACKDROP_PATH="Hinata Origin Backdrop/hyuga_compound.png";
@@ -1161,47 +1162,494 @@ function registerHinataOriginPresentation32900(){
 }
 registerHinataOriginPresentation32900();
 A.register({sceneId:scene,eventId:scene,title:"ACADEMY HINATA",entryBeatId:id("hin_opening"),participants:[],beats,onCompleteConsequences:[X("academy_hinata",[spar,young])]});})();
-// Wasabi Izuno
-(()=>{const tracking="occ_origin_izuno_pursuit_tracking_resolution",intercept="occ_origin_izuno_intercept_prediction_resolution",coop="occ_origin_izuno_pursuit_cooperation_resolution",rogue="occ_origin_izuno_rogue_genin_interruption_resolution",scene=A.sceneByVariant.academy_izuno;
-const IZUNO_PRESENTATION_BACKDROPS=Object.freeze({
-  izuno_origin_training_grounds_day:"Izuno Origin Backdrop/training_grounds_day.png",
-  izuno_origin_practical_ground_day:"Izuno Origin Backdrop/practical_ground_day.png",
-  izuno_origin_konoha_main_street:"Izuno Origin Backdrop/konoha_main_street.png",
-  izuno_origin_konoha_alleyway_day:"Izuno Origin Backdrop/konoha_alleyway_day.png",
-  izuno_origin_konoha_narrow_yard:"Izuno Origin Backdrop/konoha_narrow_yard.png",
-  izuno_origin_konoha_rooftop_pursuit_day:"Izuno Origin Backdrop/konoha_rooftop_pursuit_day.png",
-  izuno_origin_river_route_day:"Izuno Origin Backdrop/river_route_day.png"
+// Wasabi Izuno — #343 owner-approved complete rewrite v2 + authorised Rogue Genin Battle
+(()=>{const tracking="occ_origin_izuno_pursuit_tracking_resolution",intercept="occ_origin_izuno_intercept_prediction_resolution",coop="occ_origin_izuno_pursuit_cooperation_resolution",rogue="occ_origin_izuno_rogue_genin_interruption_resolution",river="occ_origin_izuno_river_endurance_resolution",scene=A.sceneByVariant.academy_izuno;
+const W=globalThis.SC_ACADEMY_WASABI_WRITING_GOLDEN_343;if(!W)throw new Error("academy_wasabi_writing_golden_343_required");
+const G=key=>W.get(key);
+const beats=[];
+const IZUNO_BACKDROPS=Object.freeze({
+  practical:Object.freeze({assetId:"academy_izuno_practical_ground_day",assetPath:"Izuno Origin Backdrop/practical_ground_day.png"}),
+  rooftop:Object.freeze({assetId:"academy_izuno_konoha_rooftop_pursuit_day",assetPath:"Izuno Origin Backdrop/konoha_rooftop_pursuit_day.png"}),
+  mainStreet:Object.freeze({assetId:"academy_izuno_konoha_main_street",assetPath:"Izuno Origin Backdrop/konoha_main_street.png"}),
+  river:Object.freeze({assetId:"academy_izuno_river_route_day",assetPath:"Izuno Origin Backdrop/river_route_day.png"}),
+  narrowYard:Object.freeze({assetId:"academy_izuno_konoha_narrow_yard",assetPath:"Izuno Origin Backdrop/konoha_narrow_yard.png"}),
+  alley:Object.freeze({assetId:"academy_izuno_konoha_alleyway_day",assetPath:"Izuno Origin Backdrop/konoha_alleyway_day.png"}),
+  training:Object.freeze({assetId:"academy_izuno_training_grounds_day",assetPath:"Izuno Origin Backdrop/training_grounds_day.png"})
 });
-try{
-  const registerPath=typeof registerSceneBackdropAssetPath==="function"?registerSceneBackdropAssetPath:globalThis.registerSceneBackdropAssetPath;
-  if(typeof registerPath==="function")for(const [id,path] of Object.entries(IZUNO_PRESENTATION_BACKDROPS))registerPath(id,path);
-}catch(_error){}
-const IZUNO_GOLDEN_PRESENTATION_READINESS=Object.freeze({
-  writingAuthority:"Academy_Wasabi_Izuno_Origin_WRITING_GOLDEN_2026-09-24",
-  codingIssue:343,
-  runtimeReplacementPerformed:false,
-  staleCompressedRuntimePromoted:false,
-  provenSceneMappings:Object.freeze({
-    riverRoute:Object.freeze({environmentId:"izuno_origin_river_route_day",assetPath:"Izuno Origin Backdrop/river_route_day.png"})
-  }),
-  unresolvedExactAssetBindings:Object.freeze([
-    "head_start","street_trail","split_non_river","stronger_trail","rogue_interruption","intercept","finish","instructor_debrief","after"
-  ]),
-  backdrops:IZUNO_PRESENTATION_BACKDROPS
+const IZUNO_BATTLE_ENVIRONMENT=IZUNO_BACKDROPS.alley.assetPath;
+const IZUNO_ACTORS=Object.freeze({
+  wasabi:Object.freeze({id:"academy_izuno",label:"WASABI",image:"Assets/Academy Student/academy_izuno.png"}),
+  instructor:Object.freeze({id:"wasabi_academy_instructor",label:"ACADEMY INSTRUCTOR",image:"NPC/izuno_instructor.png"}),
+  student1:Object.freeze({id:"wasabi_academy_student_01",label:"ACADEMY STUDENT",image:"NPC/academy_student_fem_1.png"}),
+  student2:Object.freeze({id:"wasabi_academy_student_02",label:"ACADEMY STUDENT 2",image:"NPC/izuno_student_2.png"}),
+  proctor:Object.freeze({id:"wasabi_origin_proctor",label:"PROCTOR",image:"NPC/izuno_proctor.png"}),
+  target:Object.freeze({id:"wasabi_origin_pursuit_target_01",label:"TARGET",image:"NPC/pursuit_target.png"}),
+  rogue:Object.freeze({id:"wasabi_origin_rogue_genin_01",label:"ROGUE GENIN",image:"Enemies/rogue_genin.png"})
 });
-globalThis.SC_ACADEMY_IZUNO_GOLDEN_PRESENTATION_READINESS_20260927=IZUNO_GOLDEN_PRESENTATION_READINESS;
-A.register({sceneId:scene,eventId:scene,title:"ACADEMY WASABI IZUNO",entryBeatId:"izu_start",participants:[],beats:[
-{beatId:"izu_start",mode:"narration",text:"Academy pursuit trial: find the target before they reach the extraction point.",nextBeatId:"izu_initial"},
-{beatId:"izu_initial",mode:"choice",text:"Choose how Wasabi begins.",choices:[C("obvious_trail","Follow the obvious trail","izu_split",{initial:"obvious_trail"}),C("environmental_signs","Search for environmental signs","izu_split",{initial:"environmental_signs",environmental:true}),C("cooperate_students","Cooperate with other students","izu_split",{initial:"cooperate_students",cooperated:true}),C("predict_destination","Ignore the trail and predict the destination","izu_split",{initial:"predict_destination",predicted:true})]},
-{beatId:"izu_split",mode:"choice",text:"The route diverges.",choices:[C("river_route","Take the river route","izu_eval",{route:"river_route",outcome:"arrive_just_after_target"}),C("stronger_trail","Follow the stronger trail","izu_eval",{route:"stronger_trail",falseTrail:true,outcome:"false_trail_discovered"}),C("rogue_interruption","Stop for the Rogue Genin situation","izu_rogue",{route:"rogue_interruption"}),C("intercept_prediction","Continue the Intercept prediction","izu_eval",{route:"intercept_prediction",predicted:true,outcome:"intercept_before_extraction"})]},
-{beatId:"izu_rogue",mode:"choice",text:"A Rogue Genin is interfering with another Academy student. This is a separate occurrence.",choices:[C("intervene","Intervene","izu_rogue",null,{availability:A.unavailableBattle(scene,"Direct Rogue Genin Battle needs the exact current Combat caller; another authored response remains available.")}),C("call_for_help","Call for help","izu_eval",{rogueResponse:"call_for_help",rogueResolved:true,outcome:"secondary_occurrence_resolved_then_pursuit"}),C("keep_pursuing","Keep pursuing","izu_eval",{rogueResponse:"keep_pursuing",rogueResolved:false,outcome:"pursuit_continued"})]},
-{beatId:"izu_eval",mode:"narration",text:"The instructor evaluates route, evidence, target result and any secondary occurrence rather than reducing the Origin to catch/fail.",onEnterConsequences:[
-R("izu_tracking_32900","academy_izuno",tracking,c=>({reliableEnvironmentalTrackingEstablished:c.environmental===true,falseTrailCorrectlyDiscovered:c.falseTrail===true,pursuitOutcome:c.outcome||null}),c=>c.environmental||c.falseTrail?["IZU-01"]:[]),
-R("izu_intercept_32900","academy_izuno",intercept,c=>({interceptReachedByPrediction:c.predicted===true,pursuitOutcome:c.outcome||null}),c=>c.predicted?["IZU-02"]:[]),
-R("izu_coop_32900","academy_izuno",coop,c=>({cooperatedWithAcademyStudents:c.cooperated===true,cooperatingParticipantRefs:[]}),c=>c.cooperated?["IZU-03"]:[]),
-R("izu_rogue_32900","academy_izuno",rogue,c=>({rogueGeninInterruptionResolvedByWasabiAction:c.rogueResolved===true,rogueGeninResponse:c.rogueResponse||null,battleOccurrenceIds:[]}),c=>c.rogueResolved?["IZU-04"]:[],{participantRefs:["wasabi_origin_rogue_genin_01","wasabi_origin_interference_student"]})],nextBeatId:"izu_reflect"},
-{beatId:"izu_reflect",mode:"choice",text:"What does Wasabi carry forward?",choices:[C("trust_trail","Next time I'll trust the trail.","izu_end"),C("trust_notice","Next time I'll trust what I notice.","izu_end"),C("fastest_not_obvious","Sometimes the fastest path isn't the obvious one.","izu_end"),C("catch_not_only","Catching them wasn't the only thing that mattered.","izu_end")]},
-{beatId:"izu_end",mode:"narration",text:"No Speed/Agility stat, morality score or automatic specialization is created.",exitScene:true}],onCompleteConsequences:[X("academy_izuno",[tracking,intercept,coop,rogue])]});})();
+function izunoBackdropKey32900(beatId){
+  const id=String(beatId||"");
+  if(id.startsWith("izu_open_"))return"practical";
+  if(id.startsWith("izu_trail_")||id==="izu_initial_choice"||id.startsWith("izu_initial_"))return"rooftop";
+  if(id.startsWith("izu_split_intro_")||id==="izu_split_choice")return"mainStreet";
+  if(id.startsWith("izu_river_"))return"river";
+  if(id.startsWith("izu_stronger_"))return"narrowYard";
+  if(id.startsWith("izu_intercept_"))return"mainStreet";
+  if(
+    id.startsWith("izu_finish_")||
+    id.startsWith("izu_rogue_call_help_finish_")||
+    id.startsWith("izu_rogue_keep_finish_")||
+    id.startsWith("izu_eval_")||
+    id.startsWith("izu_after_")||
+    id.startsWith("izu_reflect")
+  )return"training";
+  if(id.startsWith("izu_close_"))return"mainStreet";
+  if(id.startsWith("izu_rogue_"))return"alley";
+  return null;
+}
+function izunoSceneLabel32900(beatId){
+  const id=String(beatId||"");
+  if(id.startsWith("izu_open_"))return"HEAD START";
+  if(id.startsWith("izu_trail_")||id==="izu_initial_choice"||id.startsWith("izu_initial_"))return"THE TRAIL";
+  if(id.startsWith("izu_split_intro_")||id==="izu_split_choice")return"THE SPLIT";
+  if(id.startsWith("izu_river_"))return"THE RIVER";
+  if(id.startsWith("izu_stronger_"))return"THE STRONGER TRAIL";
+  if(id.startsWith("izu_intercept_"))return"THE INTERCEPT";
+  if(id.startsWith("izu_finish_")||id.startsWith("izu_rogue_call_help_finish_")||id.startsWith("izu_rogue_keep_finish_"))return"THE FINISH";
+  if(id.startsWith("izu_eval_"))return"WHAT THE INSTRUCTOR SAW";
+  if(id.startsWith("izu_after_")||id.startsWith("izu_reflect"))return"AFTER";
+  if(id.startsWith("izu_close_"))return"ORIGIN CLOSE";
+  if(id.startsWith("izu_rogue_"))return"THE SHOUTING";
+  return"ACADEMY WASABI IZUNO";
+}
+function izunoBackdropProjection32900(beatId){
+  if(String(beatId||"")==="izu_receipt")return null;
+  const key=izunoBackdropKey32900(beatId),row=key&&IZUNO_BACKDROPS[key]||null;
+  return row?{assetId:row.assetId,assetPath:row.assetPath}:null;
+}
+function izunoActorKeys32900(beatId){
+  const id=String(beatId||"");
+  if(id==="izu_receipt")return[];
+  if(id.startsWith("izu_open_"))return["wasabi","instructor"];
+  if(id.startsWith("izu_river_"))return["wasabi","target"];
+  if(id.startsWith("izu_finish_river_")||id.startsWith("izu_finish_intercept_"))return["wasabi","target","proctor"];
+  if(id.startsWith("izu_finish_false_"))return["wasabi","instructor","target"];
+  if(id.startsWith("izu_finish_secondary_")||id.startsWith("izu_rogue_call_help_finish_")||id.startsWith("izu_rogue_keep_finish_"))return["wasabi","target"];
+  if(id.startsWith("izu_eval_"))return["wasabi","instructor"];
+  if(id.startsWith("izu_after_river_")||id.startsWith("izu_after_false_"))return["wasabi","target"];
+  if(id.startsWith("izu_after_direct_")||id.startsWith("izu_after_secondary_")||id.startsWith("izu_after_rogue_call_")||id.startsWith("izu_after_rogue_keep_"))return["wasabi","student1"];
+  if(id.startsWith("izu_close_"))return["wasabi","student1","target"];
+  if(id.startsWith("izu_rogue_")&&!id.startsWith("izu_rogue_step_in_battle"))return["wasabi","student1","rogue"];
+  return["wasabi"];
+}
+function izunoActors32900(beatId,performance){
+  const speaker=String(performance&&performance.cue&&(performance.cue.speakerName||performance.cue.speaker)||"").trim().toUpperCase();
+  const keys=izunoActorKeys32900(beatId);
+  const speakerKey={
+    "WASABI":"wasabi",
+    "ACADEMY INSTRUCTOR":"instructor",
+    "ACADEMY STUDENT":"student1",
+    "ACADEMY STUDENT 2":"student2",
+    "PROCTOR":"proctor",
+    "TARGET":"target",
+    "ROGUE GENIN":"rogue"
+  }[speaker]||null;
+  if(speakerKey&&!keys.includes(speakerKey))keys.push(speakerKey);
+  return keys.slice(0,3).map((key,index)=>{
+    const row=IZUNO_ACTORS[key];
+    return{...row,focus:speaker?String(row.label||"").toUpperCase()===speaker:index===0};
+  });
+}
+function wasabiReceiptLines32900(){
+  const c=A.clone(local()),lines=[
+    "YOUR ORIGIN",
+    "ACADEMY WASABI IZUNO",
+    "",
+    "RECORDED IN YOUR CHRONICLE",
+    "",
+    "YOUR DECISIONS"
+  ];
+  const initial={
+    obvious_trail:"Trusted the obvious pursuit trail.",
+    environmental_signs:"Stopped to look for better environmental signs.",
+    cooperate_students:"Worked with the other Academy students.",
+    predict_destination:"Focused on where the target was going."
+  };
+  const route={
+    river_route:"Took the river route.",
+    stronger_trail:"Followed the stronger trail.",
+    rogue_interruption:"Checked the shouting during the pursuit.",
+    intercept_prediction:"Cut for the intercept."
+  };
+  const rogueChoice={
+    intervene:"Stepped in against the Rogue Genin.",
+    call_for_help:"Called for help at the Rogue Genin interruption.",
+    keep_pursuing:"Kept pursuing the target."
+  };
+  const reflection={
+    river_hard_way:"I caught them the hard way.",
+    river_beat_time:"Next time I beat that time.",
+    river_head_start:"Give them a bigger head start.",
+    river_rematch:"I want the rematch.",
+    intercept_first:"Why chase from behind if I can get there first?",
+    intercept_route:"The route mattered more than the trail.",
+    intercept_read:"I trusted my read. It worked.",
+    intercept_sooner:"Next time I cut them off sooner.",
+    false_got_me:"They got me with that one.",
+    false_saw_late:"I saw the trick. Just too late.",
+    false_check_fit:"Next time I check what doesn't fit.",
+    false_better_trick:"They'll need a better trick next time.",
+    step_again:"I'd step in again.",
+    step_faster:"Next time I end the fight faster.",
+    step_finished:"The target got away. I still finished what I started.",
+    step_time_cost:"I need to know how much time a fight really costs.",
+    call_faster:"Calling the instructor was faster.",
+    call_student_moving:"I got the student moving.",
+    call_handoff:"Next time I hand it off sooner.",
+    call_watch_both:"I can watch the chase and the people in it.",
+    keep_target:"I chose the target.",
+    keep_waited:"I waited too long before I moved.",
+    keep_decide:"Next time I decide immediately.",
+    keep_another_shot:"Give me another shot at the chase."
+  };
+  if(initial[c.initial])lines.push("• "+initial[c.initial]);
+  if(route[c.route])lines.push("• "+route[c.route]);
+  if(rogueChoice[c.rogueGeninResponse])lines.push("• "+rogueChoice[c.rogueGeninResponse]);
+  if(reflection[c.reflection])lines.push("• "+reflection[c.reflection]);
+  lines.push("","WHAT HAPPENED");
+  const outcome={
+    arrive_just_after_target:"Reached extraction just after the target.",
+    false_trail_discovered:"Discovered that the stronger trail was false.",
+    secondary_occurrence_costs_pursuit:"The Rogue Genin interruption cost time in the pursuit.",
+    intercept_before_extraction:"Reached the target before extraction.",
+    direct_catch:"Caught the target before extraction."
+  };
+  if(outcome[c.outcome])lines.push("• "+outcome[c.outcome]);
+  if(c.rogueBattleResult==="victory")lines.push("• Defeated the Rogue Genin in the PL Battle.");
+  if(c.rogueBattleResult==="defeat")lines.push("• Wasabi withdrew after her Battle PL was depleted.");
+  lines.push("","HISTORY CREATED");
+  const trackingRow=A.findOccurrence(tracking),interceptRow=A.findOccurrence(intercept),coopRow=A.findOccurrence(coop),rogueRow=A.findOccurrence(rogue);
+  if(trackingRow&&trackingRow.fact&&trackingRow.fact.reliableEnvironmentalTrackingEstablished===true)lines.push("• Reliable environmental tracking was demonstrated.");
+  if(trackingRow&&trackingRow.fact&&trackingRow.fact.falseTrailCorrectlyDiscovered===true)lines.push("• The planted false trail was recognised.");
+  if(interceptRow&&interceptRow.fact&&interceptRow.fact.interceptReachedByPrediction===true)lines.push("• Wasabi predicted the target's route and reached the intercept.");
+  if(coopRow&&coopRow.fact&&coopRow.fact.cooperatedWithAcademyStudents===true)lines.push("• Wasabi cooperated with other Academy students during the pursuit.");
+  if(rogueRow)lines.push("• The Rogue Genin interruption is part of Wasabi's recorded Origin history.");
+  if(lines[lines.length-1]==="HISTORY CREATED")lines.push("• The completed pursuit exercise is part of Wasabi's Chronicle.");
+  const historyRows=A.history();
+  const purseReceipt=historyRows.find(row=>row&&String(row.rewardSourceId||row.sourceId||"")==="origin_completion_starting_purse_ryo_01"&&(row.originVariantId==="academy_izuno"||row.actorVariantId==="academy_izuno"));
+  const battleReceipt=historyRows.find(row=>row&&String(row.rewardSourceId||row.sourceId||"")==="wasabi_origin_rogue_genin_battle_victory_ryo_01"&&row.actorVariantId==="academy_izuno");
+  const riverReceipt=historyRows.find(row=>row&&row.type==="discipline_development"&&row.subjectVariantId==="academy_izuno"&&row.sourceOccurrenceId===river&&row.disciplineId==="stamina");
+  lines.push("","REWARDS");
+  if(purseReceipt)lines.push("• Origin Starting Purse: +100 Ryō.");
+  if(battleReceipt)lines.push("• Rogue Genin Battle Victory: +50 Ryō.");
+  if(riverReceipt)lines.push("","DEVELOPMENT","• Stamina Development: +1.");
+  return lines;
+}
+function buildWasabiReceipt32900(){return wasabiReceiptLines32900().join("\n");}
+function registerWasabiOriginPresentation32900(){
+  try{
+    const registerPath=typeof registerSceneBackdropAssetPath==="function"?registerSceneBackdropAssetPath:globalThis.registerSceneBackdropAssetPath;
+    if(typeof registerPath==="function")for(const row of Object.values(IZUNO_BACKDROPS))registerPath(row.assetId,row.assetPath);
+  }catch(_error){}
+  const registerBoard=()=>{
+    if(typeof globalThis.registerStorySceneBoardDefinition!=="function")return{success:false,reason:"story_scene_board_not_loaded"};
+    const closeLastBeatId="izu_close_"+G("origin_close").length;
+    return globalThis.registerStorySceneBoardDefinition(scene,{
+      resolve:({beatId,performance})=>({
+        mode:String(beatId||"")==="izu_receipt"?"record":"conversation",
+        location:String(beatId||"")==="izu_receipt"?"YOUR ORIGIN":izunoSceneLabel32900(beatId),
+        actors:izunoActors32900(beatId,performance)
+      }),
+      resolveBackdrop:({beatId})=>izunoBackdropProjection32900(beatId),
+      performanceSequences:{
+        izu_receipt:()=>[{kind:"record",text:buildWasabiReceipt32900()}]
+      },
+      performanceTransitions:{[closeLastBeatId]:"wipe_right_to_left"}
+    });
+  };
+  if(globalThis.SC_STORY_SCENE_BOARD_33900)return registerBoard();
+  const queue=globalThis.SC_STORY_SCENE_BOARD_PENDING_REGISTRATIONS||(globalThis.SC_STORY_SCENE_BOARD_PENDING_REGISTRATIONS=[]);
+  if(!queue.some(row=>row&&row.id==="academy_izuno_backdrops_343"))queue.push({id:"academy_izuno_backdrops_343",register:registerBoard});
+  return{success:true,queued:true};
+}
+function norm(cue){return cue.kind==="dialogue"?{mode:"dialogue",speakerName:cue.speakerName,text:cue.text}:{mode:"narration",text:cue.text};}
+function seq(prefix,cues,nextBeatId,{first={},last={}}={}){
+  const rows=Array.isArray(cues)?cues:[];
+  if(!rows.length)throw new Error("wasabi_golden_empty_sequence:"+prefix);
+  rows.forEach((cue,index)=>{
+    const beatId=prefix+"_"+(index+1),lastRow=index===rows.length-1;
+    beats.push({beatId,...norm(cue),nextBeatId:lastRow?(nextBeatId||null):prefix+"_"+(index+2),...(index===0?first:{}),...(lastRow?last:{})});
+  });
+  return prefix+"_1";
+}
+function avail(fn){return()=>({available:!!fn(),knownBlocker:fn()?null:"wasabi_golden_branch_not_current"});}
+function local(){const a=A.active();return a&&a.localContext&&typeof a.localContext==="object"?a.localContext:{};}
+function battleResume(ctx){return ctx&&ctx.sceneContext&&ctx.sceneContext.battleResume||A.active()&&A.active().battleResume||null;}
+function battleSpec(){
+  return{
+    encounterId:"origin_academy_izuno_rogue_genin_step_in",
+    battleConfigId:"academy_izuno_origin_rogue_genin_step_in_battle",
+    environmentPath:IZUNO_BATTLE_ENVIRONMENT,backdrop:IZUNO_BATTLE_ENVIRONMENT,
+    victoryBeatId:"izu_finish_secondary_1",defeatBeatId:"izu_finish_secondary_1",
+    resultProjector:()=>globalThis.projectAcademyWasabiRogueGeninBattle343?globalThis.projectAcademyWasabiRogueGeninBattle343():null,
+    actionLabel:"Start PL Battle",
+    launchResolver:({active:returnActive,returnContext})=>{
+      if(!globalThis.launchAcademyWasabiRogueGeninBattle343)return{success:false,reason:"wasabi_rogue_battle_adapter_missing"};
+      return globalThis.launchAcademyWasabiRogueGeninBattle343({
+        returnContext,storyOccurrenceId:returnActive.instanceId,
+        sourceOccurrenceId:rogue,bindingRef:"academy_izuno.origin.rogue_genin.step_in"
+      });
+    }
+  };
+}
+const captureBattleReturn={requestId:"izu_rogue_step_in_return_343",kind:"domain",resolve:ctx=>{
+  const safe=battleResume(ctx),authored=safe&&safe.authored||null;
+  if(!authored)return{success:false,reason:"wasabi_rogue_battle_resume_missing"};
+  if(authored.sourceOccurrenceId!==rogue||authored.historicalParticipantRef!=="wasabi_origin_rogue_genin_01")return{success:false,reason:"wasabi_rogue_battle_return_identity_mismatch"};
+  if(!["victory","defeat"].includes(authored.battleResult))return{success:false,reason:"wasabi_rogue_battle_result_not_terminal"};
+  const a=A.active();if(!a)return{success:false,reason:"wasabi_story_runtime_missing"};
+  if(!a.localContext||typeof a.localContext!=="object")a.localContext={};
+  a.localContext.rogueGeninResponse="intervene";
+  a.localContext.rogueGeninInterruptionResolvedByWasabiAction=true;
+  a.localContext.rogueResolved=true;
+  a.localContext.battleOccurrenceIds=[authored.battleOccurrenceId];
+  a.localContext.rogueBattleResult=authored.battleResult;
+  a.localContext.rogueGeninBattlePLDepleted=authored.rogueGeninBattlePLDepleted===true;
+  a.localContext.wasabiBattlePLDepleted=authored.wasabiBattlePLDepleted===true;
+  a.localContext.outcome="secondary_occurrence_costs_pursuit";
+  if(typeof savePlayerData==="function")savePlayerData();
+  return{success:true,battleOccurrenceId:authored.battleOccurrenceId,battleResult:authored.battleResult};
+}};
+const trackingCommit=R("izu_tracking_32900","academy_izuno",tracking,c=>({
+  reliableEnvironmentalTrackingEstablished:c.environmental===true,
+  falseTrailCorrectlyDiscovered:c.falseTrail===true,
+  pursuitOutcome:c.outcome||null,
+  academyTrackingRecommendation:c.environmental===true||c.falseTrail===true
+}),c=>c.environmental||c.falseTrail?["IZU-01"]:[],c=>({participantRefs:["wasabi_origin_pursuit_target_01"]}));
+const interceptCommit=R("izu_intercept_32900","academy_izuno",intercept,c=>({
+  interceptReachedByPrediction:c.outcome==="intercept_before_extraction",
+  pursuitOutcome:c.outcome||null,
+  academyTrackingRecommendation:c.outcome==="intercept_before_extraction"
+}),c=>c.outcome==="intercept_before_extraction"?["IZU-02"]:[],c=>({participantRefs:["wasabi_origin_pursuit_target_01"]}));
+const coopCommit=R("izu_coop_32900","academy_izuno",coop,c=>({
+  cooperatedWithAcademyStudents:c.cooperated===true,
+  cooperatingParticipantRefs:c.cooperated===true?["wasabi_origin_pursuit_student_roof_01","wasabi_origin_pursuit_student_street_02"]:[],
+  multiSourceSynthesisEstablished:c.cooperated===true,
+  searchSectorCoordinationEstablished:c.cooperated===true
+}),c=>c.cooperated?["IZU-03"]:[],c=>({participantRefs:c.cooperated===true?["wasabi_origin_pursuit_student_roof_01","wasabi_origin_pursuit_student_street_02"]:[]}));
+const rogueCommit={requestId:"izu_rogue_32900",kind:"domain",resolve:()=>{
+  const c=A.clone(local());
+  if(c.rogueResolved!==true)return{success:true,skipped:true,reason:"izu04_not_factually_resolved_by_wasabi_action"};
+  return A.commitOccurrence("academy_izuno",rogue,{
+    rogueGeninInterruptionResolvedByWasabiAction:true,
+    rogueGeninResponse:c.rogueGeninResponse||null,
+    affectedStudentPhysicallyRemoved:c.rogueGeninResponse==="call_for_help",
+    affectedStudentParticipantRef:"wasabi_origin_interference_student",
+    instructorInvolvement:c.rogueGeninResponse==="call_for_help",
+    battleOccurrenceIds:Array.isArray(c.battleOccurrenceIds)?[...new Set(c.battleOccurrenceIds.filter(Boolean))]:[]
+  },["IZU-04"],{participantRefs:["wasabi_origin_rogue_genin_01","wasabi_origin_interference_student"]});
+}};
+const riverCommit={requestId:"izu_river_endurance_40900",kind:"domain",resolve:()=>{
+  const c=A.clone(local());
+  if(c.route!=="river_route")return{success:true,skipped:true,reason:"river_route_not_selected"};
+  return A.commitOccurrence("academy_izuno",river,{
+    sustainedEnduranceExertion:true,
+    developmentClass:"ordinary_qualified_non_battle_endurance",
+    pursuitOutcome:c.outcome||null
+  },[],{participantRefs:["wasabi_origin_pursuit_target_01"]});
+}};
+function projectWasabiEvidence40900(sourceOccurrenceId,qualificationId,tags,activityFamilyId,targetRefs=[],context={}){
+  const source=A.findOccurrence(sourceOccurrenceId);
+  if(!source||source.committed!==true)return{success:true,skipped:true,reason:"wasabi_specialist_source_not_committed"};
+  if(typeof globalThis.projectSpecialJoninContextualEvidence34700!=="function")return{success:true,skipped:true,reason:"wasabi_specialist_evidence_producer_unavailable"};
+  return globalThis.projectSpecialJoninContextualEvidence34700({
+    subjectVariantId:"academy_izuno",sourceOccurrenceId,qualificationId,tags,significance:1,
+    category:"chronicle_origin",activityFamilyId,causalRootOccurrenceId:sourceOccurrenceId,targetRefs,
+    verified:true,specialistLevel:false,capstoneAuthorized:false,
+    context:{originId:"academy_izuno",sceneId:scene,...context}
+  });
+}
+function commitRiverStamina40900(){
+  const source=A.findOccurrence(river);
+  if(!source||source.committed!==true||!source.fact||source.fact.sustainedEnduranceExertion!==true)return{success:true,skipped:true,reason:"river_endurance_source_not_qualified"};
+  const rows=A.history(),receiptId="discipline_development:academy_izuno:"+river+":stamina";
+  const existing=rows.find(row=>row&&row.type==="discipline_development"&&row.receiptId===receiptId);
+  if(existing)return{success:true,idempotent:true,receipt:A.clone(existing),expGranted:0};
+  if(typeof getCharacterDisciplineProgression!=="function"||typeof processDisciplineLevelUps!=="function"||typeof getPlayerCharacter!=="function")return{success:true,skipped:true,reason:"discipline_progression_api_unavailable"};
+  const character=getPlayerCharacter("academy_izuno"),progression=getCharacterDisciplineProgression("academy_izuno","stamina");
+  if(!character||!progression)return{success:false,reason:"academy_izuno_stamina_progression_missing"};
+  const progressionBefore=A.clone(character.disciplineProgression),statsBefore=A.clone(character.stats),historyLength=rows.length;
+  try{
+    progression.exp=(Number(progression.exp)||0)+1;
+    const levelResult=processDisciplineLevelUps("academy_izuno","stamina");
+    if(!levelResult)throw new Error("stamina_level_processing_failed");
+    const record={
+      receiptId,type:"discipline_development",activity:"origin_development",completed:true,committed:true,success:true,
+      outcome:"discipline_development_granted",subjectVariantId:"academy_izuno",actorVariantId:"academy_izuno",
+      sourceOccurrenceId:river,causalRootId:river,disciplineId:"stamina",developmentClass:"ordinary_qualified_non_battle_endurance",
+      expGranted:1,capSuppressed:false,directPLGrant:0,directStatGrant:false,timestamp:Date.now()
+    };
+    rows.push(record);if(typeof savePlayerData==="function")savePlayerData();
+    return{success:true,idempotent:false,receipt:A.clone(record),expGranted:1,levelResult:A.clone(levelResult)};
+  }catch(error){
+    character.disciplineProgression=progressionBefore;character.stats=statsBefore;while(rows.length>historyLength)rows.pop();
+    return{success:false,reason:"river_stamina_development_commit_failed",error:String(error&&error.message||error)};
+  }
+}
+const progressionCommit={requestId:"izu_progression_40900",kind:"domain",resolve:()=>{
+  const c=A.clone(local()),results=[];
+  if(c.environmental===true||c.falseTrail===true)results.push(projectWasabiEvidence40900(tracking,"reconnaissance.tracker_nin",["reconnaissance.tracker_nin:trail_analysis"],"academy_izuno_origin_tracking",["wasabi_origin_pursuit_target_01"],{environmentalTracking:c.environmental===true,falseTrailDetected:c.falseTrail===true}));
+  if(c.falseTrail===true)results.push(projectWasabiEvidence40900(tracking,"intelligence.counter_intelligence_analyst",["intelligence.counter_intelligence_analyst:deception_detection"],"academy_izuno_origin_tracking",["wasabi_origin_pursuit_target_01"],{falseTrailDetected:true}));
+  if(c.outcome==="intercept_before_extraction")results.push(projectWasabiEvidence40900(intercept,"reconnaissance.tracker_nin",["reconnaissance.tracker_nin:route_intercept_execution"],"academy_izuno_origin_intercept",["wasabi_origin_pursuit_target_01"],{interceptReachedByPrediction:true}));
+  if(c.cooperated===true){
+    results.push(projectWasabiEvidence40900(coop,"intelligence.strategic_intelligence_analyst",["intelligence.strategic_intelligence_analyst:multi_source_analysis"],"academy_izuno_origin_coordinated_search",["wasabi_origin_pursuit_student_roof_01","wasabi_origin_pursuit_student_street_02"],{sharedCausalSource:true}));
+    results.push(projectWasabiEvidence40900(coop,"communications_and_cryptography.battlefield_communications_specialist",["communications_and_cryptography.battlefield_communications_specialist:communications_planning"],"academy_izuno_origin_coordinated_search",["wasabi_origin_pursuit_student_roof_01","wasabi_origin_pursuit_student_street_02"],{sharedCausalSource:true}));
+  }
+  if(c.rogueGeninResponse==="call_for_help"){
+    const source=A.findOccurrence(rogue);
+    if(source&&source.fact&&source.fact.affectedStudentPhysicallyRemoved===true)results.push(projectWasabiEvidence40900(rogue,"covert_operations.extraction_specialist",["covert_operations.extraction_specialist:subject_recovery"],"academy_izuno_origin_subject_recovery",["wasabi_origin_interference_student"],{beneficiaryRef:"wasabi_origin_interference_student",physicalRemovalCommitted:true}));
+  }
+  results.push(commitRiverStamina40900());
+  const failed=results.find(row=>row&&row.success===false);
+  return failed||{success:true,results};
+}};
+
+seq("izu_open",G("scene1"),"izu_trail_1");
+seq("izu_trail",G("scene2"),"izu_initial_choice");
+beats.push({beatId:"izu_initial_choice",mode:"choice",text:"",choices:[
+  C("obvious_trail","TAKE THE OBVIOUS TRAIL","izu_initial_obvious_1",{initial:"obvious_trail"}),
+  C("environmental_signs","LOOK FOR SOMETHING BETTER","izu_initial_better_1",{initial:"environmental_signs",environmental:true}),
+  C("cooperate_students","WORK WITH THE OTHERS","izu_initial_cooperate_1",{initial:"cooperate_students",cooperated:true}),
+  C("predict_destination","FORGET THE TRAIL — WHERE ARE THEY GOING?","izu_initial_predict_1",{initial:"predict_destination",predictionApproach:true})
+]});
+seq("izu_initial_obvious",G("initial_obvious"),"izu_split_intro_1");
+seq("izu_initial_better",G("initial_better"),"izu_split_intro_1");
+seq("izu_initial_cooperate",G("initial_cooperate"),"izu_split_intro_1");
+seq("izu_initial_predict",G("initial_predict"),"izu_split_intro_1");
+seq("izu_split_intro",G("scene3"),"izu_split_choice");
+beats.push({beatId:"izu_split_choice",mode:"choice",text:"",choices:[
+  C("river_route","TAKE THE RIVER","izu_river_1",{route:"river_route",outcome:"direct_catch"}),
+  C("stronger_trail","FOLLOW THE STRONGER TRAIL","izu_stronger_1",{route:"stronger_trail",falseTrail:true,outcome:"false_trail_discovered"}),
+  C("rogue_interruption","CHECK THE SHOUTING","izu_rogue_intro_1",{route:"rogue_interruption"}),
+  C("intercept_prediction","CUT FOR THE INTERCEPT","izu_intercept_1",{route:"intercept_prediction",outcome:"intercept_before_extraction"})
+]});
+
+seq("izu_river",G("river"),"izu_finish_river_1");
+seq("izu_finish_river",G("finish_river"),"izu_eval_base_1");
+seq("izu_stronger",G("stronger"),"izu_finish_false_1");
+seq("izu_finish_false",G("finish_false"),"izu_eval_base_1");
+seq("izu_intercept",G("intercept"),"izu_finish_intercept_1");
+seq("izu_finish_intercept",G("finish_intercept"),"izu_eval_base_1");
+
+seq("izu_rogue_intro",G("rogue_intro"),"izu_rogue_choice");
+beats.push({beatId:"izu_rogue_choice",mode:"choice",text:"",choices:[
+  C("intervene","STEP IN","izu_rogue_step_in_1",{rogueGeninResponse:"intervene",rogueResponse:"intervene",rogueResolved:false,outcome:"secondary_occurrence_costs_pursuit"}),
+  C("call_for_help","CALL FOR HELP","izu_rogue_call_help_1",{rogueGeninResponse:"call_for_help",rogueResponse:"call_for_help",rogueGeninInterruptionResolvedByWasabiAction:true,rogueResolved:true,battleOccurrenceIds:[],outcome:"secondary_occurrence_costs_pursuit"}),
+  C("keep_pursuing","KEEP PURSUING","izu_rogue_keep_pursuing_1",{rogueGeninResponse:"keep_pursuing",rogueResponse:"keep_pursuing",rogueGeninInterruptionResolvedByWasabiAction:false,rogueResolved:false,battleOccurrenceIds:[],outcome:"secondary_occurrence_costs_pursuit"})
+]});
+seq("izu_rogue_step_in",G("rogue_step_in"),"izu_rogue_step_in_battle");
+beats.push({beatId:"izu_rogue_step_in_battle",mode:"battle_transition",text:"",battle:battleSpec()});
+seq("izu_finish_secondary",G("finish_secondary"),"izu_eval_base_1",{first:{onEnterConsequences:[captureBattleReturn]}});
+seq("izu_rogue_call_help",G("rogue_call_help"),"izu_rogue_call_help_finish_1");
+seq("izu_rogue_call_help_finish",G("finish_secondary"),"izu_eval_base_1");
+seq("izu_rogue_keep_pursuing",G("rogue_keep_pursuing"),"izu_rogue_keep_finish_1");
+seq("izu_rogue_keep_finish",G("finish_secondary"),"izu_eval_base_1");
+
+seq("izu_eval_base",G("eval_base"),"izu_eval_route_resolver");
+beats.push({beatId:"izu_eval_route_resolver",mode:"resolver",machineResolved:true,text:"",choices:[
+  C("eval_false","RESOLVE RESULT","izu_eval_false_1",null,{availability:avail(()=>local().outcome==="false_trail_discovered")}),
+  C("eval_intercept","RESOLVE RESULT","izu_eval_intercept_1",null,{availability:avail(()=>local().outcome==="intercept_before_extraction")}),
+  C("eval_river","RESOLVE RESULT","izu_eval_quick_1",null,{availability:avail(()=>local().outcome==="direct_catch")}),
+  C("eval_rogue","RESOLVE RESULT","izu_eval_coop_resolver",null,{availability:avail(()=>local().outcome==="secondary_occurrence_costs_pursuit")})
+]});
+seq("izu_eval_false",G("eval_false"),"izu_eval_coop_resolver");
+seq("izu_eval_intercept",G("eval_intercept"),"izu_eval_coop_resolver");
+seq("izu_eval_quick",G("eval_quick"),"izu_eval_coop_resolver");
+beats.push({beatId:"izu_eval_coop_resolver",mode:"resolver",machineResolved:true,text:"",choices:[
+  C("eval_cooperate_yes","RESOLVE RESULT","izu_eval_cooperate_1",null,{availability:avail(()=>local().cooperated===true)}),
+  C("eval_cooperate_no","RESOLVE RESULT","izu_eval_rogue_resolver",null,{availability:avail(()=>local().cooperated!==true)})
+]});
+seq("izu_eval_cooperate",G("eval_cooperate"),"izu_eval_rogue_resolver");
+beats.push({beatId:"izu_eval_rogue_resolver",mode:"resolver",machineResolved:true,text:"",choices:[
+  C("eval_rogue_intervene","RESOLVE RESULT","izu_eval_rogue_intervene_1",null,{availability:avail(()=>local().rogueGeninResponse==="intervene")}),
+  C("eval_rogue_call","RESOLVE RESULT","izu_eval_rogue_call_1",null,{availability:avail(()=>local().rogueGeninResponse==="call_for_help")}),
+  C("eval_rogue_keep","RESOLVE RESULT","izu_eval_rogue_keep_1",null,{availability:avail(()=>local().rogueGeninResponse==="keep_pursuing")}),
+  C("eval_rogue_none","RESOLVE RESULT","izu_after_base_1",null,{availability:avail(()=>!local().rogueGeninResponse)})
+]});
+seq("izu_eval_rogue_intervene",G("eval_rogue_intervene"),"izu_eval_rogue_intervene_result_resolver");
+beats.push({beatId:"izu_eval_rogue_intervene_result_resolver",mode:"resolver",machineResolved:true,text:"",choices:[
+  C("eval_rogue_victory","RESOLVE RESULT","izu_eval_rogue_intervene_victory_1",null,{availability:avail(()=>local().rogueBattleResult==="victory")}),
+  C("eval_rogue_defeat","RESOLVE RESULT","izu_eval_rogue_intervene_defeat_1",null,{availability:avail(()=>local().rogueBattleResult==="defeat")})
+]});
+seq("izu_eval_rogue_intervene_victory",G("eval_rogue_intervene_victory"),"izu_eval_rogue_intervene_post_1");
+seq("izu_eval_rogue_intervene_defeat",G("eval_rogue_intervene_defeat"),"izu_eval_rogue_intervene_post_1");
+seq("izu_eval_rogue_intervene_post",G("eval_rogue_intervene_post"),"izu_after_base_1");
+seq("izu_eval_rogue_call",G("eval_rogue_call_help"),"izu_after_base_1");
+seq("izu_eval_rogue_keep",G("eval_rogue_keep_pursuing"),"izu_after_base_1");
+
+seq("izu_after_base",G("after_base"),"izu_after_result_resolver",{first:{onEnterConsequences:[trackingCommit,interceptCommit,coopCommit,rogueCommit,riverCommit,progressionCommit]}});
+beats.push({beatId:"izu_after_result_resolver",mode:"resolver",machineResolved:true,text:"",choices:[
+  C("after_river","RESOLVE RESULT","izu_after_river_1",null,{availability:avail(()=>local().outcome==="direct_catch")}),
+  C("after_false","RESOLVE RESULT","izu_after_false_1",null,{availability:avail(()=>local().outcome==="false_trail_discovered")}),
+  C("after_intercept","RESOLVE RESULT","izu_after_direct_1",null,{availability:avail(()=>local().outcome==="intercept_before_extraction")}),
+  C("after_secondary","RESOLVE RESULT","izu_after_secondary_resolver",null,{availability:avail(()=>local().outcome==="secondary_occurrence_costs_pursuit")})
+]});
+seq("izu_after_river",G("after_river"),"izu_reflect_river");
+seq("izu_after_false",G("after_false"),"izu_reflect_false");
+seq("izu_after_direct",G("after_direct"),"izu_reflect_intercept");
+beats.push({beatId:"izu_after_secondary_resolver",mode:"resolver",machineResolved:true,text:"",choices:[
+  C("after_step","RESOLVE RESULT","izu_after_secondary_1",null,{availability:avail(()=>local().rogueGeninResponse==="intervene")}),
+  C("after_call","RESOLVE RESULT","izu_after_rogue_call_1",null,{availability:avail(()=>local().rogueGeninResponse==="call_for_help")}),
+  C("after_keep","RESOLVE RESULT","izu_after_rogue_keep_1",null,{availability:avail(()=>local().rogueGeninResponse==="keep_pursuing")})
+]});
+seq("izu_after_secondary",G("after_secondary"),"izu_reflect_step_in");
+seq("izu_after_rogue_call",G("after_rogue_call_help"),"izu_reflect_call_for_help");
+seq("izu_after_rogue_keep",G("after_rogue_keep_pursuing"),"izu_reflect_keep_pursuing");
+
+beats.push({beatId:"izu_reflect_river",mode:"choice",text:"",choices:[
+  C("river_hard_way","I caught them the hard way.","izu_close_1",{reflection:"river_hard_way"}),
+  C("river_beat_time","Next time I beat that time.","izu_close_1",{reflection:"river_beat_time"}),
+  C("river_head_start","Give them a bigger head start.","izu_close_1",{reflection:"river_head_start"}),
+  C("river_rematch","I want the rematch.","izu_close_1",{reflection:"river_rematch"})
+]});
+beats.push({beatId:"izu_reflect_intercept",mode:"choice",text:"",choices:[
+  C("intercept_first","Why chase from behind if I can get there first?","izu_close_1",{reflection:"intercept_first"}),
+  C("intercept_route","The route mattered more than the trail.","izu_close_1",{reflection:"intercept_route"}),
+  C("intercept_read","I trusted my read. It worked.","izu_close_1",{reflection:"intercept_read"}),
+  C("intercept_sooner","Next time I cut them off sooner.","izu_close_1",{reflection:"intercept_sooner"})
+]});
+beats.push({beatId:"izu_reflect_false",mode:"choice",text:"",choices:[
+  C("false_got_me","They got me with that one.","izu_close_1",{reflection:"false_got_me"}),
+  C("false_saw_late","I saw the trick. Just too late.","izu_close_1",{reflection:"false_saw_late"}),
+  C("false_check_fit","Next time I check what doesn't fit.","izu_close_1",{reflection:"false_check_fit"}),
+  C("false_better_trick","They'll need a better trick next time.","izu_close_1",{reflection:"false_better_trick"})
+]});
+beats.push({beatId:"izu_reflect_step_in",mode:"choice",text:"",choices:[
+  C("step_again","I'd step in again.","izu_close_1",{reflection:"step_again"}),
+  C("step_faster","Next time I end the fight faster.","izu_close_1",{reflection:"step_faster"}),
+  C("step_finished","The target got away. I still finished what I started.","izu_close_1",{reflection:"step_finished"}),
+  C("step_time_cost","I need to know how much time a fight really costs.","izu_close_1",{reflection:"step_time_cost"})
+]});
+beats.push({beatId:"izu_reflect_call_for_help",mode:"choice",text:"",choices:[
+  C("call_faster","Calling the instructor was faster.","izu_close_1",{reflection:"call_faster"}),
+  C("call_student_moving","I got the student moving.","izu_close_1",{reflection:"call_student_moving"}),
+  C("call_handoff","Next time I hand it off sooner.","izu_close_1",{reflection:"call_handoff"}),
+  C("call_watch_both","I can watch the chase and the people in it.","izu_close_1",{reflection:"call_watch_both"})
+]});
+beats.push({beatId:"izu_reflect_keep_pursuing",mode:"choice",text:"",choices:[
+  C("keep_target","I chose the target.","izu_close_1",{reflection:"keep_target"}),
+  C("keep_waited","I waited too long before I moved.","izu_close_1",{reflection:"keep_waited"}),
+  C("keep_decide","Next time I decide immediately.","izu_close_1",{reflection:"keep_decide"}),
+  C("keep_another_shot","Give me another shot at the chase.","izu_close_1",{reflection:"keep_another_shot"})
+]});
+seq("izu_close",G("origin_close"),"izu_receipt");
+beats.push({beatId:"izu_receipt",mode:"record",text:"",exitScene:true,onEnterConsequences:[X("academy_izuno",[tracking,intercept,coop,rogue,river])]});
+registerWasabiOriginPresentation32900();
+
+A.register({
+  sceneId:scene,eventId:scene,title:"ACADEMY WASABI IZUNO",entryBeatId:"izu_open_1",participants:[],beats,
+  onCompleteConsequences:[X("academy_izuno",[tracking,intercept,coop,rogue,river])]
+});})();
+
 // Mirai
 (()=>{const sub="occ_origin_mirai_substitution_verification_resolution",checkpoint="occ_origin_mirai_checkpoint_escort_resolution",scene=A.sceneByVariant.academy_mirai;
 const MIRAI_PRESENTATION_ENV=Object.freeze({

@@ -74,6 +74,7 @@ function beginOrigin(id){selectOrigin(id);const r=context.beginAlphaChronicleOri
 try{
   // Exact production Origin package order, then both browser-realisation layers.
   load("runtime/alpha-origin-scenes-32900-core.js");
+  load("runtime/academy-wasabi-writing-golden-343.js");
   registerStoryScene({sceneId:"origin_academy_menma_prologue",entryBeatId:"menma",beats:[{beatId:"menma",mode:"narration",text:"Menma",exitScene:true}],onCompleteConsequences:[]});
   load("runtime/alpha-origin-scenes-32900-a.js");load("runtime/alpha-origin-scenes-32900-b.js");load("runtime/alpha-origin-scenes-32900-c.js");load("runtime/alpha-origin-scenes-32900-integrator.js");load("runtime/alpha-origin-browser-realisation-33500.js");load("runtime/alpha-origin-choice-reaction-33510.js");
 
@@ -85,28 +86,38 @@ try{
   assert("story_backdrop_stack_above_world",!!style&&style.textContent.includes("z-index:0!important")&&style.textContent.includes("z-index:2!important"));
   assert("browser_golden_not_claimed",diag.browserGoldenClaimed===false&&diag2.browserGoldenClaimed===false);
 
-  // Public Origin dispatcher -> rendered DOM choice -> public advance handler.
+  // Public Origin dispatcher -> native benchmark Kushina chain -> rendered choices.
   beginOrigin("academy_kushina");
+  assert("kushina_native_benchmark_entry",render.beatId==="kus_practical_01",render);
+  continueUntil("kus_crisis");
   assert("kushina_real_entry_choice",render.beatId==="kus_crisis"&&render.buttons.length===4,render);
   clickChoice("correct_formula");
-  assert("one_click_reaches_exact_next_beat",render.beatId==="kus_reverse"&&render.text.includes("reverse-summoning"),render);
-  clickContinue();
-  assert("continue_does_not_skip_multiple_beats",render.beatId==="kus_gero_1"&&render.text.includes("not where I was"),render);
-  clickContinue();clickContinue();clickContinue();
+  assert("one_click_reaches_exact_next_beat",render.beatId==="kus_reverse_01"&&render.text.includes("Kushina drops beside the scroll"),render);
+  continueUntil("kus_contact_choice");
   assert("kushina_second_choice_is_rendered",render.beatId==="kus_contact_choice"&&render.buttons.length===4,render);
   clickChoice("ask_who");
-  assert("kushina_second_choice_has_visible_consequence",render.beatId==="kus_contact_result"&&render.text.includes("gives his name: Gerotora"),render);
+  assert("kushina_identity_route_starts_natively",render.beatId==="kus_ask_who_01",render);
+  continueUntil("kus_ask_who_03");
+  assert("kushina_second_choice_has_visible_consequence",render.text==="Gerotora.",render);
 
-  // Two materially different Kurenai player routes must produce visibly different DOM sequences.
-  beginOrigin("academy_kurenai");clickContinue();clickChoice("false_kurenai");clickChoice("rush_bell");
-  assert("kurenai_loss_has_distinct_visible_result",render.beatId==="kur_complete_loss_1"&&render.text.includes("does not obtain the bell"),render);
-  const lossText=render.text;
+  // Two materially different Kurenai routes must traverse the final three-stage Bell Test
+  // and resolve to visibly different authored result classes.
+  beginOrigin("academy_kurenai");continueUntil("kur_approach");clickChoice("false_kurenai");
+  assert("kurenai_loss_stage1_starts_natively",render.beatId==="kur_stage1_false_01"&&render.text.includes("second Kurenai breaks toward the bell"),render);
+  continueUntil("kur_stage2_false");clickChoice("rush_bell");
+  continueUntil("kur_stage3_false_rush");clickChoice("take_bell_now");
+  assert("kurenai_loss_enters_complete_loss_result",render.beatId==="kur_resolve_false_rush_take",render);
+  const lossSequence=continueUntil("kur_eval_complete_loss_01").map(x=>x.text);
+  assert("kurenai_loss_has_distinct_visible_result",lossSequence.some(t=>t.includes("hand closes on empty air"))&&lossSequence.some(t=>t==="Too early."),lossSequence);
 
-  beginOrigin("academy_kurenai");clickContinue();clickChoice("fake_clumsy");clickChoice("rush_bell");clickChoice("let_him_think_caught");
-  assert("kurenai_win_enters_full_authored_chain",render.beatId==="kur_complete_win_result_1",render);
-  const winSequence=[];for(let i=0;i<6;i++){winSequence.push(render.text);clickContinue();}
-  assert("kurenai_win_chain_contains_locked_dialogue",winSequence.some(t=>t.includes("Have you?"))&&winSequence.some(t=>t==="Yes.")&&winSequence.some(t=>t.includes("genuinely holding the bell")),winSequence);
-  assert("kurenai_choices_do_not_reconverge_to_same_text",lossText!==winSequence[0]);
+  beginOrigin("academy_kurenai");continueUntil("kur_approach");clickChoice("fake_direct");
+  assert("kurenai_win_stage1_starts_natively",render.beatId==="kur_stage1_direct_01",render);
+  continueUntil("kur_stage2_direct");clickChoice("rush_bell");
+  continueUntil("kur_stage3_direct_rush");clickChoice("let_instructor_think_caught");
+  assert("kurenai_win_enters_complete_win_result",render.beatId==="kur_resolve_direct_rush_caught",render);
+  const winSequence=continueUntil("kur_eval_complete_win_01").map(x=>x.text);
+  assert("kurenai_win_chain_contains_locked_dialogue",winSequence.some(t=>t==="Got you.")&&winSequence.some(t=>t==="Have you?")&&winSequence.some(t=>t==="Yes.")&&winSequence.some(t=>t==="You were saying?"),winSequence);
+  assert("kurenai_choices_do_not_reconverge_to_same_text",lossSequence[0]!==winSequence[0]);
 
   // Hinata GOLDEN: connected exchanges alter the opponent and mixed history selects the contextual evaluation.
   beginOrigin("academy_hinata");
@@ -126,11 +137,12 @@ try{
   beginOrigin("academy_mirai");clickContinue();clickChoice("ask_route");
   assert("mirai_prior_choice_changes_later_evidence",render.beatId==="mir_inconsistent"&&render.text.includes("route the escort described"),render);
 
-  // Wasabi route and Iwabee terrain choice both change visible successor realization.
-  beginOrigin("academy_izuno");clickContinue();clickChoice("environmental_signs");clickChoice("stronger_trail");
-  assert("wasabi_route_choice_has_visible_successor",render.beatId==="izu_route_result"&&render.text.includes("false trail"),render);
-  beginOrigin("academy_iwabee");clickContinue();clickChoice("build_path");
-  assert("iwabee_terrain_choice_changes_visible_world_result",render.beatId==="iwa_expose"&&render.text.includes("builds a stable path"),render);
+  // Wasabi #343 complete rewrite v2 owns the native visible route successor.
+  // 33500 must stand down and preserve that exact authored route presentation.
+  beginOrigin("academy_izuno");continueUntil("izu_initial_choice");clickChoice("environmental_signs");continueUntil("izu_split_choice");clickChoice("stronger_trail");
+  assert("wasabi_route_choice_has_visible_successor",render.beatId==="izu_stronger_1"&&render.text==="The inland trail looks perfect.",render);
+  beginOrigin("academy_iwabee");continueUntil("iwa_reshape");clickChoice("build_path");
+  assert("iwabee_natural_voice_terrain_choice_has_native_visible_successor",render.beatId==="iwa_path_01"&&render.text.includes("The path locks into place."),render);
 
   // Academy Kakashi legacy Origin is intentionally absent during the V2 clean-room rebuild.
   selectOrigin("academy_kakashi");

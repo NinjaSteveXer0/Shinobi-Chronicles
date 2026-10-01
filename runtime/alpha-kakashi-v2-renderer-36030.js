@@ -35,6 +35,7 @@ function cueState(){
   if(typeof getAcademyKakashiV2TransitionState36040==="function")return getAcademyKakashiV2TransitionState36040();
   const p=projection(),cues=p&&p.cues||[];return{cueIndex:0,cueCount:cues.length,atEnd:cues.length<=1};
 }
+// Owner lock 2026-09-28: narration/dialogue frame outlines are cyan for every speaker side.
 function installStyle(){
   if(typeof document==="undefined"||!document.head||document.getElementById(STYLE_ID))return;
   const s=document.createElement("style");s.id=STYLE_ID;s.textContent=`
@@ -119,8 +120,8 @@ function installStyle(){
 #${ROOT_ID} .kv2-speech{position:absolute;left:var(--kv2-speech-x,50%);bottom:23.5%;z-index:31;width:min(36vw,500px);box-sizing:border-box;transform:translateX(-50%);padding:12px 15px 13px;border:1px solid rgba(103,221,230,.55);border-radius:16px;background:linear-gradient(145deg,rgba(4,18,24,.94),rgba(2,9,14,.97));box-shadow:0 18px 48px rgba(0,0,0,.48),0 0 22px rgba(78,210,220,.08);backdrop-filter:blur(8px);pointer-events:none}
 #${ROOT_ID} .kv2-speech[hidden]{display:none!important}
 #${ROOT_ID} .kv2-speech::after{content:"";position:absolute;left:var(--kv2-speech-tail,50%);top:-8px;width:14px;height:14px;transform:translateX(-50%) rotate(45deg);border-left:1px solid rgba(103,221,230,.5);border-top:1px solid rgba(103,221,230,.5);background:rgba(2,9,14,.97)}
-#${ROOT_ID} .kv2-speech[data-speaker-side="opposition"]{border-color:rgba(218,176,77,.58);background:linear-gradient(145deg,rgba(25,18,6,.93),rgba(8,10,12,.97));box-shadow:0 18px 48px rgba(0,0,0,.48),0 0 22px rgba(218,176,77,.08)}
-#${ROOT_ID} .kv2-speech[data-speaker-side="opposition"]::after{border-color:rgba(218,176,77,.52);background:rgba(8,10,12,.97)}
+#${ROOT_ID} .kv2-speech[data-speaker-side="opposition"]{border-color:rgba(103,221,230,.55);background:linear-gradient(145deg,rgba(25,18,6,.93),rgba(8,10,12,.97));box-shadow:0 18px 48px rgba(0,0,0,.48),0 0 22px rgba(78,210,220,.08)}
+#${ROOT_ID} .kv2-speech[data-speaker-side="opposition"]::after{border-color:rgba(103,221,230,.5);background:rgba(8,10,12,.97)}
 #${ROOT_ID} .kv2-speech-name{color:#78dfe7;font-size:8px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}
 #${ROOT_ID} .kv2-speech[data-speaker-side="opposition"] .kv2-speech-name{color:#e5c66f}
 #${ROOT_ID} .kv2-speech-text{margin-top:5px;color:#f0f4f1;font-size:clamp(12px,.96vw,16px);line-height:1.42;text-shadow:0 1px 2px #000}
@@ -128,7 +129,7 @@ function installStyle(){
 #${ROOT_ID} .kv2-actions button{position:relative;min-height:40px;border:1px solid rgba(211,171,78,.48);border-radius:10px;background:linear-gradient(180deg,rgba(13,27,33,.96),rgba(5,13,18,.98));color:#eee2c8;padding:8px 10px 8px 36px;text-align:left;font-size:clamp(7px,.56vw,10px);font-weight:900;letter-spacing:.07em;cursor:pointer;transition:border-color .14s ease,color .14s ease,transform .14s ease,background .14s ease}
 #${ROOT_ID} .kv2-actions button::before{content:attr(data-intent-icon);position:absolute;left:11px;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:16px;height:16px;border:1px solid rgba(112,215,224,.3);border-radius:50%;color:#74dce4;font-size:10px}
 #${ROOT_ID} .kv2-actions button:hover,#${ROOT_ID} .kv2-actions button:focus-visible{border-color:#68dce6;color:#8ce5ec;outline:none;background:rgba(10,42,49,.96);transform:translateY(-1px)}
-#${ROOT_ID} .kv2-battle{grid-column:1/-1!important;text-align:center!important;padding-left:10px!important;border-color:rgba(206,91,72,.66)!important;color:#f2c0ae!important;background:linear-gradient(180deg,rgba(67,20,15,.82),rgba(27,9,8,.95))!important}
+#${ROOT_ID} .kv2-battle{grid-column:1/-1!important;justify-self:center!important;width:min(220px,100%)!important;min-height:42px!important;padding:10px 16px!important;border:1px solid rgba(244,82,82,.78)!important;border-radius:6px!important;background:linear-gradient(180deg,#a82222,#5d0d0d)!important;color:#fff!important;text-align:center!important;letter-spacing:.06em!important;box-shadow:0 8px 24px rgba(109,8,8,.26)!important}
 #${ROOT_ID} .kv2-battle::before{display:none!important}
 #${ROOT_ID}[data-preset="chronicle_receipt"] .kv2-top,#${ROOT_ID}[data-preset="chronicle_receipt"] .kv2-actors,#${ROOT_ID}[data-preset="chronicle_receipt"] .kv2-dialogue,#${ROOT_ID}[data-preset="chronicle_receipt"] .kv2-speech{display:none!important}
 #${ROOT_ID} .kv2-receipt{display:none;position:absolute;left:50%;top:50%;width:min(780px,78vw);max-height:76vh;transform:translate(-50%,-50%);z-index:40;box-sizing:border-box;padding:34px 38px;border:1px solid rgba(214,173,74,.72);border-radius:18px;background:linear-gradient(165deg,rgba(6,13,17,.98),rgba(2,7,10,.99));box-shadow:0 36px 90px rgba(0,0,0,.72),inset 0 0 50px rgba(201,162,73,.03);overflow:auto}
@@ -139,6 +140,8 @@ function installStyle(){
 #${ROOT_ID}[data-battle-action-only="true"] .kv2-speaker,#${ROOT_ID}[data-battle-action-only="true"] .kv2-progress,#${ROOT_ID}[data-battle-action-only="true"] .kv2-text,#${ROOT_ID}[data-battle-action-only="true"] .kv2-continue-hint{display:none!important}
 #${ROOT_ID}[data-battle-action-only="true"] .kv2-dialogue{display:grid!important;width:min(56%,720px);padding:10px 14px;grid-template-rows:1fr}
 #${ROOT_ID}[data-battle-action-only="true"] .kv2-actions{grid-row:1;margin-top:0;grid-template-columns:1fr}
+#${ROOT_ID}[data-battle-action-only="true"] .kv2-actions button{justify-self:center;width:min(220px,100%);min-height:42px;padding:10px 16px;border:1px solid rgba(244,82,82,.78);border-radius:6px;background:linear-gradient(180deg,#a82222,#5d0d0d);color:#fff;text-align:center;box-shadow:0 8px 24px rgba(109,8,8,.26)}
+#${ROOT_ID}[data-battle-action-only="true"] .kv2-actions button::before{display:none}
 #${ROOT_ID} .kv2-receipt button{margin-top:24px;width:100%;min-height:40px;border:1px solid rgba(95,215,225,.42);border-radius:10px;background:rgba(7,33,39,.72);color:#78dfe7;font-weight:900;letter-spacing:.1em;cursor:pointer}
 #${ROOT_ID}[data-can-advance="true"]{cursor:pointer}
 #${ROOT_ID}[data-has-choices="true"]{cursor:default}
@@ -644,7 +647,7 @@ function syncStandard(root,p,t){
   const battleReady=t.atEnd&&beat&&beat.mode==="battle_transition";
   root.dataset.battleActionOnly=battleReady&&Number(t.cueCount||0)===0?"true":"false";
   const semanticNext=t.atEnd&&beat&&(isMachineResolvedBeat36030(beat)||(beat.mode!=="choice"&&beat.mode!=="battle_transition"));
-  const actions=choices.length?choices.map(row=>({choiceId:row.choiceId,label:row.label})):battleReady?[{label:"BEGIN PL BATTLE",battle:true}]:[];
+  const actions=choices.length?choices.map(row=>({choiceId:row.choiceId,label:row.label})):battleReady?[{label:"Start PL Battle",battle:true}]:[];
   syncActions(root,actions);
   const actionBox=root.querySelector(".kv2-actions");if(actionBox)actionBox.style.display=actions.length?"grid":"none";
   root.dataset.hasChoices=actions.length?"true":"false";
@@ -652,6 +655,8 @@ function syncStandard(root,p,t){
 }
 function syncReceipt(root,p,t){
   root.dataset.battleActionOnly="false";
+  root.dataset.hasChoices="false";
+  root.dataset.canAdvance="false";
   setBackdrop(root,p.backdrop);
   syncActors(root,[]);
   const cue=currentCue(p,t),pre=root.querySelector(".kv2-receipt pre");
@@ -733,7 +738,7 @@ if(PRE_RENDER){
   try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_e){}
 }
 if(typeof document!=="undefined"){
-  document.addEventListener("keydown",e=>{if(!isActive()||e.defaultPrevented||!(e.key==="Enter"||e.key===" "))return;const tag=String(e.target&&e.target.tagName||"").toLowerCase();if(["input","textarea","select"].includes(tag))return;e.preventDefault();globalThis.advanceAcademyKakashiV236040?globalThis.advanceAcademyKakashiV236040():advanceStoryScene();});
+  document.addEventListener("keydown",e=>{if(!isActive()||e.defaultPrevented||!(e.key==="Enter"||e.key===" "))return;const tag=String(e.target&&e.target.tagName||"").toLowerCase();if(["input","textarea","select","button","a"].includes(tag))return;const root=document.getElementById(ROOT_ID);if(root&&root.dataset.preset==="chronicle_receipt")return;e.preventDefault();globalThis.advanceAcademyKakashiV236040?globalThis.advanceAcademyKakashiV236040():advanceStoryScene();});
 }
 function geometryDiagnostics(){
   if(typeof document==="undefined")return{pass:true,headless:true};

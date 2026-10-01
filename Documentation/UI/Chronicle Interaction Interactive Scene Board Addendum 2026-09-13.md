@@ -270,6 +270,55 @@ Canonical rule:
 
 > **Battle Portraits belong to Battle presentation. Story scenes use authored scene/entity assets. Sharing an identity across surfaces does not collapse the asset families.**
 
+## 7C. GLOBAL NARRATION / DIALOGUE FRAME COLOUR LOCK — 2026-09-28
+
+Stephen-approved global presentation rule:
+
+> **Every ordinary Story narration box and every speaker-owned Story dialogue box uses the cyan/teal Shinobi Chronicles frame outline. Speaker side must never switch the frame to orange, gold or brown.**
+
+This rule applies to **every Origin**, including Academy Kakashi.
+
+Canonical Alpha frame contract:
+
+- **Narration surface**
+  - lower-stage compact strip;
+  - width: `min(72%, 980px)`;
+  - bottom offset: approximately `3%`;
+  - padding: `11px 15px 12px`;
+  - radius: `16px`;
+  - outline: `1px solid rgba(93, 215, 225, .32)`;
+  - speaker/header text: `8px`, bold, compact tracking;
+  - body text: `clamp(12px, .94vw, 15px)`, line-height `1.42`;
+  - compact cue counter in the upper-right of the panel;
+  - subtle `CLICK ANYWHERE TO CONTINUE` hint in the lower-right;
+  - **no visible arrow/CONTINUE button for ordinary narration**;
+  - dark neutral glass fill.
+
+- **Speaker-owned dialogue surface**
+  - anchored to the actual visible speaker;
+  - width: `min(36vw, 500px)`;
+  - bottom offset: approximately `23.5%`;
+  - padding: `12px 15px 13px`;
+  - radius: `16px`;
+  - outline: `1px solid rgba(103, 221, 230, .55)`;
+  - pointer/tail outline: cyan/teal (`rgba(103, 221, 230, .5)`);
+  - speaker label: `8px`, bold, compact tracking;
+  - body text: `clamp(12px, .96vw, 16px)`, line-height `1.42`;
+  - **no visible arrow/CONTINUE button for ordinary dialogue**;
+  - speaker ownership is communicated by card focus, placement, pointer and speaker label — **not by changing the frame to gold/brown**.
+
+The frame/glow colour is presentation-only and must not encode Player / Opposition / Guest / Independent semantic authority.
+
+Speaker-name text or subtle dark fill treatment may still carry bounded presentation variation where useful, but the **outer dialogue/narration outline and dialogue pointer remain cyan/teal globally**.
+
+This lock does **not** recolour Chronicle Receipts, choice/action controls, committed-state callouts, or other components whose existing gold semantics represent committed/pivotal state.
+
+No Origin-local renderer may override this frame rule.
+
+Academy Kakashi is the visual benchmark for these box dimensions/typography. All other Origins must consume the same shared specification rather than maintaining a separate Origin-local dialogue/narration treatment.
+
+---
+
 ## 8. Kakashi reference example — why this matters
 
 The recovered original Academy Kakashi Story is particularly suitable for the scene-board model:
@@ -419,3 +468,32 @@ Only after this benchmark feels like **Shinobi Chronicles gameplay** rather than
 > **Do not illustrate every branch. Recompose authoritative state inside reusable places.**
 
 > **A Story choice that merely selects a different paragraph is not the target. A Story choice should be capable of changing the visible situation, later affordances, factual consequences, or Chronicle-relative reactions where the underlying authority supports it.**
+
+
+---
+
+## GLOBAL ORIGIN RECEIPT INPUT LOCK — 2026-09-29
+
+This is a global Origin presentation/input rule.
+
+- Ordinary Story narration/dialogue keeps click-anywhere advancement.
+- A visible Chronicle Receipt MUST NOT advance from a stage/background click.
+- Enter/Space MUST NOT bypass a Receipt through the global Story advance handler.
+- The player advances a Receipt through its visible Receipt continuation button.
+- Normal keyboard activation of that focused button remains valid.
+- The Receipt button advances exactly once.
+- This rule applies to every Origin, including already-GOLDEN Origins, without changing their Receipt content.
+
+## GLOBAL STORY → PL BATTLE CTA — 2026-09-29
+
+Every current Origin Story → PL Battle seam uses one reusable presentation rule:
+
+- exact visible text: `Start PL Battle`
+- centered
+- compact squared/rectangular treatment
+- red
+- visually distinct as the Battle commitment action
+
+Retire per-Origin variants such as `BEGIN PL BATTLE`, `STOP THE TEST SUBJECTS`, and gold Battle-start controls.
+
+This presentation rule does not alter Battle mechanics, route truth, rewards, or frozen Origin Story content.

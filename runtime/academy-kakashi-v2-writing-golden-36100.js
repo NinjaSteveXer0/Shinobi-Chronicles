@@ -712,10 +712,6 @@ const SECTIONS=Object.freeze({
         "text": "Not with you."
       },
       {
-        "kind": "narration",
-        "text": "A beat."
-      },
-      {
         "kind": "dialogue",
         "speakerName": "ANBU MARKED TARGET",
         "text": "You don't know."
@@ -1166,10 +1162,6 @@ const SECTIONS=Object.freeze({
       {
         "kind": "narration",
         "text": "His eyes flick over Kakashi."
-      },
-      {
-        "kind": "narration",
-        "text": "A beat of surprise."
       },
       {
         "kind": "narration",
@@ -4164,10 +4156,6 @@ const SECTIONS=Object.freeze({
         "text": "No."
       },
       {
-        "kind": "narration",
-        "text": "A beat."
-      },
-      {
         "kind": "dialogue",
         "speakerName": "MINATO",
         "text": "He didn't."
@@ -4603,10 +4591,6 @@ const SECTIONS=Object.freeze({
         "kind": "dialogue",
         "speakerName": "MINATO",
         "text": "This was our test."
-      },
-      {
-        "kind": "narration",
-        "text": "A beat."
       },
       {
         "kind": "dialogue",
@@ -6331,10 +6315,6 @@ const CORRECTED_F07=Object.freeze({
         "text": "The operative reaches the end of the report."
       },
       {
-        "kind": "narration",
-        "text": "A beat."
-      },
-      {
         "kind": "dialogue",
         "speakerName": "ANBU OPERATIVE",
         "text": "Anything else?"
@@ -6554,10 +6534,6 @@ const CORRECTED_F07=Object.freeze({
         "kind": "dialogue",
         "speakerName": "MINATO",
         "text": "No."
-      },
-      {
-        "kind": "narration",
-        "text": "A beat."
       },
       {
         "kind": "dialogue",
@@ -7009,10 +6985,6 @@ const CORRECTED_F07=Object.freeze({
         "kind": "dialogue",
         "speakerName": "MINATO",
         "text": "This was our test."
-      },
-      {
-        "kind": "narration",
-        "text": "A beat."
       },
       {
         "kind": "dialogue",
