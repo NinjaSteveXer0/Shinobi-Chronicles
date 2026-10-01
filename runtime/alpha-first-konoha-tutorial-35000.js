@@ -108,6 +108,13 @@ function applyRecommendedHighlights(){
   return true;
 }
 
+function chooseOpening(choice){
+  if(!["show_me_around","explore_konoha"].includes(choice))return{success:false,reason:"unknown_opening_choice"};
+  const guided=choice==="show_me_around";
+  const result=update({sandboxPopupSeen:true,recommendedRouteEnabled:guided,openingChoice:choice});
+  removePanel();if(guided)applyRecommendedHighlights();else clearRecommendedHighlights();
+  return{...result,freePlayAuthorized:true,recommendedRouteEnabled:guided,currentTeam:clone(team())};
+}
 function openingPopup(){
   const p=progress({create:true});if(!p||p.sandboxPopupSeen===true||!validTeam())return false;
   return showPanel({
@@ -115,8 +122,8 @@ function openingPopup(){
     title:"KONOHA IS OPEN",
     body:`<p>Your Academy team is formed. You are now in Sandbox mode. Explore Konoha at your own pace, or head to the Arena when you are ready to attempt the Genin Promotion Assessment and continue your Chronicle.</p><p>The first time you visit important areas, a short guide will explain what you can do there.</p>`,
     actions:[
-      {id:"show",label:"SHOW ME AROUND",run(){update({sandboxPopupSeen:true,recommendedRouteEnabled:true,openingChoice:"show_me_around"});removePanel();applyRecommendedHighlights();}},
-      {id:"explore",label:"EXPLORE KONOHA",secondary:true,run(){update({sandboxPopupSeen:true,recommendedRouteEnabled:false,openingChoice:"explore_konoha"});removePanel();clearRecommendedHighlights();}}
+      {id:"show",label:"SHOW ME AROUND",run(){chooseOpening("show_me_around");}},
+      {id:"explore",label:"EXPLORE KONOHA",secondary:true,run(){chooseOpening("explore_konoha");}}
     ]
   });
 }
@@ -134,20 +141,23 @@ function practicalTip(){return firstUseTip("practicalTipSeen","PRACTICAL TRAININ
 function examsTip(){return firstUseTip("examsTipSeen","SHINOBI EXAMS","Exams test specific shinobi disciplines and capabilities when you are eligible to take them. They are separate from formal Rank Promotion.");}
 function recordTip(){return firstUseTip("shinobiRecordTipSeen","SHINOBI RECORD","Your Shinobi Record tracks your current journey, missions, intelligence, Chronicle history and development. Use it when you are unsure what has changed or where your Chronicle is heading.");}
 
+function chooseNextStep(choice){
+  if(!["promotion","keep_exploring"].includes(choice))return{success:false,reason:"unknown_next_step_choice"};
+  const result=update({arenaCompletionChoiceSeen:true});removePanel();
+  if(choice==="promotion"&&typeof openArenaPromotionSurface==="function")openArenaPromotionSurface();
+  if(choice==="keep_exploring"){
+    if(typeof openOverlay==="function")openOverlay("village");else if(typeof closeOverlay==="function")closeOverlay();
+  }
+  return{...result,choice};
+}
 function nextStepPopup(){
   const p=progress({create:true});if(!p||p.arenaCompletionChoiceSeen===true||!tipsEnabled())return false;
   return showPanel({
     kind:"arena_next_step",title:"YOUR NEXT STEP",
     body:`<p>You have seen the main routes available to your Academy team. You can take the Genin Promotion Assessment now, or keep exploring Konoha and develop your Chronicle first.</p>`,
     actions:[
-      {id:"promotion",label:"TAKE PROMOTION ASSESSMENT",run(){
-        update({arenaCompletionChoiceSeen:true});removePanel();
-        if(typeof openArenaPromotionSurface==="function")openArenaPromotionSurface();
-      }},
-      {id:"explore",label:"KEEP EXPLORING",secondary:true,run(){
-        update({arenaCompletionChoiceSeen:true});removePanel();
-        if(typeof openOverlay==="function")openOverlay("village");else if(typeof closeOverlay==="function")closeOverlay();
-      }}
+      {id:"promotion",label:"TAKE PROMOTION ASSESSMENT",run(){chooseNextStep("promotion");}},
+      {id:"explore",label:"KEEP EXPLORING",secondary:true,run(){chooseNextStep("keep_exploring");}}
     ]
   });
 }
@@ -260,7 +270,15 @@ globalThis.resolveFirstKonohaTutorialObservation35000=()=>({success:true,skipped
 globalThis.reportFirstKonohaTutorialReady35000=()=>({success:true,skipped:true,reason:"phase2_optional_guidance",freePlayAuthorized:true});
 globalThis.gateFirstKonohaTutorialStanding35000=()=>({gated:0,ids:[],reason:"phase2_free_play_not_tutorial_gated"});
 globalThis.showKonohaSandboxOpening35000=openingPopup;
+globalThis.chooseKonohaSandboxOpening35000=chooseOpening;
 globalThis.applyKonohaRecommendedRoute35000=applyRecommendedHighlights;
+globalThis.showKonohaTrainingTip35000=trainingTip;
+globalThis.showKonohaPracticalTip35000=practicalTip;
+globalThis.showKonohaExamsTip35000=examsTip;
+globalThis.showKonohaArenaGuide35000=arenaGuide;
+globalThis.showKonohaShinobiRecordTip35000=recordTip;
+globalThis.showKonohaNextStep35000=nextStepPopup;
+globalThis.chooseKonohaNextStep35000=chooseNextStep;
 globalThis.setKonohaTutorialTips35000=setTipsEnabled;
 globalThis.runFirstKonohaTutorial35000Diagnostics=diagnostics;
 globalThis.SC_FIRST_KONOHA_TUTORIAL_35000=Object.freeze({
