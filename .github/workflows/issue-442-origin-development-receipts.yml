@@ -29,6 +29,12 @@ jobs:
           node --check runtime/alpha-origin-reward-spectrum-440.js
           node --check tools/qa_issue_440_origin_reward_spectrum.js
           node --check tools/qa_issue_442_origin_development_receipts_browser.js
+          node --check tools/qa_issue_105_origin_presentation_browser.js
+          node --check tools/qa_issue_340_hinata_browser.js
+          node --check tools/qa_obito_story_presentation_browser.js
+          node --check tools/qa_issue_369_menma_evolved_pl_battle_browser.js
+          node --check tools/qa_issue_343_wasabi_browser.js
+          node --check tools/qa_kakashi_v2_browser.js
 
       - name: Reward spectrum + Kurenai classification QA
         run: node tools/qa_issue_440_origin_reward_spectrum.js
@@ -53,8 +59,17 @@ jobs:
       - name: Installed-browser Origin development Receipt matrix
         run: node tools/qa_issue_442_origin_development_receipts_browser.js
 
-      - name: Mirai Menma shared Origin regression
+      - name: Full Story Receipts — Mirai Kurenai Kushina Iwabee Metal
         run: node tools/qa_issue_105_origin_presentation_browser.js
+
+      - name: Full Story Receipt — Hinata
+        run: xvfb-run -a node tools/qa_issue_340_hinata_browser.js
+
+      - name: Full Story Receipt — Obito
+        run: xvfb-run -a node tools/qa_obito_story_presentation_browser.js
+
+      - name: Full Story Receipt — Menma
+        run: xvfb-run -a node tools/qa_issue_369_menma_evolved_pl_battle_browser.js
 
       - name: Menma Battle reward regression
         run: xvfb-run -a node tools/qa_issue_362_menma_reward_browser.js
@@ -64,6 +79,9 @@ jobs:
 
       - name: Kakashi frozen reward and Receipt contract
         run: node tools/qa_kakashi_v2_clean_room.js
+
+      - name: Full Story Receipt — Kakashi
+        run: xvfb-run -a node tools/qa_kakashi_v2_browser.js
 
       - name: Metal Iwabee Battle reward regression
         run: xvfb-run -a node tools/qa_issues_396_399_400_browser.js
