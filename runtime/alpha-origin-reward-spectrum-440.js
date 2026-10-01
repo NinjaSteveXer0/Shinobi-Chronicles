@@ -63,6 +63,19 @@ const DEVELOPMENT_REASONS=Object.freeze({
 
 function clone(v){return A&&typeof A.clone==="function"?A.clone(v):v&&typeof v==="object"?JSON.parse(JSON.stringify(v)):v;}
 function history(){return A&&typeof A.history==="function"?A.history():[];}
+const RUNTIME_DISCIPLINE_ID_440=Object.freeze({
+  ninjutsu:"nin",
+  taijutsu:"tai",
+  genjutsu:"gen",
+  bukijutsu:"buki",
+  fuinjutsu:"fuin",
+  kinjutsu:"kin",
+  stamina:"stamina"
+});
+function runtimeDisciplineId440(disciplineId){
+  const id=String(disciplineId||"").trim().toLowerCase();
+  return RUNTIME_DISCIPLINE_ID_440[id]||id||null;
+}
 function titleDiscipline(id){
   const key=String(id||"").toLowerCase();
   return{taijutsu:"Taijutsu",ninjutsu:"Ninjutsu",bukijutsu:"Bukijutsu",fuinjutsu:"Fūinjutsu",genjutsu:"Genjutsu",stamina:"Stamina"}[key]||String(id||"Development");
@@ -94,12 +107,13 @@ function commitDevelopment440({subjectVariantId,sourceOccurrenceId,progressionSl
   if(typeof getCharacterDisciplineProgression!=="function"||typeof processDisciplineLevelUps!=="function"||typeof getPlayerCharacter!=="function"){
     return{success:true,skipped:true,reason:"discipline_progression_api_unavailable",receipt:null,expGranted:0};
   }
-  const character=getPlayerCharacter(subjectVariantId),progression=getCharacterDisciplineProgression(subjectVariantId,disciplineId);
-  if(!character||!progression)return{success:false,reason:"discipline_progression_missing",subjectVariantId,disciplineId};
+  const runtimeDisciplineId=runtimeDisciplineId440(disciplineId);
+  const character=getPlayerCharacter(subjectVariantId),progression=getCharacterDisciplineProgression(subjectVariantId,runtimeDisciplineId);
+  if(!character||!progression)return{success:false,reason:"discipline_progression_missing",subjectVariantId,disciplineId,runtimeDisciplineId};
   const progressionBefore=clone(character.disciplineProgression),statsBefore=clone(character.stats),historyLength=rows.length;
   try{
     progression.exp=(Number(progression.exp)||0)+grant;
-    const levelResult=processDisciplineLevelUps(subjectVariantId,disciplineId);
+    const levelResult=processDisciplineLevelUps(subjectVariantId,runtimeDisciplineId);
     if(!levelResult)throw new Error("discipline_level_processing_failed");
     rows.push(record);if(typeof savePlayerData==="function")savePlayerData();
     return{success:true,idempotent:false,receipt:clone(record),expGranted:grant,levelResult:clone(levelResult)};
@@ -408,6 +422,7 @@ function diagnostics(){
     metalPrivateAndProtectiveDevelopment:["metal_private_spinning_kick","metal_private_full_force_fist","metal_private_conditioned_endurance","metal_protective_redirect_dummy","metal_protective_destroy_dummy"].every(id=>Object.prototype.hasOwnProperty.call(DEVELOPMENT_REASONS,id)),
     iwabeeEarthReleaseDevelopment:String(projectOccurrence440).includes("iwabee_training_ground_reshape_ninjutsu")&&String(projectOccurrence440).includes("iwabee_rogue_escape_constraint_ninjutsu"),
     kurenaiStageAccuracy:String(kurenaiBellDevelopment440).includes("KURENAI_STAGE1_RESULT")&&KURENAI_STAGE1_RESULT.false_kurenai.requestedExp===1&&KURENAI_STAGE1_RESULT.fake_direct.requestedExp===2&&KURENAI_STAGE2_RESULT["fake_direct|draw_attention"].requestedExp===1,
+    canonicalDisciplineIdBridge:RUNTIME_DISCIPLINE_ID_440.ninjutsu==="nin"&&RUNTIME_DISCIPLINE_ID_440.taijutsu==="tai"&&RUNTIME_DISCIPLINE_ID_440.genjutsu==="gen"&&RUNTIME_DISCIPLINE_ID_440.fuinjutsu==="fuin"&&RUNTIME_DISCIPLINE_ID_440.bukijutsu==="buki"&&RUNTIME_DISCIPLINE_ID_440.kinjutsu==="kin"&&RUNTIME_DISCIPLINE_ID_440.stamina==="stamina",
     sourceScopedDevelopmentIdentity:String(developmentReceiptId).includes("progressionSlotId")&&String(commitDevelopment440).includes("causalRootId===sourceOccurrenceId"),
     noDirectPLOrStatGrant:String(commitDevelopment440).includes("directPLGrant:0")&&String(commitDevelopment440).includes("directStatGrant:false"),
     receiptHidesSpecialistInternals:!String(appendReceiptLines440).includes("qualificationId")&&!String(appendReceiptLines440).includes("significance"),
@@ -421,6 +436,7 @@ const reconciled=reconcileCommitted440();
 globalThis.projectAcademyOriginRewardOccurrence440=projectOccurrence440;
 globalThis.reconcileAcademyOriginRewardSpectrum440=reconcileCommitted440;
 globalThis.getAcademyOriginRewardReceiptProjection440=getReceiptProjection440;
+globalThis.getAcademyOriginRuntimeDisciplineId440=runtimeDisciplineId440;
 globalThis.classifyKurenaiBellDevelopment440=kurenaiBellDevelopment440;
 globalThis.appendAcademyOriginRewardReceipt440=appendReceiptLines440;
 globalThis.runAcademyOriginRewardSpectrum440Diagnostics=diagnostics;
