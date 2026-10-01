@@ -83,10 +83,11 @@ function defaultTutorialProgress(teamRef=null){
 }
 function legacyTutorialProjection(save,progress){
   const receipt=formationReceiptFrom(save),legacy=receipt&&receipt.firstKonohaTutorial&&typeof receipt.firstKonohaTutorial==="object"?receipt.firstKonohaTutorial:null;
-  const a=acquisitionFrom(save),formation=formationFrom(save);
-  const legacyCompleted=!!(legacy&&legacy.completed===true&&legacy.completionReceipt)||!!(formation&&formation.continuationCompleted===true&&a&&a.onboardingStatus==="academy_free_play");
+  const legacyCompleted=!!(legacy&&legacy.completed===true&&legacy.completionReceipt);
   if(legacyCompleted){
-    // #209 only proves the old opening/training/practical orientation happened.
+    // Only an exact committed #209 completion receipt proves the old
+    // opening/training/practical orientation happened. Generic free-play state
+    // is not enough evidence and must not pre-consume the new Sandbox popup.
     // Do not fabricate Exams/Arena/Record tutorial history.
     progress.sandboxPopupSeen=true;
     progress.recommendedRouteEnabled=false;
