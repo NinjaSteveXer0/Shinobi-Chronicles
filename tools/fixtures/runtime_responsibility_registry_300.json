@@ -1492,13 +1492,15 @@
         "executeKonohaPracticalTraining",
         "getDevelopedCharacterStats",
         "getKonohaCharacterActivityData",
-        "getKonohaDisciplineUIPanelData"
+        "getKonohaDisciplineUIPanelData",
+        "runtime/alpha-origin-reward-spectrum-440.js"
       ],
       "stateReads": [
         "committed currentTeam from getChronicleCurrentTeam43600",
         "stable ownedCharacterId / progressionCharacterId from existing Acquisition authority",
         "existing playerData.characters disciplineProgression and canonical Current Stats",
-        "existing playerData.activityHistory causal/idempotence receipts"
+        "existing playerData.activityHistory causal/idempotence receipts",
+        "existing source-owned development receipt provenance from Origin/Battle/Story adapters"
       ],
       "stateWrites": [
         "existing disciplineProgression EXP ledger through one #448 transaction",
