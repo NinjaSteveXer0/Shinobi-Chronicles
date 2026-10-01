@@ -32,9 +32,6 @@ const priorPracticalOpen=typeof openKonohaPracticalFromVillage==="function"?open
 const priorExamOpen=typeof openKonohaExamFromVillage==="function"?openKonohaExamFromVillage:null;
 const priorArenaRender=typeof renderArenaMainOverlay==="function"?renderArenaMainOverlay:null;
 const priorRecordOpen=typeof openShinobiRecord==="function"?openShinobiRecord:null;
-const priorSelectableCharacters=typeof getKonohaSelectableCharacters==="function"?getKonohaSelectableCharacters:null;
-const priorExamVisualRender=typeof renderKonohaExamVisualScreen==="function"?renderKonohaExamVisualScreen:null;
-const priorPracticalVisualRender=typeof renderKonohaPracticalVisualScreen==="function"?renderKonohaPracticalVisualScreen:null;
 
 function clone(value){
   if(value==null)return value;
@@ -47,56 +44,6 @@ function team(){
   return typeof globalThis.getChronicleCurrentTeam43600==="function"?globalThis.getChronicleCurrentTeam43600():null;
 }
 function validTeam(){const t=team();return !!(t&&t.committed===true&&Array.isArray(t.teamVariantIds)&&t.teamVariantIds.length===3&&new Set(t.teamVariantIds).size===3);}
-
-function projectCurrentTeamSelectableCharacters(){
-  const t=team();
-  if(!t||t.committed!==true||!Array.isArray(t.teamVariantIds)||t.teamVariantIds.length!==3){
-    return priorSelectableCharacters?priorSelectableCharacters():[];
-  }
-  if(typeof getPlayerCharacter!=="function"||typeof calculateCurrentPL!=="function")return[];
-  const rows=t.teamVariantIds.map(id=>getPlayerCharacter(id));
-  if(rows.some(row=>!row))return[];
-  return rows.map(character=>({
-    id:character.id,
-    name:character.name,
-    rank:character.rank,
-    rarity:character.rarity||null,
-    image:character.image||null,
-    currentPL:calculateCurrentPL(character)
-  }));
-}
-function naturalizeKonohaActivitySurface(serviceId){
-  if(typeof document==="undefined")return false;
-  const root=document.getElementById("konoha-activity-screen");
-  if(!root||root.dataset.serviceId!==serviceId)return false;
-  root.dataset.phase2CurrentTeam="true";
-  const subtitle=root.querySelector(".alpha-activity-header p");
-  const note=root.querySelector(".alpha-activity-authority-note");
-  if(serviceId==="exams"){
-    if(subtitle)subtitle.textContent="Test one discipline at a time. Choose your shinobi, choose a discipline, then begin.";
-    if(note){
-      const strong=note.querySelector("strong"),span=note.querySelector("span");
-      if(strong)strong.textContent="HOW EXAMS WORK";
-      if(span)span.textContent="Exams test the selected discipline. Rank Promotion is handled separately through the Arena.";
-    }
-  }else if(serviceId==="practical"){
-    if(subtitle)subtitle.textContent="Hands-on discipline training for the shinobi you choose.";
-    if(note){
-      const strong=note.querySelector("strong"),span=note.querySelector("span");
-      if(strong)strong.textContent="HOW PRACTICAL TRAINING WORKS";
-      if(span)span.textContent="Choose a discipline and complete the training. Any development earned is applied to that shinobi.";
-    }
-  }
-  const known=["nin","tai","gen","buki","fuin","kin","stamina"];
-  for(const node of root.querySelectorAll(".alpha-activity-discipline")){
-    for(const id of known)node.classList.remove("is-discipline-"+id);
-    const onclick=node.getAttribute("onclick")||"";
-    const match=onclick.match(/\('([^']+)'\)/);
-    const id=match&&known.includes(match[1])?match[1]:null;
-    if(id){node.classList.add("is-discipline-"+id);node.dataset.disciplineId=id;}
-  }
-  return true;
-}
 function progress({create=true}={}){
   return typeof globalThis.getChronicleTutorialProgress43600==="function"
     ?globalThis.getChronicleTutorialProgress43600({create})
@@ -190,8 +137,8 @@ function firstUseTip(key,title,copy){
   });
 }
 function trainingTip(){return firstUseTip("trainingTipSeen","TRAINING GROUND","Training Grounds let you work with the shinobi you own across My Clan. Practical Training focuses on developing individual disciplines.");}
-function practicalTip(){return firstUseTip("practicalTipSeen","PRACTICAL TRAINING","Choose one of your current team and train a specific discipline through hands-on practice. Development is awarded only for training you actually complete.");}
-function examsTip(){return firstUseTip("examsTipSeen","SHINOBI EXAMS","Choose one of your current team and test a specific discipline. These exams track discipline development; Rank Promotion is handled separately in the Arena.");}
+function practicalTip(){return firstUseTip("practicalTipSeen","PRACTICAL TRAINING","Practical Training puts your current team through hands-on discipline exercises. Complete an exercise to earn the development it awards.");}
+function examsTip(){return firstUseTip("examsTipSeen","SHINOBI EXAMS","Exams test specific shinobi disciplines and capabilities when you are eligible to take them. They are separate from formal Rank Promotion.");}
 function recordTip(){return firstUseTip("shinobiRecordTipSeen","SHINOBI RECORD","Your Shinobi Record tracks your current journey, missions, intelligence, Chronicle history and development. Use it when you are unsure what has changed or where your Chronicle is heading.");}
 
 function chooseNextStep(choice){
@@ -252,19 +199,6 @@ function migrateLegacyPending(){
   return{success:true,migrated:true,freePlayAuthorized:true};
 }
 
-
-if(priorSelectableCharacters){
-  const wrapped=function phase2CurrentTeamKonohaActivityRoster(){return projectCurrentTeamSelectableCharacters();};
-  globalThis.getKonohaSelectableCharacters=wrapped;try{getKonohaSelectableCharacters=wrapped;}catch(_error){}
-}
-if(priorExamVisualRender){
-  const wrapped=function phase2ExamPlayerFacingSurface(){const result=priorExamVisualRender.apply(this,arguments);naturalizeKonohaActivitySurface("exams");return result;};
-  globalThis.renderKonohaExamVisualScreen=wrapped;try{renderKonohaExamVisualScreen=wrapped;}catch(_error){}
-}
-if(priorPracticalVisualRender){
-  const wrapped=function phase2PracticalPlayerFacingSurface(){const result=priorPracticalVisualRender.apply(this,arguments);naturalizeKonohaActivitySurface("practical");return result;};
-  globalThis.renderKonohaPracticalVisualScreen=wrapped;try{renderKonohaPracticalVisualScreen=wrapped;}catch(_error){}
-}
 if(priorContinue){
   const wrapped=function phase2ContinueAcademyTeamFormationToSandbox(){return continueSandboxTrial.apply(this,arguments);};
   globalThis.continueAcademyTeamFormationJourney=wrapped;try{continueAcademyTeamFormationJourney=wrapped;}catch(_error){}
@@ -303,7 +237,7 @@ if(priorRecordOpen){
 function setTipsEnabled(enabled){return update({tutorialTipsEnabled:enabled===true});}
 function snapshot(){return clone(progress({create:false}));}
 function diagnostics(){
-  const source=[continueSandboxTrial,openingPopup,chooseOpening,applyRecommendedHighlights,projectCurrentTeamSelectableCharacters,naturalizeKonohaActivitySurface,trainingTip,practicalTip,examsTip,arenaGuide,nextStepPopup,chooseNextStep,recordTip].map(fn=>fn.toString()).join("\n");
+  const source=[continueSandboxTrial,openingPopup,chooseOpening,applyRecommendedHighlights,trainingTip,practicalTip,examsTip,arenaGuide,nextStepPopup,chooseNextStep,recordTip].map(fn=>fn.toString()).join("\n");
   const checks={
     stableLegacyIds:TUTORIAL_ID==="konoha_onboarding_first_team_orientation_v1"&&COMPLETION_RECEIPT_ID==="konoha_onboarding_first_team_orientation_completed_v1",
     freePlayImmediatelyAfterCommittedTeam:continueSandboxTrial.toString().includes("onboardingStatus=FREE_PLAY_STATUS")&&continueSandboxTrial.toString().includes("freePlayAuthorized:true"),
@@ -318,9 +252,6 @@ function diagnostics(){
     promotionUsesExistingRoute:chooseNextStep.toString().includes("openArenaPromotionSurface"),
     noGameplayGrant:!source.includes("basePL")&&!source.includes("disciplineProgression")&&!source.includes("playerData.ryo")&&!source.includes("formalRank=")&&!source.includes("setWorldEvent"),
     exactCommittedCurrentTeam:continueSandboxTrial.toString().includes("currentTeam:clone(team())"),
-    activityRosterUsesCommittedTeam:projectCurrentTeamSelectableCharacters.toString().includes("t.teamVariantIds.map")&&!projectCurrentTeamSelectableCharacters.toString().includes("playerTeam"),
-    activityCopyPlayerFacing:!naturalizeKonohaActivitySurface.toString().includes("runtime-owned")&&!naturalizeKonohaActivitySurface.toString().includes("AUTHORITY")&&naturalizeKonohaActivitySurface.toString().includes("HOW EXAMS WORK"),
-    disciplineToneProjection:naturalizeKonohaActivitySurface.toString().includes("is-discipline-"),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
