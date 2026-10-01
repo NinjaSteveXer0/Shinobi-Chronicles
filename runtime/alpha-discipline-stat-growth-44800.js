@@ -664,7 +664,7 @@ function diagnostics(){
     exactCurve21:thresholdForStat(21)===20,
     foundationCeiling:FOUNDATION_CEILING===15,
     foundationProfile:FOUNDATION_PROFILE_ID==="academy_foundation_discipline_activity_v1",
-    materialFailureGrant:String(executeFoundationAttempt448).includes('commitDevelopment(characterId,disciplineId,1'),
+    materialFailureGrant:String(executeFoundationAttempt448).includes("resolution.passed===true?2:1")&&String(executeFoundationAttempt448).includes('"material_attempt"'),
     effectiveExecutionGrant:FOUNDATION_ACTION_EXP===2,
     noFractionalPL:String(exactDevelopedStats).includes("exactStats")&&!String(exactDevelopedStats).includes("progressFraction"),
     noNumericMasteryUI:String(rows448).includes("CURRENT STAT")&&!String(rows448).includes("MASTERY"),
