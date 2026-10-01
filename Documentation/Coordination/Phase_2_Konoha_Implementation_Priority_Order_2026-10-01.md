@@ -30,24 +30,9 @@ Do not open five new location builds while these are still unstable.
 Acceptance result:
 `real Origin -> real team -> Konoha -> Inventory -> real hotspot/event -> correct Record/Receipt projection`.
 
-## 2. FIRST LIVE CE / HOTSPOT BENCHMARK
+## 2. PERSISTENT DEVELOPMENT + CURRENT-TEAM TRAINING
 
-Activate the smallest real Konoha CE event capable of proving:
-- real current team;
-- participant-first Structured Autonomy;
-- player choice after teammate intent;
-- factual outcome/consequence;
-- relationship/shared-history receipts;
-- Shinobi Record update;
-- save/load idempotence.
-
-Use existing #432 activation requirements and current World hotspot authority.
-
-This is the first proof that Konoha is alive rather than a menu hub.
-
-Do not activate the broad 500-seed reservoir.
-
-## 3. PERSISTENT DEVELOPMENT + CURRENT-TEAM TRAINING
+New owner-browser evidence shows that My Clan does not yet reflect training changes. Treat this as a source-of-truth problem, not a My Clan-only cosmetic patch.
 
 Implement #448 after #431 owner acceptance.
 
@@ -62,7 +47,54 @@ Targets:
 
 This makes free play materially useful.
 
-## 4. CENTRAL COMMERCIAL DISTRICT — FIRST REAL ECONOMY LOOP
+My Clan must consume the resulting canonical persistent Stats/PL and prove the trained Character's state updates without inventing a My Clan-local Stats store.
+
+## 3. INVENTORY CORE SURFACE
+
+Implement a bounded Inventory surface before any Shop.
+
+Initial scope:
+- persistent owned stackable Items/material quantities;
+- persistent durable Weapon/Equipment instances where current authority already supplies them;
+- exact source/provenance summary hooks;
+- clear owned vs equipped/prepared distinction;
+- save/load;
+- text-first Alpha presentation;
+- no invented full Loadout/Manage Shinobi system.
+
+Inventory must consume existing ownership transactions; UI inspection never creates ownership.
+
+This is an infrastructure surface for Shop, Crafting, rewards and later provenance.
+
+## 4. FIRST LIVE CE / HOTSPOT BENCHMARK
+
+CE authoring/preflight may proceed in parallel while Steps 1–3 are being stabilised.
+
+Coding should consume one exact #432 benchmark package rather than invent generic hotspot content.
+
+The first event must prove:
+- real current team;
+- participant-first Structured Autonomy;
+- player choice after teammate intent;
+- factual outcome/consequence;
+- relationship/shared-history receipts;
+- Shinobi Record update;
+- save/load idempotence.
+
+This is the first proof that Konoha is alive rather than a menu hub.
+
+Do not activate the broad 500-seed reservoir.
+
+## 5. KONOHA LIVE HUD
+
+Design may proceed in parallel under:
+`Documentation/Coordination/Konoha_Phase_2_Live_HUD_Minimum_Information_and_Navigation_Contract_2026-10-01.md`.
+
+Coding implements after UI direction is approved and currentTeam / Inventory / persistent Stats projections are trustworthy.
+
+HUD should expose compact live identity, Rank, Ryō, current team, Journey plus My Clan / Inventory / Shinobi Record access without becoming a second state store.
+
+## 6. CENTRAL COMMERCIAL DISTRICT — FIRST REAL ECONOMY LOOP
 
 Implement the first spending loop only after Inventory ownership/persistence is trustworthy.
 
@@ -79,7 +111,7 @@ Preserve:
 
 Use a deliberately small Alpha catalogue first.
 
-## 5. HOKAGE ADMINISTRATION + MISSION ASSIGNMENT / MAIN STORY FRONT DOOR
+## 7. HOKAGE ADMINISTRATION + MISSION ASSIGNMENT / MAIN STORY FRONT DOOR
 
 Upgrade Hokage Administration / Mission Assignment Hall into the proper institutional Story/mission hub.
 
@@ -95,7 +127,7 @@ Do not turn the Hokage Office into a generic vendor/service menu.
 
 This tranche should help move Arc 1 real-browser integration forward rather than becoming decorative UI.
 
-## 6. ARENA v2 + CE-DRIVEN PROMOTION
+## 8. ARENA v2 + CE-DRIVEN PROMOTION
 
 Arena is strategically important but must wait until the current Promotion design is closed through #446.
 
@@ -114,7 +146,7 @@ Do not polish the current single-screen Promotion flow as though it were final.
 
 Arena Battle / Staged Battles / Village Tournament remain separate Arena lanes and can be activated incrementally after the main shell is coherent.
 
-## 7. PROVENANCE FOUNDATION + FORGE / CRAFTING
+## 9. PROVENANCE FOUNDATION + FORGE / CRAFTING
 
 Activate #148 only after Inventory + first economy transaction are proven.
 
@@ -134,7 +166,7 @@ Then implement:
 
 Do not bulk-enable the item catalogue.
 
-## 8. FŪIN CRAFT
+## 10. FŪIN CRAFT
 
 Implement after ordinary durable-object/provenance infrastructure is proven.
 
@@ -148,7 +180,7 @@ Keep distinct from Forge:
 
 Fūin Craft should reuse proven object-instance and Inventory transaction infrastructure rather than inventing a second ownership model.
 
-## 9. HOSPITAL
+## 11. HOSPITAL
 
 Implement when there is a real persistent treatment/recovery state worth consuming.
 
@@ -162,7 +194,7 @@ Do not fabricate a giant medical economy or sell every catalogue medicine merely
 
 Hospital should become earlier only if active World/Main Story testing creates a concrete recovery blocker.
 
-## 10. BATH HOUSE / HOT SPRINGS + SOCIAL CHRONICLE HUB
+## 12. BATH HOUSE / HOT SPRINGS + SOCIAL CHRONICLE HUB
 
 Implement after the first CE/participant-first/relationship-history loop is proven.
 
