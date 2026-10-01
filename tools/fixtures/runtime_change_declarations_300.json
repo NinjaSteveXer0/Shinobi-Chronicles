@@ -1104,6 +1104,38 @@
       "replaces": [],
       "contractChangeReason": "OWNER_BROWSER_REPAIR",
       "rationale": "Owner Phase-2 browser testing found fixture/demo Naruto and Sasuke leaking into normal Practical / Exams and developer-facing copy on those surfaces. This bounded late adapter uses the already committed Academy currentTeam for Practical / Exams only, preserves Training Grounds as the wider owned-roster surface, and applies presentation-only Discipline accents and natural player language without changing progression, rewards, Rank, Promotion, Battle or ownership semantics."
+    },
+    {
+      "changeId": "issue-448-phase2-discipline-stat-growth",
+      "classification": "REPLACES",
+      "responsibilityIds": [
+        "phase2.discipline_development.stat_growth"
+      ],
+      "owner": "runtime/alpha-discipline-stat-growth-44800.js",
+      "directCallers": [
+        "index.html",
+        "existing Training / Practical / Shinobi Exam progression hooks",
+        "My Clan canonical Character projection"
+      ],
+      "stateTouched": [
+        "existing playerData.characters[progressionCharacterId].disciplineProgression discipline EXP ledger",
+        "existing canonical runtime Character Current Stats and playerData.characters stats",
+        "playerData.activityHistory discipline development / breakthrough / ceiling receipts",
+        "presentation-only Practical / Exam CURRENT STAT and dynamic DEVELOPMENT projection"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_448_discipline_stat_growth.js",
+        "tools/qa_issue_448_discipline_stat_growth_browser.js",
+        "tools/qa_phase2_chronicle_state_manifest_436.js",
+        "tools/qa_save_compatibility_311.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [
+        "game.js::legacy_discipline_level_mastery_and_fractional_pl_projection"
+      ],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Consumes binding #448 / #434 Phase-2 Trial v1. Replaces the fossil level/Mastery threshold semantics and fractional Discipline-EXP PL projection with one shared persistent Discipline Development transaction: exact v1 dynamic thresholds, permanent Current-Stat breakthroughs, overflow, causal caps, activity ceiling 15 for explicitly registered Academy Foundation Exam/Practical actions, formula-only Current PL, stable owned-character identity, save/load/idempotence, and observer-safe player projection. Technique Practice remains inactive."
     }
   ]
 }
