@@ -443,6 +443,79 @@ This plugs into the existing Story loop:
 
 ---
 
+# Nonverbal turn and scene closure
+
+Affective expression does **not** require verbal turn completion.
+
+A laugh, chuckle, look, gesture, breath, posture change, resumed task, touch, departure, stillness or other legible action may legitimately:
+
+- begin an interaction;
+- answer;
+- acknowledge;
+- refuse;
+- continue;
+- redirect;
+- de-escalate;
+- close the current conversational beat;
+- end the scene.
+
+Preserve:
+
+> **Spoken line != required spoken response.**
+
+> **Last spoken line != required final beat.**
+
+> **Conversation closure != verbal closure.**
+
+> **Nonverbal response may carry the interaction forward or finish it.**
+
+The acceptance question is:
+
+> **Did the interaction naturally complete its current beat?**
+
+not:
+
+> **Did every spoken line receive a spoken reply?**
+
+This matters especially in affective Writing because a character's regulation / defence may make a nonverbal response more truthful than another line.
+
+Examples:
+
+- laughter can acknowledge without explaining;
+- resumed work can close a challenge;
+- a look can refuse disclosure;
+- stepping away can end negotiation;
+- touch can answer reassurance;
+- a breath and changed posture can show regained control;
+- leaving can be the consequence;
+- silence can close the scene when the cause is already legible.
+
+Do not append dialogue merely to balance conversational turns.
+
+An extra spoken reply is a Writing defect when it adds no new:
+
+- intent;
+- Knowledge;
+- Relationship movement;
+- action;
+- pressure;
+- consequence;
+- character texture.
+
+The inverse also applies: interaction may begin before the first spoken line through blocking, eye contact, avoidance, offered objects, visible injuries, entering/leaving space or resumed work.
+
+This is **not** a default preference for nonverbal endings. It removes forced conversational bookkeeping.
+
+Owner-law provenance:
+
+- #170 comment `5939076126`;
+- PR #458, `Lock nonverbal conversation and scene closure rule`;
+- PR #458 head observed: `14733f8b65f7155597c66a5650b547cd14a703ee`.
+
+PR #458 owns the universal Quality Gate wording. This section records how that law constrains affective-expression authoring.
+
+---
+
 # Emotional continuity
 
 New scene != emotional reset.
@@ -622,6 +695,8 @@ Before approving an important emotional scene, ask:
 12. Is intensity proportionate?
 13. Could another named character be swapped into this beat without major change? If yes, the expression is probably too generic.
 14. Can the player feel the reaction without being told an abstract emotional state?
+15. Did Writing avoid forcing a spoken reply merely because the preceding beat was dialogue?
+16. If the beat ends nonverbally, does the action naturally complete the current interaction rather than feel abruptly truncated?
 
 If several fail, the affective expression is not Writing-complete.
 
