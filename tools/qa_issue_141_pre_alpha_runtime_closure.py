@@ -22,6 +22,7 @@ GAME = ROOT / "game.js"
 EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-runtime-build-fingerprint-303.js",
     "game.js",
+    "runtime/alpha-chronicle-state-manifest-43600.js",
     "runtime/alpha-origin-starting-purse-409.js",
     "runtime/alpha-special-jonin-evidence-producer-34700.js",
     "runtime/alpha-menma-tutorial-111.js",
@@ -58,6 +59,7 @@ EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-combat-skill-lock-38300.js",
     "runtime/alpha-origin-skill-display-names-400.js",
     "runtime/alpha-pl-battle-tutorial-38500.js",
+    "runtime/alpha-first-konoha-tutorial-35000.js",
 ]
 
 PYTHON_GATES = [
@@ -96,6 +98,8 @@ NODE_GATES = [
     "tools/qa_issue_312_story_battle_benchmark.js",
     "tools/qa_issue_334_story_transition_owner.js",
     "tools/qa_issue_322_kakashi_dispositions.js",
+    "tools/qa_phase2_chronicle_state_manifest_436.js",
+    "tools/qa_first_konoha_tutorial_35000.js",
 ]
 
 EXTERNAL_ASSET_GATES = [
