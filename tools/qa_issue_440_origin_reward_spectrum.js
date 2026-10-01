@@ -3,6 +3,8 @@ const fs=require('fs');
 const vm=require('vm');
 const assert=require('assert');
 
+const ledgerPath='runtime/alpha-discipline-development-ledger-442.js';
+const ledgerSource=fs.readFileSync(ledgerPath,'utf8');
 const overlayPath='runtime/alpha-origin-reward-spectrum-440.js';
 const overlaySource=fs.readFileSync(overlayPath,'utf8');
 const indexSource=fs.readFileSync('index.html','utf8');
@@ -13,8 +15,13 @@ const binderSource=fs.readFileSync('runtime/alpha-origin-scene-board-bindings-10
 const obitoSource=fs.readFileSync('runtime/alpha-origin-scenes-32900-c.js','utf8');
 
 function boot(seed={}){
-  const playerData={activityHistory:JSON.parse(JSON.stringify(seed.history||[])),ryo:0};
-  const chars={};
+  const ids=['academy_hinata','academy_mirai','academy_menma','academy_kushina','academy_kurenai','academy_obito','academy_metal_lee','academy_iwabee','academy_izuno'];
+  const ownedCharactersByVariantId={};
+  for(const id of ids)ownedCharactersByVariantId[id]={ownedCharacterId:'owned_character_'+id,variantId:id,progressionCharacterId:id,acquisitionRecordIds:[]};
+  const playerData={
+    activityHistory:JSON.parse(JSON.stringify(seed.history||[])),ryo:0,
+    acquisition:{ownedCharactersByVariantId}
+  };
   const active={sceneId:'test',instanceId:'test:1',localContext:{}};
   const evidence=[];
   let runtimeCtx=null;
@@ -39,18 +46,10 @@ function boot(seed={}){
       return{success:true,occurrenceId,record:this.clone(row),receipts:[],rewardSpectrum440};
     }
   };
-  const getChar=id=>{
-    if(!chars[id])chars[id]={id,stats:{},disciplineProgression:{}};
-    return chars[id];
-  };
   const ctx={
     console,playerData,SC_ALPHA_ORIGIN_32900:A,
     savePlayerData(){},
-    getPlayerCharacter:getChar,
-    getCharacterDisciplineProgression(id,discipline){
-      const c=getChar(id);c.disciplineProgression[discipline]=c.disciplineProgression[discipline]||{level:0,exp:0};return c.disciplineProgression[discipline];
-    },
-    processDisciplineLevelUps(id,discipline){return{success:true,id,discipline};},
+    ensurePlayerAcquisitionState(){return playerData.acquisition;},
     projectSpecialJoninContextualEvidence34700(input){
       const key=[input.subjectVariantId,input.qualificationId,input.causalRootOccurrenceId].join('|');
       let row=evidence.find(x=>x.key===key);
@@ -59,10 +58,12 @@ function boot(seed={}){
       return{success:true,idempotent:!!evidence.find((x,i)=>x.key===key&&i<evidence.indexOf(row)),evidence:JSON.parse(JSON.stringify(row))};
     }
   };
-  ctx.globalThis=ctx;runtimeCtx=ctx;vm.createContext(ctx);vm.runInContext(overlaySource,ctx,{filename:overlayPath});
-  return{ctx,A,playerData,chars,evidence,active};
+  ctx.globalThis=ctx;runtimeCtx=ctx;vm.createContext(ctx);
+  vm.runInContext(ledgerSource,ctx,{filename:ledgerPath});
+  vm.runInContext(overlaySource,ctx,{filename:overlayPath});
+  return{ctx,A,playerData,evidence,active};
 }
-function exp(state,id,discipline){return Number(state.chars[id]?.disciplineProgression?.[discipline]?.exp)||0;}
+function exp(state,id,discipline){return Number(state.playerData.acquisition.ownedCharactersByVariantId[id]?.disciplineProgression?.[discipline]?.exp)||0;}
 function receipts(state,id){return state.playerData.activityHistory.filter(r=>r&&r.type==='discipline_development'&&r.subjectVariantId===id);}
 function evidenceTags(state,id){return state.evidence.filter(r=>r.subjectVariantId===id).flatMap(r=>r.tags||[]);}
 
@@ -75,7 +76,10 @@ assert(!iwabeeSource.includes('noReward:true'),'stale Iwabee zero-reward launch 
 assert(metalSource.includes('const REWARD_SOURCE_ID="metal_origin_controlled_spar_victory_ryo_01";'),'Metal canonical reward source drift');
 assert(metalSource.includes('const LEGACY_REWARD_SOURCE_ID="metal_origin_controlled_spar_battle_victory_ryo_01";'),'Metal legacy source dedupe alias missing');
 
-// Load order: overlay observes the final Origin definitions and precedes Receipt projection.
+// Load order: the real Discipline ledger must exist before any Origin development caller.
+assert(indexSource.indexOf('game.js')<indexSource.indexOf('alpha-discipline-development-ledger-442.js'));
+assert(indexSource.indexOf('alpha-discipline-development-ledger-442.js')<indexSource.indexOf('alpha-origin-scenes-32900-a.js'));
+assert(indexSource.indexOf('alpha-discipline-development-ledger-442.js')<indexSource.indexOf('alpha-origin-reward-spectrum-440.js'));
 assert(indexSource.indexOf('alpha-origin-writing-golden-105.js')<indexSource.indexOf('alpha-origin-reward-spectrum-440.js'));
 assert(indexSource.indexOf('alpha-origin-reward-spectrum-440.js')<indexSource.indexOf('alpha-origin-scene-board-bindings-105.js'));
 assert(binderSource.includes('appendAcademyOriginRewardReceipt440'),'shared Origin Receipt projection is not wired');
@@ -142,14 +146,52 @@ assert(obitoSource.includes('appendAcademyOriginRewardReceipt440(lines,ORIGIN_ID
   assert(!jt.some(x=>String(x).includes('reverse_summoning')),'Kushina joint closure incorrectly granted reverse-summoning qualification');
 }
 
-// Kurenai: three material stages are source-scoped and obey the exact root cap of 3.
+// Kurenai: exact +1/+2 classification, exact cap suppression and Receipt projection.
 {
   const s=boot();
   s.A.commitOccurrence('academy_kurenai','occ_origin_kurenai_bell_test_resolution',{
     kurenaiStage1:'false_kurenai',kurenaiStage2:'rush_bell',kurenaiStage3:'take_bell_now',bellTestOutcomeClass:'complete_loss'
   });
+  const rows=receipts(s,'academy_kurenai');
   assert.equal(exp(s,'academy_kurenai','genjutsu'),3);
-  assert.equal(receipts(s,'academy_kurenai').length,3);
+  assert.deepStrictEqual(rows.map(r=>r.requestedExp),[1,1,1]);
+  assert.deepStrictEqual(rows.map(r=>r.expGranted),[1,1,1]);
+}
+{
+  const s=boot();
+  s.A.commitOccurrence('academy_kurenai','occ_origin_kurenai_bell_test_resolution',{
+    kurenaiStage1:'fake_direct',kurenaiStage2:'draw_attention',kurenaiStage3:'take_bell_now',bellTestOutcomeClass:'partial_loss'
+  });
+  const rows=receipts(s,'academy_kurenai');
+  assert.equal(exp(s,'academy_kurenai','genjutsu'),3);
+  assert.deepStrictEqual(rows.map(r=>r.requestedExp),[2,1,1]);
+  assert.deepStrictEqual(rows.map(r=>r.expGranted),[2,1,0]);
+  assert.strictEqual(rows[2].capSuppressed,true);
+  const lines=['REWARDS'];s.ctx.appendAcademyOriginRewardReceipt440(lines,'academy_kurenai');
+  const text=lines.join('\n');
+  assert(text.includes('Genjutsu Development: +2')&&text.includes('direct approach'),'effective Stage 1 Receipt line missing');
+  assert(text.includes('Genjutsu Development: +1')&&text.includes('attention draw'),'resisted Stage 2 Receipt line missing');
+  assert(!text.includes('final bell grab'),'cap-suppressed Stage 3 falsely displayed');
+}
+{
+  const s=boot();
+  s.A.commitOccurrence('academy_kurenai','occ_origin_kurenai_bell_test_resolution',{
+    kurenaiStage1:'conceal_movement',kurenaiStage2:'draw_attention',kurenaiStage3:'pretend_withdraw',bellTestOutcomeClass:'partial_win'
+  });
+  const rows=receipts(s,'academy_kurenai');
+  assert.equal(exp(s,'academy_kurenai','genjutsu'),3);
+  assert.deepStrictEqual(rows.map(r=>r.requestedExp),[2,2,2]);
+  assert.deepStrictEqual(rows.map(r=>r.expGranted),[2,1,0],'effective/effective route exceeded root cap 3');
+}
+{
+  const s=boot();
+  s.A.commitOccurrence('academy_kurenai','occ_origin_kurenai_bell_test_resolution',{
+    kurenaiStage1:'false_kurenai',kurenaiStage2:'rush_bell',kurenaiStage3:'pretend_withdraw',bellTestOutcomeClass:'partial_loss'
+  });
+  const rows=receipts(s,'academy_kurenai');
+  assert.deepStrictEqual(rows.map(r=>r.expGranted),[1,1,1],"Stephen's false/rush/withdraw route drifted");
+  const lines=['REWARDS'];s.ctx.appendAcademyOriginRewardReceipt440(lines,'academy_kurenai');
+  assert.equal(lines.filter(line=>line.includes('Genjutsu Development: +1')).length,3,'Stephen route Receipt breakdown not exact');
 }
 
 // Metal: exact private development; MET-03 technical branches only; taking impact gives no invented Stamina/technical EXP.
@@ -214,6 +256,12 @@ assert(obitoSource.includes('appendAcademyOriginRewardReceipt440(lines,ORIGIN_ID
   assert.equal(s.playerData.activityHistory.length,before,'reconcile duplicated reward receipt');
 }
 
+const kurReceiptBlock=binderSource.slice(binderSource.indexOf('function buildKurenaiReceipt105'),binderSource.indexOf('function buildIwabeeReceipt105'));
+assert.strictEqual((kurReceiptBlock.match(/Origin Starting Purse/g)||[]).length,1,'Kurenai Receipt purse appears more than once');
+
+const ledgerDiag=boot().ctx.runDisciplineDevelopmentLedger442Diagnostics();
+assert.equal(ledgerDiag.pass,true,JSON.stringify(ledgerDiag,null,2));
+
 const d=boot().ctx.runAcademyOriginRewardSpectrum440Diagnostics();
 assert.equal(d.pass,true,JSON.stringify(d,null,2));
 
@@ -224,7 +272,9 @@ console.log(JSON.stringify({
     startingPurse100:true,
     iwabeeBattleVictory50:true,
     metalCanonicalSourceWithLegacyDedupe:true,
+    productionDisciplineLedger:true,
     developmentSourceScopedAndIdempotent:true,
+    kurenaiExactOneTwoCapThree:true,
     specialJoninMappingsBounded:true,
     kushinaReverseSummoningRejected:true,
     obitoNoDoubleDevelopment:true,
