@@ -491,6 +491,81 @@ Another may refuse to participate.
 
 The scene should reflect relationships, not seating order.
 
+## 13.1 Verbal turn completion is not required
+
+Conversation is not a mandatory alternating sequence of spoken replies.
+
+A character does **not** always need to speak in order to:
+
+- begin an interaction;
+- answer;
+- acknowledge;
+- refuse;
+- continue;
+- redirect;
+- de-escalate;
+- close a conversational beat;
+- end the scene.
+
+A meaningful response may instead be:
+
+- laughter / a chuckle;
+- a sigh or changed breath;
+- a look / eye-line shift;
+- a gesture;
+- posture or physical distance changing;
+- turning away;
+- returning to a task;
+- handing over / taking an object;
+- leaving;
+- staying;
+- touch;
+- silence;
+- another character noticing the non-verbal reaction;
+- environmental/action continuation that makes the social meaning legible.
+
+Canonical rules:
+
+> **Spoken line != required response.**
+
+> **Last spoken line != required final beat.**
+
+> **Conversation closure != verbal closure.**
+
+> **Non-verbal response may carry the interaction forward or finish it.**
+
+Do not append another spoken line merely to make dialogue feel symmetrical, to give every present character a final turn, or to verbally restate meaning already carried by performance.
+
+Example shape:
+
+```text
+A says something that changes the emotional/social state.
+B reacts physically or non-verbally.
+Scene ends.
+```
+
+That may be more natural than:
+
+```text
+A speaks.
+B reacts.
+A explains/acknowledges the reaction.
+B gives a closing reply.
+Scene ends.
+```
+
+If the extra line adds no new intent, relationship movement, Knowledge, action, pressure or character texture, it may actively weaken the scene.
+
+Likewise, a conversation may **start** before anybody speaks. Blocking, eye contact, avoidance, entering/leaving space, an offered object, a visible injury, resumed work or another action may establish the interaction before the first line.
+
+Canonical acceptance test:
+
+> **Do not ask whether every line received a reply. Ask whether the interaction has naturally completed its current beat.**
+
+This does not require every scene to end silently or non-verbally. Spoken closure remains valid when it belongs to the people and situation.
+
+The rule exists to prevent **forced conversational bookkeeping**.
+
 ---
 
 # 14. Player agency
