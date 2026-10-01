@@ -115,7 +115,8 @@ function commitDevelopment440({subjectVariantId,sourceOccurrenceId,progressionSl
     progression.exp=(Number(progression.exp)||0)+grant;
     const levelResult=processDisciplineLevelUps(subjectVariantId,runtimeDisciplineId,{
       transactionId:receiptId,
-      sourceDevelopmentReceiptRefs:[receiptId]
+      sourceDevelopmentReceiptRefs:[receiptId],
+      deferSave:true
     });
     if(!levelResult)throw new Error("discipline_level_processing_failed");
     rows.push(record);if(typeof savePlayerData==="function")savePlayerData();
