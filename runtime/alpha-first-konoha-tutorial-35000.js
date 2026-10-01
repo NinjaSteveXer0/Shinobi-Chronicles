@@ -186,7 +186,6 @@ function continueSandboxTrial(){
   if(f){f.continuationCompleted=true;if(!f.continuedAt)f.continuedAt=Date.now();}
   if(typeof globalThis.ensurePhase2ChronicleState43600==="function")globalThis.ensurePhase2ChronicleState43600({save:false});
   save();
-  try{if(typeof ensureKonohaAlphaWorldSemanticRefill==="function")ensureKonohaAlphaWorldSemanticRefill({save:false});}catch(_error){}
   return{...(result&&typeof result==="object"?result:{}),success:true,destination:result&&result.destination||destination(),freePlayAuthorized:true,tutorialTrial:true,currentTeam:clone(team())};
 }
 function migrateLegacyPending(){
@@ -196,7 +195,6 @@ function migrateLegacyPending(){
   a.onboardingStatus=FREE_PLAY_STATUS;f.continuationCompleted=true;if(!f.continuedAt)f.continuedAt=Date.now();
   if(typeof globalThis.ensurePhase2ChronicleState43600==="function")globalThis.ensurePhase2ChronicleState43600({save:false});
   save();
-  try{if(typeof ensureKonohaAlphaWorldSemanticRefill==="function")ensureKonohaAlphaWorldSemanticRefill({save:false});}catch(_error){}
   return{success:true,migrated:true,freePlayAuthorized:true};
 }
 
