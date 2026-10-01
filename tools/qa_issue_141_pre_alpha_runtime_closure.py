@@ -61,6 +61,7 @@ EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-pl-battle-tutorial-38500.js",
     "runtime/alpha-first-konoha-tutorial-35000.js",
     "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
+    "runtime/alpha-phase2-discipline-development-44800.js",
 ]
 
 PYTHON_GATES = [
@@ -101,6 +102,7 @@ NODE_GATES = [
     "tools/qa_issue_322_kakashi_dispositions.js",
     "tools/qa_phase2_chronicle_state_manifest_436.js",
     "tools/qa_first_konoha_tutorial_35000.js",
+    "tools/qa_issue_448_persistent_discipline_development.js",
 ]
 
 EXTERNAL_ASSET_GATES = [
