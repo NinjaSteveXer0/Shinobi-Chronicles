@@ -237,6 +237,14 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
     assert(receipt.text.includes("YOUR ORIGIN")&&receipt.text.includes("ACADEMY OBITO")&&receipt.text.includes("RECORDED IN YOUR CHRONICLE"),label+" Obito Chronicle Receipt header missing");
     assert(receipt.text.includes("YOUR DECISIONS")&&receipt.text.includes("WHAT HAPPENED")&&receipt.text.includes("REWARDS"),label+" Obito Chronicle Receipt sections missing");
     assert(receipt.text.includes("Origin Starting Purse: +100 Ryō."),label+" Obito Chronicle Receipt starting purse missing");
+    const expectedTrainingLine={
+      FULL:"Formal Training: +1 Ninjutsu, +1 Taijutsu, +1 Bukijutsu, +1 Stamina Current Stats.",
+      SUBSTANTIAL:"Formal Training: +1 Ninjutsu, +1 Taijutsu, +1 Bukijutsu Current Stats.",
+      REDUCED:"Formal Training: +1 Ninjutsu, +1 Taijutsu Current Stats.",
+      MINIMAL:"Formal Training: +1 Taijutsu Current Stats.",
+      NONE:null
+    }[expectedEntitlement];
+    if(expectedTrainingLine)assert(receipt.text.includes(expectedTrainingLine),label+" Obito Chronicle Receipt missing earned Current-Stat package "+expectedTrainingLine);
     assert.strictEqual(receipt.actors.length,0,label+" Chronicle Receipt should not retain Story actors");
     await screenshot(page,label+"-receipt");
     await finishActiveStory(page);
@@ -247,6 +255,8 @@ async function runRoute(browser,{label,helpSet,expectedDelay,expectedEntitlement
     }));
     assert.strictEqual(completion.active,null,label+" Story runtime remained active");
     assert.strictEqual(completion.complete,true,label+" Origin did not complete");
+    const purseCount=await page.evaluate(()=>getActivityHistory().filter(row=>row?.type==="origin_completion_reward"&&row.rewardSourceId==="origin_completion_starting_purse_ryo_01"&&row.originVariantId==="academy_obito").length);
+    assert.strictEqual(purseCount,1,label+" Obito completion starting purse missing/duplicated");
     assert.strictEqual(completion.obito.pass,true,JSON.stringify(completion.obito));
     assert.strictEqual(completion.board.pass,true,JSON.stringify(completion.board));
     const errors=await gate.assertClean(label);
