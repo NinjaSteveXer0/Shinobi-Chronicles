@@ -261,23 +261,35 @@ The assessment records observer/authority-legitimate evidence in six authored do
 
 These are evidence domains, not Stats and not hidden PL modifiers.
 
-### Rank pass/fail interpretation — FINAL ALPHA RULE
+### Rank pass/fail interpretation — PHASE-2 VARIABLE PACKAGE RULE
 
-A valid **PASS** requires all of the following:
+Binding successor:
+
+`Documentation/Rank/Academy to Genin Variable Promotion Requirement Packages 2026-10-01.md`
+
+For newly committed Phase-2 CE-driven Promotion lineages, a valid **PASS** requires all of the following:
 
 1. `missionObjectiveCompleted=true`;
 2. qualifying evidence for **mission comprehension**;
 3. qualifying evidence for **judgement under pressure**;
-4. qualifying evidence in at least **two** of the remaining four domains:
-   - information use;
-   - team coordination;
-   - combat readiness;
-   - objective protection;
+4. qualifying evidence in the **exact two secondary readiness domains named by the committed `promotionRequirementPackageId`**;
 5. no authored examiner safety/integrity abort or disqualification.
 
-This means the assessment requires at least **four distinct readiness domains**, but does not require Battle to occur. If no legitimate Battle occurs, `combat_readiness` is simply not one of the supporting domains used for that attempt.
+The package selects exactly two from:
+- information use;
+- team coordination;
+- combat readiness;
+- objective protection.
 
-A Battle victory may supply relevant Combat evidence but does not itself satisfy the formal mission objective or the overall pass contract.
+The initial Rank-authored pool contains all six two-domain combinations. This preserves exactly **four distinct readiness domains** per Academy -> Genin package and does not add a fifth criterion on top of the former `any two of four` rule.
+
+Package ID is selected once from a prevalidated scenario-compatible pool, persists across normal retries and alternate authorised scenarios in the same Promotion lineage, and must not reroll on UI/save-load. A different scenario is valid only if it supports the already-committed package.
+
+Requirement truth and player Knowledge remain separate. Hidden requirements may project as `??????`; a satisfied requirement may remain hidden until legitimate discovery/disclosure. Diagnostics may inspect exact package/domain truth without leaking it to player UI.
+
+Historical attempts already resolved under the former fixed resolver remain historical truth.
+
+The assessment does not require Battle to occur unless the committed package includes `combat_readiness`. A Battle victory may supply relevant Combat evidence but does not itself satisfy the formal mission objective or the overall pass contract.
 
 Objective protection evidence may contribute here without granting Escort / Protective Detail Special Jōnin qualification.
 
@@ -303,6 +315,8 @@ Failure:
 ### Re-attempt
 
 Re-attempt is permitted after the previous attempt has resolved and the assessment is available again. There is no universal cooldown unless an exact future authority explicitly authors one.
+
+For Phase-2 variable requirements, normal retry does **not** reroll the committed `promotionRequirementPackageId`. The package persists across the Promotion requirement lineage; alternate authorised scenarios must support that already-committed package. Supersession requires explicit institutional/new-lineage authority with provenance.
 
 ### Presentation / CE boundary
 
