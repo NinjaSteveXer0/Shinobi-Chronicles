@@ -1356,6 +1356,130 @@
         "tools/qa_issue_105_origin_presentation_browser.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
+    },
+    {
+      "responsibilityId": "phase2.chronicle_state_manifest.shared",
+      "canonicalOwner": "runtime/alpha-chronicle-state-manifest-43600.js",
+      "ownerType": "persistent_state_manifest",
+      "directCallers": [
+        "index.html",
+        "runtime/alpha-first-konoha-tutorial-35000.js"
+      ],
+      "stateReads": [
+        "playerData.acquisition Academy Team Formation receipt",
+        "playerData.acquisition Chronicle Origin identity",
+        "playerData.ryo",
+        "legacy academyTeamFormation.confirmationReceipt.firstKonohaTutorial"
+      ],
+      "stateWrites": [
+        "playerData.phase2ChronicleState.tutorialProgress only through updateChronicleTutorialProgress43600 / ensurePhase2ChronicleState43600"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-chronicle-state-manifest-43600.js"
+      ],
+      "extensionHooks": [
+        "getChronicleStateManifest43600",
+        "getChronicleCurrentTeam43600",
+        "migratePhase2ChronicleState43600",
+        "ensurePhase2ChronicleState43600",
+        "updateChronicleTutorialProgress43600"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "playerData.phase2ChronicleState.schemaVersion",
+        "playerData.phase2ChronicleState.tutorialProgress"
+      ],
+      "qaRefs": [
+        "tools/qa_phase2_chronicle_state_manifest_436.js",
+        "tools/qa_save_compatibility_311.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "phase2.konoha_onboarding.trial",
+      "canonicalOwner": "runtime/alpha-first-konoha-tutorial-35000.js",
+      "ownerType": "phase2_onboarding_presentation_adapter",
+      "directCallers": [
+        "continueAcademyTeamFormationJourney",
+        "renderVillageOverlay",
+        "renderTrainingOverlay",
+        "openKonohaPracticalFromVillage",
+        "openKonohaExamFromVillage",
+        "renderArenaMainOverlay",
+        "openShinobiRecord"
+      ],
+      "stateReads": [
+        "committed currentTeam from Chronicle State Manifest",
+        "playerData.phase2ChronicleState.tutorialProgress",
+        "existing Academy Team Formation continuation state"
+      ],
+      "stateWrites": [
+        "playerData.acquisition.onboardingStatus academy_free_play trial correction",
+        "playerData.acquisition.academyTeamFormation.continuationCompleted / continuedAt",
+        "tutorialProgress only through Chronicle State Manifest canonical writer",
+        "presentation DOM / public Konoha recommendation attributes"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-first-konoha-tutorial-35000.js"
+      ],
+      "extensionHooks": [
+        "continueAcademyTeamFormationJourney",
+        "renderVillageOverlay",
+        "renderTrainingOverlay",
+        "openKonohaPracticalFromVillage",
+        "openKonohaExamFromVillage",
+        "renderArenaMainOverlay",
+        "openShinobiRecord"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "playerData.acquisition.onboardingStatus",
+        "playerData.acquisition.academyTeamFormation.continuationCompleted",
+        "playerData.phase2ChronicleState.tutorialProgress"
+      ],
+      "qaRefs": [
+        "tools/qa_first_konoha_tutorial_35000.js",
+        "tools/qa_phase2_chronicle_state_manifest_436.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "responsibilityId": "phase2.konoha_player_surfaces.trial",
+      "canonicalOwner": "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
+      "ownerType": "phase2_player_surface_adapter",
+      "directCallers": [
+        "getKonohaSelectableCharacters",
+        "renderKonohaPracticalVisualScreen",
+        "renderKonohaExamVisualScreen"
+      ],
+      "stateReads": [
+        "committed currentTeam from getChronicleCurrentTeam43600",
+        "existing playerTeam Character instances",
+        "existing Practical / Exams UI data"
+      ],
+      "stateWrites": [
+        "presentation DOM only; no persistent gameplay state"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-phase2-konoha-player-surfaces-43110.js"
+      ],
+      "extensionHooks": [
+        "getKonohaSelectableCharacters",
+        "renderKonohaPracticalVisualScreen",
+        "renderKonohaExamVisualScreen"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [],
+      "saveSchemaRefs": [],
+      "qaRefs": [
+        "tools/qa_phase2_konoha_player_surfaces_431.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
     }
   ],
   "adapters": [
@@ -1626,6 +1750,16 @@
       "semanticId": "academy_menma.final.story",
       "owner": "runtime/alpha-origin-writing-golden-105.js",
       "responsibilityId": "origin.academy_menma.final_story_state"
+    },
+    {
+      "semanticId": "phase2.tutorial_progress.commit",
+      "owner": "runtime/alpha-chronicle-state-manifest-43600.js",
+      "responsibilityId": "phase2.chronicle_state_manifest.shared"
+    },
+    {
+      "semanticId": "phase2.konoha_onboarding.presentation",
+      "owner": "runtime/alpha-first-konoha-tutorial-35000.js",
+      "responsibilityId": "phase2.konoha_onboarding.trial"
     }
   ],
   "globalWrapperChains": [
@@ -1913,6 +2047,16 @@
       "stateRef": "activeStorySceneRuntime.localContext Academy Menma GOLDEN Story choices",
       "owner": "runtime/alpha-origin-writing-golden-105.js",
       "responsibilityId": "origin.academy_menma.final_story_state"
+    },
+    {
+      "stateRef": "playerData.phase2ChronicleState.tutorialProgress",
+      "owner": "runtime/alpha-chronicle-state-manifest-43600.js",
+      "responsibilityId": "phase2.chronicle_state_manifest.shared"
+    },
+    {
+      "stateRef": "playerData.acquisition.onboardingStatus / academyTeamFormation continuation Phase-2 trial correction",
+      "owner": "runtime/alpha-first-konoha-tutorial-35000.js",
+      "responsibilityId": "phase2.konoha_onboarding.trial"
     }
   ]
 }

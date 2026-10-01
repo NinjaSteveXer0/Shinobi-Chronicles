@@ -9,6 +9,7 @@ const assert=require("assert");
 const ROOT=path.resolve(__dirname,"..");
 const CORPUS=JSON.parse(fs.readFileSync(path.join(ROOT,"tools/fixtures/save_compatibility_corpus_311.json"),"utf8"));
 const GAME=fs.readFileSync(path.join(ROOT,"game.js"),"utf8");
+const PHASE2_STATE=fs.readFileSync(path.join(ROOT,"runtime/alpha-chronicle-state-manifest-43600.js"),"utf8");
 const SAVE_KEY="shinobiChroniclesPlayerSave";
 
 function dummy(){
@@ -49,6 +50,7 @@ function makeContext(){
   context.globalThis=context;
   vm.createContext(context);
   vm.runInContext(GAME,context,{filename:"game.js"});
+  vm.runInContext(PHASE2_STATE,context,{filename:"runtime/alpha-chronicle-state-manifest-43600.js"});
   return{context,store};
 }
 function clone(value){return JSON.parse(JSON.stringify(value));}
@@ -172,6 +174,53 @@ assert(legacy&&legacy.saveSchemaGeneration==="pre-characterOwnership-alpha","#31
 const free=rows.find(r=>r.id==="origin_complete_free_play");
 assert(free&&free.projection.onboardingStatus==="academy_free_play"&&free.projection.ownedCount===3,"#311 free-play lifecycle fixture failed");
 
+// Phase-2 bounded compatibility extension (#436): currentTeam remains derived
+// from the committed Team Formation receipt and tutorialProgress survives
+// save/load without a second writer or migration reroll.
+{
+  const fixture=clone(CORPUS.fixtures.find(row=>row.id==="origin_complete_free_play").save);
+  fixture.acquisition.academyTeamFormation.confirmationReceipt={
+    ...(fixture.acquisition.academyTeamFormation.confirmationReceipt||{}),
+    commitId:"save311_phase2_team",
+    originVariantId:"academy_kakashi",
+    teamVariantIds:["academy_kakashi","academy_hinata","academy_kushina"]
+  };
+  fixture.phase2ChronicleState={
+    schemaVersion:1,
+    tutorialProgress:{
+      schemaVersion:1,
+      academyTeamFormationReceiptRef:"save311_phase2_team",
+      sandboxPopupSeen:true,
+      recommendedRouteEnabled:true,
+      openingChoice:"show_me_around",
+      trainingTipSeen:true,
+      practicalTipSeen:false,
+      examsTipSeen:false,
+      arenaTipSeen:false,
+      arenaCompletionChoiceSeen:false,
+      shinobiRecordTipSeen:false,
+      tutorialTipsEnabled:true,
+      updatedAt:123
+    }
+  };
+  store.clear();store.set(SAVE_KEY,JSON.stringify(fixture));
+  const rawBefore=store.get(SAVE_KEY);
+  const loaded=context.loadPlayerData();
+  assert.strictEqual(store.get(SAVE_KEY),rawBefore,"#436 compatibility reader mutated Phase-2 save while loading");
+  assert.deepStrictEqual(loaded.phase2ChronicleState,fixture.phase2ChronicleState,"#436 Phase-2 root dropped/rewritten by compatibility reader");
+  context.playerData=loaded;
+  const team=JSON.parse(JSON.stringify(context.getChronicleCurrentTeam43600()));
+  assert.deepStrictEqual(team.teamVariantIds,["academy_kakashi","academy_hinata","academy_kushina"],"#436 currentTeam projection drift");
+  const pureInput=JSON.stringify(loaded);
+  const migrated=JSON.parse(JSON.stringify(context.migratePhase2ChronicleState43600(loaded)));
+  assert.strictEqual(JSON.stringify(loaded),pureInput,"#436 pure migration mutated loaded save");
+  const migratedAgain=JSON.parse(JSON.stringify(context.migratePhase2ChronicleState43600(migrated)));
+  assert.deepStrictEqual(migratedAgain,migrated,"#436 migration rerolled Phase-2 state");
+  vm.runInContext("playerData=loadPlayerData();savePlayerData();",context);
+  const reloaded=context.loadPlayerData();
+  assert.deepStrictEqual(reloaded.phase2ChronicleState,fixture.phase2ChronicleState,"#436 save/reload changed tutorialProgress");
+}
+
 console.log(JSON.stringify({
   pass:true,
   issue:311,
@@ -189,7 +238,10 @@ console.log(JSON.stringify({
     compatibilityReaderNotSecondWriter:true,
     storyIntentReceiptsPersist:true,
     factualResolverReceiptsPersist:true,
-    contextualSpecialJoninEvidencePersists:true
+    contextualSpecialJoninEvidencePersists:true,
+    phase2ChronicleStatePersists:true,
+    phase2CurrentTeamDerived:true,
+    phase2MigrationPureAndIdempotent:true
   },
   browserGoldenClaimed:false
 },null,2));

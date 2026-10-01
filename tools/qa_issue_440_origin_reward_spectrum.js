@@ -240,6 +240,21 @@ assert(obitoSource.includes('appendAcademyOriginRewardReceipt440(lines,ORIGIN_ID
   assert(!/qualificationId|significance|sourceOccurrenceId|progressionSlotId/.test(text));
 }
 
+// Receipt-time recovery: an already-committed source with a missing projection is repaired before display, once.
+{
+  const s=boot();
+  s.A.commitOccurrence('academy_iwabee','occ_origin_iwabee_training_ground_reshape_resolution',{trainingGroundReshapeObjectiveCompletedByIwabee:true});
+  s.playerData.activityHistory=s.playerData.activityHistory.filter(row=>!(row&&row.type==='discipline_development'&&row.subjectVariantId==='academy_iwabee'));
+  s.chars.academy_iwabee.disciplineProgression.nin.exp=0;
+  const lines=['REWARDS'];
+  s.ctx.appendAcademyOriginRewardReceipt440(lines,'academy_iwabee');
+  assert.equal(exp(s,'academy_iwabee','ninjutsu'),2,'Receipt-time reconcile did not restore committed Ninjutsu development');
+  assert(lines.some(line=>line.includes('Ninjutsu Development: +2')),'Receipt-time reconcile did not project restored development');
+  const before=s.playerData.activityHistory.length;
+  s.ctx.appendAcademyOriginRewardReceipt440(['REWARDS'],'academy_iwabee');
+  assert.equal(s.playerData.activityHistory.length,before,'Receipt rerender duplicated repaired development');
+}
+
 // Save/load/reconcile: committed source facts deterministically project once; rerun is idempotent.
 {
   const source={type:'origin_story_occurrence',activity:'story_scene',completed:true,committed:true,success:true,
@@ -272,6 +287,7 @@ console.log(JSON.stringify({
     kushinaReverseSummoningRejected:true,
     obitoNoDoubleDevelopment:true,
     receiptProjectionHidesCeInternals:true,
-    saveLoadReconcileIdempotent:true
+    saveLoadReconcileIdempotent:true,
+    receiptTimeReconcileIdempotent:true
   }
 },null,2));
