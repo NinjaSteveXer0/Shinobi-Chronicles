@@ -101,7 +101,7 @@ async function restorePracticalResolver(page){
         team:getChronicleCurrentTeam43600(),
         manifest:getChronicleStateManifest43600(),
         diagnostics:runPhase2DisciplineDevelopment44800Diagnostics(),
-        before:{nin:menma.stats.nin,ninExp:nin.exp,tai:menma.stats.tai,taiExp:tai.exp,pl:calculateCurrentPL(menma)}
+        before:{nin:menma.stats.nin,ninExp:menma.disciplineProgression.nin.exp,tai:menma.stats.tai,taiExp:menma.disciplineProgression.tai.exp,pl:calculateCurrentPL(menma)}
       };
     });
     assert.strictEqual(setup.selected?.success,true,"Origin select failed");
