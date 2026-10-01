@@ -1,0 +1,79 @@
+name: Issue 442 Origin Development Receipts
+
+on:
+  push:
+    branches:
+      - coding/issue-442-origin-development-receipts
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  origin-development-receipts:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Source syntax
+        run: |
+          node --check runtime/alpha-origin-reward-spectrum-440.js
+          node --check tools/qa_issue_440_origin_reward_spectrum.js
+          node --check tools/qa_issue_442_origin_development_receipts_browser.js
+
+      - name: Reward spectrum + Kurenai classification QA
+        run: node tools/qa_issue_440_origin_reward_spectrum.js
+
+      - name: Runtime ownership safety
+        run: node tools/qa_runtime_ownership_safety_300.js
+
+      - name: Save compatibility
+        run: node tools/qa_save_compatibility_311.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > issue442-server.log 2>&1 &
+          echo $! > issue442-server.pid
+          sleep 2
+
+      - name: Installed-browser Origin development Receipt matrix
+        run: node tools/qa_issue_442_origin_development_receipts_browser.js
+
+      - name: Mirai Menma shared Origin regression
+        run: node tools/qa_issue_105_origin_presentation_browser.js
+
+      - name: Menma Battle reward regression
+        run: xvfb-run -a node tools/qa_issue_362_menma_reward_browser.js
+
+      - name: Wasabi benchmark Receipt regression
+        run: xvfb-run -a node tools/qa_issue_343_wasabi_browser.js
+
+      - name: Kakashi frozen reward and Receipt contract
+        run: node tools/qa_kakashi_v2_clean_room.js
+
+      - name: Metal Iwabee Battle reward regression
+        run: xvfb-run -a node tools/qa_issues_396_399_400_browser.js
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-442-origin-development-receipts
+          path: |
+            artifacts/issue-442-origin-development-receipts
+            issue442-server.log
+          if-no-files-found: ignore
