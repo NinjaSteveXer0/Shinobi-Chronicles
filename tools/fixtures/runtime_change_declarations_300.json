@@ -1104,6 +1104,41 @@
       "replaces": [],
       "contractChangeReason": "OWNER_BROWSER_REPAIR",
       "rationale": "Owner Phase-2 browser testing found fixture/demo Naruto and Sasuke leaking into normal Practical / Exams and developer-facing copy on those surfaces. This bounded late adapter uses the already committed Academy currentTeam for Practical / Exams only, preserves Training Grounds as the wider owned-roster surface, and applies presentation-only Discipline accents and natural player language without changing progression, rewards, Rank, Promotion, Battle or ownership semantics."
+    },
+    {
+      "changeId": "issue-448-phase2-persistent-discipline-development",
+      "classification": "REPLACES",
+      "responsibilityIds": [
+        "phase2.discipline_development.foundation_trial"
+      ],
+      "owner": "runtime/alpha-phase2-discipline-development-44800.js",
+      "directCallers": [
+        "index.html",
+        "Practical / Shinobi Exams attempt and batch hooks",
+        "Chronicle State Manifest #436"
+      ],
+      "stateTouched": [
+        "playerData.characters[progressionCharacterId].disciplineProgression.exp",
+        "playerData.characters[progressionCharacterId].stats",
+        "playerData.phase2ChronicleState.disciplineDevelopment receipts / migration markers",
+        "activityHistory factual Practical / Exam attempt development receipts",
+        "derived Current PL and My Clan projection"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_448_persistent_discipline_development.js",
+        "tools/qa_issue_448_persistent_discipline_development_browser.js",
+        "tools/qa_phase2_konoha_onboarding_browser_431.js",
+        "tools/qa_save_compatibility_311.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [
+        "game.js::legacy fixed 50+25*(level-1) Discipline threshold for registered Academy Foundation Practical/Exam activity",
+        "game.js::legacy partial Discipline EXP contribution to Current PL for canonical Current-Stat projection",
+        "Practical/Exam UI::numeric MASTERY + fixed DISCIPLINE EXP semantics"
+      ],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Consumes closed #434/#448 Progression authority. The Academy Foundation trial now awards action-derived +1/+2 Discipline Development EXP to one exact persistent committed-team subject, resolves dynamic discipline_stat_curve_v1 Stat breakthroughs with overflow and a source ceiling of 15, derives Current PL only from the seven canonical Current Stats, persists idempotent receipts through the #436 Chronicle State Manifest, and makes Practical/Exams/My Clan project the same saved truth without inventing Technique Practice, Skill XP, Energy, team-wide sharing or a second Stat owner."
     }
   ]
 }
