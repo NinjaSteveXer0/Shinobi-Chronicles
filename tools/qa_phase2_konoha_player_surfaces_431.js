@@ -89,7 +89,7 @@ async function activitySnapshot(page,service){
     assert(!/Kage Naruto|Jonin Sasuke/i.test(practical.text),"fixture/demo shinobi leaked into Practical");
     assert.strictEqual(practical.noteTitle,"TRAINING RESULTS");
     assert(!/runtime|resolver|authority/i.test(practical.subtitle+" "+practical.note),"developer-facing Practical copy leaked");
-    assert.deepStrictEqual(practical.disciplineIds,["nin","tai","gen","buki","fuin","kin","stamina"]);
+    assert.deepStrictEqual(practical.disciplineIds,practical.data.disciplines.map(row=>row.id),"Practical rendered discipline accents do not match available discipline data");
     await page.screenshot({path:path.join(OUT,"01-practical-current-team.png"),fullPage:true});
 
     await page.evaluate(()=>changeKonohaPracticalCharacter(1));
@@ -108,8 +108,14 @@ async function activitySnapshot(page,service){
     assert.strictEqual(exams.noteTitle,"EXAM RECORD");
     assert(exams.note.includes("Rank Promotion is earned separately."),"natural Exam Rank distinction missing");
     assert(!/runtime|resolver|authority/i.test(exams.subtitle+" "+exams.note),"developer-facing Exam copy leaked");
-    assert.deepStrictEqual(exams.disciplineIds,["nin","tai","gen","buki","fuin","kin","stamina"]);
+    assert.deepStrictEqual(exams.disciplineIds,exams.data.disciplines.map(row=>row.id),"Exam rendered discipline accents do not match available discipline data");
     await page.screenshot({path:path.join(OUT,"02-exams-current-team.png"),fullPage:true});
+    const accentMap=await page.evaluate(()=>{
+      const css=document.getElementById("sc-phase2-konoha-player-surfaces-43110")?.textContent||"";
+      const ids=["nin","tai","gen","buki","fuin","kin","stamina"];
+      return ids.filter(id=>css.includes('data-discipline-id="'+id+'"'));
+    });
+    assert.deepStrictEqual(accentMap,["nin","tai","gen","buki","fuin","kin","stamina"],"Seven-discipline accent map is incomplete");
 
     const diagnostics=await page.evaluate(()=>runPhase2KonohaPlayerSurfaces43110Diagnostics());
     assert.strictEqual(diagnostics.pass,true,JSON.stringify(diagnostics));
