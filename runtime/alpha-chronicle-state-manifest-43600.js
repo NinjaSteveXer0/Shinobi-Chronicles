@@ -19,7 +19,7 @@ const SAVE_KEY="shinobiChroniclesPlayerSave";
 const priorLoadPlayerData=typeof globalThis.loadPlayerData==="function"?globalThis.loadPlayerData:null;
 
 function clone(value){
-  if(value==null)return value;
+  if(value==null||typeof value!=="object")return value;
   try{return typeof cloneProgressionData==="function"?cloneProgressionData(value):JSON.parse(JSON.stringify(value));}
   catch(_error){return value;}
 }
@@ -204,7 +204,7 @@ const DOMAINS=Object.freeze([
     stateDomainId:"tutorialProgress",
     semanticOwner:"Coding / Konoha onboarding presentation",
     canonicalWritePath:"updateChronicleTutorialProgress43600",
-    stableIdentityKey:"academyTeamFormation.confirmationReceipt.commitId",
+    stableIdentityKey:"currentTeam.assignmentId (modern commitId or legacy receiptId)",
     savePath:"playerData.phase2ChronicleState.tutorialProgress",
     schemaVersion:TUTORIAL_SCHEMA_VERSION,
     sourceOccurrenceIdFormat:"konoha_onboarding::<teamFormationCommitId>::<tip>",
@@ -296,7 +296,7 @@ function diagnostics(){
     minimumFields:DOMAINS.every(row=>required.every(key=>Object.prototype.hasOwnProperty.call(row,key))),
     uniqueDomains:unique.size===DOMAINS.length,
     initialDomains:["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","shinobiRecordProjection"].every(id=>unique.has(id)),
-    currentTeamDerivedNotDuplicated:DOMAINS.find(row=>row.stateDomainId==="currentTeam")?.savePath==="playerData.acquisition.academyTeamFormation.confirmationReceipt.teamVariantIds",
+    currentTeamDerivedNotDuplicated:DOMAINS.find(row=>row.stateDomainId==="currentTeam")?.canonicalWritePath==="confirmAcademyTeamFormation"&&!String(DOMAINS.find(row=>row.stateDomainId==="currentTeam")?.savePath||"").includes("phase2ChronicleState.currentTeam"),
     ryoExistingOwnerPreserved:DOMAINS.find(row=>row.stateDomainId==="currentRyo")?.savePath==="playerData.ryo",
     recordProjectionNoWriter:DOMAINS.find(row=>row.stateDomainId==="shinobiRecordProjection")?.canonicalWritePath==="NONE_DERIVED_PROJECTION_ONLY",
     pureMigration:JSON.stringify(defaultSave)===JSON.stringify({ryo:77,acquisition:{chronicleOriginVariantId:"academy_menma",chronicleOriginOwnedCharacterId:"owned_character_academy_menma",ninjaIdentityVariantId:"academy_menma",ninjaIdentityLocked:true,academyTeamFormation:{completed:true,confirmationReceipt:{commitId:"team-1",originVariantId:"academy_menma",teamVariantIds:["academy_menma","academy_hinata","academy_kushina"]}}}}),
