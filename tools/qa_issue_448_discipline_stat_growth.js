@@ -249,12 +249,13 @@ function commit(ctx,amount,n,{source="story",causalRootId=null,receiptId=null,te
   const s=boot();
   const d=s.runPhase2DisciplineStatGrowth448Diagnostics();
   assert.equal(d.pass,true,JSON.stringify(d));
+  assert.equal(d.checks.materialFailureGrant,true,"+1 material-failure law missing");
   assert.equal(d.curveId,"discipline_stat_curve_v1");
   assert.equal(d.profileId,"academy_foundation_discipline_activity_v1");
 }
 console.log(JSON.stringify({
   pass:true,issue:448,curve:"discipline_stat_curve_v1",foundationProfile:"academy_foundation_discipline_activity_v1",
   thresholdSequenceProven:true,overflowProven:true,multiBreakthroughProven:true,noFractionalPLFromPartialExp:true,
-  currentTeamAndStaleSelectionGuards:true,causalCap3:true,ceiling15:true,idempotence:true,saveRehydrate:true,
+  currentTeamAndStaleSelectionGuards:true,causalCap3:true,materialFailureDevelopment:true,ceiling15:true,idempotence:true,saveRehydrate:true,
   techniquePracticeActivated:false,browserGoldenClaimed:false
 },null,2));
