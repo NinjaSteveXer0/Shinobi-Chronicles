@@ -15,6 +15,8 @@ const PATCH_ID="phase2_chronicle_state_manifest_43600_2026_10_01";
 const ROOT_KEY="phase2ChronicleState";
 const ROOT_SCHEMA_VERSION=1;
 const TUTORIAL_SCHEMA_VERSION=1;
+const SAVE_KEY="shinobiChroniclesPlayerSave";
+const priorLoadPlayerData=typeof globalThis.loadPlayerData==="function"?globalThis.loadPlayerData:null;
 
 function clone(value){
   if(value==null)return value;
@@ -22,6 +24,26 @@ function clone(value){
   catch(_error){return value;}
 }
 function currentPlayerData(){return typeof playerData!=="undefined"&&playerData?playerData:null;}
+function readPersistedPhase2Root(){
+  try{
+    if(typeof localStorage==="undefined")return null;
+    const raw=localStorage.getItem(SAVE_KEY);if(!raw)return null;
+    const parsed=JSON.parse(raw),root=parsed&&parsed[ROOT_KEY];
+    return root&&typeof root==="object"?clone(root):null;
+  }catch(_error){return null;}
+}
+function installCompatibilityLoadAdapter(){
+  if(!priorLoadPlayerData)return false;
+  const wrapped=function phase2CompatibilityLoadPlayerData(){
+    const persistedRoot=readPersistedPhase2Root();
+    const loaded=priorLoadPlayerData.apply(this,arguments);
+    if(loaded&&persistedRoot&&typeof loaded==="object")loaded[ROOT_KEY]=persistedRoot;
+    return loaded;
+  };
+  globalThis.loadPlayerData=wrapped;
+  try{loadPlayerData=wrapped;}catch(_error){}
+  return true;
+}
 function acquisitionFrom(save){return save&&save.acquisition&&typeof save.acquisition==="object"?save.acquisition:null;}
 function formationFrom(save){const a=acquisitionFrom(save);return a&&a.academyTeamFormation&&typeof a.academyTeamFormation==="object"?a.academyTeamFormation:null;}
 function formationReceiptFrom(save){const f=formationFrom(save);return f&&f.confirmationReceipt&&typeof f.confirmationReceipt==="object"?f.confirmationReceipt:null;}
@@ -254,11 +276,14 @@ function diagnostics(){
     deterministicMigration:JSON.stringify(migrated)===JSON.stringify(migratedAgain),
     exactTeam:getCurrentTeam(migrated)?.teamVariantIds.join("|")==="academy_menma|academy_hinata|academy_kushina",
     ryoPreserved:getCurrentRyo(migrated)===77,
+    compatibilityLoadAdapterInstalled:!priorLoadPlayerData||globalThis.loadPlayerData!==priorLoadPlayerData,
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
   return{patchId:PATCH_ID,pass:failed.length===0,checks,failed,browserGoldenClaimed:false};
 }
+
+installCompatibilityLoadAdapter();
 
 globalThis.getChronicleStateManifest43600=()=>MANIFEST;
 globalThis.getChronicleCurrentTeam43600=getCurrentTeam;
