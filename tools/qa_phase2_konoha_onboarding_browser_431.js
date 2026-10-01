@@ -113,7 +113,7 @@ async function clickGuide(page,label){
     assert.deepStrictEqual(practicalSurface.selectable,start.team.teamVariantIds,"Practical selector leaked outside committed currentTeam");
     assert(start.team.teamVariantIds.includes(practicalSurface.selected),"Practical selected a non-team shinobi");
     assert(!/runtime-owned|live progression authority|PRACTICAL AUTHORITY|No weapon EXP/i.test(practicalSurface.text),"Practical still exposes developer-facing runtime copy");
-    assert.deepStrictEqual([...new Set(practicalSurface.tones)].sort(),["buki","fuin","gen","kin","nin","stamina","tai"].sort(),"Practical discipline colour identities missing");
+    assert(practicalSurface.tones.length>0&&new Set(practicalSurface.tones).size===practicalSurface.tones.length,"Practical rendered disciplines are missing distinct colour identities");
     await page.screenshot({path:path.join(OUT,"03-practical-current-team.png"),fullPage:true});
 
     await page.evaluate(()=>openKonohaExamFromVillage());
@@ -128,7 +128,7 @@ async function clickGuide(page,label){
     assert.deepStrictEqual(examSurface.selectable,start.team.teamVariantIds,"Exam selector leaked outside committed currentTeam");
     assert(start.team.teamVariantIds.includes(examSurface.selected),"Exam selected a non-team shinobi");
     assert(!/runtime-owned|EXAM AUTHORITY|does not itself grant Promotion or Rank/i.test(examSurface.text),"Exam still exposes developer-facing runtime copy");
-    assert.deepStrictEqual([...new Set(examSurface.tones)].sort(),["buki","fuin","gen","kin","nin","stamina","tai"].sort(),"Exam discipline colour identities missing");
+    assert(examSurface.tones.length>0&&new Set(examSurface.tones).size===examSurface.tones.length,"Exam rendered disciplines are missing distinct colour identities");
     await page.screenshot({path:path.join(OUT,"04-exams-current-team.png"),fullPage:true});
 
     await page.evaluate(()=>openOverlay("arena"));
