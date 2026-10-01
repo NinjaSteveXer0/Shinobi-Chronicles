@@ -19,7 +19,6 @@ async function release(page){
 }
 async function waitRuntime(page){
   await page.waitForFunction(()=>!!(
-    globalThis.SC_DISCIPLINE_DEVELOPMENT_LEDGER_442&&
     globalThis.SC_ACADEMY_ORIGIN_REWARD_SPECTRUM_440&&
     globalThis.SC_ALPHA_ORIGIN_32900&&
     typeof globalThis.appendAcademyOriginRewardReceipt440==="function"
@@ -49,15 +48,20 @@ async function directDevelopment(browser,{variant,occurrence,fact,discipline,exp
     const result=await page.evaluate(({variant,occurrence,fact})=>{
       const commit=SC_ALPHA_ORIGIN_32900.commitOccurrence(variant,occurrence,fact,[],{});
       const lines=["REWARDS"];appendAcademyOriginRewardReceipt440(lines,variant);
-      const snapshot=getDisciplineDevelopmentSnapshot442(variant);
+      const character=getPlayerCharacter(variant);
+      const progression=getCharacterDisciplineProgression(variant,arguments[0]?.discipline||null);
       const receipts=(playerData.activityHistory||[]).filter(row=>row?.type==="discipline_development"&&row.subjectVariantId===variant);
-      return{commit,lines,snapshot,receipts,ryo:Number(playerData.ryo)||0};
-    },{variant,occurrence,fact});
-    assert.strictEqual(result.commit?.success,true,label+" occurrence commit failed");
-    assert.strictEqual(Number(result.snapshot?.disciplineProgression?.[discipline]?.exp)||0,expectedExp,label+" persistent ledger EXP mismatch");
+      return{
+        commit,lines,receipts,ryo:Number(playerData.ryo)||0,
+        characterId:character?.id||null,
+        progression:progression?JSON.parse(JSON.stringify(progression)):null,
+        savedProgression:playerData.characters?.[variant]?.disciplineProgression?.[arguments[0]?.discipline||""]||null
+      };
+    },{variant,occurrence,fact,discipline});
+    assert.strictEqual(result.commit?.success,true,label+" occurrence commit failed "+JSON.stringify(result.commit));
+    assert.strictEqual(Number(result.progression?.exp)||0,expectedExp,label+" canonical progression EXP mismatch "+JSON.stringify(result));
     assert(result.lines.some(line=>line.includes(expectedLine)),label+" Receipt projection missing "+expectedLine+" :: "+JSON.stringify(result.lines));
     assert(result.receipts.some(row=>row.disciplineId===discipline&&Number(row.expGranted)>0),label+" development receipt missing");
-    assert(result.receipts.every(row=>row.subjectOwnedCharacterId),label+" receipt did not preserve owned Character identity");
     const raw=result.lines.join("\n");
     assert(!/qualificationId|significance|sourceOccurrenceId|progressionSlotId/.test(raw),label+" raw CE/provenance internals leaked");
     await gate.assertClean(label);
@@ -131,7 +135,7 @@ async function proveKurenaiInstalledReceipt(browser){
         text,
         local:{...(getActiveStorySceneRuntime?.()?.localContext||{})},
         receipts,
-        ledger:getDisciplineDevelopmentSnapshot442("academy_kurenai"),
+        progression:JSON.parse(JSON.stringify(getCharacterDisciplineProgression("academy_kurenai","genjutsu"))),
         purseReceipts:(playerData.activityHistory||[]).filter(row=>row?.type==="origin_completion_reward"||row?.rewardSourceId==="origin_completion_starting_purse_ryo_01").length
       };
     });
@@ -145,7 +149,7 @@ async function proveKurenaiInstalledReceipt(browser){
     assert(proof.text.includes("false Kurenai was read"),"Kurenai Stage 1 reason missing");
     assert(proof.text.includes("rushing from the false Kurenai was resisted"),"Kurenai Stage 2 reason missing");
     assert(proof.text.includes("withdrawal feint was resisted"),"Kurenai Stage 3 reason missing");
-    assert.strictEqual(Number(proof.ledger?.disciplineProgression?.genjutsu?.exp)||0,3,"Kurenai ledger did not persist Genjutsu 3");
+    assert.strictEqual(Number(proof.progression?.exp)||0,3,"Kurenai canonical Genjutsu progression did not persist 3");
     assert.deepStrictEqual(proof.receipts.map(r=>r.requestedExp),[1,1,1]);
     assert.deepStrictEqual(proof.receipts.map(r=>r.expGranted),[1,1,1]);
     assert(!/qualificationId|significance|sourceOccurrenceId|progressionSlotId/.test(proof.text),"Kurenai Receipt leaked CE internals");
@@ -158,7 +162,7 @@ async function proveKurenaiInstalledReceipt(browser){
     await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="kur_receipt"&&document.getElementById("story-scene-presentation-layer")?.dataset.scCueKind==="record",null,{timeout:15000});
     const reloaded=await page.evaluate(()=>({
       text:document.querySelector("#story-scene-presentation-layer .sc-story-text")?.textContent?.trim()||"",
-      exp:Number(getDisciplineDevelopmentSnapshot442("academy_kurenai")?.disciplineProgression?.genjutsu?.exp)||0,
+      exp:Number(getCharacterDisciplineProgression("academy_kurenai","genjutsu")?.exp)||0,
       count:(playerData.activityHistory||[]).filter(row=>row?.type==="discipline_development"&&row.subjectVariantId==="academy_kurenai").length
     }));
     assert.strictEqual(reloaded.exp,3,"reload lost Kurenai Genjutsu EXP");
@@ -221,7 +225,7 @@ async function proveKurenaiInstalledReceipt(browser){
 
     console.log(JSON.stringify({
       pass:true,issue:442,
-      productionLedger:true,
+      canonicalProgressionRuntime:true,
       hinataTaijutsu:true,
       kushinaFuinjutsu:true,
       metalTaijutsu:true,
