@@ -1104,6 +1104,61 @@
       "replaces": [],
       "contractChangeReason": "OWNER_BROWSER_REPAIR",
       "rationale": "Owner Phase-2 browser testing found fixture/demo Naruto and Sasuke leaking into normal Practical / Exams and developer-facing copy on those surfaces. This bounded late adapter uses the already committed Academy currentTeam for Practical / Exams only, preserves Training Grounds as the wider owned-roster surface, and applies presentation-only Discipline accents and natural player language without changing progression, rewards, Rank, Promotion, Battle or ownership semantics."
+    },
+    {
+      "changeId": "issue-448-phase2-discipline-development-persistent-stat-trial",
+      "classification": "REPLACES",
+      "responsibilityIds": [
+        "phase2.discipline_development.trial"
+      ],
+      "owner": "runtime/alpha-phase2-discipline-development-44800.js",
+      "directCallers": [
+        "index.html",
+        "runtime/alpha-origin-reward-spectrum-440.js",
+        "existing Practical / Shinobi Exams discipline activity execution"
+      ],
+      "stateTouched": [
+        "playerData.characters[progressionCharacterId].disciplineProgression existing canonical ledger",
+        "playerData.characters[progressionCharacterId].stats authorised permanent Current-Stat mutation",
+        "playerData.activityHistory discipline_development / discipline_stat_breakthrough / activity_development_ceiling_reached / curve activation receipts"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_448_phase2_discipline_stat_growth.js",
+        "tools/qa_issue_448_phase2_discipline_stat_growth_browser.js",
+        "tools/qa_phase2_chronicle_state_manifest_436.js",
+        "tools/qa_save_compatibility_311.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [
+        "game.js::legacy_numeric_discipline_mastery_level_to_stat_growth_and_fractional_exp_pl_projection"
+      ],
+      "contractChangeReason": "PHASE_2_BINDING_PROGRESSION_AUTHORITY",
+      "rationale": "Consumes the binding #434/#448 Phase-2 trial contract. Existing Discipline EXP remains one persistent Character ledger, but numeric Mastery/level-based Stat growth and partial-EXP PL inflation are superseded by discipline_stat_curve_v1 thresholds, sequential +1 Current-Stat breakthroughs, overflow, formula-only Current PL, Academy Foundation activity ceiling 15, currentTeam single-subject preflight and receipt idempotence. No second Stats owner, Skill XP, Technique Practice route or phase2 duplicate ledger is created."
+    },
+    {
+      "changeId": "issue-448-phase2-discipline-development-player-projection",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "phase2.discipline_development.trial"
+      ],
+      "owner": "runtime/alpha-phase2-discipline-development-ui-44810.js",
+      "directCallers": [
+        "index.html",
+        "runtime/alpha-phase2-konoha-player-surfaces-43110.js"
+      ],
+      "stateTouched": [
+        "presentation DOM only: Current Stat / Development X/Y / activity ceiling projection",
+        "presentation-only Begin control disabled when Foundation primary Stat development is complete"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_448_phase2_discipline_stat_growth_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "PHASE_2_PLAYER_PROJECTION",
+      "rationale": "Projects #448 canonical development state after the accepted #431 player-facing activity surface. Removes visible numeric Mastery and fixed 0/50 fossils, exposes dynamic Current Stat/Development/ceiling truth, and writes no gameplay state. Result Stage polish remains separately queued in #453."
     }
   ]
 }
