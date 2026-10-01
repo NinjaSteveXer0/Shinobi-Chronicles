@@ -96,13 +96,11 @@ function commitDevelopment440({subjectVariantId,sourceOccurrenceId,progressionSl
   }
   const character=getPlayerCharacter(subjectVariantId),progression=getCharacterDisciplineProgression(subjectVariantId,disciplineId);
   if(!character||!progression)return{success:false,reason:"discipline_progression_missing",subjectVariantId,disciplineId};
-  record.subjectOwnedCharacterId=character.ownedCharacterId||null;
-  record.progressionCharacterId=character.progressionCharacterId||subjectVariantId;
   const progressionBefore=clone(character.disciplineProgression),statsBefore=clone(character.stats),historyLength=rows.length;
   try{
     progression.exp=(Number(progression.exp)||0)+grant;
     const levelResult=processDisciplineLevelUps(subjectVariantId,disciplineId);
-    if(!levelResult||levelResult.success===false)throw new Error("discipline_level_processing_failed");
+    if(!levelResult)throw new Error("discipline_level_processing_failed");
     rows.push(record);if(typeof savePlayerData==="function")savePlayerData();
     return{success:true,idempotent:false,receipt:clone(record),expGranted:grant,levelResult:clone(levelResult)};
   }catch(error){
