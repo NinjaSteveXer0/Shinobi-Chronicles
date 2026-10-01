@@ -62,7 +62,8 @@ function boot(seed={}){
   ctx.globalThis=ctx;runtimeCtx=ctx;vm.createContext(ctx);vm.runInContext(overlaySource,ctx,{filename:overlayPath});
   return{ctx,A,playerData,chars,evidence,active};
 }
-function exp(state,id,discipline){return Number(state.chars[id]?.disciplineProgression?.[discipline]?.exp)||0;}
+const RUNTIME_DISCIPLINE={ninjutsu:"nin",taijutsu:"tai",genjutsu:"gen",bukijutsu:"buki",fuinjutsu:"fuin",kinjutsu:"kin",stamina:"stamina"};
+function exp(state,id,discipline){const runtimeId=RUNTIME_DISCIPLINE[discipline]||discipline;return Number(state.chars[id]?.disciplineProgression?.[runtimeId]?.exp)||0;}
 function receipts(state,id){return state.playerData.activityHistory.filter(r=>r&&r.type==='discipline_development'&&r.subjectVariantId===id);}
 function evidenceTags(state,id){return state.evidence.filter(r=>r.subjectVariantId===id).flatMap(r=>r.tags||[]);}
 
