@@ -1,97 +1,48 @@
-# Chronicle Engine Bible
+# Chronicle Engine Bible — Authority Pointer
 
-## Overview
+**Status:** DEPRECATED LOCAL STUB / DO NOT EXTEND
 
-The Chronicle Engine is the gameplay architecture behind Shinobi Chronicles.
+This file is **not** the authoritative Chronicle Engine Design Bible.
 
-It is designed to connect player actions, progression, characters, events, and consequences into a persistent game experience.
+The durable Chronicle Engine architecture, research, genealogy, implementation guidance, and game-validation material lives in the dedicated repository:
 
----
+**NinjaSteveXer0/Chronicle-Engine-Design-Bible**
 
-# Core Philosophy
+https://github.com/NinjaSteveXer0/Chronicle-Engine-Design-Bible
 
-Traditional gameplay:
+## Repository boundary
 
-Player Action → Reward
+Use **Chronicle-Engine-Design-Bible** for reusable Chronicle Engine material, including:
 
+- core CE architecture;
+- Research;
+- derived principles and candidate systems;
+- promotion/adjudication genealogy;
+- implementation-readiness contracts;
+- reusable causal/history semantics;
+- cross-game CE design.
 
-Chronicle Engine:
+Use **Shinobi-Chronicles** for Shinobi Chronicles production authority, including:
 
-Player Action → Event → Outcome → Progression → History
+- live SC runtime source;
+- game-specific implementation;
+- SC-specific content and presentation;
+- Alpha/Phase execution;
+- game-specific specialist contracts and QA.
 
----
+Shinobi Chronicles may provide evidence and proving-ground material for Chronicle Engine, but:
 
-# Core Systems
+> **SC implementation truth != reusable CE architecture automatically.**
 
-## Location Engine
+Any reusable lesson extracted from Shinobi Chronicles should be reconciled into the dedicated Chronicle Engine Design Bible rather than growing a second local CE Bible here.
 
-Controls:
+## Current authority
 
-- World locations
-- Discovery
-- Travel
-- Location states
-- Available activities
+Start in the CE repository with:
 
+- `README.md`
+- `Architecture/Chronicle Engine Core Architecture.md`
+- `Research/Cycle 3 Current Research and Promotion Index.md`
+- relevant `Architecture/`, `Research/`, `Changelog/`, `Implementation/`, and `Games/` documents.
 
-## Activity Engine
-
-Controls:
-
-- Training
-- Exams
-- Missions
-- Battles
-- Events
-
-
-## Progression Engine
-
-Controls:
-
-- Experience
-- Stats
-- Growth
-- Unlocks
-
-
-## Reward Engine
-
-Controls:
-
-- EXP
-- Currency
-- Items
-- Character development
-
-
-## Future Chronicle Systems
-
-Planned:
-
-- Events
-- Relationships
-- Memories
-- Legacy progression
-
----
-
-## Recovery Addenda
-
-This file is an early historical skeleton and does not yet contain the full recovered Chronicle Engine doctrine.
-
-Durable recovered doctrine from the original Shinobi Chronicles Combat Stuffs / Battle Systems workspace is preserved in:
-
-- [`Chronicle_Engine_Combat_Recovery_Addendum_2026-09-04.md`](./Chronicle_Engine_Combat_Recovery_Addendum_2026-09-04.md)
-
-Recovery addenda must preserve provenance and candidate boundaries rather than silently promoting unresolved game-specific material into Engine canon.
-
----
-
-## Strategic Direction
-
-The competitive / uniqueness / productisation audit and the resulting preservation-first CE expansion roadmap are recorded in:
-
-- [`Chronicle_Engine_Strategic_Differentiation_and_Expansion_Plan_2026-09-06.md`](./Chronicle_Engine_Strategic_Differentiation_and_Expansion_Plan_2026-09-06.md)
-
-This strategic plan does **not** supersede current durable doctrine or production authority. It defines how CE should be strengthened without sacrificing existing semantic boundaries, and explicitly keeps serious middleware/productisation work post-Alpha.
+This pointer exists to prevent future tools/workspaces from treating the historical local stub as a second CE authority.
