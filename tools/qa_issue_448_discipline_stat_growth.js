@@ -193,6 +193,17 @@ function commit(ctx,amount,n,{source="story",causalRootId=null,receiptId=null,te
   assert.equal(c.stats.nin,11);assert.equal(s.playerData.characters.academy_menma.stats.nin,11);
   assert.equal(s.calculateCurrentPL(c),Math.round(formula(c.stats)));
 }
+// Existing specialised writers can pass their exact development receipt provenance into the breakthrough.
+{
+  const s=boot({stat:10});
+  const row=s.getCharacterDisciplineProgression("academy_menma","nin");row.exp=10;
+  const result=s.processDisciplineLevelUps("academy_menma","nin",{transactionId:"origin-dev-receipt-1",sourceDevelopmentReceiptRefs:["origin-dev-receipt-1"]});
+  assert.equal(result.statPointsGained,1);
+  const receipt=s.activityHistory.find(r=>r?.type==="discipline_stat_breakthrough"&&r?.disciplineId==="nin");
+  assert(receipt,"compatibility breakthrough receipt missing");
+  assert.deepStrictEqual(JSON.parse(JSON.stringify(receipt.sourceDevelopmentReceiptRefs)),["origin-dev-receipt-1"]);
+  assert(String(receipt.receiptId).includes("origin-dev-receipt-1"));
+}
 // Existing +1 / +2 / +3 action-derived values remain valid and exact.
 {
   const s=boot({stat:10});
