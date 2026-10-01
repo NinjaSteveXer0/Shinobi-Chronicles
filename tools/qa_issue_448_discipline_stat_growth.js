@@ -4,7 +4,12 @@
 const fs=require("fs"),path=require("path"),vm=require("vm"),assert=require("assert");
 const ROOT=path.resolve(__dirname,"..");
 const SRC=fs.readFileSync(path.join(ROOT,"runtime/alpha-discipline-stat-growth-44800.js"),"utf8");
+const GAME=fs.readFileSync(path.join(ROOT,"game.js"),"utf8");
 const DISC=["nin","tai","gen","buki","fuin","kin","stamina"];
+
+assert(GAME.includes("function getPersistentCharacterProgressionSaveKey"),"stable progression save-key resolver missing");
+assert(GAME.includes("ownedRecord.progressionCharacterId"),"progressionCharacterId is not used as the canonical save key");
+assert(GAME.includes("playerData.characters[\n        progressionSaveKey\n      ]"),"stable progression save write path missing");
 
 function formula(stats){
   const vals=DISC.map(id=>Number(stats[id])||0).sort((a,b)=>b-a);
@@ -256,6 +261,6 @@ function commit(ctx,amount,n,{source="story",causalRootId=null,receiptId=null,te
 console.log(JSON.stringify({
   pass:true,issue:448,curve:"discipline_stat_curve_v1",foundationProfile:"academy_foundation_discipline_activity_v1",
   thresholdSequenceProven:true,overflowProven:true,multiBreakthroughProven:true,noFractionalPLFromPartialExp:true,
-  currentTeamAndStaleSelectionGuards:true,causalCap3:true,materialFailureDevelopment:true,ceiling15:true,idempotence:true,saveRehydrate:true,
+  currentTeamAndStaleSelectionGuards:true,causalCap3:true,materialFailureDevelopment:true,stableProgressionSaveIdentity:true,ceiling15:true,idempotence:true,saveRehydrate:true,
   techniquePracticeActivated:false,browserGoldenClaimed:false
 },null,2));
