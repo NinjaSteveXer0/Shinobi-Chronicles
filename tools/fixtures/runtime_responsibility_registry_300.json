@@ -1446,6 +1446,40 @@
         "tools/qa_phase2_chronicle_state_manifest_436.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
+    },
+    {
+      "responsibilityId": "phase2.konoha_player_surfaces.trial",
+      "canonicalOwner": "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
+      "ownerType": "phase2_player_surface_adapter",
+      "directCallers": [
+        "getKonohaSelectableCharacters",
+        "renderKonohaPracticalVisualScreen",
+        "renderKonohaExamVisualScreen"
+      ],
+      "stateReads": [
+        "committed currentTeam from getChronicleCurrentTeam43600",
+        "existing playerTeam Character instances",
+        "existing Practical / Exams UI data"
+      ],
+      "stateWrites": [
+        "presentation DOM only; no persistent gameplay state"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-phase2-konoha-player-surfaces-43110.js"
+      ],
+      "extensionHooks": [
+        "getKonohaSelectableCharacters",
+        "renderKonohaPracticalVisualScreen",
+        "renderKonohaExamVisualScreen"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [],
+      "saveSchemaRefs": [],
+      "qaRefs": [
+        "tools/qa_phase2_konoha_player_surfaces_431.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
     }
   ],
   "adapters": [
