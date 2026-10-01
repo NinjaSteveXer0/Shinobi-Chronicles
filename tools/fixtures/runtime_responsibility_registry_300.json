@@ -1480,6 +1480,55 @@
         "tools/qa_phase2_konoha_player_surfaces_431.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
+    },
+    {
+      "responsibilityId": "phase2.discipline_development.trial",
+      "canonicalOwner": "runtime/alpha-phase2-discipline-development-44800.js",
+      "ownerType": "phase2_persistent_progression_transaction",
+      "directCallers": [
+        "runtime/alpha-origin-reward-spectrum-440.js",
+        "game.js Practical / Exam action adapters",
+        "runtime/alpha-phase2-discipline-development-ui-44810.js"
+      ],
+      "stateReads": [
+        "committed currentTeam from Chronicle State Manifest",
+        "owned Character stable identity from Acquisition records",
+        "existing playerData.characters disciplineProgression and stats",
+        "existing source-scoped development receipts"
+      ],
+      "stateWrites": [
+        "existing playerData.characters[progressionCharacterId].disciplineProgression ledger",
+        "existing playerData.characters[progressionCharacterId].stats through discipline_stat_breakthrough",
+        "playerData.activityHistory factual development / breakthrough / ceiling / curve activation receipts"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-phase2-discipline-development-44800.js"
+      ],
+      "extensionHooks": [
+        "commitDisciplineDevelopment44800",
+        "getDisciplineStatExpThreshold44800",
+        "getDisciplineDevelopmentPreflight44800",
+        "addDisciplineExp",
+        "processDisciplineLevelUps",
+        "calculateCurrentRawPL"
+      ],
+      "permittedAdapters": [
+        "phase2_discipline_development_ui_44810"
+      ],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "playerData.characters[progressionCharacterId].disciplineProgression",
+        "playerData.characters[progressionCharacterId].stats",
+        "playerData.activityHistory discipline development receipts"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_448_phase2_discipline_stat_growth.js",
+        "tools/qa_issue_448_phase2_discipline_stat_growth_browser.js",
+        "tools/qa_phase2_chronicle_state_manifest_436.js",
+        "tools/qa_save_compatibility_311.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
     }
   ],
   "adapters": [
@@ -1613,6 +1662,18 @@
       "retirementCondition": "Review when shared Origin Story-to-Battle consumes the exact #338 Mirai contract natively.",
       "milestone": "shared Origin runtime propagation review",
       "qaRef": "tools/qa_issue_105_origin_presentation_browser.js",
+      "temporary": false
+    },
+    {
+      "adapterId": "phase2_discipline_development_ui_44810",
+      "reason": "Project the canonical #448 Discipline development transaction onto the accepted #431 Practical / Exams player-facing surface without making presentation a Stats or progression owner.",
+      "owner": "runtime/alpha-phase2-discipline-development-ui-44810.js",
+      "sourceOwner": "runtime/alpha-phase2-discipline-development-44800.js",
+      "targetOwner": "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
+      "exactBehaviorBridged": "Current Stat, dynamic Development EXP threshold/progress, Academy Foundation ceiling state, and truthful disabled Begin control after primary development ceiling.",
+      "retirementCondition": "Review when the canonical Practical / Exams renderer natively consumes the #448 Current Stat / Development projection and #431 adapter is consolidated.",
+      "milestone": "Phase-2 persistent development browser acceptance",
+      "qaRef": "tools/qa_issue_448_phase2_discipline_stat_growth_browser.js",
       "temporary": false
     }
   ],
@@ -1760,6 +1821,11 @@
       "semanticId": "phase2.konoha_onboarding.presentation",
       "owner": "runtime/alpha-first-konoha-tutorial-35000.js",
       "responsibilityId": "phase2.konoha_onboarding.trial"
+    },
+    {
+      "semanticId": "phase2.discipline_development.commit",
+      "owner": "runtime/alpha-phase2-discipline-development-44800.js",
+      "responsibilityId": "phase2.discipline_development.trial"
     }
   ],
   "globalWrapperChains": [
@@ -2057,6 +2123,16 @@
       "stateRef": "playerData.acquisition.onboardingStatus / academyTeamFormation continuation Phase-2 trial correction",
       "owner": "runtime/alpha-first-konoha-tutorial-35000.js",
       "responsibilityId": "phase2.konoha_onboarding.trial"
+    },
+    {
+      "stateRef": "playerData.characters[progressionCharacterId].disciplineProgression Phase-2 Discipline Development transaction",
+      "owner": "runtime/alpha-phase2-discipline-development-44800.js",
+      "responsibilityId": "phase2.discipline_development.trial"
+    },
+    {
+      "stateRef": "playerData.characters[progressionCharacterId].stats discipline_stat_breakthrough mutation source",
+      "owner": "runtime/alpha-phase2-discipline-development-44800.js",
+      "responsibilityId": "phase2.discipline_development.trial"
     }
   ]
 }
