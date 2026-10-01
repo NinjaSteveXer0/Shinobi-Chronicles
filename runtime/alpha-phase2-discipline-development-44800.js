@@ -208,6 +208,14 @@ function recordAttemptHistory(serviceId,context,resolution,tx){
 function commitDevelopment({serviceId,characterId,disciplineId,developmentExp,receiptId=null,expectedTeamAssignmentId=null,context=null,resolution=null,recordHistory=false}={}){
   const expAmount=Math.floor(Number(developmentExp));
   if(!Number.isFinite(expAmount)||expAmount<1||expAmount>3)return{success:false,reason:"invalid_action_derived_development_exp"};
+  // Idempotence is checked before current eligibility. A legitimately committed
+  // receipt must remain a successful no-op replay even if that original commit
+  // itself reached the activity ceiling or the team later changed.
+  const earlyState=root();
+  if(receiptId&&earlyState&&earlyState.processedReceiptIds.includes(receiptId)){
+    const existing=findDevelopmentReceipt(receiptId);
+    return{success:true,idempotent:true,...clone(existing||{receiptId})};
+  }
   const before=preflight(serviceId,characterId,disciplineId);
   if(!before.allowed)return{success:false,...before};
   if(expectedTeamAssignmentId&&expectedTeamAssignmentId!==before.teamAssignmentId)return{success:false,reason:"stale_team_assignment",expectedTeamAssignmentId,currentTeamAssignmentId:before.teamAssignmentId};
