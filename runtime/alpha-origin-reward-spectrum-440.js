@@ -113,7 +113,10 @@ function commitDevelopment440({subjectVariantId,sourceOccurrenceId,progressionSl
   const progressionBefore=clone(character.disciplineProgression),statsBefore=clone(character.stats),historyLength=rows.length;
   try{
     progression.exp=(Number(progression.exp)||0)+grant;
-    const levelResult=processDisciplineLevelUps(subjectVariantId,runtimeDisciplineId);
+    const levelResult=processDisciplineLevelUps(subjectVariantId,runtimeDisciplineId,{
+      transactionId:receiptId,
+      sourceDevelopmentReceiptRefs:[receiptId]
+    });
     if(!levelResult)throw new Error("discipline_level_processing_failed");
     rows.push(record);if(typeof savePlayerData==="function")savePlayerData();
     return{success:true,idempotent:false,receipt:clone(record),expGranted:grant,levelResult:clone(levelResult)};
