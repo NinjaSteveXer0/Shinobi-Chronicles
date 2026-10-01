@@ -74,7 +74,6 @@ assert.strictEqual(committed.success,true,"Team Formation commit failed");
 const committedTeam=plain("getChronicleCurrentTeam43600()");
 assert.deepStrictEqual(committedTeam.teamVariantIds,["academy_menma"].concat(candidates),"manifest currentTeam is not exact committed Academy squad");
 const beforeRyo=plain("playerData.ryo");
-const beforeHistory=plain("(playerData.activityHistory||[]).length");
 const beforeStats=plain('JSON.stringify(getPlayerCharacter("academy_menma")&&getPlayerCharacter("academy_menma").stats||{})');
 
 const continued=plain("continueAcademyTeamFormationJourney()");
@@ -85,6 +84,7 @@ assert.strictEqual(plain("ensurePlayerAcquisitionState().academyTeamFormation.co
 assert.strictEqual(plain("isAcademyFreePlayAvailable()"),true,"ordinary Konoha free play still trapped behind tutorial");
 assert.strictEqual(plain("isFirstKonohaTutorialPending35000()"),false,"retired mandatory tutorial still pending");
 assert.deepStrictEqual(plain("getChronicleCurrentTeam43600().teamVariantIds"),committedTeam.teamVariantIds,"onboarding changed current team");
+const tutorialHistoryBaseline=plain("(playerData.activityHistory||[]).length");
 
 let p=plain("getChronicleTutorialProgress43600({create:false})");
 assert(p&&p.sandboxPopupSeen===false,"opening popup incorrectly pre-consumed");
@@ -123,7 +123,7 @@ assert.strictEqual(plain("getChronicleTutorialProgress43600({create:false}).aren
 
 assert.strictEqual(plain("playerData.ryo"),beforeRyo,"tutorial changed Ryō");
 assert.strictEqual(plain('JSON.stringify(getPlayerCharacter("academy_menma")&&getPlayerCharacter("academy_menma").stats||{})'),beforeStats,"tutorial changed Stats");
-assert.strictEqual(plain("(playerData.activityHistory||[]).length"),beforeHistory,"tutorial created World/Chronicle events");
+assert.strictEqual(plain("(playerData.activityHistory||[]).length"),tutorialHistoryBaseline,"tutorial coachmarks created World/Chronicle events");
 assert.deepStrictEqual(plain("getChronicleCurrentTeam43600().teamVariantIds"),committedTeam.teamVariantIds,"tutorial mutated current team");
 
 run("savePlayerData();playerData=loadPlayerData();","reload.js");
