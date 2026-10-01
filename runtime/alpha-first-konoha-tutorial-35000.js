@@ -237,7 +237,7 @@ if(priorRecordOpen){
 function setTipsEnabled(enabled){return update({tutorialTipsEnabled:enabled===true});}
 function snapshot(){return clone(progress({create:false}));}
 function diagnostics(){
-  const source=[continueSandboxTrial,openingPopup,applyRecommendedHighlights,trainingTip,practicalTip,examsTip,arenaGuide,nextStepPopup,recordTip].map(fn=>fn.toString()).join("\n");
+  const source=[continueSandboxTrial,openingPopup,chooseOpening,applyRecommendedHighlights,trainingTip,practicalTip,examsTip,arenaGuide,nextStepPopup,chooseNextStep,recordTip].map(fn=>fn.toString()).join("\n");
   const checks={
     stableLegacyIds:TUTORIAL_ID==="konoha_onboarding_first_team_orientation_v1"&&COMPLETION_RECEIPT_ID==="konoha_onboarding_first_team_orientation_completed_v1",
     freePlayImmediatelyAfterCommittedTeam:continueSandboxTrial.toString().includes("onboardingStatus=FREE_PLAY_STATUS")&&continueSandboxTrial.toString().includes("freePlayAuthorized:true"),
@@ -249,7 +249,7 @@ function diagnostics(){
     arenaFourLanes:["PROMOTION","ARENA BATTLE","STAGED BATTLES","VILLAGE TOURNAMENT"].every(text=>arenaGuide.toString().includes(text)),
     unavailableArenaLanesHonest:arenaGuide.toString().includes("NOT CURRENTLY AVAILABLE"),
     nextStepExact:nextStepPopup.toString().includes("YOUR NEXT STEP")&&nextStepPopup.toString().includes("TAKE PROMOTION ASSESSMENT")&&nextStepPopup.toString().includes("KEEP EXPLORING"),
-    promotionUsesExistingRoute:nextStepPopup.toString().includes("openArenaPromotionSurface"),
+    promotionUsesExistingRoute:chooseNextStep.toString().includes("openArenaPromotionSurface"),
     noGameplayGrant:!source.includes("basePL")&&!source.includes("disciplineProgression")&&!source.includes("playerData.ryo")&&!source.includes("formalRank=")&&!source.includes("setWorldEvent"),
     exactCommittedCurrentTeam:continueSandboxTrial.toString().includes("currentTeam:clone(team())"),
     browserGoldenClaimed:false
