@@ -47,7 +47,14 @@ const teamSave={
   const c=boot(teamSave);
   const manifest=plain(c.getChronicleStateManifest43600());
   assert.strictEqual(manifest.manifestId,"sc.phase2.chronicle_state_manifest.v1");
-  assert.deepStrictEqual(manifest.domains.map(x=>x.stateDomainId),["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","shinobiRecordProjection"]);
+  assert.deepStrictEqual(manifest.domains.map(x=>x.stateDomainId),["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","disciplineDevelopment","characterStats","shinobiRecordProjection"]);
+  const disciplineDomain=manifest.domains.find(x=>x.stateDomainId==="disciplineDevelopment");
+  const statsDomain=manifest.domains.find(x=>x.stateDomainId==="characterStats");
+  assert.strictEqual(disciplineDomain.savePath,"playerData.characters[progressionCharacterId].disciplineProgression");
+  assert.strictEqual(statsDomain.savePath,"playerData.characters[progressionCharacterId].stats");
+  assert.strictEqual(statsDomain.semanticOwner,"PL / Registry / Rank");
+  assert(!manifest.domains.some(x=>x.stateDomainId==="techniquePractice"),"Technique Practice activated without an exact route");
+  assert(!manifest.domains.some(x=>x.stateDomainId==="mastery"),"numeric Mastery domain was reintroduced");
   for(const row of manifest.domains){
     for(const key of ["stateDomainId","semanticOwner","canonicalWritePath","stableIdentityKey","savePath","schemaVersion","sourceOccurrenceIdFormat","idempotenceKeyFormat","derivedFields","projectionConsumers","migrationRule","resetRule","difficultyScope","inheritanceRule","devOverridePolicy","qaRefs"]){
       assert(Object.prototype.hasOwnProperty.call(row,key),"domain "+row.stateDomainId+" missing "+key);
@@ -116,7 +123,11 @@ console.log(JSON.stringify({
   pass:true,
   issue:436,
   manifest:"sc.phase2.chronicle_state_manifest.v1",
-  initialDomains:["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","shinobiRecordProjection"],
+  initialDomains:["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","disciplineDevelopment","characterStats","shinobiRecordProjection"],
+  disciplineDevelopmentExistingSavePath:true,
+  characterStatsRegistryOwned:true,
+  noTechniquePracticeDomain:true,
+  noMasteryDomain:true,
   pureMigration:true,
   deterministicMigration:true,
   currentTeamDerivedFromCommittedFormation:true,
