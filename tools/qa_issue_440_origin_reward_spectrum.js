@@ -62,7 +62,8 @@ function boot(seed={}){
   ctx.globalThis=ctx;runtimeCtx=ctx;vm.createContext(ctx);vm.runInContext(overlaySource,ctx,{filename:overlayPath});
   return{ctx,A,playerData,chars,evidence,active};
 }
-function exp(state,id,discipline){return Number(state.chars[id]?.disciplineProgression?.[discipline]?.exp)||0;}
+const RUNTIME_DISCIPLINE={ninjutsu:"nin",taijutsu:"tai",genjutsu:"gen",bukijutsu:"buki",fuinjutsu:"fuin",kinjutsu:"kin",stamina:"stamina"};
+function exp(state,id,discipline){const runtimeId=RUNTIME_DISCIPLINE[discipline]||discipline;return Number(state.chars[id]?.disciplineProgression?.[runtimeId]?.exp)||0;}
 function receipts(state,id){return state.playerData.activityHistory.filter(r=>r&&r.type==='discipline_development'&&r.subjectVariantId===id);}
 function evidenceTags(state,id){return state.evidence.filter(r=>r.subjectVariantId===id).flatMap(r=>r.tags||[]);}
 
@@ -142,14 +143,52 @@ assert(obitoSource.includes('appendAcademyOriginRewardReceipt440(lines,ORIGIN_ID
   assert(!jt.some(x=>String(x).includes('reverse_summoning')),'Kushina joint closure incorrectly granted reverse-summoning qualification');
 }
 
-// Kurenai: three material stages are source-scoped and obey the exact root cap of 3.
+// Kurenai: exact +1 resisted / +2 effective classification under the exact root cap of 3.
 {
   const s=boot();
   s.A.commitOccurrence('academy_kurenai','occ_origin_kurenai_bell_test_resolution',{
     kurenaiStage1:'false_kurenai',kurenaiStage2:'rush_bell',kurenaiStage3:'take_bell_now',bellTestOutcomeClass:'complete_loss'
   });
+  const rows=receipts(s,'academy_kurenai');
   assert.equal(exp(s,'academy_kurenai','genjutsu'),3);
-  assert.equal(receipts(s,'academy_kurenai').length,3);
+  assert.deepStrictEqual(rows.map(r=>r.requestedExp),[1,1,1]);
+  assert.deepStrictEqual(rows.map(r=>r.expGranted),[1,1,1]);
+}
+{
+  const s=boot();
+  s.A.commitOccurrence('academy_kurenai','occ_origin_kurenai_bell_test_resolution',{
+    kurenaiStage1:'fake_direct',kurenaiStage2:'draw_attention',kurenaiStage3:'take_bell_now',bellTestOutcomeClass:'partial_loss'
+  });
+  const rows=receipts(s,'academy_kurenai');
+  assert.equal(exp(s,'academy_kurenai','genjutsu'),3);
+  assert.deepStrictEqual(rows.map(r=>r.requestedExp),[2,1,1]);
+  assert.deepStrictEqual(rows.map(r=>r.expGranted),[2,1,0]);
+  assert.strictEqual(rows[2].capSuppressed,true);
+  const lines=['REWARDS'];s.ctx.appendAcademyOriginRewardReceipt440(lines,'academy_kurenai');
+  const text=lines.join('\n');
+  assert(text.includes('Genjutsu Development: +2')&&text.includes('direct approach'),'effective Stage 1 Receipt line missing');
+  assert(text.includes('Genjutsu Development: +1')&&text.includes('attention draw'),'resisted Stage 2 Receipt line missing');
+  assert(!text.includes('final bell grab'),'cap-suppressed Stage 3 falsely displayed');
+}
+{
+  const s=boot();
+  s.A.commitOccurrence('academy_kurenai','occ_origin_kurenai_bell_test_resolution',{
+    kurenaiStage1:'conceal_movement',kurenaiStage2:'draw_attention',kurenaiStage3:'pretend_withdraw',bellTestOutcomeClass:'partial_win'
+  });
+  const rows=receipts(s,'academy_kurenai');
+  assert.equal(exp(s,'academy_kurenai','genjutsu'),3);
+  assert.deepStrictEqual(rows.map(r=>r.requestedExp),[2,2,2]);
+  assert.deepStrictEqual(rows.map(r=>r.expGranted),[2,1,0],'effective/effective route exceeded root cap 3');
+}
+{
+  const s=boot();
+  s.A.commitOccurrence('academy_kurenai','occ_origin_kurenai_bell_test_resolution',{
+    kurenaiStage1:'false_kurenai',kurenaiStage2:'rush_bell',kurenaiStage3:'pretend_withdraw',bellTestOutcomeClass:'partial_loss'
+  });
+  const rows=receipts(s,'academy_kurenai');
+  assert.deepStrictEqual(rows.map(r=>r.expGranted),[1,1,1],"Stephen route false/rush/withdraw drifted");
+  const lines=['REWARDS'];s.ctx.appendAcademyOriginRewardReceipt440(lines,'academy_kurenai');
+  assert.equal(lines.filter(line=>line.includes('Genjutsu Development: +1')).length,3,'Stephen route Receipt breakdown not exact');
 }
 
 // Metal: exact private development; MET-03 technical branches only; taking impact gives no invented Stamina/technical EXP.
@@ -214,6 +253,9 @@ assert(obitoSource.includes('appendAcademyOriginRewardReceipt440(lines,ORIGIN_ID
   assert.equal(s.playerData.activityHistory.length,before,'reconcile duplicated reward receipt');
 }
 
+const kurReceiptBlock=binderSource.slice(binderSource.indexOf('function buildKurenaiReceipt105'),binderSource.indexOf('function buildIwabeeReceipt105'));
+assert.strictEqual((kurReceiptBlock.match(/Origin Starting Purse/g)||[]).length,1,'Kurenai Receipt purse appears more than once');
+
 const d=boot().ctx.runAcademyOriginRewardSpectrum440Diagnostics();
 assert.equal(d.pass,true,JSON.stringify(d,null,2));
 
@@ -225,6 +267,7 @@ console.log(JSON.stringify({
     iwabeeBattleVictory50:true,
     metalCanonicalSourceWithLegacyDedupe:true,
     developmentSourceScopedAndIdempotent:true,
+    kurenaiExactOneTwoCapThree:true,
     specialJoninMappingsBounded:true,
     kushinaReverseSummoningRejected:true,
     obitoNoDoubleDevelopment:true,
