@@ -1480,7 +1480,59 @@
         "tools/qa_phase2_konoha_player_surfaces_431.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
+    },
+    {
+      "responsibilityId": "phase2.discipline_development.foundation_trial",
+      "canonicalOwner": "runtime/alpha-phase2-discipline-development-44800.js",
+      "ownerType": "progression_transaction_adapter",
+      "directCallers": [
+        "executeKonohaExamAttempt",
+        "executeKonohaExamBatch",
+        "executeKonohaPracticalAttempt",
+        "executeKonohaPracticalTraining",
+        "renderKonohaExamVisualScreen",
+        "renderKonohaPracticalVisualScreen"
+      ],
+      "stateReads": [
+        "committed currentTeam from getChronicleCurrentTeam43600",
+        "stable acquisition ownedCharacterId / progressionCharacterId",
+        "canonical runtime Current Stats",
+        "existing disciplineProgression.exp ledger"
+      ],
+      "stateWrites": [
+        "canonical Current Stat mutation on exact persistent Character",
+        "existing disciplineProgression.exp ledger",
+        "playerData.phase2ChronicleState.disciplineDevelopment idempotence / development / breakthrough / ceiling receipts",
+        "factual Practical / Exam activityHistory development evidence"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-phase2-discipline-development-44800.js"
+      ],
+      "extensionHooks": [
+        "commitFoundationDisciplineDevelopment44800",
+        "getDisciplineDevelopmentProjection44800",
+        "preflightFoundationDisciplineDevelopment44800",
+        "rehydratePersistentDisciplineStats44800"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [
+        "registered Academy Foundation Practical/Exam legacy fixed-threshold level->Stat mutation",
+        "partial Discipline EXP -> fractional Current Stat -> Current PL projection"
+      ],
+      "saveSchemaRefs": [
+        "playerData.characters[progressionCharacterId].stats",
+        "playerData.characters[progressionCharacterId].disciplineProgression.exp",
+        "playerData.phase2ChronicleState.disciplineDevelopment"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_448_persistent_discipline_development.js",
+        "tools/qa_issue_448_persistent_discipline_development_browser.js",
+        "tools/qa_save_compatibility_311.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
     }
+
   ],
   "adapters": [
     {
