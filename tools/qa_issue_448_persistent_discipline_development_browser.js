@@ -88,10 +88,12 @@ async function restorePracticalResolver(page){
       // canonical Current Stats. The fixture then behaves like a persisted save.
       rehydratePersistentDisciplineStats44800();
       const menma=getPlayerCharacter("academy_menma");
-      const nin=getCharacterDisciplineProgression("academy_menma","nin");
-      const tai=getCharacterDisciplineProgression("academy_menma","tai");
-      menma.stats.nin=9;nin.exp=8;
-      menma.stats.tai=9;tai.exp=9;
+      // getCharacterDisciplineProgression normalizes the whole progression
+      // object, so seed both rows first and mutate the final canonical object.
+      getCharacterDisciplineProgression("academy_menma","nin");
+      getCharacterDisciplineProgression("academy_menma","tai");
+      menma.stats.nin=9;menma.disciplineProgression.nin.exp=8;
+      menma.stats.tai=9;menma.disciplineProgression.tai.exp=9;
       savePlayerData();
 
       return{
