@@ -136,14 +136,14 @@ function firstUseTip(key,title,copy){
     actions:[{id:"continue",label:"CONTINUE",run(){removePanel();}}]
   });
 }
-function trainingTip(){return firstUseTip("trainingTipSeen","TRAINING GROUND","Training and Practical activities are where your ninja and current team will develop.");}
-function practicalTip(){return firstUseTip("practicalTipSeen","PRACTICAL TRAINING","Practical activities put your current ninja and team into hands-on training situations. Development will only be awarded when the activity's real runtime supports it.");}
+function trainingTip(){return firstUseTip("trainingTipSeen","TRAINING GROUND","Training Grounds let you work with the shinobi you own across My Clan. Practical Training focuses on developing individual disciplines.");}
+function practicalTip(){return firstUseTip("practicalTipSeen","PRACTICAL TRAINING","Practical Training puts your current team through hands-on discipline exercises. Complete an exercise to earn the development it awards.");}
 function examsTip(){return firstUseTip("examsTipSeen","SHINOBI EXAMS","Exams test specific shinobi disciplines and capabilities when you are eligible to take them. They are separate from formal Rank Promotion.");}
 function recordTip(){return firstUseTip("shinobiRecordTipSeen","SHINOBI RECORD","Your Shinobi Record tracks your current journey, missions, intelligence, Chronicle history and development. Use it when you are unsure what has changed or where your Chronicle is heading.");}
 
 function chooseNextStep(choice){
   if(!["promotion","keep_exploring"].includes(choice))return{success:false,reason:"unknown_next_step_choice"};
-  const result=update({arenaCompletionChoiceSeen:true});removePanel();
+  const result=update({arenaCompletionChoiceSeen:true,recommendedRouteEnabled:false});clearRecommendedHighlights();removePanel();
   if(choice==="promotion"&&typeof openArenaPromotionSurface==="function")openArenaPromotionSurface();
   if(choice==="keep_exploring"){
     if(typeof openOverlay==="function")openOverlay("village");else if(typeof closeOverlay==="function")closeOverlay();
