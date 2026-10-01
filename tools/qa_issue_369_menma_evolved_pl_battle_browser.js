@@ -764,6 +764,9 @@ async function legitimatePartyDefeat(browser){
     assert.strictEqual(receipt.cueKind,"record","#105 Menma Chronicle Receipt record presentation missing after #369 defeat return");
     assert.strictEqual(receipt.heading,"CHRONICLE RECEIPT","#105 Menma Chronicle Receipt heading missing after #369 defeat return");
     assert(receipt.text.includes("ACADEMY MENMA"),"#105 Menma Chronicle Receipt content missing after #369 defeat return");
+    assert(receipt.text.includes("REWARDS"),"#105 Menma Chronicle Receipt rewards section missing");
+    assert.strictEqual((receipt.text.match(/Origin Starting Purse: \+100 Ryō\./g)||[]).length,1,"#105 Menma Chronicle Receipt starting purse missing/duplicated");
+    assert(!receipt.text.includes("PL Battle Victory: +100 Ryō."),"#105 Menma defeat Receipt falsely displayed victory cash");
     assert.strictEqual(receipt.button,"CONTINUE","#105 Menma Chronicle Receipt dedicated button missing");
     await page.screenshot({path:path.join(OUT,"party-defeat-future-receipt.png"),fullPage:false,timeout:12000}).catch(()=>{});
     await clickStoryPrimary(page);
@@ -776,6 +779,8 @@ async function legitimatePartyDefeat(browser){
     }));
     assert.strictEqual(completion.activeScene,null,"Scene 10 terminal did not close the Origin");
     assert.strictEqual(completion.origin?.prologueCompleted,true,"existing Origin completion boundary did not fire");
+    const purseCount=await page.evaluate(()=>getActivityHistory().filter(row=>row?.type==="origin_completion_reward"&&row.rewardSourceId==="origin_completion_starting_purse_ryo_01"&&row.originVariantId==="academy_menma").length);
+    assert.strictEqual(purseCount,1,"Menma completion starting purse missing/duplicated");
     assert.strictEqual(completion.formation?.required,true,"existing Chronicle-begins/team-formation boundary did not follow Scene 10");
     assert.strictEqual(completion.intentCount,1,"Origin completion duplicated future-ambition intent");
 
