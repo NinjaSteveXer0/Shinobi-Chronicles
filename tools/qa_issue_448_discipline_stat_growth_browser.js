@@ -143,18 +143,32 @@ async function inspectMyClan(page,characterId){
     // Save/reload preserves exact Current Stat, remaining EXP and formula PL.
     const beforeReload=await page.evaluate(()=>{
       const c=getPlayerCharacter("academy_menma");
-      return{snapshot:getDisciplineDevelopmentSnapshot448(c.id,"nin","exam"),pl:calculateCurrentPL(c),saved:JSON.parse(JSON.stringify(playerData.characters[c.id]))};
+      const rows=playerData.activityHistory||[];
+      return{
+        snapshot:getDisciplineDevelopmentSnapshot448(c.id,"nin","exam"),pl:calculateCurrentPL(c),
+        saved:JSON.parse(JSON.stringify(playerData.characters[c.id])),
+        developmentReceipts:rows.filter(row=>row?.type==="discipline_development"&&row?.progressionCharacterId===c.id&&row?.disciplineId==="nin").length,
+        breakthroughReceipts:rows.filter(row=>row?.type==="discipline_stat_breakthrough"&&row?.progressionCharacterId===c.id&&row?.disciplineId==="nin").length
+      };
     });
     await page.reload({waitUntil:"domcontentloaded",timeout:60000});
     await waitRuntime(page);await release(page);
     const afterReload=await page.evaluate(()=>{
       const c=getPlayerCharacter("academy_menma");
-      return{snapshot:getDisciplineDevelopmentSnapshot448(c.id,"nin","exam"),pl:calculateCurrentPL(c),saved:JSON.parse(JSON.stringify(playerData.characters[c.id]))};
+      const rows=playerData.activityHistory||[];
+      return{
+        snapshot:getDisciplineDevelopmentSnapshot448(c.id,"nin","exam"),pl:calculateCurrentPL(c),
+        saved:JSON.parse(JSON.stringify(playerData.characters[c.id])),
+        developmentReceipts:rows.filter(row=>row?.type==="discipline_development"&&row?.progressionCharacterId===c.id&&row?.disciplineId==="nin").length,
+        breakthroughReceipts:rows.filter(row=>row?.type==="discipline_stat_breakthrough"&&row?.progressionCharacterId===c.id&&row?.disciplineId==="nin").length
+      };
     });
     assert.strictEqual(afterReload.snapshot.currentStat,11);
     assert.strictEqual(afterReload.snapshot.developmentExp,0);
     assert.strictEqual(afterReload.pl,beforeReload.pl);
     assert.strictEqual(afterReload.saved.stats.nin,11);
+    assert.strictEqual(afterReload.developmentReceipts,beforeReload.developmentReceipts,"reload duplicated/lost development receipts");
+    assert.strictEqual(afterReload.breakthroughReceipts,beforeReload.breakthroughReceipts,"reload duplicated/lost breakthrough receipts");
 
     // Ceiling/batch semantics: last eligible attempt reaches 15 with overflow; ×10 stops immediately afterward.
     const ceiling=await page.evaluate(()=>{
@@ -186,11 +200,19 @@ async function inspectMyClan(page,characterId){
     await page.screenshot({path:path.join(OUT,"03-exam-ceiling-complete.png"),fullPage:true});
 
     // Practical gets the same dynamic player-facing semantics.
-    await page.evaluate(()=>{
+    const practicalAction=await page.evaluate(()=>{
       const c=getPlayerCharacter("academy_menma"),p=getCharacterDisciplineProgression(c.id,"tai");
       c.stats.tai=10;p.exp=0;p.level=1;p.statLevelApplied=1;savePlayerData();
+      const old=Math.random;Math.random=()=>0.999999;
+      let result;
+      try{result=executeKonohaPracticalAttempt(c.id,"tai");}finally{Math.random=old;}
       openKonohaPracticalFromVillage();selectKonohaPracticalDiscipline("tai");
+      return{result:JSON.parse(JSON.stringify(result)),snapshot:getDisciplineDevelopmentSnapshot448(c.id,"tai","practical")};
     });
+    assert.strictEqual(practicalAction.result.success,true,"deterministic Practical action did not pass");
+    assert.strictEqual(practicalAction.result.rewardExp,2,"Practical effective execution did not award +2 Development");
+    assert.strictEqual(practicalAction.snapshot.currentStat,10);
+    assert.strictEqual(practicalAction.snapshot.developmentExp,2);
     await page.waitForSelector("#konoha-activity-screen[data-service-id='practical']",{state:"visible",timeout:10000});
     const practical=await page.evaluate(()=>{
       const data=getKonohaPracticalUIScreenData(),root=document.getElementById("konoha-activity-screen");
@@ -209,6 +231,8 @@ async function inspectMyClan(page,characterId){
       pass:true,issue:448,
       currentTeam:["academy_menma","academy_hinata","academy_kakashi"],
       realExamActionToStatBreakthrough:true,
+      realPracticalActionToDevelopment:true,
+      reloadReceiptIdempotence:true,
       developmentPerEffectiveFoundationAction:2,
       dynamicThresholdUI:true,numericMasteryRetired:true,
       myClanCanonicalProjection:true,saveReload:true,
