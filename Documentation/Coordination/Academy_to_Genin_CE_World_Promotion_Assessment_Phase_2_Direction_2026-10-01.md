@@ -244,3 +244,171 @@ Hidden projects as ??????.
 Revealed+satisfied may use light-green text/checkmark.
 
 Do not expose package ID, hidden domain identity, evidence weights or pass probability to normal player UI.
+
+## 25. Player-facing Promotion projection closure — hidden slots / examiner / Receipt
+
+This section closes the CE/player-facing semantic presentation required before UI/runtime routing. It does not prescribe final geometry, art, animation or typography.
+
+### Arena -> Promotion entry
+
+Arena remains the only Alpha assessment-launch surface.
+
+Before explicit attempt commit, the player may inspect:
+- the selected assessment subject;
+- formal Academy -> Genin assessment availability;
+- the known mission family/purpose;
+- prior known attempt/result history where observer-safe;
+- any requirement information already legitimately revealed for that subject/playthrough.
+
+Inspection does not:
+- commit an attempt;
+- choose/reroll `assessmentScenarioId`;
+- choose/reroll `promotionRequirementPackageId`;
+- satisfy evidence;
+- trigger teammate intent;
+- trigger Chronicle Pulse.
+
+The actual attempt begins only from an explicit player commit.
+
+### Readiness presentation is a Record projection, not the gameplay
+
+The assessment must not return to a flat checklist as the primary play experience.
+
+A compact read-only **ASSESSMENT RECORD** / equivalent projection may expose:
+- the disclosed formal mission objective;
+- four stable readiness slots;
+- current safety/integrity status only when player-facing disclosure is legitimate;
+- the authoritative final Promotion result after resolution.
+
+The four readiness slots remain the stable Rank-owned slot IDs:
+- `academy_genin_req_mission_comprehension`;
+- `academy_genin_req_judgement_under_pressure`;
+- `academy_genin_req_secondary_1`;
+- `academy_genin_req_secondary_2`.
+
+For each slot, player projection is strictly:
+- hidden + unsatisfied -> `??????`;
+- hidden + satisfied -> `??????`;
+- revealed + unsatisfied -> disclosed player-facing label, no success treatment;
+- revealed + satisfied -> disclosed player-facing label with approved light-green/checkmarked success treatment or final UI equivalent.
+
+Never expose:
+- package ID;
+- hidden domain identity;
+- evidence counts/weights;
+- examiner score;
+- pass probability;
+- internal CE/Rank diagnostics;
+- hidden satisfaction state.
+
+The Assessment Record is a projection over authority. Opening, closing or refreshing it cannot mutate assessment truth.
+
+### During field play
+
+The main player experience is the real World/Story assessment.
+
+Player-facing state should prioritise:
+- current known objective;
+- discovered evidence/leads;
+- observer-safe participant intent;
+- current factual courier/dispatch situation where legitimately known;
+- current Journey/location;
+- factual Battle/route consequences;
+- newly discovered requirement information only when a legitimate reveal source occurs.
+
+Do not continuously translate every action into visible readiness-domain progress.
+
+A player action may create qualifying hidden evidence without receiving a UI confirmation that a hidden requirement was satisfied.
+
+### Examiner behaviour
+
+The examiner is an institutional observer/adjudicator, not an omniscient narrator for the player.
+
+Examiner presentation may:
+- brief the formal mission;
+- communicate authored safety/integrity rules;
+- observe/record institutional evidence through legitimate assessment authority;
+- disclose selected rationale after resolution;
+- reveal a requirement when an authorised disclosure route says the subject may know it;
+- communicate the authoritative Promotion result.
+
+Examiner presentation must not:
+- expose hidden package mechanics merely because the examiner knows them;
+- turn hidden evaluation into live points;
+- imply Battle victory is Promotion;
+- erase meaningful unsuccessful history.
+
+### Promotion Chronicle Receipt
+
+Every completed attempt, successful, unsuccessful, withdrawn or otherwise terminal under authored assessment authority, must project one read-only Promotion Chronicle Receipt from committed facts.
+
+Use the following semantic sections where non-empty:
+- **YOUR DECISIONS**
+- **TEAM / PARTICIPANT ACTIONS**
+- **WHAT HAPPENED**
+- **PROMOTION RESULT**
+- **HISTORY CREATED**
+- **DEVELOPMENT / EVIDENCE**
+- **REWARDS**
+- **NEWLY ACTIONABLE**
+
+Projection rules:
+- show only participant actions the protagonist legitimately knows;
+- preserve autonomous participant authorship rather than rewriting teammate decisions as player decisions;
+- show exact visible Ryō/items/material/equipment entitlements already committed by owning systems;
+- show player-visible development/evidence without exposing hidden Rank scoring;
+- show newly revealed requirement/rationale only when disclosure provenance exists;
+- unsuccessful attempts still show retained history/value;
+- opening/reopening Receipt never grants, rerolls or recommits anything.
+
+### One occurrence, participant Chronicles
+
+A Promotion attempt is one authoritative World/assessment occurrence lineage.
+
+Material actions/outcomes may be indexed into each legitimate participant's personal Chronicle:
+- assessment subject;
+- current teammates;
+- examiner/institution where persistent;
+- courier/opponents/other persistent participants where applicable.
+
+Participant-specific Chronicle projection may differ by action, Knowledge and consequence, but World Truth remains one occurrence.
+
+The protagonist's Shinobi Record must not expose another participant's private Chronicle beyond shared/known/discovered history.
+
+### Chronicle Pulse relation
+
+A completed/resolved Promotion attempt is a qualifying semantic Chronicle Pulse boundary because it is a formal mission/Rank-world occurrence resolution.
+
+A materially authored travel/rest/training transition inside the assessment may also qualify only when existing World-time authority says it advances world state.
+
+The following are never Chronicle Pulse boundaries by themselves:
+- opening Arena;
+- opening Promotion;
+- inspecting hidden slots;
+- opening/reopening the Assessment Record;
+- opening/reopening the Promotion Chronicle Receipt;
+- save/load;
+- browser refresh;
+- hovering/selecting UI controls.
+
+Pulse evaluation happens from committed semantic progression, not UI activity.
+
+### Post-result actions
+
+After authoritative Rank result:
+
+Success may expose:
+- continue into the existing Genin roster transition;
+- Receipt/Record review;
+- other already-authorised next Journey actions.
+
+Unsuccessful/withdrawn attempts may expose only authorised options such as:
+- retry this assessment;
+- choose another compatible authorised assessment scenario;
+- return to Konoha / keep exploring.
+
+Changing scenario cannot change the fixed playthrough package. Any alternate offered must support the subject's existing `promotionRequirementPackageId`.
+
+### Final presentation lock
+
+> **Promotion is played as a real Chronicle mission, not as a score panel. Hidden requirement truth may be satisfied without being known. The examiner discloses only authorised information. The Assessment Record and Promotion Chronicle Receipt are read-only projections. Autonomous teammate actions remain their actions and enter participant Chronicles accordingly. Attempt resolution can trigger Chronicle Pulse; UI inspection cannot.**
