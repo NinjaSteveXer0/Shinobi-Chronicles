@@ -107,3 +107,34 @@ Do not use broad fixture/Kage/test Characters on ordinary player surfaces unless
 ## Final lock
 
 > **Phase 1 is complete. The ten Academy Origins and global Battle System are FROZEN GOLDEN at Stephen's owner-accepted browser checkpoint. The current reward-spectrum pass is a bounded semantic overlay and does not reopen the Origins. Phase 2 now builds the persistent game on top of that frozen foundation.**
+
+## Final reward-overlay owner freeze — 2026-10-01
+
+After the bounded #440 reward-spectrum overlay, Stephen gave the final owner verdict:
+
+> **everything in the Academy Origin package is FROZEN GOLDEN**
+
+Exact PR #417 head:
+
+`2b665913d2817840a076cb5cb6b2811b250ca025`
+
+Exact-head validation:
+
+- 22 / 22 workflows GREEN;
+- 0 failed;
+- 0 pending;
+- frozen Story/presentation firewall held;
+- shared Battle regression GREEN;
+- reward/idempotence/save-load regression GREEN.
+
+This supersedes the earlier Phase-1 Golden checkpoint only as the **latest accepted package head**.
+
+The earlier `1d3289dc...` remains useful as the pre-reward-overlay Golden baseline.
+
+Current final Phase-1 candidate lineage:
+
+`1d3289dc... FROZEN GOLDEN Origins/Battle baseline`
+-> bounded reward overlay
+-> `2b665913d2817840a076cb5cb6b2811b250ca025` **FINAL PHASE-1 FROZEN GOLDEN CANDIDATE**
+
+PR #417 remains unmerged until Coding completes source-control finalisation.
