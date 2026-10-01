@@ -8,11 +8,13 @@ on:
       - 'index.html'
       - 'runtime/alpha-chronicle-state-manifest-43600.js'
       - 'runtime/alpha-first-konoha-tutorial-35000.js'
+      - 'runtime/alpha-phase2-konoha-player-surfaces-43110.js'
       - 'tools/fixtures/runtime_change_declarations_300.json'
       - 'tools/fixtures/runtime_responsibility_registry_300.json'
       - 'tools/qa_phase2_chronicle_state_manifest_436.js'
       - 'tools/qa_first_konoha_tutorial_35000.js'
       - 'tools/qa_phase2_konoha_onboarding_browser_431.js'
+      - 'tools/qa_phase2_konoha_player_surfaces_431.js'
       - 'tools/qa_save_compatibility_311.js'
       - '.github/workflows/issues-431-436-phase2-konoha-onboarding.yml'
   pull_request:
@@ -38,9 +40,11 @@ jobs:
         run: |
           node --check runtime/alpha-chronicle-state-manifest-43600.js
           node --check runtime/alpha-first-konoha-tutorial-35000.js
+          node --check runtime/alpha-phase2-konoha-player-surfaces-43110.js
           node --check tools/qa_phase2_chronicle_state_manifest_436.js
           node --check tools/qa_first_konoha_tutorial_35000.js
           node --check tools/qa_phase2_konoha_onboarding_browser_431.js
+          node --check tools/qa_phase2_konoha_player_surfaces_431.js
       - name: Chronicle State Manifest
         run: node tools/qa_phase2_chronicle_state_manifest_436.js
       - name: Konoha onboarding deterministic trial
@@ -60,6 +64,8 @@ jobs:
           sleep 2
       - name: Installed-browser Konoha onboarding trial
         run: node tools/qa_phase2_konoha_onboarding_browser_431.js
+      - name: Installed-browser Practical / Exams player surfaces
+        run: node tools/qa_phase2_konoha_player_surfaces_431.js
       - name: Upload browser evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -67,5 +73,6 @@ jobs:
           name: phase2-konoha-onboarding-browser
           path: |
             artifacts/phase2-konoha-onboarding
+            artifacts/phase2-konoha-player-surfaces
             phase2-konoha-server.log
           if-no-files-found: ignore
