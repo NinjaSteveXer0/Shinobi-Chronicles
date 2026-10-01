@@ -44,6 +44,15 @@ function installCompatibilityLoadAdapter(){
   try{loadPlayerData=wrapped;}catch(_error){}
   return true;
 }
+function rehydrateCurrentPhase2Root(){
+  const pd=currentPlayerData(),persistedRoot=readPersistedPhase2Root();
+  if(!pd||!persistedRoot||pd[ROOT_KEY])return false;
+  // game.js loads the browser save before this Phase-2 module is evaluated.
+  // Reattach the already-persisted Phase-2 root to that in-memory save once;
+  // this is pure rehydration and does not write localStorage or recommit facts.
+  pd[ROOT_KEY]=persistedRoot;
+  return true;
+}
 function acquisitionFrom(save){return save&&save.acquisition&&typeof save.acquisition==="object"?save.acquisition:null;}
 function formationFrom(save){const a=acquisitionFrom(save);return a&&a.academyTeamFormation&&typeof a.academyTeamFormation==="object"?a.academyTeamFormation:null;}
 function formationReceiptFrom(save){const f=formationFrom(save);return f&&f.confirmationReceipt&&typeof f.confirmationReceipt==="object"?f.confirmationReceipt:null;}
@@ -311,12 +320,14 @@ function diagnostics(){
 }
 
 installCompatibilityLoadAdapter();
+rehydrateCurrentPhase2Root();
 
 globalThis.getChronicleStateManifest43600=()=>MANIFEST;
 globalThis.getChronicleCurrentTeam43600=getCurrentTeam;
 globalThis.getChronicleIdentity43600=getChronicleIdentity;
 globalThis.getChronicleCurrentRyo43600=getCurrentRyo;
 globalThis.migratePhase2ChronicleState43600=migratePhase2ChronicleState;
+globalThis.rehydratePhase2ChronicleState43600=rehydrateCurrentPhase2Root;
 globalThis.ensurePhase2ChronicleState43600=ensurePhase2Root;
 globalThis.getChronicleTutorialProgress43600=getTutorialProgress;
 globalThis.updateChronicleTutorialProgress43600=updateTutorialProgress;
