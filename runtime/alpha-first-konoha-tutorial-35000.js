@@ -186,6 +186,7 @@ function continueSandboxTrial(){
   if(f){f.continuationCompleted=true;if(!f.continuedAt)f.continuedAt=Date.now();}
   if(typeof globalThis.ensurePhase2ChronicleState43600==="function")globalThis.ensurePhase2ChronicleState43600({save:false});
   save();
+  setTimeout(openingPopup,0);
   return{...(result&&typeof result==="object"?result:{}),success:true,destination:result&&result.destination||destination(),freePlayAuthorized:true,tutorialTrial:true,currentTeam:clone(team())};
 }
 function migrateLegacyPending(){
