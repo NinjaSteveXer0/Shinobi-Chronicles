@@ -356,6 +356,7 @@ function enrichFoundationAttemptResult(result,tx){
   result.currentExp=Number(tx.expAfter);
   result.disciplineExpBefore=Number(tx.expBefore);
   result.disciplineExpAfter=Number(tx.expAfter);
+  result.expToNext=thresholdForStat(Number(tx.statAfter)||0);
   result.currentPLBefore=tx.currentPLBefore;
   result.currentPLAfter=tx.currentPLAfter;
   return result;
@@ -406,6 +407,7 @@ function executeFoundationAttempt448(source,prior,characterId,disciplineId){
     rewardExp:developmentExp,
     expGained:developmentExp,
     previousLevel:1,newLevel:1,levelsGained:0,leveledUp:false,
+    disciplineLevelBefore:1,disciplineLevelAfter:1,
     difficulty:resolution.difficulty,
     score:resolution.score,
     historyPressure:resolution.history,
