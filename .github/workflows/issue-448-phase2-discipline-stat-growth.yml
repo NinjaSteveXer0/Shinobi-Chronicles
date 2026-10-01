@@ -39,6 +39,7 @@ jobs:
 
       - name: Source syntax
         run: |
+          node --check game.js
           node --check runtime/alpha-discipline-stat-growth-44800.js
           node --check runtime/alpha-origin-reward-spectrum-440.js
           node --check runtime/alpha-chronicle-state-manifest-43600.js
