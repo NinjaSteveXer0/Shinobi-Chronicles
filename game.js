@@ -9250,6 +9250,43 @@ let playerData =
 //
 // =========================================================
 
+function getPersistentCharacterProgressionSaveKey(
+  character
+) {
+
+
+  if (!character) {
+
+    return null;
+
+  }
+
+
+  const registryId =
+    typeof getCharacterRegistryId === "function"
+      ? getCharacterRegistryId(character)
+      : (
+          character.registryId ||
+          character.id ||
+          null
+        );
+
+
+  const ownedRecord =
+    registryId &&
+    typeof getOwnedCharacterRecordByVariantId === "function"
+      ? getOwnedCharacterRecordByVariantId(registryId)
+      : null;
+
+
+  return (
+    ownedRecord &&
+    ownedRecord.progressionCharacterId
+  ) || character.id || registryId || null;
+
+}
+
+
 function syncCharacterProgressionFromSave() {
 
 
@@ -9269,7 +9306,19 @@ function syncCharacterProgressionFromSave() {
     character => {
 
 
+      const progressionSaveKey =
+        getPersistentCharacterProgressionSaveKey(
+          character
+        );
+
+
       const savedCharacter =
+        (
+          progressionSaveKey &&
+          playerData.characters[
+            progressionSaveKey
+          ]
+        ) ||
         playerData.characters[
           character.id
         ];
@@ -9416,8 +9465,15 @@ function syncRuntimeProgressionToPlayerData() {
     character => {
 
 
+      const progressionSaveKey =
+        getPersistentCharacterProgressionSaveKey(
+          character
+        ) ||
+        character.id;
+
+
       playerData.characters[
-        character.id
+        progressionSaveKey
       ] = {
 
         stats: {
@@ -9441,6 +9497,25 @@ function syncRuntimeProgressionToPlayerData() {
           )
 
       };
+
+
+      // Phase-2 persistent Character identity migration:
+      // once the stable progression key is known, retire the old
+      // representation-keyed duplicate for this same runtime Character.
+      if (
+        progressionSaveKey !==
+          character.id &&
+        Object.prototype.hasOwnProperty.call(
+          playerData.characters,
+          character.id
+        )
+      ) {
+
+        delete playerData.characters[
+          character.id
+        ];
+
+      }
 
     }
   );
