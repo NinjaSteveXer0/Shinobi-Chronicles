@@ -122,6 +122,8 @@ async function clickGuide(page,label){
     s=await snapshot(page);
     assert.strictEqual(s.overlay,"village","KEEP EXPLORING did not return to Konoha");
     assert.strictEqual(s.progress.arenaCompletionChoiceSeen,true);
+    assert.strictEqual(s.progress.recommendedRouteEnabled,false,"recommended-route halos remained active after YOUR NEXT STEP");
+    assert.strictEqual(await page.locator("[data-konoha-guide-step]").count(),0,"recommended-route halo DOM attributes remained after YOUR NEXT STEP");
 
     await page.evaluate(()=>openShinobiRecord("overview"));
     await expectGuide(page,"SHINOBI RECORD");
@@ -151,7 +153,7 @@ async function clickGuide(page,label){
 
     // Prove Promotion action still delegates to the existing Promotion surface.
     await page.evaluate(()=>{
-      updateChronicleTutorialProgress43600({arenaCompletionChoiceSeen:false,arenaTipSeen:true},{save:true});
+      updateChronicleTutorialProgress43600({arenaCompletionChoiceSeen:false,arenaTipSeen:true,recommendedRouteEnabled:true},{save:true});
       openOverlay("arena");
     });
     await expectGuide(page,"YOUR NEXT STEP");
@@ -162,6 +164,7 @@ async function clickGuide(page,label){
       progress:getChronicleTutorialProgress43600({create:false})
     }));
     assert.strictEqual(promotionState.progress.arenaCompletionChoiceSeen,true);
+    assert.strictEqual(promotionState.progress.recommendedRouteEnabled,false,"Promotion choice did not retire recommended-route halos");
     assert.notStrictEqual(promotionState.overlay,"village","Promotion action incorrectly returned to village");
 
     await gate.assertClean("phase2-konoha-onboarding");
