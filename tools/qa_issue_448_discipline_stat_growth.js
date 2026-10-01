@@ -140,6 +140,23 @@ function commit(ctx,amount,n,{source="story",causalRootId=null,receiptId=null,te
   assert.deepStrictEqual(JSON.parse(JSON.stringify(breaks.map(r=>[r.priorStat,r.newStat,r.thresholdConsumed]))),[[10,11,10],[11,12,15]]);
 }
 {
+  // Outer transaction owners such as Origin #440 must be able to defer the
+  // compatibility resolver's save until their own factual receipt is committed.
+  const s=boot({stat:10,exp:9});
+  const p=s.getCharacterDisciplineProgression("academy_menma","nin");
+  p.exp=10;
+  const savesBefore=s.__saves;
+  const r=s.processDisciplineLevelUps("academy_menma","nin",{
+    transactionId:"qa448-outer-owner",
+    sourceDevelopmentReceiptRefs:["qa448-outer-development"],
+    deferSave:true
+  });
+  assert.equal(r.statPointsGained,1);
+  assert.equal(s.getPlayerCharacter("academy_menma").stats.nin,11);
+  assert.equal(p.exp,0);
+  assert.equal(s.__saves,savesBefore,"deferred compatibility breakthrough performed an inner save");
+}
+{
   const s=boot({stat:10});
   const r1=commit(s,3,1,{receiptId:"same-receipt"});
   const expAfter=r1.expAfter,historyAfter=s.activityHistory.length;
@@ -261,6 +278,6 @@ function commit(ctx,amount,n,{source="story",causalRootId=null,receiptId=null,te
 console.log(JSON.stringify({
   pass:true,issue:448,curve:"discipline_stat_curve_v1",foundationProfile:"academy_foundation_discipline_activity_v1",
   thresholdSequenceProven:true,overflowProven:true,multiBreakthroughProven:true,noFractionalPLFromPartialExp:true,
-  currentTeamAndStaleSelectionGuards:true,causalCap3:true,materialFailureDevelopment:true,stableProgressionSaveIdentity:true,ceiling15:true,idempotence:true,saveRehydrate:true,
+  currentTeamAndStaleSelectionGuards:true,causalCap3:true,materialFailureDevelopment:true,stableProgressionSaveIdentity:true,deferredOuterTransactionSave:true,ceiling15:true,idempotence:true,saveRehydrate:true,
   techniquePracticeActivated:false,browserGoldenClaimed:false
 },null,2));
