@@ -148,6 +148,13 @@ function commit(ctx,amount,n,{source="story",causalRootId=null,receiptId=null,te
   const b=commit(s,3,2,{causalRootId:"same-root"});
   assert.equal(a.grantedExp,3);assert.equal(b.grantedExp,0);assert.equal(b.reason,"causal_cap_reached");
 }
+// Foundation activities fail closed without one committed Academy team.
+{
+  const s=boot({stat:10});
+  s.__team=null;
+  const denied=s.preflightDisciplineDevelopment448("academy_menma","nin","exam");
+  assert.equal(denied.allowed,false);assert.equal(denied.reason,"committed_current_team_unavailable");
+}
 {
   const s=boot({stat:10});
   const ok=s.preflightDisciplineDevelopment448("academy_menma","nin","exam");
