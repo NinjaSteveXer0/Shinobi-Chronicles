@@ -423,14 +423,46 @@ function stablePick46900(boundaryId,choiceIds,seedRef=privateSeedRef46900()){
   if(!legal.length)return null;
   return legal[stableHash46900(seedRef+"|"+boundaryId+"|intent")%legal.length];
 }
-function privateChoiceReceipt46900(boundaryId,choiceId,seedRef){
-  if(!AUTONOMOUS_KAKASHI_BOUNDARIES[boundaryId]||!AUTONOMOUS_KAKASHI_BOUNDARIES[boundaryId].choiceIds.includes(choiceId))throw new Error("ce478_autonomous_choice_not_in_frozen_profile:"+boundaryId+":"+choiceId);
+function privateStoryUnitRef46900(seedRef){
+  return ORIGIN_ID+":autonomous_private:"+stableHash46900(String(seedRef||"")).toString(16);
+}
+function privateChoiceReceipt46900(boundaryId,choiceId,seedRef,eligibleChoiceIds=[]){
+  const boundary=AUTONOMOUS_KAKASHI_BOUNDARIES[boundaryId];
+  if(!boundary||!boundary.choiceIds.includes(choiceId))throw new Error("ce478_autonomous_choice_not_in_frozen_profile:"+boundaryId+":"+choiceId);
+  const eligible=[...new Set((eligibleChoiceIds||[]).filter(id=>boundary.choiceIds.includes(id)))];
+  if(!eligible.includes(choiceId))eligible.push(choiceId);
+  const storyUnitRef=privateStoryUnitRef46900(seedRef);
+  const opened=D.openSemanticChoiceSet({
+    storyUnitRef,
+    storyUnitType:"origin_private_history",
+    decisionPointRef:"academy_kakashi.v2.autonomous_private."+boundaryId,
+    contextStateRef:storyUnitRef+":"+boundaryId,
+    authorityVersionRefs:["Academy_Kakashi_Autonomous_Origin_Intent_Profile_2026-10-02"],
+    sourceOccurrenceRefs:[],
+    observerRef:ORIGIN_ID,
+    excludedIntentRefs:[],
+    choices:eligible.map((id,index)=>({
+      choiceId:id,
+      intentType:"AUTONOMOUS_PRIVATE_"+id.toUpperCase(),
+      intentPayload:{subjectStableId:ORIGIN_ID,boundaryId,originDefinitionId:PRIVATE_ORIGIN_DEFINITION},
+      eligibilityBasisRefs:["profile_boundary:"+boundaryId],
+      resolverBindingRef:"ce478.private_origin.intent."+id,
+      presentationLabel:id,
+      authoredOrder:index
+    }))
+  });
+  if(!opened||opened.success!==true)throw new Error("ce478_private_choice_set_failed:"+boundaryId+":"+(opened&&opened.reason||"unknown"));
+  const committed=D.commitStoryIntent({storyUnitRef,choiceSetId:opened.choiceSet.choiceSetId,choiceId});
+  if(!committed||committed.success!==true)throw new Error("ce478_private_choice_intent_failed:"+boundaryId+":"+(committed&&committed.reason||"unknown"));
   return{
+    ...clone(committed.receipt),
     boundaryId,
-    beatId:AUTONOMOUS_KAKASHI_BOUNDARIES[boundaryId].beatId,
+    beatId:boundary.beatId,
     choiceId,
-    receiptId:"private_choice::"+PRIVATE_ORIGIN_SUBJECT+"::"+boundaryId+"::"+choiceId,
+    receiptId:committed.receipt.storyDecisionReceiptId,
     stableSeedRef:seedRef,
+    eligibleCharacterIntentRefs:[...eligible],
+    privateOriginHistory:true,
     committed:true
   };
 }
@@ -505,13 +537,35 @@ function resolvePrivateMachine46900(key,seedRef,{bindingRef=null,eligibleOutcome
   const F=globalThis.SC_STORY_FACTUAL_RESOLVER_34600;
   const binding=String(bindingRef||privateMachineBinding46900(key)||"");
   if(!F||typeof F.resolveStoryFactualAction!=="function"||!binding)return{success:false,reason:"private_origin_factual_resolver_unavailable",key,bindingRef:binding};
-  const decisionReceiptId="private_origin_intent::"+stableHash46900(seedRef+"|"+key).toString(16);
+  const storyUnitRef=privateStoryUnitRef46900(seedRef);
+  const machineChoiceId="machine::"+key;
+  const opened=D.openSemanticChoiceSet({
+    storyUnitRef,
+    storyUnitType:"origin_private_history",
+    decisionPointRef:"academy_kakashi.v2.autonomous_private.machine."+key,
+    contextStateRef:storyUnitRef+":machine:"+key,
+    authorityVersionRefs:["Academy_Kakashi_Origin_100_Percent_Writing_Closure_2026-09-20"],
+    sourceOccurrenceRefs:[],
+    observerRef:ORIGIN_ID,
+    choices:[{
+      choiceId:machineChoiceId,
+      intentType:"MACHINE_FACTUAL_RESOLUTION",
+      intentPayload:{subjectStableId:ORIGIN_ID,key},
+      eligibilityBasisRefs:["machine_gate:"+key],
+      resolverBindingRef:binding,
+      presentationLabel:"RESOLVE RESULT",
+      authoredOrder:0
+    }]
+  });
+  if(!opened||opened.success!==true)return opened||{success:false,reason:"private_origin_machine_choice_set_failed",key};
+  const committed=D.commitStoryIntent({storyUnitRef,choiceSetId:opened.choiceSet.choiceSetId,choiceId:machineChoiceId});
+  if(!committed||committed.success!==true)return committed||{success:false,reason:"private_origin_machine_intent_failed",key};
   const idempotenceKey=F.stableRef("ce478-private-factual",{seedRef,key,binding});
   const result=F.resolveStoryFactualAction({
-    storyDecisionReceiptId:decisionReceiptId,
+    storyDecisionReceiptId:committed.receipt.storyDecisionReceiptId,
     bindingRef:binding,
     actorRef:ORIGIN_ID,
-    intentCommitRef:"private_origin_commit::"+stableHash46900(decisionReceiptId+"|"+binding).toString(16),
+    intentCommitRef:committed.receipt.intentCommitRef,
     attemptOrdinal:1,
     idempotenceKey,
     authorityVersionRefs:["Academy_Kakashi_Origin_100_Percent_Writing_Closure_2026-09-20","Academy_Kakashi_Autonomous_Origin_Intent_Profile_2026-10-02"],
@@ -709,8 +763,7 @@ function resolveAutonomousKakashiPrivateHistory46900({migrationReason="origin_co
   const addChoice=(boundaryId,context={})=>{
     const selected=selectPrivateBoundaryChoice46900(boundaryId,state,seedRef,context);
     if(!selected.success)throw new Error("ce478_private_choice_failed:"+boundaryId+":"+selected.reason);
-    const receipt=privateChoiceReceipt46900(boundaryId,selected.choiceId,seedRef);
-    receipt.eligibleCharacterIntentRefs=[...selected.eligibleCharacterIntentRefs];
+    const receipt=privateChoiceReceipt46900(boundaryId,selected.choiceId,seedRef,selected.eligibleCharacterIntentRefs);
     receipt.severeLethalEligible=selected.severeLethalEligible===true;
     choices.push(receipt);materialRefs.push(receipt.receiptId);
     state.routeHistory.push({boundaryId,choiceId:selected.choiceId,receiptId:receipt.receiptId});
