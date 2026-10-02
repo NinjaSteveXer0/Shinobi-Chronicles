@@ -16,10 +16,10 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-02-BB",
-    sourceBaselineCommit:"c18c83f489374bd59554dcf9c0909d4c72323a0b",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-02-CC",
+    sourceBaselineCommit:"7e96e3e927d8e2190db9c001e83dfd69db728ce5",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
-    runtimeGeneration:"phase2-first-live-ce-hotspot-469",
+    runtimeGeneration:"phase2-private-origin-live-ce-hotspot-478",
     majorRuntimeFeatures:Object.freeze([
       "academy-kakashi-v2",
       "runtime-ownership-safety-300",
@@ -71,7 +71,7 @@
       "academy-mirai-terminal-receipt-repair-105",
       "academy-menma-nine-tails-speaker-receipt-repair-105",
       "academy-menma-victory-diagnostic-retired-105",
-      "phase2-first-live-ce-hotspot-469"
+      "phase2-private-origin-live-ce-hotspot-478"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -104,10 +104,10 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-02-BB",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-02-CC",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
-      generationPresent:first.runtimeGeneration==="phase2-first-live-ce-hotspot-469",
+      generationPresent:first.runtimeGeneration==="phase2-private-origin-live-ce-hotspot-478",
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)
