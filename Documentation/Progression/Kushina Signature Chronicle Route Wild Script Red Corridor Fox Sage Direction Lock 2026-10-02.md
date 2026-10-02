@@ -4,210 +4,503 @@
 **Owner:** Stephen + Progression / Development  
 **Source:** #470  
 **Status:** **BINDING DESIGN DIRECTION — implementation semantics still open**  
-**Priority:** Post-Alpha / later Phase-2; **NOT AN ALPHA BLOCKER**
+**Priority:** **PRE-ALPHA DESIGN CLOSURE**; runtime implementation remains separately prioritised.
 
-## Owner sign-off
+## 1. Owner sign-off
 
-Stephen accepts the combined Kushina signature route built from:
+Stephen accepts the combined Kushina signature Chronicle route built from:
 
 1. **Wild Script**
 2. **Beastprint**
 3. **Red Corridor**
 4. **Kurama's Den**
-5. **Fox Sage Kushina**
+5. **Great Fox Sage**
+6. **Fox Sage Kushina**
 
-This supersedes earlier #470 Kushina brainstorming.
+This supersedes all earlier #470 Kushina brainstorming.
 
-The route is SC-original. Canon/Uzumaki/Kurama material may support it but does not define the destination.
+The route is SC-original. Canon/Uzumaki/Kurama material may participate, but does not define the route's destination.
 
-## Origin seed
+---
+
+## 2. Origin seed
 
 Academy Kushina already proves the first impossible clue:
 
 - a damaged seal formula is live;
-- Kushina may solve the active problem rather than restore the original exercise exactly;
+- Kushina may solve the active problem rather than merely restore the original exercise;
 - one successful correction can connect somewhere it had no business reaching;
 - Gerotora can become physically present through that accidental cross-boundary result.
 
-The route grows from that fact.
+The route grows from that factual Chronicle seed.
 
 > **What if Kushina keeps playing with the fact that a seal can reach the wrong place, and discovers that some "mistakes" can be cultivated into entirely new sealing behaviour?**
 
-# Stage 1 — Wild Script
+---
 
-**Wild Script** is an adaptive, history-bearing seal formula that can alter its own structure in response to factual chakra/pressure/state exposure.
+# 3. Stage One — Wild Script
+
+## Stable SC noun
+
+**Wild Script**
+
+Possible unstable failure state:
+
+**Feral Script**
+
+## Core truth
+
+Wild Script is an adaptive, history-bearing seal formula capable of altering its own structure in response to factual chakra / pressure / state exposure.
 
 It is:
+
 - non-sentient;
 - not an Entity;
 - not a Hosted Entity;
+- not an AI;
 - not a universal "seal anything" answer.
 
-Possible failed state: **Feral Script**.
+Each exact Wild Script instance learns only from exposure/history legitimately committed to that instance or an authored inheritance/transfer rule.
 
-A Script can become dangerous by over-optimising containment, losing release conditions, propagating onto compatible surfaces or otherwise mutating beyond Kushina's intent.
+## Failure matters
 
-Its learned/adapted properties are committed Chronicle history rather than rerolled presentation.
+Wild Script may fail by:
 
-# Stage 1B — Beastprint
+- over-optimising containment;
+- mutating away a safe release condition;
+- propagating onto nearby compatible material;
+- preserving the wrong response;
+- becoming a **Feral Script** that Kushina must suppress, recover, rewrite or destroy.
 
-A sufficiently developed Wild Script may record one bounded **Beastprint** from legitimate Tailed-Beast chakra/technique exposure.
+A failed Script can itself create later Chronicle content.
 
-Later Kushina may release that recorded pattern:
-- from prepared paper/scroll media;
-- or at a later stage through a compatible internal Wild Script interface tied to her own legal Jinchūriki seal/state.
+---
 
-Beastprint explicitly does **not** grant:
-- donor Bijū ownership;
-- donor Skill ownership;
-- donor attachment/hosting;
-- donor PL/Stats;
-- donor relationship;
-- the donor's entire technique package.
+# 4. Beastprint — Kushina-only Tailed-Beast imprint branch
 
-It is an SC-original reproduction of one exact recorded attack pattern.
+## Stable SC noun
 
-## Random release rule
+**Beastprint**
 
-Stephen's intended fantasy is authorised at design level:
+Working route identity:
 
-> **Wild Script may release one random eligible Beastprint attack from a random eligible Bijū imprint.**
+`wild_script_beastprint`
 
-Hard boundary:
+## Core idea
 
-> **Randomness may choose among already-eligible Beastprints; randomness may not create eligibility.**
+A mature Wild Script can record a bounded **attack-pattern imprint** from a legitimate Tailed-Beast knowledge/source interaction.
 
-A Beastprint must enter Kushina's pool through factual provenance, for example:
-- direct legitimate exposure;
-- an exact authorised sample/relic/archive;
-- a future Kurama's Den source that factually provides a Beastprint.
+Kushina later releases that pattern herself through Wild Script media.
 
-If Kurama's Den later contains a legitimate all-nine Beastprint source, all nine may eventually become eligible through that authored content.
+This does **not** mean Kushina:
 
-Exact attacks, numerics, action economy and paper/internal media behaviour remain Combat / Skills authority.
+- owns the donor Bijū;
+- hosts the donor Bijū;
+- owns the donor Bijū's Skill;
+- gains the donor Bijū's PL/Stats;
+- gains a relationship with the donor Bijū;
+- learns the donor's entire technique package.
 
-# Stage 2 — Red Corridor
+A Beastprint is a **Kushina-exclusive Wild Script reproduction**, not copied donor ownership.
 
-Repeated misbinding / Wild Script incidents reveal a recurring residual signature.
+## 4.1 Knowledge/source rule
 
-Kushina discovers they touch a narrow intermediary state/location:
+Kushina does **not** need personal Knowledge of the donor technique when a legitimate participating source does.
+
+The route may consume:
+
+`source actor Knowledge / capability -> Wild Script recording -> Kushina Beastprint access`
+
+without collapsing source Knowledge into Kushina Knowledge.
+
+### Kurama starting lineage
+
+Kushina's own legitimate Kurama source may supply Beastprint patterns that Kurama himself knows.
+
+Therefore the initial/early Beastprint family may include exact authorised attack patterns derived from:
+
+- Yin Kurama lineage;
+- Yang Kurama lineage;
+- Complete Kurama lineage;
+
+where current Kurama/source authority makes that exact pattern legitimately available.
+
+This is **Kurama supplying the pattern**, not Kushina inexplicably knowing all Kurama techniques.
+
+## 4.2 Expanding the pool
+
+As Kushina later legitimately:
+
+- encounters;
+- recognises;
+- records;
+- studies through an authorised source;
+- or obtains an exact Beastprint archive/sample
+
+from other Bijū, her Beastprint pool may expand.
+
+Preferred long-horizon direction:
+
+**one specially authored Kushina-only Beastprint per Tailed-Beast family**, with Kurama potentially retaining several lineage-specific prints because Yin / Yang / Complete are already materially distinct source states in SC.
+
+Exact catalogue remains Combat / Skills authoring.
+
+## 4.3 One-shot battle fantasy
+
+Design direction:
+
+Kushina should have a **one-use-per-battle Wild Script Beastprint release**.
+
+Two possible media/modes may coexist if Combat later approves them:
+
+### Prepared Beastprint
+Kushina prepares one exact eligible paper/scroll Beastprint before Battle and releases that deterministic pattern once.
+
+### Wild Beastprint
+Kushina invokes the internal/live Wild Script and it selects one pattern from the currently eligible Beastprint pool.
+
+Hard rule:
+
+> **Randomness may select among eligible Beastprints; randomness may not create eligibility.**
+
+No recorded/authorised pattern -> it cannot be rolled.
+
+This preserves player-recognition hype without violating CE Knowledge/Access law.
+
+---
+
+# 5. Stage Two — Red Corridor
+
+## Stable SC noun
 
 **Red Corridor**
 
-Possible formula family:
+Red Corridor is a **location/state-space**, not merely the name of a Skill.
+
+Possible access formula / technique family:
 
 **Elsewhere Script**
 
-Red Corridor is **not ordinary teleportation**.
+## Core truth
 
-Its Story escalation should be earned through:
-1. another wrong-destination seal;
-2. the same unexplained residue;
-3. deliberate tiny misbinding experiments;
-4. object loss/recovery;
-5. a living rescue or dangerous stranded state;
-6. controlled entry/exit;
-7. discovery of a deeper route leading toward Kurama's Den.
+Repeated misbinding / Wild Script incidents reveal the same impossible residue.
 
-Once earned, exact authored content may expose Kushina-only routes to recover, quarantine, redirect or follow legitimate misbound seal/spatial connections.
+Kushina eventually establishes that some incorrect seal destinations are touching the same intermediary place:
 
-No provenance/seam -> no Red Corridor route.
+**the Red Corridor**.
 
-# Stage 3 — Kurama's Den
+It is not ordinary teleportation.
 
-The Red Corridor eventually exposes one connection that behaves unlike an ordinary failed destination.
+No valid provenance / connection / seam -> no Red Corridor access.
 
-Following it leads Kushina to **Kurama's Den**.
+## 5.1 Out-of-Battle Red Corridor
 
-Exact ontology remains World / CE / Writing authority.
+Out-of-Battle Red Corridor use is a major part of the route.
+
+Potential authored uses include:
+
+- recovering a misbound object;
+- pursuing/rescuing a person stranded through a seal/spatial failure;
+- quarantining a dangerous connection;
+- redirecting or severing a misbound seal pathway;
+- entering the Corridor through an exact factual connection;
+- following a deeper route toward Kurama's Den.
+
+The Corridor must not become "Kushina teleports anywhere."
+
+Each opportunity needs an exact causal seam.
+
+## 5.2 In-Battle Red Corridor — strategic reserve control
+
+Design direction:
+
+Kushina later develops a Combat application such as:
+
+**Red Corridor Seal / Red Corridor: Fox Hunt**  
+working names only.
+
+Core targeting law:
+
+- targets **one non-active enemy** in a benched / reserve / supporting slot;
+- does **not** target the currently active enemy actor;
+- temporarily seals/displaces that exact reserve into the Red Corridor;
+- that target cannot normally enter the active slot while the Corridor state remains unresolved.
+
+This turns the Skill into **rotation/tempo control**, not a direct hard-disable on the enemy currently fighting.
+
+### Strategic intent
+
+Example:
+
+1. enemy A is active and nearly defeated;
+2. enemy B is the dangerous next reserve;
+3. Kushina seals enemy B into the Red Corridor;
+4. Kushina's team defeats enemy A;
+5. enemy B is still dealing with the Corridor rather than immediately taking a clean normal turn.
+
+The exact turn-order / fallback actor rules remain Combat authority, but the design goal is:
+
+**Kushina can pre-emptively disrupt the next threat rather than simply stun the active threat.**
+
+## 5.3 Fox Hunt pressure inside the Corridor
+
+After Fox Sage development, a sealed enemy may be subjected to **Great Fox Sage / fox-domain hunt pressure** while displaced.
+
+Preferred discipline split:
+
+- **Fūinjutsu** establishes and maintains the Red Corridor binding;
+- **Genjutsu** carries the fear/hunt/perception pressure;
+- the sealed target uses an exact **Ninjutsu / chakra-control escape resolver** to attempt early release.
+
+The Great Fox Sage is not automatically an independently deployed Battle participant.
+
+Preferred implementation direction is an attributed Corridor environmental/source effect unless Combat later authorises another form.
+
+Exact:
+
+- turn duration;
+- damage/PL effect;
+- control severity;
+- escape thresholds;
+- release state;
+- boss immunity/eligibility;
+- one-use/cooldown law
+
+remain Combat-owned.
+
+## 5.4 No deadlock
+
+Red Corridor must never create an infinite Battle with no legal actor.
+
+If the sealed target becomes the only remaining enemy-side participant, Combat must author an exact early-release / exposed-release / forced-return rule.
+
+---
+
+# 6. Stage Three — Kurama's Den
+
+## Stable SC noun
+
+**Kurama's Den**
+
+Kurama's Den is **not Kurama's internal mindscape**.
+
+It is a new SC-only extraordinary domain/location with its own World Truth.
 
 Preferred direction:
-- hidden fox/natural-energy domain or sealed refuge;
-- not automatically Kurama's ordinary internal mindscape;
-- not an ordinary Summon territory;
-- not a generic world-map destination;
-- not player-owned.
 
-Kurama may know of it, react to it, help, obstruct or alter access depending on legitimate current history.
+- hidden fox / natural-energy domain;
+- accessible through the Red Corridor only after exact route history;
+- not ordinary Summon territory;
+- not generic World Map geography;
+- not player-owned;
+- not available merely because somebody hosts Kurama.
+
+Kurama may:
+
+- know of it;
+- recognise it;
+- fear/respect it;
+- assist or obstruct access;
+- supply bounded Knowledge;
+
+depending on current relationship/history.
+
+But:
 
 > **Kurama relationship is an ingredient, not the source of the route.**
 
-# Stage 4 — Fox Sage Kushina
+---
 
-Kushina does **not** become Fox Sage because she is:
-- an Uzumaki;
-- a Jinchūriki;
+# 7. Great Fox Sage — new SC-only Character
+
+Kurama's Den is associated with a new SC-original Character.
+
+Working concept names:
+
+- **Great Fox Sage**
+- **Great Fox Skulk Huntsman**
+
+Final name/identity remains open.
+
+This Character is **not Kurama** and is not a renamed Tailed Beast.
+
+Required future semantics:
+
+- persistent Character/entity identity;
+- observer-safe introduction;
+- relationship/history independent of Kurama;
+- exact Den authority;
+- natural-energy/Sage mentorship role;
+- possible Red Corridor hunt-pressure provenance.
+
+Visual design is **queued only**.
+
+No image generation may occur until Stephen uses the exact phrase:
+
+`generate now`
+
+in the active visual workflow.
+
+---
+
+# 8. Stage Four — Fox Sage Kushina
+
+## Stable SC noun
+
+**Fox Sage**
+
+Possible representation:
+
+**Fox Sage Kushina**
+
+## Route-exclusive access law
+
+Kushina's Academy Origin signature Chronicle route is the **exclusive Origin-route path** to Fox Sage.
+
+She does not gain it because she is:
+
+- Uzumaki;
+- Jinchūriki;
 - high level;
 - liked by Kurama.
 
-She reaches that state only after the Chronicle has already established:
+She gains it only after:
+
 - Wild Script control;
 - Beastprint history;
 - Red Corridor control;
 - Kurama's Den discovery;
-- exact natural-energy / fox-domain training there.
+- Great Fox Sage / Den training;
+- exact natural-energy development.
 
-Possible representation/state:
+## Future generic Sage-system compatibility
 
-**Fox Sage Kushina**
+A later general Sage system may separately author extremely demanding Fox-Sage mentorship for non-Kushina Characters.
 
-Future generic Sage architecture may exist, but it must not retroactively flatten this exact Kushina route into an ordinary unlock.
+That future possibility does **not** weaken Kushina's exclusivity:
 
-Preferred interaction:
-Fox Sage stabilises or expands Kushina's ability to maintain dangerous Wild Scripts / Beastprints without replacing their provenance rules.
+- only Kushina's signature Origin route reaches Fox Sage through Wild Script -> Red Corridor -> Kurama's Den;
+- no other Origin receives this route;
+- later mentorship would be a separate generic/post-route pathway;
+- no Character receives it automatically from Kurama compatibility.
 
-# Menma A2M3 precedent
+Stephen has identified Naruto, Menma and Himawari as possible future Characters with **faster/easier eligibility** if a generic Fox-Sage mentorship system is ever deliberately authored.
 
-Menma's A2M3 Sealed-Wall history proves SC already supports capability-responsive outcomes of this scale.
+This is **not currently an unlock**.
 
-Menma's Fūinjutsu/Kinjutsu history let him preserve/remove the sealed chamber state rather than resolve it generically.
+Himawari in particular should not be reduced to "another Fox Sage route" if she later becomes an Origin Character; her own future signature route should aim higher/different.
 
-Kushina must **not** inherit the same solution.
+---
 
-Instead future anomalies may produce different outcomes such as:
-- Wild Script adapts to the construct;
-- Red Corridor residue is discovered;
-- a misbound connection is quarantined or redirected.
+# 9. Menma A2M3 precedent
 
-**Same problem != same specialist outcome.**
+Menma's A2M3 Sealed-Wall/chamber history proves SC already supports capability-responsive outcomes at this level.
 
-# Hard non-collapse
+Menma's Fūinjutsu/Kinjutsu history let him preserve/remove the sealed chamber state into secret custody rather than resolve it generically.
+
+Kushina must not copy that solution.
+
+Future equivalent anomalies may instead let Kushina:
+
+- expose a Wild Script response;
+- discover Red Corridor residue;
+- adapt to the seal;
+- quarantine/redirect a misbound connection;
+- accelerate an unresolved Chronicle thread owned by another Character where Cross-Origin Chronicle Assist authority permits it.
+
+> **Same problem != same specialist outcome.**
+
+---
+
+# 10. Cross-Origin compatibility seed
+
+The route is explicitly intended to support later **Cross-Origin Chronicle Assist / Chronicle Convergence** content.
+
+Example seed:
+
+- Menma owns the unresolved A2M3 Sealed-Wall/chamber history;
+- Menma has not yet completed the exact route needed to safely reveal/open/resolve it;
+- Kushina is a legitimate teammate;
+- Kushina has already reached the relevant Wild Script / Red Corridor stage;
+- Menma deliberately shares/allows access to the chamber;
+- Kushina's route may create an alternate assist that advances or accelerates Menma's unresolved side-thread.
+
+Hard rule:
+
+**Kushina may change the route/timing; she does not steal Menma's Chronicle ownership or delete the missing Story.**
+
+Exact reusable cross-Origin semantics belong to CE / Codex / Coordination.
+
+---
+
+# 11. Hard non-collapse
 
 Preserve:
 
 - Wild Script != sentient Entity
 - Beastprint != donor Bijū ownership
 - Beastprint != donor Skill ownership
+- donor Knowledge != Kushina Knowledge
+- source-assisted use != copied source identity
 - donor Bijū PL != Kushina PL
 - random selection != random eligibility
 - Jinchūriki state != Beastprint pool
 - Kurama relationship != Fox Sage automatically
-- Kurama's Den != ordinary map destination by default
-- Fox Sage != generic Sage unlock
+- Kurama's Den != Kurama mindscape
+- Kurama's Den != generic map destination
+- Great Fox Sage != Kurama
+- Fox Sage Kushina route != generic Sage unlock
+- Red Corridor location != Red Corridor Combat technique
 - Red Corridor != teleport-anywhere
+- Red Corridor provenance != geographic permission
 - Fūinjutsu competence != automatic route success
-- one Script's adaptation != all Scripts know it
+- one Script adaptation != all Scripts know it
 - one Beastprint != all attacks from that beast
 - paper Script and internal-seal Script may have different legality/cost
+- Cross-Origin assist != route ownership transfer
+- assist/acceleration != skipped history
 - route completion != Rank / Promotion
 - route power != direct PL grant
 
-# Still open
+---
 
-Not yet closed:
+# 12. Current state
+
+## Design direction — LOCKED
+
+- Wild Script
+- Feral Script failure possibility
+- Beastprint family
+- Kurama-supplied pattern Knowledge allowed without Kushina personally knowing the donor technique
+- Kurama-lineage early Beastprint access direction
+- pool expands only through legitimate source history
+- one-use-per-battle Beastprint release fantasy
+- Red Corridor as location/state-space
+- Red Corridor out-of-Battle route utility
+- Red Corridor strategic non-active-enemy Combat use
+- Fox-hunt pressure direction after Fox Sage
+- Kurama's Den as new SC-only non-mindscape domain
+- Great Fox Sage / Great Fox Skulk Huntsman new Character direction
+- Kushina-exclusive Origin-route path to Fox Sage
+- future generic Sage mentorship remains separately possible
+- Cross-Origin Chronicle Assist compatibility is intentional
+
+## Still open
+
 - exact stage timing;
 - exact Stat/discipline thresholds;
-- Beastprint catalogue and sampling rules;
-- Combat numerics;
-- Fox Sage mechanics;
-- Kurama's Den ontology/location;
+- exact Beastprint catalogue;
+- whether Kurama gets 1 or several lineage-specific prints;
+- exact Combat numerics/action economy;
+- exact Red Corridor duration/escape formula;
+- exact Fox Hunt effects;
+- Great Fox Sage final identity/name;
+- Kurama's Den ontology/location implementation;
 - exact Story scenes;
 - exact failure branches;
 - representation/card requirements;
 - runtime/save schema.
 
-Those belong to later specialist authoring.
-
-No Coding handoff.
-No Writing handoff yet.
-No asset work.
+No Coding handoff yet.
+No Writing production handoff yet.
+No image generation.
