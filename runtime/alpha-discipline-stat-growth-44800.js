@@ -471,13 +471,17 @@ function rows448(data,selectedId,serviceId){
   return data.disciplines.map(d=>{
     const complete=d.developmentAvailable===false;
     const ceiling=d.developmentCeilingStat!=null
-      ?(complete?"STAT DEVELOPMENT COMPLETE FOR THIS ACTIVITY":"DEVELOPMENT EFFECTIVE THROUGH STAT "+d.developmentCeilingStat)
+      ?(complete?"FOUNDATION TRAINING LIMIT REACHED":"FOUNDATION DEVELOPMENT RANGE — THROUGH STAT "+d.developmentCeilingStat)
+      :"";
+    const ceilingDetail=complete
+      ?"This activity can no longer advance "+String(d.name||d.id||"this discipline").toUpperCase()+". Further development requires a more demanding source."
       :"";
     return `<button type="button" class="alpha-activity-discipline ${d.id===selectedId?"is-selected":""}" data-discipline-id="${d.id}" onclick="${selectFn}('${d.id}')" aria-pressed="${d.id===selectedId}">
       <span class="alpha-activity-discipline-name">${d.name}</span>
       <span class="alpha-activity-mastery">CURRENT STAT <strong>${Number(d.currentStat)||0}</strong></span>
       <span class="alpha-activity-exp">DEVELOPMENT <b>${Number(d.exp)||0} / ${Number(d.expRequired)||0}</b></span>
       ${ceiling?`<span class="alpha-activity-development-ceiling ${complete?"is-complete":""}">${ceiling}</span>`:""}
+      ${ceilingDetail?`<span class="alpha-activity-development-ceiling-detail">${ceilingDetail}</span>`:""}
       <span class="alpha-activity-discipline-track"><i style="width:${Math.max(0,Math.min(100,Number(d.progressPercent)||0))}%"></i></span>
     </button>`;
   }).join("");
@@ -563,7 +567,7 @@ function foundationBatchNotification448(source,characterId){
   if(Number(last?.newStat)>Number(first?.previousStat))detail.push("CURRENT STAT "+Number(first.previousStat)+" → "+Number(last.newStat));
   const beforePL=Number(meta.beforePL&&meta.beforePL.displayedPL),afterPL=Number(meta.afterPL&&meta.afterPL.displayedPL);
   if(Number.isFinite(beforePL)&&Number.isFinite(afterPL)&&afterPL>beforePL)detail.push("POWER LEVEL "+beforePL+" → "+afterPL);
-  if(meta.stoppedAtCeiling===true)detail.push("FOUNDATION DEVELOPMENT COMPLETE AT STAT "+FOUNDATION_CEILING);
+  if(meta.stoppedAtCeiling===true)detail.push("FOUNDATION TRAINING NO LONGER ADVANCES "+label);
   return{
     id:source+"-result-"+characterId+"-"+disciplineId+"-"+Date.now(),
     characterId,type,significance:"activity-result",title,detail:detail.join(" · "),timestamp:Date.now()
@@ -665,7 +669,7 @@ function migrateExistingLedgers448(){
 function injectStyles(){
   if(typeof document==="undefined"||document.getElementById("sc-phase2-discipline-growth-44800"))return;
   const style=document.createElement("style");style.id="sc-phase2-discipline-growth-44800";
-  style.textContent='.alpha-activity-development-ceiling{display:block;margin-top:5px;font-size:10px;letter-spacing:.08em;opacity:.72}.alpha-activity-development-ceiling.is-complete{opacity:1;font-weight:700}.alpha-activity-discipline .alpha-activity-exp{display:block}';
+  style.textContent='.alpha-activity-development-ceiling{display:block;margin-top:5px;font-size:10px;letter-spacing:.08em;opacity:.72}.alpha-activity-development-ceiling.is-complete{opacity:1;font-weight:700}.alpha-activity-development-ceiling-detail{display:block;margin-top:3px;font-size:10px;line-height:1.35;letter-spacing:.02em;opacity:.82}.alpha-activity-discipline .alpha-activity-exp{display:block}';
   document.head.appendChild(style);
 }
 
