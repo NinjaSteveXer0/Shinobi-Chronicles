@@ -4,12 +4,11 @@
 const fs=require("fs"),path=require("path"),vm=require("vm"),assert=require("assert");
 const ROOT=path.resolve(__dirname,"..");
 const SRC=fs.readFileSync(path.join(ROOT,"runtime/alpha-discipline-stat-growth-44800.js"),"utf8");
-const GAME=fs.readFileSync(path.join(ROOT,"game.js"),"utf8");
 const DISC=["nin","tai","gen","buki","fuin","kin","stamina"];
 
-assert(GAME.includes("function getPersistentCharacterProgressionSaveKey"),"stable progression save-key resolver missing");
-assert(GAME.includes("ownedRecord.progressionCharacterId"),"progressionCharacterId is not used as the canonical save key");
-assert(GAME.includes("playerData.characters[\n        progressionSaveKey\n      ]"),"stable progression save write path missing");
+assert(SRC.includes("function stableProgressionSaveKey448"),"stable progression save-key resolver missing from #448 owner");
+assert(SRC.includes("function syncRuntimeProgressionToPlayerData448"),"stable progression save adapter missing from #448 owner");
+assert(SRC.includes("delete pd.characters[legacyKey]"),"legacy representation-keyed save duplicate is not retired by #448 adapter");
 
 function formula(stats){
   const vals=DISC.map(id=>Number(stats[id])||0).sort((a,b)=>b-a);
@@ -24,11 +23,11 @@ function makeStats(primary=10){
 function makeProgress(exp=0){
   return Object.fromEntries(DISC.map(id=>[id,{level:1,exp:id==="nin"?exp:0,statLevelApplied:1}]));
 }
-function boot({stat=10,exp=0,team=["academy_menma","academy_hinata","academy_kakashi"],savedStats=null,savedExp=null}={}){
+function boot({stat=10,exp=0,team=["academy_menma","academy_hinata","academy_kakashi"],savedStats=null,savedExp=null,progressionId="academy_menma"}={}){
   const stats=savedStats||makeStats(stat);
   const progression=makeProgress(savedExp==null?exp:savedExp);
   const ctx=vm.createContext({console:{log(){},warn(){},error(){}},Date,Math,JSON,Object,Array,Number,String,Set,Map,Infinity});
-  ctx.__saves=0;
+  ctx.__saves=0;ctx.__progressionId=progressionId;
   ctx.playerTeam=[
     {id:"academy_menma",registryId:"academy_menma",name:"Menma",baseStats:makeStats(5),stats:{...stats},disciplineProgression:JSON.parse(JSON.stringify(progression)),weaponSpecializations:{},permanentPLBonus:0},
     {id:"academy_hinata",registryId:"academy_hinata",name:"Hinata",baseStats:makeStats(5),stats:makeStats(9),disciplineProgression:makeProgress(0),weaponSpecializations:{},permanentPLBonus:0},
@@ -49,7 +48,7 @@ function boot({stat=10,exp=0,team=["academy_menma","academy_hinata","academy_kak
     function clone(v){return JSON.parse(JSON.stringify(v));}
     function getPlayerCharacter(id){return playerTeam.find(c=>c.id===id)||null;}
     function getCharacterRegistryId(x){if(!x)return null;if(typeof x==="object")return x.registryId||x.id||null;const c=getPlayerCharacter(x);return c?c.registryId||c.id:x;}
-    function getOwnedCharacterRecordByVariantId(id){return id?{ownedCharacterId:"owned_character_"+id,variantId:id,progressionCharacterId:id,acquisitionRecordIds:[]}:null;}
+    function getOwnedCharacterRecordByVariantId(id){return id?{ownedCharacterId:"owned_character_"+id,variantId:id,progressionCharacterId:(id==="academy_menma"?__progressionId:id),acquisitionRecordIds:[]}:null;}
     function getChronicleCurrentTeam43600(){return __team;}
     function normalizeDisciplineProgression(saved){
       const src=saved&&typeof saved==="object"?saved:{};
@@ -86,12 +85,8 @@ function boot({stat=10,exp=0,team=["academy_menma","academy_hinata","academy_kak
       if(id==="practical")return{id:"practical",rewards:[{type:"discipline",id:"tai",amount:15},{type:"discipline",id:"buki",amount:10},{type:"discipline",id:"stamina",amount:15}]};
       return null;
     }
-    function savePlayerData(){
-      __saves++;
-      for(const c of playerTeam){playerData.characters[c.id]={stats:{...c.stats},disciplineProgression:normalizeDisciplineProgression(c.disciplineProgression),weaponSpecializations:clone(c.weaponSpecializations||{}),permanentPLBonus:0};}
-      playerData.activityHistory=activityHistory;
-      return true;
-    }
+    function syncRuntimeProgressionToPlayerData(){for(const c of playerTeam){playerData.characters[c.id]={stats:{...c.stats},disciplineProgression:normalizeDisciplineProgression(c.disciplineProgression),weaponSpecializations:clone(c.weaponSpecializations||{}),permanentPLBonus:0};}}
+    function savePlayerData(){__saves++;syncRuntimeProgressionToPlayerData();playerData.activityHistory=activityHistory;return true;}
   `;
   vm.runInContext(setup,ctx,{filename:"qa448-setup.js"});
   vm.runInContext(SRC,ctx,{filename:"alpha-discipline-stat-growth-44800.js"});
@@ -153,8 +148,15 @@ function commit(ctx,amount,n,{source="story",causalRootId=null,receiptId=null,te
   });
   assert.equal(r.statPointsGained,1);
   assert.equal(s.getPlayerCharacter("academy_menma").stats.nin,11);
-  assert.equal(p.exp,0);
+  assert.equal(s.getCharacterDisciplineProgression("academy_menma","nin").exp,0);
   assert.equal(s.__saves,savesBefore,"deferred compatibility breakthrough performed an inner save");
+}
+{
+  const s=boot({stat:10,progressionId:"progression_menma_448"});
+  s.savePlayerData();
+  assert(s.playerData.characters.progression_menma_448,"stable progressionCharacterId save record missing");
+  assert(!Object.prototype.hasOwnProperty.call(s.playerData.characters,"academy_menma"),"legacy representation-keyed duplicate survived stable save migration");
+  assert.equal(s.playerData.characters.progression_menma_448.stats.nin,10);
 }
 {
   const s=boot({stat:10});

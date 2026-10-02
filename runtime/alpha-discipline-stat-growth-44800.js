@@ -38,6 +38,7 @@ const priorPracticalAttempt=typeof globalThis.executeKonohaPracticalAttempt==="f
 const priorExamBatchNotification=typeof globalThis.buildKonohaExamBatchResultNotification==="function"?globalThis.buildKonohaExamBatchResultNotification:null;
 const priorPracticalBatchNotification=typeof globalThis.buildKonohaPracticalBatchResultNotification==="function"?globalThis.buildKonohaPracticalBatchResultNotification:null;
 const priorRestore=typeof globalThis.syncCharacterProgressionFromSave==="function"?globalThis.syncCharacterProgressionFromSave:null;
+const priorSyncRuntimeProgression=typeof globalThis.syncRuntimeProgressionToPlayerData==="function"?globalThis.syncRuntimeProgressionToPlayerData:null;
 
 function clone(value){try{return value&&typeof value==="object"?JSON.parse(JSON.stringify(value)):value;}catch(_error){return value;}}
 function currentPlayerData(){return typeof playerData!=="undefined"&&playerData?playerData:null;}
@@ -583,6 +584,33 @@ function practicalNotifications448(characterId){
   }
   return notifications;
 }
+function stableProgressionSaveKey448(character){
+  if(!character||!character.id)return null;
+  const subject=stableSubject(character.id);
+  return subject&&subject.progressionCharacterId?subject.progressionCharacterId:character.id;
+}
+function syncRuntimeProgressionToPlayerData448(){
+  const result=priorSyncRuntimeProgression?priorSyncRuntimeProgression.apply(this,arguments):undefined;
+  const pd=currentPlayerData();if(!pd)return result;
+  if(!pd.characters||typeof pd.characters!=="object")pd.characters={};
+  for(const character of runtimeTeam()){
+    if(!character||!character.id)continue;
+    const stableKey=stableProgressionSaveKey448(character);if(!stableKey)continue;
+    const legacyKey=character.id;
+    const existing=pd.characters[legacyKey]||pd.characters[stableKey]||{};
+    pd.characters[stableKey]={
+      ...existing,
+      stats:exactStats(character),
+      permanentPLBonus:0,
+      disciplineProgression:typeof globalThis.normalizeDisciplineProgression==="function"
+        ?globalThis.normalizeDisciplineProgression(character.disciplineProgression)
+        :clone(character.disciplineProgression||{}),
+      weaponSpecializations:clone(character.weaponSpecializations||{})
+    };
+    if(stableKey!==legacyKey&&Object.prototype.hasOwnProperty.call(pd.characters,legacyKey))delete pd.characters[legacyKey];
+  }
+  return result;
+}
 function restoreCanonicalStats448(){
   const pd=currentPlayerData();if(!pd||!pd.characters)return false;
   let changed=false;
@@ -636,6 +664,7 @@ for(const activityId of ["exam","practical"]){
 }
 
 // Replace fossil semantics with the Phase-2 v1 transaction while preserving old function names for callers.
+if(priorSyncRuntimeProgression){globalThis.syncRuntimeProgressionToPlayerData=syncRuntimeProgressionToPlayerData448;try{syncRuntimeProgressionToPlayerData=syncRuntimeProgressionToPlayerData448;}catch(_error){}}
 globalThis.getDevelopedCharacterStats=exactDevelopedStats;try{getDevelopedCharacterStats=exactDevelopedStats;}catch(_error){}
 globalThis.getTrainingActionData=trainingData448;try{getTrainingActionData=trainingData448;}catch(_error){}
 globalThis.getKonohaCharacterActivityData=activityData448;try{getKonohaCharacterActivityData=activityData448;}catch(_error){}
@@ -672,6 +701,7 @@ function diagnostics(){
     noNumericMasteryUI:String(rows448).includes("CURRENT STAT")&&!String(rows448).includes("MASTERY"),
     dynamicDevelopmentUI:String(rows448).includes("DEVELOPMENT")&&String(panelData448).includes("developmentRequired"),
     stableOwnedIdentity:String(stableSubject).includes("ownedCharacterId")&&String(stableSubject).includes("progressionCharacterId"),
+    stableProgressionSavePath:String(syncRuntimeProgressionToPlayerData448).includes("stableProgressionSaveKey448")&&String(syncRuntimeProgressionToPlayerData448).includes("delete pd.characters[legacyKey]"),
     currentTeamGuard:String(foundationSnapshot).includes("subject_not_in_committed_current_team"),
     batchCeilingGuard:String(examBatch448).includes("foundationSnapshot")&&String(practicalBatch448).includes("foundationSnapshot"),
     techniquePracticeNotActivated:!String(commitDevelopment).includes("techniquePractice"),

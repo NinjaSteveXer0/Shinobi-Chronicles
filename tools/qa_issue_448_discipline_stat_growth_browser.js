@@ -174,7 +174,7 @@ async function inspectMyClan(page,characterId){
       const rows=playerData.activityHistory||[];
       return{
         snapshot:getDisciplineDevelopmentSnapshot448(c.id,"nin","exam"),pl:calculateCurrentPL(c),
-        saved:JSON.parse(JSON.stringify(playerData.characters[c.id])),
+        saved:JSON.parse(JSON.stringify(playerData.characters[getOwnedCharacterRecordByVariantId(getCharacterRegistryId(c))?.progressionCharacterId||c.id])),
         developmentReceipts:rows.filter(row=>row?.type==="discipline_development"&&row?.progressionCharacterId===c.id&&row?.disciplineId==="nin").length,
         breakthroughReceipts:rows.filter(row=>row?.type==="discipline_stat_breakthrough"&&row?.progressionCharacterId===c.id&&row?.disciplineId==="nin").length
       };

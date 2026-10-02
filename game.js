@@ -9250,43 +9250,6 @@ let playerData =
 //
 // =========================================================
 
-function getPersistentCharacterProgressionSaveKey(
-  character
-) {
-
-
-  if (!character) {
-
-    return null;
-
-  }
-
-
-  const registryId =
-    typeof getCharacterRegistryId === "function"
-      ? getCharacterRegistryId(character)
-      : (
-          character.registryId ||
-          character.id ||
-          null
-        );
-
-
-  const ownedRecord =
-    registryId &&
-    typeof getOwnedCharacterRecordByVariantId === "function"
-      ? getOwnedCharacterRecordByVariantId(registryId)
-      : null;
-
-
-  return (
-    ownedRecord &&
-    ownedRecord.progressionCharacterId
-  ) || character.id || registryId || null;
-
-}
-
-
 function syncCharacterProgressionFromSave() {
 
 
@@ -9306,19 +9269,7 @@ function syncCharacterProgressionFromSave() {
     character => {
 
 
-      const progressionSaveKey =
-        getPersistentCharacterProgressionSaveKey(
-          character
-        );
-
-
       const savedCharacter =
-        (
-          progressionSaveKey &&
-          playerData.characters[
-            progressionSaveKey
-          ]
-        ) ||
         playerData.characters[
           character.id
         ];
@@ -9465,15 +9416,8 @@ function syncRuntimeProgressionToPlayerData() {
     character => {
 
 
-      const progressionSaveKey =
-        getPersistentCharacterProgressionSaveKey(
-          character
-        ) ||
-        character.id;
-
-
       playerData.characters[
-        progressionSaveKey
+        character.id
       ] = {
 
         stats: {
@@ -9497,25 +9441,6 @@ function syncRuntimeProgressionToPlayerData() {
           )
 
       };
-
-
-      // Phase-2 persistent Character identity migration:
-      // once the stable progression key is known, retire the old
-      // representation-keyed duplicate for this same runtime Character.
-      if (
-        progressionSaveKey !==
-          character.id &&
-        Object.prototype.hasOwnProperty.call(
-          playerData.characters,
-          character.id
-        )
-      ) {
-
-        delete playerData.characters[
-          character.id
-        ];
-
-      }
 
     }
   );
@@ -99531,7 +99456,7 @@ function renderMyClanInspectionContent(character){
   const slot=getMyClanStagedSlotNumber(character.id);
   const affiliation=getMyClanCharacterAffiliation(character)||"—";
   const tab=CLAN_UI_STATE.inspectionTab||"overview";
-  const statSource=character.stats||character.baseStats||{};
+  const statSource=character.baseStats||character.stats||{};
   const statLabels=[["nin","NIN"],["tai","TAI"],["gen","GEN"],["buki","BUKI"],["fuin","FŪIN"],["kin","KIN"],["stamina","STAMINA"]];
   let tabContent="";
   if (tab==="stats") {
@@ -100923,7 +100848,7 @@ function renderMyClanInspectionContent(character){
   const slot=getMyClanStagedSlotNumber(character.id);
   const affiliation=getMyClanCharacterAffiliation(character)||"—";
   const tab=CLAN_UI_STATE.inspectionTab||"overview";
-  const statSource=character.stats||character.baseStats||{};
+  const statSource=character.baseStats||character.stats||{};
   const statLabels=[["nin","NIN"],["tai","TAI"],["gen","GEN"],["buki","BUKI"],["fuin","FŪIN"],["kin","KIN"],["stamina","STAMINA"]];
   const editable=canEditClanFormation().allowed===true;
   let tabContent="";
