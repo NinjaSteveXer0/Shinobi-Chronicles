@@ -16,10 +16,10 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-29-AZ",
-    sourceBaselineCommit:"604daa50b3bc274fd6533fdeb8075806e614d30b",
-    sourceRef:"issue-303-runtime-build-fingerprint-v1",
-    runtimeGeneration:"origin-golden-repair-105-mirai-menma-global-ui",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-02-BA",
+    sourceBaselineCommit:"a1e967bc299d70c02e2759d1bb40d266ca744d35",
+    sourceRef:"issue-469-first-live-ce-hotspot",
+    runtimeGeneration:"phase2-first-live-ce-hotspot-469",
     majorRuntimeFeatures:Object.freeze([
       "academy-kakashi-v2",
       "runtime-ownership-safety-300",
@@ -70,7 +70,8 @@
       "origin-start-pl-battle-global-cta-105",
       "academy-mirai-terminal-receipt-repair-105",
       "academy-menma-nine-tails-speaker-receipt-repair-105",
-      "academy-menma-victory-diagnostic-retired-105"
+      "academy-menma-victory-diagnostic-retired-105",
+      "phase2-first-live-ce-hotspot-469"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -103,10 +104,10 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-29-AZ",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-02-BA",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
-      sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
-      generationPresent:first.runtimeGeneration==="origin-golden-repair-105-mirai-menma-global-ui",
+      sourceRefPresent:first.sourceRef==="issue-469-first-live-ce-hotspot",
+      generationPresent:first.runtimeGeneration==="phase2-first-live-ce-hotspot-469",
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)
