@@ -192,14 +192,14 @@ function teamProjection(){
 function navigationProjection(surface){
   const rows=[];
   const freePlay=call("isAcademyFreePlayAvailable")===true;
-  if(surface.kind==="world"&&freePlay&&typeof globalThis.openOverlay==="function"){
+  if(surface.kind==="world"&&freePlay&&typeof globalThis["openOverlay"]==="function"){
     rows.push({id:"village",label:"VILLAGE"});
   }else if(surface.kind==="village"){
-    if(typeof globalThis.openRegionHub==="function")rows.push({id:"region",label:"REGION"});
-    if(typeof globalThis.closeOverlay==="function")rows.push({id:"world",label:"WORLD MAP"});
+    if(typeof globalThis["openRegionHub"]==="function")rows.push({id:"region",label:"REGION"});
+    if(typeof globalThis["closeOverlay"]==="function")rows.push({id:"world",label:"WORLD MAP"});
   }else if(surface.kind==="region"){
-    if(freePlay&&typeof globalThis.openOverlay==="function")rows.push({id:"village",label:"VILLAGE"});
-    if(typeof globalThis.closeOverlay==="function")rows.push({id:"world",label:"WORLD MAP"});
+    if(freePlay&&typeof globalThis["openOverlay"]==="function")rows.push({id:"village",label:"VILLAGE"});
+    if(typeof globalThis["closeOverlay"]==="function")rows.push({id:"world",label:"WORLD MAP"});
   }
   return rows;
 }
@@ -296,13 +296,13 @@ function scheduleRefresh(){
   else if(typeof setTimeout==="function")setTimeout(()=>render(true),0);
 }
 function routeAction(action){
-  if(action==="clan"&&typeof globalThis.openOverlay==="function")return globalThis.openOverlay("clan");
-  if(action==="inventory"&&typeof globalThis.openOverlay==="function")return globalThis.openOverlay("inventory");
-  if(action==="journey"&&typeof globalThis.openOverlay==="function")return globalThis.openOverlay("missions");
-  if(action==="record"&&typeof globalThis.openShinobiRecord==="function")return globalThis.openShinobiRecord("overview");
-  if(action==="village"&&typeof globalThis.openOverlay==="function")return globalThis.openOverlay("village");
-  if(action==="region"&&typeof globalThis.openRegionHub==="function")return globalThis.openRegionHub("fire");
-  if(action==="world"&&typeof globalThis.closeOverlay==="function")return globalThis.closeOverlay();
+  if(action==="clan"&&typeof globalThis["openOverlay"]==="function")return call("openOverlay","clan");
+  if(action==="inventory"&&typeof globalThis["openOverlay"]==="function")return call("openOverlay","inventory");
+  if(action==="journey"&&typeof globalThis["openOverlay"]==="function")return call("openOverlay","missions");
+  if(action==="record"&&typeof globalThis["openShinobiRecord"]==="function")return call("openShinobiRecord","overview");
+  if(action==="village"&&typeof globalThis["openOverlay"]==="function")return call("openOverlay","village");
+  if(action==="region"&&typeof globalThis["openRegionHub"]==="function")return call("openRegionHub","fire");
+  if(action==="world"&&typeof globalThis["closeOverlay"]==="function")return call("closeOverlay");
   return{success:false,reason:"hud_navigation_unavailable",action};
 }
 function onClick(event){
@@ -379,7 +379,7 @@ function diagnostics(){
     canonicalIdentity:String(activeSubjectId).includes("getAlphaSurfaceTruthSubjectId"),
     canonicalPortrait:String(portraitFor).includes("resolveUIPortraitProjection")&&String(portraitFor).includes("getUIPortraitAssetPath"),
     noEnergyProjection:data.energy===null&&!String(render).includes("ENERGY"),
-    canonicalRoutes:String(routeAction).includes('openOverlay("clan")')&&String(routeAction).includes('openOverlay("inventory")')&&String(routeAction).includes('openShinobiRecord')&&String(routeAction).includes('openOverlay("missions")'),
+    canonicalRoutes:String(routeAction).includes('call("openOverlay","clan")')&&String(routeAction).includes('call("openOverlay","inventory")')&&String(routeAction).includes('call("openShinobiRecord","overview")')&&String(routeAction).includes('call("openOverlay","missions")'),
     deepSurfaceSuppression:String(surfaceProjection).includes('kind:"deep"')&&String(surfaceProjection).includes("storyActive")&&String(surfaceProjection).includes("battleActive"),
     browserGoldenClaimed:false
   };
