@@ -119,7 +119,7 @@ async function stateDigest(page){
     assert(text.includes("OWNED ×2"));
     assert(text.includes("BATTLE POUCH · PREPARED"));
     assert(text.includes("DURABLE EQUIPMENT & TOOLS"));
-    assert(text.includes("EQUIPPED · Menma"));
+    assert(text.includes("EQUIPPED · Academy Menma"));
     assert(text.includes("qa461-source-ref"));
     assert(text.includes("Not exposed on this current Inventory record."));
     assert(!/\b(EQUIP|PREPARE|USE|BUY|PURCHASE|CRAFT)\b/.test(
