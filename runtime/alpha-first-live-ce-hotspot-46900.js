@@ -629,17 +629,20 @@ function boardProjection({runtime,performance,beat}={}){
   return{mode:"conversation",location:"HOKAGE ADMINISTRATION · PUBLIC APPROACH",actors:ids.map(id=>boardActor(id,speaker))};
 }
 function installBoardRegistration(){
-  if(typeof globalThis.registerStorySceneBoardDefinition!=="function")return false;
-  globalThis.registerStorySceneBoardDefinition(SCENE_ID,{
+  if(typeof globalThis.registerStorySceneBoardDefinition!=="function")return{success:false,reason:"story_scene_board_not_loaded"};
+  const result=globalThis.registerStorySceneBoardDefinition(SCENE_ID,{
     resolveProjection:boardProjection,
     resolveBackdrop:()=>null
   });
-  return true;
+  return result&&result.success!==false
+    ?{success:true,sceneId:SCENE_ID}
+    :{success:false,reason:"story_scene_board_registration_failed"};
 }
 function queueBoardRegistration(){
-  if(installBoardRegistration())return true;
+  const immediate=installBoardRegistration();
+  if(immediate&&immediate.success===true)return true;
   const queue=globalThis.SC_STORY_SCENE_BOARD_PENDING_REGISTRATIONS||(globalThis.SC_STORY_SCENE_BOARD_PENDING_REGISTRATIONS=[]);
-  if(!queue.some(row=>row&&row.owner===PATCH_ID))queue.push({owner:PATCH_ID,register:installBoardRegistration});
+  if(!queue.some(row=>row&&row.id===PATCH_ID))queue.push({id:PATCH_ID,register:installBoardRegistration});
   return false;
 }
 
