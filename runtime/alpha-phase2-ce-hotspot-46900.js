@@ -1228,6 +1228,22 @@ function currentTeam(){
   try{return typeof globalThis.getChronicleCurrentTeam43600==="function"?globalThis.getChronicleCurrentTeam43600():null;}
   catch(_error){return null;}
 }
+function menmaSecondTeammateRef46900(team=currentTeam()){
+  const refs=team&&Array.isArray(team.teamVariantIds)?team.teamVariantIds.map(String):[];
+  const candidates=refs.filter(id=>id!==MENMA_ID&&id!==ORIGIN_ID);
+  return candidates.length===1?candidates[0]:null;
+}
+function teammateDisplayName46900(id){
+  const raw=TEAMMATE_LABELS[id]||String(id||"").replace(/^academy_/,"").replaceAll("_"," ");
+  return raw.toLowerCase().replace(/\b\w/g,ch=>ch.toUpperCase());
+}
+function menmaSecondTeammateReaction46900(actorRef){
+  const authored=REACTIONS[actorRef];
+  if(!authored)return null;
+  const kind=authored.noStrong===true?"no_strong":(authored.strong&&authored.strong.length?"strong":"fallback");
+  const cues=kind==="strong"?authored.strong:authored.fallback;
+  return{actorRef,kind,cues:clone(cues||[])};
+}
 function originCompletionEvidence(){
   const a=acquisition(),origin=a&&a.chronicleOrigin;
   const ids=origin&&Array.isArray(origin.completionEvidenceIds)?origin.completionEvidenceIds:[];
@@ -1472,7 +1488,9 @@ function eligibility(){
   if(!team||team.originVariantId!==selectedOrigin||!Array.isArray(team.teamVariantIds)||team.teamVariantIds.length!==3)return{available:false,reason:"exact_current_academy_team_required"};
   if(!team.teamVariantIds.includes(ORIGIN_ID))return{available:false,reason:"kakashi_current_presence_required"};
   if(selectedOrigin!==ORIGIN_ID&&selectedOrigin!==MENMA_ID)return{available:false,reason:"non_kakashi_protagonist_writing_not_authorised"};
-  if(selectedOrigin===MENMA_ID&&!team.teamVariantIds.includes(HINATA_ID))return{available:false,reason:"menma_live_benchmark_requires_hinata"};
+  const secondTeammateRef=selectedOrigin===MENMA_ID?menmaSecondTeammateRef46900(team):null;
+  if(selectedOrigin===MENMA_ID&&!secondTeammateRef)return{available:false,reason:"menma_second_teammate_required"};
+  if(selectedOrigin===MENMA_ID&&!REACTIONS[secondTeammateRef])return{available:false,reason:"menma_second_teammate_reaction_not_authored",secondTeammateRef};
   if(!continuity)return{available:false,reason:"masked_interceptor_continuity_unproven"};
   if(continuity.encounteredByProtagonist!==true||continuity.fieldDispositionState==="UNSEEN")return{available:false,reason:"masked_interceptor_unseen"};
   if(continuity.survivedOrigin!==true||continuity.fieldDispositionState==="KILLED")return{available:false,reason:"masked_interceptor_killed"};
@@ -1486,7 +1504,8 @@ function eligibility(){
     protagonistVariantId:selectedOrigin,
     team:clone(team),
     continuity:clone(continuity),
-    privateHistory:selectedOrigin===ORIGIN_ID?storedKakashiPrivateHistory():storedKakashiPrivateHistory(),
+    privateHistory:storedKakashiPrivateHistory(),
+    secondTeammateRef,
     historyFamily:historyFamily(continuity)
   };
 }
@@ -1500,7 +1519,9 @@ function eventPlan(){
     teammateOrder=[...teammates].sort((a,b)=>(order.has(a)?order.get(a):999)-(order.has(b)?order.get(b):999));
     if(teammateOrder.length!==2||teammateOrder.some(id=>!REACTIONS[id]))return{success:false,reason:"authored_teammate_reaction_missing",teammates};
   }else{
-    teammateOrder=[ORIGIN_ID,HINATA_ID];
+    const secondTeammateRef=gate.secondTeammateRef||menmaSecondTeammateRef46900(gate.team);
+    if(!secondTeammateRef||!REACTIONS[secondTeammateRef])return{success:false,reason:"menma_second_teammate_reaction_not_authored",secondTeammateRef};
+    teammateOrder=[ORIGIN_ID,secondTeammateRef];
   }
   return{
     success:true,
@@ -1881,12 +1902,15 @@ function menmaAutonomyState46900(phase){
   const plan=eventPlan();
   const active=typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;
   const local=active&&active.sceneId===MENMA_SCENE_ID&&active.localContext&&typeof active.localContext==="object"?active.localContext:null;
+  const teamVariantIds=local&&Array.isArray(local.teamVariantIds)?[...local.teamVariantIds]:(plan.success?[...plan.teamVariantIds]:[]);
+  const secondTeammateRef=menmaSecondTeammateRef46900({teamVariantIds});
   return{
     committedStateRef:OCCURRENCE_ID,
     autonomyPhase:String(phase||""),
     battleLive:false,
     occurrenceId:OCCURRENCE_ID,
-    teamVariantIds:local&&Array.isArray(local.teamVariantIds)?[...local.teamVariantIds]:(plan.success?[...plan.teamVariantIds]:[]),
+    teamVariantIds,
+    secondTeammateRef,
     privateOriginHistoryRef:local&&local.privateOriginHistoryRef||plan.privateOriginHistoryRef||null,
     historyFamily:local&&local.historyFamily||plan.historyFamily||null
   };
@@ -1907,13 +1931,24 @@ function hinataReactionFamily46900(){
   if(family==="mi_defeated_kakashi")return"explicit_history";
   return"visible_recognition";
 }
-function resolveHinataCurrentResponse46900(){
-  const family=hinataReactionFamily46900();
+function resolveSecondTeammateCurrentResponse46900(actorRef){
+  if(!actorRef||!REACTIONS[actorRef])return{success:false,reason:"menma_second_teammate_reaction_not_authored",actorRef};
+  if(actorRef===HINATA_ID){
+    const family=hinataReactionFamily46900();
+    return{
+      success:true,
+      participantIntentRef:MENMA_STORY_UNIT_REF+":second_teammate_current_evidence:"+actorRef+":"+family,
+      resolverResultRef:D.stableRef("ce478-second-teammate-current-evidence",{occurrenceId:OCCURRENCE_ID,actorRef,family}),
+      result:{actorRef,reactionFamily:family,knowledgeScope:"current_scene_direct_evidence_only"}
+    };
+  }
+  const reaction=menmaSecondTeammateReaction46900(actorRef);
+  if(!reaction)return{success:false,reason:"menma_second_teammate_reaction_not_authored",actorRef};
   return{
     success:true,
-    participantIntentRef:MENMA_STORY_UNIT_REF+":hinata_current_evidence:"+family,
-    resolverResultRef:D.stableRef("ce478-hinata-current-evidence",{occurrenceId:OCCURRENCE_ID,family}),
-    result:{actorRef:HINATA_ID,reactionFamily:family,knowledgeScope:"current_scene_direct_evidence_only"}
+    participantIntentRef:MENMA_STORY_UNIT_REF+":second_teammate_current_evidence:"+actorRef+":"+reaction.kind,
+    resolverResultRef:D.stableRef("ce478-second-teammate-current-evidence",{occurrenceId:OCCURRENCE_ID,actorRef,kind:reaction.kind}),
+    result:{actorRef,reactionFamily:reaction.kind,knowledgeScope:"current_scene_direct_evidence_only"}
   };
 }
 function nestedKakashiIntentCandidates46900(){
@@ -1940,19 +1975,28 @@ function resolveNestedKakashiCurrentIntent46900(){
     result:{actorRef:ORIGIN_ID,choiceId,intentType:choice.intentType,playerControlled:false}
   };
 }
-for(const anchor of [
-  {anchorId:"kakashi_private_history_current_response",actorRef:ORIGIN_ID,phase:"kakashi_response",priority:10,resolve:resolveKakashiCurrentResponse46900},
-  {anchorId:"hinata_current_evidence_response",actorRef:HINATA_ID,phase:"hinata_response",priority:20,resolve:resolveHinataCurrentResponse46900},
-  {anchorId:"kakashi_nested_current_intent",actorRef:ORIGIN_ID,phase:"nested_kakashi_intent",priority:30,resolve:resolveNestedKakashiCurrentIntent46900}
-]){
+const MENMA_SECOND_TEAMMATE_REFS=Object.freeze(TEAMMATE_AUTHORED_ORDER.filter(id=>id!==MENMA_ID));
+const MENMA_AUTONOMY_ANCHORS=[
+  {anchorId:"kakashi_private_history_current_response",actorRef:ORIGIN_ID,phase:"kakashi_response",priority:10,resolve:resolveKakashiCurrentResponse46900,due:state=>state&&state.autonomyPhase==="kakashi_response"},
+  ...MENMA_SECOND_TEAMMATE_REFS.map((actorRef,index)=>({
+    anchorId:"second_teammate_current_evidence_"+actorRef,
+    actorRef,
+    phase:"second_teammate_response",
+    priority:20+index,
+    resolve:()=>resolveSecondTeammateCurrentResponse46900(actorRef),
+    due:state=>state&&state.autonomyPhase==="second_teammate_response"&&state.secondTeammateRef===actorRef
+  })),
+  {anchorId:"kakashi_nested_current_intent",actorRef:ORIGIN_ID,phase:"nested_kakashi_intent",priority:40,resolve:resolveNestedKakashiCurrentIntent46900,due:state=>state&&state.autonomyPhase==="nested_kakashi_intent"}
+];
+for(const anchor of MENMA_AUTONOMY_ANCHORS){
   const registered=D.registerAutonomyAnchor(MENMA_STORY_UNIT_REF,{
     anchorId:anchor.anchorId,
     classes:["PARTICIPANT_AUTONOMY","PRIVATE_HISTORY_EMERGENCE"],
     actorRef:anchor.actorRef,
     priority:anchor.priority,
-    orderRef:"ce478_"+anchor.phase,
+    orderRef:"ce478_"+anchor.phase+":"+anchor.actorRef,
     material:true,
-    due:state=>state&&state.occurrenceId===OCCURRENCE_ID&&state.autonomyPhase===anchor.phase,
+    due:state=>state&&state.occurrenceId===OCCURRENCE_ID&&anchor.due(state),
     resolve:anchor.resolve,
     metadata:{eventId:EVENT_ID,hostId:HOST_ID,privateHistoryObserverFirewall:true}
   });
@@ -1978,9 +2022,11 @@ for(const choice of MENMA_CHOICES){
   if(!reg||reg.success!==true)throw new Error("ce478_menma_choice_resolver_registration_failed:"+choice.id);
 }
 function ensureMenmaChoiceSet46900(){
+  const state=menmaAutonomyState46900("menma_choice");
+  const secondTeammateRef=state.secondTeammateRef;
   const kakashi=menmaAutonomyReceiptByActor46900(ORIGIN_ID,"kakashi_current_response:");
-  const hinata=menmaAutonomyReceiptByActor46900(HINATA_ID,"hinata_current_evidence:");
-  if(!kakashi||!hinata)return{success:false,reason:"menma_prechoice_autonomy_incomplete"};
+  const secondTeammate=secondTeammateRef?menmaAutonomyReceiptByActor46900(secondTeammateRef,"second_teammate_current_evidence:"+secondTeammateRef+":"):null;
+  if(!kakashi||!secondTeammate)return{success:false,reason:"menma_prechoice_autonomy_incomplete",secondTeammateRef};
   return D.openDecisionAfterAutonomy({
     storyUnitRef:MENMA_STORY_UNIT_REF,
     storyUnitType:"world_event",
@@ -2051,7 +2097,7 @@ function menmaRecordPayload46900(choiceId){
     anbuMembershipKnowledgeGranted:false,moralityScalarCreated:false,friendshipScalarCreated:false,rewardsGranted:false,
     commonFactualReceiptId:commonReceipt,branchFactualReceiptId:null,branchKnowledge:{},sharedHistoryReceiptIds:[],futureLeadIds:[],
     testimony:null,recordAddendum:null,nestedKakashiIntent:null,
-    storyTeamParticipantRefs:currentTeam()?.teamVariantIds?[...currentTeam().teamVariantIds]:[MENMA_ID,HINATA_ID,ORIGIN_ID],
+    storyTeamParticipantRefs:currentTeam()?.teamVariantIds?[...currentTeam().teamVariantIds]:[MENMA_ID,ORIGIN_ID],
     originMaterialHistorySourceRefs:[...(continuity&&continuity.materialHistoryRefs||[])],
     rememberedHistoryFamily:historyFamily(continuity)
   };
@@ -2096,7 +2142,7 @@ function menmaRecordPayload46900(choiceId){
     id:OCCURRENCE_ID,occurrenceId:OCCURRENCE_ID,sourceOccurrenceId:OCCURRENCE_ID,
     type:"konoha_ce_private_history_emergence_knowledge_occurrence",activity:"world_chronicle_hotspot",
     title:"Hokage Administration Crossing",locationId:HOST_ID,actorVariantId:MENMA_ID,protagonistParticipantId:MENMA_ID,
-    participants:[MENMA_ID,HINATA_ID,ORIGIN_ID,MI_ID],committed:true,completed:true,outcome,data,sourceRefs,timestamp:Date.now()
+    participants:[...new Set([...(data.storyTeamParticipantRefs||[MENMA_ID,ORIGIN_ID]),MI_ID])],committed:true,completed:true,outcome,data,sourceRefs,timestamp:Date.now()
   };
 }
 function commitMenmaResolution46900(expectedChoiceId){
@@ -2153,10 +2199,12 @@ function observerSafeMenmaCue46900(row){
   return out;
 }
 function menmaOpeningCues46900(){
+  const secondTeammateRef=menmaSecondTeammateRef46900();
+  const secondTeammateName=teammateDisplayName46900(secondTeammateRef||HINATA_ID);
   return[
     cue("narration","At the public intake window, a clerk presses a stamp onto a narrow receipt and slides it back beneath the frame."),
     cue("narration","The masked woman folds the slip into her sleeve and turns away.\n\nThe clerk calls the next visitor forward. A waiting messenger steps up to the counter."),
-    cue("narration","Menma is crossing the forecourt with Hinata and Kakashi when Kakashi's pace breaks for half a step.\n\nMenma follows his line of sight to the masked woman."),
+    cue("narration","Menma is crossing the forecourt with "+secondTeammateName+" and Kakashi when Kakashi's pace breaks for half a step.\n\nMenma follows his line of sight to the masked woman."),
     cue("narration","She sees Kakashi.\n\nHer attention fixes on him before it touches either of the others.")
   ];
 }
@@ -2179,9 +2227,16 @@ function kakashiCurrentResponseCues46900(runtime){
   }
   return clone(KAKASHI_CURRENT_RESPONSE_CUES[family]||KAKASHI_CURRENT_RESPONSE_CUES.material_encounter);
 }
-function hinataCurrentResponseCues46900(){
-  const family=hinataReactionFamily46900();
-  return clone(HINATA_RESPONSE_CUES[family]||HINATA_RESPONSE_CUES.quiet);
+function secondTeammateCurrentResponseCues46900(){
+  const actorRef=menmaSecondTeammateRef46900();
+  if(actorRef===HINATA_ID){
+    const family=hinataReactionFamily46900();
+    return clone(HINATA_RESPONSE_CUES[family]||HINATA_RESPONSE_CUES.quiet);
+  }
+  const reaction=menmaSecondTeammateReaction46900(actorRef);
+  return reaction&&reaction.cues.length
+    ?reaction.cues.map(observerSafeMenmaCue46900)
+    :[cue("narration",teammateDisplayName46900(actorRef)+" watches the exchange without claiming to know the history behind it.")];
 }
 function menmaAskKakashiCues46900(){
   const disclosure=kakashiDisclosure46900();
@@ -2210,9 +2265,10 @@ function menmaYieldCues46900(){
   ];
 }
 function menmaDisengageCues46900(){
+  const secondTeammateName=teammateDisplayName46900(menmaSecondTeammateRef46900()||HINATA_ID);
   return[
     cue("dialogue","We're moving.","MENMA"),
-    cue("narration","Menma keeps walking.\n\nHinata moves with him.\n\nKakashi stays still for half a second longer, then follows."),
+    cue("narration","Menma keeps walking.\n\n"+secondTeammateName+" moves with him.\n\nKakashi stays still for half a second longer, then follows."),
     cue("narration","The masked woman continues toward the street.\n\nMenma does not turn the recognition into an interrogation.\n\nThe Administration routine carries on behind them.")
   ];
 }
@@ -2222,9 +2278,11 @@ function menmaBoardActor46900(id,focus=false){
 }
 function menmaBoardProjection46900({beatId,performance}){
   const speaker=String(performance&&performance.cue&&(performance.cue.speakerName||performance.cue.speaker)||"").toUpperCase();
+  const secondTeammateRef=menmaSecondTeammateRef46900();
   let ids=[MENMA_ID,ORIGIN_ID,MI_ID];
-  if(beatId==="ce478_hinata_response"||beatId==="ce478_menma_choice")ids=[MENMA_ID,HINATA_ID,ORIGIN_ID,MI_ID];
-  if(String(beatId||"").startsWith("ce478_branch_"))ids=[MENMA_ID,HINATA_ID,ORIGIN_ID,MI_ID];
+  if((beatId==="ce478_hinata_response"||beatId==="ce478_menma_choice"||String(beatId||"").startsWith("ce478_branch_"))&&secondTeammateRef){
+    ids=[MENMA_ID,secondTeammateRef,ORIGIN_ID,MI_ID];
+  }
   return{
     mode:beatId==="ce478_menma_choice"?"encounter":"conversation",
     location:"HOKAGE ADMINISTRATION · PUBLIC APPROACH",
@@ -2249,7 +2307,9 @@ function actorImage(id){
     academy_kushina:"Assets/Academy Student/academy_kushina.png",
     academy_kurenai:"Assets/Academy Student/academy_kurenai.png",
     academy_iwabee:"Assets/Academy Student/academy_iwabe.png",
-    academy_metal_lee:"Assets/Academy Student/academy_metal.png"
+    academy_metal_lee:"Assets/Academy Student/academy_metal.png",
+    academy_obito:"Assets/Academy Student/academy_obito.png",
+    academy_izuno:"Assets/Academy Student/academy_izuno.png"
   };
   return fallback[id]||null;
 }
@@ -2366,7 +2426,7 @@ const menmaBeats46900=[
   },
   {
     beatId:"ce478_hinata_response",mode:"narration",text:"",
-    onEnterConsequences:[domainRequest("ce478_hinata_autonomy",()=>consumeMenmaAutonomy46900("hinata_response"))],
+    onEnterConsequences:[domainRequest("ce478_second_teammate_autonomy",()=>consumeMenmaAutonomy46900("second_teammate_response"))],
     nextBeatId:"ce478_menma_choice"
   },
   {
@@ -2402,7 +2462,6 @@ const menmaSceneRegistration46900=registerStoryScene({
   locationId:HOST_ID,
   participants:[
     {sourceId:MENMA_ID,physicalPresence:true,visible:true,role:"protagonist",displayName:"Menma"},
-    {sourceId:HINATA_ID,physicalPresence:true,visible:true,role:"current_teammate",displayName:"Hinata"},
     {sourceId:ORIGIN_ID,physicalPresence:true,visible:true,role:"private_history_owner",displayName:"Kakashi"},
     {sourceId:MI_ID,physicalPresence:true,visible:true,role:"returning_participant",displayName:"Masked Woman"}
   ],
@@ -2420,7 +2479,7 @@ if(typeof globalThis.registerStorySceneBoardDefinition==="function"){
       ce478_opening:menmaOpeningCues46900,
       ce478_history:({runtime})=>menmaHistoryCues46900(runtime),
       ce478_kakashi_response:({runtime})=>kakashiCurrentResponseCues46900(runtime),
-      ce478_hinata_response:hinataCurrentResponseCues46900,
+      ce478_hinata_response:secondTeammateCurrentResponseCues46900,
       ce478_branch_menma_ask_kakashi_prior_connection:menmaAskKakashiCues46900,
       ce478_branch_menma_ask_mi_prior_connection:menmaAskMiCues46900,
       ce478_branch_menma_yield_to_kakashi:menmaYieldCues46900,
@@ -2511,7 +2570,9 @@ function getShinobiRecordParticipants46900(record){
   if(record&&recordId(record)===OCCURRENCE_ID){
     const d=record.data&&typeof record.data==="object"?record.data:{};
     if(d.observerRef===MENMA_ID||record.protagonistParticipantId===MENMA_ID){
-      return["Menma","Hinata","Kakashi","Masked Woman"];
+      const team=Array.isArray(d.storyTeamParticipantRefs)?d.storyTeamParticipantRefs:[MENMA_ID,ORIGIN_ID];
+      const names=team.map(id=>id===MENMA_ID?"Menma":id===ORIGIN_ID?"Kakashi":teammateDisplayName46900(id));
+      return[...names,"Masked Woman"];
     }
     const team=Array.isArray(d.storyTeamParticipantRefs)?d.storyTeamParticipantRefs:[ORIGIN_ID];
     const teammateNames=team.filter(id=>id!==ORIGIN_ID).map(id=>TEAMMATE_LABELS[id]||String(id).replace(/^academy_/,"").replaceAll("_"," ").toUpperCase());
@@ -2579,7 +2640,9 @@ function diagnostics(){
     battleOwnedAutonomousResult:typeof globalThis.resolveAcademyKakashiV2AutonomousPrivateBattle36010==="function",
     privateHistoryNoEconomyMutation:!privateHistory||privateHistory.economyFirewall&&privateHistory.economyFirewall.playerEconomyMutation===false&&privateHistory.economyFirewall.duplicateStartingPurseGranted===false&&privateHistory.economyFirewall.autonomousPlayerVictoryBattleRyoGranted===false,
     participantFirstAuthority:D.getRegisteredAnchorInventory(STORY_UNIT_REF).length===9,
-    menmaParticipantAutonomy:D.getRegisteredAnchorInventory(MENMA_STORY_UNIT_REF).length===3,
+    menmaParticipantAutonomy:D.getRegisteredAnchorInventory(MENMA_STORY_UNIT_REF).length===MENMA_SECOND_TEAMMATE_REFS.length+2,
+    menmaSecondTeammateDynamic:!String(eligibility).includes("menma_live_benchmark_requires_hinata")&&String(eligibility).includes("menmaSecondTeammateRef46900")&&String(eventPlan).includes("secondTeammateRef"),
+    obitoSecondTeammateAuthored:!!REACTIONS.academy_obito&&String(REACTIONS.academy_obito.strong&&REACTIONS.academy_obito.strong[1]&&REACTIONS.academy_obito.strong[1].text)==="Wait—you know her?",
     exactFourChoices:labels==="Tell her you remember her.|Ask about the delivery.|Watch what she does.|Keep moving.",
     exactMenmaChoices:menmaLabels==="Ask Kakashi what happened.|Ask her how she knows Kakashi.|Let Kakashi handle it.|Keep moving.",
     distinctBranchConsequences:Object.keys(BRANCH_CONSEQUENCES).length===4&&new Set(Object.values(BRANCH_CONSEQUENCES).map(row=>row.factualReceiptId)).size===4,
@@ -2611,6 +2674,7 @@ globalThis.getMenmaPrivateHistoryDecisionSnapshot46900=()=>clone(menmaDecisionSn
 globalThis.getMenmaNestedKakashiIntent46900=committedNestedKakashiIntent46900;
 globalThis.getOriginParticipantContinuity46900=getContinuity;
 globalThis.getKonohaCeHotspotEligibility46900=eligibility;
+globalThis.getMenmaSecondTeammateRef46900=menmaSecondTeammateRef46900;
 globalThis.getKonohaCeHotspotPlan46900=eventPlan;
 globalThis.getKonohaCeHotspotTeammateReactions46900=()=>clone(committedTeammateReactions());
 globalThis.getKonohaCeHotspotResolvedRecord46900=()=>clone(resolvedRecord());
