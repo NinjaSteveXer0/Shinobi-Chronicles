@@ -1172,18 +1172,20 @@
       "classification": "EXTENDS",
       "responsibilityIds": [
         "phase2.chronicle_state_manifest.shared",
-        "phase2.konoha_ce_hotspot.first_live_benchmark"
+        "phase2.konoha_ce_hotspot.first_live_benchmark",
+        "story.intent.commit.shared"
       ],
-      "owner": "runtime/alpha-phase2-ce-hotspot-46900.js",
+      "owner": "runtime/alpha-phase2-ce-hotspot-46900.js + game.js #34000 save compatibility reader",
       "directCallers": [
         "runtime/alpha-traversal-bridge-33200.js",
         "existing Academy Kakashi Origin completion",
         "existing Konoha V3 KON-P01 presentation/activation",
-        "existing World opportunity + Story Scene + #34000 participant-autonomy runtimes"
+        "existing World opportunity + Story Scene + #34000 participant-autonomy runtimes",
+        "game.js loadPlayerData compatibility reader"
       ],
       "stateTouched": [
         "playerData.phase2ChronicleState.originParticipantContinuity exact bounded continuity capture/projection",
-        "playerData.storyDecisionRealisation34000 exact participant-first and protagonist-intent receipts through existing APIs",
+        "playerData.storyDecisionRuntime34000 exact participant-first and protagonist-intent receipts through existing APIs",
         "existing World event runtime dimensions for one finite KON-P01 occurrence",
         "one observer-safe playerData.activityHistory Chronicle/Knowledge/shared-history occurrence",
         "presentation-only Konoha P01 actionability and shared Story Scene Board delivery"
@@ -1198,7 +1200,7 @@
       ],
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
-      "rationale": "Consumes the CE LIVE TEST READY #432/#469 contract and Writing #465 production scene. Adds one bounded Kakashi-Origin-only participant-continuity adapter and one finite KON-P01 authored World occurrence. It preserves frozen Origin truth, currentTeam authority, participant-first #34000 receipts, observer-safe Knowledge, Shinobi Record as projection, KILLED/UNSEEN exclusion, and save/load no-reroll. It does not activate generic hotspot generation, teammate-Kakashi history, Battle escalation, rewards, morality or hidden test truth."
+      "rationale": "Consumes the CE LIVE TEST READY #432/#469 contract and Writing #465 production scene. Adds one bounded Kakashi-Origin-only participant-continuity adapter and one finite KON-P01 authored World occurrence. It preserves frozen Origin truth, currentTeam authority, participant-first #34000 receipts including canonical save/load preservation, observer-safe Knowledge, Shinobi Record as projection, KILLED/UNSEEN exclusion, and save/load no-reroll. It does not activate generic hotspot generation, teammate-Kakashi history, Battle escalation, rewards, morality or hidden test truth."
     }
   ]
 }
