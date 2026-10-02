@@ -234,7 +234,8 @@ assert(free&&free.projection.onboardingStatus==="academy_free_play"&&free.projec
   const loaded=context.loadPlayerData();
   assert.strictEqual(store.get(SAVE_KEY),rawBefore,"#436 compatibility reader mutated Phase-2 save while loading");
   assert.deepStrictEqual(loaded.phase2ChronicleState,fixture.phase2ChronicleState,"#436 Phase-2 root dropped/rewritten by compatibility reader");
-  context.playerData=loaded;
+  context.__phase2Loaded=loaded;
+  vm.runInContext("playerData=__phase2Loaded;",context);
   const team=JSON.parse(JSON.stringify(context.getChronicleCurrentTeam43600()));
   assert.deepStrictEqual(team.teamVariantIds,["academy_kakashi","academy_hinata","academy_kushina"],"#436 currentTeam projection drift");
   const privateStore=JSON.parse(JSON.stringify(context.getPrivateOriginHistoryStore43600({create:false})));
