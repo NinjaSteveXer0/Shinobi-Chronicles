@@ -65,8 +65,6 @@ const teamSave={
   assert.strictEqual(privateOriginDomain.savePath,"playerData.phase2ChronicleState.privateOriginHistories.bySubject[subjectStableId]");
   assert(privateOriginDomain.projectionConsumers.includes("participant autonomy"));
   assert(privateOriginDomain.devOverridePolicy.includes("never becomes protagonist Knowledge"));
-  const privateStore=plain(c.getPrivateOriginHistoryStore43600({create:true}));
-  assert.deepStrictEqual(privateStore,{schemaVersion:1,bySubject:{}});
   const disciplineDomain=manifest.domains.find(row=>row.stateDomainId==="disciplineDevelopment");
   const statsDomain=manifest.domains.find(row=>row.stateDomainId==="characterStats");
   assert.strictEqual(disciplineDomain.semanticOwner,"Progression / Development");
@@ -86,9 +84,12 @@ const teamSave={
   assert.deepStrictEqual(migrated2,migrated1,"migration is not deterministic/idempotent");
 
   assert.strictEqual(c.getChronicleTutorialProgress43600(),null,"read-only tutorial getter fabricated state");
+  assert.strictEqual(c.getPrivateOriginHistoryStore43600({create:false}),null,"read-only private Origin getter fabricated state");
   const root=c.ensurePhase2ChronicleState43600({save:true});
   assert(root&&root.schemaVersion===1);
   assert.strictEqual(c.saveCount,1,"first scaffold write must save exactly once");
+  const privateStore=plain(c.getPrivateOriginHistoryStore43600({create:true}));
+  assert.deepStrictEqual(privateStore,{schemaVersion:1,bySubject:{}});
   const continuity=c.getOriginParticipantContinuityStore43600({create:true});
   continuity.byKey["academy_kakashi::academy_kakashi_origin_masked_interceptor"]={schemaVersion:1,originId:"academy_kakashi",stableParticipantId:"academy_kakashi_origin_masked_interceptor",survivedOrigin:true};
   c.savePlayerData();
