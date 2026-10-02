@@ -1175,7 +1175,7 @@
         "phase2.konoha_ce_hotspot.first_live_benchmark",
         "story.intent.commit.shared"
       ],
-      "owner": "runtime/alpha-phase2-ce-hotspot-46900.js + game.js #34000 save compatibility reader",
+      "owner": "runtime/alpha-phase2-ce-hotspot-46900.js + runtime/alpha-kakashi-v2-battle-36010.js + runtime/alpha-chronicle-state-manifest-43600.js",
       "directCallers": [
         "runtime/alpha-traversal-bridge-33200.js",
         "existing Academy Kakashi Origin completion",
@@ -1188,7 +1188,10 @@
         "playerData.storyDecisionRuntime34000 exact participant-first and protagonist-intent receipts through existing APIs",
         "existing World event runtime dimensions for one finite KON-P01 occurrence",
         "one observer-safe playerData.activityHistory Chronicle/Knowledge/shared-history occurrence",
-        "presentation-only Konoha P01 actionability and shared Story Scene Board delivery"
+        "presentation-only Konoha P01 actionability and shared Story Scene Board delivery",
+        "playerData.phase2ChronicleState.privateOriginHistories one sealed Kakashi-private Origin ledger row",
+        "Battle-owned headless autonomous Kakashi Battle facts with no player economy mutation",
+        "Menma observer-safe Knowledge / Shinobi Record branch consequences for #478"
       ],
       "productionLoader": "runtime/alpha-traversal-bridge-33200.js",
       "qaRefs": [
@@ -1200,7 +1203,7 @@
       ],
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
-      "rationale": "Consumes the CE LIVE TEST READY #432/#469 contract and Writing #465 production scene. Adds one bounded Kakashi-Origin-only participant-continuity adapter and one finite KON-P01 authored World occurrence. It preserves frozen Origin truth, currentTeam authority, participant-first #34000 receipts including canonical save/load preservation, observer-safe Knowledge, Shinobi Record as projection, KILLED/UNSEEN exclusion, and save/load no-reroll. It does not activate generic hotspot generation, teammate-Kakashi history, Battle escalation, rewards, morality or hidden test truth."
+      "rationale": "Extends the already repaired #469 live hotspot into CE/Codex #478: Kakashi can now arrive as a current teammate with one sealed private Academy Kakashi Origin history. The resolver uses the closed 23-boundary / 93-choice autonomous Kakashi profile, delegates hidden Battle outcomes to the existing Kakashi Battle adapter, filters player-economy rewards, preserves stable MI continuity, and projects only current-scene/source-attributed Knowledge to Menma. The original Kakashi-protagonist scene remains intact."
     }
   ]
 }
