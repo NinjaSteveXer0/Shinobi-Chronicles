@@ -1565,6 +1565,97 @@ function teammateCueSequence(index){
   return row&&row.cues&&row.cues.length?clone(row.cues):[cue("narration","The teammate notices the exchange and does not manufacture an answer.")];
 }
 function branchCues(id){return clone(BRANCH_CUES[id]||[]);}
+function observerSafeMenmaCue46900(row){
+  const out=clone(row);
+  if(!out)return out;
+  if(out.speakerName==="MASKED INTERCEPTOR")out.speakerName="MASKED WOMAN";
+  if(typeof out.text==="string"){
+    out.text=out.text
+      .replaceAll("Masked Interceptor's","The masked woman's")
+      .replaceAll("Masked Interceptor","The masked woman");
+  }
+  return out;
+}
+function menmaOpeningCues46900(){
+  return[
+    cue("narration","At the public intake window, a clerk presses a stamp onto a narrow receipt and slides it back beneath the frame."),
+    cue("narration","The masked woman folds the slip into her sleeve and turns away.\n\nThe clerk calls the next visitor forward. A waiting messenger steps up to the counter."),
+    cue("narration","Menma is crossing the forecourt with Hinata and Kakashi when Kakashi's pace breaks for half a step.\n\nMenma follows his line of sight to the masked woman."),
+    cue("narration","She sees Kakashi.\n\nHer attention fixes on him before it touches either of the others.")
+  ];
+}
+function menmaHistoryCues46900(runtime){
+  const family=runtime&&runtime.localContext&&runtime.localContext.historyFamily||"material_encounter";
+  return clone(HISTORY_CUES[family]||HISTORY_CUES.material_encounter).map(observerSafeMenmaCue46900);
+}
+function kakashiCurrentResponseCues46900(runtime){
+  const family=runtime&&runtime.localContext&&runtime.localContext.historyFamily||historyFamily(getContinuity())||"material_encounter";
+  if(family==="restraint_or_anbu"){
+    const c=getContinuity();
+    const isAnbu=c&&c.fieldDispositionState==="ANBU_CUSTODY";
+    return isAnbu
+      ?[
+        cue("narration","Kakashi notices the turn of her wrist.\n\nHis gaze stays there for one second too long.\n\nThen he looks toward the public intake window.")
+      ]
+      :[
+        cue("narration","Kakashi's hand starts toward the side where he carried ninja wire during the old encounter.\n\nHe stops the movement before touching it.")
+      ];
+  }
+  return clone(KAKASHI_CURRENT_RESPONSE_CUES[family]||KAKASHI_CURRENT_RESPONSE_CUES.material_encounter);
+}
+function hinataCurrentResponseCues46900(){
+  const family=hinataReactionFamily46900();
+  return clone(HINATA_RESPONSE_CUES[family]||HINATA_RESPONSE_CUES.quiet);
+}
+function menmaAskKakashiCues46900(){
+  const disclosure=kakashiDisclosure46900();
+  return[
+    cue("dialogue","Kakashi. What happened?","MENMA"),
+    cue("dialogue",disclosure.text,"KAKASHI"),
+    cue("narration","Menma looks at Kakashi first.\n\nThen at the masked woman.\n\nWhatever else happened before they became a team, Kakashi has given him one piece of it.\n\nThe masked woman does not volunteer the rest.\n\nShe continues across the forecourt.")
+  ];
+}
+function menmaAskMiCues46900(){
+  const disclosure=miDisclosure46900();
+  return[
+    cue("dialogue","How do you know Kakashi?","MENMA"),
+    cue("dialogue",disclosure.text,"MASKED WOMAN"),
+    cue("narration","Kakashi looks at her.\n\nShe does not add an explanation.\n\nThe clerk at the intake window calls another visitor forward behind them.\n\nThe masked woman steps away.")
+  ];
+}
+function menmaYieldCues46900(){
+  const nested=committedNestedKakashiIntent46900();
+  const nestedCues=nested?branchCues(nested).map(observerSafeMenmaCue46900):[];
+  return[
+    cue("narration","Menma steps aside."),
+    cue("dialogue","Your mess.","MENMA"),
+    cue("narration","He leaves Kakashi the space instead of taking the exchange over."),
+    ...nestedCues
+  ];
+}
+function menmaDisengageCues46900(){
+  return[
+    cue("dialogue","We're moving.","MENMA"),
+    cue("narration","Menma keeps walking.\n\nHinata moves with him.\n\nKakashi stays still for half a second longer, then follows."),
+    cue("narration","The masked woman continues toward the street.\n\nMenma does not turn the recognition into an interrogation.\n\nThe Administration routine carries on behind them.")
+  ];
+}
+function menmaBoardActor46900(id,focus=false){
+  const label=id===MI_ID?"MASKED WOMAN":actorLabel(id);
+  return{id,label,image:actorImage(id),focus:focus===true};
+}
+function menmaBoardProjection46900({beatId,performance}){
+  const speaker=String(performance&&performance.cue&&(performance.cue.speakerName||performance.cue.speaker)||"").toUpperCase();
+  let ids=[MENMA_ID,ORIGIN_ID,MI_ID];
+  if(beatId==="ce478_hinata_response"||beatId==="ce478_menma_choice")ids=[MENMA_ID,HINATA_ID,ORIGIN_ID,MI_ID];
+  if(String(beatId||"").startsWith("ce478_branch_"))ids=[MENMA_ID,HINATA_ID,ORIGIN_ID,MI_ID];
+  return{
+    mode:beatId==="ce478_menma_choice"?"encounter":"conversation",
+    location:"HOKAGE ADMINISTRATION · PUBLIC APPROACH",
+    actors:ids.map(id=>menmaBoardActor46900(id,(id===MI_ID?"MASKED WOMAN":actorLabel(id))===speaker)),
+    objects:beatId==="ce478_opening"||beatId==="ce478_history"?[{label:"STAMPED RECEIPT",state:"Folded into sleeve"}]:[]
+  };
+}
 
 function actorImage(id){
   if(id===MI_ID)return"NPC/masked_interceptor.png";
