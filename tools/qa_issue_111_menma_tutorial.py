@@ -8,10 +8,23 @@ patch=(ROOT/'runtime/alpha-menma-tutorial-111.js').read_text(encoding='utf-8')
 index=(ROOT/'index.html').read_text(encoding='utf-8')
 
 EXPECTED_BLOB='05e014efc8a77705c53f0ec9d8f143703ad91da8'
-# #322 intentionally extends only loadPlayerData persistence for canonical Story/evidence roots; all Menma assertions below remain binding.
+# #469 intentionally extends only loadPlayerData persistence for the canonical
+# #34000 Story-decision runtime store. Strip that exact declared compatibility
+# reader before comparing the previously audited game.js blob; every other byte
+# of the old audited core must remain unchanged.
+# #322's older compatibility root remains preserved immediately after it.
 def git_blob_sha(text:str)->str:
     raw=text.encode('utf-8')
     return hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
+
+def game_without_declared_469_save_reader(text:str)->str:
+    start_marker='      // ISSUE #469 / #34000 — preserve the canonical neutral Story decision'
+    end_marker='      // ISSUE #322 / #23 — preserve the older shared Story intent/factual'
+    start=text.find(start_marker)
+    end=text.find(end_marker,start if start >= 0 else 0)
+    if start < 0 or end <= start:
+        return ''
+    return text[:start]+text[end:]
 
 five=[
  'academy_menma_chakra_knuckle',
@@ -27,7 +40,7 @@ legacy=[
 ]
 
 checks={}
-checks['audited_game_blob_unchanged']=git_blob_sha(game)==EXPECTED_BLOB
+checks['audited_game_blob_unchanged']=git_blob_sha(game_without_declared_469_save_reader(game))==EXPECTED_BLOB
 checks['patch_loaded_after_game']=index.index('<script src="game.js"></script>') < index.index('<script src="runtime/alpha-menma-tutorial-111.js"></script>')
 checks['stable_policy_id']='alpha_combat_content_projection_v1_2026_09_11' in patch
 checks['exact_five_in_patch_order']=all(patch.index(f'"{sid}"') < patch.index(f'"{five[i+1]}"') for i,sid in enumerate(five[:-1])) and all(sid in patch for sid in five)
