@@ -111,9 +111,13 @@ async function closeAndVillage(page){
         canonicalIdentity:{
           id:String(subject),
           variantId:presentationVariant,
-          name:scalar(character&& (character.name||character.displayName||character.playerFacingName))
-            ||scalar((getCharacterRegistryEntry?.(presentationVariant)||getRegistryCharacter?.(presentationVariant))?.displayName)
-            ||scalar((getCharacterRegistryEntry?.(presentationVariant)||getRegistryCharacter?.(presentationVariant))?.name),
+          name:(()=>{
+            const registry=(typeof globalThis.getCharacterRegistryEntry==="function"?globalThis.getCharacterRegistryEntry(presentationVariant):null)
+              ||(typeof globalThis.getRegistryCharacter==="function"?globalThis.getRegistryCharacter(presentationVariant):null);
+            return scalar(character&& (character.name||character.displayName||character.playerFacingName))
+              ||scalar(registry&&registry.displayName)
+              ||scalar(registry&&registry.name);
+          })(),
           rank:scalar(getAlphaSurfaceTruthRankLabel(subject)),
           affiliation:scalar(getMyClanCharacterAffiliation(character))
         },
