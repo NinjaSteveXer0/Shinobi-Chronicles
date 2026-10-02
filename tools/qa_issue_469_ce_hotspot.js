@@ -112,6 +112,7 @@ assert(src.includes("registerWorldEventOpportunity"),"existing World opportunity
 assert(src.includes("routeWorldOpportunityInteraction"),"KON-P01 does not route existing World interaction authority");
 assert(src.includes("registerStoryScene"),"shared Story Scene runtime not consumed");
 assert(src.includes("registerStorySceneBoardDefinition"),"shared Scene Board presentation not consumed");
+assert(src.includes('resolveBackdrop:()=>({assetPath:"Scene backdrops/hokage_district_exterior.png"})'),"KON-P01 Administration exterior backdrop not bound");
 assert(src.includes("resolvedRecord()"),"finite no-reroll record guard missing");
 assert(src.includes("setOpportunityResolution"),"World resolution commit missing");
 assert(src.includes("setWorldEventLifecycle"),"World lifecycle commit missing");
