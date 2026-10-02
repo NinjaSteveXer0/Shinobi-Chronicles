@@ -30,6 +30,10 @@ The intended player journey begins:
 
 → `complete that Origin's Prologue`
 
+→ **Origin Convergence Preparation** — autonomously resolve and seal the other nine Origin-capable Characters' private Origin histories exactly once
+
+→ apply authorised subject-persistent carry-forward without importing whole source-era worlds
+
 → committed Active-Konoha entry boundary
 
 → `ACADEMY TEAM FORMATION`
@@ -68,15 +72,27 @@ The player first chooses one authorised Origin Character.
 
 The player completes that exact Origin's Prologue before the ordinary Academy journey opens.
 
-Origin selection acquires/establishes the protagonist only. It does not auto-acquire all other Academy representations and does not fabricate the other Origins as having occurred.
+Origin selection acquires/establishes the protagonist only. It does not auto-acquire the other Academy representations.
 
-The existing committed Active-Konoha entry boundary remains the transition out of the Origin Prologue.
+However, current CE/SC authority now distinguishes **player-experienced Origin** from **autonomously resolved private Origin history**.
+
+After the selected protagonist's Origin seals and before Active Konoha begins, the other nine authorised Academy Origin Characters resolve one private Origin history each under:
+
+`Documentation/Coordination/Parallel_Origin_Private_History_and_Active_Konoha_Convergence_Contract_2026-10-02.md`.
+
+Those histories occur in their own declared Origin historical scopes. They are not retroactively inserted into the protagonist's source-era childhood/cohort.
+
+The existing committed Active-Konoha entry boundary remains the transition out of pre-convergence Origin scope(s).
+
+This narrowly supersedes the older assumption that an unselected Character's authored Origin prologue simply did not occur in this Chronicle.
 
 Preserve:
 
-**selected Origin ≠ all Origins happened**  
-**unselected Academy candidate ≠ retroactively completed Origin**  
-**source-era provenance ≠ current Chronicle history**
+**selected Origin = player-experienced Origin POV, not exclusive historical existence**  
+**all Origin histories committed ≠ all Origin events shared one source-era world**  
+**autonomous private Origin history ≠ protagonist Knowledge**  
+**source-era provenance/history ≠ Active-Konoha Shared History automatically**  
+**Team Formation ≠ prior-history creation**
 
 ---
 
@@ -92,13 +108,19 @@ This remains the already-authorised Academy Team Formation transaction.
 
 The player cannot enter ordinary Academy free play until this three-person squad is committed.
 
-The two chosen teammates become actual Chronicle participants with subsequent team/shared-history potential from the point their legitimate formation/participation history begins. Formation itself does not fabricate earlier shared memories or events.
+The two chosen teammates become actual Active-Konoha team participants with subsequent team/shared-history potential from the point their legitimate formation/participation history begins.
+
+They may already possess sealed private Origin history and actor-local persistent state from the pre-convergence phase. Formation consumes that current Character state; it does not create or reroll it.
+
+Formation itself does not fabricate earlier **shared** memories between the protagonist and teammate and does not disclose the teammate's private Origin history.
 
 Preserve:
 
 **candidate eligibility ≠ ownership**  
 **selection ≠ acquisition/commit**  
+**team formation ≠ private-history creation**  
 **team formation ≠ fabricated prior Shared History**  
+**team membership ≠ private-history disclosure**  
 **team membership ≠ obedience**
 
 ---
