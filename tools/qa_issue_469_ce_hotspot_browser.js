@@ -224,9 +224,11 @@ async function advanceThroughBeat(page,beatId,max=20){
 
     const opening=await advanceThroughBeat(page,"ce469_opening");
     const openingText=opening.join(" ");
-    assert(openingText.includes("stamped receipt"));
-    assert(openingText.includes("No alarm follows her"));
-    assert(openingText.includes("Then she sees Kakashi."));
+    assert(openingText.includes("clerk presses a stamp onto a narrow receipt"));
+    assert(openingText.includes("clerk calls the next visitor forward"));
+    assert(openingText.includes("The woman from the package incident."));
+    assert(openingText.includes("She looks up and sees him."));
+    assert(!openingText.includes("No alarm follows her"),"rejected semantic-predicate narration returned");
 
     const historyTexts=await advanceThroughBeat(page,"ce469_history");
     const historyText=historyTexts.join(" ");
@@ -238,7 +240,7 @@ async function advanceThroughBeat(page,beatId,max=20){
     const team1=await advanceThroughBeat(page,"ce469_team_1");
     assert(team1.join(" ").includes("She recognised you."),"Hinata strong participant-first reaction missing");
     const team2=await advanceThroughBeat(page,"ce469_team_2");
-    assert(team2.join(" ").includes("Menma looks from the receipt"),"Menma NO STRONG STANCE reaction missing");
+    assert(team2.join(" ").includes("Menma's eyes move from the stamped receipt"),"Menma NO STRONG STANCE reaction missing");
 
     const reactions=await page.evaluate(()=>({
       reactions:getKonohaCeHotspotTeammateReactions46900(),
@@ -253,22 +255,39 @@ async function advanceThroughBeat(page,beatId,max=20){
     const choiceLabels=await page.locator("#story-scene-presentation-layer .sc-story-choice").allInnerTexts();
     assert.deepStrictEqual(choiceLabels,[
       "Tell her you remember her.",
-      "Ask what she is doing here.",
-      "Watch her pass.",
+      "Ask about the delivery.",
+      "Watch what she does.",
       "Keep moving."
     ]);
     assert(!choiceLabels.some(label=>/attack/i.test(label)),"ATTACK leaked into live choice UI");
     await page.screenshot({path:path.join(OUT,"03-kakashi-choice-surface.png"),fullPage:true});
 
-    const askChoice=page.locator("#story-scene-presentation-layer .sc-story-choice").filter({hasText:"Ask what she is doing here."});
-    assert.strictEqual(await askChoice.count(),1,"Ask-business choice control missing or duplicated");
+    const branchMatrix=await page.evaluate(()=>({
+      acknowledge:getKonohaCeHotspotBranchConsequence46900("acknowledge_recognition"),
+      question:getKonohaCeHotspotBranchConsequence46900("ask_about_delivery"),
+      observe:getKonohaCeHotspotBranchConsequence46900("observe_intake_and_departure"),
+      disengage:getKonohaCeHotspotBranchConsequence46900("disengage_keep_moving")
+    }));
+    assert.strictEqual(branchMatrix.acknowledge.factualReceiptId,"mi_mutual_recognition_explicit_v1");
+    assert.strictEqual(branchMatrix.question.factualReceiptId,"mi_dispatch_task_confirmed_v1");
+    assert.strictEqual(branchMatrix.observe.factualReceiptId,"mi_public_intake_process_observed_v1");
+    assert.strictEqual(branchMatrix.disengage.factualReceiptId,"kakashi_declined_mi_contact_v1");
+    assert.deepStrictEqual(branchMatrix.question.futureLeadIds,["mi_admin_dispatch_inquiry_lead_v1"]);
+    assert.deepStrictEqual(branchMatrix.observe.futureLeadIds,["mi_admin_intake_process_lead_v1"]);
+    assert.deepStrictEqual(branchMatrix.disengage.futureLeadIds,[]);
+    assert.strictEqual(branchMatrix.disengage.privateMiFollowupEligible,false);
+
+    const askChoice=page.locator("#story-scene-presentation-layer .sc-story-choice").filter({hasText:"Ask about the delivery."});
+    assert.strictEqual(await askChoice.count(),1,"Ask-delivery choice control missing or duplicated");
     await askChoice.click();
-    await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="ce469_branch_ask_business",null,{timeout:10000});
-    const branchTexts=await advanceThroughBeat(page,"ce469_branch_ask_business");
+    await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="ce469_branch_ask_about_delivery",null,{timeout:10000});
+    const branchTexts=await advanceThroughBeat(page,"ce469_branch_ask_about_delivery");
     const branchText=branchTexts.join(" ");
-    assert(branchText.includes("What are you doing here?"));
-    assert(branchText.includes("Delivery. Finished."));
-    assert(branchText.includes("public intake window that has already moved on"));
+    assert(branchText.includes("What did you deliver?"));
+    assert(branchText.includes("A dispatch."));
+    assert(branchText.includes("From who?"));
+    assert(branchText.includes("Ask the desk."));
+    assert(branchText.includes("clerk is already working through the next visitor's papers"));
     assert(!/Minato|staged test|employer|ANBU membership/i.test(branchText),"hidden truth leaked into player-facing branch");
     await page.screenshot({path:path.join(OUT,"04-ask-branch.png"),fullPage:true});
 
@@ -290,13 +309,24 @@ async function advanceThroughBeat(page,beatId,max=20){
     assert.strictEqual(resolved.recordCount,1);
     assert.strictEqual(resolved.autonomy.length,2);
     assert.strictEqual(resolved.decisions.length,1);
-    assert.strictEqual(resolved.decisions[0].selectedChoiceId,"ask_business");
+    assert.strictEqual(resolved.decisions[0].selectedChoiceId,"ask_about_delivery");
     assert.strictEqual(resolved.world.resolved,true);
     assert.strictEqual(resolved.eligibility.available,false);
     assert.strictEqual(resolved.eligibility.reason,"hotspot_already_resolved");
     assert.strictEqual(resolved.record.data.rememberedHistoryFamily,"restraint_or_anbu");
     assert.deepStrictEqual(resolved.record.data.originMaterialHistorySourceRefs,["qa469_origin_restrain_ref"]);
     assert.strictEqual(resolved.record.data.properName,"Unknown");
+    assert.strictEqual(resolved.record.data.commonFactualReceiptId,"mi_admin_crossing_base_lead_v1");
+    assert.strictEqual(resolved.record.data.branchFactualReceiptId,"mi_dispatch_task_confirmed_v1");
+    assert.strictEqual(resolved.record.data.branchKnowledge.documentTaskClass,"dispatch");
+    assert.strictEqual(resolved.record.data.branchKnowledge.dispatchSourceKnown,false);
+    assert.strictEqual(resolved.record.data.branchKnowledge.sourceDisclosureRefused,true);
+    assert.strictEqual(resolved.record.data.branchKnowledge.redirectedToAdministrationDesk,true);
+    assert.deepStrictEqual(resolved.record.data.sharedHistoryReceiptIds,["kakashi_questioned_mi_current_admin_business_v1"]);
+    assert.deepStrictEqual(resolved.record.data.futureLeadIds,["mi_admin_dispatch_inquiry_lead_v1"]);
+    assert.strictEqual(resolved.record.data.privateMiFollowupEligible,true);
+    assert.strictEqual(resolved.record.data.recordAddendum,"She described the document as a dispatch and redirected the source question to the Administration desk.");
+    assert.deepStrictEqual(resolved.record.data.teammateKnowledgeParticipantRefs,["academy_hinata","academy_menma"]);
     assert.strictEqual(resolved.record.data.hiddenTestTruthGranted,false);
     assert.strictEqual(resolved.record.data.anbuMembershipKnowledgeGranted,false);
     assert.strictEqual(resolved.record.data.moralityScalarCreated,false);
@@ -314,9 +344,9 @@ async function advanceThroughBeat(page,beatId,max=20){
     for(const phrase of [
       "hokage administration crossing",
       "masked interceptor",
-      "seen leaving hokage administration after a document handoff",
-      "administration staff did not challenge her presence",
+      "seen leaving hokage administration after completing a stamped document handoff through the public intake",
       "previously encountered during the academy package incident",
+      "she described the document as a dispatch and redirected the source question to the administration desk",
       "proper name: unknown"
     ])assert(recordText.includes(phrase),"Shinobi Record missing observer-safe fact: "+phrase);
     assert(!recordText.includes("minato"),"hidden Minato truth leaked into Shinobi Record");
@@ -375,6 +405,7 @@ async function advanceThroughBeat(page,beatId,max=20){
       exactCurrentTeam:true,
       participantFirstReceipts:true,
       exactFourChoices:true,
+      distinctBranchConsequences:true,
       attackAbsent:true,
       writingDelivery:true,
       observerSafeRecord:true,
