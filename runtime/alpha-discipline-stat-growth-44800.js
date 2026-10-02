@@ -39,6 +39,7 @@ const priorExamBatchNotification=typeof globalThis.buildKonohaExamBatchResultNot
 const priorPracticalBatchNotification=typeof globalThis.buildKonohaPracticalBatchResultNotification==="function"?globalThis.buildKonohaPracticalBatchResultNotification:null;
 const priorRestore=typeof globalThis.syncCharacterProgressionFromSave==="function"?globalThis.syncCharacterProgressionFromSave:null;
 const priorSyncRuntimeProgression=typeof globalThis.syncRuntimeProgressionToPlayerData==="function"?globalThis.syncRuntimeProgressionToPlayerData:null;
+const priorMyClanInspection=typeof globalThis.renderMyClanInspectionContent==="function"?globalThis.renderMyClanInspectionContent:null;
 
 function clone(value){try{return value&&typeof value==="object"?JSON.parse(JSON.stringify(value)):value;}catch(_error){return value;}}
 function currentPlayerData(){return typeof playerData!=="undefined"&&playerData?playerData:null;}
@@ -584,6 +585,19 @@ function practicalNotifications448(characterId){
   }
   return notifications;
 }
+function myClanInspection448(character){
+  const html=priorMyClanInspection?priorMyClanInspection.apply(this,arguments):"";
+  if(!character||!html||typeof CLAN_UI_STATE==="undefined"||CLAN_UI_STATE.inspectionTab!=="stats")return html;
+  const values=exactStats(character);
+  const labels={nin:"NIN",tai:"TAI",gen:"GEN",buki:"BUKI",fuin:"FŪIN",kin:"KIN",stamina:"STAMINA"};
+  let projected=String(html);
+  for(const id of DISCIPLINES){
+    const label=labels[id];
+    const pattern=new RegExp("(<span>"+label+"</span><strong>)[^<]*(</strong>)");
+    projected=projected.replace(pattern,"$1"+values[id]+"$2");
+  }
+  return projected;
+}
 function stableProgressionSaveKey448(character){
   if(!character||!character.id)return null;
   const subject=stableSubject(character.id);
@@ -664,6 +678,7 @@ for(const activityId of ["exam","practical"]){
 }
 
 // Replace fossil semantics with the Phase-2 v1 transaction while preserving old function names for callers.
+if(priorMyClanInspection){globalThis.renderMyClanInspectionContent=myClanInspection448;try{renderMyClanInspectionContent=myClanInspection448;}catch(_error){}}
 if(priorSyncRuntimeProgression){globalThis.syncRuntimeProgressionToPlayerData=syncRuntimeProgressionToPlayerData448;try{syncRuntimeProgressionToPlayerData=syncRuntimeProgressionToPlayerData448;}catch(_error){}}
 globalThis.getDevelopedCharacterStats=exactDevelopedStats;try{getDevelopedCharacterStats=exactDevelopedStats;}catch(_error){}
 globalThis.getTrainingActionData=trainingData448;try{getTrainingActionData=trainingData448;}catch(_error){}
@@ -700,6 +715,7 @@ function diagnostics(){
     noFractionalPL:String(exactDevelopedStats).includes("exactStats")&&!String(exactDevelopedStats).includes("progressFraction"),
     noNumericMasteryUI:String(rows448).includes("CURRENT STAT")&&!String(rows448).includes("MASTERY"),
     dynamicDevelopmentUI:String(rows448).includes("DEVELOPMENT")&&String(panelData448).includes("developmentRequired"),
+    myClanProjectsCanonicalCurrentStats:String(myClanInspection448).includes("exactStats(character)")&&!String(myClanInspection448).includes("baseStats"),
     stableOwnedIdentity:String(stableSubject).includes("ownedCharacterId")&&String(stableSubject).includes("progressionCharacterId"),
     stableProgressionSavePath:String(syncRuntimeProgressionToPlayerData448).includes("stableProgressionSaveKey448")&&String(syncRuntimeProgressionToPlayerData448).includes("delete pd.characters[legacyKey]"),
     currentTeamGuard:String(foundationSnapshot).includes("subject_not_in_committed_current_team"),
