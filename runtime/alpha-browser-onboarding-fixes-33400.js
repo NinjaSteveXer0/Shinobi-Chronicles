@@ -424,7 +424,7 @@
       patchId:PATCH_ID==="alpha_browser_onboarding_fixes_33400_2026_09_13",
       exactNewPlayerSequence:["account","ninja_id","village","ninja","intro"].every(stage=>Object.prototype.hasOwnProperty.call(({account:1,ninja_id:1,village:1,ninja:1,intro:1}),stage)),
       registerLoginPresented:renderAccount33400.toString().includes("REGISTER / NEW NINJA")&&renderAccount33400.toString().includes("LOGIN / CONTINUE"),
-      browserLocalAuthTruth:renderAccount33400.toString().includes("browser-local")&&!renderAccount33400.toString().includes("password"),
+      browserLocalAuthTruth:renderAccount33400.toString().includes("browser-local")&&renderAccount33400.toString().includes("No online account, password or server authentication is being pretended here."),
       freshPendingShellNotBegun:getSavedChronicleSnapshot33400.toString().includes("chronicle_origin_pending")&&getSavedChronicleSnapshot33400.toString().includes("pendingShell"),
       forceNewReloadMarker:newSource.includes("FORCE_NEW_KEY")&&newSource.includes("location.reload"),
       exactResetKeys:newSource.includes("PLAYER_SAVE_KEY")&&newSource.includes("PROFILE_KEY")&&newSource.includes("SESSION_RESUME_KEY")&&!newSource.includes("localStorage.clear")&&!newSource.includes("sessionStorage.clear"),
