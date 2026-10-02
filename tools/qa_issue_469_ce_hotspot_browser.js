@@ -103,11 +103,12 @@ async function advanceThroughBeat(page,beatId,max=20){
       let deterministicSameSeed=false;
       for(let i=0;i<2200&&Object.keys(examples).length<required.size;i++){
         resetSemanticRoots();
-        const seed="qa478_variance_"+String(i).padStart(4,"0");
+        const runId="sc_run_v1_qa478_variance_"+String(i).padStart(4,"0");
+        const seed=["sc.privateOriginHistory.v1",runId,"academy_kakashi","academy_kakashi_v2","v3"].join("::");
         const first=previewAutonomousKakashiPrivateOrigin46900(seed);
         if(!first||first.success!==true||!first.history)continue;
         const family=familyOf(first.history);
-        if(required.has(family)&&!examples[family])examples[family]={seed,signature:signature(first.history)};
+        if(required.has(family)&&!examples[family])examples[family]={runId,seed,signature:signature(first.history)};
         if(!deterministicSameSeed&&i%31===0){
           const sig1=signature(first.history);
           resetSemanticRoots();
@@ -121,7 +122,7 @@ async function advanceThroughBeat(page,beatId,max=20){
       return{
         required:[...required],
         found:Object.keys(examples),
-        examples:Object.fromEntries(Object.entries(examples).map(([k,v])=>[k,v.seed])),
+        examples:Object.fromEntries(Object.entries(examples).map(([k,v])=>[k,{runId:v.runId,seed:v.seed}])),
         deterministicSameSeed,
         ryoBefore,ryoAfter:Number(playerData.ryo)||0,
         inventoryBefore,inventoryAfter:JSON.stringify(playerData.inventory||{})
@@ -131,6 +132,10 @@ async function advanceThroughBeat(page,beatId,max=20){
     assert.strictEqual(ce478Variance.deterministicSameSeed,true,"same private-Origin seed did not reproduce the same semantic history");
     assert.strictEqual(ce478Variance.ryoAfter,ce478Variance.ryoBefore,"variance preview mutated player Ryō");
     assert.strictEqual(ce478Variance.inventoryAfter,ce478Variance.inventoryBefore,"variance preview mutated player inventory");
+    const positiveRunIds=Object.entries(ce478Variance.examples)
+      .filter(([family])=>family!=="KILLED"&&family!=="UNSEEN")
+      .map(([,value])=>value.runId);
+    assert(positiveRunIds.length>=2,"#494 variance scan did not produce two positive run IDs: "+JSON.stringify(ce478Variance));
 
     const setup=await page.evaluate(()=>{
       localStorage.clear();
