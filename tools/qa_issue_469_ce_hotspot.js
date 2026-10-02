@@ -57,10 +57,11 @@ assert(src.includes("kakashi_current_presence_required"),"#478 Kakashi physical-
 assert(src.includes('reason:"chronicle_run_identity_required"'),"#494 stable run identity fail-closed gate missing");
 assert(src.includes("getChronicleRunIdentity43600"),"#469 private history does not consume canonical Chronicle run identity");
 assert(src.includes("ensureChronicleRunIdentity43600"),"#469 legacy begun save cannot receive persisted run identity");
-assert(!String(chronicleStableId46900).includes("completionEvidenceIds")&&!String(privateSeedRef46900).includes("completionEvidenceIds"),"#494 private seed still fingerprints Origin completion evidence");
-assert(!String(chronicleStableId46900).includes("chronicleOriginOwnedCharacterId")&&!String(privateSeedRef46900).includes("chronicleOriginOwnedCharacterId"),"#494 private seed still collapses onto protagonist/person identity");
-assert(src.includes("chronicleRunId:runId"),"#494 private Origin history does not record run-instance namespace");
+const chronicleStableSource=src.slice(src.indexOf("function chronicleStableId46900"),src.indexOf("function privateSeedRef46900"));
 const privateSeedSource=src.slice(src.indexOf("function privateSeedRef46900"),src.indexOf("function stablePick46900"));
+assert(!chronicleStableSource.includes("completionEvidenceIds")&&!privateSeedSource.includes("completionEvidenceIds"),"#494 private seed still fingerprints Origin completion evidence");
+assert(!chronicleStableSource.includes("chronicleOriginOwnedCharacterId")&&!privateSeedSource.includes("chronicleOriginOwnedCharacterId"),"#494 private seed still collapses onto protagonist/person identity");
+assert(src.includes("chronicleRunId:runId"),"#494 private Origin history does not record run-instance namespace");
 assert(privateSeedSource.includes("runId"),"#494 private seed does not include runId");
 assert(privateSeedSource.includes("PRIVATE_ORIGIN_SUBJECT")&&privateSeedSource.includes("PRIVATE_ORIGIN_DEFINITION")&&privateSeedSource.includes("PRIVATE_ORIGIN_VERSION"),"#494 private seed dropped subject/resolver/version identity");
 assert(!privateSeedSource.includes("teamVariantIds")&&!privateSeedSource.includes("completionEvidence"),"#494 private seed improperly consumes team/evidence state");
