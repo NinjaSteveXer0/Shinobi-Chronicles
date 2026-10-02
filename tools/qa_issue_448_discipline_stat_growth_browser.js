@@ -71,6 +71,9 @@ async function inspectMyClan(page,characterId){
     return{
       opened:opened||null,selected,tab,roster,
       html:panel?.innerHTML||"",text:panel?.innerText||"",
+      renderedStats:Object.fromEntries([...panel?.querySelectorAll(".my-clan-stat-grid > div")||[]].map(node=>[
+        node.querySelector("span")?.textContent?.trim()||"",Number(node.querySelector("strong")?.textContent?.trim()||0)
+      ])),
       characterStats:{...getPlayerCharacter(characterId).stats},pl:calculateCurrentPL(getPlayerCharacter(characterId))
     };
   },characterId);
@@ -163,8 +166,7 @@ async function inspectMyClan(page,characterId){
     assert(clan.roster.includes("academy_menma"),"My Clan manageable roster lost persistent subject: "+JSON.stringify(clan));
     assert.strictEqual(clan.tab,"stats");
     assert.strictEqual(clan.characterStats.nin,11);
-    assert(/\bNIN\b/.test(clan.text),"My Clan Stats tab missing NIN");
-    assert(new RegExp("\\bNIN\\s*11\\b").test(clan.text.replace(/\s+/g," ")),"My Clan did not project canonical Current NIN 11");
+    assert.strictEqual(clan.renderedStats.NINJUTSU,11,"My Clan did not project canonical Current Ninjutsu 11");
     assert(clan.text.includes("PL "+clan.pl)||clan.text.includes("CURRENT PL")||clan.html.includes(String(clan.pl)),"My Clan PL projection missing");
     await page.screenshot({path:path.join(OUT,"02-my-clan-current-stat.png"),fullPage:true});
 
