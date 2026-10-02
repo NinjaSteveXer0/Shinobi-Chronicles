@@ -144,6 +144,7 @@ async function advanceThroughBeat(page,beatId,max=20){
       savePlayerData();
 
       const selected=selectChronicleOrigin("academy_kakashi","qa469_origin");
+      const runIdentity=commitChronicleRunIdentity43600({runId:"sc_run_v1_qa469_kakashi_matrix_0001",creationKind:"NEW_START"});
       const completed=completeChronicleOriginPrologue("academy_kakashi",["kakashi_v2:qa469_origin_instance"]);
       const snapshot=getAcademyTeamFormationSnapshot();
       const desired=["academy_hinata","academy_menma"];
@@ -186,8 +187,9 @@ async function advanceThroughBeat(page,beatId,max=20){
       store.byKey["academy_kakashi::academy_kakashi_origin_masked_interceptor"]=base;
       savePlayerData();
       return{
-        selected,completed,one,two,formed,continued,
+        selected,runIdentity,completed,one,two,formed,continued,
         team:getChronicleCurrentTeam43600(),
+        currentRunIdentity:getChronicleRunIdentity43600(),
         freePlay:isAcademyFreePlayAvailable(),
         ownedCharacterId:ensurePlayerAcquisitionState().chronicleOriginOwnedCharacterId,
         ryo:Number(playerData.ryo)||0
@@ -195,6 +197,8 @@ async function advanceThroughBeat(page,beatId,max=20){
     });
     assert(!setup.error,JSON.stringify(setup));
     assert.strictEqual(setup.selected.success,true);
+    assert.strictEqual(setup.runIdentity.success,true);
+    assert.strictEqual(setup.currentRunIdentity.runId,"sc_run_v1_qa469_kakashi_matrix_0001");
     assert.strictEqual(setup.completed.success,true);
     assert.strictEqual(setup.formed.success,true);
     assert.strictEqual(setup.continued.success,true);
