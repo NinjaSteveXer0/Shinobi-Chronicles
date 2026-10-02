@@ -256,7 +256,7 @@
 (function activateOriginSceneBoardTerminalChain33200(){
   if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
 
-  const BUILD="kakashi-v2-writing-golden-20260924-5";
+  const BUILD="kakashi-v2-writing-golden-20260924-7-ce478";
   function loadOne(id,src,ready,next){
     if(ready()){if(next)next();return;}
     let script=document.getElementById(id);
@@ -265,7 +265,8 @@
     if(next)script.addEventListener("load",next,{once:true});
     document.head.appendChild(script);
   }
-  function load36040(){loadOne("sc-kakashi-v2-transition-36040-script","runtime/alpha-kakashi-v2-transition-36040.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_TRANSITION_36040);}
+  function load36040(){loadOne("sc-kakashi-v2-transition-36040-script","runtime/alpha-kakashi-v2-transition-36040.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_TRANSITION_36040,load46900);}
+  function load46900(){loadOne("sc-phase2-ce-hotspot-46900-script","runtime/alpha-phase2-ce-hotspot-46900.js",()=>!!globalThis.SC_PHASE2_CE_HOTSPOT_46900);}
   function load36030(){loadOne("sc-kakashi-v2-renderer-36030-script","runtime/alpha-kakashi-v2-renderer-36030.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_RENDERER_36030,load36040);}
   function load36020(){loadOne("sc-kakashi-v2-core-36020-script","runtime/alpha-kakashi-v2-core-36020.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_CORE_36020,load36030);}
   function load36015(){loadOne("sc-kakashi-v2-rewards-36015-script","runtime/alpha-kakashi-v2-rewards-36015.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_REWARDS_36015,load36020);}

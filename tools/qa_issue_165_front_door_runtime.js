@@ -65,6 +65,8 @@ const document={
 const localStorage=new MemoryStorage();
 const sessionStorage=new MemoryStorage();
 let selectCalls=0;
+let runIdentityAllocateCalls=0;
+let runIdentityCommitCalls=0;
 let prologueCalls=0;
 let reloadCalls=0;
 const originIds=[
@@ -85,6 +87,8 @@ const context={
   SC_ALPHA_ORIGIN_SCENE_IDS:sceneIds,
   getAlphaChronicleOriginSelectionEntries(){return entries.map(item=>({...item}));},
   selectChronicleOrigin(variantId,sourceEventId){selectCalls+=1;return {success:true,variantId,sourceEventId};},
+  allocateChronicleRunId43600(){runIdentityAllocateCalls+=1;return "sc_run_v1_qa-front-door-33300";},
+  commitChronicleRunIdentity43600(options){runIdentityCommitCalls+=1;return {success:true,idempotent:false,identity:{runId:options&&options.runId||null,creationKind:options&&options.creationKind||null}};},
   beginAlphaChronicleOriginPrologue(){prologueCalls+=1;return {success:true,sceneId:"stub_scene"};},
   getStorySceneDefinition(sceneId){return Object.values(sceneIds).includes(sceneId)?{sceneId}:null;},
   Object,Array,String,Number,Boolean,RegExp,JSON,Date,Map,Set,Math,Error,TypeError
@@ -135,6 +139,10 @@ try{
   localStorage.removeItem("shinobiChroniclesPlayerSave");
   const confirmed=plain(context.confirmAlphaFrontDoorNinja33300());
   assert("origin_confirmation_delegates_once",confirmed.success===true&&selectCalls===1,confirmed);
+  assert("run_identity_candidate_allocated_once",runIdentityAllocateCalls===1,confirmed);
+  assert("run_identity_committed_once",runIdentityCommitCalls===1,confirmed);
+  assert("run_identity_candidate_persisted",confirmed.runIdentity&&confirmed.runIdentity.identity&&confirmed.runIdentity.identity.runId==="sc_run_v1_qa-front-door-33300",confirmed);
+  assert("run_identity_creation_kind_new_start",confirmed.runIdentity&&confirmed.runIdentity.identity&&confirmed.runIdentity.identity.creationKind==="NEW_START",confirmed);
   assert("origin_prologue_dispatches_once",prologueCalls===1);
   assert("front_door_releases_after_prologue",gameContainer.inert===false&&!document.getElementById("sc-alpha-front-door-33300"));
   const profile=JSON.parse(localStorage.getItem("shinobiChroniclesFrontDoorProfileV1"));

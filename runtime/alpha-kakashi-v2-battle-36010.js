@@ -277,6 +277,64 @@ function authoritativePlayerBasePLAtEntry(participantId){
   const maximum=typeof getBattleMaximumPL==="function"?Number(getBattleMaximumPL("player",participantId)):0;
   return Number.isFinite(maximum)&&maximum>0?maximum:null;
 }
+function stableAutonomousBattleHash36010(input){
+  let h=2166136261;
+  const raw=String(input||"");
+  for(let i=0;i<raw.length;i++){h^=raw.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}
+  return h>>>0;
+}
+function autonomousKakashiCurrentPL36010(){
+  const registry=typeof getCharacterRegistryEntry==="function"?getCharacterRegistryEntry(KAKASHI):null;
+  const p=typeof playerData!=="undefined"&&playerData&&playerData.characters&&playerData.characters[KAKASHI]?playerData.characters[KAKASHI]:null;
+  const candidates=[
+    p&&p.currentPL,p&&p.powerLevel,p&&p.pl,
+    registry&&registry.currentPL,registry&&registry.basePL,registry&&registry.powerLevel,registry&&registry.pl
+  ];
+  for(const value of candidates){const n=Number(value);if(Number.isFinite(n)&&n>0)return n;}
+  return 15;
+}
+function resolveAutonomousPrivateBattle36010(spec={}){
+  const def=config(spec.battleConfigId);
+  if(!def)return{success:false,reason:"kakashi_v2_battle_config_unknown"};
+  const seedRef=String(spec.seedRef||"");
+  if(!seedRef)return{success:false,reason:"autonomous_private_battle_seed_required"};
+  const playerPL=autonomousKakashiCurrentPL36010();
+  const opposition=def.opposition.map(id=>({participantRef:id,basePL:Number(PROFILE[id]&&PROFILE[id].pl)||1}));
+  const strongest=Math.max(...opposition.map(row=>row.basePL),1);
+  const secondary=Math.max(0,opposition.reduce((sum,row)=>sum+row.basePL,0)-strongest);
+  const pakkunSupport=def.pakkun===true?5:0;
+  const pressure=strongest+(secondary*0.22);
+  const variance=((stableAutonomousBattleHash36010(seedRef+"|"+def.id+"|variance")%7)-3)*0.75;
+  const effectivePlayerPL=playerPL+pakkunSupport+variance;
+  const outcome=effectivePlayerPL>=pressure?"victory":"defeat";
+  const actionCount=1+(stableAutonomousBattleHash36010(seedRef+"|"+def.id+"|actions")%5);
+  const occurrenceRef="private_battle::"+KAKASHI+"::"+def.id+"::"+stableAutonomousBattleHash36010(seedRef+"|"+def.id).toString(16);
+  return{
+    success:true,
+    autonomousPrivate:true,
+    battleConfigId:def.id,
+    battleOccurrenceId:occurrenceRef,
+    outcome,
+    resultState:outcome==="victory"?"player_side_victory":"opposition_side_victory",
+    playerActionOpportunityCount:actionCount,
+    playerParticipantRef:KAKASHI,
+    playerPLAtEntry:playerPL,
+    effectivePlayerPL:Number(effectivePlayerPL.toFixed(2)),
+    oppositionPressure:Number(pressure.toFixed(2)),
+    oppositionParticipantRefs:def.opposition.slice(),
+    participants:[
+      {participantRef:KAKASHI,side:"player",basePLAtEntry:playerPL,battleStatus:outcome==="victory"?"active":"defeated"},
+      ...opposition.map(row=>({participantRef:row.participantRef,side:"opposition",basePLAtEntry:row.basePL,battleStatus:outcome==="victory"?"defeated":"active"}))
+    ],
+    rewardGranted:false,
+    lootGranted:false,
+    playerEconomyMutation:false,
+    randomnessAppliedAfterEligibility:true,
+    stableSeedRef:seedRef,
+    sourceRefs:[{type:"battle_config",id:def.id},{type:"autonomous_private_origin_seed",id:seedRef}]
+  };
+}
+
 function projectResult(){
   const dep=currentBattle&&currentBattle.kakashiV2;if(!dep)return null;
   const evidence=currentBattle.runtime&&Array.isArray(currentBattle.runtime.evidence)?currentBattle.runtime.evidence:[];
@@ -330,6 +388,7 @@ function diagnostics(){
     pakkunPanelClearsActionTray:String(installPakkunBattleButtons).includes("bottom:31.5%")&&String(installPakkunBattleButtons).includes("top:auto"),
     playerEntryPLNotHardcoded:!String(projectResult).includes("basePLAtEntry:15")&&String(projectResult).includes("authoritativePlayerBasePLAtEntry"),
     noStoryDom:!String(launch).includes("querySelector")&&!String(projectResult).includes("document."),
+    autonomousPrivateBattleOwned:typeof resolveAutonomousPrivateBattle36010==="function"&&String(resolveAutonomousPrivateBattle36010).includes("rewardGranted:false")&&String(resolveAutonomousPrivateBattle36010).includes("playerEconomyMutation:false"),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
@@ -339,6 +398,7 @@ function diagnostics(){
 const installed=registerProfiles();if(!installed.success)throw new Error(installed.reason);
 globalThis.launchAcademyKakashiV2Battle36010=launch;
 globalThis.projectAcademyKakashiV2BattleResult36010=projectResult;
+globalThis.resolveAcademyKakashiV2AutonomousPrivateBattle36010=resolveAutonomousPrivateBattle36010;
 globalThis.attemptAcademyKakashiV2PakkunAction36010=pakkunAction;
 globalThis.runAcademyKakashiV2Battle36010Diagnostics=diagnostics;
 globalThis.SC_ACADEMY_KAKASHI_V2_BATTLE_36010=Object.freeze({patchId:PATCH_ID,configs:CONFIGS,participantRefs:Object.freeze({kakashi:KAKASHI,amt:AMT,packageSmuggler:PS,maskedInterceptor:MI,pakkun:PAKKUN}),browserGoldenClaimed:false});

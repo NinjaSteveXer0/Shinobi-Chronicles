@@ -9188,6 +9188,13 @@ function loadPlayerData() {
       encounterRuntime: normalizeEncounterRuntimeState(parsedData.encounterRuntime),
       // BRICK 742 — restore current scene continuation state without inventing a story ledger.
       storySceneRuntime: normalizeStorySceneRuntimeState(parsedData.storySceneRuntime),
+      // ISSUE #469 / #34000 — preserve the canonical neutral Story decision
+      // runtime store written by alpha-story-decision-realisation-34000.js.
+      // This is a compatibility read only: #34000 remains the semantic writer.
+      storyDecisionRuntime34000:
+        parsedData.storyDecisionRuntime34000 && typeof parsedData.storyDecisionRuntime34000 === "object"
+          ? cloneProgressionData(parsedData.storyDecisionRuntime34000)
+          : undefined,
       // ISSUE #322 / #23 — preserve shared Story intent/factual receipts and
       // contextual Special Jonin evidence written by their canonical owners.
       // loadPlayerData remains a compatibility reader; it must not silently

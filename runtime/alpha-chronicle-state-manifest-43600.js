@@ -15,6 +15,8 @@ const PATCH_ID="phase2_chronicle_state_manifest_43600_2026_10_01";
 const ROOT_KEY="phase2ChronicleState";
 const ROOT_SCHEMA_VERSION=1;
 const TUTORIAL_SCHEMA_VERSION=1;
+const RUN_IDENTITY_SCHEMA_VERSION=1;
+const RUN_ID_PREFIX="sc_run_v1_";
 const SAVE_KEY="shinobiChroniclesPlayerSave";
 const priorLoadPlayerData=typeof globalThis.loadPlayerData==="function"?globalThis.loadPlayerData:null;
 
@@ -99,6 +101,139 @@ function getCurrentTeam(save=currentPlayerData()){
     legacyProjection:true
   });
 }
+function defaultOriginParticipantContinuity(){
+  return{schemaVersion:1,byKey:{}};
+}
+
+function defaultPrivateOriginHistories(){
+  return{schemaVersion:1,bySubject:{}};
+}
+function normalizePrivateOriginHistories(value){
+  const source=value&&typeof value==="object"&&!Array.isArray(value)?value:{};
+  const rows=source.bySubject&&typeof source.bySubject==="object"&&!Array.isArray(source.bySubject)?source.bySubject:{};
+  return{
+    schemaVersion:1,
+    bySubject:Object.fromEntries(Object.entries(rows).filter(([key,row])=>key&&row&&typeof row==="object"&&!Array.isArray(row)).map(([key,row])=>[String(key),clone(row)]))
+  };
+}
+function normalizeOriginParticipantContinuity(value){
+  const source=value&&typeof value==="object"&&!Array.isArray(value)?value:{};
+  const rows=source.byKey&&typeof source.byKey==="object"&&!Array.isArray(source.byKey)?source.byKey:{};
+  return{
+    schemaVersion:1,
+    byKey:Object.fromEntries(Object.entries(rows).filter(([key,row])=>key&&row&&typeof row==="object"&&!Array.isArray(row)).map(([key,row])=>[String(key),clone(row)]))
+  };
+}
+function isValidChronicleRunId43600(value){
+  return typeof value==="string"&&value.startsWith(RUN_ID_PREFIX)&&value.length>RUN_ID_PREFIX.length+8;
+}
+function normalizeChronicleRunIdentity43600(value){
+  if(!value||typeof value!=="object"||Array.isArray(value)||!isValidChronicleRunId43600(value.runId))return null;
+  const donorRunRefs=Array.isArray(value.donorRunRefs)?[...new Set(value.donorRunRefs.filter(isValidChronicleRunId43600))]:[];
+  const migrationSourceRefs=Array.isArray(value.migrationSourceRefs)?[...new Set(value.migrationSourceRefs.filter(Boolean).map(String))]:[];
+  return{
+    schemaVersion:RUN_IDENTITY_SCHEMA_VERSION,
+    runId:String(value.runId),
+    creationKind:String(value.creationKind||"LEGACY_SAVE_MIGRATION"),
+    startManifestRef:value.startManifestRef?String(value.startManifestRef):null,
+    parentRunRef:isValidChronicleRunId43600(value.parentRunRef)?String(value.parentRunRef):null,
+    donorRunRefs,
+    migrationSourceRefs,
+    committedAt:Number(value.committedAt)||null
+  };
+}
+function getChronicleRunIdentity(save=currentPlayerData()){
+  const root=save&&save[ROOT_KEY]&&typeof save[ROOT_KEY]==="object"?save[ROOT_KEY]:null;
+  const normalized=normalizeChronicleRunIdentity43600(root&&root.chronicleRunIdentity);
+  return normalized?Object.freeze(clone(normalized)):null;
+}
+function begunChronicle43600(save=currentPlayerData()){
+  const a=acquisitionFrom(save);
+  return !!(a&&a.chronicleOriginVariantId&&(
+    a.ninjaIdentityLocked===true||
+    a.chronicleOriginOwnedCharacterId||
+    (a.chronicleOrigin&&a.chronicleOrigin.prologueCompleted===true)
+  ));
+}
+function allocateChronicleRunId43600(){
+  const c=globalThis.crypto;
+  if(c&&typeof c.randomUUID==="function"){
+    const id=String(c.randomUUID());
+    return id?RUN_ID_PREFIX+id:null;
+  }
+  if(c&&typeof c.getRandomValues==="function"){
+    const bytes=new Uint8Array(16);c.getRandomValues(bytes);
+    bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;
+    const hex=[...bytes].map(v=>v.toString(16).padStart(2,"0"));
+    const uuid=hex.slice(0,4).join("")+"-"+hex.slice(4,6).join("")+"-"+hex.slice(6,8).join("")+"-"+hex.slice(8,10).join("")+"-"+hex.slice(10).join("");
+    return RUN_ID_PREFIX+uuid;
+  }
+  return null;
+}
+function migrationSourceRefs43600(save=currentPlayerData()){
+  const a=acquisitionFrom(save);if(!a)return[];
+  return [...new Set([
+    a.chronicleOriginVariantId?"chronicle_origin::"+a.chronicleOriginVariantId:null,
+    a.chronicleOriginOwnedCharacterId?"origin_owned_character::"+a.chronicleOriginOwnedCharacterId:null,
+    a.ninjaIdentityVariantId?"ninja_identity_variant::"+a.ninjaIdentityVariantId:null
+  ].filter(Boolean))];
+}
+function commitChronicleRunIdentity43600({
+  runId=null,
+  creationKind="LEGACY_SAVE_MIGRATION",
+  startManifestRef=null,
+  parentRunRef=null,
+  donorRunRefs=[],
+  migrationSourceRefs=[]
+}={}){
+  const pd=currentPlayerData();if(!pd)return{success:false,reason:"player_state_unavailable"};
+  const existing=getChronicleRunIdentity(pd);
+  if(existing)return{success:true,idempotent:true,identity:clone(existing)};
+  if(!begunChronicle43600(pd))return{success:false,reason:"chronicle_not_begun"};
+  const candidate=runId||allocateChronicleRunId43600();
+  if(!isValidChronicleRunId43600(candidate))return{success:false,reason:"chronicle_run_id_allocation_unavailable"};
+  const normalized=normalizeChronicleRunIdentity43600({
+    schemaVersion:RUN_IDENTITY_SCHEMA_VERSION,
+    runId:candidate,
+    creationKind,
+    startManifestRef,
+    parentRunRef,
+    donorRunRefs,
+    migrationSourceRefs,
+    committedAt:Date.now()
+  });
+  if(!normalized)return{success:false,reason:"chronicle_run_identity_invalid"};
+  const priorRoot=pd[ROOT_KEY]&&typeof pd[ROOT_KEY]==="object"?clone(pd[ROOT_KEY]):null;
+  const root=ensurePhase2Root({save:false});if(!root)return{success:false,reason:"phase2_root_unavailable"};
+  root.chronicleRunIdentity=clone(normalized);
+  pd[ROOT_KEY]=root;
+  if(typeof savePlayerData!=="function"){
+    if(priorRoot)pd[ROOT_KEY]=priorRoot;else delete pd[ROOT_KEY];
+    return{success:false,reason:"save_authority_unavailable"};
+  }
+  try{savePlayerData();}
+  catch(error){
+    if(priorRoot)pd[ROOT_KEY]=priorRoot;else delete pd[ROOT_KEY];
+    return{success:false,reason:"chronicle_run_identity_persist_failed",error:String(error&&error.message||error)};
+  }
+  const persisted=getChronicleRunIdentity(pd);
+  if(!persisted||persisted.runId!==candidate){
+    if(priorRoot)pd[ROOT_KEY]=priorRoot;else delete pd[ROOT_KEY];
+    return{success:false,reason:"chronicle_run_identity_persist_verification_failed"};
+  }
+  return{success:true,idempotent:false,identity:clone(persisted)};
+}
+function ensureChronicleRunIdentity43600(options={}){
+  const existing=getChronicleRunIdentity();
+  if(existing)return{success:true,idempotent:true,identity:clone(existing)};
+  if(!begunChronicle43600())return{success:false,reason:"chronicle_not_begun"};
+  const creationKind=String(options.creationKind||"LEGACY_SAVE_MIGRATION");
+  const refs=creationKind==="LEGACY_SAVE_MIGRATION"
+    ?[...new Set([...(options.migrationSourceRefs||[]),...migrationSourceRefs43600()].filter(Boolean).map(String))]
+    :(options.migrationSourceRefs||[]);
+  return commitChronicleRunIdentity43600({...options,creationKind,migrationSourceRefs:refs});
+}
+
 function defaultTutorialProgress(teamRef=null){
   return{
     schemaVersion:TUTORIAL_SCHEMA_VERSION,
@@ -141,8 +276,12 @@ function migratePhase2ChronicleState(save){
     schemaVersion:ROOT_SCHEMA_VERSION,
     tutorialProgress:existing.tutorialProgress&&typeof existing.tutorialProgress==="object"
       ?{...defaultTutorialProgress(team&&team.assignmentId),...existing.tutorialProgress,schemaVersion:TUTORIAL_SCHEMA_VERSION}
-      :legacyTutorialProjection(source,defaultTutorialProgress(team&&team.assignmentId))
+      :legacyTutorialProjection(source,defaultTutorialProgress(team&&team.assignmentId)),
+    originParticipantContinuity:normalizeOriginParticipantContinuity(existing.originParticipantContinuity),
+    privateOriginHistories:normalizePrivateOriginHistories(existing.privateOriginHistories)
   };
+  const runIdentity=normalizeChronicleRunIdentity43600(existing.chronicleRunIdentity);
+  if(runIdentity)root.chronicleRunIdentity=runIdentity;
   if(team&&root.tutorialProgress.academyTeamFormationReceiptRef!==team.assignmentId){
     // A different committed Academy-team assignment is a different onboarding
     // identity. This is deterministic reset of tutorial presentation state only.
@@ -246,6 +385,24 @@ const DOMAINS=Object.freeze([
     qaRefs:Object.freeze(["tools/qa_phase2_chronicle_state_manifest_436.js","tools/qa_save_compatibility_311.js"])
   }),
   Object.freeze({
+    stateDomainId:"chronicleRunIdentity",
+    semanticOwner:"CE / Historical Scope + Meta-History",
+    canonicalWritePath:"Chronicle start commit / explicit legacy-save identity migration",
+    stableIdentityKey:"playerData.phase2ChronicleState.chronicleRunIdentity.runId",
+    savePath:"playerData.phase2ChronicleState.chronicleRunIdentity",
+    schemaVersion:1,
+    sourceOccurrenceIdFormat:"chronicle_start::<runId> OR migration::<runId>",
+    idempotenceKeyFormat:"runId",
+    derivedFields:Object.freeze([]),
+    projectionConsumers:Object.freeze(["deterministic private Origin histories","CE occurrence generation","historical-scope lineage"]),
+    migrationRule:"explicit one-time persisted identity assignment for begun legacy saves; never inside pure compatibility reader",
+    resetRule:"replace only when a new Chronicle namespace is explicitly committed",
+    difficultyScope:"all",
+    inheritanceRule:"new Chronicle gets new runId; lineage references source/parent run IDs rather than inheriting identity",
+    devOverridePolicy:"fixtures may inject explicit run IDs; ordinary player runtime never regenerates a committed runId",
+    qaRefs:Object.freeze(["tools/qa_phase2_chronicle_state_manifest_436.js","tools/qa_issue_469_ce_hotspot.js","tools/qa_issue_469_ce_hotspot_browser.js"])
+  }),
+  Object.freeze({
     stateDomainId:"currentRyo",
     semanticOwner:"existing player economy authority",
     canonicalWritePath:"existing reward / transaction owners",
@@ -300,6 +457,42 @@ const DOMAINS=Object.freeze([
     qaRefs:Object.freeze(["tools/qa_issue_448_discipline_stat_growth.js","tools/qa_issue_448_discipline_stat_growth_browser.js","tools/qa_save_compatibility_311.js"])
   }),
   Object.freeze({
+    stateDomainId:"originParticipantContinuity",
+    semanticOwner:"CE / Coding bounded Origin participant continuity adapter",
+    canonicalWritePath:"sc.originParticipantContinuity.v1 capture at exact Origin terminal boundary; deterministic durable-history backfill read otherwise",
+    stableIdentityKey:"originId + stableParticipantId",
+    savePath:"playerData.phase2ChronicleState.originParticipantContinuity.byKey[originId::stableParticipantId]",
+    schemaVersion:1,
+    sourceOccurrenceIdFormat:"origin_participant_continuity::<originId>::<stableParticipantId>::<originOccurrenceRef>",
+    idempotenceKeyFormat:"originId + stableParticipantId + originOccurrenceRef",
+    derivedFields:Object.freeze(["encounteredByProtagonist","fieldDispositionState","survivedOrigin","hiddenPostTestReviewReached","materialHistoryRefs","postTestTruthClass","protagonistKnowsTestTruth"]),
+    projectionConsumers:Object.freeze(["Konoha World authored events","Story participant continuity","Shinobi Record source projection"]),
+    migrationRule:"capture exact live Origin terminal truth when available; legacy completed saves derive only from durable evidence and fail closed on ambiguity",
+    resetRule:"new_chronicle_only; later World availability remains separate current-state authority",
+    difficultyScope:"all",
+    inheritanceRule:"same stable participant survives Origin-to-World continuity unless exact death/unavailability authority says otherwise",
+    devOverridePolicy:"no fixture or inferred proper-name/test-truth substitution in ordinary player state",
+    qaRefs:Object.freeze(["tools/qa_issue_469_ce_hotspot.js","tools/qa_issue_469_ce_hotspot_browser.js","tools/qa_phase2_chronicle_state_manifest_436.js","tools/qa_save_compatibility_311.js"])
+  }),
+  Object.freeze({
+    stateDomainId:"privateOriginHistory",
+    semanticOwner:"Chronicle Engine / subject-private Origin convergence",
+    canonicalWritePath:"authorised autonomous Origin resolver or player-experienced Origin completion adapter",
+    stableIdentityKey:"chronicleId + subjectStableId + originDefinitionId + originDefinitionVersion",
+    savePath:"playerData.phase2ChronicleState.privateOriginHistories.bySubject[subjectStableId]",
+    schemaVersion:1,
+    sourceOccurrenceIdFormat:"private_origin::<subjectStableId>::<originDefinitionVersion>",
+    idempotenceKeyFormat:"subjectStableId + originDefinitionId + originDefinitionVersion + stableResolutionSeedRef",
+    derivedFields:Object.freeze(["resolutionMode","convergenceCarryForwardClass"]),
+    projectionConsumers:Object.freeze(["World event eligibility","participant autonomy","bounded Knowledge disclosure","actor-local Development/Stats adapters"]),
+    migrationRule:"missing pre-471 private history may resolve exactly once through an explicit migration receipt; never overwrite an existing committed row",
+    resetRule:"new_chronicle_only",
+    difficultyScope:"origin_historical_scope_private",
+    inheritanceRule:"subject-private history survives Team Formation; external Origin world state does not import without continuity authority",
+    devOverridePolicy:"private ledger never becomes protagonist Knowledge or Shinobi Record merely because the subject joins the team",
+    qaRefs:Object.freeze(["tools/qa_issue_469_ce_hotspot.js","tools/qa_issue_469_ce_hotspot_browser.js","tools/qa_save_compatibility_311.js"])
+  }),
+  Object.freeze({
     stateDomainId:"shinobiRecordProjection",
     semanticOwner:"Shinobi Record presentation",
     canonicalWritePath:"NONE_DERIVED_PROJECTION_ONLY",
@@ -340,8 +533,12 @@ function diagnostics(){
   const checks={
     minimumFields:DOMAINS.every(row=>required.every(key=>Object.prototype.hasOwnProperty.call(row,key))),
     uniqueDomains:unique.size===DOMAINS.length,
-    initialDomains:["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","shinobiRecordProjection"].every(id=>unique.has(id)),
+    initialDomains:["currentTeam","tutorialProgress","chronicleIdentity","chronicleRunIdentity","currentRyo","originParticipantContinuity","shinobiRecordProjection"].every(id=>unique.has(id)),
+    chronicleRunIdentityDomain:DOMAINS.find(row=>row.stateDomainId==="chronicleRunIdentity")?.stableIdentityKey==="playerData.phase2ChronicleState.chronicleRunIdentity.runId",
+    pureMigrationDoesNotMintRunId:!Object.prototype.hasOwnProperty.call(migrated.phase2ChronicleState,"chronicleRunIdentity"),
+    continuityDomainPersisted:DOMAINS.find(row=>row.stateDomainId==="originParticipantContinuity")?.savePath==="playerData.phase2ChronicleState.originParticipantContinuity.byKey[originId::stableParticipantId]"&&migrated.phase2ChronicleState.originParticipantContinuity.schemaVersion===1,
     phase2DevelopmentDomains:["disciplineDevelopment","characterStats"].every(id=>unique.has(id)),
+    privateOriginHistoryDomain:unique.has("privateOriginHistory"),
     disciplineLedgerNotDuplicated:DOMAINS.find(row=>row.stateDomainId==="disciplineDevelopment")?.savePath==="playerData.characters[progressionCharacterId].disciplineProgression[disciplineId]",
     characterStatsExistingOwnerPreserved:DOMAINS.find(row=>row.stateDomainId==="characterStats")?.semanticOwner==="PL / Registry / Rank",
     currentTeamDerivedNotDuplicated:DOMAINS.find(row=>row.stateDomainId==="currentTeam")?.canonicalWritePath==="confirmAcademyTeamFormation"&&!String(DOMAINS.find(row=>row.stateDomainId==="currentTeam")?.savePath||"").includes("phase2ChronicleState.currentTeam"),
@@ -364,10 +561,28 @@ rehydrateCurrentPhase2Root();
 globalThis.getChronicleStateManifest43600=()=>MANIFEST;
 globalThis.getChronicleCurrentTeam43600=getCurrentTeam;
 globalThis.getChronicleIdentity43600=getChronicleIdentity;
+globalThis.getChronicleRunIdentity43600=getChronicleRunIdentity;
+globalThis.allocateChronicleRunId43600=allocateChronicleRunId43600;
+globalThis.commitChronicleRunIdentity43600=commitChronicleRunIdentity43600;
+globalThis.ensureChronicleRunIdentity43600=ensureChronicleRunIdentity43600;
 globalThis.getChronicleCurrentRyo43600=getCurrentRyo;
 globalThis.migratePhase2ChronicleState43600=migratePhase2ChronicleState;
 globalThis.rehydratePhase2ChronicleState43600=rehydrateCurrentPhase2Root;
 globalThis.ensurePhase2ChronicleState43600=ensurePhase2Root;
+globalThis.getOriginParticipantContinuityStore43600=({create=false}={})=>{
+  const pd=currentPlayerData();if(!pd)return null;
+  const root=pd[ROOT_KEY]&&typeof pd[ROOT_KEY]==="object"?pd[ROOT_KEY]:(create?ensurePhase2Root({save:false}):null);
+  if(!root)return null;
+  if((!root.originParticipantContinuity||typeof root.originParticipantContinuity!=="object")&&create)root.originParticipantContinuity=defaultOriginParticipantContinuity();
+  return root.originParticipantContinuity&&typeof root.originParticipantContinuity==="object"?root.originParticipantContinuity:null;
+};
+globalThis.getPrivateOriginHistoryStore43600=({create=false}={})=>{
+  const pd=currentPlayerData();if(!pd)return null;
+  const root=pd[ROOT_KEY]&&typeof pd[ROOT_KEY]==="object"?pd[ROOT_KEY]:(create?ensurePhase2Root({save:false}):null);
+  if(!root)return null;
+  if((!root.privateOriginHistories||typeof root.privateOriginHistories!=="object")&&create)root.privateOriginHistories=defaultPrivateOriginHistories();
+  return root.privateOriginHistories&&typeof root.privateOriginHistories==="object"?root.privateOriginHistories:null;
+};
 globalThis.getChronicleTutorialProgress43600=getTutorialProgress;
 globalThis.updateChronicleTutorialProgress43600=updateTutorialProgress;
 globalThis.runChronicleStateManifest43600Diagnostics=diagnostics;

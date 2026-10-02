@@ -66,6 +66,8 @@ const localStorage=new MemoryStorage();
 const sessionStorage=new MemoryStorage();
 let reloadCalls=0;
 let selectCalls=0;
+let runIdentityAllocateCalls=0;
+let runIdentityCommitCalls=0;
 let prologueCalls=0;
 let baseConsumeCalls=0;
 let enemyCalls=0;
@@ -86,6 +88,8 @@ const context={
   getAlphaChronicleOriginSelectionEntries(){return entries.map(row=>({...row}));},
   getStorySceneDefinition(sceneId){return Object.values(sceneIds).includes(sceneId)?{sceneId}:null;},
   selectChronicleOrigin(variantId,sourceEventId){selectCalls+=1;return {success:true,variantId,sourceEventId};},
+  allocateChronicleRunId43600(){runIdentityAllocateCalls+=1;return "sc_run_v1_qa-front-door-33400";},
+  commitChronicleRunIdentity43600(options){runIdentityCommitCalls+=1;return {success:true,idempotent:false,identity:{runId:options&&options.runId||null,creationKind:options&&options.creationKind||null}};},
   beginAlphaChronicleOriginPrologue(){prologueCalls+=1;return {success:true,sceneId:"stub_prologue"};},
   consumeBattleActionOpportunity(side,participantId,actionId,reason){baseConsumeCalls+=1;return {side,participantId,actionId,reason};},
   evaluateEnemyActionScheduler(){return context.currentBattle.active&&!context.currentBattle.battleOver?{ready:true}:{ready:false};},
@@ -145,6 +149,10 @@ try{
   // BEGIN is the only V2 commit point and delegates to existing authorities.
   const begun=plain(runtime.beginSelectedOrigin());
   assert("begin_commits_existing_origin_once",begun.success===true&&selectCalls===1,begun);
+  assert("begin_allocates_run_identity_candidate_once",runIdentityAllocateCalls===1,begun);
+  assert("begin_commits_run_identity_once",runIdentityCommitCalls===1,begun);
+  assert("begin_persists_allocated_run_identity",begun.runIdentity&&begun.runIdentity.identity&&begun.runIdentity.identity.runId==="sc_run_v1_qa-front-door-33400",begun);
+  assert("begin_run_identity_is_new_start",begun.runIdentity&&begun.runIdentity.identity&&begun.runIdentity.identity.creationKind==="NEW_START",begun);
   assert("begin_dispatches_existing_prologue_once",prologueCalls===1);
   assert("front_door_releases_after_begin",gameContainer.inert===false&&!document.getElementById("sc-alpha-front-door-33400"));
   const profile=JSON.parse(localStorage.getItem("shinobiChroniclesFrontDoorProfileV1"));
@@ -163,6 +171,10 @@ try{
 
   const battleStyle=document.getElementById("sc-alpha-battle-pl-calibration-33400");
   assert("pl_circles_lowered",!!battleStyle&&battleStyle.textContent.includes("top:50.2%"));
+  const diag=plain(context.runAlphaBrowserOnboardingFixes33400Diagnostics());
+  assert("internal_diagnostics_green",diag.pass===true,diag);
+  assert("run_identity_allocation_diagnostic_green",diag.checks.beginAllocatesRunIdentityBeforeOrigin===true,diag);
+  assert("run_identity_diagnostic_green",diag.checks.beginCommitsRunIdentityBeforePrologue===true,diag);
   assert("browser_golden_not_claimed",runtime.browserGoldenClaimed===false);
 
   console.log("Issue #165 V2 onboarding / tutorial browser-runtime QA: PASS");

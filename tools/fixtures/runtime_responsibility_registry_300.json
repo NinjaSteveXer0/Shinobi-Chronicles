@@ -18,7 +18,8 @@
     "runtime/alpha-kakashi-v2-rewards-36015.js",
     "runtime/alpha-kakashi-v2-core-36020.js",
     "runtime/alpha-kakashi-v2-renderer-36030.js",
-    "runtime/alpha-kakashi-v2-transition-36040.js"
+    "runtime/alpha-kakashi-v2-transition-36040.js",
+    "runtime/alpha-phase2-ce-hotspot-46900.js"
   ],
   "responsibilities": [
     {
@@ -105,14 +106,18 @@
       "canonicalOwner": "runtime/alpha-story-decision-realisation-34000.js",
       "ownerType": "shared_semantic_runtime",
       "directCallers": [
-        "runtime/alpha-kakashi-v2-core-36020.js"
+        "runtime/alpha-kakashi-v2-core-36020.js",
+        "runtime/alpha-phase2-ce-hotspot-46900.js"
       ],
       "stateReads": [
-        "playerData.storyDecisionRealisation34000"
+        "playerData.storyDecisionRuntime34000"
       ],
       "stateWrites": [
-        "playerData.storyDecisionRealisation.intentCommits",
-        "playerData.storyDecisionRealisation.receipts"
+        "playerData.storyDecisionRuntime34000.storyUnits[*].choiceSets",
+        "playerData.storyDecisionRuntime34000.storyUnits[*].decisionReceipts",
+        "playerData.storyDecisionRuntime34000.storyUnits[*].autonomyReceipts",
+        "playerData.storyDecisionRuntime34000.storyUnits[*].participantStates",
+        "playerData.storyDecisionRuntime34000.storyUnits[*].materialStates"
       ],
       "productionLoadPath": [
         "runtime/alpha-traversal-bridge-33200.js",
@@ -126,7 +131,7 @@
       "permittedAdapters": [],
       "retiredOwners": [],
       "saveSchemaRefs": [
-        "playerData.storyDecisionRealisation"
+        "playerData.storyDecisionRuntime34000"
       ],
       "qaRefs": [
         "tools/qa_issue_188_story_decision_runtime.js",
@@ -354,11 +359,13 @@
       "canonicalOwner": "runtime/alpha-kakashi-v2-battle-36010.js",
       "ownerType": "origin_battle_adapter",
       "directCallers": [
-        "runtime/alpha-kakashi-v2-core-36020.js"
+        "runtime/alpha-kakashi-v2-core-36020.js",
+        "runtime/alpha-phase2-ce-hotspot-46900.js"
       ],
       "stateReads": [
         "activeStorySceneRuntime.pendingBattle",
-        "currentBattle"
+        "currentBattle",
+        "Registry / current Kakashi PL for autonomous private Battle projection"
       ],
       "stateWrites": [
         "currentBattle.kakashiV2"
@@ -369,7 +376,8 @@
       ],
       "extensionHooks": [
         "launchAcademyKakashiV2Battle36010",
-        "projectAcademyKakashiV2BattleResult36010"
+        "projectAcademyKakashiV2BattleResult36010",
+        "resolveAcademyKakashiV2AutonomousPrivateBattle36010"
       ],
       "permittedAdapters": [
         "academy_kakashi_v2_battle_adapter_36010"
@@ -1369,10 +1377,14 @@
         "playerData.acquisition Academy Team Formation receipt",
         "playerData.acquisition Chronicle Origin identity",
         "playerData.ryo",
-        "legacy academyTeamFormation.confirmationReceipt.firstKonohaTutorial"
+        "legacy academyTeamFormation.confirmationReceipt.firstKonohaTutorial",
+        "playerData.phase2ChronicleState.originParticipantContinuity deterministic participant continuity projection",
+        "playerData.phase2ChronicleState.privateOriginHistories subject-private history ledger"
       ],
       "stateWrites": [
-        "playerData.phase2ChronicleState.tutorialProgress only through updateChronicleTutorialProgress43600 / ensurePhase2ChronicleState43600"
+        "playerData.phase2ChronicleState.tutorialProgress only through updateChronicleTutorialProgress43600 / ensurePhase2ChronicleState43600",
+        "playerData.phase2ChronicleState.originParticipantContinuity preserved/normalized by #436 manifest; exact writes owned by authorised #469 adapter",
+        "playerData.phase2ChronicleState.privateOriginHistories preserved/normalized by #436 manifest; exact writes owned by authorised #469/#478 adapter"
       ],
       "productionLoadPath": [
         "index.html",
@@ -1383,18 +1395,24 @@
         "getChronicleCurrentTeam43600",
         "migratePhase2ChronicleState43600",
         "ensurePhase2ChronicleState43600",
-        "updateChronicleTutorialProgress43600"
+        "updateChronicleTutorialProgress43600",
+        "getOriginParticipantContinuityStore43600",
+        "getPrivateOriginHistoryStore43600"
       ],
       "permittedAdapters": [],
       "retiredOwners": [],
       "saveSchemaRefs": [
         "playerData.phase2ChronicleState.schemaVersion",
-        "playerData.phase2ChronicleState.tutorialProgress"
+        "playerData.phase2ChronicleState.tutorialProgress",
+        "playerData.phase2ChronicleState.originParticipantContinuity.byKey",
+        "playerData.phase2ChronicleState.privateOriginHistories.bySubject"
       ],
       "qaRefs": [
         "tools/qa_phase2_chronicle_state_manifest_436.js",
         "tools/qa_save_compatibility_311.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_469_ce_hotspot.js",
+        "tools/qa_issue_469_ce_hotspot_browser.js"
       ]
     },
     {
@@ -1571,6 +1589,85 @@
       "qaRefs": [
         "tools/qa_phase2_inventory_core_461.js",
         "tools/qa_phase2_inventory_core_461_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_save_compatibility_311.js"
+      ]
+    },
+    {
+      "responsibilityId": "phase2.konoha_ce_hotspot.first_live_benchmark",
+      "canonicalOwner": "runtime/alpha-phase2-ce-hotspot-46900.js",
+      "ownerType": "phase2_ce_live_hotspot_and_private_history_convergence_adapter",
+      "directCallers": [
+        "runtime/alpha-traversal-bridge-33200.js",
+        "completeChronicleOriginPrologue",
+        "renderAlphaKonohaV3IdentifiedAnchor",
+        "activateAlphaKonohaV3PublicLocation",
+        "getShinobiRecordParticipants",
+        "game.js loadPlayerData compatibility reader"
+      ],
+      "stateReads": [
+        "frozen Academy Kakashi V2 terminal localContext before completion only",
+        "playerData.activityHistory exact Kakashi Origin durable evidence",
+        "playerData.kakashiV2RewardReceipts36015 exact Battle victory receipts",
+        "playerData.phase2ChronicleState.originParticipantContinuity",
+        "committed currentTeam from getChronicleCurrentTeam43600",
+        "existing World event runtime dimensions",
+        "playerData.storyDecisionRuntime34000 participant-autonomy and protagonist-intent receipts",
+        "playerData.phase2ChronicleState.privateOriginHistories.bySubject[academy_kakashi]",
+        "Battle-owned autonomous private result through resolveAcademyKakashiV2AutonomousPrivateBattle36010",
+        "SC_STORY_DECISION_REALISATION_34000 semantic choice/intention authority",
+        "SC_STORY_FACTUAL_RESOLVER_34600 registered Academy Kakashi factual bindings",
+        "current Academy Kakashi Registry stats/PL read-only capability snapshot"
+      ],
+      "stateWrites": [
+        "playerData.phase2ChronicleState.originParticipantContinuity exact terminal capture only",
+        "playerData.storyDecisionRuntime34000 only through existing #34000 APIs",
+        "existing World lifecycle/actionability/resolution dimensions only through current World APIs",
+        "one observer-safe committed playerData.activityHistory occurrence for resolved Hokage Administration Crossing",
+        "active Story Scene runtime only through existing startStoryScene / Story consequence APIs",
+        "presentation-only Konoha P01 actionability wrapper and shared Story Scene Board projection",
+        "presentation-only observer-safe Shinobi Record participant labels for the one #469 occurrence",
+        "playerData.phase2ChronicleState.privateOriginHistories.bySubject[academy_kakashi] exactly once per Chronicle",
+        "observer-relative Menma Knowledge/Record projection without private transcript import",
+        "playerData.storyDecisionRuntime34000 private-origin semantic choice + machine-gate intent receipts",
+        "playerData.storyFactualResolver34600 private-origin factual resolver receipts"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-traversal-bridge-33200.js",
+        "runtime/alpha-story-scene-board-33900.js",
+        "runtime/alpha-story-decision-realisation-34000.js",
+        "runtime/alpha-kakashi-v2-core-36020.js",
+        "runtime/alpha-kakashi-v2-transition-36040.js",
+        "runtime/alpha-phase2-ce-hotspot-46900.js"
+      ],
+      "extensionHooks": [
+        "getOriginParticipantContinuity46900",
+        "getKonohaCeHotspotEligibility46900",
+        "getKonohaCeHotspotPlan46900",
+        "getKonohaCeHotspotTeammateReactions46900",
+        "getKonohaCeHotspotResolvedRecord46900",
+        "runPhase2CeHotspot46900Diagnostics",
+        "getKakashiPrivateOriginHistory46900",
+        "ensureAutonomousKakashiPrivateHistory46900",
+        "migrateLegacyKakashiPrivateOrigin46900",
+        "getMenmaPrivateHistoryDecisionSnapshot46900",
+        "getMenmaNestedKakashiIntent46900",
+        "previewAutonomousKakashiPrivateOrigin46900"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "playerData.phase2ChronicleState.originParticipantContinuity.byKey[academy_kakashi::academy_kakashi_origin_masked_interceptor]",
+        "playerData.storyDecisionRuntime34000.storyUnits[konoha_ce_kakashi_masked_interceptor_admin_crossing_v1]",
+        "playerData.worldEventRuntime existing dimensions",
+        "playerData.activityHistory occ_konoha_ce_kakashi_masked_interceptor_admin_crossing_v1",
+        "playerData.phase2ChronicleState.privateOriginHistories.bySubject[academy_kakashi]"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_469_ce_hotspot.js",
+        "tools/qa_issue_469_ce_hotspot_browser.js",
+        "tools/qa_phase2_chronicle_state_manifest_436.js",
         "tools/qa_runtime_ownership_safety_300.js",
         "tools/qa_save_compatibility_311.js"
       ]
@@ -1869,6 +1966,36 @@
       "semanticId": "phase2.inventory.presentation",
       "owner": "runtime/alpha-phase2-inventory-core-46100.js",
       "responsibilityId": "phase2.inventory_core.presentation"
+    },
+    {
+      "semanticId": "phase2.origin_participant_continuity.kakashi_masked_interceptor",
+      "owner": "runtime/alpha-phase2-ce-hotspot-46900.js",
+      "responsibilityId": "phase2.konoha_ce_hotspot.first_live_benchmark"
+    },
+    {
+      "semanticId": "phase2.konoha_ce_hotspot.first_live_benchmark",
+      "owner": "runtime/alpha-phase2-ce-hotspot-46900.js",
+      "responsibilityId": "phase2.konoha_ce_hotspot.first_live_benchmark"
+    },
+    {
+      "semanticId": "phase2.private_origin_history.academy_kakashi",
+      "owner": "runtime/alpha-phase2-ce-hotspot-46900.js",
+      "responsibilityId": "phase2.konoha_ce_hotspot.first_live_benchmark"
+    },
+    {
+      "semanticId": "academy_kakashi.v2.battle.autonomous_private_result",
+      "owner": "runtime/alpha-kakashi-v2-battle-36010.js",
+      "responsibilityId": "origin.academy_kakashi.v2.story_to_battle"
+    },
+    {
+      "semanticId": "phase2.private_origin_history.story_intent_provenance",
+      "owner": "runtime/alpha-story-decision-realisation-34000.js",
+      "responsibilityId": "story.decision_realisation.neutral"
+    },
+    {
+      "semanticId": "phase2.private_origin_history.factual_result_provenance",
+      "owner": "runtime/alpha-story-factual-resolver-34600.js",
+      "responsibilityId": "story.factual_resolution.neutral"
     }
   ],
   "globalWrapperChains": [
@@ -2031,13 +2158,16 @@
     {
       "symbol": "completeChronicleOriginPrologue",
       "chain": [
-        "runtime/alpha-origin-starting-purse-409.js"
+        "runtime/alpha-origin-starting-purse-409.js",
+        "runtime/alpha-phase2-ce-hotspot-46900.js"
       ],
-      "canonicalActiveOwner": "runtime/alpha-origin-starting-purse-409.js",
-      "activationCondition": "Core completion remains semantic authority; wrapper adds only the locked idempotent starting purse after successful sealed completion.",
+      "canonicalActiveOwner": "runtime/alpha-phase2-ce-hotspot-46900.js",
+      "activationCondition": "Existing #409 starting-purse wrapper remains semantic delegate. #469 additionally captures exact Academy Kakashi Masked Interceptor continuity only after successful completion; every other Origin delegates unchanged.",
       "qaRefs": [
         "tools/qa_issue_343_wasabi_writing_golden.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_469_ce_hotspot.js",
+        "tools/qa_issue_469_ce_hotspot_browser.js"
       ]
     },
     {
@@ -2055,6 +2185,45 @@
         "tools/qa_phase2_inventory_core_461_browser.js",
         "tools/qa_kakashi_v2_browser.js",
         "tools/qa_issue_362_menma_three_subject_reward.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "symbol": "renderAlphaKonohaV3IdentifiedAnchor",
+      "chain": [
+        "runtime/alpha-phase2-ce-hotspot-46900.js"
+      ],
+      "canonicalActiveOwner": "runtime/alpha-phase2-ce-hotspot-46900.js",
+      "activationCondition": "Only KON-P01 becomes an actionable button while the exact #469 eligibility predicate is true; all other Konoha anchors and ineligible/resolved P01 delegate unchanged.",
+      "qaRefs": [
+        "tools/qa_issue_469_ce_hotspot.js",
+        "tools/qa_issue_469_ce_hotspot_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "symbol": "activateAlphaKonohaV3PublicLocation",
+      "chain": [
+        "runtime/alpha-phase2-ce-hotspot-46900.js"
+      ],
+      "canonicalActiveOwner": "runtime/alpha-phase2-ce-hotspot-46900.js",
+      "activationCondition": "Only eligible KON-P01 routes the registered finite CE World opportunity; all other public-location activation delegates unchanged.",
+      "qaRefs": [
+        "tools/qa_issue_469_ce_hotspot.js",
+        "tools/qa_issue_469_ce_hotspot_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "symbol": "getShinobiRecordParticipants",
+      "chain": [
+        "runtime/alpha-phase2-ce-hotspot-46900.js"
+      ],
+      "canonicalActiveOwner": "runtime/alpha-phase2-ce-hotspot-46900.js",
+      "activationCondition": "Only the exact #469 occurrence maps stable participant refs to observer-safe display labels; every other Shinobi Record entry delegates unchanged.",
+      "qaRefs": [
+        "tools/qa_issue_469_ce_hotspot.js",
+        "tools/qa_issue_469_ce_hotspot_browser.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
     }
@@ -2194,6 +2363,11 @@
       "stateRef": "playerData.characters[*].stats[*] via discipline_stat_breakthrough",
       "owner": "runtime/alpha-discipline-stat-growth-44800.js",
       "responsibilityId": "phase2.discipline_development.stat_growth"
+    },
+    {
+      "stateRef": "playerData.phase2ChronicleState.privateOriginHistories.bySubject[academy_kakashi]",
+      "owner": "runtime/alpha-phase2-ce-hotspot-46900.js",
+      "responsibilityId": "phase2.konoha_ce_hotspot.first_live_benchmark"
     }
   ]
 }

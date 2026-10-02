@@ -34,6 +34,7 @@ def main()->int:
     fix=FIX.read_text(encoding="utf-8") if FIX.is_file() else ""
     bridge=BRIDGE.read_text(encoding="utf-8") if BRIDGE.is_file() else ""
     reset_source=function_slice(fix,"function startNewChronicle33400()","function beginSelectedOrigin33400()")
+    begin_source=function_slice(fix,"function beginSelectedOrigin33400()","function onClick33400(")
     checks={
         "legacy_front_runtime_present":FRONT.is_file() and syntax(FRONT),
         "browser_fix_runtime_present":FIX.is_file() and syntax(FIX),
@@ -53,6 +54,8 @@ def main()->int:
         "exact_origin_authority_reused":"getAlphaChronicleOriginSelectionEntries" in fix,
         "selection_does_not_commit_before_intro":"selection only" in fix and "BEGIN after the introduction" in fix,
         "begin_reuses_existing_authorities":"selectChronicleOrigin(entry.variantId" in fix and "beginAlphaChronicleOriginPrologue()" in fix,
+        "begin_allocates_run_identity_before_origin":"allocateChronicleRunId43600" in begin_source and begin_source.find("allocateChronicleRunId43600") < begin_source.find("const selected=selectChronicleOrigin"),
+        "begin_commits_run_identity":"commitChronicleRunIdentity43600" in begin_source and 'creationKind:"NEW_START"' in begin_source and begin_source.find("commitChronicleRunIdentity43600") < begin_source.find("beginAlphaChronicleOriginPrologue()"),
         "no_second_acquisition_authority":"commitCharacterAcquisition(" not in fix and "grantCharacterRegistryOwnership(" not in fix,
         "enemy_turn_uses_existing_scheduler":"evaluateEnemyActionScheduler" in fix and "executeEnemyAuthoredActionOpportunity" in fix,
         "enemy_turn_one_way_guard":'side!==\"player\"' in fix and "enemyTurnInProgress33400" in fix,
