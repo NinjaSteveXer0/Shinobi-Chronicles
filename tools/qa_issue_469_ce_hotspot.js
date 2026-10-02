@@ -89,7 +89,11 @@ assert(src.includes("moralityScalarCreated:false")&&src.includes("friendshipScal
 assert(!src.includes("Math.random"),"#469 history/participant behavior must be deterministic");
 assert(!src.includes("addItemToInventory(")&&!src.includes("grantReward("),"#469 must not grant material rewards");
 assert(traversal.includes("runtime/alpha-phase2-ce-hotspot-46900.js"),"#469 missing from production dynamic chain");
-assert(traversal.indexOf("alpha-kakashi-v2-transition-36040.js")<traversal.indexOf("alpha-phase2-ce-hotspot-46900.js"),"#469 must load after frozen Kakashi V2 terminal chain");
+assert(
+  traversal.includes('function load36040(){loadOne("sc-kakashi-v2-transition-36040-script","runtime/alpha-kakashi-v2-transition-36040.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_TRANSITION_36040,load46900);}')&&
+  traversal.includes('function load46900(){loadOne("sc-phase2-ce-hotspot-46900-script","runtime/alpha-phase2-ce-hotspot-46900.js",()=>!!globalThis.SC_PHASE2_CE_HOTSPOT_46900);}'),
+  "#469 must load only from the frozen Kakashi V2 terminal transition callback"
+);
 
 console.log(JSON.stringify({
   pass:true,
