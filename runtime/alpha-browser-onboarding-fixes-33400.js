@@ -432,7 +432,7 @@
       selectionBeforeIntroNoCommit:!renderNinja33400.toString().includes("selectChronicleOrigin"),
       beginOwnsOriginCommit:beginSource.includes("selectChronicleOrigin")&&beginSource.includes("beginAlphaChronicleOriginPrologue"),
       beginAllocatesRunIdentityBeforeOrigin:beginSource.includes("allocateChronicleRunId43600")&&beginSource.indexOf("allocateChronicleRunId43600")<beginSource.indexOf("const selected=selectChronicleOrigin"),
-      beginCommitsRunIdentityBeforePrologue:beginSource.includes("commitChronicleRunIdentity43600")&&beginSource.includes('creationKind:"NEW_START"')&&beginSource.indexOf("commitChronicleRunIdentity43600")<beginSource.indexOf("beginAlphaChronicleOriginPrologue"),
+      beginCommitsRunIdentityBeforePrologue:beginSource.includes("commitChronicleRunIdentity43600")&&beginSource.includes('creationKind:"NEW_START"')&&beginSource.indexOf("commitChronicleRunIdentity43600")<beginSource.indexOf("const launched=beginAlphaChronicleOriginPrologue()"),
       noSecondAcquisitionAuthority:!beginSource.includes("commitCharacterAcquisition")&&!beginSource.includes("grantCharacterRegistryOwnership"),
       konohaOnlyAlphaStart:VILLAGES.filter(v=>v.enabled).length===1&&VILLAGES[0].id==="konoha",
       enemyTurnHooksCompletedPlayerOpportunity:consumeSource.includes('shouldRunEnemyTurn33400(side)')&&consumeSource.includes("executeEnemyAuthoredActionOpportunity"),
