@@ -32,6 +32,15 @@ async function beat(page){
     return a?{sceneId:a.sceneId,beatId:a.beatId,localContext:JSON.parse(JSON.stringify(a.localContext||{}))}:null;
   });
 }
+async function assertSceneLocation(page,expected){
+  const locator=page.locator("#story-scene-presentation-layer .sc-scene-board-33900__location");
+  await locator.waitFor({state:"visible",timeout:10000});
+  await page.waitForFunction(value=>{
+    const node=document.querySelector("#story-scene-presentation-layer .sc-scene-board-33900__location");
+    return !!(node&&String(node.textContent||"").includes(value));
+  },expected,{timeout:10000});
+  assert((await locator.innerText()).includes(expected),"Story Scene Board location did not settle to "+expected);
+}
 async function advanceThroughBeat(page,beatId,max=20){
   const texts=[];
   for(let i=0;i<max;i++){
@@ -312,7 +321,7 @@ async function advanceThroughBeat(page,beatId,max=20){
     assert.deepStrictEqual(started.localContext.teamVariantIds,["academy_kakashi","academy_hinata","academy_menma"]);
     assert.deepStrictEqual(started.localContext.teammateOrder,["academy_hinata","academy_menma"]);
     const openingBoard=await page.locator("#story-scene-presentation-layer").innerText();
-    assert(openingBoard.includes("HOKAGE ADMINISTRATION · PUBLIC APPROACH"));
+    await assertSceneLocation(page,"HOKAGE ADMINISTRATION · PUBLIC APPROACH");
     assert(openingBoard.includes("STAMPED RECEIPT"));
     const activeBackdrop=await page.evaluate(()=>getActiveStorySceneBackdropPath33900());
     assert(activeBackdrop&&activeBackdrop.includes("hokage_district_exterior.png"),"KON-P01 Administration exterior backdrop missing: "+activeBackdrop);
@@ -697,7 +706,7 @@ async function advanceThroughBeat(page,beatId,max=20){
 
     const menmaBoard=(await page.locator("#story-scene-presentation-layer").innerText());
     const menmaBoardActorLabels=await page.evaluate(()=>[...document.querySelectorAll("#story-scene-presentation-layer .sc-scene-board-33900__actor")].map(node=>node.dataset.actorLabel||""));
-    assert(menmaBoard.includes("HOKAGE ADMINISTRATION · PUBLIC APPROACH"));
+    await assertSceneLocation(page,"HOKAGE ADMINISTRATION · PUBLIC APPROACH");
     assert(menmaBoardActorLabels.includes("MASKED WOMAN"),"Menma-facing board did not use observer-safe actor label: "+JSON.stringify(menmaBoardActorLabels));
     assert(!menmaBoardActorLabels.includes("MASKED INTERCEPTOR"),"Kakashi historical role label leaked into Menma-facing board actor projection");
     const menmaBackdrop=await page.evaluate(()=>getActiveStorySceneBackdropPath33900());
