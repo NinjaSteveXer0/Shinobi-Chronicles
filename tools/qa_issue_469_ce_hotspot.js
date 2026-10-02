@@ -77,7 +77,8 @@ const profileChoiceIds=[...autonomousBoundaryBlock.matchAll(/choiceIds:Object\.f
   .flatMap(m=>[...m[1].matchAll(/"([^"]+)"/g)].map(x=>x[1]));
 assert.strictEqual(profileChoiceIds.length,93,"Kakashi autonomous profile must encode all 93 player-facing legal choices");
 assert.strictEqual(new Set(profileChoiceIds).size,93,"autonomous Kakashi choice IDs must be unique across frozen boundaries");
-assert(!profileChoiceIds.some(id=>/success|failure|resolve_result/i.test(id)),"machine RESOLVE RESULT choice leaked into autonomous Character profile");
+assert(!profileChoiceIds.some(id=>/^machine::|resolve_result|machine_factual_resolution/i.test(id)),"machine RESOLVE RESULT choice leaked into autonomous Character profile");
+assert(!autonomousBoundaryBlock.includes('intentType:"MACHINE_FACTUAL_RESOLUTION"'),"machine factual resolver intent leaked into Character boundary profile");
 assert(privateProfile.includes("all 23 meaningful current Kakashi choice boundaries covered: **YES**"),"runtime profile is not grounded in Writing autonomous-intent authority");
 assert(privateProfile.includes("all 93 current player-facing legal choice IDs represented: **YES**"),"Writing authority 93-choice audit missing");
 for(const teammate of [
