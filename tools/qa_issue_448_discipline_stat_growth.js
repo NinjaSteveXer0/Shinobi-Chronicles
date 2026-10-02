@@ -9,6 +9,8 @@ const DISC=["nin","tai","gen","buki","fuin","kin","stamina"];
 assert(SRC.includes("function stableProgressionSaveKey448"),"stable progression save-key resolver missing from #448 owner");
 assert(SRC.includes("function syncRuntimeProgressionToPlayerData448"),"stable progression save adapter missing from #448 owner");
 assert(SRC.includes("delete pd.characters[legacyKey]"),"legacy representation-keyed save duplicate is not retired by #448 adapter");
+assert(SRC.includes("function myClanInspection448"),"My Clan Current-Stat projection adapter missing");
+assert(SRC.includes("exactStats(character)")&&SRC.includes("renderMyClanInspectionContent=myClanInspection448"),"My Clan is not bound to canonical Current Stats");
 
 function formula(stats){
   const vals=DISC.map(id=>Number(stats[id])||0).sort((a,b)=>b-a);
