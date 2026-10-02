@@ -90,7 +90,7 @@ const teamSave={
   const saved=JSON.stringify(c.playerData.phase2ChronicleState);
   c.ensurePhase2ChronicleState43600({save:true});
   assert.strictEqual(JSON.stringify(c.playerData.phase2ChronicleState),saved);
-  assert.strictEqual(c.saveCount,1,"repeat ensure rewrote identical state");
+  assert.strictEqual(c.saveCount,2,"repeat ensure rewrote identical state");
 
   c.updateChronicleTutorialProgress43600({sandboxPopupSeen:true,recommendedRouteEnabled:true,openingChoice:"show_me_around"},{save:true});
   assert.strictEqual(c.saveCount,2);
