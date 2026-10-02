@@ -648,7 +648,7 @@ function finalRecordPayload(choiceId){
     participants:[ORIGIN_ID,MI_ID,...(Array.isArray(ctx.teammateOrder)?ctx.teammateOrder:[])],
     committed:true,
     completed:true,
-    outcome:choiceId==="tell_remember"?"Recognition acknowledged":choiceId==="ask_business"?"Public delivery acknowledged":choiceId==="watch_pass"?"Observed and let pass":"Kept moving after observation",
+    outcome:"Seen leaving Hokage Administration after a document handoff. Administration staff did not challenge her presence. Previously encountered during the Academy package incident. Proper name: Unknown.",
     data:{
       eventId:EVENT_ID,
       opportunityId:OPPORTUNITY_ID,
