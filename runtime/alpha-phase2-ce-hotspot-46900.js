@@ -1489,6 +1489,8 @@ function eligibility(){
   if(!a||!a.chronicleOriginVariantId)return{available:false,reason:"selected_origin_required"};
   const selectedOrigin=String(a.chronicleOriginVariantId);
   if(!a.chronicleOrigin||a.chronicleOrigin.prologueCompleted!==true)return{available:false,reason:"selected_origin_incomplete"};
+  const runId=chronicleStableId46900({ensure:true});
+  if(!runId)return{available:false,reason:"chronicle_run_identity_required"};
   if(selectedOrigin!==ORIGIN_ID){
     const privateResult=ensureAutonomousKakashiPrivateHistory46900(currentTeam()?"pre_471_active_konoha_migration":"origin_convergence_preparation");
     if(!privateResult||privateResult.success!==true)return{available:false,reason:privateResult&&privateResult.reason||"kakashi_private_origin_unavailable"};
@@ -1515,6 +1517,7 @@ function eligibility(){
     team:clone(team),
     continuity:clone(continuity),
     privateHistory:storedKakashiPrivateHistory(),
+    chronicleRunId:runId,
     secondTeammateRef,
     historyFamily:historyFamily(continuity)
   };
