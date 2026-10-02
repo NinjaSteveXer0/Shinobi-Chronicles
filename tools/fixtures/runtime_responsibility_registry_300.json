@@ -18,7 +18,8 @@
     "runtime/alpha-kakashi-v2-rewards-36015.js",
     "runtime/alpha-kakashi-v2-core-36020.js",
     "runtime/alpha-kakashi-v2-renderer-36030.js",
-    "runtime/alpha-kakashi-v2-transition-36040.js"
+    "runtime/alpha-kakashi-v2-transition-36040.js",
+    "runtime/alpha-phase2-ce-hotspot-46900.js"
   ],
   "responsibilities": [
     {
