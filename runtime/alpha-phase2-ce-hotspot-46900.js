@@ -1775,6 +1775,83 @@ if(typeof globalThis.registerStorySceneBoardDefinition==="function"){
   if(!board||board.success!==true)throw new Error("ce469_scene_board_registration_failed");
 }
 
+const menmaBeats46900=[
+  {
+    beatId:"ce478_opening",mode:"narration",text:"",
+    onEnterConsequences:[domainRequest("ce478_begin_occurrence",beginOccurrence)],
+    nextBeatId:"ce478_history"
+  },
+  {beatId:"ce478_history",mode:"narration",text:"",nextBeatId:"ce478_kakashi_response"},
+  {
+    beatId:"ce478_kakashi_response",mode:"narration",text:"",
+    onEnterConsequences:[domainRequest("ce478_kakashi_autonomy",()=>consumeMenmaAutonomy46900("kakashi_response"))],
+    nextBeatId:"ce478_hinata_response"
+  },
+  {
+    beatId:"ce478_hinata_response",mode:"narration",text:"",
+    onEnterConsequences:[domainRequest("ce478_hinata_autonomy",()=>consumeMenmaAutonomy46900("hinata_response"))],
+    nextBeatId:"ce478_menma_choice"
+  },
+  {
+    beatId:"ce478_menma_choice",mode:"choice",text:"",
+    onEnterConsequences:[domainRequest("ce478_open_menma_choice",()=>{const r=ensureMenmaChoiceSet46900();return r&&r.success?{success:true,choiceSetId:r.choiceSet&&r.choiceSet.choiceSetId||null}:r;})],
+    choices:MENMA_CHOICES.map(choice=>({
+      choiceId:choice.id,
+      label:choice.label,
+      nextBeatId:"ce478_branch_"+choice.id,
+      consequenceRequests:[domainRequest("ce478_menma_intent_"+choice.id,()=>resolveMenmaChoice46900(choice.id))]
+    }))
+  },
+  ...MENMA_CHOICES.map(choice=>({
+    beatId:"ce478_branch_"+choice.id,
+    mode:"narration",text:"",
+    exitScene:true,
+    onEnterConsequences:choice.id==="menma_yield_to_kakashi"
+      ?[domainRequest("ce478_nested_kakashi_autonomy",()=>consumeMenmaAutonomy46900("nested_kakashi_intent"))]
+      :[],
+    onAdvanceConsequences:[
+      domainRequest("ce478_commit_resolution_"+choice.id,()=>commitMenmaResolution46900(choice.id)),
+      {requestId:"ce478_feedback_"+choice.id,kind:"feedback",feedbackKind:"chronicle_update",label:"Shinobi Record Updated"}
+    ]
+  }))
+];
+
+try{unregisterStoryScene(MENMA_SCENE_ID);}catch(_error){}
+const menmaSceneRegistration46900=registerStoryScene({
+  sceneId:MENMA_SCENE_ID,
+  eventId:EVENT_ID,
+  title:"Hokage Administration Crossing",
+  entryBeatId:"ce478_opening",
+  locationId:HOST_ID,
+  participants:[
+    {sourceId:MENMA_ID,physicalPresence:true,visible:true,role:"protagonist",displayName:"Menma"},
+    {sourceId:HINATA_ID,physicalPresence:true,visible:true,role:"current_teammate",displayName:"Hinata"},
+    {sourceId:ORIGIN_ID,physicalPresence:true,visible:true,role:"private_history_owner",displayName:"Kakashi"},
+    {sourceId:MI_ID,physicalPresence:true,visible:true,role:"returning_participant",displayName:"Masked Woman"}
+  ],
+  beats:menmaBeats46900,
+  defaultReturnContext:{type:"overlay",overlayType:"village"}
+});
+if(!menmaSceneRegistration46900||menmaSceneRegistration46900.success!==true)throw new Error("ce478_menma_story_scene_registration_failed");
+
+if(typeof globalThis.registerStorySceneBoardDefinition==="function"){
+  const board=globalThis.registerStorySceneBoardDefinition(MENMA_SCENE_ID,{
+    resolve:menmaBoardProjection46900,
+    resolveBackdrop:()=>({assetPath:"Scene backdrops/hokage_district_exterior.png"}),
+    performanceSequences:{
+      ce478_opening:menmaOpeningCues46900,
+      ce478_history:({runtime})=>menmaHistoryCues46900(runtime),
+      ce478_kakashi_response:({runtime})=>kakashiCurrentResponseCues46900(runtime),
+      ce478_hinata_response:hinataCurrentResponseCues46900,
+      ce478_branch_menma_ask_kakashi_prior_connection:menmaAskKakashiCues46900,
+      ce478_branch_menma_ask_mi_prior_connection:menmaAskMiCues46900,
+      ce478_branch_menma_yield_to_kakashi:menmaYieldCues46900,
+      ce478_branch_menma_disengage:menmaDisengageCues46900
+    }
+  });
+  if(!board||board.success!==true)throw new Error("ce478_menma_scene_board_registration_failed");
+}
+
 function sceneContext(){
   const plan=eventPlan();
   if(!plan.success)return plan;
@@ -1786,7 +1863,10 @@ function sceneContext(){
     stableParticipantId:plan.stableParticipantId,
     teamAssignmentId:plan.teamAssignmentId,
     teamVariantIds:[...plan.teamVariantIds],
+    mode:plan.mode,
+    protagonistVariantId:plan.protagonistVariantId,
     teammateOrder:[...plan.teammateOrder],
+    privateOriginHistoryRef:plan.privateOriginHistoryRef||null,
     historyFamily:plan.historyFamily,
     historySourceRefs:[...plan.historySourceRefs],
     continuityOriginOccurrenceRef:plan.continuityOriginOccurrenceRef
