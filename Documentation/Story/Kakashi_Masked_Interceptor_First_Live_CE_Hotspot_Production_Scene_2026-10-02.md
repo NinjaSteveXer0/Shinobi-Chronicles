@@ -502,7 +502,7 @@ The current teammates now have legitimate evidence that Kakashi and Masked Inter
 
 ## B4 — MASKED INTERCEPTOR
 
-**MASKED INTERCEPTOR:** “If they want you to know, they'll tell you.”
+**MASKED INTERCEPTOR:** “Ask the desk.”
 
 ## B5 — NARRATION
 
@@ -548,7 +548,7 @@ Kakashi is still watching.
 
 He turns his attention to the intake window instead of following her.
 
-The clerk opens a ledger, copies the mark from a duplicate receipt and clips the slip inside the page.
+The clerk opens a ledger, sets a duplicate receipt beside it, makes an entry and clips the slip inside the page.
 
 ## C4 — NARRATION
 
@@ -711,9 +711,9 @@ She does not:
 - act like a generic assassin;
 - announce that she is secretly Konoha-aligned.
 
-Her longest authorised line in this revised scene is still brief:
+Her revised dialogue remains deliberately compressed. Even the branch that yields the most information stops at:
 
-> “If they want you to know, they'll tell you.”
+> “Ask the desk.”
 
 That is enough to define a disclosure boundary without turning her into an exposition source.
 
@@ -756,7 +756,7 @@ Kakashi additionally knows:
 
 - the delivered document is described by Masked Interceptor as a **dispatch**;
 - she refuses to identify its source;
-- she frames further disclosure as something Administration would authorise, not something she will volunteer.
+- she redirects the source question to the Administration desk instead of answering it herself; this does not guarantee the desk will disclose anything.
 
 Current teammates who hear the exchange may know the same spoken facts.
 
@@ -969,7 +969,7 @@ Generic future encounter eligibility remains governed by later World authority.
 
 ## Branch B addendum
 
-**She described the document as a dispatch and declined to identify its source.**
+**She described the document as a dispatch and redirected the source question to the Administration desk.**
 
 ## Branch C addendum
 
