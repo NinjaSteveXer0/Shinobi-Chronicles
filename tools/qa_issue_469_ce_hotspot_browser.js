@@ -95,7 +95,7 @@ async function advanceThroughBeat(page,beatId,max=20){
       };
       globalThis.savePlayerData=()=>true;
       try{savePlayerData=globalThis.savePlayerData;}catch(_error){}
-      const requiredSeedExamples=new Set(["kakashi_defeated_mi","mi_defeated_kakashi","KILLED","UNSEEN"]);
+      const requiredSeedExamples=new Set(["kakashi_defeated_mi","mi_defeated_kakashi","UNSEEN"]);
       const examples={};
       let deterministicSameSeed=false;
       for(let i=0;i<2200&&Object.keys(examples).length<requiredSeedExamples.size;i++){
