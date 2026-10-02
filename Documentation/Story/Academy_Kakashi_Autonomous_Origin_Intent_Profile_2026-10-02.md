@@ -59,7 +59,7 @@ This profile consumes:
   \`runtime/alpha-kakashi-v2-core-36020.js\`  
   blob \`07d22bbb55aedef87771f074d5e94d6bed6a390d\`.
 
-Runtime source contains **115 total choice entries**, of which **23 boundaries / 92 entries are meaningful player-facing intent choices**. Machine-only \`RESOLVE RESULT\` gates are not Character decisions and must never be selected through this profile.
+Runtime source contains **115 total choice entries**, of which **23 boundaries / 93 entries are meaningful player-facing intent choices**. Machine-only \`RESOLVE RESULT\` gates are not Character decisions and must never be selected through this profile.
 
 ---
 
@@ -924,7 +924,7 @@ The target is:
 # 14. Completion audit
 
 - all 23 meaningful current Kakashi choice boundaries covered: **YES**;
-- all 92 current player-facing legal choice IDs represented: **YES**;
+- all 93 current player-facing legal choice IDs represented: **YES**;
 - machine-only \`RESOLVE RESULT\` gates excluded from personality selection: **YES**;
 - Battle result predetermined: **NO**;
 - reward optimisation used: **NO**;
