@@ -676,7 +676,7 @@ async function advanceThroughBeat(page,beatId,max=20){
     });
     assert.strictEqual(preChoice.autonomy.length,2,"Menma received control before Kakashi + Hinata autonomy completed");
     assert(preChoice.autonomy.some(row=>row.actorRef==="academy_kakashi"&&String(row.participantIntentRef).includes("kakashi_current_response:")),"Kakashi current response autonomy receipt missing");
-    assert(preChoice.autonomy.some(row=>row.actorRef==="academy_hinata"&&String(row.participantIntentRef).includes("hinata_current_evidence:")),"Hinata current-evidence autonomy receipt missing");
+    assert(preChoice.autonomy.some(row=>row.actorRef==="academy_hinata"&&String(row.participantIntentRef).includes("second_teammate_current_evidence:academy_hinata:")),"Hinata current-evidence autonomy receipt missing");
 
     const menmaChoiceState=await beat(page);
     assert.strictEqual(menmaChoiceState.beatId,"ce478_menma_choice");
