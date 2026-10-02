@@ -11,6 +11,14 @@ assert(SRC.includes("function syncRuntimeProgressionToPlayerData448"),"stable pr
 assert(SRC.includes("delete pd.characters[legacyKey]"),"legacy representation-keyed save duplicate is not retired by #448 adapter");
 assert(SRC.includes("function myClanInspection448"),"My Clan Current-Stat projection adapter missing");
 assert(SRC.includes("exactStats(character)")&&SRC.includes("renderMyClanInspectionContent=myClanInspection448"),"My Clan is not bound to canonical Current Stats");
+assert(SRC.includes("FOUNDATION TRAINING LIMIT REACHED"),"#460 source-efficacy primary label missing");
+assert(SRC.includes("This activity can no longer advance "), "#460 source-scoped supporting copy missing");
+assert(SRC.includes("Further development requires a more demanding source."),"#460 earned-harder-route supporting copy missing");
+assert(SRC.includes("FOUNDATION DEVELOPMENT RANGE — THROUGH STAT "),"#460 below-ceiling source range wording missing");
+assert(SRC.includes("FOUNDATION TRAINING NO LONGER ADVANCES "),"#460 compact source-limit notification missing");
+for(const forbidden of ["STAT DEVELOPMENT COMPLETE FOR THIS ACTIVITY","FOUNDATION DEVELOPMENT COMPLETE AT STAT","MAX STAT 15","DISCIPLINE MAXED","STAT COMPLETE"]){
+  assert(!SRC.includes(forbidden),"global-cap-suggestive wording survived #460: "+forbidden);
+}
 
 function formula(stats){
   const vals=DISC.map(id=>Number(stats[id])||0).sort((a,b)=>b-a);
