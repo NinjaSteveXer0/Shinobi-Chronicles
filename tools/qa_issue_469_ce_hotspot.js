@@ -70,7 +70,7 @@ assert(board.includes("data-sc-stage-anchor"),"#486 actor semantic anchor projec
 assert(!board.includes('.sc-scene-board-33900__actors[data-count="4"]>.sc-scene-board-33900__actor:nth-child'),"#486 four-person staging still depends on ordinal nth-child margins");
 assert(board.includes("scChoreoReducedSettle33900"),"#486 reduced-motion non-exit settle grammar missing");
 assert(board.includes("scChoreoReducedExit33900"),"#486 reduced-motion exit/flee opacity grammar missing");
-assert(!board.includes("from{opacity:.72}"),"#486 reduced motion still fades present non-entry/non-exit actors");
+assert(!board.includes("@keyframes scChoreoReduced33900{from{opacity:.72}to{opacity:1}}"),"#486 superseded reduced-motion blanket fade remains");
 assert(src.includes('stageAnchor=id===MENMA_ID?"PLAYER_LEFT"'),"#469 Menma semantic stage anchor missing");
 assert(src.includes('id===ORIGIN_ID?"INNER_RIGHT":id===MI_ID?"OPPONENT_RIGHT":"INNER_LEFT"'),"#469 four-person semantic stage hierarchy missing");
 assert(src.includes('stageAnchor=id===ORIGIN_ID?"PLAYER_LEFT":id===MI_ID?"OPPONENT_RIGHT":"CENTER"'),"#469 Kakashi protagonist stage anchors missing");
