@@ -14,7 +14,7 @@ def git_blob_sha(text:str)->str:
 
 def game_without_declared_469_save_reader(text:str)->str:
     start_marker='      // ISSUE #469 / #34000 — preserve the canonical neutral Story decision'
-    end_marker='      // ISSUE #322 / #23 — preserve the older shared Story intent/factual'
+    end_marker='      // ISSUE #322 / #23 — preserve shared Story intent/factual receipts and'
     start=text.find(start_marker)
     end=text.find(end_marker,start if start >= 0 else 0)
     if start < 0 or end <= start:
