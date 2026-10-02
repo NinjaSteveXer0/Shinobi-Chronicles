@@ -666,3 +666,40 @@ UI may cap recent/key-event cards for readability, but this does not delete cano
 Use pagination, filters, significance ranking and reversible summaries instead of semantic eviction.
 
 Never evict causally important history such as provenance, Promotion, awakening, death/restoration, major relationship history or Story divergence merely because a display slot is full.
+
+## 36. Parallel Origin private-history projection
+
+Consume:
+
+`Documentation/Coordination/Parallel_Origin_Private_History_and_Active_Konoha_Convergence_Contract_2026-10-02.md`
+
+A known teammate may possess a fully committed private Origin history before Team Formation.
+
+That private history is **not** automatically a player-facing Record section.
+
+Shinobi Record projects only what the currently inspected observer legitimately knows.
+
+For a teammate such as Kakashi in a Menma-origin Chronicle, the Record may therefore move through states such as:
+
+- **Known teammate** — current identity/current-team status is known;
+- **Prior connection suspected** — Menma witnesses another participant recognise Kakashi;
+- **Prior connection confirmed** — a legitimate source establishes that Kakashi and that person met before Team Formation;
+- **Specific prior fact learned** — Kakashi, a witness, document or other legitimate source reveals an exact past action/outcome;
+- **Contradicted / disputed** — later evidence conflicts with an earlier account;
+- **Unknown** — private Origin facts remain hidden.
+
+Preserve:
+
+**private Origin history truth != protagonist Knowledge**  
+**teammate current state != teammate biography**  
+**dossier activation != private-history disclosure**  
+**recognition reaction != full prior-event Knowledge**  
+**same-person continuity != omniscient retrospective access**
+
+A Character's private Origin ledger may remain machine-addressable for causal evaluation while completely absent from ordinary protagonist-facing Record presentation.
+
+The preferred revelation chain is:
+
+`private historical truth -> current observable evidence/disclosure -> bounded Knowledge -> Record projection`.
+
+
