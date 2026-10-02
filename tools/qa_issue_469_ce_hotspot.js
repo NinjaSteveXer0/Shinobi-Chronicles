@@ -52,8 +52,8 @@ for(const line of [
 
 const exactChoices=[
   "Tell her you remember her.",
-  "Ask what she is doing here.",
-  "Watch her pass.",
+  "Ask about the delivery.",
+  "Watch what she does.",
   "Keep moving."
 ];
 for(const label of exactChoices){
@@ -66,13 +66,45 @@ assert(!/\bATTACK\b/i.test(choicesSection),"ATTACK leaked into #469 choice surfa
 for(const authored of [
   "Not here.",
   "I remember you.",
-  "I know.",
-  "What are you doing here?",
-  "Delivery. Finished.",
-  "Seen leaving Hokage Administration after a document handoff. Administration staff did not challenge her presence.",
+  "I remember you too.",
+  "They weren't there.",
+  "What did you deliver?",
+  "A dispatch.",
+  "From who?",
+  "Ask the desk.",
+  "Seen leaving Hokage Administration after completing a stamped document handoff through the public intake.",
   "Previously encountered during the Academy package incident.",
   'properName:"Unknown"'
 ])assert(src.includes(authored),"Writing/Record authority missing: "+authored);
+
+for(const stale of [
+  "No alarm follows her. No one moves to stop her.",
+  "Ask what she is doing here.",
+  "Watch her pass.",
+  "Delivery. Finished."
+])assert(!src.includes(stale),"rejected owner-run copy remains in runtime: "+stale);
+
+for(const receipt of [
+  "mi_admin_crossing_base_lead_v1",
+  "mi_mutual_recognition_explicit_v1",
+  "kakashi_mi_prior_connection_observed_v1",
+  "kakashi_mi_prior_history_openly_acknowledged_v1",
+  "mi_dispatch_task_confirmed_v1",
+  "kakashi_questioned_mi_current_admin_business_v1",
+  "mi_admin_dispatch_inquiry_lead_v1",
+  "mi_public_intake_process_observed_v1",
+  "kakashi_observed_mi_without_confrontation_v1",
+  "mi_noticed_kakashi_observation_v1",
+  "mi_admin_intake_process_lead_v1",
+  "kakashi_declined_mi_contact_v1"
+])assert(src.includes(receipt),"branch consequence receipt missing: "+receipt);
+
+assert(src.includes("const BRANCH_CONSEQUENCES=Object.freeze({"),"branch consequence matrix missing");
+assert(src.includes("const consequence=branchConsequence(choiceId);"),"final record does not consume selected branch consequence");
+assert(src.includes("branchFactualReceiptId:consequence.factualReceiptId"),"branch factual delta not persisted");
+assert(src.includes("sharedHistoryReceiptIds:[...consequence.sharedHistoryReceiptIds]"),"shared-history delta not persisted");
+assert(src.includes("futureLeadIds:[...consequence.futureLeadIds]"),"future lead delta not persisted");
+assert(src.includes("recordAddendum:consequence.recordAddendum||null"),"branch-specific Shinobi Record addendum missing");
 
 assert(src.includes('sourceKind:"story"'),"#469 opportunity is not authored Story source");
 assert(src.includes("randomPoolEligible:false"),"#469 leaked into random pool");
@@ -111,6 +143,7 @@ console.log(JSON.stringify({
   exactNineTeammateFamilies:true,
   participantFirst34000:true,
   exactFourChoices:true,
+  distinctBranchConsequences:true,
   attackAbsent:true,
   observerSafeRecord:true,
   noRandomHistory:true,
