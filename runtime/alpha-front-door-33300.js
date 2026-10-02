@@ -283,7 +283,7 @@
       return {success:false,reason:"origin_confirmed_prologue_launch_failed",selected,launched};
     }
     releaseFrontDoor33300();
-    return {success:true,variantId:entry.variantId,sceneId,selected,launched};
+    return {success:true,variantId:entry.variantId,sceneId,selected,runIdentity,launched};
   }
 
   function onClick33300(event){
