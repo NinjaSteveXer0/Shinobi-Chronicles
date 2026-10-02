@@ -372,7 +372,7 @@ function diagnostics(){
   const source=[snapshot,render,routeAction,teamProjection,journeyProjection].map(String).join("\n");
   const data=snapshot();
   const checks={
-    readOnlyProjection:!source.includes("savePlayerData(")&&!source.includes("localStorage.setItem")&&!source.includes("confirmAcademyTeamFormation("),
+    readOnlyProjection:!/savePlayerData\s*\(/.test(source)&&!/localStorage\.setItem\s*\(/.test(source)&&!/confirmAcademyTeamFormation\s*\(/.test(source),
     canonicalTeam:String(currentTeam).includes("getChronicleCurrentTeam43600"),
     canonicalRyo:String(currentRyo).includes("getChronicleCurrentRyo43600"),
     canonicalJourney:String(journeyProjection).includes("getAlphaTailedBeastJourneyState")&&String(journeyProjection).includes("getAlphaSurfaceTruthJourneyAction"),
