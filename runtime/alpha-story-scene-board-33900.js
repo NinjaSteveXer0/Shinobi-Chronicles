@@ -428,13 +428,20 @@ function installStyle(){
 .sc-scene-board-33900__actors{position:absolute;left:4%;right:4%;top:13%;bottom:26%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:3%;}
 .sc-scene-board-33900__actors[data-count="1"]{grid-template-columns:minmax(0,300px);justify-content:start;padding-left:4%;}
 .sc-scene-board-33900__actors[data-count="2"]{grid-template-columns:repeat(2,minmax(0,270px));justify-content:center;column-gap:clamp(80px,14vw,240px);}
-.sc-scene-board-33900__actor{position:relative;justify-self:center;width:min(74%,238px);aspect-ratio:7/10;max-height:390px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;opacity:.72;transform:translateY(4px) scale(.95);filter:saturate(.78) brightness(.88);}
-.sc-scene-board-33900__actor.is-focus{opacity:1;transform:translateY(0) scale(1);filter:none;}
-.sc-scene-board-33900__actor-frame{position:absolute;inset:0;border:1px solid rgba(194,158,73,.38);background:linear-gradient(180deg,rgba(7,13,17,.03),rgba(3,7,10,.12) 65%,rgba(3,7,10,.72));box-shadow:0 16px 34px rgba(0,0,0,.30);}
-.sc-scene-board-33900__actor.is-focus .sc-scene-board-33900__actor-frame{border-color:rgba(97,220,229,.78);box-shadow:0 0 0 1px rgba(97,220,229,.15),0 18px 38px rgba(0,0,0,.38);}
+.sc-scene-board-33900__actors[data-count="3"]>.sc-scene-board-33900__actor:nth-child(2){margin-bottom:5.5vh;}
+.sc-scene-board-33900__actors[data-count="3"]>.sc-scene-board-33900__actor:nth-child(3){margin-bottom:1.5vh;}
+.sc-scene-board-33900__actors[data-count="4"]{left:2.2%;right:2.2%;bottom:23%;grid-template-columns:repeat(4,minmax(0,1fr));gap:1.5%;}
+.sc-scene-board-33900__actors[data-count="4"]>.sc-scene-board-33900__actor{width:min(86%,220px);}
+.sc-scene-board-33900__actors[data-count="4"]>.sc-scene-board-33900__actor:nth-child(2){margin-bottom:6vh;}
+.sc-scene-board-33900__actors[data-count="4"]>.sc-scene-board-33900__actor:nth-child(3){margin-bottom:2vh;}
+.sc-scene-board-33900__actors[data-count="4"]>.sc-scene-board-33900__actor:nth-child(4){margin-bottom:7vh;}
+.sc-scene-board-33900__actor{position:relative;justify-self:center;width:min(74%,238px);aspect-ratio:7/10;max-height:390px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;opacity:1;transform:translateY(2px) scale(.98);filter:none;transition:transform .14s ease,filter .14s ease,opacity .14s ease;z-index:1;}
+.sc-scene-board-33900__actor.is-focus{opacity:1;transform:translateY(-4px) scale(1.055);filter:none;z-index:6;}
+.sc-scene-board-33900__actor-frame{position:absolute;inset:0;border:1px solid rgba(194,158,73,.52);background:linear-gradient(180deg,rgba(7,13,17,.03),rgba(3,7,10,.12) 65%,rgba(3,7,10,.72));box-shadow:0 16px 34px rgba(0,0,0,.30);}
+.sc-scene-board-33900__actor.is-focus .sc-scene-board-33900__actor-frame{border:2px solid rgba(97,220,229,.96);box-shadow:0 0 0 1px rgba(97,220,229,.20),0 0 20px rgba(97,220,229,.13),0 20px 42px rgba(0,0,0,.40);}
 .sc-scene-board-33900__actor img{position:relative;z-index:1;width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 12px 14px rgba(0,0,0,.52));}
 .sc-scene-board-33900__actor.is-entering{animation:scActorEnter33900 .46s cubic-bezier(.2,.75,.25,1) both;}
-@keyframes scActorEnter33900{from{opacity:0;transform:translateX(44px) scale(.96);filter:brightness(.35) blur(2px)}to{opacity:.72;transform:translateX(0) scale(.95);filter:saturate(.78) brightness(.88)}}
+@keyframes scActorEnter33900{from{opacity:0;transform:translateX(44px) scale(.96);filter:brightness(.65) blur(2px)}to{opacity:1;transform:translateX(0) scale(.98);filter:none}}
 .sc-scene-board-33900__actor.is-entering.is-focus{animation-name:scActorEnterFocus33900}@keyframes scActorEnterFocus33900{from{opacity:0;transform:translateX(44px) scale(.97)}to{opacity:1;transform:translateX(0) scale(1)}}
 .sc-scene-board-33900__actor-silhouette{position:relative;z-index:1;width:58%;height:78%;margin-bottom:24px;border-radius:46% 46% 18% 18%;background:radial-gradient(circle at 50% 18%,rgba(177,191,194,.38) 0 14%,transparent 15%),linear-gradient(180deg,transparent 0 24%,rgba(81,95,101,.38) 25% 100%);filter:blur(.2px);}
 .sc-scene-board-33900__actor-tag{position:absolute;z-index:3;left:7%;right:7%;bottom:4%;padding:6px 8px;background:rgba(2,7,10,.84);border:1px solid rgba(194,158,73,.48);text-align:center;backdrop-filter:blur(2px);}.sc-scene-board-33900__actor-tag strong{display:block;color:#efe6cf;font-size:10px;letter-spacing:.1em}.sc-scene-board-33900__actor-tag small{display:table;color:#77dfe7;font-size:8px;font-weight:900;letter-spacing:.07em;margin:4px auto 0;padding:2px 6px;line-height:1.25;border:1px solid rgba(104,219,229,.32);background:rgba(2,17,22,.78);box-shadow:0 0 14px rgba(80,216,228,.09);text-shadow:0 0 8px rgba(93,223,233,.22)}.sc-scene-board-33900__actor.is-focus .sc-scene-board-33900__actor-tag small{color:#f0cf78;border-color:rgba(220,177,77,.54);background:rgba(24,17,5,.72);box-shadow:0 0 16px rgba(220,177,77,.13);text-shadow:0 0 8px rgba(235,199,98,.24)}
@@ -473,6 +480,8 @@ function installStyle(){
 #${HARD_TRANSITION_CURTAIN_ID}{position:fixed;inset:0;z-index:2147483000;background:#020508;opacity:0;visibility:hidden;pointer-events:none;transition:none}
 #${HARD_TRANSITION_CURTAIN_ID}.is-covered{opacity:1;visibility:visible;pointer-events:auto;transition:none!important}
 #${HARD_TRANSITION_CURTAIN_ID}.is-releasing{opacity:0;visibility:visible;pointer-events:auto;transition:opacity .18s ease-out}
+#${HARD_TRANSITION_CURTAIN_ID}.is-soft-covered{opacity:.28;visibility:visible;pointer-events:none;transition:opacity .10s ease-out}
+#${HARD_TRANSITION_CURTAIN_ID}.is-soft-releasing{opacity:0;visibility:visible;pointer-events:none;transition:opacity .18s ease-out}
 @media(prefers-reduced-motion:reduce){.sc-scene-board-33900__actor.is-entering{animation:none!important}#${HARD_TRANSITION_CURTAIN_ID}.is-releasing{transition:none!important}}
 @media(max-width:820px){.sc-scene-board-33900__actors{left:1.5%;right:1.5%;gap:1%;bottom:31%}.sc-scene-board-33900__actors[data-count="2"]{column-gap:20px}.sc-scene-board-33900__actor{width:90%;max-height:290px}.sc-scene-board-33900__objective{max-width:58%;font-size:8px}#story-scene-presentation-layer[data-sc-scene-mode="encounter"] .sc-chronicle-actions{grid-template-columns:1fr}}
 `;
@@ -487,7 +496,7 @@ function actorMarkup(actor){
   return `<figure class="sc-scene-board-33900__actor ${actor.focus?"is-focus":""} ${actor.entering?"is-entering":""}" data-actor-id="${escapeHTML(actor.id||"")}" data-actor-label="${escapeHTML(actor.label||"")}"><div class="sc-scene-board-33900__actor-frame"></div>${image}${tag}</figure>`;
 }
 function boardMarkup(projection){
-  const actors=Array.isArray(projection.actors)?projection.actors.slice(0,3):[];
+  const actors=Array.isArray(projection.actors)?projection.actors.slice(0,4):[];
   const objects=(projection.objects||[]).map(row=>`<span class="sc-scene-board-33900__object sc-live-state-callout-33900${row&&row.committed?" is-committed":""}"><b>${escapeHTML(row.label||"OBJECT")}</b>${escapeHTML(row.state||"")}</span>`).join("");
   return `<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">${escapeHTML(projection.location||"STORY SCENE")}</div>${projection.objective?`<div class="sc-scene-board-33900__objective"><b>OBJECTIVE</b>${escapeHTML(projection.objective)}</div>`:""}</div>${projection.reaction?`<div class="sc-scene-board-33900__reaction">${escapeHTML(projection.reaction)}</div>`:""}${projection.committed?`<div class="sc-scene-board-33900__receipt">CHRONICLE FACT COMMITTED</div>`:""}<div class="sc-scene-board-33900__actors" data-count="${actors.length}">${actors.map(actorMarkup).join("")}</div>${objects?`<div class="sc-scene-board-33900__objects sc-live-state-callouts-33900">${objects}</div>`:""}`;
 }
@@ -548,7 +557,8 @@ function updatePerformancePanel(layer,runtime=currentRuntime()){
   if(progress)progress.textContent=(p.index+1)+" / "+p.sequence.length;
   let hint=panel&&panel.querySelector(".sc-performance-hint-33900");
   if(!hint&&panel){hint=document.createElement("span");hint.className="sc-performance-hint-33900";panel.appendChild(hint);}
-  if(hint)hint.textContent=cue.kind==="record"?"USE CONTINUE TO CONFIRM":"CLICK ANYWHERE TO CONTINUE";
+  const finishingScene=beat&&beat.exitScene===true&&p.atEnd===true;
+  if(hint)hint.textContent=cue.kind==="record"?"USE CONTINUE TO CONFIRM":finishingScene?"SCENE COMPLETE · CLICK ANYWHERE TO RETURN":"CLICK ANYWHERE TO CONTINUE";
   if(kicker)kicker.style.setProperty("display","none","important");
   const primary=layer.querySelector&&layer.querySelector(".sc-chronicle-primary");if(primary){const label=cue.kind==="record"?"CONTINUE":"›";if(primary.textContent!==label)primary.textContent=label;primary.setAttribute("aria-label",cue.kind==="record"?"Continue":"Advance scene");primary.title=cue.kind==="record"?"Continue":"Advance scene";}
   return true;
@@ -651,7 +661,7 @@ function cancelStoryHardSceneTransition33900(reason="cancelled"){
   clearStoryHardTransitionTimers33900();
   retireLegacyStoryTransitionDom33900();
   const curtain=typeof document!=="undefined"?document.getElementById(HARD_TRANSITION_CURTAIN_ID):null;
-  if(curtain)curtain.classList.remove("is-covered","is-releasing");
+  if(curtain)curtain.classList.remove("is-covered","is-releasing","is-soft-covered","is-soft-releasing");
   hardTransitionState={...hardTransitionState,active:false,phase:"settled",covered:false,generation:hardTransitionGeneration,completedAt:Date.now(),cancelReason:String(reason||"cancelled")};
   return{success:true,reason:String(reason||"cancelled"),state:getStoryHardSceneTransitionState33900()};
 }
@@ -680,7 +690,35 @@ function playStoryHardSceneTransition33900({scopeKey="story_hard_scene",fromScen
       curtain.classList.remove("is-releasing","is-covered");
       hardTransitionState={...hardTransitionState,active:false,phase:"settled",covered:false,completedAt:Date.now()};
     },190,generation);
-  },70,generation);
+  },240,generation);
+  return{success:true,pending:true,presentationOnly:true,state:getStoryHardSceneTransitionState33900()};
+}
+function playStorySoftSceneTransition33900({scopeKey="story_soft_scene",fromSceneId=null,toSceneId=null,fromBeatId=null,toBeatId=null,reason="same_location_scene_change"}={}){
+  const scope=String(scopeKey||"story_soft_scene");
+  const current=getStoryHardSceneTransitionState33900();
+  if(current.active&&current.scopeKey===scope)return{success:true,reused:true,pending:true,presentationOnly:true,state:current};
+  cancelStoryHardSceneTransition33900("superseded");
+  const generation=++hardTransitionGeneration,startedAt=Date.now(),isReduced=reducedMotion();
+  hardTransitionState={active:!isReduced,phase:isReduced?"settled":"soft_covered",scopeKey:scope,generation,covered:false,startedAt,completedAt:isReduced?startedAt:null,cancelReason:null,presentationOnly:true,reducedMotion:isReduced,fromSceneId,toSceneId,fromBeatId,toBeatId,reason:String(reason||"same_location_scene_change"),transitionClass:"soft"};
+  if(typeof document==="undefined"||isReduced){
+    hardTransitionState={...hardTransitionState,active:false,phase:"settled",completedAt:startedAt};
+    return{success:true,pending:false,presentationOnly:true,skippedMotion:true,state:getStoryHardSceneTransitionState33900()};
+  }
+  const curtain=ensureStoryHardTransitionCurtain33900();
+  if(!curtain){
+    hardTransitionState={...hardTransitionState,active:false,phase:"settled",completedAt:Date.now()};
+    return{success:true,pending:false,presentationOnly:true,skippedMotion:true,state:getStoryHardSceneTransitionState33900()};
+  }
+  curtain.classList.remove("is-covered","is-releasing","is-soft-releasing");
+  curtain.classList.add("is-soft-covered");
+  scheduleStoryHardTransition33900(()=>{
+    curtain.classList.remove("is-soft-covered");curtain.classList.add("is-soft-releasing");
+    hardTransitionState={...hardTransitionState,phase:"soft_releasing"};
+    scheduleStoryHardTransition33900(()=>{
+      curtain.classList.remove("is-soft-releasing");
+      hardTransitionState={...hardTransitionState,active:false,phase:"settled",completedAt:Date.now()};
+    },180,generation);
+  },120,generation);
   return{success:true,pending:true,presentationOnly:true,state:getStoryHardSceneTransitionState33900()};
 }
 function performSceneCut(){
@@ -728,7 +766,27 @@ function advanceStoryScene33900(choiceId=null){
     const machineResult=resolveMachineStoryChain33900();
     if(machineResult&&machineResult.success===false)return machineResult;
   }
-  if(result&&result.success===true&&transition==="wipe_right_to_left")performSceneCut();
+  if(result&&result.success===true){
+    const after=currentRuntime();
+    const exitTransition=def&&def.exitTransition;
+    if(beat&&beat.exitScene===true&&exitTransition==="black_wipe"){
+      playStoryHardSceneTransition33900({
+        scopeKey:"story_scene_exit:"+String(runtime.sceneId)+":"+String(beat.beatId),
+        fromSceneId:runtime.sceneId,toSceneId:after&&after.sceneId||null,
+        fromBeatId:beat.beatId,toBeatId:after&&after.beatId||null,
+        reason:"story_scene_exit_black_wipe"
+      });
+    }else if(transition==="wipe_right_to_left"||transition==="black_wipe"||transition==="hard_black"){
+      performSceneCut();
+    }else if(transition==="soft_crossfade"){
+      playStorySoftSceneTransition33900({
+        scopeKey:"story_soft_scene:"+String(runtime.sceneId)+":"+String(beat.beatId),
+        fromSceneId:runtime.sceneId,toSceneId:after&&after.sceneId||runtime.sceneId,
+        fromBeatId:beat.beatId,toBeatId:after&&after.beatId||null,
+        reason:"same_location_scene_change"
+      });
+    }
+  }
   return result;
 }
 if(PRE_ADVANCE){globalThis.advanceStoryScene=advanceStoryScene33900;try{advanceStoryScene=advanceStoryScene33900;}catch(_error){}}
@@ -790,6 +848,11 @@ function runStorySceneBoard33900Diagnostics(){
       String(markStoryPresentationHidden33900).includes('setProperty("display","none","important")')&&
       installStyle.toString().includes("data-sc-presentation-hidden"),
     authoredSinglePageCueContract:String(expandStoryPerformanceSequence33900).includes("authoredSinglePage")&&String(expandStoryPerformanceSequence33900).includes("cue.singlePage=true")&&String(expandStoryPerformanceSequence33900).includes("cue.singlePage===true"),
+    fourActorBoardSupported:String(boardMarkup).includes("slice(0,4)")&&installStyle.toString().includes('data-count="4"'),
+    nonSpeakerCardsRemainFullColour:installStyle.toString().includes("opacity:1;transform:translateY(2px) scale(.98);filter:none"),
+    speakerFocusUsesScaleAndBorder:installStyle.toString().includes("scale(1.055)")&&installStyle.toString().includes("2px solid rgba(97,220,229,.96)"),
+    explicitExitEndingHint:String(updatePerformancePanel).includes("SCENE COMPLETE · CLICK ANYWHERE TO RETURN"),
+    sharedSoftTransitionOwner:String(playStorySoftSceneTransition33900).includes("same_location_scene_change"),
     wrapsExistingStoryRenderer:!!PRE_RENDER,
     browserGoldenClaimed:false
   };
@@ -813,6 +876,7 @@ globalThis.cancelStoryChoreography33900=cancelStoryChoreography33900;
 globalThis.getStoryChoreographyState33900=getStoryChoreographyState33900;
 globalThis.normalizeStoryChoreographyCue33900=normalizeStoryChoreographyCue33900;
 globalThis.playStoryHardSceneTransition33900=playStoryHardSceneTransition33900;
+globalThis.playStorySoftSceneTransition33900=playStorySoftSceneTransition33900;
 globalThis.cancelStoryHardSceneTransition33900=cancelStoryHardSceneTransition33900;
 globalThis.getStoryHardSceneTransitionState33900=getStoryHardSceneTransitionState33900;
 globalThis.markStoryPresentationHidden33900=markStoryPresentationHidden33900;
