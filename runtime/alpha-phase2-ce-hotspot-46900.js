@@ -291,7 +291,7 @@ function branchConsequence(choiceId){
   return row?clone(row):null;
 }
 
-function clone(value){function clone(value){
+function clone(value){
   if(value===undefined)return undefined;
   try{return typeof cloneProgressionData==="function"?cloneProgressionData(value):JSON.parse(JSON.stringify(value));}
   catch(_error){return value;}
@@ -806,7 +806,7 @@ function finalRecordPayload(choiceId){
     timestamp:Date.now()
   };
 }
-function commitResolution(expectedChoiceId){function commitResolution(expectedChoiceId){
+function commitResolution(expectedChoiceId){
   const selected=committedProtagonistChoice();
   if(!selected)return{success:false,reason:"protagonist_intent_receipt_missing"};
   if(expectedChoiceId&&selected!==expectedChoiceId)return{success:false,reason:"protagonist_intent_branch_mismatch",selected,expectedChoiceId};
@@ -839,7 +839,7 @@ function openingCues(){
     cue("narration","She looks up and sees him.")
   ];
 }
-function historyCues(runtime){function historyCues(runtime){
+function historyCues(runtime){
   const family=runtime&&runtime.localContext&&runtime.localContext.historyFamily||"material_encounter";
   return clone(HISTORY_CUES[family]||HISTORY_CUES.material_encounter);
 }
