@@ -295,6 +295,14 @@
     }
     const selected=selectChronicleOrigin(entry.variantId,"alpha_front_door_33400_begin_confirmation");
     if(!selected||selected.success!==true){state.feedback=`Origin confirmation failed: ${selected&&selected.reason?selected.reason:"unknown error"}.`;render33400();return selected||{success:false,reason:"origin_confirmation_failed"};}
+    const runIdentity=typeof globalThis.ensureChronicleRunIdentity43600==="function"
+      ?globalThis.ensureChronicleRunIdentity43600({creationKind:"NEW_START"})
+      :{success:false,reason:"chronicle_run_identity_authority_missing"};
+    if(!runIdentity||runIdentity.success!==true){
+      state.feedback=`Origin was confirmed, but Chronicle run identity could not be committed: ${runIdentity&&runIdentity.reason?runIdentity.reason:"unknown error"}.`;
+      render33400();
+      return{success:false,reason:"chronicle_run_identity_commit_failed",selected,runIdentity};
+    }
     persistProfile33400();
     try{sessionStorage.removeItem(SESSION_RESUME_KEY);}catch(_error){}
     const launched=beginAlphaChronicleOriginPrologue();
