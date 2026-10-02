@@ -6,6 +6,7 @@ on:
       - coding/phase-2-ce-hotspot-469
     paths:
       - 'runtime/alpha-phase2-ce-hotspot-46900.js'
+      - 'runtime/alpha-kakashi-v2-battle-36010.js'
       - 'runtime/alpha-chronicle-state-manifest-43600.js'
       - 'runtime/alpha-traversal-bridge-33200.js'
       - 'runtime/alpha-runtime-build-fingerprint-303.js'
@@ -39,6 +40,7 @@ jobs:
       - name: Source syntax
         run: |
           node --check runtime/alpha-phase2-ce-hotspot-46900.js
+          node --check runtime/alpha-kakashi-v2-battle-36010.js
           node --check runtime/alpha-chronicle-state-manifest-43600.js
           node --check tools/qa_issue_469_ce_hotspot.js
           node --check tools/qa_issue_469_ce_hotspot_browser.js
