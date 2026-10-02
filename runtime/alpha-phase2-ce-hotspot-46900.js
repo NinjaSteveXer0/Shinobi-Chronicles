@@ -610,28 +610,46 @@ function initialPrivateOriginState46900(){
     terminal:{reportReached:false,hiddenTestReviewReached:false,receiptReached:false,originCompleted:false,reason:null}
   };
 }
-function privateChoiceSevereEligible46900(boundaryId,state,seedRef){
+function privateKakashiCapability46900(){
+  const registry=typeof getCharacterRegistryEntry==="function"?getCharacterRegistryEntry(ORIGIN_ID):null;
+  const stats=registry&&registry.stats&&typeof registry.stats==="object"?registry.stats:(registry&&registry.baseStats||{});
+  const candidates=[registry&&registry.currentPL,registry&&registry.basePL,registry&&registry.powerLevel,registry&&registry.pl];
+  let pl=null;
+  for(const value of candidates){const n=Number(value);if(Number.isFinite(n)&&n>0){pl=n;break;}}
+  const nin=Number(stats&&stats.nin||stats&&stats.Ninjutsu)||0;
+  const tai=Number(stats&&stats.tai||stats&&stats.Taijutsu)||0;
+  const buki=Number(stats&&stats.buki||stats&&stats.Bukijutsu)||0;
+  return{
+    pl:pl||15,nin,tai,buki,
+    cleanExtractionSupported:(pl||15)>=12||nin>=10,
+    directControlConfidence:(pl||15)>=18||Math.max(tai,buki)>=17,
+    multiOpponentConfidence:(pl||15)>=20
+  };
+}
+function privateChoiceSevereEligible46900(boundaryId,state){
   const p=state&&state.pressure||{};
-  const exactPressure=(Number(p.directForceEscalations)||0)+(Number(p.dangerousResistance)||0)+(Number(p.failedStealth)||0)+(Number(p.multiOpponentVictories)||0);
-  if(exactPressure<2)return false;
-  const denominator=["B22","B23"].includes(boundaryId)?3:6;
-  return stableHash46900(seedRef+"|"+boundaryId+"|severe_lethal_equal_top")%denominator===0;
+  const direct=Number(p.directForceEscalations)||0;
+  const resistance=Number(p.dangerousResistance)||0;
+  const failedStealth=Number(p.failedStealth)||0;
+  const multiWins=Number(p.multiOpponentVictories)||0;
+  const battleDefeats=Number(p.battleDefeats)||0;
+  if(["B22","B23"].includes(boundaryId))return direct>=1&&resistance>=2&&(multiWins>=1||failedStealth>=1);
+  return (direct>=2&&resistance>=2)||(failedStealth>=1&&multiWins>=1)||battleDefeats>=2;
 }
 function privateBoundaryCandidates46900(boundaryId,state,seedRef,context={}){
-  const severe=privateChoiceSevereEligible46900(boundaryId,state,seedRef);
+  const severe=privateChoiceSevereEligible46900(boundaryId,state);
   const p=state.package||{},collected=state.collectedParticipantKeys||[];
+  const capability=privateKakashiCapability46900();
   switch(boundaryId){
     case"B01":{
-      const base=["watch_exchange","move_in_closer"];
-      if(stableHash46900(seedRef+"|B01|clean_extraction_confidence")%3!==0)base.push("slip_for_package");
-      if(stableHash46900(seedRef+"|B01|immediate_loss_pressure")%7===0)base.push("strike_before_handoff");
-      return base;
+      const out=["watch_exchange","move_in_closer"];
+      if(capability.cleanExtractionSupported)out.push("slip_for_package");
+      if(capability.directControlConfidence&&p.holder==="AMT")out.push("strike_before_handoff");
+      return out;
     }
     case"B02":{
-      const mode=stableHash46900(seedRef+"|B02|dominant_operational_problem")%6;
-      if(mode===0)return["go_original_target"];
-      if(mode<=2)return["stop_assassin","assassin_then_package"];
-      return["secure_package","secure_before_assassin"];
+      const immediateViolenceDominates=capability.pl<18&&!capability.multiOpponentConfidence;
+      return immediateViolenceDominates?["stop_assassin","assassin_then_package"]:["secure_package","secure_before_assassin"];
     }
     case"B03":{
       const open=context.pursuitOpen===true;
@@ -641,9 +659,10 @@ function privateBoundaryCandidates46900(boundaryId,state,seedRef,context={}){
     }
     case"B04":{
       const open=context.amtContinuationOpen===true;
-      const out=open?["ps_go_amt","ps_restrain_continue","ps_report"]:["ps_report","ps_anbu","ps_police"];
+      const out=open?["ps_go_amt","ps_restrain_continue"]:["ps_report","ps_anbu","ps_police"];
+      if(state.package.recovered===true&&!open)out.push("ps_report");
       if(severe)out.push("ps_kill");
-      return out;
+      return [...new Set(out)];
     }
     case"B05":{
       if(collected.length)return["amt_seq_collect"];
@@ -666,46 +685,49 @@ function privateBoundaryCandidates46900(boundaryId,state,seedRef,context={}){
     }
     case"B08":return["secure_stay_first","secure_return"];
     case"B09":{
-      const out=["secure_amt_anbu","secure_amt_police","secure_amt_release"];
+      const out=["secure_amt_anbu","secure_amt_police"];
+      if(p.recovered===true)out.push("secure_amt_release");
       if(severe)out.push("secure_amt_kill");
       return out;
     }
     case"B10":return context.amtContinuationOpen===true?["package_second_stay_amt","package_second_return"]:["package_second_return"];
     case"B11":{
-      const out=["package_second_amt_anbu","package_second_amt_police","package_second_amt_release"];
+      const out=["package_second_amt_anbu","package_second_amt_police"];
+      if(p.recovered===true)out.push("package_second_amt_release");
       if(severe)out.push("package_second_amt_kill");
       return out;
     }
     case"B12":{
-      const out=["closer_handoff","closer_pick"];
-      if(stableHash46900(seedRef+"|B12|handoff_urgency")%4===0)out.push("closer_strike");
+      const out=["closer_handoff"];
+      if(capability.cleanExtractionSupported)out.push("closer_pick");
+      if(capability.directControlConfidence)out.push("closer_strike");
       return out;
     }
     case"B13":{
-      const mode=stableHash46900(seedRef+"|B13|dominant_operational_problem")%6;
-      if(mode===0)return["closer_watch_amt"];
-      if(mode<=2)return["closer_watch_stop","closer_watch_sequence"];
-      return["closer_watch_secure","closer_watch_before"];
+      const immediateViolenceDominates=capability.pl<18&&!capability.multiOpponentConfidence;
+      return immediateViolenceDominates?["closer_watch_stop","closer_watch_sequence"]:["closer_watch_secure","closer_watch_before"];
     }
     case"B14":{
       const out=["failure_stay","failure_cutoff"];
-      if(stableHash46900(seedRef+"|B14|receiver_immediate_blocker")%3===0)out.push("failure_stop_ps");
+      if(capability.directControlConfidence)out.push("failure_stop_ps");
       return out;
     }
     case"B15":{
       const out=["demand_package","ask_where"];
-      if(stableHash46900(seedRef+"|B15|direct_control_pressure")%3===0)out.push("take_him_down");
+      if(capability.directControlConfidence)out.push("take_him_down");
       return out;
     }
-    case"B16":return stableHash46900(seedRef+"|B16|compliance_read")%3===0?["ask_then_demand","ask_then_take"]:["ask_then_demand"];
+    case"B16":return capability.directControlConfidence?["ask_then_demand","ask_then_take"]:["ask_then_demand"];
     case"B17":{
-      const out=["demand_anbu","demand_police","demand_release"];
+      const out=["demand_anbu","demand_police"];
+      if(p.recovered===true)out.push("demand_release");
       if(severe)out.push("demand_kill");
       return out;
     }
     case"B18":{
-      const out=["take_anbu","take_police","take_release"];
-      if(severe||stableHash46900(seedRef+"|B18|direct_control_severe_pressure")%5===0)out.push("take_kill");
+      const out=["take_anbu","take_police"];
+      if(p.recovered===true)out.push("take_release");
+      if(severe)out.push("take_kill");
       return out;
     }
     case"B19":{
@@ -745,7 +767,7 @@ function selectPrivateBoundaryChoice46900(boundaryId,state,seedRef,context={}){
     .filter(id=>AUTONOMOUS_KAKASHI_BOUNDARIES[boundaryId]&&AUTONOMOUS_KAKASHI_BOUNDARIES[boundaryId].choiceIds.includes(id));
   if(!legal.length)return{success:false,reason:"private_origin_zero_character_intents",boundaryId};
   const choiceId=stablePick46900(boundaryId,legal,seedRef);
-  return{success:true,boundaryId,choiceId,eligibleCharacterIntentRefs:[...legal],severeLethalEligible:privateChoiceSevereEligible46900(boundaryId,state,seedRef)};
+  return{success:true,boundaryId,choiceId,eligibleCharacterIntentRefs:[...legal],severeLethalEligible:privateChoiceSevereEligible46900(boundaryId,state)};
 }
 function resolveAutonomousKakashiPrivateHistory46900({migrationReason="origin_convergence_preparation",seedRefOverride=null,persist=true,diagnosticPreview=false}={}){
   const existing=persist?storedKakashiPrivateHistory():null;
