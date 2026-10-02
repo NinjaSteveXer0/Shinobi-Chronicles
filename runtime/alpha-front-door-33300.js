@@ -262,12 +262,20 @@
     if(!sceneId||typeof getStorySceneDefinition!=="function"||!getStorySceneDefinition(sceneId)){
       state.feedback="The selected Origin prologue is not registered.";render33300();return {success:false,reason:"origin_scene_not_registered",variantId:entry.variantId,sceneId};
     }
+    const candidateRunId=typeof globalThis.allocateChronicleRunId43600==="function"
+      ?globalThis.allocateChronicleRunId43600()
+      :null;
+    if(!candidateRunId){
+      state.feedback="Chronicle run identity could not be allocated.";
+      render33300();
+      return{success:false,reason:"chronicle_run_identity_allocation_failed"};
+    }
     const selected=selectChronicleOrigin(entry.variantId,"alpha_front_door_33300_origin_confirmation");
     if(!selected||selected.success!==true){
       state.feedback=`Origin confirmation failed: ${selected&&selected.reason?selected.reason:"unknown error"}.`;render33300();return selected||{success:false,reason:"origin_confirmation_failed"};
     }
-    const runIdentity=typeof globalThis.ensureChronicleRunIdentity43600==="function"
-      ?globalThis.ensureChronicleRunIdentity43600({creationKind:"NEW_START"})
+    const runIdentity=typeof globalThis.commitChronicleRunIdentity43600==="function"
+      ?globalThis.commitChronicleRunIdentity43600({runId:candidateRunId,creationKind:"NEW_START"})
       :{success:false,reason:"chronicle_run_identity_authority_missing"};
     if(!runIdentity||runIdentity.success!==true){
       state.feedback=`Origin was confirmed, but Chronicle run identity could not be committed: ${runIdentity&&runIdentity.reason?runIdentity.reason:"unknown error"}.`;
@@ -368,7 +376,8 @@
       unavailableVillagesFailClosed:VILLAGES.filter(v=>!v.enabled).length===4&&villageSource.includes("disabled"),
       reusesExactOriginEntries:getOriginEntries33300.toString().includes("getAlphaChronicleOriginSelectionEntries"),
       originCommitUsesExistingAuthority:confirmSource.includes("selectChronicleOrigin")&&!confirmSource.includes("commitCharacterAcquisition")&&!confirmSource.includes("grantCharacterRegistryOwnership"),
-      runIdentityCommittedAtBegin:confirmSource.includes("ensureChronicleRunIdentity43600")&&confirmSource.includes('creationKind:"NEW_START"')&&confirmSource.indexOf("ensureChronicleRunIdentity43600")<confirmSource.indexOf("beginAlphaChronicleOriginPrologue"),
+      runIdentityCandidateAllocatedBeforeOrigin:confirmSource.includes("allocateChronicleRunId43600")&&confirmSource.indexOf("allocateChronicleRunId43600")<confirmSource.indexOf("selectChronicleOrigin"),
+      runIdentityCommittedAtBegin:confirmSource.includes("commitChronicleRunIdentity43600")&&confirmSource.includes('creationKind:"NEW_START"')&&confirmSource.indexOf("commitChronicleRunIdentity43600")<confirmSource.indexOf("beginAlphaChronicleOriginPrologue"),
       originPrologueUsesExistingDispatcher:confirmSource.includes("beginAlphaChronicleOriginPrologue"),
       noRankPLStoryWorldMutation:["recordOwnedCharacterGeninPromotion","currentPL=","basePL=","commitWorld","commitStory"].every(token=>!confirmSource.includes(token)),
       underlyingGameGated:lockUnderlyingGame33300.toString().includes("game.inert=true")&&releaseFrontDoor33300.toString().includes("unlockUnderlyingGame33300"),
