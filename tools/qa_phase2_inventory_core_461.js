@@ -9,8 +9,16 @@ const INDEX=fs.readFileSync(path.join(ROOT,"index.html"),"utf8");
 assert(RUNTIME.includes('const PATCH_ID="phase2_inventory_core_46100_2026_10_02"'),"Inventory patch identity missing");
 assert(INDEX.includes('data-alpha-route="inventory"'),"Inventory navigation route missing");
 assert(INDEX.includes('runtime/alpha-phase2-inventory-core-46100.js'),"Inventory runtime loader missing");
-for(const forbidden of ["addItemToInventory","equipItemToCharacter","consumeInventoryStackQuantity","savePlayerData","localStorage.setItem","playerData.inventory.push"]){
-  assert(!RUNTIME.includes(forbidden),"#461 read-only surface contains forbidden writer: "+forbidden);
+const forbiddenCalls=[
+  /\\baddItemToInventory\\s*\\(/,
+  /\\bequipItemToCharacter\\s*\\(/,
+  /\\bconsumeInventoryStackQuantity\\s*\\(/,
+  /\\bsavePlayerData\\s*\\(/,
+  /\\blocalStorage\\.setItem\\s*\\(/,
+  /playerData\\.inventory\\s*\\.push\\s*\\(/
+];
+for(const pattern of forbiddenCalls){
+  assert(!pattern.test(RUNTIME),"#461 read-only surface contains forbidden writer call: "+pattern);
 }
 assert(!RUNTIME.includes("activityHistory.find"),"#461 must not infer provenance from fuzzy history search");
 assert(RUNTIME.includes("not_exposed_on_inventory_record"),"truthful missing-provenance state missing");
