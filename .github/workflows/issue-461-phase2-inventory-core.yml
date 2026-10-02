@@ -47,9 +47,6 @@ jobs:
       - name: Runtime ownership safety
         run: node tools/qa_runtime_ownership_safety_300.js
 
-      - name: Phase 2 current-team regression
-        run: node tools/qa_phase2_konoha_player_surfaces_431.js
-
       - name: Phase 2 persistent-development regression
         run: node tools/qa_issue_448_discipline_stat_growth.js
 
@@ -57,6 +54,9 @@ jobs:
         run: |
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
+
+      - name: Phase 2 current-team regression
+        run: node tools/qa_phase2_konoha_player_surfaces_431.js
 
       - name: Start local Alpha server
         run: |
