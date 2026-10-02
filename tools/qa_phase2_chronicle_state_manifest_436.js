@@ -47,7 +47,7 @@ const teamSave={
   const c=boot(teamSave);
   const manifest=plain(c.getChronicleStateManifest43600());
   assert.strictEqual(manifest.manifestId,"sc.phase2.chronicle_state_manifest.v1");
-  assert.deepStrictEqual(manifest.domains.map(x=>x.stateDomainId),["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","shinobiRecordProjection"]);
+  assert.deepStrictEqual(manifest.domains.map(x=>x.stateDomainId),["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","disciplineDevelopment","characterStats","shinobiRecordProjection"]);
   for(const row of manifest.domains){
     for(const key of ["stateDomainId","semanticOwner","canonicalWritePath","stableIdentityKey","savePath","schemaVersion","sourceOccurrenceIdFormat","idempotenceKeyFormat","derivedFields","projectionConsumers","migrationRule","resetRule","difficultyScope","inheritanceRule","devOverridePolicy","qaRefs"]){
       assert(Object.prototype.hasOwnProperty.call(row,key),"domain "+row.stateDomainId+" missing "+key);
@@ -58,6 +58,14 @@ const teamSave={
   assert.strictEqual(team.assignmentId,"team_commit_436_a");
   assert.strictEqual(c.getChronicleCurrentRyo43600(),237);
   assert.strictEqual(plain(c.getChronicleIdentity43600()).variantId,"academy_menma");
+
+  const disciplineDomain=manifest.domains.find(row=>row.stateDomainId==="disciplineDevelopment");
+  const statsDomain=manifest.domains.find(row=>row.stateDomainId==="characterStats");
+  assert.strictEqual(disciplineDomain.semanticOwner,"Progression / Development");
+  assert.strictEqual(disciplineDomain.savePath,"playerData.characters[progressionCharacterId].disciplineProgression[disciplineId]");
+  assert.strictEqual(statsDomain.semanticOwner,"PL / Registry / Rank");
+  assert.strictEqual(statsDomain.savePath,"playerData.characters[progressionCharacterId].stats[statId]");
+  assert.strictEqual(manifest.domains.some(row=>row.stateDomainId==="mastery"),false,"#448 fabricated a universal mastery domain");
 
   const before=JSON.stringify(c.playerData);
   const migrated1=plain(c.migratePhase2ChronicleState43600(c.playerData));
@@ -116,7 +124,10 @@ console.log(JSON.stringify({
   pass:true,
   issue:436,
   manifest:"sc.phase2.chronicle_state_manifest.v1",
-  initialDomains:["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","shinobiRecordProjection"],
+  initialDomains:["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","disciplineDevelopment","characterStats","shinobiRecordProjection"],
+  disciplineDevelopmentRegistered:true,
+  characterStatsExistingOwnerPreserved:true,
+  noMasteryDomain:true,
   pureMigration:true,
   deterministicMigration:true,
   currentTeamDerivedFromCommittedFormation:true,

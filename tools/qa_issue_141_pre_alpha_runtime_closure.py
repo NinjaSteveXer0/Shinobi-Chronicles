@@ -23,6 +23,7 @@ EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-runtime-build-fingerprint-303.js",
     "game.js",
     "runtime/alpha-chronicle-state-manifest-43600.js",
+    "runtime/alpha-discipline-stat-growth-44800.js",
     "runtime/alpha-origin-starting-purse-409.js",
     "runtime/alpha-special-jonin-evidence-producer-34700.js",
     "runtime/alpha-menma-tutorial-111.js",
@@ -100,6 +101,7 @@ NODE_GATES = [
     "tools/qa_issue_334_story_transition_owner.js",
     "tools/qa_issue_322_kakashi_dispositions.js",
     "tools/qa_phase2_chronicle_state_manifest_436.js",
+    "tools/qa_issue_448_discipline_stat_growth.js",
     "tools/qa_first_konoha_tutorial_35000.js",
 ]
 
