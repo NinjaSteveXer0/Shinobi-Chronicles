@@ -58,6 +58,80 @@ async function advanceThroughBeat(page,beatId,max=20){
     await waitRuntime(page);
     await releaseFrontDoor(page);
 
+    const ce478Variance=await page.evaluate(()=>{
+      playerData=createDefaultPlayerData();
+      setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+      const originalSave=globalThis.savePlayerData;
+      const originalDecision=JSON.parse(JSON.stringify(playerData.storyDecisionRuntime34000||null));
+      const originalFactual=JSON.parse(JSON.stringify(playerData.storyFactualResolver34600||null));
+      const ryoBefore=Number(playerData.ryo)||0;
+      const inventoryBefore=JSON.stringify(playerData.inventory||{});
+      const familyOf=history=>{
+        const c=history&&history.miContinuity||{},m=c.materialHistory||{};
+        if(c.fieldDispositionState==="KILLED"||c.survivedOrigin===false)return"KILLED";
+        if(c.fieldDispositionState==="UNSEEN"||c.encounteredByProtagonist!==true)return"UNSEEN";
+        if(m.lethalAttempt===true)return"lethal_attempt";
+        if(m.policeTransfer===true||c.fieldDispositionState==="POLICE_CUSTODY")return"police_transfer";
+        if(m.restraintOrAnbu===true||["RESTRAINED","ANBU_CUSTODY"].includes(c.fieldDispositionState))return"restraint_or_anbu";
+        if(m.deliberateRelease===true||c.fieldDispositionState==="RELEASED")return"deliberate_release";
+        if(m.miDefeatedKakashi===true)return"mi_defeated_kakashi";
+        if(m.kakashiDefeatedMi===true||c.fieldDispositionState==="BATTLE_DEFEATED")return"kakashi_defeated_mi";
+        return"material_encounter";
+      };
+      const signature=history=>JSON.stringify({
+        choices:(history.exactMaterialChoiceIntentReceipts||[]).map(r=>[r.boundaryId,r.choiceId]),
+        facts:(history.exactFactualResolverReceipts||[]).map(r=>[r.key,r.selectedOutcomeRef]),
+        battles:(history.exactBattleOutcomeRefs||[]).map(r=>[r.battleConfigId,r.outcome,r.playerActionOpportunityCount]),
+        final:history.exactFinalOriginState,
+        continuity:{
+          fieldDispositionState:history.miContinuity&&history.miContinuity.fieldDispositionState,
+          survivedOrigin:history.miContinuity&&history.miContinuity.survivedOrigin,
+          materialHistory:history.miContinuity&&history.miContinuity.materialHistory
+        }
+      });
+      const resetSemanticRoots=()=>{
+        playerData.storyDecisionRuntime34000=originalDecision?JSON.parse(JSON.stringify(originalDecision)):undefined;
+        playerData.storyFactualResolver34600=originalFactual?JSON.parse(JSON.stringify(originalFactual)):undefined;
+      };
+      globalThis.savePlayerData=()=>true;
+      try{savePlayerData=globalThis.savePlayerData;}catch(_error){}
+      const required=new Set([
+        "lethal_attempt","police_transfer","restraint_or_anbu","deliberate_release",
+        "mi_defeated_kakashi","kakashi_defeated_mi","material_encounter","KILLED","UNSEEN"
+      ]);
+      const examples={};
+      let deterministicSameSeed=false;
+      for(let i=0;i<2200&&Object.keys(examples).length<required.size;i++){
+        resetSemanticRoots();
+        const seed="qa478_variance_"+String(i).padStart(4,"0");
+        const first=previewAutonomousKakashiPrivateOrigin46900(seed);
+        if(!first||first.success!==true||!first.history)continue;
+        const family=familyOf(first.history);
+        if(required.has(family)&&!examples[family])examples[family]={seed,signature:signature(first.history)};
+        if(!deterministicSameSeed&&i%31===0){
+          const sig1=signature(first.history);
+          resetSemanticRoots();
+          const second=previewAutonomousKakashiPrivateOrigin46900(seed);
+          deterministicSameSeed=!!(second&&second.success===true&&signature(second.history)===sig1);
+        }
+      }
+      resetSemanticRoots();
+      globalThis.savePlayerData=originalSave;
+      try{savePlayerData=originalSave;}catch(_error){}
+      return{
+        required:[...required],
+        found:Object.keys(examples),
+        examples:Object.fromEntries(Object.entries(examples).map(([k,v])=>[k,v.seed])),
+        deterministicSameSeed,
+        ryoBefore,ryoAfter:Number(playerData.ryo)||0,
+        inventoryBefore,inventoryAfter:JSON.stringify(playerData.inventory||{})
+      };
+    });
+    for(const required of ce478Variance.required)assert(ce478Variance.found.includes(required),"#478 autonomous-history variance missing "+required+": "+JSON.stringify(ce478Variance));
+    assert.strictEqual(ce478Variance.deterministicSameSeed,true,"same private-Origin seed did not reproduce the same semantic history");
+    assert.strictEqual(ce478Variance.ryoAfter,ce478Variance.ryoBefore,"variance preview mutated player Ryō");
+    assert.strictEqual(ce478Variance.inventoryAfter,ce478Variance.inventoryBefore,"variance preview mutated player inventory");
+
     const setup=await page.evaluate(()=>{
       localStorage.clear();
       playerData=createDefaultPlayerData();
