@@ -93,7 +93,11 @@ async function closeAndVillage(page){
       const snap=getPhase2LiveHudSnapshot49900();
       const root=document.getElementById("sc-phase2-live-hud-49900");
       const subject=getAlphaSurfaceTruthSubjectId();
-      const character=getPlayerCharacter(subject);
+      const chronicleIdentity=getChronicleIdentity43600();
+      const presentationVariant=chronicleIdentity&&String(chronicleIdentity.ownedCharacterId||"")===String(subject)&&chronicleIdentity.variantId
+        ?String(chronicleIdentity.variantId)
+        :String(subject);
+      const character=getPlayerCharacter(subject)||getPlayerCharacter(presentationVariant);
       const scalar=value=>{
         if(value==null)return null;
         if(typeof value==="string"||typeof value==="number")return String(value);
@@ -106,7 +110,10 @@ async function closeAndVillage(page){
         snap,
         canonicalIdentity:{
           id:String(subject),
-          name:scalar(character&& (character.name||character.displayName||character.playerFacingName)),
+          variantId:presentationVariant,
+          name:scalar(character&& (character.name||character.displayName||character.playerFacingName))
+            ||scalar((getCharacterRegistryEntry?.(presentationVariant)||getRegistryCharacter?.(presentationVariant))?.displayName)
+            ||scalar((getCharacterRegistryEntry?.(presentationVariant)||getRegistryCharacter?.(presentationVariant))?.name),
           rank:scalar(getAlphaSurfaceTruthRankLabel(subject)),
           affiliation:scalar(getMyClanCharacterAffiliation(character))
         },
@@ -123,6 +130,7 @@ async function closeAndVillage(page){
     assert.strictEqual(initial.snap.visible,true);
     assert.strictEqual(initial.snap.surface.kind,"village");
     assert.strictEqual(initial.snap.identity.id,initial.canonicalIdentity.id,"HUD identity does not match canonical active subject");
+    assert.strictEqual(initial.snap.identity.variantId,initial.canonicalIdentity.variantId,"HUD presentation Variant does not match canonical Chronicle representation");
     assert.strictEqual(initial.snap.identity.name,initial.canonicalIdentity.name,"HUD player-facing name does not match canonical character projection");
     assert.strictEqual(initial.snap.identity.rank,initial.canonicalIdentity.rank,"HUD formal Rank does not match canonical Rank projection");
     assert.strictEqual(initial.snap.identity.affiliation,initial.canonicalIdentity.affiliation,"HUD affiliation does not match canonical affiliation projection");
