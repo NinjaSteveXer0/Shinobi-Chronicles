@@ -119,6 +119,8 @@ No new asset is required by Writing. Use the existing `KON-P01` event-stage / pu
 
 Each numbered item is one Story box / cue.
 
+Only text explicitly under **NARRATION** or a speaker heading is player-facing. Eligibility notes, family selectors, semantic mappings, `NO LINE` instructions and implementation notes are author/runtime scaffolding.
+
 ## OPENING 01 — NARRATION
 
 The Hokage Administration forecourt is busy enough that nobody owns the whole path.
@@ -131,7 +133,7 @@ A stamped receipt is passed back through the public counter.
 
 She folds it once and slips it into her sleeve.
 
-The entrance staff have already turned to the next piece of business.
+The public intake has already moved on to the next piece of business.
 
 ## OPENING 03 — NARRATION
 
@@ -181,8 +183,6 @@ Her hands stay empty.
 
 **MASKED INTERCEPTOR:** “Not here.”
 
-No threat follows the line.
-
 She does not reach for a weapon.
 
 ---
@@ -191,7 +191,7 @@ She does not reach for a weapon.
 
 ### NARRATION
 
-Her eyes move from Kakashi to the Administration crest above the public doors.
+Her eyes move from Kakashi to the Administration doors.
 
 Then back to him.
 
@@ -253,9 +253,7 @@ No line is required.
 
 She recognises him and changes her path just enough to keep a clear arm's length between them.
 
-Not retreat.
-
-Room.
+She keeps the extra space as they cross.
 
 No line is required.
 
@@ -312,7 +310,7 @@ Hinata's eyes follow Masked Interceptor's attention back to Kakashi.
 
 Hinata shifts half a step so she can see both Kakashi and the masked woman clearly.
 
-She does not ask the same question twice.
+Her mouth closes. She keeps watching.
 
 ---
 
@@ -324,7 +322,7 @@ Wasabi turns on one foot before the others finish stopping.
 
 She keeps Masked Interceptor in view, weight already forward, ready to move if the situation actually changes.
 
-She does not invent a problem that has not happened.
+She stays ready without closing the distance.
 
 ---
 
@@ -352,8 +350,6 @@ Menma's eyes move from the stamped receipt, to the Administration doors, to Mask
 
 He says nothing.
 
-He is already comparing the pieces.
-
 ---
 
 ## ACADEMY KUSHINA
@@ -368,9 +364,9 @@ Kushina looks from Kakashi to the masked woman.
 
 Kushina's eyebrows rise.
 
-She waits exactly long enough to see whether Kakashi is going to answer before deciding whether the silence itself is the answer.
+Her eyebrows stay raised.
 
-No second line is required.
+When Kakashi does not answer immediately, she folds her arms.
 
 ---
 
@@ -382,7 +378,7 @@ Kurenai tracks Masked Interceptor's eye-line instead of studying the mask.
 
 Then she watches Kakashi.
 
-She leaves the first move to the two people who plainly share the history.
+She says nothing.
 
 ---
 
@@ -408,9 +404,9 @@ If Kakashi keeps moving, he moves too.
 
 Metal straightens on reflex.
 
-When Masked Interceptor makes no hostile move, he keeps his hands down.
+When Masked Interceptor makes no hostile move, his hands stay down.
 
-He watches rather than manufacturing a confrontation.
+He keeps watching.
 
 ---
 
@@ -474,7 +470,7 @@ No one from the Administration calls her back.
 
 ## A4 — NARRATION
 
-Kakashi looks once at the crest above the public doors.
+Kakashi looks once at the Administration doors.
 
 Then he lets her go.
 
@@ -552,7 +548,7 @@ He keeps walking.
 
 ## D2 — NARRATION
 
-His team moves with him according to its already-resolved participant state.
+The team keeps moving.
 
 Behind them, Masked Interceptor's footsteps do not change pace.
 
@@ -560,7 +556,7 @@ Behind them, Masked Interceptor's footsteps do not change pace.
 
 Kakashi does not look back.
 
-The Hokage Administration crest passes out of view behind the team.
+The Hokage Administration falls behind them.
 
 **SCENE END.**
 
