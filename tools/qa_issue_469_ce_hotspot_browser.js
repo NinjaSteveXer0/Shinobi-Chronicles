@@ -400,7 +400,7 @@ async function advanceThroughBeat(page,beatId,max=20){
       savePlayerData();
 
       const selected=selectChronicleOrigin("academy_menma","qa478_origin");
-      const completed=completeChronicleOriginPrologue("academy_menma",["qa478_menma_origin"]);
+      const completed=completeChronicleOriginPrologue("academy_menma",["qa478_menma_origin_3"]);
       const snapshot=getAcademyTeamFormationSnapshot();
       const desired=["academy_hinata","academy_kakashi"];
       if(!desired.every(id=>snapshot.eligibleCandidateVariantIds.includes(id))){
@@ -448,6 +448,16 @@ async function advanceThroughBeat(page,beatId,max=20){
     assert.strictEqual(menmaSetup.privateAfterConfirm.profileCoverage.meaningfulBoundaryCount,23);
     assert.strictEqual(menmaSetup.privateAfterConfirm.profileCoverage.legalPlayerFacingChoiceCount,93);
     assert.strictEqual(menmaSetup.privateAfterConfirm.profileCoverage.machineResolveResultChoicesExcluded,true);
+    assert.strictEqual(menmaSetup.privateAfterConfirm.terminalConvergence.reportReached,true);
+    assert.strictEqual(menmaSetup.privateAfterConfirm.terminalConvergence.hiddenTestReviewReached,true);
+    assert.strictEqual(menmaSetup.privateAfterConfirm.terminalConvergence.receiptReached,true);
+    assert.strictEqual(menmaSetup.privateAfterConfirm.terminalConvergence.originCompleted,true);
+    assert(menmaSetup.privateAfterConfirm.exactFactualResolverReceipts.length>=0);
+    assert(menmaSetup.privateAfterConfirm.exactFinalOriginState.terminal.originCompleted===true);
+    assert(menmaSetup.privateAfterConfirm.exactFinalOriginState.semanticTrace.some(row=>String(row).startsWith("terminal:v2_report>v2_hidden_review>v2_receipt:")));
+    if(menmaSetup.privateAfterConfirm.filteredChronicleRewardPreview){
+      assert.strictEqual(menmaSetup.privateAfterConfirm.filteredChronicleRewardPreview.grantAppliedToPlayer,false);
+    }
     assert.strictEqual(menmaSetup.privateAfterConfirm.exactMaterialChoiceIntentReceipts[0].choiceId,"watch_exchange");
     assert(menmaSetup.privateAfterConfirm.exactBattleOutcomeRefs.length>=1,"autonomous Kakashi Origin produced no Battle fact");
     assert.strictEqual(menmaSetup.privateAfterConfirm.economyFirewall.duplicateStartingPurseGranted,false);
