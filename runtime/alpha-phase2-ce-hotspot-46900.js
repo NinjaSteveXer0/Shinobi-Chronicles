@@ -387,6 +387,247 @@ function clone(value){
 function pd(){try{return typeof playerData!=="undefined"&&playerData?playerData:globalThis.playerData||null;}catch(_error){return globalThis.playerData||null;}}
 function history(){const p=pd();return p&&Array.isArray(p.activityHistory)?p.activityHistory:[];}
 function acquisition(){const p=pd();return p&&p.acquisition&&typeof p.acquisition==="object"?p.acquisition:null;}
+function stableHash46900(input){
+  let h=2166136261;
+  const raw=String(input||"");
+  for(let i=0;i<raw.length;i++){h^=raw.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}
+  return h>>>0;
+}
+function privateOriginStore(create=false){
+  if(typeof globalThis.getPrivateOriginHistoryStore43600!=="function")return null;
+  return globalThis.getPrivateOriginHistoryStore43600({create:create===true});
+}
+function storedKakashiPrivateHistory(){
+  const store=privateOriginStore(false);
+  const row=store&&store.bySubject&&store.bySubject[PRIVATE_ORIGIN_SUBJECT];
+  return row&&typeof row==="object"?clone(row):null;
+}
+function chronicleStableId46900(){
+  const p=pd(),a=acquisition();
+  const candidates=[
+    p&&p.chronicleId,
+    p&&p.chronicleIdentity&&p.chronicleIdentity.id,
+    a&&a.chronicleId,
+    a&&a.chronicleOriginOwnedCharacterId,
+    a&&a.ninjaIdentityOwnedCharacterId,
+    a&&a.chronicleOriginVariantId
+  ];
+  const found=candidates.find(value=>value!=null&&String(value).trim());
+  return String(found||"anonymous_chronicle");
+}
+function privateSeedRef46900(){
+  return [PRIVATE_ORIGIN_SCHEMA,chronicleStableId46900(),PRIVATE_ORIGIN_SUBJECT,PRIVATE_ORIGIN_DEFINITION,PRIVATE_ORIGIN_VERSION].join("::");
+}
+function stablePick46900(boundaryId,choiceIds,seedRef=privateSeedRef46900()){
+  const legal=(choiceIds||[]).filter(id=>AUTONOMOUS_KAKASHI_BOUNDARIES[boundaryId]&&AUTONOMOUS_KAKASHI_BOUNDARIES[boundaryId].choiceIds.includes(id));
+  if(!legal.length)return null;
+  return legal[stableHash46900(seedRef+"|"+boundaryId+"|intent")%legal.length];
+}
+function privateChoiceReceipt46900(boundaryId,choiceId,seedRef){
+  if(!AUTONOMOUS_KAKASHI_BOUNDARIES[boundaryId]||!AUTONOMOUS_KAKASHI_BOUNDARIES[boundaryId].choiceIds.includes(choiceId))throw new Error("ce478_autonomous_choice_not_in_frozen_profile:"+boundaryId+":"+choiceId);
+  return{
+    boundaryId,
+    beatId:AUTONOMOUS_KAKASHI_BOUNDARIES[boundaryId].beatId,
+    choiceId,
+    receiptId:"private_choice::"+PRIVATE_ORIGIN_SUBJECT+"::"+boundaryId+"::"+choiceId,
+    stableSeedRef:seedRef,
+    committed:true
+  };
+}
+function resolvePrivateBattle46900(battleConfigId,boundaryId,seedRef){
+  if(typeof globalThis.resolveAcademyKakashiV2AutonomousPrivateBattle36010!=="function")return{success:false,reason:"kakashi_autonomous_battle_owner_missing"};
+  return globalThis.resolveAcademyKakashiV2AutonomousPrivateBattle36010({
+    battleConfigId,
+    seedRef:seedRef+"|"+boundaryId,
+    sourceAnchorRef:boundaryId,
+    resolutionMode:"AUTONOMOUS_PRIVATE"
+  });
+}
+function privateHistoryIdentity46900(seedRef){
+  return "private_origin::"+PRIVATE_ORIGIN_SUBJECT+"::"+stableHash46900(seedRef).toString(16);
+}
+function persistKakashiPrivateHistory46900(row){
+  if(!row||row.committed!==true)return{success:false,reason:"private_origin_history_uncommitted"};
+  const store=privateOriginStore(true);
+  if(!store||!store.bySubject)return{success:false,reason:"private_origin_history_store_missing"};
+  const prior=store.bySubject[PRIVATE_ORIGIN_SUBJECT];
+  if(prior&&prior.committed===true){
+    const same=String(prior.privateOriginHistoryId||"")===String(row.privateOriginHistoryId||"");
+    return same?{success:true,idempotent:true,history:clone(prior)}:{success:false,reason:"private_origin_history_conflict",existing:clone(prior)};
+  }
+  store.bySubject[PRIVATE_ORIGIN_SUBJECT]=clone(row);
+  const continuity=row.miContinuity&&typeof row.miContinuity==="object"?row.miContinuity:null;
+  if(continuity){
+    const saved=saveContinuity(continuity);
+    if(!saved||saved.success!==true){
+      delete store.bySubject[PRIVATE_ORIGIN_SUBJECT];
+      return saved||{success:false,reason:"private_origin_continuity_import_failed"};
+    }
+  }
+  if(typeof savePlayerData==="function")savePlayerData();
+  return{success:true,idempotent:false,history:clone(store.bySubject[PRIVATE_ORIGIN_SUBJECT])};
+}
+function autonomousMiContinuity46900({historyId,fieldDispositionState,materialHistory,materialRefs,encountered,survived}){
+  return{
+    schemaVersion:1,
+    originId:ORIGIN_ID,
+    stableParticipantId:MI_ID,
+    observerLabel:"Masked Interceptor",
+    originOccurrenceRef:historyId,
+    storySceneInstanceId:null,
+    encounteredByProtagonist:encountered===true,
+    fieldDispositionState:String(fieldDispositionState||"UNSEEN"),
+    fieldDispositionOccurrenceRef:materialRefs.length?materialRefs[materialRefs.length-1]:null,
+    survivedOrigin:survived===true,
+    hiddenPostTestReviewReached:encountered===true&&survived===true,
+    postTestTruthClass:encountered===true&&survived===true?"staged_konoha_test_participant":null,
+    protagonistKnowsTestTruth:false,
+    materialHistory:clone(materialHistory),
+    materialHistoryRefs:[...materialRefs],
+    captureMode:"autonomous_private_origin_sealed",
+    capturedAt:Date.now()
+  };
+}
+function resolveAutonomousKakashiPrivateHistory46900({migrationReason="origin_convergence_preparation"}={}){
+  const existing=storedKakashiPrivateHistory();
+  if(existing&&existing.committed===true)return{success:true,idempotent:true,history:existing};
+  const a=acquisition(),origin=a&&a.chronicleOrigin;
+  if(!a||a.chronicleOriginVariantId===ORIGIN_ID)return{success:false,reason:"autonomous_kakashi_not_required_for_selected_kakashi"};
+  if(!origin||origin.prologueCompleted!==true)return{success:false,reason:"selected_origin_must_complete_before_private_convergence"};
+  const seedRef=privateSeedRef46900();
+  const historyId=privateHistoryIdentity46900(seedRef);
+  const choices=[],battles=[],materialRefs=[];
+  const addChoice=(boundaryId,choiceId)=>{
+    const receipt=privateChoiceReceipt46900(boundaryId,choiceId,seedRef);
+    choices.push(receipt);materialRefs.push(receipt.receiptId);return choiceId;
+  };
+  const addBattle=(configId,boundaryId)=>{
+    const result=resolvePrivateBattle46900(configId,boundaryId,seedRef);
+    if(!result||result.success!==true)throw new Error("ce478_autonomous_battle_failed:"+(result&&result.reason||"unknown"));
+    battles.push(clone(result));materialRefs.push(String(result.battleOccurrenceId));return result;
+  };
+
+  let encountered=false,survived=true,fieldDispositionState="UNSEEN";
+  const materialHistory={
+    lethalAttempt:false,policeTransfer:false,anbuTransfer:false,restraint:false,restraintOrAnbu:false,
+    deliberateRelease:false,miDefeatedKakashi:false,kakashiDefeatedMi:false,otherMaterialEncounter:false
+  };
+
+  const routeRoll=stableHash46900(seedRef+"|B01|route")%20;
+  const initial=routeRoll===1?"strike_before_handoff":routeRoll===2?"slip_for_package":"watch_exchange";
+  addChoice("B01",initial);
+
+  if(initial==="watch_exchange"){
+    const b02=stablePick46900("B02",["stop_assassin","assassin_then_package"],seedRef);
+    addChoice("B02",b02);
+    encountered=true;materialHistory.otherMaterialEncounter=true;
+    const battle=addBattle(b02==="stop_assassin"?"academy_kakashi_origin_battle_seq_mi":"academy_kakashi_origin_battle_mi_1v1","B02");
+    if(battle.outcome==="defeat"){
+      materialHistory.miDefeatedKakashi=true;
+      fieldDispositionState="ESCAPED";
+    }else{
+      materialHistory.kakashiDefeatedMi=true;
+      const pursuitOpen=Number(battle.playerActionOpportunityCount)<=4;
+      const lethalEligible=Number(battle.playerActionOpportunityCount)>=4&&(stableHash46900(seedRef+"|B03|severe_lethal")%7===0);
+      let b03;
+      if(lethalEligible)b03="mi_kill";
+      else if(pursuitOpen)b03=stablePick46900("B03",["mi_pursue_ps","mi_restrain"],seedRef);
+      else b03=stablePick46900("B03",["mi_anbu","mi_police"],seedRef);
+      addChoice("B03",b03);
+      if(b03==="mi_kill"){materialHistory.lethalAttempt=true;survived=false;fieldDispositionState="KILLED";}
+      else if(b03==="mi_restrain"){materialHistory.restraint=true;materialHistory.restraintOrAnbu=true;fieldDispositionState="RESTRAINED";}
+      else if(b03==="mi_anbu"){materialHistory.anbuTransfer=true;materialHistory.restraintOrAnbu=true;fieldDispositionState="ANBU_CUSTODY";}
+      else if(b03==="mi_police"){materialHistory.policeTransfer=true;fieldDispositionState="POLICE_CUSTODY";}
+      else fieldDispositionState="BATTLE_DEFEATED";
+    }
+  }else if(initial==="strike_before_handoff"){
+    encountered=true;materialHistory.otherMaterialEncounter=true;
+    const battle=addBattle("academy_kakashi_origin_battle_amt_ps_mi_3v1","B22");
+    if(battle.outcome==="defeat"){
+      materialHistory.miDefeatedKakashi=true;fieldDispositionState="ESCAPED";
+    }else{
+      materialHistory.kakashiDefeatedMi=true;
+      const severe=stableHash46900(seedRef+"|B22|severe_lethal")%5===0;
+      const b22=stablePick46900("B22",severe?["direct_group_anbu","direct_group_police","direct_group_release","direct_group_kill"]:["direct_group_anbu","direct_group_police","direct_group_release"],seedRef);
+      addChoice("B22",b22);
+      if(b22==="direct_group_kill"){materialHistory.lethalAttempt=true;survived=false;fieldDispositionState="KILLED";}
+      else if(b22==="direct_group_release"){materialHistory.deliberateRelease=true;fieldDispositionState="RELEASED";}
+      else if(b22==="direct_group_police"){materialHistory.policeTransfer=true;fieldDispositionState="POLICE_CUSTODY";}
+      else{materialHistory.anbuTransfer=true;materialHistory.restraintOrAnbu=true;fieldDispositionState="ANBU_CUSTODY";}
+    }
+  }else{
+    const pickSuccess=stableHash46900(seedRef+"|direct_pickpocket_result")%3!==0;
+    materialRefs.push("machine_result::direct_pickpocket::"+(pickSuccess?"success":"failure"));
+    if(pickSuccess){
+      fieldDispositionState="UNSEEN";encountered=false;survived=true;
+    }else{
+      encountered=true;materialHistory.otherMaterialEncounter=true;
+      const battle=addBattle("academy_kakashi_origin_battle_amt_ps_mi_3v1","B23");
+      if(battle.outcome==="defeat"){
+        materialHistory.miDefeatedKakashi=true;fieldDispositionState="ESCAPED";
+      }else{
+        materialHistory.kakashiDefeatedMi=true;
+        const severe=stableHash46900(seedRef+"|B23|severe_lethal")%5===0;
+        const b23=stablePick46900("B23",severe?["pick_group_anbu","pick_group_police","pick_group_release","pick_group_kill"]:["pick_group_anbu","pick_group_police","pick_group_release"],seedRef);
+        addChoice("B23",b23);
+        if(b23==="pick_group_kill"){materialHistory.lethalAttempt=true;survived=false;fieldDispositionState="KILLED";}
+        else if(b23==="pick_group_release"){materialHistory.deliberateRelease=true;fieldDispositionState="RELEASED";}
+        else if(b23==="pick_group_police"){materialHistory.policeTransfer=true;fieldDispositionState="POLICE_CUSTODY";}
+        else{materialHistory.anbuTransfer=true;materialHistory.restraintOrAnbu=true;fieldDispositionState="ANBU_CUSTODY";}
+      }
+    }
+  }
+
+  const miContinuity=autonomousMiContinuity46900({historyId,fieldDispositionState,materialHistory,materialRefs,encountered,survived});
+  const row={
+    schemaVersion:1,
+    semanticType:PRIVATE_ORIGIN_SCHEMA,
+    privateOriginHistoryId:historyId,
+    chronicleId:chronicleStableId46900(),
+    subjectStableId:PRIVATE_ORIGIN_SUBJECT,
+    originDefinitionId:PRIVATE_ORIGIN_DEFINITION,
+    originDefinitionVersion:PRIVATE_ORIGIN_VERSION,
+    resolutionMode:"AUTONOMOUS_PRIVATE",
+    stableAutonomousResolutionSeedRef:seedRef,
+    profileAuthority:"Academy_Kakashi_Autonomous_Origin_Intent_Profile_2026-10-02",
+    profileCoverage:{meaningfulBoundaryCount:Object.keys(AUTONOMOUS_KAKASHI_BOUNDARIES).length,legalPlayerFacingChoiceCount:AUTONOMOUS_KAKASHI_CHOICE_IDS.length,machineResolveResultChoicesExcluded:true},
+    exactCommittedSourceOccurrences:[...materialRefs],
+    exactMaterialChoiceIntentReceipts:choices,
+    exactBattleOutcomeRefs:battles.map(row=>({battleOccurrenceId:row.battleOccurrenceId,battleConfigId:row.battleConfigId,outcome:row.outcome,playerActionOpportunityCount:row.playerActionOpportunityCount})),
+    subjectPersistentConsequences:{
+      knowledgeMemory:{maskedInterceptorEncountered:encountered,miMaterialHistory:clone(materialHistory)},
+      developmentRefs:[],
+      currentStatMutationRefs:[],
+      learnedAccessRefs:[],
+      relationshipSharedHistoryRefs:[...materialRefs],
+      persistentConditionRefs:[]
+    },
+    externalParticipantRefs:[MI_ID,"academy_kakashi_origin_amt","academy_kakashi_origin_package_smuggler"],
+    convergenceCarryForwardClassification:{
+      subjectKnowledgeMemory:"ALWAYS",
+      developmentStats:"EXISTING_OWNER_ONLY_NO_SYNTHETIC_GRANT_IN_478",
+      materialObjects:"CONDITIONAL_EXACT_OWNERSHIP_ONLY",
+      externalOriginWorldState:"ORIGIN_SCOPE_ONLY_UNLESS_IMPORTED"
+    },
+    economyFirewall:{
+      duplicateStartingPurseGranted:false,
+      autonomousPlayerVictoryBattleRyoGranted:false,
+      blanketInventoryRewardsGranted:false,
+      playerEconomyMutation:false
+    },
+    migrationReceipt:{semanticType:"sc.parallelOriginHistoryMigration.v1",reason:String(migrationReason||"origin_convergence_preparation"),oneShot:true},
+    miContinuity,
+    commitState:"COMMITTED",
+    committed:true,
+    committedAt:Date.now()
+  };
+  return persistKakashiPrivateHistory46900(row);
+}
+function ensureAutonomousKakashiPrivateHistory46900(reason="origin_convergence_preparation"){
+  const existing=storedKakashiPrivateHistory();
+  if(existing&&existing.committed===true)return{success:true,idempotent:true,history:existing};
+  return resolveAutonomousKakashiPrivateHistory46900({migrationReason:reason});
+}
 function recordId(row){return row&&String(row.sourceOccurrenceId||row.occurrenceId||row.id||"")||"";}
 function continuityStore(create=false){
   if(typeof globalThis.getOriginParticipantContinuityStore43600!=="function")return null;
