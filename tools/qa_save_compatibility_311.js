@@ -188,6 +188,16 @@ assert(free&&free.projection.onboardingStatus==="academy_free_play"&&free.projec
   };
   fixture.phase2ChronicleState={
     schemaVersion:1,
+    chronicleRunIdentity:{
+      schemaVersion:1,
+      runId:"sc_run_v1_save311_00000000-0000-4000-8000-000000000001",
+      creationKind:"LEGACY_SAVE_MIGRATION",
+      startManifestRef:null,
+      parentRunRef:null,
+      donorRunRefs:[],
+      migrationSourceRefs:["chronicle_origin::academy_kakashi"],
+      committedAt:123
+    },
     tutorialProgress:{
       schemaVersion:1,
       academyTeamFormationReceiptRef:"save311_phase2_team",
@@ -211,7 +221,8 @@ assert(free&&free.projection.onboardingStatus==="academy_free_play"&&free.projec
           schemaVersion:1,
           semanticType:"sc.privateOriginHistory.v1",
           privateOriginHistoryId:"private_origin::academy_kakashi::save311",
-          chronicleId:"save311_chronicle",
+          chronicleId:"sc_run_v1_save311_00000000-0000-4000-8000-000000000001",
+          chronicleRunId:"sc_run_v1_save311_00000000-0000-4000-8000-000000000001",
           subjectStableId:"academy_kakashi",
           originDefinitionId:"academy_kakashi_v2",
           originDefinitionVersion:"v3",
@@ -238,6 +249,8 @@ assert(free&&free.projection.onboardingStatus==="academy_free_play"&&free.projec
   vm.runInContext("playerData=__phase2Loaded;",context);
   const team=JSON.parse(JSON.stringify(context.getChronicleCurrentTeam43600()));
   assert.deepStrictEqual(team.teamVariantIds,["academy_kakashi","academy_hinata","academy_kushina"],"#436 currentTeam projection drift");
+  const runIdentity=JSON.parse(JSON.stringify(context.getChronicleRunIdentity43600()));
+  assert.strictEqual(runIdentity.runId,"sc_run_v1_save311_00000000-0000-4000-8000-000000000001","#494 Chronicle run identity dropped on load");
   const privateStore=JSON.parse(JSON.stringify(context.getPrivateOriginHistoryStore43600({create:false})));
   assert.strictEqual(privateStore.bySubject.academy_kakashi.privateOriginHistoryId,"private_origin::academy_kakashi::save311","#478 private Origin history dropped on load");
   assert.strictEqual(privateStore.bySubject.academy_kakashi.economyFirewall.playerEconomyMutation,false,"#478 private Origin economy firewall drift");
@@ -273,7 +286,8 @@ console.log(JSON.stringify({
     phase2CurrentTeamDerived:true,
     phase2MigrationPureAndIdempotent:true,
     privateOriginHistoryPersists:true,
-    privateOriginHistoryNoReroll:true
+    privateOriginHistoryNoReroll:true,
+    chronicleRunIdentityPersists:true
   },
   browserGoldenClaimed:false
 },null,2));
