@@ -78,6 +78,19 @@ async function stateDigest(page){
     menmaEquipment:getPlayerCharacter("academy_menma")?.equipment||[]
   }));
 }
+async function openInventoryRoute(page){
+  await page.evaluate(()=>globalThis.refreshPhase2LiveHud49900?.());
+  const hud=page.locator('#sc-phase2-live-hud-49900 [data-hud499-action="inventory"]');
+  if(await hud.count()){
+    await hud.waitFor({state:"visible",timeout:10000});
+    await hud.click();
+    return"phase2_live_hud_499";
+  }
+  const legacy=page.locator('.header-nav-tabs [data-alpha-route="inventory"]');
+  await legacy.waitFor({state:"visible",timeout:10000});
+  await legacy.click();
+  return"legacy_header_nav";
+}
 
 (async()=>{
   const browser=await chromium.launch({headless:true});
@@ -110,7 +123,8 @@ async function stateDigest(page){
     assert(wireInitial&&wireInitial.sourceRefs.includes("qa461-source-ref"));
 
     const beforeOpen=await stateDigest(page);
-    await page.click('.header-nav-tabs [data-alpha-route="inventory"]');
+    const inventoryRoute=await openInventoryRoute(page);
+    assert(["phase2_live_hud_499","legacy_header_nav"].includes(inventoryRoute));
     await page.waitForSelector(".sc-inventory-core",{state:"visible",timeout:10000});
 
     const text=await page.locator(".sc-inventory-core").innerText();
@@ -138,7 +152,7 @@ async function stateDigest(page){
     assert.strictEqual(afterOpen,beforeOpen,"opening Inventory mutated ownership/preparation/history/equipment");
 
     await page.click(".sc-inventory-close");
-    await page.click('.header-nav-tabs [data-alpha-route="inventory"]');
+    await openInventoryRoute(page);
     await page.waitForSelector(".sc-inventory-core",{state:"visible",timeout:10000});
     const afterReopen=await stateDigest(page);
     assert.strictEqual(afterReopen,beforeOpen,"reopening Inventory mutated persistent truth");
