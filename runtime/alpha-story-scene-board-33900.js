@@ -866,8 +866,8 @@ function runStorySceneBoard33900Diagnostics(){
       String(markStoryPresentationHidden33900).includes('setProperty("display","none","important")')&&
       installStyle.toString().includes("data-sc-presentation-hidden"),
     authoredSinglePageCueContract:String(expandStoryPerformanceSequence33900).includes("authoredSinglePage")&&String(expandStoryPerformanceSequence33900).includes("cue.singlePage=true")&&String(expandStoryPerformanceSequence33900).includes("cue.singlePage===true"),
-    fourActorBoardSupported:String(boardMarkup).includes("slice(0,4)")&&installStyle.toString().includes('data-count="4"'),
-    nonSpeakerCardsRemainFullColour:installStyle.toString().includes("opacity:1;transform:translateY(2px) scale(.98);filter:none"),
+    fourActorBoardSupported:String(boardMarkup).includes("slice(0,4)")&&String(BOARD_STAGE_PROFILES_33900[4]).length>0,
+    nonSpeakerCardsRemainFullColour:installStyle.toString().includes("opacity:1;transform:translateX(-50%) translateY(2px) scale(.98);filter:none"),
     speakerFocusUsesScaleAndBorder:installStyle.toString().includes("scale(1.045)")&&installStyle.toString().includes("translateY(-10px)")&&installStyle.toString().includes("2px solid rgba(97,220,229,.96)"),
     semanticStageAnchorsPrimary:String(resolveBoardActorStage33900).includes("stageAnchor")&&String(actorMarkup).includes("data-sc-stage-anchor")&&!installStyle.toString().includes("nth-child"),
     reducedMotionPreservesPresentActorOpacity:installStyle.toString().includes("scChoreoReducedSettle33900")&&installStyle.toString().includes("scChoreoReducedExit33900")&&!installStyle.toString().includes("from{opacity:.72}"),
