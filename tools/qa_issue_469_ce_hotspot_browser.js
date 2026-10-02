@@ -470,6 +470,7 @@ async function advanceThroughBeat(page,beatId,max=20){
 
     const menmaSetup=await page.evaluate(()=>{
       playerData=createDefaultPlayerData();
+      playerData.chronicleId="qa478_live_chronicle_0009";
       setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
       savePlayerData();
 
