@@ -811,7 +811,8 @@ function resolveAutonomousKakashiPrivateHistory46900({migrationReason="origin_co
     const pursuit=machine("secureAmtPursuit");
     if(pursuit!=="SECURE_AMT_PURSUIT_SUCCESS"){state.participants.AMT.state="ESCAPED";return terminal(boundaryId+":amt_pursuit_failure");}
     state.pakkun.present=true;
-    const b=battle(boundaryId+":amt","academy_kakashi_origin_battle_seq_amt_pakkun");
+    const amtConfig=boundaryId==="B10"?"academy_kakashi_origin_battle_seq_amt_pakkun":"academy_kakashi_origin_battle_kakashi_pakkun_vs_amt";
+    const b=battle(boundaryId+":amt",amtConfig);
     if(b.outcome!=="victory"){state.participants.AMT.state="ESCAPED";return terminal(boundaryId+":amt_battle_defeat");}
     state.participants.AMT.state="BATTLE_DEFEATED";
     return boundaryId==="B10"?routeB11():routeB09();
@@ -2527,6 +2528,7 @@ try{migrateLegacyKakashiPrivateOrigin46900();}catch(_error){}
 
 globalThis.getKakashiPrivateOriginHistory46900=()=>clone(storedKakashiPrivateHistory());
 globalThis.ensureAutonomousKakashiPrivateHistory46900=reason=>ensureAutonomousKakashiPrivateHistory46900(reason);
+globalThis.previewAutonomousKakashiPrivateOrigin46900=seedRef=>resolveAutonomousKakashiPrivateHistory46900({seedRefOverride:String(seedRef||"diagnostic_private_origin_seed"),persist:false,diagnosticPreview:true,migrationReason:"diagnostic_preview"});
 globalThis.migrateLegacyKakashiPrivateOrigin46900=migrateLegacyKakashiPrivateOrigin46900;
 globalThis.getMenmaPrivateHistoryDecisionSnapshot46900=()=>clone(menmaDecisionSnapshot46900());
 globalThis.getMenmaNestedKakashiIntent46900=committedNestedKakashiIntent46900;
