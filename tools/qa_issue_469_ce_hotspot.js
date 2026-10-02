@@ -229,9 +229,10 @@ assert(src.includes('exitTransition:"black_wipe"'),"KON-P01 scene exit does not 
 const cueHelper=src.slice(src.indexOf("function cue(kind,text,speakerName=null)"),src.indexOf("function openingCues()"));
 assert(!cueHelper.includes("singlePage:true"),"#469 forces multi-paragraph narration into one giant Story box");
 assert(board.includes("slice(0,4)"),"shared Scene Board still truncates four-person scenes");
-assert(board.includes('data-count="4"'),"shared Scene Board lacks four-actor staging");
-assert(board.includes("opacity:1;transform:translateY(2px) scale(.98);filter:none"),"non-speaker cards are still greyed/dimmed");
-assert(board.includes("scale(1.055)")&&board.includes("2px solid rgba(97,220,229,.96)"),"active speaker does not enlarge with coloured border");
+assert(board.includes("function resolveBoardActorStage33900"),"shared Scene Board lacks semantic four-actor staging");
+assert(board.includes("BOARD_STAGE_PROFILES_33900")&&board.includes("data-sc-stage-anchor"),"shared Scene Board semantic stage projection missing");
+assert(board.includes("opacity:1;transform:translateX(-50%) translateY(2px) scale(.98);filter:none"),"non-speaker cards are still greyed/dimmed");
+assert(board.includes("scale(1.045)")&&board.includes("2px solid rgba(97,220,229,.96)"),"active speaker does not use bounded enlarged coloured focus");
 assert(board.includes("SCENE COMPLETE · CLICK ANYWHERE TO RETURN"),"Story exit lacks explicit ending affordance");
 assert(board.includes("playStorySoftSceneTransition33900"),"same-location soft transition owner missing from shared Scene Board");
 assert(board.includes("story_scene_exit_black_wipe"),"Story exit does not dispatch shared black wipe");
