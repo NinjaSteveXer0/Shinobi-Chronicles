@@ -1253,6 +1253,295 @@ function commitResolution(expectedChoiceId){
   return{success:true,idempotent:false,record:clone(record)};
 }
 
+function menmaDecisionSnapshot46900(){
+  return D.getStoryUnitSnapshot(MENMA_STORY_UNIT_REF)||{autonomyReceipts:{},decisionReceipts:{}};
+}
+function menmaAutonomyReceipts46900(){
+  const snap=menmaDecisionSnapshot46900();
+  return Object.values(snap.autonomyReceipts||{}).filter(row=>row&&row.committedStateRef===OCCURRENCE_ID);
+}
+function menmaAutonomyReceiptByActor46900(actorRef,phaseToken=null){
+  const rows=menmaAutonomyReceipts46900().filter(row=>row.actorRef===actorRef);
+  if(!phaseToken)return rows[0]||null;
+  return rows.find(row=>String(row.participantIntentRef||"").includes(phaseToken))||null;
+}
+function disclosureClass46900(continuity=getContinuity()){
+  if(!continuity)return"other";
+  const m=continuity.materialHistory||{};
+  if(m.lethalAttempt===true)return"lethal";
+  if(m.policeTransfer===true||continuity.fieldDispositionState==="POLICE_CUSTODY")return"police";
+  if(m.anbuTransfer===true||continuity.fieldDispositionState==="ANBU_CUSTODY")return"anbu";
+  if(m.restraint===true||continuity.fieldDispositionState==="RESTRAINED")return"restraint";
+  if(m.restraintOrAnbu===true)return continuity.fieldDispositionState==="ANBU_CUSTODY"?"anbu":"restraint";
+  if(m.deliberateRelease===true||continuity.fieldDispositionState==="RELEASED")return"release";
+  if(m.miDefeatedKakashi===true)return"mi_defeated_kakashi";
+  if(m.kakashiDefeatedMi===true||continuity.fieldDispositionState==="BATTLE_DEFEATED")return"kakashi_defeated_mi";
+  return"other";
+}
+const KAKASHI_DISCLOSURE=Object.freeze({
+  lethal:Object.freeze({claimClass:"kakashi_testimony_lethal_attempt_v1",text:"I tried to kill her. She got away.",record:"Kakashi said he tried to kill her and she got away."}),
+  police:Object.freeze({claimClass:"kakashi_testimony_police_transfer_v1",text:"I handed her to the Uchiha Police.",record:"Kakashi said he handed her to the Uchiha Police."}),
+  anbu:Object.freeze({claimClass:"kakashi_testimony_anbu_transfer_v1",text:"I handed her to ANBU.",record:"Kakashi said he handed her to ANBU."}),
+  restraint:Object.freeze({claimClass:"kakashi_testimony_restraint_v1",text:"I restrained her. It didn't hold.",record:"Kakashi said he restrained her and it didn't hold."}),
+  release:Object.freeze({claimClass:"kakashi_testimony_release_v1",text:"I let her go.",record:"Kakashi said he let her go."}),
+  mi_defeated_kakashi:Object.freeze({claimClass:"kakashi_testimony_mi_defeated_him_v1",text:"She beat me and went after the package.",record:"Kakashi said she beat him and went after the package."}),
+  kakashi_defeated_mi:Object.freeze({claimClass:"kakashi_testimony_he_defeated_mi_v1",text:"I beat her. Then I moved on.",record:"Kakashi said he beat her and then moved on."}),
+  other:Object.freeze({claimClass:"kakashi_testimony_other_material_encounter_v1",text:"We crossed paths during an assignment.",record:"Kakashi said they crossed paths during an assignment."})
+});
+const MI_DISCLOSURE=Object.freeze({
+  lethal:Object.freeze({claimClass:"mi_testimony_lethal_attempt_v1",text:"He tried to kill me.",record:"The masked woman said Kakashi tried to kill her."}),
+  police:Object.freeze({claimClass:"mi_testimony_police_transfer_v1",text:"He handed me to the Police.",record:"The masked woman said Kakashi handed her to the Police."}),
+  anbu:Object.freeze({claimClass:"mi_testimony_anbu_transfer_v1",text:"He handed me to ANBU.",record:"The masked woman said Kakashi handed her to ANBU."}),
+  restraint:Object.freeze({claimClass:"mi_testimony_restraint_v1",text:"He tied me down.",record:"The masked woman said Kakashi tied her down."}),
+  release:Object.freeze({claimClass:"mi_testimony_release_v1",text:"He let me go.",record:"The masked woman said Kakashi let her go."}),
+  mi_defeated_kakashi:Object.freeze({claimClass:"mi_testimony_defeated_kakashi_v1",text:"I beat him.",record:"The masked woman said she defeated Kakashi."}),
+  kakashi_defeated_mi:Object.freeze({claimClass:"mi_testimony_kakashi_defeated_her_v1",text:"He beat me.",record:"The masked woman said Kakashi defeated her."}),
+  other:Object.freeze({claimClass:"mi_testimony_other_material_encounter_v1",text:"We met before.",record:"The masked woman said they met before."})
+});
+function kakashiDisclosure46900(){return clone(KAKASHI_DISCLOSURE[disclosureClass46900()]||KAKASHI_DISCLOSURE.other);}
+function miDisclosure46900(){return clone(MI_DISCLOSURE[disclosureClass46900()]||MI_DISCLOSURE.other);}
+
+function menmaAutonomyState46900(phase){
+  const plan=eventPlan();
+  const active=typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;
+  const local=active&&active.sceneId===MENMA_SCENE_ID&&active.localContext&&typeof active.localContext==="object"?active.localContext:null;
+  return{
+    committedStateRef:OCCURRENCE_ID,
+    autonomyPhase:String(phase||""),
+    battleLive:false,
+    occurrenceId:OCCURRENCE_ID,
+    teamVariantIds:local&&Array.isArray(local.teamVariantIds)?[...local.teamVariantIds]:(plan.success?[...plan.teamVariantIds]:[]),
+    privateOriginHistoryRef:local&&local.privateOriginHistoryRef||plan.privateOriginHistoryRef||null,
+    historyFamily:local&&local.historyFamily||plan.historyFamily||null
+  };
+}
+function resolveKakashiCurrentResponse46900(){
+  const family=historyFamily(getContinuity())||"material_encounter";
+  const intentRef=MENMA_STORY_UNIT_REF+":kakashi_current_response:"+family;
+  return{
+    success:true,
+    participantIntentRef:intentRef,
+    resolverResultRef:D.stableRef("ce478-kakashi-current-response",{occurrenceId:OCCURRENCE_ID,family}),
+    result:{actorRef:ORIGIN_ID,responseFamily:family,privateOriginHistoryRef:storedKakashiPrivateHistory()?.privateOriginHistoryId||null}
+  };
+}
+function hinataReactionFamily46900(){
+  const family=historyFamily(getContinuity())||"material_encounter";
+  if(family==="lethal_attempt")return"danger";
+  if(family==="mi_defeated_kakashi")return"explicit_history";
+  return"visible_recognition";
+}
+function resolveHinataCurrentResponse46900(){
+  const family=hinataReactionFamily46900();
+  return{
+    success:true,
+    participantIntentRef:MENMA_STORY_UNIT_REF+":hinata_current_evidence:"+family,
+    resolverResultRef:D.stableRef("ce478-hinata-current-evidence",{occurrenceId:OCCURRENCE_ID,family}),
+    result:{actorRef:HINATA_ID,reactionFamily:family,knowledgeScope:"current_scene_direct_evidence_only"}
+  };
+}
+function nestedKakashiIntentCandidates46900(){
+  const family=historyFamily(getContinuity())||"material_encounter";
+  if(family==="lethal_attempt")return["acknowledge_recognition","disengage_keep_moving"];
+  if(["police_transfer","restraint_or_anbu","deliberate_release","kakashi_defeated_mi"].includes(family))return["ask_about_delivery","observe_intake_and_departure"];
+  if(family==="mi_defeated_kakashi")return["observe_intake_and_departure","ask_about_delivery","acknowledge_recognition"];
+  return["ask_about_delivery","observe_intake_and_departure"];
+}
+function selectNestedKakashiIntent46900(){
+  const privateHistory=storedKakashiPrivateHistory();
+  const seed=String(privateHistory&&privateHistory.stableAutonomousResolutionSeedRef||privateHistory&&privateHistory.privateOriginHistoryId||privateSeedRef46900());
+  const candidates=nestedKakashiIntentCandidates46900();
+  return candidates[stableHash46900(seed+"|ce478|nested_current_intent")%candidates.length];
+}
+function resolveNestedKakashiCurrentIntent46900(){
+  const choiceId=selectNestedKakashiIntent46900();
+  const choice=CHOICES.find(row=>row.id===choiceId);
+  if(!choice)return{success:false,reason:"nested_kakashi_choice_unknown"};
+  return{
+    success:true,
+    participantIntentRef:MENMA_STORY_UNIT_REF+":nested_kakashi_intent:"+choiceId,
+    resolverResultRef:D.stableRef("ce478-nested-kakashi-intent",{occurrenceId:OCCURRENCE_ID,choiceId,privateOriginHistoryRef:storedKakashiPrivateHistory()?.privateOriginHistoryId||null}),
+    result:{actorRef:ORIGIN_ID,choiceId,intentType:choice.intentType,playerControlled:false}
+  };
+}
+for(const anchor of [
+  {anchorId:"kakashi_private_history_current_response",actorRef:ORIGIN_ID,phase:"kakashi_response",priority:10,resolve:resolveKakashiCurrentResponse46900},
+  {anchorId:"hinata_current_evidence_response",actorRef:HINATA_ID,phase:"hinata_response",priority:20,resolve:resolveHinataCurrentResponse46900},
+  {anchorId:"kakashi_nested_current_intent",actorRef:ORIGIN_ID,phase:"nested_kakashi_intent",priority:30,resolve:resolveNestedKakashiCurrentIntent46900}
+]){
+  const registered=D.registerAutonomyAnchor(MENMA_STORY_UNIT_REF,{
+    anchorId:anchor.anchorId,
+    classes:["PARTICIPANT_AUTONOMY","PRIVATE_HISTORY_EMERGENCE"],
+    actorRef:anchor.actorRef,
+    priority:anchor.priority,
+    orderRef:"ce478_"+anchor.phase,
+    material:true,
+    due:state=>state&&state.occurrenceId===OCCURRENCE_ID&&state.autonomyPhase===anchor.phase,
+    resolve:anchor.resolve,
+    metadata:{eventId:EVENT_ID,hostId:HOST_ID,privateHistoryObserverFirewall:true}
+  });
+  if(!registered||registered.success!==true)throw new Error("ce478_autonomy_anchor_registration_failed:"+anchor.anchorId);
+}
+function consumeMenmaAutonomy46900(phase){
+  const result=D.consumeNextAutonomy({storyUnitRef:MENMA_STORY_UNIT_REF,state:menmaAutonomyState46900(phase)});
+  if(!result||result.success!==true)return result||{success:false,reason:"ce478_autonomy_failed",phase};
+  return{success:true,idempotent:result.idempotent===true,receipt:result.receipt||null};
+}
+
+for(const choice of MENMA_CHOICES){
+  const bindingRef=MENMA_STORY_UNIT_REF+":intent:"+choice.id;
+  const reg=D.registerResolver(bindingRef,({receipt})=>({
+    success:true,
+    resolverResultRef:D.stableRef("ce478-menma-intent",{occurrenceId:OCCURRENCE_ID,choiceId:choice.id,receiptId:receipt&&receipt.storyDecisionReceiptId||null}),
+    result:{choiceId:choice.id,intentType:choice.intentType,observerRef:MENMA_ID},
+    consequenceRefs:[],
+    knowledgeDeltaRefs:[],
+    relationshipHistoryRefs:[],
+    successorSituationRef:MENMA_STORY_UNIT_REF+":branch:"+choice.id
+  }),{owner:PATCH_ID,battleOwned:false});
+  if(!reg||reg.success!==true)throw new Error("ce478_menma_choice_resolver_registration_failed:"+choice.id);
+}
+function ensureMenmaChoiceSet46900(){
+  const kakashi=menmaAutonomyReceiptByActor46900(ORIGIN_ID,"kakashi_current_response:");
+  const hinata=menmaAutonomyReceiptByActor46900(HINATA_ID,"hinata_current_evidence:");
+  if(!kakashi||!hinata)return{success:false,reason:"menma_prechoice_autonomy_incomplete"};
+  return D.openDecisionAfterAutonomy({
+    storyUnitRef:MENMA_STORY_UNIT_REF,
+    storyUnitType:"world_event",
+    decisionPointRef:MENMA_STORY_UNIT_REF+":menma_intent",
+    contextStateRef:OCCURRENCE_ID,
+    sceneRef:MENMA_SCENE_ID,
+    beatRef:"ce478_menma_choice",
+    authorityVersionRefs:["Kakashi_MI_Private_History_Emergence_Non_Kakashi_Protagonist_Scene_Family_2026-10-02"],
+    sourceOccurrenceRefs:[OCCURRENCE_ID,storedKakashiPrivateHistory()?.privateOriginHistoryId].filter(Boolean),
+    observerRef:MENMA_ID,
+    excludedIntentRefs:["ATTACK"],
+    state:menmaAutonomyState46900("menma_choice"),
+    choices:MENMA_CHOICES.map((choice,index)=>({
+      choiceId:choice.id,
+      intentType:choice.intentType,
+      intentPayload:{stableParticipantId:MI_ID,hostId:HOST_ID,privateHistoryOwnerRef:ORIGIN_ID},
+      eligibilityBasisRefs:[OCCURRENCE_ID],
+      resolverBindingRef:MENMA_STORY_UNIT_REF+":intent:"+choice.id,
+      presentationLabel:choice.label,
+      authoredOrder:index
+    }))
+  });
+}
+function resolveMenmaChoice46900(choiceId){
+  const choice=MENMA_CHOICES.find(row=>row.id===choiceId);
+  if(!choice)return{success:false,reason:"menma_choice_unknown"};
+  const opened=ensureMenmaChoiceSet46900();
+  if(!opened||opened.success!==true)return opened||{success:false,reason:"menma_choice_set_unavailable"};
+  const resolved=D.resolveStoryChoice({
+    storyUnitRef:MENMA_STORY_UNIT_REF,
+    choiceSetId:opened.choiceSet.choiceSetId,
+    choiceId,
+    state:menmaAutonomyState46900("menma_choice"),
+    context:{occurrenceId:OCCURRENCE_ID,hostId:HOST_ID,stableParticipantId:MI_ID,observerRef:MENMA_ID}
+  });
+  return resolved&&resolved.success===true?{success:true,semanticReceipt:resolved.receipt||null}:resolved;
+}
+function committedMenmaChoice46900(){
+  const snap=menmaDecisionSnapshot46900();
+  const receipts=Object.values(snap.decisionReceipts||{}).filter(row=>row&&row.status==="resolved"&&row.storyUnitRef===MENMA_STORY_UNIT_REF);
+  const receipt=receipts.find(row=>MENMA_CHOICES.some(choice=>choice.id===row.selectedChoiceId));
+  return receipt?receipt.selectedChoiceId:null;
+}
+function committedNestedKakashiIntent46900(){
+  const receipt=menmaAutonomyReceiptByActor46900(ORIGIN_ID,"nested_kakashi_intent:");
+  if(!receipt)return null;
+  const raw=String(receipt.participantIntentRef||"");
+  const token="nested_kakashi_intent:";
+  const i=raw.indexOf(token);
+  return i>=0?raw.slice(i+token.length):null;
+}
+
+function menmaRecordPayload46900(choiceId){
+  const continuity=getContinuity();
+  const commonFact="Seen completing a stamped document handoff through Hokage Administration public intake. She and Kakashi appeared to recognise each other.";
+  const commonReceipt="mi_private_history_emergence_base_v1";
+  const sourceRefs=[
+    {type:"world_event",id:EVENT_ID,role:"observer_safe_occurrence"},
+    {type:"world_location",id:HOST_ID,role:"directly_observed_host"},
+    {type:"event_fact_receipt",id:commonReceipt,role:"menma_observer_safe_base"}
+  ];
+  const data={
+    eventId:EVENT_ID,opportunityId:OPPORTUNITY_ID,semanticLocationId:HOST_ID,
+    stableParticipantId:MI_ID,knownPerson:"Masked Woman",sharedOccurrence:"Hokage Administration Crossing",
+    knownFact:commonFact,properName:"Unknown",connectionToKakashi:"Prior contact indicated; details unknown unless this occurrence produced a bounded disclosure.",
+    observerRef:MENMA_ID,privateHistoryOwnerRef:ORIGIN_ID,privateOriginTranscriptGranted:false,
+    kakashiPrivateChoiceIdsGranted:false,hiddenTestTruthGranted:false,properNameKnowledgeGranted:false,
+    anbuMembershipKnowledgeGranted:false,moralityScalarCreated:false,friendshipScalarCreated:false,rewardsGranted:false,
+    commonFactualReceiptId:commonReceipt,branchFactualReceiptId:null,branchKnowledge:{},sharedHistoryReceiptIds:[],futureLeadIds:[],
+    testimony:null,recordAddendum:null,nestedKakashiIntent:null,
+    storyTeamParticipantRefs:currentTeam()?.teamVariantIds?[...currentTeam().teamVariantIds]:[MENMA_ID,HINATA_ID,ORIGIN_ID],
+    originMaterialHistorySourceRefs:[...(continuity&&continuity.materialHistoryRefs||[])],
+    rememberedHistoryFamily:historyFamily(continuity)
+  };
+  if(choiceId==="menma_ask_kakashi_prior_connection"){
+    const disclosure=kakashiDisclosure46900();
+    data.branchFactualReceiptId="menma_requested_kakashi_private_history_disclosure_v1";
+    data.testimony={source:ORIGIN_ID,claimClass:disclosure.claimClass,truthStatus:"source_attributed_testimony"};
+    data.branchKnowledge={boundedKakashiTestimonyHeard:true,claimClass:disclosure.claimClass};
+    data.sharedHistoryReceiptIds=["menma_asked_kakashi_about_private_past_v1","kakashi_disclosed_bounded_mi_history_to_current_team_v1"];
+    data.futureLeadIds=["teammate_followup_on_disclosed_kakashi_mi_fact_v1"];
+    data.recordAddendum=disclosure.record;
+  }else if(choiceId==="menma_ask_mi_prior_connection"){
+    const disclosure=miDisclosure46900();
+    data.branchFactualReceiptId="menma_requested_mi_prior_connection_testimony_v1";
+    data.testimony={source:MI_ID,observerLabel:"Masked Woman",claimClass:disclosure.claimClass,truthStatus:"source_attributed_testimony"};
+    data.branchKnowledge={boundedMiTestimonyHeard:true,claimClass:disclosure.claimClass};
+    data.sharedHistoryReceiptIds=["mi_disclosed_kakashi_private_history_in_front_of_team_v1"];
+    data.futureLeadIds=["later_kakashi_reaction_to_mi_disclosure_v1"];
+    data.recordAddendum=disclosure.record;
+  }else if(choiceId==="menma_yield_to_kakashi"){
+    const nested=committedNestedKakashiIntent46900();
+    const consequence=nested?branchConsequence(nested):null;
+    data.branchFactualReceiptId="menma_yielded_private_history_collision_to_kakashi_v1";
+    data.sharedHistoryReceiptIds=["menma_deferred_to_kakashi_on_private_connection_v1",...(consequence&&consequence.sharedHistoryReceiptIds||[])];
+    data.futureLeadIds=[...(consequence&&consequence.futureLeadIds||[])];
+    data.nestedKakashiIntent=nested;
+    data.branchKnowledge=nested==="acknowledge_recognition"?{explicitMutualRecognitionObserved:true}
+      :nested==="ask_about_delivery"?{dispatchTaskClassHeard:true,sourceDisclosureRefusedHeard:true}
+      :nested==="observe_intake_and_departure"?{publicIntakeProcessMayHaveBeenObserved:true}
+      :{};
+    data.recordAddendum=nested==="acknowledge_recognition"?"Kakashi and the masked woman openly acknowledged that they remembered each other."
+      :nested==="ask_about_delivery"?"Kakashi asked about the delivery; the masked woman described it as a dispatch and redirected the source question to the desk."
+      :nested==="observe_intake_and_departure"?"Kakashi stayed to watch the public intake process and her departure."
+      :null;
+  }else if(choiceId==="menma_disengage"){
+    data.branchFactualReceiptId="menma_declined_private_history_inquiry_v1";
+    data.sharedHistoryReceiptIds=["menma_saw_kakashi_mi_recognition_and_did_not_press_v1"];
+  }else throw new Error("ce478_menma_record_choice_unknown:"+String(choiceId||""));
+  sourceRefs.push({type:"event_fact_receipt",id:data.branchFactualReceiptId,role:"menma_branch_delta"});
+  const outcome=[commonFact,"Proper name: Unknown.",data.recordAddendum].filter(Boolean).join(" ");
+  return{
+    id:OCCURRENCE_ID,occurrenceId:OCCURRENCE_ID,sourceOccurrenceId:OCCURRENCE_ID,
+    type:"konoha_ce_private_history_emergence_knowledge_occurrence",activity:"world_chronicle_hotspot",
+    title:"Hokage Administration Crossing",locationId:HOST_ID,actorVariantId:MENMA_ID,protagonistParticipantId:MENMA_ID,
+    participants:[MENMA_ID,HINATA_ID,ORIGIN_ID,MI_ID],committed:true,completed:true,outcome,data,sourceRefs,timestamp:Date.now()
+  };
+}
+function commitMenmaResolution46900(expectedChoiceId){
+  const selected=committedMenmaChoice46900();
+  if(!selected)return{success:false,reason:"menma_intent_receipt_missing"};
+  if(expectedChoiceId&&selected!==expectedChoiceId)return{success:false,reason:"menma_intent_branch_mismatch",selected,expectedChoiceId};
+  if(selected==="menma_yield_to_kakashi"&&!committedNestedKakashiIntent46900())return{success:false,reason:"nested_kakashi_intent_receipt_missing"};
+  const existing=resolvedRecord();
+  if(existing)return{success:true,idempotent:true,record:clone(existing)};
+  const p=pd();if(!p)return{success:false,reason:"player_state_missing"};
+  if(!Array.isArray(p.activityHistory))p.activityHistory=[];
+  const record=menmaRecordPayload46900(selected);
+  p.activityHistory.push(record);
+  try{if(typeof activityHistory!=="undefined"&&Array.isArray(activityHistory)&&activityHistory!==p.activityHistory){activityHistory.length=0;activityHistory.push(...p.activityHistory);}}catch(_error){}
+  if(typeof setOpportunityResolution==="function")setOpportunityResolution(OPPORTUNITY_ID,{resolved:true,visibleState:"resolved",occurrenceId:OCCURRENCE_ID,selectedIntent:selected,observerRef:MENMA_ID},{save:false});
+  if(typeof setWorldEventLifecycle==="function")setWorldEventLifecycle(EVENT_ID,{occurrenceId:OCCURRENCE_ID,stableParticipantId:MI_ID,started:true,resolved:true,projectable:false,observerRef:MENMA_ID},{save:false});
+  if(typeof setOpportunityActionability==="function")setOpportunityActionability(OPPORTUNITY_ID,{available:false,reason:"resolved",reasonVisible:false},{save:false});
+  if(typeof savePlayerData==="function")savePlayerData();
+  return{success:true,idempotent:false,record:clone(record)};
+}
+
 function cue(kind,text,speakerName=null){
   const row={kind,text,singlePage:true};
   if(speakerName)row.speakerName=speakerName;
