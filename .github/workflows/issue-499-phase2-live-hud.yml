@@ -51,12 +51,6 @@ jobs:
       - name: Existing save compatibility
         run: node tools/qa_save_compatibility_311.js
 
-      - name: Phase 2 current-team regression
-        run: node tools/qa_phase2_konoha_player_surfaces_431.js
-
-      - name: Inventory route regression
-        run: node tools/qa_phase2_inventory_core_461.js
-
       - name: Install Playwright Chromium
         run: |
           npm install --no-save playwright@1.55.0
@@ -67,6 +61,12 @@ jobs:
           python -m http.server 8080 --bind 127.0.0.1 > phase2-499-server.log 2>&1 &
           echo $! > phase2-499-server.pid
           sleep 2
+
+      - name: Phase 2 current-team regression
+        run: node tools/qa_phase2_konoha_player_surfaces_431.js
+
+      - name: Inventory route regression
+        run: node tools/qa_phase2_inventory_core_461.js
 
       - name: Installed-browser Phase 2 live HUD
         run: node tools/qa_phase2_live_hud_499_browser.js
