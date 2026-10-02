@@ -566,13 +566,13 @@ async function advanceThroughBeat(page,beatId,max=20){
     await waitRuntime(page);
     await releaseFrontDoor(page);
 
-    const menmaSetup=await page.evaluate(()=>{
+    const menmaSetup=await page.evaluate((fixtureRunId)=>{
       playerData=createDefaultPlayerData();
-      playerData.chronicleId="qa478_live_chronicle_0009";
       setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
       savePlayerData();
 
       const selected=selectChronicleOrigin("academy_menma","qa478_origin");
+      const runIdentity=commitChronicleRunIdentity43600({runId:fixtureRunId,creationKind:"NEW_START"});
       const completed=completeChronicleOriginPrologue("academy_menma",["qa478_menma_origin_3"]);
       const snapshot=getAcademyTeamFormationSnapshot();
       const desired=["academy_hinata","academy_kakashi"];
@@ -596,7 +596,8 @@ async function advanceThroughBeat(page,beatId,max=20){
       },{save:true});
       savePlayerData();
       return{
-        selected,completed,one,two,formed,continued,
+        selected,runIdentity,completed,one,two,formed,continued,
+        runIdentityAfterTeam:getChronicleRunIdentity43600(),
         privateBeforeConfirm,privateAfterConfirm,
         ryoBeforeConfirm,ryoAfterConfirm,inventoryBeforeConfirm,inventoryAfterConfirm,
         team:getChronicleCurrentTeam43600(),
@@ -604,9 +605,12 @@ async function advanceThroughBeat(page,beatId,max=20){
         eligibility:getKonohaCeHotspotEligibility46900(),
         ownedCharacterId:ensurePlayerAcquisitionState().chronicleOriginOwnedCharacterId
       };
-    });
+    },positiveRunIds[1]);
     assert(!menmaSetup.error,JSON.stringify(menmaSetup));
     assert.strictEqual(menmaSetup.selected.success,true);
+    assert.strictEqual(menmaSetup.runIdentity.success,true,JSON.stringify(menmaSetup.runIdentity));
+    assert.strictEqual(menmaSetup.runIdentityAfterTeam.runId,positiveRunIds[1],"Menma Team Formation changed Chronicle run identity");
+    assert.notStrictEqual(menmaSetup.runIdentityAfterTeam.runId,obitoTeamSetup.runIdentityAfterTeam.runId,"separate fixture Chronicles collapsed onto one run ID");
     assert.strictEqual(menmaSetup.completed.success,true);
     assert.strictEqual(menmaSetup.privateBeforeConfirm,null,"Team selection pre-resolved Kakashi private Origin");
     assert.strictEqual(menmaSetup.formed.success,true,JSON.stringify(menmaSetup.formed));
@@ -618,6 +622,8 @@ async function advanceThroughBeat(page,beatId,max=20){
     assert.strictEqual(menmaSetup.privateAfterConfirm.subjectStableId,"academy_kakashi");
     assert.strictEqual(menmaSetup.privateAfterConfirm.resolutionMode,"AUTONOMOUS_PRIVATE");
     assert.strictEqual(menmaSetup.privateAfterConfirm.commitState,"COMMITTED");
+    assert.strictEqual(menmaSetup.privateAfterConfirm.chronicleRunId,positiveRunIds[1],"private Kakashi history was not sealed under Chronicle run identity");
+    assert.strictEqual(menmaSetup.privateAfterConfirm.chronicleId,positiveRunIds[1],"legacy private-history Chronicle identity field drifted from run namespace");
     assert.strictEqual(menmaSetup.privateAfterConfirm.profileCoverage.meaningfulBoundaryCount,23);
     assert.strictEqual(menmaSetup.privateAfterConfirm.profileCoverage.legalPlayerFacingChoiceCount,93);
     assert.strictEqual(menmaSetup.privateAfterConfirm.profileCoverage.machineResolveResultChoicesExcluded,true);
