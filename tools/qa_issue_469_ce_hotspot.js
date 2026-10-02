@@ -53,7 +53,15 @@ assert(src.includes("kakashi_current_presence_required"),"#478 Kakashi physical-
 const eligibilitySource=src.slice(src.indexOf("function eligibility(){"),src.indexOf("function eventPlan(){"));
 assert(!eligibilitySource.includes('reason:"academy_kakashi_origin_required"'),"obsolete selected-Origin==Kakashi hotspot gate remains");
 assert(src.includes("menma_private_history_emergence"),"Menma private-history emergence mode missing");
-assert(src.includes("menma_live_benchmark_requires_hinata"),"Menma + Hinata + Kakashi exact benchmark gate missing");
+assert(!eligibilitySource.includes("menma_live_benchmark_requires_hinata"),"stale Hinata-only eligibility gate remains");
+assert(eligibilitySource.includes("menmaSecondTeammateRef46900"),"Menma second teammate is not derived from committed current team");
+assert(eligibilitySource.includes("menma_second_teammate_reaction_not_authored"),"Menma dynamic second-teammate reaction must fail closed when unauthorised");
+assert(src.includes('text:"Wait—you know her?"'),"Obito authored current-evidence reaction missing");
+assert(src.includes('second_teammate_current_evidence:'),"dynamic second-teammate observer receipt missing");
+assert(src.includes('ce478_second_teammate_autonomy'),"Menma private-history scene still owns a Hinata-specific autonomy request");
+assert(src.includes("secondTeammateCurrentResponseCues46900"),"Menma current-evidence presentation is not dynamic by second teammate");
+assert(src.includes("participants:[...new Set([...(data.storyTeamParticipantRefs"),"Menma Record participants are not projected from exact current team");
+assert(src.includes("getMenmaSecondTeammateRef46900"),"focused second-teammate diagnostic export missing");
 assert(src.includes("confirmAcademyTeamFormation46900"),"private history is not sealed before Team Formation");
 assert(src.includes("ensureAutonomousKakashiPrivateHistory46900"),"one-shot autonomous Kakashi history resolver missing");
 assert(src.includes("privateStoryUnitRef46900"),"private Origin choices are not namespaced through #34000");
@@ -114,6 +122,8 @@ assert(!/\bATTACK\b/i.test(choicesSection),"ATTACK leaked into #469 choice surfa
 assert(src.includes('const MENMA_SCENE_ID="scene_konoha_ce_kakashi_masked_interceptor_admin_crossing_menma_v1"'),"Menma scene identity missing");
 assert(src.includes('displayName:"Masked Woman"'),"Menma observer-safe current label missing");
 assert(src.includes('knownPerson:"Masked Woman"'),"Menma Shinobi Record leaks stable historical role label");
+assert(!src.includes('return["Menma","Hinata","Kakashi","Masked Woman"]'),"Menma Record participant projection still hardcodes Hinata");
+assert(!src.includes('participants:[MENMA_ID,HINATA_ID,ORIGIN_ID,MI_ID]'),"Menma record still hardcodes Hinata as physically present");
 assert(src.includes("privateOriginTranscriptGranted:false"),"Menma private-history transcript firewall missing");
 assert(src.includes("kakashiPrivateChoiceIdsGranted:false"),"Menma private choice-ledger firewall missing");
 
