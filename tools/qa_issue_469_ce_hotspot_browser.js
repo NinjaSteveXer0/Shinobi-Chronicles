@@ -572,7 +572,8 @@ async function advanceThroughBeat(page,beatId,max=20){
     await page.screenshot({path:path.join(OUT,"06-menma-private-history-arrival.png"),fullPage:true});
 
     const menmaOpening=await advanceThroughBeat(page,"ce478_opening");
-    const menmaOpeningText=menmaOpening.join(" ");
+    assert(menmaOpening.every(text=>!String(text).includes("\n\n")),"Menma narration pagination collapsed multiple paragraphs into one Story box");
+        const menmaOpeningText=menmaOpening.join(" ");
     assert(menmaOpeningText.includes("Menma is crossing the forecourt with Hinata and Kakashi"));
     assert(menmaOpeningText.includes("Her attention fixes on him before it touches either of the others."));
 
@@ -597,7 +598,17 @@ async function advanceThroughBeat(page,beatId,max=20){
 
     const menmaChoiceState=await beat(page);
     assert.strictEqual(menmaChoiceState.beatId,"ce478_menma_choice");
-    const menmaChoiceLabels=await page.locator("#story-scene-presentation-layer .sc-story-choice").allInnerTexts();
+    const menmaActorStage=await page.evaluate(()=>({
+      labels:[...document.querySelectorAll(".sc-scene-board-33900__actor")].map(node=>node.dataset.actorLabel),
+      count:document.querySelectorAll(".sc-scene-board-33900__actor").length,
+      opacity:[...document.querySelectorAll(".sc-scene-board-33900__actor")].map(node=>getComputedStyle(node).opacity),
+      filters:[...document.querySelectorAll(".sc-scene-board-33900__actor")].map(node=>getComputedStyle(node).filter)
+    }));
+    assert.strictEqual(menmaActorStage.count,4,"four-person CE scene truncated a physical participant");
+    for(const expected of ["MENMA","HINATA","KAKASHI","MASKED WOMAN"])assert(menmaActorStage.labels.includes(expected),"four-person stage missing "+expected);
+    assert(menmaActorStage.opacity.every(value=>Number(value)>=0.99),"non-speaking Story cards are still faded: "+JSON.stringify(menmaActorStage));
+    assert(menmaActorStage.filters.every(value=>value==="none"),"non-speaking Story cards are still filtered/greyed: "+JSON.stringify(menmaActorStage));
+        const menmaChoiceLabels=await page.locator("#story-scene-presentation-layer .sc-story-choice").allInnerTexts();
     assert.deepStrictEqual(menmaChoiceLabels,[
       "Ask Kakashi what happened.",
       "Ask her how she knows Kakashi.",
@@ -618,6 +629,8 @@ async function advanceThroughBeat(page,beatId,max=20){
     assert(!/Minato|staged test|employer|ANBU membership/i.test(yieldText),"private hidden truth leaked through nested Kakashi autonomy");
 
     await page.waitForFunction(()=>!globalThis.getActiveStorySceneRuntime?.(),null,{timeout:10000});
+    const menmaExitTransition=await page.evaluate(()=>getStoryHardSceneTransitionState33900());
+    assert.strictEqual(menmaExitTransition.reason,"story_scene_exit_black_wipe","Menma scene returned to Konoha without shared black-wipe exit");
     const menmaResolved=await page.evaluate(()=>({
       privateHistory:getKakashiPrivateOriginHistory46900(),
       nested:getMenmaNestedKakashiIntent46900(),
