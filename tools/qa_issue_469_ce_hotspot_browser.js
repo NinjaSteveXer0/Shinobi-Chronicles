@@ -432,6 +432,7 @@ async function advanceThroughBeat(page,beatId,max=20){
     await page.screenshot({path:path.join(OUT,"05-shinobi-record.png"),fullPage:true});
 
     const beforeReload=await page.evaluate(()=>({
+      runId:getChronicleRunIdentity43600()?.runId||null,
       record:JSON.stringify(getKonohaCeHotspotResolvedRecord46900()),
       continuity:JSON.stringify(getOriginParticipantContinuity46900()),
       decision:JSON.stringify(SC_STORY_DECISION_REALISATION_34000.getStoryUnitSnapshot("konoha_ce_kakashi_masked_interceptor_admin_crossing_v1")),
@@ -444,6 +445,7 @@ async function advanceThroughBeat(page,beatId,max=20){
     await releaseFrontDoor(page);
 
     const afterReload=await page.evaluate(()=>({
+      runId:getChronicleRunIdentity43600()?.runId||null,
       record:JSON.stringify(getKonohaCeHotspotResolvedRecord46900()),
       continuity:JSON.stringify(getOriginParticipantContinuity46900()),
       decision:JSON.stringify(SC_STORY_DECISION_REALISATION_34000.getStoryUnitSnapshot("konoha_ce_kakashi_masked_interceptor_admin_crossing_v1")),
@@ -451,7 +453,9 @@ async function advanceThroughBeat(page,beatId,max=20){
       eligibility:getKonohaCeHotspotEligibility46900(),
       ryo:Number(playerData.ryo)||0
     }));
-    assert.strictEqual(afterReload.record,beforeReload.record,"resolved occurrence changed after reload");
+    assert.strictEqual(beforeReload.runId,"sc_run_v1_qa469_kakashi_matrix_0001","#494 Kakashi run identity drifted before reload");
+    assert.strictEqual(afterReload.runId,beforeReload.runId,"#494 Kakashi run identity changed after reload");
+        assert.strictEqual(afterReload.record,beforeReload.record,"resolved occurrence changed after reload");
     assert.strictEqual(afterReload.continuity,beforeReload.continuity,"participant continuity changed after reload");
     assert.strictEqual(afterReload.decision,beforeReload.decision,"participant/protagonist receipts changed after reload");
     assert.strictEqual(afterReload.count,1);
@@ -748,6 +752,7 @@ async function advanceThroughBeat(page,beatId,max=20){
     const menmaExitTransition=await page.evaluate(()=>getStoryHardSceneTransitionState33900());
     assert.strictEqual(menmaExitTransition.reason,"story_scene_exit_black_wipe","Menma scene returned to Konoha without shared black-wipe exit");
     const menmaResolved=await page.evaluate(()=>({
+      runId:getChronicleRunIdentity43600()?.runId||null,
       privateHistory:getKakashiPrivateOriginHistory46900(),
       nested:getMenmaNestedKakashiIntent46900(),
       record:getKonohaCeHotspotResolvedRecord46900(),
@@ -758,7 +763,8 @@ async function advanceThroughBeat(page,beatId,max=20){
       ryo:Number(playerData.ryo)||0,
       inventory:JSON.stringify(playerData.inventory||{})
     }));
-    assert.strictEqual(JSON.stringify(menmaResolved.privateHistory),sealedBeforeScene,"private Kakashi Origin rerolled during current event");
+    assert.strictEqual(menmaResolved.runId,positiveRunIds[1],"#494 hotspot/Record path changed Menma Chronicle run identity");
+        assert.strictEqual(JSON.stringify(menmaResolved.privateHistory),sealedBeforeScene,"private Kakashi Origin rerolled during current event");
     assert(["acknowledge_recognition","ask_about_delivery","observe_intake_and_departure","disengage_keep_moving"].includes(menmaResolved.nested),"nested Kakashi current intent not committed");
     assert(menmaResolved.record);
     assert.strictEqual(menmaResolved.record.protagonistParticipantId,"academy_menma");
@@ -796,6 +802,7 @@ async function advanceThroughBeat(page,beatId,max=20){
     await page.screenshot({path:path.join(OUT,"08-menma-observer-safe-record.png"),fullPage:true});
 
     const before478Reload=await page.evaluate(()=>({
+      runId:getChronicleRunIdentity43600()?.runId||null,
       privateHistory:JSON.stringify(getKakashiPrivateOriginHistory46900()),
       record:JSON.stringify(getKonohaCeHotspotResolvedRecord46900()),
       decision:JSON.stringify(getMenmaPrivateHistoryDecisionSnapshot46900()),
@@ -808,6 +815,7 @@ async function advanceThroughBeat(page,beatId,max=20){
     await waitRuntime(page);
     await releaseFrontDoor(page);
     const after478Reload=await page.evaluate(()=>({
+      runId:getChronicleRunIdentity43600()?.runId||null,
       privateHistory:JSON.stringify(getKakashiPrivateOriginHistory46900()),
       record:JSON.stringify(getKonohaCeHotspotResolvedRecord46900()),
       decision:JSON.stringify(getMenmaPrivateHistoryDecisionSnapshot46900()),
@@ -817,7 +825,9 @@ async function advanceThroughBeat(page,beatId,max=20){
       ryo:Number(playerData.ryo)||0,
       inventory:JSON.stringify(playerData.inventory||{})
     }));
-    assert.strictEqual(after478Reload.privateHistory,before478Reload.privateHistory,"sealed Kakashi private Origin changed after reload");
+    assert.strictEqual(before478Reload.runId,positiveRunIds[1],"#494 Menma run identity drifted before reload");
+    assert.strictEqual(after478Reload.runId,before478Reload.runId,"#494 Menma run identity changed after reload");
+        assert.strictEqual(after478Reload.privateHistory,before478Reload.privateHistory,"sealed Kakashi private Origin changed after reload");
     assert.strictEqual(after478Reload.record,before478Reload.record,"Menma occurrence changed after reload");
     assert.strictEqual(after478Reload.decision,before478Reload.decision,"Menma/Kakashi autonomy receipts changed after reload");
     assert.strictEqual(after478Reload.nested,before478Reload.nested,"nested Kakashi current intent rerolled after reload");
