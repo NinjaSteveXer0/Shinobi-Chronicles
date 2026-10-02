@@ -1136,6 +1136,36 @@
       ],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Consumes binding #448 / #434 Phase-2 Trial v1. Replaces the fossil level/Mastery threshold semantics and fractional Discipline-EXP PL projection with one shared persistent Discipline Development transaction: exact v1 dynamic thresholds, permanent Current-Stat breakthroughs, overflow, causal caps, activity ceiling 15 for explicitly registered Academy Foundation Exam/Practical actions, formula-only Current PL, stable owned-character identity, save/load/idempotence, and observer-safe player projection. Technique Practice remains inactive."
+    },
+    {
+      "changeId": "issue-461-phase2-inventory-core-surface",
+      "classification": "NEW",
+      "responsibilityIds": [
+        "phase2.inventory_core.presentation"
+      ],
+      "owner": "runtime/alpha-phase2-inventory-core-46100.js",
+      "directCallers": [
+        "index.html",
+        "existing openOverlay navigation shell"
+      ],
+      "stateTouched": [
+        "read-only playerData.inventory ownership projection",
+        "read-only playerData.battlePouch preparation projection",
+        "read-only Character equipment linkage for durable instances",
+        "presentation-only Inventory DOM and navigation state"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_phase2_inventory_core_461.js",
+        "tools/qa_phase2_inventory_core_461_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_save_compatibility_311.js",
+        "tools/qa_phase2_konoha_player_surfaces_431.js",
+        "tools/qa_issue_448_discipline_stat_growth.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "PHASE_2_ACTIVATION",
+      "rationale": "Consumes #449 Step 2 and the durable Inventory/provenance boundaries as one bounded read-only Alpha surface. Existing playerData.inventory remains ownership/quantity authority; existing Battle Pouch and Character equipment remain separate preparation/equipment authorities. The UI projects exact stack quantities and durable instance IDs, exposes source/provenance only when an exact Inventory-row reference exists, and creates no ownership, equip, preparation, Shop, Crafting, PL, Stat, Rank, Skill or Chronicle mutation."
     }
   ]
 }
