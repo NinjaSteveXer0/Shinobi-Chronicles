@@ -402,21 +402,21 @@ function storedKakashiPrivateHistory(){
   const row=store&&store.bySubject&&store.bySubject[PRIVATE_ORIGIN_SUBJECT];
   return row&&typeof row==="object"?clone(row):null;
 }
-function chronicleStableId46900(){
-  const p=pd(),a=acquisition(),origin=a&&a.chronicleOrigin;
-  const explicit=[
-    p&&p.chronicleId,
-    p&&p.chronicleIdentity&&p.chronicleIdentity.id,
-    a&&a.chronicleId
-  ].find(value=>value!=null&&String(value).trim());
-  if(explicit)return String(explicit);
-  const completionRefs=origin&&Array.isArray(origin.completionEvidenceIds)?origin.completionEvidenceIds.filter(Boolean).map(String).sort():[];
-  if(a&&a.chronicleOriginVariantId&&completionRefs.length)return["chronicle",a.chronicleOriginVariantId,...completionRefs].join("::");
-  const fallback=[a&&a.chronicleOriginOwnedCharacterId,a&&a.ninjaIdentityOwnedCharacterId,a&&a.chronicleOriginVariantId].find(value=>value!=null&&String(value).trim());
-  return String(fallback||"anonymous_chronicle");
+function chronicleStableId46900({ensure=false}={}){
+  const existing=typeof globalThis.getChronicleRunIdentity43600==="function"
+    ?globalThis.getChronicleRunIdentity43600()
+    :null;
+  if(existing&&existing.runId)return String(existing.runId);
+  if(ensure&&typeof globalThis.ensureChronicleRunIdentity43600==="function"){
+    const committed=globalThis.ensureChronicleRunIdentity43600({creationKind:"LEGACY_SAVE_MIGRATION"});
+    if(committed&&committed.success===true&&committed.identity&&committed.identity.runId)return String(committed.identity.runId);
+  }
+  return null;
 }
 function privateSeedRef46900(){
-  return [PRIVATE_ORIGIN_SCHEMA,chronicleStableId46900(),PRIVATE_ORIGIN_SUBJECT,PRIVATE_ORIGIN_DEFINITION,PRIVATE_ORIGIN_VERSION].join("::");
+  const runId=chronicleStableId46900({ensure:true});
+  if(!runId)return null;
+  return [PRIVATE_ORIGIN_SCHEMA,runId,PRIVATE_ORIGIN_SUBJECT,PRIVATE_ORIGIN_DEFINITION,PRIVATE_ORIGIN_VERSION].join("::");
 }
 function stablePick46900(boundaryId,choiceIds,seedRef=privateSeedRef46900()){
   const legal=(choiceIds||[]).filter(id=>AUTONOMOUS_KAKASHI_BOUNDARIES[boundaryId]&&AUTONOMOUS_KAKASHI_BOUNDARIES[boundaryId].choiceIds.includes(id));
@@ -777,7 +777,11 @@ function resolveAutonomousKakashiPrivateHistory46900({migrationReason="origin_co
     if(!a||a.chronicleOriginVariantId===ORIGIN_ID)return{success:false,reason:"autonomous_kakashi_not_required_for_selected_kakashi"};
     if(!origin||origin.prologueCompleted!==true)return{success:false,reason:"selected_origin_must_complete_before_private_convergence"};
   }
-  const seedRef=String(seedRefOverride||privateSeedRef46900());
+  const resolvedSeedRef=seedRefOverride?String(seedRefOverride):privateSeedRef46900();
+  if(!resolvedSeedRef)return{success:false,reason:"chronicle_run_identity_required"};
+  const seedRef=String(resolvedSeedRef);
+  const runId=chronicleStableId46900();
+  if(!seedRefOverride&&!runId)return{success:false,reason:"chronicle_run_identity_required"};
   const historyId=privateHistoryIdentity46900(seedRef);
   const state=initialPrivateOriginState46900();
   const choices=[],battles=[],materialRefs=[],machineReceipts=[],semanticTrace=[];
@@ -1142,7 +1146,8 @@ function resolveAutonomousKakashiPrivateHistory46900({migrationReason="origin_co
     schemaVersion:1,
     semanticType:PRIVATE_ORIGIN_SCHEMA,
     privateOriginHistoryId:historyId,
-    chronicleId:chronicleStableId46900(),
+    chronicleId:runId||null,
+    chronicleRunId:runId||null,
     subjectStableId:PRIVATE_ORIGIN_SUBJECT,
     originDefinitionId:PRIVATE_ORIGIN_DEFINITION,
     originDefinitionVersion:PRIVATE_ORIGIN_VERSION,
@@ -1200,6 +1205,8 @@ function resolveAutonomousKakashiPrivateHistory46900({migrationReason="origin_co
 function ensureAutonomousKakashiPrivateHistory46900(reason="origin_convergence_preparation"){
   const existing=storedKakashiPrivateHistory();
   if(existing&&existing.committed===true)return{success:true,idempotent:true,history:existing};
+  const runId=chronicleStableId46900({ensure:true});
+  if(!runId)return{success:false,reason:"chronicle_run_identity_required"};
   return resolveAutonomousKakashiPrivateHistory46900({migrationReason:reason});
 }
 function recordId(row){return row&&String(row.sourceOccurrenceId||row.occurrenceId||row.id||"")||"";}
@@ -1395,7 +1402,9 @@ function persistPlayerExperiencedKakashiPrivateHistory46900(state,instanceId,con
   if(!state||!instanceId||!continuity)return{success:false,reason:"player_experienced_private_history_source_missing"};
   const existing=storedKakashiPrivateHistory();
   if(existing&&existing.committed===true)return{success:true,idempotent:true,history:existing};
-  const seedRef=[PRIVATE_ORIGIN_SCHEMA,chronicleStableId46900(),PRIVATE_ORIGIN_SUBJECT,PRIVATE_ORIGIN_DEFINITION,PRIVATE_ORIGIN_VERSION,"PLAYER_EXPERIENCED"].join("::");
+  const runId=chronicleStableId46900({ensure:true});
+  if(!runId)return{success:false,reason:"chronicle_run_identity_required"};
+  const seedRef=[PRIVATE_ORIGIN_SCHEMA,runId,PRIVATE_ORIGIN_SUBJECT,PRIVATE_ORIGIN_DEFINITION,PRIVATE_ORIGIN_VERSION,"PLAYER_EXPERIENCED"].join("::");
   const battles=Object.values(state.battles||{}).map(row=>({
     battleOccurrenceId:row&&row.battleId||null,
     battleConfigId:row&&row.encounterId||null,
@@ -1406,7 +1415,8 @@ function persistPlayerExperiencedKakashiPrivateHistory46900(state,instanceId,con
     schemaVersion:1,
     semanticType:PRIVATE_ORIGIN_SCHEMA,
     privateOriginHistoryId:"private_origin::"+PRIVATE_ORIGIN_SUBJECT+"::"+stableHash46900(seedRef+"|"+instanceId).toString(16),
-    chronicleId:chronicleStableId46900(),
+    chronicleId:runId,
+    chronicleRunId:runId,
     subjectStableId:PRIVATE_ORIGIN_SUBJECT,
     originDefinitionId:PRIVATE_ORIGIN_DEFINITION,
     originDefinitionVersion:PRIVATE_ORIGIN_VERSION,
@@ -2670,6 +2680,9 @@ function diagnostics(){
     storyBoardRegistered:typeof globalThis.resolveStorySceneBoardProjection==="function",
     administrationBackdropBound:String(installPhase2CeHotspot46900).includes("hokage_district_exterior.png"),
     currentTeamAuthority:String(currentTeam).includes("getChronicleCurrentTeam43600")&&String(eligibility).includes("currentTeam()"),
+    chronicleRunIdentityAuthority:String(chronicleStableId46900).includes("getChronicleRunIdentity43600")&&String(chronicleStableId46900).includes("ensureChronicleRunIdentity43600"),
+    privateSeedUsesRunIdOnly:String(privateSeedRef46900).includes("runId")&&!String(chronicleStableId46900).includes("completionEvidenceIds")&&!String(chronicleStableId46900).includes("chronicleOriginOwnedCharacterId"),
+    sealedPrivateHistoryWinsBeforeRunIdentity:String(ensureAutonomousKakashiPrivateHistory46900).indexOf("storedKakashiPrivateHistory")<String(ensureAutonomousKakashiPrivateHistory46900).indexOf("chronicleStableId46900"),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
@@ -2679,6 +2692,7 @@ function diagnostics(){
 try{migrateLegacyKakashiPrivateOrigin46900();}catch(_error){}
 
 globalThis.getKakashiPrivateOriginHistory46900=()=>clone(storedKakashiPrivateHistory());
+globalThis.getChronicleRunId46900=()=>chronicleStableId46900();
 globalThis.ensureAutonomousKakashiPrivateHistory46900=reason=>ensureAutonomousKakashiPrivateHistory46900(reason);
 globalThis.previewAutonomousKakashiPrivateOrigin46900=seedRef=>resolveAutonomousKakashiPrivateHistory46900({seedRefOverride:String(seedRef||"diagnostic_private_origin_seed"),persist:false,diagnosticPreview:true,migrationReason:"diagnostic_preview"});
 globalThis.migrateLegacyKakashiPrivateOrigin46900=migrateLegacyKakashiPrivateOrigin46900;
