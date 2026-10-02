@@ -528,9 +528,13 @@ async function advanceThroughBeat(page,beatId,max=20){
 
     const obitoChoiceState=await beat(page);
     assert.strictEqual(obitoChoiceState.beatId,"ce478_menma_choice");
-    const obitoStage=await page.evaluate(()=>[...document.querySelectorAll(".sc-scene-board-33900__actor")].map(node=>node.dataset.actorLabel));
-    for(const expected of ["MENMA","OBITO","KAKASHI","MASKED WOMAN"])assert(obitoStage.includes(expected),"Menma + Obito stage missing "+expected+": "+JSON.stringify(obitoStage));
-    assert(!obitoStage.includes("HINATA"),"Hinata ghost participant leaked into Menma + Obito current team");
+    const obitoStage=await page.evaluate(()=>[...document.querySelectorAll(".sc-scene-board-33900__actor")].map(node=>({label:node.dataset.actorLabel,anchor:node.dataset.scStageAnchor,opacity:getComputedStyle(node).opacity,filter:getComputedStyle(node).filter})));
+    const obitoLabels=obitoStage.map(row=>row.label);
+    for(const expected of ["MENMA","OBITO","KAKASHI","MASKED WOMAN"])assert(obitoLabels.includes(expected),"Menma + Obito stage missing "+expected+": "+JSON.stringify(obitoStage));
+    assert(!obitoLabels.includes("HINATA"),"Hinata ghost participant leaked into Menma + Obito current team");
+    const obitoAnchors=Object.fromEntries(obitoStage.map(row=>[row.label,row.anchor]));
+    assert.deepStrictEqual(obitoAnchors,{MENMA:"PLAYER_LEFT",OBITO:"INNER_LEFT",KAKASHI:"INNER_RIGHT","MASKED WOMAN":"OPPONENT_RIGHT"},"Obito team did not consume semantic Scene Board anchors");
+    assert(obitoStage.every(row=>Number(row.opacity)>=0.99&&row.filter==="none"),"Obito team listener cards are faded/desaturated: "+JSON.stringify(obitoStage));
     const obitoChoiceLabels=await page.locator("#story-scene-presentation-layer .sc-story-choice").allInnerTexts();
     assert.deepStrictEqual(obitoChoiceLabels,[
       "Ask Kakashi what happened.",
@@ -680,16 +684,28 @@ async function advanceThroughBeat(page,beatId,max=20){
 
     const menmaChoiceState=await beat(page);
     assert.strictEqual(menmaChoiceState.beatId,"ce478_menma_choice");
-    const menmaActorStage=await page.evaluate(()=>({
-      labels:[...document.querySelectorAll(".sc-scene-board-33900__actor")].map(node=>node.dataset.actorLabel),
-      count:document.querySelectorAll(".sc-scene-board-33900__actor").length,
-      opacity:[...document.querySelectorAll(".sc-scene-board-33900__actor")].map(node=>getComputedStyle(node).opacity),
-      filters:[...document.querySelectorAll(".sc-scene-board-33900__actor")].map(node=>getComputedStyle(node).filter)
-    }));
+    const menmaActorStage=await page.evaluate(()=>{
+      const nodes=[...document.querySelectorAll(".sc-scene-board-33900__actor")];
+      return{
+        labels:nodes.map(node=>node.dataset.actorLabel),
+        count:nodes.length,
+        opacity:nodes.map(node=>getComputedStyle(node).opacity),
+        filters:nodes.map(node=>getComputedStyle(node).filter),
+        entries:nodes.map(node=>{const r=node.getBoundingClientRect();return{label:node.dataset.actorLabel,anchor:node.dataset.scStageAnchor,left:r.left,right:r.right,top:r.top,bottom:r.bottom};})
+      };
+    });
     assert.strictEqual(menmaActorStage.count,4,"four-person CE scene truncated a physical participant");
     for(const expected of ["MENMA","HINATA","KAKASHI","MASKED WOMAN"])assert(menmaActorStage.labels.includes(expected),"four-person stage missing "+expected);
     assert(menmaActorStage.opacity.every(value=>Number(value)>=0.99),"non-speaking Story cards are still faded: "+JSON.stringify(menmaActorStage));
     assert(menmaActorStage.filters.every(value=>value==="none"),"non-speaking Story cards are still filtered/greyed: "+JSON.stringify(menmaActorStage));
+    const menmaAnchorMap=Object.fromEntries(menmaActorStage.entries.map(row=>[row.label,row.anchor]));
+    assert.deepStrictEqual(menmaAnchorMap,{MENMA:"PLAYER_LEFT",HINATA:"INNER_LEFT",KAKASHI:"INNER_RIGHT","MASKED WOMAN":"OPPONENT_RIGHT"},"#486 semantic anchor hierarchy drifted");
+    for(let i=0;i<menmaActorStage.entries.length;i++)for(let j=i+1;j<menmaActorStage.entries.length;j++){
+      const a=menmaActorStage.entries[i],b=menmaActorStage.entries[j];
+      const overlapX=Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left));
+      const overlapY=Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));
+      assert(!(overlapX>2&&overlapY>2),"#486 actor collision detected: "+JSON.stringify({a,b,overlapX,overlapY}));
+    }
         const menmaChoiceLabels=await page.locator("#story-scene-presentation-layer .sc-story-choice").allInnerTexts();
     assert.deepStrictEqual(menmaChoiceLabels,[
       "Ask Kakashi what happened.",
