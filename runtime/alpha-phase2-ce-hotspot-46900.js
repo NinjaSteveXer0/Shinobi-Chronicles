@@ -291,6 +291,94 @@ function branchConsequence(choiceId){
   return row?clone(row):null;
 }
 
+const PRIVATE_ORIGIN_SCHEMA="sc.privateOriginHistory.v1";
+const PRIVATE_ORIGIN_SUBJECT=ORIGIN_ID;
+const PRIVATE_ORIGIN_DEFINITION="academy_kakashi_v2";
+const PRIVATE_ORIGIN_VERSION="v3";
+const MENMA_ID="academy_menma";
+const HINATA_ID="academy_hinata";
+const MENMA_STORY_UNIT_REF=EVENT_ID+":menma_private_history_emergence";
+const MENMA_SCENE_ID="scene_konoha_ce_kakashi_masked_interceptor_admin_crossing_menma_v1";
+const MENMA_ACTION_ID="observe_kakashi_private_history_emergence";
+
+const AUTONOMOUS_KAKASHI_BOUNDARIES=Object.freeze({
+  B01:Object.freeze({beatId:"v2_scene02_tail",choiceIds:Object.freeze(["watch_exchange","move_in_closer","strike_before_handoff","slip_for_package"])}),
+  B02:Object.freeze({beatId:"v2_watch_exchange",choiceIds:Object.freeze(["stop_assassin","secure_package","secure_before_assassin","assassin_then_package","go_original_target"])}),
+  B03:Object.freeze({beatId:"v2_mi_stop_win",choiceIds:Object.freeze(["mi_pursue_ps","mi_kill","mi_anbu","mi_police","mi_restrain"])}),
+  B04:Object.freeze({beatId:"v2_ps_seq_win",choiceIds:Object.freeze(["ps_go_amt","ps_kill","ps_restrain_continue","ps_anbu","ps_police","ps_report"])}),
+  B05:Object.freeze({beatId:"v2_amt_seq_win",choiceIds:Object.freeze(["amt_seq_police","amt_seq_release","amt_seq_kill","amt_seq_anbu","amt_seq_collect"])}),
+  B06:Object.freeze({beatId:"v2_group_collect_choice",choiceIds:Object.freeze(["collect_one_mi_anbu","collect_one_mi_police","collect_one_ps_anbu","collect_one_ps_police","collect_one_amt_anbu","collect_one_amt_police","collect_group_anbu","collect_group_police"])}),
+  B07:Object.freeze({beatId:"v2_amt_missing_win",choiceIds:Object.freeze(["amt_missing_kill","amt_missing_restrain","amt_missing_anbu","amt_missing_police"])}),
+  B08:Object.freeze({beatId:"v2_ps_mi_win",choiceIds:Object.freeze(["secure_stay_first","secure_return"])}),
+  B09:Object.freeze({beatId:"v2_secure_amt_win",choiceIds:Object.freeze(["secure_amt_police","secure_amt_release","secure_amt_kill","secure_amt_anbu"])}),
+  B10:Object.freeze({beatId:"v2_ps_package_second_win",choiceIds:Object.freeze(["package_second_stay_amt","package_second_return"])}),
+  B11:Object.freeze({beatId:"v2_amt_package_second_win",choiceIds:Object.freeze(["package_second_amt_police","package_second_amt_release","package_second_amt_kill","package_second_amt_anbu"])}),
+  B12:Object.freeze({beatId:"v2_get_closer_success",choiceIds:Object.freeze(["closer_handoff","closer_strike","closer_pick"])}),
+  B13:Object.freeze({beatId:"v2_closer_handoff",choiceIds:Object.freeze(["closer_watch_stop","closer_watch_secure","closer_watch_before","closer_watch_sequence","closer_watch_amt"])}),
+  B14:Object.freeze({beatId:"v2_get_closer_failure",choiceIds:Object.freeze(["failure_stay","failure_stop_ps","failure_cutoff"])}),
+  B15:Object.freeze({beatId:"v2_stay_package_intercept",choiceIds:Object.freeze(["demand_package","take_him_down","ask_where"])}),
+  B16:Object.freeze({beatId:"v2_ask_where",choiceIds:Object.freeze(["ask_then_demand","ask_then_take"])}),
+  B17:Object.freeze({beatId:"v2_demand_win",choiceIds:Object.freeze(["demand_police","demand_release","demand_kill","demand_anbu"])}),
+  B18:Object.freeze({beatId:"v2_take_down_win",choiceIds:Object.freeze(["take_police","take_release","take_kill","take_anbu"])}),
+  B19:Object.freeze({beatId:"v2_ps_missing_win",choiceIds:Object.freeze(["ps_missing_kill","ps_missing_restrain","ps_missing_anbu","ps_missing_police"])}),
+  B20:Object.freeze({beatId:"v2_cutoff_win",choiceIds:Object.freeze(["cutoff_police","cutoff_anbu","cutoff_kill","cutoff_release"])}),
+  B21:Object.freeze({beatId:"v2_improved_2v1_win",choiceIds:Object.freeze(["improved_police","improved_anbu","improved_kill","improved_release"])}),
+  B22:Object.freeze({beatId:"v2_direct_mi_win",choiceIds:Object.freeze(["direct_group_police","direct_group_anbu","direct_group_kill","direct_group_release"])}),
+  B23:Object.freeze({beatId:"v2_pickpocket_3v1_win",choiceIds:Object.freeze(["pick_group_police","pick_group_anbu","pick_group_kill","pick_group_release"])})
+});
+const AUTONOMOUS_KAKASHI_CHOICE_IDS=Object.freeze(Object.values(AUTONOMOUS_KAKASHI_BOUNDARIES).flatMap(row=>row.choiceIds));
+
+const MENMA_CHOICES=Object.freeze([
+  Object.freeze({id:"menma_ask_kakashi_prior_connection",label:"Ask Kakashi what happened.",intentType:"ASK_KAKASHI_PRIOR_CONNECTION"}),
+  Object.freeze({id:"menma_ask_mi_prior_connection",label:"Ask her how she knows Kakashi.",intentType:"ASK_MI_PRIOR_CONNECTION"}),
+  Object.freeze({id:"menma_yield_to_kakashi",label:"Let Kakashi handle it.",intentType:"YIELD_TO_KAKASHI_AUTONOMY"}),
+  Object.freeze({id:"menma_disengage",label:"Keep moving.",intentType:"DISENGAGE_CURRENT_TEAM"})
+]);
+
+const KAKASHI_CURRENT_RESPONSE_CUES=Object.freeze({
+  lethal_attempt:Object.freeze([
+    Object.freeze({kind:"narration",text:"Kakashi's eyes drop once to her hands."}),
+    Object.freeze({kind:"dialogue",speakerName:"KAKASHI",text:"I know."}),
+    Object.freeze({kind:"narration",text:"His own hands stay clear of his weapons."})
+  ]),
+  police_transfer:Object.freeze([
+    Object.freeze({kind:"narration",text:"Kakashi follows her glance toward the Administration doors.\n\nThen he looks back at her.\n\nHe says nothing."})
+  ]),
+  restraint_or_anbu:Object.freeze([
+    Object.freeze({kind:"narration",text:"Kakashi notices the turn of her wrist.\n\nHis gaze stays there for one second too long.\n\nThen he looks toward the public intake window."})
+  ]),
+  deliberate_release:Object.freeze([
+    Object.freeze({kind:"narration",text:"Kakashi returns the small inclination of her head.\n\nNothing warmer is added."})
+  ]),
+  mi_defeated_kakashi:Object.freeze([
+    Object.freeze({kind:"narration",text:"Her glance reaches his shoulder.\n\nKakashi rolls it once."}),
+    Object.freeze({kind:"dialogue",speakerName:"KAKASHI",text:"I remember."})
+  ]),
+  kakashi_defeated_mi:Object.freeze([
+    Object.freeze({kind:"narration",text:"Kakashi sees the distance she keeps.\n\nHe does not close it.\n\nHis attention moves from her stance to the receipt hidden in her sleeve."})
+  ]),
+  material_encounter:Object.freeze([
+    Object.freeze({kind:"narration",text:"Kakashi stops fully.\n\nHe watches her for the next move instead of explaining the recognition."})
+  ])
+});
+const HINATA_RESPONSE_CUES=Object.freeze({
+  danger:Object.freeze([
+    Object.freeze({kind:"narration",text:"Hinata looks between them."}),
+    Object.freeze({kind:"dialogue",speakerName:"HINATA",text:"That sounded specific."})
+  ]),
+  explicit_history:Object.freeze([
+    Object.freeze({kind:"narration",text:"Hinata's eyes narrow slightly."}),
+    Object.freeze({kind:"dialogue",speakerName:"HINATA",text:"You two have history."})
+  ]),
+  visible_recognition:Object.freeze([
+    Object.freeze({kind:"narration",text:"Hinata watches the way the masked woman's attention stays on Kakashi."}),
+    Object.freeze({kind:"dialogue",speakerName:"HINATA",text:"She knows you."})
+  ]),
+  quiet:Object.freeze([
+    Object.freeze({kind:"narration",text:"Hinata shifts until both Kakashi and the masked woman are in view.\n\nShe keeps quiet."})
+  ])
+});
+
 function clone(value){
   if(value===undefined)return undefined;
   try{return typeof cloneProgressionData==="function"?cloneProgressionData(value):JSON.parse(JSON.stringify(value));}
