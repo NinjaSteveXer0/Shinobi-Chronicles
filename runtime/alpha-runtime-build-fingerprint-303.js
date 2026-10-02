@@ -107,7 +107,8 @@
       exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-02-CC",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
-      generationPresent:first.runtimeGeneration==="phase2-private-origin-live-ce-hotspot-478",
+      generationPresent:first.runtimeGeneration==="phase2-first-live-ce-hotspot-469",
+      "phase2-private-origin-live-ce-hotspot-478",
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)
