@@ -431,7 +431,7 @@
       exactTenOriginAuthority:getOriginEntries33400.toString().includes("getAlphaChronicleOriginSelectionEntries"),
       selectionBeforeIntroNoCommit:!renderNinja33400.toString().includes("selectChronicleOrigin"),
       beginOwnsOriginCommit:beginSource.includes("selectChronicleOrigin")&&beginSource.includes("beginAlphaChronicleOriginPrologue"),
-      beginAllocatesRunIdentityBeforeOrigin:beginSource.includes("allocateChronicleRunId43600")&&beginSource.indexOf("allocateChronicleRunId43600")<beginSource.indexOf("selectChronicleOrigin"),
+      beginAllocatesRunIdentityBeforeOrigin:beginSource.includes("allocateChronicleRunId43600")&&beginSource.indexOf("allocateChronicleRunId43600")<beginSource.indexOf("const selected=selectChronicleOrigin"),
       beginCommitsRunIdentityBeforePrologue:beginSource.includes("commitChronicleRunIdentity43600")&&beginSource.includes('creationKind:"NEW_START"')&&beginSource.indexOf("commitChronicleRunIdentity43600")<beginSource.indexOf("beginAlphaChronicleOriginPrologue"),
       noSecondAcquisitionAuthority:!beginSource.includes("commitCharacterAcquisition")&&!beginSource.includes("grantCharacterRegistryOwnership"),
       konohaOnlyAlphaStart:VILLAGES.filter(v=>v.enabled).length===1&&VILLAGES[0].id==="konoha",
