@@ -801,6 +801,55 @@ function legacyContinuity(){
 function getContinuity(){
   return storedContinuity()||legacyContinuity();
 }
+function persistPlayerExperiencedKakashiPrivateHistory46900(state,instanceId,continuity){
+  if(!state||!instanceId||!continuity)return{success:false,reason:"player_experienced_private_history_source_missing"};
+  const existing=storedKakashiPrivateHistory();
+  if(existing&&existing.committed===true)return{success:true,idempotent:true,history:existing};
+  const seedRef=[PRIVATE_ORIGIN_SCHEMA,chronicleStableId46900(),PRIVATE_ORIGIN_SUBJECT,PRIVATE_ORIGIN_DEFINITION,PRIVATE_ORIGIN_VERSION,"PLAYER_EXPERIENCED"].join("::");
+  const battles=Object.values(state.battles||{}).map(row=>({
+    battleOccurrenceId:row&&row.battleId||null,
+    battleConfigId:row&&row.encounterId||null,
+    outcome:row&&row.outcome||null,
+    playerActionOpportunityCount:Number(row&&row.playerActionOpportunityCount)||null
+  })).filter(row=>row.battleConfigId||row.battleOccurrenceId);
+  const row={
+    schemaVersion:1,
+    semanticType:PRIVATE_ORIGIN_SCHEMA,
+    privateOriginHistoryId:"private_origin::"+PRIVATE_ORIGIN_SUBJECT+"::"+stableHash46900(seedRef+"|"+instanceId).toString(16),
+    chronicleId:chronicleStableId46900(),
+    subjectStableId:PRIVATE_ORIGIN_SUBJECT,
+    originDefinitionId:PRIVATE_ORIGIN_DEFINITION,
+    originDefinitionVersion:PRIVATE_ORIGIN_VERSION,
+    resolutionMode:"PLAYER_EXPERIENCED",
+    stableAutonomousResolutionSeedRef:null,
+    profileAuthority:"player_experienced_frozen_kakashi_v2",
+    profileCoverage:{meaningfulBoundaryCount:Object.keys(AUTONOMOUS_KAKASHI_BOUNDARIES).length,legalPlayerFacingChoiceCount:AUTONOMOUS_KAKASHI_CHOICE_IDS.length,machineResolveResultChoicesExcluded:true},
+    exactCommittedSourceOccurrences:[...(continuity.materialHistoryRefs||[])],
+    exactMaterialChoiceIntentReceipts:clone(state.routeHistory||[]),
+    exactBattleOutcomeRefs:battles,
+    subjectPersistentConsequences:{
+      knowledgeMemory:{maskedInterceptorEncountered:continuity.encounteredByProtagonist===true,miMaterialHistory:clone(continuity.materialHistory||{})},
+      developmentRefs:[],currentStatMutationRefs:[],learnedAccessRefs:[],relationshipSharedHistoryRefs:[...(continuity.materialHistoryRefs||[])],persistentConditionRefs:[]
+    },
+    externalParticipantRefs:[MI_ID,"academy_kakashi_origin_amt","academy_kakashi_origin_package_smuggler"],
+    convergenceCarryForwardClassification:{
+      subjectKnowledgeMemory:"ALWAYS",
+      developmentStats:"ALREADY_COMMITTED_BY_PLAYER_EXPERIENCED_ORIGIN",
+      materialObjects:"EXISTING_OWNERSHIP_AUTHORITY",
+      externalOriginWorldState:"ORIGIN_SCOPE_ONLY_UNLESS_IMPORTED"
+    },
+    economyFirewall:{
+      duplicateStartingPurseGranted:false,
+      autonomousPlayerVictoryBattleRyoGranted:false,
+      blanketInventoryRewardsGranted:false,
+      playerEconomyMutation:false
+    },
+    migrationReceipt:null,
+    miContinuity:clone(continuity),
+    commitState:"COMMITTED",committed:true,committedAt:Date.now()
+  };
+  return persistKakashiPrivateHistory46900(row);
+}
 function laterParticipantUnavailabilityRefs(continuity){
   if(!continuity)return[];
   const originTime=Number(continuity.capturedAt)||0;
@@ -836,11 +885,20 @@ function isResolved(){
   }catch(_error){return false;}
 }
 function eligibility(){
-  const a=acquisition(),team=currentTeam(),continuity=getContinuity();
-  if(!a||a.chronicleOriginVariantId!==ORIGIN_ID)return{available:false,reason:"academy_kakashi_origin_required"};
-  if(!a.chronicleOrigin||a.chronicleOrigin.prologueCompleted!==true)return{available:false,reason:"academy_kakashi_origin_incomplete"};
+  const a=acquisition();
+  if(!a||!a.chronicleOriginVariantId)return{available:false,reason:"selected_origin_required"};
+  const selectedOrigin=String(a.chronicleOriginVariantId);
+  if(!a.chronicleOrigin||a.chronicleOrigin.prologueCompleted!==true)return{available:false,reason:"selected_origin_incomplete"};
+  if(selectedOrigin!==ORIGIN_ID){
+    const privateResult=ensureAutonomousKakashiPrivateHistory46900(currentTeam()?"pre_471_active_konoha_migration":"origin_convergence_preparation");
+    if(!privateResult||privateResult.success!==true)return{available:false,reason:privateResult&&privateResult.reason||"kakashi_private_origin_unavailable"};
+  }
+  const team=currentTeam(),continuity=getContinuity();
   if(typeof isAcademyFreePlayAvailable==="function"&&isAcademyFreePlayAvailable()!==true)return{available:false,reason:"academy_free_play_required"};
-  if(!team||team.originVariantId!==ORIGIN_ID||!Array.isArray(team.teamVariantIds)||team.teamVariantIds.length!==3)return{available:false,reason:"exact_current_academy_team_required"};
+  if(!team||team.originVariantId!==selectedOrigin||!Array.isArray(team.teamVariantIds)||team.teamVariantIds.length!==3)return{available:false,reason:"exact_current_academy_team_required"};
+  if(!team.teamVariantIds.includes(ORIGIN_ID))return{available:false,reason:"kakashi_current_presence_required"};
+  if(selectedOrigin!==ORIGIN_ID&&selectedOrigin!==MENMA_ID)return{available:false,reason:"non_kakashi_protagonist_writing_not_authorised"};
+  if(selectedOrigin===MENMA_ID&&!team.teamVariantIds.includes(HINATA_ID))return{available:false,reason:"menma_live_benchmark_requires_hinata"};
   if(!continuity)return{available:false,reason:"masked_interceptor_continuity_unproven"};
   if(continuity.encounteredByProtagonist!==true||continuity.fieldDispositionState==="UNSEEN")return{available:false,reason:"masked_interceptor_unseen"};
   if(continuity.survivedOrigin!==true||continuity.fieldDispositionState==="KILLED")return{available:false,reason:"masked_interceptor_killed"};
@@ -848,17 +906,32 @@ function eligibility(){
   const unavailableRefs=laterParticipantUnavailabilityRefs(continuity);
   if(unavailableRefs.length)return{available:false,reason:"masked_interceptor_later_unavailable",sourceRefs:unavailableRefs};
   if(isResolved())return{available:false,reason:"hotspot_already_resolved"};
-  return{available:true,team:clone(team),continuity:clone(continuity),historyFamily:historyFamily(continuity)};
+  return{
+    available:true,
+    mode:selectedOrigin===ORIGIN_ID?"kakashi_protagonist":"menma_private_history_emergence",
+    protagonistVariantId:selectedOrigin,
+    team:clone(team),
+    continuity:clone(continuity),
+    privateHistory:selectedOrigin===ORIGIN_ID?storedKakashiPrivateHistory():storedKakashiPrivateHistory(),
+    historyFamily:historyFamily(continuity)
+  };
 }
 function eventPlan(){
   const gate=eligibility();
   if(!gate.available)return{success:false,reason:gate.reason};
-  const teammates=gate.team.teamVariantIds.filter(id=>id!==ORIGIN_ID);
-  const order=new Map(TEAMMATE_AUTHORED_ORDER.map((id,index)=>[id,index]));
-  const teammateOrder=[...teammates].sort((a,b)=>(order.has(a)?order.get(a):999)-(order.has(b)?order.get(b):999));
-  if(teammateOrder.length!==2||teammateOrder.some(id=>!REACTIONS[id]))return{success:false,reason:"authored_teammate_reaction_missing",teammates};
+  let teammateOrder;
+  if(gate.mode==="kakashi_protagonist"){
+    const teammates=gate.team.teamVariantIds.filter(id=>id!==ORIGIN_ID);
+    const order=new Map(TEAMMATE_AUTHORED_ORDER.map((id,index)=>[id,index]));
+    teammateOrder=[...teammates].sort((a,b)=>(order.has(a)?order.get(a):999)-(order.has(b)?order.get(b):999));
+    if(teammateOrder.length!==2||teammateOrder.some(id=>!REACTIONS[id]))return{success:false,reason:"authored_teammate_reaction_missing",teammates};
+  }else{
+    teammateOrder=[ORIGIN_ID,HINATA_ID];
+  }
   return{
     success:true,
+    mode:gate.mode,
+    protagonistVariantId:gate.protagonistVariantId,
     occurrenceId:OCCURRENCE_ID,
     eventId:EVENT_ID,
     opportunityId:OPPORTUNITY_ID,
@@ -867,6 +940,7 @@ function eventPlan(){
     teamAssignmentId:gate.team.assignmentId,
     teamVariantIds:[...gate.team.teamVariantIds],
     teammateOrder,
+    privateOriginHistoryRef:gate.privateHistory&&gate.privateHistory.privateOriginHistoryId||null,
     historyFamily:gate.historyFamily,
     historySourceRefs:[...(gate.continuity.materialHistoryRefs||[])],
     continuityOriginOccurrenceRef:gate.continuity.originOccurrenceRef,
@@ -887,13 +961,37 @@ function completeChronicleOriginPrologue46900(originVariantId,evidenceIds=[]){
   const result=PRE_COMPLETE_ORIGIN?PRE_COMPLETE_ORIGIN.apply(this,arguments):{success:false,reason:"origin_completion_authority_missing"};
   if(result&&result.success===true&&originVariantId===ORIGIN_ID&&capturedState&&capturedInstance){
     const row=continuityFromCapturedState(capturedState,capturedInstance);
-    if(row&&row.hiddenPostTestReviewReached===true)saveContinuity(row);
+    if(row&&row.hiddenPostTestReviewReached===true){
+      saveContinuity(row);
+      persistPlayerExperiencedKakashiPrivateHistory46900(capturedState,capturedInstance,row);
+    }
   }
   return result;
 }
 if(PRE_COMPLETE_ORIGIN){
   globalThis.completeChronicleOriginPrologue=completeChronicleOriginPrologue46900;
   try{completeChronicleOriginPrologue=completeChronicleOriginPrologue46900;}catch(_error){}
+}
+
+const PRE_CONFIRM_ACADEMY_TEAM_46900=typeof globalThis.confirmAcademyTeamFormation==="function"?globalThis.confirmAcademyTeamFormation:null;
+function confirmAcademyTeamFormation46900(){
+  const a=acquisition();
+  if(a&&a.chronicleOriginVariantId&&a.chronicleOriginVariantId!==ORIGIN_ID&&a.chronicleOrigin&&a.chronicleOrigin.prologueCompleted===true){
+    const privateResult=ensureAutonomousKakashiPrivateHistory46900("origin_convergence_preparation_before_team_formation");
+    if(!privateResult||privateResult.success!==true)return privateResult||{success:false,reason:"kakashi_private_origin_preparation_failed"};
+  }
+  return PRE_CONFIRM_ACADEMY_TEAM_46900?PRE_CONFIRM_ACADEMY_TEAM_46900.apply(this,arguments):{success:false,reason:"academy_team_formation_authority_missing"};
+}
+if(PRE_CONFIRM_ACADEMY_TEAM_46900){
+  globalThis.confirmAcademyTeamFormation=confirmAcademyTeamFormation46900;
+  try{confirmAcademyTeamFormation=confirmAcademyTeamFormation46900;}catch(_error){}
+}
+function migrateLegacyKakashiPrivateOrigin46900(){
+  const a=acquisition();
+  if(!a||!a.chronicleOriginVariantId||a.chronicleOriginVariantId===ORIGIN_ID||!a.chronicleOrigin||a.chronicleOrigin.prologueCompleted!==true)return{success:false,reason:"migration_not_applicable"};
+  if(storedKakashiPrivateHistory())return{success:true,idempotent:true,history:storedKakashiPrivateHistory()};
+  if(!currentTeam()&&!(typeof isAcademyFreePlayAvailable==="function"&&isAcademyFreePlayAvailable()===true))return{success:false,reason:"migration_waiting_for_convergence_boundary"};
+  return ensureAutonomousKakashiPrivateHistory46900("pre_471_active_konoha_one_shot_migration");
 }
 
 function decisionSnapshot(){
