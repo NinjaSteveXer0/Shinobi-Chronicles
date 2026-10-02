@@ -25,6 +25,10 @@ assert(manifest.includes('stateDomainId:"originParticipantContinuity"'),"#436 co
 assert(manifest.includes("getOriginParticipantContinuityStore43600"),"#436 continuity access seam missing");
 assert(manifest.includes('stateDomainId:"privateOriginHistory"'),"#471/#478 private Origin history domain missing");
 assert(manifest.includes("getPrivateOriginHistoryStore43600"),"private Origin history access seam missing");
+assert(manifest.includes('stateDomainId:"chronicleRunIdentity"'),"#494 Chronicle run identity domain missing");
+assert(manifest.includes('stableIdentityKey:"playerData.phase2ChronicleState.chronicleRunIdentity.runId"'),"#494 canonical runId path missing");
+assert(manifest.includes("ensureChronicleRunIdentity43600"),"#494 run identity ensure seam missing");
+assert(manifest.includes("allocateChronicleRunId43600"),"#494 run identity allocator missing");
 assert(src.includes('const PRIVATE_ORIGIN_SCHEMA="sc.privateOriginHistory.v1"'),"private Origin semantic identity missing");
 assert(src.includes('resolutionMode:"AUTONOMOUS_PRIVATE"'),"autonomous private Kakashi history mode missing");
 assert(src.includes('resolutionMode:"PLAYER_EXPERIENCED"'),"player-experienced Kakashi private history mode missing");
@@ -50,6 +54,16 @@ assert(src.includes("hiddenPostTestReviewReached"),"hidden post-test review cont
 assert(src.includes('postTestTruthClass:"staged_konoha_test_participant"')||src.includes('"staged_konoha_test_participant"'),"post-test World truth class missing");
 
 assert(src.includes("kakashi_current_presence_required"),"#478 Kakashi physical-presence eligibility missing");
+assert(src.includes('reason:"chronicle_run_identity_required"'),"#494 stable run identity fail-closed gate missing");
+assert(src.includes("getChronicleRunIdentity43600"),"#469 private history does not consume canonical Chronicle run identity");
+assert(src.includes("ensureChronicleRunIdentity43600"),"#469 legacy begun save cannot receive persisted run identity");
+assert(!src.includes("completionEvidenceIds)?origin.completionEvidenceIds"),"#494 private seed still fingerprints Origin completion evidence");
+assert(!src.includes('fallback=[a&&a.chronicleOriginOwnedCharacterId'),"#494 private seed still collapses onto protagonist/person identity");
+assert(src.includes("chronicleRunId:runId"),"#494 private Origin history does not record run-instance namespace");
+const privateSeedSource=src.slice(src.indexOf("function privateSeedRef46900"),src.indexOf("function stablePick46900"));
+assert(privateSeedSource.includes("runId"),"#494 private seed does not include runId");
+assert(privateSeedSource.includes("PRIVATE_ORIGIN_SUBJECT")&&privateSeedSource.includes("PRIVATE_ORIGIN_DEFINITION")&&privateSeedSource.includes("PRIVATE_ORIGIN_VERSION"),"#494 private seed dropped subject/resolver/version identity");
+assert(!privateSeedSource.includes("teamVariantIds")&&!privateSeedSource.includes("completionEvidence"),"#494 private seed improperly consumes team/evidence state");
 const eligibilitySource=src.slice(src.indexOf("function eligibility(){"),src.indexOf("function eventPlan(){"));
 assert(!eligibilitySource.includes('reason:"academy_kakashi_origin_required"'),"obsolete selected-Origin==Kakashi hotspot gate remains");
 assert(src.includes("menma_private_history_emergence"),"Menma private-history emergence mode missing");
@@ -76,6 +90,8 @@ assert(src.includes('id===ORIGIN_ID?"INNER_RIGHT":id===MI_ID?"OPPONENT_RIGHT":"I
 assert(src.includes('stageAnchor=id===ORIGIN_ID?"PLAYER_LEFT":id===MI_ID?"OPPONENT_RIGHT":"CENTER"'),"#469 Kakashi protagonist stage anchors missing");
 assert(src.includes("confirmAcademyTeamFormation46900"),"private history is not sealed before Team Formation");
 assert(src.includes("ensureAutonomousKakashiPrivateHistory46900"),"one-shot autonomous Kakashi history resolver missing");
+const ensurePrivateSource=src.slice(src.indexOf("function ensureAutonomousKakashiPrivateHistory46900"),src.indexOf("function recordId("));
+assert(ensurePrivateSource.indexOf("storedKakashiPrivateHistory")<ensurePrivateSource.indexOf('chronicleStableId46900({ensure:true})'),"#494 already-sealed private history is not checked before run identity seeding");
 assert(src.includes("privateStoryUnitRef46900"),"private Origin choices are not namespaced through #34000");
 assert(src.includes("D.openSemanticChoiceSet"),"private Origin does not consume #34000 semantic choice machinery");
 assert(src.includes("D.commitStoryIntent"),"private Origin does not commit #34000 intent receipts");
