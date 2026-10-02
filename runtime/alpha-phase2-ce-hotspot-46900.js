@@ -968,7 +968,7 @@ function diagnostics(){
     finiteResolution:String(commitResolution).includes("resolvedRecord")&&String(commitResolution).includes("setOpportunityResolution"),
     p01OnlyWhileEligible:!!PRE_RENDER_KONOHA_ANCHOR&&String(renderAlphaKonohaV3IdentifiedAnchor46900).includes("eligibility().available===true"),
     storyBoardRegistered:typeof globalThis.resolveStorySceneBoardProjection==="function",
-    currentTeamAuthority:String(eventPlan).includes("currentTeam()"),
+    currentTeamAuthority:String(currentTeam).includes("getChronicleCurrentTeam43600")&&String(eligibility).includes("currentTeam()"),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
