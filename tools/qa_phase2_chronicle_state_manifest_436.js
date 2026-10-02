@@ -47,7 +47,7 @@ const teamSave={
   const c=boot(teamSave);
   const manifest=plain(c.getChronicleStateManifest43600());
   assert.strictEqual(manifest.manifestId,"sc.phase2.chronicle_state_manifest.v1");
-  assert.deepStrictEqual(manifest.domains.map(x=>x.stateDomainId),["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","disciplineDevelopment","characterStats","shinobiRecordProjection"]);
+  assert.deepStrictEqual(manifest.domains.map(x=>x.stateDomainId),["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","disciplineDevelopment","characterStats","originParticipantContinuity","shinobiRecordProjection"]);
   for(const row of manifest.domains){
     for(const key of ["stateDomainId","semanticOwner","canonicalWritePath","stableIdentityKey","savePath","schemaVersion","sourceOccurrenceIdFormat","idempotenceKeyFormat","derivedFields","projectionConsumers","migrationRule","resetRule","difficultyScope","inheritanceRule","devOverridePolicy","qaRefs"]){
       assert(Object.prototype.hasOwnProperty.call(row,key),"domain "+row.stateDomainId+" missing "+key);
@@ -66,6 +66,10 @@ const teamSave={
   assert.strictEqual(statsDomain.semanticOwner,"PL / Registry / Rank");
   assert.strictEqual(statsDomain.savePath,"playerData.characters[progressionCharacterId].stats[statId]");
   assert.strictEqual(manifest.domains.some(row=>row.stateDomainId==="mastery"),false,"#448 fabricated a universal mastery domain");
+  const continuityDomain=manifest.domains.find(row=>row.stateDomainId==="originParticipantContinuity");
+  assert(continuityDomain,"#469 participant continuity domain missing");
+  assert.strictEqual(continuityDomain.savePath,"playerData.phase2ChronicleState.originParticipantContinuity.byKey[originId::stableParticipantId]");
+
 
   const before=JSON.stringify(c.playerData);
   const migrated1=plain(c.migratePhase2ChronicleState43600(c.playerData));
@@ -77,6 +81,12 @@ const teamSave={
   const root=c.ensurePhase2ChronicleState43600({save:true});
   assert(root&&root.schemaVersion===1);
   assert.strictEqual(c.saveCount,1,"first scaffold write must save exactly once");
+  const continuity=c.getOriginParticipantContinuityStore43600({create:true});
+  continuity.byKey["academy_kakashi::academy_kakashi_origin_masked_interceptor"]={schemaVersion:1,originId:"academy_kakashi",stableParticipantId:"academy_kakashi_origin_masked_interceptor",survivedOrigin:true};
+  c.savePlayerData();
+  const withContinuity=plain(c.migratePhase2ChronicleState43600(c.playerData));
+  assert.strictEqual(withContinuity.phase2ChronicleState.originParticipantContinuity.byKey["academy_kakashi::academy_kakashi_origin_masked_interceptor"].survivedOrigin,true,"#436 migration dropped participant continuity");
+
   const saved=JSON.stringify(c.playerData.phase2ChronicleState);
   c.ensurePhase2ChronicleState43600({save:true});
   assert.strictEqual(JSON.stringify(c.playerData.phase2ChronicleState),saved);
@@ -124,7 +134,7 @@ console.log(JSON.stringify({
   pass:true,
   issue:436,
   manifest:"sc.phase2.chronicle_state_manifest.v1",
-  initialDomains:["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","disciplineDevelopment","characterStats","shinobiRecordProjection"],
+  initialDomains:["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","disciplineDevelopment","characterStats","originParticipantContinuity","shinobiRecordProjection"],
   disciplineDevelopmentRegistered:true,
   characterStatsExistingOwnerPreserved:true,
   noMasteryDomain:true,
