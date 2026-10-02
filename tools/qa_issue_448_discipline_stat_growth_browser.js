@@ -120,7 +120,8 @@ async function inspectMyClan(page,characterId){
     assert.strictEqual(nin.developmentCeilingStat,15);
     assert(exam.text.includes("CURRENT STAT"),"CURRENT STAT player field missing");
     assert(exam.text.includes("DEVELOPMENT"),"DEVELOPMENT player field missing");
-    assert(exam.text.includes("DEVELOPMENT EFFECTIVE THROUGH STAT 15"),"Foundation ceiling not visible");
+    assert(exam.text.includes("FOUNDATION DEVELOPMENT RANGE — THROUGH STAT 15"),"Foundation source range not visible below ceiling");
+    assert(!/MAX STAT 15|DISCIPLINE MAXED|STAT COMPLETE/i.test(exam.text),"global-cap language visible below Foundation source ceiling");
     assert(!/MASTERY\s+\d/i.test(exam.text),"numeric MASTERY fossil still visible");
     assert(!/DISCIPLINE EXP/i.test(exam.text),"DISCIPLINE EXP fossil label still visible");
     assert(!/\/\s*50\b/.test(exam.text),"fixed 50 denominator fossil still visible");
@@ -240,7 +241,9 @@ async function inspectMyClan(page,characterId){
     assert.strictEqual(ceiling.preflight.allowed,false);
     assert.strictEqual(ceiling.preflight.reason,"activity_development_ceiling_reached");
     assert.strictEqual(ceiling.meta.stoppedAtCeiling,true);
-    assert(ceiling.text.includes("STAT DEVELOPMENT COMPLETE FOR THIS ACTIVITY"),"ceiling-complete UI state missing");
+    assert(ceiling.text.includes("FOUNDATION TRAINING LIMIT REACHED"),"source-efficacy primary label missing at Foundation limit");
+    assert(ceiling.text.includes("This activity can no longer advance NINJUTSU. Further development requires a more demanding source."),"source-scoped supporting copy missing at Foundation limit");
+    assert(!/STAT DEVELOPMENT COMPLETE FOR THIS ACTIVITY|FOUNDATION DEVELOPMENT COMPLETE AT STAT|MAX STAT 15|DISCIPLINE MAXED|STAT COMPLETE/i.test(ceiling.text),"global-cap-suggestive wording visible at Foundation source limit");
     assert(ceiling.history.some(row=>row.type==="activity_development_ceiling_reached"),"ceiling milestone receipt missing");
     await page.screenshot({path:path.join(OUT,"03-exam-ceiling-complete.png"),fullPage:true});
 
@@ -282,7 +285,7 @@ async function inspectMyClan(page,characterId){
       developmentPerEffectiveFoundationAction:2,
       dynamicThresholdUI:true,numericMasteryRetired:true,
       myClanCanonicalProjection:true,saveReload:true,
-      ceiling15:true,batchStopsAtCeiling:true,overflowPreserved:true,
+      foundationSourceLimit15:true,noGlobalStatCapSemantics:true,batchStopsAtCeiling:true,overflowPreserved:true,
       passiveTeamSharing:false,techniquePracticeActivated:false,
       browserGoldenClaimed:false
     },null,2));
