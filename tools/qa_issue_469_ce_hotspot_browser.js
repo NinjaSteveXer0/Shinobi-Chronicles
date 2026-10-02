@@ -37,8 +37,13 @@ async function advanceThroughBeat(page,beatId,max=20){
   for(let i=0;i<max;i++){
     const active=await beat(page);
     if(!active||active.beatId!==beatId)break;
-    const text=await page.locator("#story-scene-presentation-layer .sc-story-text").innerText().catch(()=> "");
-    if(text)texts.push(text.trim());
+    const performance=await page.evaluate(()=>{
+      const p=typeof globalThis.getStoryScenePerformance33900==="function"?globalThis.getStoryScenePerformance33900():null;
+      return p&&p.cue?{text:String(p.cue.text||""),kind:String(p.cue.kind||"")} : null;
+    });
+    const domText=await page.locator("#story-scene-presentation-layer .sc-story-text").innerText().catch(()=> "");
+    const text=performance&&performance.text?performance.text:domText;
+    if(text)texts.push(String(text).trim());
     const result=await page.evaluate(()=>advanceStoryScene());
     assert(result&&result.success===true,"advance failed in "+beatId+": "+JSON.stringify(result));
     await page.waitForTimeout(35);
