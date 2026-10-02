@@ -1166,6 +1166,40 @@
       "replaces": [],
       "contractChangeReason": "PHASE_2_ACTIVATION",
       "rationale": "Consumes #449 Step 2 and the durable Inventory/provenance boundaries as one bounded read-only Alpha surface. Existing playerData.inventory remains ownership/quantity authority; existing Battle Pouch and Character equipment remain separate preparation/equipment authorities. The UI projects exact stack quantities and durable instance IDs, exposes source/provenance only when an exact Inventory-row reference exists, and creates no ownership, equip, preparation, Shop, Crafting, PL, Stat, Rank, Skill or Chronicle mutation."
+    },
+    {
+      "changeId": "issue-469-first-live-ce-hotspot",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "phase2.chronicle_state_manifest.shared",
+        "phase2.first_live_ce_hotspot.469"
+      ],
+      "owner": "runtime/alpha-first-live-ce-hotspot-46900.js",
+      "directCallers": [
+        "index.html",
+        "frozen Academy Kakashi Origin completion boundary",
+        "Konoha V3 KON-P01",
+        "existing World opportunity and Story Scene runtimes"
+      ],
+      "stateTouched": [
+        "Phase-2 hidden originParticipantContinuity projection",
+        "one finite existing World opportunity lifecycle",
+        "exact current Academy team read only",
+        "existing Story Scene runtime",
+        "one observer-safe Shinobi Record/activityHistory consequence",
+        "KON-P01 presentation-only eligibility decoration"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_issue_469_first_live_ce_hotspot.js",
+        "tools/qa_issue_469_first_live_ce_hotspot_browser.js",
+        "tools/qa_phase2_chronicle_state_manifest_436.js",
+        "tools/qa_save_compatibility_311.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Consumes CE LIVE TEST READY #469 as the first single production Chronicle-reactive Konoha hotspot. It preserves the same female Masked Interceptor, keeps hidden post-test World truth outside observer-facing activityHistory, uses the existing World/Story/Shinobi Record authorities, consumes exact currentTeam, commits one finite observer-safe contradiction/lead, and adds no generic hotspot generator, Battle, morality scalar, proper-name reveal or Origin rewrite."
     }
   ]
 }
