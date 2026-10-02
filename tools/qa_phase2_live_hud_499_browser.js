@@ -92,8 +92,24 @@ async function closeAndVillage(page){
     const initial=await page.evaluate(()=>{
       const snap=getPhase2LiveHudSnapshot49900();
       const root=document.getElementById("sc-phase2-live-hud-49900");
+      const subject=getAlphaSurfaceTruthSubjectId();
+      const character=getPlayerCharacter(subject);
+      const scalar=value=>{
+        if(value==null)return null;
+        if(typeof value==="string"||typeof value==="number")return String(value);
+        for(const key of ["label","name","displayName","title","value"]){
+          if(value&&value[key]!=null&&String(value[key]).trim())return String(value[key]);
+        }
+        return null;
+      };
       return{
         snap,
+        canonicalIdentity:{
+          id:String(subject),
+          name:scalar(character&& (character.name||character.displayName||character.playerFacingName)),
+          rank:scalar(getAlphaSurfaceTruthRankLabel(subject)),
+          affiliation:scalar(getMyClanCharacterAffiliation(character))
+        },
         text:root?.innerText||"",
         legacyHeaderDisplay:getComputedStyle(document.querySelector(".game-header")).display,
         legacySidebarDisplay:getComputedStyle(document.querySelector(".map-sidebar-left")).display,
@@ -106,7 +122,10 @@ async function closeAndVillage(page){
     });
     assert.strictEqual(initial.snap.visible,true);
     assert.strictEqual(initial.snap.surface.kind,"village");
-    assert.strictEqual(initial.snap.identity.id,"academy_menma");
+    assert.strictEqual(initial.snap.identity.id,initial.canonicalIdentity.id,"HUD identity does not match canonical active subject");
+    assert.strictEqual(initial.snap.identity.name,initial.canonicalIdentity.name,"HUD player-facing name does not match canonical character projection");
+    assert.strictEqual(initial.snap.identity.rank,initial.canonicalIdentity.rank,"HUD formal Rank does not match canonical Rank projection");
+    assert.strictEqual(initial.snap.identity.affiliation,initial.canonicalIdentity.affiliation,"HUD affiliation does not match canonical affiliation projection");
     assert.strictEqual(initial.snap.ryo,321);
     assert.deepStrictEqual(initial.snap.team.map(row=>row.id),setup.team.teamVariantIds);
     assert(initial.snap.journey&&initial.snap.journey.label,"observer-safe Journey projection missing");
