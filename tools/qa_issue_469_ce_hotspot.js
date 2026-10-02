@@ -11,6 +11,7 @@ const writing=fs.readFileSync(path.join(ROOT,"Documentation/Story/Kakashi_Masked
 const privateWriting=fs.readFileSync(path.join(ROOT,"Documentation/Story/Kakashi_MI_Private_History_Emergence_Non_Kakashi_Protagonist_Scene_Family_2026-10-02.md"),"utf8");
 const privateProfile=fs.readFileSync(path.join(ROOT,"Documentation/Story/Academy_Kakashi_Autonomous_Origin_Intent_Profile_2026-10-02.md"),"utf8");
 const battle=fs.readFileSync(path.join(ROOT,"runtime/alpha-kakashi-v2-battle-36010.js"),"utf8");
+const board=fs.readFileSync(path.join(ROOT,"runtime/alpha-story-scene-board-33900.js"),"utf8");
 
 for(const exact of [
   'const EVENT_ID="konoha_ce_kakashi_masked_interceptor_admin_crossing_v1"',
@@ -183,6 +184,16 @@ assert(src.includes("MENMA_ACTION_ID"),"same KON-P01 opportunity lacks Menma obs
 assert(src.includes('actionId=gate.mode==="menma_private_history_emergence"?MENMA_ACTION_ID:ACTION_ID'),"KON-P01 route is not observer-mode driven");
 assert(src.includes("registerStorySceneBoardDefinition"),"shared Scene Board presentation not consumed");
 assert(src.includes('resolveBackdrop:()=>({assetPath:"Scene backdrops/hokage_district_exterior.png"})'),"KON-P01 Administration exterior backdrop not bound");
+assert(src.includes('exitTransition:"black_wipe"'),"KON-P01 scene exit does not request shared black wipe");
+const cueHelper=src.slice(src.indexOf("function cue(kind,text,speakerName=null)"),src.indexOf("function openingCues()"));
+assert(!cueHelper.includes("singlePage:true"),"#469 forces multi-paragraph narration into one giant Story box");
+assert(board.includes("slice(0,4)"),"shared Scene Board still truncates four-person scenes");
+assert(board.includes('data-count="4"'),"shared Scene Board lacks four-actor staging");
+assert(board.includes("opacity:1;transform:translateY(2px) scale(.98);filter:none"),"non-speaker cards are still greyed/dimmed");
+assert(board.includes("scale(1.055)")&&board.includes("2px solid rgba(97,220,229,.96)"),"active speaker does not enlarge with coloured border");
+assert(board.includes("SCENE COMPLETE · CLICK ANYWHERE TO RETURN"),"Story exit lacks explicit ending affordance");
+assert(board.includes("playStorySoftSceneTransition33900"),"same-location soft transition owner missing from shared Scene Board");
+assert(board.includes("story_scene_exit_black_wipe"),"Story exit does not dispatch shared black wipe");
 assert(src.includes("resolvedRecord()"),"finite no-reroll record guard missing");
 assert(src.includes("setOpportunityResolution"),"World resolution commit missing");
 assert(src.includes("setWorldEventLifecycle"),"World lifecycle commit missing");
