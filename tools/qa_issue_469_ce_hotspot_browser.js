@@ -477,13 +477,13 @@ async function advanceThroughBeat(page,beatId,max=20){
     await waitRuntime(page);
     await releaseFrontDoor(page);
 
-    const obitoTeamSetup=await page.evaluate(()=>{
+    const obitoTeamSetup=await page.evaluate((fixtureRunId)=>{
       playerData=createDefaultPlayerData();
-      playerData.chronicleId="qa478_live_chronicle_0009";
       setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
       savePlayerData();
 
       const selected=selectChronicleOrigin("academy_menma","qa478_obito_origin");
+      const runIdentity=commitChronicleRunIdentity43600({runId:fixtureRunId,creationKind:"NEW_START"});
       const completed=completeChronicleOriginPrologue("academy_menma",["qa478_menma_origin_obito_team"]);
       const snapshot=getAcademyTeamFormationSnapshot();
       const desired=["academy_obito","academy_kakashi"];
@@ -501,14 +501,17 @@ async function advanceThroughBeat(page,beatId,max=20){
       },{save:true});
       savePlayerData();
       return{
-        selected,completed,one,two,formed,continued,
+        selected,runIdentity,completed,one,two,formed,continued,
         team:getChronicleCurrentTeam43600(),
+        runIdentityAfterTeam:getChronicleRunIdentity43600(),
         secondTeammate:getMenmaSecondTeammateRef46900(),
         eligibility:getKonohaCeHotspotEligibility46900(),
         plan:getKonohaCeHotspotPlan46900()
       };
-    });
+    },positiveRunIds[0]);
     assert(!obitoTeamSetup.error,JSON.stringify(obitoTeamSetup));
+    assert.strictEqual(obitoTeamSetup.runIdentity.success,true,JSON.stringify(obitoTeamSetup.runIdentity));
+    assert.strictEqual(obitoTeamSetup.runIdentityAfterTeam.runId,positiveRunIds[0],"Obito Team Formation changed Chronicle run identity");
     assert.strictEqual(obitoTeamSetup.formed.success,true,JSON.stringify(obitoTeamSetup.formed));
     assert.strictEqual(obitoTeamSetup.continued.success,true);
     assert.deepStrictEqual(obitoTeamSetup.team.teamVariantIds,["academy_menma","academy_obito","academy_kakashi"]);
