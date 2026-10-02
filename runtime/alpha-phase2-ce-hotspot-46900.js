@@ -1889,22 +1889,42 @@ const worldRegistration=registerWorldEventOpportunity({
     family:"Chronicle Event",
     category:"STORY",
     label:"Hokage Administration",
-    summary:"A familiar masked figure is leaving the public intake approach.",
+    summary:"A masked woman is leaving the public intake approach.",
     showUnknownMarker:false
   },
   anchor:{x:52.41,y:20.02},
-  interactions:[{
-    id:ACTION_ID,
-    label:"OBSERVE",
-    kind:"story_scene",
-    sceneId:SCENE_ID,
-    evaluateAvailability:()=>{const gate=eligibility();return{available:gate.available,reason:gate.reason,reasonVisible:false};},
-    sceneContextResolver:()=>{
-      const context=sceneContext();
-      return context&&context.occurrenceId?context:null;
+  interactions:[
+    {
+      id:ACTION_ID,
+      label:"OBSERVE",
+      kind:"story_scene",
+      sceneId:SCENE_ID,
+      evaluateAvailability:()=>{
+        const gate=eligibility();
+        return{available:gate.available===true&&gate.mode==="kakashi_protagonist",reason:gate.available?gate.mode:gate.reason,reasonVisible:false};
+      },
+      sceneContextResolver:()=>{
+        const context=sceneContext();
+        return context&&context.occurrenceId&&context.mode==="kakashi_protagonist"?context:null;
+      },
+      returnContext:{type:"overlay",overlayType:"village"}
     },
-    returnContext:{type:"overlay",overlayType:"village"}
-  }]
+    {
+      id:MENMA_ACTION_ID,
+      label:"OBSERVE",
+      kind:"story_scene",
+      sceneId:MENMA_SCENE_ID,
+      evaluateAvailability:()=>{
+        const gate=eligibility();
+        return{available:gate.available===true&&gate.mode==="menma_private_history_emergence",reason:gate.available?gate.mode:gate.reason,reasonVisible:false};
+      },
+      sceneContextResolver:()=>{
+        const context=sceneContext();
+        return context&&context.occurrenceId&&context.mode==="menma_private_history_emergence"?context:null;
+      },
+      returnContext:{type:"overlay",overlayType:"village"}
+    }
+  ]
 });
 if(!worldRegistration||worldRegistration.success!==true)throw new Error("ce469_world_opportunity_registration_failed");
 
@@ -1912,6 +1932,9 @@ const PRE_SHINOBI_RECORD_PARTICIPANTS=typeof globalThis.getShinobiRecordParticip
 function getShinobiRecordParticipants46900(record){
   if(record&&recordId(record)===OCCURRENCE_ID){
     const d=record.data&&typeof record.data==="object"?record.data:{};
+    if(d.observerRef===MENMA_ID||record.protagonistParticipantId===MENMA_ID){
+      return["Menma","Hinata","Kakashi","Masked Woman"];
+    }
     const team=Array.isArray(d.storyTeamParticipantRefs)?d.storyTeamParticipantRefs:[ORIGIN_ID];
     const teammateNames=team.filter(id=>id!==ORIGIN_ID).map(id=>TEAMMATE_LABELS[id]||String(id).replace(/^academy_/,"").replaceAll("_"," ").toUpperCase());
     return["Kakashi","Masked Interceptor",...teammateNames];
@@ -1942,7 +1965,8 @@ function activateAlphaKonohaV3PublicLocation46900(event,locationId){
     if(gate.available===true){
       if(event&&typeof event.preventDefault==="function")event.preventDefault();
       if(event&&typeof event.stopPropagation==="function")event.stopPropagation();
-      const result=routeWorldOpportunityInteraction(OPPORTUNITY_ID,ACTION_ID);
+      const actionId=gate.mode==="menma_private_history_emergence"?MENMA_ACTION_ID:ACTION_ID;
+      const result=routeWorldOpportunityInteraction(OPPORTUNITY_ID,actionId);
       return result&&result.success===true?result:(result||{success:false,reason:"ce469_hotspot_route_failed"});
     }
   }
