@@ -653,6 +653,7 @@ function finalRecordPayload(choiceId){
       eventId:EVENT_ID,
       opportunityId:OPPORTUNITY_ID,
       semanticLocationId:HOST_ID,
+      stableParticipantId:MI_ID,
       knownPerson:"Masked Interceptor",
       sharedOccurrence:"Hokage Administration Crossing",
       knownFact:"Seen leaving Hokage Administration after a document handoff. Administration staff did not challenge her presence.",
@@ -899,6 +900,21 @@ const worldRegistration=registerWorldEventOpportunity({
 });
 if(!worldRegistration||worldRegistration.success!==true)throw new Error("ce469_world_opportunity_registration_failed");
 
+const PRE_SHINOBI_RECORD_PARTICIPANTS=typeof globalThis.getShinobiRecordParticipants==="function"?globalThis.getShinobiRecordParticipants:null;
+function getShinobiRecordParticipants46900(record){
+  if(record&&recordId(record)===OCCURRENCE_ID){
+    const d=record.data&&typeof record.data==="object"?record.data:{};
+    const team=Array.isArray(d.storyTeamParticipantRefs)?d.storyTeamParticipantRefs:[ORIGIN_ID];
+    const teammateNames=team.filter(id=>id!==ORIGIN_ID).map(id=>TEAMMATE_LABELS[id]||String(id).replace(/^academy_/,"").replaceAll("_"," ").toUpperCase());
+    return["Kakashi","Masked Interceptor",...teammateNames];
+  }
+  return PRE_SHINOBI_RECORD_PARTICIPANTS?PRE_SHINOBI_RECORD_PARTICIPANTS.apply(this,arguments):[];
+}
+if(PRE_SHINOBI_RECORD_PARTICIPANTS){
+  globalThis.getShinobiRecordParticipants=getShinobiRecordParticipants46900;
+  try{getShinobiRecordParticipants=getShinobiRecordParticipants46900;}catch(_error){}
+}
+
 const PRE_RENDER_KONOHA_ANCHOR=typeof globalThis.renderAlphaKonohaV3IdentifiedAnchor==="function"?globalThis.renderAlphaKonohaV3IdentifiedAnchor:null;
 function renderAlphaKonohaV3IdentifiedAnchor46900(location,options={}){
   if(PRE_RENDER_KONOHA_ANCHOR&&location&&location.id===HOST_ID&&eligibility().available===true){
@@ -945,6 +961,7 @@ function diagnostics(){
     exactFourChoices:labels==="Tell her you remember her.|Ask what she is doing here.|Watch her pass.|Keep moving.",
     noAttackChoice:!CHOICES.some(row=>/attack/i.test(row.label+" "+row.intentType)),
     oneObserverSafeRecord:String(finalRecordPayload).includes("Hokage Administration Crossing")&&String(finalRecordPayload).includes('properName:"Unknown"')&&String(finalRecordPayload).includes("hiddenTestTruthGranted:false"),
+    recordParticipantProjection:!!PRE_SHINOBI_RECORD_PARTICIPANTS&&String(getShinobiRecordParticipants46900).includes('"Masked Interceptor"'),
     noRewardWriter:!String(commitResolution).includes("addItemToInventory")&&!String(commitResolution).includes("ryo"),
     finiteResolution:String(commitResolution).includes("resolvedRecord")&&String(commitResolution).includes("setOpportunityResolution"),
     p01OnlyWhileEligible:!!PRE_RENDER_KONOHA_ANCHOR&&String(renderAlphaKonohaV3IdentifiedAnchor46900).includes("eligibility().available===true"),
