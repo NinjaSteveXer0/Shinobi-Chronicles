@@ -6,6 +6,7 @@ const ROOT=path.resolve(__dirname,"..");
 const src=fs.readFileSync(path.join(ROOT,"runtime/alpha-phase2-ce-hotspot-46900.js"),"utf8");
 const manifest=fs.readFileSync(path.join(ROOT,"runtime/alpha-chronicle-state-manifest-43600.js"),"utf8");
 const traversal=fs.readFileSync(path.join(ROOT,"runtime/alpha-traversal-bridge-33200.js"),"utf8");
+const game=fs.readFileSync(path.join(ROOT,"game.js"),"utf8");
 const writing=fs.readFileSync(path.join(ROOT,"Documentation/Story/Kakashi_Masked_Interceptor_First_Live_CE_Hotspot_Production_Scene_2026-10-02.md"),"utf8");
 
 for(const exact of [
@@ -88,6 +89,10 @@ assert(src.includes("anbuMembershipKnowledgeGranted:false"),"ANBU inference fire
 assert(src.includes("moralityScalarCreated:false")&&src.includes("friendshipScalarCreated:false"),"relationship/morality scalar firewall missing");
 assert(!src.includes("Math.random"),"#469 history/participant behavior must be deterministic");
 assert(!src.includes("addItemToInventory(")&&!src.includes("grantReward("),"#469 must not grant material rewards");
+assert(
+  game.includes("storyDecisionRuntime34000:")&&game.includes("parsedData.storyDecisionRuntime34000"),
+  "#34000 participant/protagonist intent receipts are not preserved by loadPlayerData"
+);
 assert(traversal.includes("runtime/alpha-phase2-ce-hotspot-46900.js"),"#469 missing from production dynamic chain");
 assert(
   traversal.includes('function load36040(){loadOne("sc-kakashi-v2-transition-36040-script","runtime/alpha-kakashi-v2-transition-36040.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_TRANSITION_36040,load46900);}')&&
