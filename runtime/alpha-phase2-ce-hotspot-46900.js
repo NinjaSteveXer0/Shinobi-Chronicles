@@ -403,17 +403,17 @@ function storedKakashiPrivateHistory(){
   return row&&typeof row==="object"?clone(row):null;
 }
 function chronicleStableId46900(){
-  const p=pd(),a=acquisition();
-  const candidates=[
+  const p=pd(),a=acquisition(),origin=a&&a.chronicleOrigin;
+  const explicit=[
     p&&p.chronicleId,
     p&&p.chronicleIdentity&&p.chronicleIdentity.id,
-    a&&a.chronicleId,
-    a&&a.chronicleOriginOwnedCharacterId,
-    a&&a.ninjaIdentityOwnedCharacterId,
-    a&&a.chronicleOriginVariantId
-  ];
-  const found=candidates.find(value=>value!=null&&String(value).trim());
-  return String(found||"anonymous_chronicle");
+    a&&a.chronicleId
+  ].find(value=>value!=null&&String(value).trim());
+  if(explicit)return String(explicit);
+  const completionRefs=origin&&Array.isArray(origin.completionEvidenceIds)?origin.completionEvidenceIds.filter(Boolean).map(String).sort():[];
+  if(a&&a.chronicleOriginVariantId&&completionRefs.length)return["chronicle",a.chronicleOriginVariantId,...completionRefs].join("::");
+  const fallback=[a&&a.chronicleOriginOwnedCharacterId,a&&a.ninjaIdentityOwnedCharacterId,a&&a.chronicleOriginVariantId].find(value=>value!=null&&String(value).trim());
+  return String(fallback||"anonymous_chronicle");
 }
 function privateSeedRef46900(){
   return [PRIVATE_ORIGIN_SCHEMA,chronicleStableId46900(),PRIVATE_ORIGIN_SUBJECT,PRIVATE_ORIGIN_DEFINITION,PRIVATE_ORIGIN_VERSION].join("::");
@@ -1149,6 +1149,8 @@ function beginOccurrence(){
       started:true,
       resolved:false,
       exactTeamVariantIds:Array.isArray(ctx.teamVariantIds)?[...ctx.teamVariantIds]:[],
+      observerRef:ctx.protagonistVariantId||null,
+      privateOriginHistoryRef:ctx.privateOriginHistoryRef||null,
       projectable:true
     },{save:false});
   }
@@ -1980,33 +1982,56 @@ if(PRE_ACTIVATE_KONOHA_LOCATION){
 function diagnostics(){
   const continuity=getContinuity(),gate=eligibility();
   const labels=CHOICES.map(row=>row.label).join("|");
+  const menmaLabels=MENMA_CHOICES.map(row=>row.label).join("|");
+  const privateHistory=storedKakashiPrivateHistory();
   const checks={
     exactEventIdentity:EVENT_ID==="konoha_ce_kakashi_masked_interceptor_admin_crossing_v1"&&HOST_ID==="KON-P01"&&MI_ID==="academy_kakashi_origin_masked_interceptor",
     continuitySchemaBounded:typeof globalThis.getOriginParticipantContinuityStore43600==="function",
+    privateOriginHistorySchemaBounded:typeof globalThis.getPrivateOriginHistoryStore43600==="function",
     frozenOriginWrappedNotRewritten:!!PRE_COMPLETE_ORIGIN&&String(completeChronicleOriginPrologue46900).includes("PRE_COMPLETE_ORIGIN.apply"),
+    teamFormationSelectsAlreadyLivedKakashi:!PRE_CONFIRM_ACADEMY_TEAM_46900||String(confirmAcademyTeamFormation46900).includes("ensureAutonomousKakashiPrivateHistory46900"),
     killedTerminal:String(eligibility).includes('fieldDispositionState==="KILLED"'),
     unseenIneligible:String(eligibility).includes('fieldDispositionState==="UNSEEN"'),
+    kakashiPresenceRequired:String(eligibility).includes("kakashi_current_presence_required"),
+    selectedOriginSlotNoLongerOwnsKakashiHistory:!String(eligibility).includes("academy_kakashi_origin_required"),
     hiddenReviewRequired:String(eligibility).includes("hiddenPostTestReviewReached"),
     sevenHistoryFamilies:Object.keys(HISTORY_CUES).length===7,
     deterministicPrecedence:String(historyFamily).indexOf("lethalAttempt")<String(historyFamily).indexOf("policeTransfer")&&String(historyFamily).indexOf("policeTransfer")<String(historyFamily).indexOf("restraintOrAnbu"),
+    autonomousProfile23Boundaries:Object.keys(AUTONOMOUS_KAKASHI_BOUNDARIES).length===23,
+    autonomousProfile93Choices:AUTONOMOUS_KAKASHI_CHOICE_IDS.length===93&&new Set(AUTONOMOUS_KAKASHI_CHOICE_IDS).size===93,
+    machineResolveExcluded:!AUTONOMOUS_KAKASHI_CHOICE_IDS.some(id=>String(id).includes("success")&&String(id).includes("resolver")),
+    battleOwnedAutonomousResult:typeof globalThis.resolveAcademyKakashiV2AutonomousPrivateBattle36010==="function",
+    privateHistoryNoEconomyMutation:!privateHistory||privateHistory.economyFirewall&&privateHistory.economyFirewall.playerEconomyMutation===false&&privateHistory.economyFirewall.duplicateStartingPurseGranted===false&&privateHistory.economyFirewall.autonomousPlayerVictoryBattleRyoGranted===false,
     participantFirstAuthority:D.getRegisteredAnchorInventory(STORY_UNIT_REF).length===9,
+    menmaParticipantAutonomy:D.getRegisteredAnchorInventory(MENMA_STORY_UNIT_REF).length===3,
     exactFourChoices:labels==="Tell her you remember her.|Ask about the delivery.|Watch what she does.|Keep moving.",
+    exactMenmaChoices:menmaLabels==="Ask Kakashi what happened.|Ask her how she knows Kakashi.|Let Kakashi handle it.|Keep moving.",
     distinctBranchConsequences:Object.keys(BRANCH_CONSEQUENCES).length===4&&new Set(Object.values(BRANCH_CONSEQUENCES).map(row=>row.factualReceiptId)).size===4,
-    noAttackChoice:!CHOICES.some(row=>/attack/i.test(row.label+" "+row.intentType)),
+    menmaObserverSafeRecord:String(menmaRecordPayload46900).includes('knownPerson:"Masked Woman"')&&String(menmaRecordPayload46900).includes("privateOriginTranscriptGranted:false"),
+    nestedKakashiNotPlayerControlled:String(resolveNestedKakashiCurrentIntent46900).includes("playerControlled:false"),
+    noAttackChoice:![...CHOICES,...MENMA_CHOICES].some(row=>/attack/i.test(row.label+" "+row.intentType)),
     oneObserverSafeRecord:String(finalRecordPayload).includes("Hokage Administration Crossing")&&String(finalRecordPayload).includes('properName:"Unknown"')&&String(finalRecordPayload).includes("hiddenTestTruthGranted:false"),
-    recordParticipantProjection:!!PRE_SHINOBI_RECORD_PARTICIPANTS&&String(getShinobiRecordParticipants46900).includes('"Masked Interceptor"'),
-    noRewardWriter:!String(commitResolution).includes("addItemToInventory")&&!String(commitResolution).includes("ryo"),
-    finiteResolution:String(commitResolution).includes("resolvedRecord")&&String(commitResolution).includes("setOpportunityResolution"),
+    recordParticipantProjection:!!PRE_SHINOBI_RECORD_PARTICIPANTS&&String(getShinobiRecordParticipants46900).includes('"Masked Woman"')&&String(getShinobiRecordParticipants46900).includes('"Masked Interceptor"'),
+    noRewardWriter:!String(commitResolution).includes("addItemToInventory")&&!String(commitResolution).includes("ryo")&&!String(commitMenmaResolution46900).includes("addItemToInventory")&&!String(commitMenmaResolution46900).includes("ryo"),
+    finiteResolution:String(commitResolution).includes("resolvedRecord")&&String(commitResolution).includes("setOpportunityResolution")&&String(commitMenmaResolution46900).includes("resolvedRecord"),
     p01OnlyWhileEligible:!!PRE_RENDER_KONOHA_ANCHOR&&String(renderAlphaKonohaV3IdentifiedAnchor46900).includes("eligibility().available===true"),
+    observerModeRoutesSameOpportunity:String(activateAlphaKonohaV3PublicLocation46900).includes("MENMA_ACTION_ID")&&String(activateAlphaKonohaV3PublicLocation46900).includes("ACTION_ID"),
     storyBoardRegistered:typeof globalThis.resolveStorySceneBoardProjection==="function",
     administrationBackdropBound:String(installPhase2CeHotspot46900).includes("hokage_district_exterior.png"),
     currentTeamAuthority:String(currentTeam).includes("getChronicleCurrentTeam43600")&&String(eligibility).includes("currentTeam()"),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
-  return{patchId:PATCH_ID,pass:failed.length===0,checks,failed,currentContinuity:clone(continuity),currentEligibility:clone(gate),browserGoldenClaimed:false};
+  return{patchId:PATCH_ID,pass:failed.length===0,checks,failed,currentPrivateHistory:clone(privateHistory),currentContinuity:clone(continuity),currentEligibility:clone(gate),browserGoldenClaimed:false};
 }
 
+try{migrateLegacyKakashiPrivateOrigin46900();}catch(_error){}
+
+globalThis.getKakashiPrivateOriginHistory46900=()=>clone(storedKakashiPrivateHistory());
+globalThis.ensureAutonomousKakashiPrivateHistory46900=reason=>ensureAutonomousKakashiPrivateHistory46900(reason);
+globalThis.migrateLegacyKakashiPrivateOrigin46900=migrateLegacyKakashiPrivateOrigin46900;
+globalThis.getMenmaPrivateHistoryDecisionSnapshot46900=()=>clone(menmaDecisionSnapshot46900());
+globalThis.getMenmaNestedKakashiIntent46900=committedNestedKakashiIntent46900;
 globalThis.getOriginParticipantContinuity46900=getContinuity;
 globalThis.getKonohaCeHotspotEligibility46900=eligibility;
 globalThis.getKonohaCeHotspotPlan46900=eventPlan;
@@ -2015,6 +2040,6 @@ globalThis.getKonohaCeHotspotResolvedRecord46900=()=>clone(resolvedRecord());
 globalThis.getKonohaCeHotspotBranchConsequence46900=choiceId=>branchConsequence(choiceId);
 globalThis.runPhase2CeHotspot46900Diagnostics=diagnostics;
 globalThis.SC_PHASE2_CE_HOTSPOT_46900=Object.freeze({
-  patchId:PATCH_ID,eventId:EVENT_ID,opportunityId:OPPORTUNITY_ID,occurrenceId:OCCURRENCE_ID,sceneId:SCENE_ID,hostId:HOST_ID,stableParticipantId:MI_ID,browserGoldenClaimed:false
+  patchId:PATCH_ID,eventId:EVENT_ID,opportunityId:OPPORTUNITY_ID,occurrenceId:OCCURRENCE_ID,sceneId:SCENE_ID,menmaSceneId:MENMA_SCENE_ID,hostId:HOST_ID,stableParticipantId:MI_ID,privateOriginSchema:PRIVATE_ORIGIN_SCHEMA,browserGoldenClaimed:false
 });
 })();
