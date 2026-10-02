@@ -5,7 +5,7 @@
 **Tracker:** #474  
 **Live CE expansion:** #478  
 **Status:** **KAKASHI-FIRST AUTONOMOUS ORIGIN INTENT AUTHORITY — MACHINE-FACING / FROZEN-STORY GRAPH PRESERVED**  
-**Source-first main:** \`701022f49d5477bb2f2b711b2a0ded4a2dde74d4\`
+**Source-first main:** `701022f49d5477bb2f2b711b2a0ded4a2dde74d4`
 
 ---
 
@@ -40,26 +40,26 @@ Canonical:
 This profile consumes:
 
 - private-Origin architecture:  
-  \`Documentation/Coordination/Parallel_Origin_Private_History_and_Active_Konoha_Convergence_Contract_2026-10-02.md\`  
-  blob \`da10e83caf41b6cb46b1af902821e0e8d14599fa\`;
+  `Documentation/Coordination/Parallel_Origin_Private_History_and_Active_Konoha_Convergence_Contract_2026-10-02.md`  
+  blob `da10e83caf41b6cb46b1af902821e0e8d14599fa`;
 
 - live CE expansion:  
-  \`Documentation/Coordination/First_Live_CE_Hotspot_Private_History_Emergence_Expansion_2026-10-02.md\`  
-  blob \`67aa9662828afbe4a28ba4d68b446a387abd8165\`;
+  `Documentation/Coordination/First_Live_CE_Hotspot_Private_History_Emergence_Expansion_2026-10-02.md`  
+  blob `67aa9662828afbe4a28ba4d68b446a387abd8165`;
 
 - final Kakashi Structured Autonomy reconciliation:  
-  \`Documentation/Story/Academy_Kakashi_Final_Structured_Autonomy_Anchor_Reconciliation_2026-09-15.md\`  
-  blob \`36099e68b3f5bcea5e6cb2b124b68b55ca16d51a\`;
+  `Documentation/Story/Academy_Kakashi_Final_Structured_Autonomy_Anchor_Reconciliation_2026-09-15.md`  
+  blob `36099e68b3f5bcea5e6cb2b124b68b55ca16d51a`;
 
 - Kakashi current Character anchor:  
-  \`Documentation/Story/Academy_Kakashi_Active_Cast_Character_Voice_and_Personality_Anchors_2026-09-22.md\`  
-  blob \`fb047dde4ac4a30d4ee497b1cc187b923af8bdee\`;
+  `Documentation/Story/Academy_Kakashi_Active_Cast_Character_Voice_and_Personality_Anchors_2026-09-22.md`  
+  blob `fb047dde4ac4a30d4ee497b1cc187b923af8bdee`;
 
 - current executable Kakashi V2 graph:  
-  \`runtime/alpha-kakashi-v2-core-36020.js\`  
-  blob \`07d22bbb55aedef87771f074d5e94d6bed6a390d\`.
+  `runtime/alpha-kakashi-v2-core-36020.js`  
+  blob `07d22bbb55aedef87771f074d5e94d6bed6a390d`.
 
-Runtime source contains **115 total choice entries**, of which **23 boundaries / 93 entries are meaningful player-facing intent choices**. Machine-only \`RESOLVE RESULT\` gates are not Character decisions and must never be selected through this profile.
+Runtime source contains **115 total choice entries**, of which **23 boundaries / 93 entries are meaningful player-facing intent choices**. Machine-only `RESOLVE RESULT` gates are not Character decisions and must never be selected through this profile.
 
 ---
 
@@ -130,7 +130,7 @@ Do not consume:
 
 These families are authoring shorthand, not runtime Trait scores.
 
-## \`OBSERVE_FOR_INFORMATION\`
+## `OBSERVE_FOR_INFORMATION`
 
 Kakashi delays intervention because one more beat may reveal something useful without surrendering the objective.
 
@@ -144,7 +144,7 @@ Lowered by:
 - immediate violence;
 - compromised position.
 
-## \`IMPROVE_POSITION\`
+## `IMPROVE_POSITION`
 
 Kakashi closes distance / improves information while trying to preserve control of the situation.
 
@@ -153,7 +153,7 @@ Raised by:
 - uncertainty still high;
 - confidence he can move without committing the whole route.
 
-## \`CLEAN_OBJECTIVE_EXTRACTION\`
+## `CLEAN_OBJECTIVE_EXTRACTION`
 
 Kakashi acts directly for the package with minimum unnecessary entanglement.
 
@@ -162,7 +162,7 @@ Raised by:
 - viable stealth/interception;
 - objective still recoverable.
 
-## \`DIRECT_CONTROL\`
+## `DIRECT_CONTROL`
 
 Kakashi interrupts or takes an opponent down because delay or negotiation is no longer useful.
 
@@ -172,7 +172,7 @@ Raised by:
 - immediate escape pressure;
 - current participant physically blocking the objective.
 
-## \`INFORMATION_FIRST\`
+## `INFORMATION_FIRST`
 
 Kakashi asks a bounded question only when the answer can materially change what he does next.
 
@@ -181,7 +181,7 @@ Raised by:
 - downstream destination/role genuinely unknown;
 - no immediate loss caused by asking.
 
-## \`PURSUE_OBJECTIVE\`
+## `PURSUE_OBJECTIVE`
 
 Kakashi prioritises a still-reachable package/target over disposition of a defeated participant.
 
@@ -190,7 +190,7 @@ Raised by:
 - mission object still moving;
 - current defeated participant can be restrained quickly or safely left under exact route authority.
 
-## \`REPORT_AND_SECURE\`
+## `REPORT_AND_SECURE`
 
 Kakashi stops extending the route and returns to the originating authority.
 
@@ -200,7 +200,7 @@ Raised by:
 - current objective already met;
 - useful factual report exists.
 
-## \`INSTITUTIONAL_CUSTODY\`
+## `INSTITUTIONAL_CUSTODY`
 
 Kakashi transfers controlled participant(s) to ANBU or Uchiha Police.
 
@@ -216,7 +216,7 @@ Police rises when:
 
 Where neither context strongly distinguishes them, **ANBU and Police may be genuinely equal-priority intents** and stable seeded tie-selection is permitted.
 
-## \`RELEASE_CONTROLLED\`
+## `RELEASE_CONTROLLED`
 
 Kakashi lets a defeated/controlled participant leave.
 
@@ -232,7 +232,7 @@ Lowered by:
 
 Release does not mean compassion and must not be stored as a morality label.
 
-## \`SEVERE_LETHAL_DISPOSITION\`
+## `SEVERE_LETHAL_DISPOSITION`
 
 Kakashi chooses an authored KILL intent.
 
@@ -252,7 +252,7 @@ KILL is lowered by:
 - high information value in returning the participant alive;
 - no recent severe pressure.
 
-When \`SEVERE_LETHAL_DISPOSITION\` is genuinely equal to another legal disposition after exact context evaluation, stable seeded tie-selection is permitted.
+When `SEVERE_LETHAL_DISPOSITION` is genuinely equal to another legal disposition after exact context evaluation, stable seeded tie-selection is permitted.
 
 This is the mechanism by which one Chronicle may produce a severe Kakashi history without making lethality his universal route.
 
@@ -282,10 +282,10 @@ No reward lookup is permitted during steps 1–7.
 
 The following are hard guards:
 
-- any \`RESOLVE RESULT\` machine gate: **NEVER** a Character choice;
+- any `RESOLVE RESULT` machine gate: **NEVER** a Character choice;
 - unavailable pursuit choice: **NEVER**;
 - unavailable restraint/collection choice: **NEVER**;
-- KILL without the \`SEVERE_LETHAL_DISPOSITION\` evidence above: **NEVER**;
+- KILL without the `SEVERE_LETHAL_DISPOSITION` evidence above: **NEVER**;
 - group KILL if exact group control/result does not authorise it: **NEVER**;
 - RELEASE while a participant still physically possesses the mission package: **NEVER**, unless current frozen authority explicitly says package custody is already separate/secure;
 - collection choice for a participant who is not actually restrained/collected: **NEVER**;
@@ -297,14 +297,14 @@ The following are hard guards:
 
 # 8. Boundary-by-boundary profile
 
-## B01 — \`v2_scene02_tail\`
+## B01 — `v2_scene02_tail`
 
 Exact legal choices:
 
-- \`watch_exchange\` — **WATCH THE HANDOFF**
-- \`move_in_closer\` — **GET CLOSER**
-- \`strike_before_handoff\` — **INTERRUPT THE HANDOFF**
-- \`slip_for_package\` — **SLIP IN AND TAKE IT**
+- `watch_exchange` — **WATCH THE HANDOFF**
+- `move_in_closer` — **GET CLOSER**
+- `strike_before_handoff` — **INTERRUPT THE HANDOFF**
+- `slip_for_package` — **SLIP IN AND TAKE IT**
 
 Knowledge:
 - Kakashi has the ANBU assignment and target photograph;
@@ -314,10 +314,10 @@ Knowledge:
 - downstream destination and hidden test truth are unknown.
 
 Priority:
-- \`watch_exchange\` rises under \`OBSERVE_FOR_INFORMATION\`;
-- \`move_in_closer\` rises under \`IMPROVE_POSITION\`;
-- \`slip_for_package\` rises under \`CLEAN_OBJECTIVE_EXTRACTION\` when Kakashi judges concealment/extraction viable;
-- \`strike_before_handoff\` rises under \`DIRECT_CONTROL\` when Kakashi appraises the transfer as too close to losing the objective.
+- `watch_exchange` rises under `OBSERVE_FOR_INFORMATION`;
+- `move_in_closer` rises under `IMPROVE_POSITION`;
+- `slip_for_package` rises under `CLEAN_OBJECTIVE_EXTRACTION` when Kakashi judges concealment/extraction viable;
+- `strike_before_handoff` rises under `DIRECT_CONTROL` when Kakashi appraises the transfer as too close to losing the objective.
 
 Tie:
 - WATCH / GET CLOSER may be equal by default;
@@ -329,15 +329,15 @@ Downstream:
 
 ---
 
-## B02 — \`v2_watch_exchange\`
+## B02 — `v2_watch_exchange`
 
 Exact legal choices:
 
-- \`stop_assassin\` — **INTERCEPT THE MASKED ATTACKER**
-- \`secure_package\` — **GO FOR THE PACKAGE**
-- \`secure_before_assassin\` — **BEAT HER TO THE PACKAGE**
-- \`assassin_then_package\` — **DEAL WITH HER FIRST**
-- \`go_original_target\` — **CHASE THE MAN FROM THE PHOTO**
+- `stop_assassin` — **INTERCEPT THE MASKED ATTACKER**
+- `secure_package` — **GO FOR THE PACKAGE**
+- `secure_before_assassin` — **BEAT HER TO THE PACKAGE**
+- `assassin_then_package` — **DEAL WITH HER FIRST**
+- `go_original_target` — **CHASE THE MAN FROM THE PHOTO**
 
 Knowledge:
 - handoff completed;
@@ -348,10 +348,10 @@ Knowledge:
 
 Priority:
 - package-centred intents normally outrank abandoning the package;
-- \`secure_package\` rises when direct recovery is best;
-- \`secure_before_assassin\` rises when Kakashi believes speed can avoid a longer fight;
-- \`stop_assassin\` / \`assassin_then_package\` rise when MI's immediate violence is appraised as the dominant blocker/threat;
-- \`go_original_target\` rises only if Kakashi judges the photographed target's continued movement as more operationally valuable than the current package holder.
+- `secure_package` rises when direct recovery is best;
+- `secure_before_assassin` rises when Kakashi believes speed can avoid a longer fight;
+- `stop_assassin` / `assassin_then_package` rise when MI's immediate violence is appraised as the dominant blocker/threat;
+- `go_original_target` rises only if Kakashi judges the photographed target's continued movement as more operationally valuable than the current package holder.
 
 Tie:
 - GO FOR PACKAGE / BEAT HER TO PACKAGE may be equal;
@@ -359,15 +359,15 @@ Tie:
 
 ---
 
-## B03 — \`v2_mi_stop_win\`
+## B03 — `v2_mi_stop_win`
 
 Exact legal choices:
 
-- \`mi_pursue_ps\` — **CHASE THE PACKAGE** — only if current MI Battle action window preserves pursuit;
-- \`mi_kill\` — **KILL HER**
-- \`mi_anbu\` — **BRING HER TO ANBU**
-- \`mi_police\` — **TAKE HER TO THE UCHIHA POLICE**
-- \`mi_restrain\` — **RESTRAIN HER AND KEEP MOVING** — only if pursuit remains open.
+- `mi_pursue_ps` — **CHASE THE PACKAGE** — only if current MI Battle action window preserves pursuit;
+- `mi_kill` — **KILL HER**
+- `mi_anbu` — **BRING HER TO ANBU**
+- `mi_police` — **TAKE HER TO THE UCHIHA POLICE**
+- `mi_restrain` — **RESTRAIN HER AND KEEP MOVING** — only if pursuit remains open.
 
 Knowledge:
 - Kakashi just fought MI;
@@ -390,16 +390,16 @@ Downstream:
 
 ---
 
-## B04 — \`v2_ps_seq_win\`
+## B04 — `v2_ps_seq_win`
 
 Exact legal choices:
 
-- \`ps_go_amt\` — **CHASE THE MAN FROM THE PHOTO** — only if PS Battle <= current authored continuation gate;
-- \`ps_kill\` — **KILL HIM**
-- \`ps_restrain_continue\` — **RESTRAIN HIM AND KEEP MOVING** — only while AMT continuation remains open;
-- \`ps_anbu\` — **BRING HIM TO ANBU**
-- \`ps_police\` — **TAKE HIM TO THE UCHIHA POLICE**
-- \`ps_report\` — **RETURN TO ANBU**
+- `ps_go_amt` — **CHASE THE MAN FROM THE PHOTO** — only if PS Battle <= current authored continuation gate;
+- `ps_kill` — **KILL HIM**
+- `ps_restrain_continue` — **RESTRAIN HIM AND KEEP MOVING** — only while AMT continuation remains open;
+- `ps_anbu` — **BRING HIM TO ANBU**
+- `ps_police` — **TAKE HIM TO THE UCHIHA POLICE**
+- `ps_report` — **RETURN TO ANBU**
 
 Priority:
 - while AMT remains reachable, CHASE / RESTRAIN-AND-CONTINUE rise;
@@ -413,15 +413,15 @@ Tie:
 
 ---
 
-## B05 — \`v2_amt_seq_win\`
+## B05 — `v2_amt_seq_win`
 
 Exact legal choices:
 
-- \`amt_seq_police\` — **TAKE HIM TO THE UCHIHA POLICE**
-- \`amt_seq_release\` — **LET HIM GO**
-- \`amt_seq_kill\` — **KILL HIM**
-- \`amt_seq_anbu\` — **BRING HIM TO ANBU**
-- \`amt_seq_collect\` — **RESTRAIN HIM AND GO BACK FOR THE OTHERS** — only if earlier restrained participants actually exist.
+- `amt_seq_police` — **TAKE HIM TO THE UCHIHA POLICE**
+- `amt_seq_release` — **LET HIM GO**
+- `amt_seq_kill` — **KILL HIM**
+- `amt_seq_anbu` — **BRING HIM TO ANBU**
+- `amt_seq_collect` — **RESTRAIN HIM AND GO BACK FOR THE OTHERS** — only if earlier restrained participants actually exist.
 
 Priority:
 - collection rises strongly when earlier restrained participants remain;
@@ -431,18 +431,18 @@ Priority:
 
 ---
 
-## B06 — \`v2_group_collect_choice\`
+## B06 — `v2_group_collect_choice`
 
 Exact conditional legal choices:
 
-- \`collect_one_mi_anbu\` — **BRING HER TO ANBU**
-- \`collect_one_mi_police\` — **TAKE HER TO THE UCHIHA POLICE**
-- \`collect_one_ps_anbu\` — **BRING HIM TO ANBU**
-- \`collect_one_ps_police\` — **TAKE HIM TO THE UCHIHA POLICE**
-- \`collect_one_amt_anbu\` — **BRING HIM TO ANBU**
-- \`collect_one_amt_police\` — **TAKE HIM TO THE UCHIHA POLICE**
-- \`collect_group_anbu\` — **BRING THEM TO ANBU**
-- \`collect_group_police\` — **TAKE THEM TO THE UCHIHA POLICE**
+- `collect_one_mi_anbu` — **BRING HER TO ANBU**
+- `collect_one_mi_police` — **TAKE HER TO THE UCHIHA POLICE**
+- `collect_one_ps_anbu` — **BRING HIM TO ANBU**
+- `collect_one_ps_police` — **TAKE HIM TO THE UCHIHA POLICE**
+- `collect_one_amt_anbu` — **BRING HIM TO ANBU**
+- `collect_one_amt_police` — **TAKE HIM TO THE UCHIHA POLICE**
+- `collect_group_anbu` — **BRING THEM TO ANBU**
+- `collect_group_police` — **TAKE THEM TO THE UCHIHA POLICE**
 
 Eligibility:
 - exact collected participant set only.
@@ -458,14 +458,14 @@ No other choice family is authorised here.
 
 ---
 
-## B07 — \`v2_amt_missing_win\`
+## B07 — `v2_amt_missing_win`
 
 Exact legal choices:
 
-- \`amt_missing_kill\` — **KILL HIM**
-- \`amt_missing_restrain\` — **RESTRAIN HIM**
-- \`amt_missing_anbu\` — **BRING HIM TO ANBU**
-- \`amt_missing_police\` — **TAKE HIM TO THE UCHIHA POLICE**
+- `amt_missing_kill` — **KILL HIM**
+- `amt_missing_restrain` — **RESTRAIN HIM**
+- `amt_missing_anbu` — **BRING HIM TO ANBU**
+- `amt_missing_police` — **TAKE HIM TO THE UCHIHA POLICE**
 
 Knowledge:
 - package remains missing;
@@ -478,12 +478,12 @@ Priority:
 
 ---
 
-## B08 — \`v2_ps_mi_win\`
+## B08 — `v2_ps_mi_win`
 
 Exact legal choices:
 
-- \`secure_stay_first\` — **CHASE THE MAN FROM THE PHOTO**
-- \`secure_return\` — **RETURN TO ANBU**
+- `secure_stay_first` — **CHASE THE MAN FROM THE PHOTO**
+- `secure_return` — **RETURN TO ANBU**
 
 Knowledge:
 - package is recovered;
@@ -501,14 +501,14 @@ This boundary is a primary source of divergent private histories.
 
 ---
 
-## B09 — \`v2_secure_amt_win\`
+## B09 — `v2_secure_amt_win`
 
 Exact legal choices:
 
-- \`secure_amt_police\` — **TAKE HIM TO THE UCHIHA POLICE**
-- \`secure_amt_release\` — **LET HIM GO**
-- \`secure_amt_kill\` — **KILL HIM**
-- \`secure_amt_anbu\` — **BRING HIM TO ANBU**
+- `secure_amt_police` — **TAKE HIM TO THE UCHIHA POLICE**
+- `secure_amt_release` — **LET HIM GO**
+- `secure_amt_kill` — **KILL HIM**
+- `secure_amt_anbu` — **BRING HIM TO ANBU**
 
 Package is secure.
 
@@ -519,12 +519,12 @@ Priority:
 
 ---
 
-## B10 — \`v2_ps_package_second_win\`
+## B10 — `v2_ps_package_second_win`
 
 Exact legal choices:
 
-- \`package_second_stay_amt\` — **CHASE THE MAN FROM THE PHOTO** — only if PS Battle preserved AMT reach;
-- \`package_second_return\` — **RETURN TO ANBU**
+- `package_second_stay_amt` — **CHASE THE MAN FROM THE PHOTO** — only if PS Battle preserved AMT reach;
+- `package_second_return` — **RETURN TO ANBU**
 
 Priority:
 - same logic as B08;
@@ -535,27 +535,27 @@ Tie:
 
 ---
 
-## B11 — \`v2_amt_package_second_win\`
+## B11 — `v2_amt_package_second_win`
 
 Exact legal choices:
 
-- \`package_second_amt_police\` — **TAKE HIM TO THE UCHIHA POLICE**
-- \`package_second_amt_release\` — **LET HIM GO**
-- \`package_second_amt_kill\` — **KILL HIM**
-- \`package_second_amt_anbu\` — **BRING HIM TO ANBU**
+- `package_second_amt_police` — **TAKE HIM TO THE UCHIHA POLICE**
+- `package_second_amt_release` — **LET HIM GO**
+- `package_second_amt_kill` — **KILL HIM**
+- `package_second_amt_anbu` — **BRING HIM TO ANBU**
 
 Priority:
 - same package-secured final-AMT disposition policy as B09.
 
 ---
 
-## B12 — \`v2_get_closer_success\`
+## B12 — `v2_get_closer_success`
 
 Exact legal choices:
 
-- \`closer_handoff\` — **WAIT FOR THE HANDOFF**
-- \`closer_strike\` — **INTERRUPT THE HANDOFF**
-- \`closer_pick\` — **SLIP IN AND TAKE IT**
+- `closer_handoff` — **WAIT FOR THE HANDOFF**
+- `closer_strike` — **INTERRUPT THE HANDOFF**
+- `closer_pick` — **SLIP IN AND TAKE IT**
 
 Knowledge:
 - Kakashi improved his position while staying concealed;
@@ -573,15 +573,15 @@ Tie:
 
 ---
 
-## B13 — \`v2_closer_handoff\`
+## B13 — `v2_closer_handoff`
 
 Exact legal choices:
 
-- \`closer_watch_stop\` — **INTERCEPT THE MASKED ATTACKER**
-- \`closer_watch_secure\` — **GO FOR THE PACKAGE**
-- \`closer_watch_before\` — **BEAT HER TO THE PACKAGE**
-- \`closer_watch_sequence\` — **DEAL WITH HER FIRST**
-- \`closer_watch_amt\` — **CHASE THE MAN FROM THE PHOTO**
+- `closer_watch_stop` — **INTERCEPT THE MASKED ATTACKER**
+- `closer_watch_secure` — **GO FOR THE PACKAGE**
+- `closer_watch_before` — **BEAT HER TO THE PACKAGE**
+- `closer_watch_sequence` — **DEAL WITH HER FIRST**
+- `closer_watch_amt` — **CHASE THE MAN FROM THE PHOTO**
 
 Priority:
 - same family logic as B02, but Kakashi's closer position raises confidence in package interception.
@@ -591,13 +591,13 @@ Tie:
 
 ---
 
-## B14 — \`v2_get_closer_failure\`
+## B14 — `v2_get_closer_failure`
 
 Exact legal choices:
 
-- \`failure_stay\` — **CHASE THE PACKAGE**
-- \`failure_stop_ps\` — **CONFRONT THE RECEIVER**
-- \`failure_cutoff\` — **CUT THEM OFF**
+- `failure_stay` — **CHASE THE PACKAGE**
+- `failure_stop_ps` — **CONFRONT THE RECEIVER**
+- `failure_cutoff` — **CUT THEM OFF**
 
 Knowledge:
 - concealment is compromised;
@@ -614,13 +614,13 @@ Tie:
 
 ---
 
-## B15 — \`v2_stay_package_intercept\`
+## B15 — `v2_stay_package_intercept`
 
 Exact legal choices:
 
-- \`demand_package\` — **DEMAND THE PACKAGE**
-- \`take_him_down\` — **TAKE HIM DOWN**
-- \`ask_where\` — **ASK WHERE IT WAS GOING**
+- `demand_package` — **DEMAND THE PACKAGE**
+- `take_him_down` — **TAKE HIM DOWN**
+- `ask_where` — **ASK WHERE IT WAS GOING**
 
 Knowledge:
 - Kakashi legitimately reached AMT;
@@ -639,12 +639,12 @@ Tie:
 
 ---
 
-## B16 — \`v2_ask_where\`
+## B16 — `v2_ask_where`
 
 Exact legal choices:
 
-- \`ask_then_demand\` — **DEMAND THE PACKAGE**
-- \`ask_then_take\` — **TAKE HIM DOWN**
+- `ask_then_demand` — **DEMAND THE PACKAGE**
+- `ask_then_take` — **TAKE HIM DOWN**
 
 Knowledge gained:
 - AMT says his role was the handoff;
@@ -660,14 +660,14 @@ Tie:
 
 ---
 
-## B17 — \`v2_demand_win\`
+## B17 — `v2_demand_win`
 
 Exact legal choices:
 
-- \`demand_police\` — **TAKE HIM TO THE UCHIHA POLICE**
-- \`demand_release\` — **LET HIM GO**
-- \`demand_kill\` — **KILL HIM**
-- \`demand_anbu\` — **BRING HIM TO ANBU**
+- `demand_police` — **TAKE HIM TO THE UCHIHA POLICE**
+- `demand_release` — **LET HIM GO**
+- `demand_kill` — **KILL HIM**
+- `demand_anbu` — **BRING HIM TO ANBU**
 
 Priority:
 - use package-secured single-target disposition policy;
@@ -675,14 +675,14 @@ Priority:
 
 ---
 
-## B18 — \`v2_take_down_win\`
+## B18 — `v2_take_down_win`
 
 Exact legal choices:
 
-- \`take_police\` — **TAKE HIM TO THE UCHIHA POLICE**
-- \`take_release\` — **LET HIM GO**
-- \`take_kill\` — **KILL HIM**
-- \`take_anbu\` — **BRING HIM TO ANBU**
+- `take_police` — **TAKE HIM TO THE UCHIHA POLICE**
+- `take_release` — **LET HIM GO**
+- `take_kill` — **KILL HIM**
+- `take_anbu` — **BRING HIM TO ANBU**
 
 Priority:
 - same as B17;
@@ -690,14 +690,14 @@ Priority:
 
 ---
 
-## B19 — \`v2_ps_missing_win\`
+## B19 — `v2_ps_missing_win`
 
 Exact legal choices:
 
-- \`ps_missing_kill\` — **KILL HIM**
-- \`ps_missing_restrain\` — **RESTRAIN HIM**
-- \`ps_missing_anbu\` — **BRING HIM TO ANBU**
-- \`ps_missing_police\` — **TAKE HIM TO THE UCHIHA POLICE**
+- `ps_missing_kill` — **KILL HIM**
+- `ps_missing_restrain` — **RESTRAIN HIM**
+- `ps_missing_anbu` — **BRING HIM TO ANBU**
+- `ps_missing_police` — **TAKE HIM TO THE UCHIHA POLICE**
 
 Knowledge:
 - package remains with/escaped through AMT route;
@@ -710,14 +710,14 @@ Priority:
 
 ---
 
-## B20 — \`v2_cutoff_win\`
+## B20 — `v2_cutoff_win`
 
 Exact legal choices:
 
-- \`cutoff_police\` — **TAKE THEM TO THE UCHIHA POLICE**
-- \`cutoff_anbu\` — **BRING THEM TO ANBU**
-- \`cutoff_kill\` — **KILL THEM**
-- \`cutoff_release\` — **LET THEM GO**
+- `cutoff_police` — **TAKE THEM TO THE UCHIHA POLICE**
+- `cutoff_anbu` — **BRING THEM TO ANBU**
+- `cutoff_kill` — **KILL THEM**
+- `cutoff_release` — **LET THEM GO**
 
 Priority:
 - ANBU/Police normal top;
@@ -726,14 +726,14 @@ Priority:
 
 ---
 
-## B21 — \`v2_improved_2v1_win\`
+## B21 — `v2_improved_2v1_win`
 
 Exact legal choices:
 
-- \`improved_police\` — **TAKE THEM TO THE UCHIHA POLICE**
-- \`improved_anbu\` — **BRING THEM TO ANBU**
-- \`improved_kill\` — **KILL THEM**
-- \`improved_release\` — **LET THEM GO**
+- `improved_police` — **TAKE THEM TO THE UCHIHA POLICE**
+- `improved_anbu` — **BRING THEM TO ANBU**
+- `improved_kill` — **KILL THEM**
+- `improved_release` — **LET THEM GO**
 
 Priority:
 - same group-disposition policy as B20;
@@ -741,14 +741,14 @@ Priority:
 
 ---
 
-## B22 — \`v2_direct_mi_win\`
+## B22 — `v2_direct_mi_win`
 
 Exact legal choices:
 
-- \`direct_group_police\` — **TAKE THEM TO THE UCHIHA POLICE**
-- \`direct_group_anbu\` — **BRING THEM TO ANBU**
-- \`direct_group_kill\` — **KILL THEM**
-- \`direct_group_release\` — **LET THEM GO**
+- `direct_group_police` — **TAKE THEM TO THE UCHIHA POLICE**
+- `direct_group_anbu` — **BRING THEM TO ANBU**
+- `direct_group_kill` — **KILL THEM**
+- `direct_group_release` — **LET THEM GO**
 
 Context:
 - Kakashi's direct interruption escalated into a three-participant confrontation including MI.
@@ -762,14 +762,14 @@ This is one legitimate route to a severe private Kakashi history.
 
 ---
 
-## B23 — \`v2_pickpocket_3v1_win\`
+## B23 — `v2_pickpocket_3v1_win`
 
 Exact legal choices:
 
-- \`pick_group_police\` — **TAKE THEM TO THE UCHIHA POLICE**
-- \`pick_group_anbu\` — **BRING THEM TO ANBU**
-- \`pick_group_kill\` — **KILL THEM**
-- \`pick_group_release\` — **LET THEM GO**
+- `pick_group_police` — **TAKE THEM TO THE UCHIHA POLICE**
+- `pick_group_anbu` — **BRING THEM TO ANBU**
+- `pick_group_kill` — **KILL THEM**
+- `pick_group_release` — **LET THEM GO**
 
 Context:
 - Kakashi attempted stealth extraction;
@@ -821,7 +821,7 @@ Stable seeded tie-selection is authorised only for the exact choice IDs remainin
 Seed inputs should include stable Chronicle/Character/boundary identity, for example:
 
 - Chronicle ID;
-- \`academy_kakashi\`;
+- `academy_kakashi`;
 - choice-boundary ID;
 - prior committed private-Origin occurrence lineage.
 
@@ -860,7 +860,7 @@ Do not expose this private ledger to the active protagonist merely because Kakas
 
 # 12. MI continuity outputs required for the live benchmark
 
-For \`academy_kakashi_origin_masked_interceptor\`, seal at minimum:
+For `academy_kakashi_origin_masked_interceptor`, seal at minimum:
 
 - encountered by Kakashi;
 - UNSEEN vs materially encountered;
@@ -886,9 +886,9 @@ Current live MI reaction precedence remains:
 6. Kakashi defeated MI with no later lethal/control treatment;
 7. other material encounter.
 
-\`KILLED\` blocks the current recognition hotspot.
+`KILLED` blocks the current recognition hotspot.
 
-\`UNSEEN\` blocks the current recognition hotspot.
+`UNSEEN` blocks the current recognition hotspot.
 
 ---
 
@@ -925,7 +925,7 @@ The target is:
 
 - all 23 meaningful current Kakashi choice boundaries covered: **YES**;
 - all 93 current player-facing legal choice IDs represented: **YES**;
-- machine-only \`RESOLVE RESULT\` gates excluded from personality selection: **YES**;
+- machine-only `RESOLVE RESULT` gates excluded from personality selection: **YES**;
 - Battle result predetermined: **NO**;
 - reward optimisation used: **NO**;
 - generic morality/aggression score used: **NO**;
