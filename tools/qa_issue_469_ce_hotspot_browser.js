@@ -201,7 +201,11 @@ async function advanceThroughBeat(page,beatId,max=20){
     await page.evaluate(()=>openOverlay("village"));
     await page.waitForSelector('button[data-village-hotspot-id="KON-P01"]',{state:"visible",timeout:10000});
     const p01=page.locator('button[data-village-hotspot-id="KON-P01"]');
-    assert((await p01.innerText()).includes("Hokage Administration"));
+    assert((await p01.getAttribute("aria-label")||"").includes("Hokage Administration"),"KON-P01 accessible identity missing");
+    await p01.hover();
+    const p01Label=p01.locator(".village-golden-halo-label");
+    await p01Label.waitFor({state:"visible",timeout:5000});
+    assert((await p01Label.innerText()).includes("Hokage Administration"),"KON-P01 visible hover label missing");
     await page.screenshot({path:path.join(OUT,"01-kon-p01-live-hotspot.png"),fullPage:true});
 
     await p01.dblclick();
