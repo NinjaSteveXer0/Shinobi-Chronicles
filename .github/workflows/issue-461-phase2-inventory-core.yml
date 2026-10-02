@@ -1,0 +1,78 @@
+name: Issue 461 Phase 2 Inventory Core
+
+on:
+  push:
+    branches:
+      - coding/phase-2-inventory-core-461
+    paths:
+      - 'index.html'
+      - 'runtime/alpha-phase2-inventory-core-46100.js'
+      - 'tools/qa_phase2_inventory_core_461.js'
+      - 'tools/qa_phase2_inventory_core_461_browser.js'
+      - 'tools/fixtures/runtime_change_declarations_300.json'
+      - 'tools/fixtures/runtime_responsibility_registry_300.json'
+      - '.github/workflows/issue-461-phase2-inventory-core.yml'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  phase2-inventory-core:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Source syntax
+        run: |
+          node --check runtime/alpha-phase2-inventory-core-46100.js
+          node --check tools/qa_phase2_inventory_core_461.js
+          node --check tools/qa_phase2_inventory_core_461_browser.js
+
+      - name: Bounded Inventory projection contract
+        run: node tools/qa_phase2_inventory_core_461.js
+
+      - name: Existing save compatibility
+        run: node tools/qa_save_compatibility_311.js
+
+      - name: Runtime ownership safety
+        run: node tools/qa_runtime_ownership_safety_300.js
+
+      - name: Phase 2 current-team regression
+        run: node tools/qa_phase2_konoha_player_surfaces_431.js
+
+      - name: Phase 2 persistent-development regression
+        run: node tools/qa_issue_448_discipline_stat_growth.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > phase2-461-server.log 2>&1 &
+          echo $! > phase2-461-server.pid
+          sleep 2
+
+      - name: Installed-browser Inventory core
+        run: node tools/qa_phase2_inventory_core_461_browser.js
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase2-inventory-core-461-browser
+          path: |
+            artifacts/phase2-inventory-core-461
+            phase2-461-server.log
+          if-no-files-found: ignore
