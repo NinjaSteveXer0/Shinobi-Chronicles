@@ -686,9 +686,10 @@ async function advanceThroughBeat(page,beatId,max=20){
     ].includes(menmaStarted.localContext.historyFamily),"unexpected private-history family: "+menmaStarted.localContext.historyFamily);
 
     const menmaBoard=(await page.locator("#story-scene-presentation-layer").innerText());
+    const menmaBoardActorLabels=await page.evaluate(()=>[...document.querySelectorAll("#story-scene-presentation-layer .sc-scene-board-33900__actor")].map(node=>node.dataset.actorLabel||""));
     assert(menmaBoard.includes("HOKAGE ADMINISTRATION · PUBLIC APPROACH"));
-    assert(menmaBoard.includes("MASKED WOMAN"),"Menma-facing board did not use observer-safe label");
-    assert(!menmaBoard.includes("MASKED INTERCEPTOR"),"Kakashi historical role label leaked into Menma-facing board");
+    assert(menmaBoardActorLabels.includes("MASKED WOMAN"),"Menma-facing board did not use observer-safe actor label: "+JSON.stringify(menmaBoardActorLabels));
+    assert(!menmaBoardActorLabels.includes("MASKED INTERCEPTOR"),"Kakashi historical role label leaked into Menma-facing board actor projection");
     const menmaBackdrop=await page.evaluate(()=>getActiveStorySceneBackdropPath33900());
     assert(menmaBackdrop&&menmaBackdrop.includes("hokage_district_exterior.png"),"Menma scene missing Administration backdrop");
     await page.screenshot({path:path.join(OUT,"06-menma-private-history-arrival.png"),fullPage:true});
