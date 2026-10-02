@@ -2703,6 +2703,7 @@ globalThis.getMenmaPrivateHistoryDecisionSnapshot46900=()=>clone(menmaDecisionSn
 globalThis.getMenmaNestedKakashiIntent46900=committedNestedKakashiIntent46900;
 globalThis.getOriginParticipantContinuity46900=getContinuity;
 globalThis.getKonohaCeHotspotEligibility46900=eligibility;
+globalThis.getKonohaCeHotspotHistoryFamily46900=continuity=>historyFamily(clone(continuity));
 globalThis.getMenmaSecondTeammateRef46900=menmaSecondTeammateRef46900;
 globalThis.getKonohaCeHotspotPlan46900=eventPlan;
 globalThis.getKonohaCeHotspotTeammateReactions46900=()=>clone(committedTeammateReactions());
