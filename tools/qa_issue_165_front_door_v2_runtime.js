@@ -66,6 +66,7 @@ const localStorage=new MemoryStorage();
 const sessionStorage=new MemoryStorage();
 let reloadCalls=0;
 let selectCalls=0;
+let runIdentityCalls=0;
 let prologueCalls=0;
 let baseConsumeCalls=0;
 let enemyCalls=0;
@@ -86,6 +87,7 @@ const context={
   getAlphaChronicleOriginSelectionEntries(){return entries.map(row=>({...row}));},
   getStorySceneDefinition(sceneId){return Object.values(sceneIds).includes(sceneId)?{sceneId}:null;},
   selectChronicleOrigin(variantId,sourceEventId){selectCalls+=1;return {success:true,variantId,sourceEventId};},
+  ensureChronicleRunIdentity43600(options){runIdentityCalls+=1;return {success:true,idempotent:false,identity:{runId:"sc_run_v1_qa-front-door-33400",creationKind:options&&options.creationKind||null}};},
   beginAlphaChronicleOriginPrologue(){prologueCalls+=1;return {success:true,sceneId:"stub_prologue"};},
   consumeBattleActionOpportunity(side,participantId,actionId,reason){baseConsumeCalls+=1;return {side,participantId,actionId,reason};},
   evaluateEnemyActionScheduler(){return context.currentBattle.active&&!context.currentBattle.battleOver?{ready:true}:{ready:false};},
@@ -145,6 +147,8 @@ try{
   // BEGIN is the only V2 commit point and delegates to existing authorities.
   const begun=plain(runtime.beginSelectedOrigin());
   assert("begin_commits_existing_origin_once",begun.success===true&&selectCalls===1,begun);
+  assert("begin_commits_run_identity_once",runIdentityCalls===1,begun);
+  assert("begin_run_identity_is_new_start",begun.runIdentity&&begun.runIdentity.identity&&begun.runIdentity.identity.creationKind==="NEW_START",begun);
   assert("begin_dispatches_existing_prologue_once",prologueCalls===1);
   assert("front_door_releases_after_begin",gameContainer.inert===false&&!document.getElementById("sc-alpha-front-door-33400"));
   const profile=JSON.parse(localStorage.getItem("shinobiChroniclesFrontDoorProfileV1"));
