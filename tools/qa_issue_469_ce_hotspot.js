@@ -192,6 +192,12 @@ assert(src.includes("anbuMembershipKnowledgeGranted:false"),"ANBU inference fire
 assert(src.includes("moralityScalarCreated:false")&&src.includes("friendshipScalarCreated:false"),"relationship/morality scalar firewall missing");
 assert(!src.includes("Math.random"),"#469 history/participant behavior must be deterministic");
 assert(src.includes("previewAutonomousKakashiPrivateOrigin46900"),"deterministic private-history preview seam missing");
+const candidateFn=src.slice(src.indexOf("function privateBoundaryCandidates46900("),src.indexOf("function selectPrivateBoundaryChoice46900("));
+assert(!candidateFn.includes("stableHash46900("),"stable seed is deciding Character/context preference membership instead of only equal-top tie selection");
+assert(src.includes("stablePick46900(boundaryId,legal,seedRef)"),"stable tie selection missing after Character/context eligibility");
+assert(src.includes("privateKakashiCapability46900"),"Character/context selection lacks current Kakashi capability input");
+assert(src.includes("privateChoiceSevereEligible46900"),"severe lethal eligibility gate missing");
+
 for(const boundary of Array.from({length:23},(_,i)=>"case\"B"+String(i+1).padStart(2,"0")+"\"")){
   assert(src.includes(boundary),"terminal walker missing boundary logic: "+boundary);
 }
