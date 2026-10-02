@@ -211,6 +211,10 @@ async function inspectMyClan(page,characterId){
     assert.strictEqual(afterReload.developmentReceipts,beforeReload.developmentReceipts,"reload duplicated/lost development receipts");
     assert.strictEqual(afterReload.breakthroughReceipts,beforeReload.breakthroughReceipts,"reload duplicated/lost breakthrough receipts");
 
+    // Reload returns to the normal shell; reopen the real Exam surface before validating its ceiling presentation.
+    await page.evaluate(()=>openKonohaExamFromVillage());
+    await page.waitForSelector("#konoha-activity-screen",{state:"visible",timeout:10000});
+
     // Ceiling/batch semantics: last eligible attempt reaches 15 with overflow; ×10 stops immediately afterward.
     const ceiling=await page.evaluate(()=>{
       const c=getPlayerCharacter("academy_menma"),p=getCharacterDisciplineProgression(c.id,"nin");
