@@ -1166,6 +1166,39 @@
       "replaces": [],
       "contractChangeReason": "PHASE_2_ACTIVATION",
       "rationale": "Consumes #449 Step 2 and the durable Inventory/provenance boundaries as one bounded read-only Alpha surface. Existing playerData.inventory remains ownership/quantity authority; existing Battle Pouch and Character equipment remain separate preparation/equipment authorities. The UI projects exact stack quantities and durable instance IDs, exposes source/provenance only when an exact Inventory-row reference exists, and creates no ownership, equip, preparation, Shop, Crafting, PL, Stat, Rank, Skill or Chronicle mutation."
+    },
+    {
+      "changeId": "issue-469-first-live-ce-hotspot",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "phase2.chronicle_state_manifest.shared",
+        "phase2.konoha_ce_hotspot.first_live_benchmark"
+      ],
+      "owner": "runtime/alpha-phase2-ce-hotspot-46900.js",
+      "directCallers": [
+        "runtime/alpha-traversal-bridge-33200.js",
+        "existing Academy Kakashi Origin completion",
+        "existing Konoha V3 KON-P01 presentation/activation",
+        "existing World opportunity + Story Scene + #34000 participant-autonomy runtimes"
+      ],
+      "stateTouched": [
+        "playerData.phase2ChronicleState.originParticipantContinuity exact bounded continuity capture/projection",
+        "playerData.storyDecisionRealisation34000 exact participant-first and protagonist-intent receipts through existing APIs",
+        "existing World event runtime dimensions for one finite KON-P01 occurrence",
+        "one observer-safe playerData.activityHistory Chronicle/Knowledge/shared-history occurrence",
+        "presentation-only Konoha P01 actionability and shared Story Scene Board delivery"
+      ],
+      "productionLoader": "runtime/alpha-traversal-bridge-33200.js",
+      "qaRefs": [
+        "tools/qa_issue_469_ce_hotspot.js",
+        "tools/qa_issue_469_ce_hotspot_browser.js",
+        "tools/qa_phase2_chronicle_state_manifest_436.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_save_compatibility_311.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Consumes the CE LIVE TEST READY #432/#469 contract and Writing #465 production scene. Adds one bounded Kakashi-Origin-only participant-continuity adapter and one finite KON-P01 authored World occurrence. It preserves frozen Origin truth, currentTeam authority, participant-first #34000 receipts, observer-safe Knowledge, Shinobi Record as projection, KILLED/UNSEEN exclusion, and save/load no-reroll. It does not activate generic hotspot generation, teammate-Kakashi history, Battle escalation, rewards, morality or hidden test truth."
     }
   ]
 }
