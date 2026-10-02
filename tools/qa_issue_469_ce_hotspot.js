@@ -8,6 +8,9 @@ const manifest=fs.readFileSync(path.join(ROOT,"runtime/alpha-chronicle-state-man
 const traversal=fs.readFileSync(path.join(ROOT,"runtime/alpha-traversal-bridge-33200.js"),"utf8");
 const game=fs.readFileSync(path.join(ROOT,"game.js"),"utf8");
 const writing=fs.readFileSync(path.join(ROOT,"Documentation/Story/Kakashi_Masked_Interceptor_First_Live_CE_Hotspot_Production_Scene_2026-10-02.md"),"utf8");
+const privateWriting=fs.readFileSync(path.join(ROOT,"Documentation/Story/Kakashi_MI_Private_History_Emergence_Non_Kakashi_Protagonist_Scene_Family_2026-10-02.md"),"utf8");
+const privateProfile=fs.readFileSync(path.join(ROOT,"Documentation/Story/Academy_Kakashi_Autonomous_Origin_Intent_Profile_2026-10-02.md"),"utf8");
+const battle=fs.readFileSync(path.join(ROOT,"runtime/alpha-kakashi-v2-battle-36010.js"),"utf8");
 
 for(const exact of [
   'const EVENT_ID="konoha_ce_kakashi_masked_interceptor_admin_crossing_v1"',
@@ -19,6 +22,12 @@ for(const exact of [
 
 assert(manifest.includes('stateDomainId:"originParticipantContinuity"'),"#436 continuity domain missing");
 assert(manifest.includes("getOriginParticipantContinuityStore43600"),"#436 continuity access seam missing");
+assert(manifest.includes('stateDomainId:"privateOriginHistory"'),"#471/#478 private Origin history domain missing");
+assert(manifest.includes("getPrivateOriginHistoryStore43600"),"private Origin history access seam missing");
+assert(src.includes('const PRIVATE_ORIGIN_SCHEMA="sc.privateOriginHistory.v1"'),"private Origin semantic identity missing");
+assert(src.includes('resolutionMode:"AUTONOMOUS_PRIVATE"'),"autonomous private Kakashi history mode missing");
+assert(src.includes('resolutionMode:"PLAYER_EXPERIENCED"'),"player-experienced Kakashi private history mode missing");
+assert(src.includes("sc.parallelOriginHistoryMigration.v1"),"one-shot old-save migration semantic missing");
 assert(src.includes("PRE_COMPLETE_ORIGIN.apply"),"#469 does not delegate frozen Origin completion");
 assert(!src.includes("getAcademyKakashiV2State36020().participants.MI.state="),"#469 appears to rewrite frozen Kakashi state");
 
@@ -39,9 +48,27 @@ assert(src.includes('fieldDispositionState==="UNSEEN"'),"UNSEEN exclusion missin
 assert(src.includes("hiddenPostTestReviewReached"),"hidden post-test review continuity requirement missing");
 assert(src.includes('postTestTruthClass:"staged_konoha_test_participant"')||src.includes('"staged_konoha_test_participant"'),"post-test World truth class missing");
 
+assert(src.includes("kakashi_current_presence_required"),"#478 Kakashi physical-presence eligibility missing");
+assert(!src.includes("academy_kakashi_origin_required"),"obsolete selected-Origin==Kakashi hotspot gate remains");
+assert(src.includes("menma_private_history_emergence"),"Menma private-history emergence mode missing");
+assert(src.includes("menma_live_benchmark_requires_hinata"),"Menma + Hinata + Kakashi exact benchmark gate missing");
+assert(src.includes("confirmAcademyTeamFormation46900"),"private history is not sealed before Team Formation");
+assert(src.includes("ensureAutonomousKakashiPrivateHistory46900"),"one-shot autonomous Kakashi history resolver missing");
+
 for(const api of ["registerAutonomyAnchor","consumeNextAutonomy","openDecisionAfterAutonomy","resolveStoryChoice"]){
   assert(src.includes(api),"#34000 participant-first/intent API not consumed: "+api);
 }
+
+const autonomousBoundaryBlock=src.slice(src.indexOf("const AUTONOMOUS_KAKASHI_BOUNDARIES="),src.indexOf("const MENMA_CHOICES="));
+const boundaryIds=[...autonomousBoundaryBlock.matchAll(/B\d\d:Object\.freeze/g)].map(m=>m[0].slice(0,3));
+assert.strictEqual(boundaryIds.length,23,"Kakashi autonomous profile must encode all 23 meaningful boundaries");
+const profileChoiceIds=[...autonomousBoundaryBlock.matchAll(/choiceIds:Object\.freeze\(\[([^\]]+)\]\)/g)]
+  .flatMap(m=>[...m[1].matchAll(/"([^"]+)"/g)].map(x=>x[1]));
+assert.strictEqual(profileChoiceIds.length,93,"Kakashi autonomous profile must encode all 93 player-facing legal choices");
+assert.strictEqual(new Set(profileChoiceIds).size,93,"autonomous Kakashi choice IDs must be unique across frozen boundaries");
+assert(!profileChoiceIds.some(id=>/success|failure|resolve_result/i.test(id)),"machine RESOLVE RESULT choice leaked into autonomous Character profile");
+assert(privateProfile.includes("all 23 meaningful current Kakashi choice boundaries covered: **YES**"),"runtime profile is not grounded in Writing autonomous-intent authority");
+assert(privateProfile.includes("all 93 current player-facing legal choice IDs represented: **YES**"),"Writing authority 93-choice audit missing");
 for(const teammate of [
   "academy_hinata","academy_izuno","academy_mirai","academy_menma","academy_kushina",
   "academy_kurenai","academy_iwabee","academy_metal_lee","academy_obito"
@@ -60,8 +87,23 @@ for(const label of exactChoices){
   assert(src.includes(label),"exact Kakashi choice missing: "+label);
   assert(writing.includes(label),"runtime choice not grounded in Writing authority: "+label);
 }
+const menmaChoices=[
+  "Ask Kakashi what happened.",
+  "Ask her how she knows Kakashi.",
+  "Let Kakashi handle it.",
+  "Keep moving."
+];
+for(const label of menmaChoices){
+  assert(src.includes(label),"exact Menma choice missing: "+label);
+  assert(privateWriting.includes(label),"Menma runtime choice not grounded in Writing authority: "+label);
+}
 const choicesSection=src.slice(src.indexOf("const CHOICES="),src.indexOf("function clone("));
 assert(!/\bATTACK\b/i.test(choicesSection),"ATTACK leaked into #469 choice surface");
+assert(src.includes('const MENMA_SCENE_ID="scene_konoha_ce_kakashi_masked_interceptor_admin_crossing_menma_v1"'),"Menma scene identity missing");
+assert(src.includes('displayName:"Masked Woman"'),"Menma observer-safe current label missing");
+assert(src.includes('knownPerson:"Masked Woman"'),"Menma Shinobi Record leaks stable historical role label");
+assert(src.includes("privateOriginTranscriptGranted:false"),"Menma private-history transcript firewall missing");
+assert(src.includes("kakashiPrivateChoiceIdsGranted:false"),"Menma private choice-ledger firewall missing");
 
 for(const authored of [
   "Not here.",
@@ -99,6 +141,22 @@ for(const receipt of [
   "kakashi_declined_mi_contact_v1"
 ])assert(src.includes(receipt),"branch consequence receipt missing: "+receipt);
 
+for(const receipt of [
+  "mi_private_history_emergence_base_v1",
+  "menma_requested_kakashi_private_history_disclosure_v1",
+  "menma_asked_kakashi_about_private_past_v1",
+  "kakashi_disclosed_bounded_mi_history_to_current_team_v1",
+  "menma_requested_mi_prior_connection_testimony_v1",
+  "mi_disclosed_kakashi_private_history_in_front_of_team_v1",
+  "menma_yielded_private_history_collision_to_kakashi_v1",
+  "menma_deferred_to_kakashi_on_private_connection_v1",
+  "menma_declined_private_history_inquiry_v1"
+])assert(src.includes(receipt),"#478 Menma branch receipt missing: "+receipt);
+
+assert(src.includes("playerControlled:false"),"nested Kakashi current intent may be player-controlled");
+assert(src.includes("consumeMenmaAutonomy46900(\"nested_kakashi_intent\")"),"Branch C does not commit nested Kakashi autonomy");
+assert(src.includes("source_attributed_testimony"),"disclosure branches do not preserve testimony attribution");
+
 assert(src.includes("const BRANCH_CONSEQUENCES=Object.freeze({"),"branch consequence matrix missing");
 assert(src.includes("const consequence=branchConsequence(choiceId);"),"final record does not consume selected branch consequence");
 assert(src.includes("branchFactualReceiptId:consequence.factualReceiptId"),"branch factual delta not persisted");
@@ -111,6 +169,9 @@ assert(src.includes("randomPoolEligible:false"),"#469 leaked into random pool");
 assert(src.includes("registerWorldEventOpportunity"),"existing World opportunity authority not consumed");
 assert(src.includes("routeWorldOpportunityInteraction"),"KON-P01 does not route existing World interaction authority");
 assert(src.includes("registerStoryScene"),"shared Story Scene runtime not consumed");
+assert(src.includes("menmaSceneRegistration46900"),"Menma private-history scene not registered on shared Story runtime");
+assert(src.includes("MENMA_ACTION_ID"),"same KON-P01 opportunity lacks Menma observer route");
+assert(src.includes('actionId=gate.mode==="menma_private_history_emergence"?MENMA_ACTION_ID:ACTION_ID'),"KON-P01 route is not observer-mode driven");
 assert(src.includes("registerStorySceneBoardDefinition"),"shared Scene Board presentation not consumed");
 assert(src.includes('resolveBackdrop:()=>({assetPath:"Scene backdrops/hokage_district_exterior.png"})'),"KON-P01 Administration exterior backdrop not bound");
 assert(src.includes("resolvedRecord()"),"finite no-reroll record guard missing");
@@ -121,12 +182,18 @@ assert(src.includes("properNameKnowledgeGranted:false"),"proper-name firewall re
 assert(src.includes("anbuMembershipKnowledgeGranted:false"),"ANBU inference firewall receipt missing");
 assert(src.includes("moralityScalarCreated:false")&&src.includes("friendshipScalarCreated:false"),"relationship/morality scalar firewall missing");
 assert(!src.includes("Math.random"),"#469 history/participant behavior must be deterministic");
+assert(battle.includes("resolveAutonomousPrivateBattle36010"),"Battle owner does not expose headless autonomous Kakashi result");
+assert(battle.includes("rewardGranted:false")&&battle.includes("lootGranted:false")&&battle.includes("playerEconomyMutation:false"),"autonomous private Battle may mutate player rewards/economy");
+assert(src.includes("duplicateStartingPurseGranted:false"),"private Origin duplicate starting-purse firewall missing");
+assert(src.includes("autonomousPlayerVictoryBattleRyoGranted:false"),"autonomous private Battle Ryō firewall missing");
+assert(src.includes("blanketInventoryRewardsGranted:false"),"autonomous private inventory firewall missing");
 assert(!src.includes("addItemToInventory(")&&!src.includes("grantReward("),"#469 must not grant material rewards");
 assert(
   game.includes("storyDecisionRuntime34000:")&&game.includes("parsedData.storyDecisionRuntime34000"),
   "#34000 participant/protagonist intent receipts are not preserved by loadPlayerData"
 );
-assert(traversal.includes("runtime/alpha-phase2-ce-hotspot-46900.js"),"#469 missing from production dynamic chain");
+assert(traversal.includes("runtime/alpha-phase2-ce-hotspot-46900.js"),"#469/#478 missing from production dynamic chain");
+assert(traversal.includes('kakashi-v2-writing-golden-20260924-7-ce478'),"#478 terminal cache key not activated");
 assert(
   traversal.includes('function load36040(){loadOne("sc-kakashi-v2-transition-36040-script","runtime/alpha-kakashi-v2-transition-36040.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_TRANSITION_36040,load46900);}')&&
   traversal.includes('function load46900(){loadOne("sc-phase2-ce-hotspot-46900-script","runtime/alpha-phase2-ce-hotspot-46900.js",()=>!!globalThis.SC_PHASE2_CE_HOTSPOT_46900);}'),
@@ -144,6 +211,12 @@ console.log(JSON.stringify({
   exactNineTeammateFamilies:true,
   participantFirst34000:true,
   exactFourChoices:true,
+  exactMenmaChoices:true,
+  privateOriginHistory:true,
+  autonomousProfile23x93:true,
+  battleOwnedAutonomousResolution:true,
+  observerRelativeLabel:true,
+  nestedKakashiAutonomy:true,
   distinctBranchConsequences:true,
   attackAbsent:true,
   observerSafeRecord:true,
