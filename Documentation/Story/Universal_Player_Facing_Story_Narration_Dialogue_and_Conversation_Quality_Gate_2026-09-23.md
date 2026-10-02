@@ -409,6 +409,61 @@ Use narration to **show the event**, not grade the event.
 
 ---
 
+## 11.1 Semantic predicate != narration sentence
+
+Author-side semantic truth is not automatically player-facing prose.
+
+If a scene must preserve facts such as:
+
+- no alarm;
+- no detention;
+- tolerated presence;
+- accepted access;
+- no hostility;
+- routine institutional handling;
+- recognised authority;
+- legitimate processing;
+
+Writing should normally dramatize the **positive observable behaviour** that establishes those facts.
+
+Hard-fail smell:
+
+```text
+No X happened.
+Nobody Y.
+Nothing Z.
+```
+
+when those clauses exist mainly to reassure the author/runtime that a semantic condition was preserved.
+
+Ask instead:
+
+> **What ordinary thing did people actually do that lets the player infer the condition?**
+
+Examples:
+
+- accepted access -> the clerk processes the person normally;
+- tolerated presence -> the queue/routine continues around them;
+- no immediate threat -> guards/staff continue ordinary duties;
+- recognised authority -> staff respond/defer in-world;
+- legitimate processing -> a receipt is stamped, logged or returned through the ordinary procedure.
+
+Preserve:
+
+> **semantic predicate != narration sentence**
+
+and:
+
+> **show the ordinary behaviour that proves the state; do not narrate the absence of every invalid state.**
+
+This does not ban negative sentences in prose.
+
+It bans using negative-state checklists as disguised CE/QA documentation.
+
+Runtime/Coding must consume approved player-facing copy faithfully and must not paraphrase semantic rails into new narration.
+
+---
+
 # 12. Dialogue job
 
 Dialogue should arise from:
