@@ -62,6 +62,18 @@ assert(src.includes('ce478_second_teammate_autonomy'),"Menma private-history sce
 assert(src.includes("secondTeammateCurrentResponseCues46900"),"Menma current-evidence presentation is not dynamic by second teammate");
 assert(src.includes("participants:[...new Set([...(data.storyTeamParticipantRefs"),"Menma Record participants are not projected from exact current team");
 assert(src.includes("getMenmaSecondTeammateRef46900"),"focused second-teammate diagnostic export missing");
+assert(board.includes("scale(1.045)"),"#486 speaker focus scale must stay inside locked +3–5% band");
+assert(!board.includes("scale(1.055)"),"#486 superseded speaker focus scale remains");
+assert(board.includes("translateY(-10px)"),"#486 speaker focus raise is missing");
+assert(board.includes("function resolveBoardActorStage33900"),"#486 semantic stage resolver missing");
+assert(board.includes("data-sc-stage-anchor"),"#486 actor semantic anchor projection missing");
+assert(!board.includes('.sc-scene-board-33900__actors[data-count="4"]>.sc-scene-board-33900__actor:nth-child'),"#486 four-person staging still depends on ordinal nth-child margins");
+assert(board.includes("scChoreoReducedSettle33900"),"#486 reduced-motion non-exit settle grammar missing");
+assert(board.includes("scChoreoReducedExit33900"),"#486 reduced-motion exit/flee opacity grammar missing");
+assert(!board.includes("from{opacity:.72}"),"#486 reduced motion still fades present non-entry/non-exit actors");
+assert(src.includes('stageAnchor=id===MENMA_ID?"PLAYER_LEFT"'),"#469 Menma semantic stage anchor missing");
+assert(src.includes('id===ORIGIN_ID?"INNER_RIGHT":id===MI_ID?"OPPONENT_RIGHT":"INNER_LEFT"'),"#469 four-person semantic stage hierarchy missing");
+assert(src.includes('stageAnchor=id===ORIGIN_ID?"PLAYER_LEFT":id===MI_ID?"OPPONENT_RIGHT":"CENTER"'),"#469 Kakashi protagonist stage anchors missing");
 assert(src.includes("confirmAcademyTeamFormation46900"),"private history is not sealed before Team Formation");
 assert(src.includes("ensureAutonomousKakashiPrivateHistory46900"),"one-shot autonomous Kakashi history resolver missing");
 assert(src.includes("privateStoryUnitRef46900"),"private Origin choices are not namespaced through #34000");
