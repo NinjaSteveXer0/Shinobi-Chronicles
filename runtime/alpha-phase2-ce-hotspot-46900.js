@@ -2119,7 +2119,7 @@ function commitMenmaResolution46900(expectedChoiceId){
 }
 
 function cue(kind,text,speakerName=null){
-  const row={kind,text,singlePage:true};
+  const row={kind,text};
   if(speakerName)row.speakerName=speakerName;
   return row;
 }
@@ -2337,6 +2337,7 @@ if(typeof globalThis.registerStorySceneBoardDefinition==="function"){
   const board=globalThis.registerStorySceneBoardDefinition(SCENE_ID,{
     resolve:boardProjection,
     resolveBackdrop:()=>({assetPath:"Scene backdrops/hokage_district_exterior.png"}),
+    exitTransition:"black_wipe",
     performanceSequences:{
       ce469_opening:openingCues,
       ce469_history:({runtime})=>historyCues(runtime),
@@ -2414,6 +2415,7 @@ if(typeof globalThis.registerStorySceneBoardDefinition==="function"){
   const board=globalThis.registerStorySceneBoardDefinition(MENMA_SCENE_ID,{
     resolve:menmaBoardProjection46900,
     resolveBackdrop:()=>({assetPath:"Scene backdrops/hokage_district_exterior.png"}),
+    exitTransition:"black_wipe",
     performanceSequences:{
       ce478_opening:menmaOpeningCues46900,
       ce478_history:({runtime})=>menmaHistoryCues46900(runtime),
