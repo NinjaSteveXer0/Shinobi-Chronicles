@@ -55,14 +55,14 @@ jobs:
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
 
-      - name: Phase 2 current-team regression
-        run: node tools/qa_phase2_konoha_player_surfaces_431.js
-
       - name: Start local Alpha server
         run: |
           python -m http.server 8080 --bind 127.0.0.1 > phase2-461-server.log 2>&1 &
           echo $! > phase2-461-server.pid
           sleep 2
+
+      - name: Phase 2 current-team regression
+        run: node tools/qa_phase2_konoha_player_surfaces_431.js
 
       - name: Installed-browser Inventory core
         run: node tools/qa_phase2_inventory_core_461_browser.js
