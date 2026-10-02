@@ -1589,7 +1589,8 @@
         "runtime/alpha-traversal-bridge-33200.js",
         "completeChronicleOriginPrologue",
         "renderAlphaKonohaV3IdentifiedAnchor",
-        "activateAlphaKonohaV3PublicLocation"
+        "activateAlphaKonohaV3PublicLocation",
+        "getShinobiRecordParticipants"
       ],
       "stateReads": [
         "frozen Academy Kakashi V2 terminal localContext before completion only",
@@ -1606,7 +1607,8 @@
         "existing World lifecycle/actionability/resolution dimensions only through current World APIs",
         "one observer-safe committed playerData.activityHistory occurrence for resolved Hokage Administration Crossing",
         "active Story Scene runtime only through existing startStoryScene / Story consequence APIs",
-        "presentation-only Konoha P01 actionability wrapper and shared Story Scene Board projection"
+        "presentation-only Konoha P01 actionability wrapper and shared Story Scene Board projection",
+        "presentation-only observer-safe Shinobi Record participant labels for the one #469 occurrence"
       ],
       "productionLoadPath": [
         "index.html",
@@ -2157,6 +2159,19 @@
       ],
       "canonicalActiveOwner": "runtime/alpha-phase2-ce-hotspot-46900.js",
       "activationCondition": "Only eligible KON-P01 routes the registered finite CE World opportunity; all other public-location activation delegates unchanged.",
+      "qaRefs": [
+        "tools/qa_issue_469_ce_hotspot.js",
+        "tools/qa_issue_469_ce_hotspot_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "symbol": "getShinobiRecordParticipants",
+      "chain": [
+        "runtime/alpha-phase2-ce-hotspot-46900.js"
+      ],
+      "canonicalActiveOwner": "runtime/alpha-phase2-ce-hotspot-46900.js",
+      "activationCondition": "Only the exact #469 occurrence maps stable participant refs to observer-safe display labels; every other Shinobi Record entry delegates unchanged.",
       "qaRefs": [
         "tools/qa_issue_469_ce_hotspot.js",
         "tools/qa_issue_469_ce_hotspot_browser.js",
