@@ -61,22 +61,33 @@ async function examSnapshot(page){
   });
 }
 async function inspectMyClan(page,characterId){
-  return page.evaluate(characterId=>{
+  const state=await page.evaluate(characterId=>{
     setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
     const roster=getClanManageableRosterCharacters().map(row=>row.id);
     const opened=openOverlay("clan");
     const selected=selectMyClanCharacterForInspection(characterId);
     const tab=selected?.success===true?setMyClanInspectionTab("stats"):null;
+    return{opened:opened||null,selected,tab,roster,currentOverlayType:typeof currentOverlayType!=="undefined"?currentOverlayType:null};
+  },characterId);
+  if(state.selected?.success===true&&state.tab==="stats"){
+    await page.waitForSelector(".my-clan-inspection-panel .my-clan-stat-grid",{state:"visible",timeout:10000});
+  }
+  const projection=await page.evaluate(characterId=>{
     const panel=document.querySelector(".my-clan-inspection-panel");
+    const rows=[...(panel?.querySelectorAll(".my-clan-stat-grid > div")||[])];
     return{
-      opened:opened||null,selected,tab,roster,
-      html:panel?.innerHTML||"",text:panel?.innerText||"",
-      renderedStats:Object.fromEntries([...panel?.querySelectorAll(".my-clan-stat-grid > div")||[]].map(node=>[
-        node.querySelector("span")?.textContent?.trim()||"",Number(node.querySelector("strong")?.textContent?.trim()||0)
+      html:panel?.innerHTML||"",
+      text:panel?.innerText||"",
+      renderedStats:Object.fromEntries(rows.map(node=>[
+        node.querySelector("span")?.textContent?.trim()||"",
+        Number(node.querySelector("strong")?.textContent?.trim()||0)
       ])),
-      characterStats:{...getPlayerCharacter(characterId).stats},pl:calculateCurrentPL(getPlayerCharacter(characterId))
+      renderedStatRows:rows.map(node=>node.innerText.trim()),
+      characterStats:{...getPlayerCharacter(characterId).stats},
+      pl:calculateCurrentPL(getPlayerCharacter(characterId))
     };
   },characterId);
+  return{...state,...projection};
 }
 
 (async()=>{
@@ -166,7 +177,7 @@ async function inspectMyClan(page,characterId){
     assert(clan.roster.includes("academy_menma"),"My Clan manageable roster lost persistent subject: "+JSON.stringify(clan));
     assert.strictEqual(clan.tab,"stats");
     assert.strictEqual(clan.characterStats.nin,11);
-    assert.strictEqual(clan.renderedStats.NINJUTSU,11,"My Clan did not project canonical Current Ninjutsu 11");
+    assert.strictEqual(clan.renderedStats.NINJUTSU,11,"My Clan did not project canonical Current Ninjutsu 11: "+JSON.stringify(clan));
     assert(clan.text.includes("PL "+clan.pl)||clan.text.includes("CURRENT PL")||clan.html.includes(String(clan.pl)),"My Clan PL projection missing");
     await page.screenshot({path:path.join(OUT,"02-my-clan-current-stat.png"),fullPage:true});
 
