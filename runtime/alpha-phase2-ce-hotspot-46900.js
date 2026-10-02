@@ -2276,9 +2276,11 @@ function menmaBoardActor46900(id,focus=false){
   const label=id===MI_ID?"MASKED WOMAN":actorLabel(id);
   const stageAnchor=id===MENMA_ID?"PLAYER_LEFT":id===ORIGIN_ID?"INNER_RIGHT":id===MI_ID?"OPPONENT_RIGHT":"INNER_LEFT";
   const role=id===MENMA_ID?"protagonist":id===ORIGIN_ID?"private_history_owner":id===MI_ID?"returning_participant":"current_teammate";
+  const stageXPercent=id===MENMA_ID?12:id===ORIGIN_ID?64:id===MI_ID?88:36;
   const stageRiseVh=id===MENMA_ID?0:id===ORIGIN_ID?2:id===MI_ID?8:7;
+  const stageWidthPercent=19;
   const stageDepth=id===MENMA_ID?5:id===ORIGIN_ID?4:id===MI_ID?2:3;
-  return{id,label,image:actorImage(id),role,stageAnchor,stageRiseVh,stageDepth,focus:focus===true};
+  return{id,label,image:actorImage(id),role,stageAnchor,stageXPercent,stageRiseVh,stageWidthPercent,stageDepth,focus:focus===true};
 }
 function menmaBoardProjection46900({beatId,performance}){
   const speaker=String(performance&&performance.cue&&(performance.cue.speakerName||performance.cue.speaker)||"").toUpperCase();
@@ -2325,9 +2327,11 @@ function actorLabel(id){
 function boardActor(id,focus=false){
   const stageAnchor=id===ORIGIN_ID?"PLAYER_LEFT":id===MI_ID?"OPPONENT_RIGHT":"CENTER";
   const role=id===ORIGIN_ID?"protagonist":id===MI_ID?"returning_participant":"current_teammate";
+  const stageXPercent=id===ORIGIN_ID?18:id===MI_ID?82:50;
   const stageRiseVh=id===ORIGIN_ID?0:id===MI_ID?6:4;
+  const stageWidthPercent=id===MI_ID||id===ORIGIN_ID?24:22;
   const stageDepth=id===ORIGIN_ID?5:id===MI_ID?3:4;
-  return{id,label:actorLabel(id),image:actorImage(id),role,stageAnchor,stageRiseVh,stageDepth,focus:focus===true};
+  return{id,label:actorLabel(id),image:actorImage(id),role,stageAnchor,stageXPercent,stageRiseVh,stageWidthPercent,stageDepth,focus:focus===true};
 }
 function boardProjection({runtime,beatId,performance}){
   const speaker=String(performance&&performance.cue&&(performance.cue.speakerName||performance.cue.speaker)||"").toUpperCase();
