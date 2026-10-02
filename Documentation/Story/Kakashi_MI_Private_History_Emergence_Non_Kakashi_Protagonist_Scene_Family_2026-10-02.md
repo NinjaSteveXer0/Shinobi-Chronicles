@@ -5,7 +5,7 @@
 **Tracker:** #474  
 **Live CE tracker:** #478  
 **Status:** **KAKASHI-FIRST LIVE CE PRODUCTION WRITING — MENMA TARGET COMPLETE / REUSABLE NON-KAKASHI SEMANTICS CLOSED**  
-**Source-first main:** \`701022f49d5477bb2f2b711b2a0ded4a2dde74d4\`
+**Source-first main:** `701022f49d5477bb2f2b711b2a0ded4a2dde74d4`
 
 ---
 
@@ -13,7 +13,7 @@
 
 This is the production-ready private-history-emergence variant of:
 
-\`konoha_ce_kakashi_masked_interceptor_admin_crossing_v1\`
+`konoha_ce_kakashi_masked_interceptor_admin_crossing_v1`
 
 for:
 
@@ -25,12 +25,12 @@ The first exact owner target is:
 
 Required causal order:
 
-\`MI history-sensitive reaction to Kakashi\`  
-→ \`Kakashi autonomous current-scene response\`  
-→ \`Hinata current-evidence reaction\`  
-→ \`Menma meaningful choice\`  
-→ \`branch consequence\`  
-→ \`Menma observer-safe Shinobi Record projection\`.
+`MI history-sensitive reaction to Kakashi`  
+→ `Kakashi autonomous current-scene response`  
+→ `Hinata current-evidence reaction`  
+→ `Menma meaningful choice`  
+→ `branch consequence`  
+→ `Menma observer-safe Shinobi Record projection`.
 
 Kakashi's private Origin drives the event.
 
@@ -42,20 +42,20 @@ Menma does not inherit Kakashi's private Origin.
 
 Consume:
 
-- \`Documentation/Coordination/First_Live_CE_Hotspot_Private_History_Emergence_Expansion_2026-10-02.md\`  
-  blob \`67aa9662828afbe4a28ba4d68b446a387abd8165\`;
+- `Documentation/Coordination/First_Live_CE_Hotspot_Private_History_Emergence_Expansion_2026-10-02.md`  
+  blob `67aa9662828afbe4a28ba4d68b446a387abd8165`;
 
-- \`Documentation/Story/Academy_Kakashi_Autonomous_Origin_Intent_Profile_2026-10-02.md\`;
+- `Documentation/Story/Academy_Kakashi_Autonomous_Origin_Intent_Profile_2026-10-02.md`;
 
 - repaired Kakashi-protagonist hotspot Writing:  
-  \`Documentation/Story/Kakashi_Masked_Interceptor_First_Live_CE_Hotspot_Production_Scene_2026-10-02.md\`  
-  blob \`3000cacaa8fe6b6b64527611bdcab01518dfab68\`;
+  `Documentation/Story/Kakashi_Masked_Interceptor_First_Live_CE_Hotspot_Production_Scene_2026-10-02.md`  
+  blob `3000cacaa8fe6b6b64527611bdcab01518dfab68`;
 
-- Kakashi voice anchor \`fb047dde4ac4a30d4ee497b1cc187b923af8bdee\`;
+- Kakashi voice anchor `fb047dde4ac4a30d4ee497b1cc187b923af8bdee`;
 
-- Menma characterisation lock \`460e7ff437531aedf78101f4de86b30e1999b4b3\`;
+- Menma characterisation lock `460e7ff437531aedf78101f4de86b30e1999b4b3`;
 
-- Academy Hinata voice anchor \`a063da14d03597b2359b20b7a201b0e86264d92b\`.
+- Academy Hinata voice anchor `a063da14d03597b2359b20b7a201b0e86264d92b`.
 
 ---
 
@@ -63,7 +63,7 @@ Consume:
 
 Internal stable participant remains:
 
-\`academy_kakashi_origin_masked_interceptor\`
+`academy_kakashi_origin_masked_interceptor`
 
 Kakashi may know/remember her through the observer label:
 
@@ -79,7 +79,7 @@ Canonical:
 
 > **stable person identity != every observer's label for that person**
 
-Do not leak \`Masked Interceptor\` into Menma's in-world Record merely because the engine uses that stable identity internally.
+Do not leak `Masked Interceptor` into Menma's in-world Record merely because the engine uses that stable identity internally.
 
 ---
 
@@ -92,10 +92,10 @@ This variant is eligible only when:
 - Kakashi has exactly one sealed private Academy Kakashi Origin history;
 - his private history says he materially encountered MI;
 - MI survived;
-- MI is not \`KILLED\`;
-- MI is not \`UNSEEN\` to Kakashi;
+- MI is not `KILLED`;
+- MI is not `UNSEEN` to Kakashi;
 - current MI World availability permits the event;
-- Konoha free play and \`KON-P01\` are eligible;
+- Konoha free play and `KON-P01` are eligible;
 - occurrence is unresolved.
 
 The active protagonist need not know any of those private historical facts.
@@ -270,7 +270,7 @@ She reacts only to what just happened in front of her.
 
 Use when MI/Kakashi actually produced a line such as:
 
-\`“Not here.” / “I know.”\`
+`“Not here.” / “I know.”`
 
 ### HINATA
 
@@ -327,10 +327,10 @@ Exact player-facing labels:
 
 Semantic intents:
 
-- \`menma_ask_kakashi_prior_connection\` — seek bounded teammate disclosure;
-- \`menma_ask_mi_prior_connection\` — seek bounded third-party disclosure;
-- \`menma_yield_to_kakashi\` — let the participant who owns the private history decide the next interaction;
-- \`menma_disengage\` — decline further investigation and move the current team on.
+- `menma_ask_kakashi_prior_connection` — seek bounded teammate disclosure;
+- `menma_ask_mi_prior_connection` — seek bounded third-party disclosure;
+- `menma_yield_to_kakashi` — let the participant who owns the private history decide the next interaction;
+- `menma_disengage` — decline further investigation and move the current team on.
 
 These are distinct.
 
@@ -486,18 +486,18 @@ Kakashi now resolves one current-scene intent autonomously.
 
 Eligible semantic intents are the existing repaired Kakashi hotspot intents:
 
-- \`acknowledge_recognition\`;
-- \`ask_about_delivery\`;
-- \`observe_intake_and_departure\`;
-- \`disengage_keep_moving\`.
+- `acknowledge_recognition`;
+- `ask_about_delivery`;
+- `observe_intake_and_departure`;
+- `disengage_keep_moving`.
 
 ## Kakashi current-scene priority
 
 ### Prior lethal attempt
 
 Top plausible set:
-- \`acknowledge_recognition\`;
-- \`disengage_keep_moving\`.
+- `acknowledge_recognition`;
+- `disengage_keep_moving`.
 
 ASK/OBSERVE remain legal but lower unless some new current evidence materially changes priority.
 
@@ -505,9 +505,9 @@ Stable seeded tie is permitted between ACKNOWLEDGE and DISENGAGE when both remai
 
 ### Prior Police / ANBU / restraint history
 
-\`ask_about_delivery\` rises strongly because routine Administration processing directly contradicts Kakashi's prior custody model.
+`ask_about_delivery` rises strongly because routine Administration processing directly contradicts Kakashi's prior custody model.
 
-\`observe_intake_and_departure\` is also highly plausible.
+`observe_intake_and_departure` is also highly plausible.
 
 Stable seeded tie between ASK / OBSERVE is permitted when current evidence does not distinguish them.
 
@@ -622,7 +622,7 @@ He does not automatically know:
 
 Every branch commits:
 
-\`mi_private_history_emergence_base_v1\`
+`mi_private_history_emergence_base_v1`
 
 Meaning:
 
@@ -632,19 +632,19 @@ This common receipt is **evidence of prior contact**, not the private history it
 
 ---
 
-## A — \`menma_ask_kakashi_prior_connection\`
+## A — `menma_ask_kakashi_prior_connection`
 
 ### Occurrence receipt
 
-\`menma_requested_kakashi_private_history_disclosure_v1\`
+`menma_requested_kakashi_private_history_disclosure_v1`
 
 ### Menma Knowledge
 
 Store a source-attributed testimony fact:
 
-\`source = academy_kakashi\`
+`source = academy_kakashi`
 
-\`claimClass = <exact bounded Kakashi disclosure family>\`
+`claimClass = <exact bounded Kakashi disclosure family>`
 
 Examples:
 - Kakashi said he tried to kill her;
@@ -663,10 +663,10 @@ If physically present/hearing:
 ### Shared-history
 
 Menma ↔ Kakashi:
-\`menma_asked_kakashi_about_private_past_v1\`
+`menma_asked_kakashi_about_private_past_v1`
 
 Kakashi:
-\`kakashi_disclosed_bounded_mi_history_to_current_team_v1\`
+`kakashi_disclosed_bounded_mi_history_to_current_team_v1`
 
 ### Future eligibility
 
@@ -676,19 +676,19 @@ No mandatory confrontation follows.
 
 ---
 
-## B — \`menma_ask_mi_prior_connection\`
+## B — `menma_ask_mi_prior_connection`
 
 ### Occurrence receipt
 
-\`menma_requested_mi_prior_connection_testimony_v1\`
+`menma_requested_mi_prior_connection_testimony_v1`
 
 ### Menma Knowledge
 
 Store source-attributed testimony:
 
-\`source = academy_kakashi_origin_masked_interceptor\`
+`source = academy_kakashi_origin_masked_interceptor`
 
-\`claimClass = <exact bounded MI testimony family>\`
+`claimClass = <exact bounded MI testimony family>`
 
 This remains a claim Menma heard.
 
@@ -698,7 +698,7 @@ Kakashi knows MI disclosed one private-history fact to his teammates.
 
 Receipt:
 
-\`mi_disclosed_kakashi_private_history_in_front_of_team_v1\`
+`mi_disclosed_kakashi_private_history_in_front_of_team_v1`
 
 ### Hinata Knowledge
 
@@ -712,11 +712,11 @@ A later Kakashi reaction/disclosure/refusal scene may legitimately consume that 
 
 ---
 
-## C — \`menma_yield_to_kakashi\`
+## C — `menma_yield_to_kakashi`
 
 ### Occurrence receipt
 
-\`menma_yielded_private_history_collision_to_kakashi_v1\`
+`menma_yielded_private_history_collision_to_kakashi_v1`
 
 ### Nested autonomous receipt
 
@@ -740,7 +740,7 @@ Examples:
 ### Shared-history
 
 Menma ↔ Kakashi:
-\`menma_deferred_to_kakashi_on_private_connection_v1\`
+`menma_deferred_to_kakashi_on_private_connection_v1`
 
 This is factual history, not trust/friendship scoring.
 
@@ -750,15 +750,15 @@ Inherit only the bounded follow-up lead produced by the nested Kakashi branch.
 
 ---
 
-## D — \`menma_disengage\`
+## D — `menma_disengage`
 
 ### Occurrence receipt
 
-\`menma_declined_private_history_inquiry_v1\`
+`menma_declined_private_history_inquiry_v1`
 
 ### Menma Knowledge
 
-No branch-specific Knowledge beyond \`mi_private_history_emergence_base_v1\`.
+No branch-specific Knowledge beyond `mi_private_history_emergence_base_v1`.
 
 ### Shared-history
 
@@ -795,7 +795,7 @@ The existing unresolved connection can still surface later if another legitimate
 
 Do not show:
 
-- \`Masked Interceptor\` as Menma's historical role label;
+- `Masked Interceptor` as Menma's historical role label;
 - Kakashi's Origin transcript;
 - private choice IDs;
 - private Battle results not disclosed;
@@ -869,10 +869,10 @@ Her current reaction may be emotionally significant without becoming retrospecti
 
 For the other eight possible non-Kakashi Academy protagonists, the reusable semantic intent set is:
 
-1. \`ASK_KAKASHI_PRIOR_CONNECTION\`
-2. \`ASK_MI_PRIOR_CONNECTION\`
-3. \`YIELD_TO_KAKASHI_AUTONOMY\`
-4. \`DISENGAGE_CURRENT_TEAM\`
+1. `ASK_KAKASHI_PRIOR_CONNECTION`
+2. `ASK_MI_PRIOR_CONNECTION`
+3. `YIELD_TO_KAKASHI_AUTONOMY`
+4. `DISENGAGE_CURRENT_TEAM`
 
 The consequence families in Section 15 are reusable.
 
@@ -882,7 +882,7 @@ Before another protagonist becomes a production target, Writing must provide pro
 
 Do not render:
 
-- Menma's \`“Your mess.”\` for Kushina;
+- Menma's `“Your mess.”` for Kushina;
 - Menma's question cadence for Mirai;
 - generic protagonist dialogue under a swapped name.
 
