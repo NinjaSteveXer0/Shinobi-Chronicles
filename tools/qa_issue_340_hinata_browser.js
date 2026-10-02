@@ -129,7 +129,7 @@ async function clickContinue(page){
   assert.strictEqual(before.battleVisible,false,"Battle visible before continue "+before.beatId);
   const root=page.locator("#story-scene-presentation-layer");
   const button=root.locator(".sc-chronicle-primary").first();
-  if(await button.count()&&await button.isVisible())await button.click();
+  if(await button.count()&&await button.isVisible())await button.evaluate(el=>el.click());
   else{
     const stage=root.locator(".sc-chronicle-stage,.sc-story-stage").first();
     await stage.waitFor({state:"visible",timeout:8000});

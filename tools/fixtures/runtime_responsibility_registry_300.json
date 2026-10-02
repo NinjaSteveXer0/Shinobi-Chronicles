@@ -1534,6 +1534,46 @@
         "tools/qa_save_compatibility_311.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
+    },
+    {
+      "responsibilityId": "phase2.inventory_core.presentation",
+      "canonicalOwner": "runtime/alpha-phase2-inventory-core-46100.js",
+      "ownerType": "phase2_read_only_inventory_surface",
+      "directCallers": [
+        "index.html",
+        "openOverlay"
+      ],
+      "stateReads": [
+        "playerData.inventory existing persistent ownership rows",
+        "playerData.battlePouch prepared stack identities",
+        "existing Character equipment projection for exact inventory instance verification",
+        "existing Item/Weapon/Gear catalogue definitions"
+      ],
+      "stateWrites": [
+        "presentation DOM only; no persistent gameplay state"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-phase2-inventory-core-46100.js"
+      ],
+      "extensionHooks": [
+        "getPhase2InventorySnapshot46100",
+        "renderPhase2InventoryCore46100",
+        "openPhase2InventoryCore46100"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "read-only playerData.inventory",
+        "read-only playerData.battlePouch",
+        "read-only character.equipment"
+      ],
+      "qaRefs": [
+        "tools/qa_phase2_inventory_core_461.js",
+        "tools/qa_phase2_inventory_core_461_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_save_compatibility_311.js"
+      ]
     }
   ],
   "adapters": [
@@ -1824,6 +1864,11 @@
       "semanticId": "phase2.discipline_stat_breakthrough.commit",
       "owner": "runtime/alpha-discipline-stat-growth-44800.js",
       "responsibilityId": "phase2.discipline_development.stat_growth"
+    },
+    {
+      "semanticId": "phase2.inventory.presentation",
+      "owner": "runtime/alpha-phase2-inventory-core-46100.js",
+      "responsibilityId": "phase2.inventory_core.presentation"
     }
   ],
   "globalWrapperChains": [
@@ -1992,6 +2037,24 @@
       "activationCondition": "Core completion remains semantic authority; wrapper adds only the locked idempotent starting purse after successful sealed completion.",
       "qaRefs": [
         "tools/qa_issue_343_wasabi_writing_golden.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "symbol": "openOverlay",
+      "chain": [
+        "runtime/alpha-menma-origin-rewards-36200.js",
+        "runtime/alpha-battle-modern-33000.js",
+        "runtime/alpha-alpha-sprint-33100.js",
+        "runtime/alpha-kakashi-v2-rewards-36015.js",
+        "runtime/alpha-phase2-inventory-core-46100.js"
+      ],
+      "canonicalActiveOwner": "runtime/alpha-phase2-inventory-core-46100.js",
+      "activationCondition": "Existing scoped Battle/Origin wrappers retain their prior behavior and delegate normally; #461 is final only for exact type=\"inventory\" presentation and delegates every non-Inventory route unchanged.",
+      "qaRefs": [
+        "tools/qa_phase2_inventory_core_461_browser.js",
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_issue_362_menma_three_subject_reward.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
     }
