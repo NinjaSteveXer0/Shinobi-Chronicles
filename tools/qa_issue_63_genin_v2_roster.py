@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
-import hashlib, subprocess, sys
+import hashlib, re, subprocess, sys
 
 ROOT=Path(__file__).resolve().parents[1]
 game=(ROOT/'game.js').read_text(encoding='utf-8')
@@ -12,6 +12,15 @@ def git_blob_sha(text:str)->str:
     raw=text.encode('utf-8')
     return hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
 
+def game_without_declared_469_save_reader(text:str)->str:
+    start_marker='      // ISSUE #469 / #34000 — preserve the canonical neutral Story decision'
+    end_marker='      // ISSUE #322 / #23 — preserve the older shared Story intent/factual'
+    start=text.find(start_marker)
+    end=text.find(end_marker,start if start >= 0 else 0)
+    if start < 0 or end <= start:
+        return ''
+    return text[:start]+text[end:]
+
 V1=[
 'genin_boruto','genin_chocho','genin_himawari','genin_hinata','genin_hoki','genin_karin','genin_menma','genin_mikoto','genin_mitsuki','genin_naruto','genin_orochimaru','genin_sarada','genin_sasuke'
 ]
@@ -20,8 +29,12 @@ V2_NEW=[
 ]
 LEADERS=['jonin_hanabi','jonin_inojin','jonin_konohamaru','jonin_kushina','jonin_sasuke','jonin_shikaku','jonin_shino','sj_anko','sj_ebisu','sj_genma','sj_ibiki','sj_kiba','sj_nono']
 checks={}
-# #322 intentionally extends only loadPlayerData persistence for canonical Story/evidence roots; all roster assertions below remain binding.
-checks['audited_game_blob_preserved']=git_blob_sha(game)=='05e014efc8a77705c53f0ec9d8f143703ad91da8'
+# #469 intentionally extends only loadPlayerData persistence for the canonical
+# #34000 Story-decision runtime store. Strip that exact declared compatibility
+# reader before comparing the previously audited game.js blob; every other byte
+# of the old audited core must remain unchanged.
+# #322's older compatibility root remains preserved immediately after it.
+checks['audited_game_blob_preserved']=git_blob_sha(game_without_declared_469_save_reader(game))=='05e014efc8a77705c53f0ec9d8f143703ad91da8'
 core_pos=index.find('runtime/alpha-world-konoha-112-core.js')
 fix_pos=index.find('runtime/alpha-world-konoha-112-fix.js')
 roster_pos=index.find('runtime/alpha-genin-roster-63.js')
