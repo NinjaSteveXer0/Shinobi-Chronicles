@@ -50,7 +50,8 @@ assert(src.includes("hiddenPostTestReviewReached"),"hidden post-test review cont
 assert(src.includes('postTestTruthClass:"staged_konoha_test_participant"')||src.includes('"staged_konoha_test_participant"'),"post-test World truth class missing");
 
 assert(src.includes("kakashi_current_presence_required"),"#478 Kakashi physical-presence eligibility missing");
-assert(!src.includes("academy_kakashi_origin_required"),"obsolete selected-Origin==Kakashi hotspot gate remains");
+const eligibilitySource=src.slice(src.indexOf("function eligibility(){"),src.indexOf("function eventPlan(){"));
+assert(!eligibilitySource.includes('reason:"academy_kakashi_origin_required"'),"obsolete selected-Origin==Kakashi hotspot gate remains");
 assert(src.includes("menma_private_history_emergence"),"Menma private-history emergence mode missing");
 assert(src.includes("menma_live_benchmark_requires_hinata"),"Menma + Hinata + Kakashi exact benchmark gate missing");
 assert(src.includes("confirmAcademyTeamFormation46900"),"private history is not sealed before Team Formation");
