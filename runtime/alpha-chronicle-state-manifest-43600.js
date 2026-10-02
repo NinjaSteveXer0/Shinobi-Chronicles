@@ -102,6 +102,18 @@ function getCurrentTeam(save=currentPlayerData()){
 function defaultOriginParticipantContinuity(){
   return{schemaVersion:1,byKey:{}};
 }
+
+function defaultPrivateOriginHistories(){
+  return{schemaVersion:1,bySubject:{}};
+}
+function normalizePrivateOriginHistories(value){
+  const source=value&&typeof value==="object"&&!Array.isArray(value)?value:{};
+  const rows=source.bySubject&&typeof source.bySubject==="object"&&!Array.isArray(source.bySubject)?source.bySubject:{};
+  return{
+    schemaVersion:1,
+    bySubject:Object.fromEntries(Object.entries(rows).filter(([key,row])=>key&&row&&typeof row==="object"&&!Array.isArray(row)).map(([key,row])=>[String(key),clone(row)]))
+  };
+}
 function normalizeOriginParticipantContinuity(value){
   const source=value&&typeof value==="object"&&!Array.isArray(value)?value:{};
   const rows=source.byKey&&typeof source.byKey==="object"&&!Array.isArray(source.byKey)?source.byKey:{};
@@ -154,7 +166,8 @@ function migratePhase2ChronicleState(save){
     tutorialProgress:existing.tutorialProgress&&typeof existing.tutorialProgress==="object"
       ?{...defaultTutorialProgress(team&&team.assignmentId),...existing.tutorialProgress,schemaVersion:TUTORIAL_SCHEMA_VERSION}
       :legacyTutorialProjection(source,defaultTutorialProgress(team&&team.assignmentId)),
-    originParticipantContinuity:normalizeOriginParticipantContinuity(existing.originParticipantContinuity)
+    originParticipantContinuity:normalizeOriginParticipantContinuity(existing.originParticipantContinuity),
+    privateOriginHistories:normalizePrivateOriginHistories(existing.privateOriginHistories)
   };
   if(team&&root.tutorialProgress.academyTeamFormationReceiptRef!==team.assignmentId){
     // A different committed Academy-team assignment is a different onboarding
@@ -331,6 +344,24 @@ const DOMAINS=Object.freeze([
     qaRefs:Object.freeze(["tools/qa_issue_469_ce_hotspot.js","tools/qa_issue_469_ce_hotspot_browser.js","tools/qa_phase2_chronicle_state_manifest_436.js","tools/qa_save_compatibility_311.js"])
   }),
   Object.freeze({
+    stateDomainId:"privateOriginHistory",
+    semanticOwner:"Chronicle Engine / subject-private Origin convergence",
+    canonicalWritePath:"authorised autonomous Origin resolver or player-experienced Origin completion adapter",
+    stableIdentityKey:"chronicleId + subjectStableId + originDefinitionId + originDefinitionVersion",
+    savePath:"playerData.phase2ChronicleState.privateOriginHistories.bySubject[subjectStableId]",
+    schemaVersion:1,
+    sourceOccurrenceIdFormat:"private_origin::<subjectStableId>::<originDefinitionVersion>",
+    idempotenceKeyFormat:"subjectStableId + originDefinitionId + originDefinitionVersion + stableResolutionSeedRef",
+    derivedFields:Object.freeze(["resolutionMode","convergenceCarryForwardClass"]),
+    projectionConsumers:Object.freeze(["World event eligibility","participant autonomy","bounded Knowledge disclosure","actor-local Development/Stats adapters"]),
+    migrationRule:"missing pre-471 private history may resolve exactly once through an explicit migration receipt; never overwrite an existing committed row",
+    resetRule:"new_chronicle_only",
+    difficultyScope:"origin_historical_scope_private",
+    inheritanceRule:"subject-private history survives Team Formation; external Origin world state does not import without continuity authority",
+    devOverridePolicy:"private ledger never becomes protagonist Knowledge or Shinobi Record merely because the subject joins the team",
+    qaRefs:Object.freeze(["tools/qa_issue_469_ce_hotspot.js","tools/qa_issue_469_ce_hotspot_browser.js","tools/qa_save_compatibility_311.js"])
+  }),
+  Object.freeze({
     stateDomainId:"shinobiRecordProjection",
     semanticOwner:"Shinobi Record presentation",
     canonicalWritePath:"NONE_DERIVED_PROJECTION_ONLY",
@@ -374,6 +405,7 @@ function diagnostics(){
     initialDomains:["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","originParticipantContinuity","shinobiRecordProjection"].every(id=>unique.has(id)),
     continuityDomainPersisted:DOMAINS.find(row=>row.stateDomainId==="originParticipantContinuity")?.savePath==="playerData.phase2ChronicleState.originParticipantContinuity.byKey[originId::stableParticipantId]"&&migrated.phase2ChronicleState.originParticipantContinuity.schemaVersion===1,
     phase2DevelopmentDomains:["disciplineDevelopment","characterStats"].every(id=>unique.has(id)),
+    privateOriginHistoryDomain:unique.has("privateOriginHistory"),
     disciplineLedgerNotDuplicated:DOMAINS.find(row=>row.stateDomainId==="disciplineDevelopment")?.savePath==="playerData.characters[progressionCharacterId].disciplineProgression[disciplineId]",
     characterStatsExistingOwnerPreserved:DOMAINS.find(row=>row.stateDomainId==="characterStats")?.semanticOwner==="PL / Registry / Rank",
     currentTeamDerivedNotDuplicated:DOMAINS.find(row=>row.stateDomainId==="currentTeam")?.canonicalWritePath==="confirmAcademyTeamFormation"&&!String(DOMAINS.find(row=>row.stateDomainId==="currentTeam")?.savePath||"").includes("phase2ChronicleState.currentTeam"),
@@ -406,6 +438,13 @@ globalThis.getOriginParticipantContinuityStore43600=({create=false}={})=>{
   if(!root)return null;
   if((!root.originParticipantContinuity||typeof root.originParticipantContinuity!=="object")&&create)root.originParticipantContinuity=defaultOriginParticipantContinuity();
   return root.originParticipantContinuity&&typeof root.originParticipantContinuity==="object"?root.originParticipantContinuity:null;
+};
+globalThis.getPrivateOriginHistoryStore43600=({create=false}={})=>{
+  const pd=currentPlayerData();if(!pd)return null;
+  const root=pd[ROOT_KEY]&&typeof pd[ROOT_KEY]==="object"?pd[ROOT_KEY]:(create?ensurePhase2Root({save:false}):null);
+  if(!root)return null;
+  if((!root.privateOriginHistories||typeof root.privateOriginHistories!=="object")&&create)root.privateOriginHistories=defaultPrivateOriginHistories();
+  return root.privateOriginHistories&&typeof root.privateOriginHistories==="object"?root.privateOriginHistories:null;
 };
 globalThis.getChronicleTutorialProgress43600=getTutorialProgress;
 globalThis.updateChronicleTutorialProgress43600=updateTutorialProgress;
