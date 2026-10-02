@@ -106,14 +106,18 @@
       "canonicalOwner": "runtime/alpha-story-decision-realisation-34000.js",
       "ownerType": "shared_semantic_runtime",
       "directCallers": [
-        "runtime/alpha-kakashi-v2-core-36020.js"
+        "runtime/alpha-kakashi-v2-core-36020.js",
+        "runtime/alpha-phase2-ce-hotspot-46900.js"
       ],
       "stateReads": [
-        "playerData.storyDecisionRealisation34000"
+        "playerData.storyDecisionRuntime34000"
       ],
       "stateWrites": [
-        "playerData.storyDecisionRealisation.intentCommits",
-        "playerData.storyDecisionRealisation.receipts"
+        "playerData.storyDecisionRuntime34000.storyUnits[*].choiceSets",
+        "playerData.storyDecisionRuntime34000.storyUnits[*].decisionReceipts",
+        "playerData.storyDecisionRuntime34000.storyUnits[*].autonomyReceipts",
+        "playerData.storyDecisionRuntime34000.storyUnits[*].participantStates",
+        "playerData.storyDecisionRuntime34000.storyUnits[*].materialStates"
       ],
       "productionLoadPath": [
         "runtime/alpha-traversal-bridge-33200.js",
@@ -127,7 +131,7 @@
       "permittedAdapters": [],
       "retiredOwners": [],
       "saveSchemaRefs": [
-        "playerData.storyDecisionRealisation"
+        "playerData.storyDecisionRuntime34000"
       ],
       "qaRefs": [
         "tools/qa_issue_188_story_decision_runtime.js",
@@ -1591,7 +1595,8 @@
         "completeChronicleOriginPrologue",
         "renderAlphaKonohaV3IdentifiedAnchor",
         "activateAlphaKonohaV3PublicLocation",
-        "getShinobiRecordParticipants"
+        "getShinobiRecordParticipants",
+        "game.js loadPlayerData compatibility reader"
       ],
       "stateReads": [
         "frozen Academy Kakashi V2 terminal localContext before completion only",
@@ -1600,11 +1605,11 @@
         "playerData.phase2ChronicleState.originParticipantContinuity",
         "committed currentTeam from getChronicleCurrentTeam43600",
         "existing World event runtime dimensions",
-        "playerData.storyDecisionRealisation34000 participant-autonomy and protagonist-intent receipts"
+        "playerData.storyDecisionRuntime34000 participant-autonomy and protagonist-intent receipts"
       ],
       "stateWrites": [
         "playerData.phase2ChronicleState.originParticipantContinuity exact terminal capture only",
-        "playerData.storyDecisionRealisation34000 only through existing #34000 APIs",
+        "playerData.storyDecisionRuntime34000 only through existing #34000 APIs",
         "existing World lifecycle/actionability/resolution dimensions only through current World APIs",
         "one observer-safe committed playerData.activityHistory occurrence for resolved Hokage Administration Crossing",
         "active Story Scene runtime only through existing startStoryScene / Story consequence APIs",
@@ -1632,7 +1637,7 @@
       "retiredOwners": [],
       "saveSchemaRefs": [
         "playerData.phase2ChronicleState.originParticipantContinuity.byKey[academy_kakashi::academy_kakashi_origin_masked_interceptor]",
-        "playerData.storyDecisionRealisation34000.storyUnits[konoha_ce_kakashi_masked_interceptor_admin_crossing_v1]",
+        "playerData.storyDecisionRuntime34000.storyUnits[konoha_ce_kakashi_masked_interceptor_admin_crossing_v1]",
         "playerData.worldEventRuntime existing dimensions",
         "playerData.activityHistory occ_konoha_ce_kakashi_masked_interceptor_admin_crossing_v1"
       ],
