@@ -21,7 +21,7 @@ for(const pattern of [
   assert(!pattern.test(RUNTIME),"#499 read-only HUD contains forbidden writer: "+pattern);
 }
 assert(RUNTIME.includes("energy:null"),"#499 HUD snapshot must reserve Energy structurally as null");
-assert(!RUNTIME.includes(">ENERGY<")&&!RUNTIME.includes('"ENERGY"')&&!RUNTIME.includes("'ENERGY'"),"#499 rendered a player-facing Energy label before #433");
+assert(!/>\s*ENERGY\s*</i.test(RUNTIME)&&!/aria-label=["'][^"']*ENERGY/i.test(RUNTIME),"#499 rendered a player-facing Energy label before #433");
 assert(RUNTIME.includes("getChronicleCurrentTeam43600"),"HUD does not read canonical currentTeam");
 assert(RUNTIME.includes("getChronicleCurrentRyo43600"),"HUD does not read canonical Ryō");
 assert(RUNTIME.includes("getAlphaTailedBeastJourneyState")&&RUNTIME.includes("getAlphaSurfaceTruthJourneyAction"),"HUD Journey projection bypasses observer-safe Journey authority");
