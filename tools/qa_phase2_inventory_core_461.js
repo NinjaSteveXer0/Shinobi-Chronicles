@@ -10,12 +10,12 @@ assert(RUNTIME.includes('const PATCH_ID="phase2_inventory_core_46100_2026_10_02"
 assert(INDEX.includes('data-alpha-route="inventory"'),"Inventory navigation route missing");
 assert(INDEX.includes('runtime/alpha-phase2-inventory-core-46100.js'),"Inventory runtime loader missing");
 const forbiddenCalls=[
-  /\\baddItemToInventory\\s*\\(/,
-  /\\bequipItemToCharacter\\s*\\(/,
-  /\\bconsumeInventoryStackQuantity\\s*\\(/,
-  /\\bsavePlayerData\\s*\\(/,
-  /\\blocalStorage\\.setItem\\s*\\(/,
-  /playerData\\.inventory\\s*\\.push\\s*\\(/
+  /\baddItemToInventory\s*\(/,
+  /\bequipItemToCharacter\s*\(/,
+  /\bconsumeInventoryStackQuantity\s*\(/,
+  /\bsavePlayerData\s*\(/,
+  /\blocalStorage\.setItem\s*\(/,
+  /playerData\.inventory\s*\.push\s*\(/
 ];
 for(const pattern of forbiddenCalls){
   assert(!pattern.test(RUNTIME),"#461 read-only surface contains forbidden writer call: "+pattern);
