@@ -64,137 +64,234 @@ const REACTIONS=Object.freeze({
   academy_hinata:Object.freeze({
     redundancyClass:"recognition_observation",
     strong:Object.freeze([
-      Object.freeze({kind:"narration",text:"Hinata's eyes follow the exchange."}),
+      Object.freeze({kind:"narration",text:"Hinata's eyes follow Masked Interceptor's attention back to Kakashi."}),
       Object.freeze({kind:"dialogue",speakerName:"HINATA",text:"She recognised you."})
     ]),
     fallback:Object.freeze([
-      Object.freeze({kind:"narration",text:"Hinata looks from Masked Interceptor to Kakashi and keeps watching."})
+      Object.freeze({kind:"narration",text:"Hinata shifts half a step until both Kakashi and the masked woman are in view."}),
+      Object.freeze({kind:"narration",text:"Her mouth closes. She keeps watching."})
     ])
   }),
   academy_izuno:Object.freeze({
     redundancyClass:null,
     noStrong:true,
     fallback:Object.freeze([
-      Object.freeze({kind:"narration",text:"Wasabi shifts half a step, ready without making it a challenge. She says nothing."})
+      Object.freeze({kind:"narration",text:"Wasabi pivots before the others finish stopping."}),
+      Object.freeze({kind:"narration",text:"She keeps Masked Interceptor in view, weight forward, hands loose."})
     ])
   }),
   academy_mirai:Object.freeze({
     redundancyClass:"recognition_observation",
     strong:Object.freeze([
-      Object.freeze({kind:"narration",text:"Mirai watches the masked woman pass the intake window, then looks to Kakashi."}),
+      Object.freeze({kind:"narration",text:"Mirai watches the masked woman's feet rather than the mask."}),
       Object.freeze({kind:"dialogue",speakerName:"MIRAI",text:"She changed pace when she saw you."})
     ]),
     fallback:Object.freeze([
-      Object.freeze({kind:"narration",text:"Mirai checks the stamped receipt, the public intake window, and then Kakashi."})
+      Object.freeze({kind:"narration",text:"Mirai checks the receipt disappearing into the woman's sleeve, then the public intake window."}),
+      Object.freeze({kind:"narration",text:"Her attention stays on the mismatch without claiming an explanation."})
     ])
   }),
   academy_menma:Object.freeze({
     redundancyClass:null,
     noStrong:true,
     fallback:Object.freeze([
-      Object.freeze({kind:"narration",text:"Menma looks from the receipt to the Administration doors, then from Masked Interceptor to Kakashi. He stays quiet."})
+      Object.freeze({kind:"narration",text:"Menma's eyes move from the stamped receipt, to the Administration doors, to Masked Interceptor, and finally to Kakashi."}),
+      Object.freeze({kind:"narration",text:"He says nothing."})
     ])
   }),
   academy_kushina:Object.freeze({
     redundancyClass:"identity_question",
     strong:Object.freeze([
-      Object.freeze({kind:"narration",text:"Kushina catches the recognition between them immediately."}),
+      Object.freeze({kind:"narration",text:"Kushina looks from Kakashi to the masked woman."}),
       Object.freeze({kind:"dialogue",speakerName:"KUSHINA",text:"Kakashi. Who is she?"})
     ]),
     fallback:Object.freeze([
-      Object.freeze({kind:"narration",text:"Kushina raises her brows at Kakashi and folds her arms, waiting."})
+      Object.freeze({kind:"narration",text:"Kushina's eyebrows rise."}),
+      Object.freeze({kind:"narration",text:"When Kakashi does not answer immediately, she folds her arms."})
     ])
   }),
   academy_kurenai:Object.freeze({
     redundancyClass:null,
     noStrong:true,
     fallback:Object.freeze([
-      Object.freeze({kind:"narration",text:"Kurenai tracks Masked Interceptor's eye-line, then watches Kakashi instead. She does not speak."})
+      Object.freeze({kind:"narration",text:"Kurenai tracks Masked Interceptor's eye-line instead of studying the mask."}),
+      Object.freeze({kind:"narration",text:"Then she watches Kakashi."}),
+      Object.freeze({kind:"narration",text:"She stays quiet."})
     ])
   }),
   academy_iwabee:Object.freeze({
     redundancyClass:"threat_check",
     strong:Object.freeze([
-      Object.freeze({kind:"narration",text:"Iwabee tips his chin toward the masked woman."}),
+      Object.freeze({kind:"narration",text:"Iwabee tips his chin toward Masked Interceptor."}),
       Object.freeze({kind:"dialogue",speakerName:"IWABEE",text:"Problem?"})
     ]),
     fallback:Object.freeze([
-      Object.freeze({kind:"narration",text:"Iwabee plants his feet and waits for Kakashi to decide whether this matters."})
+      Object.freeze({kind:"narration",text:"Iwabee plants his feet and waits."}),
+      Object.freeze({kind:"narration",text:"If Kakashi keeps moving, he moves too."})
     ])
   }),
   academy_metal_lee:Object.freeze({
     redundancyClass:null,
     noStrong:true,
     fallback:Object.freeze([
-      Object.freeze({kind:"narration",text:"Metal straightens when the woman notices Kakashi, then lets his hands settle when no hostility follows."})
+      Object.freeze({kind:"narration",text:"Metal straightens on reflex."}),
+      Object.freeze({kind:"narration",text:"Masked Interceptor keeps walking; his hands stay at his sides."}),
+      Object.freeze({kind:"narration",text:"He keeps watching."})
     ])
   }),
   academy_obito:Object.freeze({
     redundancyClass:"recognition_observation",
     strong:Object.freeze([
-      Object.freeze({kind:"narration",text:"Obito looks from Kakashi to the mask."}),
+      Object.freeze({kind:"narration",text:"Obito looks from Kakashi to Masked Interceptor and back again."}),
       Object.freeze({kind:"dialogue",speakerName:"OBITO",text:"Wait—you know her?"})
     ]),
     fallback:Object.freeze([
-      Object.freeze({kind:"narration",text:"Obito's eyebrows lift. He looks at Kakashi, but does not interrupt."})
+      Object.freeze({kind:"narration",text:"Obito's eyebrows climb high enough to say the question without him repeating it aloud."})
     ])
   })
 });
 
 const HISTORY_CUES=Object.freeze({
   lethal_attempt:Object.freeze([
-    Object.freeze({kind:"narration",text:"Masked Interceptor stops outside arm's reach. Her hands remain empty."}),
-    Object.freeze({kind:"dialogue",speakerName:"MASKED INTERCEPTOR",text:"Not here."}),
-    Object.freeze({kind:"narration",text:"She makes no move toward a weapon."})
+    Object.freeze({kind:"narration",text:"Masked Interceptor stops outside arm's reach."}),
+    Object.freeze({kind:"narration",text:"Her hands settle at her sides."}),
+    Object.freeze({kind:"dialogue",speakerName:"MASKED INTERCEPTOR",text:"Not here."})
   ]),
   police_transfer:Object.freeze([
-    Object.freeze({kind:"narration",text:"Her eyes move to the Administration doors, then back to Kakashi. She takes half a step outside his edge of reach. Her hands stay still."})
+    Object.freeze({kind:"narration",text:"Her eyes move from Kakashi to the Administration doors."}),
+    Object.freeze({kind:"narration",text:"Then back to him."}),
+    Object.freeze({kind:"narration",text:"She shifts half a step toward the outside edge of the path, leaving the centre clear between them."})
   ]),
   restraint_or_anbu:Object.freeze([
-    Object.freeze({kind:"narration",text:"Her gaze drops once to Kakashi's hands. One wrist turns inside her sleeve, then stills. She looks back at him."})
+    Object.freeze({kind:"narration",text:"Her gaze drops once to Kakashi's hands."}),
+    Object.freeze({kind:"narration",text:"One wrist turns inside her sleeve."}),
+    Object.freeze({kind:"narration",text:"Then it stills."}),
+    Object.freeze({kind:"narration",text:"She looks back at his face."})
   ]),
   deliberate_release:Object.freeze([
-    Object.freeze({kind:"narration",text:"Recognition settles behind the mask. She leaves the lane between them open and gives Kakashi a small inclination of the head."})
+    Object.freeze({kind:"narration",text:"She recognises him."}),
+    Object.freeze({kind:"narration",text:"This time she leaves the lane between them open."}),
+    Object.freeze({kind:"narration",text:"A small inclination of her head is the only acknowledgement."})
   ]),
   mi_defeated_kakashi:Object.freeze([
-    Object.freeze({kind:"narration",text:"Her eyes flick once to the shoulder she pinned before returning to Kakashi's face. She does not slow further."})
+    Object.freeze({kind:"narration",text:"Her eyes flick once to the shoulder she pinned against the stone that night."}),
+    Object.freeze({kind:"narration",text:"Then back to Kakashi."}),
+    Object.freeze({kind:"narration",text:"Her stride stays even."})
   ]),
   kakashi_defeated_mi:Object.freeze([
-    Object.freeze({kind:"narration",text:"She changes her path just enough to keep a clear arm's length between them and continues to assess him as she passes."})
+    Object.freeze({kind:"narration",text:"She recognises him and changes her path just enough to keep a clear arm's length between them."}),
+    Object.freeze({kind:"narration",text:"She holds that distance as they cross."})
   ]),
   material_encounter:Object.freeze([
-    Object.freeze({kind:"narration",text:"Her attention lands on Kakashi before it reaches either of his teammates. The recognition is mutual. She says nothing."})
+    Object.freeze({kind:"narration",text:"Her attention lands on Kakashi before it lands on either teammate."}),
+    Object.freeze({kind:"narration",text:"That is enough to make the recognition mutual."})
   ])
 });
 
 const BRANCH_CUES=Object.freeze({
-  tell_remember:Object.freeze([
+  acknowledge_recognition:Object.freeze([
     Object.freeze({kind:"dialogue",speakerName:"KAKASHI",text:"I remember you."}),
-    Object.freeze({kind:"dialogue",speakerName:"MASKED INTERCEPTOR",text:"I know."}),
-    Object.freeze({kind:"narration",text:"She goes down the steps, the stamped receipt already folded away. No member of staff calls after her. Kakashi looks once at the Administration doors and lets her go."})
+    Object.freeze({kind:"narration",text:"Masked Interceptor's attention shifts past him to the two students at his side."}),
+    Object.freeze({kind:"dialogue",speakerName:"MASKED INTERCEPTOR",text:"I remember you too."}),
+    Object.freeze({kind:"dialogue",speakerName:"MASKED INTERCEPTOR",text:"They weren't there."}),
+    Object.freeze({kind:"dialogue",speakerName:"KAKASHI",text:"No."}),
+    Object.freeze({kind:"narration",text:"Her gaze returns to Kakashi."}),
+    Object.freeze({kind:"narration",text:"She leaves the rest unsaid, steps past him and continues down the forecourt."})
   ]),
-  ask_business:Object.freeze([
-    Object.freeze({kind:"dialogue",speakerName:"KAKASHI",text:"What are you doing here?"}),
-    Object.freeze({kind:"narration",text:"Masked Interceptor touches two fingers to the folded receipt inside her sleeve."}),
-    Object.freeze({kind:"dialogue",speakerName:"MASKED INTERCEPTOR",text:"Delivery. Finished."}),
-    Object.freeze({kind:"narration",text:"She steps around the team and keeps walking. Kakashi watches the retreating mask, then the public intake window that has already moved on to the next piece of business."})
+  ask_about_delivery:Object.freeze([
+    Object.freeze({kind:"dialogue",speakerName:"KAKASHI",text:"What did you deliver?"}),
+    Object.freeze({kind:"dialogue",speakerName:"MASKED INTERCEPTOR",text:"A dispatch."}),
+    Object.freeze({kind:"dialogue",speakerName:"KAKASHI",text:"From who?"}),
+    Object.freeze({kind:"dialogue",speakerName:"MASKED INTERCEPTOR",text:"Ask the desk."}),
+    Object.freeze({kind:"narration",text:"She presses two fingers briefly against the folded receipt inside her sleeve.\n\nThen she steps around the team and keeps walking."}),
+    Object.freeze({kind:"narration",text:"At the intake window, the clerk is already working through the next visitor's papers."})
   ]),
-  watch_pass:Object.freeze([
-    Object.freeze({kind:"narration",text:"Kakashi says nothing and leaves the path open. Masked Interceptor passes the team, folds the receipt fully into her sleeve, and keeps the same steady pace. The crowd takes her. Kakashi looks back to the Administration doors."})
+  observe_intake_and_departure:Object.freeze([
+    Object.freeze({kind:"narration",text:"Kakashi says nothing.\n\nHe shifts out of her path but stays where he is."}),
+    Object.freeze({kind:"narration",text:"Masked Interceptor passes him.\n\nAt the bottom of the steps, she glances back once.\n\nKakashi is still watching."}),
+    Object.freeze({kind:"narration",text:"He turns his attention to the intake window instead of following her.\n\nThe clerk opens a ledger, sets a duplicate receipt beside it, makes an entry and clips the slip inside the page."}),
+    Object.freeze({kind:"narration",text:"The next visitor steps forward.\n\nWhen Kakashi looks back across the forecourt, Masked Interceptor is taking the main path into the village traffic."})
   ]),
-  keep_moving:Object.freeze([
-    Object.freeze({kind:"narration",text:"Kakashi turns away before she reaches them. The team keeps moving. Her steps do not change behind him, and he does not look back."})
+  disengage_keep_moving:Object.freeze([
+    Object.freeze({kind:"narration",text:"Kakashi turns away before she reaches them."}),
+    Object.freeze({kind:"dialogue",speakerName:"KAKASHI",text:"We're moving."}),
+    Object.freeze({kind:"narration",text:"He keeps walking.\n\nHis teammates fall in around him.\n\nMasked Interceptor's footsteps pass behind them and continue toward the street."}),
+    Object.freeze({kind:"narration",text:"Kakashi reaches the next corner without turning back.\n\nThe Administration falls behind the team."})
   ])
 });
 
 const CHOICES=Object.freeze([
-  Object.freeze({id:"tell_remember",label:"Tell her you remember her.",intentType:"ACKNOWLEDGE_RECOGNITION"}),
-  Object.freeze({id:"ask_business",label:"Ask what she is doing here.",intentType:"ASK_WHY_SHE_IS_HERE"}),
-  Object.freeze({id:"watch_pass",label:"Watch her pass.",intentType:"OBSERVE_LET_PASS"}),
-  Object.freeze({id:"keep_moving",label:"Keep moving.",intentType:"DISENGAGE_KEEP_MOVING"})
+  Object.freeze({id:"acknowledge_recognition",label:"Tell her you remember her.",intentType:"ACKNOWLEDGE_RECOGNITION"}),
+  Object.freeze({id:"ask_about_delivery",label:"Ask about the delivery.",intentType:"ASK_INVESTIGATE_CURRENT_BUSINESS"}),
+  Object.freeze({id:"observe_intake_and_departure",label:"Watch what she does.",intentType:"DELIBERATE_OBSERVATION"}),
+  Object.freeze({id:"disengage_keep_moving",label:"Keep moving.",intentType:"DISENGAGE_DECLINE_INTERACTION"})
 ]);
 
-function clone(value){
+const BRANCH_CONSEQUENCES=Object.freeze({
+  acknowledge_recognition:Object.freeze({
+    factualReceiptId:"mi_mutual_recognition_explicit_v1",
+    branchKnowledge:Object.freeze({
+      mutualRecognitionExplicit:true,
+      currentTeammatesExplicitlyAbsentFromPriorEncounter:true
+    }),
+    teammateKnowledgeReceiptIds:Object.freeze(["kakashi_mi_prior_connection_observed_v1"]),
+    teammateKnowledgeFacts:Object.freeze(["kakashi_mi_prior_connection","current_teammates_not_part_of_prior_encounter"]),
+    sharedHistoryReceiptIds:Object.freeze(["kakashi_mi_prior_history_openly_acknowledged_v1"]),
+    futureLeadIds:Object.freeze([]),
+    teammateDisclosureFollowupEligible:true,
+    privateMiFollowupEligible:true,
+    recordAddendum:"Both openly acknowledged that they remembered each other. Masked Interceptor noted that Kakashi's current teammates were not present for the earlier encounter."
+  }),
+  ask_about_delivery:Object.freeze({
+    factualReceiptId:"mi_dispatch_task_confirmed_v1",
+    branchKnowledge:Object.freeze({
+      documentTaskClass:"dispatch",
+      dispatchSourceKnown:false,
+      sourceDisclosureRefused:true,
+      redirectedToAdministrationDesk:true
+    }),
+    teammateKnowledgeReceiptIds:Object.freeze(["mi_dispatch_task_confirmed_v1"]),
+    teammateKnowledgeFacts:Object.freeze(["document_task_class_dispatch","dispatch_source_unknown","source_question_redirected_to_administration_desk"]),
+    sharedHistoryReceiptIds:Object.freeze(["kakashi_questioned_mi_current_admin_business_v1"]),
+    futureLeadIds:Object.freeze(["mi_admin_dispatch_inquiry_lead_v1"]),
+    teammateDisclosureFollowupEligible:false,
+    privateMiFollowupEligible:true,
+    recordAddendum:"She described the document as a dispatch and redirected the source question to the Administration desk."
+  }),
+  observe_intake_and_departure:Object.freeze({
+    factualReceiptId:"mi_public_intake_process_observed_v1",
+    branchKnowledge:Object.freeze({
+      publicIntakeLedgerObserved:true,
+      mainPublicDepartureObserved:true,
+      miNoticedObservation:true
+    }),
+    teammateKnowledgeReceiptIds:Object.freeze([]),
+    teammateKnowledgeFacts:Object.freeze([]),
+    sharedHistoryReceiptIds:Object.freeze(["kakashi_observed_mi_without_confrontation_v1","mi_noticed_kakashi_observation_v1"]),
+    futureLeadIds:Object.freeze(["mi_admin_intake_process_lead_v1"]),
+    teammateDisclosureFollowupEligible:false,
+    privateMiFollowupEligible:true,
+    recordAddendum:"Kakashi watched the public intake log the handoff before she left by the main approach."
+  }),
+  disengage_keep_moving:Object.freeze({
+    factualReceiptId:"kakashi_declined_mi_contact_v1",
+    branchKnowledge:Object.freeze({}),
+    teammateKnowledgeReceiptIds:Object.freeze([]),
+    teammateKnowledgeFacts:Object.freeze([]),
+    sharedHistoryReceiptIds:Object.freeze(["kakashi_declined_mi_contact_v1"]),
+    futureLeadIds:Object.freeze([]),
+    teammateDisclosureFollowupEligible:false,
+    privateMiFollowupEligible:false,
+    recordAddendum:null
+  })
+});
+
+function branchConsequence(choiceId){
+  const row=BRANCH_CONSEQUENCES[choiceId];
+  return row?clone(row):null;
+}
+
+function clone(value){function clone(value){
   if(value===undefined)return undefined;
   try{return typeof cloneProgressionData==="function"?cloneProgressionData(value):JSON.parse(JSON.stringify(value));}
   catch(_error){return value;}
@@ -635,6 +732,14 @@ function finalRecordPayload(choiceId){
   const active=typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;
   const ctx=active&&active.localContext&&typeof active.localContext==="object"?active.localContext:{};
   const reactions=committedTeammateReactions();
+  const consequence=branchConsequence(choiceId);
+  if(!consequence)throw new Error("ce469_branch_consequence_missing:"+String(choiceId||""));
+  const teammateRefs=Array.isArray(ctx.teammateOrder)?[...ctx.teammateOrder]:[];
+  const teammateKnowledgeParticipantRefs=consequence.teammateKnowledgeReceiptIds.length?teammateRefs:[];
+  const commonKnownFact="Seen leaving Hokage Administration after completing a stamped document handoff through the public intake.";
+  const priorConnection="Previously encountered during the Academy package incident.";
+  const recordParts=[commonKnownFact,priorConnection,"Proper name: Unknown."];
+  if(consequence.recordAddendum)recordParts.push(consequence.recordAddendum);
   return{
     id:OCCURRENCE_ID,
     occurrenceId:OCCURRENCE_ID,
@@ -645,10 +750,10 @@ function finalRecordPayload(choiceId){
     locationId:HOST_ID,
     actorVariantId:ORIGIN_ID,
     protagonistParticipantId:ORIGIN_ID,
-    participants:[ORIGIN_ID,MI_ID,...(Array.isArray(ctx.teammateOrder)?ctx.teammateOrder:[])],
+    participants:[ORIGIN_ID,MI_ID,...teammateRefs],
     committed:true,
     completed:true,
-    outcome:"Seen leaving Hokage Administration after a document handoff. Administration staff did not challenge her presence. Previously encountered during the Academy package incident. Proper name: Unknown.",
+    outcome:recordParts.join(" "),
     data:{
       eventId:EVENT_ID,
       opportunityId:OPPORTUNITY_ID,
@@ -656,15 +761,26 @@ function finalRecordPayload(choiceId){
       stableParticipantId:MI_ID,
       knownPerson:"Masked Interceptor",
       sharedOccurrence:"Hokage Administration Crossing",
-      knownFact:"Seen leaving Hokage Administration after a document handoff. Administration staff did not challenge her presence.",
-      priorConnection:"Previously encountered during the Academy package incident.",
+      knownFact:commonKnownFact,
+      priorConnection,
       properName:"Unknown",
       sharedHistory:true,
+      commonFactualReceiptId:"mi_admin_crossing_base_lead_v1",
+      branchFactualReceiptId:consequence.factualReceiptId,
+      branchKnowledge:clone(consequence.branchKnowledge),
+      teammateKnowledgeReceiptIds:[...consequence.teammateKnowledgeReceiptIds],
+      teammateKnowledgeFacts:[...consequence.teammateKnowledgeFacts],
+      teammateKnowledgeParticipantRefs,
+      sharedHistoryReceiptIds:[...consequence.sharedHistoryReceiptIds],
+      futureLeadIds:[...consequence.futureLeadIds],
+      teammateDisclosureFollowupEligible:consequence.teammateDisclosureFollowupEligible===true,
+      privateMiFollowupEligible:consequence.privateMiFollowupEligible===true,
+      recordAddendum:consequence.recordAddendum||null,
       knowledge:{
         recognisedSamePerson:true,
         recognisedByMaskedInterceptor:true,
         publicAdministrationBusinessObserved:true,
-        staffDidNotChallengePresence:true,
+        publicIntakeProcessedOrdinaryBusiness:true,
         priorModelIncomplete:true
       },
       protagonistIntent:CHOICES.find(row=>row.id===choiceId)?.intentType||null,
@@ -683,12 +799,14 @@ function finalRecordPayload(choiceId){
     },
     sourceRefs:[
       {type:"world_event",id:EVENT_ID,role:"observer_safe_occurrence"},
-      {type:"world_location",id:HOST_ID,role:"directly_observed_host"}
+      {type:"world_location",id:HOST_ID,role:"directly_observed_host"},
+      {type:"event_fact_receipt",id:"mi_admin_crossing_base_lead_v1",role:"common_observer_safe_lead"},
+      {type:"event_fact_receipt",id:consequence.factualReceiptId,role:"branch_observer_safe_delta"}
     ],
     timestamp:Date.now()
   };
 }
-function commitResolution(expectedChoiceId){
+function commitResolution(expectedChoiceId){function commitResolution(expectedChoiceId){
   const selected=committedProtagonistChoice();
   if(!selected)return{success:false,reason:"protagonist_intent_receipt_missing"};
   if(expectedChoiceId&&selected!==expectedChoiceId)return{success:false,reason:"protagonist_intent_branch_mismatch",selected,expectedChoiceId};
@@ -715,13 +833,13 @@ function cue(kind,text,speakerName=null){
 }
 function openingCues(){
   return[
-    cue("narration","The public approach to Hokage Administration is busy enough that nobody owns the steps for long."),
-    cue("narration","A masked woman leaves the intake side with a stamped receipt in hand. The clerk behind the window has already turned to the next document. No alarm follows her. No one moves to stop her."),
-    cue("narration","She folds the receipt into her sleeve."),
-    cue("narration","Then she sees Kakashi.")
+    cue("narration","At the public intake window, a clerk presses a stamp onto a narrow receipt and slides it back beneath the frame."),
+    cue("narration","The masked woman folds the slip into her sleeve and turns away.\n\nThe clerk calls the next visitor forward. A waiting messenger steps up to the counter."),
+    cue("narration","Kakashi is crossing the forecourt with his team when he sees the mask.\n\nHis pace breaks for half a step.\n\nSame controlled stride.\n\nThe woman from the package incident."),
+    cue("narration","She looks up and sees him.")
   ];
 }
-function historyCues(runtime){
+function historyCues(runtime){function historyCues(runtime){
   const family=runtime&&runtime.localContext&&runtime.localContext.historyFamily||"material_encounter";
   return clone(HISTORY_CUES[family]||HISTORY_CUES.material_encounter);
 }
@@ -840,10 +958,10 @@ if(typeof globalThis.registerStorySceneBoardDefinition==="function"){
       ce469_history:({runtime})=>historyCues(runtime),
       ce469_team_1:()=>teammateCueSequence(0),
       ce469_team_2:()=>teammateCueSequence(1),
-      ce469_branch_tell_remember:()=>branchCues("tell_remember"),
-      ce469_branch_ask_business:()=>branchCues("ask_business"),
-      ce469_branch_watch_pass:()=>branchCues("watch_pass"),
-      ce469_branch_keep_moving:()=>branchCues("keep_moving")
+      ce469_branch_acknowledge_recognition:()=>branchCues("acknowledge_recognition"),
+      ce469_branch_ask_about_delivery:()=>branchCues("ask_about_delivery"),
+      ce469_branch_observe_intake_and_departure:()=>branchCues("observe_intake_and_departure"),
+      ce469_branch_disengage_keep_moving:()=>branchCues("disengage_keep_moving")
     }
   });
   if(!board||board.success!==true)throw new Error("ce469_scene_board_registration_failed");
@@ -960,7 +1078,8 @@ function diagnostics(){
     sevenHistoryFamilies:Object.keys(HISTORY_CUES).length===7,
     deterministicPrecedence:String(historyFamily).indexOf("lethalAttempt")<String(historyFamily).indexOf("policeTransfer")&&String(historyFamily).indexOf("policeTransfer")<String(historyFamily).indexOf("restraintOrAnbu"),
     participantFirstAuthority:D.getRegisteredAnchorInventory(STORY_UNIT_REF).length===9,
-    exactFourChoices:labels==="Tell her you remember her.|Ask what she is doing here.|Watch her pass.|Keep moving.",
+    exactFourChoices:labels==="Tell her you remember her.|Ask about the delivery.|Watch what she does.|Keep moving.",
+    distinctBranchConsequences:Object.keys(BRANCH_CONSEQUENCES).length===4&&new Set(Object.values(BRANCH_CONSEQUENCES).map(row=>row.factualReceiptId)).size===4,
     noAttackChoice:!CHOICES.some(row=>/attack/i.test(row.label+" "+row.intentType)),
     oneObserverSafeRecord:String(finalRecordPayload).includes("Hokage Administration Crossing")&&String(finalRecordPayload).includes('properName:"Unknown"')&&String(finalRecordPayload).includes("hiddenTestTruthGranted:false"),
     recordParticipantProjection:!!PRE_SHINOBI_RECORD_PARTICIPANTS&&String(getShinobiRecordParticipants46900).includes('"Masked Interceptor"'),
@@ -980,6 +1099,7 @@ globalThis.getKonohaCeHotspotEligibility46900=eligibility;
 globalThis.getKonohaCeHotspotPlan46900=eventPlan;
 globalThis.getKonohaCeHotspotTeammateReactions46900=()=>clone(committedTeammateReactions());
 globalThis.getKonohaCeHotspotResolvedRecord46900=()=>clone(resolvedRecord());
+globalThis.getKonohaCeHotspotBranchConsequence46900=choiceId=>branchConsequence(choiceId);
 globalThis.runPhase2CeHotspot46900Diagnostics=diagnostics;
 globalThis.SC_PHASE2_CE_HOTSPOT_46900=Object.freeze({
   patchId:PATCH_ID,eventId:EVENT_ID,opportunityId:OPPORTUNITY_ID,occurrenceId:OCCURRENCE_ID,sceneId:SCENE_ID,hostId:HOST_ID,stableParticipantId:MI_ID,browserGoldenClaimed:false
