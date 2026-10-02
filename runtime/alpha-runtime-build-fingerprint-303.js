@@ -16,7 +16,7 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-02-DE",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-02-DF",
     sourceBaselineCommit:"7e96e3e927d8e2190db9c001e83dfd69db728ce5",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
     runtimeGeneration:"phase2-private-origin-live-ce-hotspot-478",
@@ -74,7 +74,8 @@
       "phase2-first-live-ce-hotspot-469",
       "phase2-private-origin-live-ce-hotspot-478",
       "story-scene-board-owner-retest-469",
-      "menma-dynamic-second-teammate-ce-hotspot-469"
+      "menma-dynamic-second-teammate-ce-hotspot-469",
+      "story-scene-board-ui486-golden-plus-authority"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -107,7 +108,7 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-02-DE",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-02-DF",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
       generationPresent:first.runtimeGeneration==="phase2-private-origin-live-ce-hotspot-478",
@@ -115,6 +116,7 @@
       privateHistory478FeaturePresent:first.majorRuntimeFeatures.includes("phase2-private-origin-live-ce-hotspot-478"),
       ownerRetestPresentationFeaturePresent:first.majorRuntimeFeatures.includes("story-scene-board-owner-retest-469"),
       dynamicSecondTeammate469Present:first.majorRuntimeFeatures.includes("menma-dynamic-second-teammate-ce-hotspot-469"),
+      sceneBoardUi486AuthorityPresent:first.majorRuntimeFeatures.includes("story-scene-board-ui486-golden-plus-authority"),
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)
