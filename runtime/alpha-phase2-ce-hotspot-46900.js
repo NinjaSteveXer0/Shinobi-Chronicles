@@ -2274,7 +2274,11 @@ function menmaDisengageCues46900(){
 }
 function menmaBoardActor46900(id,focus=false){
   const label=id===MI_ID?"MASKED WOMAN":actorLabel(id);
-  return{id,label,image:actorImage(id),focus:focus===true};
+  const stageAnchor=id===MENMA_ID?"PLAYER_LEFT":id===ORIGIN_ID?"INNER_RIGHT":id===MI_ID?"OPPONENT_RIGHT":"INNER_LEFT";
+  const role=id===MENMA_ID?"protagonist":id===ORIGIN_ID?"private_history_owner":id===MI_ID?"returning_participant":"current_teammate";
+  const stageRiseVh=id===MENMA_ID?0:id===ORIGIN_ID?2:id===MI_ID?8:7;
+  const stageDepth=id===MENMA_ID?5:id===ORIGIN_ID?4:id===MI_ID?2:3;
+  return{id,label,image:actorImage(id),role,stageAnchor,stageRiseVh,stageDepth,focus:focus===true};
 }
 function menmaBoardProjection46900({beatId,performance}){
   const speaker=String(performance&&performance.cue&&(performance.cue.speakerName||performance.cue.speaker)||"").toUpperCase();
@@ -2319,7 +2323,11 @@ function actorLabel(id){
   return TEAMMATE_LABELS[id]||String(id||"").replace(/^academy_/,"").replaceAll("_"," ").toUpperCase();
 }
 function boardActor(id,focus=false){
-  return{id,label:actorLabel(id),image:actorImage(id),focus:focus===true};
+  const stageAnchor=id===ORIGIN_ID?"PLAYER_LEFT":id===MI_ID?"OPPONENT_RIGHT":"CENTER";
+  const role=id===ORIGIN_ID?"protagonist":id===MI_ID?"returning_participant":"current_teammate";
+  const stageRiseVh=id===ORIGIN_ID?0:id===MI_ID?6:4;
+  const stageDepth=id===ORIGIN_ID?5:id===MI_ID?3:4;
+  return{id,label:actorLabel(id),image:actorImage(id),role,stageAnchor,stageRiseVh,stageDepth,focus:focus===true};
 }
 function boardProjection({runtime,beatId,performance}){
   const speaker=String(performance&&performance.cue&&(performance.cue.speakerName||performance.cue.speaker)||"").toUpperCase();
