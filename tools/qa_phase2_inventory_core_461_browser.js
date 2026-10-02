@@ -146,6 +146,11 @@ async function stateDigest(page){
     const beforeReload=await page.evaluate(()=>getPhase2InventorySnapshot46100());
     await page.reload({waitUntil:"domcontentloaded",timeout:60000});
     await waitRuntime(page);await release(page);
+    await page.waitForFunction(()=>{
+      const character=typeof getPlayerCharacter==="function"?getPlayerCharacter("academy_menma"):null;
+      const equipped=(playerData&&Array.isArray(playerData.inventory)?playerData.inventory:[]).find(row=>row&&row.id==="kunai"&&row.equippedBy==="academy_menma");
+      return !!(equipped&&character&&Array.isArray(character.equipment)&&character.equipment.some(entry=>entry&&entry.instanceId===equipped.instanceId&&entry.itemId==="kunai"));
+    },null,{timeout:15000});
     await page.evaluate(()=>openOverlay("inventory"));
     await page.waitForSelector(".sc-inventory-core",{state:"visible",timeout:10000});
     const afterReload=await page.evaluate(()=>getPhase2InventorySnapshot46100());
