@@ -61,7 +61,7 @@ EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-origin-skill-display-names-400.js",
     "runtime/alpha-pl-battle-tutorial-38500.js",
     "runtime/alpha-first-konoha-tutorial-35000.js",
-    "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
+    "runtime/alpha-phase2-konoha-player-surfaces-43110.js",\n    "runtime/alpha-phase2-inventory-core-46100.js",
 ]
 
 PYTHON_GATES = [
