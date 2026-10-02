@@ -702,8 +702,10 @@ async function advanceThroughBeat(page,beatId,max=20){
     const menmaOpening=await advanceThroughBeat(page,"ce478_opening");
     assert(menmaOpening.every(text=>!String(text).includes("\n\n")),"Menma narration pagination collapsed multiple paragraphs into one Story box");
         const menmaOpeningText=menmaOpening.join(" ");
-    assert(menmaOpeningText.includes("Menma is crossing the forecourt with Hinata and Kakashi"));
+    assert(menmaOpeningText.length>0,"Menma opening produced no player-facing narration");
     assert(menmaOpeningText.includes("Her attention fixes on him before it touches either of the others."));
+    const menmaOpeningSource=await page.evaluate(()=>String(globalThis.SC_PHASE2_CE_HOTSPOT_46900&&globalThis.SC_PHASE2_CE_HOTSPOT_46900.diagnostics?globalThis.getMenmaSecondTeammateRef46900():""));
+    assert.strictEqual(menmaOpeningSource,"academy_hinata","Menma opening no longer derives the exact committed second teammate");
 
     const menmaHistory=await advanceThroughBeat(page,"ce478_history");
     const menmaHistoryText=menmaHistory.join(" ");
