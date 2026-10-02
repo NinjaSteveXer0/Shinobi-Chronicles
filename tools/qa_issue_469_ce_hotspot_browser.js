@@ -155,11 +155,6 @@ async function advanceThroughBeat(page,beatId,max=20){
       store.byKey[key]={...JSON.parse(JSON.stringify(original)),fieldDispositionState:"UNSEEN",encounteredByProtagonist:false};
       rows.unseen=getKonohaCeHotspotEligibility46900();
 
-      const savedOrigin=playerData.acquisition.chronicleOriginVariantId;
-      playerData.acquisition.chronicleOriginVariantId="academy_menma";
-      rows.noKakashiOrigin=getKonohaCeHotspotEligibility46900();
-      playerData.acquisition.chronicleOriginVariantId=savedOrigin;
-
       store.byKey[key]={...JSON.parse(JSON.stringify(original)),fieldDispositionState:"POLICE_CUSTODY",materialHistory:{...original.materialHistory,policeTransfer:true}};
       rows.policeSurvivorEligible=getKonohaCeHotspotEligibility46900();
 
@@ -191,8 +186,6 @@ async function advanceThroughBeat(page,beatId,max=20){
     assert.strictEqual(matrix.killed.reason,"masked_interceptor_killed");
     assert.strictEqual(matrix.unseen.available,false);
     assert.strictEqual(matrix.unseen.reason,"masked_interceptor_unseen");
-    assert.strictEqual(matrix.noKakashiOrigin.available,false);
-    assert.strictEqual(matrix.noKakashiOrigin.reason,"academy_kakashi_origin_required");
     assert.strictEqual(matrix.policeSurvivorEligible.available,true,"historical Police custody incorrectly blocked current World appearance");
     assert.strictEqual(matrix.anbuSurvivorEligible.available,true,"historical ANBU custody incorrectly blocked current World appearance");
     assert.strictEqual(matrix.alreadyResolved.available,false);
@@ -391,6 +384,235 @@ async function advanceThroughBeat(page,beatId,max=20){
     const finalCount=await page.evaluate(()=>playerData.activityHistory.filter(row=>(row.occurrenceId||row.id)==="occ_konoha_ce_kakashi_masked_interceptor_admin_crossing_v1").length);
     assert.strictEqual(finalCount,1,"reopen/reroute duplicated the occurrence");
 
+    // -----------------------------------------------------------------------
+    // #478 LIVE CE BENCHMARK — MENMA ORIGIN + HINATA + KAKASHI
+    // Proves Kakashi arrives as a teammate with one already-lived private
+    // Origin history, then acts autonomously before Menma receives control.
+    // -----------------------------------------------------------------------
+    await page.evaluate(()=>localStorage.clear());
+    await page.reload({waitUntil:"domcontentloaded",timeout:60000});
+    await waitRuntime(page);
+    await releaseFrontDoor(page);
+
+    const menmaSetup=await page.evaluate(()=>{
+      playerData=createDefaultPlayerData();
+      setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+      savePlayerData();
+
+      const selected=selectChronicleOrigin("academy_menma","qa478_origin");
+      const completed=completeChronicleOriginPrologue("academy_menma",["qa478_menma_origin"]);
+      const snapshot=getAcademyTeamFormationSnapshot();
+      const desired=["academy_hinata","academy_kakashi"];
+      if(!desired.every(id=>snapshot.eligibleCandidateVariantIds.includes(id))){
+        return{error:"qa478_required_teammates_missing",eligible:snapshot.eligibleCandidateVariantIds};
+      }
+      const one=selectAcademyTeamFormationTeammate(1,desired[0]);
+      const two=selectAcademyTeamFormationTeammate(2,desired[1]);
+      const privateBeforeConfirm=getKakashiPrivateOriginHistory46900();
+      const ryoBeforeConfirm=Number(playerData.ryo)||0;
+      const inventoryBeforeConfirm=JSON.stringify(playerData.inventory||{});
+      const formed=confirmAcademyTeamFormation("qa478_team",desired);
+      const privateAfterConfirm=getKakashiPrivateOriginHistory46900();
+      const ryoAfterConfirm=Number(playerData.ryo)||0;
+      const inventoryAfterConfirm=JSON.stringify(playerData.inventory||{});
+      const continued=continueAcademyTeamFormationJourney();
+      updateChronicleTutorialProgress43600({
+        sandboxPopupSeen:true,recommendedRouteEnabled:false,openingChoice:"explore",
+        trainingTipSeen:true,practicalTipSeen:true,examsTipSeen:true,arenaTipSeen:true,
+        arenaCompletionChoiceSeen:true,shinobiRecordTipSeen:true
+      },{save:true});
+      savePlayerData();
+      return{
+        selected,completed,one,two,formed,continued,
+        privateBeforeConfirm,privateAfterConfirm,
+        ryoBeforeConfirm,ryoAfterConfirm,inventoryBeforeConfirm,inventoryAfterConfirm,
+        team:getChronicleCurrentTeam43600(),
+        freePlay:isAcademyFreePlayAvailable(),
+        eligibility:getKonohaCeHotspotEligibility46900(),
+        ownedCharacterId:ensurePlayerAcquisitionState().chronicleOriginOwnedCharacterId
+      };
+    });
+    assert(!menmaSetup.error,JSON.stringify(menmaSetup));
+    assert.strictEqual(menmaSetup.selected.success,true);
+    assert.strictEqual(menmaSetup.completed.success,true);
+    assert.strictEqual(menmaSetup.privateBeforeConfirm,null,"Team selection pre-resolved Kakashi private Origin");
+    assert.strictEqual(menmaSetup.formed.success,true,JSON.stringify(menmaSetup.formed));
+    assert.strictEqual(menmaSetup.continued.success,true);
+    assert.deepStrictEqual(menmaSetup.team.teamVariantIds,["academy_menma","academy_hinata","academy_kakashi"]);
+    assert.strictEqual(menmaSetup.freePlay,true);
+    assert(menmaSetup.privateAfterConfirm,"Team Formation did not select an already-lived Kakashi");
+    assert.strictEqual(menmaSetup.privateAfterConfirm.semanticType,"sc.privateOriginHistory.v1");
+    assert.strictEqual(menmaSetup.privateAfterConfirm.subjectStableId,"academy_kakashi");
+    assert.strictEqual(menmaSetup.privateAfterConfirm.resolutionMode,"AUTONOMOUS_PRIVATE");
+    assert.strictEqual(menmaSetup.privateAfterConfirm.commitState,"COMMITTED");
+    assert.strictEqual(menmaSetup.privateAfterConfirm.profileCoverage.meaningfulBoundaryCount,23);
+    assert.strictEqual(menmaSetup.privateAfterConfirm.profileCoverage.legalPlayerFacingChoiceCount,93);
+    assert.strictEqual(menmaSetup.privateAfterConfirm.profileCoverage.machineResolveResultChoicesExcluded,true);
+    assert.strictEqual(menmaSetup.privateAfterConfirm.exactMaterialChoiceIntentReceipts[0].choiceId,"watch_exchange");
+    assert(menmaSetup.privateAfterConfirm.exactBattleOutcomeRefs.length>=1,"autonomous Kakashi Origin produced no Battle fact");
+    assert.strictEqual(menmaSetup.privateAfterConfirm.economyFirewall.duplicateStartingPurseGranted,false);
+    assert.strictEqual(menmaSetup.privateAfterConfirm.economyFirewall.autonomousPlayerVictoryBattleRyoGranted,false);
+    assert.strictEqual(menmaSetup.privateAfterConfirm.economyFirewall.blanketInventoryRewardsGranted,false);
+    assert.strictEqual(menmaSetup.privateAfterConfirm.economyFirewall.playerEconomyMutation,false);
+    assert.strictEqual(menmaSetup.ryoAfterConfirm,menmaSetup.ryoBeforeConfirm,"private Kakashi Origin granted player Ryō during Team Formation");
+    assert.strictEqual(menmaSetup.inventoryAfterConfirm,menmaSetup.inventoryBeforeConfirm,"private Kakashi Origin mutated player inventory during Team Formation");
+    assert.strictEqual(menmaSetup.eligibility.available,true,JSON.stringify(menmaSetup.eligibility));
+    assert.strictEqual(menmaSetup.eligibility.mode,"menma_private_history_emergence");
+    assert.strictEqual(menmaSetup.eligibility.protagonistVariantId,"academy_menma");
+
+    const sealedBeforeScene=JSON.stringify(menmaSetup.privateAfterConfirm);
+    await page.evaluate(()=>openOverlay("village"));
+    await page.waitForSelector('button[data-village-hotspot-id="KON-P01"]',{state:"visible",timeout:10000});
+    const menmaP01=page.locator('button[data-village-hotspot-id="KON-P01"]');
+    await menmaP01.dblclick();
+    await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.sceneId==="scene_konoha_ce_kakashi_masked_interceptor_admin_crossing_menma_v1",null,{timeout:10000});
+    await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:10000});
+
+    const menmaStarted=await beat(page);
+    assert.strictEqual(menmaStarted.localContext.protagonistVariantId,"academy_menma");
+    assert.strictEqual(menmaStarted.localContext.mode,"menma_private_history_emergence");
+    assert.deepStrictEqual(menmaStarted.localContext.teamVariantIds,["academy_menma","academy_hinata","academy_kakashi"]);
+    assert.strictEqual(menmaStarted.localContext.privateOriginHistoryRef,menmaSetup.privateAfterConfirm.privateOriginHistoryId);
+    assert([
+      "lethal_attempt","police_transfer","restraint_or_anbu","deliberate_release",
+      "mi_defeated_kakashi","kakashi_defeated_mi","material_encounter"
+    ].includes(menmaStarted.localContext.historyFamily),"unexpected private-history family: "+menmaStarted.localContext.historyFamily);
+
+    const menmaBoard=(await page.locator("#story-scene-presentation-layer").innerText());
+    assert(menmaBoard.includes("HOKAGE ADMINISTRATION · PUBLIC APPROACH"));
+    assert(menmaBoard.includes("MASKED WOMAN"),"Menma-facing board did not use observer-safe label");
+    assert(!menmaBoard.includes("MASKED INTERCEPTOR"),"Kakashi historical role label leaked into Menma-facing board");
+    const menmaBackdrop=await page.evaluate(()=>getActiveStorySceneBackdropPath33900());
+    assert(menmaBackdrop&&menmaBackdrop.includes("hokage_district_exterior.png"),"Menma scene missing Administration backdrop");
+    await page.screenshot({path:path.join(OUT,"06-menma-private-history-arrival.png"),fullPage:true});
+
+    const menmaOpening=await advanceThroughBeat(page,"ce478_opening");
+    const menmaOpeningText=menmaOpening.join(" ");
+    assert(menmaOpeningText.includes("Menma is crossing the forecourt with Hinata and Kakashi"));
+    assert(menmaOpeningText.includes("Her attention fixes on him before it touches either of the others."));
+
+    const menmaHistory=await advanceThroughBeat(page,"ce478_history");
+    const menmaHistoryText=menmaHistory.join(" ");
+    assert(!/Minato|staged test|employer|ANBU membership/i.test(menmaHistoryText),"private hidden truth leaked through MI remembered-history reaction");
+    assert(!menmaHistoryText.includes("Masked Interceptor"),"historical role label leaked into Menma history projection");
+
+    const kakashiResponse=await advanceThroughBeat(page,"ce478_kakashi_response");
+    assert(kakashiResponse.join(" ").length>0,"Kakashi private-history autonomous response missing");
+    const hinataResponse=await advanceThroughBeat(page,"ce478_hinata_response");
+    assert(hinataResponse.join(" ").length>0,"Hinata current-evidence reaction missing");
+
+    const preChoice=await page.evaluate(()=>{
+      const snap=getMenmaPrivateHistoryDecisionSnapshot46900();
+      const autonomy=Object.values(snap.autonomyReceipts||{}).filter(row=>row.committedStateRef==="occ_konoha_ce_kakashi_masked_interceptor_admin_crossing_v1");
+      return{autonomy};
+    });
+    assert.strictEqual(preChoice.autonomy.length,2,"Menma received control before Kakashi + Hinata autonomy completed");
+    assert(preChoice.autonomy.some(row=>row.actorRef==="academy_kakashi"&&String(row.participantIntentRef).includes("kakashi_current_response:")),"Kakashi current response autonomy receipt missing");
+    assert(preChoice.autonomy.some(row=>row.actorRef==="academy_hinata"&&String(row.participantIntentRef).includes("hinata_current_evidence:")),"Hinata current-evidence autonomy receipt missing");
+
+    const menmaChoiceState=await beat(page);
+    assert.strictEqual(menmaChoiceState.beatId,"ce478_menma_choice");
+    const menmaChoiceLabels=await page.locator("#story-scene-presentation-layer .sc-story-choice").allInnerTexts();
+    assert.deepStrictEqual(menmaChoiceLabels,[
+      "Ask Kakashi what happened.",
+      "Ask her how she knows Kakashi.",
+      "Let Kakashi handle it.",
+      "Keep moving."
+    ]);
+    assert(!menmaChoiceLabels.some(label=>/attack/i.test(label)),"ATTACK leaked into Menma live choice surface");
+    await page.screenshot({path:path.join(OUT,"07-menma-choice-surface.png"),fullPage:true});
+
+    const yieldChoice=page.locator("#story-scene-presentation-layer .sc-story-choice").filter({hasText:"Let Kakashi handle it."});
+    assert.strictEqual(await yieldChoice.count(),1);
+    await yieldChoice.click();
+    await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="ce478_branch_menma_yield_to_kakashi",null,{timeout:10000});
+    const yieldTexts=await advanceThroughBeat(page,"ce478_branch_menma_yield_to_kakashi");
+    const yieldText=yieldTexts.join(" ");
+    assert(yieldText.includes("Your mess."),"Menma yield branch prose missing");
+    assert(!yieldText.includes("Masked Interceptor"),"historical role label leaked into Menma yield branch");
+    assert(!/Minato|staged test|employer|ANBU membership/i.test(yieldText),"private hidden truth leaked through nested Kakashi autonomy");
+
+    await page.waitForFunction(()=>!globalThis.getActiveStorySceneRuntime?.(),null,{timeout:10000});
+    const menmaResolved=await page.evaluate(()=>({
+      privateHistory:getKakashiPrivateOriginHistory46900(),
+      nested:getMenmaNestedKakashiIntent46900(),
+      record:getKonohaCeHotspotResolvedRecord46900(),
+      snapshot:getMenmaPrivateHistoryDecisionSnapshot46900(),
+      participants:getShinobiRecordParticipants(getKonohaCeHotspotResolvedRecord46900()),
+      eligibility:getKonohaCeHotspotEligibility46900(),
+      count:playerData.activityHistory.filter(row=>(row.occurrenceId||row.id)==="occ_konoha_ce_kakashi_masked_interceptor_admin_crossing_v1").length,
+      ryo:Number(playerData.ryo)||0,
+      inventory:JSON.stringify(playerData.inventory||{})
+    }));
+    assert.strictEqual(JSON.stringify(menmaResolved.privateHistory),sealedBeforeScene,"private Kakashi Origin rerolled during current event");
+    assert(["acknowledge_recognition","ask_about_delivery","observe_intake_and_departure","disengage_keep_moving"].includes(menmaResolved.nested),"nested Kakashi current intent not committed");
+    assert(menmaResolved.record);
+    assert.strictEqual(menmaResolved.record.protagonistParticipantId,"academy_menma");
+    assert.strictEqual(menmaResolved.record.data.observerRef,"academy_menma");
+    assert.strictEqual(menmaResolved.record.data.knownPerson,"Masked Woman");
+    assert.strictEqual(menmaResolved.record.data.privateOriginTranscriptGranted,false);
+    assert.strictEqual(menmaResolved.record.data.kakashiPrivateChoiceIdsGranted,false);
+    assert.strictEqual(menmaResolved.record.data.branchFactualReceiptId,"menma_yielded_private_history_collision_to_kakashi_v1");
+    assert.strictEqual(menmaResolved.record.data.nestedKakashiIntent,menmaResolved.nested);
+    assert(menmaResolved.record.data.sharedHistoryReceiptIds.includes("menma_deferred_to_kakashi_on_private_connection_v1"));
+    assert.strictEqual(menmaResolved.record.data.hiddenTestTruthGranted,false);
+    assert.strictEqual(menmaResolved.record.data.properNameKnowledgeGranted,false);
+    assert.strictEqual(menmaResolved.record.data.anbuMembershipKnowledgeGranted,false);
+    assert.strictEqual(menmaResolved.record.data.rewardsGranted,false);
+    assert.deepStrictEqual(menmaResolved.participants,["Menma","Hinata","Kakashi","Masked Woman"]);
+    assert.strictEqual(menmaResolved.count,1);
+    assert.strictEqual(menmaResolved.eligibility.available,false);
+    assert.strictEqual(menmaResolved.eligibility.reason,"hotspot_already_resolved");
+    const menmaDecisions=Object.values(menmaResolved.snapshot.decisionReceipts||{}).filter(row=>row.status==="resolved");
+    const menmaAutonomy=Object.values(menmaResolved.snapshot.autonomyReceipts||{}).filter(row=>row.committedStateRef==="occ_konoha_ce_kakashi_masked_interceptor_admin_crossing_v1");
+    assert.strictEqual(menmaDecisions.length,1);
+    assert.strictEqual(menmaDecisions[0].selectedChoiceId,"menma_yield_to_kakashi");
+    assert.strictEqual(menmaAutonomy.length,3,"nested Kakashi autonomy did not produce the third participant receipt");
+    assert.strictEqual(menmaResolved.ryo,menmaSetup.ryoAfterConfirm,"current #478 hotspot granted Ryō");
+    assert.strictEqual(menmaResolved.inventory,menmaSetup.inventoryAfterConfirm,"current #478 hotspot mutated inventory");
+
+    await page.evaluate(ownedId=>openShinobiRecord("chronicle",ownedId),menmaSetup.ownedCharacterId);
+    await page.waitForSelector(".shinobi-record-screen",{state:"visible",timeout:10000});
+    const menmaRecordText=(await page.locator(".shinobi-record-screen").innerText()).toLowerCase();
+    assert(menmaRecordText.includes("hokage administration crossing"));
+    assert(menmaRecordText.includes("masked woman"));
+    assert(!menmaRecordText.includes("masked interceptor"),"Menma Shinobi Record leaked Kakashi's historical observer label");
+    assert(!menmaRecordText.includes("minato"),"Menma Shinobi Record leaked hidden Minato truth");
+    assert(!menmaRecordText.includes("staged test"),"Menma Shinobi Record leaked hidden staged-test truth");
+    await page.screenshot({path:path.join(OUT,"08-menma-observer-safe-record.png"),fullPage:true});
+
+    const before478Reload=await page.evaluate(()=>({
+      privateHistory:JSON.stringify(getKakashiPrivateOriginHistory46900()),
+      record:JSON.stringify(getKonohaCeHotspotResolvedRecord46900()),
+      decision:JSON.stringify(getMenmaPrivateHistoryDecisionSnapshot46900()),
+      nested:getMenmaNestedKakashiIntent46900(),
+      count:playerData.activityHistory.filter(row=>(row.occurrenceId||row.id)==="occ_konoha_ce_kakashi_masked_interceptor_admin_crossing_v1").length,
+      ryo:Number(playerData.ryo)||0,
+      inventory:JSON.stringify(playerData.inventory||{})
+    }));
+    await page.reload({waitUntil:"domcontentloaded",timeout:60000});
+    await waitRuntime(page);
+    await releaseFrontDoor(page);
+    const after478Reload=await page.evaluate(()=>({
+      privateHistory:JSON.stringify(getKakashiPrivateOriginHistory46900()),
+      record:JSON.stringify(getKonohaCeHotspotResolvedRecord46900()),
+      decision:JSON.stringify(getMenmaPrivateHistoryDecisionSnapshot46900()),
+      nested:getMenmaNestedKakashiIntent46900(),
+      count:playerData.activityHistory.filter(row=>(row.occurrenceId||row.id)==="occ_konoha_ce_kakashi_masked_interceptor_admin_crossing_v1").length,
+      eligibility:getKonohaCeHotspotEligibility46900(),
+      ryo:Number(playerData.ryo)||0,
+      inventory:JSON.stringify(playerData.inventory||{})
+    }));
+    assert.strictEqual(after478Reload.privateHistory,before478Reload.privateHistory,"sealed Kakashi private Origin changed after reload");
+    assert.strictEqual(after478Reload.record,before478Reload.record,"Menma occurrence changed after reload");
+    assert.strictEqual(after478Reload.decision,before478Reload.decision,"Menma/Kakashi autonomy receipts changed after reload");
+    assert.strictEqual(after478Reload.nested,before478Reload.nested,"nested Kakashi current intent rerolled after reload");
+    assert.strictEqual(after478Reload.count,1);
+    assert.strictEqual(after478Reload.eligibility.available,false);
+    assert.strictEqual(after478Reload.eligibility.reason,"hotspot_already_resolved");
+    assert.strictEqual(after478Reload.ryo,before478Reload.ryo);
+    assert.strictEqual(after478Reload.inventory,before478Reload.inventory);
+
     const diag=await page.evaluate(()=>runPhase2CeHotspot46900Diagnostics());
     assert.strictEqual(diag.pass,true,JSON.stringify(diag));
     await gate.assertClean("phase2-ce-hotspot-469");
@@ -402,7 +624,6 @@ async function advanceThroughBeat(page,beatId,max=20){
       sevenHistoryFamilies:true,
       killedNegative:true,
       unseenNegative:true,
-      noOriginNegative:true,
       fieldCustodyNotPermanentBlock:true,
       exactCurrentTeam:true,
       participantFirstReceipts:true,
@@ -414,6 +635,12 @@ async function advanceThroughBeat(page,beatId,max=20){
       saveReloadNoReroll:true,
       duplicateOccurrence:false,
       rewardsGranted:false,
+      privateOriginHistorySealed:true,
+      teamFormationDidNotResolveAtSelection:true,
+      autonomousBattleOwned:true,
+      menmaObserverRelativeKnowledge:true,
+      nestedKakashiAutonomy:true,
+      privateHistoryReloadNoReroll:true,
       browserGoldenClaimed:false
     },null,2));
   }finally{
