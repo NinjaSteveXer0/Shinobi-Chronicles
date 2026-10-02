@@ -15,6 +15,7 @@ const PATCH_ID="phase2_chronicle_state_manifest_43600_2026_10_01";
 const ROOT_KEY="phase2ChronicleState";
 const ROOT_SCHEMA_VERSION=1;
 const TUTORIAL_SCHEMA_VERSION=1;
+const ORIGIN_PARTICIPANT_CONTINUITY_SCHEMA_VERSION=1;
 const SAVE_KEY="shinobiChroniclesPlayerSave";
 const priorLoadPlayerData=typeof globalThis.loadPlayerData==="function"?globalThis.loadPlayerData:null;
 
@@ -116,6 +117,16 @@ function defaultTutorialProgress(teamRef=null){
     updatedAt:null
   };
 }
+function defaultOriginParticipantContinuity(){
+  return{schemaVersion:ORIGIN_PARTICIPANT_CONTINUITY_SCHEMA_VERSION,byStableParticipantId:{}};
+}
+function normalizeOriginParticipantContinuity(saved){
+  const source=saved&&typeof saved==="object"&&!Array.isArray(saved)?saved:{};
+  const table=source.byStableParticipantId&&typeof source.byStableParticipantId==="object"&&!Array.isArray(source.byStableParticipantId)
+    ?clone(source.byStableParticipantId):{};
+  return{schemaVersion:ORIGIN_PARTICIPANT_CONTINUITY_SCHEMA_VERSION,byStableParticipantId:table};
+}
+
 function legacyTutorialProjection(save,progress){
   const receipt=formationReceiptFrom(save),legacy=receipt&&receipt.firstKonohaTutorial&&typeof receipt.firstKonohaTutorial==="object"?receipt.firstKonohaTutorial:null;
   const legacyCompleted=!!(legacy&&legacy.completed===true&&legacy.completionReceipt);
@@ -141,7 +152,8 @@ function migratePhase2ChronicleState(save){
     schemaVersion:ROOT_SCHEMA_VERSION,
     tutorialProgress:existing.tutorialProgress&&typeof existing.tutorialProgress==="object"
       ?{...defaultTutorialProgress(team&&team.assignmentId),...existing.tutorialProgress,schemaVersion:TUTORIAL_SCHEMA_VERSION}
-      :legacyTutorialProjection(source,defaultTutorialProgress(team&&team.assignmentId))
+      :legacyTutorialProjection(source,defaultTutorialProgress(team&&team.assignmentId)),
+    originParticipantContinuity:normalizeOriginParticipantContinuity(existing.originParticipantContinuity)
   };
   if(team&&root.tutorialProgress.academyTeamFormationReceiptRef!==team.assignmentId){
     // A different committed Academy-team assignment is a different onboarding
@@ -300,6 +312,24 @@ const DOMAINS=Object.freeze([
     qaRefs:Object.freeze(["tools/qa_issue_448_discipline_stat_growth.js","tools/qa_issue_448_discipline_stat_growth_browser.js","tools/qa_save_compatibility_311.js"])
   }),
   Object.freeze({
+    stateDomainId:"originParticipantContinuity",
+    semanticOwner:"CE / Codex / Coordination + frozen Origin authority",
+    canonicalWritePath:"commitOriginParticipantContinuity46900",
+    stableIdentityKey:"originId + stableParticipantId",
+    savePath:"playerData.phase2ChronicleState.originParticipantContinuity.byStableParticipantId[stableParticipantId]",
+    schemaVersion:1,
+    sourceOccurrenceIdFormat:"origin_participant_continuity::<originId>::<stableParticipantId>",
+    idempotenceKeyFormat:"originId + stableParticipantId + frozen Origin completion boundary",
+    derivedFields:Object.freeze(["currentWorldAvailability","rememberedHistoryFamily"]),
+    projectionConsumers:Object.freeze(["World hotspot eligibility","Story participant continuity","CE event authoring","save/load"]),
+    migrationRule:"no fabricated continuity; future exact Origin completion captures source truth; legacy reconstruction may use committed evidence only and otherwise fails closed",
+    resetRule:"new_chronicle_only",
+    difficultyScope:"all",
+    inheritanceRule:"same stable person survives representation changes; KILLED remains terminal",
+    devOverridePolicy:"hidden World truth is not Shinobi Record Knowledge and must never be written to observer-facing activityHistory merely for convenience",
+    qaRefs:Object.freeze(["tools/qa_issue_469_first_live_ce_hotspot.js","tools/qa_issue_469_first_live_ce_hotspot_browser.js","tools/qa_save_compatibility_311.js"])
+  }),
+  Object.freeze({
     stateDomainId:"shinobiRecordProjection",
     semanticOwner:"Shinobi Record presentation",
     canonicalWritePath:"NONE_DERIVED_PROJECTION_ONLY",
@@ -342,6 +372,7 @@ function diagnostics(){
     uniqueDomains:unique.size===DOMAINS.length,
     initialDomains:["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","shinobiRecordProjection"].every(id=>unique.has(id)),
     phase2DevelopmentDomains:["disciplineDevelopment","characterStats"].every(id=>unique.has(id)),
+    originParticipantContinuityDomain:unique.has("originParticipantContinuity")&&DOMAINS.find(row=>row.stateDomainId==="originParticipantContinuity")?.canonicalWritePath==="commitOriginParticipantContinuity46900",
     disciplineLedgerNotDuplicated:DOMAINS.find(row=>row.stateDomainId==="disciplineDevelopment")?.savePath==="playerData.characters[progressionCharacterId].disciplineProgression[disciplineId]",
     characterStatsExistingOwnerPreserved:DOMAINS.find(row=>row.stateDomainId==="characterStats")?.semanticOwner==="PL / Registry / Rank",
     currentTeamDerivedNotDuplicated:DOMAINS.find(row=>row.stateDomainId==="currentTeam")?.canonicalWritePath==="confirmAcademyTeamFormation"&&!String(DOMAINS.find(row=>row.stateDomainId==="currentTeam")?.savePath||"").includes("phase2ChronicleState.currentTeam"),

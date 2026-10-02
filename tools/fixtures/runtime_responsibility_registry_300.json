@@ -1372,7 +1372,8 @@
         "legacy academyTeamFormation.confirmationReceipt.firstKonohaTutorial"
       ],
       "stateWrites": [
-        "playerData.phase2ChronicleState.tutorialProgress only through updateChronicleTutorialProgress43600 / ensurePhase2ChronicleState43600"
+        "playerData.phase2ChronicleState.tutorialProgress only through updateChronicleTutorialProgress43600 / ensurePhase2ChronicleState43600",
+        "playerData.phase2ChronicleState.originParticipantContinuity through #469 continuity adapter"
       ],
       "productionLoadPath": [
         "index.html",
@@ -1389,12 +1390,14 @@
       "retiredOwners": [],
       "saveSchemaRefs": [
         "playerData.phase2ChronicleState.schemaVersion",
-        "playerData.phase2ChronicleState.tutorialProgress"
+        "playerData.phase2ChronicleState.tutorialProgress",
+        "playerData.phase2ChronicleState.originParticipantContinuity"
       ],
       "qaRefs": [
         "tools/qa_phase2_chronicle_state_manifest_436.js",
         "tools/qa_save_compatibility_311.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_issue_469_first_live_ce_hotspot.js"
       ]
     },
     {
@@ -1573,6 +1576,61 @@
         "tools/qa_phase2_inventory_core_461_browser.js",
         "tools/qa_runtime_ownership_safety_300.js",
         "tools/qa_save_compatibility_311.js"
+      ]
+    },
+    {
+      "responsibilityId": "phase2.first_live_ce_hotspot.469",
+      "canonicalOwner": "runtime/alpha-first-live-ce-hotspot-46900.js",
+      "ownerType": "bounded_chronicle_reactive_world_story_adapter",
+      "directCallers": [
+        "index.html",
+        "completeChronicleOriginPrologue",
+        "renderAlphaKonohaVillageHotspots",
+        "activateAlphaKonohaV3PublicLocation",
+        "WORLD_EVENT_OPPORTUNITY_REGISTRY",
+        "Story Scene runtime"
+      ],
+      "stateReads": [
+        "frozen Academy Kakashi V2 terminal state at exact Origin completion boundary",
+        "committed Kakashi activityHistory source occurrences",
+        "Phase-2 currentTeam from getChronicleCurrentTeam43600",
+        "existing World event lifecycle/actionability/resolution dimensions",
+        "existing Konoha V3 KON-P01 host",
+        "existing Story Scene runtime and Scene Board",
+        "existing Shinobi Record activityHistory projection"
+      ],
+      "stateWrites": [
+        "playerData.phase2ChronicleState.originParticipantContinuity exact hidden continuity projection",
+        "existing worldEventRuntime dimensions for one finite #469 occurrence only",
+        "one observer-safe activityHistory record for Hokage Administration Crossing",
+        "existing Story Scene runtime for the authored #469 scene",
+        "presentation-only KON-P01 hotspot label/actionability decoration"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-first-live-ce-hotspot-46900.js"
+      ],
+      "extensionHooks": [
+        "getOriginParticipantContinuity46900",
+        "evaluateFirstLiveCEHotspotEligibility46900",
+        "syncFirstLiveCEHotspot46900",
+        "startFirstLiveCEHotspot46900",
+        "commitFirstLiveCEHotspotClosure46900"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "playerData.phase2ChronicleState.originParticipantContinuity.byStableParticipantId[academy_kakashi_origin_masked_interceptor]",
+        "playerData.worldEventRuntime",
+        "playerData.storySceneRuntime",
+        "playerData.activityHistory observer-safe #469 record only"
+      ],
+      "qaRefs": [
+        "tools/qa_issue_469_first_live_ce_hotspot.js",
+        "tools/qa_issue_469_first_live_ce_hotspot_browser.js",
+        "tools/qa_phase2_chronicle_state_manifest_436.js",
+        "tools/qa_save_compatibility_311.js",
+        "tools/qa_runtime_ownership_safety_300.js"
       ]
     }
   ],
@@ -1869,6 +1927,16 @@
       "semanticId": "phase2.inventory.presentation",
       "owner": "runtime/alpha-phase2-inventory-core-46100.js",
       "responsibilityId": "phase2.inventory_core.presentation"
+    },
+    {
+      "semanticId": "phase2.origin_participant_continuity",
+      "owner": "runtime/alpha-first-live-ce-hotspot-46900.js",
+      "responsibilityId": "phase2.first_live_ce_hotspot.469"
+    },
+    {
+      "semanticId": "phase2.first_live_ce_hotspot",
+      "owner": "runtime/alpha-first-live-ce-hotspot-46900.js",
+      "responsibilityId": "phase2.first_live_ce_hotspot.469"
     }
   ],
   "globalWrapperChains": [
@@ -2031,11 +2099,13 @@
     {
       "symbol": "completeChronicleOriginPrologue",
       "chain": [
-        "runtime/alpha-origin-starting-purse-409.js"
+        "runtime/alpha-origin-starting-purse-409.js",
+        "runtime/alpha-first-live-ce-hotspot-46900.js"
       ],
-      "canonicalActiveOwner": "runtime/alpha-origin-starting-purse-409.js",
-      "activationCondition": "Core completion remains semantic authority; wrapper adds only the locked idempotent starting purse after successful sealed completion.",
+      "canonicalActiveOwner": "runtime/alpha-first-live-ce-hotspot-46900.js",
+      "activationCondition": "Existing Origin completion/starting-purse chain remains authoritative; #469 captures only Academy Kakashi Masked Interceptor continuity immediately before the successful frozen Origin completion boundary and delegates all completion semantics.",
       "qaRefs": [
+        "tools/qa_issue_469_first_live_ce_hotspot.js",
         "tools/qa_issue_343_wasabi_writing_golden.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
@@ -2055,6 +2125,30 @@
         "tools/qa_phase2_inventory_core_461_browser.js",
         "tools/qa_kakashi_v2_browser.js",
         "tools/qa_issue_362_menma_three_subject_reward.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "symbol": "renderAlphaKonohaVillageHotspots",
+      "chain": [
+        "runtime/alpha-first-live-ce-hotspot-46900.js"
+      ],
+      "canonicalActiveOwner": "runtime/alpha-first-live-ce-hotspot-46900.js",
+      "activationCondition": "Exact #469 eligibility only; delegates existing Konoha V3 markup unchanged and decorates KON-P01 only while the finite event is eligible.",
+      "qaRefs": [
+        "tools/qa_issue_469_first_live_ce_hotspot_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "symbol": "activateAlphaKonohaV3PublicLocation",
+      "chain": [
+        "runtime/alpha-first-live-ce-hotspot-46900.js"
+      ],
+      "canonicalActiveOwner": "runtime/alpha-first-live-ce-hotspot-46900.js",
+      "activationCondition": "Exact locationId=KON-P01 plus #469 eligibility only; otherwise delegates every existing Konoha public-location route unchanged.",
+      "qaRefs": [
+        "tools/qa_issue_469_first_live_ce_hotspot_browser.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
     }
