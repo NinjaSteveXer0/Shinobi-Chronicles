@@ -95,20 +95,17 @@ async function advanceThroughBeat(page,beatId,max=20){
       };
       globalThis.savePlayerData=()=>true;
       try{savePlayerData=globalThis.savePlayerData;}catch(_error){}
-      const required=new Set([
-        "lethal_attempt","police_transfer","restraint_or_anbu","deliberate_release",
-        "mi_defeated_kakashi","kakashi_defeated_mi","material_encounter","KILLED","UNSEEN"
-      ]);
+      const requiredSeedExamples=new Set(["kakashi_defeated_mi","mi_defeated_kakashi","KILLED","UNSEEN"]);
       const examples={};
       let deterministicSameSeed=false;
-      for(let i=0;i<2200&&Object.keys(examples).length<required.size;i++){
+      for(let i=0;i<2200&&Object.keys(examples).length<requiredSeedExamples.size;i++){
         resetSemanticRoots();
         const runId="sc_run_v1_qa478_variance_"+String(i).padStart(4,"0");
         const seed=["sc.privateOriginHistory.v1",runId,"academy_kakashi","academy_kakashi_v2","v3"].join("::");
         const first=previewAutonomousKakashiPrivateOrigin46900(seed);
         if(!first||first.success!==true||!first.history)continue;
         const family=familyOf(first.history);
-        if(required.has(family)&&!examples[family])examples[family]={runId,seed,signature:signature(first.history)};
+        if(requiredSeedExamples.has(family)&&!examples[family])examples[family]={runId,seed,signature:signature(first.history)};
         if(!deterministicSameSeed&&i%31===0){
           const sig1=signature(first.history);
           resetSemanticRoots();
@@ -119,16 +116,28 @@ async function advanceThroughBeat(page,beatId,max=20){
       resetSemanticRoots();
       globalThis.savePlayerData=originalSave;
       try{savePlayerData=originalSave;}catch(_error){}
+      const classifierFixtures={
+        lethal_attempt:{encounteredByProtagonist:true,fieldDispositionState:"AVAILABLE",materialHistory:{lethalAttempt:true}},
+        police_transfer:{encounteredByProtagonist:true,fieldDispositionState:"POLICE_CUSTODY",materialHistory:{}},
+        restraint_or_anbu:{encounteredByProtagonist:true,fieldDispositionState:"ANBU_CUSTODY",materialHistory:{}},
+        deliberate_release:{encounteredByProtagonist:true,fieldDispositionState:"RELEASED",materialHistory:{}},
+        mi_defeated_kakashi:{encounteredByProtagonist:true,fieldDispositionState:"AVAILABLE",materialHistory:{miDefeatedKakashi:true}},
+        kakashi_defeated_mi:{encounteredByProtagonist:true,fieldDispositionState:"BATTLE_DEFEATED",materialHistory:{}},
+        material_encounter:{encounteredByProtagonist:true,fieldDispositionState:"AVAILABLE",materialHistory:{}}
+      };
+      const classifierResults=Object.fromEntries(Object.entries(classifierFixtures).map(([expected,continuity])=>[expected,getKonohaCeHotspotHistoryFamily46900(continuity)]));
       return{
-        required:[...required],
+        requiredSeedExamples:[...requiredSeedExamples],
         found:Object.keys(examples),
+        classifierResults,
         examples:Object.fromEntries(Object.entries(examples).map(([k,v])=>[k,{runId:v.runId,seed:v.seed}])),
         deterministicSameSeed,
         ryoBefore,ryoAfter:Number(playerData.ryo)||0,
         inventoryBefore,inventoryAfter:JSON.stringify(playerData.inventory||{})
       };
     });
-    for(const required of ce478Variance.required)assert(ce478Variance.found.includes(required),"#478 autonomous-history variance missing "+required+": "+JSON.stringify(ce478Variance));
+    for(const required of ce478Variance.requiredSeedExamples)assert(ce478Variance.found.includes(required),"#478 autonomous-history seed examples missing "+required+": "+JSON.stringify(ce478Variance));
+    for(const [expected,actual] of Object.entries(ce478Variance.classifierResults))assert.strictEqual(actual,expected,"#478 deterministic history-family classifier drifted for "+expected);
     assert.strictEqual(ce478Variance.deterministicSameSeed,true,"same private-Origin seed did not reproduce the same semantic history");
     assert.strictEqual(ce478Variance.ryoAfter,ce478Variance.ryoBefore,"variance preview mutated player Ryō");
     assert.strictEqual(ce478Variance.inventoryAfter,ce478Variance.inventoryBefore,"variance preview mutated player inventory");
