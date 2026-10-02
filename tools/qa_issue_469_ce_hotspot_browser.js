@@ -459,6 +459,88 @@ async function advanceThroughBeat(page,beatId,max=20){
     assert.strictEqual(finalCount,1,"reopen/reroute duplicated the occurrence");
 
     // -----------------------------------------------------------------------
+    // #478 CURRENT-TEAM VARIANCE — MENMA + OBITO + KAKASHI
+    // Regression for owner report: the same Kakashi-private-history hotspot
+    // must remain enterable when Menma's other committed teammate is Obito.
+    // -----------------------------------------------------------------------
+    await page.evaluate(()=>localStorage.clear());
+    await page.reload({waitUntil:"domcontentloaded",timeout:60000});
+    await waitRuntime(page);
+    await releaseFrontDoor(page);
+
+    const obitoTeamSetup=await page.evaluate(()=>{
+      playerData=createDefaultPlayerData();
+      playerData.chronicleId="qa478_live_chronicle_0009";
+      setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+      savePlayerData();
+
+      const selected=selectChronicleOrigin("academy_menma","qa478_obito_origin");
+      const completed=completeChronicleOriginPrologue("academy_menma",["qa478_menma_origin_obito_team"]);
+      const snapshot=getAcademyTeamFormationSnapshot();
+      const desired=["academy_obito","academy_kakashi"];
+      if(!desired.every(id=>snapshot.eligibleCandidateVariantIds.includes(id))){
+        return{error:"qa478_obito_team_required_teammates_missing",eligible:snapshot.eligibleCandidateVariantIds};
+      }
+      const one=selectAcademyTeamFormationTeammate(1,desired[0]);
+      const two=selectAcademyTeamFormationTeammate(2,desired[1]);
+      const formed=confirmAcademyTeamFormation("qa478_obito_team",desired);
+      const continued=continueAcademyTeamFormationJourney();
+      updateChronicleTutorialProgress43600({
+        sandboxPopupSeen:true,recommendedRouteEnabled:false,openingChoice:"explore",
+        trainingTipSeen:true,practicalTipSeen:true,examsTipSeen:true,arenaTipSeen:true,
+        arenaCompletionChoiceSeen:true,shinobiRecordTipSeen:true
+      },{save:true});
+      savePlayerData();
+      return{
+        selected,completed,one,two,formed,continued,
+        team:getChronicleCurrentTeam43600(),
+        secondTeammate:getMenmaSecondTeammateRef46900(),
+        eligibility:getKonohaCeHotspotEligibility46900(),
+        plan:getKonohaCeHotspotPlan46900()
+      };
+    });
+    assert(!obitoTeamSetup.error,JSON.stringify(obitoTeamSetup));
+    assert.strictEqual(obitoTeamSetup.formed.success,true,JSON.stringify(obitoTeamSetup.formed));
+    assert.strictEqual(obitoTeamSetup.continued.success,true);
+    assert.deepStrictEqual(obitoTeamSetup.team.teamVariantIds,["academy_menma","academy_obito","academy_kakashi"]);
+    assert.strictEqual(obitoTeamSetup.secondTeammate,"academy_obito");
+    assert.strictEqual(obitoTeamSetup.eligibility.available,true,"Menma + Obito + Kakashi was incorrectly blocked: "+JSON.stringify(obitoTeamSetup.eligibility));
+    assert.strictEqual(obitoTeamSetup.plan.success,true,JSON.stringify(obitoTeamSetup.plan));
+    assert.deepStrictEqual(obitoTeamSetup.plan.teammateOrder,["academy_kakashi","academy_obito"]);
+
+    await page.evaluate(()=>openOverlay("village"));
+    await page.waitForSelector('button[data-village-hotspot-id="KON-P01"]',{state:"visible",timeout:10000});
+    const obitoP01=page.locator('button[data-village-hotspot-id="KON-P01"]');
+    await obitoP01.dblclick();
+    await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.sceneId==="scene_konoha_ce_kakashi_masked_interceptor_admin_crossing_menma_v1",null,{timeout:10000});
+    await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:10000});
+
+    const obitoStarted=await beat(page);
+    assert.deepStrictEqual(obitoStarted.localContext.teamVariantIds,["academy_menma","academy_obito","academy_kakashi"]);
+    assert.deepStrictEqual(obitoStarted.localContext.teammateOrder,["academy_kakashi","academy_obito"]);
+
+    const obitoOpening=await advanceThroughBeat(page,"ce478_opening");
+    assert(obitoOpening.join(" ").includes("Menma is crossing the forecourt with Obito and Kakashi"),"Menma opening did not project exact second teammate");
+    await advanceThroughBeat(page,"ce478_history");
+    await advanceThroughBeat(page,"ce478_kakashi_response");
+    const obitoResponse=await advanceThroughBeat(page,"ce478_hinata_response");
+    assert(obitoResponse.join(" ").includes("Wait—you know her?"),"Obito authored current-evidence reaction did not replace stale Hinata branch");
+
+    const obitoChoiceState=await beat(page);
+    assert.strictEqual(obitoChoiceState.beatId,"ce478_menma_choice");
+    const obitoStage=await page.evaluate(()=>[...document.querySelectorAll(".sc-scene-board-33900__actor")].map(node=>node.dataset.actorLabel));
+    for(const expected of ["MENMA","OBITO","KAKASHI","MASKED WOMAN"])assert(obitoStage.includes(expected),"Menma + Obito stage missing "+expected+": "+JSON.stringify(obitoStage));
+    assert(!obitoStage.includes("HINATA"),"Hinata ghost participant leaked into Menma + Obito current team");
+    const obitoChoiceLabels=await page.locator("#story-scene-presentation-layer .sc-story-choice").allInnerTexts();
+    assert.deepStrictEqual(obitoChoiceLabels,[
+      "Ask Kakashi what happened.",
+      "Ask her how she knows Kakashi.",
+      "Let Kakashi handle it.",
+      "Keep moving."
+    ]);
+    await page.screenshot({path:path.join(OUT,"05b-menma-obito-kakashi-hotspot.png"),fullPage:true});
+
+    // -----------------------------------------------------------------------
     // #478 LIVE CE BENCHMARK — MENMA ORIGIN + HINATA + KAKASHI
     // Proves Kakashi arrives as a teammate with one already-lived private
     // Origin history, then acts autonomously before Menma receives control.
