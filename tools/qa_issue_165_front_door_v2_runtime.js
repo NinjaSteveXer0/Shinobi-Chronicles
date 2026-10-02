@@ -167,6 +167,9 @@ try{
 
   const battleStyle=document.getElementById("sc-alpha-battle-pl-calibration-33400");
   assert("pl_circles_lowered",!!battleStyle&&battleStyle.textContent.includes("top:50.2%"));
+  const diag=plain(context.runAlphaBrowserOnboardingFixes33400Diagnostics());
+  assert("internal_diagnostics_green",diag.pass===true,diag);
+  assert("run_identity_diagnostic_green",diag.checks.beginCommitsRunIdentityBeforePrologue===true,diag);
   assert("browser_golden_not_claimed",runtime.browserGoldenClaimed===false);
 
   console.log("Issue #165 V2 onboarding / tutorial browser-runtime QA: PASS");
