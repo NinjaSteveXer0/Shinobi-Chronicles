@@ -1614,7 +1614,10 @@
         "existing World event runtime dimensions",
         "playerData.storyDecisionRuntime34000 participant-autonomy and protagonist-intent receipts",
         "playerData.phase2ChronicleState.privateOriginHistories.bySubject[academy_kakashi]",
-        "Battle-owned autonomous private result through resolveAcademyKakashiV2AutonomousPrivateBattle36010"
+        "Battle-owned autonomous private result through resolveAcademyKakashiV2AutonomousPrivateBattle36010",
+        "SC_STORY_DECISION_REALISATION_34000 semantic choice/intention authority",
+        "SC_STORY_FACTUAL_RESOLVER_34600 registered Academy Kakashi factual bindings",
+        "current Academy Kakashi Registry stats/PL read-only capability snapshot"
       ],
       "stateWrites": [
         "playerData.phase2ChronicleState.originParticipantContinuity exact terminal capture only",
@@ -1625,7 +1628,9 @@
         "presentation-only Konoha P01 actionability wrapper and shared Story Scene Board projection",
         "presentation-only observer-safe Shinobi Record participant labels for the one #469 occurrence",
         "playerData.phase2ChronicleState.privateOriginHistories.bySubject[academy_kakashi] exactly once per Chronicle",
-        "observer-relative Menma Knowledge/Record projection without private transcript import"
+        "observer-relative Menma Knowledge/Record projection without private transcript import",
+        "playerData.storyDecisionRuntime34000 private-origin semantic choice + machine-gate intent receipts",
+        "playerData.storyFactualResolver34600 private-origin factual resolver receipts"
       ],
       "productionLoadPath": [
         "index.html",
@@ -1647,7 +1652,8 @@
         "ensureAutonomousKakashiPrivateHistory46900",
         "migrateLegacyKakashiPrivateOrigin46900",
         "getMenmaPrivateHistoryDecisionSnapshot46900",
-        "getMenmaNestedKakashiIntent46900"
+        "getMenmaNestedKakashiIntent46900",
+        "previewAutonomousKakashiPrivateOrigin46900"
       ],
       "permittedAdapters": [],
       "retiredOwners": [],
@@ -1980,6 +1986,16 @@
       "semanticId": "academy_kakashi.v2.battle.autonomous_private_result",
       "owner": "runtime/alpha-kakashi-v2-battle-36010.js",
       "responsibilityId": "origin.academy_kakashi.v2.story_to_battle"
+    },
+    {
+      "semanticId": "phase2.private_origin_history.story_intent_provenance",
+      "owner": "runtime/alpha-story-decision-realisation-34000.js",
+      "responsibilityId": "story.decision_realisation.neutral"
+    },
+    {
+      "semanticId": "phase2.private_origin_history.factual_result_provenance",
+      "owner": "runtime/alpha-story-factual-resolver-34600.js",
+      "responsibilityId": "story.factual_resolution.neutral"
     }
   ],
   "globalWrapperChains": [
