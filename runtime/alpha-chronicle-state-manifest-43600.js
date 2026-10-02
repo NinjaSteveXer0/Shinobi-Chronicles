@@ -99,6 +99,18 @@ function getCurrentTeam(save=currentPlayerData()){
     legacyProjection:true
   });
 }
+function defaultOriginParticipantContinuity(){
+  return{schemaVersion:1,byKey:{}};
+}
+function normalizeOriginParticipantContinuity(value){
+  const source=value&&typeof value==="object"&&!Array.isArray(value)?value:{};
+  const rows=source.byKey&&typeof source.byKey==="object"&&!Array.isArray(source.byKey)?source.byKey:{};
+  return{
+    schemaVersion:1,
+    byKey:Object.fromEntries(Object.entries(rows).filter(([key,row])=>key&&row&&typeof row==="object"&&!Array.isArray(row)).map(([key,row])=>[String(key),clone(row)]))
+  };
+}
+
 function defaultTutorialProgress(teamRef=null){
   return{
     schemaVersion:TUTORIAL_SCHEMA_VERSION,
@@ -141,7 +153,8 @@ function migratePhase2ChronicleState(save){
     schemaVersion:ROOT_SCHEMA_VERSION,
     tutorialProgress:existing.tutorialProgress&&typeof existing.tutorialProgress==="object"
       ?{...defaultTutorialProgress(team&&team.assignmentId),...existing.tutorialProgress,schemaVersion:TUTORIAL_SCHEMA_VERSION}
-      :legacyTutorialProjection(source,defaultTutorialProgress(team&&team.assignmentId))
+      :legacyTutorialProjection(source,defaultTutorialProgress(team&&team.assignmentId)),
+    originParticipantContinuity:normalizeOriginParticipantContinuity(existing.originParticipantContinuity)
   };
   if(team&&root.tutorialProgress.academyTeamFormationReceiptRef!==team.assignmentId){
     // A different committed Academy-team assignment is a different onboarding
@@ -300,6 +313,24 @@ const DOMAINS=Object.freeze([
     qaRefs:Object.freeze(["tools/qa_issue_448_discipline_stat_growth.js","tools/qa_issue_448_discipline_stat_growth_browser.js","tools/qa_save_compatibility_311.js"])
   }),
   Object.freeze({
+    stateDomainId:"originParticipantContinuity",
+    semanticOwner:"CE / Coding bounded Origin participant continuity adapter",
+    canonicalWritePath:"sc.originParticipantContinuity.v1 capture at exact Origin terminal boundary; deterministic durable-history backfill read otherwise",
+    stableIdentityKey:"originId + stableParticipantId",
+    savePath:"playerData.phase2ChronicleState.originParticipantContinuity.byKey[originId::stableParticipantId]",
+    schemaVersion:1,
+    sourceOccurrenceIdFormat:"origin_participant_continuity::<originId>::<stableParticipantId>::<originOccurrenceRef>",
+    idempotenceKeyFormat:"originId + stableParticipantId + originOccurrenceRef",
+    derivedFields:Object.freeze(["encounteredByProtagonist","fieldDispositionState","survivedOrigin","hiddenPostTestReviewReached","materialHistoryRefs","postTestTruthClass","protagonistKnowsTestTruth"]),
+    projectionConsumers:Object.freeze(["Konoha World authored events","Story participant continuity","Shinobi Record source projection"]),
+    migrationRule:"capture exact live Origin terminal truth when available; legacy completed saves derive only from durable evidence and fail closed on ambiguity",
+    resetRule:"new_chronicle_only; later World availability remains separate current-state authority",
+    difficultyScope:"all",
+    inheritanceRule:"same stable participant survives Origin-to-World continuity unless exact death/unavailability authority says otherwise",
+    devOverridePolicy:"no fixture or inferred proper-name/test-truth substitution in ordinary player state",
+    qaRefs:Object.freeze(["tools/qa_issue_469_ce_hotspot.js","tools/qa_issue_469_ce_hotspot_browser.js","tools/qa_phase2_chronicle_state_manifest_436.js","tools/qa_save_compatibility_311.js"])
+  }),
+  Object.freeze({
     stateDomainId:"shinobiRecordProjection",
     semanticOwner:"Shinobi Record presentation",
     canonicalWritePath:"NONE_DERIVED_PROJECTION_ONLY",
@@ -340,7 +371,8 @@ function diagnostics(){
   const checks={
     minimumFields:DOMAINS.every(row=>required.every(key=>Object.prototype.hasOwnProperty.call(row,key))),
     uniqueDomains:unique.size===DOMAINS.length,
-    initialDomains:["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","shinobiRecordProjection"].every(id=>unique.has(id)),
+    initialDomains:["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","originParticipantContinuity","shinobiRecordProjection"].every(id=>unique.has(id)),
+    continuityDomainPersisted:DOMAINS.find(row=>row.stateDomainId==="originParticipantContinuity")?.savePath==="playerData.phase2ChronicleState.originParticipantContinuity.byKey[originId::stableParticipantId]"&&migrated.phase2ChronicleState.originParticipantContinuity.schemaVersion===1,
     phase2DevelopmentDomains:["disciplineDevelopment","characterStats"].every(id=>unique.has(id)),
     disciplineLedgerNotDuplicated:DOMAINS.find(row=>row.stateDomainId==="disciplineDevelopment")?.savePath==="playerData.characters[progressionCharacterId].disciplineProgression[disciplineId]",
     characterStatsExistingOwnerPreserved:DOMAINS.find(row=>row.stateDomainId==="characterStats")?.semanticOwner==="PL / Registry / Rank",
@@ -368,6 +400,13 @@ globalThis.getChronicleCurrentRyo43600=getCurrentRyo;
 globalThis.migratePhase2ChronicleState43600=migratePhase2ChronicleState;
 globalThis.rehydratePhase2ChronicleState43600=rehydrateCurrentPhase2Root;
 globalThis.ensurePhase2ChronicleState43600=ensurePhase2Root;
+globalThis.getOriginParticipantContinuityStore43600=({create=false}={})=>{
+  const pd=currentPlayerData();if(!pd)return null;
+  const root=pd[ROOT_KEY]&&typeof pd[ROOT_KEY]==="object"?pd[ROOT_KEY]:(create?ensurePhase2Root({save:false}):null);
+  if(!root)return null;
+  if((!root.originParticipantContinuity||typeof root.originParticipantContinuity!=="object")&&create)root.originParticipantContinuity=defaultOriginParticipantContinuity();
+  return root.originParticipantContinuity&&typeof root.originParticipantContinuity==="object"?root.originParticipantContinuity:null;
+};
 globalThis.getChronicleTutorialProgress43600=getTutorialProgress;
 globalThis.updateChronicleTutorialProgress43600=updateTutorialProgress;
 globalThis.runChronicleStateManifest43600Diagnostics=diagnostics;
