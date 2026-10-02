@@ -47,7 +47,7 @@ const teamSave={
   const c=boot(teamSave);
   const manifest=plain(c.getChronicleStateManifest43600());
   assert.strictEqual(manifest.manifestId,"sc.phase2.chronicle_state_manifest.v1");
-  assert.deepStrictEqual(manifest.domains.map(x=>x.stateDomainId),["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","disciplineDevelopment","characterStats","originParticipantContinuity","shinobiRecordProjection"]);
+  assert.deepStrictEqual(manifest.domains.map(x=>x.stateDomainId),["currentTeam","tutorialProgress","chronicleIdentity","currentRyo","disciplineDevelopment","characterStats","originParticipantContinuity","privateOriginHistory","shinobiRecordProjection"]);
   for(const row of manifest.domains){
     for(const key of ["stateDomainId","semanticOwner","canonicalWritePath","stableIdentityKey","savePath","schemaVersion","sourceOccurrenceIdFormat","idempotenceKeyFormat","derivedFields","projectionConsumers","migrationRule","resetRule","difficultyScope","inheritanceRule","devOverridePolicy","qaRefs"]){
       assert(Object.prototype.hasOwnProperty.call(row,key),"domain "+row.stateDomainId+" missing "+key);
@@ -59,6 +59,14 @@ const teamSave={
   assert.strictEqual(c.getChronicleCurrentRyo43600(),237);
   assert.strictEqual(plain(c.getChronicleIdentity43600()).variantId,"academy_menma");
 
+  const privateOriginDomain=manifest.domains.find(row=>row.stateDomainId==="privateOriginHistory");
+  assert(privateOriginDomain,"privateOriginHistory domain missing");
+  assert.strictEqual(privateOriginDomain.semanticOwner,"Chronicle Engine / subject-private Origin convergence");
+  assert.strictEqual(privateOriginDomain.savePath,"playerData.phase2ChronicleState.privateOriginHistories.bySubject[subjectStableId]");
+  assert(privateOriginDomain.projectionConsumers.includes("participant autonomy"));
+  assert(privateOriginDomain.devOverridePolicy.includes("never becomes protagonist Knowledge"));
+  const privateStore=plain(c.getPrivateOriginHistoryStore43600({create:true}));
+  assert.deepStrictEqual(privateStore,{schemaVersion:1,bySubject:{}});
   const disciplineDomain=manifest.domains.find(row=>row.stateDomainId==="disciplineDevelopment");
   const statsDomain=manifest.domains.find(row=>row.stateDomainId==="characterStats");
   assert.strictEqual(disciplineDomain.semanticOwner,"Progression / Development");
