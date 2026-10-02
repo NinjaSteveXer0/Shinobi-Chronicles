@@ -668,6 +668,8 @@ function finalRecordPayload(choiceId){
         priorModelIncomplete:true
       },
       protagonistIntent:CHOICES.find(row=>row.id===choiceId)?.intentType||null,
+      rememberedHistoryFamily:ctx.historyFamily||null,
+      originMaterialHistorySourceRefs:Array.isArray(ctx.historySourceRefs)?[...ctx.historySourceRefs]:[],
       storyTeamParticipantRefs:Array.isArray(ctx.teamVariantIds)?[...ctx.teamVariantIds]:[],
       observingParticipantRefs:Array.isArray(ctx.teamVariantIds)?[...ctx.teamVariantIds]:[],
       teammateDirectPerceptionOnly:true,
