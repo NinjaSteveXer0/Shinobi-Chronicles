@@ -266,6 +266,14 @@
     if(!selected||selected.success!==true){
       state.feedback=`Origin confirmation failed: ${selected&&selected.reason?selected.reason:"unknown error"}.`;render33300();return selected||{success:false,reason:"origin_confirmation_failed"};
     }
+    const runIdentity=typeof globalThis.ensureChronicleRunIdentity43600==="function"
+      ?globalThis.ensureChronicleRunIdentity43600({creationKind:"NEW_START"})
+      :{success:false,reason:"chronicle_run_identity_authority_missing"};
+    if(!runIdentity||runIdentity.success!==true){
+      state.feedback=`Origin was confirmed, but Chronicle run identity could not be committed: ${runIdentity&&runIdentity.reason?runIdentity.reason:"unknown error"}.`;
+      render33300();
+      return{success:false,reason:"chronicle_run_identity_commit_failed",selected,runIdentity};
+    }
     persistProfile33300();
     try{sessionStorage.removeItem(SESSION_RESUME_KEY_33300);}catch(_error){}
     const launched=beginAlphaChronicleOriginPrologue();
@@ -360,6 +368,7 @@
       unavailableVillagesFailClosed:VILLAGES.filter(v=>!v.enabled).length===4&&villageSource.includes("disabled"),
       reusesExactOriginEntries:getOriginEntries33300.toString().includes("getAlphaChronicleOriginSelectionEntries"),
       originCommitUsesExistingAuthority:confirmSource.includes("selectChronicleOrigin")&&!confirmSource.includes("commitCharacterAcquisition")&&!confirmSource.includes("grantCharacterRegistryOwnership"),
+      runIdentityCommittedAtBegin:confirmSource.includes("ensureChronicleRunIdentity43600")&&confirmSource.includes('creationKind:"NEW_START"')&&confirmSource.indexOf("ensureChronicleRunIdentity43600")<confirmSource.indexOf("beginAlphaChronicleOriginPrologue"),
       originPrologueUsesExistingDispatcher:confirmSource.includes("beginAlphaChronicleOriginPrologue"),
       noRankPLStoryWorldMutation:["recordOwnedCharacterGeninPromotion","currentPL=","basePL=","commitWorld","commitStory"].every(token=>!confirmSource.includes(token)),
       underlyingGameGated:lockUnderlyingGame33300.toString().includes("game.inert=true")&&releaseFrontDoor33300.toString().includes("unlockUnderlyingGame33300"),
