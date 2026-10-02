@@ -53,6 +53,7 @@ def main()->int:
         "exact_origin_authority_reused":"getAlphaChronicleOriginSelectionEntries" in fix,
         "selection_does_not_commit_before_intro":"selection only" in fix and "BEGIN after the introduction" in fix,
         "begin_reuses_existing_authorities":"selectChronicleOrigin(entry.variantId" in fix and "beginAlphaChronicleOriginPrologue()" in fix,
+        "begin_commits_run_identity":"ensureChronicleRunIdentity43600" in fix and 'creationKind:"NEW_START"' in fix and fix.find("ensureChronicleRunIdentity43600") < fix.find("beginAlphaChronicleOriginPrologue()"),
         "no_second_acquisition_authority":"commitCharacterAcquisition(" not in fix and "grantCharacterRegistryOwnership(" not in fix,
         "enemy_turn_uses_existing_scheduler":"evaluateEnemyActionScheduler" in fix and "executeEnemyAuthoredActionOpportunity" in fix,
         "enemy_turn_one_way_guard":'side!==\"player\"' in fix and "enemyTurnInProgress33400" in fix,
