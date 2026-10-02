@@ -293,10 +293,18 @@
     if(!sceneId||typeof getStorySceneDefinition!=="function"||!getStorySceneDefinition(sceneId)){
       state.feedback="The selected Origin prologue is not registered.";render33400();return {success:false,reason:"origin_scene_not_registered",sceneId};
     }
+    const candidateRunId=typeof globalThis.allocateChronicleRunId43600==="function"
+      ?globalThis.allocateChronicleRunId43600()
+      :null;
+    if(!candidateRunId){
+      state.feedback="Chronicle run identity could not be allocated.";
+      render33400();
+      return{success:false,reason:"chronicle_run_identity_allocation_failed"};
+    }
     const selected=selectChronicleOrigin(entry.variantId,"alpha_front_door_33400_begin_confirmation");
     if(!selected||selected.success!==true){state.feedback=`Origin confirmation failed: ${selected&&selected.reason?selected.reason:"unknown error"}.`;render33400();return selected||{success:false,reason:"origin_confirmation_failed"};}
-    const runIdentity=typeof globalThis.ensureChronicleRunIdentity43600==="function"
-      ?globalThis.ensureChronicleRunIdentity43600({creationKind:"NEW_START"})
+    const runIdentity=typeof globalThis.commitChronicleRunIdentity43600==="function"
+      ?globalThis.commitChronicleRunIdentity43600({runId:candidateRunId,creationKind:"NEW_START"})
       :{success:false,reason:"chronicle_run_identity_authority_missing"};
     if(!runIdentity||runIdentity.success!==true){
       state.feedback=`Origin was confirmed, but Chronicle run identity could not be committed: ${runIdentity&&runIdentity.reason?runIdentity.reason:"unknown error"}.`;
@@ -423,7 +431,8 @@
       exactTenOriginAuthority:getOriginEntries33400.toString().includes("getAlphaChronicleOriginSelectionEntries"),
       selectionBeforeIntroNoCommit:!renderNinja33400.toString().includes("selectChronicleOrigin"),
       beginOwnsOriginCommit:beginSource.includes("selectChronicleOrigin")&&beginSource.includes("beginAlphaChronicleOriginPrologue"),
-      beginCommitsRunIdentityBeforePrologue:beginSource.includes("ensureChronicleRunIdentity43600")&&beginSource.includes('creationKind:"NEW_START"')&&beginSource.indexOf("ensureChronicleRunIdentity43600")<beginSource.indexOf("beginAlphaChronicleOriginPrologue"),
+      beginAllocatesRunIdentityBeforeOrigin:beginSource.includes("allocateChronicleRunId43600")&&beginSource.indexOf("allocateChronicleRunId43600")<beginSource.indexOf("selectChronicleOrigin"),
+      beginCommitsRunIdentityBeforePrologue:beginSource.includes("commitChronicleRunIdentity43600")&&beginSource.includes('creationKind:"NEW_START"')&&beginSource.indexOf("commitChronicleRunIdentity43600")<beginSource.indexOf("beginAlphaChronicleOriginPrologue"),
       noSecondAcquisitionAuthority:!beginSource.includes("commitCharacterAcquisition")&&!beginSource.includes("grantCharacterRegistryOwnership"),
       konohaOnlyAlphaStart:VILLAGES.filter(v=>v.enabled).length===1&&VILLAGES[0].id==="konoha",
       enemyTurnHooksCompletedPlayerOpportunity:consumeSource.includes('shouldRunEnemyTurn33400(side)')&&consumeSource.includes("executeEnemyAuthoredActionOpportunity"),
