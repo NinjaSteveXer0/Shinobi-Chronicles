@@ -953,6 +953,7 @@ if(!sceneRegistration||sceneRegistration.success!==true)throw new Error("ce469_s
 if(typeof globalThis.registerStorySceneBoardDefinition==="function"){
   const board=globalThis.registerStorySceneBoardDefinition(SCENE_ID,{
     resolve:boardProjection,
+    resolveBackdrop:()=>({assetPath:"Scene backdrops/hokage_district_exterior.png"}),
     performanceSequences:{
       ce469_opening:openingCues,
       ce469_history:({runtime})=>historyCues(runtime),
@@ -1087,6 +1088,7 @@ function diagnostics(){
     finiteResolution:String(commitResolution).includes("resolvedRecord")&&String(commitResolution).includes("setOpportunityResolution"),
     p01OnlyWhileEligible:!!PRE_RENDER_KONOHA_ANCHOR&&String(renderAlphaKonohaV3IdentifiedAnchor46900).includes("eligibility().available===true"),
     storyBoardRegistered:typeof globalThis.resolveStorySceneBoardProjection==="function",
+    administrationBackdropBound:String(installPhase2CeHotspot46900).includes("hokage_district_exterior.png"),
     currentTeamAuthority:String(currentTeam).includes("getChronicleCurrentTeam43600")&&String(eligibility).includes("currentTeam()"),
     browserGoldenClaimed:false
   };
