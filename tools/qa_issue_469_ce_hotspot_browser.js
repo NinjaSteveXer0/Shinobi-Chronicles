@@ -219,6 +219,8 @@ async function advanceThroughBeat(page,beatId,max=20){
     const openingBoard=await page.locator("#story-scene-presentation-layer").innerText();
     assert(openingBoard.includes("HOKAGE ADMINISTRATION · PUBLIC APPROACH"));
     assert(openingBoard.includes("STAMPED RECEIPT"));
+    const activeBackdrop=await page.evaluate(()=>getActiveStorySceneBackdropPath33900());
+    assert(activeBackdrop&&activeBackdrop.includes("hokage_district_exterior.png"),"KON-P01 Administration exterior backdrop missing: "+activeBackdrop);
     assert.strictEqual(await page.locator('#story-scene-presentation-layer img[src*="masked_interceptor.png"]').count()>0,true,"existing Masked Interceptor visual not projected");
     await page.screenshot({path:path.join(OUT,"02-arrival-stamped-receipt.png"),fullPage:true});
 
