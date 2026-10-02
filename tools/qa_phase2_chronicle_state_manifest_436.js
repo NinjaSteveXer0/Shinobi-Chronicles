@@ -93,7 +93,7 @@ const teamSave={
   assert.strictEqual(c.saveCount,2,"repeat ensure rewrote identical state");
 
   c.updateChronicleTutorialProgress43600({sandboxPopupSeen:true,recommendedRouteEnabled:true,openingChoice:"show_me_around"},{save:true});
-  assert.strictEqual(c.saveCount,2);
+  assert.strictEqual(c.saveCount,3);
   const progress=plain(c.getChronicleTutorialProgress43600());
   assert.strictEqual(progress.sandboxPopupSeen,true);
   assert.strictEqual(progress.recommendedRouteEnabled,true);
