@@ -54,6 +54,15 @@ assert(src.includes("menma_private_history_emergence"),"Menma private-history em
 assert(src.includes("menma_live_benchmark_requires_hinata"),"Menma + Hinata + Kakashi exact benchmark gate missing");
 assert(src.includes("confirmAcademyTeamFormation46900"),"private history is not sealed before Team Formation");
 assert(src.includes("ensureAutonomousKakashiPrivateHistory46900"),"one-shot autonomous Kakashi history resolver missing");
+assert(src.includes("privateStoryUnitRef46900"),"private Origin choices are not namespaced through #34000");
+assert(src.includes("D.openSemanticChoiceSet"),"private Origin does not consume #34000 semantic choice machinery");
+assert(src.includes("D.commitStoryIntent"),"private Origin does not commit #34000 intent receipts");
+assert(src.includes("F.resolveStoryFactualAction"),"private machine gates do not consume #34600 factual-result authority");
+assert(src.includes("terminalConvergence:{reportReached:true,hiddenTestReviewReached:true,receiptReached:true,originCompleted:true"),"autonomous Kakashi private Origin does not prove terminal convergence");
+assert(src.includes('semanticTrace.push("terminal:v2_report>v2_hidden_review>v2_receipt:"'),"private Origin terminal path does not match frozen Kakashi convergence");
+assert(src.includes("previewAcademyKakashiV2TerminalRewards36015"),"private Origin does not consume Kakashi reward preview authority");
+assert(!src.includes("commitAcademyKakashiV2TerminalRewards36015("),"private Origin must not commit Kakashi terminal rewards to player economy");
+assert(src.includes('ownerProjectionNote:"No authorised Kakashi-specific Origin Development/Current-Stat mutation source is exposed'),"unsupported actor-local development is not explicitly fail-closed");
 
 for(const api of ["registerAutonomyAnchor","consumeNextAutonomy","openDecisionAfterAutonomy","resolveStoryChoice"]){
   assert(src.includes(api),"#34000 participant-first/intent API not consumed: "+api);
@@ -182,6 +191,10 @@ assert(src.includes("properNameKnowledgeGranted:false"),"proper-name firewall re
 assert(src.includes("anbuMembershipKnowledgeGranted:false"),"ANBU inference firewall receipt missing");
 assert(src.includes("moralityScalarCreated:false")&&src.includes("friendshipScalarCreated:false"),"relationship/morality scalar firewall missing");
 assert(!src.includes("Math.random"),"#469 history/participant behavior must be deterministic");
+assert(src.includes("previewAutonomousKakashiPrivateOrigin46900"),"deterministic private-history preview seam missing");
+for(const boundary of Array.from({length:23},(_,i)=>"case\"B"+String(i+1).padStart(2,"0")+"\"")){
+  assert(src.includes(boundary),"terminal walker missing boundary logic: "+boundary);
+}
 assert(battle.includes("resolveAutonomousPrivateBattle36010"),"Battle owner does not expose headless autonomous Kakashi result");
 assert(battle.includes("rewardGranted:false")&&battle.includes("lootGranted:false")&&battle.includes("playerEconomyMutation:false"),"autonomous private Battle may mutate player rewards/economy");
 assert(src.includes("duplicateStartingPurseGranted:false"),"private Origin duplicate starting-purse firewall missing");
