@@ -52,7 +52,12 @@ async function advanceThroughBeat(page,beatId,max=20){
   const browser=await chromium.launch({headless:true});
   const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1});
   const page=await context.newPage();
-  const gate=await installBrowserRuntimeErrorGate(page);
+  const gate=await installBrowserRuntimeErrorGate(page,{allowlist:[{
+    kind:"requestfailed",
+    match:"net::ERR_ABORTED",
+    reason:"This multi-Chronicle browser gate intentionally reloads the page between fixture Chronicles; Chromium aborts in-flight optional portrait image requests during navigation.",
+    retirementCondition:"Remove when fixture isolation no longer requires full-page reloads or asset loading completes before each intentional navigation."
+  }]});
   try{
     await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});
     await waitRuntime(page);
