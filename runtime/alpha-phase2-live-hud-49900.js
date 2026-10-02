@@ -55,19 +55,35 @@ function activeSubjectId(){
   const a=acquisition();
   return a&&String(a.chronicleOriginVariantId||a.ninjaIdentityVariantId||a.chronicleOriginOwnedCharacterId||"")||null;
 }
+function presentationVariantId(id){
+  if(!id)return null;
+  const stable=String(id);
+  const chronicle=call("getChronicleIdentity43600");
+  if(chronicle&&String(chronicle.ownedCharacterId||"")===stable&&chronicle.variantId)return String(chronicle.variantId);
+  const a=acquisition();
+  if(a){
+    if(String(a.chronicleOriginOwnedCharacterId||"")===stable&&a.chronicleOriginVariantId)return String(a.chronicleOriginVariantId);
+    if(String(a.ninjaIdentityOwnedCharacterId||"")===stable&&a.ninjaIdentityVariantId)return String(a.ninjaIdentityVariantId);
+  }
+  return stable;
+}
 function characterFor(id){
   if(!id)return null;
-  return call("getPlayerCharacter",id);
+  const direct=call("getPlayerCharacter",id);
+  if(direct)return direct;
+  const variant=presentationVariantId(id);
+  return variant&&variant!==String(id)?call("getPlayerCharacter",variant):null;
 }
 function displayNameFor(id,character=characterFor(id)){
   if(character){
     const value=scalar(character.name||character.displayName||character.playerFacingName);
     if(value)return value;
   }
-  const registry=call("getCharacterRegistryEntry",id)||call("getRegistryCharacter",id);
+  const variant=presentationVariantId(id);
+  const registry=call("getCharacterRegistryEntry",variant)||call("getRegistryCharacter",variant)||call("getCharacterRegistryEntry",id)||call("getRegistryCharacter",id);
   const registryName=registry&&scalar(registry.displayName||registry.name);
   if(registryName)return registryName;
-  return String(id||"SHINOBI").replace(/^academy_/,"").replaceAll("_"," ").replace(/\b\w/g,ch=>ch.toUpperCase());
+  return String(variant||id||"SHINOBI").replace(/^academy_/,"").replaceAll("_"," ").replace(/\b\w/g,ch=>ch.toUpperCase());
 }
 function rankFor(id,character){
   const canonical=scalar(call("getAlphaSurfaceTruthRankLabel",id));
@@ -92,12 +108,15 @@ function portraitPathFrom(value){
 }
 function portraitFor(id,character=characterFor(id)){
   if(!id)return null;
+  const variant=presentationVariantId(id);
   const attempts=[
+    ()=>call("resolveUIPortraitProjection",variant),
     ()=>call("resolveUIPortraitProjection",id),
-    ()=>call("resolveUIPortraitProjection",character||id),
-    ()=>call("resolveUIPortraitProjection",{variantId:id,character:character||null}),
+    ()=>call("resolveUIPortraitProjection",character||variant||id),
+    ()=>call("resolveUIPortraitProjection",{variantId:variant||id,character:character||null}),
+    ()=>call("getUIPortraitAssetPath",variant),
     ()=>call("getUIPortraitAssetPath",id),
-    ()=>call("getUIPortraitAssetPath",character||id)
+    ()=>call("getUIPortraitAssetPath",character||variant||id)
   ];
   for(const attempt of attempts){
     const path=portraitPathFrom(attempt());
@@ -171,6 +190,7 @@ function identityProjection(){
   const character=characterFor(id);
   return{
     id,
+    variantId:presentationVariantId(id),
     name:displayNameFor(id,character),
     rank:rankFor(id,character),
     affiliation:affiliationFor(character),
@@ -376,7 +396,8 @@ function diagnostics(){
     canonicalTeam:String(currentTeam).includes("getChronicleCurrentTeam43600"),
     canonicalRyo:String(currentRyo).includes("getChronicleCurrentRyo43600"),
     canonicalJourney:String(journeyProjection).includes("getAlphaTailedBeastJourneyState")&&String(journeyProjection).includes("getAlphaSurfaceTruthJourneyAction"),
-    canonicalIdentity:String(activeSubjectId).includes("getAlphaSurfaceTruthSubjectId"),
+    canonicalIdentity:String(activeSubjectId).includes("getAlphaSurfaceTruthSubjectId")&&String(presentationVariantId).includes("getChronicleIdentity43600"),
+    identityRepresentationSeparated:String(presentationVariantId).includes("ownedCharacterId")&&String(presentationVariantId).includes("variantId"),
     canonicalPortrait:String(portraitFor).includes("resolveUIPortraitProjection")&&String(portraitFor).includes("getUIPortraitAssetPath"),
     noEnergyProjection:data.energy===null&&!String(render).includes("ENERGY"),
     canonicalRoutes:String(routeAction).includes('call("openOverlay","clan")')&&String(routeAction).includes('call("openOverlay","inventory")')&&String(routeAction).includes('call("openShinobiRecord","overview")')&&String(routeAction).includes('call("openOverlay","missions")'),
