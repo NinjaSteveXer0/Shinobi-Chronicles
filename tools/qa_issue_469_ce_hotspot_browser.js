@@ -587,6 +587,8 @@ async function advanceThroughBeat(page,beatId,max=20){
       const selected=selectChronicleOrigin("academy_menma","qa478_origin");
       const runIdentity=commitChronicleRunIdentity43600({runId:fixtureRunId,creationKind:"NEW_START"});
       const completed=completeChronicleOriginPrologue("academy_menma",["qa478_menma_origin_3"]);
+      const preparedPrivate=ensureAutonomousKakashiPrivateHistory46900("qa478_pre_team_run_identity_fixture");
+      const privateBeforeSelection=getKakashiPrivateOriginHistory46900();
       const snapshot=getAcademyTeamFormationSnapshot();
       const desired=["academy_hinata","academy_kakashi"];
       if(!desired.every(id=>snapshot.eligibleCandidateVariantIds.includes(id))){
@@ -609,9 +611,9 @@ async function advanceThroughBeat(page,beatId,max=20){
       },{save:true});
       savePlayerData();
       return{
-        selected,runIdentity,completed,one,two,formed,continued,
+        selected,runIdentity,completed,preparedPrivate,one,two,formed,continued,
         runIdentityAfterTeam:getChronicleRunIdentity43600(),
-        privateBeforeConfirm,privateAfterConfirm,
+        privateBeforeSelection,privateBeforeConfirm,privateAfterConfirm,
         ryoBeforeConfirm,ryoAfterConfirm,inventoryBeforeConfirm,inventoryAfterConfirm,
         team:getChronicleCurrentTeam43600(),
         freePlay:isAcademyFreePlayAvailable(),
@@ -625,12 +627,15 @@ async function advanceThroughBeat(page,beatId,max=20){
     assert.strictEqual(menmaSetup.runIdentityAfterTeam.runId,positiveRunIds[1],"Menma Team Formation changed Chronicle run identity");
     assert.notStrictEqual(menmaSetup.runIdentityAfterTeam.runId,obitoTeamSetup.runIdentityAfterTeam.runId,"separate fixture Chronicles collapsed onto one run ID");
     assert.strictEqual(menmaSetup.completed.success,true);
-    assert.strictEqual(menmaSetup.privateBeforeConfirm,null,"Team selection pre-resolved Kakashi private Origin");
+    assert.strictEqual(menmaSetup.preparedPrivate.success,true,JSON.stringify(menmaSetup.preparedPrivate));
+    assert(menmaSetup.privateBeforeSelection,"run identity did not seal Kakashi private Origin before team choice");
+    assert.strictEqual(JSON.stringify(menmaSetup.privateBeforeConfirm),JSON.stringify(menmaSetup.privateBeforeSelection),"teammate selection changed sealed Kakashi private Origin");
     assert.strictEqual(menmaSetup.formed.success,true,JSON.stringify(menmaSetup.formed));
     assert.strictEqual(menmaSetup.continued.success,true);
     assert.deepStrictEqual(menmaSetup.team.teamVariantIds,["academy_menma","academy_hinata","academy_kakashi"]);
     assert.strictEqual(menmaSetup.freePlay,true);
-    assert(menmaSetup.privateAfterConfirm,"Team Formation did not select an already-lived Kakashi");
+    assert(menmaSetup.privateAfterConfirm,"Team Formation lost the already-lived Kakashi private Origin");
+    assert.strictEqual(JSON.stringify(menmaSetup.privateAfterConfirm),JSON.stringify(menmaSetup.privateBeforeSelection),"Team Formation rerolled or rewrote sealed Kakashi private Origin");
     assert.strictEqual(menmaSetup.privateAfterConfirm.semanticType,"sc.privateOriginHistory.v1");
     assert.strictEqual(menmaSetup.privateAfterConfirm.subjectStableId,"academy_kakashi");
     assert.strictEqual(menmaSetup.privateAfterConfirm.resolutionMode,"AUTONOMOUS_PRIVATE");
