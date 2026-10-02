@@ -308,7 +308,7 @@
     const launched=beginAlphaChronicleOriginPrologue();
     if(!launched||launched.success!==true){state.feedback=`Origin committed, but prologue launch failed: ${launched&&launched.reason?launched.reason:"unknown error"}.`;render33400();return {success:false,reason:"origin_confirmed_prologue_launch_failed",selected,launched};}
     release33400();
-    return {success:true,selected,launched,commitPoint:"introduction_begin"};
+    return {success:true,selected,runIdentity,launched,commitPoint:"introduction_begin"};
   }
 
   function onClick33400(event){
