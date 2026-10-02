@@ -423,6 +423,7 @@
       exactTenOriginAuthority:getOriginEntries33400.toString().includes("getAlphaChronicleOriginSelectionEntries"),
       selectionBeforeIntroNoCommit:!renderNinja33400.toString().includes("selectChronicleOrigin"),
       beginOwnsOriginCommit:beginSource.includes("selectChronicleOrigin")&&beginSource.includes("beginAlphaChronicleOriginPrologue"),
+      beginCommitsRunIdentityBeforePrologue:beginSource.includes("ensureChronicleRunIdentity43600")&&beginSource.includes('creationKind:"NEW_START"')&&beginSource.indexOf("ensureChronicleRunIdentity43600")<beginSource.indexOf("beginAlphaChronicleOriginPrologue"),
       noSecondAcquisitionAuthority:!beginSource.includes("commitCharacterAcquisition")&&!beginSource.includes("grantCharacterRegistryOwnership"),
       konohaOnlyAlphaStart:VILLAGES.filter(v=>v.enabled).length===1&&VILLAGES[0].id==="konoha",
       enemyTurnHooksCompletedPlayerOpportunity:consumeSource.includes('shouldRunEnemyTurn33400(side)')&&consumeSource.includes("executeEnemyAuthoredActionOpportunity"),
