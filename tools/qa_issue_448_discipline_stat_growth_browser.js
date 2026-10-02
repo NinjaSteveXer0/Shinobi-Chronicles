@@ -177,7 +177,7 @@ async function inspectMyClan(page,characterId){
     assert(clan.roster.includes("academy_menma"),"My Clan manageable roster lost persistent subject: "+JSON.stringify(clan));
     assert.strictEqual(clan.tab,"stats");
     assert.strictEqual(clan.characterStats.nin,11);
-    assert.strictEqual(clan.renderedStats.NINJUTSU,11,"My Clan did not project canonical Current Ninjutsu 11: "+JSON.stringify(clan));
+    assert.strictEqual(clan.renderedStats.NIN??clan.renderedStats.NINJUTSU,11,"My Clan did not project canonical Current Ninjutsu 11: "+JSON.stringify(clan));
     assert(clan.text.includes("PL "+clan.pl)||clan.text.includes("CURRENT PL")||clan.html.includes(String(clan.pl)),"My Clan PL projection missing");
     await page.screenshot({path:path.join(OUT,"02-my-clan-current-stat.png"),fullPage:true});
 
