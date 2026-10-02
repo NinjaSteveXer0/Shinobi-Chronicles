@@ -260,7 +260,9 @@ async function advanceThroughBeat(page,beatId,max=20){
     assert(!choiceLabels.some(label=>/attack/i.test(label)),"ATTACK leaked into live choice UI");
     await page.screenshot({path:path.join(OUT,"03-kakashi-choice-surface.png"),fullPage:true});
 
-    await page.getByRole("button",{name:"Ask what she is doing here.",exact:true}).click();
+    const askChoice=page.locator("#story-scene-presentation-layer .sc-story-choice").filter({hasText:"Ask what she is doing here."});
+    assert.strictEqual(await askChoice.count(),1,"Ask-business choice control missing or duplicated");
+    await askChoice.click();
     await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId==="ce469_branch_ask_business",null,{timeout:10000});
     const branchTexts=await advanceThroughBeat(page,"ce469_branch_ask_business");
     const branchText=branchTexts.join(" ");
