@@ -9195,8 +9195,10 @@ function loadPlayerData() {
         parsedData.storyDecisionRuntime34000 && typeof parsedData.storyDecisionRuntime34000 === "object"
           ? cloneProgressionData(parsedData.storyDecisionRuntime34000)
           : undefined,
-      // ISSUE #322 / #23 — preserve the older shared Story intent/factual
-      // compatibility root still consumed by frozen Kakashi V2 paths.
+      // ISSUE #322 / #23 — preserve shared Story intent/factual receipts and
+      // contextual Special Jonin evidence written by their canonical owners.
+      // loadPlayerData remains a compatibility reader; it must not silently
+      // discard these idempotence roots on reload.
       storyDecisionRealisation34000:
         parsedData.storyDecisionRealisation34000 && typeof parsedData.storyDecisionRealisation34000 === "object"
           ? cloneProgressionData(parsedData.storyDecisionRealisation34000)
