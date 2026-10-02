@@ -377,7 +377,7 @@
       reusesExactOriginEntries:getOriginEntries33300.toString().includes("getAlphaChronicleOriginSelectionEntries"),
       originCommitUsesExistingAuthority:confirmSource.includes("selectChronicleOrigin")&&!confirmSource.includes("commitCharacterAcquisition")&&!confirmSource.includes("grantCharacterRegistryOwnership"),
       runIdentityCandidateAllocatedBeforeOrigin:confirmSource.includes("allocateChronicleRunId43600")&&confirmSource.indexOf("allocateChronicleRunId43600")<confirmSource.indexOf("const selected=selectChronicleOrigin"),
-      runIdentityCommittedAtBegin:confirmSource.includes("commitChronicleRunIdentity43600")&&confirmSource.includes('creationKind:"NEW_START"')&&confirmSource.indexOf("commitChronicleRunIdentity43600")<confirmSource.indexOf("beginAlphaChronicleOriginPrologue"),
+      runIdentityCommittedAtBegin:confirmSource.includes("commitChronicleRunIdentity43600")&&confirmSource.includes('creationKind:"NEW_START"')&&confirmSource.indexOf("commitChronicleRunIdentity43600")<confirmSource.indexOf("const launched=beginAlphaChronicleOriginPrologue()"),
       originPrologueUsesExistingDispatcher:confirmSource.includes("beginAlphaChronicleOriginPrologue"),
       noRankPLStoryWorldMutation:["recordOwnedCharacterGeninPromotion","currentPL=","basePL=","commitWorld","commitStory"].every(token=>!confirmSource.includes(token)),
       underlyingGameGated:lockUnderlyingGame33300.toString().includes("game.inert=true")&&releaseFrontDoor33300.toString().includes("unlockUnderlyingGame33300"),
