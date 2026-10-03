@@ -1687,14 +1687,16 @@
         "current Ryō from getChronicleCurrentRyo43600",
         "committed currentTeam from getChronicleCurrentTeam43600",
         "observer-safe Journey action from getAlphaTailedBeastJourneyState + getAlphaSurfaceTruthJourneyAction",
-        "existing overlay / Story / Battle / map-navigation presentation truth"
+        "existing overlay / Story / Battle / map-navigation presentation truth",
+        "exact World Map-only franchise lockup asset Logo/sc_title.png as presentation authority"
       ],
       "stateWrites": [
         "presentation DOM and disposable render signature/timer only; no persistent gameplay state"
       ],
       "productionLoadPath": [
         "index.html",
-        "runtime/alpha-phase2-live-hud-49900.js"
+        "runtime/alpha-phase2-live-hud-49900.js",
+        "Logo/sc_title.png"
       ],
       "extensionHooks": [
         "getPhase2LiveHudSnapshot49900",
