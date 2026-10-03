@@ -363,7 +363,7 @@ function installStyles(){
   if(typeof document==="undefined"||document.getElementById(STYLE_ID))return;
   const style=document.createElement("style");
   style.id=STYLE_ID;
-  style.textContent=\`
+  style.textContent=`
     .game-container.sc-hud499-installed>.game-header{display:none!important}
     .game-container.sc-hud499-installed .world-map-viewport>.map-sidebar-left{display:none!important}
     .game-container.sc-hud499-installed .world-map-viewport{position:relative;min-height:0;grid-template-columns:minmax(0,1fr)}
@@ -412,7 +412,7 @@ function installStyles(){
     @media(max-width:1450px){.sc-hud499-brand{width:clamp(190px,17vw,244px)}.sc-hud499-state-cluster{width:clamp(315px,32vw,420px)}.sc-hud499-tools{top:124px;width:138px}.sc-hud499-team{top:116px}}
     @media(max-width:900px){.sc-hud499-root{--sc-hud499-edge:8px;--sc-hud499-safe-bottom:72px}.sc-hud499-brand{left:10px;top:10px;width:170px}.sc-hud499-state-cluster{right:8px;top:8px;width:300px}.sc-hud499-state-main{padding:7px 8px}.sc-hud499-identity-portrait,.sc-hud499-silhouette.sc-hud499-identity-portrait{width:40px;height:40px;flex-basis:40px}.sc-hud499-team{left:8px;top:108px;width:64px}.sc-hud499-team-member{width:50px;height:50px}.sc-hud499-team-portrait,.sc-hud499-silhouette.sc-hud499-team-portrait{width:42px;height:42px}.sc-hud499-tools{right:8px;top:116px;width:128px}.sc-hud499-map-nav{right:8px;bottom:72px;min-width:160px}}
     @media(prefers-reduced-motion:reduce){.sc-hud499-root *{transition:none!important}}
-  \`;
+  `;
   document.head.appendChild(style);
 }
 function diagnostics(){
