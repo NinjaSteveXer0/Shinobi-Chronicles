@@ -34,7 +34,7 @@ Stephen supplied and approved two exact transparent RGBA PNG assets:
 
 Intended production path:
 
-`UI/brand/shinobi_chronicles_brand_mark.png`
+`Logo/sc_logo.png`
 
 Dimensions:
 
@@ -48,7 +48,7 @@ SHA-256:
 
 Intended production path:
 
-`UI/brand/shinobi_chronicles_world_map_lockup.png`
+`Logo/sc_title.png`
 
 Dimensions:
 
@@ -62,7 +62,7 @@ These hashes identify the exact owner-approved raster outputs.
 
 Do not regenerate, redraw, reinterpret, re-encode or substitute these assets after publication unless Brand authority explicitly reopens them.
 
-The current connected GitHub toolchain cannot ingest these PNG bytes directly from the conversation/container. Publication therefore remains a binary-transport operation and is **not complete until the exact files exist at the committed repository paths above**.
+The exact approved PNGs are now durably published on the dedicated `visuals/asset-vault` branch at commit `8efdbf990888e59c3495e80d5672f86b194b4a23`. Binary publication is therefore **COMPLETE**.
 
 ---
 
@@ -123,8 +123,8 @@ Individual titles may later introduce subtitles, secondary emblems, palettes or 
 # Final status
 
 - current franchise masterbrand: **Direction B — Brushstroke Shinobi Crest + SHINOBI CHRONICLES**
-- exact mark PNG: **owner-approved / bytes frozen / repository publication pending**
-- exact World Map lockup PNG: **owner-approved / bytes frozen / repository publication pending**
+- exact mark PNG: **PUBLISHED — `Logo/sc_logo.png` @ `8efdbf990888e59c3495e80d5672f86b194b4a23`**
+- exact World Map lockup PNG: **PUBLISHED — `Logo/sc_title.png` @ `8efdbf990888e59c3495e80d5672f86b194b4a23`**
 - World Map top-left placement: **APPROVED**
 - Region/Village placement: **NOT YET IMPLIED**
 - Concept 5 Dual Path: **SUPERSEDED / HISTORICAL ONLY**
