@@ -34,10 +34,45 @@ async function closeAndVillage(page){
   await page.waitForTimeout(80);
   await openVillage(page);
 }
+async function openTools(page){
+  const opened=await page.$eval(".sc-hud499-tools",node=>node.open===true);
+  if(!opened)await page.click(".sc-hud499-tools>summary");
+}
+async function captureHudLayout(page){
+  return page.evaluate(()=>{
+    const root=document.getElementById("sc-phase2-live-hud-49900");
+    const rect=selector=>{
+      const node=root&&root.querySelector(selector);
+      if(!node)return null;
+      const r=node.getBoundingClientRect();
+      return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height};
+    };
+    return{
+      viewport:[innerWidth,innerHeight],
+      state:rect(".sc-hud499-state-cluster"),
+      team:rect(".sc-hud499-team"),
+      tools:rect(".sc-hud499-tools"),
+      compass:rect(".sc-hud499-map-nav"),
+      brand:rect(".sc-hud499-brand")
+    };
+  });
+}
+function assertHudLayout(layout,label){
+  const vw=layout.viewport[0],vh=layout.viewport[1];
+  for(const key of ["state","team","tools","compass"]){
+    const box=layout[key];
+    assert(box,label+": missing "+key+" dock");
+    assert(box.left>=-1&&box.top>=-1&&box.right<=vw+1&&box.bottom<=vh+1,label+": "+key+" clips viewport: "+JSON.stringify(layout));
+  }
+  assert(layout.state.height<=128,label+": unified player-state cluster is too tall: "+JSON.stringify(layout.state));
+  assert(layout.team.width<=96,label+": Current Team rail exceeds compact width: "+JSON.stringify(layout.team));
+  assert(layout.compass.bottom<=vh-48,label+": Chronicle Compass violates bottom safe reserve: "+JSON.stringify(layout.compass));
+}
+
 
 (async()=>{
   const browser=await chromium.launch({headless:true});
-  const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1});
+  const context=await browser.newContext({viewport:{width:1366,height:768},deviceScaleFactor:1});
   const page=await context.newPage();
   const gate=await installBrowserRuntimeErrorGate(page);
   try{
@@ -128,7 +163,7 @@ async function closeAndVillage(page){
         teamIds:[...(root?.querySelectorAll("[data-team-variant-id]")||[])].map(node=>node.dataset.teamVariantId),
         teamImageCount:root?.querySelectorAll(".sc-hud499-team-member img").length||0,
         rootPointerEvents:getComputedStyle(root).pointerEvents,
-        focusable:[...(root?.querySelectorAll("button")||[])].every(node=>!node.disabled&&node.tabIndex>=0)
+        focusable:[...(root?.querySelectorAll("button,summary")||[])].every(node=>!node.disabled&&node.tabIndex>=0),\n        brandImage:root?.querySelector(".sc-hud499-brand img")?.getAttribute("src")||null
       };
     });
     assert.strictEqual(initial.snap.visible,true);
@@ -150,6 +185,7 @@ async function closeAndVillage(page){
     assert.strictEqual(initial.teamImageCount,3,"Current Team dock is missing approved portraits");
     assert.strictEqual(initial.rootPointerEvents,"none","transparent HUD root blocks map interaction");
     assert.strictEqual(initial.focusable,true,"HUD controls are not keyboard focusable");
+    assert.strictEqual(initial.brandImage,null,"World-only masterbrand leaked onto Village surface");
 
     const clickability=await page.evaluate(()=>{
       const buttons=[...document.querySelectorAll('button[data-village-hotspot-id]')].filter(node=>{
@@ -176,11 +212,13 @@ async function closeAndVillage(page){
     assert.strictEqual((await page.evaluate(()=>getPhase2LiveHudSnapshot49900().visible)),false,"HUD did not suppress on My Clan");
     await closeAndVillage(page);
 
+    await openTools(page);
     await page.click('[data-hud499-action="inventory"]');
     await page.waitForSelector(".sc-inventory-core",{state:"visible",timeout:10000});
     assert.strictEqual(await page.evaluate(()=>getPhase2LiveHudSnapshot49900().visible),false,"HUD did not suppress on Inventory");
     await closeAndVillage(page);
 
+    await openTools(page);
     await page.click('[data-hud499-action="record"]');
     await page.waitForFunction(()=>{
       const overlay=document.getElementById("screen-overlay");
@@ -189,6 +227,7 @@ async function closeAndVillage(page){
     assert.strictEqual(await page.evaluate(()=>getPhase2LiveHudSnapshot49900().visible),false,"HUD did not suppress on Shinobi Record");
     await closeAndVillage(page);
 
+    await openTools(page);
     await page.click('[data-hud499-action="journey"]');
     await page.waitForSelector(".alpha328-journey",{state:"visible",timeout:10000});
     assert.strictEqual(await page.evaluate(()=>getPhase2LiveHudSnapshot49900().visible),false,"HUD did not suppress on Journey detail");
@@ -226,6 +265,7 @@ async function closeAndVillage(page){
     assert(worldDominance.canvas.height>=worldDominance.viewport[1]*0.50,"World Map height collapsed under HUD: "+JSON.stringify(worldDominance));
     assert(worldDominance.display.width>=worldDominance.viewport[0]*0.90,"World Map display remains trapped in retired sidebar track: "+JSON.stringify(worldDominance));
     await page.screenshot({path:path.join(OUT,"01b-world-map-live-hud.png"),fullPage:true});
+    const worldBrand=await page.evaluate(()=>{\n      const img=document.querySelector(".sc-hud499-brand img");\n      return img?{src:img.getAttribute("src"),complete:img.complete,naturalWidth:img.naturalWidth,naturalHeight:img.naturalHeight}:null;\n    });\n    assert(worldBrand&&worldBrand.src==="Logo/sc_title.png","World Map did not consume exact approved brand lockup: "+JSON.stringify(worldBrand));\n    assert(worldBrand.complete&&worldBrand.naturalWidth>0&&worldBrand.naturalHeight>0,"World Map brand asset failed to load: "+JSON.stringify(worldBrand));
 
     const worldNav=await page.evaluate(()=>getPhase2LiveHudSnapshot49900().navigation.map(row=>row.id));
     assert(worldNav.includes("village"),"World HUD lacks legal Village return");
@@ -284,24 +324,26 @@ async function closeAndVillage(page){
     assert.strictEqual(afterReload.journey?.label,beforeReload.journey?.label,"reload changed observer-safe Journey projection");
     await page.screenshot({path:path.join(OUT,"02-village-live-hud-after-reload.png"),fullPage:true});
 
-    const layout=await page.evaluate(()=>{
-      const root=document.getElementById("sc-phase2-live-hud-49900");
-      const top=root.querySelector(".sc-hud499-top").getBoundingClientRect();
-      const team=root.querySelector(".sc-hud499-team").getBoundingClientRect();
-      const actions=root.querySelector(".sc-hud499-actions").getBoundingClientRect();
-      return{
-        viewport:[innerWidth,innerHeight],
-        top:{left:top.left,right:top.right,top:top.top,bottom:top.bottom},
-        team:{left:team.left,right:team.right,top:team.top,bottom:team.bottom},
-        actions:{left:actions.left,right:actions.right,top:actions.top,bottom:actions.bottom}
-      };
-    });
-    const [vw,vh]=layout.viewport;
-    for(const box of [layout.top,layout.team,layout.actions]){
-      assert(box.left>=-1&&box.top>=-1&&box.right<=vw+1&&box.bottom<=vh+1,"HUD dock clips Alpha viewport: "+JSON.stringify(layout));
-    }
-    assert(layout.top.bottom<=100,"top HUD exceeds approved compact visual budget: "+JSON.stringify(layout.top));
-    assert((layout.team.right-layout.team.left)<=100,"team dock exceeds approved collapsed width budget");
+    const layout1366=await captureHudLayout(page);
+    assert.deepStrictEqual(layout1366.viewport,[1366,768]);
+    assertHudLayout(layout1366,"1366x768");
+    assert.strictEqual(layout1366.brand,null,"World-only brand leaked onto Village at 1366x768");
+    await page.screenshot({path:path.join(OUT,"03-village-1366x768-safe-hud.png"),fullPage:true});
+
+    await page.setViewportSize({width:1920,height:1080});
+    await page.waitForTimeout(180);
+    await page.evaluate(()=>refreshPhase2LiveHud49900());
+    const layout1920=await captureHudLayout(page);
+    assert.deepStrictEqual(layout1920.viewport,[1920,1080]);
+    assertHudLayout(layout1920,"1920x1080");
+    assert.strictEqual(layout1920.brand,null,"World-only brand leaked onto Village at 1920x1080");
+
+    await page.click('[data-hud499-action="world"]');
+    await page.waitForFunction(()=>getPhase2LiveHudSnapshot49900().surface.kind==="world",null,{timeout:10000});
+    const world1920=await captureHudLayout(page);
+    assert(world1920.brand&&world1920.brand.width>150,"World Map brand is absent or unreadably small at 1920x1080");
+    assertHudLayout(world1920,"1920x1080 World");
+    await page.screenshot({path:path.join(OUT,"04-world-1920x1080-chronicle-compass.png"),fullPage:true});
 
     const diagnostics=await page.evaluate(()=>runPhase2LiveHud49900Diagnostics());
     assert.strictEqual(diagnostics.pass,true,JSON.stringify(diagnostics));
@@ -319,6 +361,11 @@ async function closeAndVillage(page){
       quickActions:true,
       contextualMapNavigation:true,
       worldMapDominant:true,
+      worldBrandExact:true,
+      chronicleCompass:true,
+      collapsiblePlayerTools:true,
+      safeBottomReserve1366:true,
+      safeBottomReserve1920:true,
       mapClickable:true,
       deepStoryBattleSuppression:true,
       refreshReadOnly:true,
