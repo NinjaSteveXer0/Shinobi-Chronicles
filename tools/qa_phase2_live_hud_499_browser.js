@@ -57,6 +57,7 @@ async function captureHudLayout(page){
     };
   });
 }
+function documentBodyLiteralNewline(text){return String(text||"").includes("\\n");}
 function assertHudLayout(layout,label){
   const vw=layout.viewport[0],vh=layout.viewport[1];
   for(const key of ["state","team","tools","compass"]){
@@ -187,6 +188,7 @@ function assertHudLayout(layout,label){
     assert.strictEqual(initial.rootPointerEvents,"none","transparent HUD root blocks map interaction");
     assert.strictEqual(initial.focusable,true,"HUD controls are not keyboard focusable");
     assert.strictEqual(initial.brandImage,null,"World-only masterbrand leaked onto Village surface");
+    assert(!documentBodyLiteralNewline(await page.evaluate(()=>document.body.innerText||"")),"literal escaped newline leaked into rendered HUD page");
 
     const clickability=await page.evaluate(()=>{
       const buttons=[...document.querySelectorAll('button[data-village-hotspot-id]')].filter(node=>{
