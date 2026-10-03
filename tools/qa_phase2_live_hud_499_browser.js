@@ -214,13 +214,13 @@ function assertHudLayout(layout,label){
     await closeAndVillage(page);
 
     await openTools(page);
-    await page.click('[data-hud499-action="inventory"]');
+    await page.click('.sc-hud499-tools [data-hud499-action="inventory"]');
     await page.waitForSelector(".sc-inventory-core",{state:"visible",timeout:10000});
     assert.strictEqual(await page.evaluate(()=>getPhase2LiveHudSnapshot49900().visible),false,"HUD did not suppress on Inventory");
     await closeAndVillage(page);
 
     await openTools(page);
-    await page.click('[data-hud499-action="record"]');
+    await page.click('.sc-hud499-tools [data-hud499-action="record"]');
     await page.waitForFunction(()=>{
       const overlay=document.getElementById("screen-overlay");
       return overlay&&getComputedStyle(overlay).display!=="none"&&/SHINOBI RECORD/i.test(overlay.innerText||"");
@@ -229,7 +229,7 @@ function assertHudLayout(layout,label){
     await closeAndVillage(page);
 
     await openTools(page);
-    await page.click('[data-hud499-action="journey"]');
+    await page.click('.sc-hud499-tools [data-hud499-action="journey"]');
     await page.waitForSelector(".alpha328-journey",{state:"visible",timeout:10000});
     assert.strictEqual(await page.evaluate(()=>getPhase2LiveHudSnapshot49900().visible),false,"HUD did not suppress on Journey detail");
     await closeAndVillage(page);
