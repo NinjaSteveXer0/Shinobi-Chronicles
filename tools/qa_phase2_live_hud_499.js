@@ -30,6 +30,7 @@ assert(RUNTIME.includes("getChronicleCurrentTeam43600"),"HUD does not read canon
 assert(RUNTIME.includes("getChronicleCurrentRyo43600"),"HUD does not read canonical Ryō");
 assert(RUNTIME.includes("getAlphaTailedBeastJourneyState")&&RUNTIME.includes("getAlphaSurfaceTruthJourneyAction"),"HUD Journey projection bypasses observer-safe Journey authority");
 assert(RUNTIME.includes("getAlphaSurfaceTruthSubjectId"),"HUD active identity authority missing");
+assert(RUNTIME.includes('call("returnToWorldMap")'),"HUD World navigation does not delegate to canonical World-map return owner");
 assert(RUNTIME.includes("resolveUIPortraitProjection")&&RUNTIME.includes("getUIPortraitAssetPath"),"HUD uiPortrait authority missing");
 
 const calls=[];
