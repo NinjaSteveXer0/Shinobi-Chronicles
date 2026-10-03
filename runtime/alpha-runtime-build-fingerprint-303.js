@@ -16,7 +16,7 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-03-DI",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-03-DJ",
     sourceBaselineCommit:"7e96e3e927d8e2190db9c001e83dfd69db728ce5",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
     runtimeGeneration:"phase2-live-hud-499",
@@ -78,7 +78,8 @@
       "story-scene-board-ui486-golden-plus-authority",
       "chronicle-run-instance-identity-494",
       "phase2-live-hud-499",
-      "phase2-live-hud-owned-identity-variant-projection-499"
+      "phase2-live-hud-owned-identity-variant-projection-499",
+      "phase2-live-hud-canonical-affiliation-projection-499"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -111,7 +112,7 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-03-DI",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-03-DJ",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
       generationPresent:first.runtimeGeneration==="phase2-live-hud-499",
@@ -123,6 +124,7 @@
       chronicleRunInstance494Present:first.majorRuntimeFeatures.includes("chronicle-run-instance-identity-494"),
       phase2LiveHud499Present:first.majorRuntimeFeatures.includes("phase2-live-hud-499"),
       phase2LiveHudOwnedIdentityVariantProjection499Present:first.majorRuntimeFeatures.includes("phase2-live-hud-owned-identity-variant-projection-499"),
+      phase2LiveHudCanonicalAffiliation499Present:first.majorRuntimeFeatures.includes("phase2-live-hud-canonical-affiliation-projection-499"),
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)
