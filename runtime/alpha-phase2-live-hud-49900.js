@@ -11,6 +11,7 @@ if(globalThis.SC_PHASE2_LIVE_HUD_49900)return;
 const PATCH_ID="phase2_live_hud_49900_2026_10_03";
 const ROOT_ID="sc-phase2-live-hud-49900";
 const STYLE_ID="sc-phase2-live-hud-49900-style";
+const BRAND_PATH="Logo/sc_title.png";
 const MAP_OVERLAYS=new Set(["village","region","region_map","world","world_map"]);
 const state={lastSignature:null,timer:null};
 
@@ -259,11 +260,33 @@ function teamMarkup(rows){
       '<span class="sc-hud499-team-name">'+esc(row.name)+'</span></span>'
     ).join("")+'</span></button>';
 }
-function navMarkup(rows){
+function brandMarkup(surfaceKind){
+  if(surfaceKind!=="world")return"";
+  return '<div class="sc-hud499-brand" aria-label="Shinobi Chronicles">'+
+    '<img src="'+esc(BRAND_PATH)+'" alt="Shinobi Chronicles" draggable="false">'+
+  '</div>';
+}
+function toolsMarkup(){
+  return '<details class="sc-hud499-tools">'+
+    '<summary aria-label="Open player tools"><span>PLAYER TOOLS</span><b aria-hidden="true">＋</b></summary>'+
+    '<nav aria-label="Player tools">'+
+      '<button type="button" data-hud499-action="clan">MY CLAN</button>'+
+      '<button type="button" data-hud499-action="inventory">INVENTORY</button>'+
+      '<button type="button" data-hud499-action="record">SHINOBI RECORD</button>'+
+      '<button type="button" data-hud499-action="journey">JOURNEY</button>'+
+    '</nav>'+
+  '</details>';
+}
+function navMarkup(rows,surfaceKind){
   if(!rows.length)return"";
-  return '<nav class="sc-hud499-map-nav" aria-label="Map navigation">'+rows.map(row=>
-    '<button type="button" data-hud499-action="'+esc(row.id)+'">'+esc(row.label)+'</button>'
-  ).join("")+'</nav>';
+  const depth=surfaceKind==="world"?"WORLD":surfaceKind==="region"?"REGION":"VILLAGE";
+  return '<nav class="sc-hud499-map-nav" aria-label="Chronicle Compass map navigation">'+
+    '<span class="sc-hud499-kicker">CHRONICLE COMPASS</span>'+
+    '<strong class="sc-hud499-compass-depth">'+esc(depth)+'</strong>'+
+    '<span class="sc-hud499-compass-actions">'+rows.map(row=>
+      '<button type="button" data-hud499-action="'+esc(row.id)+'">'+esc(row.label)+'</button>'
+    ).join("")+'</span>'+
+  '</nav>';
 }
 function ensureRoot(){
   if(typeof document==="undefined")return null;
@@ -296,25 +319,23 @@ function render(force=false){
   const identity=data.identity;
   const journey=data.journey;
   root.innerHTML=
-    '<div class="sc-hud499-top">'+
-      '<div class="sc-hud499-identity" data-subject-id="'+esc(identity.id)+'">'+
-        imageMarkup(identity.portrait,identity.name,"sc-hud499-identity-portrait")+
-        '<span class="sc-hud499-identity-copy"><strong>'+esc(identity.name)+'</strong>'+
-          '<span><b>'+esc(identity.rank)+'</b>'+(identity.affiliation?' · '+esc(identity.affiliation):'')+'</span></span>'+
+    brandMarkup(data.surface.kind)+
+    '<section class="sc-hud499-state-cluster" aria-label="Current shinobi state">'+
+      '<div class="sc-hud499-state-main">'+
+        '<div class="sc-hud499-identity" data-subject-id="'+esc(identity.id)+'">'+
+          imageMarkup(identity.portrait,identity.name,"sc-hud499-identity-portrait")+
+          '<span class="sc-hud499-identity-copy"><strong>'+esc(identity.name)+'</strong>'+
+            '<span><b>'+esc(identity.rank)+'</b>'+(identity.affiliation?' · '+esc(identity.affiliation):'')+'</span></span>'+
+        '</div>'+
+        '<div class="sc-hud499-ryo" aria-label="Current Ryō"><span>RYŌ</span><strong data-hud499-ryo>'+esc(data.ryo)+'</strong></div>'+
       '</div>'+
       (journey?'<button type="button" class="sc-hud499-journey" data-hud499-action="journey" title="'+esc(journey.detail||journey.label)+'">'+
         '<span>CURRENT JOURNEY</span><strong>'+esc(journey.label)+'</strong>'+
         (journey.detail?'<small>'+esc(journey.detail)+'</small>':'')+'</button>':'')+
-      '<div class="sc-hud499-ryo" aria-label="Current Ryō"><span>RYŌ</span><strong data-hud499-ryo>'+esc(data.ryo)+'</strong></div>'+
-    '</div>'+
+    '</section>'+
     teamMarkup(data.team)+
-    '<nav class="sc-hud499-actions" aria-label="Chronicle quick actions">'+
-      '<button type="button" data-hud499-action="clan">MY CLAN</button>'+
-      '<button type="button" data-hud499-action="inventory">INVENTORY</button>'+
-      '<button type="button" data-hud499-action="record">SHINOBI RECORD</button>'+
-      '<button type="button" data-hud499-action="journey">JOURNEY</button>'+
-    '</nav>'+
-    navMarkup(data.navigation);
+    toolsMarkup()+
+    navMarkup(data.navigation,data.surface.kind);
   return data;
 }
 function scheduleRefresh(){
@@ -342,65 +363,60 @@ function installStyles(){
   if(typeof document==="undefined"||document.getElementById(STYLE_ID))return;
   const style=document.createElement("style");
   style.id=STYLE_ID;
-  style.textContent=`
+  style.textContent=\`
     .game-container.sc-hud499-installed>.game-header{display:none!important}
     .game-container.sc-hud499-installed .world-map-viewport>.map-sidebar-left{display:none!important}
     .game-container.sc-hud499-installed .world-map-viewport{position:relative;min-height:0;grid-template-columns:minmax(0,1fr)}
     .game-container.sc-hud499-installed .world-map-display{grid-column:1;width:100%;max-width:none;padding:8px 14px 12px}
-    .sc-hud499-root{position:absolute;inset:0;z-index:1400;pointer-events:none;font-family:Inter,Arial,sans-serif;color:#edf5f7}
+    .sc-hud499-root{--sc-hud499-edge:14px;--sc-hud499-safe-bottom:clamp(72px,8vh,96px);position:absolute;inset:0;z-index:1400;pointer-events:none;font-family:Inter,Arial,sans-serif;color:#edf5f7}
     .sc-hud499-root[hidden]{display:none!important}
-    .sc-hud499-root button{font:inherit;color:inherit}
-    .sc-hud499-top{position:absolute;left:14px;right:14px;top:10px;height:78px;display:grid;grid-template-columns:minmax(220px,330px) minmax(220px,560px) minmax(95px,150px);justify-content:space-between;align-items:start;gap:18px;pointer-events:none}
-    .sc-hud499-identity,.sc-hud499-journey,.sc-hud499-ryo,.sc-hud499-team,.sc-hud499-actions,.sc-hud499-map-nav{background:linear-gradient(180deg,rgba(7,13,22,.94),rgba(7,13,22,.78));border:1px solid rgba(195,159,70,.48);box-shadow:0 8px 22px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.035);backdrop-filter:blur(5px)}
-    .sc-hud499-identity{pointer-events:auto;display:flex;align-items:center;gap:10px;min-width:0;padding:7px 10px;border-radius:4px}
-    .sc-hud499-identity-portrait,.sc-hud499-silhouette.sc-hud499-identity-portrait{width:54px;height:54px;flex:0 0 54px;object-fit:cover;object-position:top center;border:1px solid rgba(74,216,229,.5);background:#111923}
+    .sc-hud499-root button,.sc-hud499-root summary{font:inherit;color:inherit}
+    .sc-hud499-brand{position:absolute;left:18px;top:14px;width:clamp(210px,18vw,300px);pointer-events:none;filter:drop-shadow(0 8px 20px rgba(0,0,0,.45))}
+    .sc-hud499-brand img{display:block;width:100%;height:auto;max-height:88px;object-fit:contain;object-position:left top}
+    .sc-hud499-state-cluster{position:absolute;right:var(--sc-hud499-edge);top:12px;width:clamp(330px,31vw,470px);pointer-events:auto;overflow:hidden;border:1px solid rgba(195,159,70,.42);border-radius:8px;background:linear-gradient(150deg,rgba(7,14,23,.95),rgba(6,12,20,.82));box-shadow:0 12px 30px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.04);backdrop-filter:blur(6px)}
+    .sc-hud499-state-main{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;padding:8px 10px}
+    .sc-hud499-identity{display:flex;align-items:center;gap:9px;min-width:0}
+    .sc-hud499-identity-portrait,.sc-hud499-silhouette.sc-hud499-identity-portrait{width:46px;height:46px;flex:0 0 46px;object-fit:cover;object-position:top center;border:1px solid rgba(75,215,228,.45);border-radius:5px;background:#111923}
     .sc-hud499-silhouette{display:grid;place-items:center;color:#d4b667;font-weight:900}
     .sc-hud499-identity-copy{display:flex;flex-direction:column;min-width:0;gap:4px}
-    .sc-hud499-identity-copy strong{font:800 15px/1.1 Georgia,"Times New Roman",serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .sc-hud499-identity-copy span{font:700 9px/1.25 Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#aebbc6}
-    .sc-hud499-identity-copy b{color:#e2c46e}
-    .sc-hud499-journey{pointer-events:auto;justify-self:center;width:min(100%,560px);min-height:56px;padding:7px 14px;border-radius:4px;text-align:left;cursor:pointer;overflow:hidden}
-    .sc-hud499-journey>span,.sc-hud499-kicker,.sc-hud499-ryo>span{display:block;color:#6ed9e4;font-size:8px;font-weight:900;letter-spacing:.13em;text-transform:uppercase}
-    .sc-hud499-journey strong{display:block;margin-top:2px;font-size:12px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .sc-hud499-journey small{display:-webkit-box;margin-top:2px;color:#b8c5ce;font-size:9px;line-height:1.2;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-    .sc-hud499-ryo{pointer-events:auto;justify-self:end;min-width:96px;padding:9px 12px;border-radius:4px;text-align:right}
-    .sc-hud499-ryo strong{display:block;margin-top:2px;color:#efcf72;font:900 18px/1 Georgia,"Times New Roman",serif}
-    .sc-hud499-team{position:absolute;left:14px;top:102px;width:78px;max-height:330px;padding:9px 7px 10px;border-radius:8px;pointer-events:auto;cursor:pointer;text-align:center;overflow:visible;background:linear-gradient(180deg,rgba(7,14,23,.94),rgba(5,10,17,.76));border-color:rgba(195,159,70,.36);box-shadow:0 12px 28px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.04)}
-    .sc-hud499-team::before{content:"";position:absolute;left:8px;top:38px;bottom:13px;width:1px;background:linear-gradient(180deg,rgba(88,221,233,.78),rgba(195,159,70,.58),rgba(195,159,70,.08));box-shadow:0 0 8px rgba(88,221,233,.12)}
-    .sc-hud499-team::after{content:"";position:absolute;left:5.5px;top:36px;width:5px;height:5px;transform:rotate(45deg);border:1px solid rgba(93,218,230,.68);background:#08121a;box-shadow:0 0 7px rgba(93,218,230,.18)}
-    .sc-hud499-team .sc-hud499-kicker{padding:0 0 7px;margin:0 1px 1px;border-bottom:1px solid rgba(195,159,70,.2);font-size:7px;letter-spacing:.16em;white-space:nowrap}
-    .sc-hud499-team-stack{display:flex;flex-direction:column;align-items:flex-end;gap:8px;margin-top:8px}
-    .sc-hud499-team-member{position:relative;display:grid;place-items:center;width:58px;height:58px;padding:3px;border:1px solid rgba(195,159,70,.24);border-radius:7px;background:linear-gradient(145deg,rgba(19,31,42,.94),rgba(8,15,23,.94));box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 5px 12px rgba(0,0,0,.2);transition:border-color 120ms ease,transform 120ms ease,box-shadow 120ms ease}
-    .sc-hud499-team-member:hover{transform:translateX(2px);border-color:rgba(87,218,230,.58);box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 6px 15px rgba(0,0,0,.26),0 0 0 1px rgba(87,218,230,.08)}
-    .sc-hud499-team-portrait,.sc-hud499-silhouette.sc-hud499-team-portrait{display:block;width:50px;height:50px;margin:auto;object-fit:cover;object-position:top center;border:1px solid rgba(98,211,224,.28);border-radius:5px;background:#111923;box-shadow:inset 0 0 0 1px rgba(255,255,255,.025)}
-    .sc-hud499-team-name{position:absolute;left:66px;top:50%;z-index:8;display:block;max-height:none;margin:0;padding:5px 8px;overflow:visible;opacity:0;transform:translate(-4px,-50%);border:1px solid rgba(195,159,70,.34);border-radius:4px;background:rgba(6,12,19,.96);box-shadow:0 7px 18px rgba(0,0,0,.34);color:#dfe9ec;font-size:8px;font-weight:800;line-height:1.1;letter-spacing:.04em;white-space:nowrap;pointer-events:none;transition:opacity 120ms ease,transform 120ms ease}
+    .sc-hud499-identity-copy strong{font:800 15px/1.08 Georgia,"Times New Roman",serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .sc-hud499-identity-copy span{font:700 8px/1.25 Arial,sans-serif;letter-spacing:.09em;text-transform:uppercase;color:#aebbc6}
+    .sc-hud499-identity-copy b{color:#e4c76f}
+    .sc-hud499-ryo{min-width:74px;padding-left:10px;border-left:1px solid rgba(195,159,70,.22);text-align:right}
+    .sc-hud499-ryo>span,.sc-hud499-kicker,.sc-hud499-journey>span{display:block;color:#69dce7;font-size:7px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}
+    .sc-hud499-ryo strong{display:block;margin-top:3px;color:#efcf72;font:900 17px/1 Georgia,"Times New Roman",serif}
+    .sc-hud499-journey{width:100%;min-height:39px;padding:7px 10px 8px;border:0;border-top:1px solid rgba(195,159,70,.2);background:linear-gradient(90deg,rgba(9,20,28,.76),rgba(8,14,22,.34));text-align:left;cursor:pointer}
+    .sc-hud499-journey strong{display:block;margin-top:2px;font-size:11px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .sc-hud499-journey small{display:block;margin-top:2px;color:#aebbc5;font-size:8px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .sc-hud499-team{position:absolute;left:14px;top:122px;width:72px;max-height:330px;padding:8px 6px 10px;border:0;border-left:1px solid rgba(88,221,233,.42);border-radius:0 8px 8px 0;pointer-events:auto;cursor:pointer;text-align:center;overflow:visible;background:linear-gradient(90deg,rgba(5,11,18,.91),rgba(6,13,20,.68),rgba(6,13,20,.12));box-shadow:8px 12px 24px rgba(0,0,0,.18)}
+    .sc-hud499-team::before{content:"";position:absolute;left:-2px;top:34px;bottom:12px;width:3px;background:linear-gradient(180deg,rgba(83,221,232,.82),rgba(198,162,72,.55),rgba(198,162,72,.08));box-shadow:0 0 9px rgba(83,221,232,.13)}
+    .sc-hud499-team .sc-hud499-kicker{padding-bottom:6px;font-size:6px;white-space:nowrap}
+    .sc-hud499-team-stack{display:flex;flex-direction:column;align-items:center;gap:7px;margin-top:5px}
+    .sc-hud499-team-member{position:relative;display:grid;place-items:center;width:56px;height:56px;padding:3px;border:1px solid rgba(195,159,70,.25);border-radius:50%;background:radial-gradient(circle at 50% 32%,rgba(28,43,56,.95),rgba(8,15,23,.96));box-shadow:0 5px 12px rgba(0,0,0,.25);transition:transform 120ms ease,border-color 120ms ease}
+    .sc-hud499-team-member:hover{transform:translateX(2px);border-color:rgba(82,220,232,.62)}
+    .sc-hud499-team-portrait,.sc-hud499-silhouette.sc-hud499-team-portrait{display:block;width:48px;height:48px;margin:auto;object-fit:cover;object-position:top center;border:1px solid rgba(96,211,224,.3);border-radius:50%;background:#111923}
+    .sc-hud499-team-name{position:absolute;left:63px;top:50%;z-index:8;display:block;margin:0;padding:5px 8px;opacity:0;transform:translate(-4px,-50%);border:1px solid rgba(195,159,70,.34);border-radius:4px;background:rgba(6,12,19,.96);box-shadow:0 7px 18px rgba(0,0,0,.34);color:#dfe9ec;font-size:8px;font-weight:800;line-height:1.1;letter-spacing:.04em;white-space:nowrap;pointer-events:none;transition:opacity 120ms ease,transform 120ms ease}
     .sc-hud499-team-member:hover .sc-hud499-team-name,.sc-hud499-team:focus-visible .sc-hud499-team-name{opacity:1;transform:translate(0,-50%)}
-    .sc-hud499-actions{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);height:46px;display:flex;align-items:center;gap:5px;padding:5px;border-radius:4px;pointer-events:auto}
-    .sc-hud499-actions button,.sc-hud499-map-nav button{min-height:34px;padding:0 12px;border:1px solid rgba(150,133,82,.45);background:rgba(8,14,22,.82);cursor:pointer;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
-    .sc-hud499-actions button:hover,.sc-hud499-actions button:focus-visible,.sc-hud499-map-nav button:hover,.sc-hud499-map-nav button:focus-visible,.sc-hud499-journey:hover,.sc-hud499-journey:focus-visible,.sc-hud499-team:hover,.sc-hud499-team:focus-visible{outline:2px solid rgba(85,218,231,.75);outline-offset:1px;border-color:rgba(85,218,231,.7)}
-    .sc-hud499-map-nav{position:absolute;right:12px;bottom:10px;display:flex;gap:5px;padding:5px;border-radius:4px;pointer-events:auto}
-    @media(max-width:1050px){
-      .sc-hud499-top{grid-template-columns:minmax(180px,270px) minmax(160px,1fr) 90px;gap:8px}
-      .sc-hud499-identity-portrait,.sc-hud499-silhouette.sc-hud499-identity-portrait{width:46px;height:46px;flex-basis:46px}
-      .sc-hud499-actions button{padding:0 8px;font-size:8px}
-      .sc-hud499-team{width:70px;padding-left:6px;padding-right:6px}
-      .sc-hud499-team-member{width:52px;height:52px}
-      .sc-hud499-team-portrait,.sc-hud499-silhouette.sc-hud499-team-portrait{width:44px;height:44px}
-    }
-    @media(max-width:760px){
-      .sc-hud499-top{left:8px;right:8px;top:6px;height:auto;grid-template-columns:minmax(170px,1fr) 84px}
-      .sc-hud499-journey{position:absolute;left:0;top:66px;width:min(72vw,420px);min-height:42px}
-      .sc-hud499-team{top:122px;left:7px;width:62px}
-      .sc-hud499-actions{left:8px;right:8px;bottom:7px;transform:none;justify-content:center;height:44px}
-      .sc-hud499-actions button{flex:1;padding:0 4px;font-size:7px}
-      .sc-hud499-map-nav{right:7px;bottom:58px}
-    }
+    .sc-hud499-tools{position:absolute;right:var(--sc-hud499-edge);top:128px;width:148px;pointer-events:auto;border:1px solid rgba(195,159,70,.28);border-radius:7px;background:linear-gradient(145deg,rgba(7,14,22,.93),rgba(6,11,18,.78));box-shadow:0 10px 24px rgba(0,0,0,.26);overflow:hidden}
+    .sc-hud499-tools summary{min-height:34px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 10px;cursor:pointer;list-style:none;color:#d7c27f;font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+    .sc-hud499-tools summary::-webkit-details-marker{display:none}
+    .sc-hud499-tools summary b{color:#69dce7;font-size:15px;line-height:1;font-weight:500;transition:transform 120ms ease}
+    .sc-hud499-tools[open] summary b{transform:rotate(45deg)}
+    .sc-hud499-tools nav{display:grid;gap:4px;padding:5px;border-top:1px solid rgba(195,159,70,.18)}
+    .sc-hud499-tools button{min-height:31px;padding:0 8px;border:1px solid rgba(129,129,101,.28);background:rgba(8,16,24,.78);cursor:pointer;text-align:left;font-size:8px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}
+    .sc-hud499-map-nav{position:absolute;right:var(--sc-hud499-edge);bottom:var(--sc-hud499-safe-bottom);min-width:176px;max-width:248px;padding:8px;pointer-events:auto;border:1px solid rgba(195,159,70,.38);border-radius:9px;background:linear-gradient(145deg,rgba(7,14,22,.94),rgba(6,11,18,.8));box-shadow:0 12px 28px rgba(0,0,0,.3);backdrop-filter:blur(5px)}
+    .sc-hud499-compass-depth{display:block;margin-top:3px;color:#e7d8a6;font:800 12px/1 Georgia,"Times New Roman",serif;letter-spacing:.06em}
+    .sc-hud499-compass-actions{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+    .sc-hud499-map-nav button{min-height:30px;padding:0 9px;border:1px solid rgba(150,133,82,.42);background:rgba(8,14,22,.82);cursor:pointer;font-size:8px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}
+    .sc-hud499-journey:hover,.sc-hud499-journey:focus-visible,.sc-hud499-team:hover,.sc-hud499-team:focus-visible,.sc-hud499-tools summary:hover,.sc-hud499-tools summary:focus-visible,.sc-hud499-tools button:hover,.sc-hud499-tools button:focus-visible,.sc-hud499-map-nav button:hover,.sc-hud499-map-nav button:focus-visible{outline:2px solid rgba(85,218,231,.72);outline-offset:1px;border-color:rgba(85,218,231,.66)}
+    @media(max-width:1450px){.sc-hud499-brand{width:clamp(190px,17vw,244px)}.sc-hud499-state-cluster{width:clamp(315px,32vw,420px)}.sc-hud499-tools{top:124px;width:138px}.sc-hud499-team{top:116px}}
+    @media(max-width:900px){.sc-hud499-root{--sc-hud499-edge:8px;--sc-hud499-safe-bottom:72px}.sc-hud499-brand{left:10px;top:10px;width:170px}.sc-hud499-state-cluster{right:8px;top:8px;width:300px}.sc-hud499-state-main{padding:7px 8px}.sc-hud499-identity-portrait,.sc-hud499-silhouette.sc-hud499-identity-portrait{width:40px;height:40px;flex-basis:40px}.sc-hud499-team{left:8px;top:108px;width:64px}.sc-hud499-team-member{width:50px;height:50px}.sc-hud499-team-portrait,.sc-hud499-silhouette.sc-hud499-team-portrait{width:42px;height:42px}.sc-hud499-tools{right:8px;top:116px;width:128px}.sc-hud499-map-nav{right:8px;bottom:72px;min-width:160px}}
     @media(prefers-reduced-motion:reduce){.sc-hud499-root *{transition:none!important}}
-  `;
+  \`;
   document.head.appendChild(style);
 }
 function diagnostics(){
-  const source=[snapshot,render,routeAction,teamProjection,journeyProjection].map(String).join("\n");
+  const source=[snapshot,render,routeAction,teamProjection,journeyProjection,brandMarkup,toolsMarkup,navMarkup].map(String).join("\n");
   const data=snapshot();
   const checks={
     readOnlyProjection:!/savePlayerData\s*\(/.test(source)&&!/localStorage\.setItem\s*\(/.test(source)&&!/confirmAcademyTeamFormation\s*\(/.test(source),
@@ -410,6 +426,10 @@ function diagnostics(){
     canonicalIdentity:String(activeSubjectId).includes("getAlphaSurfaceTruthSubjectId")&&String(presentationVariantId).includes("getChronicleIdentity43600"),
     identityRepresentationSeparated:String(presentationVariantId).includes("ownedCharacterId")&&String(presentationVariantId).includes("variantId"),
     canonicalPortrait:String(portraitFor).includes("resolveUIPortraitProjection")&&String(portraitFor).includes("getUIPortraitAssetPath"),
+    exactWorldBrand:BRAND_PATH==="Logo/sc_title.png"&&String(brandMarkup).includes('surfaceKind!=="world"'),
+    chronicleCompass:String(navMarkup).includes("CHRONICLE COMPASS"),
+    collapsiblePlayerTools:String(toolsMarkup).includes("<details")&&String(toolsMarkup).includes("PLAYER TOOLS"),
+    safeBottomReserve:String(installStyles).includes("--sc-hud499-safe-bottom"),
     noEnergyProjection:data.energy===null&&!String(render).includes("ENERGY"),
     canonicalRoutes:String(routeAction).includes('call("openOverlay","clan")')&&String(routeAction).includes('call("openOverlay","inventory")')&&String(routeAction).includes('call("openShinobiRecord","overview")')&&String(routeAction).includes('call("openOverlay","missions")'),
     deepSurfaceSuppression:String(surfaceProjection).includes('kind:"deep"')&&String(surfaceProjection).includes("storyActive")&&String(surfaceProjection).includes("battleActive"),
