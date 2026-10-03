@@ -207,6 +207,26 @@ async function closeAndVillage(page){
       await page.click('[data-hud499-action="world"]');
       await page.waitForFunction(()=>getPhase2LiveHudSnapshot49900().surface.kind==="world",null,{timeout:10000});
     }
+    const worldDominance=await page.evaluate(()=>{
+      const canvas=document.querySelector(".world-map-canvas");
+      const display=document.querySelector(".world-map-display");
+      const viewport=document.querySelector(".world-map-viewport");
+      const cr=canvas&&canvas.getBoundingClientRect();
+      const dr=display&&display.getBoundingClientRect();
+      const vr=viewport&&viewport.getBoundingClientRect();
+      return{
+        viewport:[innerWidth,innerHeight],
+        canvas:cr?{left:cr.left,top:cr.top,width:cr.width,height:cr.height,right:cr.right,bottom:cr.bottom}:null,
+        display:dr?{left:dr.left,top:dr.top,width:dr.width,height:dr.height,right:dr.right,bottom:dr.bottom}:null,
+        mapViewport:vr?{left:vr.left,top:vr.top,width:vr.width,height:vr.height,right:vr.right,bottom:vr.bottom}:null
+      };
+    });
+    assert(worldDominance.canvas&&worldDominance.display&&worldDominance.mapViewport,"World Map geometry missing");
+    assert(worldDominance.canvas.width>=worldDominance.viewport[0]*0.65,"World Map no longer visually dominates viewport: "+JSON.stringify(worldDominance));
+    assert(worldDominance.canvas.height>=worldDominance.viewport[1]*0.50,"World Map height collapsed under HUD: "+JSON.stringify(worldDominance));
+    assert(worldDominance.display.width>=worldDominance.viewport[0]*0.90,"World Map display remains trapped in retired sidebar track: "+JSON.stringify(worldDominance));
+    await page.screenshot({path:path.join(OUT,"01b-world-map-live-hud.png"),fullPage:true});
+
     const worldNav=await page.evaluate(()=>getPhase2LiveHudSnapshot49900().navigation.map(row=>row.id));
     assert(worldNav.includes("village"),"World HUD lacks legal Village return");
     await page.click('[data-hud499-action="village"]');
@@ -298,6 +318,7 @@ async function closeAndVillage(page){
       observerSafeJourney:true,
       quickActions:true,
       contextualMapNavigation:true,
+      worldMapDominant:true,
       mapClickable:true,
       deepStoryBattleSuppression:true,
       refreshReadOnly:true,
