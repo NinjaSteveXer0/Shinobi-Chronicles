@@ -9,6 +9,10 @@ const INDEX=fs.readFileSync(path.join(ROOT,"index.html"),"utf8");
 assert(RUNTIME.includes('const PATCH_ID="phase2_live_hud_49900_2026_10_03"'),"HUD patch identity missing");
 assert(INDEX.includes('runtime/alpha-phase2-live-hud-49900.js'),"HUD runtime loader missing");
 assert(INDEX.indexOf('runtime/alpha-phase2-live-hud-49900.js')>INDEX.indexOf('runtime/alpha-phase2-inventory-core-46100.js'),"HUD must load after existing player-surface owners");
+assert(RUNTIME.includes('const BRAND_PATH="Logo/sc_title.png"'),"approved World Map brand path missing");
+assert(fs.existsSync(path.join(ROOT,"Logo","sc_title.png"))&&fs.statSync(path.join(ROOT,"Logo","sc_title.png")).size>0,"approved World Map brand asset missing");
+assert(RUNTIME.includes("CHRONICLE COMPASS"),"Chronicle Compass presentation missing");
+assert(RUNTIME.includes("--sc-hud499-safe-bottom"),"desktop-safe bottom reserve missing");
 
 for(const pattern of [
   /\bsavePlayerData\s*\(/,
