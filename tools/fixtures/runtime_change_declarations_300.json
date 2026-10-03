@@ -1251,7 +1251,8 @@
         "presentation-only Current Team left-rail visual refinement; canonical team order and interaction unchanged",
         "World Map-only exact masterbrand projection from Logo/sc_title.png",
         "Concept C Chronicle Compass presentation: unified upper-right player state, collapsible right tools and safely raised legal map navigation",
-        "viewport-safe persistent control reserve proven at 1366x768 and 1920x1080"
+        "viewport-safe persistent control reserve proven at 1366x768 and 1920x1080",
+        "canonical World-map return delegation through existing returnToWorldMap owner; visible-overlay truth wins over stale overlay type for HUD projection"
       ],
       "productionLoader": "index.html",
       "qaRefs": [
