@@ -16,7 +16,7 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-03-DJ",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-03-DK",
     sourceBaselineCommit:"7e96e3e927d8e2190db9c001e83dfd69db728ce5",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
     runtimeGeneration:"phase2-live-hud-499",
@@ -79,7 +79,8 @@
       "chronicle-run-instance-identity-494",
       "phase2-live-hud-499",
       "phase2-live-hud-owned-identity-variant-projection-499",
-      "phase2-live-hud-canonical-affiliation-projection-499"
+      "phase2-live-hud-canonical-affiliation-projection-499",
+      "phase2-live-hud-canonical-empty-affiliation-preservation-499"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -112,7 +113,7 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-03-DJ",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-03-DK",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
       generationPresent:first.runtimeGeneration==="phase2-live-hud-499",
@@ -125,6 +126,7 @@
       phase2LiveHud499Present:first.majorRuntimeFeatures.includes("phase2-live-hud-499"),
       phase2LiveHudOwnedIdentityVariantProjection499Present:first.majorRuntimeFeatures.includes("phase2-live-hud-owned-identity-variant-projection-499"),
       phase2LiveHudCanonicalAffiliation499Present:first.majorRuntimeFeatures.includes("phase2-live-hud-canonical-affiliation-projection-499"),
+      phase2LiveHudCanonicalEmptyAffiliation499Present:first.majorRuntimeFeatures.includes("phase2-live-hud-canonical-empty-affiliation-preservation-499"),
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)
