@@ -83,30 +83,42 @@ Do not collapse:
 
 ---
 
-## 4. Five-star Shinobi Chronicles ladder
+## 4. Five-level doctrine and five-star projection
 
-The recovered Shinobi Chronicles player-facing proficiency ladder is:
+Stephen clarified the recovered doctrine directly on 2026-10-03:
 
-- ★
-- ★★
-- ★★★
-- ★★★★
-- ★★★★★
+> **Untrained -> Standard -> Proficient -> Expert -> Master is exactly the correct five-level Weapon Proficiency doctrine.**
 
-**★★★★★ is the normal global maximum Weapon Proficiency.**
+The stars are the player-facing projection of those same five semantic levels, not a replacement system.
+
+Canonical mapping:
+
+- ★ = **Untrained**
+- ★★ = **Standard**
+- ★★★ = **Proficient**
+- ★★★★ = **Expert**
+- ★★★★★ = **Master**
+
+Therefore:
+
+> **named proficiency level == corresponding star projection.**
+
+**★★★★★ / Master is the normal global maximum Weapon Proficiency.**
 
 This is a Shinobi Chronicles game rule, not a universal Chronicle Engine ladder.
 
-The star ladder is a readable projection of the persistent Character ↔ weapon relationship.
+The five named states and the five-star presentation describe the same persistent Character ↔ weapon relationship.
 
-It must not be silently replaced by:
+Do not create two competing proficiency systems.
+
+The ladder must not be silently replaced by:
 
 - raw Bukijutsu;
 - generic Character level;
 - weapon rarity;
 - weapon price;
 - an item's own universal "level";
-- an old prototype proficiency tier derived directly from Buki.
+- a second independent mastery ladder.
 
 ---
 
@@ -194,27 +206,29 @@ Therefore:
 
 ---
 
-## 8. Historical prototype warning
+## 8. Recovered named tiers are current doctrine; old automatic derivation is not
 
-Older project implementation archaeology contains prototype proficiency code using named tiers such as:
+Project archaeology contains the same correct five named Weapon Proficiency levels:
 
 - Untrained;
 - Standard;
 - Proficient;
 - Expert;
-- Master;
+- Master.
 
-derived from Bukijutsu / weapon-class difficulty.
+Those names are **not obsolete**. They are the semantic levels currently projected to the player as ★ through ★★★★★.
 
-That prototype is **historical evidence, not current authority for the restored SC five-star relationship doctrine**.
+What remains historical/prototype-specific is any old implementation assumption that the persistent Character ↔ weapon proficiency state should be automatically derived from raw Bukijutsu / weapon-class difficulty rather than developed and persisted as its own relationship state.
 
-Do not reintroduce the old model merely because source archaeology contains it.
+Therefore:
 
-In particular:
+> **Untrained -> Standard -> Proficient -> Expert -> Master == ★ -> ★★ -> ★★★ -> ★★★★ -> ★★★★★.**
 
-> **Current Weapon Proficiency is not automatically derived from raw Bukijutsu.**
+and separately:
 
-Bukijutsu may affect capability with weapons, but the persistent exact-weapon proficiency relationship must remain distinct.
+> **Current persistent Weapon Proficiency is not automatically identical to raw Bukijutsu.**
+
+Bukijutsu may legitimately influence weapon capability and exact progression rules where the owning systems authorise it, but general Bukijutsu and exact-weapon proficiency remain distinct state.
 
 ---
 
@@ -300,4 +314,4 @@ Those require exact owning-domain authority if/when Alpha needs them.
 
 ## 12. Final restored rule
 
-> **Weapon Proficiency is a persistent Character ↔ exact-weapon relationship, not Bukijutsu and not an item level. Shinobi Chronicles projects normal proficiency as ★ through ★★★★★, with ★★★★★ as the normal global cap. Pure mentorship can instruct only to ★; sparring can support one further star; meaningful exact-weapon practice is the primary route for deeper proficiency and may contribute smaller general Bukijutsu development where authorised. Rarity, ownership and proficiency do not collapse into one another. Any ★★★★★★ state is an explicit route-specific exception, never the default ladder.**
+> **Weapon Proficiency is a persistent Character ↔ exact-weapon relationship, not Bukijutsu and not an item level. The five semantic levels are Untrained -> Standard -> Proficient -> Expert -> Master and Shinobi Chronicles projects those same levels as ★ -> ★★ -> ★★★ -> ★★★★ -> ★★★★★. ★★★★★ / Master is the normal global cap. Pure mentorship can instruct only to ★; sparring can support one further star; meaningful exact-weapon practice is the primary route for deeper proficiency and may contribute smaller general Bukijutsu development where authorised. Rarity, ownership and proficiency do not collapse into one another. Any ★★★★★★ state is an explicit route-specific exception, never the default ladder.**
