@@ -158,10 +158,10 @@ function journeyProjection(){
   };
 }
 function currentOverlay(){
-  try{
-    if(typeof currentOverlayType!=="undefined"&&currentOverlayType)return String(currentOverlayType);
-  }catch(_error){}
-  if(typeof document==="undefined")return null;
+  if(typeof document==="undefined"){
+    try{return typeof currentOverlayType!=="undefined"&&currentOverlayType?String(currentOverlayType):null;}
+    catch(_error){return null;}
+  }
   const overlay=document.getElementById("screen-overlay");
   if(!overlay)return null;
   try{
@@ -169,6 +169,9 @@ function currentOverlay(){
   }catch(_error){
     if(overlay.style&&overlay.style.display==="none")return null;
   }
+  try{
+    if(typeof currentOverlayType!=="undefined"&&currentOverlayType)return String(currentOverlayType);
+  }catch(_error){}
   return "unknown_overlay";
 }
 function storyActive(){
@@ -223,10 +226,10 @@ function navigationProjection(surface){
     rows.push({id:"village",label:"VILLAGE"});
   }else if(surface.kind==="village"){
     if(typeof globalThis["openRegionHub"]==="function")rows.push({id:"region",label:"REGION"});
-    if(typeof globalThis["closeOverlay"]==="function")rows.push({id:"world",label:"WORLD MAP"});
+    if(typeof globalThis["returnToWorldMap"]==="function"||typeof globalThis["closeOverlay"]==="function")rows.push({id:"world",label:"WORLD MAP"});
   }else if(surface.kind==="region"){
     if(freePlay&&typeof globalThis["openOverlay"]==="function")rows.push({id:"village",label:"VILLAGE"});
-    if(typeof globalThis["closeOverlay"]==="function")rows.push({id:"world",label:"WORLD MAP"});
+    if(typeof globalThis["returnToWorldMap"]==="function"||typeof globalThis["closeOverlay"]==="function")rows.push({id:"world",label:"WORLD MAP"});
   }
   return rows;
 }
@@ -349,6 +352,7 @@ function routeAction(action){
   if(action==="record"&&typeof globalThis["openShinobiRecord"]==="function")return call("openShinobiRecord","overview");
   if(action==="village"&&typeof globalThis["openOverlay"]==="function")return call("openOverlay","village");
   if(action==="region"&&typeof globalThis["openRegionHub"]==="function")return call("openRegionHub","fire");
+  if(action==="world"&&typeof globalThis["returnToWorldMap"]==="function")return call("returnToWorldMap");
   if(action==="world"&&typeof globalThis["closeOverlay"]==="function")return call("closeOverlay");
   return{success:false,reason:"hud_navigation_unavailable",action};
 }
