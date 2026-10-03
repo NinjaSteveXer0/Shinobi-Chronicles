@@ -1695,8 +1695,7 @@
       ],
       "productionLoadPath": [
         "index.html",
-        "runtime/alpha-phase2-live-hud-49900.js",
-        "Logo/sc_title.png"
+        "runtime/alpha-phase2-live-hud-49900.js"
       ],
       "extensionHooks": [
         "getPhase2LiveHudSnapshot49900",
