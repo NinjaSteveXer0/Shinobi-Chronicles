@@ -16,7 +16,7 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-03-DM",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-03-DN",
     sourceBaselineCommit:"7e96e3e927d8e2190db9c001e83dfd69db728ce5",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
     runtimeGeneration:"phase2-live-hud-499",
@@ -85,7 +85,8 @@
       "phase2-live-hud-team-rail-owner-polish-499",
       "phase2-live-hud-chronicle-compass-synthesis-499",
       "phase2-live-hud-world-masterbrand-lockup-499",
-      "phase2-live-hud-safe-bottom-reserve-499"
+      "phase2-live-hud-safe-bottom-reserve-499",
+      "phase2-live-hud-canonical-world-return-499"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -118,7 +119,7 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-03-DM",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-03-DN",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
       generationPresent:first.runtimeGeneration==="phase2-live-hud-499",
@@ -137,6 +138,7 @@
       phase2LiveHudChronicleCompass499Present:first.majorRuntimeFeatures.includes("phase2-live-hud-chronicle-compass-synthesis-499"),
       phase2LiveHudWorldMasterbrand499Present:first.majorRuntimeFeatures.includes("phase2-live-hud-world-masterbrand-lockup-499"),
       phase2LiveHudSafeBottomReserve499Present:first.majorRuntimeFeatures.includes("phase2-live-hud-safe-bottom-reserve-499"),
+      phase2LiveHudCanonicalWorldReturn499Present:first.majorRuntimeFeatures.includes("phase2-live-hud-canonical-world-return-499"),
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)
