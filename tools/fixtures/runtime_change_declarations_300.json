@@ -1245,7 +1245,8 @@
         "read-only observer-safe Journey projection",
         "presentation-only live HUD DOM / focus / responsive docking / suppression",
         "presentation-only retirement of legacy header/sidebar while live HUD is installed",
-        "stable owned-character active identity remains canonical while player-facing name / portrait resolve through its Chronicle Variant representation"
+        "stable owned-character active identity remains canonical while player-facing name / portrait resolve through its Chronicle Variant representation",
+        "canonical My Clan affiliation read-model projection through live global lexical authority"
       ],
       "productionLoader": "index.html",
       "qaRefs": [
@@ -1258,7 +1259,7 @@
       ],
       "replaces": [],
       "contractChangeReason": "PHASE_2_ACTIVATION",
-      "rationale": "Consumes master #449 Step 4 and the approved #497 Konoha Phase-2 Live HUD presentation contract. The runtime projects existing canonical Identity/Rank/village, Ryō, exact currentTeam and observer-safe Journey state into compact edge-docked map HUD controls, delegates My Clan/Inventory/Shinobi Record/Journey/map navigation to existing owners, suppresses itself during Story/Battle/deep management surfaces, and hides the older static map header/sidebar presentation while leaving map art and hotspot authority untouched. It creates no HUD save schema, no second semantic state owner, no team assignment mutation, no Chronicle history, and no fake Energy before #433. Installed-browser identity evidence showed Alpha Surface Truth correctly returns the stable owned-character identity (for example `owned_character_academy_menma`) rather than a Variant ID. The HUD now preserves that stable identity as `identity.id`, derives the canonical Chronicle Variant only for presentation (`identity.variantId`), and resolves name/Registry/uiPortrait through that representation. This does not collapse Registry identity into ownership or create a second identity state owner."
+      "rationale": "Consumes master #449 Step 4 and the approved #497 Konoha Phase-2 Live HUD presentation contract. The runtime projects existing canonical Identity/Rank/village, Ryō, exact currentTeam and observer-safe Journey state into compact edge-docked map HUD controls, delegates My Clan/Inventory/Shinobi Record/Journey/map navigation to existing owners, suppresses itself during Story/Battle/deep management surfaces, and hides the older static map header/sidebar presentation while leaving map art and hotspot authority untouched. It creates no HUD save schema, no second semantic state owner, no team assignment mutation, no Chronicle history, and no fake Energy before #433. Installed-browser identity evidence showed Alpha Surface Truth correctly returns the stable owned-character identity (for example `owned_character_academy_menma`) rather than a Variant ID. The HUD now preserves that stable identity as `identity.id`, derives the canonical Chronicle Variant only for presentation (`identity.variantId`), and resolves name/Registry/uiPortrait through that representation. This does not collapse Registry identity into ownership or create a second identity state owner. Installed-browser evidence showed the canonical My Clan affiliation helper is callable from the live global lexical environment even when it is not exposed as a globalThis property. HUD affiliation projection now consumes that exact authority directly when available, then falls back to the existing global-call seam / character fields without creating a new affiliation owner."
     }
   ]
 }
