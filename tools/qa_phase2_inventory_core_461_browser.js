@@ -82,6 +82,11 @@ async function openInventoryRoute(page){
   await page.evaluate(()=>globalThis.refreshPhase2LiveHud49900?.());
   const hud=page.locator('#sc-phase2-live-hud-49900 [data-hud499-action="inventory"]');
   if(await hud.count()){
+    const tools=page.locator("#sc-phase2-live-hud-49900 .sc-hud499-tools");
+    if(await tools.count()){
+      const opened=await tools.evaluate(node=>node.open===true);
+      if(!opened)await page.click("#sc-phase2-live-hud-49900 .sc-hud499-tools>summary");
+    }
     await hud.waitFor({state:"visible",timeout:10000});
     await hud.click();
     return"phase2_live_hud_499";
