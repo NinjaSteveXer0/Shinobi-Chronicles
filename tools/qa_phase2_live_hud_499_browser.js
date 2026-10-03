@@ -163,7 +163,8 @@ function assertHudLayout(layout,label){
         teamIds:[...(root?.querySelectorAll("[data-team-variant-id]")||[])].map(node=>node.dataset.teamVariantId),
         teamImageCount:root?.querySelectorAll(".sc-hud499-team-member img").length||0,
         rootPointerEvents:getComputedStyle(root).pointerEvents,
-        focusable:[...(root?.querySelectorAll("button,summary")||[])].every(node=>!node.disabled&&node.tabIndex>=0),\n        brandImage:root?.querySelector(".sc-hud499-brand img")?.getAttribute("src")||null
+        focusable:[...(root?.querySelectorAll("button,summary")||[])].every(node=>!node.disabled&&node.tabIndex>=0),
+        brandImage:root?.querySelector(".sc-hud499-brand img")?.getAttribute("src")||null
       };
     });
     assert.strictEqual(initial.snap.visible,true);
@@ -265,7 +266,12 @@ function assertHudLayout(layout,label){
     assert(worldDominance.canvas.height>=worldDominance.viewport[1]*0.50,"World Map height collapsed under HUD: "+JSON.stringify(worldDominance));
     assert(worldDominance.display.width>=worldDominance.viewport[0]*0.90,"World Map display remains trapped in retired sidebar track: "+JSON.stringify(worldDominance));
     await page.screenshot({path:path.join(OUT,"01b-world-map-live-hud.png"),fullPage:true});
-    const worldBrand=await page.evaluate(()=>{\n      const img=document.querySelector(".sc-hud499-brand img");\n      return img?{src:img.getAttribute("src"),complete:img.complete,naturalWidth:img.naturalWidth,naturalHeight:img.naturalHeight}:null;\n    });\n    assert(worldBrand&&worldBrand.src==="Logo/sc_title.png","World Map did not consume exact approved brand lockup: "+JSON.stringify(worldBrand));\n    assert(worldBrand.complete&&worldBrand.naturalWidth>0&&worldBrand.naturalHeight>0,"World Map brand asset failed to load: "+JSON.stringify(worldBrand));
+    const worldBrand=await page.evaluate(()=>{
+      const img=document.querySelector(".sc-hud499-brand img");
+      return img?{src:img.getAttribute("src"),complete:img.complete,naturalWidth:img.naturalWidth,naturalHeight:img.naturalHeight}:null;
+    });
+    assert(worldBrand&&worldBrand.src==="Logo/sc_title.png","World Map did not consume exact approved brand lockup: "+JSON.stringify(worldBrand));
+    assert(worldBrand.complete&&worldBrand.naturalWidth>0&&worldBrand.naturalHeight>0,"World Map brand asset failed to load: "+JSON.stringify(worldBrand));
 
     const worldNav=await page.evaluate(()=>getPhase2LiveHudSnapshot49900().navigation.map(row=>row.id));
     assert(worldNav.includes("village"),"World HUD lacks legal Village return");
