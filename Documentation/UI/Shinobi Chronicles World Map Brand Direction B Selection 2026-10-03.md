@@ -121,17 +121,30 @@ Coding must consume the committed exact production asset. Coding must not recrea
 
 ---
 
-# 6. Current source gap
+# 6. Source recovery status
 
-Source-first audit confirms the repository durably records **Dual Path** as the franchise master mark, but does not currently expose a standalone production asset/path containing exact Dual Path geometry.
+Source-first audit confirms the repository durably records **Dual Path** as the franchise master mark but does not currently expose a standalone production asset/path containing exact Dual Path geometry.
 
-The historic World Map lineage demonstrates prior visual use of the masterbrand, but current Brand authority explicitly forbids treating the map raster itself as inferred standalone master-asset authority.
+UI / Assets has, however, recovered the original historic **Shinobi Chronicles Logo Concept Board** from Project/Library history. That board visibly contains:
+
+> **Concept 5 — THE DUAL PATH**
+
+and therefore provides the correct visual provenance for the approved emblem geometry.
+
+This is materially stronger than trying to infer the emblem from the World Map raster.
+
+However:
+
+- the concept board is still a concept-sheet source, not a standalone production logo;
+- current file tooling did not expose an authorised raw-byte materialisation path for direct production promotion;
+- the historic World Map raster remains unsuitable as a standalone brand source;
+- no crop from a map or arbitrary recreation may be treated as exact franchise authority.
 
 Therefore:
 
-> **Do not crop/extract the logo from World Map art and call that the production source.**
+> **Use the recovered Concept 5 board as visual provenance for the exact Dual Path geometry, but do not call the concept board itself the production asset.**
 
-The final standalone lockup must preserve the approved Dual Path geometry through a legitimate source/reconstruction path, then be frozen and committed once exact production output is owner-approved.
+The final standalone lockup must preserve that approved geometry through a legitimate exact production/export path, then be frozen and committed.
 
 No new masterbrand invention is authorised by this selection.
 
@@ -170,5 +183,7 @@ Until then:
 > **The franchise master emblem remains Dual Path.**
 
 > **No generated exploratory crest supersedes the master mark.**
+
+> **The recovered Concept 5 board is visual provenance, not the production file.**
 
 > **The final logo must exist as standalone committed SVG/PNG authority before Coding consumes it.**
