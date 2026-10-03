@@ -5,6 +5,8 @@
 **Status:** **STEPHEN-DIRECTED BINDING PLAYER-FACING WRITING QUALITY STANDARD**  
 **Primary priority:** **FINISH SHINOBI CHRONICLES ALPHA**
 
+> **2026-10-02 AFFECTIVE-EXPRESSION REFINEMENT:** This standard is now supplemented by `Writing_Affective_Appraisal_and_Emotional_Expression_Refinement_2026-10-02.md`. For important emotional beats, derive expression through `TRIGGER -> PERCEPTION -> APPRAISAL -> AFFECTIVE PRESSURE -> REGULATION / DEFENCE -> IMMEDIATE WANT -> EXPRESSION CHANNEL -> CONSEQUENCE`. This is Writing discipline only; it creates no new Emotion runtime/system authority and does not reopen frozen Phase-1 Origins.
+
 ## 1. Purpose
 
 This standard exists to prevent a recurring successor-chat drift: Story structure, branch causality and implementation detail may remain strong while the actual prose loses character personality, emotional performance, linguistic texture, cadence, physical reaction and narrative atmosphere.
