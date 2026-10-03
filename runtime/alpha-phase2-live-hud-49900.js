@@ -92,7 +92,11 @@ function rankFor(id,character){
   return row||"UNRANKED";
 }
 function affiliationFor(character){
-  const canonical=scalar(call("getMyClanCharacterAffiliation",character));
+  let canonical=null;
+  try{
+    if(typeof getMyClanCharacterAffiliation==="function")canonical=scalar(getMyClanCharacterAffiliation(character));
+  }catch(_error){}
+  if(!canonical)canonical=scalar(call("getMyClanCharacterAffiliation",character));
   if(canonical)return canonical;
   return character&&scalar(character.village||character.allegiance||character.affiliation)||null;
 }
