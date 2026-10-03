@@ -1226,6 +1226,47 @@
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Extends repaired #469 into CE/Codex #478 with a real terminal-convergent private Academy Kakashi Origin. Every reached Character boundary is filtered by frozen legal eligibility and Writing Character/context priority, then a stable Chronicle seed breaks only genuine equal-top ties through #34000 intent receipts. Machine RESOLVE RESULT gates are never Character choices; they commit machine-gate intent provenance through #34000 and resolve factual outcomes through the frozen #34600 bindings. Battle outcomes remain owned by the existing Kakashi Battle adapter. The private ledger seals exact choices, factual receipts, Battle facts/action windows, package/participant/Knowledge history, terminal hidden-review separation, observer-safe MI continuity and filtered reward provenance while prohibiting Chronicle-wide duplicate money/items. No Kakashi-specific Origin Development source currently exists in #440/#448, so #478 records current Registry Stats/PL read-only and does not invent Development. Owner browser retest additionally proved CE/private-history variance and exposed presentation defects: four-person Scene Board truncation, deliberate non-speaker greying, forced one-page multi-paragraph narration, and abrupt scene exit. These are repaired in the existing shared 33900 presentation owner without changing Story semantics or reopening Origin graphs. Location/surface exit uses the existing shared hard black curtain; same-location scene changes now have a bounded soft transition API under the same owner. Owner replay exposed stale runtime drift: Menma + Kakashi + Obito could see KON-P01 but could not enter because #469 still required Hinata despite the merged #478 authority defining Kakashi presence as the physical gate and Writing defining Menma + Kakashi + one other current teammate. The repair keeps Menma as the only non-Kakashi protagonist currently production-authorised while projecting the exact committed second teammate through already-authored current-evidence reaction families. UI #486 successor authority merged on main and was consumed directly: #33900 now treats semantic actor anchors/current hierarchy as the primary stage grammar for 1–4 actors, caps ordinary speaker emphasis inside the +3–5% band, and preserves full opacity for reduced-motion non-entry/non-exit cues. #469 explicitly supplies role/anchor/x/depth metadata for Kakashi- and Menma-observer variants so four-person layouts do not depend on ordinal CSS nth-child positions. CE/Codex #494 closed the missing distinction between protagonist/person identity and Chronicle run-instance identity. Runtime now persists one opaque `sc_run_v1_*` runId at NEW_START BEGIN, preserves it across Team Formation/map/hotspot/Record/save-load, assigns exactly one runId to begun legacy saves through an explicit persisted migration, and seeds autonomous private Kakashi history only from runId + subject + resolver identity/version. Pure compatibility migration remains read-only, repeated UI actions never mint new IDs, and already-sealed private history wins before any identity migration so historical truth cannot reroll."
+    },
+    {
+      "changeId": "issue-499-phase2-live-hud",
+      "classification": "NEW",
+      "responsibilityIds": [
+        "phase2.live_hud.presentation"
+      ],
+      "owner": "runtime/alpha-phase2-live-hud-49900.js",
+      "directCallers": [
+        "index.html",
+        "existing openOverlay / closeOverlay / map-navigation owners"
+      ],
+      "stateTouched": [
+        "read-only canonical active identity / Rank / affiliation / uiPortrait projection",
+        "read-only current Ryō projection",
+        "read-only committed currentTeam projection",
+        "read-only observer-safe Journey projection",
+        "presentation-only live HUD DOM / focus / responsive docking / suppression",
+        "presentation-only retirement of legacy header/sidebar while live HUD is installed",
+        "stable owned-character active identity remains canonical while player-facing name / portrait resolve through its Chronicle Variant representation",
+        "canonical My Clan affiliation read-model projection through live global lexical authority",
+        "presentation-only World Map single-column expansion after retired sidebar suppression",
+        "presentation-only Current Team left-rail visual refinement; canonical team order and interaction unchanged",
+        "World Map-only exact masterbrand projection from Logo/sc_title.png",
+        "Concept C Chronicle Compass presentation: unified upper-right player state, collapsible right tools and safely raised legal map navigation",
+        "viewport-safe persistent control reserve proven at 1366x768 and 1920x1080",
+        "canonical World-map return delegation through existing returnToWorldMap owner; visible-overlay truth wins over stale overlay type for HUD projection",
+        "production loader escaped-newline artifact removed so no literal \\n text node renders beneath map surfaces"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_phase2_live_hud_499.js",
+        "tools/qa_phase2_live_hud_499_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_save_compatibility_311.js",
+        "tools/qa_phase2_konoha_player_surfaces_431.js",
+        "tools/qa_phase2_inventory_core_461.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "PHASE_2_ACTIVATION",
+      "rationale": "Consumes master #449 Step 4 and the approved #497 Konoha Phase-2 Live HUD presentation contract. The runtime projects existing canonical Identity/Rank/village, Ryō, exact currentTeam and observer-safe Journey state into compact edge-docked map HUD controls, delegates My Clan/Inventory/Shinobi Record/Journey/map navigation to existing owners, suppresses itself during Story/Battle/deep management surfaces, and hides the older static map header/sidebar presentation while leaving map art and hotspot authority untouched. It creates no HUD save schema, no second semantic state owner, no team assignment mutation, no Chronicle history, and no fake Energy before #433. Installed-browser identity evidence showed Alpha Surface Truth correctly returns the stable owned-character identity (for example `owned_character_academy_menma`) rather than a Variant ID. The HUD now preserves that stable identity as `identity.id`, derives the canonical Chronicle Variant only for presentation (`identity.variantId`), and resolves name/Registry/uiPortrait through that representation. This does not collapse Registry identity into ownership or create a second identity state owner. Installed-browser evidence showed the canonical My Clan affiliation helper is callable from the live global lexical environment even when it is not exposed as a globalThis property. HUD affiliation projection now consumes that exact authority directly when available, then falls back to the existing global-call seam / character fields without creating a new affiliation owner. Stephen's first owner browser pass kept Step 4 AMBER: retiring the sidebar without collapsing the legacy two-column World Map grid trapped the map inside the old 280px sidebar track, violating map-dominance authority; the HUD now collapses that grid to one map column only while installed. The same owner pass approved the left-edge Current Team concept but found its raw boxed stack visually unfinished; presentation has been refined into a compact connected rail with framed portrait slots and bounded side labels without changing currentTeam order, assignment semantics, assets, or navigation. CE/Codex #505 then closed the final owner-selected HUD synthesis: Concept C / Chronicle Compass is the spatial base, Concept B supplies the unified Identity/Journey/Ryō hierarchy, and Concept A supplies the companion-first Current Team philosophy. #508 closed the exact Direction B masterbrand; World Map alone consumes `Logo/sc_title.png` published from asset-vault commit `8efdbf990888e59c3495e80d5672f86b194b4a23`. Bottom-edge quick actions are retired in favour of collapsible right-side player tools and a Chronicle Compass raised by an explicit safe reserve, with browser proof at 1366×768 and 1920×1080. Region/Village do not inherit the World Map brand by implication. Final screenshot inspection also exposed a literal escaped `\\n` text node beneath the map, traced to loader markup rather than HUD semantics; the loader now uses a real newline and both source/browser QA gate that presentation artifact."
     }
   ]
 }

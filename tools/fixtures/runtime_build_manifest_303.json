@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "buildId": "SC-ALPHA-RUNTIME-R303-2026-10-02-DG",
+  "buildId": "SC-ALPHA-RUNTIME-R303-2026-10-03-DO",
   "sourceBaselineCommit": "7e96e3e927d8e2190db9c001e83dfd69db728ce5",
   "sourceRef": "issue-303-runtime-build-fingerprint-v1",
-  "runtimeGeneration": "phase2-private-origin-live-ce-hotspot-478",
+  "runtimeGeneration": "phase2-live-hud-499",
   "majorRuntimeFeatures": [
     "academy-kakashi-v2",
     "runtime-ownership-safety-300",
@@ -60,7 +60,18 @@
     "story-scene-board-owner-retest-469",
     "menma-dynamic-second-teammate-ce-hotspot-469",
     "story-scene-board-ui486-golden-plus-authority",
-    "chronicle-run-instance-identity-494"
+    "chronicle-run-instance-identity-494",
+    "phase2-live-hud-499",
+    "phase2-live-hud-owned-identity-variant-projection-499",
+    "phase2-live-hud-canonical-affiliation-projection-499",
+    "phase2-live-hud-canonical-empty-affiliation-preservation-499",
+    "phase2-live-hud-world-map-dominance-repair-499",
+    "phase2-live-hud-team-rail-owner-polish-499",
+    "phase2-live-hud-chronicle-compass-synthesis-499",
+    "phase2-live-hud-world-masterbrand-lockup-499",
+    "phase2-live-hud-safe-bottom-reserve-499",
+    "phase2-live-hud-canonical-world-return-499",
+    "phase2-live-hud-loader-newline-cleanup-499"
   ],
   "productionLoader": "index.html",
   "runtimeModule": "runtime/alpha-runtime-build-fingerprint-303.js",
