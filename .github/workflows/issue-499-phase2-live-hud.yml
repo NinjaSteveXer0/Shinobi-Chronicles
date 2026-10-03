@@ -7,6 +7,7 @@ on:
     paths:
       - 'index.html'
       - 'runtime/alpha-phase2-live-hud-49900.js'
+      - 'Logo/sc_title.png'
       - 'tools/qa_phase2_live_hud_499.js'
       - 'tools/qa_phase2_live_hud_499_browser.js'
       - 'tools/fixtures/runtime_build_manifest_303.json'
