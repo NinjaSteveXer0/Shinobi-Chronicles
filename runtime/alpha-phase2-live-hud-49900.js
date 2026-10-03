@@ -345,8 +345,8 @@ function installStyles(){
   style.textContent=`
     .game-container.sc-hud499-installed>.game-header{display:none!important}
     .game-container.sc-hud499-installed .world-map-viewport>.map-sidebar-left{display:none!important}
-    .game-container.sc-hud499-installed .world-map-viewport{position:relative;min-height:0}
-    .game-container.sc-hud499-installed .world-map-display{width:100%;max-width:none;padding-bottom:0}
+    .game-container.sc-hud499-installed .world-map-viewport{position:relative;min-height:0;grid-template-columns:minmax(0,1fr)}
+    .game-container.sc-hud499-installed .world-map-display{grid-column:1;width:100%;max-width:none;padding:8px 14px 12px}
     .sc-hud499-root{position:absolute;inset:0;z-index:1400;pointer-events:none;font-family:Inter,Arial,sans-serif;color:#edf5f7}
     .sc-hud499-root[hidden]{display:none!important}
     .sc-hud499-root button{font:inherit;color:inherit}
@@ -365,12 +365,16 @@ function installStyles(){
     .sc-hud499-journey small{display:-webkit-box;margin-top:2px;color:#b8c5ce;font-size:9px;line-height:1.2;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
     .sc-hud499-ryo{pointer-events:auto;justify-self:end;min-width:96px;padding:9px 12px;border-radius:4px;text-align:right}
     .sc-hud499-ryo strong{display:block;margin-top:2px;color:#efcf72;font:900 18px/1 Georgia,"Times New Roman",serif}
-    .sc-hud499-team{position:absolute;left:12px;top:102px;width:82px;max-height:330px;padding:8px 6px;border-radius:4px;pointer-events:auto;cursor:pointer;text-align:center}
-    .sc-hud499-team-stack{display:flex;flex-direction:column;align-items:center;gap:7px;margin-top:7px}
-    .sc-hud499-team-member{position:relative;display:block;width:56px}
-    .sc-hud499-team-portrait,.sc-hud499-silhouette.sc-hud499-team-portrait{display:block;width:52px;height:52px;margin:auto;object-fit:cover;object-position:top center;border:1px solid rgba(98,211,224,.38);background:#111923}
-    .sc-hud499-team-name{display:block;max-height:0;opacity:0;overflow:hidden;margin-top:2px;font-size:8px;line-height:1.1;color:#d9e4e8;transition:max-height 120ms ease,opacity 120ms ease}
-    .sc-hud499-team:hover .sc-hud499-team-name,.sc-hud499-team:focus-visible .sc-hud499-team-name{max-height:24px;opacity:1}
+    .sc-hud499-team{position:absolute;left:14px;top:102px;width:78px;max-height:330px;padding:9px 7px 10px;border-radius:8px;pointer-events:auto;cursor:pointer;text-align:center;overflow:visible;background:linear-gradient(180deg,rgba(7,14,23,.94),rgba(5,10,17,.76));border-color:rgba(195,159,70,.36);box-shadow:0 12px 28px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.04)}
+    .sc-hud499-team::before{content:"";position:absolute;left:8px;top:38px;bottom:13px;width:1px;background:linear-gradient(180deg,rgba(88,221,233,.78),rgba(195,159,70,.58),rgba(195,159,70,.08));box-shadow:0 0 8px rgba(88,221,233,.12)}
+    .sc-hud499-team::after{content:"";position:absolute;left:5.5px;top:36px;width:5px;height:5px;transform:rotate(45deg);border:1px solid rgba(93,218,230,.68);background:#08121a;box-shadow:0 0 7px rgba(93,218,230,.18)}
+    .sc-hud499-team .sc-hud499-kicker{padding:0 0 7px;margin:0 1px 1px;border-bottom:1px solid rgba(195,159,70,.2);font-size:7px;letter-spacing:.16em;white-space:nowrap}
+    .sc-hud499-team-stack{display:flex;flex-direction:column;align-items:flex-end;gap:8px;margin-top:8px}
+    .sc-hud499-team-member{position:relative;display:grid;place-items:center;width:58px;height:58px;padding:3px;border:1px solid rgba(195,159,70,.24);border-radius:7px;background:linear-gradient(145deg,rgba(19,31,42,.94),rgba(8,15,23,.94));box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 5px 12px rgba(0,0,0,.2);transition:border-color 120ms ease,transform 120ms ease,box-shadow 120ms ease}
+    .sc-hud499-team-member:hover{transform:translateX(2px);border-color:rgba(87,218,230,.58);box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 6px 15px rgba(0,0,0,.26),0 0 0 1px rgba(87,218,230,.08)}
+    .sc-hud499-team-portrait,.sc-hud499-silhouette.sc-hud499-team-portrait{display:block;width:50px;height:50px;margin:auto;object-fit:cover;object-position:top center;border:1px solid rgba(98,211,224,.28);border-radius:5px;background:#111923;box-shadow:inset 0 0 0 1px rgba(255,255,255,.025)}
+    .sc-hud499-team-name{position:absolute;left:66px;top:50%;z-index:8;display:block;max-height:none;margin:0;padding:5px 8px;overflow:visible;opacity:0;transform:translate(-4px,-50%);border:1px solid rgba(195,159,70,.34);border-radius:4px;background:rgba(6,12,19,.96);box-shadow:0 7px 18px rgba(0,0,0,.34);color:#dfe9ec;font-size:8px;font-weight:800;line-height:1.1;letter-spacing:.04em;white-space:nowrap;pointer-events:none;transition:opacity 120ms ease,transform 120ms ease}
+    .sc-hud499-team-member:hover .sc-hud499-team-name,.sc-hud499-team:focus-visible .sc-hud499-team-name{opacity:1;transform:translate(0,-50%)}
     .sc-hud499-actions{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);height:46px;display:flex;align-items:center;gap:5px;padding:5px;border-radius:4px;pointer-events:auto}
     .sc-hud499-actions button,.sc-hud499-map-nav button{min-height:34px;padding:0 12px;border:1px solid rgba(150,133,82,.45);background:rgba(8,14,22,.82);cursor:pointer;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
     .sc-hud499-actions button:hover,.sc-hud499-actions button:focus-visible,.sc-hud499-map-nav button:hover,.sc-hud499-map-nav button:focus-visible,.sc-hud499-journey:hover,.sc-hud499-journey:focus-visible,.sc-hud499-team:hover,.sc-hud499-team:focus-visible{outline:2px solid rgba(85,218,231,.75);outline-offset:1px;border-color:rgba(85,218,231,.7)}
@@ -379,8 +383,9 @@ function installStyles(){
       .sc-hud499-top{grid-template-columns:minmax(180px,270px) minmax(160px,1fr) 90px;gap:8px}
       .sc-hud499-identity-portrait,.sc-hud499-silhouette.sc-hud499-identity-portrait{width:46px;height:46px;flex-basis:46px}
       .sc-hud499-actions button{padding:0 8px;font-size:8px}
-      .sc-hud499-team{width:70px}
-      .sc-hud499-team-portrait,.sc-hud499-silhouette.sc-hud499-team-portrait{width:46px;height:46px}
+      .sc-hud499-team{width:70px;padding-left:6px;padding-right:6px}
+      .sc-hud499-team-member{width:52px;height:52px}
+      .sc-hud499-team-portrait,.sc-hud499-silhouette.sc-hud499-team-portrait{width:44px;height:44px}
     }
     @media(max-width:760px){
       .sc-hud499-top{left:8px;right:8px;top:6px;height:auto;grid-template-columns:minmax(170px,1fr) 84px}
