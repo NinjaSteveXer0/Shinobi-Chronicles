@@ -92,12 +92,14 @@ function rankFor(id,character){
   return row||"UNRANKED";
 }
 function affiliationFor(character){
-  let canonical=null;
   try{
-    if(typeof getMyClanCharacterAffiliation==="function")canonical=scalar(getMyClanCharacterAffiliation(character));
+    if(typeof getMyClanCharacterAffiliation==="function"){
+      const canonical=scalar(getMyClanCharacterAffiliation(character));
+      if(canonical!==null)return canonical;
+    }
   }catch(_error){}
-  if(!canonical)canonical=scalar(call("getMyClanCharacterAffiliation",character));
-  if(canonical)return canonical;
+  const globalCanonical=scalar(call("getMyClanCharacterAffiliation",character));
+  if(globalCanonical!==null)return globalCanonical;
   return character&&scalar(character.village||character.allegiance||character.affiliation)||null;
 }
 function portraitPathFrom(value){
