@@ -193,9 +193,9 @@ async function openCharacterShopViaCommercialDistrict(page){
     await page.evaluate(()=>openOverlay("clan"));
     await page.waitForFunction(()=>currentOverlayType==="clan",null,{timeout:10000});
     await page.evaluate(()=>setClanFilter("all"));
-    const izunoClanCard=page.locator('.my-clan-card-hitbox[aria-label="Inspect Academy Izuno"]');
+    const izunoClanCard=page.locator('.my-clan-card-hitbox[aria-label="Inspect Izuno"]');
     assert.strictEqual(await izunoClanCard.count(),1,
-      "My Clan ALL view did not project exactly one newly owned Academy Izuno card: "+JSON.stringify(clanProjection));
+      "My Clan ALL view did not project exactly one newly owned Izuno representation card: "+JSON.stringify(clanProjection));
     assert.strictEqual(await izunoClanCard.locator('img[alt="Academy Izuno collectible card"]').count(),1,
       "My Clan Academy Izuno collectible-card presentation missing");
     await page.screenshot({path:path.join(OUT,"02-my-clan-new-ownership.png"),fullPage:true});

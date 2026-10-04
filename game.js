@@ -1940,6 +1940,39 @@ function getProductionRuntimeRankLabel(registryId) {
   return String(value||"").split("_").filter(Boolean).map(part=>part.charAt(0).toUpperCase()+part.slice(1)).join(" ");
 }
 
+function getProductionRuntimePersonName(registryId) {
+  const record=getCharacterRegistryEntry(registryId);
+  const explicit=record&&typeof record.personName==="string"&&record.personName.trim()?record.personName.trim():null;
+  if (explicit) return explicit;
+  const runtime=getRuntimeCharacterByRegistryId(registryId);
+  let value=runtime&&typeof runtime.name==="string"&&runtime.name.trim()
+    ? runtime.name.trim()
+    : getProductionRuntimeDisplayName(registryId);
+  const rawId=String(registryId||"");
+  const prefixRows=[
+    ["special_jonin_",["Special Jonin ","Special Jōnin "]],
+    ["academy_",["Academy "]],
+    ["genin_",["Genin "]],
+    ["chunin_",["Chunin ","Chūnin "]],
+    ["jonin_",["Jonin ","Jōnin "]],
+    ["sannin_",["Sannin "]],
+    ["kage_",["Kage "]],
+    ["anbu_",["ANBU "]]
+  ];
+  for (const [idPrefix,labelPrefixes] of prefixRows) {
+    if (!rawId.startsWith(idPrefix)) continue;
+    for (const labelPrefix of labelPrefixes) {
+      if (value.toLowerCase().startsWith(labelPrefix.toLowerCase())) {
+        value=value.slice(labelPrefix.length).trim();
+        return value||getProductionRuntimeDisplayName(registryId);
+      }
+    }
+    const cleaned=rawId.slice(idPrefix.length);
+    if (cleaned) return cleaned.split("_").filter(Boolean).map(part=>part.charAt(0).toUpperCase()+part.slice(1)).join(" ");
+  }
+  return value||getProductionRuntimeDisplayName(registryId);
+}
+
 function materializeProductionRuntimeCharacter(registryId) {
   const existing=getRuntimeCharacterByRegistryId(registryId);
   if (existing) return existing;
@@ -6694,10 +6727,16 @@ function confirmAcademyTeamFormation(sourceEventId="academy_team_formation_confi
     const teammateRuntimes=selected.map(id=>materializeProductionRuntimeCharacter(id)||getRuntimeCharacterByRegistryId(id));
     if (!originRuntime||teammateRuntimes.some(runtime=>!runtime)) throw new Error("academy_team_runtime_materialization_failed");
 
-    playerData.clan=normalizeClanManagementState({
-      teamSlots:[originRuntime.id,teammateRuntimes[0].id,teammateRuntimes[1].id,null,null,null],
-      favoriteIds:(playerData.clan&&playerData.clan.favoriteIds)||[]
-    },playerData.characterOwnership);
+    const assignmentCommit=commitClanTeamAssignment(
+      [originRuntime.id,teammateRuntimes[0].id,teammateRuntimes[1].id,null,null,null],
+      {
+        source:"academy_team_formation",
+        sourceEventId:String(sourceEventId||"academy_team_formation_confirmation"),
+        save:false,
+        openingAuthority:true
+      }
+    );
+    if (!assignmentCommit.success) throw new Error(assignmentCommit.reason||"academy_team_assignment_commit_failed");
 
     formation.completed=true;
     formation.required=false;
@@ -8433,13 +8472,69 @@ function createDefaultClanManagementState(ownershipState = characterOwnershipRun
     .map(character => character.id);
   return {
     teamSlots: Array.from({length:CLAN_TEAM_SLOT_COUNT}, (_, index) => defaultIds[index] || null),
-    favoriteIds: []
+    favoriteIds: [],
+    assignmentSequence: 0,
+    currentTeamAssignment: null
   };
 }
 
-function normalizeClanManagementState(savedClan, ownershipState = characterOwnershipRuntimeAuthority) {
+function getClanOwnedLineageIdForVariant(variantId, acquisitionState=null) {
+  if (!variantId) return null;
+  const owned=acquisitionState&&acquisitionState.ownedCharactersByVariantId
+    ? acquisitionState.ownedCharactersByVariantId[variantId]
+    : null;
+  if (owned&&typeof owned.ownedCharacterId==="string"&&owned.ownedCharacterId) return owned.ownedCharacterId;
+  return typeof createOwnedCharacterIdForVariant==="function"
+    ? createOwnedCharacterIdForVariant(variantId)
+    : null;
+}
+
+function projectClanTeamIdentity(teamSlots, acquisitionState=null) {
+  const teamRuntimeIds=Array.from(
+    {length:CLAN_TEAM_SLOT_COUNT},
+    (_,index)=>Array.isArray(teamSlots)&&typeof teamSlots[index]==="string"?teamSlots[index]:null
+  );
+  const teamVariantIds=teamRuntimeIds.map(id=>id?getCharacterRegistryId(id):null);
+  const teamLineageIds=teamVariantIds.map(variantId=>variantId?getClanOwnedLineageIdForVariant(variantId,acquisitionState):null);
+  return {teamRuntimeIds,teamVariantIds,teamLineageIds};
+}
+
+function normalizeClanCurrentTeamAssignment(savedAssignment, teamSlots, acquisitionState=null, assignmentSequence=0) {
+  if (!savedAssignment||typeof savedAssignment!=="object") return null;
+  const projected=projectClanTeamIdentity(teamSlots,acquisitionState);
+  const normalizeSlots=value=>Array.from(
+    {length:CLAN_TEAM_SLOT_COUNT},
+    (_,index)=>Array.isArray(value)&&typeof value[index]==="string"?value[index]:null
+  );
+  if (JSON.stringify(normalizeSlots(savedAssignment.teamRuntimeIds))!==JSON.stringify(projected.teamRuntimeIds)) return null;
+  if (JSON.stringify(normalizeSlots(savedAssignment.teamVariantIds))!==JSON.stringify(projected.teamVariantIds)) return null;
+  if (JSON.stringify(normalizeSlots(savedAssignment.teamLineageIds))!==JSON.stringify(projected.teamLineageIds)) return null;
+  const occupiedLineages=projected.teamLineageIds.filter(Boolean);
+  if (!occupiedLineages.length||new Set(occupiedLineages).size!==occupiedLineages.length) return null;
+  const assignmentId=typeof savedAssignment.assignmentId==="string"&&savedAssignment.assignmentId?savedAssignment.assignmentId:null;
+  if (!assignmentId) return null;
+  return {
+    schemaVersion:1,
+    assignmentId,
+    sequence:Math.max(0,Number(savedAssignment.sequence)||Number(assignmentSequence)||0),
+    source:typeof savedAssignment.source==="string"&&savedAssignment.source?savedAssignment.source:"saved_assignment",
+    sourceEventId:typeof savedAssignment.sourceEventId==="string"&&savedAssignment.sourceEventId?savedAssignment.sourceEventId:null,
+    teamRuntimeIds:projected.teamRuntimeIds,
+    teamVariantIds:projected.teamVariantIds,
+    teamLineageIds:projected.teamLineageIds,
+    committedAt:Number(savedAssignment.committedAt)||null
+  };
+}
+
+function normalizeClanManagementState(savedClan, ownershipState = characterOwnershipRuntimeAuthority, acquisitionState=null) {
   const defaults = createDefaultClanManagementState(ownershipState);
   if (!savedClan || typeof savedClan !== "object") return defaults;
+  let acquisition=acquisitionState;
+  if (!acquisition) {
+    try {
+      if (typeof playerData!=="undefined"&&playerData&&playerData.acquisition) acquisition=playerData.acquisition;
+    } catch (_error) {}
+  }
   const manageableIds = new Set(getClanManageableRosterCharacters(ownershipState).map(character => character.id));
   const rawSlots = Array.isArray(savedClan.teamSlots)
     ? savedClan.teamSlots
@@ -8459,10 +8554,32 @@ function normalizeClanManagementState(savedClan, ownershipState = characterOwner
   const favoriteIds = Array.isArray(savedClan.favoriteIds)
     ? [...new Set(savedClan.favoriteIds.filter(characterId => typeof characterId === "string" && manageableIds.has(characterId)))]
     : [];
-  return { teamSlots, favoriteIds };
+  const assignmentSequence=Math.max(0,Number(savedClan.assignmentSequence)||0);
+  let currentTeamAssignment=normalizeClanCurrentTeamAssignment(
+    savedClan.currentTeamAssignment,
+    teamSlots,
+    acquisition,
+    assignmentSequence
+  );
+  if (!currentTeamAssignment&&rawSlots&&teamSlots.some(Boolean)) {
+    const projected=projectClanTeamIdentity(teamSlots,acquisition);
+    const occupiedLineages=projected.teamLineageIds.filter(Boolean);
+    if (occupiedLineages.length&&new Set(occupiedLineages).size===occupiedLineages.length) {
+      currentTeamAssignment={
+        schemaVersion:1,
+        assignmentId:"clan_team_assignment:migrated:"+occupiedLineages.join("+"),
+        sequence:assignmentSequence,
+        source:"save_migration",
+        sourceEventId:null,
+        teamRuntimeIds:projected.teamRuntimeIds,
+        teamVariantIds:projected.teamVariantIds,
+        teamLineageIds:projected.teamLineageIds,
+        committedAt:null
+      };
+    }
+  }
+  return {teamSlots,favoriteIds,assignmentSequence,currentTeamAssignment};
 }
-
-
 
 // BRICK 373 — ENTITY CURRENT-STATE SAVE AUTHORITY
 // BRICK 374 — ATTACHED SUMMON SAVE AUTHORITY
@@ -9172,7 +9289,7 @@ function loadPlayerData() {
       characterOwnership: characterOwnership,
       acquisition: acquisition,
       specialistQualifications: normalizeSpecialistQualificationState(parsedData.specialistQualifications),
-      clan: normalizeClanManagementState(parsedData.clan, characterOwnership),
+      clan: normalizeClanManagementState(parsedData.clan, characterOwnership, acquisition),
       entities: normalizePlayerEntityState(parsedData.entities,{legacySeedMigration}),
       weaponAcclimation: normalizeWeaponAcclimationState(parsedData.weaponAcclimation),
       activityHistory: normalizedActivityHistory,
@@ -42824,7 +42941,9 @@ function ensureClanManagementState() {
 
   const normalized =
     normalizeClanManagementState(
-      playerData.clan
+      playerData.clan,
+      playerData.characterOwnership,
+      ensurePlayerAcquisitionState()
     );
 
 
@@ -42835,6 +42954,107 @@ function ensureClanManagementState() {
   return normalized;
 }
 
+
+function validateClanTeamAssignmentCandidate(teamSlots,{openingAuthority=false}={}) {
+  const slots=Array.from(
+    {length:CLAN_TEAM_SLOT_COUNT},
+    (_,index)=>Array.isArray(teamSlots)&&typeof teamSlots[index]==="string"?teamSlots[index]:null
+  );
+  const occupied=slots.filter(Boolean);
+  if (!occupied.length) return {valid:false,reason:"clan_team_requires_one_member"};
+  const manageable=new Set(getClanManageableRosterCharacters().map(character=>character.id));
+  if (occupied.some(id=>!manageable.has(id))) return {valid:false,reason:"character_not_clan_manageable"};
+  const acquisition=ensurePlayerAcquisitionState();
+  const projected=projectClanTeamIdentity(slots,acquisition);
+  if (projected.teamLineageIds.some((lineageId,index)=>slots[index]&&!lineageId)) {
+    return {valid:false,reason:"owned_lineage_identity_missing"};
+  }
+  const occupiedLineages=projected.teamLineageIds.filter(Boolean);
+  if (new Set(occupiedLineages).size!==occupiedLineages.length) {
+    return {valid:false,reason:"duplicate_exact_owned_lineage_assignment"};
+  }
+  for (let index=0;index<slots.length;index+=1) {
+    const id=slots[index];
+    if (!id) continue;
+    const placement=evaluateClanFormationPlacement(id,index+1);
+    if (!placement.allowed) {
+      return {valid:false,reason:placement.reason,contextId:placement.contextId||null,slotNumber:index+1};
+    }
+  }
+  const formation=acquisition&&acquisition.academyTeamFormation;
+  const openingIncomplete=!!(
+    acquisition&&acquisition.chronicleOrigin&&acquisition.chronicleOrigin.activeKonohaEntered===true&&
+    (!formation||formation.completed!==true||formation.continuationCompleted!==true)
+  );
+  if (openingIncomplete&&openingAuthority!==true) {
+    const originLineage=getClanOwnedLineageIdForVariant(acquisition.chronicleOriginVariantId,acquisition);
+    if (originLineage&&!occupiedLineages.includes(originLineage)) {
+      return {valid:false,reason:"chronicle_protagonist_required_until_opening_restriction_complete"};
+    }
+  }
+  return {valid:true,reason:null,teamSlots:slots,...projected};
+}
+
+function getCommittedClanTeamAssignment() {
+  const clan=ensureClanManagementState();
+  return clan.currentTeamAssignment?cloneProgressionData(clan.currentTeamAssignment):null;
+}
+
+function commitClanTeamAssignment(teamSlots,{source="my_clan",sourceEventId=null,save=true,openingAuthority=false}={}) {
+  const editability=canEditClanFormation();
+  if (!editability.allowed) return {success:false,reason:editability.reason};
+  const validation=validateClanTeamAssignmentCandidate(teamSlots,{openingAuthority});
+  if (!validation.valid) {
+    return {
+      success:false,
+      reason:validation.reason,
+      contextId:validation.contextId||null,
+      slotNumber:validation.slotNumber||null
+    };
+  }
+  const clan=ensureClanManagementState();
+  const existing=clan.currentTeamAssignment;
+  const sameSlots=JSON.stringify(clan.teamSlots)===JSON.stringify(validation.teamSlots);
+  const sameLineages=!!(existing&&JSON.stringify(existing.teamLineageIds)===JSON.stringify(validation.teamLineageIds));
+  if (sameSlots&&sameLineages) {
+    return {
+      success:true,
+      changed:false,
+      committed:true,
+      teamSlots:[...clan.teamSlots],
+      assignment:cloneProgressionData(existing)
+    };
+  }
+  const sequence=Math.max(0,Number(clan.assignmentSequence)||0)+1;
+  const assignment={
+    schemaVersion:1,
+    assignmentId:"clan_team_assignment:"+sequence+":"+validation.teamLineageIds.filter(Boolean).join("+"),
+    sequence,
+    source:String(source||"my_clan"),
+    sourceEventId:sourceEventId?String(sourceEventId):null,
+    teamRuntimeIds:[...validation.teamRuntimeIds],
+    teamVariantIds:[...validation.teamVariantIds],
+    teamLineageIds:[...validation.teamLineageIds],
+    committedAt:Date.now()
+  };
+  playerData.clan=normalizeClanManagementState({
+    ...clan,
+    teamSlots:validation.teamSlots,
+    assignmentSequence:sequence,
+    currentTeamAssignment:assignment
+  },playerData.characterOwnership,ensurePlayerAcquisitionState());
+  if (!playerData.clan.currentTeamAssignment||playerData.clan.currentTeamAssignment.assignmentId!==assignment.assignmentId) {
+    return {success:false,reason:"clan_team_assignment_normalization_failed"};
+  }
+  if (save===true) savePlayerData();
+  return {
+    success:true,
+    changed:true,
+    committed:true,
+    teamSlots:[...playerData.clan.teamSlots],
+    assignment:cloneProgressionData(playerData.clan.currentTeamAssignment)
+  };
+}
 
 function getClanTeamSlotNumber(
   characterId
@@ -43004,202 +43224,36 @@ function setClanTeamSlot(
   slotNumber,
   characterId
 ) {
-
-
-  const editability =
-    canEditClanFormation();
-
-
-  if (
-    !editability.allowed
-  ) {
-
-
-    return {
-
-      success:
-        false,
-
-      reason:
-        editability.reason
-
-    };
-  }
-
-
-  const slotIndex =
-    Number(slotNumber) - 1;
-
-
-  if (
-    !Number.isInteger(
-      slotIndex
-    ) ||
-    slotIndex < 0 ||
-    slotIndex >=
-      CLAN_TEAM_SLOT_COUNT
-  ) {
-
-
-    return {
-
-      success:
-        false,
-
-      reason:
-        "invalid_clan_team_slot"
-
-    };
-  }
-
-
-  const formationPlacement =
-    evaluateClanFormationPlacement(
-      characterId,
-      slotNumber
-    );
-
-
-  if (
-    !formationPlacement.allowed
-  ) {
-
-
-    return {
-
-      success:
-        false,
-
-      reason:
-        formationPlacement.reason,
-
-      contextId:
-        formationPlacement.contextId ||
-        null
-
-    };
-  }
-
-
-  const character =
-    getClanManageableRosterCharacters()
-      .find(
-        member =>
-          member.id ===
-            characterId
-      ) ||
-    null;
-
-
-  if (!character) {
-
-
-    return {
-
-      success:
-        false,
-
-      reason:
-        "character_not_clan_manageable"
-
-    };
-  }
-
-
-  const clan =
-    ensureClanManagementState();
-
-
-  const previousIndex =
-    clan.teamSlots.indexOf(
-      character.id
-    );
-
-
-  const displacedId =
-    clan.teamSlots[
-      slotIndex
-    ] ||
-    null;
-
-
-  if (
-    previousIndex ===
-      slotIndex
-  ) {
-
-
-    return {
-
-      success:
-        true,
-
-      changed:
-        false,
-
-      slotNumber:
-        slotNumber,
-
-      characterId:
-        character.id
-
-    };
-  }
-
-
-  clan.teamSlots[
-    slotIndex
-  ] =
-    character.id;
-
-
-  if (
-    previousIndex >=
-      0
-  ) {
-
-
-    clan.teamSlots[
-      previousIndex
-    ] =
-      displacedId;
-  }
-
-
-  playerData.clan =
-    normalizeClanManagementState(
-      clan
-    );
-
-
-  savePlayerData();
-
-
+  const editability=canEditClanFormation();
+  if (!editability.allowed) return {success:false,reason:editability.reason};
+  const slotIndex=Number(slotNumber)-1;
+  if (!Number.isInteger(slotIndex)||slotIndex<0||slotIndex>=CLAN_TEAM_SLOT_COUNT) return {success:false,reason:"invalid_clan_team_slot"};
+  const formationPlacement=evaluateClanFormationPlacement(characterId,slotNumber);
+  if (!formationPlacement.allowed) return {success:false,reason:formationPlacement.reason,contextId:formationPlacement.contextId||null};
+  const character=getClanManageableRosterCharacters().find(member=>member.id===characterId)||null;
+  if (!character) return {success:false,reason:"character_not_clan_manageable"};
+  const clan=ensureClanManagementState();
+  const next=[...clan.teamSlots];
+  const previousIndex=next.indexOf(character.id);
+  const displacedId=next[slotIndex]||null;
+  if (previousIndex===slotIndex) return {success:true,changed:false,slotNumber,characterId:character.id};
+  next[slotIndex]=character.id;
+  if (previousIndex>=0) next[previousIndex]=displacedId;
+  const committed=commitClanTeamAssignment(next,{source:"direct_clan_slot_assignment",sourceEventId:"setClanTeamSlot"});
+  if (!committed.success) return committed;
   rerenderClanOverlay();
-
-
   return {
-
-    success:
-      true,
-
-    changed:
-      true,
-
-    slotNumber:
-      slotNumber,
-
-    characterId:
-      character.id,
-
-    displacedCharacterId:
-      displacedId
-
+    success:true,
+    changed:committed.changed,
+    slotNumber,
+    characterId:character.id,
+    displacedCharacterId:displacedId,
+    assignment:committed.assignment
   };
 }
 
-
 // =========================================================
+
 // BRICK 424 — NEXT-OPEN TEAM SLOT ASSIGNMENT
 // BRICK 425 — TEAM REORDER AUTHORITY FOR FUTURE DRAG UI
 // =========================================================
@@ -43217,12 +43271,15 @@ function assignClanCharacterToNextOpenSlot(characterId) {
     const anyOpen=clan.teamSlots.some(id=>!id);
     return {success:false,reason:anyOpen?"no_eligible_open_formation_slot":"clan_team_full"};
   }
-  clan.teamSlots[openIndex]=characterId;
-  playerData.clan=normalizeClanManagementState(clan);
-  savePlayerData();
+  const next=[...clan.teamSlots];
+  next[openIndex]=characterId;
+  const committed=commitClanTeamAssignment(next,{source:"direct_clan_next_open_assignment",sourceEventId:"assignClanCharacterToNextOpenSlot"});
+  if (!committed.success) return committed;
   rerenderClanOverlay();
-  return {success:true,changed:true,slotNumber:openIndex+1,characterId};
+  return {success:true,changed:committed.changed,slotNumber:openIndex+1,characterId,assignment:committed.assignment};
 }
+
+
 
 function moveClanCharacterToSlot(characterId, slotNumber) {
   return setClanTeamSlot(slotNumber,characterId);
@@ -43255,120 +43312,24 @@ function dropClanCharacterIntoTeamSlot(event, slotNumber) {
 function removeClanCharacterFromTeam(
   characterId
 ) {
-
-
-  const editability =
-    canEditClanFormation();
-
-
-  if (
-    !editability.allowed
-  ) {
-
-
-    return {
-
-      success:
-        false,
-
-      reason:
-        editability.reason
-
-    };
-  }
-
-
-  const clan =
-    ensureClanManagementState();
-
-
-  const slotIndex =
-    clan.teamSlots.indexOf(
-      characterId
-    );
-
-
+  const editability=canEditClanFormation();
+  if (!editability.allowed) return {success:false,reason:editability.reason};
+  const clan=ensureClanManagementState();
+  const slotIndex=clan.teamSlots.indexOf(characterId);
   const activeConstraint=getActiveClanFormationConstraint();
   if (slotIndex>=0&&activeConstraint&&activeConstraint.fixedRegistryIdBySlot&&activeConstraint.fixedRegistryIdBySlot[slotIndex+1]===getCharacterRegistryId(characterId)) {
     return {success:false,reason:"formation_slot_fixed",contextId:activeConstraint.contextId||null};
   }
-
-
-  if (
-    slotIndex < 0
-  ) {
-
-
-    return {
-
-      success:
-        true,
-
-      changed:
-        false,
-
-      reason:
-        null
-
-    };
-  }
-
-
-  const deployedCount =
-    clan.teamSlots.filter(
-      id =>
-        !!id
-    ).length;
-
-
-  if (
-    deployedCount <= 1
-  ) {
-
-
-    return {
-
-      success:
-        false,
-
-      reason:
-        "clan_team_requires_one_member"
-
-    };
-  }
-
-
-  clan.teamSlots[
-    slotIndex
-  ] =
-    null;
-
-
-  playerData.clan =
-    normalizeClanManagementState(
-      clan
-    );
-
-
-  savePlayerData();
-
-
+  if (slotIndex<0) return {success:true,changed:false,reason:null};
+  if (clan.teamSlots.filter(Boolean).length<=1) return {success:false,reason:"clan_team_requires_one_member"};
+  const next=[...clan.teamSlots];
+  next[slotIndex]=null;
+  const committed=commitClanTeamAssignment(next,{source:"direct_clan_remove_assignment",sourceEventId:"removeClanCharacterFromTeam"});
+  if (!committed.success) return committed;
   rerenderClanOverlay();
-
-
-  return {
-
-    success:
-      true,
-
-    changed:
-      true,
-
-    characterId:
-      characterId
-
-  };
+  return {success:true,changed:committed.changed,characterId,assignment:committed.assignment};
 }
+
 
 
 function toggleClanFavourite(
@@ -98861,7 +98822,7 @@ function stageMyClanCharacterToSlot(slotNumber,characterId) {
   }
   CLAN_UI_STATE.stagedTeamSlots=staged;
   refreshMyClanDirtyState();
-  setMyClanFeedback(`${character.name} staged for ${getClanBattleQueueSlotLabel(slotNumber)}.`,"staged");
+  setMyClanFeedback(`${getMyClanPersonName(character)} staged for ${getClanBattleQueueSlotLabel(slotNumber)}.`,"staged");
   rerenderClanOverlay();
   return {success:true,changed:true,slotNumber,characterId:character.id,displacedCharacterId:displacedId,committed:false};
 }
@@ -98964,46 +98925,51 @@ function resetMyClanStagedFormation() {
 
 function validateMyClanStagedFormationForCommit() {
   const staged=cloneMyClanTeamSlots(ensureMyClanAdaptiveStaging());
-  const ids=staged.filter(Boolean);
-  if (!ids.length) return {valid:false,reason:"clan_team_requires_one_member"};
-  if (new Set(ids).size!==ids.length) return {valid:false,reason:"duplicate_clan_team_character"};
-  const manageable=new Set(getClanManageableRosterCharacters().map(character=>character.id));
-  if (ids.some(id=>!manageable.has(id))) return {valid:false,reason:"character_not_clan_manageable"};
-  for (let index=0;index<staged.length;index+=1) {
-    const id=staged[index];
-    if (!id) continue;
-    const placement=evaluateClanFormationPlacement(id,index+1);
-    if (!placement.allowed) return {valid:false,reason:placement.reason,contextId:placement.contextId||null,slotNumber:index+1};
-  }
-  return {valid:true,reason:null,teamSlots:staged};
+  return validateClanTeamAssignmentCandidate(staged);
 }
+
+
 
 function saveMyClanStagedFormation() {
   const editability=canEditClanFormation();
   if (!editability.allowed) return {success:false,reason:editability.reason};
   const validation=validateMyClanStagedFormationForCommit();
   if (!validation.valid) {
-    setMyClanFeedback(`Formation not saved: ${validation.reason}.`,`error`);
+    setMyClanFeedback(\`Formation not saved: \${validation.reason}.\`,"error");
     rerenderClanOverlay();
     return {success:false,reason:validation.reason};
   }
-  const before=getCommittedMyClanTeamSlots();
-  if (JSON.stringify(before)===JSON.stringify(validation.teamSlots)) {
-    CLAN_UI_STATE.stagedBaseline=cloneMyClanTeamSlots(before);
-    CLAN_UI_STATE.formationDirty=false;
-    setMyClanFeedback("Formation already saved.","info");
+  const committed=commitClanTeamAssignment(validation.teamSlots,{
+    source:"my_clan_save_formation",
+    sourceEventId:"saveMyClanStagedFormation"
+  });
+  if (!committed.success) {
+    setMyClanFeedback(\`Formation not saved: \${committed.reason}.\`,"error");
     rerenderClanOverlay();
-    return {success:true,changed:false,teamSlots:before};
+    return committed;
   }
-  const clan=ensureClanManagementState();
-  playerData.clan=normalizeClanManagementState({...clan,teamSlots:validation.teamSlots});
-  savePlayerData();
   CLAN_UI_STATE.stagedBaseline=cloneMyClanTeamSlots(playerData.clan.teamSlots);
   CLAN_UI_STATE.stagedTeamSlots=cloneMyClanTeamSlots(playerData.clan.teamSlots);
   CLAN_UI_STATE.formationDirty=false;
-  setMyClanFeedback("Formation saved.","saved");
+  setMyClanFeedback(committed.changed?"Formation saved.":"Formation already saved.",committed.changed?"saved":"info");
   rerenderClanOverlay();
-  return {success:true,changed:true,teamSlots:cloneMyClanTeamSlots(playerData.clan.teamSlots),committed:true};
+  return {
+    success:true,
+    changed:committed.changed,
+    teamSlots:cloneMyClanTeamSlots(playerData.clan.teamSlots),
+    committed:true,
+    assignment:committed.assignment
+  };
+}
+
+
+
+function getMyClanPersonName(character) {
+  if (!character) return "";
+  const registryId=getCharacterRegistryId(character);
+  return registryId&&typeof getProductionRuntimePersonName==="function"
+    ? getProductionRuntimePersonName(registryId)
+    : String(character.name||"");
 }
 
 function getMyClanCollectibleCardPath(character) {
@@ -99073,7 +99039,7 @@ function createMyClanFormationSlot(slotNumber) {
   return `<button type="button" class="my-clan-formation-slot ${character?"is-occupied":"is-empty"}" data-slot-number="${slotNumber}" draggable="${character?"true":"false"}" ${character?`ondragstart="beginMyClanFormationDrag(event,${slotNumber})"`:""} ondragover="allowMyClanFormationDrop(event)" ondragleave="leaveMyClanFormationDrop(event)" ondrop="dropMyClanCharacterIntoSlot(event,${slotNumber})" onclick="stageSelectedMyClanCharacterToSlot(${slotNumber})">
     <span class="my-clan-slot-label">${escapeStorySceneHTML(definition?definition.label:`SLOT ${slotNumber}`)}</span>
     <span class="my-clan-slot-portrait">${portrait?`<img src="${escapeStorySceneHTML(portrait)}" alt="${escapeStorySceneHTML(character.name)}">`:`<span class="my-clan-slot-empty-mark">忍</span>`}</span>
-    <span class="my-clan-slot-name">${character?escapeStorySceneHTML(character.name):"EMPTY"}</span>
+    <span class="my-clan-slot-name">${character?escapeStorySceneHTML(getMyClanPersonName(character)):"EMPTY"}</span>
     <span class="my-clan-slot-pl">${character?`PL ${currentPL}`:""}</span>
   </button>`;
 }
@@ -99085,7 +99051,7 @@ function createClanCard(character) {
   const favourite=isClanFavourite(character.id);
   const selected=CLAN_UI_STATE.selectedCharacterId===character.id&&CLAN_UI_STATE.viewMode==="inspection";
   return `<article class="my-clan-roster-card ${selected?"is-selected":""}" draggable="true" ondragstart="beginMyClanCharacterDrag(event,'${escapeStorySceneHTML(character.id)}')">
-    <button type="button" class="my-clan-card-hitbox" onclick="selectMyClanCharacterForInspection('${escapeStorySceneHTML(character.id)}')" ondblclick="openMyClanCodexShortcut('${escapeStorySceneHTML(character.id)}')" aria-label="Inspect ${escapeStorySceneHTML(character.name)}">
+    <button type="button" class="my-clan-card-hitbox" onclick="selectMyClanCharacterForInspection('${escapeStorySceneHTML(character.id)}')" ondblclick="openMyClanCodexShortcut('${escapeStorySceneHTML(character.id)}')" aria-label="Inspect ${escapeStorySceneHTML(getMyClanPersonName(character))}">
       ${cardPath?`<img class="my-clan-collectible-card" src="${escapeStorySceneHTML(cardPath)}" alt="${escapeStorySceneHTML(character.name)} collectible card" draggable="false">`:`<span class="my-clan-card-missing">COLLECTIBLE CARD<br>NOT MAPPED</span>`}
       ${badge?`<span class="my-clan-assignment-badge">${badge}</span>`:""}
       ${favourite?`<span class="my-clan-favourite-badge">★</span>`:""}
@@ -99120,7 +99086,7 @@ function renderMyClanInspectionContent(character) {
     <button type="button" class="my-clan-inspection-close" onclick="closeMyClanInspection()" aria-label="Close inspection">✕</button>
     <div class="my-clan-selected-identity">
       <div class="my-clan-selected-portrait">${portrait?`<img src="${escapeStorySceneHTML(portrait)}" alt="${escapeStorySceneHTML(character.name)}">`:`<span>忍</span>`}</div>
-      <div class="my-clan-selected-copy"><span class="my-clan-selected-kicker">SELECTED SHINOBI</span><h3>${escapeStorySceneHTML(character.name)}</h3><small>${escapeStorySceneHTML(getMyClanRankValue(character))} · PL ${currentPL}</small></div>
+      <div class="my-clan-selected-copy"><span class="my-clan-selected-kicker">SELECTED SHINOBI</span><h3>${escapeStorySceneHTML(getMyClanPersonName(character))}</h3><small>${escapeStorySceneHTML(getMyClanRankValue(character))} · PL ${currentPL}</small></div>
       <button type="button" class="my-clan-favourite-toggle" onclick="toggleClanFavourite('${escapeStorySceneHTML(character.id)}')" aria-label="Toggle favourite">${isClanFavourite(character.id)?"★":"☆"}</button>
     </div>
     <div class="my-clan-inspection-tabs">${["overview","stats","techniques","conditions","profile"].map(id=>`<button type="button" class="${tab===id?"is-active":""}" onclick="setMyClanInspectionTab('${id}')">${id.toUpperCase()}</button>`).join("")}</div>
@@ -100838,7 +100804,7 @@ function createClanCard(character){
   const selected=CLAN_UI_STATE.selectedCharacterId===character.id&&CLAN_UI_STATE.viewMode==="inspection";
   const editable=canEditClanFormation().allowed===true;
   return `<article class="my-clan-roster-card ${selected?"is-selected":""} ${editable?"":"is-formation-locked"}" draggable="${editable?"true":"false"}" ${editable?`ondragstart="beginMyClanCharacterDrag(event,'${escapeStorySceneHTML(character.id)}')"`:""}>
-    <button type="button" class="my-clan-card-hitbox" onclick="selectMyClanCharacterForInspection('${escapeStorySceneHTML(character.id)}')" ondblclick="openMyClanCodexShortcut('${escapeStorySceneHTML(character.id)}')" aria-label="Inspect ${escapeStorySceneHTML(character.name)}" aria-pressed="${selected?"true":"false"}">
+    <button type="button" class="my-clan-card-hitbox" onclick="selectMyClanCharacterForInspection('${escapeStorySceneHTML(character.id)}')" ondblclick="openMyClanCodexShortcut('${escapeStorySceneHTML(character.id)}')" aria-label="Inspect ${escapeStorySceneHTML(getMyClanPersonName(character))}" aria-pressed="${selected?"true":"false"}">
       ${cardPath?`<img class="my-clan-collectible-card" src="${escapeStorySceneHTML(cardPath)}" alt="${escapeStorySceneHTML(character.name)} collectible card" draggable="false">`:`<span class="my-clan-card-missing">COLLECTIBLE CARD<br>NOT MAPPED</span>`}
       ${badge?`<span class="my-clan-assignment-badge">${badge}</span>`:""}
       ${favourite?`<span class="my-clan-favourite-badge">★</span>`:""}
