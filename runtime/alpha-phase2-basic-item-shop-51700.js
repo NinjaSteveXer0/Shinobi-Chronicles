@@ -358,6 +358,7 @@ if(typeof document!=="undefined"){
 }
 
 globalThis.getPhase2BasicItemShopSnapshot51700=catalogueSnapshot;
+globalThis.renderPhase2BasicItemShop51700=renderShop;
 globalThis.commitPhase2BasicItemShopPurchase51700=commitPurchase;
 globalThis.purchasePhase2BasicShopItem51700=purchaseFromUI;
 globalThis.openPhase2BasicItemShop51700=openShop;
