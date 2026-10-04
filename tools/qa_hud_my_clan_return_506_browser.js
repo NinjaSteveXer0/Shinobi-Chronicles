@@ -172,12 +172,13 @@ async function semanticFingerprint(page){
     await closeClan(page);
     await waitSurface(page,"world");
     const worldAfter=await page.evaluate(()=>({
-      overlay:currentOverlayType,
+      staleOverlayType:currentOverlayType,
       overlayVisible:document.getElementById("screen-overlay")?.style.display!=="none",
+      hudSurface:getPhase2LiveHudSnapshot49900()?.surface?.kind||null,
       adapter:getHudMyClanReturnContext50600()
     }));
-    assert.strictEqual(worldAfter.overlay,null);
-    assert.strictEqual(worldAfter.overlayVisible,false);
+    assert.strictEqual(worldAfter.overlayVisible,false,"canonical World return left the screen overlay visible");
+    assert.strictEqual(worldAfter.hudSurface,"world","canonical World return did not restore the accepted #499 World surface");
     assert.strictEqual(worldAfter.adapter.armed,false);
 
     // Non-HUD My Clan entry keeps legacy close behavior and never arms #506.
