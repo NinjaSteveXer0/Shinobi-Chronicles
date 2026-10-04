@@ -24,6 +24,7 @@ assert(!staged.includes("playerData.clan=normalizeClanManagementState"),"#532 Sa
 assert(SHOP.includes("assignmentCommitted:false")&&SHOP.includes("retailDoesNotAssign:true"),"#532 retail ownership/assignment separation regressed");
 assert(STATE.indexOf("clanAssignmentFrom(save)")<STATE.indexOf("validCommittedTeamReceipt(receipt)"),"#532 State Manifest does not prefer current clan assignment");
 assert(STATE.includes('sourcePath:"playerData.clan.currentTeamAssignment"'),"#532 canonical currentTeam source path missing");
+assert(STATE.includes('semanticOwner:"Current Team Assignment / game.js"'),"#532 State Manifest semantic owner did not move to canonical Current Team assignment authority");
 assert(STATE.includes("protagonistPresent"),"#532 protagonist/team separation projection missing");
 assert(STATE.includes("teamLineageIds"),"#532 State Manifest lineage projection missing");
 assert(HUD.includes('call("getProductionRuntimePersonName",variant||id)'),"#532 HUD person-name projection missing");
