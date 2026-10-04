@@ -2374,11 +2374,10 @@
     {
       "symbol": "forceCloseMyClanOverlay",
       "chain": [
-        "game.js",
         "runtime/alpha-hud-my-clan-return-context-50600.js"
       ],
       "canonicalActiveOwner": "runtime/alpha-hud-my-clan-return-context-50600.js",
-      "activationCondition": "Only when #506 holds a transient return underlay captured from an actual #499 HUD My Clan activation while currentOverlayType is clan; otherwise delegate unchanged to game.js.",
+      "activationCondition": "The base game.js function remains the delegated predecessor; #506 is the only declared assignment wrapper and becomes active only when a transient return underlay was captured from an actual #499 HUD My Clan activation while currentOverlayType is clan.",
       "qaRefs": [
         "tools/qa_hud_my_clan_return_506.js",
         "tools/qa_hud_my_clan_return_506_browser.js",
