@@ -16,10 +16,10 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-04-DW",
-    sourceBaselineCommit:"f5283e6044825da14a4fa6852e596eb404a20327",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-04-DX",
+    sourceBaselineCommit:"98f826b5c064634fb964d8ebff6f5f6aa18ea075",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
-    runtimeGeneration:"hud-my-clan-return-context-506",
+    runtimeGeneration:"phase2-character-card-shop-524",
     majorRuntimeFeatures:Object.freeze([
       "academy-kakashi-v2",
       "runtime-ownership-safety-300",
@@ -93,7 +93,8 @@
       "phase2-live-hud-region-village-map-echo-499",
       "phase2-live-hud-region-village-map-echo-visible-stage-499",
       "phase2-basic-item-shop-517",
-      "hud-my-clan-exact-map-return-506"
+      "hud-my-clan-exact-map-return-506",
+      "phase2-character-card-shop-retail-acquisition-524"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -126,7 +127,7 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-04-DW",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-04-DX",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
       generationPresent:first.runtimeGeneration==="hud-my-clan-return-context-506",
@@ -153,6 +154,7 @@
       phase2LiveHudRegionVillageMapEchoVisibleStage499Present:first.majorRuntimeFeatures.includes("phase2-live-hud-region-village-map-echo-visible-stage-499"),
       phase2BasicItemShop517Present:first.majorRuntimeFeatures.includes("phase2-basic-item-shop-517"),
       hudMyClanExactMapReturn506Present:first.majorRuntimeFeatures.includes("hud-my-clan-exact-map-return-506"),
+      phase2CharacterCardShop524Present:first.majorRuntimeFeatures.includes("phase2-character-card-shop-retail-acquisition-524"),
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)
