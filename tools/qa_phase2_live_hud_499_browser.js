@@ -173,11 +173,22 @@ async function proveRegionContext(page,label){
     const nodes=[...document.querySelectorAll(".region-hotspot[data-hotspot-id][data-region-key]")];
     return nodes.map((node,index)=>{
       const projection=getHotspotProjection(node.dataset.regionKey,node.dataset.hotspotId);
-      return{index,id:node.dataset.hotspotId,regionKey:node.dataset.regionKey,label:projection&&projection.knownLabel||null,summary:projection&&projection.knownSummary||null};
+      const rect=node.getBoundingClientRect();
+      const hit=document.elementFromPoint(rect.left+rect.width/2,rect.top+rect.height/2);
+      const topHotspot=hit&&hit.closest&&hit.closest(".region-hotspot[data-hotspot-id]");
+      return{
+        index,
+        id:node.dataset.hotspotId,
+        regionKey:node.dataset.regionKey,
+        label:projection&&projection.knownLabel||null,
+        summary:projection&&projection.knownSummary||null,
+        pointerReachable:topHotspot===node
+      };
     });
   });
   assert(data.length,label+": no observer-safe Region hotspots available");
-  const known=data.find(row=>row.label&&row.label!=="???")||data[0];
+  const known=data.find(row=>row.pointerReachable&&row.label&&row.label!=="???")||data.find(row=>row.pointerReachable);
+  assert(known,label+": no pointer-reachable Region hotspot available without changing canonical coordinates: "+JSON.stringify(data));
   const knownNode=page.locator(".region-hotspot[data-hotspot-id]").nth(known.index);
   await knownNode.hover();
   await page.waitForTimeout(320);
