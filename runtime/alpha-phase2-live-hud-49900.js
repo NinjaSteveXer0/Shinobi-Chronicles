@@ -255,13 +255,13 @@ function imageMarkup(path,name,extraClass=""){
 }
 function teamMarkup(rows){
   if(!rows.length)return"";
-  return '<button type="button" class="sc-hud499-team" data-hud499-action="clan" aria-label="Open My Clan. Current team: '+esc(rows.map(r=>r.name).join(", "))+'">'+
+  return '<section class="sc-hud499-team" data-hud499-action="clan" aria-label="Current Team: '+esc(rows.map(r=>r.name).join(", "))+'">'+
     '<span class="sc-hud499-kicker">CURRENT TEAM</span>'+
     '<span class="sc-hud499-team-stack">'+rows.map(row=>
-      '<span class="sc-hud499-team-member" data-team-variant-id="'+esc(row.id)+'" title="'+esc(row.name)+'">'+
+      '<button type="button" class="sc-hud499-team-member" data-hud499-action="clan" data-team-variant-id="'+esc(row.id)+'" aria-label="'+esc(row.name)+'. Open My Clan." title="'+esc(row.name)+'">'+
       imageMarkup(row.portrait,row.name,"sc-hud499-team-portrait")+
-      '<span class="sc-hud499-team-name">'+esc(row.name)+'</span></span>'
-    ).join("")+'</span></button>';
+      '<span class="sc-hud499-team-name">'+esc(row.name)+'</span></button>'
+    ).join("")+'</span></section>';
 }
 function brandMarkup(surfaceKind){
   if(surfaceKind!=="world")return"";
@@ -279,6 +279,124 @@ function toolsMarkup(){
       '<button type="button" data-hud499-action="journey">JOURNEY</button>'+
     '</nav>'+
   '</details>';
+}
+function contextMarkup(surfaceKind){
+  if(surfaceKind!=="region"&&surfaceKind!=="village")return"";
+  return '<aside class="sc-hud499-context" data-active="false" aria-live="polite" aria-atomic="true" aria-label="Map context"></aside>';
+}
+function regionContextProjection(node){
+  if(!node)return null;
+  const hotspotId=node.dataset&&node.dataset.hotspotId||null;
+  const regionKey=node.dataset&&node.dataset.regionKey||null;
+  if(!hotspotId||!regionKey)return null;
+  let hotspot=null;
+  try{
+    if(typeof getHotspotProjection==="function")hotspot=getHotspotProjection(regionKey,hotspotId);
+  }catch(_error){}
+  if(!hotspot)hotspot=call("getHotspotProjection",regionKey,hotspotId);
+  if(!hotspot)return null;
+  const label=scalar(hotspot.knownLabel)||"???";
+  const known=label!=="???";
+  if(!known){
+    return{surface:"region",name:"???",category:"UNKNOWN",summary:null,interaction:null,status:null,unknown:true};
+  }
+  const opportunities=Array.isArray(hotspot.opportunities)?hotspot.opportunities:[];
+  const knownOpportunity=opportunities.find(item=>item&&item.known_label&&item.known_label!=="???")||opportunities[0]||null;
+  const actions=knownOpportunity&&Array.isArray(knownOpportunity.legal_actions)?knownOpportunity.legal_actions:[];
+  const available=actions.filter(action=>action&&action.available===true);
+  const blocker=actions.find(action=>action&&action.available!==true&&action.knownBlocker);
+  const categoryParts=[];
+  if(hotspot.presentationFamily)categoryParts.push(String(hotspot.presentationFamily));
+  if(knownOpportunity&&knownOpportunity.opportunity_category&&knownOpportunity.opportunity_category!=="OTHER"&&knownOpportunity.opportunity_category!=="UNKNOWN"){
+    categoryParts.push(String(knownOpportunity.opportunity_category).replaceAll("_"," "));
+  }
+  let interaction=null;
+  if(Number(hotspot.aggregationCount)>1||available.length>1)interaction="DOUBLE-CLICK TO REVIEW";
+  else if(available.length===1)interaction=scalar(available[0].label)||"DOUBLE-CLICK TO ENTER";
+  else if(node.getAttribute("aria-label")&&/double-click to enter/i.test(node.getAttribute("aria-label")))interaction="DOUBLE-CLICK TO ENTER";
+  const status=available.length?"AVAILABLE":(blocker&&blocker.knownBlocker?String(blocker.knownBlocker).replaceAll("_"," ").toUpperCase():null);
+  return{
+    surface:"region",
+    name:label,
+    category:categoryParts.join(" · ")||null,
+    summary:scalar(hotspot.knownSummary)||null,
+    interaction,
+    status,
+    unknown:false
+  };
+}
+function villageContextProjection(node){
+  if(!node)return null;
+  const labelNode=node.querySelector(".village-golden-halo-label,.village-map-hotspot-label");
+  const aria=String(node.getAttribute("aria-label")||"").trim();
+  const title=String(node.getAttribute("title")||"").trim();
+  let name=labelNode&&String(labelNode.textContent||"").trim()||title||aria.replace(/\.\s*Double-click to enter\.?$/i,"").replace(/^Enter\s+/i,"").trim();
+  if(!name)return null;
+  const unknown=/^\?+$/.test(name)||/^unknown$/i.test(name);
+  if(unknown)return{surface:"village",name:"???",category:"UNKNOWN",summary:null,interaction:null,status:null,unknown:true};
+  const interaction=/double-click to enter/i.test(aria)?"DOUBLE-CLICK TO ENTER":null;
+  return{surface:"village",name,category:null,summary:null,interaction,status:null,unknown:false};
+}
+function mapContextNode(target){
+  if(!target||typeof target.closest!=="function")return null;
+  return target.closest(".region-hotspot,[data-village-hotspot-id],.village-map-hotspot");
+}
+function contextProjectionForNode(node){
+  if(!node||typeof document==="undefined")return null;
+  const root=document.getElementById(ROOT_ID);
+  if(!root||root.hidden)return null;
+  if(root.dataset.surface==="region"&&node.closest(".region-map-pane"))return regionContextProjection(node);
+  if(root.dataset.surface==="village"&&node.closest(".village-map-screen"))return villageContextProjection(node);
+  return null;
+}
+function renderContextProjection(projection){
+  if(typeof document==="undefined")return false;
+  const root=document.getElementById(ROOT_ID);
+  const panel=root&&root.querySelector(".sc-hud499-context");
+  if(!panel)return false;
+  if(!projection){
+    panel.dataset.active="false";
+    panel.innerHTML="";
+    return true;
+  }
+  panel.dataset.active="true";
+  panel.innerHTML=
+    '<span class="sc-hud499-kicker">MAP CONTEXT</span>'+
+    '<strong class="sc-hud499-context-name">'+esc(projection.name||"???")+'</strong>'+
+    (projection.category?'<small class="sc-hud499-context-category">'+esc(projection.category)+'</small>':'')+
+    (projection.summary?'<p>'+esc(projection.summary)+'</p>':'')+
+    (projection.interaction?'<div class="sc-hud499-context-row"><span>INTERACTION</span><b>'+esc(projection.interaction)+'</b></div>':'')+
+    (projection.status?'<div class="sc-hud499-context-row"><span>STATUS</span><b>'+esc(projection.status)+'</b></div>':'');
+  return true;
+}
+function presentMapContextFromTarget(target){
+  const node=mapContextNode(target);
+  if(!node)return false;
+  const projection=contextProjectionForNode(node);
+  if(!projection)return false;
+  return renderContextProjection(projection);
+}
+function clearMapContextWhenIdle(node){
+  if(typeof document==="undefined")return;
+  const finish=()=>{
+    const active=document.activeElement;
+    const focused=active&&mapContextNode(active);
+    let hovered=false;
+    try{hovered=!!(node&&node.matches(":hover"));}catch(_error){}
+    if(focused||hovered)return;
+    renderContextProjection(null);
+  };
+  if(typeof queueMicrotask==="function")queueMicrotask(finish);
+  else setTimeout(finish,0);
+}
+function onMapContextEnter(event){presentMapContextFromTarget(event&&event.target);}
+function onMapContextClick(event){presentMapContextFromTarget(event&&event.target);}
+function onMapContextLeave(event){
+  const node=mapContextNode(event&&event.target);
+  if(!node)return;
+  const next=event&&event.relatedTarget;
+  if(next&&node.contains(next))return;
+  clearMapContextWhenIdle(node);
 }
 function navMarkup(rows,surfaceKind){
   if(!rows.length)return"";
@@ -368,6 +486,7 @@ function render(force=false){
     '</section>'+
     teamMarkup(data.team)+
     toolsMarkup()+
+    contextMarkup(data.surface.kind)+
     navMarkup(data.navigation,data.surface.kind);
   return data;
 }
@@ -426,11 +545,11 @@ function installStyles(){
     .sc-hud499-team::before{content:"";position:absolute;left:-2px;top:34px;bottom:12px;width:3px;background:linear-gradient(180deg,rgba(83,221,232,.82),rgba(198,162,72,.55),rgba(198,162,72,.08));box-shadow:0 0 9px rgba(83,221,232,.13)}
     .sc-hud499-team .sc-hud499-kicker{padding-bottom:6px;font-size:6px;white-space:nowrap}
     .sc-hud499-team-stack{display:flex;flex-direction:column;align-items:center;gap:7px;margin-top:5px}
-    .sc-hud499-team-member{position:relative;display:grid;place-items:center;width:56px;height:56px;padding:3px;border:1px solid rgba(195,159,70,.25);border-radius:50%;background:radial-gradient(circle at 50% 32%,rgba(28,43,56,.95),rgba(8,15,23,.96));box-shadow:0 5px 12px rgba(0,0,0,.25);transition:transform 120ms ease,border-color 120ms ease}
+    .sc-hud499-team-member{appearance:none;position:relative;display:grid;place-items:center;width:56px;height:56px;padding:3px;border:1px solid rgba(195,159,70,.25);border-radius:50%;background:radial-gradient(circle at 50% 32%,rgba(28,43,56,.95),rgba(8,15,23,.96));box-shadow:0 5px 12px rgba(0,0,0,.25);transition:transform 120ms ease,border-color 120ms ease}
     .sc-hud499-team-member:hover{transform:translateX(2px);border-color:rgba(82,220,232,.62)}
     .sc-hud499-team-portrait,.sc-hud499-silhouette.sc-hud499-team-portrait{display:block;width:48px;height:48px;margin:auto;object-fit:cover;object-position:top center;border:1px solid rgba(96,211,224,.3);border-radius:50%;background:#111923}
     .sc-hud499-team-name{position:absolute;left:63px;top:50%;z-index:8;display:block;margin:0;padding:5px 8px;opacity:0;transform:translate(-4px,-50%);border:1px solid rgba(195,159,70,.34);border-radius:4px;background:rgba(6,12,19,.96);box-shadow:0 7px 18px rgba(0,0,0,.34);color:#dfe9ec;font-size:8px;font-weight:800;line-height:1.1;letter-spacing:.04em;white-space:nowrap;pointer-events:none;transition:opacity 120ms ease,transform 120ms ease}
-    .sc-hud499-team-member:hover .sc-hud499-team-name,.sc-hud499-team:focus-visible .sc-hud499-team-name{opacity:1;transform:translate(0,-50%)}
+    .sc-hud499-team-member:hover .sc-hud499-team-name,.sc-hud499-team-member:focus-visible .sc-hud499-team-name{opacity:1;transform:translate(0,-50%)}
     .sc-hud499-tools{box-sizing:border-box;position:absolute;right:var(--sc-hud499-edge);top:128px;width:148px;pointer-events:auto;border:1px solid rgba(195,159,70,.28);border-radius:7px;background:linear-gradient(145deg,rgba(7,14,22,.93),rgba(6,11,18,.78));box-shadow:0 10px 24px rgba(0,0,0,.26);overflow:hidden}
     .sc-hud499-tools summary{min-height:34px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 10px;cursor:pointer;list-style:none;color:#d7c27f;font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
     .sc-hud499-tools summary::-webkit-details-marker{display:none}
@@ -476,6 +595,28 @@ function installStyles(){
       border-color:rgba(195,159,70,.34);
       box-shadow:-7px 0 20px rgba(0,0,0,.18),0 10px 24px rgba(0,0,0,.2)
     }
+
+    .sc-hud499-context{display:none}
+    .sc-hud499-root[data-map-gutter="true"][data-surface="region"] .sc-hud499-context,
+    .sc-hud499-root[data-map-gutter="true"][data-surface="village"] .sc-hud499-context{
+      box-sizing:border-box;display:block;position:absolute;left:auto;right:var(--sc-hud499-gutter-right-anchor);
+      top:max(166px,calc(var(--sc-hud499-map-top) + 58px));width:var(--sc-hud499-gutter-control-width);
+      max-height:min(42vh,310px);padding:10px;overflow:auto;pointer-events:none;
+      opacity:0;visibility:hidden;transform:translateX(5px);
+      border:1px solid rgba(85,218,231,.24);border-radius:7px;
+      background:linear-gradient(145deg,rgba(6,13,20,.94),rgba(5,10,17,.82));
+      box-shadow:-7px 0 20px rgba(0,0,0,.17),0 10px 24px rgba(0,0,0,.18);
+      transition:opacity 120ms ease,transform 120ms ease,visibility 120ms ease
+    }
+    .sc-hud499-root[data-map-gutter="true"] .sc-hud499-context[data-active="true"]{
+      opacity:1;visibility:visible;transform:none
+    }
+    .sc-hud499-context-name{display:block;margin-top:5px;color:#ead89b;font:800 13px/1.12 Georgia,"Times New Roman",serif}
+    .sc-hud499-context-category{display:block;margin-top:3px;color:#8ea5ad;font-size:7px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+    .sc-hud499-context p{margin:8px 0 0;color:#c6d2d6;font-size:8px;line-height:1.4}
+    .sc-hud499-context-row{display:grid;gap:2px;margin-top:8px;padding-top:7px;border-top:1px solid rgba(195,159,70,.16)}
+    .sc-hud499-context-row span{color:#82969e;font-size:6px;font-weight:900;letter-spacing:.13em;text-transform:uppercase}
+    .sc-hud499-context-row b{color:#d9c783;font-size:7px;line-height:1.25;letter-spacing:.04em}
     @media(max-width:1450px){.sc-hud499-brand{width:clamp(190px,17vw,244px)}.sc-hud499-state-cluster{width:clamp(315px,32vw,420px)}.sc-hud499-tools{top:124px;width:138px}.sc-hud499-team{top:116px}}
     @media(max-width:900px){.sc-hud499-root{--sc-hud499-edge:8px;--sc-hud499-safe-bottom:72px}.sc-hud499-brand{left:10px;top:10px;width:170px}.sc-hud499-state-cluster{right:8px;top:8px;width:300px}.sc-hud499-state-main{padding:7px 8px}.sc-hud499-identity-portrait,.sc-hud499-silhouette.sc-hud499-identity-portrait{width:40px;height:40px;flex-basis:40px}.sc-hud499-team{left:8px;top:108px;width:64px}.sc-hud499-team-member{width:50px;height:50px}.sc-hud499-team-portrait,.sc-hud499-silhouette.sc-hud499-team-portrait{width:42px;height:42px}.sc-hud499-tools{right:8px;top:116px;width:128px}.sc-hud499-map-nav{right:8px;bottom:72px;min-width:160px}}
     @media(prefers-reduced-motion:reduce){.sc-hud499-root *{transition:none!important}}
@@ -483,7 +624,7 @@ function installStyles(){
   document.head.appendChild(style);
 }
 function diagnostics(){
-  const source=[snapshot,render,routeAction,teamProjection,journeyProjection,brandMarkup,toolsMarkup,navMarkup,syncMapGutterGeometry].map(String).join("\n");
+  const source=[snapshot,render,routeAction,teamProjection,journeyProjection,brandMarkup,toolsMarkup,navMarkup,syncMapGutterGeometry,regionContextProjection,villageContextProjection,renderContextProjection].map(String).join("\n");
   const data=snapshot();
   const checks={
     readOnlyProjection:!/savePlayerData\s*\(/.test(source)&&!/localStorage\.setItem\s*\(/.test(source)&&!/confirmAcademyTeamFormation\s*\(/.test(source),
@@ -498,6 +639,8 @@ function diagnostics(){
     collapsiblePlayerTools:String(toolsMarkup).includes("<details")&&String(toolsMarkup).includes("PLAYER TOOLS"),
     safeBottomReserve:String(installStyles).includes("--sc-hud499-safe-bottom"),
     regionVillageMapGutters:String(syncMapGutterGeometry).includes(".region-map-pane")&&String(syncMapGutterGeometry).includes(".village-map-screen")&&String(installStyles).includes('data-map-gutter="true"'),
+    functionalGutterContext:String(regionContextProjection).includes("getHotspotProjection")&&String(regionContextProjection).includes('name:"???"')&&String(villageContextProjection).includes("aria-label")&&String(renderContextProjection).includes("MAP CONTEXT"),
+    contextPresentationOnly:!String(regionContextProjection).includes("savePlayerData")&&!String(villageContextProjection).includes("savePlayerData")&&!String(renderContextProjection).includes("savePlayerData"),
     noEnergyProjection:data.energy===null&&!String(render).includes("ENERGY"),
     canonicalRoutes:String(routeAction).includes('call("openOverlay","clan")')&&String(routeAction).includes('call("openOverlay","inventory")')&&String(routeAction).includes('call("openShinobiRecord","overview")')&&String(routeAction).includes('call("openOverlay","missions")'),
     deepSurfaceSuppression:String(surfaceProjection).includes('kind:"deep"')&&String(surfaceProjection).includes("storyActive")&&String(surfaceProjection).includes("battleActive"),
@@ -518,6 +661,11 @@ if(typeof document!=="undefined"){
   if(overlay)observer.observe(overlay,{attributes:true,attributeFilter:["style","class","hidden"]});
   if(typeof setInterval==="function")state.timer=setInterval(()=>render(false),250);
   if(typeof window!=="undefined")window.addEventListener("resize",scheduleRefresh,{passive:true});
+  document.addEventListener("pointerover",onMapContextEnter,true);
+  document.addEventListener("pointerout",onMapContextLeave,true);
+  document.addEventListener("focusin",onMapContextEnter,true);
+  document.addEventListener("focusout",onMapContextLeave,true);
+  document.addEventListener("click",onMapContextClick,true);
 }
 
 globalThis.getPhase2LiveHudSnapshot49900=snapshot;

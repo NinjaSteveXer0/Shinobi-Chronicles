@@ -16,7 +16,7 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-04-DP",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-04-DQ",
     sourceBaselineCommit:"7e96e3e927d8e2190db9c001e83dfd69db728ce5",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
     runtimeGeneration:"phase2-live-hud-499",
@@ -88,7 +88,8 @@
       "phase2-live-hud-safe-bottom-reserve-499",
       "phase2-live-hud-canonical-world-return-499",
       "phase2-live-hud-loader-newline-cleanup-499",
-      "phase2-live-hud-region-village-gutter-integration-499"
+      "phase2-live-hud-region-village-gutter-integration-499",
+      "phase2-live-hud-functional-gutter-context-499"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -121,7 +122,7 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-04-DP",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-04-DQ",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
       generationPresent:first.runtimeGeneration==="phase2-live-hud-499",
@@ -143,6 +144,7 @@
       phase2LiveHudCanonicalWorldReturn499Present:first.majorRuntimeFeatures.includes("phase2-live-hud-canonical-world-return-499"),
       phase2LiveHudLoaderNewlineCleanup499Present:first.majorRuntimeFeatures.includes("phase2-live-hud-loader-newline-cleanup-499"),
       phase2LiveHudRegionVillageGutter499Present:first.majorRuntimeFeatures.includes("phase2-live-hud-region-village-gutter-integration-499"),
+      phase2LiveHudFunctionalGutterContext499Present:first.majorRuntimeFeatures.includes("phase2-live-hud-functional-gutter-context-499"),
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)

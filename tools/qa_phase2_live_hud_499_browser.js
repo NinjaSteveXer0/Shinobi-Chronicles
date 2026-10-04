@@ -62,6 +62,7 @@ async function captureHudLayout(page){
       team:rect(".sc-hud499-team"),
       tools:rect(".sc-hud499-tools"),
       compass:rect(".sc-hud499-map-nav"),
+      context:rect(".sc-hud499-context"),
       brand:rect(".sc-hud499-brand"),
       map:rectNode(mapSelector?document.querySelector(mapSelector):null)
     };
@@ -92,6 +93,99 @@ function assertMapGutterIntegration(layout,label){
   assert(Math.abs(layout.tools.width-layout.compass.width)<=2,label+": right-gutter widgets do not share a width: "+JSON.stringify(layout));
   assert(layout.map.width>=layout.viewport[0]*0.60,label+": map lost dominance while reserving HUD gutters: "+JSON.stringify(layout));
 }
+async function semanticHudInteractionFingerprint(page){
+  return page.evaluate(()=>JSON.stringify({
+    activityHistory:Array.isArray(playerData.activityHistory)?playerData.activityHistory:null,
+    worldEventRuntime:playerData.worldEventRuntime||null,
+    currentTeam:getChronicleCurrentTeam43600(),
+    ryo:playerData.ryo,
+    acquisition:playerData.acquisition||null
+  }));
+}
+async function contextPanelState(page){
+  return page.evaluate(()=>{
+    const panel=document.querySelector("#sc-phase2-live-hud-49900 .sc-hud499-context");
+    return panel?{active:panel.dataset.active,text:String(panel.innerText||"").trim(),html:panel.innerHTML}:null;
+  });
+}
+async function clearHudContext(page){
+  await page.mouse.move(1,1);
+  await page.evaluate(()=>{const active=document.activeElement;if(active&&typeof active.blur==="function")active.blur();});
+  await page.waitForTimeout(80);
+}
+async function proveTeamIdentityReveal(page,label){
+  const result=await page.evaluate(()=>{
+    const members=[...document.querySelectorAll(".sc-hud499-team-member")];
+    if(!members.length)return null;
+    members[0].focus();
+    const names=members.map(member=>{
+      const node=member.querySelector(".sc-hud499-team-name");
+      const cs=node&&getComputedStyle(node);
+      return{text:node&&node.textContent||"",opacity:cs?Number(cs.opacity):0};
+    });
+    return{activeId:document.activeElement&&document.activeElement.dataset.teamVariantId||null,names};
+  });
+  assert(result&&result.activeId,label+": Current Team portrait is not keyboard-focusable");
+  assert(result.names[0].text&&result.names[0].opacity>0.9,label+": focused portrait did not reveal legitimate identity");
+  assert(result.names.slice(1).every(row=>row.opacity<0.1),label+": focusing one portrait revealed unrelated team identities");
+  await clearHudContext(page);
+}
+async function proveVillageContext(page,label){
+  const before=await semanticHudInteractionFingerprint(page);
+  const hotspot=page.locator("[data-village-hotspot-id]").first();
+  assert(await hotspot.count(),label+": no legitimate Village hotspot available");
+  const expected=(await hotspot.locator(".village-golden-halo-label,.village-map-hotspot-label").first().textContent()||"").trim();
+  await hotspot.focus();
+  await page.waitForTimeout(80);
+  const focused=await contextPanelState(page);
+  assert(focused&&focused.active===true,label+": Village context did not activate on keyboard focus");
+  assert(expected&&focused.text.includes(expected),label+": Village context did not reuse visible hotspot identity: "+JSON.stringify({expected,focused}));
+  assert(/DOUBLE-CLICK TO ENTER/.test(focused.text),label+": Village context did not preserve existing interaction hint");
+  await clearHudContext(page);
+  const quiet=await contextPanelState(page);
+  assert(quiet&&quiet.active===false&&quiet.text==="",label+": Village context did not return to quiet");
+  const after=await semanticHudInteractionFingerprint(page);
+  assert.strictEqual(after,before,label+": Village hover/focus mutated canonical state");
+}
+async function proveRegionContext(page,label){
+  const before=await semanticHudInteractionFingerprint(page);
+  const data=await page.evaluate(()=>{
+    const nodes=[...document.querySelectorAll(".region-hotspot[data-hotspot-id][data-region-key]")];
+    return nodes.map((node,index)=>{
+      const projection=getHotspotProjection(node.dataset.regionKey,node.dataset.hotspotId);
+      return{index,id:node.dataset.hotspotId,regionKey:node.dataset.regionKey,label:projection&&projection.knownLabel||null,summary:projection&&projection.knownSummary||null};
+    });
+  });
+  assert(data.length,label+": no observer-safe Region hotspots available");
+  const known=data.find(row=>row.label&&row.label!=="???")||data[0];
+  const knownNode=page.locator(".region-hotspot[data-hotspot-id]").nth(known.index);
+  await knownNode.hover();
+  await page.waitForTimeout(80);
+  const hovered=await contextPanelState(page);
+  assert(hovered&&hovered.active===true,label+": Region context did not activate on hover");
+  assert(hovered.text.includes(known.label||"???"),label+": Region context diverged from observer-safe projection");
+  if(known.summary)assert(hovered.text.includes(known.summary),label+": Region context omitted observer-safe summary");
+  await knownNode.focus();
+  await page.mouse.move(1,1);
+  await page.waitForTimeout(80);
+  const selected=await contextPanelState(page);
+  assert(selected&&selected.active===true,label+": focused/selected Region hotspot did not keep useful context");
+  const unknown=data.find(row=>row.label==="???");
+  if(unknown){
+    const unknownNode=page.locator(".region-hotspot[data-hotspot-id]").nth(unknown.index);
+    await unknownNode.focus();
+    await page.waitForTimeout(80);
+    const hidden=await contextPanelState(page);
+    assert(hidden&&hidden.active===true&&hidden.text.includes("???"),label+": unknown Region hotspot lost unknown presentation");
+    assert(!/BATTLE|MISSION|STORY|TRAINING|ENTER LOCATION|AVAILABLE/.test(hidden.text),label+": unknown Region hotspot leaked hidden truth: "+JSON.stringify(hidden));
+  }
+  await clearHudContext(page);
+  const quiet=await contextPanelState(page);
+  assert(quiet&&quiet.active===false&&quiet.text==="",label+": Region context did not return to quiet");
+  const after=await semanticHudInteractionFingerprint(page);
+  assert.strictEqual(after,before,label+": Region hover/focus mutated canonical state");
+}
+
 
 
 (async()=>{
@@ -212,6 +306,8 @@ function assertMapGutterIntegration(layout,label){
     assert.strictEqual(initial.focusable,true,"HUD controls are not keyboard focusable");
     assert.strictEqual(initial.brandImage,null,"World-only masterbrand leaked onto Village surface");
     assert(!documentBodyLiteralNewline(await page.evaluate(()=>document.body.innerText||"")),"literal escaped newline leaked into rendered HUD page");
+    await proveTeamIdentityReveal(page,"1366x768 Village");
+    await proveVillageContext(page,"1366x768 Village");
 
     const clickability=await page.evaluate(()=>{
       const buttons=[...document.querySelectorAll('button[data-village-hotspot-id]')].filter(node=>{
@@ -368,6 +464,7 @@ function assertMapGutterIntegration(layout,label){
     assertHudLayout(region1366,"1366x768 Region");
     assertMapGutterIntegration(region1366,"1366x768 Region");
     assert.strictEqual(region1366.brand,null,"World-only brand leaked onto Region at 1366x768");
+    await proveRegionContext(page,"1366x768 Region");
     await page.screenshot({path:path.join(OUT,"03b-region-1366x768-gutter-hud.png"),fullPage:true});
 
     await page.click('[data-hud499-action="world"]');
@@ -377,6 +474,7 @@ function assertMapGutterIntegration(layout,label){
     assert.deepStrictEqual(world1366.viewport,[1366,768]);
     assertHudLayout(world1366,"1366x768 World");
     assert(world1366.brand&&world1366.brand.width>150,"World Map brand missing at 1366x768");
+    assert.strictEqual(world1366.context,null,"Region/Village context surface leaked onto World Map");
     assert(world1366.map&&world1366.map.width>=1366*0.65,"World Map lost dominance at 1366x768");
     await page.screenshot({path:path.join(OUT,"03c-world-1366x768-approved-composition.png"),fullPage:true});
 
@@ -387,6 +485,7 @@ function assertMapGutterIntegration(layout,label){
     assert.deepStrictEqual(world1920.viewport,[1920,1080]);
     assertHudLayout(world1920,"1920x1080 World");
     assert(world1920.brand&&world1920.brand.width>150,"World Map brand is absent or unreadably small at 1920x1080");
+    assert.strictEqual(world1920.context,null,"Region/Village context surface leaked onto World Map at 1920x1080");
     assert(world1920.map&&world1920.map.width>=1920*0.65,"World Map lost dominance at 1920x1080");
     await page.screenshot({path:path.join(OUT,"04-world-1920x1080-chronicle-compass.png"),fullPage:true});
 
@@ -397,6 +496,8 @@ function assertMapGutterIntegration(layout,label){
     assertHudLayout(village1920,"1920x1080 Village");
     assertMapGutterIntegration(village1920,"1920x1080 Village");
     assert.strictEqual(village1920.brand,null,"World-only brand leaked onto Village at 1920x1080");
+    await proveTeamIdentityReveal(page,"1920x1080 Village");
+    await proveVillageContext(page,"1920x1080 Village");
     await page.screenshot({path:path.join(OUT,"04b-village-1920x1080-gutter-hud.png"),fullPage:true});
 
     await page.click('[data-hud499-action="region"]');
@@ -406,6 +507,7 @@ function assertMapGutterIntegration(layout,label){
     assertHudLayout(region1920,"1920x1080 Region");
     assertMapGutterIntegration(region1920,"1920x1080 Region");
     assert.strictEqual(region1920.brand,null,"World-only brand leaked onto Region at 1920x1080");
+    await proveRegionContext(page,"1920x1080 Region");
     await page.screenshot({path:path.join(OUT,"04c-region-1920x1080-gutter-hud.png"),fullPage:true});
 
     const diagnostics=await page.evaluate(()=>runPhase2LiveHud49900Diagnostics());
@@ -432,6 +534,11 @@ function assertMapGutterIntegration(layout,label){
       regionVillageGutterIntegration1366:true,
       regionVillageGutterIntegration1920:true,
       worldCompositionPreservedBothViewports:true,
+      currentTeamIdentityRevealSafe:true,
+      contextualLocationSurfaceSafe:true,
+      unknownContextRemainsUnknown:true,
+      contextClearsToQuiet:true,
+      contextInteractionReadOnly:true,
       mapClickable:true,
       deepStoryBattleSuppression:true,
       refreshReadOnly:true,

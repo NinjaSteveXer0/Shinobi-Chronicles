@@ -18,6 +18,12 @@ assert(RUNTIME.includes("syncMapGutterGeometry"),"Region/Village map-frame gutte
 assert(RUNTIME.includes('.region-map-pane')&&RUNTIME.includes('.village-map-screen'),"Region/Village gutter projector is not bound to real map frames");
 assert(RUNTIME.includes('data-map-gutter="true"'),"Region/Village gutter-only CSS missing");
 assert(RUNTIME.includes('window.addEventListener("resize",scheduleRefresh'),"HUD gutter geometry does not refresh on viewport resize");
+assert(RUNTIME.includes("regionContextProjection")&&RUNTIME.includes("villageContextProjection"),"functional Region/Village context projection missing");
+assert(RUNTIME.includes("getHotspotProjection"),"Region context does not consume existing observer-safe hotspot projection");
+assert(RUNTIME.includes('name:"???"')&&RUNTIME.includes('category:"UNKNOWN"'),"unknown hotspot preservation gate missing");
+assert(RUNTIME.includes("MAP CONTEXT"),"functional right-gutter context surface missing");
+assert(!/function regionContextProjection[\\s\\S]*?savePlayerData\\s*\\(/.test(RUNTIME),"Region gutter context writes save state");
+assert(!/function villageContextProjection[\\s\\S]*?savePlayerData\\s*\\(/.test(RUNTIME),"Village gutter context writes save state");
 
 for(const pattern of [
   /\bsavePlayerData\s*\(/,
