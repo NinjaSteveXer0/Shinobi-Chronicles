@@ -141,7 +141,24 @@ async function proveVillageContext(page,label){
   await hotspot.focus();
   await page.waitForTimeout(320);
   const focused=await contextPanelState(page);
-  assert(focused&&focused.active===true,label+": Village context did not activate on keyboard focus");
+  const focusDiagnostic=await page.evaluate(()=>{
+    const active=document.activeElement;
+    const panel=document.querySelector("#sc-phase2-live-hud-49900 .sc-hud499-context");
+    const hotspot=active&&active.closest&&active.closest("[data-village-hotspot-id],.village-map-hotspot");
+    const root=document.getElementById("sc-phase2-live-hud-49900");
+    return{
+      activeTag:active&&active.tagName||null,
+      activeClass:active&&active.className||null,
+      activeVillageHotspotId:hotspot&&hotspot.dataset.villageHotspotId||null,
+      bound:hotspot&&hotspot.dataset.hud499ContextBound||null,
+      rootSurface:root&&root.dataset.surface||null,
+      panelPresent:!!panel,
+      panelActive:panel&&panel.dataset.active||null,
+      panelText:panel&&String(panel.innerText||"").trim()||"",
+      mapContainsActive:!!(active&&active.closest&&active.closest(".village-map-screen"))
+    };
+  });
+  assert(focused&&focused.active===true,label+": Village context did not activate on keyboard focus: "+JSON.stringify(focusDiagnostic));
   assert(expected&&focused.text.includes(expected),label+": Village context did not reuse visible hotspot identity: "+JSON.stringify({expected,focused}));
   assert(/DOUBLE-CLICK TO ENTER/.test(focused.text),label+": Village context did not preserve existing interaction hint");
   await clearHudContext(page);
