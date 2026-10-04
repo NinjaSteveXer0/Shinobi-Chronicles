@@ -66,16 +66,29 @@ async function openShopFromVillage(page){
   await page.evaluate(()=>openOverlay("village"));
   await page.waitForSelector('.village-map-screen[data-village-id="konohagakure"]',{state:"visible",timeout:10000});
   await page.waitForSelector('[data-shop517-location="KON-P09"]',{state:"visible",timeout:10000});
-  const topology=await page.evaluate(()=>({
-    authoritativeCount:document.querySelectorAll('[data-village-hotspot-id="KON-P09"]').length,
-    shopHostCount:document.querySelectorAll('[data-shop517-location="KON-P09"]').length,
-    sameNode:document.querySelector('[data-village-hotspot-id="KON-P09"]')===document.querySelector('[data-shop517-location="KON-P09"]'),
-    hidden:!!document.querySelector('[data-village-hotspot-id="KON-P09"]')?.hidden
-  }));
-  assert.strictEqual(topology.authoritativeCount,1,"Shop duplicated authoritative KON-P09 geography");
+  const topology=await page.evaluate(()=>{
+    const screen=document.querySelector('.village-map-screen[data-village-id="konohagakure"]');
+    const candidates=[...(screen?.querySelectorAll("[data-village-hotspot-id],.village-map-hotspot,.konoha-v3-anchor")||[])];
+    const authoritative=candidates.filter(node=>{
+      const label=node.querySelector(".village-golden-halo-label,.village-map-hotspot-label");
+      const visible=String(label&&label.textContent||"").trim();
+      const aria=String(node.getAttribute("aria-label")||"").trim();
+      const title=String(node.getAttribute("title")||"").trim();
+      return visible==="Central Commercial District"||aria.startsWith("Central Commercial District")||title==="Central Commercial District";
+    });
+    const shopHost=document.querySelector('[data-shop517-location="KON-P09"]');
+    return{
+      authoritativeCount:authoritative.length,
+      shopHostCount:document.querySelectorAll('[data-shop517-location="KON-P09"]').length,
+      sameNode:authoritative[0]===shopHost,
+      canonicalVillageHotspotId:authoritative[0]?.dataset.villageHotspotId||null,
+      hidden:!!authoritative[0]?.hidden
+    };
+  });
+  assert.strictEqual(topology.authoritativeCount,1,"Shop duplicated Central Commercial District geography");
   assert.strictEqual(topology.shopHostCount,1,"Shop action host cardinality drift");
-  assert.strictEqual(topology.sameNode,true,"Shop did not upgrade the authoritative KON-P09 node in place");
-  assert.strictEqual(topology.hidden,false,"Shop hid the authoritative KON-P09 node");
+  assert.strictEqual(topology.sameNode,true,"Shop did not upgrade the authoritative Central Commercial District node in place");
+  assert.strictEqual(topology.hidden,false,"Shop hid the authoritative Central Commercial District node");
   await page.dblclick('[data-shop517-location="KON-P09"]');
   await page.waitForSelector(".sc-shop517",{state:"visible",timeout:10000});
 }
