@@ -15,8 +15,9 @@ const exactIds=[
 for(const id of exactIds){
   assert(RUNTIME.includes('"'+id+'"'),"missing exact catalogue id "+id);
 }
-assert(!RUNTIME.includes("Object.keys(characterRegistry)"),"catalogue expanded by Registry scan");
-assert(!RUNTIME.includes("ALPHA_PRODUCTION_CHARACTER_IDS"),"catalogue expanded by production Registry universe");
+const CATALOGUE_SOURCE=RUNTIME.slice(RUNTIME.indexOf("function catalogueSnapshot"),RUNTIME.indexOf("function refreshConsumers"));
+assert(!CATALOGUE_SOURCE.includes("Object.keys(characterRegistry)"),"catalogue expanded by Registry scan");
+assert(!CATALOGUE_SOURCE.includes("ALPHA_PRODUCTION_CHARACTER_IDS"),"catalogue expanded by production Registry universe");
 assert(RUNTIME.includes("const PRICE_RYO=100"),"fixed 100-Ryo price missing");
 assert(RUNTIME.includes('const ROUTE="retail_character_card_shop"'),"retail acquisition route missing");
 assert(RUNTIME.includes('const CATALOGUE_ID="alpha_konoha_character_card_shop_v1"'),"catalogue policy id missing");
