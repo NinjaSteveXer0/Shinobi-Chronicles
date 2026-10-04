@@ -91,7 +91,7 @@ async function openCharacterShopViaCommercialDistrict(page){
       };
     });
     assert.strictEqual(init.selected.success,true);
-    assert.strictEqual(init.ryo,100);
+    assert.strictEqual(init.ryo,0,"fresh direct Origin selection should not synthesize the completion purse");
 
     // 1. Pre-Team-Formation fails closed with no mutation.
     const preBefore=await semanticSnapshot(page);
