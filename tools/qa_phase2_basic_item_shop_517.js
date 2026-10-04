@@ -11,6 +11,10 @@ assert(RUNTIME.includes('const LOCATION_ID="KON-P09"'),"Central Commercial Distr
 assert(RUNTIME.includes('["Common","Uncommon","Rare","Legendary"]'),"canonical rarity order missing");
 assert(!RUNTIME.includes('"Normal"'),"obsolete Normal rarity revived");
 assert(RUNTIME.includes("addItemToInventory"),"Shop does not delegate ownership to existing Inventory authority");
+const INJECT=RUNTIME.slice(RUNTIME.indexOf("function injectCommercialDistrictAction"),RUNTIME.indexOf("function diagnostics"));
+assert(INJECT.includes("data-village-hotspot-id"),"Shop no longer binds through authoritative Village hotspot identity");
+assert(!INJECT.includes("createElement"),"Shop manufactured duplicate Konoha geography");
+assert(!INJECT.includes(".hidden="),"Shop hides authoritative Konoha geography");
 assert(RUNTIME.includes("purchaseReceipt(stableIntent)"),"purchase-intent idempotence gate missing");
 assert(RUNTIME.includes("beforeRyo<price"),"insufficient-funds precommit gate missing");
 assert(RUNTIME.includes("pd.inventory=inventoryBefore"),"atomic rollback inventory restore missing");
@@ -99,6 +103,8 @@ console.log(JSON.stringify({
   issue:517,
   canonicalRyoDebit:true,
   canonicalInventoryGrant:true,
+  authoritativeKonohaHotspotReused:true,
+  duplicateGeographyCreated:false,
   purchaseIntentIdempotence:true,
   insufficientFundsNoMutation:true,
   catalogueInspectionReadOnly:true,
