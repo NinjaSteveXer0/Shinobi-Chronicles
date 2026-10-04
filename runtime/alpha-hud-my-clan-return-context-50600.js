@@ -115,8 +115,7 @@ function onHudClanCapture(event){
   const verify=()=>{
     if(currentOverlayName()!=="clan")clearHudMyClanReturnContext50600();
   };
-  if(typeof queueMicrotask==="function")queueMicrotask(verify);
-  else if(typeof setTimeout==="function")setTimeout(verify,0);
+  if(typeof setTimeout==="function")setTimeout(verify,0);
 }
 
 const priorForceCloseMyClan=
