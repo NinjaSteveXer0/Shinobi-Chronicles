@@ -29,12 +29,16 @@ V2_NEW=[
 ]
 LEADERS=['jonin_hanabi','jonin_inojin','jonin_konohamaru','jonin_kushina','jonin_sasuke','jonin_shikaku','jonin_shino','sj_anko','sj_ebisu','sj_genma','sj_ibiki','sj_kiba','sj_nono']
 checks={}
+# #532 intentionally extends the audited core with the canonical deliberate
+# Current Team assignment writer and Person Name projection required by closed
+# #522. The normalized blob remains strictly pinned; later core edits must be
+# separately reviewed and explicitly repinned.
 # #469 intentionally extends only loadPlayerData persistence for the canonical
 # #34000 Story-decision runtime store. Strip that exact declared compatibility
 # reader before comparing the previously audited game.js blob; every other byte
 # of the old audited core must remain unchanged.
 # #322's older compatibility root remains preserved immediately after it.
-checks['audited_game_blob_preserved']=git_blob_sha(game_without_declared_469_save_reader(game))=='05e014efc8a77705c53f0ec9d8f143703ad91da8'
+checks['audited_game_blob_preserved']=git_blob_sha(game_without_declared_469_save_reader(game))=='4c9623071ef773dac61649ffc174d26d50dd60f2'
 core_pos=index.find('runtime/alpha-world-konoha-112-core.js')
 fix_pos=index.find('runtime/alpha-world-konoha-112-fix.js')
 roster_pos=index.find('runtime/alpha-genin-roster-63.js')
