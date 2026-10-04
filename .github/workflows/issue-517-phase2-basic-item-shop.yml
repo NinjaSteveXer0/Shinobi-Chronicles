@@ -1,0 +1,92 @@
+name: Issue 517 Phase 2 Basic Item Shop
+
+on:
+  push:
+    branches:
+      - coding/phase-2-basic-item-shop-517
+    paths:
+      - 'index.html'
+      - 'runtime/alpha-phase2-basic-item-shop-51700.js'
+      - 'runtime/alpha-runtime-build-fingerprint-303.js'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
+      - 'tools/fixtures/runtime_change_declarations_300.json'
+      - 'tools/fixtures/runtime_responsibility_registry_300.json'
+      - 'tools/qa_phase2_basic_item_shop_517.js'
+      - 'tools/qa_phase2_basic_item_shop_517_browser.js'
+      - '.github/workflows/issue-517-phase2-basic-item-shop.yml'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  phase2-basic-item-shop:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Source syntax
+        run: |
+          node --check runtime/alpha-phase2-basic-item-shop-51700.js
+          node --check tools/qa_phase2_basic_item_shop_517.js
+          node --check tools/qa_phase2_basic_item_shop_517_browser.js
+
+      - name: Bounded Item Shop transaction contract
+        run: node tools/qa_phase2_basic_item_shop_517.js
+
+      - name: Runtime build fingerprint
+        run: node tools/qa_issue_303_runtime_build_fingerprint.js
+
+      - name: Runtime ownership safety
+        run: node tools/qa_runtime_ownership_safety_300.js
+
+      - name: Existing save compatibility
+        run: node tools/qa_save_compatibility_311.js
+
+      - name: Inventory projection regression
+        run: node tools/qa_phase2_inventory_core_461.js
+
+      - name: Phase 2 persistent-development regression
+        run: node tools/qa_issue_448_discipline_stat_growth.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > phase2-517-server.log 2>&1 &
+          echo $! > phase2-517-server.pid
+          sleep 2
+
+      - name: Phase 2 current-team regression
+        run: node tools/qa_phase2_konoha_player_surfaces_431.js
+
+      - name: CE hotspot regression
+        run: node tools/qa_issue_469_ce_hotspot_browser.js
+
+      - name: Live HUD regression
+        run: node tools/qa_phase2_live_hud_499_browser.js
+
+      - name: Installed-browser Basic Item Shop
+        run: node tools/qa_phase2_basic_item_shop_517_browser.js
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase2-basic-item-shop-517-browser
+          path: |
+            artifacts/phase2-basic-item-shop-517
+            phase2-517-server.log
+          if-no-files-found: ignore
