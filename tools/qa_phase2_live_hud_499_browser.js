@@ -34,9 +34,15 @@ async function closeAndVillage(page){
   await page.waitForTimeout(80);
   await openVillage(page);
 }
-async function openTools(page){
-  const opened=await page.$eval(".sc-hud499-tools",node=>node.open===true);
-  if(!opened)await page.click(".sc-hud499-tools>summary");
+async function clickTool(page,action){
+  await page.evaluate(action=>{
+    const details=document.querySelector(".sc-hud499-tools");
+    if(!details)throw new Error("Player Tools unavailable");
+    details.open=true;
+    const button=details.querySelector('[data-hud499-action="'+action+'"]');
+    if(!button)throw new Error("Player Tool unavailable: "+action);
+    button.click();
+  },action);
 }
 async function captureHudLayout(page){
   return page.evaluate(()=>{
@@ -232,14 +238,12 @@ function assertMapGutterIntegration(layout,label){
     assert.strictEqual((await page.evaluate(()=>getPhase2LiveHudSnapshot49900().visible)),false,"HUD did not suppress on My Clan");
     await closeAndVillage(page);
 
-    await openTools(page);
-    await page.click('.sc-hud499-tools [data-hud499-action="inventory"]');
+    await clickTool(page,"inventory");
     await page.waitForSelector(".sc-inventory-core",{state:"visible",timeout:10000});
     assert.strictEqual(await page.evaluate(()=>getPhase2LiveHudSnapshot49900().visible),false,"HUD did not suppress on Inventory");
     await closeAndVillage(page);
 
-    await openTools(page);
-    await page.click('.sc-hud499-tools [data-hud499-action="record"]');
+    await clickTool(page,"record");
     await page.waitForFunction(()=>{
       const overlay=document.getElementById("screen-overlay");
       return overlay&&getComputedStyle(overlay).display!=="none"&&/SHINOBI RECORD/i.test(overlay.innerText||"");
@@ -247,8 +251,7 @@ function assertMapGutterIntegration(layout,label){
     assert.strictEqual(await page.evaluate(()=>getPhase2LiveHudSnapshot49900().visible),false,"HUD did not suppress on Shinobi Record");
     await closeAndVillage(page);
 
-    await openTools(page);
-    await page.click('.sc-hud499-tools [data-hud499-action="journey"]');
+    await clickTool(page,"journey");
     await page.waitForSelector(".alpha328-journey",{state:"visible",timeout:10000});
     assert.strictEqual(await page.evaluate(()=>getPhase2LiveHudSnapshot49900().visible),false,"HUD did not suppress on Journey detail");
     await closeAndVillage(page);
