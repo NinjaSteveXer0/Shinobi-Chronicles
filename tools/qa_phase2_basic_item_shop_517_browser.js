@@ -66,6 +66,16 @@ async function openShopFromVillage(page){
   await page.evaluate(()=>openOverlay("village"));
   await page.waitForSelector('.village-map-screen[data-village-id="konohagakure"]',{state:"visible",timeout:10000});
   await page.waitForSelector('[data-shop517-location="KON-P09"]',{state:"visible",timeout:10000});
+  const topology=await page.evaluate(()=>({
+    authoritativeCount:document.querySelectorAll('[data-village-hotspot-id="KON-P09"]').length,
+    shopHostCount:document.querySelectorAll('[data-shop517-location="KON-P09"]').length,
+    sameNode:document.querySelector('[data-village-hotspot-id="KON-P09"]')===document.querySelector('[data-shop517-location="KON-P09"]'),
+    hidden:!!document.querySelector('[data-village-hotspot-id="KON-P09"]')?.hidden
+  }));
+  assert.strictEqual(topology.authoritativeCount,1,"Shop duplicated authoritative KON-P09 geography");
+  assert.strictEqual(topology.shopHostCount,1,"Shop action host cardinality drift");
+  assert.strictEqual(topology.sameNode,true,"Shop did not upgrade the authoritative KON-P09 node in place");
+  assert.strictEqual(topology.hidden,false,"Shop hid the authoritative KON-P09 node");
   await page.dblclick('[data-shop517-location="KON-P09"]');
   await page.waitForSelector(".sc-shop517",{state:"visible",timeout:10000});
 }
@@ -179,6 +189,8 @@ async function openShopFromVillage(page){
       pass:true,
       issue:517,
       legitimateKonohaCommercialDistrictRoute:true,
+      authoritativeHotspotUpgradedInPlace:true,
+      noDuplicateKonohaGeography:true,
       fixedCataloguePrices:true,
       canonicalRyoDebitExactlyOnce:true,
       canonicalInventoryGrantExactlyOnce:true,
