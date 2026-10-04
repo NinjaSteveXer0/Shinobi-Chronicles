@@ -7,7 +7,11 @@ game=(ROOT/'game.js').read_text(encoding='utf-8')
 patch=(ROOT/'runtime/alpha-menma-tutorial-111.js').read_text(encoding='utf-8')
 index=(ROOT/'index.html').read_text(encoding='utf-8')
 
-EXPECTED_BLOB='05e014efc8a77705c53f0ec9d8f143703ad91da8'
+EXPECTED_BLOB='4c9623071ef773dac61649ffc174d26d50dd60f2'
+# #532 intentionally extends the audited core with the canonical deliberate
+# Current Team assignment writer and Person Name projection required by closed
+# #522. This remains a strict normalized game.js blob pin; any further core
+# change must be separately reviewed and explicitly repinned.
 # #469 intentionally extends only loadPlayerData persistence for the canonical
 # #34000 Story-decision runtime store. Strip that exact declared compatibility
 # reader before comparing the previously audited game.js blob; every other byte
