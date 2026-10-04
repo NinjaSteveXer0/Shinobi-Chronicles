@@ -22,8 +22,10 @@ assert(RUNTIME.includes("regionContextProjection")&&RUNTIME.includes("villageCon
 assert(RUNTIME.includes("getHotspotProjection"),"Region context does not consume existing observer-safe hotspot projection");
 assert(RUNTIME.includes('name:"???"')&&RUNTIME.includes('category:"UNKNOWN"'),"unknown hotspot preservation gate missing");
 assert(RUNTIME.includes("MAP CONTEXT"),"functional right-gutter context surface missing");
-assert(!/function regionContextProjection[\\s\\S]*?savePlayerData\\s*\\(/.test(RUNTIME),"Region gutter context writes save state");
-assert(!/function villageContextProjection[\\s\\S]*?savePlayerData\\s*\\(/.test(RUNTIME),"Village gutter context writes save state");
+const regionContextSource=RUNTIME.slice(RUNTIME.indexOf("function regionContextProjection"),RUNTIME.indexOf("function villageContextProjection"));
+const villageContextSource=RUNTIME.slice(RUNTIME.indexOf("function villageContextProjection"),RUNTIME.indexOf("function mapContextNode"));
+assert(!regionContextSource.includes("savePlayerData("),"Region gutter context writes save state");
+assert(!villageContextSource.includes("savePlayerData("),"Village gutter context writes save state");
 
 for(const pattern of [
   /\bsavePlayerData\s*\(/,
