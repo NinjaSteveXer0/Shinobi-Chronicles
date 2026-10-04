@@ -337,7 +337,7 @@ function diagnostics(){
   const source=String(commitPurchase);
   const checks={
     exactLocation:LOCATION_ID==="KON-P09",
-    canonicalHotspotUpgradeOnly:!String(injectCommercialDistrictAction).includes("createElement")&&!String(injectCommercialDistrictAction).includes(".hidden=")&&String(injectCommercialDistrictAction).includes("data-village-hotspot-id"),
+    canonicalHotspotUpgradeOnly:!String(commercialDistrictHost).includes("createElement")&&!String(injectCommercialDistrictAction).includes("createElement")&&!String(injectCommercialDistrictAction).includes(".hidden=")&&String(commercialDistrictHost).includes("data-village-hotspot-id")&&String(commercialDistrictHost).includes("Central Commercial District"),
     smallCatalogue:data.catalogue.length===4,
     fixedCanonicalPrices:data.catalogue.every(row=>Number.isInteger(row.price)&&row.price>0),
     onlyExistingDefinitions:data.catalogue.every(row=>!!itemDefinition(row.itemId)),
