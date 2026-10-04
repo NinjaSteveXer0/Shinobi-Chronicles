@@ -105,7 +105,7 @@ async function semanticHudInteractionFingerprint(page){
 async function contextPanelState(page){
   return page.evaluate(()=>{
     const panel=document.querySelector("#sc-phase2-live-hud-49900 .sc-hud499-context");
-    return panel?{active:panel.dataset.active,text:String(panel.innerText||"").trim(),html:panel.innerHTML}:null;
+    return panel?{active:panel.dataset.active==="true",text:String(panel.innerText||"").trim(),html:panel.innerHTML}:null;
   });
 }
 async function clearHudContext(page){
