@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 "use strict";
+// PR contract-change declaration is required by protected #300/#303 integrity gate.
 const fs=require("fs"),path=require("path"),assert=require("assert");
 const ROOT=path.resolve(__dirname,"..");
 const read=rel=>fs.readFileSync(path.join(ROOT,rel),"utf8");
