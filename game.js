@@ -98935,7 +98935,7 @@ function saveMyClanStagedFormation() {
   if (!editability.allowed) return {success:false,reason:editability.reason};
   const validation=validateMyClanStagedFormationForCommit();
   if (!validation.valid) {
-    setMyClanFeedback(\`Formation not saved: \${validation.reason}.\`,"error");
+    setMyClanFeedback(`Formation not saved: ${validation.reason}.`,"error");
     rerenderClanOverlay();
     return {success:false,reason:validation.reason};
   }
@@ -98944,7 +98944,7 @@ function saveMyClanStagedFormation() {
     sourceEventId:"saveMyClanStagedFormation"
   });
   if (!committed.success) {
-    setMyClanFeedback(\`Formation not saved: \${committed.reason}.\`,"error");
+    setMyClanFeedback(`Formation not saved: ${committed.reason}.`,"error");
     rerenderClanOverlay();
     return committed;
   }
