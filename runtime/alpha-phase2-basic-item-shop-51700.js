@@ -290,47 +290,41 @@ function returnToVillage(){
   if(typeof globalThis.openOverlay!=="function")return{success:false,reason:"overlay_runtime_missing"};
   return globalThis.openOverlay("village")||{success:true,type:"village"};
 }
-function commercialAnchor(){
-  let x=42.64,y=53.71;
-  try{
-    const location=globalThis.getAlphaKonohaV3Location?.(LOCATION_ID);
-    if(location){x=Number(location.x)||x;y=Number(location.y)||y;}
-    if(typeof globalThis.getAlphaMapCalibrationAnchor==="function"){
-      const anchor=globalThis.getAlphaMapCalibrationAnchor("village","konohagakure",LOCATION_ID,{x,y});
-      if(anchor){x=Number(anchor.x)||x;y=Number(anchor.y)||y;}
+function bindCommercialDistrictAction(node){
+  if(!node)return false;
+  node.dataset.shop517Location=LOCATION_ID;
+  node.classList.add("sc-shop517-hotspot");
+  node.setAttribute("aria-label","Central Commercial District. Double-click to enter Basic Item Shop.");
+  if(node.dataset.shop517Bound==="true")return true;
+  node.dataset.shop517Bound="true";
+  node.addEventListener("dblclick",event=>{
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    openShop();
+  },true);
+  node.addEventListener("keydown",event=>{
+    if(event.key==="Enter"||event.key===" "){
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      openShop();
     }
-  }catch(_error){}
-  return{x,y};
+  },true);
+  return true;
 }
 function injectCommercialDistrictAction(){
   if(typeof document==="undefined")return false;
   const screen=document.querySelector('.village-map-screen[data-village-id="konohagakure"]');
   if(!screen)return false;
-  const old=screen.querySelector('.konoha-v3-anchor[aria-label="Central Commercial District."]');
-  if(old)old.hidden=true;
-  if(screen.querySelector('[data-shop517-location="KON-P09"]'))return true;
-  const anchor=commercialAnchor();
-  const button=document.createElement("button");
-  button.type="button";
-  button.className="village-golden-halo konoha-v3-anchor is-identified is-actionable sc-shop517-hotspot";
-  button.dataset.shop517Location=LOCATION_ID;
-  button.dataset.villageHotspotId=LOCATION_ID;
-  button.style.left=anchor.x+"%";
-  button.style.top=anchor.y+"%";
-  button.setAttribute("aria-label","Central Commercial District. Double-click to enter Basic Item Shop.");
-  button.innerHTML='<span class="village-golden-halo-ring" aria-hidden="true"><span></span></span><span class="village-golden-halo-label">Central Commercial District</span>';
-  button.addEventListener("dblclick",event=>{event.preventDefault();event.stopPropagation();openShop();});
-  button.addEventListener("keydown",event=>{
-    if(event.key==="Enter"||event.key===" "){event.preventDefault();event.stopPropagation();openShop();}
-  });
-  screen.appendChild(button);
-  return true;
+  const authoritative=screen.querySelector('[data-village-hotspot-id="'+LOCATION_ID+'"]');
+  if(!authoritative)return false;
+  return bindCommercialDistrictAction(authoritative);
 }
 function diagnostics(){
   const data=catalogueSnapshot();
   const source=String(commitPurchase);
   const checks={
     exactLocation:LOCATION_ID==="KON-P09",
+    canonicalHotspotUpgradeOnly:!String(injectCommercialDistrictAction).includes("createElement")&&!String(injectCommercialDistrictAction).includes(".hidden=")&&String(injectCommercialDistrictAction).includes("data-village-hotspot-id"),
     smallCatalogue:data.catalogue.length===4,
     fixedCanonicalPrices:data.catalogue.every(row=>Number.isInteger(row.price)&&row.price>0),
     onlyExistingDefinitions:data.catalogue.every(row=>!!itemDefinition(row.itemId)),
