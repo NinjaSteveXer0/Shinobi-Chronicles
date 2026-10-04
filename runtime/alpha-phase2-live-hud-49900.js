@@ -408,6 +408,32 @@ function onMapContextLeave(event){
   if(next&&node.contains(next))return;
   clearMapContextWhenIdle(node);
 }
+function bindFunctionalMapContext(root,surfaceKind){
+  if(typeof document==="undefined"||!root||!["region","village"].includes(surfaceKind))return 0;
+  const map=surfaceKind==="region"?document.querySelector(".region-map-pane"):document.querySelector(".village-map-screen");
+  if(!map)return 0;
+  const selector=surfaceKind==="region"?".region-hotspot[data-hotspot-id][data-region-key]":"[data-village-hotspot-id],.village-map-hotspot";
+  let bound=0;
+  map.querySelectorAll(selector).forEach(node=>{
+    if(node.dataset.hud499ContextBound==="true")return;
+    node.dataset.hud499ContextBound="true";
+    const present=()=>presentMapContextFromTarget(node);
+    const clear=()=>clearMapContextWhenIdle(node);
+    node.addEventListener("mouseenter",present,{passive:true});
+    node.addEventListener("mouseleave",clear,{passive:true});
+    node.addEventListener("focus",present);
+    node.addEventListener("blur",clear);
+    node.addEventListener("click",present);
+    node.addEventListener("pointerup",event=>{
+      if(event&&event.pointerType==="touch"&&typeof node.focus==="function"){
+        try{node.focus({preventScroll:true});}catch(_error){node.focus();}
+      }
+      present();
+    },{passive:true});
+    bound+=1;
+  });
+  return bound;
+}
 function navMarkup(rows,surfaceKind){
   if(!rows.length)return"";
   const depth=surfaceKind==="world"?"WORLD":surfaceKind==="region"?"REGION":"VILLAGE";
@@ -470,6 +496,7 @@ function render(force=false){
   root.hidden=!data.visible;
   root.dataset.surface=data.surface.kind;
   syncMapGutterGeometry(root,data.surface.kind);
+  bindFunctionalMapContext(root,data.surface.kind);
   syncMapContextFromDocument();
   const signature=JSON.stringify(data);
   if(!force&&signature===state.lastSignature)return data;
@@ -499,6 +526,7 @@ function render(force=false){
     toolsMarkup()+
     contextMarkup(data.surface.kind)+
     navMarkup(data.navigation,data.surface.kind);
+  bindFunctionalMapContext(root,data.surface.kind);
   syncMapContextFromDocument();
   return data;
 }
@@ -636,7 +664,7 @@ function installStyles(){
   document.head.appendChild(style);
 }
 function diagnostics(){
-  const source=[snapshot,render,routeAction,teamProjection,journeyProjection,brandMarkup,toolsMarkup,navMarkup,syncMapGutterGeometry,regionContextProjection,villageContextProjection,renderContextProjection,syncMapContextFromDocument].map(String).join("\n");
+  const source=[snapshot,render,routeAction,teamProjection,journeyProjection,brandMarkup,toolsMarkup,navMarkup,syncMapGutterGeometry,regionContextProjection,villageContextProjection,renderContextProjection,syncMapContextFromDocument,bindFunctionalMapContext].map(String).join("\n");
   const data=snapshot();
   const checks={
     readOnlyProjection:!/savePlayerData\s*\(/.test(source)&&!/localStorage\.setItem\s*\(/.test(source)&&!/confirmAcademyTeamFormation\s*\(/.test(source),
@@ -651,7 +679,7 @@ function diagnostics(){
     collapsiblePlayerTools:String(toolsMarkup).includes("<details")&&String(toolsMarkup).includes("PLAYER TOOLS"),
     safeBottomReserve:String(installStyles).includes("--sc-hud499-safe-bottom"),
     regionVillageMapGutters:String(syncMapGutterGeometry).includes(".region-map-pane")&&String(syncMapGutterGeometry).includes(".village-map-screen")&&String(installStyles).includes('data-map-gutter="true"'),
-    functionalGutterContext:String(regionContextProjection).includes("getHotspotProjection")&&String(regionContextProjection).includes('name:"???"')&&String(villageContextProjection).includes("aria-label")&&String(renderContextProjection).includes("MAP CONTEXT"),
+    functionalGutterContext:String(regionContextProjection).includes("getHotspotProjection")&&String(regionContextProjection).includes('name:"???"')&&String(villageContextProjection).includes("aria-label")&&String(renderContextProjection).includes("MAP CONTEXT")&&String(bindFunctionalMapContext).includes('addEventListener("focus"')&&String(bindFunctionalMapContext).includes('pointerType==="touch"'),
     contextPresentationOnly:!String(regionContextProjection).includes("savePlayerData")&&!String(villageContextProjection).includes("savePlayerData")&&!String(renderContextProjection).includes("savePlayerData"),
     noEnergyProjection:data.energy===null&&!String(render).includes("ENERGY"),
     canonicalRoutes:String(routeAction).includes('call("openOverlay","clan")')&&String(routeAction).includes('call("openOverlay","inventory")')&&String(routeAction).includes('call("openShinobiRecord","overview")')&&String(routeAction).includes('call("openOverlay","missions")'),
