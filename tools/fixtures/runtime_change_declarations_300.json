@@ -1301,4 +1301,4 @@
       "rationale": "Master #449 Step 5 activates the first bounded real economy loop after Inventory and HUD closure. The Shop fixes a tiny explicit catalogue/price authority, debits canonical Ryō once, delegates goods to existing Inventory authority, records one causal purchase receipt, and leaves Character acquisition/team assignment/Crafting out of scope."
     }
   ]
-}\n
+}
