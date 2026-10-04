@@ -64,18 +64,26 @@ async function captureHudLayout(page){
       compass:rect(".sc-hud499-map-nav"),
       context:rect(".sc-hud499-context"),
       brand:rect(".sc-hud499-brand"),
-      echoes:[...(root?.querySelectorAll(".sc-hud499-map-echo")||[])].filter(node=>!node.hidden).map(node=>{
-        const r=node.getBoundingClientRect(),layer=node.querySelector(".sc-hud499-map-echo-layer");
+      echo:(()=>{
+        const node=document.getElementById("sc-hud499-stage-echo");
+        if(!node)return null;
+        const r=node.getBoundingClientRect(),layer=node.querySelector(".sc-hud499-stage-echo-layer");
+        const cs=layer&&getComputedStyle(layer);
         return{
-          side:node.dataset.echoSide,
           left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height,
           pointerEvents:getComputedStyle(node).pointerEvents,
           layerPointerEvents:layer?getComputedStyle(layer).pointerEvents:null,
-          backgroundImage:layer?getComputedStyle(layer).backgroundImage:null,
-          filter:layer?getComputedStyle(layer).filter:null
+          backgroundImage:cs?cs.backgroundImage:null,
+          backgroundSize:cs?cs.backgroundSize:null,
+          filter:cs?cs.filter:null,
+          opacity:cs?Number(cs.opacity):null,
+          source:node.dataset.source||null,
+          surface:node.dataset.surface||null,
+          hotspotCount:node.querySelectorAll("button,[data-hotspot-id],[data-village-hotspot-id]").length
         };
-      }),
+      })(),
       echoSource:root?.dataset.mapEchoSource||null,
+      overlay:rectNode(document.querySelector(".overlay-content-box")),
       map:rectNode(mapSelector?document.querySelector(mapSelector):null)
     };
   });
@@ -108,9 +116,13 @@ function assertMapGutterIntegration(layout,label){
 function assertMapEcho(layout,label){
   assert(["region","village"].includes(layout.surface),label+": Map Echo must be Region/Village only");
   assert(layout.echoSource,label+": Map Echo did not reuse current map asset");
-  assert(Array.isArray(layout.echoes)&&layout.echoes.length>=2,label+": Map Echo did not surround the crisp map");
-  assert(layout.echoes.every(e=>e.pointerEvents==="none"&&e.layerPointerEvents==="none"),label+": Map Echo intercepts pointer input: "+JSON.stringify(layout.echoes));
-  assert(layout.echoes.every(e=>/blur\(/.test(e.filter||"")&&/brightness\(/.test(e.filter||"")),label+": Map Echo is not visibly softened/darkened: "+JSON.stringify(layout.echoes));
+  assert(layout.echo,label+": coherent full-stage Map Echo missing");
+  assert(layout.overlay&&layout.echo.width>=layout.overlay.width-2&&layout.echo.height>=layout.overlay.height-2,label+": Map Echo does not cover the full overlay stage: "+JSON.stringify({echo:layout.echo,overlay:layout.overlay}));
+  assert(layout.echo.pointerEvents==="none"&&layout.echo.layerPointerEvents==="none",label+": Map Echo intercepts pointer input: "+JSON.stringify(layout.echo));
+  assert(layout.echo.hotspotCount===0,label+": hotspot DOM leaked into Map Echo");
+  assert(/blur\(/.test(layout.echo.filter||"")&&/brightness\(/.test(layout.echo.filter||"")&&/saturate\(/.test(layout.echo.filter||""),label+": Map Echo is not visibly softened/darkened: "+JSON.stringify(layout.echo));
+  assert(layout.echo.opacity>=0.85,label+": Map Echo remains too faint for owner visual target: "+JSON.stringify(layout.echo));
+  assert(layout.echo.backgroundSize==="cover",label+": Map Echo is not one coherent full-stage cover projection: "+JSON.stringify(layout.echo));
 }
 async function assertMapEchoMatchesCrispAsset(page,label){
   const result=await page.evaluate(()=>{
@@ -118,19 +130,25 @@ async function assertMapEchoMatchesCrispAsset(page,label){
     const surface=root&&root.dataset.surface;
     const map=surface==="region"?document.querySelector(".region-map-pane"):surface==="village"?document.querySelector(".village-map-screen"):null;
     const img=map&&map.querySelector(".region-map-image,.village-map-image");
-    const echoes=[...(root?.querySelectorAll(".sc-hud499-map-echo")||[])];
+    const echo=document.getElementById("sc-hud499-stage-echo");
+    const layer=echo&&echo.querySelector(".sc-hud499-stage-echo-layer");
     return{
       surface,
       crispSource:img&&img.getAttribute("src")||null,
       echoSource:root&&root.dataset.mapEchoSource||null,
-      echoHotspotCount:echoes.reduce((sum,node)=>sum+node.querySelectorAll("button,[data-hotspot-id],[data-village-hotspot-id]").length,0),
-      echoInteractiveCount:echoes.filter(node=>getComputedStyle(node).pointerEvents!=="none").length,
-      worldEchoCount:surface==="world"?echoes.length:null
+      nodeSource:echo&&echo.dataset.source||null,
+      echoBackground:layer&&getComputedStyle(layer).backgroundImage||null,
+      echoHotspotCount:echo?echo.querySelectorAll("button,[data-hotspot-id],[data-village-hotspot-id]").length:0,
+      echoInteractive:echo?getComputedStyle(echo).pointerEvents!=="none":false,
+      activeClass:!!document.querySelector(".overlay-content-box.sc-hud499-map-echo-active")
     };
   });
   assert.strictEqual(result.echoSource,result.crispSource,label+": Map Echo is not the exact current map artwork: "+JSON.stringify(result));
+  assert.strictEqual(result.nodeSource,result.crispSource,label+": coherent stage source diverged from crisp map asset: "+JSON.stringify(result));
+  assert(result.echoBackground&&result.echoBackground!=="none",label+": Map Echo background image is absent");
   assert.strictEqual(result.echoHotspotCount,0,label+": interactive hotspot DOM was duplicated into Map Echo");
-  assert.strictEqual(result.echoInteractiveCount,0,label+": Map Echo became pointer-interactive");
+  assert.strictEqual(result.echoInteractive,false,label+": Map Echo became pointer-interactive");
+  assert.strictEqual(result.activeClass,true,label+": Map Echo stage activation class missing");
 }
 
 async function semanticHudInteractionFingerprint(page){
@@ -551,7 +569,7 @@ async function proveRegionContext(page,label){
     assertHudLayout(world1366,"1366x768 World");
     assert(world1366.brand&&world1366.brand.width>150,"World Map brand missing at 1366x768");
     assert.strictEqual(world1366.context,null,"Region/Village context surface leaked onto World Map");
-    assert.strictEqual(world1366.echoes.length,0,"Map Echo leaked onto World Map at 1366x768");
+    assert.strictEqual(world1366.echo,null,"Map Echo leaked onto World Map at 1366x768");
     assert(world1366.map&&world1366.map.width>=1366*0.65,"World Map lost dominance at 1366x768");
     await page.screenshot({path:path.join(OUT,"03c-world-1366x768-approved-composition.png"),fullPage:true});
 
@@ -563,7 +581,7 @@ async function proveRegionContext(page,label){
     assertHudLayout(world1920,"1920x1080 World");
     assert(world1920.brand&&world1920.brand.width>150,"World Map brand is absent or unreadably small at 1920x1080");
     assert.strictEqual(world1920.context,null,"Region/Village context surface leaked onto World Map at 1920x1080");
-    assert.strictEqual(world1920.echoes.length,0,"Map Echo leaked onto World Map at 1920x1080");
+    assert.strictEqual(world1920.echo,null,"Map Echo leaked onto World Map at 1920x1080");
     assert(world1920.map&&world1920.map.width>=1920*0.65,"World Map lost dominance at 1920x1080");
     await page.screenshot({path:path.join(OUT,"04-world-1920x1080-chronicle-compass.png"),fullPage:true});
 
@@ -619,6 +637,8 @@ async function proveRegionContext(page,label){
       regionVillageMapEchoExactAsset:true,
       mapEchoPointerIsolated:true,
       mapEchoWorldHardFreeze:true,
+      mapEchoSingleCoherentStage:true,
+      mapEchoVisibleAtmosphere:true,
       currentTeamIdentityRevealSafe:true,
       contextualLocationSurfaceSafe:true,
       unknownContextRemainsUnknown:true,

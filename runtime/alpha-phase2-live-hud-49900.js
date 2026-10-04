@@ -12,6 +12,7 @@ const PATCH_ID="phase2_live_hud_49900_2026_10_03";
 const ROOT_ID="sc-phase2-live-hud-49900";
 const STYLE_ID="sc-phase2-live-hud-49900-style";
 const BRAND_PATH="Logo/sc_title.png";
+const MAP_ECHO_STAGE_ID="sc-hud499-stage-echo";
 const MAP_OVERLAYS=new Set(["village","region","region_map","world","world_map"]);
 const state={lastSignature:null,timer:null};
 
@@ -489,22 +490,37 @@ function syncMapGutterGeometry(root,surfaceKind){
   root.dataset.mapGutter="true";
   return{selector,left,right,top,bottom,controlWidth,rightAnchor};
 }
-function mapEchoMarkup(surfaceKind){
-  if(surfaceKind!=="region"&&surfaceKind!=="village")return"";
-  return '<div class="sc-hud499-map-echo sc-hud499-map-echo-left" data-echo-side="left" aria-hidden="true"><span class="sc-hud499-map-echo-layer"></span></div>'+
-    '<div class="sc-hud499-map-echo sc-hud499-map-echo-right" data-echo-side="right" aria-hidden="true"><span class="sc-hud499-map-echo-layer"></span></div>'+
-    '<div class="sc-hud499-map-echo sc-hud499-map-echo-top" data-echo-side="top" aria-hidden="true"><span class="sc-hud499-map-echo-layer"></span></div>'+
-    '<div class="sc-hud499-map-echo sc-hud499-map-echo-bottom" data-echo-side="bottom" aria-hidden="true"><span class="sc-hud499-map-echo-layer"></span></div>';
+function ensureMapEchoStage(){
+  if(typeof document==="undefined")return null;
+  const box=document.querySelector(".overlay-content-box");
+  if(!box)return null;
+  let echo=document.getElementById(MAP_ECHO_STAGE_ID);
+  if(echo&&echo.parentElement!==box){
+    echo.remove();
+    echo=null;
+  }
+  if(!echo){
+    echo=document.createElement("div");
+    echo.id=MAP_ECHO_STAGE_ID;
+    echo.className="sc-hud499-stage-echo";
+    echo.setAttribute("aria-hidden","true");
+    echo.innerHTML='<span class="sc-hud499-stage-echo-layer"></span><span class="sc-hud499-stage-echo-vignette"></span>';
+    box.insertBefore(echo,box.firstChild);
+  }
+  return echo;
 }
 function clearMapEchoPresentation(root){
-  if(!root)return false;
-  root.dataset.mapEcho="false";
-  delete root.dataset.mapEchoSource;
-  root.querySelectorAll(".sc-hud499-map-echo").forEach(node=>{
-    node.style.cssText="";
-    const layer=node.querySelector(".sc-hud499-map-echo-layer");
-    if(layer)layer.style.cssText="";
-  });
+  if(root){
+    root.dataset.mapEcho="false";
+    delete root.dataset.mapEchoSource;
+  }
+  const echo=typeof document!=="undefined"?document.getElementById(MAP_ECHO_STAGE_ID):null;
+  if(echo)echo.remove();
+  const box=typeof document!=="undefined"?document.querySelector(".overlay-content-box"):null;
+  if(box){
+    box.classList.remove("sc-hud499-map-echo-active");
+    ["--sc-hud499-echo-map-left","--sc-hud499-echo-map-top","--sc-hud499-echo-map-width","--sc-hud499-echo-map-height"].forEach(name=>box.style.removeProperty(name));
+  }
   return true;
 }
 function syncMapEchoPresentation(root,surfaceKind){
@@ -513,60 +529,39 @@ function syncMapEchoPresentation(root,surfaceKind){
   if(!selector){clearMapEchoPresentation(root);return null;}
   const map=document.querySelector(selector);
   const image=map&&map.querySelector(".region-map-image,.village-map-image");
-  const echoes=[...root.querySelectorAll(".sc-hud499-map-echo")];
-  if(!map||!image||echoes.length!==4){clearMapEchoPresentation(root);return null;}
-  const rr=root.getBoundingClientRect();
-  const mr=map.getBoundingClientRect();
-  if(!(rr.width>0&&rr.height>0&&mr.width>0&&mr.height>0)){clearMapEchoPresentation(root);return null;}
+  const box=map&&map.closest(".overlay-content-box");
+  if(!map||!image||!box){clearMapEchoPresentation(root);return null;}
   const sourceAttr=String(image.getAttribute("src")||"").trim();
   const source=String(image.currentSrc||image.src||sourceAttr).trim();
   if(!source){clearMapEchoPresentation(root);return null;}
+  const echo=ensureMapEchoStage();
+  const layer=echo&&echo.querySelector(".sc-hud499-stage-echo-layer");
+  if(!echo||!layer){clearMapEchoPresentation(root);return null;}
 
-  const naturalWidth=Number(image.naturalWidth)||mr.width;
-  const naturalHeight=Number(image.naturalHeight)||mr.height;
-  const scale=Math.max(rr.width/naturalWidth,rr.height/naturalHeight);
-  const backgroundWidth=naturalWidth*scale;
-  const backgroundHeight=naturalHeight*scale;
-  const backgroundLeft=(rr.width-backgroundWidth)/2;
-  const backgroundTop=(rr.height-backgroundHeight)/2;
-  const mapLeft=Math.max(0,mr.left-rr.left);
-  const mapTop=Math.max(0,mr.top-rr.top);
-  const mapRight=Math.min(rr.width,mr.right-rr.left);
-  const mapBottom=Math.min(rr.height,mr.bottom-rr.top);
-  const blurBleed=18;
-  const geometry={
-    left:{x:0,y:0,width:mapLeft,height:rr.height},
-    right:{x:mapRight,y:0,width:Math.max(0,rr.width-mapRight),height:rr.height},
-    top:{x:mapLeft,y:0,width:Math.max(0,mapRight-mapLeft),height:mapTop},
-    bottom:{x:mapLeft,y:mapBottom,width:Math.max(0,mapRight-mapLeft),height:Math.max(0,rr.height-mapBottom)}
-  };
+  const br=box.getBoundingClientRect();
+  const mr=map.getBoundingClientRect();
+  if(!(br.width>0&&br.height>0&&mr.width>0&&mr.height>0)){clearMapEchoPresentation(root);return null;}
 
-  echoes.forEach(node=>{
-    const side=node.dataset.echoSide;
-    const box=geometry[side];
-    if(!box||box.width<1||box.height<1){
-      node.hidden=true;
-      return;
-    }
-    node.hidden=false;
-    node.style.left=box.x.toFixed(2)+"px";
-    node.style.top=box.y.toFixed(2)+"px";
-    node.style.width=box.width.toFixed(2)+"px";
-    node.style.height=box.height.toFixed(2)+"px";
-    const layer=node.querySelector(".sc-hud499-map-echo-layer");
-    if(!layer)return;
-    layer.style.backgroundImage='url("'+source.replace(/"/g,"%22")+'")';
-    layer.style.backgroundSize=backgroundWidth.toFixed(2)+"px "+backgroundHeight.toFixed(2)+"px";
-    layer.style.backgroundPosition=
-      (backgroundLeft-box.x+blurBleed).toFixed(2)+"px "+
-      (backgroundTop-box.y+blurBleed).toFixed(2)+"px";
-  });
+  layer.style.backgroundImage='url("'+source.replace(/"/g,"%22")+'")';
+  echo.dataset.surface=surfaceKind;
+  echo.dataset.source=sourceAttr||source;
+  box.classList.add("sc-hud499-map-echo-active");
+  box.style.setProperty("--sc-hud499-echo-map-left",Math.max(0,mr.left-br.left).toFixed(2)+"px");
+  box.style.setProperty("--sc-hud499-echo-map-top",Math.max(0,mr.top-br.top).toFixed(2)+"px");
+  box.style.setProperty("--sc-hud499-echo-map-width",mr.width.toFixed(2)+"px");
+  box.style.setProperty("--sc-hud499-echo-map-height",mr.height.toFixed(2)+"px");
   root.dataset.mapEcho="true";
   root.dataset.mapEchoSource=sourceAttr||source;
   return{
     source:sourceAttr||source,
     selector,
-    mapRect:{left:mapLeft,top:mapTop,right:mapRight,bottom:mapBottom},
+    stageKind:"single_coherent_full_stage",
+    mapRect:{
+      left:Math.max(0,mr.left-br.left),
+      top:Math.max(0,mr.top-br.top),
+      width:mr.width,
+      height:mr.height
+    },
     presentationOnly:true,
     pointerInteractive:false
   };
@@ -591,7 +586,6 @@ function render(force=false){
   const identity=data.identity;
   const journey=data.journey;
   root.innerHTML=
-    mapEchoMarkup(data.surface.kind)+
     brandMarkup(data.surface.kind)+
     '<section class="sc-hud499-state-cluster" aria-label="Current shinobi state">'+
       '<div class="sc-hud499-state-main">'+
@@ -650,14 +644,15 @@ function installStyles(){
     .sc-hud499-root{--sc-hud499-edge:14px;--sc-hud499-safe-bottom:clamp(72px,8vh,96px);position:absolute;inset:0;z-index:1400;pointer-events:none;font-family:Inter,Arial,sans-serif;color:#edf5f7}
     .sc-hud499-root[hidden]{display:none!important}
     .sc-hud499-root button,.sc-hud499-root summary{font:inherit;color:inherit}
-    .sc-hud499-map-echo{position:absolute;overflow:hidden;pointer-events:none!important;z-index:0;background:#02060b}
-    .sc-hud499-map-echo[hidden]{display:none!important}
-    .sc-hud499-map-echo-layer{position:absolute;inset:-18px;display:block;pointer-events:none!important;background-repeat:no-repeat;filter:blur(12px) saturate(.56) brightness(.30) contrast(.92);opacity:.78;transform:scale(1.015);transform-origin:center}
-    .sc-hud499-map-echo::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(rgba(2,6,11,.22),rgba(2,6,11,.22))}
-    .sc-hud499-map-echo-left::after{background:linear-gradient(90deg,rgba(1,4,8,.74) 0%,rgba(2,7,12,.35) 55%,rgba(2,7,12,.10) 100%)}
-    .sc-hud499-map-echo-right::after{background:linear-gradient(270deg,rgba(1,4,8,.74) 0%,rgba(2,7,12,.35) 55%,rgba(2,7,12,.10) 100%)}
-    .sc-hud499-map-echo-top::after{background:linear-gradient(180deg,rgba(1,4,8,.68) 0%,rgba(2,7,12,.12) 100%)}
-    .sc-hud499-map-echo-bottom::after{background:linear-gradient(0deg,rgba(1,4,8,.76) 0%,rgba(2,7,12,.12) 100%)}
+    .overlay-content-box.sc-hud499-map-echo-active{background:linear-gradient(145deg,rgba(7,13,18,.40),rgba(3,8,12,.44))}
+    .overlay-content-box.sc-hud499-map-echo-active>#overlay-content-container{position:relative;z-index:1;background:transparent!important}
+    .sc-hud499-stage-echo{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none!important;user-select:none}
+    .sc-hud499-stage-echo-layer{position:absolute;inset:-30px;display:block;pointer-events:none!important;background-repeat:no-repeat;background-position:center;background-size:cover;filter:blur(14px) saturate(.70) brightness(.62) contrast(.94);opacity:.90;transform:scale(1.045);transform-origin:center}
+    .sc-hud499-stage-echo-vignette{position:absolute;inset:0;display:block;pointer-events:none!important;background:
+      linear-gradient(180deg,rgba(2,6,9,.14),rgba(2,6,9,.05) 28%,rgba(2,6,9,.06) 72%,rgba(1,4,7,.22)),
+      radial-gradient(ellipse at center,rgba(0,0,0,0) 38%,rgba(1,4,7,.08) 66%,rgba(1,4,7,.46) 100%)}
+    .overlay-content-box.sc-hud499-map-echo-active .region-map-pane,
+    .overlay-content-box.sc-hud499-map-echo-active .village-map-screen{box-shadow:0 16px 44px rgba(0,0,0,.50),0 0 34px rgba(160,190,185,.10)!important}
     .sc-hud499-brand{z-index:2;position:absolute;left:18px;top:14px;width:clamp(210px,18vw,300px);pointer-events:none;filter:drop-shadow(0 8px 20px rgba(0,0,0,.45))}
     .sc-hud499-brand img{display:block;width:100%;height:auto;max-height:88px;object-fit:contain;object-position:left top}
     .sc-hud499-state-cluster{z-index:2;position:absolute;right:var(--sc-hud499-edge);top:12px;width:clamp(330px,31vw,470px);pointer-events:auto;overflow:hidden;border:1px solid rgba(195,159,70,.42);border-radius:8px;background:linear-gradient(150deg,rgba(7,14,23,.95),rgba(6,12,20,.82));box-shadow:0 12px 30px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.04);backdrop-filter:blur(6px)}
@@ -758,7 +753,7 @@ function installStyles(){
   document.head.appendChild(style);
 }
 function diagnostics(){
-  const source=[snapshot,render,routeAction,teamProjection,journeyProjection,brandMarkup,toolsMarkup,navMarkup,syncMapGutterGeometry,regionContextProjection,villageContextProjection,renderContextProjection,syncMapContextFromDocument,bindFunctionalMapContext,mapEchoMarkup,syncMapEchoPresentation,clearMapEchoPresentation].map(String).join("\n");
+  const source=[snapshot,render,routeAction,teamProjection,journeyProjection,brandMarkup,toolsMarkup,navMarkup,syncMapGutterGeometry,regionContextProjection,villageContextProjection,renderContextProjection,syncMapContextFromDocument,bindFunctionalMapContext,ensureMapEchoStage,syncMapEchoPresentation,clearMapEchoPresentation].map(String).join("\n");
   const data=snapshot();
   const checks={
     readOnlyProjection:!/savePlayerData\s*\(/.test(source)&&!/localStorage\.setItem\s*\(/.test(source)&&!/confirmAcademyTeamFormation\s*\(/.test(source),
@@ -775,8 +770,9 @@ function diagnostics(){
     regionVillageMapGutters:String(syncMapGutterGeometry).includes(".region-map-pane")&&String(syncMapGutterGeometry).includes(".village-map-screen")&&String(installStyles).includes('data-map-gutter="true"'),
     functionalGutterContext:String(regionContextProjection).includes("getHotspotProjection")&&String(regionContextProjection).includes('name:"???"')&&String(villageContextProjection).includes("aria-label")&&String(renderContextProjection).includes("MAP CONTEXT")&&String(bindFunctionalMapContext).includes('addEventListener("focus"')&&String(bindFunctionalMapContext).includes('pointerType==="touch"'),
     contextPresentationOnly:!String(regionContextProjection).includes("savePlayerData")&&!String(villageContextProjection).includes("savePlayerData")&&!String(renderContextProjection).includes("savePlayerData"),
-    mapEchoPresentationOnly:String(mapEchoMarkup).includes('surfaceKind!=="region"&&surfaceKind!=="village"')&&String(syncMapEchoPresentation).includes(".region-map-image,.village-map-image")&&String(syncMapEchoPresentation).includes("pointerInteractive:false")&&!String(syncMapEchoPresentation).includes("savePlayerData")&&!String(syncMapEchoPresentation).includes("localStorage"),
-    mapEchoPointerIsolated:String(installStyles).includes(".sc-hud499-map-echo")&&String(installStyles).includes("pointer-events:none!important"),
+    mapEchoPresentationOnly:String(syncMapEchoPresentation).includes('surfaceKind==="region"')&&String(syncMapEchoPresentation).includes('surfaceKind==="village"')&&String(syncMapEchoPresentation).includes(".region-map-image,.village-map-image")&&String(syncMapEchoPresentation).includes('stageKind:"single_coherent_full_stage"')&&String(syncMapEchoPresentation).includes("pointerInteractive:false")&&!String(syncMapEchoPresentation).includes("savePlayerData")&&!String(syncMapEchoPresentation).includes("localStorage"),
+    mapEchoPointerIsolated:String(installStyles).includes(".sc-hud499-stage-echo")&&String(installStyles).includes("pointer-events:none!important"),
+    mapEchoVisiblyAtmospheric:String(installStyles).includes("brightness(.62)")&&String(installStyles).includes("opacity:.90")&&String(installStyles).includes("background-size:cover"),
     noEnergyProjection:data.energy===null&&!String(render).includes("ENERGY"),
     canonicalRoutes:String(routeAction).includes('call("openOverlay","clan")')&&String(routeAction).includes('call("openOverlay","inventory")')&&String(routeAction).includes('call("openShinobiRecord","overview")')&&String(routeAction).includes('call("openOverlay","missions")'),
     deepSurfaceSuppression:String(surfaceProjection).includes('kind:"deep"')&&String(surfaceProjection).includes("storyActive")&&String(surfaceProjection).includes("battleActive"),
