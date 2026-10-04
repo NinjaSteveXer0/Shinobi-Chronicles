@@ -27,7 +27,7 @@ async function release(page){
 async function openVillage(page){
   await page.evaluate(()=>openOverlay("village"));
   await page.waitForFunction(()=>getPhase2LiveHudSnapshot49900().visible===true&&getPhase2LiveHudSnapshot49900().surface.kind==="village",null,{timeout:10000});
-  await page.waitForSelector("#sc-phase2-live-hud-49900:not([hidden])",{state:"visible",timeout:10000});
+  await page.waitForSelector("#sc-phase2-live-hud-49900:not([hidden]) .sc-hud499-state-cluster",{state:"visible",timeout:10000});
 }
 async function closeAndVillage(page){
   await page.evaluate(()=>{try{closeOverlay();}catch(_error){}});
