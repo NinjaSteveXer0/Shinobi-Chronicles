@@ -114,10 +114,13 @@ async function clearHudContext(page){
   await page.waitForTimeout(80);
 }
 async function proveTeamIdentityReveal(page,label){
+  const first=page.locator(".sc-hud499-team-member").first();
+  assert(await first.count(),label+": Current Team portrait missing");
+  await first.focus();
+  await page.waitForTimeout(180);
   const result=await page.evaluate(()=>{
     const members=[...document.querySelectorAll(".sc-hud499-team-member")];
     if(!members.length)return null;
-    members[0].focus();
     const names=members.map(member=>{
       const node=member.querySelector(".sc-hud499-team-name");
       const cs=node&&getComputedStyle(node);
