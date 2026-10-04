@@ -356,7 +356,7 @@ function injectItemShopCharacterCardsAction(){
   button.setAttribute("aria-disabled",access.available?"false":"true");
   button.title=access.available?"Open Character Card Shop":"Complete Academy Team Formation to unlock Character Card retail.";
   button.addEventListener("click",()=>{if(accessSnapshot().available)openShop();});
-  actions.prepend(button);
+  const backButton=actions.lastElementChild;\n  if(backButton)actions.insertBefore(button,backButton);\n  else actions.appendChild(button);
   return true;
 }
 function diagnostics(){
