@@ -1805,7 +1805,7 @@
       "ownerType": "phase2_character_retail_transaction_adapter",
       "directCallers": [
         "index.html",
-        "runtime/alpha-phase2-basic-item-shop-51700.js presentation surface",
+        "runtime/alpha-phase2-basic-item-shop-51700.js",
         "Konoha Central Commercial District KON-P09"
       ],
       "stateReads": [
