@@ -16,7 +16,7 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-04-DU",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-04-DV",
     sourceBaselineCommit:"1fc795e3bbee61dcdd7c3a115c0cdfce29c40bd3",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
     runtimeGeneration:"phase2-basic-item-shop-517",
@@ -125,7 +125,7 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-04-DU",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-04-DV",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
       generationPresent:first.runtimeGeneration==="phase2-basic-item-shop-517",
