@@ -376,6 +376,16 @@ function presentMapContextFromTarget(target){
   if(!projection)return false;
   return renderContextProjection(projection);
 }
+function syncMapContextFromDocument(){
+  if(typeof document==="undefined")return false;
+  const root=document.getElementById(ROOT_ID);
+  if(!root||root.hidden||!["region","village"].includes(root.dataset.surface))return renderContextProjection(null);
+  const focused=mapContextNode(document.activeElement);
+  if(focused&&contextProjectionForNode(focused))return presentMapContextFromTarget(focused);
+  const hovered=document.querySelector(".region-hotspot:hover,[data-village-hotspot-id]:hover,.village-map-hotspot:hover");
+  if(hovered&&contextProjectionForNode(hovered))return presentMapContextFromTarget(hovered);
+  return renderContextProjection(null);
+}
 function clearMapContextWhenIdle(node){
   if(typeof document==="undefined")return;
   const finish=()=>{
@@ -460,6 +470,7 @@ function render(force=false){
   root.hidden=!data.visible;
   root.dataset.surface=data.surface.kind;
   syncMapGutterGeometry(root,data.surface.kind);
+  syncMapContextFromDocument();
   const signature=JSON.stringify(data);
   if(!force&&signature===state.lastSignature)return data;
   state.lastSignature=signature;
@@ -488,6 +499,7 @@ function render(force=false){
     toolsMarkup()+
     contextMarkup(data.surface.kind)+
     navMarkup(data.navigation,data.surface.kind);
+  syncMapContextFromDocument();
   return data;
 }
 function scheduleRefresh(){
@@ -624,7 +636,7 @@ function installStyles(){
   document.head.appendChild(style);
 }
 function diagnostics(){
-  const source=[snapshot,render,routeAction,teamProjection,journeyProjection,brandMarkup,toolsMarkup,navMarkup,syncMapGutterGeometry,regionContextProjection,villageContextProjection,renderContextProjection].map(String).join("\n");
+  const source=[snapshot,render,routeAction,teamProjection,journeyProjection,brandMarkup,toolsMarkup,navMarkup,syncMapGutterGeometry,regionContextProjection,villageContextProjection,renderContextProjection,syncMapContextFromDocument].map(String).join("\n");
   const data=snapshot();
   const checks={
     readOnlyProjection:!/savePlayerData\s*\(/.test(source)&&!/localStorage\.setItem\s*\(/.test(source)&&!/confirmAcademyTeamFormation\s*\(/.test(source),
