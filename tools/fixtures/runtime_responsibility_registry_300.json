@@ -1760,6 +1760,44 @@
         "tools/qa_runtime_ownership_safety_300.js",
         "tools/qa_save_compatibility_311.js"
       ]
+    },
+    {
+      "responsibilityId": "phase2.live_hud.my_clan_return_context",
+      "canonicalOwner": "runtime/alpha-hud-my-clan-return-context-50600.js",
+      "ownerType": "phase2_presentation_return_context_adapter",
+      "directCallers": [
+        "runtime/alpha-phase2-live-hud-49900.js",
+        "game.js"
+      ],
+      "stateReads": [
+        "existing #499 observer-safe HUD map surface kind",
+        "existing captureStoryScenePresentationUnderlay presentation caller snapshot",
+        "existing currentOverlayType / selectedRegionKey / selectedLocationNode map caller state"
+      ],
+      "stateWrites": [
+        "transient in-memory returnUnderlay + counters inside #506 adapter only",
+        "presentation/navigation restoration only through existing restoreStoryScenePresentationUnderlay / returnToWorldMap authorities"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-phase2-live-hud-49900.js",
+        "runtime/alpha-hud-my-clan-return-context-50600.js"
+      ],
+      "extensionHooks": [
+        "getHudMyClanReturnContext50600",
+        "runHudMyClanReturnContext50600Diagnostics"
+      ],
+      "permittedAdapters": [
+        "hud_my_clan_return_context_506"
+      ],
+      "retiredOwners": [],
+      "saveSchemaRefs": [],
+      "qaRefs": [
+        "tools/qa_hud_my_clan_return_506.js",
+        "tools/qa_hud_my_clan_return_506_browser.js",
+        "tools/qa_phase2_live_hud_499_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
     }
   ],
   "adapters": [
@@ -1893,6 +1931,18 @@
       "retirementCondition": "Review when shared Origin Story-to-Battle consumes the exact #338 Mirai contract natively.",
       "milestone": "shared Origin runtime propagation review",
       "qaRef": "tools/qa_issue_105_origin_presentation_browser.js",
+      "temporary": false
+    },
+    {
+      "adapterId": "hud_my_clan_return_context_506",
+      "reason": "Preserve the exact World/Region/Village caller when the Phase-2 HUD temporarily opens My Clan, without creating a second navigation or My Clan authority.",
+      "owner": "runtime/alpha-hud-my-clan-return-context-50600.js",
+      "sourceOwner": "runtime/alpha-phase2-live-hud-49900.js",
+      "targetOwner": "game.js",
+      "exactBehaviorBridged": "HUD My Clan activation captures the existing presentation underlay; legitimate My Clan force-close restores that exact caller through existing presentation/world navigation authorities. Dirty SAVE/DISCARD/KEEP EDITING remains owned by existing My Clan runtime.",
+      "retirementCondition": "Retire when the canonical shared overlay/navigation owner natively preserves caller context for temporary management surfaces.",
+      "milestone": "Phase 2 Konoha first-hour navigation closure",
+      "qaRef": "tools/qa_hud_my_clan_return_506_browser.js",
       "temporary": false
     }
   ],
@@ -2318,6 +2368,19 @@
       "qaRefs": [
         "tools/qa_issue_469_ce_hotspot.js",
         "tools/qa_issue_469_ce_hotspot_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ]
+    },
+    {
+      "symbol": "forceCloseMyClanOverlay",
+      "chain": [
+        "runtime/alpha-hud-my-clan-return-context-50600.js"
+      ],
+      "canonicalActiveOwner": "runtime/alpha-hud-my-clan-return-context-50600.js",
+      "activationCondition": "The base game.js function remains the delegated predecessor; #506 is the only declared assignment wrapper and becomes active only when a transient return underlay was captured from an actual #499 HUD My Clan activation while currentOverlayType is clan.",
+      "qaRefs": [
+        "tools/qa_hud_my_clan_return_506.js",
+        "tools/qa_hud_my_clan_return_506_browser.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ]
     }
