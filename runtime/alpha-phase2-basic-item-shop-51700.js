@@ -311,11 +311,24 @@ function bindCommercialDistrictAction(node){
   },true);
   return true;
 }
+function commercialDistrictHost(screen){
+  if(!screen)return null;
+  const candidates=[...screen.querySelectorAll("[data-village-hotspot-id],.village-map-hotspot,.konoha-v3-anchor")];
+  return candidates.find(node=>{
+    const label=node.querySelector(".village-golden-halo-label,.village-map-hotspot-label");
+    const visibleName=String(label&&label.textContent||"").trim();
+    const aria=String(node.getAttribute("aria-label")||"").trim()
+      .replace(/\.\s*Double-click to enter(?: Basic Item Shop)?\.?$/i,"")
+      .trim();
+    const title=String(node.getAttribute("title")||"").trim();
+    return visibleName==="Central Commercial District"||aria==="Central Commercial District"||title==="Central Commercial District";
+  })||null;
+}
 function injectCommercialDistrictAction(){
   if(typeof document==="undefined")return false;
   const screen=document.querySelector('.village-map-screen[data-village-id="konohagakure"]');
   if(!screen)return false;
-  const authoritative=screen.querySelector('[data-village-hotspot-id="'+LOCATION_ID+'"]');
+  const authoritative=commercialDistrictHost(screen);
   if(!authoritative)return false;
   return bindCommercialDistrictAction(authoritative);
 }
