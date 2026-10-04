@@ -103,7 +103,7 @@ async function openShopFromVillage(page){
     await page.screenshot({path:path.join(OUT,"01-shop-catalogue.png"),fullPage:true});
 
     const beforeInspect=await digest(page);
-    await page.evaluate(()=>renderPhase2BasicItemShop51700?.(document.getElementById("overlay-content-container")));
+    await page.evaluate(()=>globalThis.renderPhase2BasicItemShop51700?.(document.getElementById("overlay-content-container")));
     const afterInspect=await digest(page);
     assert.strictEqual(afterInspect,beforeInspect,"Shop render manufactured transaction state");
 
