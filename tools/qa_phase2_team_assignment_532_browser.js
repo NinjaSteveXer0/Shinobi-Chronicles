@@ -120,7 +120,7 @@ async function protectedSnapshot(page){
     await page.screenshot({path:path.join(OUT,"01-owned-unassigned-my-clan.png"),fullPage:true});
 
     const staged=await page.evaluate(()=>{
-      openMyClanBrowseView();
+      closeMyClanInspection();
       const result=stageMyClanCharacterToSlot(1,"academy_izuno");
       return{
         result,
