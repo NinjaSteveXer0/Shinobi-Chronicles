@@ -58,32 +58,82 @@ function rehydrateCurrentPhase2Root(){
 function acquisitionFrom(save){return save&&save.acquisition&&typeof save.acquisition==="object"?save.acquisition:null;}
 function formationFrom(save){const a=acquisitionFrom(save);return a&&a.academyTeamFormation&&typeof a.academyTeamFormation==="object"?a.academyTeamFormation:null;}
 function formationReceiptFrom(save){const f=formationFrom(save);return f&&f.confirmationReceipt&&typeof f.confirmationReceipt==="object"?f.confirmationReceipt:null;}
+function clanAssignmentFrom(save){
+  const clan=save&&save.clan&&typeof save.clan==="object"?save.clan:null;
+  return clan&&clan.currentTeamAssignment&&typeof clan.currentTeamAssignment==="object"?clan.currentTeamAssignment:null;
+}
+function occupiedAssignmentRows(assignment){
+  if(!assignment)return[];
+  const lineages=Array.isArray(assignment.teamLineageIds)?assignment.teamLineageIds:[];
+  const variants=Array.isArray(assignment.teamVariantIds)?assignment.teamVariantIds:[];
+  const runtimes=Array.isArray(assignment.teamRuntimeIds)?assignment.teamRuntimeIds:[];
+  const max=Math.max(lineages.length,variants.length,runtimes.length);
+  const rows=[];
+  for(let index=0;index<max;index+=1){
+    const lineageId=lineages[index]||null,variantId=variants[index]||null,runtimeId=runtimes[index]||null;
+    if(!lineageId&&!variantId&&!runtimeId)continue;
+    if(!lineageId||!variantId||!runtimeId)return[];
+    rows.push({slotNumber:index+1,lineageId:String(lineageId),variantId:String(variantId),runtimeId:String(runtimeId)});
+  }
+  return rows;
+}
+function lineageForVariant(save,variantId){
+  const a=acquisitionFrom(save);
+  const owned=a&&a.ownedCharactersByVariantId&&a.ownedCharactersByVariantId[variantId];
+  return owned&&owned.ownedCharacterId?String(owned.ownedCharacterId):null;
+}
+function validCommittedClanAssignment(assignment,save){
+  const rows=occupiedAssignmentRows(assignment);
+  if(!assignment||!assignment.assignmentId||!rows.length||rows.length>6)return false;
+  if(new Set(rows.map(row=>row.lineageId)).size!==rows.length)return false;
+  return rows.every(row=>lineageForVariant(save,row.variantId)===row.lineageId);
+}
 function validCommittedTeamReceipt(receipt){
   const ids=receipt&&Array.isArray(receipt.teamVariantIds)?receipt.teamVariantIds.filter(Boolean):[];
   return !!(receipt&&receipt.commitId&&receipt.originVariantId&&ids.length===3&&new Set(ids).size===3&&ids[0]===receipt.originVariantId);
 }
 function getCurrentTeam(save=currentPlayerData()){
   const a=acquisitionFrom(save),formation=formationFrom(save),receipt=formationReceiptFrom(save);
-  if(!a||!formation||formation.completed!==true||!receipt)return null;
-
+  if(!a||!formation||formation.completed!==true)return null;
+  const originVariantId=a.chronicleOriginVariantId||null;
+  const protagonistLineageId=a.chronicleOriginOwnedCharacterId||lineageForVariant(save,originVariantId);
+  const assignment=clanAssignmentFrom(save);
+  if(validCommittedClanAssignment(assignment,save)){
+    const rows=occupiedAssignmentRows(assignment);
+    return Object.freeze({
+      schemaVersion:2,
+      assignmentId:String(assignment.assignmentId),
+      stage:"current",
+      originVariantId:originVariantId?String(originVariantId):null,
+      protagonistLineageId:protagonistLineageId?String(protagonistLineageId):null,
+      protagonistPresent:!!(protagonistLineageId&&rows.some(row=>row.lineageId===String(protagonistLineageId))),
+      teamLineageIds:Object.freeze(rows.map(row=>row.lineageId)),
+      teamVariantIds:Object.freeze(rows.map(row=>row.variantId)),
+      teamRuntimeIds:Object.freeze(rows.map(row=>row.runtimeId)),
+      slotAssignments:Object.freeze(rows.map(row=>Object.freeze({...row}))),
+      sourcePath:"playerData.clan.currentTeamAssignment",
+      committed:true,
+      legacyProjection:assignment.source==="save_migration"
+    });
+  }
+  if(!receipt)return null;
   if(validCommittedTeamReceipt(receipt)){
+    const ids=[...receipt.teamVariantIds];
     return Object.freeze({
       schemaVersion:1,
       assignmentId:String(receipt.commitId),
       stage:"academy",
       originVariantId:String(receipt.originVariantId),
-      teamVariantIds:Object.freeze([...receipt.teamVariantIds]),
+      protagonistLineageId:protagonistLineageId?String(protagonistLineageId):null,
+      protagonistPresent:true,
+      teamLineageIds:Object.freeze(ids.map(id=>lineageForVariant(save,id)).filter(Boolean)),
+      teamVariantIds:Object.freeze(ids),
+      teamRuntimeIds:Object.freeze(Array.isArray(receipt.teamRuntimeIds)?[...receipt.teamRuntimeIds]:[]),
       sourcePath:"playerData.acquisition.academyTeamFormation.confirmationReceipt.teamVariantIds",
       committed:true,
       legacyProjection:false
     });
   }
-
-  // Representative pre-Phase-2 saves may carry the older committed Team
-  // Formation shape: protagonist identity + exactly two selected teammates +
-  // a confirmation receipt, without the later receipt.teamVariantIds payload.
-  // These are existing committed facts, so deriving the three-person Academy
-  // assignment is deterministic migration, not fabricated retroactive history.
   const origin=a.chronicleOriginVariantId;
   const selected=Array.isArray(formation.selectedTeammateIds)?formation.selectedTeammateIds.filter(Boolean):[];
   const uniqueSelected=[...new Set(selected)];
@@ -95,12 +145,17 @@ function getCurrentTeam(save=currentPlayerData()){
     assignmentId:String(receipt.receiptId),
     stage:"academy",
     originVariantId:String(origin),
+    protagonistLineageId:protagonistLineageId?String(protagonistLineageId):null,
+    protagonistPresent:true,
+    teamLineageIds:Object.freeze(ids.map(id=>lineageForVariant(save,id)).filter(Boolean)),
     teamVariantIds:Object.freeze(ids),
+    teamRuntimeIds:Object.freeze([]),
     sourcePath:"playerData.acquisition.chronicleOriginVariantId + academyTeamFormation.selectedTeammateIds + confirmationReceipt.receiptId",
     committed:true,
     legacyProjection:true
   });
 }
+
 function defaultOriginParticipantContinuity(){
   return{schemaVersion:1,byKey:{}};
 }
@@ -332,19 +387,19 @@ function getCurrentRyo(save=currentPlayerData()){return Math.max(0,Number(save&&
 const DOMAINS=Object.freeze([
   Object.freeze({
     stateDomainId:"currentTeam",
-    semanticOwner:"Acquisition / Team Formation",
-    canonicalWritePath:"confirmAcademyTeamFormation",
-    stableIdentityKey:"academyTeamFormation.confirmationReceipt.commitId || confirmationReceipt.receiptId (legacy)",
-    savePath:"playerData.acquisition.academyTeamFormation (modern receipt teamVariantIds; deterministic legacy selectedTeammateIds projection)",
+    semanticOwner:"Current Team Assignment / game.js",
+    canonicalWritePath:"commitClanTeamAssignment (opening Academy formation routes through the same writer)",
+    stableIdentityKey:"playerData.clan.currentTeamAssignment.assignmentId || academyTeamFormation.confirmationReceipt.commitId (legacy fallback)",
+    savePath:"playerData.clan.currentTeamAssignment (current assignment) + playerData.acquisition.academyTeamFormation (opening historical fallback)",
     schemaVersion:1,
     sourceOccurrenceIdFormat:"academy_team_formation::<commitId|legacyReceiptId>",
     idempotenceKeyFormat:"academyTeamFormation.confirmationReceipt.commitId || receiptId",
     derivedFields:Object.freeze(["stage","originVariantId"]),
     projectionConsumers:Object.freeze(["Training","Practical","Exams","World","Battle deployment selection","Shinobi Record"]),
-    migrationRule:"prefer modern committed receipt; otherwise derive only from completed formation + committed origin + exactly two selected teammates + legacy receiptId",
+    migrationRule:"prefer exact owned-lineage playerData.clan.currentTeamAssignment; otherwise preserve deterministic opening Academy receipt fallback without rewriting history",
     resetRule:"only_explicit_new_chronicle_or_authorised_roster_transition",
     difficultyScope:"academy_active_genin_aware",
-    inheritanceRule:"promotion_transition_must_explicitly_replace_assignment",
+    inheritanceRule:"current assignment may omit protagonist after opening restriction; protagonist lineage remains independent and Promotion must explicitly replace representation later",
     devOverridePolicy:"ordinary_player_surfaces_must_not_substitute_fixture_roster",
     qaRefs:Object.freeze(["tools/qa_phase2_chronicle_state_manifest_436.js","tools/qa_save_compatibility_311.js"])
   }),
@@ -541,7 +596,7 @@ function diagnostics(){
     privateOriginHistoryDomain:unique.has("privateOriginHistory"),
     disciplineLedgerNotDuplicated:DOMAINS.find(row=>row.stateDomainId==="disciplineDevelopment")?.savePath==="playerData.characters[progressionCharacterId].disciplineProgression[disciplineId]",
     characterStatsExistingOwnerPreserved:DOMAINS.find(row=>row.stateDomainId==="characterStats")?.semanticOwner==="PL / Registry / Rank",
-    currentTeamDerivedNotDuplicated:DOMAINS.find(row=>row.stateDomainId==="currentTeam")?.canonicalWritePath==="confirmAcademyTeamFormation"&&!String(DOMAINS.find(row=>row.stateDomainId==="currentTeam")?.savePath||"").includes("phase2ChronicleState.currentTeam"),
+    currentTeamDerivedNotDuplicated:DOMAINS.find(row=>row.stateDomainId==="currentTeam")?.canonicalWritePath.includes("commitClanTeamAssignment")&&String(DOMAINS.find(row=>row.stateDomainId==="currentTeam")?.savePath||"").includes("playerData.clan.currentTeamAssignment")&&!String(DOMAINS.find(row=>row.stateDomainId==="currentTeam")?.savePath||"").includes("phase2ChronicleState.currentTeam"),
     ryoExistingOwnerPreserved:DOMAINS.find(row=>row.stateDomainId==="currentRyo")?.savePath==="playerData.ryo",
     recordProjectionNoWriter:DOMAINS.find(row=>row.stateDomainId==="shinobiRecordProjection")?.canonicalWritePath==="NONE_DERIVED_PROJECTION_ONLY",
     pureMigration:JSON.stringify(defaultSave)===JSON.stringify({ryo:77,acquisition:{chronicleOriginVariantId:"academy_menma",chronicleOriginOwnedCharacterId:"owned_character_academy_menma",ninjaIdentityVariantId:"academy_menma",ninjaIdentityLocked:true,academyTeamFormation:{completed:true,confirmationReceipt:{commitId:"team-1",originVariantId:"academy_menma",teamVariantIds:["academy_menma","academy_hinata","academy_kushina"]}}}}),

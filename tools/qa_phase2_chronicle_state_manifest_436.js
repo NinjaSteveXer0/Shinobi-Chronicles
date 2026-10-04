@@ -195,6 +195,38 @@ const teamSave={
 }
 
 {
+  const reassigned=JSON.parse(JSON.stringify(teamSave));
+  reassigned.acquisition.ownedCharactersByVariantId={
+    academy_menma:{ownedCharacterId:"owned_character_academy_menma"},
+    academy_hinata:{ownedCharacterId:"owned_character_academy_hinata"},
+    academy_kushina:{ownedCharacterId:"owned_character_academy_kushina"},
+    academy_izuno:{ownedCharacterId:"owned_character_academy_izuno"}
+  };
+  reassigned.clan={
+    teamSlots:["academy_izuno","academy_hinata","academy_kushina",null,null,null],
+    assignmentSequence:2,
+    currentTeamAssignment:{
+      schemaVersion:1,
+      assignmentId:"clan_team_assignment:2:owned_character_academy_izuno+owned_character_academy_hinata+owned_character_academy_kushina",
+      sequence:2,
+      source:"my_clan_save_formation",
+      sourceEventId:"qa436_reassignment",
+      teamRuntimeIds:["academy_izuno","academy_hinata","academy_kushina",null,null,null],
+      teamVariantIds:["academy_izuno","academy_hinata","academy_kushina",null,null,null],
+      teamLineageIds:["owned_character_academy_izuno","owned_character_academy_hinata","owned_character_academy_kushina",null,null,null],
+      committedAt:456
+    }
+  };
+  const team=plain(boot(reassigned).getChronicleCurrentTeam43600());
+  assert.deepStrictEqual(team.teamVariantIds,["academy_izuno","academy_hinata","academy_kushina"],"#532 current assignment did not supersede opening-team projection");
+  assert.deepStrictEqual(team.teamLineageIds,["owned_character_academy_izuno","owned_character_academy_hinata","owned_character_academy_kushina"],"#532 exact owned-lineage order drifted");
+  assert.strictEqual(team.originVariantId,"academy_menma","#532 reassignment rewrote Chronicle protagonist identity");
+  assert.strictEqual(team.protagonistLineageId,"owned_character_academy_menma","#532 reassignment rewrote Chronicle protagonist lineage");
+  assert.strictEqual(team.protagonistPresent,false,"#532 protagonist absence was not represented independently from identity");
+  assert.strictEqual(team.sourcePath,"playerData.clan.currentTeamAssignment");
+}
+
+{
   const invalid=JSON.parse(JSON.stringify(teamSave));
   invalid.acquisition.academyTeamFormation.confirmationReceipt.teamVariantIds=["academy_menma","academy_hinata"];
   const c=boot(invalid);
@@ -219,7 +251,7 @@ console.log(JSON.stringify({
   noMasteryDomain:true,
   pureMigration:true,
   deterministicMigration:true,
-  currentTeamDerivedFromCommittedFormation:true,
+  currentTeamDerivedFromCanonicalAssignment:true,
   ryoExistingOwnerPreserved:true,
   legacy209MigrationBounded:true,
   noFabricatedRetroactiveTips:true,

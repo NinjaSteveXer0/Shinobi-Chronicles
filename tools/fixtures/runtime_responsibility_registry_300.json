@@ -1379,7 +1379,8 @@
         "playerData.ryo",
         "legacy academyTeamFormation.confirmationReceipt.firstKonohaTutorial",
         "playerData.phase2ChronicleState.originParticipantContinuity deterministic participant continuity projection",
-        "playerData.phase2ChronicleState.privateOriginHistories subject-private history ledger"
+        "playerData.phase2ChronicleState.privateOriginHistories subject-private history ledger",
+        "playerData.clan.currentTeamAssignment exact owned-lineage current assignment"
       ],
       "stateWrites": [
         "playerData.phase2ChronicleState.tutorialProgress only through updateChronicleTutorialProgress43600 / ensurePhase2ChronicleState43600",
@@ -1412,7 +1413,8 @@
         "tools/qa_save_compatibility_311.js",
         "tools/qa_runtime_ownership_safety_300.js",
         "tools/qa_issue_469_ce_hotspot.js",
-        "tools/qa_issue_469_ce_hotspot_browser.js"
+        "tools/qa_issue_469_ce_hotspot_browser.js",
+        "tools/qa_phase2_team_assignment_532.js"
       ]
     },
     {
@@ -1712,7 +1714,8 @@
         "tools/qa_phase2_live_hud_499.js",
         "tools/qa_phase2_live_hud_499_browser.js",
         "tools/qa_runtime_ownership_safety_300.js",
-        "tools/qa_save_compatibility_311.js"
+        "tools/qa_save_compatibility_311.js",
+        "tools/qa_phase2_team_assignment_532_browser.js"
       ]
     },
     {
@@ -1848,6 +1851,51 @@
         "tools/qa_phase2_character_card_shop_524_browser.js",
         "tools/qa_phase2_basic_item_shop_517.js",
         "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_save_compatibility_311.js"
+      ]
+    },
+    {
+      "responsibilityId": "phase2.current_team.assignment",
+      "canonicalOwner": "game.js",
+      "ownerType": "persistent_team_assignment_authority",
+      "directCallers": [
+        "confirmAcademyTeamFormation",
+        "saveMyClanStagedFormation",
+        "setClanTeamSlot",
+        "assignClanCharacterToNextOpenSlot",
+        "removeClanCharacterFromTeam"
+      ],
+      "stateReads": [
+        "playerData.characterOwnership",
+        "playerData.acquisition exact owned Character lineage records",
+        "existing My Clan staged formation",
+        "opening Academy Team Formation restriction"
+      ],
+      "stateWrites": [
+        "playerData.clan.teamSlots",
+        "playerData.clan.assignmentSequence",
+        "playerData.clan.currentTeamAssignment exact runtime/Variant/owned-lineage ordering"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "game.js"
+      ],
+      "extensionHooks": [
+        "commitClanTeamAssignment",
+        "validateClanTeamAssignmentCandidate",
+        "getCommittedClanTeamAssignment"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "playerData.clan.teamSlots",
+        "playerData.clan.currentTeamAssignment.teamLineageIds",
+        "playerData.clan.currentTeamAssignment.teamVariantIds",
+        "playerData.clan.currentTeamAssignment.teamRuntimeIds"
+      ],
+      "qaRefs": [
+        "tools/qa_phase2_team_assignment_532.js",
+        "tools/qa_phase2_team_assignment_532_browser.js",
         "tools/qa_save_compatibility_311.js"
       ]
     }
@@ -2197,6 +2245,11 @@
       "semanticId": "phase2.acquisition.character_card_shop_purchase_commit",
       "owner": "runtime/alpha-phase2-character-card-shop-52400.js",
       "responsibilityId": "phase2.acquisition.character_card_shop_retail"
+    },
+    {
+      "semanticId": "currentTeam.assignment",
+      "owner": "game.js",
+      "responsibilityId": "phase2.current_team.assignment"
     }
   ],
   "globalWrapperChains": [
@@ -2612,6 +2665,16 @@
       "stateRef": "playerData.activityHistory character_card_shop_purchase receipts",
       "owner": "runtime/alpha-phase2-character-card-shop-52400.js",
       "responsibilityId": "phase2.acquisition.character_card_shop_retail"
+    },
+    {
+      "stateRef": "playerData.clan.currentTeamAssignment",
+      "owner": "game.js",
+      "responsibilityId": "phase2.current_team.assignment"
+    },
+    {
+      "stateRef": "playerData.clan.teamSlots",
+      "owner": "game.js",
+      "responsibilityId": "phase2.current_team.assignment"
     }
   ]
 }

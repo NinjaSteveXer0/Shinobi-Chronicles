@@ -77,11 +77,13 @@ function characterFor(id){
   return variant&&variant!==String(id)?call("getPlayerCharacter",variant):null;
 }
 function displayNameFor(id,character=characterFor(id)){
+  const variant=presentationVariantId(id);
+  const canonicalPersonName=scalar(call("getProductionRuntimePersonName",variant||id));
+  if(canonicalPersonName)return canonicalPersonName;
   if(character){
-    const value=scalar(character.name||character.displayName||character.playerFacingName);
+    const value=scalar(character.playerFacingName||character.displayName||character.name);
     if(value)return value;
   }
-  const variant=presentationVariantId(id);
   const registry=call("getCharacterRegistryEntry",variant)||call("getRegistryCharacter",variant)||call("getCharacterRegistryEntry",id)||call("getRegistryCharacter",id);
   const registryName=registry&&scalar(registry.displayName||registry.name);
   if(registryName)return registryName;

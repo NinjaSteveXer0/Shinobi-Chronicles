@@ -1356,6 +1356,38 @@
       "replaces": [],
       "contractChangeReason": "PHASE_2_ACTIVATION",
       "rationale": "Consumes closed Acquisition authority #520 / PR #523 under master #449 Step 5. The runtime exposes exactly the authored ten Academy representations at exactly 100 Ryo each after Origin completion, Active Konoha entry and mandatory Academy Team Formation. Final deliberate confirmation atomically debits canonical Ryo and delegates exact ownership to existing commitCharacterAcquisition with stable retail provenance. Same-intent replay is idempotent; fresh already-owned, insufficient-funds, unlisted and gate-failed attempts mutate nothing. Purchase grants My Clan ownership only and never changes currentTeam, Story participants, Genin candidate state, Rank, Stats/PL, Progression, Skills, Shared History or deployment."
+    },
+    {
+      "changeId": "issue-532-phase2-deliberate-team-assignment",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "phase2.current_team.assignment",
+        "phase2.chronicle_state_manifest.shared",
+        "phase2.live_hud.presentation"
+      ],
+      "owner": "game.js + runtime/alpha-chronicle-state-manifest-43600.js + runtime/alpha-phase2-live-hud-49900.js",
+      "directCallers": [
+        "existing My Clan SAVE FORMATION",
+        "existing Academy Team Formation confirmation",
+        "runtime/alpha-phase2-character-card-shop-52400.js ownership flow"
+      ],
+      "stateTouched": [
+        "playerData.clan.currentTeamAssignment exact owned-lineage assignment receipt",
+        "playerData.clan.teamSlots compatibility/runtime formation projection",
+        "read-only Chronicle State Manifest currentTeam projection",
+        "read-only HUD/My Clan person-name projection"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_phase2_team_assignment_532.js",
+        "tools/qa_phase2_team_assignment_532_browser.js",
+        "tools/qa_phase2_character_card_shop_524_browser.js",
+        "tools/qa_phase2_live_hud_499_browser.js",
+        "tools/qa_save_compatibility_311.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "CE_522_CLOSED_STEP5_ACTIVATION",
+      "rationale": "Master #449 Step 5 is unblocked by closed CE #522. Existing My Clan staged formation remains the only player-facing assignment surface; this tranche promotes explicit Save Formation into the canonical currentTeam assignment with exact owned-lineage identity and ordering, preserves the opening Academy receipt as history/fallback, allows the Chronicle protagonist to be absent only after the opening restriction is legitimately complete, and keeps protagonist identity/Rank, ownership, Story participants and active Battle deployment independent. HUD/My Clan person-facing identity now separates Person Name from representation title/formal Rank."
     }
   ]
 }

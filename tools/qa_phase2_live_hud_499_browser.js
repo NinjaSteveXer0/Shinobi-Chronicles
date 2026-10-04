@@ -361,7 +361,8 @@ async function proveRegionContext(page,label){
           name:(()=>{
             const registry=(typeof globalThis.getCharacterRegistryEntry==="function"?globalThis.getCharacterRegistryEntry(presentationVariant):null)
               ||(typeof globalThis.getRegistryCharacter==="function"?globalThis.getRegistryCharacter(presentationVariant):null);
-            return scalar(character&& (character.name||character.displayName||character.playerFacingName))
+            return scalar(typeof getProductionRuntimePersonName==="function"?getProductionRuntimePersonName(presentationVariant):null)
+              ||scalar(character&& (character.playerFacingName||character.displayName||character.name))
               ||scalar(registry&&registry.displayName)
               ||scalar(registry&&registry.name);
           })(),

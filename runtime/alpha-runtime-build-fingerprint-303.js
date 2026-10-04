@@ -16,10 +16,10 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-04-DZ",
-    sourceBaselineCommit:"98f826b5c064634fb964d8ebff6f5f6aa18ea075",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-05-EA",
+    sourceBaselineCommit:"33cf485dff3bc70856ea15f1062d3b39066dd2c5",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
-    runtimeGeneration:"phase2-character-card-shop-524",
+    runtimeGeneration:"phase2-deliberate-team-assignment-532",
     majorRuntimeFeatures:Object.freeze([
       "academy-kakashi-v2",
       "runtime-ownership-safety-300",
@@ -94,7 +94,11 @@
       "phase2-live-hud-region-village-map-echo-visible-stage-499",
       "phase2-basic-item-shop-517",
       "hud-my-clan-exact-map-return-506",
-      "phase2-character-card-shop-retail-acquisition-524"
+      "phase2-character-card-shop-retail-acquisition-524",
+      "phase2-deliberate-team-assignment-532",
+      "current-team-exact-owned-lineage-532",
+      "chronicle-protagonist-team-separation-532",
+      "person-name-card-title-rank-separation-532"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -127,10 +131,10 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-04-DZ",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-05-EA",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
-      generationPresent:first.runtimeGeneration==="phase2-character-card-shop-524",
+      generationPresent:first.runtimeGeneration==="phase2-deliberate-team-assignment-532",
       repaired469FeaturePresent:first.majorRuntimeFeatures.includes("phase2-first-live-ce-hotspot-469"),
       privateHistory478FeaturePresent:first.majorRuntimeFeatures.includes("phase2-private-origin-live-ce-hotspot-478"),
       ownerRetestPresentationFeaturePresent:first.majorRuntimeFeatures.includes("story-scene-board-owner-retest-469"),
@@ -155,6 +159,10 @@
       phase2BasicItemShop517Present:first.majorRuntimeFeatures.includes("phase2-basic-item-shop-517"),
       hudMyClanExactMapReturn506Present:first.majorRuntimeFeatures.includes("hud-my-clan-exact-map-return-506"),
       phase2CharacterCardShop524Present:first.majorRuntimeFeatures.includes("phase2-character-card-shop-retail-acquisition-524"),
+      phase2TeamAssignment532Present:first.majorRuntimeFeatures.includes("phase2-deliberate-team-assignment-532"),
+      exactOwnedLineage532Present:first.majorRuntimeFeatures.includes("current-team-exact-owned-lineage-532"),
+      protagonistSeparation532Present:first.majorRuntimeFeatures.includes("chronicle-protagonist-team-separation-532"),
+      personNameSeparation532Present:first.majorRuntimeFeatures.includes("person-name-card-title-rank-separation-532"),
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)

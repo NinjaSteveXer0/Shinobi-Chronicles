@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "buildId": "SC-ALPHA-RUNTIME-R303-2026-10-04-DZ",
-  "sourceBaselineCommit": "98f826b5c064634fb964d8ebff6f5f6aa18ea075",
+  "buildId": "SC-ALPHA-RUNTIME-R303-2026-10-05-EA",
+  "sourceBaselineCommit": "33cf485dff3bc70856ea15f1062d3b39066dd2c5",
   "sourceRef": "issue-303-runtime-build-fingerprint-v1",
-  "runtimeGeneration": "phase2-character-card-shop-524",
+  "runtimeGeneration": "phase2-deliberate-team-assignment-532",
   "majorRuntimeFeatures": [
     "academy-kakashi-v2",
     "runtime-ownership-safety-300",
@@ -78,7 +78,11 @@
     "phase2-live-hud-region-village-map-echo-visible-stage-499",
     "phase2-basic-item-shop-517",
     "hud-my-clan-exact-map-return-506",
-    "phase2-character-card-shop-retail-acquisition-524"
+    "phase2-character-card-shop-retail-acquisition-524",
+    "phase2-deliberate-team-assignment-532",
+    "current-team-exact-owned-lineage-532",
+    "chronicle-protagonist-team-separation-532",
+    "person-name-card-title-rank-separation-532"
   ],
   "productionLoader": "index.html",
   "runtimeModule": "runtime/alpha-runtime-build-fingerprint-303.js",
