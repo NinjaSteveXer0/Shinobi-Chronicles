@@ -1714,6 +1714,52 @@
         "tools/qa_runtime_ownership_safety_300.js",
         "tools/qa_save_compatibility_311.js"
       ]
+    },
+    {
+      "responsibilityId": "phase2.economy.basic_item_shop_transaction",
+      "canonicalOwner": "runtime/alpha-phase2-basic-item-shop-51700.js",
+      "ownerType": "phase2_commercial_transaction_authority_adapter",
+      "directCallers": [
+        "index.html",
+        "Konoha Central Commercial District KON-P09"
+      ],
+      "stateReads": [
+        "canonical playerData.ryo / getChronicleCurrentRyo43600",
+        "existing Item definitions through getItemDefinition",
+        "canonical playerData.inventory quantities",
+        "existing playerData.activityHistory purchase-intent receipts"
+      ],
+      "stateWrites": [
+        "playerData.ryo exact committed retail debit only",
+        "playerData.inventory only through existing addItemToInventory ownership authority",
+        "playerData.activityHistory one stable item_shop_purchase receipt per purchase intent",
+        "exact purchase sourceRefs appended to the affected canonical stack record"
+      ],
+      "productionLoadPath": [
+        "index.html",
+        "runtime/alpha-phase2-basic-item-shop-51700.js"
+      ],
+      "extensionHooks": [
+        "getPhase2BasicItemShopSnapshot51700",
+        "commitPhase2BasicItemShopPurchase51700",
+        "purchasePhase2BasicShopItem51700",
+        "openPhase2BasicItemShop51700",
+        "injectPhase2CommercialDistrictShop51700"
+      ],
+      "permittedAdapters": [],
+      "retiredOwners": [],
+      "saveSchemaRefs": [
+        "existing playerData.ryo",
+        "existing playerData.inventory",
+        "existing playerData.activityHistory item_shop_purchase receipts; no Shop-owned save root"
+      ],
+      "qaRefs": [
+        "tools/qa_phase2_basic_item_shop_517.js",
+        "tools/qa_phase2_basic_item_shop_517_browser.js",
+        "tools/qa_phase2_inventory_core_461.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_save_compatibility_311.js"
+      ]
     }
   ],
   "adapters": [
@@ -2039,6 +2085,11 @@
       "semanticId": "phase2.private_origin_history.factual_result_provenance",
       "owner": "runtime/alpha-story-factual-resolver-34600.js",
       "responsibilityId": "story.factual_resolution.neutral"
+    },
+    {
+      "semanticId": "phase2.economy.basic_item_shop_purchase_commit",
+      "owner": "runtime/alpha-phase2-basic-item-shop-51700.js",
+      "responsibilityId": "phase2.economy.basic_item_shop_transaction"
     }
   ],
   "globalWrapperChains": [
@@ -2411,6 +2462,21 @@
       "stateRef": "playerData.phase2ChronicleState.privateOriginHistories.bySubject[academy_kakashi]",
       "owner": "runtime/alpha-phase2-ce-hotspot-46900.js",
       "responsibilityId": "phase2.konoha_ce_hotspot.first_live_benchmark"
+    },
+    {
+      "stateRef": "playerData.ryo via phase2 item_shop_purchase committed retail debits",
+      "owner": "runtime/alpha-phase2-basic-item-shop-51700.js",
+      "responsibilityId": "phase2.economy.basic_item_shop_transaction"
+    },
+    {
+      "stateRef": "playerData.inventory via phase2 item_shop_purchase addItemToInventory commits",
+      "owner": "runtime/alpha-phase2-basic-item-shop-51700.js",
+      "responsibilityId": "phase2.economy.basic_item_shop_transaction"
+    },
+    {
+      "stateRef": "playerData.activityHistory item_shop_purchase receipts",
+      "owner": "runtime/alpha-phase2-basic-item-shop-51700.js",
+      "responsibilityId": "phase2.economy.basic_item_shop_transaction"
     }
   ]
 }

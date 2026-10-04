@@ -1271,6 +1271,34 @@
       "replaces": [],
       "contractChangeReason": "PHASE_2_ACTIVATION",
       "rationale": "Consumes master #449 Step 4 and the approved #497 Konoha Phase-2 Live HUD presentation contract. The runtime projects existing canonical Identity/Rank/village, Ryō, exact currentTeam and observer-safe Journey state into compact edge-docked map HUD controls, delegates My Clan/Inventory/Shinobi Record/Journey/map navigation to existing owners, suppresses itself during Story/Battle/deep management surfaces, and hides the older static map header/sidebar presentation while leaving map art and hotspot authority untouched. It creates no HUD save schema, no second semantic state owner, no team assignment mutation, no Chronicle history, and no fake Energy before #433. Installed-browser identity evidence showed Alpha Surface Truth correctly returns the stable owned-character identity (for example `owned_character_academy_menma`) rather than a Variant ID. The HUD now preserves that stable identity as `identity.id`, derives the canonical Chronicle Variant only for presentation (`identity.variantId`), and resolves name/Registry/uiPortrait through that representation. This does not collapse Registry identity into ownership or create a second identity state owner. Installed-browser evidence showed the canonical My Clan affiliation helper is callable from the live global lexical environment even when it is not exposed as a globalThis property. HUD affiliation projection now consumes that exact authority directly when available, then falls back to the existing global-call seam / character fields without creating a new affiliation owner. Stephen's first owner browser pass kept Step 4 AMBER: retiring the sidebar without collapsing the legacy two-column World Map grid trapped the map inside the old 280px sidebar track, violating map-dominance authority; the HUD now collapses that grid to one map column only while installed. The same owner pass approved the left-edge Current Team concept but found its raw boxed stack visually unfinished; presentation has been refined into a compact connected rail with framed portrait slots and bounded side labels without changing currentTeam order, assignment semantics, assets, or navigation. CE/Codex #505 then closed the final owner-selected HUD synthesis: Concept C / Chronicle Compass is the spatial base, Concept B supplies the unified Identity/Journey/Ryō hierarchy, and Concept A supplies the companion-first Current Team philosophy. #508 closed the exact Direction B masterbrand; World Map alone consumes `Logo/sc_title.png` published from asset-vault commit `8efdbf990888e59c3495e80d5672f86b194b4a23`. Bottom-edge quick actions are retired in favour of collapsible right-side player tools and a Chronicle Compass raised by an explicit safe reserve, with browser proof at 1366×768 and 1920×1080. Region/Village do not inherit the World Map brand by implication. Final screenshot inspection also exposed a literal escaped `\\n` text node beneath the map, traced to loader markup rather than HUD semantics; the loader now uses a real newline and both source/browser QA gate that presentation artifact. Owner surgical polish on 2026-10-04 preserves the GREEN-direction World composition and makes existing Region/Village black side space intentional: Current Team docks immediately beside the rendered map's left frame, while Player Tools and Chronicle Compass share a calculated right-gutter anchor/width and Compass retains the existing safe bottom reserve. Geometry is derived from the real `.region-map-pane` / `.village-map-screen` rectangles on render/resize only; map art, hotspot coordinates, currentTeam semantics, navigation authority and #506 return-context remain untouched. Browser acceptance now proves World, Region and Village at both 1366×768 and 1920×1080. Functional gutter follow-up keeps idle gutters quiet, makes each exact currentTeam portrait independently focusable for name-only identity reveal, and projects Region context exclusively from `getHotspotProjection()` plus Village context exclusively from already-rendered player-facing hotspot labels/interaction hints. Unknown Region truth remains `???` with action/summary suppression; hover/focus/click presentation performs no save, Chronicle, discovery, opportunity, Access or currentTeam mutation. World Map renders no contextual gutter surface, and #506 remains outside this pass. Map Echo adds no semantic state: it is rebuilt from the current Region/Village map image DOM, carries no hotspot DOM, is pointer-dead, and is omitted entirely on World. The crisp central map remains the sole interactive geography owner. Owner visual review rejected the first four-pane DR treatment as too dark to materially change the black stage. DS therefore changes only atmospheric presentation: one coherent full-overlay copy of the exact current map now sits behind Region/Village content at materially visible brightness/opacity, moderate blur/desaturation and a restrained outer-edge vignette. Interactive map dimensions, hotspot geometry, functional gutters, World Map and #506 remain untouched."
+    },
+    {
+      "changeId": "issue-517-phase2-basic-item-shop-2026-10-04",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "phase2.economy.basic_item_shop_transaction"
+      ],
+      "owner": "runtime/alpha-phase2-basic-item-shop-51700.js",
+      "directCallers": [
+        "index.html",
+        "Konoha Central Commercial District KON-P09"
+      ],
+      "stateTouched": [
+        "playerData.ryo via atomic purchase debit",
+        "playerData.inventory via existing addItemToInventory",
+        "playerData.activityHistory exact item_shop_purchase receipt",
+        "presentation-only Central Commercial District action host"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_phase2_basic_item_shop_517.js",
+        "tools/qa_phase2_basic_item_shop_517_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_save_compatibility_311.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "PHASE_2_ACTIVATION",
+      "rationale": "Master #449 Step 5 activates the first bounded real economy loop after Inventory and HUD closure. The Shop fixes a tiny explicit catalogue/price authority, debits canonical Ryō once, delegates goods to existing Inventory authority, records one causal purchase receipt, and leaves Character acquisition/team assignment/Crafting out of scope."
     }
   ]
 }

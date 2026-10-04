@@ -175,7 +175,12 @@ async function proveTeamIdentityReveal(page,label){
   const first=page.locator(".sc-hud499-team-member").first();
   assert(await first.count(),label+": Current Team portrait missing");
   await first.focus();
-  await page.waitForTimeout(180);
+  await page.waitForFunction(()=>{
+    const member=document.querySelector(".sc-hud499-team-member");
+    const node=member&&member.querySelector(".sc-hud499-team-name");
+    if(!member||!node||document.activeElement!==member)return false;
+    return Number(getComputedStyle(node).opacity)>0.9;
+  },null,{timeout:1500});
   const result=await page.evaluate(()=>{
     const members=[...document.querySelectorAll(".sc-hud499-team-member")];
     if(!members.length)return null;
