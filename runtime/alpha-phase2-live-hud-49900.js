@@ -306,15 +306,45 @@ function ensureRoot(){
   game.appendChild(root);
   return root;
 }
+function clearMapGutterGeometry(root){
+  if(!root)return;
+  ["--sc-hud499-map-left","--sc-hud499-map-right","--sc-hud499-map-top","--sc-hud499-map-bottom","--sc-hud499-gutter-control-width","--sc-hud499-gutter-right-anchor"].forEach(name=>root.style.removeProperty(name));
+  root.dataset.mapGutter="false";
+}
+function syncMapGutterGeometry(root,surfaceKind){
+  if(!root||typeof document==="undefined")return null;
+  const selector=surfaceKind==="region"?".region-map-pane":surfaceKind==="village"?".village-map-screen":null;
+  if(!selector){clearMapGutterGeometry(root);return null;}
+  const map=document.querySelector(selector);
+  if(!map){clearMapGutterGeometry(root);return null;}
+  const rr=root.getBoundingClientRect();
+  const mr=map.getBoundingClientRect();
+  if(!(mr.width>0&&mr.height>0&&rr.width>0&&rr.height>0)){clearMapGutterGeometry(root);return null;}
+  const left=Math.max(0,mr.left-rr.left);
+  const right=Math.max(0,rr.right-mr.right);
+  const top=Math.max(0,mr.top-rr.top);
+  const bottom=Math.max(0,rr.bottom-mr.bottom);
+  const controlWidth=Math.max(112,Math.min(176,right-18));
+  const rightAnchor=Math.max(10,right-controlWidth-10);
+  root.style.setProperty("--sc-hud499-map-left",left.toFixed(2)+"px");
+  root.style.setProperty("--sc-hud499-map-right",right.toFixed(2)+"px");
+  root.style.setProperty("--sc-hud499-map-top",top.toFixed(2)+"px");
+  root.style.setProperty("--sc-hud499-map-bottom",bottom.toFixed(2)+"px");
+  root.style.setProperty("--sc-hud499-gutter-control-width",controlWidth.toFixed(2)+"px");
+  root.style.setProperty("--sc-hud499-gutter-right-anchor",rightAnchor.toFixed(2)+"px");
+  root.dataset.mapGutter="true";
+  return{selector,left,right,top,bottom,controlWidth,rightAnchor};
+}
 function render(force=false){
   const root=ensureRoot();
   if(!root)return false;
   const data=snapshot();
+  root.hidden=!data.visible;
+  root.dataset.surface=data.surface.kind;
+  syncMapGutterGeometry(root,data.surface.kind);
   const signature=JSON.stringify(data);
   if(!force&&signature===state.lastSignature)return data;
   state.lastSignature=signature;
-  root.hidden=!data.visible;
-  root.dataset.surface=data.surface.kind;
   if(!data.visible){
     root.innerHTML="";
     return data;
@@ -378,9 +408,9 @@ function installStyles(){
     .sc-hud499-brand{position:absolute;left:18px;top:14px;width:clamp(210px,18vw,300px);pointer-events:none;filter:drop-shadow(0 8px 20px rgba(0,0,0,.45))}
     .sc-hud499-brand img{display:block;width:100%;height:auto;max-height:88px;object-fit:contain;object-position:left top}
     .sc-hud499-state-cluster{position:absolute;right:var(--sc-hud499-edge);top:12px;width:clamp(330px,31vw,470px);pointer-events:auto;overflow:hidden;border:1px solid rgba(195,159,70,.42);border-radius:8px;background:linear-gradient(150deg,rgba(7,14,23,.95),rgba(6,12,20,.82));box-shadow:0 12px 30px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.04);backdrop-filter:blur(6px)}
-    .sc-hud499-state-main{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;padding:8px 10px}
+    .sc-hud499-state-main{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:9px;padding:6px 9px}
     .sc-hud499-identity{display:flex;align-items:center;gap:9px;min-width:0}
-    .sc-hud499-identity-portrait,.sc-hud499-silhouette.sc-hud499-identity-portrait{width:46px;height:46px;flex:0 0 46px;object-fit:cover;object-position:top center;border:1px solid rgba(75,215,228,.45);border-radius:5px;background:#111923}
+    .sc-hud499-identity-portrait,.sc-hud499-silhouette.sc-hud499-identity-portrait{width:44px;height:44px;flex:0 0 44px;object-fit:cover;object-position:top center;border:1px solid rgba(75,215,228,.45);border-radius:5px;background:#111923}
     .sc-hud499-silhouette{display:grid;place-items:center;color:#d4b667;font-weight:900}
     .sc-hud499-identity-copy{display:flex;flex-direction:column;min-width:0;gap:4px}
     .sc-hud499-identity-copy strong{font:800 15px/1.08 Georgia,"Times New Roman",serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -389,10 +419,10 @@ function installStyles(){
     .sc-hud499-ryo{min-width:74px;padding-left:10px;border-left:1px solid rgba(195,159,70,.22);text-align:right}
     .sc-hud499-ryo>span,.sc-hud499-kicker,.sc-hud499-journey>span{display:block;color:#69dce7;font-size:7px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}
     .sc-hud499-ryo strong{display:block;margin-top:3px;color:#efcf72;font:900 17px/1 Georgia,"Times New Roman",serif}
-    .sc-hud499-journey{width:100%;min-height:39px;padding:7px 10px 8px;border:0;border-top:1px solid rgba(195,159,70,.2);background:linear-gradient(90deg,rgba(9,20,28,.76),rgba(8,14,22,.34));text-align:left;cursor:pointer}
+    .sc-hud499-journey{width:100%;min-height:35px;padding:5px 9px 6px;border:0;border-top:1px solid rgba(195,159,70,.2);background:linear-gradient(90deg,rgba(9,20,28,.76),rgba(8,14,22,.34));text-align:left;cursor:pointer}
     .sc-hud499-journey strong{display:block;margin-top:2px;font-size:11px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .sc-hud499-journey small{display:block;margin-top:2px;color:#aebbc5;font-size:8px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .sc-hud499-team{position:absolute;left:14px;top:122px;width:72px;max-height:330px;padding:8px 6px 10px;border:0;border-left:1px solid rgba(88,221,233,.42);border-radius:0 8px 8px 0;pointer-events:auto;cursor:pointer;text-align:center;overflow:visible;background:linear-gradient(90deg,rgba(5,11,18,.91),rgba(6,13,20,.68),rgba(6,13,20,.12));box-shadow:8px 12px 24px rgba(0,0,0,.18)}
+    .sc-hud499-team{box-sizing:border-box;position:absolute;left:14px;top:122px;width:72px;max-height:330px;padding:8px 6px 10px;border:0;border-left:1px solid rgba(88,221,233,.42);border-radius:0 8px 8px 0;pointer-events:auto;cursor:pointer;text-align:center;overflow:visible;background:linear-gradient(90deg,rgba(5,11,18,.91),rgba(6,13,20,.68),rgba(6,13,20,.12));box-shadow:8px 12px 24px rgba(0,0,0,.18)}
     .sc-hud499-team::before{content:"";position:absolute;left:-2px;top:34px;bottom:12px;width:3px;background:linear-gradient(180deg,rgba(83,221,232,.82),rgba(198,162,72,.55),rgba(198,162,72,.08));box-shadow:0 0 9px rgba(83,221,232,.13)}
     .sc-hud499-team .sc-hud499-kicker{padding-bottom:6px;font-size:6px;white-space:nowrap}
     .sc-hud499-team-stack{display:flex;flex-direction:column;align-items:center;gap:7px;margin-top:5px}
@@ -401,18 +431,51 @@ function installStyles(){
     .sc-hud499-team-portrait,.sc-hud499-silhouette.sc-hud499-team-portrait{display:block;width:48px;height:48px;margin:auto;object-fit:cover;object-position:top center;border:1px solid rgba(96,211,224,.3);border-radius:50%;background:#111923}
     .sc-hud499-team-name{position:absolute;left:63px;top:50%;z-index:8;display:block;margin:0;padding:5px 8px;opacity:0;transform:translate(-4px,-50%);border:1px solid rgba(195,159,70,.34);border-radius:4px;background:rgba(6,12,19,.96);box-shadow:0 7px 18px rgba(0,0,0,.34);color:#dfe9ec;font-size:8px;font-weight:800;line-height:1.1;letter-spacing:.04em;white-space:nowrap;pointer-events:none;transition:opacity 120ms ease,transform 120ms ease}
     .sc-hud499-team-member:hover .sc-hud499-team-name,.sc-hud499-team:focus-visible .sc-hud499-team-name{opacity:1;transform:translate(0,-50%)}
-    .sc-hud499-tools{position:absolute;right:var(--sc-hud499-edge);top:128px;width:148px;pointer-events:auto;border:1px solid rgba(195,159,70,.28);border-radius:7px;background:linear-gradient(145deg,rgba(7,14,22,.93),rgba(6,11,18,.78));box-shadow:0 10px 24px rgba(0,0,0,.26);overflow:hidden}
+    .sc-hud499-tools{box-sizing:border-box;position:absolute;right:var(--sc-hud499-edge);top:128px;width:148px;pointer-events:auto;border:1px solid rgba(195,159,70,.28);border-radius:7px;background:linear-gradient(145deg,rgba(7,14,22,.93),rgba(6,11,18,.78));box-shadow:0 10px 24px rgba(0,0,0,.26);overflow:hidden}
     .sc-hud499-tools summary{min-height:34px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 10px;cursor:pointer;list-style:none;color:#d7c27f;font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
     .sc-hud499-tools summary::-webkit-details-marker{display:none}
     .sc-hud499-tools summary b{color:#69dce7;font-size:15px;line-height:1;font-weight:500;transition:transform 120ms ease}
     .sc-hud499-tools[open] summary b{transform:rotate(45deg)}
     .sc-hud499-tools nav{display:grid;gap:4px;padding:5px;border-top:1px solid rgba(195,159,70,.18)}
     .sc-hud499-tools button{min-height:31px;padding:0 8px;border:1px solid rgba(129,129,101,.28);background:rgba(8,16,24,.78);cursor:pointer;text-align:left;font-size:8px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}
-    .sc-hud499-map-nav{position:absolute;right:var(--sc-hud499-edge);bottom:var(--sc-hud499-safe-bottom);min-width:176px;max-width:248px;padding:8px;pointer-events:auto;border:1px solid rgba(195,159,70,.38);border-radius:9px;background:linear-gradient(145deg,rgba(7,14,22,.94),rgba(6,11,18,.8));box-shadow:0 12px 28px rgba(0,0,0,.3);backdrop-filter:blur(5px)}
+    .sc-hud499-map-nav{box-sizing:border-box;position:absolute;right:var(--sc-hud499-edge);bottom:var(--sc-hud499-safe-bottom);min-width:176px;max-width:248px;padding:8px;pointer-events:auto;border:1px solid rgba(195,159,70,.38);border-radius:9px;background:linear-gradient(145deg,rgba(7,14,22,.94),rgba(6,11,18,.8));box-shadow:0 12px 28px rgba(0,0,0,.3);backdrop-filter:blur(5px)}
     .sc-hud499-compass-depth{display:block;margin-top:3px;color:#e7d8a6;font:800 12px/1 Georgia,"Times New Roman",serif;letter-spacing:.06em}
     .sc-hud499-compass-actions{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
     .sc-hud499-map-nav button{min-height:30px;padding:0 9px;border:1px solid rgba(150,133,82,.42);background:rgba(8,14,22,.82);cursor:pointer;font-size:8px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}
     .sc-hud499-journey:hover,.sc-hud499-journey:focus-visible,.sc-hud499-team:hover,.sc-hud499-team:focus-visible,.sc-hud499-tools summary:hover,.sc-hud499-tools summary:focus-visible,.sc-hud499-tools button:hover,.sc-hud499-tools button:focus-visible,.sc-hud499-map-nav button:hover,.sc-hud499-map-nav button:focus-visible{outline:2px solid rgba(85,218,231,.72);outline-offset:1px;border-color:rgba(85,218,231,.66)}
+
+    .sc-hud499-root[data-map-gutter="true"][data-surface="region"] .sc-hud499-team,
+    .sc-hud499-root[data-map-gutter="true"][data-surface="village"] .sc-hud499-team{
+      left:max(var(--sc-hud499-edge),calc(var(--sc-hud499-map-left) - 80px));
+      top:max(108px,calc(var(--sc-hud499-map-top) + 14px));
+      border-left:0;border-right:1px solid rgba(88,221,233,.46);
+      border-radius:8px 0 0 8px;
+      background:linear-gradient(90deg,rgba(5,11,18,.45),rgba(6,13,20,.84),rgba(6,13,20,.96));
+      box-shadow:8px 0 22px rgba(0,0,0,.2)
+    }
+    .sc-hud499-root[data-map-gutter="true"][data-surface="region"] .sc-hud499-team::before,
+    .sc-hud499-root[data-map-gutter="true"][data-surface="village"] .sc-hud499-team::before{
+      left:auto;right:-2px
+    }
+    .sc-hud499-root[data-map-gutter="true"][data-surface="region"] .sc-hud499-tools,
+    .sc-hud499-root[data-map-gutter="true"][data-surface="village"] .sc-hud499-tools{
+      left:auto;right:var(--sc-hud499-gutter-right-anchor);
+      top:max(112px,calc(var(--sc-hud499-map-top) + 10px));
+      width:var(--sc-hud499-gutter-control-width)
+    }
+    .sc-hud499-root[data-map-gutter="true"][data-surface="region"] .sc-hud499-map-nav,
+    .sc-hud499-root[data-map-gutter="true"][data-surface="village"] .sc-hud499-map-nav{
+      left:auto;right:var(--sc-hud499-gutter-right-anchor);
+      bottom:max(var(--sc-hud499-safe-bottom),calc(var(--sc-hud499-map-bottom) + 10px));
+      width:var(--sc-hud499-gutter-control-width);min-width:0;max-width:none
+    }
+    .sc-hud499-root[data-map-gutter="true"][data-surface="region"] .sc-hud499-tools,
+    .sc-hud499-root[data-map-gutter="true"][data-surface="region"] .sc-hud499-map-nav,
+    .sc-hud499-root[data-map-gutter="true"][data-surface="village"] .sc-hud499-tools,
+    .sc-hud499-root[data-map-gutter="true"][data-surface="village"] .sc-hud499-map-nav{
+      border-color:rgba(195,159,70,.34);
+      box-shadow:-7px 0 20px rgba(0,0,0,.18),0 10px 24px rgba(0,0,0,.2)
+    }
     @media(max-width:1450px){.sc-hud499-brand{width:clamp(190px,17vw,244px)}.sc-hud499-state-cluster{width:clamp(315px,32vw,420px)}.sc-hud499-tools{top:124px;width:138px}.sc-hud499-team{top:116px}}
     @media(max-width:900px){.sc-hud499-root{--sc-hud499-edge:8px;--sc-hud499-safe-bottom:72px}.sc-hud499-brand{left:10px;top:10px;width:170px}.sc-hud499-state-cluster{right:8px;top:8px;width:300px}.sc-hud499-state-main{padding:7px 8px}.sc-hud499-identity-portrait,.sc-hud499-silhouette.sc-hud499-identity-portrait{width:40px;height:40px;flex-basis:40px}.sc-hud499-team{left:8px;top:108px;width:64px}.sc-hud499-team-member{width:50px;height:50px}.sc-hud499-team-portrait,.sc-hud499-silhouette.sc-hud499-team-portrait{width:42px;height:42px}.sc-hud499-tools{right:8px;top:116px;width:128px}.sc-hud499-map-nav{right:8px;bottom:72px;min-width:160px}}
     @media(prefers-reduced-motion:reduce){.sc-hud499-root *{transition:none!important}}
@@ -420,7 +483,7 @@ function installStyles(){
   document.head.appendChild(style);
 }
 function diagnostics(){
-  const source=[snapshot,render,routeAction,teamProjection,journeyProjection,brandMarkup,toolsMarkup,navMarkup].map(String).join("\n");
+  const source=[snapshot,render,routeAction,teamProjection,journeyProjection,brandMarkup,toolsMarkup,navMarkup,syncMapGutterGeometry].map(String).join("\n");
   const data=snapshot();
   const checks={
     readOnlyProjection:!/savePlayerData\s*\(/.test(source)&&!/localStorage\.setItem\s*\(/.test(source)&&!/confirmAcademyTeamFormation\s*\(/.test(source),
@@ -434,6 +497,7 @@ function diagnostics(){
     chronicleCompass:String(navMarkup).includes("CHRONICLE COMPASS"),
     collapsiblePlayerTools:String(toolsMarkup).includes("<details")&&String(toolsMarkup).includes("PLAYER TOOLS"),
     safeBottomReserve:String(installStyles).includes("--sc-hud499-safe-bottom"),
+    regionVillageMapGutters:String(syncMapGutterGeometry).includes(".region-map-pane")&&String(syncMapGutterGeometry).includes(".village-map-screen")&&String(installStyles).includes('data-map-gutter="true"'),
     noEnergyProjection:data.energy===null&&!String(render).includes("ENERGY"),
     canonicalRoutes:String(routeAction).includes('call("openOverlay","clan")')&&String(routeAction).includes('call("openOverlay","inventory")')&&String(routeAction).includes('call("openShinobiRecord","overview")')&&String(routeAction).includes('call("openOverlay","missions")'),
     deepSurfaceSuppression:String(surfaceProjection).includes('kind:"deep"')&&String(surfaceProjection).includes("storyActive")&&String(surfaceProjection).includes("battleActive"),
@@ -453,6 +517,7 @@ if(typeof document!=="undefined"){
   if(game)observer.observe(game,{attributes:true,attributeFilter:["data-alpha-front-door-locked"]});
   if(overlay)observer.observe(overlay,{attributes:true,attributeFilter:["style","class","hidden"]});
   if(typeof setInterval==="function")state.timer=setInterval(()=>render(false),250);
+  if(typeof window!=="undefined")window.addEventListener("resize",scheduleRefresh,{passive:true});
 }
 
 globalThis.getPhase2LiveHudSnapshot49900=snapshot;

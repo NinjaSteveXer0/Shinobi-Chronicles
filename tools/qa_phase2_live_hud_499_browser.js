@@ -41,19 +41,23 @@ async function openTools(page){
 async function captureHudLayout(page){
   return page.evaluate(()=>{
     const root=document.getElementById("sc-phase2-live-hud-49900");
-    const rect=selector=>{
-      const node=root&&root.querySelector(selector);
+    const rectNode=node=>{
       if(!node)return null;
       const r=node.getBoundingClientRect();
       return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height};
     };
+    const rect=selector=>rectNode(root&&root.querySelector(selector));
+    const surface=root&&root.dataset.surface||null;
+    const mapSelector=surface==="region"?".region-map-pane":surface==="village"?".village-map-screen":surface==="world"?".world-map-canvas":null;
     return{
       viewport:[innerWidth,innerHeight],
+      surface,
       state:rect(".sc-hud499-state-cluster"),
       team:rect(".sc-hud499-team"),
       tools:rect(".sc-hud499-tools"),
       compass:rect(".sc-hud499-map-nav"),
-      brand:rect(".sc-hud499-brand")
+      brand:rect(".sc-hud499-brand"),
+      map:rectNode(mapSelector?document.querySelector(mapSelector):null)
     };
   });
 }
@@ -65,9 +69,22 @@ function assertHudLayout(layout,label){
     assert(box,label+": missing "+key+" dock");
     assert(box.left>=-1&&box.top>=-1&&box.right<=vw+1&&box.bottom<=vh+1,label+": "+key+" clips viewport: "+JSON.stringify(layout));
   }
-  assert(layout.state.height<=128,label+": unified player-state cluster is too tall: "+JSON.stringify(layout.state));
+  assert(layout.state.height<=118,label+": unified player-state cluster is too tall: "+JSON.stringify(layout.state));
   assert(layout.team.width<=96,label+": Current Team rail exceeds compact width: "+JSON.stringify(layout.team));
   assert(layout.compass.bottom<=vh-48,label+": Chronicle Compass violates bottom safe reserve: "+JSON.stringify(layout.compass));
+}
+function assertMapGutterIntegration(layout,label){
+  assert(["region","village"].includes(layout.surface),label+": wrong surface for gutter proof: "+JSON.stringify(layout));
+  assert(layout.map&&layout.map.width>0&&layout.map.height>0,label+": map frame missing");
+  const teamGap=layout.map.left-layout.team.right;
+  const toolsGap=layout.tools.left-layout.map.right;
+  const compassGap=layout.compass.left-layout.map.right;
+  assert(teamGap>=-18&&teamGap<=24,label+": Current Team is detached from left map frame: "+JSON.stringify({teamGap,layout}));
+  assert(toolsGap>=-30&&toolsGap<=24,label+": Player Tools is detached from right map frame: "+JSON.stringify({toolsGap,layout}));
+  assert(compassGap>=-30&&compassGap<=24,label+": Chronicle Compass is detached from right map frame: "+JSON.stringify({compassGap,layout}));
+  assert(Math.abs(layout.tools.left-layout.compass.left)<=2,label+": right-gutter widgets do not share an anchor: "+JSON.stringify(layout));
+  assert(Math.abs(layout.tools.width-layout.compass.width)<=2,label+": right-gutter widgets do not share a width: "+JSON.stringify(layout));
+  assert(layout.map.width>=layout.viewport[0]*0.60,label+": map lost dominance while reserving HUD gutters: "+JSON.stringify(layout));
 }
 
 
@@ -332,26 +349,61 @@ function assertHudLayout(layout,label){
     assert.strictEqual(afterReload.journey?.label,beforeReload.journey?.label,"reload changed observer-safe Journey projection");
     await page.screenshot({path:path.join(OUT,"02-village-live-hud-after-reload.png"),fullPage:true});
 
-    const layout1366=await captureHudLayout(page);
-    assert.deepStrictEqual(layout1366.viewport,[1366,768]);
-    assertHudLayout(layout1366,"1366x768");
-    assert.strictEqual(layout1366.brand,null,"World-only brand leaked onto Village at 1366x768");
-    await page.screenshot({path:path.join(OUT,"03-village-1366x768-safe-hud.png"),fullPage:true});
+    const village1366=await captureHudLayout(page);
+    assert.deepStrictEqual(village1366.viewport,[1366,768]);
+    assert.strictEqual(village1366.surface,"village");
+    assertHudLayout(village1366,"1366x768 Village");
+    assertMapGutterIntegration(village1366,"1366x768 Village");
+    assert.strictEqual(village1366.brand,null,"World-only brand leaked onto Village at 1366x768");
+    await page.screenshot({path:path.join(OUT,"03-village-1366x768-gutter-hud.png"),fullPage:true});
+
+    await page.click('[data-hud499-action="region"]');
+    await page.waitForFunction(()=>getPhase2LiveHudSnapshot49900().surface.kind==="region",null,{timeout:10000});
+    await page.waitForTimeout(120);
+    const region1366=await captureHudLayout(page);
+    assert.deepStrictEqual(region1366.viewport,[1366,768]);
+    assertHudLayout(region1366,"1366x768 Region");
+    assertMapGutterIntegration(region1366,"1366x768 Region");
+    assert.strictEqual(region1366.brand,null,"World-only brand leaked onto Region at 1366x768");
+    await page.screenshot({path:path.join(OUT,"03b-region-1366x768-gutter-hud.png"),fullPage:true});
+
+    await page.click('[data-hud499-action="world"]');
+    await page.waitForFunction(()=>getPhase2LiveHudSnapshot49900().surface.kind==="world",null,{timeout:10000});
+    await page.waitForTimeout(120);
+    const world1366=await captureHudLayout(page);
+    assert.deepStrictEqual(world1366.viewport,[1366,768]);
+    assertHudLayout(world1366,"1366x768 World");
+    assert(world1366.brand&&world1366.brand.width>150,"World Map brand missing at 1366x768");
+    assert(world1366.map&&world1366.map.width>=1366*0.65,"World Map lost dominance at 1366x768");
+    await page.screenshot({path:path.join(OUT,"03c-world-1366x768-approved-composition.png"),fullPage:true});
 
     await page.setViewportSize({width:1920,height:1080});
     await page.waitForTimeout(180);
     await page.evaluate(()=>refreshPhase2LiveHud49900());
-    const layout1920=await captureHudLayout(page);
-    assert.deepStrictEqual(layout1920.viewport,[1920,1080]);
-    assertHudLayout(layout1920,"1920x1080");
-    assert.strictEqual(layout1920.brand,null,"World-only brand leaked onto Village at 1920x1080");
-
-    await page.click('[data-hud499-action="world"]');
-    await page.waitForFunction(()=>getPhase2LiveHudSnapshot49900().surface.kind==="world",null,{timeout:10000});
     const world1920=await captureHudLayout(page);
-    assert(world1920.brand&&world1920.brand.width>150,"World Map brand is absent or unreadably small at 1920x1080");
+    assert.deepStrictEqual(world1920.viewport,[1920,1080]);
     assertHudLayout(world1920,"1920x1080 World");
+    assert(world1920.brand&&world1920.brand.width>150,"World Map brand is absent or unreadably small at 1920x1080");
+    assert(world1920.map&&world1920.map.width>=1920*0.65,"World Map lost dominance at 1920x1080");
     await page.screenshot({path:path.join(OUT,"04-world-1920x1080-chronicle-compass.png"),fullPage:true});
+
+    await page.click('[data-hud499-action="village"]');
+    await page.waitForFunction(()=>getPhase2LiveHudSnapshot49900().surface.kind==="village",null,{timeout:10000});
+    await page.waitForTimeout(120);
+    const village1920=await captureHudLayout(page);
+    assertHudLayout(village1920,"1920x1080 Village");
+    assertMapGutterIntegration(village1920,"1920x1080 Village");
+    assert.strictEqual(village1920.brand,null,"World-only brand leaked onto Village at 1920x1080");
+    await page.screenshot({path:path.join(OUT,"04b-village-1920x1080-gutter-hud.png"),fullPage:true});
+
+    await page.click('[data-hud499-action="region"]');
+    await page.waitForFunction(()=>getPhase2LiveHudSnapshot49900().surface.kind==="region",null,{timeout:10000});
+    await page.waitForTimeout(120);
+    const region1920=await captureHudLayout(page);
+    assertHudLayout(region1920,"1920x1080 Region");
+    assertMapGutterIntegration(region1920,"1920x1080 Region");
+    assert.strictEqual(region1920.brand,null,"World-only brand leaked onto Region at 1920x1080");
+    await page.screenshot({path:path.join(OUT,"04c-region-1920x1080-gutter-hud.png"),fullPage:true});
 
     const diagnostics=await page.evaluate(()=>runPhase2LiveHud49900Diagnostics());
     assert.strictEqual(diagnostics.pass,true,JSON.stringify(diagnostics));
@@ -374,6 +426,9 @@ function assertHudLayout(layout,label){
       collapsiblePlayerTools:true,
       safeBottomReserve1366:true,
       safeBottomReserve1920:true,
+      regionVillageGutterIntegration1366:true,
+      regionVillageGutterIntegration1920:true,
+      worldCompositionPreservedBothViewports:true,
       mapClickable:true,
       deepStoryBattleSuppression:true,
       refreshReadOnly:true,

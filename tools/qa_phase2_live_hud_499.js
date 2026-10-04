@@ -14,6 +14,10 @@ assert(RUNTIME.includes('const BRAND_PATH="Logo/sc_title.png"'),"approved World 
 assert(fs.existsSync(path.join(ROOT,"Logo","sc_title.png"))&&fs.statSync(path.join(ROOT,"Logo","sc_title.png")).size>0,"approved World Map brand asset missing");
 assert(RUNTIME.includes("CHRONICLE COMPASS"),"Chronicle Compass presentation missing");
 assert(RUNTIME.includes("--sc-hud499-safe-bottom"),"desktop-safe bottom reserve missing");
+assert(RUNTIME.includes("syncMapGutterGeometry"),"Region/Village map-frame gutter projector missing");
+assert(RUNTIME.includes('.region-map-pane')&&RUNTIME.includes('.village-map-screen'),"Region/Village gutter projector is not bound to real map frames");
+assert(RUNTIME.includes('data-map-gutter="true"'),"Region/Village gutter-only CSS missing");
+assert(RUNTIME.includes('window.addEventListener("resize",scheduleRefresh'),"HUD gutter geometry does not refresh on viewport resize");
 
 for(const pattern of [
   /\bsavePlayerData\s*\(/,
