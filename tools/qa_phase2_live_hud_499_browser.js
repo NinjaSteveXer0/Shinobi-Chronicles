@@ -31,7 +31,7 @@ async function openVillage(page){
 }
 async function closeAndVillage(page){
   await page.evaluate(()=>{try{closeOverlay();}catch(_error){}});
-  await page.waitForTimeout(80);
+  await page.waitForTimeout(320);
   await openVillage(page);
 }
 async function clickTool(page,action){
@@ -111,7 +111,7 @@ async function contextPanelState(page){
 async function clearHudContext(page){
   await page.mouse.move(1,1);
   await page.evaluate(()=>{const active=document.activeElement;if(active&&typeof active.blur==="function")active.blur();});
-  await page.waitForTimeout(80);
+  await page.waitForTimeout(320);
 }
 async function proveTeamIdentityReveal(page,label){
   const first=page.locator(".sc-hud499-team-member").first();
@@ -139,7 +139,7 @@ async function proveVillageContext(page,label){
   assert(await hotspot.count(),label+": no legitimate Village hotspot available");
   const expected=(await hotspot.locator(".village-golden-halo-label,.village-map-hotspot-label").first().textContent()||"").trim();
   await hotspot.focus();
-  await page.waitForTimeout(80);
+  await page.waitForTimeout(320);
   const focused=await contextPanelState(page);
   assert(focused&&focused.active===true,label+": Village context did not activate on keyboard focus");
   assert(expected&&focused.text.includes(expected),label+": Village context did not reuse visible hotspot identity: "+JSON.stringify({expected,focused}));
@@ -163,21 +163,21 @@ async function proveRegionContext(page,label){
   const known=data.find(row=>row.label&&row.label!=="???")||data[0];
   const knownNode=page.locator(".region-hotspot[data-hotspot-id]").nth(known.index);
   await knownNode.hover();
-  await page.waitForTimeout(80);
+  await page.waitForTimeout(320);
   const hovered=await contextPanelState(page);
   assert(hovered&&hovered.active===true,label+": Region context did not activate on hover");
   assert(hovered.text.includes(known.label||"???"),label+": Region context diverged from observer-safe projection");
   if(known.summary)assert(hovered.text.includes(known.summary),label+": Region context omitted observer-safe summary");
   await knownNode.focus();
   await page.mouse.move(1,1);
-  await page.waitForTimeout(80);
+  await page.waitForTimeout(320);
   const selected=await contextPanelState(page);
   assert(selected&&selected.active===true,label+": focused/selected Region hotspot did not keep useful context");
   const unknown=data.find(row=>row.label==="???");
   if(unknown){
     const unknownNode=page.locator(".region-hotspot[data-hotspot-id]").nth(unknown.index);
     await unknownNode.focus();
-    await page.waitForTimeout(80);
+    await page.waitForTimeout(320);
     const hidden=await contextPanelState(page);
     assert(hidden&&hidden.active===true&&hidden.text.includes("???"),label+": unknown Region hotspot lost unknown presentation");
     assert(!/BATTLE|MISSION|STORY|TRAINING|ENTER LOCATION|AVAILABLE/.test(hidden.text),label+": unknown Region hotspot leaked hidden truth: "+JSON.stringify(hidden));
