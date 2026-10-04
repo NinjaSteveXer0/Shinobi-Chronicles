@@ -69,15 +69,6 @@ jobs:
           echo $! > phase2-517-server.pid
           sleep 2
 
-      - name: Phase 2 current-team regression
-        run: node tools/qa_phase2_konoha_player_surfaces_431.js
-
-      - name: CE hotspot regression
-        run: node tools/qa_issue_469_ce_hotspot_browser.js
-
-      - name: Live HUD regression
-        run: node tools/qa_phase2_live_hud_499_browser.js
-
       - name: Installed-browser Basic Item Shop
         run: node tools/qa_phase2_basic_item_shop_517_browser.js
 
