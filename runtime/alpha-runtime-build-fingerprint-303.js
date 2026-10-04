@@ -16,7 +16,7 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-04-DX",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-04-DY",
     sourceBaselineCommit:"98f826b5c064634fb964d8ebff6f5f6aa18ea075",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
     runtimeGeneration:"phase2-character-card-shop-524",
@@ -127,7 +127,7 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-04-DX",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-04-DY",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
       generationPresent:first.runtimeGeneration==="hud-my-clan-return-context-506",
