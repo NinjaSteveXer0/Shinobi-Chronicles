@@ -1299,6 +1299,33 @@
       "replaces": [],
       "contractChangeReason": "PHASE_2_ACTIVATION",
       "rationale": "Master #449 Step 5 activates the first bounded real economy loop after Inventory and HUD closure. The Shop fixes a tiny explicit catalogue/price authority, debits canonical Ryō once, delegates goods to existing Inventory authority, records one causal purchase receipt, and leaves Character acquisition/team assignment/Crafting out of scope."
+    },
+    {
+      "changeId": "issue-506-hud-my-clan-exact-map-return",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "phase2.live_hud.my_clan_return_context"
+      ],
+      "owner": "runtime/alpha-hud-my-clan-return-context-50600.js",
+      "directCallers": [
+        "runtime/alpha-phase2-live-hud-49900.js HUD My Clan control",
+        "game.js forceCloseMyClanOverlay"
+      ],
+      "stateTouched": [
+        "read-only existing HUD surface and presentation underlay caller context",
+        "transient non-persistent #506 returnUnderlay only",
+        "existing navigation restoration through restoreStoryScenePresentationUnderlay / returnToWorldMap"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_hud_my_clan_return_506.js",
+        "tools/qa_hud_my_clan_return_506_browser.js",
+        "tools/qa_phase2_live_hud_499_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "OWNER_BROWSER_REPAIR",
+      "rationale": "Repairs queued #506 without reopening accepted #499 HUD architecture. HUD My Clan activation now captures the existing World/Region/Village presentation caller and legitimate My Clan close restores that same caller through existing shared return/navigation authority. The adapter creates no save schema, discovery, Knowledge, Access, Chronicle/history or team mutation, and delegates every non-HUD My Clan close unchanged."
     }
   ]
 }
