@@ -33,6 +33,7 @@ assert(!RUNTIME.includes("selectAcademyTeamFormation"),"retail module mutates Te
 assert(!RUNTIME.includes("geninRosterTransition="),"retail module mutates Genin transition");
 assert(!RUNTIME.includes("sharedHistory="),"retail module mutates Shared History");
 assert(INDEX.includes("runtime/alpha-phase2-character-card-shop-52400.js"),"production loader missing");
+assert(!RUNTIME.includes("lastElementChild;\\\\n"),"footer injection contains literal escaped newline");
 assert(FP.includes("phase2-character-card-shop-retail-acquisition-524"),"runtime fingerprint feature missing");
 assert(AUTH.includes("100 Ryō")&&AUTH.includes("retail_character_card_shop"),"durable Acquisition authority missing expected lock");
 
