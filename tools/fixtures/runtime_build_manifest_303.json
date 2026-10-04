@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "buildId": "SC-ALPHA-RUNTIME-R303-2026-10-04-DS",
-  "sourceBaselineCommit": "7e96e3e927d8e2190db9c001e83dfd69db728ce5",
+  "buildId": "SC-ALPHA-RUNTIME-R303-2026-10-04-DT",
+  "sourceBaselineCommit": "1fc795e3bbee61dcdd7c3a115c0cdfce29c40bd3",
   "sourceRef": "issue-303-runtime-build-fingerprint-v1",
-  "runtimeGeneration": "phase2-live-hud-499",
+  "runtimeGeneration": "phase2-basic-item-shop-517",
   "majorRuntimeFeatures": [
     "academy-kakashi-v2",
     "runtime-ownership-safety-300",
@@ -75,7 +75,8 @@
     "phase2-live-hud-region-village-gutter-integration-499",
     "phase2-live-hud-functional-gutter-context-499",
     "phase2-live-hud-region-village-map-echo-499",
-    "phase2-live-hud-region-village-map-echo-visible-stage-499"
+    "phase2-live-hud-region-village-map-echo-visible-stage-499",
+    "phase2-basic-item-shop-517"
   ],
   "productionLoader": "index.html",
   "runtimeModule": "runtime/alpha-runtime-build-fingerprint-303.js",
