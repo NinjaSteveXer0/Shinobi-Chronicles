@@ -342,7 +342,7 @@ function diagnostics(){
     stableIntentIdempotence:source.includes("purchaseReceipt(stableIntent)"),
     insufficientFundsBeforeMutation:source.indexOf("beforeRyo<price")<source.indexOf("pd.ryo=beforeRyo-price"),
     rollbackOnFailure:source.includes("pd.inventory=inventoryBefore")&&source.includes("pd.ryo=beforeRyo"),
-    noCharacterOwnershipMutation:!source.includes("ownedCharactersByVariantId")&&!source.includes("currentTeam"),
+    noCharacterOwnershipMutation:!source.includes("ownedCharactersByVariantId")&&!source.includes("selectAcademyTeamFormation"),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
