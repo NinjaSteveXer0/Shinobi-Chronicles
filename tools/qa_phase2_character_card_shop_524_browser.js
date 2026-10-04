@@ -109,6 +109,9 @@ async function openCharacterShopViaCommercialDistrict(page){
       const two=selectAcademyTeamFormationTeammate(2,"academy_kakashi");
       const formed=confirmAcademyTeamFormation("qa524_team",["academy_hinata","academy_kakashi"]);
       const continued=continueAcademyTeamFormationJourney();
+      if(typeof updateChronicleTutorialProgress43600==="function"){
+        updateChronicleTutorialProgress43600({sandboxPopupSeen:true,openingChoice:"explore",recommendedRouteEnabled:false},{save:true});
+      }
       return{completed,formationBefore,one,two,formed,continued,access:getPhase2CharacterCardShopAccess52400(),team:getChronicleCurrentTeam43600()};
     });
     assert.strictEqual(setup.completed.success,true);
