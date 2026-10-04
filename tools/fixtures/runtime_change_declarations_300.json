@@ -1308,8 +1308,8 @@
       ],
       "owner": "runtime/alpha-hud-my-clan-return-context-50600.js",
       "directCallers": [
-        "runtime/alpha-phase2-live-hud-49900.js HUD My Clan control",
-        "game.js forceCloseMyClanOverlay"
+        "runtime/alpha-phase2-live-hud-49900.js",
+        "game.js"
       ],
       "stateTouched": [
         "read-only existing HUD surface and presentation underlay caller context",
