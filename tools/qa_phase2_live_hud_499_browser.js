@@ -64,6 +64,18 @@ async function captureHudLayout(page){
       compass:rect(".sc-hud499-map-nav"),
       context:rect(".sc-hud499-context"),
       brand:rect(".sc-hud499-brand"),
+      echoes:[...(root?.querySelectorAll(".sc-hud499-map-echo")||[])].filter(node=>!node.hidden).map(node=>{
+        const r=node.getBoundingClientRect(),layer=node.querySelector(".sc-hud499-map-echo-layer");
+        return{
+          side:node.dataset.echoSide,
+          left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height,
+          pointerEvents:getComputedStyle(node).pointerEvents,
+          layerPointerEvents:layer?getComputedStyle(layer).pointerEvents:null,
+          backgroundImage:layer?getComputedStyle(layer).backgroundImage:null,
+          filter:layer?getComputedStyle(layer).filter:null
+        };
+      }),
+      echoSource:root?.dataset.mapEchoSource||null,
       map:rectNode(mapSelector?document.querySelector(mapSelector):null)
     };
   });
@@ -93,6 +105,34 @@ function assertMapGutterIntegration(layout,label){
   assert(Math.abs(layout.tools.width-layout.compass.width)<=2,label+": right-gutter widgets do not share a width: "+JSON.stringify(layout));
   assert(layout.map.width>=layout.viewport[0]*0.60,label+": map lost dominance while reserving HUD gutters: "+JSON.stringify(layout));
 }
+function assertMapEcho(layout,label){
+  assert(["region","village"].includes(layout.surface),label+": Map Echo must be Region/Village only");
+  assert(layout.echoSource,label+": Map Echo did not reuse current map asset");
+  assert(Array.isArray(layout.echoes)&&layout.echoes.length>=2,label+": Map Echo did not surround the crisp map");
+  assert(layout.echoes.every(e=>e.pointerEvents==="none"&&e.layerPointerEvents==="none"),label+": Map Echo intercepts pointer input: "+JSON.stringify(layout.echoes));
+  assert(layout.echoes.every(e=>/blur\(/.test(e.filter||"")&&/brightness\(/.test(e.filter||"")),label+": Map Echo is not visibly softened/darkened: "+JSON.stringify(layout.echoes));
+}
+async function assertMapEchoMatchesCrispAsset(page,label){
+  const result=await page.evaluate(()=>{
+    const root=document.getElementById("sc-phase2-live-hud-49900");
+    const surface=root&&root.dataset.surface;
+    const map=surface==="region"?document.querySelector(".region-map-pane"):surface==="village"?document.querySelector(".village-map-screen"):null;
+    const img=map&&map.querySelector(".region-map-image,.village-map-image");
+    const echoes=[...(root?.querySelectorAll(".sc-hud499-map-echo")||[])];
+    return{
+      surface,
+      crispSource:img&&img.getAttribute("src")||null,
+      echoSource:root&&root.dataset.mapEchoSource||null,
+      echoHotspotCount:echoes.reduce((sum,node)=>sum+node.querySelectorAll("button,[data-hotspot-id],[data-village-hotspot-id]").length,0),
+      echoInteractiveCount:echoes.filter(node=>getComputedStyle(node).pointerEvents!=="none").length,
+      worldEchoCount:surface==="world"?echoes.length:null
+    };
+  });
+  assert.strictEqual(result.echoSource,result.crispSource,label+": Map Echo is not the exact current map artwork: "+JSON.stringify(result));
+  assert.strictEqual(result.echoHotspotCount,0,label+": interactive hotspot DOM was duplicated into Map Echo");
+  assert.strictEqual(result.echoInteractiveCount,0,label+": Map Echo became pointer-interactive");
+}
+
 async function semanticHudInteractionFingerprint(page){
   return page.evaluate(()=>JSON.stringify({
     activityHistory:Array.isArray(playerData.activityHistory)?playerData.activityHistory:null,
@@ -339,6 +379,7 @@ async function proveRegionContext(page,label){
     assert(!documentBodyLiteralNewline(await page.evaluate(()=>document.body.innerText||"")),"literal escaped newline leaked into rendered HUD page");
     await proveTeamIdentityReveal(page,"1366x768 Village");
     await proveVillageContext(page,"1366x768 Village");
+    await assertMapEchoMatchesCrispAsset(page,"1366x768 Village");
 
     const clickability=await page.evaluate(()=>{
       const buttons=[...document.querySelectorAll('button[data-village-hotspot-id]')].filter(node=>{
@@ -484,6 +525,8 @@ async function proveRegionContext(page,label){
     assert.strictEqual(village1366.surface,"village");
     assertHudLayout(village1366,"1366x768 Village");
     assertMapGutterIntegration(village1366,"1366x768 Village");
+    assertMapEcho(village1366,"1366x768 Village");
+    await assertMapEchoMatchesCrispAsset(page,"1366x768 Village");
     assert.strictEqual(village1366.brand,null,"World-only brand leaked onto Village at 1366x768");
     await page.screenshot({path:path.join(OUT,"03-village-1366x768-gutter-hud.png"),fullPage:true});
 
@@ -494,6 +537,8 @@ async function proveRegionContext(page,label){
     assert.deepStrictEqual(region1366.viewport,[1366,768]);
     assertHudLayout(region1366,"1366x768 Region");
     assertMapGutterIntegration(region1366,"1366x768 Region");
+    assertMapEcho(region1366,"1366x768 Region");
+    await assertMapEchoMatchesCrispAsset(page,"1366x768 Region");
     assert.strictEqual(region1366.brand,null,"World-only brand leaked onto Region at 1366x768");
     await proveRegionContext(page,"1366x768 Region");
     await page.screenshot({path:path.join(OUT,"03b-region-1366x768-gutter-hud.png"),fullPage:true});
@@ -506,6 +551,7 @@ async function proveRegionContext(page,label){
     assertHudLayout(world1366,"1366x768 World");
     assert(world1366.brand&&world1366.brand.width>150,"World Map brand missing at 1366x768");
     assert.strictEqual(world1366.context,null,"Region/Village context surface leaked onto World Map");
+    assert.strictEqual(world1366.echoes.length,0,"Map Echo leaked onto World Map at 1366x768");
     assert(world1366.map&&world1366.map.width>=1366*0.65,"World Map lost dominance at 1366x768");
     await page.screenshot({path:path.join(OUT,"03c-world-1366x768-approved-composition.png"),fullPage:true});
 
@@ -517,6 +563,7 @@ async function proveRegionContext(page,label){
     assertHudLayout(world1920,"1920x1080 World");
     assert(world1920.brand&&world1920.brand.width>150,"World Map brand is absent or unreadably small at 1920x1080");
     assert.strictEqual(world1920.context,null,"Region/Village context surface leaked onto World Map at 1920x1080");
+    assert.strictEqual(world1920.echoes.length,0,"Map Echo leaked onto World Map at 1920x1080");
     assert(world1920.map&&world1920.map.width>=1920*0.65,"World Map lost dominance at 1920x1080");
     await page.screenshot({path:path.join(OUT,"04-world-1920x1080-chronicle-compass.png"),fullPage:true});
 
@@ -526,6 +573,8 @@ async function proveRegionContext(page,label){
     const village1920=await captureHudLayout(page);
     assertHudLayout(village1920,"1920x1080 Village");
     assertMapGutterIntegration(village1920,"1920x1080 Village");
+    assertMapEcho(village1920,"1920x1080 Village");
+    await assertMapEchoMatchesCrispAsset(page,"1920x1080 Village");
     assert.strictEqual(village1920.brand,null,"World-only brand leaked onto Village at 1920x1080");
     await proveTeamIdentityReveal(page,"1920x1080 Village");
     await proveVillageContext(page,"1920x1080 Village");
@@ -537,6 +586,8 @@ async function proveRegionContext(page,label){
     const region1920=await captureHudLayout(page);
     assertHudLayout(region1920,"1920x1080 Region");
     assertMapGutterIntegration(region1920,"1920x1080 Region");
+    assertMapEcho(region1920,"1920x1080 Region");
+    await assertMapEchoMatchesCrispAsset(page,"1920x1080 Region");
     assert.strictEqual(region1920.brand,null,"World-only brand leaked onto Region at 1920x1080");
     await proveRegionContext(page,"1920x1080 Region");
     await page.screenshot({path:path.join(OUT,"04c-region-1920x1080-gutter-hud.png"),fullPage:true});
@@ -565,6 +616,9 @@ async function proveRegionContext(page,label){
       regionVillageGutterIntegration1366:true,
       regionVillageGutterIntegration1920:true,
       worldCompositionPreservedBothViewports:true,
+      regionVillageMapEchoExactAsset:true,
+      mapEchoPointerIsolated:true,
+      mapEchoWorldHardFreeze:true,
       currentTeamIdentityRevealSafe:true,
       contextualLocationSurfaceSafe:true,
       unknownContextRemainsUnknown:true,

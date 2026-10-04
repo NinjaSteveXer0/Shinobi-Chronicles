@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "buildId": "SC-ALPHA-RUNTIME-R303-2026-10-04-DQ",
+  "buildId": "SC-ALPHA-RUNTIME-R303-2026-10-04-DR",
   "sourceBaselineCommit": "7e96e3e927d8e2190db9c001e83dfd69db728ce5",
   "sourceRef": "issue-303-runtime-build-fingerprint-v1",
   "runtimeGeneration": "phase2-live-hud-499",
@@ -73,7 +73,8 @@
     "phase2-live-hud-canonical-world-return-499",
     "phase2-live-hud-loader-newline-cleanup-499",
     "phase2-live-hud-region-village-gutter-integration-499",
-    "phase2-live-hud-functional-gutter-context-499"
+    "phase2-live-hud-functional-gutter-context-499",
+    "phase2-live-hud-region-village-map-echo-499"
   ],
   "productionLoader": "index.html",
   "runtimeModule": "runtime/alpha-runtime-build-fingerprint-303.js",

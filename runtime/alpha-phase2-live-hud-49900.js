@@ -489,6 +489,88 @@ function syncMapGutterGeometry(root,surfaceKind){
   root.dataset.mapGutter="true";
   return{selector,left,right,top,bottom,controlWidth,rightAnchor};
 }
+function mapEchoMarkup(surfaceKind){
+  if(surfaceKind!=="region"&&surfaceKind!=="village")return"";
+  return '<div class="sc-hud499-map-echo sc-hud499-map-echo-left" data-echo-side="left" aria-hidden="true"><span class="sc-hud499-map-echo-layer"></span></div>'+
+    '<div class="sc-hud499-map-echo sc-hud499-map-echo-right" data-echo-side="right" aria-hidden="true"><span class="sc-hud499-map-echo-layer"></span></div>'+
+    '<div class="sc-hud499-map-echo sc-hud499-map-echo-top" data-echo-side="top" aria-hidden="true"><span class="sc-hud499-map-echo-layer"></span></div>'+
+    '<div class="sc-hud499-map-echo sc-hud499-map-echo-bottom" data-echo-side="bottom" aria-hidden="true"><span class="sc-hud499-map-echo-layer"></span></div>';
+}
+function clearMapEchoPresentation(root){
+  if(!root)return false;
+  root.dataset.mapEcho="false";
+  delete root.dataset.mapEchoSource;
+  root.querySelectorAll(".sc-hud499-map-echo").forEach(node=>{
+    node.style.cssText="";
+    const layer=node.querySelector(".sc-hud499-map-echo-layer");
+    if(layer)layer.style.cssText="";
+  });
+  return true;
+}
+function syncMapEchoPresentation(root,surfaceKind){
+  if(!root||typeof document==="undefined")return null;
+  const selector=surfaceKind==="region"?".region-map-pane":surfaceKind==="village"?".village-map-screen":null;
+  if(!selector){clearMapEchoPresentation(root);return null;}
+  const map=document.querySelector(selector);
+  const image=map&&map.querySelector(".region-map-image,.village-map-image");
+  const echoes=[...root.querySelectorAll(".sc-hud499-map-echo")];
+  if(!map||!image||echoes.length!==4){clearMapEchoPresentation(root);return null;}
+  const rr=root.getBoundingClientRect();
+  const mr=map.getBoundingClientRect();
+  if(!(rr.width>0&&rr.height>0&&mr.width>0&&mr.height>0)){clearMapEchoPresentation(root);return null;}
+  const sourceAttr=String(image.getAttribute("src")||"").trim();
+  const source=String(image.currentSrc||image.src||sourceAttr).trim();
+  if(!source){clearMapEchoPresentation(root);return null;}
+
+  const naturalWidth=Number(image.naturalWidth)||mr.width;
+  const naturalHeight=Number(image.naturalHeight)||mr.height;
+  const scale=Math.max(rr.width/naturalWidth,rr.height/naturalHeight);
+  const backgroundWidth=naturalWidth*scale;
+  const backgroundHeight=naturalHeight*scale;
+  const backgroundLeft=(rr.width-backgroundWidth)/2;
+  const backgroundTop=(rr.height-backgroundHeight)/2;
+  const mapLeft=Math.max(0,mr.left-rr.left);
+  const mapTop=Math.max(0,mr.top-rr.top);
+  const mapRight=Math.min(rr.width,mr.right-rr.left);
+  const mapBottom=Math.min(rr.height,mr.bottom-rr.top);
+  const blurBleed=18;
+  const geometry={
+    left:{x:0,y:0,width:mapLeft,height:rr.height},
+    right:{x:mapRight,y:0,width:Math.max(0,rr.width-mapRight),height:rr.height},
+    top:{x:mapLeft,y:0,width:Math.max(0,mapRight-mapLeft),height:mapTop},
+    bottom:{x:mapLeft,y:mapBottom,width:Math.max(0,mapRight-mapLeft),height:Math.max(0,rr.height-mapBottom)}
+  };
+
+  echoes.forEach(node=>{
+    const side=node.dataset.echoSide;
+    const box=geometry[side];
+    if(!box||box.width<1||box.height<1){
+      node.hidden=true;
+      return;
+    }
+    node.hidden=false;
+    node.style.left=box.x.toFixed(2)+"px";
+    node.style.top=box.y.toFixed(2)+"px";
+    node.style.width=box.width.toFixed(2)+"px";
+    node.style.height=box.height.toFixed(2)+"px";
+    const layer=node.querySelector(".sc-hud499-map-echo-layer");
+    if(!layer)return;
+    layer.style.backgroundImage='url("'+source.replace(/"/g,"%22")+'")';
+    layer.style.backgroundSize=backgroundWidth.toFixed(2)+"px "+backgroundHeight.toFixed(2)+"px";
+    layer.style.backgroundPosition=
+      (backgroundLeft-box.x+blurBleed).toFixed(2)+"px "+
+      (backgroundTop-box.y+blurBleed).toFixed(2)+"px";
+  });
+  root.dataset.mapEcho="true";
+  root.dataset.mapEchoSource=sourceAttr||source;
+  return{
+    source:sourceAttr||source,
+    selector,
+    mapRect:{left:mapLeft,top:mapTop,right:mapRight,bottom:mapBottom},
+    presentationOnly:true,
+    pointerInteractive:false
+  };
+}
 function render(force=false){
   const root=ensureRoot();
   if(!root)return false;
@@ -496,6 +578,7 @@ function render(force=false){
   root.hidden=!data.visible;
   root.dataset.surface=data.surface.kind;
   syncMapGutterGeometry(root,data.surface.kind);
+  syncMapEchoPresentation(root,data.surface.kind);
   bindFunctionalMapContext(root,data.surface.kind);
   syncMapContextFromDocument();
   const signature=JSON.stringify(data);
@@ -508,6 +591,7 @@ function render(force=false){
   const identity=data.identity;
   const journey=data.journey;
   root.innerHTML=
+    mapEchoMarkup(data.surface.kind)+
     brandMarkup(data.surface.kind)+
     '<section class="sc-hud499-state-cluster" aria-label="Current shinobi state">'+
       '<div class="sc-hud499-state-main">'+
@@ -526,6 +610,8 @@ function render(force=false){
     toolsMarkup()+
     contextMarkup(data.surface.kind)+
     navMarkup(data.navigation,data.surface.kind);
+  syncMapGutterGeometry(root,data.surface.kind);
+  syncMapEchoPresentation(root,data.surface.kind);
   bindFunctionalMapContext(root,data.surface.kind);
   syncMapContextFromDocument();
   return data;
@@ -564,9 +650,17 @@ function installStyles(){
     .sc-hud499-root{--sc-hud499-edge:14px;--sc-hud499-safe-bottom:clamp(72px,8vh,96px);position:absolute;inset:0;z-index:1400;pointer-events:none;font-family:Inter,Arial,sans-serif;color:#edf5f7}
     .sc-hud499-root[hidden]{display:none!important}
     .sc-hud499-root button,.sc-hud499-root summary{font:inherit;color:inherit}
-    .sc-hud499-brand{position:absolute;left:18px;top:14px;width:clamp(210px,18vw,300px);pointer-events:none;filter:drop-shadow(0 8px 20px rgba(0,0,0,.45))}
+    .sc-hud499-map-echo{position:absolute;overflow:hidden;pointer-events:none!important;z-index:0;background:#02060b}
+    .sc-hud499-map-echo[hidden]{display:none!important}
+    .sc-hud499-map-echo-layer{position:absolute;inset:-18px;display:block;pointer-events:none!important;background-repeat:no-repeat;filter:blur(12px) saturate(.56) brightness(.30) contrast(.92);opacity:.78;transform:scale(1.015);transform-origin:center}
+    .sc-hud499-map-echo::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(rgba(2,6,11,.22),rgba(2,6,11,.22))}
+    .sc-hud499-map-echo-left::after{background:linear-gradient(90deg,rgba(1,4,8,.74) 0%,rgba(2,7,12,.35) 55%,rgba(2,7,12,.10) 100%)}
+    .sc-hud499-map-echo-right::after{background:linear-gradient(270deg,rgba(1,4,8,.74) 0%,rgba(2,7,12,.35) 55%,rgba(2,7,12,.10) 100%)}
+    .sc-hud499-map-echo-top::after{background:linear-gradient(180deg,rgba(1,4,8,.68) 0%,rgba(2,7,12,.12) 100%)}
+    .sc-hud499-map-echo-bottom::after{background:linear-gradient(0deg,rgba(1,4,8,.76) 0%,rgba(2,7,12,.12) 100%)}
+    .sc-hud499-brand{z-index:2;position:absolute;left:18px;top:14px;width:clamp(210px,18vw,300px);pointer-events:none;filter:drop-shadow(0 8px 20px rgba(0,0,0,.45))}
     .sc-hud499-brand img{display:block;width:100%;height:auto;max-height:88px;object-fit:contain;object-position:left top}
-    .sc-hud499-state-cluster{position:absolute;right:var(--sc-hud499-edge);top:12px;width:clamp(330px,31vw,470px);pointer-events:auto;overflow:hidden;border:1px solid rgba(195,159,70,.42);border-radius:8px;background:linear-gradient(150deg,rgba(7,14,23,.95),rgba(6,12,20,.82));box-shadow:0 12px 30px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.04);backdrop-filter:blur(6px)}
+    .sc-hud499-state-cluster{z-index:2;position:absolute;right:var(--sc-hud499-edge);top:12px;width:clamp(330px,31vw,470px);pointer-events:auto;overflow:hidden;border:1px solid rgba(195,159,70,.42);border-radius:8px;background:linear-gradient(150deg,rgba(7,14,23,.95),rgba(6,12,20,.82));box-shadow:0 12px 30px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.04);backdrop-filter:blur(6px)}
     .sc-hud499-state-main{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:9px;padding:6px 9px}
     .sc-hud499-identity{display:flex;align-items:center;gap:9px;min-width:0}
     .sc-hud499-identity-portrait,.sc-hud499-silhouette.sc-hud499-identity-portrait{width:44px;height:44px;flex:0 0 44px;object-fit:cover;object-position:top center;border:1px solid rgba(75,215,228,.45);border-radius:5px;background:#111923}
@@ -581,7 +675,7 @@ function installStyles(){
     .sc-hud499-journey{width:100%;min-height:35px;padding:5px 9px 6px;border:0;border-top:1px solid rgba(195,159,70,.2);background:linear-gradient(90deg,rgba(9,20,28,.76),rgba(8,14,22,.34));text-align:left;cursor:pointer}
     .sc-hud499-journey strong{display:block;margin-top:2px;font-size:11px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .sc-hud499-journey small{display:block;margin-top:2px;color:#aebbc5;font-size:8px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .sc-hud499-team{box-sizing:border-box;position:absolute;left:14px;top:122px;width:72px;max-height:330px;padding:8px 6px 10px;border:0;border-left:1px solid rgba(88,221,233,.42);border-radius:0 8px 8px 0;pointer-events:auto;cursor:pointer;text-align:center;overflow:visible;background:linear-gradient(90deg,rgba(5,11,18,.91),rgba(6,13,20,.68),rgba(6,13,20,.12));box-shadow:8px 12px 24px rgba(0,0,0,.18)}
+    .sc-hud499-team{z-index:2;box-sizing:border-box;position:absolute;left:14px;top:122px;width:72px;max-height:330px;padding:8px 6px 10px;border:0;border-left:1px solid rgba(88,221,233,.42);border-radius:0 8px 8px 0;pointer-events:auto;cursor:pointer;text-align:center;overflow:visible;background:linear-gradient(90deg,rgba(5,11,18,.91),rgba(6,13,20,.68),rgba(6,13,20,.12));box-shadow:8px 12px 24px rgba(0,0,0,.18)}
     .sc-hud499-team::before{content:"";position:absolute;left:-2px;top:34px;bottom:12px;width:3px;background:linear-gradient(180deg,rgba(83,221,232,.82),rgba(198,162,72,.55),rgba(198,162,72,.08));box-shadow:0 0 9px rgba(83,221,232,.13)}
     .sc-hud499-team .sc-hud499-kicker{padding-bottom:6px;font-size:6px;white-space:nowrap}
     .sc-hud499-team-stack{display:flex;flex-direction:column;align-items:center;gap:7px;margin-top:5px}
@@ -590,14 +684,14 @@ function installStyles(){
     .sc-hud499-team-portrait,.sc-hud499-silhouette.sc-hud499-team-portrait{display:block;width:48px;height:48px;margin:auto;object-fit:cover;object-position:top center;border:1px solid rgba(96,211,224,.3);border-radius:50%;background:#111923}
     .sc-hud499-team-name{position:absolute;left:63px;top:50%;z-index:8;display:block;margin:0;padding:5px 8px;opacity:0;transform:translate(-4px,-50%);border:1px solid rgba(195,159,70,.34);border-radius:4px;background:rgba(6,12,19,.96);box-shadow:0 7px 18px rgba(0,0,0,.34);color:#dfe9ec;font-size:8px;font-weight:800;line-height:1.1;letter-spacing:.04em;white-space:nowrap;pointer-events:none;transition:opacity 120ms ease,transform 120ms ease}
     .sc-hud499-team-member:hover .sc-hud499-team-name,.sc-hud499-team-member:focus .sc-hud499-team-name,.sc-hud499-team-member:focus-visible .sc-hud499-team-name{opacity:1;transform:translate(0,-50%)}
-    .sc-hud499-tools{box-sizing:border-box;position:absolute;right:var(--sc-hud499-edge);top:128px;width:148px;pointer-events:auto;border:1px solid rgba(195,159,70,.28);border-radius:7px;background:linear-gradient(145deg,rgba(7,14,22,.93),rgba(6,11,18,.78));box-shadow:0 10px 24px rgba(0,0,0,.26);overflow:hidden}
+    .sc-hud499-tools{z-index:2;box-sizing:border-box;position:absolute;right:var(--sc-hud499-edge);top:128px;width:148px;pointer-events:auto;border:1px solid rgba(195,159,70,.28);border-radius:7px;background:linear-gradient(145deg,rgba(7,14,22,.93),rgba(6,11,18,.78));box-shadow:0 10px 24px rgba(0,0,0,.26);overflow:hidden}
     .sc-hud499-tools summary{min-height:34px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 10px;cursor:pointer;list-style:none;color:#d7c27f;font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
     .sc-hud499-tools summary::-webkit-details-marker{display:none}
     .sc-hud499-tools summary b{color:#69dce7;font-size:15px;line-height:1;font-weight:500;transition:transform 120ms ease}
     .sc-hud499-tools[open] summary b{transform:rotate(45deg)}
     .sc-hud499-tools nav{display:grid;gap:4px;padding:5px;border-top:1px solid rgba(195,159,70,.18)}
     .sc-hud499-tools button{min-height:31px;padding:0 8px;border:1px solid rgba(129,129,101,.28);background:rgba(8,16,24,.78);cursor:pointer;text-align:left;font-size:8px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}
-    .sc-hud499-map-nav{box-sizing:border-box;position:absolute;right:var(--sc-hud499-edge);bottom:var(--sc-hud499-safe-bottom);min-width:176px;max-width:248px;padding:8px;pointer-events:auto;border:1px solid rgba(195,159,70,.38);border-radius:9px;background:linear-gradient(145deg,rgba(7,14,22,.94),rgba(6,11,18,.8));box-shadow:0 12px 28px rgba(0,0,0,.3);backdrop-filter:blur(5px)}
+    .sc-hud499-map-nav{z-index:2;box-sizing:border-box;position:absolute;right:var(--sc-hud499-edge);bottom:var(--sc-hud499-safe-bottom);min-width:176px;max-width:248px;padding:8px;pointer-events:auto;border:1px solid rgba(195,159,70,.38);border-radius:9px;background:linear-gradient(145deg,rgba(7,14,22,.94),rgba(6,11,18,.8));box-shadow:0 12px 28px rgba(0,0,0,.3);backdrop-filter:blur(5px)}
     .sc-hud499-compass-depth{display:block;margin-top:3px;color:#e7d8a6;font:800 12px/1 Georgia,"Times New Roman",serif;letter-spacing:.06em}
     .sc-hud499-compass-actions{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
     .sc-hud499-map-nav button{min-height:30px;padding:0 9px;border:1px solid rgba(150,133,82,.42);background:rgba(8,14,22,.82);cursor:pointer;font-size:8px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}
@@ -636,7 +730,7 @@ function installStyles(){
       box-shadow:-7px 0 20px rgba(0,0,0,.18),0 10px 24px rgba(0,0,0,.2)
     }
 
-    .sc-hud499-context{display:none}
+    .sc-hud499-context{z-index:2;display:none}
     .sc-hud499-root[data-map-gutter="true"][data-surface="region"] .sc-hud499-context,
     .sc-hud499-root[data-map-gutter="true"][data-surface="village"] .sc-hud499-context{
       box-sizing:border-box;display:block;position:absolute;left:auto;right:var(--sc-hud499-gutter-right-anchor);
@@ -664,7 +758,7 @@ function installStyles(){
   document.head.appendChild(style);
 }
 function diagnostics(){
-  const source=[snapshot,render,routeAction,teamProjection,journeyProjection,brandMarkup,toolsMarkup,navMarkup,syncMapGutterGeometry,regionContextProjection,villageContextProjection,renderContextProjection,syncMapContextFromDocument,bindFunctionalMapContext].map(String).join("\n");
+  const source=[snapshot,render,routeAction,teamProjection,journeyProjection,brandMarkup,toolsMarkup,navMarkup,syncMapGutterGeometry,regionContextProjection,villageContextProjection,renderContextProjection,syncMapContextFromDocument,bindFunctionalMapContext,mapEchoMarkup,syncMapEchoPresentation,clearMapEchoPresentation].map(String).join("\n");
   const data=snapshot();
   const checks={
     readOnlyProjection:!/savePlayerData\s*\(/.test(source)&&!/localStorage\.setItem\s*\(/.test(source)&&!/confirmAcademyTeamFormation\s*\(/.test(source),
@@ -681,6 +775,8 @@ function diagnostics(){
     regionVillageMapGutters:String(syncMapGutterGeometry).includes(".region-map-pane")&&String(syncMapGutterGeometry).includes(".village-map-screen")&&String(installStyles).includes('data-map-gutter="true"'),
     functionalGutterContext:String(regionContextProjection).includes("getHotspotProjection")&&String(regionContextProjection).includes('name:"???"')&&String(villageContextProjection).includes("aria-label")&&String(renderContextProjection).includes("MAP CONTEXT")&&String(bindFunctionalMapContext).includes('addEventListener("focus"')&&String(bindFunctionalMapContext).includes('pointerType==="touch"'),
     contextPresentationOnly:!String(regionContextProjection).includes("savePlayerData")&&!String(villageContextProjection).includes("savePlayerData")&&!String(renderContextProjection).includes("savePlayerData"),
+    mapEchoPresentationOnly:String(mapEchoMarkup).includes('surfaceKind!=="region"&&surfaceKind!=="village"')&&String(syncMapEchoPresentation).includes(".region-map-image,.village-map-image")&&String(syncMapEchoPresentation).includes("pointerInteractive:false")&&!String(syncMapEchoPresentation).includes("savePlayerData")&&!String(syncMapEchoPresentation).includes("localStorage"),
+    mapEchoPointerIsolated:String(installStyles).includes(".sc-hud499-map-echo")&&String(installStyles).includes("pointer-events:none!important"),
     noEnergyProjection:data.energy===null&&!String(render).includes("ENERGY"),
     canonicalRoutes:String(routeAction).includes('call("openOverlay","clan")')&&String(routeAction).includes('call("openOverlay","inventory")')&&String(routeAction).includes('call("openShinobiRecord","overview")')&&String(routeAction).includes('call("openOverlay","missions")'),
     deepSurfaceSuppression:String(surfaceProjection).includes('kind:"deep"')&&String(surfaceProjection).includes("storyActive")&&String(surfaceProjection).includes("battleActive"),

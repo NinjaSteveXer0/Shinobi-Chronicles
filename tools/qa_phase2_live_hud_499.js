@@ -22,6 +22,12 @@ assert(RUNTIME.includes("regionContextProjection")&&RUNTIME.includes("villageCon
 assert(RUNTIME.includes("getHotspotProjection"),"Region context does not consume existing observer-safe hotspot projection");
 assert(RUNTIME.includes('name:"???"')&&RUNTIME.includes('category:"UNKNOWN"'),"unknown hotspot preservation gate missing");
 assert(RUNTIME.includes("MAP CONTEXT"),"functional right-gutter context surface missing");
+assert(RUNTIME.includes("mapEchoMarkup")&&RUNTIME.includes("syncMapEchoPresentation"),"Region/Village Map Echo presentation projection missing");
+assert(RUNTIME.includes(".region-map-image,.village-map-image"),"Map Echo does not reuse existing current map artwork");
+assert(RUNTIME.includes("pointer-events:none!important"),"Map Echo lacks pointer isolation");
+assert(RUNTIME.includes('surfaceKind!=="region"&&surfaceKind!=="village"'),"Map Echo is not hard-gated away from World");
+const mapEchoSource=RUNTIME.slice(RUNTIME.indexOf("function syncMapEchoPresentation"),RUNTIME.indexOf("function render(force=false)"));
+assert(!mapEchoSource.includes("savePlayerData(")&&!mapEchoSource.includes("localStorage"),"Map Echo presentation writes semantic/save state");
 const regionContextSource=RUNTIME.slice(RUNTIME.indexOf("function regionContextProjection"),RUNTIME.indexOf("function villageContextProjection"));
 const villageContextSource=RUNTIME.slice(RUNTIME.indexOf("function villageContextProjection"),RUNTIME.indexOf("function mapContextNode"));
 assert(!regionContextSource.includes("savePlayerData("),"Region gutter context writes save state");
