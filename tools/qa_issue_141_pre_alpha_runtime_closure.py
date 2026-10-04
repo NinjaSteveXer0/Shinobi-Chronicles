@@ -66,6 +66,7 @@ EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-phase2-live-hud-49900.js",
     "runtime/alpha-phase2-basic-item-shop-51700.js",
     "runtime/alpha-hud-my-clan-return-context-50600.js",
+    "runtime/alpha-phase2-character-card-shop-52400.js",
 ]
 
 PYTHON_GATES = [
@@ -110,6 +111,7 @@ NODE_GATES = [
     "tools/qa_phase2_live_hud_499.js",
     "tools/qa_phase2_basic_item_shop_517.js",
     "tools/qa_hud_my_clan_return_506.js",
+    "tools/qa_phase2_character_card_shop_524.js",
 ]
 
 EXTERNAL_ASSET_GATES = [
