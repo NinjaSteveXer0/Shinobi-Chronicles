@@ -1766,8 +1766,8 @@
       "canonicalOwner": "runtime/alpha-hud-my-clan-return-context-50600.js",
       "ownerType": "phase2_presentation_return_context_adapter",
       "directCallers": [
-        "runtime/alpha-phase2-live-hud-49900.js HUD My Clan action",
-        "game.js forceCloseMyClanOverlay"
+        "runtime/alpha-phase2-live-hud-49900.js",
+        "game.js"
       ],
       "stateReads": [
         "existing #499 observer-safe HUD map surface kind",
