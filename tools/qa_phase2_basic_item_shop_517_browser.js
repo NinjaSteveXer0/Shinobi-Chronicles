@@ -155,10 +155,13 @@ async function openShopFromVillage(page){
     await page.click('[data-shop517-buy="standard_antidote"]');
     await page.waitForFunction(()=>playerData.ryo===55&&getInventoryStackQuantity("standard_antidote")===1,null,{timeout:10000});
     const beforeInsufficient=JSON.parse(await digest(page));
-    await page.click('[data-shop517-buy="weapon_materials"]');
-    await page.waitForFunction(()=>document.querySelector(".sc-shop517-feedback")?.textContent.includes("Insufficient Ryō"),null,{timeout:10000});
+    const blockedButton=page.locator('[data-shop517-buy="weapon_materials"]');
+    assert.strictEqual(await blockedButton.getAttribute("aria-disabled"),"true","unaffordable catalogue row was not visibly blocked");
+    const insufficient=await page.evaluate(()=>commitPhase2BasicItemShopPurchase51700("weapon_materials","qa517:insufficient:browser"));
+    assert.strictEqual(insufficient.success,false);
+    assert.strictEqual(insufficient.reason,"insufficient_ryo");
     const afterInsufficient=JSON.parse(await digest(page));
-    assert.deepStrictEqual(afterInsufficient,beforeInsufficient,"insufficient-funds UI attempt mutated canonical state");
+    assert.deepStrictEqual(afterInsufficient,beforeInsufficient,"insufficient-funds commit attempt mutated canonical state");
     assert.strictEqual(getQty(afterInsufficient.inventory,"weapon_materials"),0);
     await page.screenshot({path:path.join(OUT,"04-insufficient-funds.png"),fullPage:true});
 
