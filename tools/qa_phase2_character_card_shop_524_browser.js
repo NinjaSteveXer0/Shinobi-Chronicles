@@ -175,11 +175,27 @@ async function openCharacterShopViaCommercialDistrict(page){
     assert.strictEqual(purchaseRecord.acquisition.context.catalogueId,"alpha_konoha_character_card_shop_v1");
     assert.strictEqual(purchaseRecord.acquisition.provenance.retailDoesNotAssign,true);
 
-    // 7. My Clan naturally sees ownership.
+    // 7. My Clan naturally sees ownership. Prove the canonical derived roster
+    // first, then inspect the transient ALL presentation filter explicitly.
+    const clanProjection=await page.evaluate(()=>({
+      roster:getClanManageableRosterCharacters().map(character=>({
+        id:character.id,
+        registryId:getCharacterRegistryId(character),
+        name:character.name
+      })),
+      ownership:[...(playerData.characterOwnership.ownedRegistryIds||[])],
+      runtime:getRuntimeCharacterByRegistryId("academy_izuno")
+        ? {id:getRuntimeCharacterByRegistryId("academy_izuno").id,name:getRuntimeCharacterByRegistryId("academy_izuno").name}
+        : null
+    }));
+    assert(clanProjection.roster.some(row=>row.registryId==="academy_izuno"),
+      "My Clan derived roster omitted newly owned Academy Izuno: "+JSON.stringify(clanProjection));
     await page.evaluate(()=>openOverlay("clan"));
     await page.waitForFunction(()=>currentOverlayType==="clan",null,{timeout:10000});
+    await page.evaluate(()=>setClanFilter("all"));
     const clanText=await page.locator("#overlay-content-container").innerText();
-    assert(clanText.includes("Academy Izuno")||clanText.includes("Izuno"),"My Clan did not project newly owned Academy Izuno");
+    assert(clanText.includes("Academy Izuno")||clanText.includes("Izuno"),
+      "My Clan ALL view did not project newly owned Academy Izuno: "+JSON.stringify(clanProjection)+" :: "+clanText.slice(0,1200));
     await page.screenshot({path:path.join(OUT,"02-my-clan-new-ownership.png"),fullPage:true});
 
     // 9. Same-intent retry is idempotent: no second debit/ownership/receipt.
