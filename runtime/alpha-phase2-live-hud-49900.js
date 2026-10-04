@@ -549,7 +549,7 @@ function installStyles(){
     .sc-hud499-team-member:hover{transform:translateX(2px);border-color:rgba(82,220,232,.62)}
     .sc-hud499-team-portrait,.sc-hud499-silhouette.sc-hud499-team-portrait{display:block;width:48px;height:48px;margin:auto;object-fit:cover;object-position:top center;border:1px solid rgba(96,211,224,.3);border-radius:50%;background:#111923}
     .sc-hud499-team-name{position:absolute;left:63px;top:50%;z-index:8;display:block;margin:0;padding:5px 8px;opacity:0;transform:translate(-4px,-50%);border:1px solid rgba(195,159,70,.34);border-radius:4px;background:rgba(6,12,19,.96);box-shadow:0 7px 18px rgba(0,0,0,.34);color:#dfe9ec;font-size:8px;font-weight:800;line-height:1.1;letter-spacing:.04em;white-space:nowrap;pointer-events:none;transition:opacity 120ms ease,transform 120ms ease}
-    .sc-hud499-team-member:hover .sc-hud499-team-name,.sc-hud499-team-member:focus-visible .sc-hud499-team-name{opacity:1;transform:translate(0,-50%)}
+    .sc-hud499-team-member:hover .sc-hud499-team-name,.sc-hud499-team-member:focus .sc-hud499-team-name,.sc-hud499-team-member:focus-visible .sc-hud499-team-name{opacity:1;transform:translate(0,-50%)}
     .sc-hud499-tools{box-sizing:border-box;position:absolute;right:var(--sc-hud499-edge);top:128px;width:148px;pointer-events:auto;border:1px solid rgba(195,159,70,.28);border-radius:7px;background:linear-gradient(145deg,rgba(7,14,22,.93),rgba(6,11,18,.78));box-shadow:0 10px 24px rgba(0,0,0,.26);overflow:hidden}
     .sc-hud499-tools summary{min-height:34px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 10px;cursor:pointer;list-style:none;color:#d7c27f;font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
     .sc-hud499-tools summary::-webkit-details-marker{display:none}
@@ -561,7 +561,7 @@ function installStyles(){
     .sc-hud499-compass-depth{display:block;margin-top:3px;color:#e7d8a6;font:800 12px/1 Georgia,"Times New Roman",serif;letter-spacing:.06em}
     .sc-hud499-compass-actions{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
     .sc-hud499-map-nav button{min-height:30px;padding:0 9px;border:1px solid rgba(150,133,82,.42);background:rgba(8,14,22,.82);cursor:pointer;font-size:8px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}
-    .sc-hud499-journey:hover,.sc-hud499-journey:focus-visible,.sc-hud499-team:hover,.sc-hud499-team:focus-visible,.sc-hud499-tools summary:hover,.sc-hud499-tools summary:focus-visible,.sc-hud499-tools button:hover,.sc-hud499-tools button:focus-visible,.sc-hud499-map-nav button:hover,.sc-hud499-map-nav button:focus-visible{outline:2px solid rgba(85,218,231,.72);outline-offset:1px;border-color:rgba(85,218,231,.66)}
+    .sc-hud499-journey:hover,.sc-hud499-journey:focus-visible,.sc-hud499-team:hover,.sc-hud499-team-member:focus-visible,.sc-hud499-tools summary:hover,.sc-hud499-tools summary:focus-visible,.sc-hud499-tools button:hover,.sc-hud499-tools button:focus-visible,.sc-hud499-map-nav button:hover,.sc-hud499-map-nav button:focus-visible{outline:2px solid rgba(85,218,231,.72);outline-offset:1px;border-color:rgba(85,218,231,.66)}
 
     .sc-hud499-root[data-map-gutter="true"][data-surface="region"] .sc-hud499-team,
     .sc-hud499-root[data-map-gutter="true"][data-surface="village"] .sc-hud499-team{
