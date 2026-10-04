@@ -91,7 +91,8 @@
       "phase2-live-hud-region-village-gutter-integration-499",
       "phase2-live-hud-functional-gutter-context-499",
       "phase2-live-hud-region-village-map-echo-499",
-      "phase2-live-hud-region-village-map-echo-visible-stage-499"
+      "phase2-live-hud-region-village-map-echo-visible-stage-499",
+      "phase2-basic-item-shop-517"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
