@@ -16,10 +16,10 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-04-DV",
-    sourceBaselineCommit:"1fc795e3bbee61dcdd7c3a115c0cdfce29c40bd3",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-04-DW",
+    sourceBaselineCommit:"f5283e6044825da14a4fa6852e596eb404a20327",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
-    runtimeGeneration:"phase2-basic-item-shop-517",
+    runtimeGeneration:"hud-my-clan-return-context-506",
     majorRuntimeFeatures:Object.freeze([
       "academy-kakashi-v2",
       "runtime-ownership-safety-300",
@@ -92,7 +92,8 @@
       "phase2-live-hud-functional-gutter-context-499",
       "phase2-live-hud-region-village-map-echo-499",
       "phase2-live-hud-region-village-map-echo-visible-stage-499",
-      "phase2-basic-item-shop-517"
+      "phase2-basic-item-shop-517",
+      "hud-my-clan-exact-map-return-506"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -125,7 +126,7 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-04-DV",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-04-DW",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
       generationPresent:first.runtimeGeneration==="phase2-basic-item-shop-517",
@@ -151,6 +152,7 @@
       phase2LiveHudRegionVillageMapEcho499Present:first.majorRuntimeFeatures.includes("phase2-live-hud-region-village-map-echo-499"),
       phase2LiveHudRegionVillageMapEchoVisibleStage499Present:first.majorRuntimeFeatures.includes("phase2-live-hud-region-village-map-echo-visible-stage-499"),
       phase2BasicItemShop517Present:first.majorRuntimeFeatures.includes("phase2-basic-item-shop-517"),
+      hudMyClanExactMapReturn506Present:first.majorRuntimeFeatures.includes("hud-my-clan-exact-map-return-506"),
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)
