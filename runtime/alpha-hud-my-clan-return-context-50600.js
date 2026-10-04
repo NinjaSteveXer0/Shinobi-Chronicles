@@ -155,7 +155,7 @@ function diagnostics(){
   const restoreSource=String(restoreCapturedMapCaller);
   const closeSource=String(forceCloseMyClanOverlay50600);
   const checks={
-    existingHudCallerOnly:String(isHudClanActivation).includes('data-hud499-action="clan"')&&String(isHudClanActivation).includes(HUD_ROOT_ID),
+    existingHudCallerOnly:String(isHudClanActivation).includes('data-hud499-action="clan"')&&String(isHudClanActivation).includes("HUD_ROOT_ID"),
     existingUnderlayCapture:sourceHas(captureExistingUnderlay,"captureStoryScenePresentationUnderlay"),
     existingUnderlayRestore:restoreSource.includes("restoreStoryScenePresentationUnderlay"),
     canonicalWorldReturn:restoreSource.includes("returnToWorldMap"),
