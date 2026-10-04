@@ -73,6 +73,13 @@ async function protectedSnapshot(page){
         {source:"qa532_early_omit",sourceEventId:"qa532_early_omit"}
       );
       const continued=continueAcademyTeamFormationJourney();
+      if(typeof updateChronicleTutorialProgress43600==="function"){
+        updateChronicleTutorialProgress43600({
+          sandboxPopupSeen:true,
+          openingChoice:"explore",
+          recommendedRouteEnabled:false
+        },{save:true});
+      }
       return{selected,completed,one,two,formed,beforeContinue,illegalEarly,continued};
     });
     assert.strictEqual(setup.selected.success,true);
