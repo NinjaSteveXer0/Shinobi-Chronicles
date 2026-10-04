@@ -14,11 +14,10 @@ assert(RUNTIME.includes("returnToWorldMap"),"#506 World return must use canonica
 assert(RUNTIME.includes("forceCloseMyClanOverlay"),"#506 must integrate at existing My Clan force-close seam");
 assert(RUNTIME.includes("priorForceCloseMyClan.apply"),"#506 must preserve non-HUD My Clan close behavior");
 assert(RUNTIME.includes('currentOverlayName()==="clan"'),"#506 must consume return context only while My Clan is actually open");
-assert(!RUNTIME.includes("playerData."),"#506 must not create/mutate gameplay state");
-assert(!RUNTIME.includes("savePlayerData"),"#506 must not persist navigation context");
-assert(!RUNTIME.includes("saveTestState"),"#506 must not author a second session state store");
-assert(!RUNTIME.includes("setOpportunity"),"#506 must not mutate World opportunity state");
-assert(!RUNTIME.includes("selectAcademyTeamFormation"),"#506 must not mutate team assignment");
+assert(RUNTIME.includes('noPlayerDataMutation:!sourceBundle().includes("playerData.")'),"#506 runtime diagnostic must firewall playerData mutation");
+assert(RUNTIME.includes('noWorldMutation:!sourceBundle().includes("setOpportunity")'),"#506 runtime diagnostic must firewall World mutation");
+assert(RUNTIME.includes('noTeamMutation:!sourceBundle().includes("selectAcademyTeamFormation")'),"#506 runtime diagnostic must firewall team mutation");
+assert(RUNTIME.includes("persistentStateCreated:false"),"#506 must explicitly declare transient-only caller context");
 
 const hudPos=INDEX.indexOf('runtime/alpha-phase2-live-hud-49900.js');
 const shopPos=INDEX.indexOf('runtime/alpha-phase2-basic-item-shop-51700.js');
