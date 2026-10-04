@@ -193,9 +193,11 @@ async function openCharacterShopViaCommercialDistrict(page){
     await page.evaluate(()=>openOverlay("clan"));
     await page.waitForFunction(()=>currentOverlayType==="clan",null,{timeout:10000});
     await page.evaluate(()=>setClanFilter("all"));
-    const clanText=await page.locator("#overlay-content-container").innerText();
-    assert(clanText.includes("Academy Izuno")||clanText.includes("Izuno"),
-      "My Clan ALL view did not project newly owned Academy Izuno: "+JSON.stringify(clanProjection)+" :: "+clanText.slice(0,1200));
+    const izunoClanCard=page.locator('.my-clan-card-hitbox[aria-label="Inspect Academy Izuno"]');
+    assert.strictEqual(await izunoClanCard.count(),1,
+      "My Clan ALL view did not project exactly one newly owned Academy Izuno card: "+JSON.stringify(clanProjection));
+    assert.strictEqual(await izunoClanCard.locator('img[alt="Academy Izuno collectible card"]').count(),1,
+      "My Clan Academy Izuno collectible-card presentation missing");
     await page.screenshot({path:path.join(OUT,"02-my-clan-new-ownership.png"),fullPage:true});
 
     // 9. Same-intent retry is idempotent: no second debit/ownership/receipt.
