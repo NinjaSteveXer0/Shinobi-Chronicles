@@ -7,13 +7,15 @@
 // - Skill Details carries a readable effect summary and no USE SKILL button;
 // - Battle PL numerals are optically centered inside the radial;
 // - Combat Feed gets a small positioning refinement;
-// - My Clan keeps drag/drop + inspection, but removes click-to-assign highlight.
+// - My Clan keeps drag/drop + inspection, but removes click-to-assign highlight;
+// - #528 restores the binding #526 Browse / Inspection production-master layer
+//   without moving any roster, formation, ownership or save semantics into art.
 // No Battle resolver, ownership, roster, or World semantic subsystem is replaced.
 // ============================================================================
 (function installAlphaBrowserPolish32700(){
   "use strict";
 
-  const PATCH_ID="alpha_browser_polish_32700_2026_09_12";
+  const PATCH_ID="alpha_browser_polish_32700_2026_10_05_my_clan_master_restore";
 
   function activateBattlePreparedSkillCard(skillId){
     const selected=selectBattlePreparedSkill(skillId);
@@ -169,6 +171,19 @@
       .alpha-code-battle-stage .battle-live-skill-click-hint,.alpha-code-battle-stage .battle-live-skill-mode-prompt{display:block;margin-top:14px;color:#6fdce6;font-size:clamp(7px,.52vw,9px);line-height:1.3;letter-spacing:.08em}
       .alpha-code-battle-stage .battle-live-skill-details-actions{justify-content:flex-end!important}
       .alpha-code-battle-stage .battle-live-cancel-skill{min-width:132px!important}
+
+      /* #526 / #528 — approved My Clan masters are composition, never state. */
+      .my-clan-stage{
+        background-color:#050b10!important;
+        background-image:url('UI/my_clan_browse.png')!important;
+        background-repeat:no-repeat!important;
+        background-position:center!important;
+        background-size:100% 100%!important;
+      }
+      .my-clan-stage:has(.my-clan-inspection-panel){
+        background-image:url('UI/my_clan_inspection.png')!important;
+      }
+
       .my-clan-formation-slot.is-assignment-target{border-color:rgba(74,213,224,.24)!important;background:transparent!important;box-shadow:none!important}
       .my-clan-formation-slot.is-assignment-target::after{content:none!important;display:none!important}
       .my-clan-roster-card.is-selected,.my-clan-roster-card[aria-pressed="true"]{filter:none!important;box-shadow:none!important;outline:none!important}
@@ -183,6 +198,7 @@
     const deck=renderTemporaryBattleSkillDeck.toString();
     const details=renderBattleSelectedSkillDetails.toString();
     const clan=createMyClanFormationSlot.toString();
+    const presentation=document.getElementById("alpha-browser-polish-32700-style")?.textContent||"";
     const checks={
       cardClickExecutes:deck.includes("activateBattlePreparedSkillCard"),
       useSkillButtonRemoved:!details.includes("USE SKILL"),
@@ -191,6 +207,8 @@
       battleResolverStillUsed:activateBattlePreparedSkillCard.toString().includes("confirmSelectedBattleSkill()"),
       noClickAssignment:clan.includes("inspectMyClanFormationSlotNoAssign")&&!clan.includes("is-assignment-target"),
       dragDropPreserved:clan.includes("beginMyClanFormationDrag")&&clan.includes("dropMyClanCharacterIntoSlot"),
+      myClanBrowseMasterBound:presentation.includes("UI/my_clan_browse.png"),
+      myClanInspectionMasterBound:presentation.includes("UI/my_clan_inspection.png"),
       browserGoldenNotClaimed:true
     };
     const failed=Object.entries(checks).filter(([,v])=>v!==true).map(([k])=>k);

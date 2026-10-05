@@ -11,12 +11,63 @@
     "INTENTIONALLY_QUEUED",
     "INDETERMINATE"
   ],
+  "lifecycle_stage_enum": [
+    "DECLARED",
+    "REFERENCED",
+    "LOADED",
+    "REACHABLE",
+    "EFFECTIVE",
+    "OBSERVED",
+    "GOLDEN"
+  ],
+  "browser_canary_ledger": "qa/production_browser_canary_ledger_528.json",
+  "queue_activation_records": [
+    {
+      "id": "expressive_scene_board_polish_490",
+      "owner": "UI / ASSETS",
+      "issue_ref": "#490",
+      "ready_action": "reclassify_to_ui_assets_queue",
+      "activation_predicates": [
+        {"type": "issue_closed", "number": 469},
+        {"type": "pr_merged", "number": 475}
+      ]
+    },
+    {
+      "id": "battle_pouch_polish_463",
+      "owner": "CODING / RUNTIME",
+      "issue_ref": "#463",
+      "ready_action": "retain_pre_alpha_queue_until_owner_promotes",
+      "activation_predicates": [
+        {"type": "manual_gate", "satisfied": false, "reason": "pre_alpha_polish_owner_gate_not_promoted"}
+      ]
+    },
+    {
+      "id": "stats_skills_exams_combat_519",
+      "owner": "CE / CODEX / COORDINATION",
+      "issue_ref": "#519",
+      "ready_action": "route_closed_design_to_downstream_owners",
+      "activation_predicates": [
+        {"type": "issue_closed", "number": 519}
+      ]
+    },
+    {
+      "id": "selected_shinobi_loadout_526",
+      "owner": "UI / ASSETS",
+      "issue_ref": "#526",
+      "ready_action": "close_ui_contract_before_coding_handoff",
+      "activation_predicates": [
+        {"type": "manual_gate", "satisfied": false, "reason": "selected_shinobi_loadout_ui_contract_not_closed"}
+      ]
+    }
+  ],
   "rows": [
     {
       "id": "chronicle_interaction_depth_32",
       "surface_family": "Story / Scene Board / Chronicle Interaction Depth",
       "authority_kind": "issue_and_ui_contract",
       "authority_ref": ["#32", "#526"],
+      "production_disposition": "IMPLEMENT_NOW",
+      "lifecycle_stage": "OBSERVED",
       "consumer_paths": [
         "runtime/alpha-story-scene-board-33900.js",
         "runtime/alpha-runtime-build-fingerprint-303.js"
@@ -29,8 +80,12 @@
       "workflow_path": ".github/workflows/issue-32-chronicle-depth.yml",
       "expected_evidence": {
         "path": "runtime/alpha-runtime-build-fingerprint-303.js",
-        "contains": "chronicle-interaction-depth-32"
+        "contains": "chronicle-interaction-depth-scene-board-32"
       },
+      "observable_acceptance": [
+        "Quick, Standard and Full render distinct presentation depth without changing semantic Story state",
+        "shared Scene Board backdrop, actors and explicit meaningful choices remain intact"
+      ],
       "owner": "CODING / RUNTIME",
       "status": "CURRENT",
       "invalidation_rule": {
@@ -39,7 +94,8 @@
           "runtime/alpha-runtime-build-fingerprint-303.js",
           "tools/fixtures/runtime_build_manifest_303.json",
           "tools/qa_issue_32_chronicle_depth_browser.js",
-          ".github/workflows/issue-32-chronicle-depth.yml"
+          ".github/workflows/issue-32-chronicle-depth.yml",
+          "UI/convo.png"
         ],
         "required_lane_ids": ["issue32_static", "issue32_browser"]
       }
@@ -49,6 +105,8 @@
       "surface_family": "Inventory / Ownership Projection",
       "authority_kind": "issue_contract",
       "authority_ref": ["#461"],
+      "production_disposition": "IMPLEMENT_NOW",
+      "lifecycle_stage": "OBSERVED",
       "consumer_paths": ["runtime/alpha-phase2-inventory-core-46100.js"],
       "qa_paths": [
         "tools/qa_phase2_inventory_core_461.js",
@@ -59,6 +117,9 @@
         "path": "runtime/alpha-phase2-inventory-core-46100.js",
         "contains": "SC_PHASE2_INVENTORY_CORE_46100"
       },
+      "known_debt": [
+        "Stephen owner-browser populated-state acceptance and Battle Pouch discoverability remain explicitly queued in #463."
+      ],
       "owner": "CODING / RUNTIME",
       "status": "CURRENT",
       "invalidation_rule": {
@@ -76,6 +137,8 @@
       "surface_family": "Inventory / Battle Pouch Discoverability",
       "authority_kind": "pre_alpha_polish_issue",
       "authority_ref": ["#463"],
+      "production_disposition": "QUEUED",
+      "lifecycle_stage": "DECLARED",
       "consumer_paths": ["runtime/alpha-phase2-inventory-core-46100.js"],
       "qa_paths": [],
       "workflow_path": null,
@@ -90,6 +153,8 @@
       "surface_family": "World / Chronicle Engine Live Hotspot",
       "authority_kind": "activation_receipt_and_issue_contract",
       "authority_ref": ["#469", "#478"],
+      "production_disposition": "IMPLEMENT_NOW",
+      "lifecycle_stage": "OBSERVED",
       "consumer_paths": [
         "runtime/alpha-phase2-ce-hotspot-46900.js",
         "runtime/alpha-chronicle-state-manifest-43600.js"
@@ -121,6 +186,8 @@
       "surface_family": "World / Region / Village Live HUD",
       "authority_kind": "ui_contract_and_issue",
       "authority_ref": ["#499", "#497"],
+      "production_disposition": "IMPLEMENT_NOW",
+      "lifecycle_stage": "OBSERVED",
       "consumer_paths": ["runtime/alpha-phase2-live-hud-49900.js"],
       "qa_paths": [
         "tools/qa_phase2_live_hud_499.js",
@@ -149,6 +216,8 @@
       "surface_family": "Economy / Basic Item Shop",
       "authority_kind": "issue_contract",
       "authority_ref": ["#517"],
+      "production_disposition": "IMPLEMENT_NOW",
+      "lifecycle_stage": "OBSERVED",
       "consumer_paths": ["runtime/alpha-phase2-basic-item-shop-51700.js"],
       "qa_paths": [
         "tools/qa_phase2_basic_item_shop_517.js",
@@ -176,6 +245,8 @@
       "surface_family": "Progression / Exams / Combat Domain Governance",
       "authority_kind": "active_design_reconciliation",
       "authority_ref": ["#519"],
+      "production_disposition": "QUEUED",
+      "lifecycle_stage": "DECLARED",
       "consumer_paths": [],
       "qa_paths": [],
       "workflow_path": null,
@@ -190,6 +261,8 @@
       "surface_family": "Acquisition / Character Card Shop",
       "authority_kind": "acquisition_contract_and_issue",
       "authority_ref": ["#524", "#520"],
+      "production_disposition": "IMPLEMENT_NOW",
+      "lifecycle_stage": "OBSERVED",
       "consumer_paths": ["runtime/alpha-phase2-character-card-shop-52400.js"],
       "qa_paths": [
         "tools/qa_phase2_character_card_shop_524.js",
@@ -217,6 +290,8 @@
       "surface_family": "My Clan / Current Team Assignment",
       "authority_kind": "chronicle_team_separation_contract_and_issue",
       "authority_ref": ["#532", "#522"],
+      "production_disposition": "IMPLEMENT_NOW",
+      "lifecycle_stage": "OBSERVED",
       "consumer_paths": [
         "game.js",
         "runtime/alpha-chronicle-state-manifest-43600.js",
@@ -241,6 +316,216 @@
           ".github/workflows/issue-532-phase2-team-assignment.yml"
         ],
         "required_lane_ids": ["issue532_static", "issue532_browser"]
+      }
+    },
+    {
+      "id": "konoha_activity_surfaces_431",
+      "surface_family": "Konoha / Practical + Exams",
+      "authority_kind": "phase2_player_surface_contract",
+      "authority_ref": ["#431", "#436", "#526"],
+      "production_disposition": "IMPLEMENT_NOW",
+      "lifecycle_stage": "OBSERVED",
+      "consumer_paths": [
+        "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
+        "style.css",
+        "UI/practical.png",
+        "UI/exams.png"
+      ],
+      "qa_paths": [
+        "tools/qa_phase2_konoha_player_surfaces_431.js",
+        "tools/qa_ui_master_consumption_528_browser.js"
+      ],
+      "workflow_path": ".github/workflows/issues-431-436-phase2-konoha-onboarding.yml",
+      "expected_evidence": {
+        "path": "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
+        "contains": "SC_PHASE2_KONOHA_PLAYER_SURFACES_43110"
+      },
+      "observable_acceptance": [
+        "Practical visibly consumes UI/practical.png while preserving code-owned team/discipline truth",
+        "Exams visibly consumes UI/exams.png while preserving code-owned team/discipline truth"
+      ],
+      "owner": "CODING / RUNTIME",
+      "status": "CURRENT",
+      "invalidation_rule": {
+        "match_any": [
+          "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
+          "tools/qa_phase2_konoha_player_surfaces_431.js",
+          "style.css",
+          "UI/practical.png",
+          "UI/exams.png"
+        ],
+        "required_lane_ids": ["issue431_browser", "ui_master_browser"]
+      }
+    },
+    {
+      "id": "victory_setback_results_141",
+      "surface_family": "Battle / Victory + Setback Results",
+      "authority_kind": "runtime_closure_and_ui_contract",
+      "authority_ref": ["#141", "#526"],
+      "production_disposition": "IMPLEMENT_NOW",
+      "lifecycle_stage": "OBSERVED",
+      "consumer_paths": [
+        "runtime/alpha-alpha-sprint-33100.js",
+        "UI/victory.png",
+        "UI/setback.png"
+      ],
+      "qa_paths": [
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_ui_master_consumption_528_browser.js"
+      ],
+      "workflow_path": ".github/workflows/issue-528-production-conformance.yml",
+      "expected_evidence": {
+        "path": "runtime/alpha-alpha-sprint-33100.js",
+        "contains": "continueAfterSetback33100"
+      },
+      "observable_acceptance": [
+        "real Battle Victory/defeat routes retain exact caller semantics in the owning Kakashi browser suite",
+        "approved Victory and Setback masters load with non-zero visible geometry beneath code-owned result semantics"
+      ],
+      "owner": "CODING / RUNTIME",
+      "status": "CURRENT",
+      "invalidation_rule": {
+        "match_any": [
+          "runtime/alpha-alpha-sprint-33100.js",
+          "UI/victory.png",
+          "UI/setback.png",
+          "tools/qa_ui_master_consumption_528_browser.js"
+        ],
+        "required_lane_ids": ["ui_master_browser"]
+      }
+    },
+    {
+      "id": "ui_active_masters_526",
+      "surface_family": "UI / Active Production Masters",
+      "authority_kind": "ui_master_classification_registry",
+      "authority_ref": ["#526", "#529"],
+      "production_disposition": "IMPLEMENT_NOW",
+      "lifecycle_stage": "OBSERVED",
+      "presentation_assets": [
+        "UI/victory.png",
+        "UI/setback.png",
+        "UI/exams.png",
+        "UI/practical.png",
+        "UI/my_clan_browse.png",
+        "UI/my_clan_inspection.png"
+      ],
+      "consumer_paths": [
+        "game.js",
+        "style.css",
+        "runtime/alpha-alpha-sprint-33100.js",
+        "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
+        "UI/victory.png",
+        "UI/setback.png",
+        "UI/exams.png",
+        "UI/practical.png",
+        "UI/my_clan_browse.png",
+        "UI/my_clan_inspection.png"
+      ],
+      "qa_paths": ["tools/qa_ui_master_consumption_528_browser.js"],
+      "workflow_path": ".github/workflows/issue-528-production-conformance.yml",
+      "expected_evidence": {
+        "path": "tools/qa_ui_master_consumption_528_browser.js",
+        "contains": "activeProductionMasters"
+      },
+      "observable_acceptance": [
+        "all six ACTIVE PRODUCTION MASTER assets load and are visibly effective on their intended surfaces",
+        "REFERENCE / COMPOSITION UI/convo.png is not forced into literal Story rendering",
+        "QUEUED UI/loadout.png is not silently promoted to production"
+      ],
+      "known_debt": [
+        "Automated observable proof does not substitute for Stephen's subjective visual/taste Golden acceptance."
+      ],
+      "owner": "CODING / RUNTIME",
+      "status": "CURRENT",
+      "invalidation_rule": {
+        "match_any": [
+          "Documentation/UI/UI Master Asset Classification and Consumption Registry 2026-10-05.md",
+          "style.css",
+          "runtime/alpha-alpha-sprint-33100.js",
+          "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
+          "UI/victory.png",
+          "UI/setback.png",
+          "UI/exams.png",
+          "UI/practical.png",
+          "UI/my_clan_browse.png",
+          "UI/my_clan_inspection.png",
+          "tools/qa_ui_master_consumption_528_browser.js"
+        ],
+        "required_lane_ids": ["ui_master_browser"]
+      }
+    },
+    {
+      "id": "promotion_transition_141_63",
+      "surface_family": "Progression / Promotion Transition Continuity",
+      "authority_kind": "runtime_closure_and_roster_transition_contract",
+      "authority_ref": ["#141", "#63", "#522"],
+      "production_disposition": "IMPLEMENT_NOW",
+      "lifecycle_stage": "EFFECTIVE",
+      "consumer_paths": [
+        "runtime/alpha-genin-roster-63.js",
+        "runtime/alpha-traversal-bridge-33200.js"
+      ],
+      "qa_paths": [
+        "tools/qa_issue_141_traversal_runtime.js",
+        "tools/qa_issue_63_genin_v2_runtime.js"
+      ],
+      "workflow_path": ".github/workflows/issue-141-pre-alpha-runtime-closure.yml",
+      "expected_evidence": {
+        "path": "runtime/alpha-genin-roster-63.js",
+        "contains": "saveGeninRosterTransitionReservations"
+      },
+      "known_debt": [
+        "A bounded installed-browser Promotion transition canary remains required before lifecycle may advance to OBSERVED."
+      ],
+      "owner": "CODING / RUNTIME",
+      "status": "CURRENT",
+      "invalidation_rule": {
+        "match_any": [
+          "runtime/alpha-genin-roster-63.js",
+          "runtime/alpha-traversal-bridge-33200.js",
+          "tools/qa_issue_141_traversal_runtime.js",
+          "tools/qa_issue_63_genin_v2_runtime.js"
+        ],
+        "required_lane_ids": ["promotion_static", "save_compatibility"]
+      }
+    },
+    {
+      "id": "frozen_origin_shared_runtime",
+      "surface_family": "Frozen Academy Origins / Shared Runtime Dependencies",
+      "authority_kind": "phase1_golden_shared_runtime_watch",
+      "authority_ref": ["#105", "#141", "#312"],
+      "production_disposition": "IMPLEMENT_NOW",
+      "lifecycle_stage": "OBSERVED",
+      "consumer_paths": [
+        "game.js",
+        "runtime/alpha-story-scene-board-33900.js",
+        "runtime/alpha-alpha-sprint-33100.js"
+      ],
+      "qa_paths": [
+        "tools/qa_issue_105_origin_presentation_repair.js",
+        "tools/qa_issue_312_story_battle_benchmark.js",
+        "tools/qa_save_compatibility_311.js"
+      ],
+      "workflow_path": ".github/workflows/issue-141-pre-alpha-runtime-closure.yml",
+      "expected_evidence": {
+        "path": "runtime/alpha-story-scene-board-33900.js",
+        "contains": "SC_STORY_SCENE_BOARD_33900"
+      },
+      "known_debt": [
+        "The firewall watches shared runtime dependencies only; it does not reopen frozen Origin prose, choices, rewards or owner Golden decisions."
+      ],
+      "owner": "CODING / RUNTIME",
+      "status": "CURRENT",
+      "invalidation_rule": {
+        "match_any": [
+          "game.js",
+          "runtime/alpha-story-scene-board-33900.js",
+          "runtime/alpha-alpha-sprint-33100.js",
+          "tools/qa_issue_105_origin_presentation_repair.js",
+          "tools/qa_issue_312_story_battle_benchmark.js",
+          "tools/qa_save_compatibility_311.js"
+        ],
+        "required_lane_ids": ["issue32_static", "save_compatibility"]
       }
     }
   ]

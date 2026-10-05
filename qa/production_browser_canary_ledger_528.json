@@ -1,0 +1,325 @@
+{
+  "schema_version": 1,
+  "ledger_id": "sc.production-browser-canary-ledger.v1",
+  "authority_issue": 528,
+  "baseline_sha": "3316b02d3dda5b4bd4efd980b1235dc8f1a6acf8",
+  "canaries": [
+    {
+      "id": "origin_team_konoha",
+      "state": "CURRENT",
+      "starting_fixture": "fresh default save; Academy Origin selected and completed",
+      "route_actions": [
+        "select Origin",
+        "complete Origin",
+        "choose two legal teammates",
+        "confirm formation",
+        "continue to Konoha"
+      ],
+      "expected_checkpoints": [
+        "stable Chronicle protagonist retained",
+        "currentTeam committed exactly once",
+        "Konoha/free-play continuation reachable"
+      ],
+      "contract_ids": [
+        "deliberate_team_assignment_532",
+        "konoha_activity_surfaces_431"
+      ],
+      "qa_refs": [
+        "tools/qa_phase2_team_assignment_532_browser.js",
+        "tools/qa_phase2_konoha_onboarding_browser_431.js"
+      ],
+      "last_successful_sha": "b132c7f6f52678977ade88af3b28801ef6cb246e",
+      "golden_claimed": false
+    },
+    {
+      "id": "chronicle_depth_quick_standard_full",
+      "state": "CURRENT",
+      "starting_fixture": "fresh Academy Obito Origin at first meaningful choice",
+      "route_actions": [
+        "open shared Scene Board",
+        "project Quick",
+        "project Standard",
+        "project Full"
+      ],
+      "expected_checkpoints": [
+        "same semantic Story state across all depths",
+        "Quick lean",
+        "Standard baseline",
+        "Full authority context",
+        "no literal UI/convo.png renderer"
+      ],
+      "contract_ids": [
+        "chronicle_interaction_depth_32"
+      ],
+      "qa_refs": [
+        "tools/qa_issue_32_chronicle_depth_browser.js"
+      ],
+      "last_successful_sha": "b132c7f6f52678977ade88af3b28801ef6cb246e",
+      "golden_claimed": false
+    },
+    {
+      "id": "story_battle_same_story_return",
+      "state": "CURRENT",
+      "starting_fixture": "Academy Kakashi V2 authored Battle transition",
+      "route_actions": [
+        "enter authored Battle",
+        "resolve outcome",
+        "resume exact Story caller"
+      ],
+      "expected_checkpoints": [
+        "Battle uses authored Story environment",
+        "return envelope survives",
+        "same Story resumes",
+        "action count round-trips"
+      ],
+      "contract_ids": [
+        "frozen_origin_shared_runtime",
+        "victory_setback_results_141"
+      ],
+      "qa_refs": [
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_issue_312_story_battle_benchmark.js"
+      ],
+      "last_successful_sha": null,
+      "known_debt": [
+        "The exact-head #528 workflow does not run the full Kakashi browser matrix on every PR; this is a deep/high-cost route and remains covered by its owning browser suite and release matrix."
+      ],
+      "golden_claimed": false
+    },
+    {
+      "id": "victory_result_master",
+      "state": "OBSERVABILITY_PENDING",
+      "starting_fixture": "authorised Battle victory fixture",
+      "route_actions": [
+        "resolve victory",
+        "open Victory result",
+        "inspect approved result art beneath code-owned semantics"
+      ],
+      "expected_checkpoints": [
+        "UI/victory.png requested successfully",
+        "Victory root visibly rendered",
+        "effective image size/visibility non-zero",
+        "result semantics remain code-owned"
+      ],
+      "contract_ids": [
+        "victory_setback_results_141",
+        "ui_active_masters_526"
+      ],
+      "qa_refs": [
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_ui_master_consumption_528_browser.js"
+      ],
+      "last_successful_sha": null,
+      "golden_claimed": false
+    },
+    {
+      "id": "setback_result_master",
+      "state": "OBSERVABILITY_PENDING",
+      "starting_fixture": "authorised Battle defeat/withdrawal fixture",
+      "route_actions": [
+        "resolve defeat",
+        "open Setback result",
+        "inspect approved result art beneath code-owned semantics"
+      ],
+      "expected_checkpoints": [
+        "UI/setback.png requested successfully",
+        "Setback root visibly rendered",
+        "effective image size/visibility non-zero",
+        "no injury/death inference"
+      ],
+      "contract_ids": [
+        "victory_setback_results_141",
+        "ui_active_masters_526"
+      ],
+      "qa_refs": [
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_ui_master_consumption_528_browser.js"
+      ],
+      "last_successful_sha": null,
+      "golden_claimed": false
+    },
+    {
+      "id": "inventory_empty_and_populated",
+      "state": "CURRENT_WITH_OWNER_DEBT",
+      "starting_fixture": "fresh save plus bounded QA-owned populated fixture",
+      "route_actions": [
+        "open Inventory empty",
+        "project legitimate owned stack/durable instance in QA fixture",
+        "inspect equipment/Battle Pouch projection"
+      ],
+      "expected_checkpoints": [
+        "empty state truthful",
+        "quantities remain stacks",
+        "durables remain instances",
+        "prepared/equipped/owned remain distinct"
+      ],
+      "contract_ids": [
+        "inventory_core_461",
+        "battle_pouch_discoverability_463"
+      ],
+      "qa_refs": [
+        "tools/qa_phase2_inventory_core_461_browser.js"
+      ],
+      "last_successful_sha": "b132c7f6f52678977ade88af3b28801ef6cb246e",
+      "known_debt": [
+        "Stephen owner-browser populated-state acceptance remains queued in #463; QA fixture proof must not seed fake ownership into a production save."
+      ],
+      "golden_claimed": false
+    },
+    {
+      "id": "character_purchase_ownership_assignment_boundary",
+      "state": "CURRENT",
+      "starting_fixture": "Konoha Character Card Shop with sufficient QA Ryō",
+      "route_actions": [
+        "purchase legal Character card",
+        "verify ownership",
+        "verify not auto-assigned",
+        "deliberately assign through My Clan"
+      ],
+      "expected_checkpoints": [
+        "purchase ownership commits once",
+        "assignment remains separate",
+        "currentTeam changes only on deliberate save"
+      ],
+      "contract_ids": [
+        "character_card_shop_524",
+        "deliberate_team_assignment_532"
+      ],
+      "qa_refs": [
+        "tools/qa_phase2_character_card_shop_524_browser.js",
+        "tools/qa_phase2_team_assignment_532_browser.js"
+      ],
+      "last_successful_sha": "b132c7f6f52678977ade88af3b28801ef6cb246e",
+      "golden_claimed": false
+    },
+    {
+      "id": "promotion_transition",
+      "state": "SOURCE_INTEGRATION_VALIDATED_BROWSER_DEBT",
+      "starting_fixture": "legal Promotion/roster-transition source fixture",
+      "route_actions": [
+        "exercise authorised Promotion seam",
+        "save/reload",
+        "continue Journey"
+      ],
+      "expected_checkpoints": [
+        "Promotion authority reused",
+        "Rank/representation/team semantics not collapsed",
+        "post-Promotion Journey survives reload"
+      ],
+      "contract_ids": [
+        "promotion_transition_141_63"
+      ],
+      "qa_refs": [
+        "tools/qa_issue_141_traversal_runtime.js",
+        "tools/qa_issue_63_genin_v2_runtime.js"
+      ],
+      "last_successful_sha": null,
+      "known_debt": [
+        "A bounded installed-browser Promotion transition canary remains required before this row may advance to OBSERVED."
+      ],
+      "golden_claimed": false
+    },
+    {
+      "id": "world_region_village_navigation",
+      "state": "CURRENT",
+      "starting_fixture": "Konoha free-play save",
+      "route_actions": [
+        "open Village",
+        "open Region",
+        "return World",
+        "exercise HUD return contexts"
+      ],
+      "expected_checkpoints": [
+        "canonical navigation authority reused",
+        "exact current location preserved",
+        "no persistent gameplay mutation from presentation routing"
+      ],
+      "contract_ids": [
+        "live_hud_499"
+      ],
+      "qa_refs": [
+        "tools/qa_phase2_live_hud_499_browser.js",
+        "tools/qa_hud_my_clan_return_506_browser.js"
+      ],
+      "last_successful_sha": "b132c7f6f52678977ade88af3b28801ef6cb246e",
+      "golden_claimed": false
+    },
+    {
+      "id": "ce_hotspot_occurrence",
+      "state": "CURRENT",
+      "starting_fixture": "eligible Kakashi private-history participant continuity fixture",
+      "route_actions": [
+        "reach KON-P01",
+        "activate live hotspot",
+        "resolve participant-first occurrence"
+      ],
+      "expected_checkpoints": [
+        "occurrence is finite/no-reroll",
+        "participant-first autonomy",
+        "observer-safe Chronicle record",
+        "browser Scene Board visible"
+      ],
+      "contract_ids": [
+        "first_live_ce_hotspot_469"
+      ],
+      "qa_refs": [
+        "tools/qa_issue_469_ce_hotspot_browser.js"
+      ],
+      "last_successful_sha": "b132c7f6f52678977ade88af3b28801ef6cb246e",
+      "golden_claimed": false
+    },
+    {
+      "id": "save_load_committed_consequence",
+      "state": "CURRENT",
+      "starting_fixture": "current Alpha save compatibility fixtures",
+      "route_actions": [
+        "commit meaningful consequence",
+        "save",
+        "reload/migrate",
+        "re-read projection"
+      ],
+      "expected_checkpoints": [
+        "no duplicate grant",
+        "no reroll",
+        "private history persists",
+        "current team derives from canonical assignment"
+      ],
+      "contract_ids": [
+        "frozen_origin_shared_runtime",
+        "deliberate_team_assignment_532"
+      ],
+      "qa_refs": [
+        "tools/qa_save_compatibility_311.js"
+      ],
+      "last_successful_sha": "b132c7f6f52678977ade88af3b28801ef6cb246e",
+      "golden_claimed": false
+    },
+    {
+      "id": "active_ui_master_consumption",
+      "state": "OBSERVABILITY_PENDING",
+      "starting_fixture": "fresh Konoha QA save plus presentation-only result fixtures",
+      "route_actions": [
+        "open My Clan Browse/Inspection",
+        "open Practical",
+        "open Exams",
+        "open Victory",
+        "open Setback"
+      ],
+      "expected_checkpoints": [
+        "all six ACTIVE PRODUCTION MASTER assets are loaded and visibly effective",
+        "REFERENCE assets are not required to render literally",
+        "queued UI/loadout.png is not treated as broken"
+      ],
+      "contract_ids": [
+        "ui_active_masters_526",
+        "victory_setback_results_141",
+        "konoha_activity_surfaces_431"
+      ],
+      "qa_refs": [
+        "tools/qa_ui_master_consumption_528_browser.js"
+      ],
+      "last_successful_sha": null,
+      "golden_claimed": false
+    }
+  ]
+}

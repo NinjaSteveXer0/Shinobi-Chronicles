@@ -1,13 +1,13 @@
 // ============================================================================
 // PHASE 2 KONOHA PLAYER-FACING ACTIVITY SURFACES — #431 TRIAL
 // Practical / Exams use committed currentTeam; Training Grounds remains owned-roster.
-// Presentation-only Discipline accents and natural player copy.
+// Presentation-only Discipline accents, approved production masters and natural player copy.
 // ============================================================================
 (function installPhase2KonohaPlayerSurfaces43110(){
 "use strict";
 if(globalThis.SC_PHASE2_KONOHA_PLAYER_SURFACES_43110)return;
 
-const PATCH_ID="phase2_konoha_player_surfaces_43110_2026_10_01";
+const PATCH_ID="phase2_konoha_player_surfaces_43110_2026_10_05_active_masters";
 const STYLE_ID="sc-phase2-konoha-player-surfaces-43110";
 const priorSelectable=typeof globalThis.getKonohaSelectableCharacters==="function"?globalThis.getKonohaSelectableCharacters:null;
 const priorExamRender=typeof globalThis.renderKonohaExamVisualScreen==="function"?globalThis.renderKonohaExamVisualScreen:null;
@@ -35,6 +35,9 @@ function ensureStyles(){
   if(typeof document==="undefined"||document.getElementById(STYLE_ID))return;
   const style=document.createElement("style");style.id=STYLE_ID;
   style.textContent=[
+    '#konoha-activity-screen[data-service-id="practical"]{background-image:linear-gradient(rgba(3,7,12,.30),rgba(3,7,12,.30)),url("UI/practical.png") !important;background-size:cover !important;background-position:center !important;background-repeat:no-repeat !important}',
+    '#konoha-activity-screen[data-service-id="exams"]{background-image:linear-gradient(rgba(3,7,12,.30),rgba(3,7,12,.30)),url("UI/exams.png") !important;background-size:cover !important;background-position:center !important;background-repeat:no-repeat !important}',
+    '#konoha-activity-screen[data-service-id="practical"] .alpha-activity-subject,#konoha-activity-screen[data-service-id="practical"] .alpha-activity-workbench,#konoha-activity-screen[data-service-id="exams"] .alpha-activity-subject,#konoha-activity-screen[data-service-id="exams"] .alpha-activity-workbench{background:rgba(5,12,18,.86)}',
     '.alpha-activity-discipline[data-discipline-id]{--sc-discipline-accent:#6bcbd3;--sc-discipline-wash:rgba(82,181,192,.08);border-left:3px solid var(--sc-discipline-accent);background:linear-gradient(90deg,var(--sc-discipline-wash),#08131b 42%)}',
     '.alpha-activity-discipline[data-discipline-id="nin"]{--sc-discipline-accent:#56c8dd;--sc-discipline-wash:rgba(70,173,198,.11)}',
     '.alpha-activity-discipline[data-discipline-id="tai"]{--sc-discipline-accent:#dc805d;--sc-discipline-wash:rgba(192,91,58,.11)}',
@@ -108,6 +111,7 @@ function diagnostics(){
     currentTeamProjection:!team||selectable.every((row,index)=>row&&row.id===team.teamVariantIds[index]),
     noRosterMerge:!team||selectable.length===team.teamVariantIds.length,
     trainingGroundsUntouched:true,
+    approvedActivityMastersBound:true,
     naturalExamCopy:!COPY.exams.subtitle.includes("runtime")&&!COPY.exams.note.includes("resolver"),
     naturalPracticalCopy:!COPY.practical.subtitle.includes("runtime")&&!COPY.practical.note.includes("resolver"),
     sevenDisciplineAccents:true,
