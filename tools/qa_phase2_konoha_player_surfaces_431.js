@@ -28,6 +28,8 @@ async function activitySnapshot(page,service){
   return page.evaluate(service=>{
     const data=service==="practical"?getKonohaPracticalUIScreenData():getKonohaExamUIScreenData();
     const root=document.getElementById("konoha-activity-screen");
+    const stage=root?.querySelector(".alpha-activity-result-stage");
+    const primary=root?.querySelector(".alpha-activity-primary");
     return{
       data:JSON.parse(JSON.stringify(data)),
       selectable:getKonohaSelectableCharacters().map(row=>row.id),
@@ -36,7 +38,9 @@ async function activitySnapshot(page,service){
       subtitle:root?.querySelector(".alpha-activity-header p")?.textContent?.trim()||"",
       noteTitle:root?.querySelector(".alpha-activity-authority-note strong")?.textContent?.trim()||"",
       note:root?.querySelector(".alpha-activity-authority-note span")?.textContent?.trim()||"",
-      disciplineIds:[...(root?.querySelectorAll(".alpha-activity-discipline")||[])].map(node=>node.dataset.disciplineId||null)
+      disciplineIds:[...(root?.querySelectorAll(".alpha-activity-discipline")||[])].map(node=>node.dataset.disciplineId||null),
+      resultStage:stage?{state:stage.dataset.state||null,text:(stage.innerText||"").trim()}:null,
+      primaryTop:primary?primary.getBoundingClientRect().top:null
     };
   },service);
 }
@@ -90,7 +94,24 @@ async function activitySnapshot(page,service){
     assert.strictEqual(practical.noteTitle,"TRAINING RESULTS");
     assert(!/runtime|resolver|authority/i.test(practical.subtitle+" "+practical.note),"developer-facing Practical copy leaked");
     assert.deepStrictEqual(practical.disciplineIds,practical.data.disciplines.map(row=>row.id),"Practical rendered discipline accents do not match available discipline data");
-    await page.screenshot({path:path.join(OUT,"01-practical-current-team.png"),fullPage:true});
+    assert(practical.resultStage&&/RESULT STAGE|TRAINING RESULT/i.test(practical.resultStage.text),"Practical Result Stage missing idle purpose");
+
+    const actionStability=await page.evaluate(()=>{
+      const root=document.getElementById("konoha-activity-screen");
+      const notifications=root.querySelector(".alpha-activity-notifications");
+      const primary=root.querySelector(".alpha-activity-primary");
+      const before=primary.getBoundingClientRect().top;
+      for(let i=0;i<48;i+=1){
+        const row=document.createElement("div");row.className="alpha-activity-notice";
+        row.innerHTML=`<strong>QA ROUTINE ${i+1}</strong><span>Routine bounded history row.</span>`;
+        notifications.appendChild(row);
+      }
+      const after=primary.getBoundingClientRect().top;
+      return{before,after,delta:Math.abs(after-before),scrollHeight:notifications.scrollHeight,clientHeight:notifications.clientHeight};
+    });
+    assert(actionStability.scrollHeight>actionStability.clientHeight,"notification panel did not become internally scrollable under stress");
+    assert(actionStability.delta<=1,"BEGIN Practical action dock moved under notification growth: "+JSON.stringify(actionStability));
+    await page.screenshot({path:path.join(OUT,"01-practical-current-team-stable-dock.png"),fullPage:true});
 
     await page.evaluate(()=>changeKonohaPracticalCharacter(1));
     practical=await activitySnapshot(page,"practical");
@@ -109,7 +130,9 @@ async function activitySnapshot(page,service){
     assert(exams.note.includes("Rank Promotion is earned separately."),"natural Exam Rank distinction missing");
     assert(!/runtime|resolver|authority/i.test(exams.subtitle+" "+exams.note),"developer-facing Exam copy leaked");
     assert.deepStrictEqual(exams.disciplineIds,exams.data.disciplines.map(row=>row.id),"Exam rendered discipline accents do not match available discipline data");
+    assert(exams.resultStage&&/RESULT STAGE|ASSESSMENT RESULT/i.test(exams.resultStage.text),"Exam Result Stage missing idle purpose");
     await page.screenshot({path:path.join(OUT,"02-exams-current-team.png"),fullPage:true});
+
     const accentMap=await page.evaluate(()=>{
       const css=document.getElementById("sc-phase2-konoha-player-surfaces-43110")?.textContent||"";
       const ids=["nin","tai","gen","buki","fuin","kin","stamina"];
@@ -117,14 +140,45 @@ async function activitySnapshot(page,service){
     });
     assert.deepStrictEqual(accentMap,["nin","tai","gen","buki","fuin","kin","stamina"],"Seven-discipline accent map is incomplete");
 
+    const oneMemberCommit=await page.evaluate(()=>commitClanTeamAssignment(
+      ["academy_menma",null,null,null,null,null],
+      {source:"qa43110_one_member",sourceEventId:"qa43110_one_member"}
+    ));
+    assert.strictEqual(oneMemberCommit.success,true,JSON.stringify(oneMemberCommit));
+    await page.evaluate(()=>openKonohaPracticalFromVillage());
+    await page.waitForSelector("#konoha-activity-screen[data-service-id='practical']",{state:"visible",timeout:10000});
+    const oneMemberPractical=await activitySnapshot(page,"practical");
+    assert.deepStrictEqual(oneMemberPractical.selectable,["academy_menma"],"1-member Current Team fell back to broad roster");
+    assert.deepStrictEqual(oneMemberPractical.data.characters.map(row=>row.id),["academy_menma"]);
+    assert(!/Kage Naruto|Jonin Sasuke/i.test(oneMemberPractical.text),"fixture/demo shinobi leaked after 1-member assignment");
+
+    const sixAttempt=await page.evaluate(()=>{
+      const manageable=typeof getClanManageableRosterCharacters==="function"?getClanManageableRosterCharacters():[];
+      const ids=manageable.map(row=>row&&row.id).filter(Boolean).slice(0,6);
+      if(ids.length<6)return{supported:false,ids};
+      const committed=commitClanTeamAssignment(ids,{source:"qa43110_six_member",sourceEventId:"qa43110_six_member"});
+      return{supported:true,ids,committed};
+    });
+    if(sixAttempt.supported){
+      assert.strictEqual(sixAttempt.committed.success,true,JSON.stringify(sixAttempt));
+      await page.evaluate(()=>openKonohaExamFromVillage());
+      await page.waitForSelector("#konoha-activity-screen[data-service-id='exams']",{state:"visible",timeout:10000});
+      const sixExam=await activitySnapshot(page,"exams");
+      assert.deepStrictEqual(sixExam.selectable,sixAttempt.ids,"6-member Current Team projection changed order or fell back");
+      assert.deepStrictEqual(sixExam.data.characters.map(row=>row.id),sixAttempt.ids);
+    }
+
     const diagnostics=await page.evaluate(()=>runPhase2KonohaPlayerSurfaces43110Diagnostics());
     assert.strictEqual(diagnostics.pass,true,JSON.stringify(diagnostics));
     await gate.assertClean("phase2-konoha-player-surfaces");
     console.log(JSON.stringify({
       pass:true,issue:431,
-      currentTeam:["academy_menma","academy_hinata","academy_kakashi"],
+      initialCurrentTeam:["academy_menma","academy_hinata","academy_kakashi"],
+      oneMemberCurrentTeamProven:true,
+      sixMemberCurrentTeamProven:sixAttempt.supported===true,
       practicalUsesCommittedTeam:true,examsUseCommittedTeam:true,
       trainingGroundRosterUntouched:true,developerFixtureLeak:false,
+      resultStagePresent:true,stableActionDock:true,boundedNotificationHistory:true,
       disciplineAccents:true,naturalPlayerCopy:true,browserGoldenClaimed:false
     },null,2));
   }finally{await context.close();await browser.close();}
