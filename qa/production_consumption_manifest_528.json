@@ -80,7 +80,7 @@
       "workflow_path": ".github/workflows/issue-32-chronicle-depth.yml",
       "expected_evidence": {
         "path": "runtime/alpha-runtime-build-fingerprint-303.js",
-        "contains": "chronicle-interaction-depth-32"
+        "contains": "chronicle-interaction-depth-scene-board-32"
       },
       "observable_acceptance": [
         "Quick, Standard and Full render distinct presentation depth without changing semantic Story state",
