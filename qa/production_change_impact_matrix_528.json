@@ -212,6 +212,7 @@
       "id": "active_ui_master_consumption",
       "changed_any": [
         "Documentation/UI/UI Master Asset Classification and Consumption Registry 2026-10-05.md",
+        "runtime/alpha-browser-polish-32700.js",
         "style.css",
         "UI/victory.png",
         "UI/setback.png",
