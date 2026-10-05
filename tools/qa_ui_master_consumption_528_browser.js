@@ -103,8 +103,16 @@ async function openMyClanAndProbe(page){
   await page.evaluate(()=>openOverlay("clan"));
   await page.waitForSelector(".my-clan-stage",{state:"visible",timeout:10000});
   await page.waitForFunction(()=>typeof CLAN_UI_STATE!=="undefined"&&CLAN_UI_STATE.viewMode==="browse",null,{timeout:8000});
-  const browse=await assetProbe(page,"UI/my_clan_browse.png");
-  await page.locator("#overlay-content-container").screenshot({path:path.join(OUT,"01-my-clan-browse.png")});
+  const browse=await page.evaluate(()=>{
+    const stage=document.querySelector(".my-clan-stage");
+    const diagnostic=typeof runAlphaBrowserPolish32700Diagnostics==="function"?runAlphaBrowserPolish32700Diagnostics():null;
+    return{backgroundImage:getComputedStyle(stage).backgroundImage,diagnostic};
+  });
+  assert(!/my_clan_browse\.png|my_clan_inspection\.png/i.test(browse.backgroundImage),"My Clan browse still consumes literal reference master: "+JSON.stringify(browse));
+  assert.strictEqual(browse.diagnostic?.checks?.myClanCodeFirst,true,JSON.stringify(browse.diagnostic));
+  assert.strictEqual(browse.diagnostic?.checks?.myClanLiteralMasterNotRequired,true,JSON.stringify(browse.diagnostic));
+  await page.locator("#overlay-content-container").screenshot({path:path.join(OUT,"01-my-clan-code-first-browse.png")});
+
   const selected=await page.evaluate(()=>{
     const team=getChronicleCurrentTeam43600?.();
     const id=team?.teamVariantIds?.[0]||"academy_menma";
@@ -112,8 +120,17 @@ async function openMyClanAndProbe(page){
   });
   assert.strictEqual(selected?.success,true,JSON.stringify(selected));
   await page.waitForFunction(()=>CLAN_UI_STATE.viewMode==="inspection",null,{timeout:8000});
-  const inspection=await assetProbe(page,"UI/my_clan_inspection.png");
-  await page.locator("#overlay-content-container").screenshot({path:path.join(OUT,"02-my-clan-inspection.png")});
+  await page.waitForSelector(".my-clan-inspection-panel",{state:"visible",timeout:8000});
+  const inspection=await page.evaluate(()=>{
+    const stage=document.querySelector(".my-clan-stage");
+    const panel=document.querySelector(".my-clan-inspection-panel");
+    const rect=panel.getBoundingClientRect();
+    return{backgroundImage:getComputedStyle(stage).backgroundImage,width:rect.width,height:rect.height,text:(panel.innerText||"").trim()};
+  });
+  assert(!/my_clan_browse\.png|my_clan_inspection\.png/i.test(inspection.backgroundImage),"My Clan inspection still consumes literal reference master: "+JSON.stringify(inspection));
+  assert(inspection.width>=320&&inspection.height>=360,"Selected Shinobi inspector is not large enough for readable inspection: "+JSON.stringify(inspection));
+  assert(inspection.text.length>20,"Selected Shinobi inspector rendered no meaningful text");
+  await page.locator("#overlay-content-container").screenshot({path:path.join(OUT,"02-my-clan-code-first-inspection.png")});
   return{browse,inspection};
 }
 
@@ -216,12 +233,16 @@ async function openVictoryAndProbe(page){
       pass:true,
       issue:528,
       activeProductionMasters:{
-        myClanBrowse:clan.browse.visible,
-        myClanInspection:clan.inspection.visible,
         practical:activities.practical.visible,
         exams:activities.exams.visible,
         victory:victory.victory.visible,
         setback:setback.setback.visible
+      },
+      referenceCompositionMasters:{
+        myClanBrowseLiteral:false,
+        myClanInspectionLiteral:false,
+        myClanCodeFirst:true,
+        inspectorReadable:clan.inspection.width>=320&&clan.inspection.height>=360
       },
       referenceCompositionConvoNotLiteral:true,
       queuedLoadoutNotSilentlyPromoted:true,
