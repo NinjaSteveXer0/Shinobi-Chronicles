@@ -1,0 +1,46 @@
+name: Issue 545 Durable Object Provenance
+
+on:
+  push:
+    branches:
+      - coding/provenance-foundation-545
+    paths:
+      - 'runtime/alpha-phase2-inventory-core-46100.js'
+      - 'tools/qa_durable_object_provenance_545.js'
+      - 'runtime/alpha-kakashi-v2-rewards-36015.js'
+      - 'runtime/alpha-runtime-build-fingerprint-303.js'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
+      - 'qa/production_change_impact_matrix_528.json'
+      - '.github/workflows/issue-545-durable-object-provenance.yml'
+  pull_request:
+    paths:
+      - 'runtime/alpha-phase2-inventory-core-46100.js'
+      - 'tools/qa_durable_object_provenance_545.js'
+      - 'runtime/alpha-kakashi-v2-rewards-36015.js'
+      - 'runtime/alpha-runtime-build-fingerprint-303.js'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
+      - 'qa/production_change_impact_matrix_528.json'
+      - '.github/workflows/issue-545-durable-object-provenance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  durable-object-provenance:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Runtime source syntax
+        run: node --check runtime/alpha-phase2-inventory-core-46100.js
+      - name: Durable object provenance contract
+        run: node tools/qa_durable_object_provenance_545.js
+      - name: Existing Inventory static regression
+        run: node tools/qa_phase2_inventory_core_461.js
+      - name: Runtime ownership safety
+        run: node tools/qa_runtime_ownership_safety_300.js
+      - name: Save compatibility
+        run: node tools/qa_save_compatibility_311.js
