@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "buildId": "SC-ALPHA-RUNTIME-R303-2026-10-05-EB",
-  "sourceBaselineCommit": "f84eade945786eb2b30c7d1296ebe86d5a338238",
+  "buildId": "SC-ALPHA-RUNTIME-R303-2026-10-05-EC",
+  "sourceBaselineCommit": "3316b02d3dda5b4bd4efd980b1235dc8f1a6acf8",
   "sourceRef": "issue-303-runtime-build-fingerprint-v1",
-  "runtimeGeneration": "chronicle-interaction-depth-32",
+  "runtimeGeneration": "production-conformance-my-clan-master-528",
   "majorRuntimeFeatures": [
     "academy-kakashi-v2",
     "runtime-ownership-safety-300",
@@ -83,7 +83,8 @@
     "current-team-exact-owned-lineage-532",
     "chronicle-protagonist-team-separation-532",
     "person-name-card-title-rank-separation-532",
-    "chronicle-interaction-depth-scene-board-32"
+    "chronicle-interaction-depth-scene-board-32",
+    "my-clan-active-master-consumption-526-528"
   ],
   "productionLoader": "index.html",
   "runtimeModule": "runtime/alpha-runtime-build-fingerprint-303.js",
