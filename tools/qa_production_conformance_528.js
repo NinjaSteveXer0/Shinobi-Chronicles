@@ -260,7 +260,6 @@ function runLanes(matrix,laneIds){
       if(result.status!==0){record.status="BROKEN";pass=false;break;}
     }
     ledger.push(record);
-    if(!pass)break;
   }
   return{pass,ledger};
 }
@@ -352,6 +351,6 @@ function main(){
 
 module.exports={
   STATE_ENUM,LIFECYCLE_STAGE_ORDER,LIFECYCLE_STAGE_ENUM,REQUIRED_BROWSER_CANARIES,
-  globRegex,matches,validateManifestAndMatrix,validateLedger,evaluateRowStates,buildPlan,isProductionRelevant,computeEvidenceFreshness
+  globRegex,matches,validateManifestAndMatrix,validateLedger,evaluateRowStates,buildPlan,isProductionRelevant,computeEvidenceFreshness,runLanes
 };
 if(require.main===module)main();
