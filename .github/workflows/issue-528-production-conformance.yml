@@ -7,9 +7,9 @@ on:
   push:
     branches:
       - main
-      - coding/regression-firewall-528
+      - 'coding/regression-firewall-528*'
   schedule:
-    - cron: '17 3 * * 1,4'
+    - cron: '17 3 * * *'
   workflow_dispatch:
 
 permissions:
@@ -57,9 +57,19 @@ jobs:
         run: |
           node --check tools/qa_production_conformance_528.js
           node --check tools/qa_production_conformance_528_selftest.js
+          node --check tools/qa_queued_activation_528.js
+          node --check tools/qa_ui_master_consumption_528_browser.js
 
-      - name: Firewall schema and state-model self-test
+      - name: Firewall schema, lifecycle and ledger self-test
         run: node tools/qa_production_conformance_528_selftest.js
+
+      - name: Audit queued activation predicates
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p artifacts/issue-528-production-conformance
+          node tools/qa_queued_activation_528.js \
+            --json-out=artifacts/issue-528-production-conformance/queue-activation.json
 
       - name: Plan selective conformance lanes
         run: |
@@ -103,7 +113,7 @@ jobs:
             --execute \
             --json-out=artifacts/issue-528-production-conformance/ledger.json
 
-      - name: Upload conformance plan and browser-canary ledger
+      - name: Upload conformance reports and browser-canary evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -113,5 +123,7 @@ jobs:
             artifacts/issue-32-chronicle-depth
             artifacts/phase2-ce-hotspot-469
             artifacts/phase2-team-assignment-532
+            artifacts/phase2-konoha-player-surfaces
+            artifacts/issue-528-ui-master-consumption
             issue528-server.log
           if-no-files-found: ignore
