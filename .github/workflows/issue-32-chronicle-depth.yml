@@ -1,0 +1,36 @@
+name: Issue 32 Chronicle Interaction Depth
+
+on:
+  push:
+    branches:
+      - coding/chronicle-depth-32
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  chronicle-depth:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Trace live Chronicle depth authority
+        run: |
+          echo '=== DEPTH SYMBOLS ==='
+          grep -RInE 'presentationDepth|chroniclePresentationDepth|getActiveChronicleInteractionDepth|interactionDepth|depthsById|pickDepth|buildInteractionScene' game.js runtime tools Documentation || true
+          echo '=== SCENE BOARD OPEN/CALL SITES ==='
+          grep -RInE 'SC_ALPHA_STORY_SCENE_BOARD_33900|openScene\(|alpha-story-scene-board-33900' game.js runtime tools | head -n 500 || true
+          echo '=== DEPTH LABELS / PREFERENCES ==='
+          grep -RInE '(^|[^A-Za-z])(Quick|Standard|Full)([^A-Za-z]|$)|chronicle.*depth|depth.*chronicle' game.js runtime tools Documentation | head -n 800 || true
+
+      - name: Source syntax
+        run: |
+          node --check game.js
+          node --check runtime/alpha-story-scene-board-33900.js
