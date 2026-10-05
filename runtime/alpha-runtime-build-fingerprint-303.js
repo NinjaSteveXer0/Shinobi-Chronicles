@@ -16,10 +16,10 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-05-EA",
-    sourceBaselineCommit:"33cf485dff3bc70856ea15f1062d3b39066dd2c5",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-05-EB",
+    sourceBaselineCommit:"f84eade945786eb2b30c7d1296ebe86d5a338238",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
-    runtimeGeneration:"phase2-deliberate-team-assignment-532",
+    runtimeGeneration:"chronicle-interaction-depth-32",
     majorRuntimeFeatures:Object.freeze([
       "academy-kakashi-v2",
       "runtime-ownership-safety-300",
@@ -98,7 +98,8 @@
       "phase2-deliberate-team-assignment-532",
       "current-team-exact-owned-lineage-532",
       "chronicle-protagonist-team-separation-532",
-      "person-name-card-title-rank-separation-532"
+      "person-name-card-title-rank-separation-532",
+      "chronicle-interaction-depth-scene-board-32"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -131,10 +132,10 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-05-EA",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-05-EB",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
-      generationPresent:first.runtimeGeneration==="phase2-deliberate-team-assignment-532",
+      generationPresent:first.runtimeGeneration==="chronicle-interaction-depth-32",
       repaired469FeaturePresent:first.majorRuntimeFeatures.includes("phase2-first-live-ce-hotspot-469"),
       privateHistory478FeaturePresent:first.majorRuntimeFeatures.includes("phase2-private-origin-live-ce-hotspot-478"),
       ownerRetestPresentationFeaturePresent:first.majorRuntimeFeatures.includes("story-scene-board-owner-retest-469"),
@@ -163,6 +164,7 @@
       exactOwnedLineage532Present:first.majorRuntimeFeatures.includes("current-team-exact-owned-lineage-532"),
       protagonistSeparation532Present:first.majorRuntimeFeatures.includes("chronicle-protagonist-team-separation-532"),
       personNameSeparation532Present:first.majorRuntimeFeatures.includes("person-name-card-title-rank-separation-532"),
+      chronicleInteractionDepth32Present:first.majorRuntimeFeatures.includes("chronicle-interaction-depth-scene-board-32"),
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)
