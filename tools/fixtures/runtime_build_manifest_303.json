@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "buildId": "SC-ALPHA-RUNTIME-R303-2026-10-05-EA",
-  "sourceBaselineCommit": "33cf485dff3bc70856ea15f1062d3b39066dd2c5",
+  "buildId": "SC-ALPHA-RUNTIME-R303-2026-10-05-EB",
+  "sourceBaselineCommit": "f84eade945786eb2b30c7d1296ebe86d5a338238",
   "sourceRef": "issue-303-runtime-build-fingerprint-v1",
-  "runtimeGeneration": "phase2-deliberate-team-assignment-532",
+  "runtimeGeneration": "chronicle-interaction-depth-32",
   "majorRuntimeFeatures": [
     "academy-kakashi-v2",
     "runtime-ownership-safety-300",
@@ -82,7 +82,8 @@
     "phase2-deliberate-team-assignment-532",
     "current-team-exact-owned-lineage-532",
     "chronicle-protagonist-team-separation-532",
-    "person-name-card-title-rank-separation-532"
+    "person-name-card-title-rank-separation-532",
+    "chronicle-interaction-depth-scene-board-32"
   ],
   "productionLoader": "index.html",
   "runtimeModule": "runtime/alpha-runtime-build-fingerprint-303.js",

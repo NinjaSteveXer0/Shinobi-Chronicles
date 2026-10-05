@@ -199,7 +199,7 @@ async function semanticFingerprint(page){
     assert.strictEqual(diagnostics.pass,true,JSON.stringify(diagnostics));
 
     await page.screenshot({path:path.join(OUT,"final-region-after-nonhud-control.png"),fullPage:true});
-    gate.assertClean();
+    await gate.assertClean("issue-506-hud-my-clan-return");
 
     console.log(JSON.stringify({
       pass:true,
