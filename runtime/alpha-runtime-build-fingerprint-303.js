@@ -16,10 +16,10 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-05-EC",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-05-ED",
     sourceBaselineCommit:"3316b02d3dda5b4bd4efd980b1235dc8f1a6acf8",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
-    runtimeGeneration:"production-conformance-my-clan-master-528",
+    runtimeGeneration:"production-conformance-active-ui-masters-528",
     majorRuntimeFeatures:Object.freeze([
       "academy-kakashi-v2",
       "runtime-ownership-safety-300",
@@ -100,7 +100,8 @@
       "chronicle-protagonist-team-separation-532",
       "person-name-card-title-rank-separation-532",
       "chronicle-interaction-depth-scene-board-32",
-      "my-clan-active-master-consumption-526-528"
+      "my-clan-active-master-consumption-526-528",
+      "konoha-activity-active-master-consumption-431-526-528"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -133,10 +134,10 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-05-EC",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-05-ED",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
-      generationPresent:first.runtimeGeneration==="production-conformance-my-clan-master-528",
+      generationPresent:first.runtimeGeneration==="production-conformance-active-ui-masters-528",
       repaired469FeaturePresent:first.majorRuntimeFeatures.includes("phase2-first-live-ce-hotspot-469"),
       privateHistory478FeaturePresent:first.majorRuntimeFeatures.includes("phase2-private-origin-live-ce-hotspot-478"),
       ownerRetestPresentationFeaturePresent:first.majorRuntimeFeatures.includes("story-scene-board-owner-retest-469"),
@@ -167,6 +168,7 @@
       personNameSeparation532Present:first.majorRuntimeFeatures.includes("person-name-card-title-rank-separation-532"),
       chronicleInteractionDepth32Present:first.majorRuntimeFeatures.includes("chronicle-interaction-depth-scene-board-32"),
       myClanActiveMaster526528Present:first.majorRuntimeFeatures.includes("my-clan-active-master-consumption-526-528"),
+      konohaActivityActiveMaster431526528Present:first.majorRuntimeFeatures.includes("konoha-activity-active-master-consumption-431-526-528"),
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)
