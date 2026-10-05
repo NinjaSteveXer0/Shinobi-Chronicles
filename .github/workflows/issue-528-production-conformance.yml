@@ -1,0 +1,117 @@
+name: Issue 528 Production Conformance Firewall
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+      - coding/regression-firewall-528
+  schedule:
+    - cron: '17 3 * * 1,4'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  production-conformance:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Resolve conformance mode and diff boundary
+        id: context
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "schedule" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "mode=scheduled" >> "$GITHUB_OUTPUT"
+            echo "base=" >> "$GITHUB_OUTPUT"
+            echo "head=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "mode=pr" >> "$GITHUB_OUTPUT"
+            echo "base=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_OUTPUT"
+            echo "head=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "mode=main" >> "$GITHUB_OUTPUT"
+            echo "base=${{ github.event.before }}" >> "$GITHUB_OUTPUT"
+            echo "head=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "mode=pr" >> "$GITHUB_OUTPUT"
+            echo "base=${{ github.event.before }}" >> "$GITHUB_OUTPUT"
+            echo "head=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Source syntax
+        run: |
+          node --check tools/qa_production_conformance_528.js
+          node --check tools/qa_production_conformance_528_selftest.js
+
+      - name: Firewall schema and state-model self-test
+        run: node tools/qa_production_conformance_528_selftest.js
+
+      - name: Plan selective conformance lanes
+        run: |
+          mkdir -p artifacts/issue-528-production-conformance
+          node tools/qa_production_conformance_528.js \
+            --mode=${{ steps.context.outputs.mode }} \
+            --base=${{ steps.context.outputs.base }} \
+            --head=${{ steps.context.outputs.head }} \
+            --plan-only \
+            --json-out=artifacts/issue-528-production-conformance/plan.json
+
+      - name: Read browser requirement
+        id: plan
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const report=JSON.parse(fs.readFileSync('artifacts/issue-528-production-conformance/plan.json','utf8'));
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'browser_required='+String(report.plan.browserRequired)+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'lane_count='+String(report.plan.laneIds.length)+'\n');
+          NODE
+
+      - name: Install Playwright Chromium only when selected
+        if: steps.plan.outputs.browser_required == 'true'
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server only for browser lanes
+        if: steps.plan.outputs.browser_required == 'true'
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > issue528-server.log 2>&1 &
+          echo $! > issue528-server.pid
+          sleep 2
+
+      - name: Execute selective production conformance
+        run: |
+          node tools/qa_production_conformance_528.js \
+            --mode=${{ steps.context.outputs.mode }} \
+            --base=${{ steps.context.outputs.base }} \
+            --head=${{ steps.context.outputs.head }} \
+            --execute \
+            --json-out=artifacts/issue-528-production-conformance/ledger.json
+
+      - name: Upload conformance plan and browser-canary ledger
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-528-production-conformance
+          path: |
+            artifacts/issue-528-production-conformance
+            artifacts/issue-32-chronicle-depth
+            artifacts/phase2-ce-hotspot-469
+            artifacts/phase2-team-assignment-532
+            issue528-server.log
+          if-no-files-found: ignore
