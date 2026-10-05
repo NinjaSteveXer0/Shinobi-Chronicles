@@ -71,7 +71,7 @@ jobs:
         run: node tools/qa_issue_32_chronicle_depth_browser.js
 
       - name: Existing shared Scene Board browser regression
-        run: node tools/qa_obito_story_presentation_browser.js
+        run: xvfb-run -a node tools/qa_obito_story_presentation_browser.js
 
       - name: Existing Story to Battle to Story browser regression
         run: xvfb-run -a node tools/qa_issue_312_browser.js
