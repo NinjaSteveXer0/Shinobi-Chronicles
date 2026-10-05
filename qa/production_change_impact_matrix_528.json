@@ -31,6 +31,11 @@
       "commands": ["node tools/qa_issue_32_chronicle_depth_browser.js"],
       "scheduled_representative": true
     },
+    "issue431_browser": {
+      "kind": "browser",
+      "commands": ["node tools/qa_phase2_konoha_player_surfaces_431.js"],
+      "scheduled_representative": false
+    },
     "issue461_static": {
       "kind": "static",
       "commands": ["node tools/qa_phase2_inventory_core_461.js"],
@@ -90,6 +95,19 @@
       "kind": "browser",
       "commands": ["node tools/qa_phase2_team_assignment_532_browser.js"],
       "scheduled_representative": true
+    },
+    "promotion_static": {
+      "kind": "static",
+      "commands": [
+        "node tools/qa_issue_141_traversal_runtime.js",
+        "node tools/qa_issue_63_genin_v2_runtime.js"
+      ],
+      "scheduled_representative": false
+    },
+    "ui_master_browser": {
+      "kind": "browser",
+      "commands": ["node tools/qa_ui_master_consumption_528_browser.js"],
+      "scheduled_representative": true
     }
   },
   "rules": [
@@ -98,8 +116,11 @@
       "changed_any": [
         "qa/production_consumption_manifest_528.json",
         "qa/production_change_impact_matrix_528.json",
+        "qa/production_browser_canary_ledger_528.json",
         "tools/qa_production_conformance_528.js",
         "tools/qa_production_conformance_528_selftest.js",
+        "tools/qa_queued_activation_528.js",
+        "tools/qa_ui_master_consumption_528_browser.js",
         ".github/workflows/issue-528-production-conformance.yml"
       ],
       "affected_consumers": [
@@ -109,22 +130,30 @@
         "live_hud_499",
         "basic_item_shop_517",
         "character_card_shop_524",
-        "deliberate_team_assignment_532"
+        "deliberate_team_assignment_532",
+        "konoha_activity_surfaces_431",
+        "victory_setback_results_141",
+        "ui_active_masters_526",
+        "promotion_transition_141_63",
+        "frozen_origin_shared_runtime"
       ],
       "required_lane_ids": [
         "runtime_fingerprint",
         "ownership_safety",
         "save_compatibility",
         "issue32_static",
+        "issue431_browser",
         "issue461_static",
         "issue469_static",
         "issue499_static",
         "issue517_static",
         "issue524_static",
         "issue532_static",
+        "promotion_static",
         "issue32_browser",
         "issue469_browser",
-        "issue532_browser"
+        "issue532_browser",
+        "ui_master_browser"
       ]
     },
     {
@@ -139,7 +168,8 @@
         "live_hud_499",
         "basic_item_shop_517",
         "character_card_shop_524",
-        "deliberate_team_assignment_532"
+        "deliberate_team_assignment_532",
+        "frozen_origin_shared_runtime"
       ],
       "required_lane_ids": ["runtime_fingerprint", "ownership_safety", "save_compatibility"]
     },
@@ -155,7 +185,9 @@
         "live_hud_499",
         "basic_item_shop_517",
         "character_card_shop_524",
-        "deliberate_team_assignment_532"
+        "deliberate_team_assignment_532",
+        "promotion_transition_141_63",
+        "frozen_origin_shared_runtime"
       ],
       "required_lane_ids": ["ownership_safety", "save_compatibility"]
     },
@@ -165,14 +197,87 @@
       "affected_consumers": [
         "first_live_ce_hotspot_469",
         "live_hud_499",
-        "deliberate_team_assignment_532"
+        "deliberate_team_assignment_532",
+        "konoha_activity_surfaces_431"
       ],
       "required_lane_ids": [
         "issue469_static",
         "issue499_static",
         "issue532_static",
-        "issue532_browser"
+        "issue532_browser",
+        "issue431_browser"
       ]
+    },
+    {
+      "id": "active_ui_master_consumption",
+      "changed_any": [
+        "Documentation/UI/UI Master Asset Classification and Consumption Registry 2026-10-05.md",
+        "style.css",
+        "UI/victory.png",
+        "UI/setback.png",
+        "UI/exams.png",
+        "UI/practical.png",
+        "UI/my_clan_browse.png",
+        "UI/my_clan_inspection.png"
+      ],
+      "affected_consumers": [
+        "ui_active_masters_526",
+        "victory_setback_results_141",
+        "konoha_activity_surfaces_431"
+      ],
+      "required_lane_ids": ["ui_master_browser", "issue431_browser"]
+    },
+    {
+      "id": "chronicle_reference_master",
+      "changed_any": [
+        "Documentation/UI/UI Master Asset Classification and Consumption Registry 2026-10-05.md",
+        "UI/convo.png"
+      ],
+      "affected_consumers": ["chronicle_interaction_depth_32"],
+      "required_lane_ids": ["issue32_static", "issue32_browser"]
+    },
+    {
+      "id": "battle_result_presentation",
+      "changed_any": [
+        "runtime/alpha-alpha-sprint-33100.js",
+        "UI/victory.png",
+        "UI/setback.png",
+        "tools/qa_ui_master_consumption_528_browser.js"
+      ],
+      "affected_consumers": [
+        "victory_setback_results_141",
+        "ui_active_masters_526",
+        "frozen_origin_shared_runtime"
+      ],
+      "required_lane_ids": ["ui_master_browser", "issue32_static", "save_compatibility"]
+    },
+    {
+      "id": "konoha_activity_presentation",
+      "changed_any": [
+        "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
+        "tools/qa_phase2_konoha_player_surfaces_431.js",
+        "UI/practical.png",
+        "UI/exams.png"
+      ],
+      "affected_consumers": [
+        "konoha_activity_surfaces_431",
+        "ui_active_masters_526"
+      ],
+      "required_lane_ids": ["issue431_browser", "ui_master_browser"]
+    },
+    {
+      "id": "promotion_transition_contract",
+      "changed_any": [
+        "runtime/alpha-genin-roster-63.js",
+        "runtime/alpha-traversal-bridge-33200.js",
+        "tools/qa_issue_141_traversal_runtime.js",
+        "tools/qa_issue_63_genin_v2_runtime.js"
+      ],
+      "affected_consumers": [
+        "promotion_transition_141_63",
+        "frozen_origin_shared_runtime"
+      ],
+      "required_lane_ids": ["promotion_static", "save_compatibility"]
     },
     {
       "id": "production_loader_surface",
@@ -181,15 +286,24 @@
         "inventory_core_461",
         "live_hud_499",
         "basic_item_shop_517",
-        "character_card_shop_524"
+        "character_card_shop_524",
+        "konoha_activity_surfaces_431",
+        "victory_setback_results_141",
+        "ui_active_masters_526",
+        "promotion_transition_141_63",
+        "frozen_origin_shared_runtime"
       ],
       "required_lane_ids": [
+        "runtime_fingerprint",
         "issue461_static",
         "issue499_static",
         "issue517_static",
         "issue524_static",
+        "promotion_static",
         "issue499_browser",
-        "issue524_browser"
+        "issue524_browser",
+        "issue431_browser",
+        "ui_master_browser"
       ]
     },
     {
@@ -202,7 +316,10 @@
         "live_hud_499",
         "basic_item_shop_517",
         "character_card_shop_524",
-        "deliberate_team_assignment_532"
+        "deliberate_team_assignment_532",
+        "ui_active_masters_526",
+        "promotion_transition_141_63",
+        "frozen_origin_shared_runtime"
       ],
       "required_lane_ids": [
         "runtime_fingerprint",
@@ -215,8 +332,10 @@
         "issue517_static",
         "issue524_static",
         "issue532_static",
+        "promotion_static",
         "issue32_browser",
-        "issue532_browser"
+        "issue532_browser",
+        "ui_master_browser"
       ]
     }
   ]
