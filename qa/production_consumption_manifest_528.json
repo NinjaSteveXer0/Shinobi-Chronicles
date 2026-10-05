@@ -322,7 +322,7 @@
       "id": "konoha_activity_surfaces_431",
       "surface_family": "Konoha / Practical + Exams",
       "authority_kind": "phase2_player_surface_contract",
-      "authority_ref": ["#431", "#436", "#526"],
+      "authority_ref": ["#431", "#436", "#526", "#541"],
       "production_disposition": "IMPLEMENT_NOW",
       "lifecycle_stage": "OBSERVED",
       "consumer_paths": [
@@ -342,7 +342,8 @@
       },
       "observable_acceptance": [
         "Practical visibly consumes UI/practical.png while preserving code-owned team/discipline truth",
-        "Exams visibly consumes UI/exams.png while preserving code-owned team/discipline truth"
+        "Exams visibly consumes UI/exams.png while preserving code-owned team/discipline truth",
+        "valid committed Current Team sizes 1 through 6 are projected in exact order without broad-roster fallback leakage"
       ],
       "owner": "CODING / RUNTIME",
       "status": "CURRENT",
@@ -396,43 +397,41 @@
     },
     {
       "id": "ui_active_masters_526",
-      "surface_family": "UI / Active Production Masters",
-      "authority_kind": "ui_master_classification_registry",
-      "authority_ref": ["#526", "#529"],
+      "surface_family": "UI / Active Production Masters + My Clan Reference Composition",
+      "authority_kind": "ui_master_classification_registry_with_owner_correction",
+      "authority_ref": ["#526", "#529", "#541"],
       "production_disposition": "IMPLEMENT_NOW",
       "lifecycle_stage": "OBSERVED",
       "presentation_assets": [
         "UI/victory.png",
         "UI/setback.png",
         "UI/exams.png",
-        "UI/practical.png",
-        "UI/my_clan_browse.png",
-        "UI/my_clan_inspection.png"
+        "UI/practical.png"
       ],
       "consumer_paths": [
-        "game.js",
         "style.css",
         "runtime/alpha-alpha-sprint-33100.js",
         "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
+        "runtime/alpha-browser-polish-32700.js",
         "UI/victory.png",
         "UI/setback.png",
         "UI/exams.png",
-        "UI/practical.png",
-        "UI/my_clan_browse.png",
-        "UI/my_clan_inspection.png"
+        "UI/practical.png"
       ],
       "qa_paths": ["tools/qa_ui_master_consumption_528_browser.js"],
       "workflow_path": ".github/workflows/issue-528-production-conformance.yml",
       "expected_evidence": {
         "path": "tools/qa_ui_master_consumption_528_browser.js",
-        "contains": "activeProductionMasters"
+        "contains": "referenceCompositionMasters"
       },
       "observable_acceptance": [
-        "all six ACTIVE PRODUCTION MASTER assets load and are visibly effective on their intended surfaces",
+        "all four ACTIVE PRODUCTION MASTER assets load and are visibly effective on their intended surfaces",
+        "My Clan Browse and Selected Shinobi Inspection remain code-first and do not require UI/my_clan_browse.png or UI/my_clan_inspection.png as literal backgrounds",
         "REFERENCE / COMPOSITION UI/convo.png is not forced into literal Story rendering",
         "QUEUED UI/loadout.png is not silently promoted to production"
       ],
       "known_debt": [
+        "Stephen's #541 owner correction supersedes the earlier literal My Clan master-consumption expectation; the two My Clan PNGs remain repository reference/composition material.",
         "Automated observable proof does not substitute for Stephen's subjective visual/taste Golden acceptance."
       ],
       "owner": "CODING / RUNTIME",
@@ -440,15 +439,15 @@
       "invalidation_rule": {
         "match_any": [
           "Documentation/UI/UI Master Asset Classification and Consumption Registry 2026-10-05.md",
+          "Documentation/Coordination/Issue_541_Owner_UI_Correction_2026-10-05.md",
           "style.css",
           "runtime/alpha-alpha-sprint-33100.js",
           "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
+          "runtime/alpha-browser-polish-32700.js",
           "UI/victory.png",
           "UI/setback.png",
           "UI/exams.png",
           "UI/practical.png",
-          "UI/my_clan_browse.png",
-          "UI/my_clan_inspection.png",
           "tools/qa_ui_master_consumption_528_browser.js"
         ],
         "required_lane_ids": ["ui_master_browser"]

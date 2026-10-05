@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "buildId": "SC-ALPHA-RUNTIME-R303-2026-10-05-ED",
-  "sourceBaselineCommit": "3316b02d3dda5b4bd4efd980b1235dc8f1a6acf8",
+  "buildId": "SC-ALPHA-RUNTIME-R303-2026-10-05-EE",
+  "sourceBaselineCommit": "3e9fbc714ebff8e775321d8fcacc0fbc195d03ec",
   "sourceRef": "issue-303-runtime-build-fingerprint-v1",
-  "runtimeGeneration": "production-conformance-active-ui-masters-528",
+  "runtimeGeneration": "owner-ui-correction-current-team-code-first-my-clan-541",
   "majorRuntimeFeatures": [
     "academy-kakashi-v2",
     "runtime-ownership-safety-300",
@@ -84,7 +84,9 @@
     "chronicle-protagonist-team-separation-532",
     "person-name-card-title-rank-separation-532",
     "chronicle-interaction-depth-scene-board-32",
-    "my-clan-active-master-consumption-526-528",
+    "my-clan-code-first-inspector-541",
+    "konoha-activity-current-team-1-6-541",
+    "konoha-activity-result-stage-stable-dock-453-541",
     "konoha-activity-active-master-consumption-431-526-528"
   ],
   "productionLoader": "index.html",

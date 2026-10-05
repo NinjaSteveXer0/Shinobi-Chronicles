@@ -8,14 +8,14 @@
 // - Battle PL numerals are optically centered inside the radial;
 // - Combat Feed gets a small positioning refinement;
 // - My Clan keeps drag/drop + inspection, but removes click-to-assign highlight;
-// - #528 restores the binding #526 Browse / Inspection production-master layer
-//   without moving any roster, formation, ownership or save semantics into art.
-// No Battle resolver, ownership, roster, or World semantic subsystem is replaced.
+// - #541 restores My Clan to a code-owned live surface; the #526 bitmap masters
+//   remain reference/composition evidence rather than literal runtime backgrounds.
+// No Battle resolver, ownership, roster, assignment, or World semantic subsystem is replaced.
 // ============================================================================
 (function installAlphaBrowserPolish32700(){
   "use strict";
 
-  const PATCH_ID="alpha_browser_polish_32700_2026_10_05_my_clan_master_restore";
+  const PATCH_ID="alpha_browser_polish_32700_2026_10_05_my_clan_code_first_541";
 
   function activateBattlePreparedSkillCard(skillId){
     const selected=selectBattlePreparedSkill(skillId);
@@ -172,21 +172,34 @@
       .alpha-code-battle-stage .battle-live-skill-details-actions{justify-content:flex-end!important}
       .alpha-code-battle-stage .battle-live-cancel-skill{min-width:132px!important}
 
-      /* #526 / #528 — approved My Clan masters are composition, never state. */
-      .my-clan-stage{
-        background-color:#050b10!important;
-        background-image:url('UI/my_clan_browse.png')!important;
-        background-repeat:no-repeat!important;
-        background-position:center!important;
-        background-size:100% 100%!important;
+      /* #541 — My Clan is code-owned again. Reference masters remain non-semantic repository evidence. */
+      .my-clan-stage,.my-clan-stage.is-master-art-on,.my-clan-stage:has(.my-clan-inspection-panel){
+        background-image:none!important;
+        background:radial-gradient(circle at 48% 18%,rgba(34,78,90,.28),transparent 38%),linear-gradient(180deg,#09131a 0%,#050b10 52%,#071017 100%)!important;
+        border:1px solid rgba(183,145,65,.34)!important;
       }
-      .my-clan-stage:has(.my-clan-inspection-panel){
-        background-image:url('UI/my_clan_inspection.png')!important;
-      }
-
+      .my-clan-fallback-title{display:flex!important;left:3.8%!important;top:2.8%!important}
+      .my-clan-runtime-owned-count{background:rgba(5,11,15,.92)!important}
+      .my-clan-formation{left:3.8%!important;top:10.2%!important;width:82.4%!important;height:25%!important;padding:.8%!important;border:1px solid rgba(177,142,65,.28)!important;background:rgba(5,11,15,.48)!important}
+      .my-clan-formation-slot{border:1px solid rgba(148,131,88,.22)!important;border-radius:4px!important;background:rgba(6,15,20,.28)!important}
+      .my-clan-slot-fallback-label{display:block!important}
+      .my-clan-formation-actions .my-clan-clear span,.my-clan-formation-actions .my-clan-save span{opacity:1!important}
+      .my-clan-rail-hit{color:#aebabc!important}
+      .my-clan-rail-hit span{opacity:1!important;font-size:clamp(7px,.58vw,10px)!important}
+      .my-clan-runtime-toolbar{left:18.5%!important;top:34.0%!important;width:61.5%!important}
+      .my-clan-runtime-toolbar .my-clan-search,.my-clan-runtime-toolbar .my-clan-select,.my-clan-runtime-toolbar .my-clan-filter-trigger{border:1px solid rgba(111,139,146,.48)!important;background:rgba(6,13,18,.82)!important;color:#cbd6d6!important;box-shadow:none!important}
+      .my-clan-roster-workspace{left:12.5%!important;top:40.2%!important;width:80.3%!important;height:53%!important;border:1px solid rgba(177,142,65,.22)!important;background:rgba(4,10,14,.38)!important}
+      .my-clan-adaptive-screen.is-inspection .my-clan-roster-workspace{width:49.5%!important}
+      .my-clan-inspection-panel{left:63.2%!important;top:39.0%!important;width:33.8%!important;height:54.5%!important;padding:1.1%!important;overflow:hidden!important;border:1px solid rgba(188,150,68,.44)!important;background:linear-gradient(180deg,rgba(7,15,20,.98),rgba(4,10,14,.96))!important;box-shadow:0 18px 40px rgba(0,0,0,.34)!important}
+      .my-clan-identity-values span{opacity:1!important}
+      .my-clan-inspection-tabs{top:31.5%!important;height:7.5%!important}
+      .my-clan-inspection-tabbody{top:40.5%!important;height:33.5%!important;max-height:none!important;overflow:auto!important;padding:7px 5px!important}
+      .my-clan-loadout-summary{top:77%!important;height:14%!important}
+      .my-clan-loadout-action{bottom:1.6%!important}
+      .my-clan-inspection-close{right:1.2%!important;top:1.2%!important}
       .my-clan-formation-slot.is-assignment-target{border-color:rgba(74,213,224,.24)!important;background:transparent!important;box-shadow:none!important}
       .my-clan-formation-slot.is-assignment-target::after{content:none!important;display:none!important}
-      .my-clan-roster-card.is-selected,.my-clan-roster-card[aria-pressed="true"]{filter:none!important;box-shadow:none!important;outline:none!important}
+      .my-clan-roster-card.is-selected,.my-clan-roster-card[aria-pressed="true"]{filter:none!important;box-shadow:none!important;outline:1px solid rgba(81,222,232,.45)!important;outline-offset:2px!important}
       .my-clan-formation-slot.is-empty:not(.is-locked){cursor:default!important}
       .my-clan-formation-slot.is-occupied:not(.is-locked){cursor:grab!important}
       .my-clan-formation-slot.is-occupied:not(.is-locked):active{cursor:grabbing!important}
@@ -207,8 +220,8 @@
       battleResolverStillUsed:activateBattlePreparedSkillCard.toString().includes("confirmSelectedBattleSkill()"),
       noClickAssignment:clan.includes("inspectMyClanFormationSlotNoAssign")&&!clan.includes("is-assignment-target"),
       dragDropPreserved:clan.includes("beginMyClanFormationDrag")&&clan.includes("dropMyClanCharacterIntoSlot"),
-      myClanBrowseMasterBound:presentation.includes("UI/my_clan_browse.png"),
-      myClanInspectionMasterBound:presentation.includes("UI/my_clan_inspection.png"),
+      myClanCodeFirst:presentation.includes("background-image:none!important")&&presentation.includes("my-clan-inspection-panel"),
+      myClanLiteralMasterNotRequired:!presentation.includes("UI/my_clan_browse.png")&&!presentation.includes("UI/my_clan_inspection.png"),
       browserGoldenNotClaimed:true
     };
     const failed=Object.entries(checks).filter(([,v])=>v!==true).map(([k])=>k);

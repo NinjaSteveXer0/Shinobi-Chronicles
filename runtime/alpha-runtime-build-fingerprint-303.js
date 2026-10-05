@@ -16,10 +16,10 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-05-ED",
-    sourceBaselineCommit:"3316b02d3dda5b4bd4efd980b1235dc8f1a6acf8",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-05-EE",
+    sourceBaselineCommit:"3e9fbc714ebff8e775321d8fcacc0fbc195d03ec",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
-    runtimeGeneration:"production-conformance-active-ui-masters-528",
+    runtimeGeneration:"owner-ui-correction-current-team-code-first-my-clan-541",
     majorRuntimeFeatures:Object.freeze([
       "academy-kakashi-v2",
       "runtime-ownership-safety-300",
@@ -100,7 +100,9 @@
       "chronicle-protagonist-team-separation-532",
       "person-name-card-title-rank-separation-532",
       "chronicle-interaction-depth-scene-board-32",
-      "my-clan-active-master-consumption-526-528",
+      "my-clan-code-first-inspector-541",
+      "konoha-activity-current-team-1-6-541",
+      "konoha-activity-result-stage-stable-dock-453-541",
       "konoha-activity-active-master-consumption-431-526-528"
     ]),
     productionLoader:"index.html",
@@ -126,18 +128,16 @@
     });
   }
 
-  function getRuntimeBuildFingerprint(){
-    return snapshot();
-  }
+  function getRuntimeBuildFingerprint(){return snapshot();}
 
   function runRuntimeBuildFingerprint303Diagnostics(){
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-05-ED",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-05-EE",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
-      generationPresent:first.runtimeGeneration==="production-conformance-active-ui-masters-528",
+      generationPresent:first.runtimeGeneration==="owner-ui-correction-current-team-code-first-my-clan-541",
       repaired469FeaturePresent:first.majorRuntimeFeatures.includes("phase2-first-live-ce-hotspot-469"),
       privateHistory478FeaturePresent:first.majorRuntimeFeatures.includes("phase2-private-origin-live-ce-hotspot-478"),
       ownerRetestPresentationFeaturePresent:first.majorRuntimeFeatures.includes("story-scene-board-owner-retest-469"),
@@ -167,7 +167,9 @@
       protagonistSeparation532Present:first.majorRuntimeFeatures.includes("chronicle-protagonist-team-separation-532"),
       personNameSeparation532Present:first.majorRuntimeFeatures.includes("person-name-card-title-rank-separation-532"),
       chronicleInteractionDepth32Present:first.majorRuntimeFeatures.includes("chronicle-interaction-depth-scene-board-32"),
-      myClanActiveMaster526528Present:first.majorRuntimeFeatures.includes("my-clan-active-master-consumption-526-528"),
+      myClanCodeFirst541Present:first.majorRuntimeFeatures.includes("my-clan-code-first-inspector-541"),
+      konohaActivityCurrentTeam541Present:first.majorRuntimeFeatures.includes("konoha-activity-current-team-1-6-541"),
+      konohaActivityResultStage541Present:first.majorRuntimeFeatures.includes("konoha-activity-result-stage-stable-dock-453-541"),
       konohaActivityActiveMaster431526528Present:first.majorRuntimeFeatures.includes("konoha-activity-active-master-consumption-431-526-528"),
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
@@ -183,8 +185,7 @@
 
   try{
     console.info(
-      "[Shinobi Chronicles][ALPHA] Runtime "+
-      MANIFEST.buildId+
+      "[Shinobi Chronicles][ALPHA] Runtime "+MANIFEST.buildId+
       " | baseline "+MANIFEST.sourceBaselineCommit.slice(0,8)+
       " | generation "+MANIFEST.runtimeGeneration
     );
