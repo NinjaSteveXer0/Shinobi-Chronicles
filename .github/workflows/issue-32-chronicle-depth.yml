@@ -10,27 +10,42 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   chronicle-depth:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v5
         with:
           node-version: '22'
 
-      - name: Trace live Chronicle depth authority
+      - name: Apply bounded Scene Board depth patch
+        if: github.event_name == 'push'
+        run: node tools/apply_issue_32_chronicle_depth_patch.js
+
+      - name: Commit bounded patch when needed
+        if: github.event_name == 'push'
         run: |
-          echo '=== DEPTH SYMBOLS ==='
-          grep -RInE 'presentationDepth|chroniclePresentationDepth|getActiveChronicleInteractionDepth|interactionDepth|depthsById|pickDepth|buildInteractionScene' game.js runtime tools Documentation || true
-          echo '=== SCENE BOARD OPEN/CALL SITES ==='
-          grep -RInE 'SC_ALPHA_STORY_SCENE_BOARD_33900|openScene\(|alpha-story-scene-board-33900' game.js runtime tools | head -n 500 || true
-          echo '=== DEPTH LABELS / PREFERENCES ==='
-          grep -RInE '(^|[^A-Za-z])(Quick|Standard|Full)([^A-Za-z]|$)|chronicle.*depth|depth.*chronicle' game.js runtime tools Documentation | head -n 800 || true
+          if ! git diff --quiet -- runtime/alpha-story-scene-board-33900.js; then
+            git config user.name "shinobi-chronicles-runtime-bot"
+            git config user.email "actions@users.noreply.github.com"
+            git add runtime/alpha-story-scene-board-33900.js
+            git commit -m "Consume Chronicle depth in shared Scene Board for #32"
+            git push origin HEAD:coding/chronicle-depth-32
+          fi
 
       - name: Source syntax
         run: |
           node --check game.js
           node --check runtime/alpha-story-scene-board-33900.js
+          node --check tools/apply_issue_32_chronicle_depth_patch.js
+
+      - name: Existing Scene Board diagnostics
+        run: |
+          node tools/qa_issue_105_origin_presentation_repair.js
+          node tools/qa_issue_312_story_battle_benchmark.js
+          node tools/qa_runtime_ownership_safety_300.js
