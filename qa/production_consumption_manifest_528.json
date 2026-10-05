@@ -1,0 +1,247 @@
+{
+  "schema_version": 1,
+  "manifest_id": "sc.production-consumption-manifest.v1",
+  "authority": {
+    "issue": 528,
+    "contract": "Documentation/Coordination/Production_Authority_Consumption_Traceability_and_Continuous_Conformance_Gate_2026-10-05.md"
+  },
+  "state_enum": [
+    "CURRENT",
+    "BROKEN",
+    "INTENTIONALLY_QUEUED",
+    "INDETERMINATE"
+  ],
+  "rows": [
+    {
+      "id": "chronicle_interaction_depth_32",
+      "surface_family": "Story / Scene Board / Chronicle Interaction Depth",
+      "authority_kind": "issue_and_ui_contract",
+      "authority_ref": ["#32", "#526"],
+      "consumer_paths": [
+        "runtime/alpha-story-scene-board-33900.js",
+        "runtime/alpha-runtime-build-fingerprint-303.js"
+      ],
+      "qa_paths": [
+        "tools/qa_issue_32_chronicle_depth_browser.js",
+        "tools/qa_issue_105_origin_presentation_repair.js",
+        "tools/qa_issue_312_story_battle_benchmark.js"
+      ],
+      "workflow_path": ".github/workflows/issue-32-chronicle-depth.yml",
+      "expected_evidence": {
+        "path": "runtime/alpha-runtime-build-fingerprint-303.js",
+        "contains": "chronicle-interaction-depth-32"
+      },
+      "owner": "CODING / RUNTIME",
+      "status": "CURRENT",
+      "invalidation_rule": {
+        "match_any": [
+          "runtime/alpha-story-scene-board-33900.js",
+          "runtime/alpha-runtime-build-fingerprint-303.js",
+          "tools/fixtures/runtime_build_manifest_303.json",
+          "tools/qa_issue_32_chronicle_depth_browser.js",
+          ".github/workflows/issue-32-chronicle-depth.yml"
+        ],
+        "required_lane_ids": ["issue32_static", "issue32_browser"]
+      }
+    },
+    {
+      "id": "inventory_core_461",
+      "surface_family": "Inventory / Ownership Projection",
+      "authority_kind": "issue_contract",
+      "authority_ref": ["#461"],
+      "consumer_paths": ["runtime/alpha-phase2-inventory-core-46100.js"],
+      "qa_paths": [
+        "tools/qa_phase2_inventory_core_461.js",
+        "tools/qa_phase2_inventory_core_461_browser.js"
+      ],
+      "workflow_path": ".github/workflows/issue-461-phase2-inventory-core.yml",
+      "expected_evidence": {
+        "path": "runtime/alpha-phase2-inventory-core-46100.js",
+        "contains": "SC_PHASE2_INVENTORY_CORE_46100"
+      },
+      "owner": "CODING / RUNTIME",
+      "status": "CURRENT",
+      "invalidation_rule": {
+        "match_any": [
+          "runtime/alpha-phase2-inventory-core-46100.js",
+          "tools/qa_phase2_inventory_core_461.js",
+          "tools/qa_phase2_inventory_core_461_browser.js",
+          ".github/workflows/issue-461-phase2-inventory-core.yml"
+        ],
+        "required_lane_ids": ["issue461_static", "issue461_browser"]
+      }
+    },
+    {
+      "id": "battle_pouch_discoverability_463",
+      "surface_family": "Inventory / Battle Pouch Discoverability",
+      "authority_kind": "pre_alpha_polish_issue",
+      "authority_ref": ["#463"],
+      "consumer_paths": ["runtime/alpha-phase2-inventory-core-46100.js"],
+      "qa_paths": [],
+      "workflow_path": null,
+      "expected_evidence": null,
+      "owner": "CODING / RUNTIME",
+      "status": "INTENTIONALLY_QUEUED",
+      "queue_reason": "Issue #463 is explicitly QUEUE / PRE-ALPHA POLISH. Current #461 ownership/preparation truth remains valid; owner-facing Battle Pouch discoverability and populated-state polish are intentionally deferred and must not be reported as broken production.",
+      "invalidation_rule": null
+    },
+    {
+      "id": "first_live_ce_hotspot_469",
+      "surface_family": "World / Chronicle Engine Live Hotspot",
+      "authority_kind": "activation_receipt_and_issue_contract",
+      "authority_ref": ["#469", "#478"],
+      "consumer_paths": [
+        "runtime/alpha-phase2-ce-hotspot-46900.js",
+        "runtime/alpha-chronicle-state-manifest-43600.js"
+      ],
+      "qa_paths": [
+        "tools/qa_issue_469_ce_hotspot.js",
+        "tools/qa_issue_469_ce_hotspot_browser.js"
+      ],
+      "workflow_path": ".github/workflows/issue-469-first-live-ce-hotspot.yml",
+      "expected_evidence": {
+        "path": "runtime/alpha-phase2-ce-hotspot-46900.js",
+        "contains": "SC_PHASE2_CE_HOTSPOT_46900"
+      },
+      "owner": "CODING / RUNTIME",
+      "status": "CURRENT",
+      "invalidation_rule": {
+        "match_any": [
+          "runtime/alpha-phase2-ce-hotspot-46900.js",
+          "runtime/alpha-chronicle-state-manifest-43600.js",
+          "tools/qa_issue_469_ce_hotspot.js",
+          "tools/qa_issue_469_ce_hotspot_browser.js",
+          ".github/workflows/issue-469-first-live-ce-hotspot.yml"
+        ],
+        "required_lane_ids": ["issue469_static", "issue469_browser"]
+      }
+    },
+    {
+      "id": "live_hud_499",
+      "surface_family": "World / Region / Village Live HUD",
+      "authority_kind": "ui_contract_and_issue",
+      "authority_ref": ["#499", "#497"],
+      "consumer_paths": ["runtime/alpha-phase2-live-hud-49900.js"],
+      "qa_paths": [
+        "tools/qa_phase2_live_hud_499.js",
+        "tools/qa_phase2_live_hud_499_browser.js"
+      ],
+      "workflow_path": ".github/workflows/issue-499-phase2-live-hud.yml",
+      "expected_evidence": {
+        "path": "runtime/alpha-phase2-live-hud-49900.js",
+        "contains": "SC_PHASE2_LIVE_HUD_49900"
+      },
+      "owner": "CODING / RUNTIME",
+      "status": "CURRENT",
+      "invalidation_rule": {
+        "match_any": [
+          "runtime/alpha-phase2-live-hud-49900.js",
+          "Logo/sc_title.png",
+          "tools/qa_phase2_live_hud_499.js",
+          "tools/qa_phase2_live_hud_499_browser.js",
+          ".github/workflows/issue-499-phase2-live-hud.yml"
+        ],
+        "required_lane_ids": ["issue499_static", "issue499_browser"]
+      }
+    },
+    {
+      "id": "basic_item_shop_517",
+      "surface_family": "Economy / Basic Item Shop",
+      "authority_kind": "issue_contract",
+      "authority_ref": ["#517"],
+      "consumer_paths": ["runtime/alpha-phase2-basic-item-shop-51700.js"],
+      "qa_paths": [
+        "tools/qa_phase2_basic_item_shop_517.js",
+        "tools/qa_phase2_basic_item_shop_517_browser.js"
+      ],
+      "workflow_path": ".github/workflows/issue-517-phase2-basic-item-shop.yml",
+      "expected_evidence": {
+        "path": "runtime/alpha-phase2-basic-item-shop-51700.js",
+        "contains": "SC_PHASE2_BASIC_ITEM_SHOP_51700"
+      },
+      "owner": "CODING / RUNTIME",
+      "status": "CURRENT",
+      "invalidation_rule": {
+        "match_any": [
+          "runtime/alpha-phase2-basic-item-shop-51700.js",
+          "tools/qa_phase2_basic_item_shop_517.js",
+          "tools/qa_phase2_basic_item_shop_517_browser.js",
+          ".github/workflows/issue-517-phase2-basic-item-shop.yml"
+        ],
+        "required_lane_ids": ["issue517_static", "issue517_browser"]
+      }
+    },
+    {
+      "id": "stats_skills_exams_combat_519",
+      "surface_family": "Progression / Exams / Combat Domain Governance",
+      "authority_kind": "active_design_reconciliation",
+      "authority_ref": ["#519"],
+      "consumer_paths": [],
+      "qa_paths": [],
+      "workflow_path": null,
+      "expected_evidence": null,
+      "owner": "CE / CODEX / COORDINATION",
+      "status": "INTENTIONALLY_QUEUED",
+      "queue_reason": "Issue #519 remains an active design reconciliation. Downstream production implementation is intentionally not authoritative yet, so the absence of a production consumer or QA receipt is queued debt rather than a production break.",
+      "invalidation_rule": null
+    },
+    {
+      "id": "character_card_shop_524",
+      "surface_family": "Acquisition / Character Card Shop",
+      "authority_kind": "acquisition_contract_and_issue",
+      "authority_ref": ["#524", "#520"],
+      "consumer_paths": ["runtime/alpha-phase2-character-card-shop-52400.js"],
+      "qa_paths": [
+        "tools/qa_phase2_character_card_shop_524.js",
+        "tools/qa_phase2_character_card_shop_524_browser.js"
+      ],
+      "workflow_path": ".github/workflows/issue-524-phase2-character-card-shop.yml",
+      "expected_evidence": {
+        "path": "runtime/alpha-phase2-character-card-shop-52400.js",
+        "contains": "SC_PHASE2_CHARACTER_CARD_SHOP_52400"
+      },
+      "owner": "CODING / RUNTIME",
+      "status": "CURRENT",
+      "invalidation_rule": {
+        "match_any": [
+          "runtime/alpha-phase2-character-card-shop-52400.js",
+          "tools/qa_phase2_character_card_shop_524.js",
+          "tools/qa_phase2_character_card_shop_524_browser.js",
+          ".github/workflows/issue-524-phase2-character-card-shop.yml"
+        ],
+        "required_lane_ids": ["issue524_static", "issue524_browser"]
+      }
+    },
+    {
+      "id": "deliberate_team_assignment_532",
+      "surface_family": "My Clan / Current Team Assignment",
+      "authority_kind": "chronicle_team_separation_contract_and_issue",
+      "authority_ref": ["#532", "#522"],
+      "consumer_paths": [
+        "game.js",
+        "runtime/alpha-chronicle-state-manifest-43600.js",
+        "runtime/alpha-phase2-live-hud-49900.js"
+      ],
+      "qa_paths": [
+        "tools/qa_phase2_team_assignment_532.js",
+        "tools/qa_phase2_team_assignment_532_browser.js"
+      ],
+      "workflow_path": ".github/workflows/issue-532-phase2-team-assignment.yml",
+      "expected_evidence": {
+        "path": "runtime/alpha-chronicle-state-manifest-43600.js",
+        "contains": "currentTeamAssignment"
+      },
+      "owner": "CODING / RUNTIME",
+      "status": "CURRENT",
+      "invalidation_rule": {
+        "match_any": [
+          "runtime/alpha-chronicle-state-manifest-43600.js",
+          "tools/qa_phase2_team_assignment_532.js",
+          "tools/qa_phase2_team_assignment_532_browser.js",
+          ".github/workflows/issue-532-phase2-team-assignment.yml"
+        ],
+        "required_lane_ids": ["issue532_static", "issue532_browser"]
+      }
+    }
+  ]
+}
