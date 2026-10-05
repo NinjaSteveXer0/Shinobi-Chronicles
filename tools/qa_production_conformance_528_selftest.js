@@ -88,6 +88,15 @@ assert(gate.validateLedger(manifest,badLedger,{skipFileChecks:true}).some(error=
 const goldenLedger=clone(ledger);goldenLedger.canaries[0].golden_claimed=true;
 assert(gate.validateLedger(manifest,goldenLedger,{skipFileChecks:true}).some(error=>error.includes("may not claim Golden")),"automation may not promote owner Golden");
 
+const fullCollection=gate.runLanes({lane_catalog:{
+  first_fails:{kind:"static",commands:["node -e \"process.exit(7)\""]},
+  second_still_runs:{kind:"static",commands:["node -e \"process.exit(0)\""]}
+}},["first_fails","second_still_runs"]);
+assert.strictEqual(fullCollection.pass,false,"a broken lane must still fail the sweep");
+assert.strictEqual(fullCollection.ledger.length,2,"a broken lane must not hide later selected lanes");
+assert.strictEqual(fullCollection.ledger[0].status,"BROKEN");
+assert.strictEqual(fullCollection.ledger[1].status,"CURRENT");
+
 const queuedIsNotBroken=rowStates.filter(row=>row.computed==="INTENTIONALLY_QUEUED").every(row=>!row.reasons.some(reason=>/^missing:/.test(reason)));
 assert(queuedIsNotBroken,"queued rows must not be converted into missing-production failures");
 
@@ -105,6 +114,7 @@ console.log(JSON.stringify({
   activeUiMasterSelection:true,
   unknownProductionFailsClosed:true,
   scheduledRepresentativeNotBlanket:true,
+  fullLaneCollectionAfterFailure:true,
   duplicateManifestRejected:true,
   invalidQueuedStateRejected:true,
   invalidLifecycleRejected:true,
