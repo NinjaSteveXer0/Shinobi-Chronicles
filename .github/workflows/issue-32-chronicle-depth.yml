@@ -1,4 +1,5 @@
 name: Issue 32 Chronicle Interaction Depth
+# Consumes binding UI #526 / existing #32 authority; runtime fingerprint bump is authority-driven.
 
 on:
   push:
