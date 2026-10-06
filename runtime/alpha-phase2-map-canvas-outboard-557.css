@@ -21,6 +21,21 @@
   min-width: min(60vw, calc(100% - 40px)) !important;
 }
 
+/*
+   FIRST-FRAME FALLBACK
+
+   Map-local chrome must never wait for the #557 measurement pass before it
+   clears the crisp map rectangle. The runtime-owned custom properties remain
+   authoritative once measured. Until then, these viewport-bounded fallback
+   values place the controls into the same outer reserve without changing any
+   map/world semantics.
+*/
+.region-map-pane,
+.village-map-screen {
+  --sc-map557-safe-outboard-right: var(--sc-map557-outboard-right, calc(clamp(128px, 14vw, 186px) * -1));
+  --sc-map557-safe-control-width: var(--sc-map557-gutter-control-width, clamp(116px, 12vw, 176px));
+}
+
 /* Keep the compact identity/journey/Ryō cluster in the clear header reserve.
    This leaves the right map-side reserve available for navigation/context. */
 body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-state-cluster,
@@ -28,15 +43,55 @@ body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-h
   top: 12px !important;
 }
 
+/* Region's own navigation/info chrome is map-local presentation, not geography.
+   Give it a safe outboard position from the first rendered frame; measured #557
+   variables replace the fallback automatically when runtime geometry is ready. */
+.region-map-pane .region-world-close,
+.region-map-pane .region-info-toggle,
+.region-map-pane .region-info-drawer,
+.region-map-pane .region-world-map-button {
+  left: auto !important;
+  right: var(--sc-map557-safe-outboard-right) !important;
+  width: var(--sc-map557-safe-control-width) !important;
+  max-width: var(--sc-map557-safe-control-width) !important;
+  box-sizing: border-box !important;
+}
+
+.region-map-pane .region-world-close {
+  top: 2% !important;
+  height: 36px !important;
+  min-width: 0 !important;
+  border-radius: 6px !important;
+}
+
+.region-map-pane .region-info-toggle {
+  top: 44% !important;
+  justify-content: flex-start !important;
+}
+
+.region-map-pane .region-info-drawer {
+  top: calc(44% + 38px) !important;
+}
+
+.region-map-pane .region-info-drawer .region-left-overlay {
+  max-height: min(31vh, 260px) !important;
+}
+
+.region-map-pane .region-world-map-button {
+  bottom: 2% !important;
+  justify-content: flex-start !important;
+}
+
 /* Region non-spatial known destinations are navigation, not geography. */
+.region-map-pane .region-known-destinations,
 .overlay-content-box.sc-map557-active .region-map-pane .region-known-destinations,
 .region-map-pane[style*="--sc-map557-outboard-right"] .region-known-destinations {
   left: auto !important;
-  right: var(--sc-map557-outboard-right) !important;
+  right: var(--sc-map557-safe-outboard-right) !important;
   top: auto !important;
   bottom: 145px !important;
-  width: var(--sc-map557-gutter-control-width) !important;
-  max-width: var(--sc-map557-gutter-control-width) !important;
+  width: var(--sc-map557-safe-control-width) !important;
+  max-width: var(--sc-map557-safe-control-width) !important;
   max-height: min(31vh, 260px) !important;
   overflow: auto !important;
   box-sizing: border-box !important;
@@ -45,14 +100,15 @@ body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-h
 
 /* The actual Region event/disambiguation drawer uses the same DOM surface as
    the selected-location card. Keep both modes in the approved right reserve. */
+.region-map-pane .region-event-drawer,
 .overlay-content-box.sc-map557-active .region-map-pane .region-event-drawer,
 .region-map-pane[style*="--sc-map557-outboard-right"] .region-event-drawer {
   left: auto !important;
-  right: var(--sc-map557-outboard-right) !important;
+  right: var(--sc-map557-safe-outboard-right) !important;
   top: 136px !important;
   bottom: 86px !important;
-  width: var(--sc-map557-gutter-control-width) !important;
-  max-width: var(--sc-map557-gutter-control-width) !important;
+  width: var(--sc-map557-safe-control-width) !important;
+  max-width: var(--sc-map557-safe-control-width) !important;
   max-height: none !important;
   box-sizing: border-box !important;
   padding: 10px !important;
@@ -60,6 +116,9 @@ body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-h
 }
 
 /* Transient rich event selection owns the contextual reserve while open. */
+.region-map-pane:has(.region-event-drawer) .region-known-destinations,
+.region-map-pane:has(.region-event-drawer) .region-info-toggle,
+.region-map-pane:has(.region-event-drawer) .region-info-drawer,
 .overlay-content-box.sc-map557-active .region-map-pane:has(.region-event-drawer) .region-known-destinations,
 .overlay-content-box.sc-map557-active .region-map-pane:has(.region-event-drawer) .region-info-toggle,
 .overlay-content-box.sc-map557-active .region-map-pane:has(.region-event-drawer) .region-info-drawer,
@@ -78,8 +137,11 @@ body:has(.region-map-pane .region-event-drawer)
 }
 
 /* Village return and information controls are navigation/context chrome, not
-   map markers. The map-local custom-property fallback survives outer-box class
-   churn without coupling the whole document to #557 activation state. */
+   map markers. Their first-frame fallback is deliberately map-local, so these
+   controls cannot flash across crisp pixels while the geometry runtime settles. */
+.village-map-screen .village-map-return,
+.village-map-screen .village-info-toggle,
+.village-map-screen .village-info-drawer,
 .overlay-content-box.sc-map557-active .village-map-screen .village-map-return,
 .overlay-content-box.sc-map557-active .village-map-screen .village-info-toggle,
 .overlay-content-box.sc-map557-active .village-map-screen .village-info-drawer,
@@ -87,23 +149,26 @@ body:has(.region-map-pane .region-event-drawer)
 .village-map-screen[style*="--sc-map557-outboard-right"] .village-info-toggle,
 .village-map-screen[style*="--sc-map557-outboard-right"] .village-info-drawer {
   left: auto !important;
-  right: var(--sc-map557-outboard-right) !important;
-  width: var(--sc-map557-gutter-control-width) !important;
-  max-width: var(--sc-map557-gutter-control-width) !important;
+  right: var(--sc-map557-safe-outboard-right) !important;
+  width: var(--sc-map557-safe-control-width) !important;
+  max-width: var(--sc-map557-safe-control-width) !important;
   box-sizing: border-box !important;
 }
 
+.village-map-screen .village-map-return,
 .overlay-content-box.sc-map557-active .village-map-screen .village-map-return,
 .village-map-screen[style*="--sc-map557-outboard-right"] .village-map-return {
   top: 2% !important;
   min-width: 0 !important;
 }
 
+.village-map-screen .village-info-toggle,
 .overlay-content-box.sc-map557-active .village-map-screen .village-info-toggle,
 .village-map-screen[style*="--sc-map557-outboard-right"] .village-info-toggle {
   top: 44% !important;
 }
 
+.village-map-screen .village-info-drawer,
 .overlay-content-box.sc-map557-active .village-map-screen .village-info-drawer,
 .village-map-screen[style*="--sc-map557-outboard-right"] .village-info-drawer {
   top: calc(44% + 38px) !important;
