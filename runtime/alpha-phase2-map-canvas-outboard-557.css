@@ -8,10 +8,12 @@
    ============================================================================ */
 
 /* #557 may reserve outer presentation space, but the crisp interactive map must
-   remain the dominant part of the visible stage. The runtime writes the
-   --sc-map557-* custom properties directly on the canonical map element. Use
-   that map-local state as the rerender-safe fallback rather than a broad
-   body:has(...) selector, so unrelated HUD visibility/composition is untouched. */
+   remain the dominant part of the visible stage. Apply this to the canonical
+   map classes from their first layout, before the runtime's first geometry
+   measurement. If activation-only selectors widen the map after that first
+   measurement, HUD/outboard controls can be positioned against a stale rect. */
+.region-map-pane,
+.village-map-screen,
 .overlay-content-box.sc-map557-active .region-map-pane,
 .overlay-content-box.sc-map557-active .village-map-screen,
 .region-map-pane[style*="--sc-map557-outboard-right"],
