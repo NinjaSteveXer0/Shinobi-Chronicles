@@ -326,6 +326,30 @@ function routeDecision(locationId){
   if(String(locationId||"")!==OFFICE_HOST_ID)return"delegate_existing_location";
   return ce469HasPriority()?"ce_hotspot_469":"hokage_office_533";
 }
+function findOfficeAnchor(){
+  if(typeof document==="undefined")return null;
+  const live=document.querySelector('button[data-village-hotspot-id="KON-P01"]');
+  if(live)return live;
+  return [...document.querySelectorAll(".konoha-v3-anchor.is-identified")].find(node=>{
+    const label=node.querySelector(".village-golden-halo-label");
+    return !!(label&&String(label.textContent||"").trim()==="Hokage Administration");
+  })||null;
+}
+function syncOfficeAnchor(){
+  const node=findOfficeAnchor();if(!node)return false;
+  if(node.matches('button[data-village-hotspot-id="KON-P01"]')){
+    node.removeAttribute("data-hokage-office-anchor");
+    return false;
+  }
+  if(routeDecision(OFFICE_HOST_ID)!=="hokage_office_533")return false;
+  node.dataset.hokageOfficeAnchor="533";
+  node.setAttribute("role","button");
+  node.setAttribute("tabindex","0");
+  node.setAttribute("aria-label","Hokage Administration. Double-click to enter.");
+  node.classList.remove("is-static");
+  node.classList.add("is-actionable");
+  return true;
+}
 function returnFromOffice(){
   const context=activeContext;
   activeContext=null;
@@ -337,7 +361,9 @@ function returnFromOffice(){
 }
 function findVillageLocationNode(locationId){
   if(typeof document==="undefined")return null;
-  return [...document.querySelectorAll("[data-village-hotspot-id]")].find(node=>String(node.dataset.villageHotspotId||"")===String(locationId||""))||null;
+  const live=[...document.querySelectorAll("[data-village-hotspot-id]")].find(node=>String(node.dataset.villageHotspotId||"")===String(locationId||""));
+  if(live)return live;
+  return String(locationId||"")===OFFICE_HOST_ID?document.querySelector('[data-hokage-office-anchor="533"]'):null;
 }
 function focusLead(leadId){
   const lead=discoveredLeadRows().find(row=>row.leadId===String(leadId));
@@ -346,6 +372,7 @@ function focusLead(leadId){
   if(typeof globalThis["openOverlay"]!=="function")return{success:false,reason:"village_router_missing",historyCommitted:false};
   globalThis.openOverlay("village");
   if(typeof setTimeout==="function")setTimeout(()=>{
+    syncOfficeAnchor();
     const node=findVillageLocationNode(lead.targetLocationId);
     if(node){node.dataset.dispatchFocus="533";try{node.focus({preventScroll:true});}catch(_error){try{node.focus();}catch(_ignore){}}}
   },0);
@@ -370,8 +397,8 @@ function renderOffice(context){
 function activationTarget(event){
   const target=event&&event.target;
   if(!(target&&typeof target.closest==="function"))return null;
-  const node=target.closest("[data-village-hotspot-id]");
-  return node&&String(node.dataset.villageHotspotId||"")===OFFICE_HOST_ID?node:null;
+  const node=target.closest('[data-village-hotspot-id="KON-P01"],[data-hokage-office-anchor="533"]');
+  return node||null;
 }
 function onOfficeActivation(event){
   if(event.type==="keydown"&&!(["Enter"," "].includes(event.key)))return;
@@ -387,7 +414,8 @@ function diagnostics(){
   const after=semanticFingerprint();
   const checks={
     officeHostExact:OFFICE_HOST_ID==="KON-P01",
-    consumesExistingP01Control:String(activationTarget).includes("data-village-hotspot-id")&&!String(onOfficeActivation).includes("createElement"),
+    consumesExistingP01Control:String(activationTarget).includes("data-hokage-office-anchor")&&!String(syncOfficeAnchor).includes("createElement"),
+    staticP01UpgradePresentationOnly:String(syncOfficeAnchor).includes("data.hokageOfficeAnchor")||String(syncOfficeAnchor).includes("hokageOfficeAnchor"),
     ce469FirstRefusal:String(routeDecision).includes("ce469HasPriority")&&String(ce469HasPriority).includes("getKonohaCeHotspotEligibility46900")&&String(ce469HasPriority).includes("ce469SceneActive"),
     activeCe469SceneProtected:String(ce469SceneActive).includes("getActiveStorySceneRuntime"),
     noGlobalVillageRouterReplacement:!String(installHokageOfficeChronicleDispatch53300).includes("activateAlphaKonohaV3PublicLocation"),
@@ -414,6 +442,11 @@ function diagnostics(){
 if(typeof document!=="undefined"){
   document.addEventListener("dblclick",onOfficeActivation,true);
   document.addEventListener("keydown",onOfficeActivation,true);
+  if(typeof MutationObserver==="function"&&document.documentElement){
+    const observer=new MutationObserver(()=>syncOfficeAnchor());
+    observer.observe(document.documentElement,{childList:true,subtree:true});
+  }
+  if(typeof queueMicrotask==="function")queueMicrotask(syncOfficeAnchor);else setTimeout(syncOfficeAnchor,0);
 }
 globalThis.openHokageOffice53300=renderOffice;
 globalThis.returnFromHokageOffice53300=returnFromOffice;
@@ -424,6 +457,7 @@ globalThis.openHokageOfficeExams53300=openExams;
 globalThis.getHokageOfficeDispatchProjection53300=()=>clone(dispatchProjection());
 globalThis.getHokageOfficeAssignmentProjection53300=()=>clone(currentAssignment());
 globalThis.getHokageOfficeRouteDecision53300=locationId=>routeDecision(locationId);
+globalThis.syncHokageOfficeAnchor53300=syncOfficeAnchor;
 globalThis.runHokageOfficeChronicleDispatch53300Diagnostics=diagnostics;
 globalThis.SC_HOKAGE_OFFICE_CHRONICLE_DISPATCH_53300=Object.freeze({patchId:PATCH_ID,hostId:OFFICE_HOST_ID,browserGoldenClaimed:false});
 })();
