@@ -16,7 +16,8 @@ async function waitRuntime(page){
     globalThis.SC_PHASE2_CE_HOTSPOT_46900&&
     typeof globalThis.getPhase2KonohaActivityTeam43110==="function"&&
     typeof globalThis.getHokageOfficeDispatchProjection53300==="function"&&
-    typeof globalThis.getKonohaCeHotspotEligibility46900==="function"
+    typeof globalThis.getKonohaCeHotspotEligibility46900==="function"&&
+    typeof globalThis.getKonohaCeHotspotResolvedRecord46900==="function"
   ),null,{timeout:30000});
 }
 async function release(page){
@@ -183,26 +184,29 @@ async function semanticFingerprint(page){
 
     // ----------------------------------------------------------------------
     // #533 — Hokage Office / Chronicle Dispatch Step 6 browser contract.
-    // The fixture creates one already-known #469 lead. Office projection must
-    // consume it without creating another occurrence, Knowledge or Access fact.
+    // The fixture creates one canonical already-known #469 occurrence/lead.
+    // Dispatch must consume #469's resolved-record API, never a second store.
     // ----------------------------------------------------------------------
     const leadFixture=await page.evaluate(()=>{
       const consequence=getKonohaCeHotspotBranchConsequence46900("ask_about_delivery");
       const leadId=consequence&&Array.isArray(consequence.futureLeadIds)?consequence.futureLeadIds[0]:null;
       if(!leadId)return{error:"469_dispatch_lead_missing"};
-      const id="qa533_known_dispatch_lead_receipt";
-      if(!playerData.activityHistory.some(row=>row&&row.id===id)){
-        playerData.activityHistory.push({
-          id,occurrenceId:id,committed:true,type:"qa_known_lead",locationId:"KON-P01",
-          data:{
-            futureLeadIds:[leadId],
-            branchKnowledge:{redirectedToAdministrationDesk:true},
-            recordAddendum:"The Administration desk is the known public follow-up for this dispatch lead."
-          },
-          sourceRefs:[{type:"world_occurrence",id:"occ_konoha_ce_kakashi_masked_interceptor_admin_crossing_v1",role:"source"}]
-        });
-        savePlayerData();
-      }
+      const id="occ_konoha_ce_kakashi_masked_interceptor_admin_crossing_v1";
+      playerData.activityHistory=playerData.activityHistory.filter(row=>!(row&&(row.id===id||row.occurrenceId===id)));
+      playerData.activityHistory.push({
+        id,occurrenceId:id,sourceOccurrenceId:id,
+        committed:true,completed:true,type:"konoha_ce_private_history_emergence",activity:"world_chronicle_hotspot",
+        title:"Hokage Administration Crossing",locationId:"KON-P01",
+        data:{
+          futureLeadIds:[leadId],
+          branchKnowledge:{redirectedToAdministrationDesk:true},
+          recordAddendum:"The Administration desk is the known public follow-up for this dispatch lead."
+        },
+        sourceRefs:[{type:"world_occurrence",id,role:"source"}],timestamp:Date.now()
+      });
+      savePlayerData();
+      const resolved=getKonohaCeHotspotResolvedRecord46900();
+      if(!resolved||resolved.occurrenceId!==id)return{error:"canonical_469_resolved_record_missing",resolved};
       const original=globalThis.getKonohaCeHotspotEligibility46900;
       globalThis.getKonohaCeHotspotEligibility46900=()=>({available:true,reason:"qa_priority"});
       const priority=getHokageOfficeRouteDecision53300("KON-P01");
@@ -210,7 +214,7 @@ async function semanticFingerprint(page){
       const office=getHokageOfficeRouteDecision53300("KON-P01");
       const other=getHokageOfficeRouteDecision53300("KON-P09");
       globalThis.getKonohaCeHotspotEligibility46900=original;
-      return{leadId,priority,office,other,dispatch:getHokageOfficeDispatchProjection53300()};
+      return{leadId,priority,office,other,resolved,dispatch:getHokageOfficeDispatchProjection53300()};
     });
     assert(!leadFixture.error,JSON.stringify(leadFixture));
     assert.strictEqual(leadFixture.priority,"ce_hotspot_469","#533 no longer gives eligible #469 first refusal");
@@ -308,7 +312,7 @@ async function semanticFingerprint(page){
       resultStagePresent:true,stableActionDock:true,boundedNotificationHistory:true,
       disciplineAccents:true,naturalPlayerCopy:true,
       hokageOfficeUsesSingleP01Control:true,ce469FirstRefusal:true,
-      dispatchKnownLeadProjected:true,dispatchNoFakeSeedDenominator:true,
+      dispatchReadsCanonicalResolved469:true,dispatchKnownLeadProjected:true,dispatchNoFakeSeedDenominator:true,
       officeOpenReadOnly:true,cutawayReadOnly:true,mapFocusReadOnly:true,
       unsupportedStep6BusinessFailsClosed:true,saveReloadNoReroll:true,
       ownerBrowserAcceptanceStillRequired:true,browserGoldenClaimed:false
