@@ -7,6 +7,15 @@
    discovery, Chronicle, ownership, assignment, Journey, Ryō, or World state.
    ============================================================================ */
 
+/* #557 may reserve outer presentation space, but the crisp interactive map must
+   remain the dominant part of the visible stage. min-width wins over the
+   runtime max-width when the latter would over-shrink a wide desktop map, while
+   the stage-bound cap prevents overflow on narrower overlay containers. */
+.overlay-content-box.sc-map557-active .region-map-pane,
+.overlay-content-box.sc-map557-active .village-map-screen {
+  min-width: min(60vw, calc(100% - 40px)) !important;
+}
+
 /* Keep the compact identity/journey/Ryō cluster in the clear header reserve.
    This leaves the right map-side reserve available for navigation/context. */
 body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-state-cluster,
