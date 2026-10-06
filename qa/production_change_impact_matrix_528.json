@@ -3,108 +3,417 @@
   "matrix_id": "sc.production-change-impact-matrix.v1",
   "authority_issue": 528,
   "lane_catalog": {
-    "runtime_fingerprint": {"kind":"static","commands":["node tools/qa_issue_303_runtime_build_fingerprint.js"],"scheduled_representative":true},
-    "ownership_safety": {"kind":"static","commands":["node tools/qa_runtime_ownership_safety_300.js"],"scheduled_representative":true},
-    "save_compatibility": {"kind":"static","commands":["node tools/qa_save_compatibility_311.js"],"scheduled_representative":true},
-    "issue32_static": {"kind":"static","commands":["node tools/qa_issue_105_origin_presentation_repair.js","node tools/qa_issue_312_story_battle_benchmark.js"],"scheduled_representative":false},
-    "issue32_browser": {"kind":"browser","commands":["node tools/qa_issue_32_chronicle_depth_browser.js"],"scheduled_representative":true},
-    "issue431_browser": {"kind":"browser","commands":["node tools/qa_phase2_konoha_player_surfaces_431.js"],"scheduled_representative":false},
-    "issue461_static": {"kind":"static","commands":["node tools/qa_phase2_inventory_core_461.js"],"scheduled_representative":true},
-    "issue461_browser": {"kind":"browser","commands":["node tools/qa_phase2_inventory_core_461_browser.js"],"scheduled_representative":false},
-    "issue545_static": {"kind":"static","commands":["node tools/qa_durable_object_provenance_545.js","node tools/qa_kakashi_tanto_provenance_545.js","node tools/qa_kakashi_v2_clean_room.js","node tools/qa_issue_322_kakashi_dispositions.js"],"scheduled_representative":true},
-    "issue552_static": {"kind":"static","commands":["node tools/qa_retail_kunai_durable_552.js"],"scheduled_representative":true},
-    "issue552_browser": {"kind":"browser","commands":["node tools/qa_retail_kunai_durable_552_browser.js"],"scheduled_representative":false},
-    "issue469_static": {"kind":"static","commands":["node tools/qa_issue_469_ce_hotspot.js"],"scheduled_representative":false},
-    "issue469_browser": {"kind":"browser","commands":["node tools/qa_issue_469_ce_hotspot_browser.js"],"scheduled_representative":true},
-    "issue499_static": {"kind":"static","commands":["node tools/qa_phase2_live_hud_499.js"],"scheduled_representative":true},
-    "issue499_browser": {"kind":"browser","commands":["node tools/qa_phase2_live_hud_499_browser.js"],"scheduled_representative":false},
-    "issue517_static": {"kind":"static","commands":["node tools/qa_phase2_basic_item_shop_517.js"],"scheduled_representative":true},
-    "issue517_browser": {"kind":"browser","commands":["node tools/qa_phase2_basic_item_shop_517_browser.js"],"scheduled_representative":false},
-    "issue524_static": {"kind":"static","commands":["node tools/qa_phase2_character_card_shop_524.js"],"scheduled_representative":true},
-    "issue524_browser": {"kind":"browser","commands":["node tools/qa_phase2_character_card_shop_524_browser.js"],"scheduled_representative":false},
-    "issue532_static": {"kind":"static","commands":["node tools/qa_phase2_team_assignment_532.js"],"scheduled_representative":false},
-    "issue532_browser": {"kind":"browser","commands":["node tools/qa_phase2_team_assignment_532_browser.js"],"scheduled_representative":true},
-    "promotion_static": {"kind":"static","commands":["node tools/qa_issue_141_traversal_runtime.js","node tools/qa_issue_63_genin_v2_runtime.js"],"scheduled_representative":false},
-    "ui_master_browser": {"kind":"browser","commands":["node tools/qa_ui_master_consumption_528_browser.js"],"scheduled_representative":true}
+    "runtime_fingerprint": {
+      "kind": "static",
+      "commands": ["node tools/qa_issue_303_runtime_build_fingerprint.js"],
+      "scheduled_representative": true
+    },
+    "ownership_safety": {
+      "kind": "static",
+      "commands": ["node tools/qa_runtime_ownership_safety_300.js"],
+      "scheduled_representative": true
+    },
+    "save_compatibility": {
+      "kind": "static",
+      "commands": ["node tools/qa_save_compatibility_311.js"],
+      "scheduled_representative": true
+    },
+    "issue32_static": {
+      "kind": "static",
+      "commands": [
+        "node tools/qa_issue_105_origin_presentation_repair.js",
+        "node tools/qa_issue_312_story_battle_benchmark.js"
+      ],
+      "scheduled_representative": false
+    },
+    "issue32_browser": {
+      "kind": "browser",
+      "commands": ["node tools/qa_issue_32_chronicle_depth_browser.js"],
+      "scheduled_representative": true
+    },
+    "issue431_browser": {
+      "kind": "browser",
+      "commands": ["node tools/qa_phase2_konoha_player_surfaces_431.js"],
+      "scheduled_representative": false
+    },
+    "issue461_static": {
+      "kind": "static",
+      "commands": ["node tools/qa_phase2_inventory_core_461.js"],
+      "scheduled_representative": true
+    },
+    "issue461_browser": {
+      "kind": "browser",
+      "commands": ["node tools/qa_phase2_inventory_core_461_browser.js"],
+      "scheduled_representative": false
+    },
+    "issue545_static": {
+      "kind": "static",
+      "commands": [
+        "node tools/qa_durable_object_provenance_545.js",
+        "node tools/qa_kakashi_tanto_provenance_545.js",
+        "node tools/qa_kakashi_v2_clean_room.js",
+        "node tools/qa_issue_322_kakashi_dispositions.js"
+      ],
+      "scheduled_representative": true
+    },
+    "issue552_static": {
+      "kind": "static",
+      "commands": ["node tools/qa_retail_kunai_durable_552.js"],
+      "scheduled_representative": true
+    },
+    "issue552_browser": {
+      "kind": "browser",
+      "commands": ["node tools/qa_retail_kunai_durable_552_browser.js"],
+      "scheduled_representative": false
+    },
+    "issue469_static": {
+      "kind": "static",
+      "commands": ["node tools/qa_issue_469_ce_hotspot.js"],
+      "scheduled_representative": false
+    },
+    "issue469_browser": {
+      "kind": "browser",
+      "commands": ["node tools/qa_issue_469_ce_hotspot_browser.js"],
+      "scheduled_representative": true
+    },
+    "issue499_static": {
+      "kind": "static",
+      "commands": ["node tools/qa_phase2_live_hud_499.js"],
+      "scheduled_representative": true
+    },
+    "issue499_browser": {
+      "kind": "browser",
+      "commands": ["node tools/qa_phase2_live_hud_499_browser.js"],
+      "scheduled_representative": false
+    },
+    "issue517_static": {
+      "kind": "static",
+      "commands": ["node tools/qa_phase2_basic_item_shop_517.js"],
+      "scheduled_representative": true
+    },
+    "issue517_browser": {
+      "kind": "browser",
+      "commands": ["node tools/qa_phase2_basic_item_shop_517_browser.js"],
+      "scheduled_representative": false
+    },
+    "issue524_static": {
+      "kind": "static",
+      "commands": ["node tools/qa_phase2_character_card_shop_524.js"],
+      "scheduled_representative": true
+    },
+    "issue524_browser": {
+      "kind": "browser",
+      "commands": ["node tools/qa_phase2_character_card_shop_524_browser.js"],
+      "scheduled_representative": false
+    },
+    "issue532_static": {
+      "kind": "static",
+      "commands": ["node tools/qa_phase2_team_assignment_532.js"],
+      "scheduled_representative": false
+    },
+    "issue532_browser": {
+      "kind": "browser",
+      "commands": ["node tools/qa_phase2_team_assignment_532_browser.js"],
+      "scheduled_representative": true
+    },
+    "promotion_static": {
+      "kind": "static",
+      "commands": [
+        "node tools/qa_issue_141_traversal_runtime.js",
+        "node tools/qa_issue_63_genin_v2_runtime.js"
+      ],
+      "scheduled_representative": false
+    },
+    "ui_master_browser": {
+      "kind": "browser",
+      "commands": ["node tools/qa_ui_master_consumption_528_browser.js"],
+      "scheduled_representative": true
+    }
   },
   "rules": [
     {
-      "id":"firewall_infrastructure",
-      "changed_any":["qa/production_consumption_manifest_528.json","qa/production_change_impact_matrix_528.json","qa/production_browser_canary_ledger_528.json","tools/qa_production_conformance_528.js","tools/qa_production_conformance_528_selftest.js","tools/qa_queued_activation_528.js","tools/qa_ui_master_consumption_528_browser.js",".github/workflows/issue-528-production-conformance.yml"],
-      "affected_consumers":["chronicle_interaction_depth_32","inventory_core_461","first_live_ce_hotspot_469","live_hud_499","basic_item_shop_517","character_card_shop_524","deliberate_team_assignment_532","konoha_activity_surfaces_431","victory_setback_results_141","ui_active_masters_526","promotion_transition_141_63","frozen_origin_shared_runtime"],
-      "required_lane_ids":["runtime_fingerprint","ownership_safety","save_compatibility","issue32_static","issue431_browser","issue461_static","issue545_static","issue552_static","issue469_static","issue499_static","issue517_static","issue524_static","issue532_static","promotion_static","issue32_browser","issue469_browser","issue532_browser","ui_master_browser"]
+      "id": "firewall_infrastructure",
+      "changed_any": [
+        "qa/production_consumption_manifest_528.json",
+        "qa/production_change_impact_matrix_528.json",
+        "qa/production_browser_canary_ledger_528.json",
+        "tools/qa_production_conformance_528.js",
+        "tools/qa_production_conformance_528_selftest.js",
+        "tools/qa_queued_activation_528.js",
+        "tools/qa_ui_master_consumption_528_browser.js",
+        ".github/workflows/issue-528-production-conformance.yml"
+      ],
+      "affected_consumers": [
+        "chronicle_interaction_depth_32",
+        "inventory_core_461",
+        "first_live_ce_hotspot_469",
+        "live_hud_499",
+        "basic_item_shop_517",
+        "character_card_shop_524",
+        "deliberate_team_assignment_532",
+        "konoha_activity_surfaces_431",
+        "victory_setback_results_141",
+        "ui_active_masters_526",
+        "promotion_transition_141_63",
+        "frozen_origin_shared_runtime"
+      ],
+      "required_lane_ids": [
+        "runtime_fingerprint",
+        "ownership_safety",
+        "save_compatibility",
+        "issue32_static",
+        "issue431_browser",
+        "issue461_static",
+        "issue545_static",
+        "issue552_static",
+        "issue469_static",
+        "issue499_static",
+        "issue517_static",
+        "issue524_static",
+        "issue532_static",
+        "promotion_static",
+        "issue32_browser",
+        "issue469_browser",
+        "issue532_browser",
+        "ui_master_browser"
+      ]
     },
     {
-      "id":"runtime_fingerprint_contract",
-      "changed_any":["runtime/alpha-runtime-build-fingerprint-303.js","tools/fixtures/runtime_build_manifest_303.json"],
-      "affected_consumers":["chronicle_interaction_depth_32","inventory_core_461","first_live_ce_hotspot_469","live_hud_499","basic_item_shop_517","character_card_shop_524","deliberate_team_assignment_532","frozen_origin_shared_runtime"],
-      "required_lane_ids":["runtime_fingerprint","ownership_safety","save_compatibility"]
+      "id": "runtime_fingerprint_contract",
+      "changed_any": [
+        "runtime/alpha-runtime-build-fingerprint-303.js",
+        "tools/fixtures/runtime_build_manifest_303.json"
+      ],
+      "affected_consumers": [
+        "chronicle_interaction_depth_32",
+        "inventory_core_461",
+        "first_live_ce_hotspot_469",
+        "live_hud_499",
+        "basic_item_shop_517",
+        "character_card_shop_524",
+        "deliberate_team_assignment_532",
+        "frozen_origin_shared_runtime"
+      ],
+      "required_lane_ids": ["runtime_fingerprint", "ownership_safety", "save_compatibility"]
     },
     {
-      "id":"runtime_ownership_contract",
-      "changed_any":["tools/fixtures/runtime_change_declarations_300.json","tools/fixtures/runtime_responsibility_registry_300.json"],
-      "affected_consumers":["inventory_core_461","first_live_ce_hotspot_469","live_hud_499","basic_item_shop_517","character_card_shop_524","deliberate_team_assignment_532","promotion_transition_141_63","frozen_origin_shared_runtime"],
-      "required_lane_ids":["ownership_safety","save_compatibility"]
+      "id": "runtime_ownership_contract",
+      "changed_any": [
+        "tools/fixtures/runtime_change_declarations_300.json",
+        "tools/fixtures/runtime_responsibility_registry_300.json"
+      ],
+      "affected_consumers": [
+        "inventory_core_461",
+        "first_live_ce_hotspot_469",
+        "live_hud_499",
+        "basic_item_shop_517",
+        "character_card_shop_524",
+        "deliberate_team_assignment_532",
+        "promotion_transition_141_63",
+        "frozen_origin_shared_runtime"
+      ],
+      "required_lane_ids": ["ownership_safety", "save_compatibility"]
     },
     {
-      "id":"chronicle_current_team_state",
-      "changed_any":["runtime/alpha-chronicle-state-manifest-43600.js"],
-      "affected_consumers":["first_live_ce_hotspot_469","live_hud_499","deliberate_team_assignment_532","konoha_activity_surfaces_431"],
-      "required_lane_ids":["issue469_static","issue499_static","issue532_static","issue532_browser","issue431_browser"]
+      "id": "chronicle_current_team_state",
+      "changed_any": ["runtime/alpha-chronicle-state-manifest-43600.js"],
+      "affected_consumers": [
+        "first_live_ce_hotspot_469",
+        "live_hud_499",
+        "deliberate_team_assignment_532",
+        "konoha_activity_surfaces_431"
+      ],
+      "required_lane_ids": [
+        "issue469_static",
+        "issue499_static",
+        "issue532_static",
+        "issue532_browser",
+        "issue431_browser"
+      ]
     },
     {
-      "id":"active_ui_master_consumption",
-      "changed_any":["Documentation/UI/UI Master Asset Classification and Consumption Registry 2026-10-05.md","runtime/alpha-browser-polish-32700.js","style.css","UI/victory.png","UI/setback.png","UI/exams.png","UI/practical.png","UI/my_clan_browse.png","UI/my_clan_inspection.png"],
-      "affected_consumers":["ui_active_masters_526","victory_setback_results_141","konoha_activity_surfaces_431"],
-      "required_lane_ids":["ui_master_browser","issue431_browser"]
+      "id": "active_ui_master_consumption",
+      "changed_any": [
+        "Documentation/UI/UI Master Asset Classification and Consumption Registry 2026-10-05.md",
+        "runtime/alpha-browser-polish-32700.js",
+        "style.css",
+        "UI/victory.png",
+        "UI/setback.png",
+        "UI/exams.png",
+        "UI/practical.png",
+        "UI/my_clan_browse.png",
+        "UI/my_clan_inspection.png"
+      ],
+      "affected_consumers": [
+        "ui_active_masters_526",
+        "victory_setback_results_141",
+        "konoha_activity_surfaces_431"
+      ],
+      "required_lane_ids": ["ui_master_browser", "issue431_browser"]
     },
     {
-      "id":"chronicle_reference_master",
-      "changed_any":["Documentation/UI/UI Master Asset Classification and Consumption Registry 2026-10-05.md","UI/convo.png"],
-      "affected_consumers":["chronicle_interaction_depth_32"],
-      "required_lane_ids":["issue32_static","issue32_browser"]
+      "id": "chronicle_reference_master",
+      "changed_any": [
+        "Documentation/UI/UI Master Asset Classification and Consumption Registry 2026-10-05.md",
+        "UI/convo.png"
+      ],
+      "affected_consumers": ["chronicle_interaction_depth_32"],
+      "required_lane_ids": ["issue32_static", "issue32_browser"]
     },
     {
-      "id":"battle_result_presentation",
-      "changed_any":["runtime/alpha-alpha-sprint-33100.js","UI/victory.png","UI/setback.png","tools/qa_ui_master_consumption_528_browser.js"],
-      "affected_consumers":["victory_setback_results_141","ui_active_masters_526","frozen_origin_shared_runtime"],
-      "required_lane_ids":["ui_master_browser","issue32_static","save_compatibility"]
+      "id": "battle_result_presentation",
+      "changed_any": [
+        "runtime/alpha-alpha-sprint-33100.js",
+        "UI/victory.png",
+        "UI/setback.png",
+        "tools/qa_ui_master_consumption_528_browser.js"
+      ],
+      "affected_consumers": [
+        "victory_setback_results_141",
+        "ui_active_masters_526",
+        "frozen_origin_shared_runtime"
+      ],
+      "required_lane_ids": ["ui_master_browser", "issue32_static", "save_compatibility"]
     },
     {
-      "id":"konoha_activity_presentation",
-      "changed_any":["runtime/alpha-phase2-konoha-player-surfaces-43110.js","tools/qa_phase2_konoha_player_surfaces_431.js","UI/practical.png","UI/exams.png"],
-      "affected_consumers":["konoha_activity_surfaces_431","ui_active_masters_526"],
-      "required_lane_ids":["issue431_browser","ui_master_browser"]
+      "id": "konoha_activity_presentation",
+      "changed_any": [
+        "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
+        "tools/qa_phase2_konoha-player-surfaces-431.js",
+        "UI/practical.png",
+        "UI/exams.png"
+      ],
+      "affected_consumers": [
+        "konoha_activity_surfaces_431",
+        "ui_active_masters_526"
+      ],
+      "required_lane_ids": ["issue431_browser", "ui_master_browser"]
     },
     {
-      "id":"durable_object_provenance",
-      "changed_any":["runtime/alpha-phase2-inventory-core-46100.js","runtime/alpha-kakashi-v2-rewards-36015.js","tools/qa_durable_object_provenance_545.js","tools/qa_kakashi_tanto_provenance_545.js","tools/qa_kakashi_v2_clean_room.js","tools/qa_issue_322_kakashi_dispositions.js",".github/workflows/issue-545-durable-object-provenance.yml"],
-      "affected_consumers":["inventory_core_461","frozen_origin_shared_runtime"],
-      "required_lane_ids":["runtime_fingerprint","ownership_safety","save_compatibility","issue461_static","issue461_browser","issue545_static","issue32_static"]
+      "id": "durable_object_provenance",
+      "changed_any": [
+        "runtime/alpha-phase2-inventory-core-46100.js",
+        "runtime/alpha-kakashi-v2-rewards-36015.js",
+        "tools/qa_durable_object_provenance_545.js",
+        "tools/qa_kakashi_tanto_provenance_545.js",
+        "tools/qa_kakashi_v2_clean_room.js",
+        "tools/qa_issue_322_kakashi_dispositions.js",
+        ".github/workflows/issue-545-durable-object-provenance.yml"
+      ],
+      "affected_consumers": [
+        "inventory_core_461",
+        "frozen_origin_shared_runtime"
+      ],
+      "required_lane_ids": [
+        "runtime_fingerprint",
+        "ownership_safety",
+        "save_compatibility",
+        "issue461_static",
+        "issue461_browser",
+        "issue545_static",
+        "issue32_static"
+      ]
     },
     {
-      "id":"durable_retail_kunai_552",
-      "changed_any":["runtime/alpha-phase2-basic-item-shop-51700.js","runtime/alpha-phase2-inventory-core-46100.js","tools/qa_phase2_basic_item_shop_517.js","tools/qa_retail_kunai_durable_552.js","tools/qa_retail_kunai_durable_552_browser.js",".github/workflows/issue-552-retail-kunai-durable.yml"],
-      "affected_consumers":["basic_item_shop_517","inventory_core_461"],
-      "required_lane_ids":["runtime_fingerprint","ownership_safety","save_compatibility","issue461_static","issue461_browser","issue545_static","issue517_static","issue517_browser","issue552_static","issue552_browser"]
+      "id": "durable_retail_kunai_552",
+      "changed_any": [
+        "runtime/alpha-phase2-basic-item-shop-51700.js",
+        "runtime/alpha-phase2-inventory-core-46100.js",
+        "tools/qa_phase2_basic_item_shop_517.js",
+        "tools/qa_phase2_inventory_core_461.js",
+        "tools/qa_retail_kunai_durable_552.js",
+        "tools/qa_retail_kunai_durable_552_browser.js",
+        ".github/workflows/issue-552-retail-kunai-durable.yml"
+      ],
+      "affected_consumers": [
+        "basic_item_shop_517",
+        "inventory_core_461"
+      ],
+      "required_lane_ids": [
+        "runtime_fingerprint",
+        "ownership_safety",
+        "save_compatibility",
+        "issue461_static",
+        "issue461_browser",
+        "issue545_static",
+        "issue517_static",
+        "issue517_browser",
+        "issue552_static",
+        "issue552_browser"
+      ]
     },
     {
-      "id":"promotion_transition_contract",
-      "changed_any":["runtime/alpha-genin-roster-63.js","runtime/alpha-traversal-bridge-33200.js","tools/qa_issue_141_traversal_runtime.js","tools/qa_issue_63_genin_v2_runtime.js"],
-      "affected_consumers":["promotion_transition_141_63","frozen_origin_shared_runtime"],
-      "required_lane_ids":["promotion_static","save_compatibility"]
+      "id": "promotion_transition_contract",
+      "changed_any": [
+        "runtime/alpha-genin-roster-63.js",
+        "runtime/alpha-traversal-bridge-33200.js",
+        "tools/qa_issue_141_traversal_runtime.js",
+        "tools/qa_issue_63_genin_v2_runtime.js"
+      ],
+      "affected_consumers": [
+        "promotion_transition_141_63",
+        "frozen_origin_shared_runtime"
+      ],
+      "required_lane_ids": ["promotion_static", "save_compatibility"]
     },
     {
-      "id":"production_loader_surface",
-      "changed_any":["index.html"],
-      "affected_consumers":["inventory_core_461","live_hud_499","basic_item_shop_517","character_card_shop_524","konoha_activity_surfaces_431","victory_setback_results_141","ui_active_masters_526","promotion_transition_141_63","frozen_origin_shared_runtime"],
-      "required_lane_ids":["runtime_fingerprint","issue461_static","issue499_static","issue517_static","issue524_static","promotion_static","issue499_browser","issue524_browser","issue431_browser","ui_master_browser"]
+      "id": "production_loader_surface",
+      "changed_any": ["index.html"],
+      "affected_consumers": [
+        "inventory_core_461",
+        "live_hud_499",
+        "basic_item_shop_517",
+        "character_card_shop_524",
+        "konoha_activity_surfaces_431",
+        "victory_setback_results_141",
+        "ui_active_masters_526",
+        "promotion_transition_141_63",
+        "frozen_origin_shared_runtime"
+      ],
+      "required_lane_ids": [
+        "runtime_fingerprint",
+        "issue461_static",
+        "issue499_static",
+        "issue517_static",
+        "issue524_static",
+        "promotion_static",
+        "issue499_browser",
+        "issue524_browser",
+        "issue431_browser",
+        "ui_master_browser"
+      ]
     },
     {
-      "id":"shared_game_runtime",
-      "changed_any":["game.js"],
-      "affected_consumers":["chronicle_interaction_depth_32","inventory_core_461","first_live_ce_hotspot_469","live_hud_499","basic_item_shop_517","character_card_shop_524","deliberate_team_assignment_532","ui_active_masters_526","promotion_transition_141_63","frozen_origin_shared_runtime"],
-      "required_lane_ids":["runtime_fingerprint","ownership_safety","save_compatibility","issue32_static","issue461_static","issue469_static","issue499_static","issue517_static","issue524_static","issue532_static","promotion_static","issue32_browser","issue532_browser","ui_master_browser"]
+      "id": "shared_game_runtime",
+      "changed_any": ["game.js"],
+      "affected_consumers": [
+        "chronicle_interaction_depth_32",
+        "inventory_core_461",
+        "first_live_ce_hotspot_469",
+        "live_hud_499",
+        "basic_item_shop_517",
+        "character_card_shop_524",
+        "deliberate_team_assignment_532",
+        "ui_active_masters_526",
+        "promotion_transition_141_63",
+        "frozen_origin_shared_runtime"
+      ],
+      "required_lane_ids": [
+        "runtime_fingerprint",
+        "ownership_safety",
+        "save_compatibility",
+        "issue32_static",
+        "issue461_static",
+        "issue469_static",
+        "issue499_static",
+        "issue517_static",
+        "issue524_static",
+        "issue532_static",
+        "promotion_static",
+        "issue32_browser",
+        "issue532_browser",
+        "ui_master_browser"
+      ]
     }
   ]
 }
