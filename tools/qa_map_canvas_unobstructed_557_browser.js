@@ -252,7 +252,8 @@ async function proveSelectedEventDrawer(page,label){
 
     const regionKey=source.node.dataset.regionKey;
     const hotspotId=source.node.dataset.hotspotId;
-    const original=getHotspotProjection;
+    const originalProjection=getHotspotProjection;
+    const originalActivate=activateAlphaRegionHotspot;
     const clone=value=>JSON.parse(JSON.stringify(value));
     const fixture=clone(source.projection);
     const first=clone(fixture.opportunities[0]);
@@ -263,15 +264,27 @@ async function proveSelectedEventDrawer(page,label){
     fixture.opportunityIds=[first.opportunity_id,second.opportunity_id];
     fixture.aggregationCount=2;
 
-    globalThis.__qa557OriginalGetHotspotProjection=original;
-    const replacement=(r,h)=>String(r)===String(regionKey)&&String(h)===String(hotspotId)?fixture:original(r,h);
-    globalThis.getHotspotProjection=replacement;
-    try{getHotspotProjection=replacement;}catch(_error){}
+    globalThis.__qa557OriginalGetHotspotProjection=originalProjection;
+    globalThis.__qa557OriginalActivateAlphaRegionHotspot=originalActivate;
+    globalThis.__qa557ActivationResult=null;
 
-    return{regionKey,hotspotId,result:activateAlphaRegionHotspot(null,regionKey,hotspotId)};
+    const replacementProjection=(r,h)=>String(r)===String(regionKey)&&String(h)===String(hotspotId)?fixture:originalProjection(r,h);
+    globalThis.getHotspotProjection=replacementProjection;
+    try{getHotspotProjection=replacementProjection;}catch(_error){}
+
+    const replacementActivate=function(...args){
+      const result=originalActivate.apply(this,args);
+      globalThis.__qa557ActivationResult=clone(result);
+      return result;
+    };
+    globalThis.activateAlphaRegionHotspot=replacementActivate;
+    try{activateAlphaRegionHotspot=replacementActivate;}catch(_error){}
+
+    source.node.dispatchEvent(new MouseEvent("dblclick",{bubbles:true,cancelable:true,view:window}));
+    return{regionKey,hotspotId,result:globalThis.__qa557ActivationResult};
   });
 
-  assert(activated&&activated.result,`${label}: no real Region opportunity available for selected-event proof`);
+  assert(activated&&activated.result,`${label}: real Region dblclick route did not invoke activation`);
   assert.strictEqual(activated.result.success,true,`${label}: selected-event activation failed: ${JSON.stringify(activated)}`);
   assert.strictEqual(activated.result.type,"event_drawer",`${label}: selected event did not use shared event drawer`);
   assert.strictEqual(activated.result.reason,"multiple_opportunities",`${label}: exact multiple-opportunity route not reached`);
@@ -306,12 +319,19 @@ async function proveSelectedEventDrawer(page,label){
   await page.screenshot({path:path.join(OUT,shot),fullPage:true});
 
   await page.evaluate(()=>{
-    const original=globalThis.__qa557OriginalGetHotspotProjection;
-    if(original){
-      globalThis.getHotspotProjection=original;
-      try{getHotspotProjection=original;}catch(_error){}
+    const originalProjection=globalThis.__qa557OriginalGetHotspotProjection;
+    if(originalProjection){
+      globalThis.getHotspotProjection=originalProjection;
+      try{getHotspotProjection=originalProjection;}catch(_error){}
       delete globalThis.__qa557OriginalGetHotspotProjection;
     }
+    const originalActivate=globalThis.__qa557OriginalActivateAlphaRegionHotspot;
+    if(originalActivate){
+      globalThis.activateAlphaRegionHotspot=originalActivate;
+      try{activateAlphaRegionHotspot=originalActivate;}catch(_error){}
+      delete globalThis.__qa557OriginalActivateAlphaRegionHotspot;
+    }
+    delete globalThis.__qa557ActivationResult;
     closeRegionEventDrawer();
   });
   await settle(page,180);
