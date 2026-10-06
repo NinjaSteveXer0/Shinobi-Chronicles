@@ -7,18 +7,20 @@ const WRITING_GOLDEN_PATH="runtime/academy-kakashi-v2-writing-golden-36100.js";
 const CORE_PATH="runtime/alpha-kakashi-v2-core-36020.js";
 const BATTLE_PATH="runtime/alpha-kakashi-v2-battle-36010.js";
 const REWARD_PATH="runtime/alpha-kakashi-v2-rewards-36015.js";
+const INVENTORY_PATH="runtime/alpha-phase2-inventory-core-46100.js";
 const RENDER_PATH="runtime/alpha-kakashi-v2-renderer-36030.js";
 const TRANSITION_PATH="runtime/alpha-kakashi-v2-transition-36040.js";
 const STORY_PATH="runtime/alpha-story-scene-board-33900.js";
 const EVIDENCE_PATH="runtime/alpha-special-jonin-evidence-producer-34700.js";
 const TRAVERSAL_PATH="runtime/alpha-traversal-bridge-33200.js";
 
-for(const p of [CONTENT_PATH,WRITING_GOLDEN_PATH,CORE_PATH,BATTLE_PATH,REWARD_PATH,RENDER_PATH,TRANSITION_PATH,STORY_PATH,EVIDENCE_PATH])assert(fs.existsSync(p),`missing V2/shared file: ${p}`);
+for(const p of [CONTENT_PATH,WRITING_GOLDEN_PATH,CORE_PATH,BATTLE_PATH,REWARD_PATH,INVENTORY_PATH,RENDER_PATH,TRANSITION_PATH,STORY_PATH,EVIDENCE_PATH])assert(fs.existsSync(p),`missing V2/shared file: ${p}`);
 
 const contentSource=fs.readFileSync(CONTENT_PATH,"utf8");
 const writingGoldenSource=fs.readFileSync(WRITING_GOLDEN_PATH,"utf8");
 const battleSource=fs.readFileSync(BATTLE_PATH,"utf8");
 const rewardSource=fs.readFileSync(REWARD_PATH,"utf8");
+const inventorySource=fs.readFileSync(INVENTORY_PATH,"utf8");
 const coreSource=fs.readFileSync(CORE_PATH,"utf8");
 const rendererSource=fs.readFileSync(RENDER_PATH,"utf8");
 const transitionSource=fs.readFileSync(TRANSITION_PATH,"utf8");
@@ -84,6 +86,8 @@ assert(rendererSource.includes('if(preset==="anbu_handoff")')&&rendererSource.in
     savePlayerData:()=>true,saveTestState:()=>true
   };
   context.globalThis=context;vm.createContext(context);
+  vm.runInContext(inventorySource,context,{filename:INVENTORY_PATH});
+  assert.strictEqual(typeof context.commitDurableInventoryAcquisition54500,"function","canonical #461 durable provenance owner missing in Kakashi clean-room");
   vm.runInContext(rewardSource,context,{filename:REWARD_PATH});
   const diag=context.runAcademyKakashiV2Rewards36015Diagnostics();
   assert.strictEqual(diag.pass,true,JSON.stringify(diag,null,2));
