@@ -1,0 +1,50 @@
+name: Issue 576 Expert Master Curriculum Profiles
+
+on:
+  push:
+    branches:
+      - coding/576-expert-master-curriculum-profiles
+    paths:
+      - 'runtime/alpha-discipline-curriculum-profiles-57600.js'
+      - 'tools/qa_issue_576_expert_master_curriculum_profiles.js'
+      - '.github/workflows/issue-576-expert-master-curriculum.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'runtime/alpha-discipline-curriculum-profiles-57600.js'
+      - 'tools/qa_issue_576_expert_master_curriculum_profiles.js'
+      - '.github/workflows/issue-576-expert-master-curriculum.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  expert-master-curriculum:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Source syntax
+        run: |
+          node --check runtime/alpha-discipline-curriculum-profiles-57600.js
+          node --check tools/qa_issue_576_expert_master_curriculum_profiles.js
+
+      - name: Issue 576 deterministic curriculum contract
+        run: node tools/qa_issue_576_expert_master_curriculum_profiles.js
+
+      - name: Existing Discipline Development regression
+        run: node tools/qa_issue_448_discipline_stat_growth.js
+
+      - name: Chronicle State Manifest regression
+        run: node tools/qa_phase2_chronicle_state_manifest_436.js
+
+      - name: Existing save compatibility
+        run: node tools/qa_save_compatibility_311.js
+
+      - name: Runtime ownership safety
+        run: node tools/qa_runtime_ownership_safety_300.js
