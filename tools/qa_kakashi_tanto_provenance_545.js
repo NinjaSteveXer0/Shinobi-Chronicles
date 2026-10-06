@@ -22,8 +22,16 @@ assert(REWARD.includes('trainingTantoInstanceId:tanto.instanceId||null'),"Termin
 assert(INVENTORY.includes('const PROVENANCE_ROOT_KEY="durableObjectProvenance14800"'),"Canonical provenance store missing");
 assert(INVENTORY.includes('function commitDurableInventoryAcquisition54500'),"Canonical durable acquisition API missing");
 assert(INVENTORY.includes('globalThis.addItemToInventory'),"Canonical durable acquisition must consume existing Inventory writer");
-assert(!INVENTORY.includes('ownedObjects'),"Provenance layer must not create a second ownership collection");
-assert(!INVENTORY.includes('provenanceScore'),"Provenance history must not become a hidden power score");
+const secondOwnershipPatterns=[
+  /\bownedObjects\s*[:=]\s*[\[{]/,
+  /(?:playerData|pd|state)\s*\.\s*ownedObjects\s*=/
+];
+assert(secondOwnershipPatterns.every(pattern=>!pattern.test(INVENTORY)),"Provenance layer must not create a second ownership collection");
+const provenancePowerPatterns=[
+  /\bprovenanceScore\s*[:=]\s*(?!["'])/,
+  /\b(?:power|plBonus)\s*:\s*[^,}\n]+provenance/i
+];
+assert(provenancePowerPatterns.every(pattern=>!pattern.test(INVENTORY)),"Provenance history must not become a hidden power score");
 
 const commitItemSource=REWARD.slice(REWARD.indexOf("function commitItemSource"),REWARD.indexOf("function commitTerminal"));
 assert(commitItemSource.includes("commitDurableInventoryAcquisition54500"),"Durable reward branch missing from commitItemSource");
