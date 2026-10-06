@@ -190,15 +190,21 @@ async function assertHotspotsReachable(page,surface,label){
 }
 
 async function proveObserverContext(page,surface,label){
-  const rows=await hotspotRows(page,surface);
-  const target=rows.find(row=>row.visible&&row.reachable&&row.contextBound)||rows.find(row=>row.visible&&row.reachable);
-  assert(target,`${label}: no pointer-reachable hotspot for observer-context proof`);
   const selector=surface==="region"?".region-hotspot[data-hotspot-id][data-region-key]":"[data-village-hotspot-id]";
+  await page.waitForFunction(selector=>[...document.querySelectorAll(selector)].some(node=>{
+    if(node.dataset.hud499ContextBound!=="true")return false;
+    const r=node.getBoundingClientRect(),cs=getComputedStyle(node);
+    return r.width>0&&r.height>0&&cs.display!=="none"&&cs.visibility!=="hidden"&&Number(cs.opacity||1)>0;
+  }),selector,{timeout:5000});
+
+  const rows=await hotspotRows(page,surface);
+  const target=rows.find(row=>row.visible&&row.reachable&&row.contextBound);
+  assert(target,`${label}: no bound pointer-reachable hotspot for observer-context proof`);
   await page.locator(selector).nth(target.index).dispatchEvent("mouseenter");
   await page.waitForFunction(()=>{
     const panel=document.querySelector('#sc-phase2-live-hud-49900 .sc-hud499-context[data-active="true"]');
     return !!(panel&&String(panel.innerText||"").trim());
-  },null,{timeout:2000});
+  },null,{timeout:3000});
 }
 
 async function contextVisibility(page){
@@ -250,28 +256,51 @@ async function proveSelectedEventDrawer(page,label){
       ||rows.find(row=>row.projection&&Array.isArray(row.projection.opportunities)&&row.projection.opportunities.length>0);
     if(!source)return null;
 
-    const regionKey=source.node.dataset.regionKey;
-    const hotspotId=source.node.dataset.hotspotId;
-    const originalProjection=getHotspotProjection;
-    const originalActivate=activateAlphaRegionHotspot;
     const clone=value=>JSON.parse(JSON.stringify(value));
-    const fixture=clone(source.projection);
-    const first=clone(fixture.opportunities[0]);
-    const second=clone(first);
-    second.opportunity_id=String(first.opportunity_id||"qa557_opportunity")+"__qa557_second";
-    second.known_label=String(first.known_label||"KNOWN OPPORTUNITY")+" — SECOND KNOWN POSSIBILITY";
-    fixture.opportunities=[first,second];
-    fixture.opportunityIds=[first.opportunity_id,second.opportunity_id];
-    fixture.aggregationCount=2;
+    const regionKey=String(source.node.dataset.regionKey||"");
+    const hotspotId=String(source.projection.hotspotId||source.node.dataset.hotspotId||"");
+    const locationId=String(source.projection.locationId||source.projection.opportunities[0]?.location_id||"");
+    const anchor=clone(source.projection.anchor||{x:50,y:50});
+    const qaOpportunityId="qa557_event_drawer_second_known_possibility";
+    unregisterWorldEventOpportunity(qaOpportunityId);
 
-    globalThis.__qa557OriginalGetHotspotProjection=originalProjection;
+    const registered=registerWorldEventOpportunity({
+      opportunityId:qaOpportunityId,
+      hotspotId,
+      eventId:null,
+      locationId,
+      regionKey,
+      sourceKind:"authored",
+      randomPoolEligible:false,
+      defaultDiscoveryLevel:"discovered",
+      presentation:{
+        family:"Discovery",
+        label:"QA SECOND KNOWN POSSIBILITY",
+        summary:"A second observer-known possibility used only to prove the shared Region disambiguation drawer.",
+        showUnknownMarker:false
+      },
+      anchor,
+      interactions:[{
+        id:"qa557_inspect",
+        label:"INSPECT",
+        kind:"custom",
+        resolve:()=>({success:false,reason:"qa557_no_commit"})
+      }]
+    });
+    if(!registered||registered.success!==true)return{registration:registered,regionKey,hotspotId,locationId};
+
+    selectedHotspotId=null;
+    selectedOpportunityId=null;
+    renderRegionHubUI(regionKey,worldRegions[regionKey]);
+
+    const refreshed=[...document.querySelectorAll(".region-hotspot[data-hotspot-id][data-region-key]")]
+      .find(node=>String(node.dataset.regionKey||"")===regionKey&&String(node.dataset.hotspotId||"")===hotspotId);
+    if(!refreshed)return{registration:registered,regionKey,hotspotId,locationId,reason:"refreshed_hotspot_missing"};
+
+    const grouped=getHotspotProjection(regionKey,hotspotId);
+    const originalActivate=activateAlphaRegionHotspot;
     globalThis.__qa557OriginalActivateAlphaRegionHotspot=originalActivate;
     globalThis.__qa557ActivationResult=null;
-
-    const replacementProjection=(r,h)=>String(r)===String(regionKey)&&String(h)===String(hotspotId)?fixture:originalProjection(r,h);
-    globalThis.getHotspotProjection=replacementProjection;
-    try{getHotspotProjection=replacementProjection;}catch(_error){}
-
     const replacementActivate=function(...args){
       const result=originalActivate.apply(this,args);
       globalThis.__qa557ActivationResult=clone(result);
@@ -280,18 +309,36 @@ async function proveSelectedEventDrawer(page,label){
     globalThis.activateAlphaRegionHotspot=replacementActivate;
     try{activateAlphaRegionHotspot=replacementActivate;}catch(_error){}
 
-    source.node.dispatchEvent(new MouseEvent("dblclick",{bubbles:true,cancelable:true,view:window}));
-    return{regionKey,hotspotId,result:globalThis.__qa557ActivationResult};
+    refreshed.dispatchEvent(new MouseEvent("dblclick",{bubbles:true,cancelable:true,view:window}));
+    const drawer=document.querySelector(".region-map-pane .region-event-drawer");
+    return{
+      registration:registered,
+      qaOpportunityId,
+      regionKey,
+      hotspotId,
+      locationId,
+      aggregationCount:grouped&&grouped.aggregationCount,
+      result:globalThis.__qa557ActivationResult,
+      immediateDrawer:drawer?{
+        text:String(drawer.innerText||""),
+        width:drawer.getBoundingClientRect().width,
+        height:drawer.getBoundingClientRect().height,
+        display:getComputedStyle(drawer).display,
+        visibility:getComputedStyle(drawer).visibility
+      }:null
+    };
   });
 
-  assert(activated&&activated.result,`${label}: real Region dblclick route did not invoke activation`);
+  assert(activated&&activated.registration&&activated.registration.success===true,`${label}: QA opportunity registration failed: ${JSON.stringify(activated)}`);
+  assert(activated.aggregationCount>=2,`${label}: real Region grouping did not aggregate the temporary second known possibility: ${JSON.stringify(activated)}`);
+  assert(activated.result,`${label}: real Region dblclick route did not invoke activation`);
   assert.strictEqual(activated.result.success,true,`${label}: selected-event activation failed: ${JSON.stringify(activated)}`);
   assert.strictEqual(activated.result.type,"event_drawer",`${label}: selected event did not use shared event drawer`);
   assert.strictEqual(activated.result.reason,"multiple_opportunities",`${label}: exact multiple-opportunity route not reached`);
 
   await page.waitForFunction(()=>{
     const drawer=document.querySelector(".region-map-pane .region-event-drawer");
-    if(!drawer||!String(drawer.innerText||"").includes("OPPORTUNITIES AT THIS HOTSPOT"))return false;
+    if(!drawer)return false;
     const r=drawer.getBoundingClientRect(),cs=getComputedStyle(drawer);
     return r.width>0&&r.height>0&&cs.display!=="none"&&cs.visibility!=="hidden";
   },null,{timeout:3000});
@@ -305,7 +352,7 @@ async function proveSelectedEventDrawer(page,label){
       optionButtons:[...drawer.querySelectorAll("button")].filter(button=>!String(button.getAttribute("aria-label")||"").toLowerCase().includes("close")).length
     };
   });
-  assert(presentation&&presentation.text.includes("OPPORTUNITIES AT THIS HOTSPOT"),`${label}: selected-event disambiguation copy missing`);
+  assert(presentation&&presentation.text.includes("OPPORTUNITIES AT THIS HOTSPOT"),`${label}: selected-event disambiguation copy missing: ${JSON.stringify({activated,presentation})}`);
   assert(presentation.optionButtons>=2,`${label}: selected-event drawer did not expose both known possibilities`);
 
   const g=await geometry(page,"region");
@@ -318,13 +365,7 @@ async function proveSelectedEventDrawer(page,label){
   const shot=label.startsWith("1366")?"05-region-selected-event-1366x768.png":"06-region-selected-event-1920x1080.png";
   await page.screenshot({path:path.join(OUT,shot),fullPage:true});
 
-  await page.evaluate(()=>{
-    const originalProjection=globalThis.__qa557OriginalGetHotspotProjection;
-    if(originalProjection){
-      globalThis.getHotspotProjection=originalProjection;
-      try{getHotspotProjection=originalProjection;}catch(_error){}
-      delete globalThis.__qa557OriginalGetHotspotProjection;
-    }
+  await page.evaluate(qaOpportunityId=>{
     const originalActivate=globalThis.__qa557OriginalActivateAlphaRegionHotspot;
     if(originalActivate){
       globalThis.activateAlphaRegionHotspot=originalActivate;
@@ -333,7 +374,9 @@ async function proveSelectedEventDrawer(page,label){
     }
     delete globalThis.__qa557ActivationResult;
     closeRegionEventDrawer();
-  });
+    unregisterWorldEventOpportunity(qaOpportunityId);
+    if(selectedRegionKey&&worldRegions[selectedRegionKey])renderRegionHubUI(selectedRegionKey,worldRegions[selectedRegionKey]);
+  },activated.qaOpportunityId);
   await settle(page,180);
   assert.strictEqual(await semanticFingerprint(page),before,`${label}: selected-event presentation mutated Chronicle/World state`);
 }
