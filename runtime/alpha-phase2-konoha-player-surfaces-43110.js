@@ -195,6 +195,10 @@ const STYLE_ID="sc-hokage-office-dispatch-53300";
 const OFFICE_HOST_ID="KON-P01";
 const SOURCE_OCCURRENCE_ID="occ_konoha_ce_kakashi_masked_interceptor_admin_crossing_v1";
 const LEAD_CHOICES=Object.freeze(["ask_about_delivery","observe_intake_and_departure"]);
+const CE469_SCENE_IDS=new Set([
+  "scene_konoha_ce_kakashi_masked_interceptor_admin_crossing_v1",
+  "scene_konoha_ce_kakashi_masked_interceptor_admin_crossing_menma_v1"
+]);
 let activeContext=null;
 
 function clone(value){try{return value&&typeof value==="object"?JSON.parse(JSON.stringify(value)):value;}catch(_error){return value;}}
@@ -308,7 +312,12 @@ function semanticFingerprint(){
     currentTeam:safeCall("getChronicleCurrentTeam43600")
   });
 }
+function ce469SceneActive(){
+  const active=safeCall("getActiveStorySceneRuntime");
+  return !!(active&&CE469_SCENE_IDS.has(String(active.sceneId||"")));
+}
 function ce469HasPriority(){
+  if(ce469SceneActive())return true;
   if(typeof globalThis.getKonohaCeHotspotEligibility46900!=="function")return true;
   const gate=safeCall("getKonohaCeHotspotEligibility46900");
   return !!(gate&&gate.available===true);
@@ -379,7 +388,8 @@ function diagnostics(){
   const checks={
     officeHostExact:OFFICE_HOST_ID==="KON-P01",
     consumesExistingP01Control:String(activationTarget).includes("data-village-hotspot-id")&&!String(onOfficeActivation).includes("createElement"),
-    ce469FirstRefusal:String(routeDecision).includes("ce469HasPriority")&&String(ce469HasPriority).includes("getKonohaCeHotspotEligibility46900"),
+    ce469FirstRefusal:String(routeDecision).includes("ce469HasPriority")&&String(ce469HasPriority).includes("getKonohaCeHotspotEligibility46900")&&String(ce469HasPriority).includes("ce469SceneActive"),
+    activeCe469SceneProtected:String(ce469SceneActive).includes("getActiveStorySceneRuntime"),
     noGlobalVillageRouterReplacement:!String(installHokageOfficeChronicleDispatch53300).includes("activateAlphaKonohaV3PublicLocation"),
     missionProjectionDelegates:typeof globalThis["openOverlay"]==="function",
     dispatchConsumesExisting469:typeof globalThis.getKonohaCeHotspotBranchConsequence46900!=="function"||issuedLeadIds().every(Boolean),
