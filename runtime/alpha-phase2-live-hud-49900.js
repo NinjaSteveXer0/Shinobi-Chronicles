@@ -997,3 +997,38 @@ globalThis.refreshUnobstructedMapCanvas55700=sync;
 globalThis.runUnobstructedMapCanvas55700Diagnostics=diagnostics;
 globalThis.SC_MAP_CANVAS_UNOBSTRUCTED_55700=Object.freeze({patchId:PATCH_ID,presentationOnly:true,browserGoldenClaimed:false});
 })();
+
+// #557 selected Region location / discovery card: keep the existing interaction
+// contract but project the card into the same right-side contextual reserve.
+(function installSelectedRegionContextReserve55710(){
+"use strict";
+if(typeof document==="undefined"||document.getElementById("sc-map-canvas-context-reserve-55710-style"))return;
+const style=document.createElement("style");
+style.id="sc-map-canvas-context-reserve-55710-style";
+style.textContent=`
+  .overlay-content-box.sc-map557-active .region-map-pane .region-event-drawer{
+    left:auto!important;
+    right:var(--sc-map557-outboard-right)!important;
+    top:136px!important;
+    bottom:86px!important;
+    width:var(--sc-map557-gutter-control-width)!important;
+    max-width:var(--sc-map557-gutter-control-width)!important;
+    max-height:none!important;
+    box-sizing:border-box!important;
+    padding:10px!important;
+    z-index:320!important;
+  }
+  body:has(.overlay-content-box.sc-map557-active .region-map-pane .region-event-drawer)
+  #sc-phase2-live-hud-49900[data-surface="region"] .sc-hud499-context{
+    opacity:0!important;
+    visibility:hidden!important;
+  }
+  .overlay-content-box.sc-map557-active .region-map-pane:has(.region-event-drawer) .region-info-toggle,
+  .overlay-content-box.sc-map557-active .region-map-pane:has(.region-event-drawer) .region-info-drawer{
+    opacity:0!important;
+    visibility:hidden!important;
+    pointer-events:none!important;
+  }
+`;
+document.head.appendChild(style);
+})();
