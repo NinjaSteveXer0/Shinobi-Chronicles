@@ -60,7 +60,7 @@ async function advanceBeat(page,id){for(let i=0;i<20;i++){const beat=await page.
 async function scenario(browser,width,height,reduced,label){
   const context=await browser.newContext({viewport:{width,height},reducedMotion:reduced?"reduce":"no-preference"});const page=await context.newPage();const errors=await installBrowserRuntimeErrorGate(page);
   try{
-    await boot(page);await setup(page,"sc_run_v1_qa490_"+label.replace(/\W+/g,"_"));await openScene(page);
+    await boot(page);await setup(page,"sc_run_v1_qa490_"+label.replace(/\W+/g,"_"));await openScene(page);await page.waitForTimeout(520);
     const rows=await stage(page),ids=rows.map(r=>r.id);
     assert.deepStrictEqual([...ids].sort(),["academy_hinata","academy_kakashi","academy_kakashi_origin_masked_interceptor","academy_menma"].sort());
     assert(rows.every(r=>r.opacity>=.99&&r.filter==="none"&&r.benchmark==="true"),label+" present-actor presentation drift: "+JSON.stringify(rows));
