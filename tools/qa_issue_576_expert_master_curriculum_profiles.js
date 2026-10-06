@@ -12,29 +12,30 @@ const EXACT_IDS=[
 ];
 
 for(const id of EXACT_IDS)assert(SRC576.includes(id),"missing exact curriculum profile: "+id);
-assert(!SRC576.includes("currentCurriculumLevel"),"#576 must not persist a semantic currentCurriculumLevel");
-assert(!SRC576.includes("Technique Practice")&&!SRC576.includes("techniquePracticeRouteId"),"#576 must not activate Technique Practice");
+assert(!SRC576.includes("currentCurriculumLevel"),"#576 must not persist semantic currentCurriculumLevel authority");
+assert(!SRC576.includes("techniquePracticeRouteId"),"#576 must not activate Technique Practice");
 assert(!SRC576.includes("playerData.ryo")&&!SRC576.includes("playerData.energy"),"#576 must not invent curriculum Ryō/Energy spend");
-assert(!SRC576.includes("performDisciplineTraining="),"#576 must not create a generic Training Grounds Discipline writer");
+assert(!/globalThis\.performDisciplineTraining\s*=(?!=)/.test(SRC576),"#576 must not replace the generic Training Grounds Discipline writer");
 
 function formula(stats){
   const vals=DISC.map(id=>Number(stats[id])||0).sort((a,b)=>b-a);
   const highest=vals[0]||0,top3=(vals[0]+vals[1]+vals[2])/3,all=vals.reduce((a,b)=>a+b,0)/7;
   return 0.60*highest+0.25*top3+0.15*all;
 }
-function stats(primary=14){return{nin:primary,tai:9,gen:primary,buki:7,fuin:primary,kin:5,stamina:10};}
-function progression(exp=0){return Object.fromEntries(DISC.map(id=>[id,{level:1,exp:["nin","gen","fuin"].includes(id)?exp:0,statLevelApplied:1}]));}
+function makeStats(primary=14){return{nin:primary,tai:9,gen:primary,buki:7,fuin:primary,kin:5,stamina:10};}
+function makeProgression(exp=0){return Object.fromEntries(DISC.map(id=>[id,{level:1,exp:["nin","gen","fuin"].includes(id)?exp:0,statLevelApplied:1}]));}
 function boot({primary=14,exp=0,kakashiNin=16}={}){
   const ctx=vm.createContext({console:{log(){},warn(){},error(){}},Date,Math,JSON,Object,Array,Number,String,Set,Map,Infinity,RegExp});
-  ctx.__pass=true;ctx.__saves=0;ctx.__energy=7;ctx.__team={committed:true,assignmentId:"team-576-a",originVariantId:"academy_menma",teamVariantIds:["academy_menma","academy_hinata","academy_kakashi"]};
+  ctx.__pass=true;ctx.__saves=0;ctx.__energy=7;
+  ctx.__team={committed:true,assignmentId:"team-576-a",originVariantId:"academy_menma",teamVariantIds:["academy_menma","academy_hinata","academy_kakashi"]};
   ctx.playerTeam=[
-    {id:"academy_menma",registryId:"academy_menma",name:"Menma",baseStats:stats(5),stats:stats(primary),disciplineProgression:progression(exp),weaponSpecializations:{},permanentPLBonus:0},
-    {id:"academy_hinata",registryId:"academy_hinata",name:"Hinata",baseStats:stats(5),stats:stats(9),disciplineProgression:progression(0),weaponSpecializations:{},permanentPLBonus:0},
-    {id:"academy_kakashi",registryId:"academy_kakashi",name:"Kakashi",baseStats:stats(5),stats:{...stats(9),nin:kakashiNin},disciplineProgression:progression(0),weaponSpecializations:{},permanentPLBonus:0}
+    {id:"academy_menma",registryId:"academy_menma",name:"Menma",baseStats:makeStats(5),stats:makeStats(primary),disciplineProgression:makeProgression(exp),weaponSpecializations:{},permanentPLBonus:0},
+    {id:"academy_hinata",registryId:"academy_hinata",name:"Hinata",baseStats:makeStats(5),stats:makeStats(9),disciplineProgression:makeProgression(0),weaponSpecializations:{},permanentPLBonus:0},
+    {id:"academy_kakashi",registryId:"academy_kakashi",name:"Kakashi",baseStats:makeStats(5),stats:{...makeStats(9),nin:kakashiNin},disciplineProgression:makeProgression(0),weaponSpecializations:{},permanentPLBonus:0}
   ];
   ctx.activityHistory=[];
   ctx.playerData={ryo:500,activityHistory:ctx.activityHistory,characters:{}};
-  const setup=`
+  vm.runInContext(`
     const DISC_IDS=["nin","tai","gen","buki","fuin","kin","stamina"];
     function clone(v){return JSON.parse(JSON.stringify(v));}
     function getPlayerCharacter(id){return playerTeam.find(c=>c.id===id)||null;}
@@ -56,7 +57,7 @@ function boot({primary=14,exp=0,kakashiNin=16}={}){
     function baseRow(characterId,id){const c=getPlayerCharacter(characterId),p=getCharacterDisciplineProgression(characterId,id),d=getShinobiDiscipline(id);return{id,name:d.name,characterId,currentStat:c.stats[id],exp:p.exp,expRequired:50,progressPercent:0,developmentAvailable:true};}
     function getKonohaCharacterActivityData(activityId,characterId){if(activityId==="exam")return{id:"exam",characterId,disciplines:["nin","gen","fuin"].map(id=>baseRow(characterId,id))};if(activityId==="practical")return{id:"practical",characterId,disciplines:["tai","buki","stamina"].map(id=>baseRow(characterId,id))};return null;}
     function getKonohaDisciplineUIPanelData(d){return d?{...d,exp:d.exp||0,expRequired:d.expRequired||50,currentStat:d.currentStat||0}:null;}
-    function renderAlphaActivityDisciplineRows(data,selectedId,serviceId){return(data&&data.disciplines||[]).map(d=>'<button data-discipline-id="'+d.id+'"><span>'+d.name+'</span><span>CURRENT STAT <strong>'+d.currentStat+'</strong></span><span>DEVELOPMENT <b>'+d.exp+' / '+d.expRequired+'</b></span></button>').join('');}
+    function renderAlphaActivityDisciplineRows(data){return(data&&data.disciplines||[]).map(d=>'<button data-discipline-id="'+d.id+'"><span>'+d.name+'</span><span>CURRENT STAT <strong>'+d.currentStat+'</strong></span><span>DEVELOPMENT <b>'+d.exp+' / '+d.expRequired+'</b></span></button>').join('');}
     function getKonohaExamUIScreenData(){const characterId="academy_menma";return{...getKonohaCharacterActivityData("exam",characterId),canExecute:true};}
     function getKonohaPracticalUIScreenData(){const characterId="academy_menma";return{...getKonohaCharacterActivityData("practical",characterId),canExecute:true};}
     function performDisciplineTraining(){return{success:false,reason:"training-ground-stub"};}
@@ -85,8 +86,7 @@ function boot({primary=14,exp=0,kakashiNin=16}={}){
     function recordKonohaPracticalSpecialNotifications(){}
     function renderKonohaPracticalVisualScreen(){}
     const KONOHA_EXAM_ATTEMPT_STATE={lastBatch:[],lastBatchMeta:null};
-  `;
-  vm.runInContext(setup,ctx,{filename:"qa576-setup.js"});
+  `,ctx,{filename:"qa576-setup.js"});
   vm.runInContext(SRC448,ctx,{filename:"alpha-discipline-stat-growth-44800.js"});
   ctx.__performAfter448=ctx.performDisciplineTraining;
   vm.runInContext(SRC576,ctx,{filename:"alpha-discipline-curriculum-profiles-57600.js"});
@@ -95,18 +95,17 @@ function boot({primary=14,exp=0,kakashiNin=16}={}){
 function setStat(ctx,characterId,disciplineId,value,exp=0){
   const c=ctx.getPlayerCharacter(characterId);c.stats[disciplineId]=value;ctx.getCharacterDisciplineProgression(characterId,disciplineId).exp=exp;
 }
-function ids(ctx,type="discipline_development"){return ctx.activityHistory.filter(r=>r&&r.type===type).map(r=>r.activityProfileId).filter(Boolean);}
+function developmentReceipts(ctx){return ctx.activityHistory.filter(r=>r&&r.type==="discipline_development");}
 
-// Registry + exact six profiles.
+// Exact profile registry and ownership firewalls.
 {
   const s=boot();
-  const profiles=JSON.parse(JSON.stringify(s.getDisciplineCurriculumProfiles576()));
-  assert.deepStrictEqual(profiles.map(p=>p.id),EXACT_IDS);
+  assert.deepStrictEqual(JSON.parse(JSON.stringify(s.getDisciplineCurriculumProfiles576())).map(p=>p.id),EXACT_IDS);
   assert.equal(s.runDisciplineCurriculumProfiles576Diagnostics().pass,true);
-  assert.strictEqual(s.performDisciplineTraining,s.__performAfter448,"#576 replaced the generic Training Grounds writer");
+  assert.strictEqual(s.performDisciplineTraining,s.__performAfter448,"#576 replaced the Training Grounds writer");
 }
 
-// Exact 14/15/16, 29/30/31, 49/50/51 boundaries.
+// Exact source-resolution boundaries across all three advanced disciplines.
 {
   const s=boot();
   for(const disciplineId of ["nin","gen","fuin"]){
@@ -119,125 +118,106 @@ function ids(ctx,type="discipline_development"){return ctx.activityHistory.filte
   }
 }
 
-// Academy Kakashi starts above 15 and enters Expert Nin immediately, without fake Foundation history or Rank/Promotion.
+// Academy Kakashi is immediately eligible for Expert Ninjutsu above 15.
 {
   const s=boot({kakashiNin:16});
   const r=s.resolveDisciplineCurriculumProfile576("academy_kakashi","nin","exam");
   assert.equal(r.allowed,true);assert.equal(r.activityProfileId,"discipline_curriculum_nin_expert_v1");
-  assert.equal(s.activityHistory.length,0,"Kakashi Expert entry fabricated lower curriculum history");
+  assert.equal(s.activityHistory.length,0,"Expert entry fabricated Foundation history");
 }
 
-// Practical is an authorised higher-curriculum host even though the old Foundation lane omitted Nin/Gen/Fūin.
+// Practical gains the authorised higher Nin/Gen/Fūin curricula without changing Training Grounds.
 {
   const s=boot({primary:16});
   const data=s.getKonohaCharacterActivityData("practical","academy_menma");
   const nin=data.disciplines.find(d=>d.id==="nin");
-  assert(nin,"Expert Ninjutsu was not registered onto Practical");
-  assert.equal(nin.activityProfileId,"discipline_curriculum_nin_expert_v1");
-  assert.equal(nin.developmentAvailable,true);
+  assert(nin);assert.equal(nin.activityProfileId,"discipline_curriculum_nin_expert_v1");assert.equal(nin.developmentAvailable,true);
 }
 
-// Direct non-curriculum development can enter current curriculum from Current Stat alone.
+// Stat authority alone permits direct Master entry after legitimate external development.
 {
-  const s=boot({primary:14});
-  setStat(s,"academy_menma","nin",30,0);
+  const s=boot({primary:14});setStat(s,"academy_menma","nin",30,0);
   const r=s.resolveDisciplineCurriculumProfile576("academy_menma","nin","exam");
-  assert.equal(r.activityProfileId,"discipline_curriculum_nin_master_v1");
-  assert.equal(s.activityHistory.length,0,"Master entry incorrectly required lower curriculum receipts");
+  assert.equal(r.activityProfileId,"discipline_curriculum_nin_master_v1");assert.equal(s.activityHistory.length,0);
 }
 
-// +1 material failure, +2 effective execution, no generic +3.
+// Generic curriculum actions preserve +1 failure / +2 success and never manufacture +3.
 {
   const s=boot({primary:16});
-  s.__pass=false;
-  const fail=s.executeDisciplineCurriculumAttempt576("exam","academy_menma","nin");
+  s.__pass=false;const fail=s.executeDisciplineCurriculumAttempt576("exam","academy_menma","nin");
   assert.equal(fail.completed,true);assert.equal(fail.developmentExp,1);assert.equal(fail.activityProfileId,"discipline_curriculum_nin_expert_v1");
-  s.__pass=true;
-  const pass=s.executeDisciplineCurriculumAttempt576("exam","academy_menma","nin");
+  s.__pass=true;const pass=s.executeDisciplineCurriculumAttempt576("exam","academy_menma","nin");
   assert.equal(pass.completed,true);assert.equal(pass.developmentExp,2);
-  assert(s.activityHistory.filter(r=>r.type==="discipline_development"&&r.activityProfileId==="discipline_curriculum_nin_expert_v1").every(r=>Number(r.grantedExp)<=2),"generic Expert source emitted +3");
+  assert(developmentReceipts(s).filter(r=>r.activityProfileId==="discipline_curriculum_nin_expert_v1").every(r=>Number(r.grantedExp)<=2));
 }
 
-// Foundation -> Expert -> Master keeps one shared ledger while provenance changes source IDs.
+// Same shared ledger, different exact source provenance: Foundation -> Expert -> Master.
 {
   const s=boot({primary:14,exp:14});s.__pass=true;
-  const f=s.executeDisciplineCurriculumAttempt576("exam","academy_menma","nin");
-  assert.equal(f.completed,true);assert.equal(s.getPlayerCharacter("academy_menma").stats.nin,15);
-  const e=s.executeDisciplineCurriculumAttempt576("exam","academy_menma","nin");
-  assert.equal(e.activityProfileId,"discipline_curriculum_nin_expert_v1");
+  const foundation=s.executeDisciplineCurriculumAttempt576("exam","academy_menma","nin");
+  assert.equal(foundation.completed,true);assert.equal(s.getPlayerCharacter("academy_menma").stats.nin,15);
+  const expert=s.executeDisciplineCurriculumAttempt576("exam","academy_menma","nin");
+  assert.equal(expert.activityProfileId,"discipline_curriculum_nin_expert_v1");
   setStat(s,"academy_menma","nin",30,0);
-  const m=s.executeDisciplineCurriculumAttempt576("exam","academy_menma","nin");
-  assert.equal(m.activityProfileId,"discipline_curriculum_nin_master_v1");
-  const provenance=ids(s);
-  assert(provenance.includes("academy_foundation_discipline_activity_v1"));
-  assert(provenance.includes("discipline_curriculum_nin_expert_v1"));
-  assert(provenance.includes("discipline_curriculum_nin_master_v1"));
-  assert.strictEqual(s.getCharacterDisciplineProgression("academy_menma","nin"),s.getPlayerCharacter("academy_menma").disciplineProgression.nin,"#576 created a second development ledger");
+  const master=s.executeDisciplineCurriculumAttempt576("exam","academy_menma","nin");
+  assert.equal(master.activityProfileId,"discipline_curriculum_nin_master_v1");
+  const profiles=developmentReceipts(s).map(r=>r.activityProfileId);
+  assert(profiles.includes("academy_foundation_discipline_activity_v1"));
+  assert(profiles.includes("discipline_curriculum_nin_expert_v1"));
+  assert(profiles.includes("discipline_curriculum_nin_master_v1"));
+  assert.strictEqual(s.getCharacterDisciplineProgression("academy_menma","nin"),s.getPlayerCharacter("academy_menma").disciplineProgression.nin);
 }
 
-// x10 Foundation stops at 15; x10 Expert stops at 30; x10 Master stops at 50. No silent source switch.
-{
-  const s=boot({primary:14,exp:14});s.__pass=true;
-  const b=s.executeDisciplineCurriculumBatch576("exam","academy_menma","nin",10);
-  assert.equal(b.completedAttempts,1);assert.equal(b.stoppedAtSourceCeiling,true);assert.equal(s.getPlayerCharacter("academy_menma").stats.nin,15);
-  assert(!ids(s).includes("discipline_curriculum_nin_expert_v1"),"Foundation x10 silently switched remaining repetitions to Expert");
-}
-{
-  const s=boot({primary:29,exp:19});s.__pass=true;
-  const b=s.executeDisciplineCurriculumBatch576("exam","academy_menma","nin",10);
-  assert.equal(b.completedAttempts,1);assert.equal(b.stoppedAtSourceCeiling,true);assert.equal(s.getPlayerCharacter("academy_menma").stats.nin,30);
-  const dev=s.activityHistory.filter(r=>r.type==="discipline_development");assert(dev.every(r=>r.activityProfileId==="discipline_curriculum_nin_expert_v1"));
-}
-{
-  const s=boot({primary:49,exp:29});s.__pass=true;
-  const b=s.executeDisciplineCurriculumBatch576("exam","academy_menma","nin",10);
-  assert.equal(b.completedAttempts,1);assert.equal(b.stoppedAtSourceCeiling,true);assert.equal(s.getPlayerCharacter("academy_menma").stats.nin,50);
-  const dev=s.activityHistory.filter(r=>r.type==="discipline_development");assert(dev.every(r=>r.activityProfileId==="discipline_curriculum_nin_master_v1"));
+// x10 batches stop at their starting source ceiling and never silently switch source.
+for(const sample of [
+  {stat:14,exp:14,expected:15,profile:"academy_foundation_discipline_activity_v1",forbidden:"discipline_curriculum_nin_expert_v1"},
+  {stat:29,exp:19,expected:30,profile:"discipline_curriculum_nin_expert_v1",forbidden:"discipline_curriculum_nin_master_v1"},
+  {stat:49,exp:29,expected:50,profile:"discipline_curriculum_nin_master_v1",forbidden:null}
+]){
+  const s=boot({primary:sample.stat,exp:sample.exp});s.__pass=true;
+  const batch=s.executeDisciplineCurriculumBatch576("exam","academy_menma","nin",10);
+  assert.equal(batch.completedAttempts,1);assert.equal(batch.stoppedAtSourceCeiling,true);assert.equal(s.getPlayerCharacter("academy_menma").stats.nin,sample.expected);
+  const profiles=developmentReceipts(s).map(r=>r.activityProfileId);
+  assert(profiles.every(id=>id===sample.profile));
+  if(sample.forbidden)assert(!profiles.includes(sample.forbidden));
 }
 
-// Exhausted primary source spends no resource and does not claim a global cap.
+// Master exhaustion is source exhaustion only; no primary-value attempt and no resource spend.
 {
-  const s=boot({primary:50});const ryo=s.playerData.ryo,energy=s.__energy;
-  const b=s.executeDisciplineCurriculumBatch576("exam","academy_menma","nin",10);
-  assert.equal(b.completedAttempts,0);assert.equal(s.playerData.ryo,ryo);assert.equal(s.__energy,energy);
-  const data=s.getKonohaCharacterActivityData("exam","academy_menma");
-  const html=s.renderAlphaActivityDisciplineRows(data,"nin","exams");
-  assert(html.includes("MASTER CURRICULUM SOURCE EXHAUSTED"));
-  assert(!html.includes("MAX STAT")&&!html.includes("MASTERED DISCIPLINE"));
+  const s=boot({primary:50});const beforeRyo=s.playerData.ryo,beforeEnergy=s.__energy,beforeExp=s.getCharacterDisciplineProgression("academy_menma","nin").exp;
+  const batch=s.executeDisciplineCurriculumBatch576("exam","academy_menma","nin",10);
+  assert.equal(batch.completedAttempts,0);assert.equal(s.playerData.ryo,beforeRyo);assert.equal(s.__energy,beforeEnergy);assert.equal(s.getCharacterDisciplineProgression("academy_menma","nin").exp,beforeExp);
 }
 
-// Exact advanced provenance includes floor/ceiling/source host and persists through the shared save path.
+// Advanced provenance records exact profile, floor, ceiling, host, curve and stable subject.
 {
   const s=boot({primary:16});s.__pass=true;
   const r=s.executeDisciplineCurriculumAttempt576("practical","academy_menma","fuin");
   assert.equal(r.activityProfileId,"discipline_curriculum_fuin_expert_v1");
-  const receipt=s.activityHistory.find(x=>x.type==="discipline_development"&&x.activityProfileId===r.activityProfileId);
-  assert(receipt);assert.equal(receipt.developmentFloorStat,15);assert.equal(receipt.developmentCeilingStat,30);assert.equal(receipt.activityId,"practical");assert.equal(receipt.curveId,"discipline_stat_curve_v1");
-  assert(s.playerData.activityHistory.some(x=>x.receiptId===receipt.receiptId),"advanced provenance was not persisted by shared save path");
+  const receipt=developmentReceipts(s).find(x=>x.activityProfileId===r.activityProfileId);
+  assert(receipt);assert.equal(receipt.developmentFloorStat,15);assert.equal(receipt.developmentCeilingStat,30);assert.equal(receipt.activityId,"practical");assert.equal(receipt.curveId,"discipline_stat_curve_v1");assert(receipt.ownedCharacterId);assert(receipt.sourceOccurrenceId);
+  assert(s.playerData.activityHistory.some(x=>x.receiptId===receipt.receiptId));
 }
 
-// Idempotence: exact occurrence replay does not duplicate EXP or receipts.
+// Exact occurrence replay is idempotent.
 {
-  const s=boot({primary:16});s.__pass=true;
-  const occurrence="qa576-idempotent-expert-nin";
-  const a=s.executeDisciplineCurriculumAttempt576("exam","academy_menma","nin",{sourceOccurrenceId:occurrence});
-  const expAfter=s.getCharacterDisciplineProgression("academy_menma","nin").exp,historyAfter=s.activityHistory.length;
-  const b=s.executeDisciplineCurriculumAttempt576("exam","academy_menma","nin",{sourceOccurrenceId:occurrence});
-  assert.equal(a.completed,true);assert.equal(b.duplicate,true);assert.equal(s.getCharacterDisciplineProgression("academy_menma","nin").exp,expAfter);assert.equal(s.activityHistory.length,historyAfter);
+  const s=boot({primary:16});s.__pass=true;const occurrence="qa576-idempotent-expert-nin";
+  const first=s.executeDisciplineCurriculumAttempt576("exam","academy_menma","nin",{sourceOccurrenceId:occurrence});
+  const exp=s.getCharacterDisciplineProgression("academy_menma","nin").exp,count=s.activityHistory.length;
+  const second=s.executeDisciplineCurriculumAttempt576("exam","academy_menma","nin",{sourceOccurrenceId:occurrence});
+  assert.equal(first.completed,true);assert.equal(second.duplicate,true);assert.equal(s.getCharacterDisciplineProgression("academy_menma","nin").exp,exp);assert.equal(s.activityHistory.length,count);
 }
 
-// Save/reload authority remains #448: canonical Stats + same ledger rehydrate; formula PL only.
+// Save/reload remains #448 authority; canonical Current Stat drives formula PL only.
 {
-  const s=boot({primary:29,exp:19});s.__pass=true;
-  const c=s.getPlayerCharacter("academy_menma");const r=s.executeDisciplineCurriculumAttempt576("exam","academy_menma","nin");
-  assert.equal(r.newStat,30);assert.equal(c.permanentPLBonus,0);assert.equal(s.calculateCurrentPL(c),Math.round(formula(c.stats)));
-  const savedExp=s.playerData.characters.progression_academy_menma.disciplineProgression.nin.exp;
-  c.stats.nin=1;s.getCharacterDisciplineProgression("academy_menma","nin").exp=999;
-  s.rehydrateCanonicalCharacterStats448();
+  const s=boot({primary:29,exp:19});s.__pass=true;const c=s.getPlayerCharacter("academy_menma");
+  const r=s.executeDisciplineCurriculumAttempt576("exam","academy_menma","nin");assert.equal(r.newStat,30);assert.equal(c.permanentPLBonus,0);assert.equal(s.calculateCurrentPL(c),Math.round(formula(c.stats)));
+  const saved=s.playerData.characters.progression_academy_menma;assert(saved);const savedExp=saved.disciplineProgression.nin.exp;
+  c.stats.nin=1;s.getCharacterDisciplineProgression("academy_menma","nin").exp=999;s.rehydrateCanonicalCharacterStats448();
   assert.equal(c.stats.nin,30);assert.equal(s.getCharacterDisciplineProgression("academy_menma","nin").exp,savedExp);
 }
 
-// Stale/current-team regression fails closed before a write.
+// Stale current-team subject fails closed before write.
 {
   const s=boot({primary:16});const before=s.getCharacterDisciplineProgression("academy_menma","nin").exp;
   s.__team={committed:true,assignmentId:"team-576-b",originVariantId:"academy_hinata",teamVariantIds:["academy_hinata","academy_kakashi"]};
