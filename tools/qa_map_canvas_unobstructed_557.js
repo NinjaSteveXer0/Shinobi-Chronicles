@@ -22,8 +22,14 @@ assert(runtime.includes(".region-map-pane .region-event-drawer")||outboard.inclu
 assert(outboard.includes(".region-known-destinations"),"non-spatial known-destination navigation can still cover the Region map");
 assert(outboard.includes(".village-map-return")&&outboard.includes(".village-info-toggle")&&outboard.includes(".village-info-drawer"),"legacy Village navigation/info chrome can still cover the Village map");
 assert(index.includes('href="runtime/alpha-phase2-map-canvas-outboard-557.css"'),"#557 outboard completion stylesheet is not production-loaded");
-assert(browserQa.includes("openRegionEventDisambiguation")&&browserQa.includes("multiple_opportunities")&&browserQa.includes("OPPORTUNITIES AT THIS HOTSPOT"),"#557 browser QA does not deliberately prove the real Region event-disambiguation route");
-assert(browserQa.includes("knownDestinations")&&browserQa.includes("villageControls"),"#557 browser QA does not measure all remaining legacy map chrome");
+
+const deliberateEventProof=(browserQa.includes("openRegionEventDisambiguation")||browserQa.includes("proveSelectedEventDrawer"))
+  &&browserQa.includes("activateAlphaRegionHotspot")
+  &&browserQa.includes("multiple_opportunities")
+  &&browserQa.includes("OPPORTUNITIES AT THIS HOTSPOT");
+assert(deliberateEventProof,"#557 browser QA does not deliberately prove the real Region event-disambiguation route");
+assert(browserQa.includes("knownDestinations")&&browserQa.includes(".village-map-return")&&browserQa.includes(".village-info-toggle")&&browserQa.includes(".village-info-drawer"),"#557 browser QA does not measure all remaining legacy map chrome");
+assert(browserQa.includes("ordinarySingleClickDoesNotOpenDrawer")&&browserQa.includes("deliberateDoubleClickRoute"),"#557 browser QA does not preserve the deliberate Region activation contract");
 assert(runtime.includes("SC_PHASE2_LIVE_HUD_49900"),"#557 does not consume existing #499 presentation authority");
 assert(runtime.includes("SC_MAP_CANVAS_UNOBSTRUCTED_55700"),"#557 integrated activation is not exposed from canonical #499 owner");
 assert(runtime.includes("browserGoldenClaimed:false"),"#557 incorrectly claims browser GOLDEN");
@@ -53,6 +59,7 @@ console.log(JSON.stringify({
   scope:["village","region"],
   selectedLocationInfoOutboard:true,
   eventDisambiguationOutboard:true,
+  deliberateRegionActivationContract:true,
   regionKnownDestinationsOutboard:true,
   villageLegacyChromeOutboard:true,
   semanticMutation:false,
