@@ -8,11 +8,15 @@
    ============================================================================ */
 
 /* #557 may reserve outer presentation space, but the crisp interactive map must
-   remain the dominant part of the visible stage. min-width wins over the
-   runtime max-width when the latter would over-shrink a wide desktop map, while
-   the stage-bound cap prevents overflow on narrower overlay containers. */
+   remain the dominant part of the visible stage. The root-state selectors are
+   intentional: current-main overlay composition can rerender the outer box and
+   momentarily drop its helper class while the canonical #499/#557 root remains
+   authoritative. Do not let that presentation rerender pull chrome back over
+   the map. */
 .overlay-content-box.sc-map557-active .region-map-pane,
-.overlay-content-box.sc-map557-active .village-map-screen {
+.overlay-content-box.sc-map557-active .village-map-screen,
+body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"]) .region-map-pane,
+body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"]) .village-map-screen {
   min-width: min(60vw, calc(100% - 40px)) !important;
 }
 
@@ -24,7 +28,8 @@ body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-h
 }
 
 /* Region non-spatial known destinations are navigation, not geography. */
-.overlay-content-box.sc-map557-active .region-map-pane .region-known-destinations {
+.overlay-content-box.sc-map557-active .region-map-pane .region-known-destinations,
+body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"]) .region-map-pane .region-known-destinations {
   left: auto !important;
   right: var(--sc-map557-outboard-right) !important;
   top: auto !important;
@@ -39,7 +44,8 @@ body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-h
 
 /* The actual Region event/disambiguation drawer uses the same DOM surface as
    the selected-location card. Keep both modes in the approved right reserve. */
-.overlay-content-box.sc-map557-active .region-map-pane .region-event-drawer {
+.overlay-content-box.sc-map557-active .region-map-pane .region-event-drawer,
+body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"]) .region-map-pane .region-event-drawer {
   left: auto !important;
   right: var(--sc-map557-outboard-right) !important;
   top: 136px !important;
@@ -55,23 +61,30 @@ body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-h
 /* Transient rich event selection owns the contextual reserve while open. */
 .overlay-content-box.sc-map557-active .region-map-pane:has(.region-event-drawer) .region-known-destinations,
 .overlay-content-box.sc-map557-active .region-map-pane:has(.region-event-drawer) .region-info-toggle,
-.overlay-content-box.sc-map557-active .region-map-pane:has(.region-event-drawer) .region-info-drawer {
+.overlay-content-box.sc-map557-active .region-map-pane:has(.region-event-drawer) .region-info-drawer,
+body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-context) .region-map-pane:has(.region-event-drawer) .region-known-destinations,
+body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-context) .region-map-pane:has(.region-event-drawer) .region-info-toggle,
+body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-context) .region-map-pane:has(.region-event-drawer) .region-info-drawer {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
 }
 
-body:has(.overlay-content-box.sc-map557-active .region-map-pane .region-event-drawer)
-#sc-phase2-live-hud-49900[data-surface="region"] .sc-hud499-context {
+body:has(.region-map-pane .region-event-drawer)
+#sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-context {
   opacity: 0 !important;
   visibility: hidden !important;
 }
 
 /* Village return and information controls are navigation/context chrome, not
-   map markers. Keep them in the right reserve rather than over Village art. */
+   map markers. Use both the helper-class and canonical root-state selectors so
+   current-main outer-box rerenders cannot strand these controls on map pixels. */
 .overlay-content-box.sc-map557-active .village-map-screen .village-map-return,
 .overlay-content-box.sc-map557-active .village-map-screen .village-info-toggle,
-.overlay-content-box.sc-map557-active .village-map-screen .village-info-drawer {
+.overlay-content-box.sc-map557-active .village-map-screen .village-info-drawer,
+body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"]) .village-map-screen .village-map-return,
+body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"]) .village-map-screen .village-info-toggle,
+body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"]) .village-map-screen .village-info-drawer {
   left: auto !important;
   right: var(--sc-map557-outboard-right) !important;
   width: var(--sc-map557-gutter-control-width) !important;
@@ -79,24 +92,27 @@ body:has(.overlay-content-box.sc-map557-active .region-map-pane .region-event-dr
   box-sizing: border-box !important;
 }
 
-.overlay-content-box.sc-map557-active .village-map-screen .village-map-return {
+.overlay-content-box.sc-map557-active .village-map-screen .village-map-return,
+body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"]) .village-map-screen .village-map-return {
   top: 2% !important;
   min-width: 0 !important;
 }
 
-.overlay-content-box.sc-map557-active .village-map-screen .village-info-toggle {
+.overlay-content-box.sc-map557-active .village-map-screen .village-info-toggle,
+body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"]) .village-map-screen .village-info-toggle {
   top: 44% !important;
 }
 
-.overlay-content-box.sc-map557-active .village-map-screen .village-info-drawer {
+.overlay-content-box.sc-map557-active .village-map-screen .village-info-drawer,
+body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"]) .village-map-screen .village-info-drawer {
   top: calc(44% + 38px) !important;
   max-height: min(31vh, 260px) !important;
   overflow: auto !important;
 }
 
 /* The richer Village info panel temporarily owns the same contextual zone. */
-body:has(.overlay-content-box.sc-map557-active .village-map-screen .village-info-drawer.open)
-#sc-phase2-live-hud-49900[data-surface="village"] .sc-hud499-context {
+body:has(.village-map-screen .village-info-drawer.open)
+#sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-hud499-context {
   opacity: 0 !important;
   visibility: hidden !important;
 }
