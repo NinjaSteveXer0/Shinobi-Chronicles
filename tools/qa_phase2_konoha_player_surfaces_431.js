@@ -12,7 +12,11 @@ async function waitRuntime(page){
   await page.waitForFunction(()=>!!(
     globalThis.SC_CHRONICLE_STATE_MANIFEST_43600&&
     globalThis.SC_PHASE2_KONOHA_PLAYER_SURFACES_43110&&
-    typeof globalThis.getPhase2KonohaActivityTeam43110==="function"
+    globalThis.SC_HOKAGE_OFFICE_CHRONICLE_DISPATCH_53300&&
+    globalThis.SC_PHASE2_CE_HOTSPOT_46900&&
+    typeof globalThis.getPhase2KonohaActivityTeam43110==="function"&&
+    typeof globalThis.getHokageOfficeDispatchProjection53300==="function"&&
+    typeof globalThis.getKonohaCeHotspotEligibility46900==="function"
   ),null,{timeout:30000});
 }
 async function release(page){
@@ -43,6 +47,15 @@ async function activitySnapshot(page,service){
       primaryTop:primary?primary.getBoundingClientRect().top:null
     };
   },service);
+}
+async function semanticFingerprint(page){
+  return page.evaluate(()=>JSON.stringify({
+    activityHistory:Array.isArray(playerData.activityHistory)?playerData.activityHistory:null,
+    worldEventRuntime:playerData.worldEventRuntime||null,
+    currentTeam:getChronicleCurrentTeam43600(),
+    ryo:playerData.ryo,
+    acquisition:playerData.acquisition||null
+  }));
 }
 
 (async()=>{
@@ -168,18 +181,137 @@ async function activitySnapshot(page,service){
       assert.deepStrictEqual(sixExam.data.characters.map(row=>row.id),sixAttempt.ids);
     }
 
-    const diagnostics=await page.evaluate(()=>runPhase2KonohaPlayerSurfaces43110Diagnostics());
-    assert.strictEqual(diagnostics.pass,true,JSON.stringify(diagnostics));
-    await gate.assertClean("phase2-konoha-player-surfaces");
+    // ----------------------------------------------------------------------
+    // #533 — Hokage Office / Chronicle Dispatch Step 6 browser contract.
+    // The fixture creates one already-known #469 lead. Office projection must
+    // consume it without creating another occurrence, Knowledge or Access fact.
+    // ----------------------------------------------------------------------
+    const leadFixture=await page.evaluate(()=>{
+      const consequence=getKonohaCeHotspotBranchConsequence46900("ask_about_delivery");
+      const leadId=consequence&&Array.isArray(consequence.futureLeadIds)?consequence.futureLeadIds[0]:null;
+      if(!leadId)return{error:"469_dispatch_lead_missing"};
+      const id="qa533_known_dispatch_lead_receipt";
+      if(!playerData.activityHistory.some(row=>row&&row.id===id)){
+        playerData.activityHistory.push({
+          id,occurrenceId:id,committed:true,type:"qa_known_lead",locationId:"KON-P01",
+          data:{
+            futureLeadIds:[leadId],
+            branchKnowledge:{redirectedToAdministrationDesk:true},
+            recordAddendum:"The Administration desk is the known public follow-up for this dispatch lead."
+          },
+          sourceRefs:[{type:"world_occurrence",id:"occ_konoha_ce_kakashi_masked_interceptor_admin_crossing_v1",role:"source"}]
+        });
+        savePlayerData();
+      }
+      const original=globalThis.getKonohaCeHotspotEligibility46900;
+      globalThis.getKonohaCeHotspotEligibility46900=()=>({available:true,reason:"qa_priority"});
+      const priority=getHokageOfficeRouteDecision53300("KON-P01");
+      globalThis.getKonohaCeHotspotEligibility46900=()=>({available:false,reason:"qa_office"});
+      const office=getHokageOfficeRouteDecision53300("KON-P01");
+      const other=getHokageOfficeRouteDecision53300("KON-P09");
+      globalThis.getKonohaCeHotspotEligibility46900=original;
+      return{leadId,priority,office,other,dispatch:getHokageOfficeDispatchProjection53300()};
+    });
+    assert(!leadFixture.error,JSON.stringify(leadFixture));
+    assert.strictEqual(leadFixture.priority,"ce_hotspot_469","#533 no longer gives eligible #469 first refusal");
+    assert.strictEqual(leadFixture.office,"hokage_office_533","ineligible/resolved P01 did not route to Office");
+    assert.strictEqual(leadFixture.other,"delegate_existing_location","#533 intercepted a non-P01 location");
+    assert.deepStrictEqual(leadFixture.dispatch.discoveredLeadIds,[leadFixture.leadId]);
+    assert.strictEqual(leadFixture.dispatch.countMode,"known_only_no_seed_denominator_claimed");
+
+    await page.evaluate(()=>openOverlay("village"));
+    await page.waitForSelector('[data-village-hotspot-id="KON-P01"]',{state:"visible",timeout:10000});
+    const p01Cardinality=await page.locator('[data-village-hotspot-id="KON-P01"]').count();
+    assert.strictEqual(p01Cardinality,1,"#533 created a second P01 hotspot/control");
+    assert.strictEqual(await page.locator(".alpha533-office-entry").count(),0,"retired duplicate #533 Office button returned");
+
+    const beforeOffice=await semanticFingerprint(page);
+    await page.evaluate(()=>{
+      const original=globalThis.getKonohaCeHotspotEligibility46900;
+      globalThis.getKonohaCeHotspotEligibility46900=()=>({available:false,reason:"qa_open_office"});
+      const node=[...document.querySelectorAll("[data-village-hotspot-id]")].find(row=>row.dataset.villageHotspotId==="KON-P01");
+      if(!node)throw new Error("KON-P01 missing");
+      node.dispatchEvent(new MouseEvent("dblclick",{bubbles:true,cancelable:true,view:window}));
+      globalThis.getKonohaCeHotspotEligibility46900=original;
+    });
+    await page.waitForSelector('[data-hokage-office="step6"]',{state:"visible",timeout:5000});
+    const officeSnapshot=await page.evaluate(()=>{
+      const root=document.querySelector('[data-hokage-office="step6"]');
+      const dispatch=root.querySelector('[data-office-section="chronicle-dispatch"]');
+      const disabled=[...root.querySelectorAll(".alpha533-business button:disabled")].map(node=>(node.innerText||"").trim());
+      return{
+        text:root.innerText||"",
+        presenceMode:root.dataset.presenceMode||null,
+        dispatchText:dispatch?.innerText||"",
+        leadIds:[...root.querySelectorAll("[data-dispatch-lead-id]")].map(node=>node.dataset.dispatchLeadId),
+        disabled
+      };
+    });
+    assert.strictEqual(officeSnapshot.presenceMode,"physical");
+    assert(officeSnapshot.text.includes("Hokage Office"),"Office shell missing");
+    assert(officeSnapshot.text.includes("Not specified by current caller"),"default Office holder did not fail closed");
+    assert.deepStrictEqual(officeSnapshot.leadIds,[leadFixture.leadId],"Dispatch did not project the known #469 lead exactly once");
+    assert(officeSnapshot.dispatchText.includes("NO SEED DENOMINATOR CLAIMED"),"Dispatch fabricated a fixed rumour denominator");
+    assert(!/\b\d+\s*\/\s*\d+\b/.test(officeSnapshot.dispatchText),"Dispatch rendered a fake N/M total without issued-seed authority");
+    assert(officeSnapshot.disabled.some(text=>/PROMOTIONS/.test(text)),"Promotions did not fail closed in Step 6");
+    assert(officeSnapshot.disabled.some(text=>/VILLAGE AFFAIRS/.test(text)),"Village Affairs did not fail closed in Step 6");
+    assert(officeSnapshot.disabled.some(text=>/DIPLOMACY/.test(text)),"Diplomacy did not fail closed in Step 6");
+    assert(officeSnapshot.disabled.some(text=>/SPECIAL ASSIGNMENTS/.test(text)),"Special Assignments did not fail closed in Step 6");
+    assert.strictEqual(await semanticFingerprint(page),beforeOffice,"opening Hokage Office mutated semantic Chronicle state");
+    await page.screenshot({path:path.join(OUT,"03-hokage-office-step6-dispatch.png"),fullPage:true});
+
+    const cutawayBefore=await semanticFingerprint(page);
+    const cutaway=await page.evaluate(()=>openHokageOffice53300({
+      callerRef:"qa533_cutaway",
+      presenceMode:"cutaway",
+      observer:{id:"qa_observer",displayName:"Caller Observer",rank:"JONIN"},
+      officeHolder:{id:"qa_holder",displayName:"Caller Holder",title:"Hokage"},
+      returnMode:"village"
+    }));
+    assert.strictEqual(cutaway.success,true,JSON.stringify(cutaway));
+    const cutawaySnapshot=await page.evaluate(()=>{
+      const root=document.querySelector('[data-hokage-office="step6"]');
+      return{mode:root?.dataset.presenceMode||null,text:root?.innerText||""};
+    });
+    assert.strictEqual(cutawaySnapshot.mode,"cutaway");
+    assert(cutawaySnapshot.text.includes("Caller Observer"),"caller-bound observer was ignored");
+    assert(cutawaySnapshot.text.includes("Caller Holder"),"caller-bound Office holder was ignored");
+    assert.strictEqual(await semanticFingerprint(page),cutawayBefore,"cutaway presentation manufactured physical/Knowledge state");
+
+    const focusBefore=await semanticFingerprint(page);
+    const focusResult=await page.evaluate(leadId=>focusHokageDispatchLead53300(leadId),leadFixture.leadId);
+    assert.strictEqual(focusResult.success,true,JSON.stringify(focusResult));
+    await page.waitForSelector('[data-village-hotspot-id="KON-P01"][data-dispatch-focus="533"]',{state:"attached",timeout:5000});
+    assert.strictEqual(await semanticFingerprint(page),focusBefore,"Dispatch map focus committed semantic state");
+
+    const beforeReloadProjection=await page.evaluate(()=>getHokageOfficeDispatchProjection53300());
+    await page.reload({waitUntil:"domcontentloaded",timeout:60000});
+    await waitRuntime(page);await release(page);
+    const afterReloadProjection=await page.evaluate(()=>getHokageOfficeDispatchProjection53300());
+    assert.deepStrictEqual(afterReloadProjection.discoveredLeadIds,beforeReloadProjection.discoveredLeadIds,"save/reload rerolled or lost Dispatch lead projection");
+    assert.strictEqual(afterReloadProjection.leads.length,1,"save/reload duplicated Dispatch lead projection");
+
+    const diagnostics=await page.evaluate(()=>({
+      activity:runPhase2KonohaPlayerSurfaces43110Diagnostics(),
+      office:runHokageOfficeChronicleDispatch53300Diagnostics()
+    }));
+    assert.strictEqual(diagnostics.activity.pass,true,JSON.stringify(diagnostics.activity));
+    assert.strictEqual(diagnostics.office.pass,true,JSON.stringify(diagnostics.office));
+    await gate.assertClean("phase2-konoha-player-surfaces-and-hokage-office");
     console.log(JSON.stringify({
-      pass:true,issue:431,
+      pass:true,issue:431,step6Issue:533,
       initialCurrentTeam:["academy_menma","academy_hinata","academy_kakashi"],
       oneMemberCurrentTeamProven:true,
       sixMemberCurrentTeamProven:sixAttempt.supported===true,
       practicalUsesCommittedTeam:true,examsUseCommittedTeam:true,
       trainingGroundRosterUntouched:true,developerFixtureLeak:false,
       resultStagePresent:true,stableActionDock:true,boundedNotificationHistory:true,
-      disciplineAccents:true,naturalPlayerCopy:true,browserGoldenClaimed:false
+      disciplineAccents:true,naturalPlayerCopy:true,
+      hokageOfficeUsesSingleP01Control:true,ce469FirstRefusal:true,
+      dispatchKnownLeadProjected:true,dispatchNoFakeSeedDenominator:true,
+      officeOpenReadOnly:true,cutawayReadOnly:true,mapFocusReadOnly:true,
+      unsupportedStep6BusinessFailsClosed:true,saveReloadNoReroll:true,
+      ownerBrowserAcceptanceStillRequired:true,browserGoldenClaimed:false
     },null,2));
   }finally{await context.close();await browser.close();}
 })().catch(error=>{console.error(error&&error.stack||error);process.exit(1);});
