@@ -7,6 +7,13 @@
    discovery, Chronicle, ownership, assignment, Journey, Ryō, or World state.
    ============================================================================ */
 
+/* Keep the compact identity/journey/Ryō cluster in the clear header reserve.
+   This leaves the right map-side reserve available for navigation/context. */
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-state-cluster,
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-hud499-state-cluster {
+  top: 12px !important;
+}
+
 /* Region non-spatial known destinations are navigation, not geography. */
 .overlay-content-box.sc-map557-active .region-map-pane .region-known-destinations {
   left: auto !important;
