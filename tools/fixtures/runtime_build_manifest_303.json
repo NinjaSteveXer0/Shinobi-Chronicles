@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "buildId": "SC-ALPHA-RUNTIME-R303-2026-10-05-EE",
-  "sourceBaselineCommit": "3e9fbc714ebff8e775321d8fcacc0fbc195d03ec",
+  "buildId": "SC-ALPHA-RUNTIME-R303-2026-10-06-EF",
+  "sourceBaselineCommit": "7b3c01c85a452cfbcb31024271120ed174828989",
   "sourceRef": "issue-303-runtime-build-fingerprint-v1",
-  "runtimeGeneration": "owner-ui-correction-current-team-code-first-my-clan-541",
+  "runtimeGeneration": "durable-object-provenance-foundation-148-545",
   "majorRuntimeFeatures": [
     "academy-kakashi-v2",
     "runtime-ownership-safety-300",
@@ -87,7 +87,8 @@
     "my-clan-code-first-inspector-541",
     "konoha-activity-current-team-1-6-541",
     "konoha-activity-result-stage-stable-dock-453-541",
-    "konoha-activity-active-master-consumption-431-526-528"
+    "konoha-activity-active-master-consumption-431-526-528",
+    "durable-object-provenance-148-545"
   ],
   "productionLoader": "index.html",
   "runtimeModule": "runtime/alpha-runtime-build-fingerprint-303.js",
