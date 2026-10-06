@@ -66,9 +66,22 @@ const chars={
   academy_mirai:{id:"academy_mirai",name:"Mirai",rank:"Academy Student",village:"Hidden Leaf"}
 };
 let activeStory=null;
+const documentStub={
+  body:{},
+  head:{appendChild(){}},
+  activeElement:null,
+  getElementById(){return null;},
+  querySelector(){return null;},
+  createElement(){return{};},
+  addEventListener(){}
+};
+class MutationObserverStub{observe(){} disconnect(){}}
 const ctx=vm.createContext({
   console:{log(){},warn(){},error(){}},
   JSON,Object,Array,String,Number,Boolean,Set,Map,Math,Date,RegExp,Error,TypeError,
+  document:documentStub,
+  MutationObserver:MutationObserverStub,
+  setInterval:()=>0,
   currentOverlayType:null,
   currentBattle:{active:false,battleOver:false},
   playerData:{ryo:321,acquisition:{chronicleOriginVariantId:"academy_menma"}},
