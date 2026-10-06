@@ -418,7 +418,7 @@ function diagnostics(){
     staticP01UpgradePresentationOnly:String(syncOfficeAnchor).includes("data.hokageOfficeAnchor")||String(syncOfficeAnchor).includes("hokageOfficeAnchor"),
     ce469FirstRefusal:String(routeDecision).includes("ce469HasPriority")&&String(ce469HasPriority).includes("getKonohaCeHotspotEligibility46900")&&String(ce469HasPriority).includes("ce469SceneActive"),
     activeCe469SceneProtected:String(ce469SceneActive).includes("getActiveStorySceneRuntime"),
-    noGlobalVillageRouterReplacement:!String(installHokageOfficeChronicleDispatch53300).includes("activateAlphaKonohaV3PublicLocation"),
+    noGlobalVillageRouterReplacement:![syncOfficeAnchor,onOfficeActivation,renderOffice].some(fn=>String(fn).includes("activateAlphaKonohaV3PublicLocation")),
     missionProjectionDelegates:typeof globalThis["openOverlay"]==="function",
     dispatchConsumesExisting469:typeof globalThis.getKonohaCeHotspotBranchConsequence46900!=="function"||issuedLeadIds().every(Boolean),
     dispatchReadsCanonicalResolved469:String(discoveredLeadRows).includes("getKonohaCeHotspotResolvedRecord46900"),
