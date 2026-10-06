@@ -16,10 +16,10 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-05-EE",
-    sourceBaselineCommit:"3e9fbc714ebff8e775321d8fcacc0fbc195d03ec",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-06-EF",
+    sourceBaselineCommit:"7b3c01c85a452cfbcb31024271120ed174828989",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
-    runtimeGeneration:"owner-ui-correction-current-team-code-first-my-clan-541",
+    runtimeGeneration:"durable-object-provenance-foundation-148-545",
     majorRuntimeFeatures:Object.freeze([
       "academy-kakashi-v2",
       "runtime-ownership-safety-300",
@@ -103,7 +103,8 @@
       "my-clan-code-first-inspector-541",
       "konoha-activity-current-team-1-6-541",
       "konoha-activity-result-stage-stable-dock-453-541",
-      "konoha-activity-active-master-consumption-431-526-528"
+      "konoha-activity-active-master-consumption-431-526-528",
+      "durable-object-provenance-148-545"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -134,10 +135,10 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-05-EE",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-06-EF",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
-      generationPresent:first.runtimeGeneration==="owner-ui-correction-current-team-code-first-my-clan-541",
+      generationPresent:first.runtimeGeneration==="durable-object-provenance-foundation-148-545",
       repaired469FeaturePresent:first.majorRuntimeFeatures.includes("phase2-first-live-ce-hotspot-469"),
       privateHistory478FeaturePresent:first.majorRuntimeFeatures.includes("phase2-private-origin-live-ce-hotspot-478"),
       ownerRetestPresentationFeaturePresent:first.majorRuntimeFeatures.includes("story-scene-board-owner-retest-469"),
@@ -171,6 +172,7 @@
       konohaActivityCurrentTeam541Present:first.majorRuntimeFeatures.includes("konoha-activity-current-team-1-6-541"),
       konohaActivityResultStage541Present:first.majorRuntimeFeatures.includes("konoha-activity-result-stage-stable-dock-453-541"),
       konohaActivityActiveMaster431526528Present:first.majorRuntimeFeatures.includes("konoha-activity-active-master-consumption-431-526-528"),
+      durableObjectProvenance148545Present:first.majorRuntimeFeatures.includes("durable-object-provenance-148-545"),
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)
