@@ -42,6 +42,13 @@ function isDurableDefinition(definition,row=null){
   if(definition&&definition.stackable===false)return true;
   return type==="weapon"||type==="gear"||type==="equipment"||type==="tool"||!!(row&&row.instanceId);
 }
+function readProvenanceState(){
+  const pd=currentPlayerData(),state=pd&&pd[PROVENANCE_ROOT_KEY];
+  if(!state||typeof state!=="object"||Array.isArray(state))return null;
+  const objectsByInstanceId=state.objectsByInstanceId&&typeof state.objectsByInstanceId==="object"&&!Array.isArray(state.objectsByInstanceId)?state.objectsByInstanceId:{};
+  const acquisitionReceipts=state.acquisitionReceipts&&typeof state.acquisitionReceipts==="object"&&!Array.isArray(state.acquisitionReceipts)?state.acquisitionReceipts:{};
+  return{schemaVersion:Number(state.schemaVersion)||PROVENANCE_SCHEMA_VERSION,objectsByInstanceId,acquisitionReceipts};
+}
 function ensureProvenanceState(){
   const pd=currentPlayerData();
   if(!pd)return null;
@@ -71,22 +78,22 @@ function inventoryRowByInstance(instanceId){
   return rows.find(row=>row&&String(row.instanceId||"")===String(instanceId))||null;
 }
 function getDurableObjectRecord54500(instanceId){
-  const state=ensureProvenanceState();
+  const state=readProvenanceState();
   const row=state&&state.objectsByInstanceId&&state.objectsByInstanceId[String(instanceId||"")];
   return row?clone(row):null;
 }
 function getDurableAcquisitionReceipt54500(addressOrSpec){
-  const state=ensureProvenanceState();
+  const state=readProvenanceState();
   if(!state)return null;
   const address=typeof addressOrSpec==="string"?addressOrSpec:acquisitionAddress(addressOrSpec||{});
   const row=state.acquisitionReceipts[address];
   return row?clone(row):null;
 }
 function appendProvenanceEvent54500({instanceId,itemId,eventType,sourceOccurrenceId,sourceId,sourceRefs=[],metadata={},timestamp=null,deferSave=false}){
-  const state=ensureProvenanceState();
-  if(!state)return{success:false,reason:"player_state_unavailable"};
   const id=String(instanceId||"").trim(),definitionId=String(itemId||"").trim();
   if(!id||!definitionId||!eventType||!sourceOccurrenceId||!sourceId)return{success:false,reason:"provenance_event_identity_incomplete"};
+  const state=ensureProvenanceState();
+  if(!state)return{success:false,reason:"player_state_unavailable"};
   const existing=state.objectsByInstanceId[id];
   if(existing&&String(existing.itemId||"")!==definitionId)return{success:false,reason:"durable_object_definition_conflict",instanceId:id,itemId:definitionId};
   const object=existing||{
@@ -148,8 +155,8 @@ function commitDurableInventoryAcquisition54500({
   if(!sourceOccurrenceId||!sourceId)return{success:false,reason:"durable_acquisition_source_incomplete"};
   if(typeof globalThis.addItemToInventory!=="function")return{success:false,reason:"inventory_ownership_writer_missing"};
   const address=acquisitionAddress({sourceOccurrenceId,sourceId,itemId,acquisitionKind});
-  const state=ensureProvenanceState();
-  const existingReceipt=state.acquisitionReceipts[address];
+  const state=readProvenanceState();
+  const existingReceipt=state&&state.acquisitionReceipts&&state.acquisitionReceipts[address];
   if(existingReceipt&&existingReceipt.committed===true){
     const object=state.objectsByInstanceId[String(existingReceipt.instanceId||"")];
     if(!object)return{success:false,reason:"durable_acquisition_receipt_object_missing",receipt:clone(existingReceipt)};
@@ -162,14 +169,17 @@ function commitDurableInventoryAcquisition54500({
   const requestedExisting=existingInstanceId?String(existingInstanceId):null;
   if(requestedExisting&&inventoryRowByInstance(requestedExisting))return{success:false,reason:"exact_object_already_owned_without_source_receipt",instanceId:requestedExisting};
   if(requestedExisting){
-    const preexisting=state.objectsByInstanceId[requestedExisting];
+    const preexisting=state&&state.objectsByInstanceId&&state.objectsByInstanceId[requestedExisting];
     if(!preexisting)return{success:false,reason:"preexisting_object_record_missing",instanceId:requestedExisting};
     if(String(preexisting.itemId||"")!==String(itemId))return{success:false,reason:"preexisting_object_definition_conflict",instanceId:requestedExisting};
   }
   const inventoryBefore=clone(pd.inventory);
-  const provenanceBefore=clone(pd[PROVENANCE_ROOT_KEY]);
+  const hadProvenanceRoot=Object.prototype.hasOwnProperty.call(pd,PROVENANCE_ROOT_KEY);
+  const provenanceBefore=hadProvenanceRoot?clone(pd[PROVENANCE_ROOT_KEY]):null;
   const beforeIds=new Set(pd.inventory.filter(row=>row&&row.instanceId).map(row=>String(row.instanceId)));
   try{
+    const refreshed=ensureProvenanceState();
+    if(!refreshed)throw new Error("provenance_state_unavailable");
     globalThis.addItemToInventory({id:String(itemId),name:String(definition.name||itemId)});
     const newRows=inventoryRowsForItem(itemId).filter(row=>row&&row.instanceId&&!beforeIds.has(String(row.instanceId)));
     if(newRows.length!==1)throw new Error("canonical_inventory_writer_did_not_create_one_durable_instance");
@@ -181,7 +191,6 @@ function commitDurableInventoryAcquisition54500({
       inventoryRow.instanceId=requestedExisting;
       instanceId=requestedExisting;
     }
-    const refreshed=ensureProvenanceState();
     let object=refreshed.objectsByInstanceId[instanceId];
     if(object&&String(object.itemId||"")!==String(itemId))throw new Error("durable_object_definition_conflict");
     if(!object){
@@ -231,7 +240,8 @@ function commitDurableInventoryAcquisition54500({
     };
   }catch(error){
     pd.inventory=inventoryBefore;
-    pd[PROVENANCE_ROOT_KEY]=provenanceBefore;
+    if(hadProvenanceRoot)pd[PROVENANCE_ROOT_KEY]=provenanceBefore;
+    else delete pd[PROVENANCE_ROOT_KEY];
     return{success:false,reason:"durable_acquisition_commit_failed",error:String(error&&error.message||error)};
   }
 }
@@ -400,7 +410,7 @@ function diagnostics(){
   return{patchId:PATCH_ID,pass:failed.length===0,checks,failed,summary:clone(data.summary),browserGoldenClaimed:false};
 }
 function provenanceDiagnostics54500(){
-  const state=ensureProvenanceState();
+  const state=readProvenanceState();
   const objects=state?Object.values(state.objectsByInstanceId):[],receipts=state?Object.values(state.acquisitionReceipts):[];
   const checks={
     canonicalInventoryWriterConsumed:String(commitDurableInventoryAcquisition54500).includes("globalThis.addItemToInventory"),
