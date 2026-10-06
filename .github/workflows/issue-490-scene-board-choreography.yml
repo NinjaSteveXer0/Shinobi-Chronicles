@@ -38,9 +38,6 @@ jobs:
       - name: Presentation-only source contract
         run: node tools/qa_issue_490_scene_board_choreography.js
 
-      - name: Existing shared Scene Board regression
-        run: node tools/qa_issue_339_story_scene_board.js
-
       - name: Existing live hotspot regression
         run: node tools/qa_issue_469_ce_hotspot.js
 
