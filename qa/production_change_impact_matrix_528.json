@@ -78,12 +78,18 @@
     },
     "issue499_static": {
       "kind": "static",
-      "commands": ["node tools/qa_phase2_live_hud_499.js"],
+      "commands": [
+        "node tools/qa_phase2_live_hud_499.js",
+        "node tools/qa_map_canvas_unobstructed_557.js"
+      ],
       "scheduled_representative": true
     },
     "issue499_browser": {
       "kind": "browser",
-      "commands": ["node tools/qa_phase2_live_hud_499_browser.js"],
+      "commands": [
+        "node tools/qa_phase2_live_hud_499_browser.js",
+        "node tools/qa_map_canvas_unobstructed_557_browser.js"
+      ],
       "scheduled_representative": false
     },
     "issue517_static": {
@@ -288,6 +294,25 @@
         "ui_active_masters_526"
       ],
       "required_lane_ids": ["issue431_browser", "ui_master_browser"]
+    },
+    {
+      "id": "live_hud_unobstructed_map_canvas_557",
+      "changed_any": [
+        "runtime/alpha-phase2-live-hud-49900.js",
+        "runtime/alpha-phase2-map-canvas-outboard-557.css",
+        "tools/qa_phase2_live_hud_499.js",
+        "tools/qa_map_canvas_unobstructed_557.js",
+        "tools/qa_map_canvas_unobstructed_557_browser.js",
+        ".github/workflows/issue-499-phase2-live-hud.yml"
+      ],
+      "affected_consumers": ["live_hud_499"],
+      "required_lane_ids": [
+        "runtime_fingerprint",
+        "ownership_safety",
+        "save_compatibility",
+        "issue499_static",
+        "issue499_browser"
+      ]
     },
     {
       "id": "durable_object_provenance",
