@@ -1,28 +1,35 @@
 // ============================================================================
-// PHASE 2 — BOUNDED KONOHA BASIC ITEM SHOP — #517 / MASTER #449 STEP 5
+// PHASE 2 — BOUNDED KONOHA BASIC ITEM SHOP — #517 / #552 / MASTER #449 STEP 5
 //
 // First real Alpha spending loop.
 // canonical playerData.ryo -> deliberate purchase intent -> atomic commit ->
-// existing addItemToInventory() -> canonical Inventory projection.
+// canonical Inventory ownership projection.
 //
-// This module owns only the bounded retail transaction and Shop presentation.
-// It does not own Inventory, character acquisition, team assignment, Crafting,
-// Forge, Fūin Craft, selling, Energy, or dynamic pricing.
+// #517 stackable goods continue through addItemToInventory(). #552 adds exactly
+// one durable retail object: canonical `kunai`, using #545's durable acquisition
+// / provenance API. This file does not create a second Inventory, Equipment,
+// Forge, Fūin Craft, selling, Energy, dynamic pricing, or generic durability
+// system. Kunai condition is exact-instance state only.
 // ============================================================================
 (function installPhase2BasicItemShop51700(){
 "use strict";
 if(globalThis.SC_PHASE2_BASIC_ITEM_SHOP_51700)return;
 
-const PATCH_ID="phase2_basic_item_shop_51700_2026_10_04";
+const PATCH_ID="phase2_basic_item_shop_51700_2026_10_06_kunai_552";
 const SHOP_ID="konoha_central_commercial_basic_item_shop";
 const LOCATION_ID="KON-P09";
 const STYLE_ID="sc-phase2-basic-item-shop-51700-style";
 const RARITY_ORDER=Object.freeze(["Common","Uncommon","Rare","Legendary"]);
+const RETAIL_KUNAI_ID="kunai";
+const RETAIL_KUNAI_DURABILITY=10;
+const RETAIL_KUNAI_PROFILE="retail_kunai_condition_552";
+const RETAIL_KUNAI_CONDITION_HISTORY="retailKunaiConditionHistory55200";
 const CATALOGUE=Object.freeze([
   Object.freeze({itemId:"field_recovery_pill",price:25}),
   Object.freeze({itemId:"standard_antidote",price:20}),
   Object.freeze({itemId:"basic_scroll",price:40}),
-  Object.freeze({itemId:"weapon_materials",price:60})
+  Object.freeze({itemId:"weapon_materials",price:60}),
+  Object.freeze({itemId:RETAIL_KUNAI_ID,price:50,durableProfile:RETAIL_KUNAI_PROFILE})
 ]);
 let intentCounter=0;
 const uiState={feedback:null};
@@ -47,6 +54,13 @@ function itemDefinition(itemId){
 function catalogueRow(itemId){
   return CATALOGUE.find(row=>row.itemId===String(itemId||""))||null;
 }
+function isRetailKunaiRow(row,definition){
+  return !!(
+    row&&row.itemId===RETAIL_KUNAI_ID&&row.durableProfile===RETAIL_KUNAI_PROFILE&&
+    definition&&definition.id===RETAIL_KUNAI_ID&&definition.type==="weapon"&&
+    definition.stackable===false&&String(definition.rarity||"")==="Common"
+  );
+}
 function currentRyo(){
   try{
     if(typeof globalThis.getChronicleCurrentRyo43600==="function"){
@@ -62,6 +76,11 @@ function history(){
   if(!pd)return null;
   if(!Array.isArray(pd.activityHistory))pd.activityHistory=[];
   return pd.activityHistory;
+}
+function inventoryRowByInstance(instanceId){
+  const pd=currentPlayer();
+  const rows=pd&&Array.isArray(pd.inventory)?pd.inventory:[];
+  return rows.find(row=>row&&String(row.instanceId||"")===String(instanceId||""))||null;
 }
 function ownedQuantity(itemId){
   const pd=currentPlayer();
@@ -101,6 +120,115 @@ function attachPurchaseSourceToInventory(itemId,receiptId){
   if(!row.sourceRefs.includes(receiptId))row.sourceRefs.push(receiptId);
   return true;
 }
+function restoreProvenanceRoot(pd,hadRoot,before){
+  if(!pd)return;
+  if(hadRoot)pd.durableObjectProvenance14800=before;
+  else delete pd.durableObjectProvenance14800;
+}
+function initializeRetailKunaiCondition(instanceId){
+  const row=inventoryRowByInstance(instanceId);
+  if(!row||String(row.id||row.itemId||"")!==RETAIL_KUNAI_ID)return{success:false,reason:"retail_kunai_instance_missing"};
+  row.durabilityCurrent=RETAIL_KUNAI_DURABILITY;
+  row.durabilityMax=RETAIL_KUNAI_DURABILITY;
+  row.durabilityProfileId=RETAIL_KUNAI_PROFILE;
+  if(!Array.isArray(row[RETAIL_KUNAI_CONDITION_HISTORY]))row[RETAIL_KUNAI_CONDITION_HISTORY]=[];
+  return{success:true,instanceId:String(row.instanceId),durabilityCurrent:row.durabilityCurrent,durabilityMax:row.durabilityMax};
+}
+function conditionEventId(kind,instanceId,sourceOccurrenceId,sourceId){
+  return ["retail_kunai_condition_v1",kind,String(instanceId||""),String(sourceOccurrenceId||""),String(sourceId||"")].join("|");
+}
+function normalizeConditionSource(sourceOccurrenceId,sourceId){
+  const occurrence=String(sourceOccurrenceId||"").trim(),source=String(sourceId||"").trim();
+  return occurrence&&source?{sourceOccurrenceId:occurrence,sourceId:source}:null;
+}
+function retailKunaiConditionSnapshot55200(instanceId){
+  const row=inventoryRowByInstance(instanceId);
+  if(!row||String(row.id||row.itemId||"")!==RETAIL_KUNAI_ID)return null;
+  return{
+    itemId:RETAIL_KUNAI_ID,
+    instanceId:String(row.instanceId||""),
+    durabilityCurrent:Math.max(0,Math.floor(Number(row.durabilityCurrent)||0)),
+    durabilityMax:Math.max(0,Math.floor(Number(row.durabilityMax)||0)),
+    usable:(Number(row.durabilityCurrent)||0)>0,
+    profileId:String(row.durabilityProfileId||""),
+    conditionHistory:clone(Array.isArray(row[RETAIL_KUNAI_CONDITION_HISTORY])?row[RETAIL_KUNAI_CONDITION_HISTORY]:[])
+  };
+}
+function commitRetailKunaiWear55200({instanceId,sourceOccurrenceId,sourceId}={}){
+  const row=inventoryRowByInstance(instanceId),source=normalizeConditionSource(sourceOccurrenceId,sourceId);
+  if(!row||String(row.id||row.itemId||"")!==RETAIL_KUNAI_ID)return{success:false,reason:"retail_kunai_instance_missing"};
+  if(!source)return{success:false,reason:"committed_wear_source_required"};
+  if(row.durabilityProfileId!==RETAIL_KUNAI_PROFILE||Number(row.durabilityMax)!==RETAIL_KUNAI_DURABILITY)return{success:false,reason:"retail_kunai_condition_not_initialized"};
+  if(!Array.isArray(row[RETAIL_KUNAI_CONDITION_HISTORY]))row[RETAIL_KUNAI_CONDITION_HISTORY]=[];
+  const eventId=conditionEventId("wear",row.instanceId,source.sourceOccurrenceId,source.sourceId);
+  const prior=row[RETAIL_KUNAI_CONDITION_HISTORY].find(event=>event&&event.eventId===eventId);
+  if(prior)return{success:true,idempotent:true,event:clone(prior),condition:retailKunaiConditionSnapshot55200(row.instanceId)};
+  const before=Math.max(0,Math.floor(Number(row.durabilityCurrent)||0));
+  if(before<=0)return{success:false,reason:"retail_kunai_depleted",condition:retailKunaiConditionSnapshot55200(row.instanceId)};
+  const historyBefore=clone(row[RETAIL_KUNAI_CONDITION_HISTORY]);
+  row.durabilityCurrent=Math.max(0,before-1);
+  const event={eventId,eventType:"wear",instanceId:String(row.instanceId),itemId:RETAIL_KUNAI_ID,sourceOccurrenceId:source.sourceOccurrenceId,sourceId:source.sourceId,durabilityBefore:before,durabilityAfter:row.durabilityCurrent,committed:true,committedAt:Date.now()};
+  row[RETAIL_KUNAI_CONDITION_HISTORY].push(event);
+  try{
+    if(typeof globalThis.savePlayerData!=="function")throw new Error("save_authority_missing");
+    globalThis.savePlayerData();
+    refreshConsumers();
+    return{success:true,idempotent:false,event:clone(event),condition:retailKunaiConditionSnapshot55200(row.instanceId)};
+  }catch(error){
+    row.durabilityCurrent=before;
+    row[RETAIL_KUNAI_CONDITION_HISTORY]=historyBefore;
+    return{success:false,reason:"retail_kunai_wear_commit_failed",error:String(error&&error.message||error)};
+  }
+}
+function repairRetailKunai55200({instanceId,sourceOccurrenceId,sourceId}={}){
+  const row=inventoryRowByInstance(instanceId),source=normalizeConditionSource(sourceOccurrenceId,sourceId);
+  if(!row||String(row.id||row.itemId||"")!==RETAIL_KUNAI_ID)return{success:false,reason:"retail_kunai_instance_missing"};
+  if(!source)return{success:false,reason:"committed_repair_source_required"};
+  if(row.durabilityProfileId!==RETAIL_KUNAI_PROFILE||Number(row.durabilityMax)!==RETAIL_KUNAI_DURABILITY)return{success:false,reason:"retail_kunai_condition_not_initialized"};
+  if(!Array.isArray(row[RETAIL_KUNAI_CONDITION_HISTORY]))row[RETAIL_KUNAI_CONDITION_HISTORY]=[];
+  const eventId=conditionEventId("repair",row.instanceId,source.sourceOccurrenceId,source.sourceId);
+  const prior=row[RETAIL_KUNAI_CONDITION_HISTORY].find(event=>event&&event.eventId===eventId);
+  if(prior)return{success:true,idempotent:true,event:clone(prior),condition:retailKunaiConditionSnapshot55200(row.instanceId)};
+  const before=Math.max(0,Math.floor(Number(row.durabilityCurrent)||0));
+  const historyBefore=clone(row[RETAIL_KUNAI_CONDITION_HISTORY]);
+  row.durabilityCurrent=RETAIL_KUNAI_DURABILITY;
+  const event={eventId,eventType:"repair",instanceId:String(row.instanceId),itemId:RETAIL_KUNAI_ID,sourceOccurrenceId:source.sourceOccurrenceId,sourceId:source.sourceId,durabilityBefore:before,durabilityAfter:row.durabilityCurrent,committed:true,committedAt:Date.now()};
+  row[RETAIL_KUNAI_CONDITION_HISTORY].push(event);
+  try{
+    if(typeof globalThis.savePlayerData!=="function")throw new Error("save_authority_missing");
+    globalThis.savePlayerData();
+    refreshConsumers();
+    return{success:true,idempotent:false,event:clone(event),condition:retailKunaiConditionSnapshot55200(row.instanceId)};
+  }catch(error){
+    row.durabilityCurrent=before;
+    row[RETAIL_KUNAI_CONDITION_HISTORY]=historyBefore;
+    return{success:false,reason:"retail_kunai_repair_commit_failed",error:String(error&&error.message||error)};
+  }
+}
+function retailKunaiContextDepleted(context){
+  if(!context||String(context.itemId||"")!==RETAIL_KUNAI_ID||!context.instanceId)return false;
+  const condition=retailKunaiConditionSnapshot55200(context.instanceId);
+  return !!(condition&&condition.durabilityCurrent<=0);
+}
+function installRetailKunaiExecutionGuard55200(){
+  let wrapped=0;
+  ["getWeaponExecutionContextForSkill","getBattleEquippedWeaponExecutionContext","getBattleAvailablePersistentThrowingWeaponContext"].forEach(name=>{
+    const prior=globalThis[name];
+    if(typeof prior!=="function"||prior.__retailKunai552Wrapped===true)return;
+    const guarded=function(){
+      const context=prior.apply(this,arguments);
+      return retailKunaiContextDepleted(context)?null:context;
+    };
+    guarded.__retailKunai552Wrapped=true;
+    guarded.__retailKunai552Prior=prior;
+    globalThis[name]=guarded;
+    try{if(name==="getWeaponExecutionContextForSkill")getWeaponExecutionContextForSkill=guarded;}catch(_error){}
+    try{if(name==="getBattleEquippedWeaponExecutionContext")getBattleEquippedWeaponExecutionContext=guarded;}catch(_error){}
+    try{if(name==="getBattleAvailablePersistentThrowingWeaponContext")getBattleAvailablePersistentThrowingWeaponContext=guarded;}catch(_error){}
+    wrapped+=1;
+  });
+  return wrapped;
+}
 function refreshConsumers(){
   try{globalThis.refreshPhase2LiveHud49900?.();}catch(_error){}
   try{
@@ -117,15 +245,17 @@ function commitPurchase(itemId,intentId){
   if(!row)return{success:false,reason:"item_not_in_alpha_shop_catalogue"};
   const definition=itemDefinition(row.itemId);
   if(!definition)return{success:false,reason:"canonical_item_definition_missing"};
-  if(definition.stackable!==true)return{success:false,reason:"durable_item_out_of_scope"};
+  const durableKunai=isRetailKunaiRow(row,definition);
+  if(!durableKunai&&definition.stackable!==true)return{success:false,reason:"durable_item_out_of_scope"};
   if(!RARITY_ORDER.includes(String(definition.rarity||"")))return{success:false,reason:"rarity_not_canonical"};
   const stableIntent=normalizeIntentId(intentId);
   if(!stableIntent)return{success:false,reason:"purchase_intent_id_required"};
 
   const existing=purchaseReceipt(stableIntent);
   if(existing){
+    const condition=existing.instanceId?retailKunaiConditionSnapshot55200(existing.instanceId):null;
     return{
-      success:true,idempotent:true,receipt:clone(existing),
+      success:true,idempotent:true,receipt:clone(existing),instanceId:existing.instanceId||null,condition,
       ryoBefore:Number(existing.ryoBefore)||0,ryoAfter:Number(existing.ryoAfter)||0,
       quantityBefore:Number(existing.quantityBefore)||0,quantityAfter:Number(existing.quantityAfter)||0
     };
@@ -142,17 +272,39 @@ function commitPurchase(itemId,intentId){
   if(!rows)return{success:false,reason:"history_state_missing"};
   const inventoryBefore=clone(Array.isArray(pd.inventory)?pd.inventory:[]);
   const historyLength=rows.length;
+  const hadProvenanceRoot=Object.prototype.hasOwnProperty.call(pd,"durableObjectProvenance14800");
+  const provenanceBefore=hadProvenanceRoot?clone(pd.durableObjectProvenance14800):null;
   const occurrenceId=exactPurchaseOccurrenceId(stableIntent);
+  let durableAcquisition=null;
 
   try{
     pd.ryo=beforeRyo-price;
 
-    if(typeof globalThis.addItemToInventory!=="function")throw new Error("inventory_commit_authority_missing");
-    globalThis.addItemToInventory({id:row.itemId,name:definition.name,rarity:definition.rarity});
+    if(durableKunai){
+      if(typeof globalThis.commitDurableInventoryAcquisition54500!=="function")throw new Error("durable_acquisition_authority_missing");
+      durableAcquisition=globalThis.commitDurableInventoryAcquisition54500({
+        itemId:RETAIL_KUNAI_ID,
+        sourceOccurrenceId:occurrenceId,
+        sourceId:SHOP_ID,
+        acquisitionKind:"purchase",
+        eventType:"purchase",
+        sourceRefs:[LOCATION_ID,SHOP_ID,RETAIL_KUNAI_ID],
+        metadata:{locationId:LOCATION_ID,shopId:SHOP_ID,itemId:RETAIL_KUNAI_ID,purchaseIntentId:stableIntent,unitPriceRyo:price},
+        deferSave:true
+      });
+      if(!durableAcquisition||durableAcquisition.success!==true)throw new Error(durableAcquisition&&durableAcquisition.reason||"durable_acquisition_commit_failed");
+      const initialized=initializeRetailKunaiCondition(durableAcquisition.instanceId);
+      if(!initialized.success)throw new Error(initialized.reason||"retail_kunai_condition_init_failed");
+    }else{
+      if(typeof globalThis.addItemToInventory!=="function")throw new Error("inventory_commit_authority_missing");
+      globalThis.addItemToInventory({id:row.itemId,name:definition.name,rarity:definition.rarity});
+      if(!attachPurchaseSourceToInventory(row.itemId,occurrenceId))throw new Error("inventory_purchase_source_attach_failed");
+    }
 
     const afterQuantity=ownedQuantity(row.itemId);
     if(afterQuantity!==beforeQuantity+1)throw new Error("inventory_quantity_commit_mismatch");
-    if(!attachPurchaseSourceToInventory(row.itemId,occurrenceId))throw new Error("inventory_purchase_source_attach_failed");
+    const purchasedInstance=durableAcquisition?inventoryRowByInstance(durableAcquisition.instanceId):null;
+    if(durableKunai&&(!purchasedInstance||purchasedInstance.equippedBy))throw new Error("retail_kunai_purchase_must_not_auto_equip");
 
     const receipt={
       id:occurrenceId,
@@ -160,10 +312,13 @@ function commitPurchase(itemId,intentId){
       sourceOccurrenceId:occurrenceId,
       type:"item_shop_purchase",
       activity:"commercial_purchase",
+      acquisitionKind:"purchase",
+      eventType:"purchase",
       completed:true,
       committed:true,
       success:true,
       shopId:SHOP_ID,
+      sourceId:SHOP_ID,
       locationId:LOCATION_ID,
       purchaseIntentId:stableIntent,
       itemId:row.itemId,
@@ -176,6 +331,10 @@ function commitPurchase(itemId,intentId){
       ryoAfter:pd.ryo,
       quantityBefore:beforeQuantity,
       quantityAfter:afterQuantity,
+      instanceId:durableAcquisition?String(durableAcquisition.instanceId):null,
+      durableAcquisitionReceiptId:durableAcquisition?String(durableAcquisition.address):null,
+      durabilityCurrent:durableAcquisition?RETAIL_KUNAI_DURABILITY:null,
+      durabilityMax:durableAcquisition?RETAIL_KUNAI_DURABILITY:null,
       sourceRefs:[
         {type:"location",id:LOCATION_ID,role:"retail_host"},
         {type:"shop",id:SHOP_ID,role:"retail_transaction"},
@@ -189,13 +348,15 @@ function commitPurchase(itemId,intentId){
     globalThis.savePlayerData();
     refreshConsumers();
     return{
-      success:true,idempotent:false,receipt:clone(receipt),
+      success:true,idempotent:false,receipt:clone(receipt),instanceId:receipt.instanceId,
+      condition:receipt.instanceId?retailKunaiConditionSnapshot55200(receipt.instanceId):null,
       ryoBefore:beforeRyo,ryoAfter:pd.ryo,
       quantityBefore:beforeQuantity,quantityAfter:afterQuantity
     };
   }catch(error){
     pd.ryo=beforeRyo;
     pd.inventory=inventoryBefore;
+    restoreProvenanceRoot(pd,hadProvenanceRoot,provenanceBefore);
     while(rows.length>historyLength)rows.pop();
     try{activityHistory=pd.activityHistory;}catch(_error){}
     return{success:false,reason:"purchase_commit_failed",error:String(error&&error.message||error)};
@@ -225,6 +386,9 @@ function catalogueSnapshot(){
         type:String(definition&&definition.type||"unknown"),
         rarity:String(definition&&definition.rarity||""),
         stackable:!!(definition&&definition.stackable===true),
+        durable:!!(definition&&isRetailKunaiRow(row,definition)),
+        durabilityCurrent:row.itemId===RETAIL_KUNAI_ID?RETAIL_KUNAI_DURABILITY:null,
+        durabilityMax:row.itemId===RETAIL_KUNAI_ID?RETAIL_KUNAI_DURABILITY:null,
         description:String(definition&&definition.description||""),
         price:row.price,
         ownedQuantity:ownedQuantity(row.itemId)
@@ -261,9 +425,10 @@ function renderShop(container){
   const data=catalogueSnapshot();
   const cards=data.catalogue.map(row=>{
     const affordable=data.ryo>=row.price;
+    const condition=row.durable?'<span class="sc-shop517-chip">DURABLE · '+row.durabilityCurrent+'/'+row.durabilityMax+'</span>':"";
     return '<article class="sc-shop517-card" data-shop517-item="'+esc(row.itemId)+'">'+
       '<header><h3>'+esc(row.name)+'</h3><span class="sc-shop517-rarity">'+esc(row.rarity.toUpperCase())+'</span></header>'+
-      '<div class="sc-shop517-meta"><span class="sc-shop517-chip">'+esc(row.type.toUpperCase())+'</span><span class="sc-shop517-chip">OWNED ×'+row.ownedQuantity+'</span><span class="sc-shop517-chip">'+row.price+' RYŌ</span></div>'+
+      '<div class="sc-shop517-meta"><span class="sc-shop517-chip">'+esc(row.type.toUpperCase())+'</span><span class="sc-shop517-chip">OWNED ×'+row.ownedQuantity+'</span>'+condition+'<span class="sc-shop517-chip">'+row.price+' RYŌ</span></div>'+
       (row.description?'<p>'+esc(row.description)+'</p>':"")+
       '<button type="button" class="sc-shop517-buy" data-shop517-buy="'+esc(row.itemId)+'" onclick="purchasePhase2BasicShopItem51700(\''+esc(row.itemId)+'\')" '+(affordable?"":'aria-disabled="true"')+'>BUY · '+row.price+' RYŌ</button>'+
     '</article>';
@@ -335,20 +500,26 @@ function injectCommercialDistrictAction(){
 function diagnostics(){
   const data=catalogueSnapshot();
   const source=String(commitPurchase);
+  const kunai=data.catalogue.find(row=>row.itemId===RETAIL_KUNAI_ID)||null;
+  const stackRows=data.catalogue.filter(row=>row.itemId!==RETAIL_KUNAI_ID);
   const checks={
     exactLocation:LOCATION_ID==="KON-P09",
     canonicalHotspotUpgradeOnly:!String(commercialDistrictHost).includes("createElement")&&!String(injectCommercialDistrictAction).includes("createElement")&&!String(injectCommercialDistrictAction).includes(".hidden=")&&String(commercialDistrictHost).includes("data-village-hotspot-id")&&String(commercialDistrictHost).includes("Central Commercial District"),
-    smallCatalogue:data.catalogue.length===4,
+    boundedCatalogue:data.catalogue.length===5,
+    originalStackableCataloguePreserved:stackRows.length===4&&stackRows.every(row=>row.stackable===true),
+    retailKunaiExact:!!kunai&&kunai.price===50&&kunai.rarity==="Common"&&kunai.stackable===false&&kunai.durable===true&&kunai.durabilityCurrent===10&&kunai.durabilityMax===10,
     fixedCanonicalPrices:data.catalogue.every(row=>Number.isInteger(row.price)&&row.price>0),
     onlyExistingDefinitions:data.catalogue.every(row=>!!itemDefinition(row.itemId)),
-    stackablesOnly:data.catalogue.every(row=>row.stackable===true),
     rarityAuthorityExact:JSON.stringify(data.rarityOrder)===JSON.stringify(["Common","Uncommon","Rare","Legendary"]),
     noObsoleteNormalRarity:!data.catalogue.some(row=>String(row.rarity).toLowerCase()==="normal"),
     canonicalRyoWrite:source.includes("pd.ryo=beforeRyo-price"),
-    canonicalInventoryCommit:source.includes("addItemToInventory"),
+    canonicalStackInventoryCommit:source.includes("addItemToInventory"),
+    durableKunaiUses545:source.includes("commitDurableInventoryAcquisition54500"),
     stableIntentIdempotence:source.includes("purchaseReceipt(stableIntent)"),
     insufficientFundsBeforeMutation:source.indexOf("beforeRyo<price")<source.indexOf("pd.ryo=beforeRyo-price"),
-    rollbackOnFailure:source.includes("pd.inventory=inventoryBefore")&&source.includes("pd.ryo=beforeRyo"),
+    rollbackOnFailure:source.includes("pd.inventory=inventoryBefore")&&source.includes("pd.ryo=beforeRyo")&&source.includes("restoreProvenanceRoot"),
+    noAutoEquip:source.includes("retail_kunai_purchase_must_not_auto_equip"),
+    noGenericDurability:String(initializeRetailKunaiCondition).includes("RETAIL_KUNAI_ID")&&String(commitRetailKunaiWear55200).includes("RETAIL_KUNAI_ID"),
     noCharacterOwnershipMutation:!source.includes("ownedCharactersByVariantId")&&!source.includes("selectAcademyTeamFormation"),
     browserGoldenClaimed:false
   };
@@ -357,6 +528,7 @@ function diagnostics(){
 }
 
 ensureStyles();
+installRetailKunaiExecutionGuard55200();
 if(typeof document!=="undefined"){
   const observer=new MutationObserver(()=>injectCommercialDistrictAction());
   const container=document.getElementById("overlay-content-container");
@@ -371,8 +543,14 @@ globalThis.purchasePhase2BasicShopItem51700=purchaseFromUI;
 globalThis.openPhase2BasicItemShop51700=openShop;
 globalThis.returnPhase2BasicShopToVillage51700=returnToVillage;
 globalThis.injectPhase2CommercialDistrictShop51700=injectCommercialDistrictAction;
+globalThis.getRetailKunaiCondition55200=retailKunaiConditionSnapshot55200;
+globalThis.commitRetailKunaiWear55200=commitRetailKunaiWear55200;
+globalThis.repairRetailKunai55200=repairRetailKunai55200;
+globalThis.installRetailKunaiExecutionGuard55200=installRetailKunaiExecutionGuard55200;
 globalThis.runPhase2BasicItemShop51700Diagnostics=diagnostics;
 globalThis.SC_PHASE2_BASIC_ITEM_SHOP_51700=Object.freeze({
-  patchId:PATCH_ID,shopId:SHOP_ID,locationId:LOCATION_ID,rarityOrder:RARITY_ORDER,catalogue:CATALOGUE,browserGoldenClaimed:false
+  patchId:PATCH_ID,shopId:SHOP_ID,locationId:LOCATION_ID,rarityOrder:RARITY_ORDER,catalogue:CATALOGUE,
+  retailKunai:Object.freeze({itemId:RETAIL_KUNAI_ID,price:50,durabilityCurrent:10,durabilityMax:10,profileId:RETAIL_KUNAI_PROFILE}),
+  browserGoldenClaimed:false
 });
 })();
