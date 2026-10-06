@@ -192,18 +192,3 @@ globalThis.SC_HUD_MY_CLAN_RETURN_50600=API;
 globalThis.getHudMyClanReturnContext50600=snapshot;
 globalThis.runHudMyClanReturnContext50600Diagnostics=diagnostics;
 })();
-
-// ============================================================================
-// ISSUE #557 — TERMINAL MAP-CANVAS PRESENTATION ACTIVATION
-// #506 is already the post-#499 map-HUD presentation seam. Load the bounded
-// unobstructed-canvas correction here without adding another semantic router.
-// ============================================================================
-(function activateUnobstructedMapCanvas55700From50600(){
-  if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
-  if(globalThis.SC_MAP_CANVAS_UNOBSTRUCTED_55700||document.getElementById("sc-map-canvas-unobstructed-55700-script"))return;
-  const script=document.createElement("script");
-  script.id="sc-map-canvas-unobstructed-55700-script";
-  script.src="runtime/alpha-map-canvas-unobstructed-55700.js";
-  script.async=false;
-  document.head.appendChild(script);
-})();
