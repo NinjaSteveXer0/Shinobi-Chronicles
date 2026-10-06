@@ -15,6 +15,7 @@ assert(runtime.includes("--sc-hud499-map-left")&&runtime.includes("--sc-hud499-m
 assert(runtime.includes(".sc-hud499-state-cluster")&&runtime.includes(".sc-hud499-team")&&runtime.includes(".sc-hud499-tools")&&runtime.includes(".sc-hud499-map-nav"),"required HUD surfaces are not explicitly placed outside the map");
 assert(runtime.includes(".region-world-close")&&runtime.includes(".region-info-toggle")&&runtime.includes(".region-info-drawer")&&runtime.includes(".region-world-map-button"),"legacy Region map chrome is not moved outboard");
 assert(runtime.includes(".region-hotspot .hotspot-hover-card{display:none!important}"),"legacy Region hover card can still cover the crisp map");
+assert(runtime.includes(".region-map-pane .region-event-drawer"),"selected Region location/info card is not moved into the contextual reserve");
 assert(runtime.includes("SC_PHASE2_LIVE_HUD_49900"),"#557 does not consume existing #499 presentation authority");
 assert(runtime.includes("SC_MAP_CANVAS_UNOBSTRUCTED_55700"),"#557 integrated activation is not exposed from canonical #499 owner");
 assert(runtime.includes("browserGoldenClaimed:false"),"#557 incorrectly claims browser GOLDEN");
@@ -38,6 +39,7 @@ console.log(JSON.stringify({
   owner:"runtime/alpha-phase2-live-hud-49900.js",
   patch:"map_canvas_unobstructed_55700_2026_10_06",
   scope:["village","region"],
+  selectedLocationInfoOutboard:true,
   semanticMutation:false,
   persistentMapOverlapPolicy:"zero",
   duplicateRuntimeOwner:false,
