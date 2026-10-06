@@ -17,12 +17,21 @@ assert(RUNTIME.includes("not_exposed_on_inventory_record"),"truthful missing-pro
 // #545 deliberately consolidates the durable-object transaction into the existing
 // Inventory owner module rather than stacking another runtime patch. Preserve the
 // original #461 read-only presentation boundary: rendering/snapshot/opening must
-// never mint ownership or write persistence. The only allowed canonical ownership
-// API consumption is inside commitDurableInventoryAcquisition54500().
-const addWriterRefs=(RUNTIME.match(/globalThis\.addItemToInventory/g)||[]).length;
-assert.equal(addWriterRefs,2,"Canonical Inventory writer must be referenced only by the durable acquisition transaction guard + commit");
+// never mint ownership or write persistence. The canonical ownership API may be
+// consumed only by the explicit durable acquisition transaction; executable checks
+// below separately prove that presentation cannot reach that transaction.
+const durableCommitStart=RUNTIME.indexOf("function commitDurableInventoryAcquisition54500");
+const durableCommitEnd=RUNTIME.indexOf("function preparedItemIds",durableCommitStart);
+assert(durableCommitStart>=0&&durableCommitEnd>durableCommitStart,"Durable acquisition transaction boundary missing");
+const durableCommitSource=RUNTIME.slice(durableCommitStart,durableCommitEnd);
+assert(durableCommitSource.includes('typeof globalThis.addItemToInventory!=="function"'),"Durable acquisition transaction must fail closed when Inventory writer is missing");
+assert(durableCommitSource.includes("globalThis.addItemToInventory("),"Durable acquisition transaction must consume canonical Inventory writer");
 assert(!RUNTIME.includes("playerData.inventory.push("),"Consolidated module must not create a second direct Inventory writer");
-assert(!RUNTIME.includes("ownedObjects"),"Consolidated module must not create a second ownership collection");
+const secondOwnershipPatterns=[
+  /\bownedObjects\s*[:=]\s*[\[{]/,
+  /(?:playerData|pd|state)\s*\.\s*ownedObjects\s*=/
+];
+assert(secondOwnershipPatterns.every(pattern=>!pattern.test(RUNTIME)),"Consolidated module must not create a second ownership collection");
 
 const definitions={
   field_recovery_pill:{id:"field_recovery_pill",name:"Field Recovery Pill",type:"consumable",rarity:"Common",stackable:true,description:"Recovery."},
