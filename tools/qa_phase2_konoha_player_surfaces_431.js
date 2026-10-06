@@ -195,6 +195,7 @@ async function semanticFingerprint(page){
       const originalEligibility=globalThis.getKonohaCeHotspotEligibility46900;
       const originalActiveStory=globalThis.getActiveStorySceneRuntime;
       globalThis.__qa533OriginalResolved469=originalResolved;
+      globalThis.__qa533OriginalEligibility469=originalEligibility;
       const record={
         id:"occ_konoha_ce_kakashi_masked_interceptor_admin_crossing_v1",
         occurrenceId:"occ_konoha_ce_kakashi_masked_interceptor_admin_crossing_v1",
@@ -214,9 +215,9 @@ async function semanticFingerprint(page){
       globalThis.getActiveStorySceneRuntime=()=>({sceneId:"scene_konoha_ce_kakashi_masked_interceptor_admin_crossing_menma_v1"});
       const activeScenePriority=getHokageOfficeRouteDecision53300("KON-P01");
       globalThis.getActiveStorySceneRuntime=originalActiveStory;
+      globalThis.getKonohaCeHotspotEligibility46900=()=>({available:false,reason:"qa_office_fallback"});
       const office=getHokageOfficeRouteDecision53300("KON-P01");
       const other=getHokageOfficeRouteDecision53300("KON-P09");
-      globalThis.getKonohaCeHotspotEligibility46900=originalEligibility;
       return{leadId,priority,activeScenePriority,office,other,dispatch:getHokageOfficeDispatchProjection53300()};
     });
     assert(!leadFixture.error,JSON.stringify(leadFixture));
@@ -227,20 +228,23 @@ async function semanticFingerprint(page){
     assert.deepStrictEqual(leadFixture.dispatch.discoveredLeadIds,[leadFixture.leadId]);
     assert.strictEqual(leadFixture.dispatch.countMode,"known_only_no_seed_denominator_claimed");
 
-    await page.evaluate(()=>openOverlay("village"));
-    await page.waitForSelector('[data-village-hotspot-id="KON-P01"]',{state:"visible",timeout:10000});
-    const p01Cardinality=await page.locator('[data-village-hotspot-id="KON-P01"]').count();
-    assert.strictEqual(p01Cardinality,1,"#533 created a second P01 hotspot/control");
+    await page.evaluate(()=>{openOverlay("village");syncHokageOfficeAnchor53300();});
+    await page.waitForSelector('[data-hokage-office-anchor="533"]',{state:"visible",timeout:10000});
+    const p01Surface=await page.evaluate(()=>({
+      officeAnchors:document.querySelectorAll('[data-hokage-office-anchor="533"]').length,
+      liveCeButtons:document.querySelectorAll('button[data-village-hotspot-id="KON-P01"]').length,
+      labelledAnchors:[...document.querySelectorAll('.konoha-v3-anchor.is-identified')].filter(node=>node.querySelector('.village-golden-halo-label')?.textContent?.trim()==="Hokage Administration").length
+    }));
+    assert.strictEqual(p01Surface.officeAnchors,1,"#533 did not upgrade the existing static P01 anchor exactly once");
+    assert.strictEqual(p01Surface.liveCeButtons,0,"#533 resurrected the resolved #469 P01 hotspot button");
+    assert.strictEqual(p01Surface.labelledAnchors,1,"#533 created a second Hokage Administration map anchor");
     assert.strictEqual(await page.locator(".alpha533-office-entry").count(),0,"retired duplicate #533 Office button returned");
 
     const beforeOffice=await semanticFingerprint(page);
     await page.evaluate(()=>{
-      const original=globalThis.getKonohaCeHotspotEligibility46900;
-      globalThis.getKonohaCeHotspotEligibility46900=()=>({available:false,reason:"qa_open_office"});
-      const node=[...document.querySelectorAll("[data-village-hotspot-id]")].find(row=>row.dataset.villageHotspotId==="KON-P01");
-      if(!node)throw new Error("KON-P01 missing");
+      const node=document.querySelector('[data-hokage-office-anchor="533"]');
+      if(!node)throw new Error("KON-P01 Office anchor missing");
       node.dispatchEvent(new MouseEvent("dblclick",{bubbles:true,cancelable:true,view:window}));
-      globalThis.getKonohaCeHotspotEligibility46900=original;
     });
     await page.waitForSelector('[data-hokage-office="step6"]',{state:"visible",timeout:5000});
     const officeSnapshot=await page.evaluate(()=>{
@@ -289,13 +293,17 @@ async function semanticFingerprint(page){
     const focusBefore=await semanticFingerprint(page);
     const focusResult=await page.evaluate(leadId=>focusHokageDispatchLead53300(leadId),leadFixture.leadId);
     assert.strictEqual(focusResult.success,true,JSON.stringify(focusResult));
-    await page.waitForSelector('[data-village-hotspot-id="KON-P01"][data-dispatch-focus="533"]',{state:"attached",timeout:5000});
+    await page.waitForSelector('[data-hokage-office-anchor="533"][data-dispatch-focus="533"]',{state:"attached",timeout:5000});
     assert.strictEqual(await semanticFingerprint(page),focusBefore,"Dispatch map focus committed semantic state");
 
     await page.evaluate(()=>{
       if(globalThis.__qa533OriginalResolved469){
         globalThis.getKonohaCeHotspotResolvedRecord46900=globalThis.__qa533OriginalResolved469;
         delete globalThis.__qa533OriginalResolved469;
+      }
+      if(globalThis.__qa533OriginalEligibility469){
+        globalThis.getKonohaCeHotspotEligibility46900=globalThis.__qa533OriginalEligibility469;
+        delete globalThis.__qa533OriginalEligibility469;
       }
     });
     const diagnostics=await page.evaluate(()=>({
@@ -315,6 +323,7 @@ async function semanticFingerprint(page){
       resultStagePresent:true,stableActionDock:true,boundedNotificationHistory:true,
       disciplineAccents:true,naturalPlayerCopy:true,
       hokageOfficeUsesSingleP01Control:true,ce469FirstRefusal:true,activeCe469SceneProtected:true,
+      resolvedCeHotspotNotResurrected:true,staticAdministrationAnchorUpgraded:true,
       dispatchReadsCanonicalResolved469:true,dispatchProviderProjectionReadOnly:true,dispatchNoFakeSeedDenominator:true,
       officeOpenReadOnly:true,cutawayReadOnly:true,mapFocusReadOnly:true,
       unsupportedStep6BusinessFailsClosed:true,
