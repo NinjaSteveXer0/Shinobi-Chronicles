@@ -16,7 +16,7 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-06-EH",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-06-EI",
     sourceBaselineCommit:"1c45661d60dad8bc456e1de4483dbb4a90182f32",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
     runtimeGeneration:"unobstructed-village-region-map-canvases-557",
@@ -137,7 +137,7 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-06-EH",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-06-EI",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
       generationPresent:first.runtimeGeneration==="unobstructed-village-region-map-canvases-557",
