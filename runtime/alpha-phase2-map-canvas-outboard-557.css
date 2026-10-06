@@ -8,15 +8,14 @@
    ============================================================================ */
 
 /* #557 may reserve outer presentation space, but the crisp interactive map must
-   remain the dominant part of the visible stage. The root-state selectors are
-   intentional: current-main overlay composition can rerender the outer box and
-   momentarily drop its helper class while the canonical #499/#557 root remains
-   authoritative. Do not let that presentation rerender pull chrome back over
-   the map. */
+   remain the dominant part of the visible stage. The runtime writes the
+   --sc-map557-* custom properties directly on the canonical map element. Use
+   that map-local state as the rerender-safe fallback rather than a broad
+   body:has(...) selector, so unrelated HUD visibility/composition is untouched. */
 .overlay-content-box.sc-map557-active .region-map-pane,
 .overlay-content-box.sc-map557-active .village-map-screen,
-body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"]) .region-map-pane,
-body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"]) .village-map-screen {
+.region-map-pane[style*="--sc-map557-outboard-right"],
+.village-map-screen[style*="--sc-map557-outboard-right"] {
   min-width: min(60vw, calc(100% - 40px)) !important;
 }
 
@@ -29,7 +28,7 @@ body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-h
 
 /* Region non-spatial known destinations are navigation, not geography. */
 .overlay-content-box.sc-map557-active .region-map-pane .region-known-destinations,
-body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"]) .region-map-pane .region-known-destinations {
+.region-map-pane[style*="--sc-map557-outboard-right"] .region-known-destinations {
   left: auto !important;
   right: var(--sc-map557-outboard-right) !important;
   top: auto !important;
@@ -45,7 +44,7 @@ body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"]) .
 /* The actual Region event/disambiguation drawer uses the same DOM surface as
    the selected-location card. Keep both modes in the approved right reserve. */
 .overlay-content-box.sc-map557-active .region-map-pane .region-event-drawer,
-body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"]) .region-map-pane .region-event-drawer {
+.region-map-pane[style*="--sc-map557-outboard-right"] .region-event-drawer {
   left: auto !important;
   right: var(--sc-map557-outboard-right) !important;
   top: 136px !important;
@@ -62,9 +61,9 @@ body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"]) .
 .overlay-content-box.sc-map557-active .region-map-pane:has(.region-event-drawer) .region-known-destinations,
 .overlay-content-box.sc-map557-active .region-map-pane:has(.region-event-drawer) .region-info-toggle,
 .overlay-content-box.sc-map557-active .region-map-pane:has(.region-event-drawer) .region-info-drawer,
-body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-context) .region-map-pane:has(.region-event-drawer) .region-known-destinations,
-body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-context) .region-map-pane:has(.region-event-drawer) .region-info-toggle,
-body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-context) .region-map-pane:has(.region-event-drawer) .region-info-drawer {
+.region-map-pane[style*="--sc-map557-outboard-right"]:has(.region-event-drawer) .region-known-destinations,
+.region-map-pane[style*="--sc-map557-outboard-right"]:has(.region-event-drawer) .region-info-toggle,
+.region-map-pane[style*="--sc-map557-outboard-right"]:has(.region-event-drawer) .region-info-drawer {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
@@ -77,14 +76,14 @@ body:has(.region-map-pane .region-event-drawer)
 }
 
 /* Village return and information controls are navigation/context chrome, not
-   map markers. Use both the helper-class and canonical root-state selectors so
-   current-main outer-box rerenders cannot strand these controls on map pixels. */
+   map markers. The map-local custom-property fallback survives outer-box class
+   churn without coupling the whole document to #557 activation state. */
 .overlay-content-box.sc-map557-active .village-map-screen .village-map-return,
 .overlay-content-box.sc-map557-active .village-map-screen .village-info-toggle,
 .overlay-content-box.sc-map557-active .village-map-screen .village-info-drawer,
-body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"]) .village-map-screen .village-map-return,
-body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"]) .village-map-screen .village-info-toggle,
-body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"]) .village-map-screen .village-info-drawer {
+.village-map-screen[style*="--sc-map557-outboard-right"] .village-map-return,
+.village-map-screen[style*="--sc-map557-outboard-right"] .village-info-toggle,
+.village-map-screen[style*="--sc-map557-outboard-right"] .village-info-drawer {
   left: auto !important;
   right: var(--sc-map557-outboard-right) !important;
   width: var(--sc-map557-gutter-control-width) !important;
@@ -93,18 +92,18 @@ body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"]) 
 }
 
 .overlay-content-box.sc-map557-active .village-map-screen .village-map-return,
-body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"]) .village-map-screen .village-map-return {
+.village-map-screen[style*="--sc-map557-outboard-right"] .village-map-return {
   top: 2% !important;
   min-width: 0 !important;
 }
 
 .overlay-content-box.sc-map557-active .village-map-screen .village-info-toggle,
-body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"]) .village-map-screen .village-info-toggle {
+.village-map-screen[style*="--sc-map557-outboard-right"] .village-info-toggle {
   top: 44% !important;
 }
 
 .overlay-content-box.sc-map557-active .village-map-screen .village-info-drawer,
-body:has(#sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"]) .village-map-screen .village-info-drawer {
+.village-map-screen[style*="--sc-map557-outboard-right"] .village-info-drawer {
   top: calc(44% + 38px) !important;
   max-height: min(31vh, 260px) !important;
   overflow: auto !important;
