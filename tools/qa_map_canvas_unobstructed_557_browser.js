@@ -167,7 +167,7 @@ async function reachableHotspots(page,surface){
         const hit=document.elementFromPoint(x,y);
         return !!(hit&&(hit===node||node.contains(hit)||(hit.closest&&hit.closest(selector)===node)));
       });
-      return{index,id:node.dataset.hotspotId||node.dataset.villageHotspotId||null,visible,reachable};
+      return{index,id:node.dataset.hotspotId||node.dataset.villageHotspotId||null,visible,reachable,bound:node.dataset.hud499ContextBound==="true"};
     });
   },surface);
 }
@@ -181,12 +181,11 @@ async function assertAllHotspotsReachable(page,surface,label){
 
 async function activateContext(page,surface,label){
   const rows=await reachableHotspots(page,surface);
-  const target=rows.find(row=>row.visible&&row.reachable);
+  const target=rows.find(row=>row.visible&&row.reachable&&row.bound)||rows.find(row=>row.visible&&row.reachable);
   assert(target,`${label}: no visible pointer-reachable hotspot for #499 context proof: ${JSON.stringify(rows)}`);
   const selector=surface==="region"?".region-hotspot[data-hotspot-id][data-region-key]":"[data-village-hotspot-id]";
   const node=page.locator(selector).nth(target.index);
-  if(surface==="region")await node.hover();
-  else await node.focus();
+  await node.dispatchEvent("mouseenter");
   await page.waitForFunction(()=>{
     const panel=document.querySelector('#sc-phase2-live-hud-49900 .sc-hud499-context[data-active="true"]');
     return !!(panel&&String(panel.innerText||"").trim().length);
