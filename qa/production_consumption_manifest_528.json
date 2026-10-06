@@ -299,8 +299,8 @@
       "invalidation_rule": {
         "match_any": [
           "runtime/alpha-phase2-character-card-shop-52400.js",
-          "tools/qa_phase2-character-card-shop-524.js",
-          "tools/qa_phase2-character-card-shop-524_browser.js",
+          "tools/qa_phase2_character_card_shop_524.js",
+          "tools/qa_phase2_character_card_shop_524_browser.js",
           ".github/workflows/issue-524-phase2-character-card-shop.yml"
         ],
         "required_lane_ids": ["issue524_static", "issue524_browser"]
