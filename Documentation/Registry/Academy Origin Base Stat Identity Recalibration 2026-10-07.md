@@ -9,7 +9,7 @@
 
 ## 1. Scope
 
-This closes #582 by recalibrating the ten Academy-Origin Base Stat identities against the canonical PL Formula v1.0 while preserving the CE firewall between:
+This closes #582 by recalibrating the ten Academy-Origin Base Stat identities against canonical PL Formula v1.0 while preserving the CE firewall between:
 
 - Academy-Origin **Base identity / Base Stats**;
 - post-15 curriculum and learned **Knowledge / Competence**;
@@ -17,6 +17,8 @@ This closes #582 by recalibrating the ten Academy-Origin Base Stat identities ag
 - Combat-owned mechanics, action numerics and equipment semantics.
 
 The audit is representation-first. It does **not** manufacture artificial non-overlap between Origins and does **not** inflate Stats merely to preserve a stale displayed PL.
+
+Owner review after the first #582 pass identified two additional under-represented Academy identities: **Hinata** and **Mirai**. Their rows are therefore deliberately recalibrated here alongside Menma rather than being preserved merely because they were Formula-valid.
 
 ## 2. Canonical Stat and PL authority
 
@@ -34,10 +36,10 @@ No hidden or direct PL bonus is authorised.
 
 | Academy Origin | NIN | TAI | BUK | FŪI | KIN | GEN | STA | Raw Formula PL | Base PL |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Hinata | 6 | 9 | 5 | 5 | 5 | 5 | 7 | 8.133333... | **8** |
+| **Hinata** | **8** | **13** | **6** | 5 | 5 | **6** | **10** | 11.519047... | **12** |
 | Izuno | 10 | 9 | 6 | 5 | 6 | 5 | 8 | 9.300000... | **9** |
-| Mirai | 8 | 8 | 9 | 5 | 6 | 7 | 8 | 8.576190... | **9** |
-| Menma | 10 | 8 | 6 | 5 | **13** | 7 | 11 | 11.919047... | **12** |
+| **Mirai** | **9** | **9** | **12** | **6** | **6** | **13** | **10** | 12.109523... | **12** |
+| **Menma** | 10 | 8 | 6 | 5 | **13** | 7 | 11 | 11.919047... | **12** |
 | Kushina | 8 | 9 | 5 | 8 | 5 | 5 | 14 | 12.140476... | **12** |
 | Kurenai | 9 | 7 | 8 | 6 | 5 | 14 | 8 | 12.204761... | **12** |
 | Iwabee | 14 | 11 | 13 | 6 | 5 | 5 | 14 | 13.273809... | **13** |
@@ -45,60 +47,112 @@ No hidden or direct PL bonus is authorised.
 | Kakashi | 16 | 14 | 15 | 8 | 9 | 10 | 14 | 15.192857... | **15** |
 | Obito | 11 | 12 | 10 | 5 | 5 | 6 | 13 | 12.128571... | **12** |
 
-## 4. Menma correction — deliberate Stat recalibration
+## 4. Deliberate Base-identity recalibrations
 
-The pre-audit Menma row was:
+### 4.1 Hinata — Hyūga / Taijutsu identity strengthened
+
+Pre-audit Hinata:
+
+`6 / 9 / 5 / 5 / 5 / 5 / 7` → raw Formula PL `8.133333...` → **PL8**.
+
+That row technically satisfied the Formula but under-represented the intended Academy Hinata identity. Taijutsu 9 was only a mild lead over an otherwise very low row and did not make her Hyūga physical/chakra-control foundation read as a meaningful strength.
+
+Final Hinata:
+
+`8 / 13 / 6 / 5 / 5 / 6 / 10` → raw Formula PL `11.519047...` → **PL12**.
+
+Changes:
+
+- Ninjutsu `6 → 8`;
+- Taijutsu `9 → 13`;
+- Bukijutsu `5 → 6`;
+- Genjutsu `5 → 6`;
+- Stamina `7 → 10`;
+- Fūinjutsu and Kinjutsu remain 5.
+
+The row keeps **Taijutsu 13** as the unmistakable defining Base axis, with Stamina 10 and Ninjutsu 8 as supporting foundations. This strengthens Hinata without turning her into a broad Kakashi-style prodigy or inventing unrelated Fūinjutsu/Kinjutsu competence.
+
+### 4.2 Mirai — Genjutsu / Bukijutsu dual identity strengthened
+
+Pre-audit Mirai:
+
+`8 / 8 / 9 / 5 / 6 / 7 / 8` → raw Formula PL `8.576190...` → **PL9**.
+
+That row was too generalist to communicate the intended Mirai identity. Bukijutsu 9 barely led the row, while Genjutsu 7 was not meaningfully specialist at all.
+
+Final Mirai:
+
+`9 / 9 / 12 / 6 / 6 / 13 / 10` → raw Formula PL `12.109523...` → **PL12**.
+
+Changes:
+
+- Ninjutsu `8 → 9`;
+- Taijutsu `8 → 9`;
+- Bukijutsu `9 → 12`;
+- Fūinjutsu `5 → 6`;
+- Genjutsu `7 → 13`;
+- Stamina `8 → 10`;
+- Kinjutsu remains 6.
+
+The final row makes **Genjutsu 13** the lead axis and **Bukijutsu 12** the clear second specialist lane. Ninjutsu/Taijutsu 9 and Stamina 10 give her a credible Academy combat foundation without erasing Kurenai's stronger Genjutsu 14 specialist spike.
+
+### 4.3 Menma — Kinjutsu identity strengthened
+
+Pre-audit Menma:
 
 `10 / 8 / 6 / 5 / 9 / 7 / 11` → raw Formula PL `10.3` → **PL10**.
 
 #519 / #582 specifically identified Menma's Kinjutsu lane as under-represented, with owner direction accepting **12–13 Kinjutsu** as plausible and asking whether Kinjutsu should become his strongest or near-strongest rare-potential axis.
 
-The final row therefore changes only Menma's Kinjutsu:
-
-`9 → 13`
-
 Final Menma:
 
 `10 / 8 / 6 / 5 / 13 / 7 / 11` → raw Formula PL `11.919047...` → **PL12**.
 
-**Why 13 rather than 12:** 13 makes the explicitly protected Kinjutsu lane visibly Menma's strongest Base axis, above Stamina 11 and Ninjutsu 10, without inventing unrelated Stat inflation. It stays below Kakashi's Academy Ninjutsu ceiling of 16 and does not turn overlap with other Origins into a prohibited condition.
+Only Kinjutsu changes:
 
-This is a Base-identity correction, not a later-progression reward and not a Combat bonus.
+`9 → 13`
 
-## 5. The other nine rows remain Stat-stable
+Kinjutsu 13 is now Menma's strongest Base axis, above Stamina 11 and Ninjutsu 10, without unrelated Stat inflation.
 
-The audit does **not** change the other nine Stat rows. Their existing Base distributions already communicate coherent Academy identities, and the upstream firewall forbids using later curriculum / starting-Skill assignment as a reason to rewrite Base Stats.
+These three recalibrations are **Base-identity corrections**, not later-progression rewards and not Combat bonuses.
 
-Representation audit:
+## 5. Remaining seven rows remain Stat-stable
 
-- **Hinata:** Taijutsu 9 is the clear highest Base axis; Hyūga physical identity is readable without fake secondary inflation.
-- **Izuno:** Ninjutsu 10 / Taijutsu 9 produces a clear mixed physical-ninjutsu base rather than a one-stat caricature.
-- **Mirai:** Bukijutsu 9 leads a broad 8/8/8 physical-ninjutsu-stamina support with Genjutsu 7. Her Genjutsu/Bukijutsu starting-skill identity may develop from this base; it does not require retroactive Base-Genjutsu inflation.
-- **Kushina:** Stamina 14 is the defining Base spike, with Taijutsu 9 and Ninjutsu/Fūinjutsu 8 behind it. Later/protected Fūinjutsu learning remains distinct from Base identity.
-- **Kurenai:** Genjutsu 14 is already an unmistakable specialist spike.
-- **Iwabee:** Ninjutsu 14 / Stamina 14 / Bukijutsu 13 expresses his durable Earth/weapon-forward Academy identity without forcing a separate Fūinjutsu Base spike from later curriculum.
+The audit does **not** change Izuno, Kushina, Kurenai, Iwabee, Metal Lee, Kakashi or Obito. Their existing Base distributions remain coherent after owner review.
+
+- **Izuno:** Ninjutsu 10 / Taijutsu 9 preserves a mixed physical-ninjutsu base.
+- **Kushina:** Stamina 14 remains the defining Base spike, with Taijutsu 9 and Ninjutsu/Fūinjutsu 8 behind it.
+- **Kurenai:** Genjutsu 14 remains an unmistakable specialist spike.
+- **Iwabee:** Ninjutsu 14 / Stamina 14 / Bukijutsu 13 expresses his durable Earth/weapon-forward Academy identity.
 - **Metal Lee:** Stamina 14 / Taijutsu 13 remains a clear physical-development identity.
-- **Kakashi:** 16 / 14 / 15 across Ninjutsu/Taijutsu/Bukijutsu preserves the intentionally broad Academy-prodigy package; he is not reduced to a single comparative 'winner' lane.
-- **Obito:** Stamina 13 / Taijutsu 12 / Ninjutsu 11 gives a coherent durable physical-ninjutsu base without invented specialist inflation.
+- **Kakashi:** 16 / 14 / 15 across Ninjutsu/Taijutsu/Bukijutsu preserves the intentionally broad Academy-prodigy package.
+- **Obito:** Stamina 13 / Taijutsu 12 / Ninjutsu 11 gives a coherent durable physical-ninjutsu base.
 
 ## 6. Formula-conformance corrections to stale PL labels
 
-The Stat audit exposed two stale displayed PL labels that must not be preserved by changing otherwise-valid Stats:
+The Stat audit also exposed two stale displayed PL labels that must not be preserved by changing otherwise-valid Stats:
 
 - **Kushina:** existing row computes raw `12.140476...` → **PL12**, not PL13.
 - **Kurenai:** existing row computes raw `12.204761...` → **PL12**, not PL13.
 
-All other unchanged rows retain their Formula-valid Base PL labels:
+Formula-valid final Base PLs:
 
-- Hinata **8**;
+- Hinata **12**;
 - Izuno **9**;
-- Mirai **9**;
+- Mirai **12**;
+- Menma **12**;
+- Kushina **12**;
+- Kurenai **12**;
 - Iwabee **13**;
 - Metal Lee **13**;
 - Kakashi **15**;
 - Obito **12**.
 
-Menma is the only Stat-row recalibration and changes from Formula-valid PL10 to Formula-valid **PL12** because Kinjutsu changes 9 → 13.
+Changed rows:
+
+- Hinata: **PL8 → PL12** because the Base Stat row is deliberately strengthened;
+- Mirai: **PL9 → PL12** because the Base Stat row is deliberately strengthened;
+- Menma: **PL10 → PL12** because Kinjutsu changes 9 → 13.
 
 ## 7. Collision / overlap audit
 
@@ -106,9 +160,11 @@ No harmful collision is created.
 
 - Two Origins may legitimately be strong in the same Stat.
 - Base Stat identity does not reserve a Stat exclusively to one character.
-- A starting-Skill specialty does not require that specialty's Stat to be the character's numerically highest Base Stat.
-- Later curriculum, progression, weapon proficiency, learned competence and Combat mechanics may deepen an identity without rewriting historical Academy Base Stats.
-- Kakashi's broad high baseline therefore coexists with narrower specialist identities rather than invalidating them.
+- Hinata's Taijutsu 13 may equal Metal Lee's Taijutsu 13 because their complete representations are different; equal lane values do not make them equivalent characters.
+- Mirai Genjutsu 13 remains below Kurenai Genjutsu 14 while Mirai's Bukijutsu 12 creates a materially different dual-specialist shape.
+- Menma Kinjutsu 13 remains a separate rare-potential axis rather than an overall-PL claim.
+- Starting-Skill specialty does not automatically author Base Stats; these changes are explicit owner-approved Base representation corrections.
+- Kakashi's broad high baseline coexists with narrower specialist identities rather than invalidating them.
 
 The correct safeguard is **causal provenance and representation fidelity**, not forced numerical non-overlap.
 
@@ -128,4 +184,4 @@ Any consumer must use this final matrix as Base authority and independently prov
 
 ## Final lock
 
-> **The ten Academy-Origin Base Stat matrix above is the binding PL / Registry authority. Menma alone receives a Base Stat recalibration: Kinjutsu 9 → 13, yielding Formula-valid Base PL12. The other nine Stat rows remain unchanged. Kushina and Kurenai's stale PL13 labels are corrected to Formula-valid PL12 rather than inflating Stats to preserve those labels. Starting Skills, later curriculum and Combat mechanics do not retroactively rewrite these Base Stats. Overlap between Origins is permitted when representation supports it.**
+> **The ten Academy-Origin Base Stat matrix above is the binding PL / Registry authority on merge. Hinata, Mirai and Menma receive deliberate Base-identity recalibrations: Hinata becomes a Taijutsu-led PL12 Hyūga prospect; Mirai becomes a Genjutsu/Bukijutsu dual-specialist PL12 prospect; Menma becomes a Kinjutsu-led PL12 prospect. The remaining seven Stat rows stay unchanged. Kushina and Kurenai's stale PL13 labels are corrected to Formula-valid PL12 rather than inflating Stats to preserve those labels. Starting Skills, later curriculum and Combat mechanics do not retroactively rewrite Base Stats. Overlap between Origins is permitted when representation supports it.**
