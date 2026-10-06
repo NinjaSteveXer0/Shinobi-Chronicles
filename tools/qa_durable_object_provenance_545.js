@@ -8,6 +8,7 @@ const path=require("path");
 
 const runtimePath=path.join(__dirname,"..","runtime","alpha-phase2-inventory-core-46100.js");
 const source=fs.readFileSync(runtimePath,"utf8");
+const PROVENANCE_ROOT="durableObjectProvenance14800";
 
 function makeSandbox(seed=null){
   let serial=0,saveCalls=0;
@@ -56,6 +57,16 @@ function makeSandbox(seed=null){
   const s=makeSandbox();
   assert.strictEqual(typeof s.commitDurableInventoryAcquisition54500,"function");
   assert.strictEqual(typeof s.registerPreexistingDurableObject54500,"function");
+  assert.strictEqual(Object.prototype.hasOwnProperty.call(s.playerData,PROVENANCE_ROOT),false,"fresh save must not begin with provenance state");
+
+  const freshReadBefore=JSON.stringify(s.playerData);
+  const freshSnapshot=s.getPhase2InventorySnapshot46100();
+  assert.strictEqual(freshSnapshot.summary.durableInstances,0);
+  assert.strictEqual(JSON.stringify(s.playerData),freshReadBefore,"Inventory snapshot must be read-only before provenance exists");
+  assert.strictEqual(Object.prototype.hasOwnProperty.call(s.playerData,PROVENANCE_ROOT),false,"Inventory read must not create empty provenance state");
+  const freshDiag=s.runDurableObjectProvenance54500Diagnostics();
+  assert.strictEqual(freshDiag.pass,true,JSON.stringify(freshDiag));
+  assert.strictEqual(Object.prototype.hasOwnProperty.call(s.playerData,PROVENANCE_ROOT),false,"provenance diagnostics must not create empty provenance state");
 
   const stackAttempt=s.commitDurableInventoryAcquisition54500({
     itemId:"basic_scroll",sourceOccurrenceId:"occ_stack",sourceId:"source_stack",acquisitionKind:"reward"
@@ -63,6 +74,19 @@ function makeSandbox(seed=null){
   assert.strictEqual(stackAttempt.success,false,"stackable objects must stay outside durable provenance acquisition");
   assert.strictEqual(stackAttempt.reason,"item_not_durable");
   assert.strictEqual(s.playerData.inventory.length,0,"failed durable commit must not mutate Inventory");
+  assert.strictEqual(Object.prototype.hasOwnProperty.call(s.playerData,PROVENANCE_ROOT),false,"rejected stackable durable commit must not create provenance state");
+
+  const missingPreexisting=s.commitDurableInventoryAcquisition54500({
+    itemId:"shop_test_kunai",
+    sourceOccurrenceId:"occ_missing_preexisting",
+    sourceId:"missing_preexisting_source",
+    acquisitionKind:"purchase",
+    eventType:"purchase",
+    existingInstanceId:"world_object_missing"
+  });
+  assert.strictEqual(missingPreexisting.success,false);
+  assert.strictEqual(missingPreexisting.reason,"preexisting_object_record_missing");
+  assert.strictEqual(Object.prototype.hasOwnProperty.call(s.playerData,PROVENANCE_ROOT),false,"failed pre-existing identity lookup must not create provenance state");
 
   const first=s.commitDurableInventoryAcquisition54500({
     itemId:"academy_training_tanto",
@@ -78,6 +102,7 @@ function makeSandbox(seed=null){
   assert.ok(first.instanceId);
   assert.strictEqual(s.playerData.inventory.length,1);
   assert.strictEqual(s.playerData.inventory[0].instanceId,first.instanceId);
+  assert.strictEqual(Object.prototype.hasOwnProperty.call(s.playerData,PROVENANCE_ROOT),true,"successful durable acquisition must commit provenance state");
 
   const object=s.getDurableObjectRecord54500(first.instanceId);
   assert.ok(object,"exact durable object record must exist");
@@ -140,11 +165,34 @@ function makeSandbox(seed=null){
   assert.strictEqual(transferredObject.events[0].eventType,"creation");
   assert.strictEqual(transferredObject.events[1].eventType,"purchase");
 
-  s.playerData.inventory.push({id:"shop_test_kunai",name:"Legacy Kunai",type:"weapon",rarity:"Common",quantity:1,instanceId:"legacy_instance_without_provenance",equippedBy:null});
-  const legacySnapshot=s.getPhase2InventorySnapshot46100();
+  const legacyOnly=makeSandbox({
+    inventory:[{id:"shop_test_kunai",name:"Legacy Kunai",type:"weapon",rarity:"Common",quantity:1,instanceId:"legacy_instance_without_provenance",equippedBy:null}]
+  });
+  assert.strictEqual(Object.prototype.hasOwnProperty.call(legacyOnly.playerData,PROVENANCE_ROOT),false);
+  const legacyBefore=JSON.stringify(legacyOnly.playerData);
+  const legacySnapshot=legacyOnly.getPhase2InventorySnapshot46100();
   const legacy=legacySnapshot.durable.find(row=>row.instanceId==="legacy_instance_without_provenance");
   assert.ok(legacy,"legacy durable instance must remain projected");
   assert.strictEqual(legacy.provenanceObject,null,"legacy instance must not receive fictional provenance");
+  assert.strictEqual(JSON.stringify(legacyOnly.playerData),legacyBefore,"legacy Inventory read must not mutate persistent state");
+  assert.strictEqual(Object.prototype.hasOwnProperty.call(legacyOnly.playerData,PROVENANCE_ROOT),false,"legacy Inventory read must not create provenance state");
+  const legacyDiag=legacyOnly.runDurableObjectProvenance54500Diagnostics();
+  assert.strictEqual(legacyDiag.pass,true,JSON.stringify(legacyDiag));
+  assert.strictEqual(Object.prototype.hasOwnProperty.call(legacyOnly.playerData,PROVENANCE_ROOT),false,"legacy provenance diagnostics must remain read-only");
+
+  const rollbackSandbox=makeSandbox();
+  rollbackSandbox.addItemToInventory=function brokenDurableWriter(){throw new Error("fixture_inventory_writer_failure");};
+  const failedMutation=rollbackSandbox.commitDurableInventoryAcquisition54500({
+    itemId:"academy_training_tanto",
+    sourceOccurrenceId:"occ_failed_mutation",
+    sourceId:"failed_mutation_source",
+    acquisitionKind:"reward",
+    eventType:"reward_acquisition"
+  });
+  assert.strictEqual(failedMutation.success,false);
+  assert.strictEqual(failedMutation.reason,"durable_acquisition_commit_failed");
+  assert.strictEqual(rollbackSandbox.playerData.inventory.length,0,"failed canonical Inventory mutation must roll Inventory back");
+  assert.strictEqual(Object.prototype.hasOwnProperty.call(rollbackSandbox.playerData,PROVENANCE_ROOT),false,"failed canonical Inventory mutation must restore provenance-root absence");
 
   const diag=s.runDurableObjectProvenance54500Diagnostics();
   assert.strictEqual(diag.pass,true,JSON.stringify(diag));
@@ -158,6 +206,9 @@ function makeSandbox(seed=null){
     preexistingTransferInstanceId:transfer.instanceId,
     inventoryCount:s.playerData.inventory.length,
     provenanceObjectCount:diag.objectCount,
-    provenanceReceiptCount:diag.receiptCount
+    provenanceReceiptCount:diag.receiptCount,
+    legacyReadCreatesProvenance:false,
+    failedCommitLeavesProvenance:false,
+    diagnosticsCreateProvenance:false
   },null,2));
 })();
