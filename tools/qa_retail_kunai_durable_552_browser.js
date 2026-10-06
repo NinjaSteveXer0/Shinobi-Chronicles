@@ -43,6 +43,24 @@ async function openShop(page){
   assert.strictEqual(result.success,true,JSON.stringify(result));
   await page.waitForSelector(".sc-shop517",{state:"visible",timeout:10000});
 }
+async function clearIntentionalReloadImageAborts(gate,label){
+  const snap=await gate.snapshot();
+  const unexpected=Array.isArray(snap.unexpected)?snap.unexpected:[];
+  const invalid=unexpected.filter(event=>!(
+    event&&
+    event.kind==="requestfailed"&&
+    event.resourceType==="image"&&
+    event.message==="net::ERR_ABORTED"
+  ));
+  assert.strictEqual(
+    invalid.length,
+    0,
+    "#552 unexpected browser runtime errors during "+label+": "+JSON.stringify(invalid,null,2)
+  );
+  const reloadImageAbortCount=unexpected.length;
+  await gate.reset();
+  return{label,reloadImageAbortCount};
+}
 
 (async()=>{
   const browser=await chromium.launch({headless:true});
@@ -107,8 +125,10 @@ async function openShop(page){
     assert(inventoryText.includes(purchased.receipt.sourceOccurrenceId));
     await page.screenshot({path:path.join(OUT,"02-kunai-inventory-instance.png"),fullPage:true});
 
+    await gate.assertClean("phase2-retail-kunai-552-before-purchase-reload");
     await page.reload({waitUntil:"domcontentloaded",timeout:60000});
     await waitRuntime(page);await release(page);
+    const purchaseReloadGate=await clearIntentionalReloadImageAborts(gate,"intentional purchase save/reload");
     const afterReload=await page.evaluate(instanceId=>({
       ryo:playerData.ryo,
       count:playerData.inventory.filter(row=>row&&row.id==="kunai").length,
@@ -125,8 +145,10 @@ async function openShop(page){
     assert.strictEqual(worn.condition.durabilityCurrent,9);
     assert.strictEqual(worn.condition.instanceId,purchased.row.instanceId);
 
+    await gate.assertClean("phase2-retail-kunai-552-before-worn-reload");
     await page.reload({waitUntil:"domcontentloaded",timeout:60000});
     await waitRuntime(page);await release(page);
+    const wornReloadGate=await clearIntentionalReloadImageAborts(gate,"intentional worn-condition save/reload");
     const wornReload=await page.evaluate(instanceId=>getRetailKunaiCondition55200(instanceId),purchased.row.instanceId);
     assert.strictEqual(wornReload.durabilityCurrent,9,"9/10 condition did not survive save/load");
 
@@ -154,6 +176,10 @@ async function openShop(page){
       repairProof:"9 -> 10",
       exactPurchaseProvenance:true,
       purchaseRetryIdempotent:true,
+      intentionalReloadImageAbortEvidence:{
+        purchaseReload:purchaseReloadGate.reloadImageAbortCount,
+        wornReload:wornReloadGate.reloadImageAbortCount
+      },
       browserGoldenClaimed:false
     },null,2));
   }finally{
