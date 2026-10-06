@@ -170,9 +170,9 @@ async function contextVisibility(page){
   });
 }
 async function activateContext(page,surface){
-  const selector=surface==="region"?".region-hotspot[data-hotspot-id]":"[data-village-hotspot-id]";
+  const selector=surface==="region"?".region-hotspot[data-hotspot-id]":"button[data-village-hotspot-id]";
   const node=page.locator(selector).first();
-  assert(await node.count(),`${surface}: no hotspot for context proof`);
+  assert(await node.count(),`${surface}: no actionable hotspot for context proof`);
   await node.focus();
   await page.waitForTimeout(220);
   return page.evaluate(()=>{
