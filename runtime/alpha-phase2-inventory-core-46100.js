@@ -314,8 +314,8 @@ function equipmentProjection(row){
 }
 function categoryFor(type,definition,row){
   const raw=String((definition&&definition.type)||(row&&row.type)||"misc").toLowerCase();
-  if(definition&&definition.stackable===false)return "durable";
-  return raw==="weapon"||raw==="gear"||raw==="equipment"||raw==="tool"||row&&row.instanceId?"durable":"stack";
+  if(raw==="weapon"||raw==="gear"||raw==="equipment"||raw==="tool"||row&&row.instanceId)return "durable";
+  return "stack";
 }
 function rowProjection(row,index,preparedSet){
   if(!row||typeof row!=="object")return null;
