@@ -66,21 +66,26 @@ const chars={
   academy_mirai:{id:"academy_mirai",name:"Mirai",rank:"Academy Student",village:"Hidden Leaf"}
 };
 let activeStory=null;
+let ctx=null;
+const overlayStub={hidden:false,style:{display:""}};
 const documentStub={
   body:{},
   head:{appendChild(){}},
   activeElement:null,
-  getElementById(){return null;},
+  getElementById(id){return id==="screen-overlay"?overlayStub:null;},
   querySelector(){return null;},
   createElement(){return{};},
   addEventListener(){}
 };
 class MutationObserverStub{observe(){} disconnect(){}}
-const ctx=vm.createContext({
+ctx=vm.createContext({
   console:{log(){},warn(){},error(){}},
   JSON,Object,Array,String,Number,Boolean,Set,Map,Math,Date,RegExp,Error,TypeError,
   document:documentStub,
   MutationObserver:MutationObserverStub,
+  getComputedStyle:node=>node===overlayStub
+    ?{display:ctx.currentOverlayType?"block":"none",visibility:"visible",opacity:"1"}
+    :{display:"block",visibility:"visible",opacity:"1"},
   setInterval:()=>0,
   currentOverlayType:null,
   currentBattle:{active:false,battleOver:false},
