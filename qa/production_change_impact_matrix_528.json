@@ -46,6 +46,16 @@
       "commands": ["node tools/qa_phase2_inventory_core_461_browser.js"],
       "scheduled_representative": false
     },
+    "issue545_static": {
+      "kind": "static",
+      "commands": [
+        "node tools/qa_durable_object_provenance_545.js",
+        "node tools/qa_kakashi_tanto_provenance_545.js",
+        "node tools/qa_kakashi_v2_clean_room.js",
+        "node tools/qa_issue_322_kakashi_dispositions.js"
+      ],
+      "scheduled_representative": true
+    },
     "issue469_static": {
       "kind": "static",
       "commands": ["node tools/qa_issue_469_ce_hotspot.js"],
@@ -144,6 +154,7 @@
         "issue32_static",
         "issue431_browser",
         "issue461_static",
+        "issue545_static",
         "issue469_static",
         "issue499_static",
         "issue517_static",
@@ -164,6 +175,7 @@
       ],
       "affected_consumers": [
         "chronicle_interaction_depth_32",
+        "inventory_core_461",
         "first_live_ce_hotspot_469",
         "live_hud_499",
         "basic_item_shop_517",
@@ -265,6 +277,31 @@
         "ui_active_masters_526"
       ],
       "required_lane_ids": ["issue431_browser", "ui_master_browser"]
+    },
+    {
+      "id": "durable_object_provenance",
+      "changed_any": [
+        "runtime/alpha-phase2-inventory-core-46100.js",
+        "runtime/alpha-kakashi-v2-rewards-36015.js",
+        "tools/qa_durable_object_provenance_545.js",
+        "tools/qa_kakashi_tanto_provenance_545.js",
+        "tools/qa_kakashi_v2_clean_room.js",
+        "tools/qa_issue_322_kakashi_dispositions.js",
+        ".github/workflows/issue-545-durable-object-provenance.yml"
+      ],
+      "affected_consumers": [
+        "inventory_core_461",
+        "frozen_origin_shared_runtime"
+      ],
+      "required_lane_ids": [
+        "runtime_fingerprint",
+        "ownership_safety",
+        "save_compatibility",
+        "issue461_static",
+        "issue461_browser",
+        "issue545_static",
+        "issue32_static"
+      ]
     },
     {
       "id": "promotion_transition_contract",

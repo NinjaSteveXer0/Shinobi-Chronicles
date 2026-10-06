@@ -6,11 +6,13 @@ const CONTENT="runtime/academy-kakashi-v2-content-36000.js";
 const WRITING_GOLDEN="runtime/academy-kakashi-v2-writing-golden-36100.js";
 const CORE="runtime/alpha-kakashi-v2-core-36020.js";
 const REWARDS="runtime/alpha-kakashi-v2-rewards-36015.js";
+const INVENTORY="runtime/alpha-phase2-inventory-core-46100.js";
 const PRODUCER="runtime/alpha-special-jonin-evidence-producer-34700.js";
 const contentSource=fs.readFileSync(CONTENT,"utf8");
 const writingGoldenSource=fs.readFileSync(WRITING_GOLDEN,"utf8");
 const coreSource=fs.readFileSync(CORE,"utf8");
 const rewardSource=fs.readFileSync(REWARDS,"utf8");
+const inventorySource=fs.readFileSync(INVENTORY,"utf8");
 const producerSource=fs.readFileSync(PRODUCER,"utf8");
 
 function makeCoreHarness(){
@@ -326,9 +328,20 @@ restrainThreeAndDeliver("POLICE");
     console,JSON,Object,Array,String,Number,Boolean,Set,Map,Math,Date,globalThis:null,itemDatabase,playerData,currentBattle:null,
     cloneProgressionData:v=>v===undefined?undefined:JSON.parse(JSON.stringify(v)),
     getItemDefinition:id=>itemDatabase[id]||null,
-    addItemToInventory:item=>playerData.inventory.push({...item,quantity:1}),
+    addItemToInventory:item=>{
+      const d=itemDatabase[item.id]||item;
+      if(d.stackable===true){
+        const found=playerData.inventory.find(row=>row&&row.id===d.id&&!row.instanceId);
+        if(found){found.quantity=(Number(found.quantity)||0)+1;return;}
+        playerData.inventory.push({id:d.id,name:d.name,type:d.type,rarity:d.rarity,quantity:1});return;
+      }
+      playerData.inventory.push({id:d.id,name:d.name,type:d.type,rarity:d.rarity,quantity:1,instanceId:`${d.id}_qa_${playerData.inventory.length+1}`,weaponClass:d.weaponClass,equipmentSlot:d.equipmentSlot,equippedBy:null});
+    },
     generateBattleRewards:()=>null,claimCurrentBattleRewards:()=>false,savePlayerData:()=>true,saveTestState:()=>true
-  };ctx.globalThis=ctx;vm.createContext(ctx);vm.runInContext(rewardSource,ctx,{filename:REWARDS});
+  };ctx.globalThis=ctx;vm.createContext(ctx);
+  vm.runInContext(inventorySource,ctx,{filename:INVENTORY});
+  assert.strictEqual(typeof ctx.commitDurableInventoryAcquisition54500,"function","canonical #461 durable provenance owner missing in #322 reward fixture");
+  vm.runInContext(rewardSource,ctx,{filename:REWARDS});
   const base={package:{},knowledge:{},resolvers:{},routeHistory:[],battles:{},terminal:{reportReached:true,minatoReached:true,receiptReached:true}};
   const plan=n=>ctx.previewAcademyKakashiV2TerminalRewards36015({...base,participants:Object.fromEntries(["MI","PS","AMT"].slice(0,n).map(k=>[k,{state:"ANBU_CUSTODY"}]))},"tier"+n);
   assert.strictEqual(plan(1).captureRyo,25);assert.strictEqual(plan(2).captureRyo,50);assert.strictEqual(plan(3).captureRyo,100);
