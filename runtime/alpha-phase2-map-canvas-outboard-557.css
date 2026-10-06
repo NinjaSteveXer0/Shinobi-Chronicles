@@ -1,0 +1,86 @@
+/* ============================================================================
+   ISSUE #557 — VILLAGE / REGION LEGACY MAP CHROME OUTBOARD COMPLETION
+
+   Presentation-only continuation of the canonical #499/#557 HUD layout.
+   These selectors move remaining legacy navigation/info surfaces outside the
+   crisp Village/Region map rectangles. They do not create or mutate gameplay,
+   discovery, Chronicle, ownership, assignment, Journey, Ryō, or World state.
+   ============================================================================ */
+
+/* Region non-spatial known destinations are navigation, not geography. */
+.overlay-content-box.sc-map557-active .region-map-pane .region-known-destinations {
+  left: auto !important;
+  right: var(--sc-map557-outboard-right) !important;
+  top: auto !important;
+  bottom: 145px !important;
+  width: var(--sc-map557-gutter-control-width) !important;
+  max-width: var(--sc-map557-gutter-control-width) !important;
+  max-height: min(31vh, 260px) !important;
+  overflow: auto !important;
+  box-sizing: border-box !important;
+  z-index: 300 !important;
+}
+
+/* The actual Region event/disambiguation drawer uses the same DOM surface as
+   the selected-location card. Keep both modes in the approved right reserve. */
+.overlay-content-box.sc-map557-active .region-map-pane .region-event-drawer {
+  left: auto !important;
+  right: var(--sc-map557-outboard-right) !important;
+  top: 136px !important;
+  bottom: 86px !important;
+  width: var(--sc-map557-gutter-control-width) !important;
+  max-width: var(--sc-map557-gutter-control-width) !important;
+  max-height: none !important;
+  box-sizing: border-box !important;
+  padding: 10px !important;
+  z-index: 320 !important;
+}
+
+/* Transient rich event selection owns the contextual reserve while open. */
+.overlay-content-box.sc-map557-active .region-map-pane:has(.region-event-drawer) .region-known-destinations,
+.overlay-content-box.sc-map557-active .region-map-pane:has(.region-event-drawer) .region-info-toggle,
+.overlay-content-box.sc-map557-active .region-map-pane:has(.region-event-drawer) .region-info-drawer {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+body:has(.overlay-content-box.sc-map557-active .region-map-pane .region-event-drawer)
+#sc-phase2-live-hud-49900[data-surface="region"] .sc-hud499-context {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Village return and information controls are navigation/context chrome, not
+   map markers. Keep them in the right reserve rather than over Village art. */
+.overlay-content-box.sc-map557-active .village-map-screen .village-map-return,
+.overlay-content-box.sc-map557-active .village-map-screen .village-info-toggle,
+.overlay-content-box.sc-map557-active .village-map-screen .village-info-drawer {
+  left: auto !important;
+  right: var(--sc-map557-outboard-right) !important;
+  width: var(--sc-map557-gutter-control-width) !important;
+  max-width: var(--sc-map557-gutter-control-width) !important;
+  box-sizing: border-box !important;
+}
+
+.overlay-content-box.sc-map557-active .village-map-screen .village-map-return {
+  top: 2% !important;
+  min-width: 0 !important;
+}
+
+.overlay-content-box.sc-map557-active .village-map-screen .village-info-toggle {
+  top: 44% !important;
+}
+
+.overlay-content-box.sc-map557-active .village-map-screen .village-info-drawer {
+  top: calc(44% + 38px) !important;
+  max-height: min(31vh, 260px) !important;
+  overflow: auto !important;
+}
+
+/* The richer Village info panel temporarily owns the same contextual zone. */
+body:has(.overlay-content-box.sc-map557-active .village-map-screen .village-info-drawer.open)
+#sc-phase2-live-hud-49900[data-surface="village"] .sc-hud499-context {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
