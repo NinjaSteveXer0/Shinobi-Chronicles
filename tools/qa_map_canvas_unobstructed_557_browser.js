@@ -335,13 +335,43 @@ async function proveSelectedEventDrawer(page,label){
   assert.strictEqual(activated.result.success,true,`${label}: selected-event activation failed: ${JSON.stringify(activated)}`);
   assert.strictEqual(activated.result.type,"event_drawer",`${label}: selected event did not use shared event drawer`);
   assert.strictEqual(activated.result.reason,"multiple_opportunities",`${label}: exact multiple-opportunity route not reached`);
+  assert(activated.immediateDrawer,`${label}: shared event drawer was absent immediately after the real dblclick route: ${JSON.stringify(activated)}`);
+  assert(activated.immediateDrawer.text.includes("OPPORTUNITIES AT THIS HOTSPOT"),`${label}: immediate event drawer did not contain disambiguation copy: ${JSON.stringify(activated)}`);
+  assert(activated.immediateDrawer.width>0&&activated.immediateDrawer.height>0&&activated.immediateDrawer.display!=="none"&&activated.immediateDrawer.visibility!=="hidden",`${label}: immediate event drawer was not visibly laid out: ${JSON.stringify(activated)}`);
 
-  await page.waitForFunction(()=>{
-    const drawer=document.querySelector(".region-map-pane .region-event-drawer");
-    if(!drawer)return false;
-    const r=drawer.getBoundingClientRect(),cs=getComputedStyle(drawer);
-    return r.width>0&&r.height>0&&cs.display!=="none"&&cs.visibility!=="hidden";
-  },null,{timeout:3000});
+  try{
+    await page.waitForFunction(()=>{
+      const drawer=document.querySelector(".region-map-pane .region-event-drawer");
+      if(!drawer)return false;
+      const r=drawer.getBoundingClientRect(),cs=getComputedStyle(drawer);
+      return r.width>0&&r.height>0&&cs.display!=="none"&&cs.visibility!=="hidden";
+    },null,{timeout:3000});
+  }catch(error){
+    const delayed=await page.evaluate(qaOpportunityId=>{
+      const drawer=document.querySelector(".region-map-pane .region-event-drawer");
+      const projection=selectedRegionKey&&selectedHotspotId?getHotspotProjection(selectedRegionKey,selectedHotspotId):null;
+      const r=drawer&&drawer.getBoundingClientRect();
+      const cs=drawer&&getComputedStyle(drawer);
+      return{
+        currentOverlayType:typeof currentOverlayType!=="undefined"?currentOverlayType:null,
+        selectedRegionKey:typeof selectedRegionKey!=="undefined"?selectedRegionKey:null,
+        selectedHotspotId:typeof selectedHotspotId!=="undefined"?selectedHotspotId:null,
+        selectedOpportunityId:typeof selectedOpportunityId!=="undefined"?selectedOpportunityId:null,
+        qaOpportunityRegistered:!!getRegisteredWorldEventOpportunity(qaOpportunityId),
+        projectedAggregationCount:projection&&projection.aggregationCount,
+        projectedOpportunityIds:projection&&projection.opportunityIds,
+        drawer:drawer?{
+          text:String(drawer.innerText||""),
+          width:r&&r.width,
+          height:r&&r.height,
+          display:cs&&cs.display,
+          visibility:cs&&cs.visibility,
+          connected:drawer.isConnected
+        }:null
+      };
+    },activated.qaOpportunityId);
+    throw new Error(`${label}: event drawer existed synchronously but did not persist visibly for the selected Region hotspot: ${JSON.stringify({activated,delayed,cause:String(error&&error.message||error)})}`);
+  }
   await settle(page);
 
   const presentation=await page.evaluate(()=>{
