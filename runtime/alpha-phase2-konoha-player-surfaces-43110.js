@@ -274,7 +274,8 @@ function issuedLeadIds(){
 }
 function discoveredLeadRows(){
   const issued=new Set(issuedLeadIds());
-  const history=globalThis.playerData&&Array.isArray(globalThis.playerData.activityHistory)?globalThis.playerData.activityHistory:[];
+  const record=safeCall("getKonohaCeHotspotResolvedRecord46900");
+  const history=record?[record]:[];
   const rows=[];
   for(const record of history){
     if(!record||record.committed!==true||!record.data||!Array.isArray(record.data.futureLeadIds))continue;
@@ -302,13 +303,9 @@ function dispatchProjection(){
   return{issuedSourceLeadIds:issued,discoveredLeadIds:leads.map(row=>row.leadId),leads,countMode:"known_only_no_seed_denominator_claimed"};
 }
 function semanticFingerprint(){
-  const pd=globalThis.playerData;
   return JSON.stringify({
-    activityHistory:pd&&Array.isArray(pd.activityHistory)?pd.activityHistory:null,
-    worldEventRuntime:pd&&pd.worldEventRuntime||null,
-    currentTeam:safeCall("getChronicleCurrentTeam43600"),
-    ryo:pd&&pd.ryo,
-    acquisition:pd&&pd.acquisition||null
+    hotspotRecord:safeCall("getKonohaCeHotspotResolvedRecord46900"),
+    currentTeam:safeCall("getChronicleCurrentTeam43600")
   });
 }
 function ce469HasPriority(){
@@ -386,6 +383,7 @@ function diagnostics(){
     noGlobalVillageRouterReplacement:!String(installHokageOfficeChronicleDispatch53300).includes("activateAlphaKonohaV3PublicLocation"),
     missionProjectionDelegates:typeof globalThis["openOverlay"]==="function",
     dispatchConsumesExisting469:typeof globalThis.getKonohaCeHotspotBranchConsequence46900!=="function"||issuedLeadIds().every(Boolean),
+    dispatchReadsCanonicalResolved469:String(discoveredLeadRows).includes("getKonohaCeHotspotResolvedRecord46900"),
     discoveredLeadsReadCommittedHistoryOnly:String(discoveredLeadRows).includes("record.committed!==true")&&before===after,
     mapFocusPresentationOnly:!String(focusLead).includes("savePlayerData")&&!String(focusLead).includes("activityHistory.push"),
     observerPrefersChronicleIdentity:String(currentObserver).includes("getAlphaSurfaceTruthSubjectId")&&String(currentObserver).includes("getChronicleRunIdentity43600"),
