@@ -35,7 +35,18 @@ jobs:
           node --check tools/qa_issue_576_expert_master_curriculum_profiles.js
 
       - name: Issue 576 deterministic curriculum contract
-        run: node tools/qa_issue_576_expert_master_curriculum_profiles.js
+        shell: bash
+        run: |
+          set -o pipefail
+          node tools/qa_issue_576_expert_master_curriculum_profiles.js 2>&1 | tee issue-576-focused-qa.log
+
+      - name: Upload focused QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-576-focused-qa
+          path: issue-576-focused-qa.log
+          if-no-files-found: ignore
 
       - name: Existing Discipline Development regression
         run: node tools/qa_issue_448_discipline_stat_growth.js
