@@ -36,6 +36,36 @@
   --sc-map557-safe-control-width: var(--sc-map557-gutter-control-width, clamp(116px, 12vw, 176px));
 }
 
+/*
+   PERSISTENT HUD EDGE OWNERSHIP
+
+   #557 reserves real horizontal space around the crisp Region/Village map. The
+   persistent #499 HUD belongs to those viewport-edge gutters, not to a pixel
+   coordinate derived from a transient map measurement. Pinning the persistent
+   controls to the stable outer edges prevents a DOM/layout refresh from placing
+   a stale measured coordinate a few pixels back across the map boundary while
+   preserving the same #499 semantic projection and control hierarchy.
+*/
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-state-cluster,
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-hud499-state-cluster,
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-tools,
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-hud499-tools,
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-context,
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-hud499-context,
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-map-nav,
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-hud499-map-nav {
+  left: auto !important;
+  right: 8px !important;
+  width: clamp(116px, 12vw, 176px) !important;
+  max-width: clamp(116px, 12vw, 176px) !important;
+}
+
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-team,
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-hud499-team {
+  left: 8px !important;
+  right: auto !important;
+}
+
 /* Keep the compact identity/journey/Ryō cluster in the clear header reserve.
    This leaves the right map-side reserve available for navigation/context. */
 body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-state-cluster,
