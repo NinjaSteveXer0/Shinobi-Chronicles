@@ -103,20 +103,27 @@
     {
       "id": "inventory_core_461",
       "surface_family": "Inventory / Ownership Projection",
-      "authority_kind": "issue_contract",
-      "authority_ref": ["#461"],
+      "authority_kind": "issue_contract_with_durable_provenance_extension",
+      "authority_ref": ["#461", "#545", "#552"],
       "production_disposition": "IMPLEMENT_NOW",
       "lifecycle_stage": "OBSERVED",
       "consumer_paths": ["runtime/alpha-phase2-inventory-core-46100.js"],
       "qa_paths": [
         "tools/qa_phase2_inventory_core_461.js",
-        "tools/qa_phase2_inventory_core_461_browser.js"
+        "tools/qa_phase2_inventory_core_461_browser.js",
+        "tools/qa_durable_object_provenance_545.js",
+        "tools/qa_retail_kunai_durable_552.js",
+        "tools/qa_retail_kunai_durable_552_browser.js"
       ],
       "workflow_path": ".github/workflows/issue-461-phase2-inventory-core.yml",
       "expected_evidence": {
         "path": "runtime/alpha-phase2-inventory-core-46100.js",
         "contains": "SC_PHASE2_INVENTORY_CORE_46100"
       },
+      "observable_acceptance": [
+        "durable ownership remains one exact canonical Inventory instance with provenance projected from the #545 owner",
+        "#552 retail Kunai save/reload preserves exact instance identity, purchase provenance and authored condition without creating provenance on legacy reads"
+      ],
       "known_debt": [
         "Stephen owner-browser populated-state acceptance and Battle Pouch discoverability remain explicitly queued in #463."
       ],
@@ -127,9 +134,14 @@
           "runtime/alpha-phase2-inventory-core-46100.js",
           "tools/qa_phase2_inventory_core_461.js",
           "tools/qa_phase2_inventory_core_461_browser.js",
-          ".github/workflows/issue-461-phase2-inventory-core.yml"
+          "tools/qa_durable_object_provenance_545.js",
+          "tools/qa_retail_kunai_durable_552.js",
+          "tools/qa_retail_kunai_durable_552_browser.js",
+          ".github/workflows/issue-461-phase2-inventory-core.yml",
+          ".github/workflows/issue-545-durable-object-provenance.yml",
+          ".github/workflows/issue-552-retail-kunai-durable.yml"
         ],
-        "required_lane_ids": ["issue461_static", "issue461_browser"]
+        "required_lane_ids": ["issue461_static", "issue461_browser", "issue545_static", "issue552_static", "issue552_browser"]
       }
     },
     {
@@ -214,20 +226,26 @@
     {
       "id": "basic_item_shop_517",
       "surface_family": "Economy / Basic Item Shop",
-      "authority_kind": "issue_contract",
-      "authority_ref": ["#517"],
+      "authority_kind": "issue_contract_with_durable_retail_extension",
+      "authority_ref": ["#517", "#552"],
       "production_disposition": "IMPLEMENT_NOW",
       "lifecycle_stage": "OBSERVED",
       "consumer_paths": ["runtime/alpha-phase2-basic-item-shop-51700.js"],
       "qa_paths": [
         "tools/qa_phase2_basic_item_shop_517.js",
-        "tools/qa_phase2_basic_item_shop_517_browser.js"
+        "tools/qa_phase2_basic_item_shop_517_browser.js",
+        "tools/qa_retail_kunai_durable_552.js",
+        "tools/qa_retail_kunai_durable_552_browser.js"
       ],
       "workflow_path": ".github/workflows/issue-517-phase2-basic-item-shop.yml",
       "expected_evidence": {
         "path": "runtime/alpha-phase2-basic-item-shop-51700.js",
         "contains": "SC_PHASE2_BASIC_ITEM_SHOP_51700"
       },
+      "observable_acceptance": [
+        "the four original #517 stackable SKUs retain their existing transaction semantics",
+        "#552 adds exactly one canonical Common non-stackable Kunai at 50 Ryō through the existing Shop -> Inventory -> #545 provenance path, without auto-equip or duplicate purchase on retry"
+      ],
       "owner": "CODING / RUNTIME",
       "status": "CURRENT",
       "invalidation_rule": {
@@ -235,9 +253,12 @@
           "runtime/alpha-phase2-basic-item-shop-51700.js",
           "tools/qa_phase2_basic_item_shop_517.js",
           "tools/qa_phase2_basic_item_shop_517_browser.js",
-          ".github/workflows/issue-517-phase2-basic-item-shop.yml"
+          "tools/qa_retail_kunai_durable_552.js",
+          "tools/qa_retail_kunai_durable_552_browser.js",
+          ".github/workflows/issue-517-phase2-basic-item-shop.yml",
+          ".github/workflows/issue-552-retail-kunai-durable.yml"
         ],
-        "required_lane_ids": ["issue517_static", "issue517_browser"]
+        "required_lane_ids": ["issue517_static", "issue517_browser", "issue552_static", "issue552_browser"]
       }
     },
     {

@@ -56,6 +56,16 @@
       ],
       "scheduled_representative": true
     },
+    "issue552_static": {
+      "kind": "static",
+      "commands": ["node tools/qa_retail_kunai_durable_552.js"],
+      "scheduled_representative": true
+    },
+    "issue552_browser": {
+      "kind": "browser",
+      "commands": ["node tools/qa_retail_kunai_durable_552_browser.js"],
+      "scheduled_representative": false
+    },
     "issue469_static": {
       "kind": "static",
       "commands": ["node tools/qa_issue_469_ce_hotspot.js"],
@@ -155,6 +165,7 @@
         "issue431_browser",
         "issue461_static",
         "issue545_static",
+        "issue552_static",
         "issue469_static",
         "issue499_static",
         "issue517_static",
@@ -301,6 +312,34 @@
         "issue461_browser",
         "issue545_static",
         "issue32_static"
+      ]
+    },
+    {
+      "id": "durable_retail_kunai_552",
+      "changed_any": [
+        "runtime/alpha-phase2-basic-item-shop-51700.js",
+        "runtime/alpha-phase2-inventory-core-46100.js",
+        "tools/qa_phase2_basic_item_shop_517.js",
+        "tools/qa_phase2_inventory_core_461.js",
+        "tools/qa_retail_kunai_durable_552.js",
+        "tools/qa_retail_kunai_durable_552_browser.js",
+        ".github/workflows/issue-552-retail-kunai-durable.yml"
+      ],
+      "affected_consumers": [
+        "basic_item_shop_517",
+        "inventory_core_461"
+      ],
+      "required_lane_ids": [
+        "runtime_fingerprint",
+        "ownership_safety",
+        "save_compatibility",
+        "issue461_static",
+        "issue461_browser",
+        "issue545_static",
+        "issue517_static",
+        "issue517_browser",
+        "issue552_static",
+        "issue552_browser"
       ]
     },
     {

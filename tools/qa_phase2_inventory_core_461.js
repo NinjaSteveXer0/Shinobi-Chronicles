@@ -7,10 +7,11 @@ const RUNTIME=fs.readFileSync(path.join(ROOT,"runtime/alpha-phase2-inventory-cor
 const INDEX=fs.readFileSync(path.join(ROOT,"index.html"),"utf8");
 const PROVENANCE_ROOT="durableObjectProvenance14800";
 
-assert(RUNTIME.includes('const PATCH_ID="phase2_inventory_core_46100_2026_10_05_provenance_545"'),"Inventory/provenance patch identity missing");
+assert(RUNTIME.includes('const PATCH_ID="phase2_inventory_core_46100_2026_10_06_provenance_persistence_552"'),"Inventory/provenance patch identity missing");
 assert(RUNTIME.includes('const PROVENANCE_ROOT_KEY="durableObjectProvenance14800"'),"Durable provenance root missing");
 assert(RUNTIME.includes("function readProvenanceState"),"Non-mutating provenance reader missing");
 assert(RUNTIME.includes("commitDurableInventoryAcquisition54500"),"Durable acquisition transaction missing");
+assert(RUNTIME.includes("rehydratePersistedProvenance54500"),"Canonical durable provenance load bridge missing");
 assert(INDEX.includes('data-alpha-route="inventory"'),"Inventory navigation route missing");
 assert(INDEX.includes('runtime/alpha-phase2-inventory-core-46100.js'),"Inventory runtime loader missing");
 assert(!RUNTIME.includes("activityHistory.find"),"#461 must not infer provenance from fuzzy history search");
@@ -130,6 +131,7 @@ console.log(JSON.stringify({
   pass:true,
   issue:461,
   provenanceExtensionIssue:545,
+  provenancePersistenceConsumerIssue:552,
   readOnlyProjection:true,
   stacksRemainQuantities:true,
   distinctDurableInstances:true,
