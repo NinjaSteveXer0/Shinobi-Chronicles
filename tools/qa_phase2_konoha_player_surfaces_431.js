@@ -192,7 +192,7 @@ async function semanticFingerprint(page){
       const leadId=consequence&&Array.isArray(consequence.futureLeadIds)?consequence.futureLeadIds[0]:null;
       if(!leadId)return{error:"469_dispatch_lead_missing"};
       const id="occ_konoha_ce_kakashi_masked_interceptor_admin_crossing_v1";
-      playerData.activityHistory=playerData.activityHistory.filter(row=>!(row&&(row.id===id||row.occurrenceId===id)));
+      playerData.activityHistory=playerData.activityHistory.filter(row=>!(row&&(row.id===id||row.occurrenceId===id||row.sourceOccurrenceId===id)));
       playerData.activityHistory.push({
         id,occurrenceId:id,sourceOccurrenceId:id,
         committed:true,completed:true,type:"konoha_ce_private_history_emergence",activity:"world_chronicle_hotspot",
@@ -204,6 +204,12 @@ async function semanticFingerprint(page){
         },
         sourceRefs:[{type:"world_occurrence",id,role:"source"}],timestamp:Date.now()
       });
+      try{
+        if(typeof activityHistory!=="undefined"&&Array.isArray(activityHistory)&&activityHistory!==playerData.activityHistory){
+          activityHistory.length=0;
+          activityHistory.push(...playerData.activityHistory);
+        }
+      }catch(_error){}
       savePlayerData();
       const resolved=getKonohaCeHotspotResolvedRecord46900();
       if(!resolved||resolved.occurrenceId!==id)return{error:"canonical_469_resolved_record_missing",resolved};
