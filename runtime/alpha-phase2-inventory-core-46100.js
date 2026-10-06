@@ -1,5 +1,5 @@
 // ============================================================================
-// PHASE 2 — INVENTORY CORE + DURABLE OBJECT PROVENANCE — #461 / #148 / #545
+// PHASE 2 — INVENTORY CORE + DURABLE OBJECT PROVENANCE — #461 / #148 / #545 / #552
 //
 // Inventory ownership/custody remains owned by the existing playerData.inventory
 // writer in game.js. This module projects that truth and owns only the bounded
@@ -12,7 +12,7 @@
 "use strict";
 if(globalThis.SC_PHASE2_INVENTORY_CORE_46100)return;
 
-const PATCH_ID="phase2_inventory_core_46100_2026_10_05_provenance_545";
+const PATCH_ID="phase2_inventory_core_46100_2026_10_06_provenance_persistence_552";
 const STYLE_ID="sc-phase2-inventory-core-46100";
 const PROVENANCE_ROOT_KEY="durableObjectProvenance14800";
 const PROVENANCE_SCHEMA_VERSION=1;
@@ -24,6 +24,29 @@ function clone(value){
 }
 function currentPlayerData(){
   return typeof playerData!=="undefined"&&playerData?playerData:null;
+}
+function rehydratePersistedProvenance54500(){
+  const pd=currentPlayerData();
+  if(!pd)return{rehydrated:false,reason:"player_state_unavailable"};
+  if(Object.prototype.hasOwnProperty.call(pd,PROVENANCE_ROOT_KEY))return{rehydrated:false,reason:"runtime_provenance_already_present"};
+  if(typeof localStorage==="undefined")return{rehydrated:false,reason:"storage_unavailable"};
+  let saveKey=null;
+  try{saveKey=typeof PLAYER_SAVE_KEY!=="undefined"?String(PLAYER_SAVE_KEY||""):null;}catch(_error){saveKey=null;}
+  if(!saveKey)return{rehydrated:false,reason:"canonical_save_key_unavailable"};
+  let raw=null;
+  try{raw=localStorage.getItem(saveKey);}catch(_error){return{rehydrated:false,reason:"canonical_save_unreadable"};}
+  if(!raw)return{rehydrated:false,reason:"canonical_save_absent"};
+  let parsed=null;
+  try{parsed=JSON.parse(raw);}catch(_error){return{rehydrated:false,reason:"canonical_save_invalid"};}
+  const persisted=parsed&&parsed[PROVENANCE_ROOT_KEY];
+  if(!persisted||typeof persisted!=="object"||Array.isArray(persisted))return{rehydrated:false,reason:"persisted_provenance_absent"};
+  const objects=persisted.objectsByInstanceId;
+  const receipts=persisted.acquisitionReceipts;
+  if(!objects||typeof objects!=="object"||Array.isArray(objects)||!receipts||typeof receipts!=="object"||Array.isArray(receipts)){
+    return{rehydrated:false,reason:"persisted_provenance_invalid"};
+  }
+  pd[PROVENANCE_ROOT_KEY]=clone(persisted);
+  return{rehydrated:true,reason:"canonical_save_provenance_restored"};
 }
 function escapeHTML(value){
   return String(value==null?"":value)
@@ -291,8 +314,8 @@ function equipmentProjection(row){
 }
 function categoryFor(type,definition,row){
   const raw=String((definition&&definition.type)||(row&&row.type)||"misc").toLowerCase();
-  if(raw==="weapon"||raw==="gear"||raw==="equipment"||raw==="tool"||row&&row.instanceId)return "durable";
-  return "stack";
+  if(definition&&definition.stackable===false)return "durable";
+  return raw==="weapon"||raw==="gear"||raw==="equipment"||raw==="tool"||row&&row.instanceId?"durable":"stack";
 }
 function rowProjection(row,index,preparedSet){
   if(!row||typeof row!=="object")return null;
@@ -418,12 +441,14 @@ function provenanceDiagnostics54500(){
     objectsDoNotOwnEquipment:objects.every(row=>row&&!Object.prototype.hasOwnProperty.call(row,"equippedBy")&&!Object.prototype.hasOwnProperty.call(row,"owned")),
     receiptsAddressExactInstances:receipts.every(row=>row&&row.instanceId&&row.itemId&&row.sourceOccurrenceId&&row.sourceId&&row.committed===true),
     historyHasNoPowerScore:objects.every(row=>!Object.prototype.hasOwnProperty.call(row,"power")&&!Object.prototype.hasOwnProperty.call(row,"plBonus")&&!Object.prototype.hasOwnProperty.call(row,"provenanceScore")),
+    canonicalSaveRehydrationBounded:String(rehydratePersistedProvenance54500).includes("PLAYER_SAVE_KEY")&&String(rehydratePersistedProvenance54500).includes("hasOwnProperty.call(pd,PROVENANCE_ROOT_KEY)"),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
   return{patchId:PATCH_ID,pass:failed.length===0,checks,failed,objectCount:objects.length,receiptCount:receipts.length,browserGoldenClaimed:false};
 }
 
+const provenanceLoadBridge=rehydratePersistedProvenance54500();
 if(priorOpenOverlay){globalThis.openOverlay=inventoryOpenOverlay;try{openOverlay=inventoryOpenOverlay;}catch(_error){}}
 globalThis.getPhase2InventorySnapshot46100=snapshot;
 globalThis.renderPhase2InventoryCore46100=render;
@@ -434,6 +459,7 @@ globalThis.getDurableAcquisitionReceipt54500=getDurableAcquisitionReceipt54500;
 globalThis.appendDurableObjectProvenanceEvent54500=appendProvenanceEvent54500;
 globalThis.registerPreexistingDurableObject54500=registerPreexistingDurableObject54500;
 globalThis.commitDurableInventoryAcquisition54500=commitDurableInventoryAcquisition54500;
+globalThis.rehydratePersistedDurableProvenance54500=rehydratePersistedProvenance54500;
 globalThis.runDurableObjectProvenance54500Diagnostics=provenanceDiagnostics54500;
-globalThis.SC_PHASE2_INVENTORY_CORE_46100=Object.freeze({patchId:PATCH_ID,provenanceAuthority:"#148/#545",browserGoldenClaimed:false});
+globalThis.SC_PHASE2_INVENTORY_CORE_46100=Object.freeze({patchId:PATCH_ID,provenanceAuthority:"#148/#545",provenanceLoadBridge:Object.freeze(clone(provenanceLoadBridge)),browserGoldenClaimed:false});
 })();
