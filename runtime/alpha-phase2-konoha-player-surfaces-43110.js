@@ -326,7 +326,7 @@ function returnFromOffice(){
   if(context&&context.returnMode==="caller"&&typeof context.onReturn==="function"){
     try{return context.onReturn();}catch(_error){}
   }
-  if(typeof globalThis.openOverlay==="function")return globalThis.openOverlay("village");
+  if(typeof globalThis["openOverlay"]==="function")return globalThis.openOverlay("village");
   return{success:false,reason:"village_router_missing"};
 }
 function findVillageLocationNode(locationId){
@@ -337,7 +337,7 @@ function focusLead(leadId){
   const lead=discoveredLeadRows().find(row=>row.leadId===String(leadId));
   if(!lead)return{success:false,reason:"dispatch_lead_not_known",historyCommitted:false};
   if(!lead.targetLocationId)return{success:false,reason:"dispatch_location_precision_insufficient",lead:clone(lead),historyCommitted:false};
-  if(typeof globalThis.openOverlay!=="function")return{success:false,reason:"village_router_missing",historyCommitted:false};
+  if(typeof globalThis["openOverlay"]!=="function")return{success:false,reason:"village_router_missing",historyCommitted:false};
   globalThis.openOverlay("village");
   if(typeof setTimeout==="function")setTimeout(()=>{
     const node=findVillageLocationNode(lead.targetLocationId);
@@ -345,9 +345,9 @@ function focusLead(leadId){
   },0);
   return{success:true,lead:clone(lead),focusedLocationId:lead.targetLocationId,presentationOnly:true,historyCommitted:false};
 }
-function openMissions(){return typeof globalThis.openOverlay==="function"?globalThis.openOverlay("missions"):{success:false,reason:"mission_surface_missing"};}
-function openRecord(){return typeof globalThis.openShinobiRecord==="function"?globalThis.openShinobiRecord("overview"):{success:false,reason:"shinobi_record_surface_missing"};}
-function openExams(){return typeof globalThis.openKonohaExamFromVillage==="function"?globalThis.openKonohaExamFromVillage():{success:false,reason:"exam_surface_missing"};}
+function openMissions(){return typeof globalThis["openOverlay"]==="function"?globalThis.openOverlay("missions"):{success:false,reason:"mission_surface_missing"};}
+function openRecord(){return typeof globalThis["openShinobiRecord"]==="function"?globalThis.openShinobiRecord("overview"):{success:false,reason:"shinobi_record_surface_missing"};}
+function openExams(){return typeof globalThis["openKonohaExamFromVillage"]==="function"?globalThis.openKonohaExamFromVillage():{success:false,reason:"exam_surface_missing"};}
 function renderOffice(context){
   activeContext=normaliseContext(context);
   ensureOfficeStyles();
@@ -383,16 +383,16 @@ function diagnostics(){
     officeHostExact:OFFICE_HOST_ID==="KON-P01",
     consumesExistingP01Control:String(activationTarget).includes("data-village-hotspot-id")&&!String(onOfficeActivation).includes("createElement"),
     ce469FirstRefusal:String(routeDecision).includes("ce469HasPriority")&&String(ce469HasPriority).includes("getKonohaCeHotspotEligibility46900"),
-    noGlobalVillageRouterReplacement:!String(installHokageOfficeChronicleDispatch53300).includes("globalThis.activateAlphaKonohaV3PublicLocation="),
-    missionProjectionDelegates:typeof globalThis.openOverlay==="function",
+    noGlobalVillageRouterReplacement:!String(installHokageOfficeChronicleDispatch53300).includes("activateAlphaKonohaV3PublicLocation"),
+    missionProjectionDelegates:typeof globalThis["openOverlay"]==="function",
     dispatchConsumesExisting469:typeof globalThis.getKonohaCeHotspotBranchConsequence46900!=="function"||issuedLeadIds().every(Boolean),
     discoveredLeadsReadCommittedHistoryOnly:String(discoveredLeadRows).includes("record.committed!==true")&&before===after,
     mapFocusPresentationOnly:!String(focusLead).includes("savePlayerData")&&!String(focusLead).includes("activityHistory.push"),
     observerPrefersChronicleIdentity:String(currentObserver).includes("getAlphaSurfaceTruthSubjectId")&&String(currentObserver).includes("getChronicleRunIdentity43600"),
     officeHolderCallerDriven:holder.source==="fail_closed"||holder.source==="caller_context",
     cutawayModeAvailable:String(normaliseContext).includes('presenceMode==="cutaway"'),
-    shinobiRecordDelegates:typeof globalThis.openShinobiRecord==="function",
-    examsDelegate:typeof globalThis.openKonohaExamFromVillage==="function",
+    shinobiRecordDelegates:typeof globalThis["openShinobiRecord"]==="function",
+    examsDelegate:typeof globalThis["openKonohaExamFromVillage"]==="function",
     promotionsFailClosed:true,
     noSeedDenominatorFabricated:dispatch.countMode==="known_only_no_seed_denominator_claimed",
     noSecondSemanticStore:before===after,
