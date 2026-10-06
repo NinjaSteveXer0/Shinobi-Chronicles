@@ -116,17 +116,23 @@ async function geometry(page,surface){
       close:asRect(map.querySelector(".region-world-close")),
       infoToggle:asRect(map.querySelector(".region-info-toggle")),
       infoDrawer:asRect(map.querySelector(".region-info-drawer.open")),
-      selectedLocation:asRect(map.querySelector(".region-event-drawer")),
+      knownDestinations:asRect(map.querySelector(".region-known-destinations")),
+      eventDrawer:asRect(map.querySelector(".region-event-drawer")),
       worldMap:asRect(map.querySelector(".region-world-map-button"))
+    }:{};
+    const villageControls=surface==="village"?{
+      returnToRegion:asRect(map.querySelector(".village-map-return")),
+      infoToggle:asRect(map.querySelector(".village-info-toggle")),
+      infoDrawer:asRect(map.querySelector(".village-info-drawer.open"))
     }:{};
     const echo=document.getElementById("sc-hud499-stage-echo");
     return{
       viewport:[innerWidth,innerHeight],surface,
       map:{left:mr.left,right:mr.right,top:mr.top,bottom:mr.bottom,width:mr.width,height:mr.height},
-      hud,regionControls,
+      hud,regionControls,villageControls,
       rootMap557:root.dataset.map557||null,
       mapEcho:echo?{pointerEvents:getComputedStyle(echo).pointerEvents,hotspots:echo.querySelectorAll("button,[data-hotspot-id],[data-village-hotspot-id]").length}:null,
-      legacyRegionHoverVisible:[...map.querySelectorAll(".hotspot-hover-card")].some(node=>{
+      legacyRegionHoverVisible:surface==="region"&&[...map.querySelectorAll(".hotspot-hover-card")].some(node=>{
         const r=node.getBoundingClientRect(),cs=getComputedStyle(node);return r.width>0&&r.height>0&&cs.display!=="none"&&cs.visibility!=="hidden"&&Number(cs.opacity||1)>0;
       })
     };
@@ -154,7 +160,14 @@ async function assertAllHotspotsReachable(page,surface,label){
   const visible=rows.filter(row=>row.visible);
   assert(visible.length>0,`${label}: no visible map hotspots`);
   const blocked=visible.filter(row=>!row.reachable);
-  assert.deepStrictEqual(blocked,[],`${label}: visible hotspot(s) blocked by persistent presentation: ${JSON.stringify(blocked)}`);
+  assert.deepStrictEqual(blocked,[],`${label}: visible hotspot(s) blocked by presentation: ${JSON.stringify(blocked)}`);
+}
+async function contextVisibility(page){
+  return page.evaluate(()=>{
+    const panel=document.querySelector('#sc-phase2-live-hud-49900 .sc-hud499-context');
+    if(!panel)return null;
+    const cs=getComputedStyle(panel);return{opacity:Number(cs.opacity),visibility:cs.visibility};
+  });
 }
 async function activateContext(page,surface){
   const selector=surface==="region"?".region-hotspot[data-hotspot-id]":"[data-village-hotspot-id]";
@@ -168,6 +181,7 @@ async function activateContext(page,surface){
   });
 }
 async function openSelectedRegionLocationCard(page,label){
+  const before=await semanticFingerprint(page);
   const selected=await page.evaluate(()=>{
     const nodes=[...document.querySelectorAll(".region-hotspot[data-hotspot-id][data-region-key]")];
     const row=nodes.map(node=>({node,projection:getHotspotProjection(node.dataset.regionKey,node.dataset.hotspotId)}))
@@ -181,17 +195,109 @@ async function openSelectedRegionLocationCard(page,label){
   await page.evaluate(()=>refreshUnobstructedMapCanvas55700());
   await page.waitForTimeout(180);
   const g=await geometry(page,"region");
-  assert(g.regionControls.selectedLocation,`${label}: selected Region location/info card did not render`);
-  assertNoIntersection(g.regionControls.selectedLocation,`${label} selected Region location/info card`);
-  const contextVisibility=await page.evaluate(()=>{
-    const panel=document.querySelector('#sc-phase2-live-hud-49900 .sc-hud499-context');
-    if(!panel)return null;
-    const cs=getComputedStyle(panel);return{opacity:Number(cs.opacity),visibility:cs.visibility};
-  });
-  assert(contextVisibility&&contextVisibility.opacity===0&&contextVisibility.visibility==="hidden",`${label}: selected location card collided with #499 context panel`);
+  assert(g.regionControls.eventDrawer,`${label}: selected Region location/info card did not render`);
+  assertNoIntersection(g.regionControls.eventDrawer,`${label} selected Region location/info card`);
+  const visibility=await contextVisibility(page);
+  assert(visibility&&visibility.opacity===0&&visibility.visibility==="hidden",`${label}: selected location card collided with #499 context panel`);
   await assertAllHotspotsReachable(page,"region",`${label} with selected location card`);
   await page.evaluate(()=>closeRegionEventDrawer());
   await page.waitForTimeout(180);
+  assert.strictEqual(await semanticFingerprint(page),before,`${label}: selected location presentation mutated Chronicle state`);
+}
+async function openRegionEventDisambiguation(page,label){
+  const before=await semanticFingerprint(page);
+  const activated=await page.evaluate(()=>{
+    const nodes=[...document.querySelectorAll(".region-hotspot[data-hotspot-id][data-region-key]")];
+    const sourceRow=nodes.map(node=>({
+      node,
+      projection:getHotspotProjection(node.dataset.regionKey,node.dataset.hotspotId)
+    })).find(row=>row.projection&&Array.isArray(row.projection.opportunities)&&row.projection.opportunities.length>0);
+    if(!sourceRow)return null;
+
+    const regionKey=sourceRow.node.dataset.regionKey;
+    const hotspotId=sourceRow.node.dataset.hotspotId;
+    const original=getHotspotProjection;
+    const clone=value=>JSON.parse(JSON.stringify(value));
+    const fixture=clone(sourceRow.projection);
+    const first=clone(fixture.opportunities[0]);
+    const second=clone(first);
+    second.opportunity_id=String(first.opportunity_id||"qa557_opportunity")+"__qa557_disambiguation";
+    second.known_label=String(first.known_label||"KNOWN OPPORTUNITY")+" — SECOND KNOWN POSSIBILITY";
+    fixture.opportunities=[first,second];
+    fixture.opportunityIds=[first.opportunity_id,second.opportunity_id];
+    fixture.aggregationCount=2;
+
+    globalThis.__qa557OriginalGetHotspotProjection=original;
+    const replacement=(r,h)=>String(r)===String(regionKey)&&String(h)===String(hotspotId)?fixture:original(r,h);
+    globalThis.getHotspotProjection=replacement;
+    try{getHotspotProjection=replacement;}catch(_error){}
+
+    const result=activateAlphaRegionHotspot(null,regionKey,hotspotId);
+    return{regionKey,hotspotId,result,fixtureOpportunityIds:fixture.opportunityIds};
+  });
+  assert(activated&&activated.result,`${label}: could not activate Region event-disambiguation fixture`);
+  assert.strictEqual(activated.result.success,true,`${label}: Region event activation failed: ${JSON.stringify(activated)}`);
+  assert.strictEqual(activated.result.type,"event_drawer",`${label}: activation did not route to event drawer: ${JSON.stringify(activated)}`);
+  assert.strictEqual(activated.result.reason,"multiple_opportunities",`${label}: exact multiple-opportunity disambiguation branch not reached: ${JSON.stringify(activated)}`);
+
+  await page.waitForSelector(".region-map-pane .region-event-drawer",{state:"visible",timeout:5000});
+  await page.waitForFunction(()=>{
+    const drawer=document.querySelector(".region-map-pane .region-event-drawer");
+    return !!(drawer&&String(drawer.innerText||"").includes("OPPORTUNITIES AT THIS HOTSPOT"));
+  },null,{timeout:5000});
+  await page.evaluate(()=>refreshUnobstructedMapCanvas55700());
+  await page.waitForTimeout(180);
+
+  const eventProof=await page.evaluate(()=>{
+    const drawer=document.querySelector(".region-map-pane .region-event-drawer");
+    return drawer?{
+      text:String(drawer.innerText||""),
+      opportunityButtons:[...drawer.querySelectorAll("button")].filter(button=>!String(button.getAttribute("aria-label")||"").toLowerCase().includes("close")).length
+    }:null;
+  });
+  assert(eventProof&&eventProof.text.includes("OPPORTUNITIES AT THIS HOTSPOT"),`${label}: event drawer lacks disambiguation presentation`);
+  assert(eventProof.opportunityButtons>=2,`${label}: event drawer did not expose multiple possibilities`);
+
+  const g=await geometry(page,"region");
+  assert(g.regionControls.eventDrawer,`${label}: Region event-disambiguation drawer missing from geometry`);
+  assertNoIntersection(g.regionControls.eventDrawer,`${label} Region event-disambiguation drawer`);
+  await assertAllHotspotsReachable(page,"region",`${label} with Region event-disambiguation drawer`);
+  const visibility=await contextVisibility(page);
+  assert(visibility&&visibility.opacity===0&&visibility.visibility==="hidden",`${label}: event drawer collided with #499 context panel`);
+
+  const shot=label.startsWith("1366")?"05-region-event-disambiguation-1366x768.png":"06-region-event-disambiguation-1920x1080.png";
+  await page.screenshot({path:path.join(OUT,shot),fullPage:true});
+
+  await page.evaluate(()=>{
+    const original=globalThis.__qa557OriginalGetHotspotProjection;
+    if(original){
+      globalThis.getHotspotProjection=original;
+      try{getHotspotProjection=original;}catch(_error){}
+      delete globalThis.__qa557OriginalGetHotspotProjection;
+    }
+    closeRegionEventDrawer();
+  });
+  await page.waitForTimeout(180);
+  assert.strictEqual(await semanticFingerprint(page),before,`${label}: event-disambiguation presentation mutated Chronicle/World state`);
+}
+async function assertVillageLegacyChrome(page,label){
+  let g=await geometry(page,"village");
+  for(const [key,row] of Object.entries(g.villageControls))assertNoIntersection(row,`${label} Village ${key}`);
+  const toggle=page.locator(".village-info-toggle");
+  if(await toggle.count()){
+    await toggle.click();
+    await page.waitForTimeout(180);
+    await page.evaluate(()=>refreshUnobstructedMapCanvas55700());
+    await page.waitForTimeout(120);
+    g=await geometry(page,"village");
+    assert(g.villageControls.infoDrawer,`${label}: Village info drawer did not open`);
+    assertNoIntersection(g.villageControls.infoDrawer,`${label} Village open info drawer`);
+    const visibility=await contextVisibility(page);
+    assert(visibility&&visibility.opacity===0&&visibility.visibility==="hidden",`${label}: Village info drawer collided with #499 context panel`);
+    await assertAllHotspotsReachable(page,"village",`${label} with Village info drawer`);
+    await toggle.click();
+    await page.waitForTimeout(120);
+  }
 }
 async function assertSurface(page,surface,label){
   const before=await semanticFingerprint(page);
@@ -205,6 +311,10 @@ async function assertSurface(page,surface,label){
   assert(g.map.width>=g.viewport[0]*0.60,`${label}: map lost dominance: ${JSON.stringify(g.map)}`);
   for(const [key,row] of Object.entries(g.hud))assertNoIntersection(row,`${label} HUD ${key}`);
   assert(g.mapEcho&&g.mapEcho.pointerEvents==="none"&&g.mapEcho.hotspots===0,`${label}: map echo became interactive: ${JSON.stringify(g.mapEcho)}`);
+
+  if(surface==="village"){
+    await assertVillageLegacyChrome(page,label);
+  }
   if(surface==="region"){
     assert.strictEqual(g.legacyRegionHoverVisible,false,`${label}: retired Region hover card still covers map`);
     for(const [key,row] of Object.entries(g.regionControls))assertNoIntersection(row,`${label} Region ${key}`);
@@ -217,14 +327,14 @@ async function assertSurface(page,surface,label){
       g=await geometry(page,surface);
       assert(g.regionControls.infoDrawer,`${label}: Region info drawer did not open`);
       assertNoIntersection(g.regionControls.infoDrawer,`${label} Region open info drawer`);
-      const contextWhileDrawer=await page.evaluate(()=>{
-        const panel=document.querySelector('#sc-phase2-live-hud-49900 .sc-hud499-context');
-        if(!panel)return null;const cs=getComputedStyle(panel);return{opacity:Number(cs.opacity),visibility:cs.visibility};
-      });
-      assert(contextWhileDrawer&&contextWhileDrawer.opacity===0&&contextWhileDrawer.visibility==="hidden",`${label}: contextual panels collide in right reserve`);
+      const visibility=await contextVisibility(page);
+      assert(visibility&&visibility.opacity===0&&visibility.visibility==="hidden",`${label}: Region info drawer collided with #499 context panel`);
+      await assertAllHotspotsReachable(page,"region",`${label} with Region info drawer`);
       await toggle.click();
+      await page.waitForTimeout(120);
     }
     await openSelectedRegionLocationCard(page,label);
+    await openRegionEventDisambiguation(page,label);
   }
   const after=await semanticFingerprint(page);
   assert.strictEqual(after,before,`${label}: layout/context interaction mutated Chronicle state`);
@@ -266,7 +376,21 @@ async function assertSurface(page,surface,label){
     assert.strictEqual(finalDiag.map.checks.browserGoldenClaimed,false,"#557 may not self-claim browser GOLDEN");
 
     await gate.assertNoUnexpectedErrors();
-    console.log(JSON.stringify({pass:true,issue:557,viewports:["1366x768","1920x1080"],surfaces:["village","region"],selectedLocationInfoOutboard:true,persistentOverlapPixels:0,hotspotReachability:"GREEN",semanticMutation:false,browserGoldenClaimed:false},null,2));
+    console.log(JSON.stringify({
+      pass:true,
+      issue:557,
+      viewports:["1366x768","1920x1080"],
+      surfaces:["village","region"],
+      selectedLocationInfoOutboard:true,
+      eventDisambiguationOutboard:true,
+      exactEventDisambiguationRoute:"multiple_opportunities",
+      regionKnownDestinationsMeasured:true,
+      villageLegacyChromeMeasured:true,
+      persistentOverlapPixels:0,
+      hotspotReachability:"GREEN",
+      semanticMutation:false,
+      browserGoldenClaimed:false
+    },null,2));
   }finally{
     await browser.close();
   }
