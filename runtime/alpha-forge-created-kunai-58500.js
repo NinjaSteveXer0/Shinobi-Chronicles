@@ -311,14 +311,18 @@ function validateCommission58500(spec,pd){
 
   const serviceHost=text58500(spec&&spec.serviceHostId,180);
   const serviceAlias=text58500(spec&&spec.serviceHostAlias,220);
-  if(serviceHost!==SERVICE_HOST_ID&&serviceAlias!==SERVICE_HOST_ALIAS){
-    return{success:false,reason:"forge_service_host_invalid"};
-  }
+  if(!serviceHost&&!serviceAlias)return{success:false,reason:"forge_service_host_required"};
+  if(serviceHost&&serviceHost!==SERVICE_HOST_ID)return{success:false,reason:"forge_service_host_invalid"};
+  if(serviceAlias&&serviceAlias!==SERVICE_HOST_ALIAS)return{success:false,reason:"forge_service_host_alias_invalid"};
   if(spec&&spec.servicePermission!==true)return{success:false,reason:"forge_service_permission_required"};
 
   const commissionerRef=stableRef58500(spec&&spec.commissionerRef,180);
   const executorRef=stableRef58500(spec&&spec.executorRef,180);
   if(!commissionerRef)return{success:false,reason:"forge_commissioner_required"};
+  if(typeof globalThis.getPlayerCharacter!=="function")return{success:false,reason:"forge_commissioner_authority_missing"};
+  try{
+    if(!globalThis.getPlayerCharacter(commissionerRef))return{success:false,reason:"forge_commissioner_invalid"};
+  }catch(_error){return{success:false,reason:"forge_commissioner_validation_failed"};}
   if(!executorRef)return{success:false,reason:"forge_executor_required"};
   if(executorRef===commissionerRef)return{success:false,reason:"forge_executor_must_differ_from_commissioner"};
 
