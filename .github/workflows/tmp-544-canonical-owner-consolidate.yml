@@ -1,0 +1,101 @@
+name: TEMP #544 canonical-owner consolidation
+
+on:
+  push:
+    branches: [coding/544-terminal-result-presentation]
+    paths: [.github/workflows/tmp-544-canonical-owner-consolidate.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  consolidate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/544-terminal-result-presentation
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Retire predecessor terminal owner and update authority
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re
+
+          p=Path('runtime/alpha-alpha-sprint-33100.js')
+          s=p.read_text()
+          start='  // --------------------------------------------------------------------------\n  // 1. STORY -> BATTLE -> SAME STORY RETURN PRIORITY\n'
+          end='  // --------------------------------------------------------------------------\n  // 3. WORLD DOSSIER STACKING — PRESENTATION ONLY\n'
+          a=s.find(start); b=s.find(end)
+          if a < 0 or b < 0 or b <= a:
+              raise SystemExit('33100 terminal retirement anchors missing')
+          replacement='''  // --------------------------------------------------------------------------\n  // 1–2. BATTLE TERMINAL RESULT OWNERSHIP — RETIRED TO #544\n  // --------------------------------------------------------------------------\n  // #601/#624 canonical-owner consolidation: #33100 no longer owns or wraps\n  // Victory continuation, zero-PL defeat completion, Setback rendering/continue,\n  // or terminal overlay routing. Those responsibilities are owned by\n  // runtime/alpha-battle-terminal-result-54400.js. The base Battle semantic and\n  // reward authorities remain unchanged; this module continues only with its\n  // unrelated World dossier and Arena responsibilities below.\n\n'''
+          s=s[:a]+replacement+s[b:]
+          forbidden=['continueAfterVictory33100','markBattleSetback33100','continueAfterSetback33100','renderSetback33100','priorOpenOverlay33100','handleBattleParticipantAtZeroPL33100']
+          for token in forbidden:
+              if token in s: raise SystemExit(f'33100 terminal token still live: {token}')
+          p.write_text(s)
+
+          rp=Path('tools/fixtures/runtime_responsibility_registry_300.json')
+          reg=json.loads(rp.read_text())
+          target=None
+          for row in reg.get('responsibilities',[]):
+              if row.get('responsibilityId')=='battle.return.story_scene.shared':
+                  target=row; break
+          if not target: raise SystemExit('battle.return.story_scene.shared missing')
+          target['canonicalOwner']='runtime/alpha-battle-terminal-result-54400.js'
+          target['ownerType']='shared_battle_terminal_result_runtime'
+          target['productionLoadPath']=['index.html','runtime/alpha-battle-terminal-result-54400.js']
+          target['extensionHooks']=['presentCommittedBattleTerminalResult54400','resumeBattleCallerAfterCompletion']
+          retired=target.setdefault('retiredOwners',[])
+          if 'runtime/alpha-alpha-sprint-33100.js' not in retired: retired.append('runtime/alpha-alpha-sprint-33100.js')
+          for row in reg.get('semanticOwners',[]):
+              if row.get('semanticId')=='battle.return.story_scene': row['owner']='runtime/alpha-battle-terminal-result-54400.js'
+          for row in reg.get('wrapperChains',[]):
+              chain=row.get('chain')
+              if isinstance(chain,list) and 'runtime/alpha-alpha-sprint-33100.js' in chain:
+                  row['chain']=[x for x in chain if x!='runtime/alpha-alpha-sprint-33100.js']
+          rp.write_text(json.dumps(reg,indent=2,ensure_ascii=False)+'\n')
+
+          dp=Path('tools/fixtures/runtime_change_declarations_300.json')
+          dec=json.loads(dp.read_text())
+          hit=None
+          for row in dec.get('declarations',[]):
+              if row.get('changeId')=='issue-544-canonical-battle-terminal-result-presentation-2026-10-07': hit=row; break
+          if not hit: raise SystemExit('issue-544 declaration missing')
+          hit['classification']='REPLACES'
+          rep=hit.setdefault('replaces',[])
+          if 'runtime/alpha-alpha-sprint-33100.js::battle_terminal_result_slice' not in rep:
+              rep.append('runtime/alpha-alpha-sprint-33100.js::battle_terminal_result_slice')
+          hit['contractChangeReason']='AUTHORITY_CHANGED_CANONICAL_OWNER_CONSOLIDATION_601_624'
+          hit['rationale']='Issue #544 is now the sole live Battle terminal-result presentation/continuation owner. It preserves committed victory/defeat semantics and existing reward/caller services while retiring the overlapping Victory/Setback/zero-PL terminal controller previously installed by #33100.'
+          dp.write_text(json.dumps(dec,indent=2,ensure_ascii=False)+'\n')
+
+          for path in ['runtime/alpha-runtime-build-fingerprint-303.js','tools/fixtures/runtime_build_manifest_303.json']:
+              q=Path(path); t=q.read_text()
+              if 'SC-ALPHA-RUNTIME-R303-2026-10-07-EK' not in t: raise SystemExit(f'fingerprint anchor missing in {path}')
+              t=t.replace('SC-ALPHA-RUNTIME-R303-2026-10-07-EK','SC-ALPHA-RUNTIME-R303-2026-10-07-EL')
+              t=t.replace('canonical-battle-terminal-result-routing-544','canonical-battle-terminal-result-owner-consolidated-544')
+              q.write_text(t)
+          PY
+      - name: Static preflight
+        shell: bash
+        run: |
+          node --check runtime/alpha-alpha-sprint-33100.js
+          node --check runtime/alpha-battle-terminal-result-54400.js
+          node tools/qa_runtime_ownership_safety_300.js
+          node tools/qa_issue_303_runtime_build_fingerprint.js
+          node tools/qa_contract_integrity_311.js
+      - name: Commit consolidation and self-remove helper
+        shell: bash
+        run: |
+          rm .github/workflows/tmp-544-canonical-owner-consolidate.yml
+          git config user.name 'shinobi-chronicles-runtime-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add runtime/alpha-alpha-sprint-33100.js tools/fixtures/runtime_responsibility_registry_300.json tools/fixtures/runtime_change_declarations_300.json runtime/alpha-runtime-build-fingerprint-303.js tools/fixtures/runtime_build_manifest_303.json .github/workflows/tmp-544-canonical-owner-consolidate.yml
+          git commit -m '[CODING][#544] Consolidate Battle terminal-result canonical owner'
+          git push origin HEAD:coding/544-terminal-result-presentation
