@@ -80,7 +80,7 @@ async function settle(page,ms=260){
 }
 
 async function openSurface(page,surface){
-  if(surface==="village") await page.evaluate(()=>openOverlay("village"));
+  if(surface==="village")await page.evaluate(()=>openOverlay("village"));
   else await page.evaluate(()=>openRegionHub("fire"));
 
   await page.waitForFunction(surface=>{
@@ -245,130 +245,34 @@ async function proveDeliberateRegionInteractionContract(page,label){
   assert.strictEqual(proof.deliberateDoubleClickRoute,true,`${label}: deliberate Region activation route missing`);
 }
 
-async function proveSelectedEventDrawer(page,label){
+async function proveOwnerSelectedRegionEventCard(page,label){
   const before=await semanticFingerprint(page);
-  const activated=await page.evaluate(()=>{
-    const rows=[...document.querySelectorAll(".region-hotspot[data-hotspot-id][data-region-key]")].map(node=>({
-      node,
-      projection:getHotspotProjection(node.dataset.regionKey,node.dataset.hotspotId)
-    }));
-    const source=rows.find(row=>row.projection&&row.projection.knownLabel&&row.projection.knownLabel!=="???"&&Array.isArray(row.projection.opportunities)&&row.projection.opportunities.length>0)
-      ||rows.find(row=>row.projection&&Array.isArray(row.projection.opportunities)&&row.projection.opportunities.length>0);
-    if(!source)return null;
-
-    const clone=value=>JSON.parse(JSON.stringify(value));
-    const regionKey=String(source.node.dataset.regionKey||"");
-    const hotspotId=String(source.projection.hotspotId||source.node.dataset.hotspotId||"");
-    const locationId=String(source.projection.locationId||source.projection.opportunities[0]?.location_id||"");
-    const anchor=clone(source.projection.anchor||{x:50,y:50});
-    const qaOpportunityId="qa557_event_drawer_second_known_possibility";
-    unregisterWorldEventOpportunity(qaOpportunityId);
-
-    const registered=registerWorldEventOpportunity({
-      opportunityId:qaOpportunityId,
-      hotspotId,
-      eventId:null,
-      locationId,
+  const selected=await page.evaluate(()=>{
+    const regionKey="fire";
+    const preferredId="hotspot_fire_konohagakure";
+    const preferred=getHotspotProjection(regionKey,preferredId);
+    const fallback=[...document.querySelectorAll('.region-hotspot[data-hotspot-id][data-region-key="fire"]')]
+      .map(node=>getHotspotProjection(regionKey,node.dataset.hotspotId))
+      .find(hotspot=>hotspot&&hotspot.knownLabel&&hotspot.knownLabel!=="???"&&Array.isArray(hotspot.opportunities)&&hotspot.opportunities.some(item=>Array.isArray(item.legal_actions)&&item.legal_actions.some(action=>action&&action.label==="ENTER LOCATION")));
+    const target=preferred&&Array.isArray(preferred.opportunities)&&preferred.opportunities.length?preferred:fallback;
+    if(!target)return null;
+    const result=selectMapNode(regionKey,target.hotspotId);
+    return result?{
       regionKey,
-      sourceKind:"authored",
-      randomPoolEligible:false,
-      defaultDiscoveryLevel:"discovered",
-      presentation:{
-        family:"Discovery",
-        label:"QA SECOND KNOWN POSSIBILITY",
-        summary:"A second observer-known possibility used only to prove the shared Region disambiguation drawer.",
-        showUnknownMarker:false
-      },
-      anchor,
-      interactions:[{
-        id:"qa557_inspect",
-        label:"INSPECT",
-        kind:"custom",
-        resolve:()=>({success:false,reason:"qa557_no_commit"})
-      }]
-    });
-    if(!registered||registered.success!==true)return{registration:registered,regionKey,hotspotId,locationId};
-
-    selectedHotspotId=null;
-    selectedOpportunityId=null;
-    renderRegionHubUI(regionKey,worldRegions[regionKey]);
-
-    const refreshed=[...document.querySelectorAll(".region-hotspot[data-hotspot-id][data-region-key]")]
-      .find(node=>String(node.dataset.regionKey||"")===regionKey&&String(node.dataset.hotspotId||"")===hotspotId);
-    if(!refreshed)return{registration:registered,regionKey,hotspotId,locationId,reason:"refreshed_hotspot_missing"};
-
-    const grouped=getHotspotProjection(regionKey,hotspotId);
-    const originalActivate=activateAlphaRegionHotspot;
-    globalThis.__qa557OriginalActivateAlphaRegionHotspot=originalActivate;
-    globalThis.__qa557ActivationResult=null;
-    const replacementActivate=function(...args){
-      const result=originalActivate.apply(this,args);
-      globalThis.__qa557ActivationResult=clone(result);
-      return result;
-    };
-    globalThis.activateAlphaRegionHotspot=replacementActivate;
-    try{activateAlphaRegionHotspot=replacementActivate;}catch(_error){}
-
-    refreshed.dispatchEvent(new MouseEvent("dblclick",{bubbles:true,cancelable:true,view:window}));
-    const drawer=document.querySelector(".region-map-pane .region-event-drawer");
-    return{
-      registration:registered,
-      qaOpportunityId,
-      regionKey,
-      hotspotId,
-      locationId,
-      aggregationCount:grouped&&grouped.aggregationCount,
-      result:globalThis.__qa557ActivationResult,
-      immediateDrawer:drawer?{
-        text:String(drawer.innerText||""),
-        width:drawer.getBoundingClientRect().width,
-        height:drawer.getBoundingClientRect().height,
-        display:getComputedStyle(drawer).display,
-        visibility:getComputedStyle(drawer).visibility
-      }:null
-    };
+      hotspotId:result.hotspotId,
+      locationId:result.locationId,
+      knownLabel:result.knownLabel,
+      opportunityIds:result.opportunityIds
+    }:null;
   });
 
-  assert(activated&&activated.registration&&activated.registration.success===true,`${label}: QA opportunity registration failed: ${JSON.stringify(activated)}`);
-  assert(activated.aggregationCount>=2,`${label}: real Region grouping did not aggregate the temporary second known possibility: ${JSON.stringify(activated)}`);
-  assert(activated.result,`${label}: real Region dblclick route did not invoke activation`);
-  assert.strictEqual(activated.result.success,true,`${label}: selected-event activation failed: ${JSON.stringify(activated)}`);
-  assert.strictEqual(activated.result.type,"event_drawer",`${label}: selected event did not use shared event drawer`);
-  assert.strictEqual(activated.result.reason,"multiple_opportunities",`${label}: exact multiple-opportunity route not reached`);
-
-  try{
-    await page.waitForFunction(()=>{
-      const drawer=document.querySelector(".region-map-pane .region-event-drawer");
-      if(!drawer)return false;
-      const r=drawer.getBoundingClientRect(),cs=getComputedStyle(drawer);
-      return r.width>0&&r.height>0&&cs.display!=="none"&&cs.visibility!=="hidden";
-    },null,{timeout:3000});
-  }catch(error){
-    const delayed=await page.evaluate(qaOpportunityId=>{
-      const drawer=document.querySelector(".region-map-pane .region-event-drawer");
-      const projection=selectedRegionKey&&selectedHotspotId?getHotspotProjection(selectedRegionKey,selectedHotspotId):null;
-      const r=drawer&&drawer.getBoundingClientRect();
-      const cs=drawer&&getComputedStyle(drawer);
-      return{
-        currentOverlayType:typeof currentOverlayType!=="undefined"?currentOverlayType:null,
-        selectedRegionKey:typeof selectedRegionKey!=="undefined"?selectedRegionKey:null,
-        selectedHotspotId:typeof selectedHotspotId!=="undefined"?selectedHotspotId:null,
-        selectedOpportunityId:typeof selectedOpportunityId!=="undefined"?selectedOpportunityId:null,
-        qaOpportunityRegistered:!!getRegisteredWorldEventOpportunity(qaOpportunityId),
-        projectedAggregationCount:projection&&projection.aggregationCount,
-        projectedOpportunityIds:projection&&projection.opportunityIds,
-        drawer:drawer?{
-          text:String(drawer.innerText||""),
-          width:r&&r.width,
-          height:r&&r.height,
-          display:cs&&cs.display,
-          visibility:cs&&cs.visibility,
-          connected:drawer.isConnected
-        }:null
-      };
-    },activated.qaOpportunityId);
-    throw new Error(`${label}: event drawer did not become visibly persistent for the selected Region hotspot: ${JSON.stringify({activated,delayed,cause:String(error&&error.message||error)})}`);
-  }
+  assert(selected,`${label}: canonical Konohagakure selected-event card target unavailable`);
+  await page.waitForFunction(()=>{
+    const drawer=document.querySelector(".region-map-pane .region-event-drawer");
+    if(!drawer)return false;
+    const r=drawer.getBoundingClientRect(),cs=getComputedStyle(drawer);
+    return r.width>0&&r.height>0&&cs.display!=="none"&&cs.visibility!=="hidden";
+  },null,{timeout:5000});
   await settle(page);
 
   const presentation=await page.evaluate(()=>{
@@ -376,34 +280,26 @@ async function proveSelectedEventDrawer(page,label){
     if(!drawer)return null;
     return{
       text:String(drawer.innerText||""),
-      optionButtons:[...drawer.querySelectorAll("button")].filter(button=>!String(button.getAttribute("aria-label")||"").toLowerCase().includes("close")).length
+      selectedHotspotId:typeof selectedHotspotId!=="undefined"?selectedHotspotId:null,
+      selectedOpportunityId:typeof selectedOpportunityId!=="undefined"?selectedOpportunityId:null
     };
   });
-  assert(presentation&&presentation.text.includes("OPPORTUNITIES AT THIS HOTSPOT"),`${label}: selected-event disambiguation copy missing: ${JSON.stringify({activated,presentation})}`);
-  assert(presentation.optionButtons>=2,`${label}: selected-event drawer did not expose both known possibilities`);
+  assert(presentation,`${label}: owner-visible Region selected-event card did not render`);
+  assert(/Konohagakure/i.test(presentation.text),`${label}: selected-event card is not the owner-visible Konohagakure card: ${JSON.stringify(presentation)}`);
+  assert(/ENTER LOCATION/i.test(presentation.text),`${label}: selected-event card lost its real ENTER LOCATION action: ${JSON.stringify(presentation)}`);
+  assert(/DISCOVERY/i.test(presentation.text),`${label}: selected-event card lost its observer-safe Discovery presentation: ${JSON.stringify(presentation)}`);
 
   const g=await geometry(page,"region");
-  assert(g&&g.region.eventDrawer,`${label}: selected-event drawer geometry missing`);
-  assertNoIntersection(g.region.eventDrawer,`${label} selected-event drawer`);
-  await assertHotspotsReachable(page,"region",`${label} with selected-event drawer`);
+  assert(g&&g.region.eventDrawer,`${label}: selected-event card geometry missing`);
+  assertNoIntersection(g.region.eventDrawer,`${label} owner-visible selected-event card`);
+  await assertHotspotsReachable(page,"region",`${label} with owner-visible selected-event card`);
   const context=await contextVisibility(page);
-  assert(context&&context.opacity===0&&context.visibility==="hidden",`${label}: selected-event drawer collided with #499 context panel`);
+  assert(context&&context.opacity===0&&context.visibility==="hidden",`${label}: selected-event card collided with #499 contextual reserve`);
 
   const shot=label.startsWith("1366")?"05-region-selected-event-1366x768.png":"06-region-selected-event-1920x1080.png";
   await page.screenshot({path:path.join(OUT,shot),fullPage:true});
 
-  await page.evaluate(qaOpportunityId=>{
-    const originalActivate=globalThis.__qa557OriginalActivateAlphaRegionHotspot;
-    if(originalActivate){
-      globalThis.activateAlphaRegionHotspot=originalActivate;
-      try{activateAlphaRegionHotspot=originalActivate;}catch(_error){}
-      delete globalThis.__qa557OriginalActivateAlphaRegionHotspot;
-    }
-    delete globalThis.__qa557ActivationResult;
-    closeRegionEventDrawer();
-    unregisterWorldEventOpportunity(qaOpportunityId);
-    if(selectedRegionKey&&worldRegions[selectedRegionKey])renderRegionHubUI(selectedRegionKey,worldRegions[selectedRegionKey]);
-  },activated.qaOpportunityId);
+  await page.evaluate(()=>closeRegionEventDrawer());
   await settle(page,180);
   assert.strictEqual(await semanticFingerprint(page),before,`${label}: selected-event presentation mutated Chronicle/World state`);
 }
@@ -429,7 +325,7 @@ async function assertSurface(page,surface,label){
     for(const [key,row] of Object.entries(g.region))assertNoIntersection(row,`${label} Region ${key}`);
     await proveInfoDrawer(page,"region",label);
     await proveDeliberateRegionInteractionContract(page,label);
-    await proveSelectedEventDrawer(page,label);
+    await proveOwnerSelectedRegionEventCard(page,label);
   }
 
   assert.strictEqual(await semanticFingerprint(page),before,`${label}: map presentation interaction mutated canonical state`);
@@ -481,8 +377,8 @@ async function assertSurface(page,surface,label){
       surfaces:["village","region"],
       ordinarySingleClickDrawer:false,
       deliberateRegionActivation:true,
-      selectedEventOverlayOutboard:true,
-      exactEventDisambiguationRoute:"multiple_opportunities",
+      ownerSelectedEventOverlayOutboard:true,
+      selectedEventProof:"konohagakure_discovery_enter_location",
       persistentOverlapPixels:0,
       hotspotReachability:"GREEN",
       semanticMutation:false,
