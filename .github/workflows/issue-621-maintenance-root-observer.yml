@@ -1,12 +1,11 @@
 name: Issue 621 One-Shot Scheduler Hardening
 
-# Triggered once after the workflow exists on the lane branch; delete after the patch lands.
+# Temporary branch-only maintenance workflow. Delete after the bounded patch lands.
 on:
-  push:
+  pull_request:
     branches:
-      - coding/621-region-hud-stability-lane-c
-    paths:
-      - '.github/workflows/issue-621-maintenance-root-observer.yml'
+      - main
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -32,9 +31,10 @@ jobs:
           text = runtime.read_text()
           old_state = '  resizeObserver:null,rootObserver:null,structureObserver:null,'
           new_state = '  resizeObserver:null,overlayObserver:null,structureObserver:null,'
-          if old_state not in text:
+          if old_state in text:
+              text = text.replace(old_state, new_state, 1)
+          elif new_state not in text:
               raise SystemExit('expected #621 scheduler state seam not found')
-          text = text.replace(old_state, new_state, 1)
 
           old = '''  const root=document.getElementById(ROOT_ID);
           if(root){
@@ -55,9 +55,10 @@ jobs:
             });
             state.overlayObserver.observe(overlay,{attributes:true,attributeFilter:["style","class","hidden"]});
             state.structureObserver=new MutationObserver(records=>{'''
-          if old not in text:
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif new not in text:
               raise SystemExit('expected root observer seam not found')
-          text = text.replace(old, new, 1)
           runtime.write_text(text)
 
           qa = Path('tools/qa_issue_621_region_hud_stability.js')
@@ -68,9 +69,10 @@ jobs:
           assert(source.includes('attributeFilter:["class","hidden"]'),"#621 does not observe bounded map structural transitions");
           assert(!source.includes("rootObserver"),"#621 still wakes from #499 root projection churn");
           assert(!source.includes('attributeFilter:["data-surface","hidden"]'),"#621 still observes #499 data-surface polling churn");'''
-          if old_q not in q:
+          if old_q in q:
+              q = q.replace(old_q, new_q, 1)
+          elif new_q not in q:
               raise SystemExit('expected static QA observer assertion seam not found')
-          q = q.replace(old_q, new_q, 1)
           qa.write_text(q)
           PY
 
@@ -78,10 +80,10 @@ jobs:
           node --check tools/qa_issue_621_region_hud_stability.js
           node tools/qa_issue_621_region_hud_stability.js
 
-      - name: Commit bounded hardening
+      - name: Commit bounded hardening if needed
         run: |
-          if git diff --quiet; then
-            echo 'No patch required.'
+          if git diff --quiet -- runtime/alpha-phase2-live-hud-49900.js tools/qa_issue_621_region_hud_stability.js; then
+            echo 'Bounded hardening already present.'
             exit 0
           fi
           git config user.name 'NinjaSteveXer0'
