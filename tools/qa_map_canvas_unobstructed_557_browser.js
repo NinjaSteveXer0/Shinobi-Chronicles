@@ -428,7 +428,7 @@ async function assertSurface(page,surface,label){
     const finalDiag=await page.evaluate(()=>({hud:runPhase2LiveHud49900Diagnostics(),map:runUnobstructedMapCanvas55700Diagnostics()}));
     assert.strictEqual(finalDiag.hud.pass,true,`#499 regression diagnostics failed: ${JSON.stringify(finalDiag.hud)}`);
     assert.strictEqual(finalDiag.map.checks.browserGoldenClaimed,false,"#557 may not self-claim browser GOLDEN");
-    await gate.assertNoUnexpectedErrors();
+    await gate.assertClean("#557 unobstructed Village/Region canvases");
 
     console.log(JSON.stringify({
       pass:true,
