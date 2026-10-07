@@ -16,10 +16,10 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-06-EI",
-    sourceBaselineCommit:"1c45661d60dad8bc456e1de4483dbb4a90182f32",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-07-EJ",
+    sourceBaselineCommit:"eee7a36872536aa769b45251d50e376cf14f8185",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
-    runtimeGeneration:"unobstructed-village-region-map-canvases-557",
+    runtimeGeneration:"academy-origin-registry-recalibration-597",
     majorRuntimeFeatures:Object.freeze([
       "academy-kakashi-v2",
       "runtime-ownership-safety-300",
@@ -106,7 +106,8 @@
       "konoha-activity-active-master-consumption-431-526-528",
       "durable-object-provenance-148-545",
       "durable-retail-kunai-148-552",
-      "phase2-unobstructed-village-region-map-canvases-557"
+      "phase2-unobstructed-village-region-map-canvases-557",
+      "academy-origin-base-stat-recalibration-582-597"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -137,10 +138,10 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-06-EI",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-07-EJ",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
-      generationPresent:first.runtimeGeneration==="unobstructed-village-region-map-canvases-557",
+      generationPresent:first.runtimeGeneration==="academy-origin-registry-recalibration-597",
       repaired469FeaturePresent:first.majorRuntimeFeatures.includes("phase2-first-live-ce-hotspot-469"),
       privateHistory478FeaturePresent:first.majorRuntimeFeatures.includes("phase2-private-origin-live-ce-hotspot-478"),
       ownerRetestPresentationFeaturePresent:first.majorRuntimeFeatures.includes("story-scene-board-owner-retest-469"),
@@ -177,6 +178,7 @@
       durableObjectProvenance148545Present:first.majorRuntimeFeatures.includes("durable-object-provenance-148-545"),
       durableRetailKunai148552Present:first.majorRuntimeFeatures.includes("durable-retail-kunai-148-552"),
       unobstructedMapCanvas557Present:first.majorRuntimeFeatures.includes("phase2-unobstructed-village-region-map-canvases-557"),
+      academyOriginRegistry597Present:first.majorRuntimeFeatures.includes("academy-origin-base-stat-recalibration-582-597"),
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)

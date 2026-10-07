@@ -7,7 +7,7 @@ game=(ROOT/'game.js').read_text(encoding='utf-8')
 patch=(ROOT/'runtime/alpha-menma-tutorial-111.js').read_text(encoding='utf-8')
 index=(ROOT/'index.html').read_text(encoding='utf-8')
 
-EXPECTED_BLOB='4c9623071ef773dac61649ffc174d26d50dd60f2'
+EXPECTED_BLOB='f45dc5a147b9569862ad7f17e7f4254ddc916f8e'
 # #532 intentionally extends the audited core with the canonical deliberate
 # Current Team assignment writer and Person Name projection required by closed
 # #522. This remains a strict normalized game.js blob pin; any further core
