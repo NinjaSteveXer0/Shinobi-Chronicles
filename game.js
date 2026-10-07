@@ -470,15 +470,15 @@ const characterRegistry = {
   "academy_hinata": {
     "id": "academy_hinata",
     "baseStats": {
-      "nin": 6,
-      "tai": 9,
-      "buki": 5,
+      "nin": 8,
+      "tai": 13,
+      "buki": 6,
       "fuin": 5,
       "kin": 5,
-      "gen": 5,
-      "stamina": 7
+      "gen": 6,
+      "stamina": 10
     },
-    "basePL": 8,
+    "basePL": 12,
     "formalRank": "academy",
     "embodiedExpressions": []
   },
@@ -500,15 +500,15 @@ const characterRegistry = {
   "academy_mirai": {
     "id": "academy_mirai",
     "baseStats": {
-      "nin": 8,
-      "tai": 8,
-      "buki": 9,
-      "fuin": 5,
+      "nin": 9,
+      "tai": 9,
+      "buki": 12,
+      "fuin": 6,
       "kin": 6,
-      "gen": 7,
-      "stamina": 8
+      "gen": 13,
+      "stamina": 10
     },
-    "basePL": 9,
+    "basePL": 12,
     "formalRank": "academy",
     "embodiedExpressions": []
   },
@@ -519,11 +519,11 @@ const characterRegistry = {
       "tai": 8,
       "buki": 6,
       "fuin": 5,
-      "kin": 9,
+      "kin": 13,
       "gen": 7,
       "stamina": 11
     },
-    "basePL": 10,
+    "basePL": 12,
     "formalRank": "academy",
     "embodiedExpressions": [],
     "defaultAttachedSummonId": "menma_nine_tails"
@@ -40328,22 +40328,22 @@ function runAcademyPilotDeploymentDiagnostics() {
 
   const expectedPL = {
 
-    academy_hinata:
-      8,
+            academy_hinata:
+              12,
 
-    academy_izuno:
-      9,
+            academy_izuno:
+              9,
 
-    academy_mirai:
-      9,
+            academy_mirai:
+              12,
 
-    academy_menma:
-      10,
+            academy_menma:
+              12,
 
-    academy_kushina:
-      12
+            academy_kushina:
+              12
 
-  };
+          };
 
 
   const result = {
