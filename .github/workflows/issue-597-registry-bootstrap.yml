@@ -35,116 +35,81 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+
           p=Path('game.js')
           text=p.read_text(encoding='utf-8')
-          replacements=[
-          ('''  "academy_hinata": {
-            "id": "academy_hinata",
-            "baseStats": {
-              "nin": 6,
-              "tai": 9,
-              "buki": 5,
-              "fuin": 5,
-              "kin": 5,
-              "gen": 5,
-              "stamina": 7
-            },
-            "basePL": 8,
-            "formalRank": "academy",
-            "embodiedExpressions": []
-          },''','''  "academy_hinata": {
-            "id": "academy_hinata",
-            "baseStats": {
-              "nin": 8,
-              "tai": 13,
-              "buki": 6,
-              "fuin": 5,
-              "kin": 5,
-              "gen": 6,
-              "stamina": 10
-            },
-            "basePL": 12,
-            "formalRank": "academy",
-            "embodiedExpressions": []
-          },'''),
-          ('''  "academy_mirai": {
-            "id": "academy_mirai",
-            "baseStats": {
-              "nin": 8,
-              "tai": 8,
-              "buki": 9,
-              "fuin": 5,
-              "kin": 6,
-              "gen": 7,
-              "stamina": 8
-            },
-            "basePL": 9,
-            "formalRank": "academy",
-            "embodiedExpressions": []
-          },''','''  "academy_mirai": {
-            "id": "academy_mirai",
-            "baseStats": {
-              "nin": 9,
-              "tai": 9,
-              "buki": 12,
-              "fuin": 6,
-              "kin": 6,
-              "gen": 13,
-              "stamina": 10
-            },
-            "basePL": 12,
-            "formalRank": "academy",
-            "embodiedExpressions": []
-          },'''),
-          ('''  "academy_menma": {
-            "id": "academy_menma",
-            "baseStats": {
-              "nin": 10,
-              "tai": 8,
-              "buki": 6,
-              "fuin": 5,
-              "kin": 9,
-              "gen": 7,
-              "stamina": 11
-            },
-            "basePL": 10,
-            "formalRank": "academy",
-            "embodiedExpressions": [],
-            "defaultAttachedSummonId": "menma_nine_tails"
-          },''','''  "academy_menma": {
-            "id": "academy_menma",
-            "baseStats": {
-              "nin": 10,
-              "tai": 8,
-              "buki": 6,
-              "fuin": 5,
-              "kin": 13,
-              "gen": 7,
-              "stamina": 11
-            },
-            "basePL": 12,
-            "formalRank": "academy",
-            "embodiedExpressions": [],
-            "defaultAttachedSummonId": "menma_nine_tails"
-          },'''),
-          ('''  const expectedPL = {
 
-            academy_hinata:
-              8,
+          def replace_between(source,start_marker,end_marker,replacement):
+              start=source.find(start_marker)
+              if start < 0:
+                  raise SystemExit(f'missing start marker: {start_marker}')
+              end=source.find(end_marker,start+len(start_marker))
+              if end < 0:
+                  raise SystemExit(f'missing end marker after {start_marker}: {end_marker}')
+              return source[:start] + replacement + source[end:]
 
-            academy_izuno:
-              9,
+          hinata='''"academy_hinata": {
+    "id": "academy_hinata",
+    "baseStats": {
+      "nin": 8,
+      "tai": 13,
+      "buki": 6,
+      "fuin": 5,
+      "kin": 5,
+      "gen": 6,
+      "stamina": 10
+    },
+    "basePL": 12,
+    "formalRank": "academy",
+    "embodiedExpressions": []
+  },
+  '''
+          mirai='''"academy_mirai": {
+    "id": "academy_mirai",
+    "baseStats": {
+      "nin": 9,
+      "tai": 9,
+      "buki": 12,
+      "fuin": 6,
+      "kin": 6,
+      "gen": 13,
+      "stamina": 10
+    },
+    "basePL": 12,
+    "formalRank": "academy",
+    "embodiedExpressions": []
+  },
+  '''
+          menma='''"academy_menma": {
+    "id": "academy_menma",
+    "baseStats": {
+      "nin": 10,
+      "tai": 8,
+      "buki": 6,
+      "fuin": 5,
+      "kin": 13,
+      "gen": 7,
+      "stamina": 11
+    },
+    "basePL": 12,
+    "formalRank": "academy",
+    "embodiedExpressions": [],
+    "defaultAttachedSummonId": "menma_nine_tails"
+  },
+  '''
 
-            academy_mirai:
-              9,
+          text=replace_between(text,'"academy_hinata": {','"academy_izuno": {',hinata)
+          text=replace_between(text,'"academy_mirai": {','"academy_menma": {',mirai)
+          text=replace_between(text,'"academy_menma": {','"academy_kushina": {',menma)
 
-            academy_menma:
-              10,
-
-            academy_kushina:
-              12
-
-          };''','''  const expectedPL = {
+          function_start=text.find('function runAcademyPilotDeploymentDiagnostics')
+          if function_start < 0:
+              raise SystemExit('runAcademyPilotDeploymentDiagnostics missing')
+          mapping_start=text.find('const expectedPL = {',function_start)
+          mapping_end=text.find('};',mapping_start)
+          if mapping_start < 0 or mapping_end < 0:
+              raise SystemExit('Academy pilot expectedPL mapping missing')
+          mapping='''const expectedPL = {
 
             academy_hinata:
               12,
@@ -161,16 +126,8 @@ jobs:
             academy_kushina:
               12
 
-          };''')
-          ]
-          for old,new in replacements:
-              count=text.count(old)
-              if count==1:
-                  text=text.replace(old,new,1)
-              elif count==0 and new in text:
-                  pass
-              else:
-                  raise SystemExit(f'exact #597 replacement mismatch: expected one old block, found {count}')
+          }'''
+          text=text[:mapping_start]+mapping+text[mapping_end:]
           p.write_text(text,encoding='utf-8')
           PY
 
