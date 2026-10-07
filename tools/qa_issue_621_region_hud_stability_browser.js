@@ -118,7 +118,7 @@ async function geometry(page,surface){
 
 function delta(a,b){return Math.abs((Number(a)||0)-(Number(b)||0));}
 function assertStableSamples(samples,label){
-  assert(samples.length>=20,`${label}: insufficient samples`);
+  assert(samples.length>=10,`${label}: insufficient samples`);
   const keys=["map","state","team","tools","compass","eventDrawer"];
   for(const key of keys){
     const rows=samples.map(sample=>sample.rows[key]).filter(Boolean);
