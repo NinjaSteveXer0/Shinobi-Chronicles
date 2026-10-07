@@ -1,0 +1,89 @@
+name: Issue 544 Kakashi Lane F Contract Proof
+
+on:
+  push:
+    branches:
+      - coding/544-terminal-proof
+    paths:
+      - '.github/workflows/issue-544-kakashi-direct-claim-proof.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  prove-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/544-terminal-result-presentation
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Patch Kakashi legacy browser chronology only
+        shell: python
+        run: |
+          from pathlib import Path
+          import base64
+
+          old_visual=base64.b64decode('ICBjb25zdCByZXN1bWVkPWF3YWl0IHBhZ2UuZXZhbHVhdGUoKCk9PnsKICAgIGN1cnJlbnRCYXR0bGUub3V0Y29tZT17dHlwZToidmljdG9yeSIsY29tcGxldGVkQXQ6RGF0ZS5ub3coKSxmaW5pc2hpbmdTaGlub2JpSWQ6ImFjYWRlbXlfa2FrYXNoaSJ9OwogICAgY3VycmVudEJhdHRsZS5iYXR0bGVPdmVyPXRydWU7CiAgICBjdXJyZW50QmF0dGxlLmFjdGl2ZT1mYWxzZTsKICAgIHJldHVybiByZXN1bWVCYXR0bGVDYWxsZXJBZnRlckNvbXBsZXRpb24oInZpY3RvcnkiKTsKICB9KTsKICBhc3NlcnQocmVzdW1lZCYmcmVzdW1lZC5zdWNjZXNzPT09dHJ1ZSxKU09OLnN0cmluZ2lmeShyZXN1bWVkKSk7CiAgYXdhaXQgcGFnZS53YWl0Rm9yU2VsZWN0b3IoIiNrYWthc2hpLXYyLXNjZW5lLWJvYXJkIix7c3RhdGU6InZpc2libGUiLHRpbWVvdXQ6MTIwMDB9KTs=').decode()
+          new_visual=base64.b64decode('ICBsZXQgcmVzdW1lZD1hd2FpdCBwYWdlLmV2YWx1YXRlKCgpPT57CiAgICBjdXJyZW50QmF0dGxlLm91dGNvbWU9e3R5cGU6InZpY3RvcnkiLGNvbXBsZXRlZEF0OkRhdGUubm93KCksZmluaXNoaW5nU2hpbm9iaUlkOiJhY2FkZW15X2tha2FzaGkifTsKICAgIGN1cnJlbnRCYXR0bGUuYmF0dGxlT3Zlcj10cnVlOwogICAgY3VycmVudEJhdHRsZS5hY3RpdmU9ZmFsc2U7CiAgICByZXR1cm4gcmVzdW1lQmF0dGxlQ2FsbGVyQWZ0ZXJDb21wbGV0aW9uKCJ2aWN0b3J5Iik7CiAgfSk7CiAgYXNzZXJ0LnN0cmljdEVxdWFsKHJlc3VtZWQ/LmNhbGxlclJlc3VtZVdpdGhoZWxkVW50aWxUZXJtaW5hbFJlc3VsdENvbnRpbnVlLHRydWUsIktha2FzaGkgY2FsbGVyIGJ5cGFzc2VkICM1NDQgVmljdG9yeSBnYXRlICIrSlNPTi5zdHJpbmdpZnkocmVzdW1lZCkpOwogIGF3YWl0IHBhZ2Uud2FpdEZvclNlbGVjdG9yKCIuYWxwaGEtdmljdG9yeS1jb2RlLXNjcmVlbiIse3N0YXRlOiJ2aXNpYmxlIix0aW1lb3V0OjEyMDAwfSk7CiAgYXdhaXQgcGFnZS53YWl0Rm9yRnVuY3Rpb24oKCk9Pmdsb2JhbFRoaXMuZ2V0QmF0dGxlVGVybWluYWxSZXN1bHRQcmVzZW50YXRpb241NDQwMD8uKCkuc3RhdHVzPT09InByZXNlbnRlZCIsbnVsbCx7dGltZW91dDoxMjAwMH0pOwogIGNvbnN0IGNvbnRpbnVlZD1hd2FpdCBwYWdlLmV2YWx1YXRlKCgpPT57CiAgICBjb25zdCBjbGFpbTE9dHlwZW9mIGNsYWltQ3VycmVudEJhdHRsZVJld2FyZHM9PT0iZnVuY3Rpb24iP2NsYWltQ3VycmVudEJhdHRsZVJld2FyZHMoKTpudWxsOwogICAgY29uc3QgY2xhaW0yPXR5cGVvZiBjbGFpbUN1cnJlbnRCYXR0bGVSZXdhcmRzPT09ImZ1bmN0aW9uIj9jbGFpbUN1cnJlbnRCYXR0bGVSZXdhcmRzKCk6bnVsbDsKICAgIGNvbnN0IHJlc3VsdD1yZXN1bWVCYXR0bGVDYWxsZXJBZnRlckNvbXBsZXRpb24oInZpY3RvcnkiKTsKICAgIHJldHVybiB7Y2xhaW0xLGNsYWltMixyZXN1bHR9OwogIH0pOwogIHJlc3VtZWQ9Y29udGludWVkLnJlc3VsdDsKICBhc3NlcnQocmVzdW1lZCYmcmVzdW1lZC5zdWNjZXNzPT09dHJ1ZSxKU09OLnN0cmluZ2lmeShjb250aW51ZWQpKTsKICBhd2FpdCBwYWdlLndhaXRGb3JTZWxlY3RvcigiI2tha2FzaGktdjItc2NlbmUtYm9hcmQiLHtzdGF0ZToidmlzaWJsZSIsdGltZW91dDoxMjAwMH0pOw==').decode()
+          old_helper=base64.b64decode('ICB9ZWxzZXsKICAgIHJlc3VtZWQ9YXdhaXQgcGFnZS5ldmFsdWF0ZSgoe291dGNvbWUsYWN0aW9uc30pPT57CiAgICAgIGNvbnN0IHByaW9yPWdsb2JhbFRoaXMuZ2V0QmF0dGxlQWN0aW9uT3Bwb3J0dW5pdHlJbmRleDsKICAgICAgZ2xvYmFsVGhpcy5nZXRCYXR0bGVBY3Rpb25PcHBvcnR1bml0eUluZGV4PShzaWRlLHBhcnRpY2lwYW50SWQpPT57CiAgICAgICAgaWYoc2lkZT09PSJwbGF5ZXIiJiZwYXJ0aWNpcGFudElkPT09ImFjYWRlbXlfa2FrYXNoaSIpcmV0dXJuIGFjdGlvbnM7CiAgICAgICAgcmV0dXJuIHR5cGVvZiBwcmlvcj09PSJmdW5jdGlvbiI/cHJpb3Ioc2lkZSxwYXJ0aWNpcGFudElkKTowOwogICAgICB9OwogICAgICB0cnl7CiAgICAgICAgY3VycmVudEJhdHRsZS5vdXRjb21lPXsuLi4oY3VycmVudEJhdHRsZS5vdXRjb21lfHx7fSksdHlwZTpvdXRjb21lLGNvbXBsZXRlZEF0OkRhdGUubm93KCksZmluaXNoaW5nU2hpbm9iaUlkOm91dGNvbWU9PT0idmljdG9yeSI/ImFjYWRlbXlfa2FrYXNoaSI6bnVsbH07CiAgICAgICAgY3VycmVudEJhdHRsZS5iYXR0bGVPdmVyPXRydWU7CiAgICAgICAgY3VycmVudEJhdHRsZS5hY3RpdmU9ZmFsc2U7CiAgICAgICAgcmV0dXJuIHJlc3VtZUJhdHRsZUNhbGxlckFmdGVyQ29tcGxldGlvbihvdXRjb21lKTsKICAgICAgfWZpbmFsbHl7CiAgICAgICAgZ2xvYmFsVGhpcy5nZXRCYXR0bGVBY3Rpb25PcHBvcnR1bml0eUluZGV4PXByaW9yOwogICAgICB9CiAgICB9LHtvdXRjb21lLGFjdGlvbnN9KTsKICAgIGFzc2VydChyZXN1bWVkJiZyZXN1bWVkLnN1Y2Nlc3M9PT10cnVlLEpTT04uc3RyaW5naWZ5KHJlc3VtZWQpKTsKICB9').decode()
+          new_helper=base64.b64decode('ICB9ZWxzZXsKICAgIHJlc3VtZWQ9YXdhaXQgcGFnZS5ldmFsdWF0ZSgoe291dGNvbWUsYWN0aW9uc30pPT57CiAgICAgIGdsb2JhbFRoaXMuX19rYWthc2hpVGVybWluYWxBY3Rpb25JbmRleFByaW9yPWdldEJhdHRsZUFjdGlvbk9wcG9ydHVuaXR5SW5kZXg7CiAgICAgIGdsb2JhbFRoaXMuZ2V0QmF0dGxlQWN0aW9uT3Bwb3J0dW5pdHlJbmRleD0oc2lkZSxwYXJ0aWNpcGFudElkKT0+ewogICAgICAgIGlmKHNpZGU9PT0icGxheWVyIiYmcGFydGljaXBhbnRJZD09PSJhY2FkZW15X2tha2FzaGkiKXJldHVybiBhY3Rpb25zOwogICAgICAgIHJldHVybiB0eXBlb2YgZ2xvYmFsVGhpcy5fX2tha2FzaGlUZXJtaW5hbEFjdGlvbkluZGV4UHJpb3I9PT0iZnVuY3Rpb24iCiAgICAgICAgICA/Z2xvYmFsVGhpcy5fX2tha2FzaGlUZXJtaW5hbEFjdGlvbkluZGV4UHJpb3Ioc2lkZSxwYXJ0aWNpcGFudElkKQogICAgICAgICAgOjA7CiAgICAgIH07CiAgICAgIHRyeXtnZXRCYXR0bGVBY3Rpb25PcHBvcnR1bml0eUluZGV4PWdsb2JhbFRoaXMuZ2V0QmF0dGxlQWN0aW9uT3Bwb3J0dW5pdHlJbmRleDt9Y2F0Y2goX2Vycm9yKXt9CiAgICAgIGN1cnJlbnRCYXR0bGUub3V0Y29tZT17Li4uKGN1cnJlbnRCYXR0bGUub3V0Y29tZXx8e30pLHR5cGU6b3V0Y29tZSxjb21wbGV0ZWRBdDpEYXRlLm5vdygpLGZpbmlzaGluZ1NoaW5vYmlJZDpvdXRjb21lPT09InZpY3RvcnkiPyJhY2FkZW15X2tha2FzaGkiOm51bGx9OwogICAgICBjdXJyZW50QmF0dGxlLmJhdHRsZU92ZXI9dHJ1ZTsKICAgICAgY3VycmVudEJhdHRsZS5hY3RpdmU9ZmFsc2U7CiAgICAgIHJldHVybiByZXN1bWVCYXR0bGVDYWxsZXJBZnRlckNvbXBsZXRpb24ob3V0Y29tZSk7CiAgICB9LHtvdXRjb21lLGFjdGlvbnN9KTsKICAgIGFzc2VydC5zdHJpY3RFcXVhbChyZXN1bWVkPy5jYWxsZXJSZXN1bWVXaXRoaGVsZFVudGlsVGVybWluYWxSZXN1bHRDb250aW51ZSx0cnVlLGBLYWthc2hpICR7b3V0Y29tZX0gY2FsbGVyIGJ5cGFzc2VkICM1NDQgdGVybWluYWwgcmVzdWx0IGdhdGU6ICR7SlNPTi5zdHJpbmdpZnkocmVzdW1lZCl9YCk7CiAgICBjb25zdCB0ZXJtaW5hbFNlbGVjdG9yPW91dGNvbWU9PT0iZGVmZWF0Ij8iLmFscGhhMzMxLXNldGJhY2siOiIuYWxwaGEtdmljdG9yeS1jb2RlLXNjcmVlbiI7CiAgICBhd2FpdCBwYWdlLndhaXRGb3JTZWxlY3Rvcih0ZXJtaW5hbFNlbGVjdG9yLHtzdGF0ZToidmlzaWJsZSIsdGltZW91dDoxMjAwMH0pOwogICAgYXdhaXQgcGFnZS53YWl0Rm9yRnVuY3Rpb24oZXhwZWN0ZWQ9PnsKICAgICAgY29uc3QgdGVybWluYWw9Z2xvYmFsVGhpcy5nZXRCYXR0bGVUZXJtaW5hbFJlc3VsdFByZXNlbnRhdGlvbjU0NDAwPy4oKTsKICAgICAgcmV0dXJuIHRlcm1pbmFsPy5zdGF0dXM9PT0icHJlc2VudGVkIiYmdGVybWluYWw/LmNvbW1pdHRlZE91dGNvbWU9PT1leHBlY3RlZDsKICAgIH0sb3V0Y29tZSx7dGltZW91dDoxMjAwMH0pOwogICAgaWYob3V0Y29tZT09PSJ2aWN0b3J5Iil7CiAgICAgIGNvbnN0IGNvbnRpbnVlZD1hd2FpdCBwYWdlLmV2YWx1YXRlKCgpPT57CiAgICAgICAgY29uc3QgY2xhaW0xPXR5cGVvZiBjbGFpbUN1cnJlbnRCYXR0bGVSZXdhcmRzPT09ImZ1bmN0aW9uIj9jbGFpbUN1cnJlbnRCYXR0bGVSZXdhcmRzKCk6bnVsbDsKICAgICAgICBjb25zdCBjbGFpbTI9dHlwZW9mIGNsYWltQ3VycmVudEJhdHRsZVJld2FyZHM9PT0iZnVuY3Rpb24iP2NsYWltQ3VycmVudEJhdHRsZVJld2FyZHMoKTpudWxsOwogICAgICAgIGNvbnN0IHJlc3VsdD1yZXN1bWVCYXR0bGVDYWxsZXJBZnRlckNvbXBsZXRpb24oInZpY3RvcnkiKTsKICAgICAgICByZXR1cm4ge2NsYWltMSxjbGFpbTIscmVzdWx0fTsKICAgICAgfSk7CiAgICAgIHJlc3VtZWQ9Y29udGludWVkLnJlc3VsdDsKICAgICAgYXNzZXJ0KHJlc3VtZWQmJnJlc3VtZWQuc3VjY2Vzcz09PXRydWUsSlNPTi5zdHJpbmdpZnkoY29udGludWVkKSk7CiAgICB9ZWxzZXsKICAgICAgcmVzdW1lZD1hd2FpdCBwYWdlLmV2YWx1YXRlKCgpPT50eXBlb2YgY29udGludWVBZnRlclNldGJhY2szMzEwMD09PSJmdW5jdGlvbiIKICAgICAgICA/Y29udGludWVBZnRlclNldGJhY2szMzEwMCgpCiAgICAgICAgOnJlc3VtZUJhdHRsZUNhbGxlckFmdGVyQ29tcGxldGlvbigiZGVmZWF0IikpOwogICAgICBhc3NlcnQocmVzdW1lZCYmcmVzdW1lZC5zdWNjZXNzPT09dHJ1ZSxKU09OLnN0cmluZ2lmeShyZXN1bWVkKSk7CiAgICB9CiAgICBhd2FpdCBwYWdlLmV2YWx1YXRlKCgpPT57CiAgICAgIGlmKGdsb2JhbFRoaXMuX19rYWthc2hpVGVybWluYWxBY3Rpb25JbmRleFByaW9yKXsKICAgICAgICBnbG9iYWxUaGlzLmdldEJhdHRsZUFjdGlvbk9wcG9ydHVuaXR5SW5kZXg9Z2xvYmFsVGhpcy5fX2tha2FzaGlUZXJtaW5hbEFjdGlvbkluZGV4UHJpb3I7CiAgICAgICAgdHJ5e2dldEJhdHRsZUFjdGlvbk9wcG9ydHVuaXR5SW5kZXg9Z2xvYmFsVGhpcy5nZXRCYXR0bGVBY3Rpb25PcHBvcnR1bml0eUluZGV4O31jYXRjaChfZXJyb3Ipe30KICAgICAgfQogICAgICBkZWxldGUgZ2xvYmFsVGhpcy5fX2tha2FzaGlUZXJtaW5hbEFjdGlvbkluZGV4UHJpb3I7CiAgICB9KTsKICB9').decode()
+
+          kak=Path('tools/qa_kakashi_v2_browser.js')
+          text=kak.read_text(encoding='utf-8')
+          assert old_visual in text, 'Kakashi visualAndBattle terminal block drifted'
+          assert old_helper in text, 'Kakashi launchAndReturnBattle terminal branch drifted'
+          text=text.replace(old_visual,new_visual,1).replace(old_helper,new_helper,1)
+          kak.write_text(text,encoding='utf-8')
+
+      - name: Source safety
+        run: |
+          node --check tools/qa_kakashi_v2_browser.js
+          node --check tools/qa_issue_343_wasabi_browser.js
+          node tools/qa_runtime_ownership_safety_300.js
+          node tools/qa_issue_303_runtime_build_fingerprint.js
+          node tools/qa_save_compatibility_311.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install chromium
+
+      - name: Start local Alpha server
+        run: |
+          python3 -m http.server 8080 >/tmp/issue-544-kakashi-lanef-proof-http.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/issue-544-kakashi-lanef-proof-http.log
+          exit 1
+
+      - name: Kakashi terminal chronology compatibility
+        env:
+          KAKASHI_V2_BASE_URL: http://127.0.0.1:8080/index.html
+          KAKASHI_V2_BROWSER_OUT: artifacts/issue-544-proof-kakashi
+        run: xvfb-run -a node tools/qa_kakashi_v2_browser.js
+
+      - name: Wasabi regression on current feature head
+        env:
+          ISSUE_343_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_343_BROWSER_OUT: artifacts/issue-544-proof-wasabi
+        run: xvfb-run -a node tools/qa_issue_343_wasabi_browser.js
+
+      - name: Publish Kakashi QA correction to feature branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/qa_kakashi_v2_browser.js
+          git diff --cached --check
+          git commit -m '[CODING][#544] Align Kakashi browser QA with terminal result chronology'
+          git push origin HEAD:coding/544-terminal-result-presentation
