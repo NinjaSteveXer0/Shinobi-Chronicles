@@ -35,7 +35,7 @@ jobs:
           p=Path("tools/bootstrap_issue_597_integration_tail.py")
           s=p.read_text(encoding="utf-8")
           old='    fingerprint = fingerprint.replace(old, new)\n'
-          new='    fingerprint = fingerprint.replace(f\'"{old}"\', f\'"{new}"\', 1) if label == "generation" else fingerprint.replace(old, new)\n'
+          new='    if label == "generation":\n        fingerprint = fingerprint.replace(f\'"{old}"\', f\'"{new}"\', 1)\n        fingerprint = fingerprint.replace(f\'first.runtimeGeneration==="{old}"\', f\'first.runtimeGeneration==="{new}"\', 1)\n    else:\n        fingerprint = fingerprint.replace(old, new)\n'
           if s.count(old) != 1:
               raise SystemExit("expected fingerprint replacement line missing/not unique")
           p.write_text(s.replace(old,new,1),encoding="utf-8")
