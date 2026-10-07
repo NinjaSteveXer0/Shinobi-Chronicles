@@ -16,6 +16,7 @@ on:
       - 'runtime/alpha-discipline-curriculum-profiles-57600.js'
       - 'tools/qa_issue_576_expert_master_curriculum_profiles.js'
       - 'tools/qa_issue_576_expert_master_curriculum_profiles_browser.js'
+      - 'tools/qa_issue_576_practical_context_probe.js'
       - '.github/workflows/issue-576-expert-master-curriculum.yml'
   workflow_dispatch:
 

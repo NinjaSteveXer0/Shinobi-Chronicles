@@ -62,7 +62,7 @@ function boot({primary=14,exp=0,kakashiNin=16}={}){
     function getKonohaPracticalUIScreenData(){const characterId="academy_menma";return{...getKonohaCharacterActivityData("practical",characterId),canExecute:true};}
     function performDisciplineTraining(){return{success:false,reason:"training-ground-stub"};}
     function createKonohaExamAttemptContext(characterId,disciplineId){return{characterId,disciplineId,statValue:getPlayerCharacter(characterId).stats[disciplineId],disciplineLevel:1,disciplineExp:0};}
-    function createKonohaPracticalAttemptContext(characterId,disciplineId){return{characterId,disciplineId,statValue:getPlayerCharacter(characterId).stats[disciplineId],disciplineLevel:1,disciplineExp:0};}
+    function createKonohaPracticalAttemptContext(characterId,disciplineId){if(["nin","gen","fuin"].includes(disciplineId))return null;return{characterId,disciplineId,statValue:getPlayerCharacter(characterId).stats[disciplineId],disciplineLevel:1,disciplineExp:0};}
     function resolveKonohaExamAttempt(){return{passed:__pass===true,outcome:__pass===true?"pass":"fail",difficulty:10,score:__pass===true?12:8,history:{}};}
     function resolveKonohaPracticalAttempt(){return{passed:__pass===true,outcome:__pass===true?"pass":"fail",difficulty:10,score:__pass===true?12:8,history:{}};}
     function executeKonohaExamAttempt(){return{success:false,completed:false,reason:"legacy-exam"};}
@@ -123,6 +123,13 @@ function developmentReceipts(ctx){return ctx.activityHistory.filter(r=>r&&r.type
   const s=boot({primary:16});
   const data=s.getKonohaCharacterActivityData("practical","academy_menma"),nin=data.disciplines.find(d=>d.id==="nin");
   assert(nin);assert.equal(nin.activityProfileId,"discipline_curriculum_nin_expert_v1");assert.equal(nin.developmentAvailable,true);
+}
+{
+  const s=boot({primary:16});s.__pass=true;
+  const advanced=s.executeDisciplineCurriculumAttempt576("practical","academy_menma","gen");
+  assert.equal(advanced.completed,true,"advanced Practical must not inherit the legacy discipline-source context rejection");
+  assert.equal(advanced.success,true);assert.equal(advanced.developmentExp,2);
+  assert.equal(advanced.activityProfileId,"discipline_curriculum_gen_expert_v1");
 }
 {
   const s=boot({primary:14});setStat(s,"academy_menma","nin",30,0);

@@ -179,10 +179,22 @@ function recordExhaustion(pre,tx){
   history().push(row);return row;
 }
 function save(){if(typeof globalThis.savePlayerData==="function")return globalThis.savePlayerData();return false;}
-function attemptContext(host,characterId,disciplineId){
-  return host==="exam"
-    ?(typeof globalThis.createKonohaExamAttemptContext==="function"?globalThis.createKonohaExamAttemptContext(characterId,disciplineId):null)
-    :(typeof globalThis.createKonohaPracticalAttemptContext==="function"?globalThis.createKonohaPracticalAttemptContext(characterId,disciplineId):null);
+function attemptContext(host,characterId,disciplineId,pre=null){
+  if(host==="exam")return typeof globalThis.createKonohaExamAttemptContext==="function"?globalThis.createKonohaExamAttemptContext(characterId,disciplineId):null;
+  const legacy=typeof globalThis.createKonohaPracticalAttemptContext==="function"?globalThis.createKonohaPracticalAttemptContext(characterId,disciplineId):null;
+  if(legacy)return legacy;
+  // The pre-#576 Practical context owner only admits its legacy discipline set.
+  // #576 independently authorises advanced Nin/Gen/Fūin Practical curricula, so
+  // build the same factual attempt context locally after that exact preflight.
+  if(!(pre&&pre.allowed===true&&pre.host==="practical"&&ADVANCED_DISCIPLINES.has(disciplineId)&&(pre.tier==="expert"||pre.tier==="master")))return null;
+  const row=character(characterId),discipline=typeof globalThis.getShinobiDiscipline==="function"?globalThis.getShinobiDiscipline(disciplineId):null;
+  const progress=progression(characterId,disciplineId);
+  if(!row||!discipline||!progress)return null;
+  return{
+    activity:"practical",characterId:row.id,disciplineId:discipline.id,disciplineName:discipline.name,
+    disciplineLevel:Number(progress.level)||1,disciplineExp:Number(progress.exp)||0,
+    statValue:Number(row.stats&&row.stats[disciplineId])||0,createdAt:Date.now()
+  };
 }
 function resolveAttempt(host,context){
   return host==="exam"
@@ -199,7 +211,7 @@ function executeAttempt(host,characterId,disciplineId,options={}){
     return prior(characterId,disciplineId);
   }
   if(typeof globalThis.commitDisciplineDevelopment448!=="function")return{success:false,completed:false,reason:"shared_discipline_writer_unavailable"};
-  const context=attemptContext(host,characterId,disciplineId);
+  const context=attemptContext(host,characterId,disciplineId,pre);
   if(!context)return{success:false,completed:false,reason:host+"_context_invalid"};
   context.disciplineLevel=1;
   const row=progression(characterId,disciplineId);context.disciplineExp=Math.max(0,Number(row&&row.exp)||0);
