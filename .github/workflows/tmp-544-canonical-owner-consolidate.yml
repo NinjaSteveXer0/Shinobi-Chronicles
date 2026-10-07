@@ -19,40 +19,72 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Retire predecessor terminal owner and update authority
+      - name: Absorb Setback presentation and retire predecessor terminal owner
         shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
           import json,re
 
-          p=Path('runtime/alpha-alpha-sprint-33100.js')
+          # 1) #544 becomes self-sufficient for Setback presentation/Continue.
+          p=Path('runtime/alpha-battle-terminal-result-54400.js')
           s=p.read_text()
+          anchor='  function renderCommittedTerminalSurface54400(battle,outcome,marker){\n'
+          if anchor not in s: raise SystemExit('544 render anchor missing')
+          helper='''  function esc54400(value){\n    if(typeof escapeStorySceneHTML==="function")return escapeStorySceneHTML(String(value??""));\n    return String(value??"").replace(/[&<>\\"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));\n  }\n\n  function setbackCaller54400(){\n    const battle=activeBattle54400();\n    try{return battle&&battle.returnContext?JSON.parse(JSON.stringify(battle.returnContext)):null;}catch(_error){return battle&&battle.returnContext||null;}\n  }\n\n  function continueAfterBattleTerminalResult54400(){\n    const battle=activeBattle54400();\n    if(!battle||battle.battleOver!==true||committedOutcome54400(battle)!=="defeat")return{success:false,reason:"committed_defeat_missing",patchId:PATCH_ID};\n    const marker=marker54400(battle,"defeat",false);\n    if(!marker||marker.status!=="presented")return{success:false,reason:"setback_not_presented",patchId:PATCH_ID};\n    if(PRIOR_RESUME_CALLER){\n      const result=PRIOR_RESUME_CALLER.call(globalThis,"defeat");\n      if(result&&result.success===true)return{...result,terminalResultOwner54400:true};\n      return result||{success:false,reason:"battle_caller_resume_failed",patchId:PATCH_ID};\n    }\n    if(PRIOR_OPEN_OVERLAY){PRIOR_OPEN_OVERLAY.call(globalThis,"battle");return{success:true,destination:"battle",fallback:true,patchId:PATCH_ID};}\n    return{success:false,reason:"setback_return_authority_missing",patchId:PATCH_ID};\n  }\n\n  function renderSetback54400(){\n    if(typeof document==="undefined")return{success:false,reason:"document_missing",patchId:PATCH_ID};\n    const overlay=document.getElementById("screen-overlay");\n    const container=document.getElementById("overlay-content-container");\n    if(!container)return{success:false,reason:"overlay_container_missing",patchId:PATCH_ID};\n    const battle=activeBattle54400();\n    const caller=setbackCaller54400();\n    const activeId=(()=>{try{return typeof getSavedClanStartCharacterId==="function"?getSavedClanStartCharacterId():null;}catch(_error){return null;}})();\n    const actor=(()=>{try{return activeId&&typeof getPlayerCharacter==="function"?getPlayerCharacter(activeId):null;}catch(_error){return null;}})();\n    const enemy=battle&&(battle.enemy||((typeof selectedEnemy!=="undefined")?selectedEnemy:null))||null;\n    try{if(typeof currentOverlayType!=="undefined")currentOverlayType="setback";}catch(_error){}\n    if(overlay)overlay.style.display="flex";\n    container.innerHTML=`<section class="alpha544-setback" aria-label="Battle setback"><div class="alpha544-result-art" aria-hidden="true"></div><header><div><span>BATTLE COMPLETE · CHRONICLE RESULT</span><h1>SETBACK</h1><p>Your deployed shinobi reached 0 Battle PL. This records withdrawal from the Battle — not automatic injury or death.</p></div><b>NO REWARD CLAIM</b></header><div class="alpha544-result-grid"><article><span>YOUR SIDE</span><h2>${esc54400(actor&&actor.name||"My Clan")}</h2><p>Deployment exhausted</p></article><article><span>OPPOSITION</span><h2>${esc54400(enemy&&enemy.name||"Encounter")}</h2><p>Battle result recorded separately from Story consequences.</p></article><article><span>RETURN</span><h2>${esc54400(caller&&caller.type?String(caller.type).replaceAll("_"," ").toUpperCase():"CALLER")}</h2><p>Continue returns to the exact owning caller when its return envelope is available.</p></article></div><footer><p>Battle PL defeat does not infer death, injury, custody, Promotion failure or Story failure unless another authorised system commits that consequence.</p><button type="button" onclick="continueAfterBattleTerminalResult54400()">CONTINUE</button></footer></section>`;\n    return{success:true,type:"setback",codeOwned:true,canonicalOwner:"runtime/alpha-battle-terminal-result-54400.js",patchId:PATCH_ID};\n  }\n\n  globalThis.continueAfterBattleTerminalResult54400=continueAfterBattleTerminalResult54400;\n  globalThis.renderSetback54400=renderSetback54400;\n\n'''
+          s=s.replace(anchor,helper+anchor,1)
+
+          old='''    try{\n      // PRIOR_OPEN_OVERLAY is the already-installed #33100/#33000 chain.\n      // At this point #33000's immutable receipt queue is proven empty, so\n      // Victory can delegate normally while Setback reaches #33100 directly.\n      const result=PRIOR_OPEN_OVERLAY.call(globalThis,surface);\n      markPresented54400(marker);\n'''
+          new='''    try{\n      // #544 is the sole terminal-result presentation owner. Victory delegates\n      // to the existing reward-capable Victory surface; defeat renders the\n      // canonical Setback surface here. #33100 is no longer in this path.\n      const result=outcome==="defeat"?renderSetback54400():PRIOR_OPEN_OVERLAY.call(globalThis,"victory");\n      if(result&&result.success===false)throw new Error(String(result.reason||"terminal_surface_render_failed"));\n      markPresented54400(marker);\n'''
+          if old not in s: raise SystemExit('544 predecessor render block missing')
+          s=s.replace(old,new,1)
+          s=s.replace('const selector=surface==="victory"?".alpha-victory-code-screen":".alpha331-setback";','const selector=surface==="victory"?".alpha-victory-code-screen":".alpha544-setback";',1)
+          old_refresh='''          if(marker&&marker.status==="presented"&&sameSurfaceActive){\n            return PRIOR_OPEN_OVERLAY.apply(this,arguments);\n          }\n'''
+          new_refresh='''          if(marker&&marker.status==="presented"&&sameSurfaceActive){\n            if(requestedOutcome==="defeat")return{success:true,idempotent:true,outcome:"defeat",surface:"setback",patchId:PATCH_ID};\n            return PRIOR_OPEN_OVERLAY.apply(this,arguments);\n          }\n'''
+          if old_refresh not in s: raise SystemExit('544 refresh block missing')
+          s=s.replace(old_refresh,new_refresh,1)
+
+          end_anchor='''  if(PRIOR_RESUME_CALLER){\n'''
+          style='''  if(typeof document!=="undefined"&&document.head&&!document.getElementById("alpha-battle-terminal-result-54400-style")){\n    const style=document.createElement("style");\n    style.id="alpha-battle-terminal-result-54400-style";\n    style.textContent=`\n      .alpha544-setback{position:relative;width:100%;height:100%;min-height:620px;overflow:hidden;display:flex;flex-direction:column;color:#e7dfcd;background:#050b10;border:1px solid rgba(214,169,58,.28)}\n      .alpha544-setback .alpha544-result-art{position:absolute;inset:0;background:linear-gradient(90deg,rgba(3,8,12,.94),rgba(3,8,12,.76)),url('UI/setback.png') center/cover no-repeat;opacity:.34;z-index:0}\n      .alpha544-setback>header,.alpha544-setback>.alpha544-result-grid,.alpha544-setback>footer{position:relative;z-index:2}\n      .alpha544-setback>header{display:flex;justify-content:space-between;gap:30px;padding:34px 40px;border-bottom:1px solid rgba(214,169,58,.22);background:rgba(3,8,12,.72)}\n      .alpha544-setback header span{color:#d9b34f;font-size:9px;font-weight:900;letter-spacing:.15em}.alpha544-setback h1{margin:7px 0 8px;color:#f2dfad;font:900 42px/1 Georgia,serif}.alpha544-setback header p{margin:0;max-width:760px;color:#8fa0a7;font-size:12px;line-height:1.5}.alpha544-setback header>b{align-self:start;padding:8px 10px;border:1px solid rgba(151,169,177,.22);color:#87989f;font-size:8px;letter-spacing:.12em;background:rgba(3,8,12,.72)}\n      .alpha544-result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:34px 40px;flex:1}.alpha544-result-grid article{padding:22px;border:1px solid rgba(255,255,255,.08);background:rgba(2,8,12,.82)}.alpha544-result-grid span{color:#6c8089;font-size:8px;letter-spacing:.13em}.alpha544-result-grid h2{margin:10px 0;color:#e8d7ad;font:800 22px/1.1 Georgia,serif}.alpha544-result-grid p{color:#8d9da3;font-size:11px;line-height:1.55}\n      .alpha544-setback footer{display:flex;align-items:center;justify-content:space-between;gap:26px;padding:20px 40px;border-top:1px solid rgba(214,169,58,.18);background:rgba(3,8,12,.88)}.alpha544-setback footer p{margin:0;color:#758890;font-size:10px;line-height:1.5}.alpha544-setback footer button{min-height:44px;padding:0 20px;border:1px solid rgba(214,169,58,.66);background:linear-gradient(180deg,#624814,#33250b);color:#f2d274;font-weight:900;letter-spacing:.08em;cursor:pointer}\n      @media(max-width:900px){.alpha544-result-grid{grid-template-columns:1fr;overflow:auto}.alpha544-setback>header,.alpha544-setback footer{padding-left:22px;padding-right:22px}}\n    `;\n    document.head.appendChild(style);\n  }\n\n'''
+          if end_anchor not in s: raise SystemExit('544 resume anchor missing')
+          s=s.replace(end_anchor,style+end_anchor,1)
+          if '#33100/#33000 chain' in s or 'Setback reaches #33100' in s: raise SystemExit('544 still documents predecessor terminal dependency')
+          p.write_text(s)
+
+          # 2) Retire all live #33100 terminal controller/presentation code.
+          p=Path('runtime/alpha-alpha-sprint-33100.js'); s=p.read_text()
           start='  // --------------------------------------------------------------------------\n  // 1. STORY -> BATTLE -> SAME STORY RETURN PRIORITY\n'
           end='  // --------------------------------------------------------------------------\n  // 3. WORLD DOSSIER STACKING — PRESENTATION ONLY\n'
           a=s.find(start); b=s.find(end)
-          if a < 0 or b < 0 or b <= a:
-              raise SystemExit('33100 terminal retirement anchors missing')
-          replacement='''  // --------------------------------------------------------------------------\n  // 1–2. BATTLE TERMINAL RESULT OWNERSHIP — RETIRED TO #544\n  // --------------------------------------------------------------------------\n  // #601/#624 canonical-owner consolidation: #33100 no longer owns or wraps\n  // Victory continuation, zero-PL defeat completion, Setback rendering/continue,\n  // or terminal overlay routing. Those responsibilities are owned by\n  // runtime/alpha-battle-terminal-result-54400.js. The base Battle semantic and\n  // reward authorities remain unchanged; this module continues only with its\n  // unrelated World dossier and Arena responsibilities below.\n\n'''
+          if a < 0 or b < 0 or b <= a: raise SystemExit('33100 terminal retirement anchors missing')
+          replacement='''  // --------------------------------------------------------------------------\n  // 1–2. BATTLE TERMINAL RESULT OWNERSHIP — RETIRED TO #544\n  // --------------------------------------------------------------------------\n  // #601/#624 canonical-owner consolidation: #33100 no longer owns or wraps\n  // Victory continuation, zero-PL defeat completion, Setback rendering/Continue,\n  // or terminal overlay routing. runtime/alpha-battle-terminal-result-54400.js\n  // is the sole live terminal-result presentation/chronology owner.\n\n'''
           s=s[:a]+replacement+s[b:]
-          forbidden=['continueAfterVictory33100','markBattleSetback33100','continueAfterSetback33100','renderSetback33100','priorOpenOverlay33100','handleBattleParticipantAtZeroPL33100']
+          s=s.replace('  // 5. PRESENTATION — VICTORY/SETBACK ART IS OPTIONAL, CODE REMAINS STRUCTURAL','  // 5. PRESENTATION — WORLD DOSSIER + ARENA ONLY')
+          css_a=s.find('      /* Approved art is atmosphere only; coded layout remains complete without it. */')
+          css_b=s.find('      .alpha331-arena{',css_a)
+          if css_a < 0 or css_b < 0: raise SystemExit('33100 terminal CSS anchors missing')
+          s=s[:css_a]+s[css_b:]
+          s=s.replace('@media(max-width:900px){.alpha331-two,.alpha331-result-grid{grid-template-columns:1fr}.alpha331-arena{width:calc(100% - 24px)}.alpha331-result-grid{overflow:auto}.alpha331-setback>header,.alpha331-setback footer{padding-left:22px;padding-right:22px}}','@media(max-width:900px){.alpha331-two{grid-template-columns:1fr}.alpha331-arena{width:calc(100% - 24px)}}')
+          diag_start=s.find('  function runAlphaPlayableSprint33100Diagnostics(){')
+          diag_end=s.find('  globalThis.SC_ALPHA_PLAYABILITY_SPRINT_33100_ID=PATCH_ID;',diag_start)
+          if diag_start < 0 or diag_end < 0: raise SystemExit('33100 diagnostics anchors missing')
+          diag='''  function runAlphaPlayableSprint33100Diagnostics(){\n    const promotionSrc=openArenaPromotionSurface33100.toString();\n    const utilitySrc=openAlphaArenaUtilitySurface33100.toString();\n    const checks={\n      terminalResultOwnerRetiredTo544:true,\n      promotionReusesExistingAuthority:promotionSrc.includes("priorPromotion33100")&&promotionSrc.includes("semanticAction"),\n      promotionFailClosedWithoutAction:promotionSrc.includes("No exact Promotion launch action")&&promotionSrc.includes("disabled"),\n      stagedNoFakeOpponent:utilitySrc.includes("fakeCompetitionStateCreated:false"),\n      pvpNoFakeMatch:arenaUtilityBody33100.toString().includes("NO FAKE ONLINE RESULT"),\n      tournamentNoFakeBracket:arenaUtilityBody33100.toString().includes("BRACKET/REWARD AUTHORITY NOT FABRICATED"),\n      dossierRaised:raiseWorldDossier33100.toString().includes("2147483000"),\n      browserGoldenClaimed:false\n    };\n    const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);\n    return{patchId:PATCH_ID,pass:failed.length===0,checks,failed,browserGoldenClaimed:false};\n  }\n\n'''
+          s=s[:diag_start]+diag+s[diag_end:]
+          forbidden=['continueAfterVictory33100','markBattleSetback33100','continueAfterSetback33100','renderSetback33100','priorOpenOverlay33100','handleBattleParticipantAtZeroPL33100','alpha331-setback','UI/setback.png','UI/victory.png']
           for token in forbidden:
               if token in s: raise SystemExit(f'33100 terminal token still live: {token}')
           p.write_text(s)
 
-          rp=Path('tools/fixtures/runtime_responsibility_registry_300.json')
-          reg=json.loads(rp.read_text())
-          target=None
-          for row in reg.get('responsibilities',[]):
-              if row.get('responsibilityId')=='battle.return.story_scene.shared':
-                  target=row; break
+          # 3) #300 declares #544 as canonical and #33100 terminal slice retired.
+          rp=Path('tools/fixtures/runtime_responsibility_registry_300.json'); reg=json.loads(rp.read_text())
+          target=next((r for r in reg.get('responsibilities',[]) if r.get('responsibilityId')=='battle.return.story_scene.shared'),None)
           if not target: raise SystemExit('battle.return.story_scene.shared missing')
           target['canonicalOwner']='runtime/alpha-battle-terminal-result-54400.js'
           target['ownerType']='shared_battle_terminal_result_runtime'
           target['productionLoadPath']=['index.html','runtime/alpha-battle-terminal-result-54400.js']
-          target['extensionHooks']=['presentCommittedBattleTerminalResult54400','resumeBattleCallerAfterCompletion']
+          target['extensionHooks']=['presentCommittedBattleTerminalResult54400','continueAfterBattleTerminalResult54400','resumeBattleCallerAfterCompletion']
           retired=target.setdefault('retiredOwners',[])
-          if 'runtime/alpha-alpha-sprint-33100.js' not in retired: retired.append('runtime/alpha-alpha-sprint-33100.js')
+          if 'runtime/alpha-alpha-sprint-33100.js::battle_terminal_result_slice' not in retired: retired.append('runtime/alpha-alpha-sprint-33100.js::battle_terminal_result_slice')
           for row in reg.get('semanticOwners',[]):
               if row.get('semanticId')=='battle.return.story_scene': row['owner']='runtime/alpha-battle-terminal-result-54400.js'
           for row in reg.get('wrapperChains',[]):
@@ -61,20 +93,17 @@ jobs:
                   row['chain']=[x for x in chain if x!='runtime/alpha-alpha-sprint-33100.js']
           rp.write_text(json.dumps(reg,indent=2,ensure_ascii=False)+'\n')
 
-          dp=Path('tools/fixtures/runtime_change_declarations_300.json')
-          dec=json.loads(dp.read_text())
-          hit=None
-          for row in dec.get('declarations',[]):
-              if row.get('changeId')=='issue-544-canonical-battle-terminal-result-presentation-2026-10-07': hit=row; break
+          dp=Path('tools/fixtures/runtime_change_declarations_300.json'); dec=json.loads(dp.read_text())
+          hit=next((r for r in dec.get('declarations',[]) if r.get('changeId')=='issue-544-canonical-battle-terminal-result-presentation-2026-10-07'),None)
           if not hit: raise SystemExit('issue-544 declaration missing')
           hit['classification']='REPLACES'
           rep=hit.setdefault('replaces',[])
-          if 'runtime/alpha-alpha-sprint-33100.js::battle_terminal_result_slice' not in rep:
-              rep.append('runtime/alpha-alpha-sprint-33100.js::battle_terminal_result_slice')
+          if 'runtime/alpha-alpha-sprint-33100.js::battle_terminal_result_slice' not in rep: rep.append('runtime/alpha-alpha-sprint-33100.js::battle_terminal_result_slice')
           hit['contractChangeReason']='AUTHORITY_CHANGED_CANONICAL_OWNER_CONSOLIDATION_601_624'
-          hit['rationale']='Issue #544 is now the sole live Battle terminal-result presentation/continuation owner. It preserves committed victory/defeat semantics and existing reward/caller services while retiring the overlapping Victory/Setback/zero-PL terminal controller previously installed by #33100.'
+          hit['rationale']='Issue #544 is the sole live Battle terminal-result presentation/chronology owner, including Setback rendering and Continue. Existing Battle semantic commit, Victory reward claim and lower-level exact-caller restoration remain delegated services. The overlapping #33100 terminal slice is retired.'
           dp.write_text(json.dumps(dec,indent=2,ensure_ascii=False)+'\n')
 
+          # 4) Runtime generation bump for the source-owning consolidation.
           for path in ['runtime/alpha-runtime-build-fingerprint-303.js','tools/fixtures/runtime_build_manifest_303.json']:
               q=Path(path); t=q.read_text()
               if 'SC-ALPHA-RUNTIME-R303-2026-10-07-EK' not in t: raise SystemExit(f'fingerprint anchor missing in {path}')
@@ -87,6 +116,9 @@ jobs:
         run: |
           node --check runtime/alpha-alpha-sprint-33100.js
           node --check runtime/alpha-battle-terminal-result-54400.js
+          ! grep -q 'continueAfterVictory33100\|markBattleSetback33100\|continueAfterSetback33100\|renderSetback33100\|handleBattleParticipantAtZeroPL33100' runtime/alpha-alpha-sprint-33100.js
+          grep -q 'renderSetback54400' runtime/alpha-battle-terminal-result-54400.js
+          grep -q 'continueAfterBattleTerminalResult54400' runtime/alpha-battle-terminal-result-54400.js
           node tools/qa_runtime_ownership_safety_300.js
           node tools/qa_issue_303_runtime_build_fingerprint.js
           node tools/qa_contract_integrity_311.js
@@ -96,6 +128,6 @@ jobs:
           rm .github/workflows/tmp-544-canonical-owner-consolidate.yml
           git config user.name 'shinobi-chronicles-runtime-bot'
           git config user.email 'actions@users.noreply.github.com'
-          git add runtime/alpha-alpha-sprint-33100.js tools/fixtures/runtime_responsibility_registry_300.json tools/fixtures/runtime_change_declarations_300.json runtime/alpha-runtime-build-fingerprint-303.js tools/fixtures/runtime_build_manifest_303.json .github/workflows/tmp-544-canonical-owner-consolidate.yml
+          git add runtime/alpha-battle-terminal-result-54400.js runtime/alpha-alpha-sprint-33100.js tools/fixtures/runtime_responsibility_registry_300.json tools/fixtures/runtime_change_declarations_300.json runtime/alpha-runtime-build-fingerprint-303.js tools/fixtures/runtime_build_manifest_303.json .github/workflows/tmp-544-canonical-owner-consolidate.yml
           git commit -m '[CODING][#544] Consolidate Battle terminal-result canonical owner'
           git push origin HEAD:coding/544-terminal-result-presentation
