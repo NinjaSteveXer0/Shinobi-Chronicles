@@ -553,7 +553,23 @@ async function terminateBattleToStory(page,outcome,label){
       return{...resumed,rewardAudit:{ryoBefore,ryoAfter,projected,firstClaim,secondClaim,receipts}};
     }finally{globalThis.getBattleRemainingPL=prior;}
   },{outcome,wasabi:WASABI,rogue:ROGUE});
-  assert(result?.success===true,label+" caller return failed "+JSON.stringify(result));
+  if(outcome==="defeat"){
+    assert.strictEqual(result?.callerResumeWithheldUntilTerminalResultContinue,true,label+" defeat bypassed #544 Setback gate "+JSON.stringify(result));
+    await page.waitForSelector(".alpha331-setback",{state:"visible",timeout:12000});
+    const setbackGate=await page.evaluate(()=>({
+      overlay:typeof currentOverlayType==="undefined"?null:currentOverlayType,
+      outcome:currentBattle?.outcome?.type||null,
+      rewardClaimed:currentBattle?.rewards?.claimed===true
+    }));
+    assert.strictEqual(setbackGate.overlay,"setback",label+" defeat did not present code-owned Setback");
+    assert.strictEqual(setbackGate.outcome,"defeat",label+" Setback mutated terminal outcome");
+    assert.strictEqual(setbackGate.rewardClaimed,false,label+" Setback incorrectly claimed reward");
+    await page.waitForSelector(".alpha331-setback button",{state:"visible",timeout:12000});
+    const continued=await page.evaluate(()=>globalThis.continueAfterSetback33100?.());
+    assert.strictEqual(continued?.success,true,label+" Setback Continue failed "+JSON.stringify(continued));
+  }else{
+    assert(result?.success===true,label+" caller return failed "+JSON.stringify(result));
+  }
   if(outcome==="victory"){
     assert.strictEqual(result.rewardAudit.projected?.ryo,50,label+" Victory projection amount drift");
     assert.strictEqual(result.rewardAudit.projected?.exp,0,label+" Victory generic EXP returned");
