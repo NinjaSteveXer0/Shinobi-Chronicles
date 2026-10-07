@@ -95,5 +95,5 @@ mapping = '''const expectedPL = {
               12
 
           }'''
-text = text[:mapping_start] + mapping + text[mapping_end:]
+text = text[:mapping_start] + mapping + text[mapping_end + 1:]
 path.write_text(text, encoding="utf-8")
