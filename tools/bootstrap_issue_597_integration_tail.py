@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # TEMP #597 bootstrap trigger; delete after guarded integration commit.
+# Temporary checkpoint logging exists only to make recovery failures durable in CI artifacts.
 from pathlib import Path
 import hashlib
 import json
@@ -38,6 +39,7 @@ def strip_declared_469_save_reader(text: str) -> str:
     return text[:start] + text[end:]
 
 
+print("checkpoint: production tokens")
 game = GAME.read_text(encoding="utf-8")
 for token in [
     '"academy_origin_base_stats_582_v1"',
@@ -49,10 +51,12 @@ for token in [
     if token not in game:
         raise SystemExit(f"required #597 production token missing: {token}")
 
+print("checkpoint: normalized audit hash")
 normalized_hash = git_blob_sha(strip_declared_469_save_reader(game))
 if not re.fullmatch(r"[0-9a-f]{40}", normalized_hash):
     raise SystemExit("normalized game hash invalid")
 
+print("checkpoint: #111 audit pin")
 qa111 = QA111.read_text(encoding="utf-8")
 qa111, n111 = re.subn(
     r"EXPECTED_BLOB='[0-9a-f]{40}'",
@@ -64,6 +68,7 @@ if n111 != 1:
     raise SystemExit("#111 exact audit pin not found once")
 QA111.write_text(qa111, encoding="utf-8")
 
+print("checkpoint: #63 audit pin")
 qa63 = QA63.read_text(encoding="utf-8")
 qa63, n63 = re.subn(
     r"game_without_declared_469_save_reader\(game\)\)==\'[0-9a-f]{40}\'",
@@ -75,6 +80,7 @@ if n63 != 1:
     raise SystemExit("#63 exact audit pin not found once")
 QA63.write_text(qa63, encoding="utf-8")
 
+print("checkpoint: #528 classification")
 matrix = json.loads(MATRIX.read_text(encoding="utf-8"))
 shared = next((row for row in matrix.get("rules", []) if row.get("id") == "shared_game_runtime"), None)
 if shared is None:
@@ -84,6 +90,7 @@ if WORKFLOW_PATH not in changed_any:
     changed_any.append(WORKFLOW_PATH)
 MATRIX.write_text(json.dumps(matrix, indent=2) + "\n", encoding="utf-8")
 
+print("checkpoint: runtime fingerprint")
 fingerprint = FINGERPRINT.read_text(encoding="utf-8")
 for old, new, label in [
     (OLD_BUILD, NEW_BUILD, "build id"),
@@ -109,6 +116,7 @@ if "academyOriginRegistry597Present" not in fingerprint:
     )
 FINGERPRINT.write_text(fingerprint, encoding="utf-8")
 
+print("checkpoint: runtime manifest")
 manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 if manifest.get("buildId") != OLD_BUILD:
     raise SystemExit("manifest old build id mismatch")
