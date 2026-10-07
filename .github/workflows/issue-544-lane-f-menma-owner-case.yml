@@ -1,0 +1,82 @@
+name: Issue 544 Lane F Menma owner-case QA
+
+on:
+  push:
+    branches:
+      - qa/544-menma-owner-case-lane-f
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  ISSUE_544_EXACT_CANDIDATE_SHA: e70475e97331af40f7bd6c9652171878e422e63f
+
+jobs:
+  menma-real-story-battle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Prove exact PR head plus QA-only workflow overlay
+        shell: bash
+        run: |
+          test "$(git rev-parse HEAD^)" = "$ISSUE_544_EXACT_CANDIDATE_SHA"
+          test -s runtime/alpha-battle-terminal-result-54400.js
+          grep -q 'runtime/alpha-battle-terminal-result-54400.js' index.html
+          test "$(git diff --name-only "$ISSUE_544_EXACT_CANDIDATE_SHA"..HEAD)" = ".github/workflows/issue-544-lane-f-menma-owner-case.yml"
+
+      - name: Menma source and runtime safety gates
+        run: |
+          node --check runtime/alpha-menma-evolved-pl-battle-36900.js
+          node --check runtime/alpha-battle-terminal-result-54400.js
+          node --check tools/qa_issue_369_menma_evolved_pl_battle.js
+          node --check tools/qa_issue_369_menma_evolved_pl_battle_browser.js
+          node tools/qa_issue_369_menma_evolved_pl_battle.js
+          node tools/qa_issue_362_menma_three_subject_reward.js
+          node tools/qa_issue_303_runtime_build_fingerprint.js
+          node tools/qa_runtime_ownership_safety_300.js
+
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start exact PR runtime
+        shell: bash
+        run: |
+          python3 -m http.server 8080 --bind 127.0.0.1 > /tmp/issue-544-menma-http.log 2>&1 &
+          echo $! > /tmp/issue-544-menma-http.pid
+          for i in {1..40}; do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi
+            sleep 0.25
+          done
+          cat /tmp/issue-544-menma-http.log
+          exit 1
+
+      - name: Run unchanged real Menma Story Battle browser proof
+        env:
+          ISSUE_369_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_369_BROWSER_OUT: artifacts/issue-544-menma-owner-case
+        shell: bash
+        run: |
+          set -o pipefail
+          xvfb-run -a node tools/qa_issue_369_menma_evolved_pl_battle_browser.js 2>&1 | tee /tmp/issue-544-menma-browser.log
+
+      - name: Upload Menma owner-case evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-544-menma-owner-case-evidence
+          path: |
+            artifacts/issue-544-menma-owner-case
+            /tmp/issue-544-menma-http.log
+            /tmp/issue-544-menma-browser.log
+          if-no-files-found: warn
