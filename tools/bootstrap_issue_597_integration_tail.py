@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# TEMP #597 bootstrap trigger; delete after guarded integration commit.
 from pathlib import Path
 import hashlib
 import json
@@ -97,7 +98,6 @@ if FEATURE not in fingerprint:
     if anchor not in fingerprint:
         raise SystemExit("#557 feature anchor missing")
     fingerprint = fingerprint.replace(anchor, anchor.rstrip("\n") + ',\n      "' + FEATURE + '"\n', 1)
-# Add an explicit diagnostic for this generation without disturbing prior feature proofs.
 diag_anchor = '      unobstructedMapCanvas557Present:first.majorRuntimeFeatures.includes("phase2-unobstructed-village-region-map-canvases-557"),\n'
 if "academyOriginRegistry597Present" not in fingerprint:
     if diag_anchor not in fingerprint:
