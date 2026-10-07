@@ -48,6 +48,252 @@ jobs:
       - name: Frozen-contract oracle + integrated source guards
         run: node tools/qa_issue_603_step7_promotion.js
 
+      - name: Combined worker-head runtime adversarial matrix
+        run: |
+          node <<'NODE'
+          "use strict";
+          const assert=require("assert");
+          const path=require("path");
+          const root=process.cwd();
+          const corePath=path.join(root,"runtime/alpha-promotion-core-60300.js");
+          const courierPath=path.join(root,"runtime/alpha-promotion-courier-assessment-60310.js");
+          const uiPath=path.join(root,"runtime/alpha-promotion-arena-ui-60320.js");
+          const clone=v=>v==null?v:JSON.parse(JSON.stringify(v));
+          const stable=v=>Array.isArray(v)?`[${v.map(stable).join(",")}]`:v&&typeof v==="object"?`{${Object.keys(v).sort().map(k=>`${JSON.stringify(k)}:${stable(v[k])}`).join(",")}}`:JSON.stringify(v);
+
+          const coreApi=require(corePath);
+          require(uiPath);
+          const uiApi=globalThis.SC_PROMOTION_ARENA_UI_60320;
+          assert(coreApi&&typeof coreApi.create==="function","Core API unavailable");
+          assert(uiApi&&typeof uiApi.normalizeTruth==="function","UI normalizer unavailable");
+
+          // Production derivation must exercise the complete six-package pool.
+          const productionPackages=new Set();
+          for(let i=0;i<10000&&productionPackages.size<6;i++){
+            productionPackages.add(coreApi.derivePromotionRequirementPackageId({
+              immutableChronicleSeed:`qa603-runtime-seed-${i}`,
+              stableCharacterId:"academy_menma",
+              rankTransitionId:"academy_to_genin"
+            }));
+          }
+          assert.deepStrictEqual([...productionPackages].sort(),[...coreApi.packageIds].sort(),"production derivation did not exercise all six packages");
+
+          function memoryStore(initial=null){
+            let value=clone(initial);
+            return {load:()=>clone(value),save:next=>{value=clone(next);return true;},snapshot:()=>clone(value)};
+          }
+          let clock=Date.UTC(2026,9,7,12,0,0),attemptOrdinal=0,transitionCalls=0;
+          const store=memoryStore();
+          const identity={immutableChronicleSeed:"qa603-runtime-immutable",stableCharacterId:"academy_menma",rankTransitionId:"academy_to_genin"};
+          const options={
+            identity,
+            persistence:store,
+            clock:()=>new Date(clock+=1000),
+            attemptIdFactory:()=>`assessment_603_runtime_${++attemptOrdinal}`,
+            geninTransitionAdapter:spec=>{transitionCalls+=1;return{success:true,receipt:{writer:"qa603",assessmentAttemptId:spec.assessmentAttemptId}};}
+          };
+          let core=coreApi.create(options);
+          const inspection=core.beginInspection();
+          assert(inspection.success,"inspection failed");
+          let diagnostic=core.getDiagnosticSnapshot();
+          assert.strictEqual(diagnostic.state.attempts.length,0,"inspection committed an assessment attempt");
+          const immutablePackage=diagnostic.state.promotionRequirementPackageId;
+
+          // Hidden satisfied/unsatisfied must stay observer-identical in actual Core and UI normalizer.
+          const hiddenSlot=Object.values(diagnostic.state.readinessSlots).find(slot=>slot.revealed===false&&slot.satisfied===false);
+          assert(hiddenSlot,"no hidden slot available for adversarial proof");
+          const hiddenBefore=inspection.projection.readinessSlots.find(slot=>slot.slotId===hiddenSlot.slotId);
+          assert(core.recordQualifiedReadinessEvidence({domain:hiddenSlot.domain,evidenceRef:"qa603-hidden-evidence"}).success,"hidden evidence commit failed");
+          const hiddenAfter=core.getObserverProjection().readinessSlots.find(slot=>slot.slotId===hiddenSlot.slotId);
+          assert.strictEqual(stable(hiddenAfter),stable(hiddenBefore),"Core leaked hidden satisfaction through observer projection");
+          const uiHidden0=uiApi.normalizeTruth({readinessSlots:[{revealed:false,domain:"combat_readiness",satisfied:false,evidenceRefs:[]}]}).readinessSlots[0];
+          const uiHidden1=uiApi.normalizeTruth({readinessSlots:[{revealed:false,domain:"objective_protection",satisfied:true,evidenceRefs:["secret"]}]}).readinessSlots[0];
+          assert.strictEqual(stable(uiHidden0),stable(uiHidden1),"UI normalizer leaked hidden truth");
+
+          // FAIL -> retry -> reload -> WITHDRAWN -> retry -> PASS, package immutable throughout.
+          const first=core.beginAssessment();
+          assert(first.success&&!first.idempotent,"first attempt did not commit");
+          assert.strictEqual(first.attempt.missionInstanceId,`mission_academy_genin_missing_courier_dispatch_v1::${first.attempt.assessmentAttemptId}`);
+          assert.strictEqual(first.attempt.worldOccurrenceId,`occ_academy_genin_missing_courier_dispatch_v1::${first.attempt.assessmentAttemptId}`);
+          assert.strictEqual(first.attempt.rewardSnapshotId,`reward_snapshot_academy_genin_missing_courier_dispatch_v1::${first.attempt.assessmentAttemptId}`);
+          assert.strictEqual(first.attempt.battleOccurrenceId,`battle_occ_academy_genin_missing_courier_hold_line_v1::${first.attempt.assessmentAttemptId}`);
+          const fail=core.resolveAssessment({assessmentAttemptId:first.attempt.assessmentAttemptId,missionObjectiveCompleted:false});
+          assert.strictEqual(fail.attempt.status,"FAIL","incomplete attempt did not FAIL");
+          assert.strictEqual(core.commitAuthorisedGeninTransition({assessmentAttemptId:first.attempt.assessmentAttemptId}).reason,"promotion_genin_transition_requires_pass","FAIL manufactured Promotion truth");
+
+          const second=core.beginAssessment();
+          assert(second.success&&!second.idempotent,"retry did not create a new attempt");
+          assert.notStrictEqual(second.attempt.assessmentAttemptId,first.attempt.assessmentAttemptId,"retry reused attempt identity");
+          diagnostic=core.getDiagnosticSnapshot();
+          assert.strictEqual(diagnostic.state.promotionRequirementPackageId,immutablePackage,"retry rerolled package");
+
+          const persistedMidAttempt=store.snapshot();
+          core=coreApi.create({...options,persistence:memoryStore(persistedMidAttempt)});
+          diagnostic=core.getDiagnosticSnapshot();
+          assert.strictEqual(diagnostic.state.promotionRequirementPackageId,immutablePackage,"reload rerolled package");
+          assert.strictEqual(diagnostic.state.activeAttemptId,second.attempt.assessmentAttemptId,"reload lost active attempt lineage");
+          assert.strictEqual(core.withdrawAssessment({assessmentAttemptId:second.attempt.assessmentAttemptId}).attempt.status,"WITHDRAWN","withdrawal projection failed");
+
+          const third=core.beginAssessment();
+          assert(third.success&&!third.idempotent,"post-withdraw retry did not commit");
+          diagnostic=core.getDiagnosticSnapshot();
+          for(const slot of Object.values(diagnostic.state.readinessSlots)){
+            assert(core.recordQualifiedReadinessEvidence({domain:slot.domain,evidenceRef:`qa603-pass-${slot.slotId}`}).success,`readiness evidence failed for ${slot.slotId}`);
+          }
+          const pass=core.resolveAssessment({assessmentAttemptId:third.attempt.assessmentAttemptId,missionObjectiveCompleted:true});
+          assert.strictEqual(pass.attempt.status,"PASS","valid completed attempt did not PASS");
+          const transition=core.commitAuthorisedGeninTransition({assessmentAttemptId:third.attempt.assessmentAttemptId});
+          assert(transition.success&&!transition.idempotent,"valid PASS did not commit Genin transition");
+          const transitionReplay=core.commitAuthorisedGeninTransition({assessmentAttemptId:third.attempt.assessmentAttemptId});
+          assert(transitionReplay.success&&transitionReplay.idempotent,"Genin transition replay was not idempotent");
+          assert.strictEqual(transitionCalls,1,"Genin transition adapter invoked more than once");
+
+          const abortStore=memoryStore();
+          const abortCore=coreApi.create({
+            identity:{immutableChronicleSeed:"qa603-abort",stableCharacterId:"academy_hinata",rankTransitionId:"academy_to_genin"},
+            persistence:abortStore,clock:()=>new Date(clock+=1000),attemptIdFactory:()=>"assessment_603_abort_1"
+          });
+          const abortAttempt=abortCore.beginAssessment();
+          assert.strictEqual(abortCore.abortAssessment({assessmentAttemptId:abortAttempt.attempt.assessmentAttemptId}).attempt.status,"ABORTED","abort projection failed");
+
+          // All four terminal outcomes survive public UI normalization and Receipt projection without semantic mutation.
+          for(const outcome of ["PASS","FAIL","ABORTED","WITHDRAWN"]){
+            const raw={phase:"RESOLVED",outcome,assessmentRecord:{outcome,attemptNumber:1,statusLabel:outcome,publicSummary:"Recorded."},receipt:{title:"Chronicle Receipt",causeLabel:`${outcome} factual cause`,provenanceLabel:"qa603",rewardLines:[{label:"Ryō",value:"0"}],consequenceLines:["History retained."]}};
+            const before=stable(raw),projected=uiApi.normalizeTruth(raw);
+            assert.strictEqual(projected.outcome,outcome,`${outcome} UI outcome projection changed`);
+            assert(projected.receipt&&projected.receipt.causeLabel.includes(outcome),`${outcome} Receipt projection missing`);
+            assert.strictEqual(stable(raw),before,`${outcome} Receipt normalization mutated source truth`);
+          }
+
+          // Courier runtime: exact Core attempt lineage, legal non-Battle path, reward causes, reload and topology firewall.
+          globalThis.savePlayerData=()=>true;
+          globalThis.addItemToInventory=item=>{globalThis.playerData.inventory.push(clone(item));return true;};
+          globalThis.playerData={
+            ryo:0,inventory:[],activityHistory:[],
+            currentTeam:["academy_menma","academy_hinata","academy_kakashi"],
+            characterOwnership:["academy_menma","academy_hinata","academy_kakashi"],
+            teamAssignments:{academy_menma:"origin",academy_hinata:"team",academy_kakashi:"team"},
+            deployment:{player:["academy_menma"],enemy:[]}
+          };
+          const courier=require(courierPath);
+          const topologyBaseline=stable({currentTeam:playerData.currentTeam,ownership:playerData.characterOwnership,assignment:playerData.teamAssignments,deployment:playerData.deployment});
+          const missionAttemptId=third.attempt.assessmentAttemptId;
+          let created=courier.createOccurrence({assessmentAttemptId:missionAttemptId,assessmentSubjectStableId:"academy_menma",attemptParticipantRefs:["academy_hinata","academy_kakashi"]});
+          assert(created.success,"Courier occurrence creation failed");
+          assert.strictEqual(created.occurrence.missionInstanceId,third.attempt.missionInstanceId,"Core/Courier mission lineage mismatch");
+          assert.strictEqual(created.occurrence.occurrenceId,third.attempt.worldOccurrenceId,"Core/Courier occurrence lineage mismatch");
+          assert.strictEqual(created.occurrence.rewardSnapshotId,third.attempt.rewardSnapshotId,"Core/Courier reward snapshot lineage mismatch");
+          assert(courier.commitBriefing(missionAttemptId).success,"Courier briefing failed");
+          assert(courier.advanceJourney(missionAttemptId,"KON-P10").success,"Courier outbound gate leg failed");
+
+          // Mid-attempt reload of Courier-owned persistent metadata must preserve the same occurrence.
+          globalThis.playerData=clone(globalThis.playerData);
+          assert.strictEqual(courier.getOccurrence(missionAttemptId).occurrenceId,third.attempt.worldOccurrenceId,"Courier reload rewrote occurrence identity");
+          assert(courier.advanceJourney(missionAttemptId,"whisper_woods").success,"Courier outbound woods leg failed");
+          assert(courier.advanceJourney(missionAttemptId,"fire_whisper_woods_north_ravine").success,"Courier ravine leg failed");
+          assert(courier.resolveSearch(missionAttemptId,"agen_m01_search_follow_fresh_sign_v1").success,"Courier search failed");
+          assert(courier.resolvePriority(missionAttemptId,"agen_m01_priority_secure_dispatch_v1").success,"Courier priority failed");
+          assert(courier.confirmHostileContact(missionAttemptId,{directContactParticipantRefs:["academy_menma","academy_hinata"]}).success,"Courier contact confirmation failed");
+          assert(courier.resolveNonBattleContact(missionAttemptId,"agen_m01_contact_extract_under_cover_v1","clean_extraction").success,"legal non-Battle path failed");
+          assert(courier.beginExtraction(missionAttemptId,{courierOutcome:"recovered_with_team"}).success,"Courier extraction failed");
+          for(const destination of ["whisper_woods","KON-P10","KON-P01"])assert(courier.advanceJourney(missionAttemptId,destination).success,`Courier return failed at ${destination}`);
+          assert(courier.handoffDispatch(missionAttemptId).success,"Courier dispatch handoff failed");
+          assert(courier.commitDebrief(missionAttemptId,{reportRef:"qa603-report"}).success,"Courier debrief failed");
+          const complete=courier.commitTerminal(missionAttemptId,courier.terminalStates.COMPLETE);
+          assert(complete.success,"Courier complete terminal failed");
+          assert.strictEqual(playerData.ryo,250,"non-Battle mission rewards were not exactly 150+100 Ryō");
+          assert.strictEqual(playerData.inventory.filter(x=>x&&x.id==="field_recovery_pill").length,1,"full mission did not grant exactly one Field Recovery Pill");
+          const missionRewards=playerData.activityHistory.filter(x=>x&&x.type==="promotion_assessment_reward");
+          assert.strictEqual(missionRewards.length,3,"mission reward causes were missing or duplicated");
+          assert(!missionRewards.some(x=>x.rewardSourceId===courier.rewardSourceIds.BATTLE),"non-Battle route manufactured Battle reward");
+          const rewardReplaySnapshot=stable({ryo:playerData.ryo,inventory:playerData.inventory,activityHistory:playerData.activityHistory});
+          assert(courier.commitTerminal(missionAttemptId,courier.terminalStates.COMPLETE).success,"terminal replay failed");
+          assert.strictEqual(stable({ryo:playerData.ryo,inventory:playerData.inventory,activityHistory:playerData.activityHistory}),rewardReplaySnapshot,"Receipt/reward reopen mutated or duplicated mission value");
+          const rankEvidence=courier.projectRankEvidence(missionAttemptId);
+          assert.strictEqual(rankEvidence.missionObjectiveCompleted,true,"completed mission truth missing");
+          assert.strictEqual(rankEvidence.battleReturn,null,"non-Battle mission manufactured Battle return");
+          assert(!/promotionPassed|combatReadinessSatisfied/.test(JSON.stringify(rankEvidence)),"Courier manufactured Promotion verdict");
+          assert.strictEqual(stable({currentTeam:playerData.currentTeam,ownership:playerData.characterOwnership,assignment:playerData.teamAssignments,deployment:playerData.deployment}),topologyBaseline,"Promotion mission mutated unrelated roster/team/deployment truth");
+          for(const forbidden of courier.arc1ForbiddenRefs)assert(!JSON.stringify(playerData).includes(forbidden),`North Ravine Arc-1 occurrence collision: ${forbidden}`);
+
+          // Partial-value unsuccessful attempt keeps factual evidence without manufacturing success/rewards.
+          const partialId="assessment_603_partial_1";
+          assert(courier.createOccurrence({assessmentAttemptId:partialId,assessmentSubjectStableId:"academy_menma",attemptParticipantRefs:["academy_hinata"]}).success);
+          assert(courier.commitBriefing(partialId).success);
+          assert(courier.advanceJourney(partialId,"KON-P10").success);
+          assert(courier.advanceJourney(partialId,"whisper_woods").success);
+          assert(courier.advanceJourney(partialId,"fire_whisper_woods_north_ravine").success);
+          assert(courier.resolveSearch(partialId,"agen_m01_search_check_waypoint_v1").success);
+          const partial=courier.commitTerminal(partialId,courier.terminalStates.FAILED);
+          assert(partial.success,"partial unsuccessful terminal failed");
+          const partialEvidence=courier.projectRankEvidence(partialId);
+          assert.strictEqual(partialEvidence.missionObjectiveCompleted,false,"failed attempt manufactured mission completion");
+          assert(partialEvidence.candidateEvidenceRefs.length>1,"failed attempt discarded truthful partial evidence");
+
+          // Optional Hold-Line: exact factual participant subset, mid-Battle reload, separate 50 Ryō, same-assessment return.
+          globalThis.playerData={
+            ryo:0,inventory:[],activityHistory:[],
+            currentTeam:["academy_menma","academy_hinata","academy_kakashi"],
+            characterOwnership:["academy_menma","academy_hinata","academy_kakashi"],
+            teamAssignments:{academy_menma:"origin",academy_hinata:"team",academy_kakashi:"team"},
+            deployment:{player:["academy_menma"],enemy:[]}
+          };
+          globalThis.enemyDatabase={};
+          globalThis.buildReusableRogueGeninOppositionActions399=()=>({actions:[],expireFeint(){}});
+          globalThis.getPlayerCharacter=ref=>({id:ref});
+          globalThis.createBattleDeploymentSlots=refs=>refs.map((participantId,index)=>({slotId:`slot_${index}`,participantId}));
+          globalThis.launchBattleWithReturnContext=(enemyId,encounterId,returnContext)=>{globalThis.currentBattle={enemyId,encounterId,returnContext,runtime:{evidence:[]},contributions:{},outcome:null,deployment:{}};return{success:true};};
+          globalThis.configureBattleEnemyParticipants=()=>true;
+          globalThis.syncBattleActivePlayerFromDeployment=()=>true;
+          globalThis.syncBattleActiveEnemyFromDeployment=()=>true;
+          globalThis.initializeBattleContributionRecordsFromDeployment=()=>true;
+          globalThis.initializeBattleRemainingPLFromDeployment=()=>true;
+          globalThis.getBattleRemainingPL=(side)=>side==="enemy"?0:10;
+          globalThis.openOverlay=()=>true;
+
+          const battleId="assessment_603_battle_1";
+          assert(courier.createOccurrence({assessmentAttemptId:battleId,assessmentSubjectStableId:"academy_menma",attemptParticipantRefs:["academy_hinata","academy_kakashi"]}).success);
+          assert(courier.commitBriefing(battleId).success);
+          for(const destination of ["KON-P10","whisper_woods","fire_whisper_woods_north_ravine"])assert(courier.advanceJourney(battleId,destination).success);
+          assert(courier.resolveSearch(battleId,"agen_m01_search_follow_fresh_sign_v1").success);
+          assert(courier.resolvePriority(battleId,"agen_m01_priority_secure_dispatch_v1").success);
+          assert(courier.confirmHostileContact(battleId,{directContactParticipantRefs:["academy_menma","academy_hinata"]}).success);
+          const launched=courier.launchHoldLineBattle(battleId);
+          assert(launched.success,"Hold-Line Battle did not launch");
+          assert.deepStrictEqual(launched.participantRefs,["academy_menma","academy_hinata"],"Hold-Line Battle included a non-contact teammate");
+          assert(!launched.participantRefs.includes("academy_kakashi"),"Hold-Line Battle included non-factual participant");
+          globalThis.playerData=clone(globalThis.playerData);
+          globalThis.currentBattle.outcome={type:"victory"};
+          const envelope=courier.projectLiveBattleReturn();
+          assert(envelope&&envelope.battleResult==="victory","Battle return envelope unavailable");
+          assert.deepStrictEqual(envelope.participantRefs,["academy_menma","academy_hinata"],"Battle return participant subset drifted");
+          const returned=courier.applyBattleReturn(battleId,envelope);
+          assert(returned.success,"Battle did not return to same assessment");
+          assert.strictEqual(returned.missionObjectiveCompleted,null,"Battle victory manufactured mission completion");
+          assert.strictEqual(playerData.ryo,50,"Battle reward was not exactly 50 Ryō");
+          const battleRewards=playerData.activityHistory.filter(x=>x&&x.type==="promotion_assessment_reward");
+          assert.strictEqual(battleRewards.length,1,"Battle reward duplicated or mixed with mission rewards");
+          assert.strictEqual(battleRewards[0].rewardSourceId,courier.rewardSourceIds.BATTLE,"Battle reward cause not separated from mission causes");
+          const battleReplay=stable({ryo:playerData.ryo,history:playerData.activityHistory});
+          assert(courier.applyBattleReturn(battleId,envelope).success,"Battle return replay failed");
+          assert.strictEqual(stable({ryo:playerData.ryo,history:playerData.activityHistory}),battleReplay,"Battle reward replay duplicated value");
+          const postBattleEvidence=courier.projectRankEvidence(battleId);
+          assert.strictEqual(postBattleEvidence.missionObjectiveCompleted,null,"Battle result collapsed into mission truth");
+          assert(postBattleEvidence.battleReturn&&postBattleEvidence.battleReturn.battleResult==="victory","Battle factual return not preserved");
+
+          console.log(JSON.stringify({
+            pass:true,
+            productionPackageCount:productionPackages.size,
+            coreOutcomes:["FAIL","WITHDRAWN","PASS","ABORTED"],
+            transitionAdapterCalls:transitionCalls,
+            nonBattleRewards:{ryo:250,pill:1},
+            battleReward:{ryo:50,separateCause:true},
+            exactBattleParticipants:launched.participantRefs,
+            partialFailureEvidenceRefs:partialEvidence.candidateEvidenceRefs.length,
+            browserGoldenClaimed:false
+          },null,2));
+          NODE
+
       - name: Existing Rank / save / ownership regression guards
         run: |
           if [[ -f tools/qa_save_compatibility_311.js ]]; then node tools/qa_save_compatibility_311.js; fi
