@@ -1,9 +1,9 @@
 name: Issue 597 Integration Tail Bootstrap
 
 on:
-  push:
+  pull_request:
     branches:
-      - coding/597-academy-origin-registry-recalibration
+      - main
     paths:
       - 'tools/bootstrap_issue_597_integration_tail.py'
       - '.github/workflows/issue-597-integration-tail-bootstrap.yml'
@@ -14,10 +14,12 @@ permissions:
 
 jobs:
   integrate:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.ref == 'coding/597-academy-origin-registry-recalibration'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: coding/597-academy-origin-registry-recalibration
           fetch-depth: 0
       - uses: actions/setup-node@v5
         with:
@@ -49,4 +51,4 @@ jobs:
             exit 0
           fi
           git commit -m '[CODING][#597] Integrate conformance tail after #560'
-          git push origin HEAD:${GITHUB_REF_NAME}
+          git push origin HEAD:coding/597-academy-origin-registry-recalibration
