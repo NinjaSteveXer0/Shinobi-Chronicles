@@ -39,18 +39,30 @@ jobs:
           git show 803bfb270a2f43c16243da522ae534b0e67954a7:runtime/alpha-battle-terminal-result-54400.js > /tmp/alpha-battle-terminal-result-54400.js
           test -s /tmp/alpha-battle-terminal-result-54400.js
 
-      - name: Normalize browser probe to live World encounter identity shape
+      - name: Normalize browser probe to live contracts
         shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
           p = Path('tools/qa_issue_544_terminal_result_routing_browser.js')
           s = p.read_text()
-          old = 'enemyId:enemy?.id||currentBattle?.activeEnemyId||null,'
-          new = 'enemyId:enemy?.id||currentBattle?.activeEnemyId||getEncounterData(result?.encounterId||"")?.enemyId||null,'
-          if old not in s:
-              raise SystemExit('Lane F live encounter-identity normalization target missing')
-          p.write_text(s.replace(old, new, 1))
+          replacements = [
+              (
+                  'enemyId:enemy?.id||currentBattle?.activeEnemyId||null,',
+                  'enemyId:enemy?.id||currentBattle?.activeEnemyId||getEncounterData(result?.encounterId||"")?.enemyId||null,',
+                  'Lane F live encounter-identity normalization target missing'
+              ),
+              (
+                  'assert.strictEqual(duplicate.state.outcome,outcome,label+" duplicate presenter changed semantic outcome");',
+                  'assert.strictEqual(duplicate.state.committedOutcome,outcome,label+" duplicate presenter changed semantic outcome");',
+                  'Lane F candidate-state contract normalization target missing'
+              )
+          ]
+          for old, new, error in replacements:
+              if old not in s:
+                  raise SystemExit(error)
+              s = s.replace(old, new, 1)
+          p.write_text(s)
           PY
 
       - name: Syntax check Lane F harnesses
