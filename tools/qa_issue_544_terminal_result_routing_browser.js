@@ -118,8 +118,10 @@ async function assertCandidateTerminal(page,label,outcome,firstSurface){
 function assertChronology(events,label,outcome,candidate,callerType){
   const wanted=expectedSurface(outcome);
   const resumeAttempt=events.find(event=>event.kind==="caller_resume_attempt");
+  const resumeReturn=events.find(event=>event.kind==="caller_resume_return");
   assert(resumeAttempt,label+" caller resume attempt was not observed");
-  assert.strictEqual(resumeAttempt.returnContext?.type,callerType,label+" caller envelope mutated before resume");
+  assert.strictEqual(resumeAttempt.returnContext?.type,callerType,label+" caller envelope mutated before resume attempt");
+  assert.strictEqual(resumeReturn?.result?.success,true,label+" exact caller resume did not succeed "+JSON.stringify(resumeReturn));
   if(candidate){
     assert.strictEqual(resumeAttempt.surface?.type,wanted,label+" caller resume outran result presentation "+JSON.stringify(events));
     const firstVisible=events.find(event=>event.kind==="terminal_surface_visible"&&event.terminalType===wanted);
@@ -128,7 +130,7 @@ function assertChronology(events,label,outcome,candidate,callerType){
     const visibleCount=events.filter(event=>event.kind==="terminal_surface_visible"&&event.terminalType===wanted).length;
     assert.strictEqual(visibleCount,1,label+" result surface became newly visible more than once");
   }else if(outcome==="defeat"){
-    assert.notStrictEqual(resumeAttempt.surface?.type,"setback",label+" baseline defeat no longer reproduces direct resume before Setback");
+    assert.notStrictEqual(resumeAttempt.surface?.type,"setback",label+" baseline defeat no longer reproduces early resume before Setback");
   }
 }
 
@@ -184,22 +186,20 @@ async function commitIwabee(page,outcome){
   },outcome);
 }
 
-async function continueIwabee(page,outcome,baselineFailure=false){
-  return page.evaluate(({outcome,baselineFailure})=>{
+async function continueIwabee(page,outcome,baselineAutoResumed=false){
+  return page.evaluate(({outcome,baselineAutoResumed})=>{
     const wallet0=Math.max(0,Number(playerData.ryo)||0);
     let claim1=null,claim2=null,resume=null;
     if(outcome==="victory"){
       claim1=claimCurrentBattleRewards();
       claim2=claimCurrentBattleRewards();
       resume=resumeBattleCallerAfterCompletion("victory");
-    }else if(baselineFailure){
-      resume=resumeBattleCallerAfterCompletion("defeat");
-    }else{
+    }else if(!baselineAutoResumed){
       resume=typeof continueAfterSetback33100==="function"?continueAfterSetback33100():resumeBattleCallerAfterCompletion("defeat");
     }
     const runtime=getActiveStorySceneRuntime();
     return{
-      claim1,claim2,resume,
+      baselineAutoResumed,claim1,claim2,resume,
       walletAfter:Math.max(0,Number(playerData.ryo)||0),
       walletDeltaFromContinue:Math.max(0,Number(playerData.ryo)||0)-wallet0,
       sceneId:runtime?.sceneId||null,beatId:runtime?.beatId||null,
@@ -208,7 +208,7 @@ async function continueIwabee(page,outcome,baselineFailure=false){
       sourceOccurrenceCount:(playerData.activityHistory||[]).filter(row=>row&&row.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution").length,
       terminal:typeof getBattleTerminalResultPresentation54400==="function"?getBattleTerminalResultPresentation54400():null
     };
-  },{outcome,baselineFailure});
+  },{outcome,baselineAutoResumed});
 }
 
 async function runIwabeeRoute(browser,outcome,candidate){
@@ -218,15 +218,18 @@ async function runIwabeeRoute(browser,outcome,candidate){
     const launch=await launchIwabee(page,label);
     const committed=await commitIwabee(page,outcome);
     assert.strictEqual(committed.outcome?.type,outcome,label+" semantic outcome drift");
-    assert.strictEqual(committed.returnContext?.type,"story_scene",label+" Story caller envelope changed at outcome commit");
+    if(candidate||outcome==="victory")assert.strictEqual(committed.returnContext?.type,"story_scene",label+" Story caller envelope changed before terminal presentation");
+    else assert.strictEqual(committed.returnContext,null,label+" baseline defeat no longer consumes caller via early resume");
+
     const firstSurface=await waitSurface(page,outcome);
     let duplicate=null;
     if(candidate)duplicate=await assertCandidateTerminal(page,label,outcome,firstSurface);
     else if(outcome==="victory")assert.strictEqual(firstSurface.type,"victory",label+" baseline Victory surface missing");
     else assert.notStrictEqual(firstSurface.type,"setback",label+" baseline unexpectedly already has Setback; baseline expectation must be refreshed");
 
-    const continued=await continueIwabee(page,outcome,!candidate&&outcome==="defeat");
-    assert.strictEqual(continued.resume?.success,true,label+" exact caller resume failed "+JSON.stringify(continued.resume));
+    const baselineAutoResumed=!candidate&&outcome==="defeat";
+    const continued=await continueIwabee(page,outcome,baselineAutoResumed);
+    if(!baselineAutoResumed)assert.strictEqual(continued.resume?.success,true,label+" exact caller resume failed "+JSON.stringify(continued.resume));
     assert.strictEqual(continued.sceneId,launch.sceneId,label+" caller returned to wrong Story scene");
     assert.notStrictEqual(continued.beatId,"iwa_confront_battle",label+" caller did not leave Battle beat");
     assert(continued.sourceOccurrenceCount<=1,label+" duplicate Story occurrence commit");
@@ -234,7 +237,7 @@ async function runIwabeeRoute(browser,outcome,candidate){
       assert.strictEqual(continued.walletDeltaFromContinue,50,label+" Victory did not grant exactly +50 Ryō once");
       assert.strictEqual(continued.rewardReceipts.length,1,label+" Victory reward receipt missing/duplicated");
     }else{
-      assert.strictEqual(continued.walletDeltaFromContinue,0,label+" Setback/defeat claimed a reward");
+      assert.strictEqual(continued.walletAfter,committed.walletBefore,label+" Setback/defeat changed Ryō");
       assert.strictEqual(continued.rewardReceipts.length,0,label+" defeat wrote Victory reward receipt");
     }
     const events=await trace(page);
@@ -346,23 +349,21 @@ async function commitBanditWorld(page,outcome,launch){
   },{outcome,playerId:launch.playerId,enemyId:launch.enemyId});
 }
 
-async function continueBanditWorld(page,outcome,baselineFailure=false,committed=null){
-  return page.evaluate(({outcome,baselineFailure,rewardSourceId})=>{
+async function continueBanditWorld(page,outcome,baselineAutoResumed=false,committed=null){
+  return page.evaluate(({outcome,baselineAutoResumed,rewardSourceId})=>{
     const wallet0=Math.max(0,Number(playerData.ryo)||0);
     let claim1=null,claim2=null,resume=null,wallet1=wallet0,wallet2=wallet0;
     if(outcome==="victory"){
       claim1=claimCurrentBattleRewards();wallet1=Math.max(0,Number(playerData.ryo)||0);
       claim2=claimCurrentBattleRewards();wallet2=Math.max(0,Number(playerData.ryo)||0);
       resume=resumeBattleCallerAfterCompletion("victory");
-    }else if(baselineFailure){
-      resume=resumeBattleCallerAfterCompletion("defeat");
-    }else{
+    }else if(!baselineAutoResumed){
       resume=typeof continueAfterSetback33100==="function"?continueAfterSetback33100():resumeBattleCallerAfterCompletion("defeat");
     }
     const world=ensureWorldState(playerData);
     const receipts=rewardSourceId?(playerData.activityHistory||[]).filter(row=>row&&row.rewardSourceId===rewardSourceId).map(row=>JSON.parse(JSON.stringify(row))):[];
     return{
-      claim1,claim2,resume,wallet0,wallet1,wallet2,
+      baselineAutoResumed,claim1,claim2,resume,wallet0,wallet1,wallet2,
       walletAfter:Math.max(0,Number(playerData.ryo)||0),
       historyAfter:(playerData.activityHistory||[]).length,
       rewardReceipts:receipts,
@@ -371,7 +372,7 @@ async function continueBanditWorld(page,outcome,baselineFailure=false,committed=
       selectedHotspotId:typeof selectedHotspotId!=="undefined"?selectedHotspotId:null,
       terminal:typeof getBattleTerminalResultPresentation54400==="function"?getBattleTerminalResultPresentation54400():null
     };
-  },{outcome,baselineFailure,rewardSourceId:committed?.rewards?.rewardSourceId||null});
+  },{outcome,baselineAutoResumed,rewardSourceId:committed?.rewards?.rewardSourceId||null});
 }
 
 async function runBanditWorldRoute(browser,outcome,candidate){
@@ -382,22 +383,25 @@ async function runBanditWorldRoute(browser,outcome,candidate){
     const committed=await commitBanditWorld(page,outcome,launched);
     assert.strictEqual(committed.battleId,launched.battleId,label+" Battle instance rerolled/replaced during outcome commit");
     assert.strictEqual(committed.outcome?.type,outcome,label+" semantic outcome drift");
-    assert.strictEqual(committed.returnContext?.type,"region_hotspot",label+" World caller envelope changed at outcome commit");
+    if(candidate||outcome==="victory")assert.strictEqual(committed.returnContext?.type,"region_hotspot",label+" World caller envelope changed before terminal presentation");
+    else assert.strictEqual(committed.returnContext,null,label+" baseline World defeat no longer consumes caller via early resume");
+
     const firstSurface=await waitSurface(page,outcome);
     let duplicate=null;
     if(candidate)duplicate=await assertCandidateTerminal(page,label,outcome,firstSurface);
     else if(outcome==="victory")assert.strictEqual(firstSurface.type,"victory",label+" baseline Victory surface missing");
     else assert.notStrictEqual(firstSurface.type,"setback",label+" baseline unexpectedly already has Setback; baseline expectation must be refreshed");
 
-    const continued=await continueBanditWorld(page,outcome,!candidate&&outcome==="defeat",committed);
-    assert.strictEqual(continued.resume?.success,true,label+" exact region_hotspot caller resume failed "+JSON.stringify(continued.resume));
+    const baselineAutoResumed=!candidate&&outcome==="defeat";
+    const continued=await continueBanditWorld(page,outcome,baselineAutoResumed,committed);
+    if(!baselineAutoResumed)assert.strictEqual(continued.resume?.success,true,label+" exact region_hotspot caller resume failed "+JSON.stringify(continued.resume));
     assert.strictEqual(continued.world.regionKey,launched.world.regionKey,label+" caller returned to wrong World region");
     assert.strictEqual(continued.world.locationId,launched.world.locationId,label+" caller returned to wrong World location");
     if(outcome==="victory"){
       assert.strictEqual(continued.wallet2,continued.wallet1,label+" repeat Victory reward claim changed Ryō");
       if(committed.rewards?.rewardSourceId)assert(continued.rewardReceipts.length<=1,label+" duplicate World Victory reward receipt");
     }else{
-      assert.strictEqual(continued.walletAfter,continued.wallet0,label+" World Setback/defeat changed Ryō");
+      assert.strictEqual(continued.walletAfter,committed.walletBefore,label+" World Setback/defeat changed Ryō");
       assert.strictEqual(continued.rewardReceipts.length,0,label+" World defeat wrote a Victory reward receipt");
     }
     const events=await trace(page);
