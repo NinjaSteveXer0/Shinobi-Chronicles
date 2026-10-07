@@ -267,12 +267,61 @@ async function proveOwnerSelectedRegionEventCard(page,label){
   });
 
   assert(selected,`${label}: canonical Konohagakure selected-event card target unavailable`);
-  await page.waitForFunction(()=>{
-    const drawer=document.querySelector(".region-map-pane .region-event-drawer");
-    if(!drawer)return false;
-    const r=drawer.getBoundingClientRect(),cs=getComputedStyle(drawer);
-    return r.width>0&&r.height>0&&cs.display!=="none"&&cs.visibility!=="hidden";
-  },null,{timeout:5000});
+  try{
+    await page.waitForFunction(()=>{
+      const drawer=document.querySelector(".region-map-pane .region-event-drawer");
+      if(!drawer)return false;
+      const r=drawer.getBoundingClientRect(),cs=getComputedStyle(drawer);
+      return r.width>0&&r.height>0&&cs.display!=="none"&&cs.visibility!=="hidden";
+    },null,{timeout:5000});
+  }catch(error){
+    const diagnostic=await page.evaluate(({regionKey,hotspotId})=>{
+      const map=document.querySelector(".region-map-pane");
+      const anywhere=document.querySelector(".region-event-drawer");
+      const inside=map&&map.querySelector(".region-event-drawer");
+      const projection=typeof getHotspotProjection==="function"?getHotspotProjection(regionKey,hotspotId):null;
+      const beforeOpportunity=typeof selectedOpportunityId!=="undefined"?selectedOpportunityId:null;
+      let directRender=null,directRenderError=null;
+      try{
+        if(typeof renderRegionEventDrawer==="function"){
+          const html=String(renderRegionEventDrawer(regionKey)||"");
+          directRender={nonEmpty:!!html.trim(),length:html.length,includesDrawer:html.includes("region-event-drawer"),preview:html.slice(0,260)};
+        }
+      }catch(renderError){directRenderError=String(renderError&&renderError.stack||renderError);}
+      try{selectedOpportunityId=beforeOpportunity;}catch(_error){}
+      const summarize=node=>{
+        if(!node)return null;
+        const r=node.getBoundingClientRect(),cs=getComputedStyle(node);
+        const parents=[];
+        for(let parent=node.parentElement;parent&&parents.length<6;parent=parent.parentElement){parents.push(parent.id||String(parent.className||parent.tagName));}
+        return{className:String(node.className||""),text:String(node.innerText||"").slice(0,500),width:r.width,height:r.height,display:cs.display,visibility:cs.visibility,connected:node.isConnected,parents};
+      };
+      const visiblePanels=[...document.querySelectorAll("#overlay-content-container *")].filter(node=>{
+        const token=(String(node.className||"")+" "+String(node.id||"")).toLowerCase();
+        if(!/(drawer|panel|card|info|known|event|location)/.test(token))return false;
+        const r=node.getBoundingClientRect(),cs=getComputedStyle(node);
+        return r.width>0&&r.height>0&&cs.display!=="none"&&cs.visibility!=="hidden"&&Number(cs.opacity||1)>0;
+      }).slice(0,40).map(node=>({tag:node.tagName,id:node.id||null,className:String(node.className||""),text:String(node.innerText||"").trim().slice(0,260)}));
+      return{
+        currentOverlayType:typeof currentOverlayType!=="undefined"?currentOverlayType:null,
+        selectedRegionKey:typeof selectedRegionKey!=="undefined"?selectedRegionKey:null,
+        selectedHotspotId:typeof selectedHotspotId!=="undefined"?selectedHotspotId:null,
+        selectedOpportunityId:beforeOpportunity,
+        projection:projection?{aggregationCount:projection.aggregationCount,opportunityIds:projection.opportunityIds,knownLabel:projection.knownLabel}:null,
+        renderRegionHubUIType:typeof renderRegionHubUI,
+        renderRegionEventDrawerType:typeof renderRegionEventDrawer,
+        renderRegionHubUIIncludesDrawer:typeof renderRegionHubUI==="function"?String(renderRegionHubUI).includes("renderRegionEventDrawer"):false,
+        drawerAnywhere:summarize(anywhere),
+        drawerInsideMap:summarize(inside),
+        overlayContainsDrawer:!!document.querySelector("#overlay-content-container .region-event-drawer"),
+        overlayInnerHtmlHasDrawer:!!document.querySelector("#overlay-content-container")?.innerHTML.includes("region-event-drawer"),
+        directRender,
+        directRenderError,
+        visiblePanels
+      };
+    },selected);
+    throw new Error(`${label}: owner-visible Region selected-event card did not become visible: ${JSON.stringify({selected,diagnostic,cause:String(error&&error.message||error)})}`);
+  }
   await settle(page);
 
   const presentation=await page.evaluate(()=>{
