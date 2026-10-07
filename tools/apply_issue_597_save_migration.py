@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from pathlib import Path
 
+# Bootstrap trigger: workflow now exists on the branch.
 GAME = Path("game.js")
 BROWSER_QA = Path("tools/qa_issue_597_academy_origin_registry_recalibration_browser.js")
 
