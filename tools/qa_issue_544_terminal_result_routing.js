@@ -29,7 +29,7 @@ const evidence={
     menmaDirectDefeatResumeBypass:/completeMenmaSuccessorDefeat[\s\S]*?resumeBattleCallerAfterCompletion\("defeat"\)/.test(menma),
     worldBanditOpportunityAuthored:game.includes('ALPHA_BANDIT_HIDEOUT_OPPORTUNITY_ID="alpha_bandit_hideout_battle"'),
     worldBanditFightActionAuthored:game.includes('id:"fight_bandit_hideout"'),
-    worldBanditEncounterBound:game.includes('encounterId:"bandit_leader"'),
+    worldBanditEncounterBound:game.includes('ALPHA_BANDIT_HIDEOUT_ENCOUNTER_ID="bandit_leader"')&&game.includes("encounterId:ALPHA_BANDIT_HIDEOUT_ENCOUNTER_ID"),
     worldGenericRouterLaunchesEncounter:game.includes("routeWorldOpportunityInteraction")&&game.includes("startEncounterActivity"),
     worldBattleReturnContextAttached:game.includes("attachWorldOpportunityBattleReturnContext"),
     worldCallerResumeExists:game.includes("resumeRegionHotspotFromBattle")
