@@ -1,5 +1,6 @@
 name: Issue 621 One Shot Maintenance
 
+# Registered-path retrigger for the bounded canonical surface handoff.
 on:
   push:
     branches:
