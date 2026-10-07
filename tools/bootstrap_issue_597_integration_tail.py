@@ -41,9 +41,9 @@ def strip_declared_469_save_reader(text: str) -> str:
 game = GAME.read_text(encoding="utf-8")
 for token in [
     '"academy_origin_base_stats_582_v1"',
-    'academy_hinata: Object.freeze({',
-    'academy_mirai: Object.freeze({',
-    'academy_menma: Object.freeze({',
+    '"academy_hinata": {',
+    '"academy_mirai": {',
+    '"academy_menma": {',
     'migrateAcademyOriginBaseSave582(parsedData);',
 ]:
     if token not in game:
