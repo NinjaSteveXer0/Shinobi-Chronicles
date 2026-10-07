@@ -26,7 +26,13 @@ const evidence={
     sprintUsesLowercaseSetback:sprint.includes("UI/setback.png"),
     setbackPresentationLivesInZeroPlWrapper:sprint.includes('openOverlay("setback")')&&sprint.includes("renderSetback33100"),
     modernTerminalGateVocabularyExcludesSetback:modern.includes('(target==="victory"||target==="defeat")'),
-    menmaDirectDefeatResumeBypass:/completeMenmaSuccessorDefeat[\s\S]*?resumeBattleCallerAfterCompletion\("defeat"\)/.test(menma)
+    menmaDirectDefeatResumeBypass:/completeMenmaSuccessorDefeat[\s\S]*?resumeBattleCallerAfterCompletion\("defeat"\)/.test(menma),
+    worldBanditOpportunityAuthored:game.includes('ALPHA_BANDIT_HIDEOUT_OPPORTUNITY_ID="alpha_bandit_hideout_battle"'),
+    worldBanditFightActionAuthored:game.includes('id:"fight_bandit_hideout"'),
+    worldBanditEncounterBound:game.includes('encounterId:"bandit_leader"'),
+    worldGenericRouterLaunchesEncounter:game.includes("routeWorldOpportunityInteraction")&&game.includes("startEncounterActivity"),
+    worldBattleReturnContextAttached:game.includes("attachWorldOpportunityBattleReturnContext"),
+    worldCallerResumeExists:game.includes("resumeRegionHotspotFromBattle")
   },
   candidate:{
     supplied:!!candidate,
@@ -52,6 +58,15 @@ evidence.baseline.failureContractObserved=[
   evidence.baseline.menmaDirectDefeatResumeBypass
 ].every(Boolean);
 
+evidence.baseline.worldRealRouteBound=[
+  evidence.baseline.worldBanditOpportunityAuthored,
+  evidence.baseline.worldBanditFightActionAuthored,
+  evidence.baseline.worldBanditEncounterBound,
+  evidence.baseline.worldGenericRouterLaunchesEncounter,
+  evidence.baseline.worldBattleReturnContextAttached,
+  evidence.baseline.worldCallerResumeExists
+].every(Boolean);
+
 evidence.candidate.acceptanceShape=[
   evidence.candidate.supplied,
   evidence.candidate.hasStableTerminalApi,
@@ -66,6 +81,7 @@ evidence.candidate.acceptanceShape=[
 
 fs.writeFileSync(path.join(OUT,"source-evidence.json"),JSON.stringify(evidence,null,2));
 assert.strictEqual(evidence.baseline.failureContractObserved,true,"#544 baseline failure topology no longer matches the durable Lane-D diagnosis");
+assert.strictEqual(evidence.baseline.worldRealRouteBound,true,"#544 World/PL Bandit caller seam no longer matches the live authored route");
 if(candidatePath)assert.strictEqual(evidence.candidate.acceptanceShape,true,"Lane-E candidate does not expose the frozen #544 acceptance interface shape");
 console.log(JSON.stringify(evidence,null,2));
-console.log("PASS #544 source failure/acceptance contract; browserGoldenClaimed=false");
+console.log("PASS #544 source failure/acceptance contract + real World Bandit seam; browserGoldenClaimed=false");
