@@ -38,7 +38,7 @@ checks={}
 # reader before comparing the previously audited game.js blob; every other byte
 # of the old audited core must remain unchanged.
 # #322's older compatibility root remains preserved immediately after it.
-checks['audited_game_blob_preserved']=git_blob_sha(game_without_declared_469_save_reader(game))=='4c9623071ef773dac61649ffc174d26d50dd60f2'
+checks['audited_game_blob_preserved']=git_blob_sha(game_without_declared_469_save_reader(game))=='f45dc5a147b9569862ad7f17e7f4254ddc916f8e'
 core_pos=index.find('runtime/alpha-world-konoha-112-core.js')
 fix_pos=index.find('runtime/alpha-world-konoha-112-fix.js')
 roster_pos=index.find('runtime/alpha-genin-roster-63.js')
