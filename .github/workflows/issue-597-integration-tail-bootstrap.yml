@@ -28,7 +28,16 @@ jobs:
         with:
           python-version: '3.12'
       - name: Apply bounded #597 integration tail
-        run: python tools/bootstrap_issue_597_integration_tail.py
+        shell: bash
+        run: |
+          set -o pipefail
+          python tools/bootstrap_issue_597_integration_tail.py 2>&1 | tee /tmp/issue-597-integration-tail.log
+      - name: Upload bootstrap evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-597-integration-tail-bootstrap
+          path: /tmp/issue-597-integration-tail.log
       - name: Validate exact audit repins and protected fingerprint
         run: |
           python tools/qa_issue_111_menma_tutorial.py
