@@ -121,7 +121,7 @@ assert(!migration.includes("localStorage.setItem")&&!migration.includes("savePla
 
 const defaultData=functionSource("createDefaultPlayerData","function normalizeSavedCharacterProgression");
 assert(defaultData.includes("academyOriginBaseAuthorityRevision: ACADEMY_ORIGIN_BASE_AUTHORITY_REVISION_582"),"fresh saves are not born at the #582 Registry authority revision");
-const loadData=functionSource("loadPlayerData","// =========================================================\n// SAVE PLAYER DATA");
+const loadData=functionSource("loadPlayerData","function savePlayerData()");
 assert(loadData.includes("migrateAcademyOriginBaseSave582(parsedData);"),"loadPlayerData does not migrate legacy Academy Base saves before normalization");
 assert(loadData.includes("academyOriginBaseAuthorityRevision"),"loadPlayerData drops the #582 migration revision before the next save");
 assert(!loadData.includes("localStorage.setItem"),"loadPlayerData reader purity regressed");
