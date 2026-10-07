@@ -30,83 +30,26 @@ jobs:
         shell: python
         run: |
           from pathlib import Path
+          import base64
 
+          old_kak=base64.b64decode('ICBjb25zdCByZXN1bWVkPWF3YWl0IHBhZ2UuZXZhbHVhdGUoKCk9PnsKICAgIGN1cnJlbnRCYXR0bGUub3V0Y29tZT17dHlwZToidmljdG9yeSIsY29tcGxldGVkQXQ6RGF0ZS5ub3coKSxmaW5pc2hpbmdTaGlub2JpSWQ6ImFjYWRlbXlfa2FrYXNoaSJ9OwogICAgY3VycmVudEJhdHRsZS5iYXR0bGVPdmVyPXRydWU7CiAgICBjdXJyZW50QmF0dGxlLmFjdGl2ZT1mYWxzZTsKICAgIHJldHVybiByZXN1bWVCYXR0bGVDYWxsZXJBZnRlckNvbXBsZXRpb24oInZpY3RvcnkiKTsKICB9KTsKICBhc3NlcnQocmVzdW1lZCYmcmVzdW1lZC5zdWNjZXNzPT09dHJ1ZSxKU09OLnN0cmluZ2lmeShyZXN1bWVkKSk7CiAgYXdhaXQgcGFnZS53YWl0Rm9yU2VsZWN0b3IoIiNrYWthc2hpLXYyLXNjZW5lLWJvYXJkIix7c3RhdGU6InZpc2libGUiLHRpbWVvdXQ6MTIwMDB9KTs=').decode()
+          new_kak=base64.b64decode('ICBsZXQgcmVzdW1lZD1hd2FpdCBwYWdlLmV2YWx1YXRlKCgpPT57CiAgICBjdXJyZW50QmF0dGxlLm91dGNvbWU9e3R5cGU6InZpY3RvcnkiLGNvbXBsZXRlZEF0OkRhdGUubm93KCksZmluaXNoaW5nU2hpbm9iaUlkOiJhY2FkZW15X2tha2FzaGkifTsKICAgIGN1cnJlbnRCYXR0bGUuYmF0dGxlT3Zlcj10cnVlOwogICAgY3VycmVudEJhdHRsZS5hY3RpdmU9ZmFsc2U7CiAgICByZXR1cm4gcmVzdW1lQmF0dGxlQ2FsbGVyQWZ0ZXJDb21wbGV0aW9uKCJ2aWN0b3J5Iik7CiAgfSk7CiAgYXNzZXJ0LnN0cmljdEVxdWFsKHJlc3VtZWQ/LmNhbGxlclJlc3VtZVdpdGhoZWxkVW50aWxUZXJtaW5hbFJlc3VsdENvbnRpbnVlLHRydWUsIktha2FzaGkgY2FsbGVyIGJ5cGFzc2VkICM1NDQgVmljdG9yeSBnYXRlICIrSlNPTi5zdHJpbmdpZnkocmVzdW1lZCkpOwogIGF3YWl0IHBhZ2Uud2FpdEZvclNlbGVjdG9yKCIuYWxwaGEtdmljdG9yeS1jb2RlLXNjcmVlbiIse3N0YXRlOiJ2aXNpYmxlIix0aW1lb3V0OjEyMDAwfSk7CiAgYXdhaXQgcGFnZS53YWl0Rm9yRnVuY3Rpb24oKCk9Pmdsb2JhbFRoaXMuZ2V0QmF0dGxlVGVybWluYWxSZXN1bHRQcmVzZW50YXRpb241NDQwMD8uKCkuc3RhdHVzPT09InByZXNlbnRlZCIsbnVsbCx7dGltZW91dDoxMjAwMH0pOwogIHJlc3VtZWQ9YXdhaXQgcGFnZS5ldmFsdWF0ZSgoKT0+cmVzdW1lQmF0dGxlQ2FsbGVyQWZ0ZXJDb21wbGV0aW9uKCJ2aWN0b3J5IikpOwogIGFzc2VydChyZXN1bWVkJiZyZXN1bWVkLnN1Y2Nlc3M9PT10cnVlLEpTT04uc3RyaW5naWZ5KHJlc3VtZWQpKTsKICBhd2FpdCBwYWdlLndhaXRGb3JTZWxlY3RvcigiI2tha2FzaGktdjItc2NlbmUtYm9hcmQiLHtzdGF0ZToidmlzaWJsZSIsdGltZW91dDoxMjAwMH0pOw==').decode()
           kak=Path('tools/qa_kakashi_v2_browser.js')
           text=kak.read_text(encoding='utf-8')
-          old='''  const resumed=await page.evaluate(()=>{\n    currentBattle.outcome={type:"victory",completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};\n    currentBattle.battleOver=true;\n    currentBattle.active=false;\n    return resumeBattleCallerAfterCompletion("victory");\n  });\n  assert(resumed&&resumed.success===true,JSON.stringify(resumed));\n  await page.waitForSelector("#kakashi-v2-scene-board",{state:"visible",timeout:12000});'''
-          new='''  let resumed=await page.evaluate(()=>{\n    currentBattle.outcome={type:"victory",completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};\n    currentBattle.battleOver=true;\n    currentBattle.active=false;\n    return resumeBattleCallerAfterCompletion("victory");\n  });\n  assert.strictEqual(resumed?.callerResumeWithheldUntilTerminalResultContinue,true,"Kakashi caller bypassed #544 Victory gate "+JSON.stringify(resumed));\n  await page.waitForSelector(".alpha-victory-code-screen",{state:"visible",timeout:12000});\n  await page.waitForFunction(()=>globalThis.getBattleTerminalResultPresentation54400?.().status==="presented",null,{timeout:12000});\n  resumed=await page.evaluate(()=>resumeBattleCallerAfterCompletion("victory"));\n  assert(resumed&&resumed.success===true,JSON.stringify(resumed));\n  await page.waitForSelector("#kakashi-v2-scene-board",{state:"visible",timeout:12000});'''
-          assert old in text, 'Kakashi visualAndBattle terminal block drifted'
-          kak.write_text(text.replace(old,new,1),encoding='utf-8')
+          assert old_kak in text, 'Kakashi visualAndBattle terminal block drifted'
+          kak.write_text(text.replace(old_kak,new_kak,1),encoding='utf-8')
+
+          new_wasa=base64.b64decode('YXN5bmMgZnVuY3Rpb24gdGVybWluYXRlQmF0dGxlVG9TdG9yeShwYWdlLG91dGNvbWUsbGFiZWwpewogIGNvbnN0IHN0YWdlZD1hd2FpdCBwYWdlLmV2YWx1YXRlKCh7b3V0Y29tZSx3YXNhYmkscm9ndWV9KT0+ewogICAgY29uc3QgcHJpb3I9Z2xvYmFsVGhpcy5nZXRCYXR0bGVSZW1haW5pbmdQTDsKICAgIGdsb2JhbFRoaXMuZ2V0QmF0dGxlUmVtYWluaW5nUEw9KHNpZGUsaWQpPT57CiAgICAgIGlmKG91dGNvbWU9PT0idmljdG9yeSImJnNpZGU9PT0iZW5lbXkiJiZpZD09PXJvZ3VlKXJldHVybiAwOwogICAgICBpZihvdXRjb21lPT09ImRlZmVhdCImJnNpZGU9PT0icGxheWVyIiYmaWQ9PT13YXNhYmkpcmV0dXJuIDA7CiAgICAgIHJldHVybiB0eXBlb2YgcHJpb3I9PT0iZnVuY3Rpb24iP3ByaW9yKHNpZGUsaWQpOjE7CiAgICB9OwogICAgdHJ5ewogICAgICBjb25zdCByeW9CZWZvcmU9TnVtYmVyKHBsYXllckRhdGEucnlvKXx8MDsKICAgICAgY3VycmVudEJhdHRsZS5vdXRjb21lPXsuLi4oY3VycmVudEJhdHRsZS5vdXRjb21lfHx7fSksdHlwZTpvdXRjb21lLGNvbW1pdHRlZDp0cnVlLGNvbXBsZXRlZEF0OkRhdGUubm93KCksZmluaXNoaW5nU2hpbm9iaUlkOm91dGNvbWU9PT0idmljdG9yeSI/d2FzYWJpOm51bGx9OwogICAgICBjdXJyZW50QmF0dGxlLmJhdHRsZU92ZXI9dHJ1ZTtjdXJyZW50QmF0dGxlLmFjdGl2ZT1mYWxzZTsKICAgICAgbGV0IHByb2plY3RlZD1udWxsOwogICAgICBpZihvdXRjb21lPT09InZpY3RvcnkiKXByb2plY3RlZD1KU09OLnBhcnNlKEpTT04uc3RyaW5naWZ5KGdlbmVyYXRlQmF0dGxlUmV3YXJkcyhlbmVteURhdGFiYXNlW3JvZ3VlXSxnZXRQbGF5ZXJDaGFyYWN0ZXIod2FzYWJpKSkpKTsKICAgICAgY29uc3QgaW5pdGlhbFJlc3VtZT1yZXN1bWVCYXR0bGVDYWxsZXJBZnRlckNvbXBsZXRpb24ob3V0Y29tZSk7CiAgICAgIHJldHVybntpbml0aWFsUmVzdW1lLHJld2FyZEF1ZGl0OntyeW9CZWZvcmUscHJvamVjdGVkfX07CiAgICB9ZmluYWxseXtnbG9iYWxUaGlzLmdldEJhdHRsZVJlbWFpbmluZ1BMPXByaW9yO30KICB9LHtvdXRjb21lLHdhc2FiaTpXQVNBQkkscm9ndWU6Uk9HVUV9KTsKICBhc3NlcnQuc3RyaWN0RXF1YWwoc3RhZ2VkLmluaXRpYWxSZXN1bWU/LmNhbGxlclJlc3VtZVdpdGhoZWxkVW50aWxUZXJtaW5hbFJlc3VsdENvbnRpbnVlLHRydWUsbGFiZWwrIiBjYWxsZXIgYnlwYXNzZWQgIzU0NCB0ZXJtaW5hbCByZXN1bHQgZ2F0ZSAiK0pTT04uc3RyaW5naWZ5KHN0YWdlZCkpOwogIGNvbnN0IHNlbGVjdG9yPW91dGNvbWU9PT0idmljdG9yeSI/Ii5hbHBoYS12aWN0b3J5LWNvZGUtc2NyZWVuIjoiLmFscGhhMzMxLXNldGJhY2siOwogIGF3YWl0IHBhZ2Uud2FpdEZvclNlbGVjdG9yKHNlbGVjdG9yLHtzdGF0ZToidmlzaWJsZSIsdGltZW91dDoxMjAwMH0pOwogIGF3YWl0IHBhZ2Uud2FpdEZvckZ1bmN0aW9uKGV4cGVjdGVkPT57CiAgICBjb25zdCB0ZXJtaW5hbD1nbG9iYWxUaGlzLmdldEJhdHRsZVRlcm1pbmFsUmVzdWx0UHJlc2VudGF0aW9uNTQ0MDA/LigpOwogICAgcmV0dXJuIHRlcm1pbmFsPy5zdGF0dXM9PT0icHJlc2VudGVkIiYmdGVybWluYWw/LmNvbW1pdHRlZE91dGNvbWU9PT1leHBlY3RlZDsKICB9LG91dGNvbWUse3RpbWVvdXQ6MTIwMDB9KTsKICBjb25zdCByZXN1bHQ9YXdhaXQgcGFnZS5ldmFsdWF0ZSgoe291dGNvbWUscnlvQmVmb3JlfSk9PnsKICAgIGxldCBmaXJzdENsYWltPW51bGwsc2Vjb25kQ2xhaW09bnVsbCxyZXN1bWVkPW51bGw7CiAgICBpZihvdXRjb21lPT09InZpY3RvcnkiKXsKICAgICAgZmlyc3RDbGFpbT1jbGFpbUN1cnJlbnRCYXR0bGVSZXdhcmRzKCk7CiAgICAgIHNlY29uZENsYWltPWNsYWltQ3VycmVudEJhdHRsZVJld2FyZHMoKTsKICAgICAgcmVzdW1lZD1yZXN1bWVCYXR0bGVDYWxsZXJBZnRlckNvbXBsZXRpb24oInZpY3RvcnkiKTsKICAgIH1lbHNlewogICAgICByZXN1bWVkPXR5cGVvZiBjb250aW51ZUFmdGVyU2V0YmFjazMzMTAwPT09ImZ1bmN0aW9uIj9jb250aW51ZUFmdGVyU2V0YmFjazMzMTAwKCk6cmVzdW1lQmF0dGxlQ2FsbGVyQWZ0ZXJDb21wbGV0aW9uKCJkZWZlYXQiKTsKICAgIH0KICAgIGNvbnN0IHJ5b0FmdGVyPU51bWJlcihwbGF5ZXJEYXRhLnJ5byl8fDA7CiAgICBjb25zdCByZWNlaXB0cz0ocGxheWVyRGF0YS5hY3Rpdml0eUhpc3Rvcnl8fFtdKS5maWx0ZXIocm93PT5yb3cmJnJvdy5yZXdhcmRTb3VyY2VJZD09PSJ3YXNhYmlfb3JpZ2luX3JvZ3VlX2dlbmluX2JhdHRsZV92aWN0b3J5X3J5b18wMSIpLm1hcChyb3c9PkpTT04ucGFyc2UoSlNPTi5zdHJpbmdpZnkocm93KSkpOwogICAgcmV0dXJuey4uLnJlc3VtZWQscmV3YXJkQXVkaXQ6e3J5b0JlZm9yZSxyeW9BZnRlcixmaXJzdENsYWltLHNlY29uZENsYWltLHJlY2VpcHRzfX07CiAgfSx7b3V0Y29tZSxyeW9CZWZvcmU6c3RhZ2VkLnJld2FyZEF1ZGl0LnJ5b0JlZm9yZX0pOwogIHJlc3VsdC5yZXdhcmRBdWRpdC5wcm9qZWN0ZWQ9c3RhZ2VkLnJld2FyZEF1ZGl0LnByb2plY3RlZDsKICBhc3NlcnQocmVzdWx0Py5zdWNjZXNzPT09dHJ1ZSxsYWJlbCsiIGNhbGxlciByZXR1cm4gZmFpbGVkICIrSlNPTi5zdHJpbmdpZnkocmVzdWx0KSk7CiAgaWYob3V0Y29tZT09PSJ2aWN0b3J5Iil7CiAgICBhc3NlcnQuc3RyaWN0RXF1YWwocmVzdWx0LnJld2FyZEF1ZGl0LnByb2plY3RlZD8ucnlvLDUwLGxhYmVsKyIgVmljdG9yeSBwcm9qZWN0aW9uIGFtb3VudCBkcmlmdCIpOwogICAgYXNzZXJ0LnN0cmljdEVxdWFsKHJlc3VsdC5yZXdhcmRBdWRpdC5wcm9qZWN0ZWQ/LmV4cCwwLGxhYmVsKyIgVmljdG9yeSBnZW5lcmljIEVYUCByZXR1cm5lZCIpOwogICAgYXNzZXJ0LmRlZXBTdHJpY3RFcXVhbChyZXN1bHQucmV3YXJkQXVkaXQucHJvamVjdGVkPy5pdGVtc3x8W10sW10sbGFiZWwrIiBWaWN0b3J5IGZpeGVkIGxvb3QgcmV0dXJuZWQiKTsKICAgIGFzc2VydC5zdHJpY3RFcXVhbChyZXN1bHQucmV3YXJkQXVkaXQuZmlyc3RDbGFpbSx0cnVlLGxhYmVsKyIgVmljdG9yeSBDTEFJTSBmYWlsZWQiKTsKICAgIGFzc2VydC5zdHJpY3RFcXVhbChyZXN1bHQucmV3YXJkQXVkaXQuc2Vjb25kQ2xhaW0sZmFsc2UsbGFiZWwrIiBkdXBsaWNhdGUgVmljdG9yeSBDTEFJTSBzdWNjZWVkZWQiKTsKICAgIGFzc2VydC5zdHJpY3RFcXVhbChyZXN1bHQucmV3YXJkQXVkaXQucnlvQWZ0ZXItcmVzdWx0LnJld2FyZEF1ZGl0LnJ5b0JlZm9yZSw1MCxsYWJlbCsiIFZpY3RvcnkgZGlkIG5vdCBncmFudCBleGFjdGx5ICs1MCBSecWNIik7CiAgICBhc3NlcnQuc3RyaWN0RXF1YWwocmVzdWx0LnJld2FyZEF1ZGl0LnJlY2VpcHRzLmxlbmd0aCwxLGxhYmVsKyIgVmljdG9yeSByZXdhcmQgcmVjZWlwdCBtaXNzaW5nL2R1cGxpY2F0ZWQiKTsKICB9ZWxzZXsKICAgIGFzc2VydC5zdHJpY3RFcXVhbChyZXN1bHQucmV3YXJkQXVkaXQucnlvQWZ0ZXItcmVzdWx0LnJld2FyZEF1ZGl0LnJ5b0JlZm9yZSwwLGxhYmVsKyIgRGVmZWF0IGdyYW50ZWQgQmF0dGxlIGNhc2giKTsKICAgIGFzc2VydC5zdHJpY3RFcXVhbChyZXN1bHQucmV3YXJkQXVkaXQucmVjZWlwdHMubGVuZ3RoLDAsbGFiZWwrIiBEZWZlYXQgd3JvdGUgVmljdG9yeSByZXdhcmQgcmVjZWlwdCIpOwogIH0KICBhd2FpdCBwYWdlLndhaXRGb3JTZWxlY3RvcigiI3N0b3J5LXNjZW5lLXByZXNlbnRhdGlvbi1sYXllciIse3N0YXRlOiJ2aXNpYmxlIix0aW1lb3V0OjEyMDAwfSk7CiAgYXdhaXQgd2FpdEJlYXQocGFnZSwiaXp1X2ZpbmlzaF9zZWNvbmRhcnlfMSIpOwogIGF3YWl0IGFzc2VydEJhY2tkcm9wKHBhZ2UsQkFDS0RST1BTLnRyYWluaW5nLGxhYmVsKyIgZGlyZWN0IHBvc3QtQmF0dGxlIFN0b3J5IHJldHVybiIpOwogIGNvbnN0IHJldHVybmVkPWF3YWl0IGluZm8ocGFnZSk7CiAgYXNzZXJ0LnN0cmljdEVxdWFsKHJldHVybmVkLnByaW1hcnlWaXNpYmxlLGZhbHNlLGxhYmVsKyIgcmVkdW5kYW50IHBvc3QtQmF0dGxlIENPTlRJTlVFIGlzIHN0aWxsIHZpc2libGUiKTsKICBhc3NlcnQuc3RyaWN0RXF1YWwocmV0dXJuZWQubG9jYWxDb250ZXh0LnJvZ3VlR2VuaW5SZXNwb25zZSwiaW50ZXJ2ZW5lIik7CiAgYXNzZXJ0LnN0cmljdEVxdWFsKHJldHVybmVkLmxvY2FsQ29udGV4dC5yb2d1ZVJlc29sdmVkLHRydWUpOwogIGFzc2VydC5zdHJpY3RFcXVhbChyZXR1cm5lZC5sb2NhbENvbnRleHQucm9ndWVCYXR0bGVSZXN1bHQsb3V0Y29tZSk7CiAgYXNzZXJ0LnN0cmljdEVxdWFsKHJldHVybmVkLmxvY2FsQ29udGV4dC5vdXRjb21lLCJzZWNvbmRhcnlfb2NjdXJyZW5jZV9jb3N0c19wdXJzdWl0Iik7CiAgYXNzZXJ0LnN0cmljdEVxdWFsKHJldHVybmVkLmxvY2FsQ29udGV4dC5iYXR0bGVPY2N1cnJlbmNlSWRzLmxlbmd0aCwxKTsKICByZXR1cm4gcmV0dXJuZWQ7Cn0=').decode()
+          kak=Path('tools/qa_kakashi_v2_browser.js')
+          text=kak.read_text(encoding='utf-8')
+          assert old_kak in text, 'Kakashi visualAndBattle terminal block drifted'
+          kak.write_text(text.replace(old_kak,new_kak,1),encoding='utf-8')
 
           wasa=Path('tools/qa_issue_343_wasabi_browser.js')
           text=wasa.read_text(encoding='utf-8')
           start=text.index('async function terminateBattleToStory(page,outcome,label){')
           end=text.index('\nasync function runBattleRoute(browser,outcome){',start)
-          new_fn=r'''async function terminateBattleToStory(page,outcome,label){
-  const staged=await page.evaluate(({outcome,wasabi,rogue})=>{
-    const prior=globalThis.getBattleRemainingPL;
-    globalThis.getBattleRemainingPL=(side,id)=>{
-      if(outcome==="victory"&&side==="enemy"&&id===rogue)return 0;
-      if(outcome==="defeat"&&side==="player"&&id===wasabi)return 0;
-      return typeof prior==="function"?prior(side,id):1;
-    };
-    try{
-      const ryoBefore=Number(playerData.ryo)||0;
-      currentBattle.outcome={...(currentBattle.outcome||{}),type:outcome,committed:true,completedAt:Date.now(),finishingShinobiId:outcome==="victory"?wasabi:null};
-      currentBattle.battleOver=true;currentBattle.active=false;
-      let projected=null;
-      if(outcome==="victory")projected=JSON.parse(JSON.stringify(generateBattleRewards(enemyDatabase[rogue],getPlayerCharacter(wasabi))));
-      const initialResume=resumeBattleCallerAfterCompletion(outcome);
-      return{initialResume,rewardAudit:{ryoBefore,projected}};
-    }finally{globalThis.getBattleRemainingPL=prior;}
-  },{outcome,wasabi:WASABI,rogue:ROGUE});
-  assert.strictEqual(staged.initialResume?.callerResumeWithheldUntilTerminalResultContinue,true,label+" caller bypassed #544 terminal result gate "+JSON.stringify(staged));
-  const selector=outcome==="victory"?".alpha-victory-code-screen":".alpha331-setback";
-  await page.waitForSelector(selector,{state:"visible",timeout:12000});
-  await page.waitForFunction(expected=>{
-    const terminal=globalThis.getBattleTerminalResultPresentation54400?.();
-    return terminal?.status==="presented"&&terminal?.committedOutcome===expected;
-  },outcome,{timeout:12000});
-  const result=await page.evaluate(({outcome,ryoBefore})=>{
-    let firstClaim=null,secondClaim=null,resumed=null;
-    if(outcome==="victory"){
-      firstClaim=claimCurrentBattleRewards();
-      secondClaim=claimCurrentBattleRewards();
-      resumed=resumeBattleCallerAfterCompletion("victory");
-    }else{
-      resumed=typeof continueAfterSetback33100==="function"?continueAfterSetback33100():resumeBattleCallerAfterCompletion("defeat");
-    }
-    const ryoAfter=Number(playerData.ryo)||0;
-    const receipts=(playerData.activityHistory||[]).filter(row=>row&&row.rewardSourceId==="wasabi_origin_rogue_genin_battle_victory_ryo_01").map(row=>JSON.parse(JSON.stringify(row)));
-    return{...resumed,rewardAudit:{ryoBefore,ryoAfter,firstClaim,secondClaim,receipts}};
-  },{outcome,ryoBefore:staged.rewardAudit.ryoBefore});
-  result.rewardAudit.projected=staged.rewardAudit.projected;
-  assert(result?.success===true,label+" caller return failed "+JSON.stringify(result));
-  if(outcome==="victory"){
-    assert.strictEqual(result.rewardAudit.projected?.ryo,50,label+" Victory projection amount drift");
-    assert.strictEqual(result.rewardAudit.projected?.exp,0,label+" Victory generic EXP returned");
-    assert.deepStrictEqual(result.rewardAudit.projected?.items||[],[],label+" Victory fixed loot returned");
-    assert.strictEqual(result.rewardAudit.firstClaim,true,label+" Victory CLAIM failed");
-    assert.strictEqual(result.rewardAudit.secondClaim,false,label+" duplicate Victory CLAIM succeeded");
-    assert.strictEqual(result.rewardAudit.ryoAfter-result.rewardAudit.ryoBefore,50,label+" Victory did not grant exactly +50 Ryō");
-    assert.strictEqual(result.rewardAudit.receipts.length,1,label+" Victory reward receipt missing/duplicated");
-  }else{
-    assert.strictEqual(result.rewardAudit.ryoAfter-result.rewardAudit.ryoBefore,0,label+" Defeat granted Battle cash");
-    assert.strictEqual(result.rewardAudit.receipts.length,0,label+" Defeat wrote Victory reward receipt");
-  }
-  await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:12000});
-  await waitBeat(page,"izu_finish_secondary_1");
-  await assertBackdrop(page,BACKDROPS.training,label+" direct post-Battle Story return");
-  const returned=await info(page);
-  assert.strictEqual(returned.primaryVisible,false,label+" redundant post-Battle CONTINUE is still visible");
-  assert.strictEqual(returned.localContext.rogueGeninResponse,"intervene");
-  assert.strictEqual(returned.localContext.rogueResolved,true);
-  assert.strictEqual(returned.localContext.rogueBattleResult,outcome);
-  assert.strictEqual(returned.localContext.outcome,"secondary_occurrence_costs_pursuit");
-  assert.strictEqual(returned.localContext.battleOccurrenceIds.length,1);
-  return returned;
-}'''
-          wasa.write_text(text[:start]+new_fn+text[end:],encoding='utf-8')
+          wasa.write_text(text[:start]+new_wasa+text[end:],encoding='utf-8')
 
       - name: Source safety
         run: |
