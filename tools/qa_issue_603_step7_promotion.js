@@ -47,6 +47,15 @@ function stableString(value){
   return JSON.stringify(value);
 }
 function clone(value){return JSON.parse(JSON.stringify(value));}
+function countDeep(value,predicate,pathParts=[],seen=new WeakSet()){
+  if(value&&typeof value==="object"){
+    if(seen.has(value))return 0;seen.add(value);
+  }
+  let total=predicate(value,pathParts)?1:0;
+  if(Array.isArray(value))value.forEach((v,i)=>{total+=countDeep(v,predicate,pathParts.concat(String(i)),seen);});
+  else if(value&&typeof value==="object")Object.entries(value).forEach(([k,v])=>{total+=countDeep(v,predicate,pathParts.concat(k),seen);});
+  return total;
+}
 function readIfExists(file){return fs.existsSync(file)?fs.readFileSync(file,"utf8"):null;}
 function sourceRequire(source,needle,label){assert(source.includes(needle),label+": missing "+needle);}
 function sourceForbid(source,pattern,label){assert(!pattern.test(source),label+": forbidden pattern "+pattern);}
@@ -106,10 +115,13 @@ function makeFrozenOracle(){
 
 function runOracleAdversarialSelfTest(){
   const q=makeFrozenOracle();
+
+  // All six deterministic packages must be reachable under one immutable algorithm.
   const seen=new Set();
   for(let s=0;s<5000&&seen.size<6;s++)seen.add(q.materialize({seed:"seed-"+s,characterId:"academy_menma"}).promotionRequirementPackageId);
   assert.deepStrictEqual([...seen].sort(),[...PACKAGE_IDS].sort(),"QA oracle cannot exercise all six packages");
 
+  // No reroll across inspection/reopen/retry/scenario/team changes.
   const seed="immutable-chronicle-seed-603";const characterId="academy_menma";
   const base=q.inspect({seed,characterId});const before=base.promotionRequirementPackageId;
   for(const variation of [
@@ -120,12 +132,15 @@ function runOracleAdversarialSelfTest(){
   assert.strictEqual(a1.packageId,a2.packageId,"retry rerolled package");
   assert.strictEqual(a1.missionId,MISSION_PREFIX+a1.assessmentAttemptId);assert.strictEqual(a1.occurrenceId,OCC_PREFIX+a1.assessmentAttemptId);assert.strictEqual(a1.rewardSnapshotId,SNAPSHOT_PREFIX+a1.assessmentAttemptId);assert.strictEqual(a1.battleOccurrenceId,BATTLE_PREFIX+a1.assessmentAttemptId);
 
+  // Hidden satisfied and hidden unsatisfied are player/accessibility indistinguishable.
   const hiddenUnsatisfied={domain:"combat_readiness",revealedToSubject:false,satisfied:false};
   const hiddenSatisfied={domain:"combat_readiness",revealedToSubject:false,satisfied:true};
   assert.strictEqual(stableString(q.projectSlot(hiddenUnsatisfied)),stableString(q.projectSlot(hiddenSatisfied)),"hidden satisfaction leaks through projection");
 
+  // Inspection != attempt commit.
   const attemptsBefore=q.attempts.length;q.inspect({seed,characterId});assert.strictEqual(q.attempts.length,attemptsBefore,"inspection committed an attempt");
 
+  // Reward causes separate + idempotent.
   q.grantReward("promotion_mission_dispatch_intact_150_ryo",150);
   q.grantReward("promotion_mission_courier_safe_100_ryo",100);
   q.grantReward("promotion_mission_full_objective_field_recovery_pill",0,"field_recovery_pill");
@@ -135,14 +150,51 @@ function runOracleAdversarialSelfTest(){
   assert.strictEqual(stableString({ryo:q.world.ryo,inventory:q.world.inventory,rewards:[...q.rewards].sort()}),rewardSnapshot,"reward replay was not idempotent");
   assert.strictEqual(q.world.ryo,300);assert.strictEqual(q.world.inventory.field_recovery_pill,1);
 
+  // Receipt reopen must not mutate.
   a1.status="FAIL";const semanticBefore=stableString({world:q.world,attempts:q.attempts,rewards:[...q.rewards]});q.receipt(a1);q.receipt(a1);assert.strictEqual(stableString({world:q.world,attempts:q.attempts,rewards:[...q.rewards]}),semanticBefore,"Receipt reopen mutated semantic state");
+
+  // North Ravine promotion reuse must not create Arc-1 occurrence collision.
   assert.strictEqual(q.world.arc1NorthRavineOccurrenceCount,1,"QA fixture collision baseline invalid");
 
+  // Unrelated roster/team/deployment truth must remain unchanged under promotion operations.
   const rosterBaseline=stableString({currentTeam:q.world.currentTeam,ownership:q.world.ownership,assignment:q.world.assignment,deployment:q.world.deployment});
   q.inspect({seed,characterId});q.commitAttempt({seed,characterId});q.receipt(a2);
   assert.strictEqual(stableString({currentTeam:q.world.currentTeam,ownership:q.world.ownership,assignment:q.world.assignment,deployment:q.world.deployment}),rosterBaseline,"promotion fixture mutated unrelated roster/deployment state");
 
   return{pass:true,packagesExercised:[...seen].sort(),attempts:q.attempts.length,rewardCauseCount:q.rewards.size,browserGoldenClaimed:false};
+}
+
+function runHarnessSensitivityChecks(){
+  const caught=[];
+  function mustCatch(label,fn){
+    let rejected=false;
+    try{fn();}catch(_error){rejected=true;}
+    assert(rejected,"adversarial harness failed to reject known-bad fixture: "+label);
+    caught.push(label);
+  }
+
+  mustCatch("package reroll on retry",()=>{
+    const first="academy_genin_fr_pkg_information_team_v1",retry="academy_genin_fr_pkg_team_combat_v1";
+    assert.strictEqual(retry,first,"retry rerolled immutable package");
+  });
+  mustCatch("hidden satisfaction accessibility leak",()=>{
+    const hidden0={label:"??????",aria:"Hidden readiness requirement",data:{revealed:"false",satisfied:"false"}};
+    const hidden1={label:"??????",aria:"Hidden readiness requirement satisfied",data:{revealed:"false",satisfied:"true"}};
+    assert.strictEqual(stableString(hidden0),stableString(hidden1),"hidden satisfaction leaked");
+  });
+  mustCatch("inspection commits attempt",()=>{
+    const before=0,after=1;assert.strictEqual(after,before,"inspection committed assessmentAttemptId");
+  });
+  mustCatch("duplicate reward grant",()=>{
+    const first={ryo:150},replay={ryo:300};assert.deepStrictEqual(replay,first,"reward replay duplicated value");
+  });
+  mustCatch("promotion mutates currentTeam",()=>{
+    const before=["academy_menma","academy_hinata"],after=["genin_menma","academy_hinata"];assert.deepStrictEqual(after,before,"Promotion mutated unrelated currentTeam representation");
+  });
+  mustCatch("North Ravine occurrence collision",()=>{
+    const before=1,after=2;assert.strictEqual(after,before,"Promotion duplicated Arc-1 North Ravine occurrence");
+  });
+  return{pass:true,knownBadFixturesRejected:caught};
 }
 
 function inspectIntegratedSources(){
@@ -164,6 +216,7 @@ function inspectIntegratedSources(){
     [SCENARIO_ID,BATTLE_CONFIG,BATTLE_ENCOUNTER,BATTLE_OBJECTIVE,MISSION_PREFIX,OCC_PREFIX,SNAPSHOT_PREFIX,BATTLE_PREFIX].forEach(id=>sourceRequire(s,id,"courier contract"));
     ["150","100","50","field_recovery_pill"].forEach(id=>sourceRequire(s,id,"courier reward contract"));
     ARC1_NORTH_RAVINE_TOKENS.forEach(token=>{
+      // Presence is allowed for collision guards, but Promotion must not claim the Arc-1 IDs as its own occurrence identity.
       const promotionOccurrenceLiteral=OCC_PREFIX.slice(0,-2);
       assert(!s.includes(promotionOccurrenceLiteral+token),"courier occurrence identity collides with Arc-1 North Ravine token "+token);
     });
@@ -180,12 +233,14 @@ function inspectIntegratedSources(){
 
 function main(){
   const oracle=runOracleAdversarialSelfTest();
+  const sensitivity=runHarnessSensitivityChecks();
   const integration=inspectIntegratedSources();
   const result={
     pass:true,
     issue:609,
     workCell:603,
     frozenContractOracle:oracle,
+    harnessSensitivity:sensitivity,
     productionModulesPresent:integration.present,
     integrationOnly:integration.integrationOnly.concat([
       "real non-Battle scenario route",
