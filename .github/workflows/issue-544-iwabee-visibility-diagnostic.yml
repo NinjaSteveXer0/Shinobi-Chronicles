@@ -1,0 +1,62 @@
+name: Issue 544 Iwabee Setback Visibility Diagnostic
+
+on:
+  push:
+    branches:
+      - coding/544-terminal-result-presentation
+    paths:
+      - '.github/workflows/issue-544-iwabee-visibility-diagnostic.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/544-terminal-result-presentation
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Patch only Iwabee synthetic terminal chronology with visibility diagnostics
+        shell: python
+        run: |
+          from pathlib import Path
+          p=Path('tools/qa_issues_396_399_400_browser.js')
+          text=p.read_text(encoding='utf-8')
+          start=text.index('async function runIwabeeBattle(browser,outcome){')
+          end=text.index('\nasync function runIwabeeWorldBranch',start)
+          seg=text[start:end]
+          seg=seg.replace('    const result=await page.evaluate(({outcome})=>{','    let result=await page.evaluate(({outcome})=>{',1)
+          old='''        const resumed=resumeBattleCallerAfterCompletion(outcome);\n        if(outcome==="defeat"){\n          // The frozen natural-voice Story can paginate one authored beat across\n          // multiple presentation cues. Advance the real Story until the\n          // canonical World consequence commits instead of assuming five clicks.\n          for(let i=0;i<24;i++){\n            const committed=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");\n            if(committed&&committed.fact&&committed.fact.rogueDisposition)break;\n            advanceStoryScene();\n          }\n        }\n        const rt=getActiveStorySceneRuntime();'''
+          assert old in seg
+          seg=seg.replace(old,'        const resumed=resumeBattleCallerAfterCompletion(outcome);\n        const rt=getActiveStorySceneRuntime();',1)
+          marker='''    assert.strictEqual(result.resumed?.success,true,label+" caller resume");\n    assert.strictEqual(result.rewards?.ryo,outcome==="victory"?50:0,label+" Battle reward projection");'''
+          replacement='''    if(outcome==="defeat"){\n      assert.strictEqual(result.resumed?.callerResumeWithheldUntilTerminalResultContinue,true,label+" defeat bypassed #544 guard");\n      await page.waitForTimeout(750);\n      const diag=await page.evaluate(()=>{\n        const node=document.querySelector(".alpha331-setback");\n        const overlay=document.getElementById("screen-overlay");\n        const container=document.getElementById("overlay-content-container");\n        const story=document.getElementById("story-scene-presentation-layer");\n        const snap=el=>{if(!el)return null;const c=getComputedStyle(el);const r=el.getBoundingClientRect();return{inlineDisplay:el.style.display||null,display:c.display,visibility:c.visibility,opacity:c.opacity,width:r.width,height:r.height,hidden:!!el.hidden,className:el.className||null};};\n        return{\n          currentOverlayType:typeof currentOverlayType==="undefined"?null:currentOverlayType,\n          terminal:globalThis.getBattleTerminalResultPresentation54400?.()||null,\n          returnContext:currentBattle?.returnContext||null,\n          battleOver:currentBattle?.battleOver===true,\n          outcome:currentBattle?.outcome?.type||null,\n          pending33000:globalThis.pendingBattlePresentation33000?.()||false,\n          overlay:snap(overlay),container:snap(container),setback:snap(node),story:snap(story),\n          setbackParent:snap(node?.parentElement||null),\n          bodyClass:document.body.className||null\n        };\n      });\n      console.log("IWABEE_544_VISIBILITY_DIAG",JSON.stringify(diag));\n      assert(diag.setback&&diag.setback.display!=="none"&&diag.setback.visibility!=="hidden"&&diag.setback.width>0&&diag.setback.height>0,label+" Setback not visibly active "+JSON.stringify(diag));\n    }\n    assert.strictEqual(result.resumed?.success,true,label+" caller resume");\n    assert.strictEqual(result.rewards?.ryo,outcome==="victory"?50:0,label+" Battle reward projection");'''
+          assert marker in seg
+          seg=seg.replace(marker,replacement,1)
+          p.write_text(text[:start]+seg+text[end:],encoding='utf-8')
+      - name: Source safety
+        run: |
+          node --check tools/qa_issues_396_399_400_browser.js
+          node tools/qa_runtime_ownership_safety_300.js
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start server
+        run: |
+          python3 -m http.server 8080 >/tmp/issue544-iwabee-http.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8080/index.html >/dev/null && exit 0; sleep 1; done
+          cat /tmp/issue544-iwabee-http.log; exit 1
+      - name: Iwabee visibility diagnostic
+        env:
+          ISSUES_396_399_400_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUES_396_399_400_BROWSER_OUT: artifacts/issue-544-iwabee-diag
+        run: xvfb-run -a node tools/qa_issues_396_399_400_browser.js
