@@ -40328,22 +40328,22 @@ function runAcademyPilotDeploymentDiagnostics() {
 
   const expectedPL = {
 
-            academy_hinata:
-              12,
+    academy_hinata:
+      12,
 
-            academy_izuno:
-              9,
+    academy_izuno:
+      9,
 
-            academy_mirai:
-              12,
+    academy_mirai:
+      12,
 
-            academy_menma:
-              12,
+    academy_menma:
+      12,
 
-            academy_kushina:
-              12
+    academy_kushina:
+      12
 
-          };
+  };
 
 
   const result = {
