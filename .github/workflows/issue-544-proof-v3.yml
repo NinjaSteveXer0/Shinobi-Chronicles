@@ -1,0 +1,101 @@
+name: Issue 544 Isolated Terminal Proof V3
+
+on:
+  push:
+    branches:
+      - coding/544-terminal-proof
+    paths:
+      - '.github/workflows/issue-544-proof-v3.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  prove-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/544-terminal-result-presentation
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Apply proven Mirai patch and player-owned Iwabee Setback chronology
+        shell: python
+        run: |
+          from pathlib import Path
+          import subprocess
+
+          proof = subprocess.check_output([
+            'git','show','origin/coding/544-terminal-proof:.github/workflows/issue-544-proof-v2.yml'
+          ], text=True)
+          anchor='      - name: Apply existing terminal chronology patch plus stable Continue harness\n'
+          start=proof.index(anchor)+len(anchor)
+          run_marker='        shell: python\n        run: |\n'
+          start=proof.index(run_marker,start)+len(run_marker)
+          end=proof.index('\n      - name: Source safety',start)
+          block=proof[start:end]
+          script='\n'.join(line[10:] if line.startswith('          ') else line for line in block.splitlines())+'\n'
+          Path('/tmp/issue544_patch_v2.py').write_text(script,encoding='utf-8')
+          subprocess.run(['python','/tmp/issue544_patch_v2.py'],check=True)
+
+          p=Path('tools/qa_issues_396_399_400_browser.js')
+          text=p.read_text(encoding='utf-8')
+          start=text.index('async function runIwabeeBattle(browser,outcome){')
+          end=text.index('\nasync function runIwabeeWorldBranch',start)
+          seg=text[start:end]
+          old='        const resumed=resumeBattleCallerAfterCompletion(outcome);'
+          new='        const resumed=outcome==="defeat"?{success:true,awaitingSetbackContinue:true}:resumeBattleCallerAfterCompletion(outcome);'
+          assert old in seg, 'Iwabee legacy direct-resume seam drifted'
+          seg=seg.replace(old,new,1)
+          old_assert='      assert.strictEqual(result.resumed?.callerResumeWithheldUntilTerminalResultContinue,true,label+" defeat bypassed #544 terminal presentation guard");'
+          new_assert='      assert.strictEqual(result.resumed?.awaitingSetbackContinue,true,label+" defeat must remain player-owned until Setback Continue");'
+          assert old_assert in seg, 'Iwabee obsolete early-resume assertion drifted'
+          seg=seg.replace(old_assert,new_assert,1)
+          p.write_text(text[:start]+seg+text[end:],encoding='utf-8')
+
+      - name: Source safety
+        run: |
+          node --check tools/qa_issue_105_origin_presentation_browser.js
+          node --check tools/qa_issues_396_399_400_browser.js
+          node tools/qa_runtime_ownership_safety_300.js
+          node tools/qa_issue_303_runtime_build_fingerprint.js
+          node tools/qa_save_compatibility_311.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install chromium
+
+      - name: Start local Alpha server
+        run: |
+          python3 -m http.server 8080 >/tmp/issue-544-proof-v3-http.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/issue-544-proof-v3-http.log
+          exit 1
+
+      - name: Iwabee authoritative terminal chronology
+        env:
+          ISSUES_396_399_400_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUES_396_399_400_BROWSER_OUT: artifacts/issue-544-proof-v3-iwabee
+        run: xvfb-run -a node tools/qa_issues_396_399_400_browser.js
+
+      - name: Publish clean QA correction to feature branch
+        run: |
+          rm -f .github/workflows/issue-544-one-shot-menma-compat.yml
+          rm -f .github/workflows/issue-544-iwabee-visibility-diagnostic.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/qa_issue_105_origin_presentation_browser.js tools/qa_issues_396_399_400_browser.js .github/workflows/issue-544-one-shot-menma-compat.yml .github/workflows/issue-544-iwabee-visibility-diagnostic.yml
+          git diff --cached --check
+          git commit -m '[CODING][#544] Align legacy browser QA with terminal result chronology'
+          git push origin HEAD:coding/544-terminal-result-presentation
