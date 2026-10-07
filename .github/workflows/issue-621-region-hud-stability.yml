@@ -1,0 +1,73 @@
+name: Issue 621 Region HUD Stability
+
+on:
+  push:
+    branches:
+      - coding/621-region-hud-stability-lane-c
+    paths:
+      - 'runtime/alpha-phase2-live-hud-49900.js'
+      - 'tools/qa_issue_621_region_hud_stability.js'
+      - 'tools/qa_issue_621_region_hud_stability_browser.js'
+      - '.github/workflows/issue-621-region-hud-stability.yml'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  region-hud-stability:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Syntax
+        run: |
+          node --check runtime/alpha-phase2-live-hud-49900.js
+          node --check tools/qa_issue_621_region_hud_stability.js
+          node --check tools/qa_issue_621_region_hud_stability_browser.js
+
+      - name: Issue 621 scheduler contract
+        run: node tools/qa_issue_621_region_hud_stability.js
+
+      - name: Existing HUD source regression
+        run: node tools/qa_phase2_live_hud_499.js
+
+      - name: Existing unobstructed-map source regression
+        run: node tools/qa_map_canvas_unobstructed_557.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > sc621-server.log 2>&1 &
+          echo $! > sc621-server.pid
+          sleep 2
+
+      - name: Temporal Region Village stability
+        run: node tools/qa_issue_621_region_hud_stability_browser.js
+
+      - name: Existing zero-overlap and interaction browser regression
+        run: node tools/qa_map_canvas_unobstructed_557_browser.js
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: region-hud-stability-621-browser
+          path: |
+            artifacts/issue-621-region-hud-stability
+            artifacts/issue-557-unobstructed-map-canvas
+            sc621-server.log
+          if-no-files-found: ignore
