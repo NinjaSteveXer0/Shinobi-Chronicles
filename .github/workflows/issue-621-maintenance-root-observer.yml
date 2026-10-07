@@ -1,5 +1,6 @@
 name: Issue 621 One-Shot Scheduler Hardening
 
+# Triggered once after the workflow exists on the lane branch; delete after the patch lands.
 on:
   push:
     branches:
