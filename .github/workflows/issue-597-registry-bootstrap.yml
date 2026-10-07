@@ -1,0 +1,186 @@
+name: Issue 597 Registry Bootstrap
+
+on:
+  push:
+    branches:
+      - coding/597-academy-origin-registry-recalibration
+    paths:
+      - '.github/workflows/issue-597-registry-bootstrap.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply-registry-recalibration:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/597-academy-origin-registry-recalibration
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Apply exact #582 canonical Registry rows
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('game.js')
+          text=p.read_text(encoding='utf-8')
+          replacements=[
+          ('''  "academy_hinata": {
+            "id": "academy_hinata",
+            "baseStats": {
+              "nin": 6,
+              "tai": 9,
+              "buki": 5,
+              "fuin": 5,
+              "kin": 5,
+              "gen": 5,
+              "stamina": 7
+            },
+            "basePL": 8,
+            "formalRank": "academy",
+            "embodiedExpressions": []
+          },''','''  "academy_hinata": {
+            "id": "academy_hinata",
+            "baseStats": {
+              "nin": 8,
+              "tai": 13,
+              "buki": 6,
+              "fuin": 5,
+              "kin": 5,
+              "gen": 6,
+              "stamina": 10
+            },
+            "basePL": 12,
+            "formalRank": "academy",
+            "embodiedExpressions": []
+          },'''),
+          ('''  "academy_mirai": {
+            "id": "academy_mirai",
+            "baseStats": {
+              "nin": 8,
+              "tai": 8,
+              "buki": 9,
+              "fuin": 5,
+              "kin": 6,
+              "gen": 7,
+              "stamina": 8
+            },
+            "basePL": 9,
+            "formalRank": "academy",
+            "embodiedExpressions": []
+          },''','''  "academy_mirai": {
+            "id": "academy_mirai",
+            "baseStats": {
+              "nin": 9,
+              "tai": 9,
+              "buki": 12,
+              "fuin": 6,
+              "kin": 6,
+              "gen": 13,
+              "stamina": 10
+            },
+            "basePL": 12,
+            "formalRank": "academy",
+            "embodiedExpressions": []
+          },'''),
+          ('''  "academy_menma": {
+            "id": "academy_menma",
+            "baseStats": {
+              "nin": 10,
+              "tai": 8,
+              "buki": 6,
+              "fuin": 5,
+              "kin": 9,
+              "gen": 7,
+              "stamina": 11
+            },
+            "basePL": 10,
+            "formalRank": "academy",
+            "embodiedExpressions": [],
+            "defaultAttachedSummonId": "menma_nine_tails"
+          },''','''  "academy_menma": {
+            "id": "academy_menma",
+            "baseStats": {
+              "nin": 10,
+              "tai": 8,
+              "buki": 6,
+              "fuin": 5,
+              "kin": 13,
+              "gen": 7,
+              "stamina": 11
+            },
+            "basePL": 12,
+            "formalRank": "academy",
+            "embodiedExpressions": [],
+            "defaultAttachedSummonId": "menma_nine_tails"
+          },'''),
+          ('''  const expectedPL = {
+
+            academy_hinata:
+              8,
+
+            academy_izuno:
+              9,
+
+            academy_mirai:
+              9,
+
+            academy_menma:
+              10,
+
+            academy_kushina:
+              12
+
+          };''','''  const expectedPL = {
+
+            academy_hinata:
+              12,
+
+            academy_izuno:
+              9,
+
+            academy_mirai:
+              12,
+
+            academy_menma:
+              12,
+
+            academy_kushina:
+              12
+
+          };''')
+          ]
+          for old,new in replacements:
+              count=text.count(old)
+              if count==1:
+                  text=text.replace(old,new,1)
+              elif count==0 and new in text:
+                  pass
+              else:
+                  raise SystemExit(f'exact #597 replacement mismatch: expected one old block, found {count}')
+          p.write_text(text,encoding='utf-8')
+          PY
+
+      - name: Focused source validation
+        run: |
+          node --check game.js
+          node --check tools/qa_issue_597_academy_origin_registry_recalibration.js
+          node --check tools/qa_issue_597_academy_origin_registry_recalibration_browser.js
+          node tools/qa_issue_597_academy_origin_registry_recalibration.js
+
+      - name: Commit canonical Registry correction
+        run: |
+          if git diff --quiet -- game.js; then
+            echo 'Registry correction already present.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add game.js
+          git commit -m '[CODING][#597] Consume Academy-Origin Base Stat recalibration'
+          git push origin HEAD:coding/597-academy-origin-registry-recalibration
