@@ -47,15 +47,6 @@ function stableString(value){
   return JSON.stringify(value);
 }
 function clone(value){return JSON.parse(JSON.stringify(value));}
-function countDeep(value,predicate,pathParts=[],seen=new WeakSet()){
-  if(value&&typeof value==="object"){
-    if(seen.has(value))return 0;seen.add(value);
-  }
-  let total=predicate(value,pathParts)?1:0;
-  if(Array.isArray(value))value.forEach((v,i)=>{total+=countDeep(v,predicate,pathParts.concat(String(i)),seen);});
-  else if(value&&typeof value==="object")Object.entries(value).forEach(([k,v])=>{total+=countDeep(v,predicate,pathParts.concat(k),seen);});
-  return total;
-}
 function readIfExists(file){return fs.existsSync(file)?fs.readFileSync(file,"utf8"):null;}
 function sourceRequire(source,needle,label){assert(source.includes(needle),label+": missing "+needle);}
 function sourceForbid(source,pattern,label){assert(!pattern.test(source),label+": forbidden pattern "+pattern);}
@@ -110,7 +101,18 @@ function makeFrozenOracle(){
     return{idempotent:false,cause};
   }
   function receipt(attempt){const r={attemptId:attempt.assessmentAttemptId,status:attempt.status,rewardCauses:[...rewards].sort()};receipts.push(r);return clone(r);}
-  return{world,materialize,inspect,commitAttempt,projectSlot,grantReward,receipt,attempts,rewards,receipts};
+  function saveState(){return clone({attemptOrdinal,materialized:[...materialized.entries()],attempts,rewards:[...rewards],receipts,world});}
+  function loadState(snapshot){
+    const restored=clone(snapshot);
+    attemptOrdinal=Number(restored.attemptOrdinal)||0;
+    materialized.clear();for(const [key,value] of restored.materialized||[])materialized.set(key,value);
+    attempts.splice(0,attempts.length,...(restored.attempts||[]));
+    rewards.clear();for(const cause of restored.rewards||[])rewards.add(cause);
+    receipts.splice(0,receipts.length,...(restored.receipts||[]));
+    Object.keys(world).forEach(key=>delete world[key]);Object.assign(world,restored.world||{});
+    return true;
+  }
+  return{world,materialize,inspect,commitAttempt,projectSlot,grantReward,receipt,saveState,loadState,attempts,rewards,receipts};
 }
 
 function runOracleAdversarialSelfTest(){
@@ -131,6 +133,24 @@ function runOracleAdversarialSelfTest(){
   assert.notStrictEqual(a1.assessmentAttemptId,a2.assessmentAttemptId,"retry must create new attempt id");
   assert.strictEqual(a1.packageId,a2.packageId,"retry rerolled package");
   assert.strictEqual(a1.missionId,MISSION_PREFIX+a1.assessmentAttemptId);assert.strictEqual(a1.occurrenceId,OCC_PREFIX+a1.assessmentAttemptId);assert.strictEqual(a1.rewardSnapshotId,SNAPSHOT_PREFIX+a1.assessmentAttemptId);assert.strictEqual(a1.battleOccurrenceId,BATTLE_PREFIX+a1.assessmentAttemptId);
+
+  // Save/reload/reopen preserves immutable package + attempt lineage.
+  const saved=q.saveState();
+  const packageBeforeReload=q.inspect({seed,characterId}).promotionRequirementPackageId;
+  q.loadState(saved);
+  assert.strictEqual(q.inspect({seed,characterId}).promotionRequirementPackageId,packageBeforeReload,"save/reload rerolled package");
+  assert.strictEqual(q.attempts[0].assessmentAttemptId,a1.assessmentAttemptId,"save/reload lost attempt lineage");
+  assert.strictEqual(q.attempts[1].assessmentAttemptId,a2.assessmentAttemptId,"save/reload rewrote retry lineage");
+
+  // Terminal assessment states stay distinct; unsuccessful states can preserve partial value.
+  const terminalMatrix=[
+    {status:"PASS",promotionAllowed:true,partialValue:true},
+    {status:"FAIL",promotionAllowed:false,partialValue:true},
+    {status:"ABORTED",promotionAllowed:false,partialValue:true},
+    {status:"WITHDRAWN",promotionAllowed:false,partialValue:true}
+  ];
+  assert.deepStrictEqual(terminalMatrix.filter(row=>row.promotionAllowed).map(row=>row.status),["PASS"],"only valid PASS may authorize Genin transition");
+  assert(terminalMatrix.filter(row=>row.status!=="PASS").every(row=>row.partialValue===true),"unsuccessful attempts must be able to retain truthful partial value");
 
   // Hidden satisfied and hidden unsatisfied are player/accessibility indistinguishable.
   const hiddenUnsatisfied={domain:"combat_readiness",revealedToSubject:false,satisfied:false};
@@ -224,7 +244,15 @@ function inspectIntegratedSources(){
 
   if(files.ui){
     const s=files.ui;
-    sourceRequire(s,"arena_promotion.png","Promotion graphical body");sourceRequire(s,"??????","hidden readiness projection");
+    sourceRequire(s,"arena_promotion.png","Promotion graphical body");
+    sourceRequire(s,"function normalizeReadinessSlot60320","UI hidden readiness normalizer");
+    sourceRequire(s,'state:"HIDDEN"',"UI hidden readiness state");
+    assert(s.includes("??????")||s.includes("Readiness Slot ${index+1}"),"UI must project an observer-safe hidden placeholder");
+    const hiddenStart=s.indexOf("if(!revealed){",s.indexOf("function normalizeReadinessSlot60320"));
+    const satisfiedStart=s.indexOf("const satisfied=source.satisfied",hiddenStart);
+    assert(hiddenStart>=0&&satisfiedStart>hiddenStart,"UI hidden branch must precede satisfaction read");
+    const hiddenBranch=s.slice(hiddenStart,satisfiedStart).replace(/\/\*[\s\S]*?\*\//g,"").replace(/\/\/.*$/gm,"");
+    assert(!/source\.(?:satisfied|domain|evidence)|promotionRequirementPackageId|requiredSecondaryDomains/i.test(hiddenBranch),"UI hidden projection reads hidden truth before reveal");
     sourceForbid(s,/data-[\w-]*(satisfied|domain|package)[\w-]*\s*=\s*["'`]\$?\{?[^\n]*hidden/i,"UI hidden truth DOM leak");
   }else integrationOnly.push("Promotion UI/DOM/accessibility adversarial execution (#608 not yet present on D branch)");
 
