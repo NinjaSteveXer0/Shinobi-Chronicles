@@ -56,6 +56,11 @@ jobs:
                   'assert.strictEqual(duplicate.state.outcome,outcome,label+" duplicate presenter changed semantic outcome");',
                   'assert.strictEqual(duplicate.state.committedOutcome,outcome,label+" duplicate presenter changed semantic outcome");',
                   'Lane F candidate-state contract normalization target missing'
+              ),
+              (
+                  '  const resumeAttempt=events.find(event=>event.kind==="caller_resume_attempt");\n  const resumeReturn=events.find(event=>event.kind==="caller_resume_return");',
+                  '  const resumeReturns=events.filter(event=>event.kind==="caller_resume_return");\n  const resumeReturn=candidate?resumeReturns.find(event=>event.result?.success===true&&!event.result?.callerResumeWithheldUntilTerminalResultContinue):resumeReturns.find(event=>event.result?.success===true);\n  const resumeReturnIndex=resumeReturn?events.indexOf(resumeReturn):-1;\n  const resumeAttempt=resumeReturnIndex>=0?[...events.slice(0,resumeReturnIndex)].reverse().find(event=>event.kind==="caller_resume_attempt"):null;',
+                  'Lane F withheld-vs-actual caller-resume normalization target missing'
               )
           ]
           for old, new, error in replacements:
