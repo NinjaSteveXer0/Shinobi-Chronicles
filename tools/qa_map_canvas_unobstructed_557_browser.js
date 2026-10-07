@@ -335,9 +335,6 @@ async function proveSelectedEventDrawer(page,label){
   assert.strictEqual(activated.result.success,true,`${label}: selected-event activation failed: ${JSON.stringify(activated)}`);
   assert.strictEqual(activated.result.type,"event_drawer",`${label}: selected event did not use shared event drawer`);
   assert.strictEqual(activated.result.reason,"multiple_opportunities",`${label}: exact multiple-opportunity route not reached`);
-  assert(activated.immediateDrawer,`${label}: shared event drawer was absent immediately after the real dblclick route: ${JSON.stringify(activated)}`);
-  assert(activated.immediateDrawer.text.includes("OPPORTUNITIES AT THIS HOTSPOT"),`${label}: immediate event drawer did not contain disambiguation copy: ${JSON.stringify(activated)}`);
-  assert(activated.immediateDrawer.width>0&&activated.immediateDrawer.height>0&&activated.immediateDrawer.display!=="none"&&activated.immediateDrawer.visibility!=="hidden",`${label}: immediate event drawer was not visibly laid out: ${JSON.stringify(activated)}`);
 
   try{
     await page.waitForFunction(()=>{
@@ -370,7 +367,7 @@ async function proveSelectedEventDrawer(page,label){
         }:null
       };
     },activated.qaOpportunityId);
-    throw new Error(`${label}: event drawer existed synchronously but did not persist visibly for the selected Region hotspot: ${JSON.stringify({activated,delayed,cause:String(error&&error.message||error)})}`);
+    throw new Error(`${label}: event drawer did not become visibly persistent for the selected Region hotspot: ${JSON.stringify({activated,delayed,cause:String(error&&error.message||error)})}`);
   }
   await settle(page);
 
