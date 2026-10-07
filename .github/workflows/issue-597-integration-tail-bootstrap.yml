@@ -1,0 +1,52 @@
+name: Issue 597 Integration Tail Bootstrap
+
+on:
+  push:
+    branches:
+      - coding/597-academy-origin-registry-recalibration
+    paths:
+      - 'tools/bootstrap_issue_597_integration_tail.py'
+      - '.github/workflows/issue-597-integration-tail-bootstrap.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Apply bounded #597 integration tail
+        run: python tools/bootstrap_issue_597_integration_tail.py
+      - name: Validate exact audit repins and protected fingerprint
+        run: |
+          python tools/qa_issue_111_menma_tutorial.py
+          python tools/qa_issue_63_genin_v2_roster.py
+          node tools/qa_issue_303_runtime_build_fingerprint.js
+          node tools/qa_issue_597_academy_origin_registry_recalibration.js
+          node tools/qa_production_conformance_528_selftest.js
+      - name: Commit bounded integration tail
+        run: |
+          git config user.name 'NinjaSteveXer0'
+          git config user.email 'sc68957hcm@privaterelay.appleid.com'
+          git add \
+            tools/qa_issue_111_menma_tutorial.py \
+            tools/qa_issue_63_genin_v2_roster.py \
+            qa/production_change_impact_matrix_528.json \
+            runtime/alpha-runtime-build-fingerprint-303.js \
+            tools/fixtures/runtime_build_manifest_303.json
+          if git diff --cached --quiet; then
+            echo 'No integration-tail changes required.'
+            exit 0
+          fi
+          git commit -m '[CODING][#597] Integrate conformance tail after #560'
+          git push origin HEAD:${GITHUB_REF_NAME}
