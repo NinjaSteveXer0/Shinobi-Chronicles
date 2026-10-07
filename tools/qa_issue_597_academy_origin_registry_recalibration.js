@@ -10,6 +10,7 @@ const ROOT=path.resolve(__dirname,"..");
 const GAME=fs.readFileSync(path.join(ROOT,"game.js"),"utf8");
 const DEV448=fs.readFileSync(path.join(ROOT,"runtime/alpha-discipline-stat-growth-44800.js"),"utf8");
 const STAT_IDS=["nin","tai","buki","fuin","kin","gen","stamina"];
+const REVISION="academy_origin_base_stats_582_v1";
 
 const EXPECTED=Object.freeze({
   academy_hinata:{stats:{nin:8,tai:13,buki:6,fuin:5,kin:5,gen:6,stamina:10},basePL:12},
@@ -66,7 +67,7 @@ function formula(stats){
 function functionSource(name,nextMarker){
   const start=GAME.indexOf("function "+name);
   assert(start>=0,name+" missing");
-  const end=nextMarker?GAME.indexOf(nextMarker,start):Math.min(GAME.length,start+12000);
+  const end=nextMarker?GAME.indexOf(nextMarker,start):Math.min(GAME.length,start+30000);
   assert(end>start,name+" end marker missing");
   return GAME.slice(start,end);
 }
@@ -108,6 +109,23 @@ assert(restore.includes("character.baseStats"),"save restore does not rebuild fr
 assert(restore.includes("statLevelApplied"),"save restore no longer preserves already-earned development level provenance");
 assert(restore.includes("character.permanentPLBonus")&&restore.includes("0;"),"legacy direct PL bonus retirement regressed");
 
+assert(GAME.includes('const ACADEMY_ORIGIN_BASE_AUTHORITY_REVISION_582 =\n  "'+REVISION+'";'),"#582 save authority revision marker missing");
+assert(GAME.includes("function migrateAcademyOriginBaseSave582"),"pre-recalibration save migration missing");
+const migration=functionSource("migrateAcademyOriginBaseSave582","// =========================================================\n// CLONE PROGRESSION OBJECT");
+assert(migration.includes('academy_hinata')&&migration.includes('academy_mirai')&&migration.includes('academy_menma'),"#582 save migration does not scope all three recalibrated Origins");
+assert(migration.includes("savedCurrent - Number(packageRow.oldBase[stat])"),"#582 save migration no longer preserves old Current-over-Base development delta");
+assert(migration.includes("Number(packageRow.newBase[stat]) + delta"),"#582 save migration no longer rebases persistent Current development onto new Base");
+assert(migration.includes("Math.max(0"),"#582 save migration may create negative persistent development delta");
+assert(migration.includes("academyOriginBaseAuthorityRevision"),"#582 migration does not write its compatibility revision marker");
+assert(!migration.includes("localStorage.setItem")&&!migration.includes("savePlayerData("),"#582 load migration violates pure-reader save compatibility");
+
+const defaultData=functionSource("createDefaultPlayerData","function normalizeSavedCharacterProgression");
+assert(defaultData.includes("academyOriginBaseAuthorityRevision: ACADEMY_ORIGIN_BASE_AUTHORITY_REVISION_582"),"fresh saves are not born at the #582 Registry authority revision");
+const loadData=functionSource("loadPlayerData","// =========================================================\n// SAVE PLAYER DATA");
+assert(loadData.includes("migrateAcademyOriginBaseSave582(parsedData);"),"loadPlayerData does not migrate legacy Academy Base saves before normalization");
+assert(loadData.includes("academyOriginBaseAuthorityRevision"),"loadPlayerData drops the #582 migration revision before the next save");
+assert(!loadData.includes("localStorage.setItem"),"loadPlayerData reader purity regressed");
+
 assert(DEV448.includes("function restoreCanonicalStats448"),"#448 canonical Current-Stat rehydration owner missing");
 assert(DEV448.includes("saved.stats")&&DEV448.includes("character.stats[id]=value"),"#448 no longer restores persisted canonical Current Stats");
 assert(DEV448.includes("disciplineProgression")&&DEV448.includes("normalizeDisciplineProgression"),"#448 no longer preserves shared Discipline Development ledger on reload");
@@ -118,6 +136,7 @@ console.log(JSON.stringify({
   academyOrigins:Object.keys(EXPECTED).length,
   changedRows:["academy_hinata","academy_mirai","academy_menma"],
   basePLs:Object.fromEntries(Object.entries(EXPECTED).map(([id,row])=>[id,row.basePL])),
+  legacySaveRevision:REVISION,
   sharedDevelopmentOwner:"runtime/alpha-discipline-stat-growth-44800.js",
   browserGoldenClaimed:false
 },null,2));
