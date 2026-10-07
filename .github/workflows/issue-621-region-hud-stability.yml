@@ -1,13 +1,9 @@
 name: Issue 621 Region HUD Stability
 
 on:
-  push:
+  pull_request:
     branches:
-      - coding/621-region-hud-stability-lane-c
-    paths:
-      - 'runtime/alpha-phase2-live-hud-49900.js'
-      - 'tools/qa_issue_621_region_hud_stability.js'
-      - '.github/workflows/issue-621-region-hud-stability.yml'
+      - main
   workflow_dispatch:
 
 permissions:
