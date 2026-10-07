@@ -1,0 +1,153 @@
+name: Issue 544 Kakashi Wasabi Compatibility Proof
+
+on:
+  push:
+    branches:
+      - coding/544-terminal-proof
+    paths:
+      - '.github/workflows/issue-544-kakashi-wasabi-compat-proof.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  prove-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/544-terminal-result-presentation
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Patch Kakashi and Wasabi legacy browser chronology
+        shell: python
+        run: |
+          from pathlib import Path
+
+          kak=Path('tools/qa_kakashi_v2_browser.js')
+          text=kak.read_text(encoding='utf-8')
+          old='''  const resumed=await page.evaluate(()=>{\n    currentBattle.outcome={type:"victory",completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};\n    currentBattle.battleOver=true;\n    currentBattle.active=false;\n    return resumeBattleCallerAfterCompletion("victory");\n  });\n  assert(resumed&&resumed.success===true,JSON.stringify(resumed));\n  await page.waitForSelector("#kakashi-v2-scene-board",{state:"visible",timeout:12000});'''
+          new='''  let resumed=await page.evaluate(()=>{\n    currentBattle.outcome={type:"victory",completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};\n    currentBattle.battleOver=true;\n    currentBattle.active=false;\n    return resumeBattleCallerAfterCompletion("victory");\n  });\n  assert.strictEqual(resumed?.callerResumeWithheldUntilTerminalResultContinue,true,"Kakashi caller bypassed #544 Victory gate "+JSON.stringify(resumed));\n  await page.waitForSelector(".alpha-victory-code-screen",{state:"visible",timeout:12000});\n  await page.waitForFunction(()=>globalThis.getBattleTerminalResultPresentation54400?.().status==="presented",null,{timeout:12000});\n  resumed=await page.evaluate(()=>resumeBattleCallerAfterCompletion("victory"));\n  assert(resumed&&resumed.success===true,JSON.stringify(resumed));\n  await page.waitForSelector("#kakashi-v2-scene-board",{state:"visible",timeout:12000});'''
+          assert old in text, 'Kakashi visualAndBattle terminal block drifted'
+          kak.write_text(text.replace(old,new,1),encoding='utf-8')
+
+          wasa=Path('tools/qa_issue_343_wasabi_browser.js')
+          text=wasa.read_text(encoding='utf-8')
+          start=text.index('async function terminateBattleToStory(page,outcome,label){')
+          end=text.index('\nasync function runBattleRoute(browser,outcome){',start)
+          new_fn=r'''async function terminateBattleToStory(page,outcome,label){
+  const staged=await page.evaluate(({outcome,wasabi,rogue})=>{
+    const prior=globalThis.getBattleRemainingPL;
+    globalThis.getBattleRemainingPL=(side,id)=>{
+      if(outcome==="victory"&&side==="enemy"&&id===rogue)return 0;
+      if(outcome==="defeat"&&side==="player"&&id===wasabi)return 0;
+      return typeof prior==="function"?prior(side,id):1;
+    };
+    try{
+      const ryoBefore=Number(playerData.ryo)||0;
+      currentBattle.outcome={...(currentBattle.outcome||{}),type:outcome,committed:true,completedAt:Date.now(),finishingShinobiId:outcome==="victory"?wasabi:null};
+      currentBattle.battleOver=true;currentBattle.active=false;
+      let projected=null;
+      if(outcome==="victory")projected=JSON.parse(JSON.stringify(generateBattleRewards(enemyDatabase[rogue],getPlayerCharacter(wasabi))));
+      const initialResume=resumeBattleCallerAfterCompletion(outcome);
+      return{initialResume,rewardAudit:{ryoBefore,projected}};
+    }finally{globalThis.getBattleRemainingPL=prior;}
+  },{outcome,wasabi:WASABI,rogue:ROGUE});
+  assert.strictEqual(staged.initialResume?.callerResumeWithheldUntilTerminalResultContinue,true,label+" caller bypassed #544 terminal result gate "+JSON.stringify(staged));
+  const selector=outcome==="victory"?".alpha-victory-code-screen":".alpha331-setback";
+  await page.waitForSelector(selector,{state:"visible",timeout:12000});
+  await page.waitForFunction(expected=>{
+    const terminal=globalThis.getBattleTerminalResultPresentation54400?.();
+    return terminal?.status==="presented"&&terminal?.committedOutcome===expected;
+  },outcome,{timeout:12000});
+  const result=await page.evaluate(({outcome,ryoBefore})=>{
+    let firstClaim=null,secondClaim=null,resumed=null;
+    if(outcome==="victory"){
+      firstClaim=claimCurrentBattleRewards();
+      secondClaim=claimCurrentBattleRewards();
+      resumed=resumeBattleCallerAfterCompletion("victory");
+    }else{
+      resumed=typeof continueAfterSetback33100==="function"?continueAfterSetback33100():resumeBattleCallerAfterCompletion("defeat");
+    }
+    const ryoAfter=Number(playerData.ryo)||0;
+    const receipts=(playerData.activityHistory||[]).filter(row=>row&&row.rewardSourceId==="wasabi_origin_rogue_genin_battle_victory_ryo_01").map(row=>JSON.parse(JSON.stringify(row)));
+    return{...resumed,rewardAudit:{ryoBefore,ryoAfter,firstClaim,secondClaim,receipts}};
+  },{outcome,ryoBefore:staged.rewardAudit.ryoBefore});
+  result.rewardAudit.projected=staged.rewardAudit.projected;
+  assert(result?.success===true,label+" caller return failed "+JSON.stringify(result));
+  if(outcome==="victory"){
+    assert.strictEqual(result.rewardAudit.projected?.ryo,50,label+" Victory projection amount drift");
+    assert.strictEqual(result.rewardAudit.projected?.exp,0,label+" Victory generic EXP returned");
+    assert.deepStrictEqual(result.rewardAudit.projected?.items||[],[],label+" Victory fixed loot returned");
+    assert.strictEqual(result.rewardAudit.firstClaim,true,label+" Victory CLAIM failed");
+    assert.strictEqual(result.rewardAudit.secondClaim,false,label+" duplicate Victory CLAIM succeeded");
+    assert.strictEqual(result.rewardAudit.ryoAfter-result.rewardAudit.ryoBefore,50,label+" Victory did not grant exactly +50 Ryō");
+    assert.strictEqual(result.rewardAudit.receipts.length,1,label+" Victory reward receipt missing/duplicated");
+  }else{
+    assert.strictEqual(result.rewardAudit.ryoAfter-result.rewardAudit.ryoBefore,0,label+" Defeat granted Battle cash");
+    assert.strictEqual(result.rewardAudit.receipts.length,0,label+" Defeat wrote Victory reward receipt");
+  }
+  await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:12000});
+  await waitBeat(page,"izu_finish_secondary_1");
+  await assertBackdrop(page,BACKDROPS.training,label+" direct post-Battle Story return");
+  const returned=await info(page);
+  assert.strictEqual(returned.primaryVisible,false,label+" redundant post-Battle CONTINUE is still visible");
+  assert.strictEqual(returned.localContext.rogueGeninResponse,"intervene");
+  assert.strictEqual(returned.localContext.rogueResolved,true);
+  assert.strictEqual(returned.localContext.rogueBattleResult,outcome);
+  assert.strictEqual(returned.localContext.outcome,"secondary_occurrence_costs_pursuit");
+  assert.strictEqual(returned.localContext.battleOccurrenceIds.length,1);
+  return returned;
+}'''
+          wasa.write_text(text[:start]+new_fn+text[end:],encoding='utf-8')
+
+      - name: Source safety
+        run: |
+          node --check tools/qa_kakashi_v2_browser.js
+          node --check tools/qa_issue_343_wasabi_browser.js
+          node tools/qa_runtime_ownership_safety_300.js
+          node tools/qa_issue_303_runtime_build_fingerprint.js
+          node tools/qa_save_compatibility_311.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install chromium
+
+      - name: Start local Alpha server
+        run: |
+          python3 -m http.server 8080 >/tmp/issue-544-kakashi-wasabi-proof-http.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/issue-544-kakashi-wasabi-proof-http.log
+          exit 1
+
+      - name: Kakashi terminal chronology compatibility
+        env:
+          KAKASHI_V2_BASE_URL: http://127.0.0.1:8080/index.html
+          KAKASHI_V2_BROWSER_OUT: artifacts/issue-544-proof-kakashi
+        run: xvfb-run -a node tools/qa_kakashi_v2_browser.js
+
+      - name: Wasabi terminal chronology compatibility
+        env:
+          ISSUE_343_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_343_BROWSER_OUT: artifacts/issue-544-proof-wasabi
+        run: xvfb-run -a node tools/qa_issue_343_wasabi_browser.js
+
+      - name: Publish clean QA corrections to feature branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/qa_kakashi_v2_browser.js tools/qa_issue_343_wasabi_browser.js
+          git diff --cached --check
+          git commit -m '[CODING][#544] Align Kakashi and Wasabi browser QA with terminal result chronology'
+          git push origin HEAD:coding/544-terminal-result-presentation
