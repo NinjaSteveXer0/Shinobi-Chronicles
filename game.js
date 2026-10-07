@@ -4854,6 +4854,63 @@ const PLAYER_SAVE_KEY =
 
 
 // =========================================================
+// BRICK 1327 — #582 ACADEMY-ORIGIN BASE AUTHORITY SAVE MIGRATION
+// =========================================================
+// Pre-#582 saves persisted absolute Current Stats against the former Base rows.
+// Rebase only the three recalibrated Origins by preserving their non-negative
+// Current-over-Base development delta. This is a pure load-time compatibility
+// transform: no storage writes, no reward grants, no history synthesis.
+// =========================================================
+
+const ACADEMY_ORIGIN_BASE_AUTHORITY_REVISION_582 =
+  "academy_origin_base_stats_582_v1";
+
+const ACADEMY_ORIGIN_BASE_SAVE_PACKAGES_582 = Object.freeze({
+  academy_hinata: Object.freeze({
+    oldBase: Object.freeze({ nin:6,tai:9,buki:5,fuin:5,kin:5,gen:5,stamina:7 }),
+    newBase: Object.freeze({ nin:8,tai:13,buki:6,fuin:5,kin:5,gen:6,stamina:10 })
+  }),
+  academy_mirai: Object.freeze({
+    oldBase: Object.freeze({ nin:8,tai:8,buki:9,fuin:5,kin:6,gen:7,stamina:8 }),
+    newBase: Object.freeze({ nin:9,tai:9,buki:12,fuin:6,kin:6,gen:13,stamina:10 })
+  }),
+  academy_menma: Object.freeze({
+    oldBase: Object.freeze({ nin:10,tai:8,buki:6,fuin:5,kin:9,gen:7,stamina:11 }),
+    newBase: Object.freeze({ nin:10,tai:8,buki:6,fuin:5,kin:13,gen:7,stamina:11 })
+  })
+});
+
+function migrateAcademyOriginBaseSave582(savedPlayerData) {
+  if (!savedPlayerData || typeof savedPlayerData !== "object") return savedPlayerData;
+  if (savedPlayerData.academyOriginBaseAuthorityRevision === ACADEMY_ORIGIN_BASE_AUTHORITY_REVISION_582) {
+    return savedPlayerData;
+  }
+
+  const savedCharacters = savedPlayerData.characters;
+  if (savedCharacters && typeof savedCharacters === "object") {
+    ["academy_hinata","academy_mirai","academy_menma"].forEach(characterId => {
+      const packageRow = ACADEMY_ORIGIN_BASE_SAVE_PACKAGES_582[characterId];
+      const savedCharacter = savedCharacters[characterId];
+      if (!savedCharacter || typeof savedCharacter !== "object" || !savedCharacter.stats || typeof savedCharacter.stats !== "object") {
+        return;
+      }
+
+      Object.keys(packageRow.newBase).forEach(stat => {
+        const numericSavedCurrent = Number(savedCharacter.stats[stat]);
+        const savedCurrent = Number.isFinite(numericSavedCurrent)
+          ? numericSavedCurrent
+          : Number(packageRow.oldBase[stat]);
+        const delta = Math.max(0, savedCurrent - Number(packageRow.oldBase[stat]));
+        savedCharacter.stats[stat] = Number(packageRow.newBase[stat]) + delta;
+      });
+    });
+  }
+
+  savedPlayerData.academyOriginBaseAuthorityRevision = ACADEMY_ORIGIN_BASE_AUTHORITY_REVISION_582;
+  return savedPlayerData;
+}
+
+// =========================================================
 // CLONE PROGRESSION OBJECT
 // =========================================================
 
@@ -8791,6 +8848,7 @@ function createDefaultPlayerData() {
   const characterOwnership = createDefaultCharacterOwnershipState();
   setCharacterOwnershipRuntimeAuthority(characterOwnership);
   return {
+    academyOriginBaseAuthorityRevision: ACADEMY_ORIGIN_BASE_AUTHORITY_REVISION_582,
     ryo: 0,
     exp: 0,
     inventory: [],
@@ -9251,6 +9309,7 @@ function loadPlayerData() {
   }
   try {
     const parsedData = JSON.parse(savedData);
+    migrateAcademyOriginBaseSave582(parsedData);
     console.log("Player save loaded:", parsedData);
 
     // POST-1994 — mixed-era save repair.
@@ -9282,6 +9341,7 @@ function loadPlayerData() {
     const acquisition = normalizeAcquisitionState(parsedData.acquisition,characterOwnership,{legacySeedMigration});
     const normalizedActivityHistory = normalizeActivityHistoryForChronicleContinuity(parsedData.activityHistory,acquisition);
     return {
+      academyOriginBaseAuthorityRevision: ACADEMY_ORIGIN_BASE_AUTHORITY_REVISION_582,
       ryo: Number(parsedData.ryo) || 0,
       exp: Number(parsedData.exp) || 0,
       inventory: Array.isArray(parsedData.inventory) ? parsedData.inventory : [],

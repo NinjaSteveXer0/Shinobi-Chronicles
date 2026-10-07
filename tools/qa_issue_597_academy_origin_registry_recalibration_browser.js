@@ -68,6 +68,59 @@ function formula(stats){
     assert.equal(fresh.runtime[id].permanentPLBonus,0,id+" hidden/direct permanent PL bonus detected");
   }
 
+  // Prove a real pre-#582 save is rebased exactly once: canonical new Base plus
+  // the already-earned non-negative Current-over-old-Base development delta.
+  await page.evaluate(()=>{
+    const legacy=createDefaultPlayerData();
+    legacy.academyOriginBaseAuthorityRevision=null;
+    legacy.characters.academy_hinata.stats={nin:8,tai:10,buki:5,fuin:5,kin:5,gen:5,stamina:7};
+    legacy.characters.academy_mirai.stats={nin:8,tai:8,buki:9,fuin:5,kin:6,gen:10,stamina:8};
+    legacy.characters.academy_menma.stats={nin:10,tai:8,buki:6,fuin:5,kin:10,gen:7,stamina:11};
+    localStorage.setItem("shinobiChroniclesPlayerSave",JSON.stringify(legacy));
+  });
+  await page.reload({waitUntil:"domcontentloaded"});
+  await page.waitForFunction(()=>typeof window.commitDisciplineDevelopment448==="function",null,{timeout:15000});
+
+  const legacyMigrated=await page.evaluate(()=>{
+    const statsOf=row=>Object.fromEntries(["nin","tai","buki","fuin","kin","gen","stamina"].map(id=>[id,Number(row&&row[id])||0]));
+    const row=id=>playerTeam.find(character=>character&&character.id===id);
+    return{
+      legacyMigrationRevision:playerData.academyOriginBaseAuthorityRevision||null,
+      hinata:{baseStats:statsOf(row("academy_hinata")?.baseStats),currentStats:statsOf(row("academy_hinata")?.stats)},
+      mirai:{baseStats:statsOf(row("academy_mirai")?.baseStats),currentStats:statsOf(row("academy_mirai")?.stats)},
+      menma:{baseStats:statsOf(row("academy_menma")?.baseStats),currentStats:statsOf(row("academy_menma")?.stats)}
+    };
+  });
+  assert.equal(legacyMigrated.legacyMigrationRevision,"academy_origin_base_stats_582_v1","legacy save did not acquire #582 Base authority revision");
+  assert.deepStrictEqual(legacyMigrated.hinata.baseStats,EXPECTED.academy_hinata.stats,"legacy migration mutated canonical Hinata Base");
+  assert.deepStrictEqual(legacyMigrated.hinata.currentStats,{nin:10,tai:14,buki:6,fuin:5,kin:5,gen:6,stamina:10},"legacy Hinata Current development delta was not rebased onto new Base");
+  assert.deepStrictEqual(legacyMigrated.mirai.baseStats,EXPECTED.academy_mirai.stats,"legacy migration mutated canonical Mirai Base");
+  assert.deepStrictEqual(legacyMigrated.mirai.currentStats,{nin:9,tai:9,buki:12,fuin:6,kin:6,gen:16,stamina:10},"legacy Mirai Current development delta was not rebased onto new Base");
+  assert.deepStrictEqual(legacyMigrated.menma.baseStats,EXPECTED.academy_menma.stats,"legacy migration mutated canonical Menma Base");
+  assert.deepStrictEqual(legacyMigrated.menma.currentStats,{nin:10,tai:8,buki:6,fuin:5,kin:14,gen:7,stamina:11},"legacy Menma Current development delta was not rebased onto new Base");
+
+  // A second reload must be idempotent because the compatibility revision is now stamped.
+  await page.reload({waitUntil:"domcontentloaded"});
+  await page.waitForFunction(()=>typeof window.commitDisciplineDevelopment448==="function",null,{timeout:15000});
+  const legacyReloaded=await page.evaluate(()=>{
+    const statsOf=row=>Object.fromEntries(["nin","tai","buki","fuin","kin","gen","stamina"].map(id=>[id,Number(row&&row[id])||0]));
+    const row=id=>playerTeam.find(character=>character&&character.id===id);
+    return{
+      revision:playerData.academyOriginBaseAuthorityRevision||null,
+      hinata:statsOf(row("academy_hinata")?.stats),
+      mirai:statsOf(row("academy_mirai")?.stats),
+      menma:statsOf(row("academy_menma")?.stats)
+    };
+  });
+  assert.equal(legacyReloaded.revision,"academy_origin_base_stats_582_v1","#582 save revision did not persist across reload");
+  assert.deepStrictEqual(legacyReloaded.hinata,legacyMigrated.hinata.currentStats,"legacy Hinata migration reran on second load");
+  assert.deepStrictEqual(legacyReloaded.mirai,legacyMigrated.mirai.currentStats,"legacy Mirai migration reran on second load");
+  assert.deepStrictEqual(legacyReloaded.menma,legacyMigrated.menma.currentStats,"legacy Menma migration reran on second load");
+
+  await page.evaluate(()=>localStorage.clear());
+  await page.reload({waitUntil:"domcontentloaded"});
+  await page.waitForFunction(()=>typeof window.commitDisciplineDevelopment448==="function",null,{timeout:15000});
+
   const developed=await page.evaluate(()=>{
     const character=playerTeam.find(row=>row&&row.id==="academy_hinata");
     if(!character)throw new Error("Academy Hinata runtime missing");
