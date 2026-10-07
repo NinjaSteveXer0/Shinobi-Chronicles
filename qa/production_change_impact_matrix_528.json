@@ -323,6 +323,7 @@
       "id": "battle_result_presentation",
       "changed_any": [
         "runtime/alpha-alpha-sprint-33100.js",
+        "runtime/alpha-battle-terminal-result-54400.js",
         "UI/victory.png",
         "UI/setback.png",
         "tools/qa_ui_master_consumption_528_browser.js"
@@ -342,7 +343,7 @@
       "id": "konoha_activity_presentation",
       "changed_any": [
         "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
-        "tools/qa_phase2_konoha_player_surfaces_431.js",
+        "tools/qa_phase2_konoha-player-surfaces-431.js",
         "UI/practical.png",
         "UI/exams.png"
       ],
