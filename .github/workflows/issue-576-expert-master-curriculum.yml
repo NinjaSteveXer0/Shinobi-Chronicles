@@ -7,6 +7,7 @@ on:
     paths:
       - 'runtime/alpha-discipline-curriculum-profiles-57600.js'
       - 'tools/qa_issue_576_expert_master_curriculum_profiles.js'
+      - 'tools/qa_issue_576_expert_master_curriculum_profiles_browser.js'
       - '.github/workflows/issue-576-expert-master-curriculum.yml'
   pull_request:
     branches:
@@ -14,6 +15,7 @@ on:
     paths:
       - 'runtime/alpha-discipline-curriculum-profiles-57600.js'
       - 'tools/qa_issue_576_expert_master_curriculum_profiles.js'
+      - 'tools/qa_issue_576_expert_master_curriculum_profiles_browser.js'
       - '.github/workflows/issue-576-expert-master-curriculum.yml'
   workflow_dispatch:
 
@@ -28,11 +30,15 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
 
       - name: Source syntax
         run: |
           node --check runtime/alpha-discipline-curriculum-profiles-57600.js
           node --check tools/qa_issue_576_expert_master_curriculum_profiles.js
+          node --check tools/qa_issue_576_expert_master_curriculum_profiles_browser.js
 
       - name: Issue 576 deterministic curriculum contract
         shell: bash
@@ -59,3 +65,27 @@ jobs:
 
       - name: Runtime ownership safety
         run: node tools/qa_runtime_ownership_safety_300.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > issue-576-server.log 2>&1 &
+          echo $! > issue-576-server.pid
+          sleep 2
+
+      - name: Installed-browser isolated curriculum proof
+        run: node tools/qa_issue_576_expert_master_curriculum_profiles_browser.js
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-576-isolated-browser
+          path: |
+            artifacts/issue-576-expert-master-curriculum
+            issue-576-server.log
+          if-no-files-found: ignore
