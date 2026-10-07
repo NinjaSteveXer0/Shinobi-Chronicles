@@ -1,0 +1,90 @@
+name: Issue 621 One-Shot Scheduler Hardening
+
+on:
+  push:
+    branches:
+      - coding/621-region-hud-stability-lane-c
+    paths:
+      - '.github/workflows/issue-621-maintenance-root-observer.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/621-region-hud-stability-lane-c
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Remove #499-root wake path from #557 scheduler
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          runtime = Path('runtime/alpha-phase2-live-hud-49900.js')
+          text = runtime.read_text()
+          old_state = '  resizeObserver:null,rootObserver:null,structureObserver:null,'
+          new_state = '  resizeObserver:null,overlayObserver:null,structureObserver:null,'
+          if old_state not in text:
+              raise SystemExit('expected #621 scheduler state seam not found')
+          text = text.replace(old_state, new_state, 1)
+
+          old = '''  const root=document.getElementById(ROOT_ID);
+          if(root){
+            state.rootObserver=new MutationObserver(()=>{
+              state.structureSignalCount+=1;
+              schedule("surface_change");
+            });
+            state.rootObserver.observe(root,{attributes:true,attributeFilter:["data-surface","hidden"]});
+          }
+          const overlay=document.getElementById("screen-overlay");
+          if(overlay){
+            state.structureObserver=new MutationObserver(records=>{'''
+          new = '''  const overlay=document.getElementById("screen-overlay");
+          if(overlay){
+            state.overlayObserver=new MutationObserver(()=>{
+              state.structureSignalCount+=1;
+              schedule("overlay_visibility");
+            });
+            state.overlayObserver.observe(overlay,{attributes:true,attributeFilter:["style","class","hidden"]});
+            state.structureObserver=new MutationObserver(records=>{'''
+          if old not in text:
+              raise SystemExit('expected root observer seam not found')
+          text = text.replace(old, new, 1)
+          runtime.write_text(text)
+
+          qa = Path('tools/qa_issue_621_region_hud_stability.js')
+          q = qa.read_text()
+          old_q = '''assert(source.includes('attributeFilter:["data-surface","hidden"]'),"#621 does not observe HUD surface transitions narrowly");
+          assert(source.includes('attributeFilter:["class","hidden"]'),"#621 does not observe bounded map structural transitions");'''
+          new_q = '''assert(source.includes('state.overlayObserver.observe(overlay,{attributes:true,attributeFilter:["style","class","hidden"]})'),"#621 does not observe real overlay visibility transitions narrowly");
+          assert(source.includes('attributeFilter:["class","hidden"]'),"#621 does not observe bounded map structural transitions");
+          assert(!source.includes("rootObserver"),"#621 still wakes from #499 root projection churn");
+          assert(!source.includes('attributeFilter:["data-surface","hidden"]'),"#621 still observes #499 data-surface polling churn");'''
+          if old_q not in q:
+              raise SystemExit('expected static QA observer assertion seam not found')
+          q = q.replace(old_q, new_q, 1)
+          qa.write_text(q)
+          PY
+
+          node --check runtime/alpha-phase2-live-hud-49900.js
+          node --check tools/qa_issue_621_region_hud_stability.js
+          node tools/qa_issue_621_region_hud_stability.js
+
+      - name: Commit bounded hardening
+        run: |
+          if git diff --quiet; then
+            echo 'No patch required.'
+            exit 0
+          fi
+          git config user.name 'NinjaSteveXer0'
+          git config user.email 'sc68957hcm@privaterelay.appleid.com'
+          git add runtime/alpha-phase2-live-hud-49900.js tools/qa_issue_621_region_hud_stability.js
+          git commit -m '#621 stop #499 root projection from waking #557'
+          git push origin HEAD:coding/621-region-hud-stability-lane-c
