@@ -69,7 +69,10 @@ jobs:
       - name: Run installed-browser baseline plus Lane E self-injection
         env:
           ISSUE_544_CANDIDATE_MODULE: /tmp/alpha-battle-terminal-result-54400.js
-        run: node tools/qa_issue_544_terminal_result_routing_browser.js
+        shell: bash
+        run: |
+          set -o pipefail
+          node tools/qa_issue_544_terminal_result_routing_browser.js 2>&1 | tee /tmp/issue-544-browser.log
 
       - name: Upload exact chronology evidence
         if: always()
@@ -79,4 +82,5 @@ jobs:
           path: |
             artifacts/issue-544-terminal-result-routing
             /tmp/issue-544-http.log
+            /tmp/issue-544-browser.log
           if-no-files-found: warn
