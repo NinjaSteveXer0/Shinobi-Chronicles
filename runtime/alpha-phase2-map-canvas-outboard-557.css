@@ -1,0 +1,268 @@
+/* ============================================================================
+   ISSUE #557 — VILLAGE / REGION LEGACY MAP CHROME OUTBOARD COMPLETION
+
+   Presentation-only continuation of the canonical #499/#557 HUD layout.
+   These selectors move remaining legacy navigation/info surfaces outside the
+   crisp Village/Region map rectangles. They do not create or mutate gameplay,
+   discovery, Chronicle, ownership, assignment, Journey, Ryō, or World state.
+   ============================================================================ */
+
+/* #557 may reserve outer presentation space, but the crisp interactive map must
+   remain the dominant part of the visible stage. Apply this to the canonical
+   map classes from their first layout, before the runtime's first geometry
+   measurement. If activation-only selectors widen the map after that first
+   measurement, HUD/outboard controls can be positioned against a stale rect. */
+.region-map-pane,
+.village-map-screen,
+.overlay-content-box.sc-map557-active .region-map-pane,
+.overlay-content-box.sc-map557-active .village-map-screen,
+.region-map-pane[style*="--sc-map557-outboard-right"],
+.village-map-screen[style*="--sc-map557-outboard-right"] {
+  min-width: min(60vw, calc(100% - 40px)) !important;
+}
+
+/*
+   FIRST-FRAME FALLBACK
+
+   Map-local chrome must never wait for the #557 measurement pass before it
+   clears the crisp map rectangle. The runtime-owned custom properties remain
+   authoritative once measured. Until then, these viewport-bounded fallback
+   values place the controls into the same outer reserve without changing any
+   map/world semantics.
+*/
+.region-map-pane,
+.village-map-screen {
+  --sc-map557-safe-outboard-right: var(--sc-map557-outboard-right, calc(clamp(128px, 14vw, 186px) * -1));
+  --sc-map557-safe-control-width: var(--sc-map557-gutter-control-width, clamp(116px, 12vw, 176px));
+}
+
+/*
+   PERSISTENT HUD MAP-EDGE CLEARANCE
+
+   Preserve the locked #499 composition: Current Team stays attached to the
+   left map frame and the right-side HUD shares one map-relative gutter anchor.
+   The original measured layout targeted an 8px clearance. #499 explicitly
+   permits up to 24px, so #557 uses a 20px nominal clearance to absorb small
+   late-layout map expansion without either overlapping the map or detaching
+   the HUD into the far viewport edge.
+*/
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-state-cluster,
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-hud499-state-cluster,
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-tools,
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-hud499-tools,
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-context,
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-hud499-context,
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-map-nav,
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-hud499-map-nav {
+  right: calc(var(--sc-hud499-gutter-right-anchor) - 12px) !important;
+}
+
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-team,
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-hud499-team {
+  left: calc(var(--sc-hud499-map-left) - 92px) !important;
+  right: auto !important;
+}
+
+/* Keep the compact identity/journey/Ryō cluster in the clear header reserve.
+   This leaves the right map-side reserve available for navigation/context. */
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-state-cluster,
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-hud499-state-cluster {
+  top: 12px !important;
+}
+
+/* Region's own navigation/info chrome is map-local presentation, not geography.
+   Give it a safe outboard position from the first rendered frame; measured #557
+   variables replace the fallback automatically when runtime geometry is ready. */
+.region-map-pane .region-world-close,
+.region-map-pane .region-info-toggle,
+.region-map-pane .region-info-drawer,
+.region-map-pane .region-world-map-button {
+  left: auto !important;
+  right: var(--sc-map557-safe-outboard-right) !important;
+  width: var(--sc-map557-safe-control-width) !important;
+  max-width: var(--sc-map557-safe-control-width) !important;
+  box-sizing: border-box !important;
+}
+
+.region-map-pane .region-world-close {
+  top: 2% !important;
+  height: 36px !important;
+  min-width: 0 !important;
+  border-radius: 6px !important;
+}
+
+.region-map-pane .region-info-toggle {
+  top: 44% !important;
+  justify-content: flex-start !important;
+}
+
+.region-map-pane .region-info-drawer {
+  top: calc(44% + 38px) !important;
+}
+
+.region-map-pane .region-info-drawer .region-left-overlay {
+  max-height: min(31vh, 260px) !important;
+}
+
+.region-map-pane .region-world-map-button {
+  bottom: 2% !important;
+  justify-content: flex-start !important;
+}
+
+/* Region non-spatial known destinations are navigation, not geography. */
+.region-map-pane .region-known-destinations,
+.overlay-content-box.sc-map557-active .region-map-pane .region-known-destinations,
+.region-map-pane[style*="--sc-map557-outboard-right"] .region-known-destinations {
+  left: auto !important;
+  right: var(--sc-map557-safe-outboard-right) !important;
+  top: auto !important;
+  bottom: 145px !important;
+  width: var(--sc-map557-safe-control-width) !important;
+  max-width: var(--sc-map557-safe-control-width) !important;
+  max-height: min(31vh, 260px) !important;
+  overflow: auto !important;
+  box-sizing: border-box !important;
+  z-index: 300 !important;
+}
+
+/* The legacy Region event/disambiguation drawer uses the same DOM surface as
+   the selected-location card. Keep those routes in the approved right reserve. */
+.region-map-pane .region-event-drawer,
+.overlay-content-box.sc-map557-active .region-map-pane .region-event-drawer,
+.region-map-pane[style*="--sc-map557-outboard-right"] .region-event-drawer {
+  left: auto !important;
+  right: var(--sc-map557-safe-outboard-right) !important;
+  top: 136px !important;
+  bottom: 86px !important;
+  width: var(--sc-map557-safe-control-width) !important;
+  max-width: var(--sc-map557-safe-control-width) !important;
+  max-height: none !important;
+  box-sizing: border-box !important;
+  padding: 10px !important;
+  z-index: 320 !important;
+}
+
+/* #328 is the actual modern owner-visible Region opportunity/event surface.
+   It replaces renderRegionEventDrawer() presentation with `.alpha328-event`.
+   #557 consumes that existing presentation truth and moves it outboard rather
+   than forcing the retired DOM class back into production. */
+.region-map-pane .alpha328-event,
+.overlay-content-box.sc-map557-active .region-map-pane .alpha328-event,
+.region-map-pane[style*="--sc-map557-outboard-right"] .alpha328-event {
+  left: auto !important;
+  right: var(--sc-map557-safe-outboard-right) !important;
+  top: 136px !important;
+  bottom: 86px !important;
+  width: var(--sc-map557-safe-control-width) !important;
+  max-width: var(--sc-map557-safe-control-width) !important;
+  max-height: none !important;
+  box-sizing: border-box !important;
+  z-index: 320 !important;
+}
+
+/* Keep the modern #328 card usable in the compact contextual reserve. */
+.region-map-pane .alpha328-event .alpha328-event__head {
+  gap: 8px !important;
+  padding: 10px 10px 8px !important;
+}
+.region-map-pane .alpha328-event h2 {
+  font-size: 18px !important;
+  overflow-wrap: anywhere !important;
+}
+.region-map-pane .alpha328-event .alpha328-event__close {
+  flex-basis: 30px !important;
+  width: 30px !important;
+  height: 30px !important;
+  font-size: 16px !important;
+}
+.region-map-pane .alpha328-event .alpha328-event__body {
+  padding: 9px 10px 10px !important;
+}
+.region-map-pane .alpha328-event .alpha328-event__summary {
+  font-size: 11px !important;
+}
+.region-map-pane .alpha328-event .alpha328-event__actions button {
+  min-height: 36px !important;
+  padding: 7px 6px !important;
+  font-size: 9px !important;
+  overflow-wrap: anywhere !important;
+}
+
+/* Transient rich event selection owns the contextual reserve while open. */
+.region-map-pane:has(.region-event-drawer) .region-known-destinations,
+.region-map-pane:has(.region-event-drawer) .region-info-toggle,
+.region-map-pane:has(.region-event-drawer) .region-info-drawer,
+.region-map-pane:has(.alpha328-event) .region-known-destinations,
+.region-map-pane:has(.alpha328-event) .region-info-toggle,
+.region-map-pane:has(.alpha328-event) .region-info-drawer,
+.overlay-content-box.sc-map557-active .region-map-pane:has(.region-event-drawer) .region-known-destinations,
+.overlay-content-box.sc-map557-active .region-map-pane:has(.region-event-drawer) .region-info-toggle,
+.overlay-content-box.sc-map557-active .region-map-pane:has(.region-event-drawer) .region-info-drawer,
+.overlay-content-box.sc-map557-active .region-map-pane:has(.alpha328-event) .region-known-destinations,
+.overlay-content-box.sc-map557-active .region-map-pane:has(.alpha328-event) .region-info-toggle,
+.overlay-content-box.sc-map557-active .region-map-pane:has(.alpha328-event) .region-info-drawer,
+.region-map-pane[style*="--sc-map557-outboard-right"]:has(.region-event-drawer) .region-known-destinations,
+.region-map-pane[style*="--sc-map557-outboard-right"]:has(.region-event-drawer) .region-info-toggle,
+.region-map-pane[style*="--sc-map557-outboard-right"]:has(.region-event-drawer) .region-info-drawer,
+.region-map-pane[style*="--sc-map557-outboard-right"]:has(.alpha328-event) .region-known-destinations,
+.region-map-pane[style*="--sc-map557-outboard-right"]:has(.alpha328-event) .region-info-toggle,
+.region-map-pane[style*="--sc-map557-outboard-right"]:has(.alpha328-event) .region-info-drawer {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+body:has(.region-map-pane .region-event-drawer)
+#sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-context,
+body:has(.region-map-pane .alpha328-event)
+#sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-context {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Village return and information controls are navigation/context chrome, not
+   map markers. Their first-frame fallback is deliberately map-local, so these
+   controls cannot flash across crisp pixels while the geometry runtime settles. */
+.village-map-screen .village-map-return,
+.village-map-screen .village-info-toggle,
+.village-map-screen .village-info-drawer,
+.overlay-content-box.sc-map557-active .village-map-screen .village-map-return,
+.overlay-content-box.sc-map557-active .village-map-screen .village-info-toggle,
+.overlay-content-box.sc-map557-active .village-map-screen .village-info-drawer,
+.village-map-screen[style*="--sc-map557-outboard-right"] .village-map-return,
+.village-map-screen[style*="--sc-map557-outboard-right"] .village-info-toggle,
+.village-map-screen[style*="--sc-map557-outboard-right"] .village-info-drawer {
+  left: auto !important;
+  right: var(--sc-map557-safe-outboard-right) !important;
+  width: var(--sc-map557-safe-control-width) !important;
+  max-width: var(--sc-map557-safe-control-width) !important;
+  box-sizing: border-box !important;
+}
+
+.village-map-screen .village-map-return,
+.overlay-content-box.sc-map557-active .village-map-screen .village-map-return,
+.village-map-screen[style*="--sc-map557-outboard-right"] .village-map-return {
+  top: 2% !important;
+  min-width: 0 !important;
+}
+
+.village-map-screen .village-info-toggle,
+.overlay-content-box.sc-map557-active .village-map-screen .village-info-toggle,
+.village-map-screen[style*="--sc-map557-outboard-right"] .village-info-toggle {
+  top: 44% !important;
+}
+
+.village-map-screen .village-info-drawer,
+.overlay-content-box.sc-map557-active .village-map-screen .village-info-drawer,
+.village-map-screen[style*="--sc-map557-outboard-right"] .village-info-drawer {
+  top: calc(44% + 38px) !important;
+  max-height: min(31vh, 260px) !important;
+  overflow: auto !important;
+}
+
+/* The richer Village info panel temporarily owns the same contextual zone. */
+body:has(.village-map-screen .village-info-drawer.open)
+#sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-hud499-context {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
