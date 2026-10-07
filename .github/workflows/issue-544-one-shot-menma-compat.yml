@@ -13,6 +13,7 @@ permissions:
 jobs:
   patch-and-verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@v4
         with:
@@ -25,62 +26,34 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Patch terminal refresh, post-claim resume, and stale QA chronology
+      - name: Patch stale Mirai and Iwabee terminal chronology harnesses
         shell: python
         run: |
-          import json
           from pathlib import Path
-
-          runtime=Path('runtime/alpha-battle-terminal-result-54400.js')
-          text=runtime.read_text(encoding='utf-8')
-
-          old_overlay='''      if(battle&&battle.battleOver===true){\n        if(target==="victory"&&outcome==="victory"){\n          return presentCommittedBattleTerminalResult54400("victory",{source:"open_overlay_victory"});\n        }\n        if((target==="defeat"||target==="setback")&&outcome==="defeat"){\n          return presentCommittedBattleTerminalResult54400("defeat",{source:"open_overlay_defeat"});\n        }\n      }'''
-          new_overlay='''      if(battle&&battle.battleOver===true){\n        const requestedOutcome=target==="victory"&&outcome==="victory"\n          ?"victory"\n          :((target==="defeat"||target==="setback")&&outcome==="defeat"?"defeat":null);\n        if(requestedOutcome){\n          const marker=marker54400(battle,requestedOutcome,false);\n          const surface=surfaceForOutcome54400(requestedOutcome);\n          let sameSurfaceActive=false;\n          try{\n            const activeType=typeof currentOverlayType!=="undefined"?String(currentOverlayType||"").trim().toLowerCase():"";\n            sameSurfaceActive=activeType===surface;\n          }catch(_error){}\n          if(!sameSurfaceActive&&typeof document!=="undefined"){\n            try{\n              const overlay=document.getElementById("screen-overlay");\n              const visible=!!(overlay&&getComputedStyle(overlay).display!=="none");\n              const selector=surface==="victory"?".alpha-victory-code-screen":".alpha331-setback";\n              sameSurfaceActive=visible&&!!document.querySelector(selector);\n            }catch(_error){}\n          }\n          // Exactly-once governs terminal entry, not a legitimate refresh of\n          // the already-visible result surface (for example Victory CLAIM\n          // REWARDS -> CONTINUE). Presentation refresh is not semantic reroll.\n          if(marker&&marker.status==="presented"&&sameSurfaceActive){\n            return PRIOR_OPEN_OVERLAY.apply(this,arguments);\n          }\n          return presentCommittedBattleTerminalResult54400(requestedOutcome,{\n            source:requestedOutcome==="victory"?"open_overlay_victory":"open_overlay_defeat"\n          });\n        }\n      }'''
-          assert old_overlay in text, 'pre-compat #544 openOverlay block missing'
-          text=text.replace(old_overlay,new_overlay,1)
-
-          old_resume='''        const marker=marker54400(battle,outcome,false);\n        if(!marker||marker.status!=="presented"){\n          const presentation=presentCommittedBattleTerminalResult54400(outcome,{source:"caller_resume_intercept"});'''
-          new_resume='''        const marker=marker54400(battle,outcome,false);\n        const victoryAlreadyClaimed=outcome==="victory"&&!!(battle.rewards&&battle.rewards.claimed===true);\n        // A claimed Victory is durable post-claim continuation evidence. The\n        // live presentation marker is intentionally non-persistent, so a\n        // browser reload must not force a second terminal entry before the\n        // player's explicit post-claim Continue restores the exact caller.\n        if((!marker||marker.status!=="presented")&&!victoryAlreadyClaimed){\n          const presentation=presentCommittedBattleTerminalResult54400(outcome,{source:"caller_resume_intercept"});'''
-          assert old_resume in text, 'pre-compat #544 resume block missing'
-          text=text.replace(old_resume,new_resume,1)
-          runtime.write_text(text,encoding='utf-8')
-
-          qa369=Path('tools/qa_issue_369_menma_evolved_pl_battle_browser.js')
-          q369=qa369.read_text(encoding='utf-8')
-          old_wait='''    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_party_defeat_return_01",null,{timeout:25000});\n    const defeatReturnDebug=await page.evaluate(()=> {'''
-          new_wait='''    await page.waitForSelector(".alpha331-setback",{state:"visible",timeout:25000});\n    const setbackGate=await page.evaluate(()=>({\n      overlay:typeof currentOverlayType!=="undefined"?currentOverlayType:null,\n      outcome:currentBattle?.outcome?.type||null,\n      rewardClaimed:currentBattle?.rewards?.claimed===true\n    }));\n    assert.strictEqual(setbackGate.overlay,"setback","#544 did not project the approved Setback surface before Menma defeat return");\n    assert.strictEqual(setbackGate.outcome,"defeat","Setback presentation mutated Menma defeat truth");\n    assert.strictEqual(setbackGate.rewardClaimed,false,"Setback incorrectly claimed a reward");\n    await page.locator(".alpha331-setback button").click();\n    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_party_defeat_return_01",null,{timeout:25000});\n    const defeatReturnDebug=await page.evaluate(()=> {'''
-          assert old_wait in q369, 'pre-#544 Menma automatic defeat-return assertion missing'
-          q369=q369.replace(old_wait,new_wait,1)
-          qa369.write_text(q369,encoding='utf-8')
 
           qa105=Path('tools/qa_issue_105_origin_presentation_browser.js')
           q105=qa105.read_text(encoding='utf-8')
           old_105='''    const returned=await page.evaluate(({terminalOutcome,expectedReturnBeat})=>{\n      if(!currentBattle)return{success:false,reason:"battle_missing"};\n      currentBattle.battleOver=true;\n      currentBattle.outcome={type:terminalOutcome};\n      if(terminalOutcome==="victory"){\n        currentBattle.rewards={\n          generated:true,claimed:true,ryo:50,exp:0,items:[],rareDrops:[],\n          mirai338FixedReward:true,\n          requiresExplicitPostClaimContinue:false\n        };\n      }\n      try{globalThis.hardSettleBattlePresentationQueue33000?.("issue_105_mirai_direct_story_return");}catch(_error){}\n      const result=globalThis.resumeBattleCallerAfterCompletion?.(terminalOutcome);\n      return{\n        result,\n        overlay:typeof currentOverlayType==="undefined"?null:currentOverlayType,\n        beatId:globalThis.getActiveStorySceneRuntime?.()?.beatId||null,\n        expectedReturnBeat\n      };\n    },{terminalOutcome,expectedReturnBeat});\n    assert.strictEqual(returned.result?.success,true,"Mirai #338 caller return failed "+JSON.stringify(returned));\n    assert.strictEqual(returned.beatId,expectedReturnBeat,"Mirai #338 caller returned to wrong Story beat "+JSON.stringify(returned));'''
           new_105='''    let returned=await page.evaluate(({terminalOutcome,expectedReturnBeat})=>{\n      if(!currentBattle)return{success:false,reason:"battle_missing"};\n      currentBattle.battleOver=true;\n      currentBattle.outcome={type:terminalOutcome};\n      if(terminalOutcome==="victory"){\n        currentBattle.rewards={\n          generated:true,claimed:true,ryo:50,exp:0,items:[],rareDrops:[],\n          mirai338FixedReward:true,\n          requiresExplicitPostClaimContinue:false\n        };\n      }\n      try{globalThis.hardSettleBattlePresentationQueue33000?.("issue_105_mirai_direct_story_return");}catch(_error){}\n      const result=globalThis.resumeBattleCallerAfterCompletion?.(terminalOutcome);\n      return{\n        result,\n        overlay:typeof currentOverlayType==="undefined"?null:currentOverlayType,\n        beatId:globalThis.getActiveStorySceneRuntime?.()?.beatId||null,\n        expectedReturnBeat\n      };\n    },{terminalOutcome,expectedReturnBeat});\n    if(terminalOutcome==="defeat"){\n      assert.strictEqual(returned.result?.callerResumeWithheldUntilTerminalResultContinue,true,"Mirai defeat bypassed #544 terminal presentation guard "+JSON.stringify(returned));\n      await page.waitForSelector(".alpha331-setback",{state:"visible",timeout:12000});\n      const gate=await page.evaluate(()=>({overlay:typeof currentOverlayType==="undefined"?null:currentOverlayType,outcome:currentBattle?.outcome?.type||null}));\n      assert.strictEqual(gate.overlay,"setback","Mirai defeat did not present code-owned Setback");\n      assert.strictEqual(gate.outcome,"defeat","Mirai Setback mutated terminal outcome");\n      await page.locator(".alpha331-setback button").click();\n      await page.waitForFunction(expected=>globalThis.getActiveStorySceneRuntime?.()?.beatId===expected,expectedReturnBeat,{timeout:12000});\n      returned={...returned,result:{success:true,viaSetbackContinue:true},beatId:await page.evaluate(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId||null)};\n    }else{\n      assert.strictEqual(returned.result?.success,true,"Mirai #338 caller return failed "+JSON.stringify(returned));\n    }\n    assert.strictEqual(returned.beatId,expectedReturnBeat,"Mirai #338 caller returned to wrong Story beat "+JSON.stringify(returned));'''
           assert old_105 in q105, 'Mirai direct-return QA block drifted'
-          q105=q105.replace(old_105,new_105,1)
-          qa105.write_text(q105,encoding='utf-8')
+          qa105.write_text(q105.replace(old_105,new_105,1),encoding='utf-8')
 
           qa396=Path('tools/qa_issues_396_399_400_browser.js')
           q396=qa396.read_text(encoding='utf-8')
-          q396=q396.replace('''    const result=await page.evaluate(({outcome})=>{''','''    let result=await page.evaluate(({outcome})=>{''',1)
+          start=q396.index('async function runIwabeeBattle(browser,outcome){')
+          end=q396.index('\nasync function runIwabeeWorldBranch',start)
+          seg=q396[start:end]
+          assert '    const result=await page.evaluate(({outcome})=>{' in seg, 'Iwabee result binding drifted'
+          seg=seg.replace('    const result=await page.evaluate(({outcome})=>{','    let result=await page.evaluate(({outcome})=>{',1)
           old_inner='''        const resumed=resumeBattleCallerAfterCompletion(outcome);\n        if(outcome==="defeat"){\n          // The frozen natural-voice Story can paginate one authored beat across\n          // multiple presentation cues. Advance the real Story until the\n          // canonical World consequence commits instead of assuming five clicks.\n          for(let i=0;i<24;i++){\n            const committed=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");\n            if(committed&&committed.fact&&committed.fact.rogueDisposition)break;\n            advanceStoryScene();\n          }\n        }\n        const rt=getActiveStorySceneRuntime();'''
           new_inner='''        const resumed=resumeBattleCallerAfterCompletion(outcome);\n        const rt=getActiveStorySceneRuntime();'''
-          assert old_inner in q396, 'Iwabee pre-#544 direct defeat advancement block drifted'
-          q396=q396.replace(old_inner,new_inner,1)
+          assert old_inner in seg, 'Iwabee pre-#544 direct defeat advancement block drifted'
+          seg=seg.replace(old_inner,new_inner,1)
           marker='''    assert.strictEqual(result.resumed?.success,true,label+" caller resume");\n    assert.strictEqual(result.rewards?.ryo,outcome==="victory"?50:0,label+" Battle reward projection");'''
           replacement='''    if(outcome==="defeat"){\n      assert.strictEqual(result.resumed?.callerResumeWithheldUntilTerminalResultContinue,true,label+" defeat bypassed #544 terminal presentation guard");\n      await page.waitForSelector(".alpha331-setback",{state:"visible",timeout:12000});\n      const setbackGate=await page.evaluate(()=>({overlay:typeof currentOverlayType==="undefined"?null:currentOverlayType,outcome:currentBattle?.outcome?.type||null,rewardClaimed:currentBattle?.rewards?.claimed===true}));\n      assert.strictEqual(setbackGate.overlay,"setback",label+" did not present code-owned Setback");\n      assert.strictEqual(setbackGate.outcome,"defeat",label+" Setback mutated terminal outcome");\n      assert.strictEqual(setbackGate.rewardClaimed,false,label+" Setback incorrectly claimed reward");\n      await page.locator(".alpha331-setback button").click();\n      const post=await page.evaluate(()=>{\n        // The frozen natural-voice Story can paginate one authored beat across\n        // multiple presentation cues. Advance only after Setback Continue has\n        // restored the exact owning Story caller.\n        for(let i=0;i<24;i++){\n          const committed=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");\n          if(committed&&committed.fact&&committed.fact.rogueDisposition)break;\n          advanceStoryScene();\n        }\n        const rt=getActiveStorySceneRuntime();\n        const row=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");\n        return{beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};\n      });\n      result={...result,beatId:post.beatId,local:post.local,fact:post.fact};\n    }\n    assert.strictEqual(result.resumed?.success,true,label+" caller resume");\n    assert.strictEqual(result.rewards?.ryo,outcome==="victory"?50:0,label+" Battle reward projection");'''
-          assert marker in q396, 'Iwabee post-evaluate assertion block drifted'
-          q396=q396.replace(marker,replacement,1)
-          qa396.write_text(q396,encoding='utf-8')
-
-          declarations_path=Path('tools/fixtures/runtime_change_declarations_300.json')
-          declarations=json.loads(declarations_path.read_text(encoding='utf-8'))
-          row=next(r for r in declarations['declarations'] if r.get('changeId')=='issue-544-canonical-battle-terminal-result-presentation-2026-10-07')
-          touched=row.setdefault('stateTouched',[])
-          evidence='read-only currentBattle.rewards.claimed as durable post-claim Victory continuation evidence after reload'
-          if evidence not in touched:touched.append(evidence)
-          declarations_path.write_text(json.dumps(declarations,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          assert marker in seg, 'Iwabee post-evaluate assertion block drifted'
+          seg=seg.replace(marker,replacement,1)
+          qa396.write_text(q396[:start]+seg+q396[end:],encoding='utf-8')
 
       - name: Source and safety verification
         run: |
@@ -122,22 +95,22 @@ jobs:
 
       - name: Mirai terminal return chronology
         env:
-          ISSUE_105_BASE_URL: http://127.0.0.1:8080/index.html
-          ISSUE_105_BROWSER_OUT: artifacts/issue-544-mirai-105
+          ISSUE_105_PRESENTATION_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_105_PRESENTATION_BROWSER_OUT: artifacts/issue-544-mirai-105
         run: xvfb-run -a node tools/qa_issue_105_origin_presentation_browser.js
 
-      - name: Metal Iwabee terminal return chronology
+      - name: Metal and Iwabee terminal return chronology
         env:
-          ISSUE_396_399_400_BASE_URL: http://127.0.0.1:8080/index.html
-          ISSUE_396_399_400_BROWSER_OUT: artifacts/issue-544-396-399-400
+          ISSUES_396_399_400_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUES_396_399_400_BROWSER_OUT: artifacts/issue-544-iwabee-396
         run: xvfb-run -a node tools/qa_issues_396_399_400_browser.js
 
-      - name: Commit exact compatibility fix and remove one-shot workflow
+      - name: Commit QA chronology corrections and remove one-shot workflow
         run: |
           rm .github/workflows/issue-544-one-shot-menma-compat.yml
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add runtime/alpha-battle-terminal-result-54400.js tools/qa_issue_369_menma_evolved_pl_battle_browser.js tools/qa_issue_105_origin_presentation_browser.js tools/qa_issues_396_399_400_browser.js tools/fixtures/runtime_change_declarations_300.json .github/workflows/issue-544-one-shot-menma-compat.yml
+          git add tools/qa_issue_105_origin_presentation_browser.js tools/qa_issues_396_399_400_browser.js .github/workflows/issue-544-one-shot-menma-compat.yml
           git diff --cached --check
-          git commit -m '[CODING][#544] Preserve terminal refresh and caller chronology compatibility'
+          git commit -m '[CODING][#544] Align legacy browser QA with terminal result chronology'
           git push origin HEAD:coding/544-terminal-result-presentation
