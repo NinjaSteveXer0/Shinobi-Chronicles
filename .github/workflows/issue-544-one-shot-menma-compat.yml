@@ -26,7 +26,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Patch stale Mirai and Iwabee terminal chronology harnesses
+      - name: Patch Mirai and Iwabee terminal chronology QA
         shell: python
         run: |
           from pathlib import Path
@@ -45,12 +45,24 @@ jobs:
           seg=q396[start:end]
           assert '    const result=await page.evaluate(({outcome})=>{' in seg, 'Iwabee result binding drifted'
           seg=seg.replace('    const result=await page.evaluate(({outcome})=>{','    let result=await page.evaluate(({outcome})=>{',1)
+
+          old_terminal='''        currentBattle.outcome={type:outcome,committed:true,completedAt:Date.now(),finishingShinobiId:outcome==="victory"?"academy_iwabee":null};\n        currentBattle.battleOver=true;currentBattle.active=false;'''
+          new_terminal='''        let authoritativeDefeat=null;\n        if(outcome==="defeat"){\n          const actionId="qa396_iwabee_rogue_finisher";\n          setBattleRemainingPL("player","academy_iwabee",0);\n          const enemy=getBattleParticipantByIdentity("enemy","iwabee_origin_rogue_genin_01");\n          const envelope={\n            actionId,\n            actorRef:createBattleParticipantRef("enemy","iwabee_origin_rogue_genin_01"),\n            targetRef:createBattleParticipantRef("player","academy_iwabee")\n          };\n          authoritativeDefeat=handleBattleParticipantAtZeroPL("player","academy_iwabee",enemy,envelope);\n        }else{\n          currentBattle.outcome={type:"victory",committed:true,completedAt:Date.now(),finishingShinobiId:"academy_iwabee"};\n          currentBattle.battleOver=true;currentBattle.active=false;\n        }'''
+          assert old_terminal in seg, 'Iwabee synthetic terminal block drifted'
+          seg=seg.replace(old_terminal,new_terminal,1)
+
           old_inner='''        const resumed=resumeBattleCallerAfterCompletion(outcome);\n        if(outcome==="defeat"){\n          // The frozen natural-voice Story can paginate one authored beat across\n          // multiple presentation cues. Advance the real Story until the\n          // canonical World consequence commits instead of assuming five clicks.\n          for(let i=0;i<24;i++){\n            const committed=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");\n            if(committed&&committed.fact&&committed.fact.rogueDisposition)break;\n            advanceStoryScene();\n          }\n        }\n        const rt=getActiveStorySceneRuntime();'''
           new_inner='''        const resumed=resumeBattleCallerAfterCompletion(outcome);\n        const rt=getActiveStorySceneRuntime();'''
           assert old_inner in seg, 'Iwabee pre-#544 direct defeat advancement block drifted'
           seg=seg.replace(old_inner,new_inner,1)
+
+          old_return='''        return{rewards:JSON.parse(JSON.stringify(rewards||null)),firstClaim,secondClaim,walletDeltaFirst:walletAfterFirst-walletBefore,walletDeltaSecond:walletAfterSecond-walletBefore,rewardReceiptCount:rewardReceipts.length,rewardReceipt:JSON.parse(JSON.stringify(rewardReceipts[0]||null)),resumed,beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};'''
+          new_return='''        return{rewards:JSON.parse(JSON.stringify(rewards||null)),firstClaim,secondClaim,walletDeltaFirst:walletAfterFirst-walletBefore,walletDeltaSecond:walletAfterSecond-walletBefore,rewardReceiptCount:rewardReceipts.length,rewardReceipt:JSON.parse(JSON.stringify(rewardReceipts[0]||null)),authoritativeDefeat:JSON.parse(JSON.stringify(authoritativeDefeat||null)),resumed,beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};'''
+          assert old_return in seg, 'Iwabee result return block drifted'
+          seg=seg.replace(old_return,new_return,1)
+
           marker='''    assert.strictEqual(result.resumed?.success,true,label+" caller resume");\n    assert.strictEqual(result.rewards?.ryo,outcome==="victory"?50:0,label+" Battle reward projection");'''
-          replacement='''    if(outcome==="defeat"){\n      assert.strictEqual(result.resumed?.callerResumeWithheldUntilTerminalResultContinue,true,label+" defeat bypassed #544 terminal presentation guard");\n      await page.waitForSelector(".alpha331-setback",{state:"visible",timeout:12000});\n      const setbackGate=await page.evaluate(()=>({overlay:typeof currentOverlayType==="undefined"?null:currentOverlayType,outcome:currentBattle?.outcome?.type||null,rewardClaimed:currentBattle?.rewards?.claimed===true}));\n      assert.strictEqual(setbackGate.overlay,"setback",label+" did not present code-owned Setback");\n      assert.strictEqual(setbackGate.outcome,"defeat",label+" Setback mutated terminal outcome");\n      assert.strictEqual(setbackGate.rewardClaimed,false,label+" Setback incorrectly claimed reward");\n      await page.locator(".alpha331-setback button").click();\n      const post=await page.evaluate(()=>{\n        // The frozen natural-voice Story can paginate one authored beat across\n        // multiple presentation cues. Advance only after Setback Continue has\n        // restored the exact owning Story caller.\n        for(let i=0;i<24;i++){\n          const committed=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");\n          if(committed&&committed.fact&&committed.fact.rogueDisposition)break;\n          advanceStoryScene();\n        }\n        const rt=getActiveStorySceneRuntime();\n        const row=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");\n        return{beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};\n      });\n      result={...result,beatId:post.beatId,local:post.local,fact:post.fact};\n    }\n    assert.strictEqual(result.resumed?.success,true,label+" caller resume");\n    assert.strictEqual(result.rewards?.ryo,outcome==="victory"?50:0,label+" Battle reward projection");'''
+          replacement='''    if(outcome==="defeat"){\n      assert.strictEqual(result.authoritativeDefeat?.setbackPresented,true,label+" authoritative zero-PL hook did not commit Setback");\n      assert.strictEqual(result.resumed?.callerResumeWithheldUntilTerminalResultContinue,true,label+" defeat bypassed #544 terminal presentation guard");\n      await page.waitForSelector(".alpha331-setback",{state:"visible",timeout:12000});\n      const setbackGate=await page.evaluate(()=>({overlay:typeof currentOverlayType==="undefined"?null:currentOverlayType,battleOver:currentBattle?.battleOver===true,outcome:currentBattle?.outcome?.type||null,rewardClaimed:currentBattle?.rewards?.claimed===true}));\n      assert.strictEqual(setbackGate.overlay,"setback",label+" did not present code-owned Setback");\n      assert.strictEqual(setbackGate.battleOver,true,label+" authoritative defeat was not retained");\n      assert.strictEqual(setbackGate.outcome,"defeat",label+" Setback mutated terminal outcome");\n      assert.strictEqual(setbackGate.rewardClaimed,false,label+" Setback incorrectly claimed reward");\n      await page.locator(".alpha331-setback button").click();\n      const post=await page.evaluate(()=>{\n        // The frozen natural-voice Story can paginate one authored beat across\n        // multiple presentation cues. Advance only after Setback Continue has\n        // restored the exact owning Story caller.\n        for(let i=0;i<24;i++){\n          const committed=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");\n          if(committed&&committed.fact&&committed.fact.rogueDisposition)break;\n          advanceStoryScene();\n        }\n        const rt=getActiveStorySceneRuntime();\n        const row=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");\n        return{beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};\n      });\n      result={...result,beatId:post.beatId,local:post.local,fact:post.fact,resumed:{success:true,viaSetbackContinue:true}};\n    }\n    assert.strictEqual(result.resumed?.success,true,label+" caller resume");\n    assert.strictEqual(result.rewards?.ryo,outcome==="victory"?50:0,label+" Battle reward projection");'''
           assert marker in seg, 'Iwabee post-evaluate assertion block drifted'
           seg=seg.replace(marker,replacement,1)
           qa396.write_text(q396[:start]+seg+q396[end:],encoding='utf-8')
@@ -68,7 +80,7 @@ jobs:
       - name: Install Playwright Chromium
         run: |
           npm install --no-save playwright@1.55.0
-          npx playwright install --with-deps chromium
+          npx playwright install chromium
 
       - name: Start local Alpha server
         run: |
@@ -105,12 +117,13 @@ jobs:
           ISSUES_396_399_400_BROWSER_OUT: artifacts/issue-544-iwabee-396
         run: xvfb-run -a node tools/qa_issues_396_399_400_browser.js
 
-      - name: Commit QA chronology corrections and remove one-shot workflow
+      - name: Commit QA corrections and remove temporary workflows
         run: |
           rm .github/workflows/issue-544-one-shot-menma-compat.yml
+          rm .github/workflows/issue-544-iwabee-visibility-diagnostic.yml
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add tools/qa_issue_105_origin_presentation_browser.js tools/qa_issues_396_399_400_browser.js .github/workflows/issue-544-one-shot-menma-compat.yml
+          git add tools/qa_issue_105_origin_presentation_browser.js tools/qa_issues_396_399_400_browser.js .github/workflows/issue-544-one-shot-menma-compat.yml .github/workflows/issue-544-iwabee-visibility-diagnostic.yml
           git diff --cached --check
           git commit -m '[CODING][#544] Align legacy browser QA with terminal result chronology'
           git push origin HEAD:coding/544-terminal-result-presentation
