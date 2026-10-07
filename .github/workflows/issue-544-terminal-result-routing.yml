@@ -1,0 +1,82 @@
+name: Issue 544 terminal-result adversarial QA
+
+on:
+  push:
+    branches:
+      - coding/544-terminal-result-adversarial-qa-lane-f
+    paths:
+      - tools/qa_issue_544_terminal_result_routing.js
+      - tools/qa_issue_544_terminal_result_routing_browser.js
+      - .github/workflows/issue-544-terminal-result-routing.yml
+  pull_request:
+    branches: [ main ]
+    paths:
+      - tools/qa_issue_544_terminal_result_routing.js
+      - tools/qa_issue_544_terminal_result_routing_browser.js
+      - .github/workflows/issue-544-terminal-result-routing.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  issue-544-terminal-result-routing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Materialize exact Lane E candidate without changing Lane F branch
+        shell: bash
+        run: |
+          git fetch origin 803bfb270a2f43c16243da522ae534b0e67954a7 --depth=1
+          git show 803bfb270a2f43c16243da522ae534b0e67954a7:runtime/alpha-battle-terminal-result-54400.js > /tmp/alpha-battle-terminal-result-54400.js
+          test -s /tmp/alpha-battle-terminal-result-54400.js
+
+      - name: Syntax check Lane F harnesses
+        run: |
+          node --check tools/qa_issue_544_terminal_result_routing.js
+          node --check tools/qa_issue_544_terminal_result_routing_browser.js
+
+      - name: Run source failure/acceptance contract
+        env:
+          ISSUE_544_CANDIDATE_MODULE: /tmp/alpha-battle-terminal-result-54400.js
+        run: node tools/qa_issue_544_terminal_result_routing.js
+
+      - name: Install browser dependency
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local runtime
+        shell: bash
+        run: |
+          python3 -m http.server 8080 --bind 127.0.0.1 > /tmp/issue-544-http.log 2>&1 &
+          echo $! > /tmp/issue-544-http.pid
+          for i in {1..40}; do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi
+            sleep 0.25
+          done
+          cat /tmp/issue-544-http.log
+          exit 1
+
+      - name: Run installed-browser baseline plus Lane E self-injection
+        env:
+          ISSUE_544_CANDIDATE_MODULE: /tmp/alpha-battle-terminal-result-54400.js
+        run: node tools/qa_issue_544_terminal_result_routing_browser.js
+
+      - name: Upload exact chronology evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-544-terminal-result-routing-evidence
+          path: |
+            artifacts/issue-544-terminal-result-routing
+            /tmp/issue-544-http.log
+          if-no-files-found: warn
