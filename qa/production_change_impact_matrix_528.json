@@ -5,17 +5,23 @@
   "lane_catalog": {
     "runtime_fingerprint": {
       "kind": "static",
-      "commands": ["node tools/qa_issue_303_runtime_build_fingerprint.js"],
+      "commands": [
+        "node tools/qa_issue_303_runtime_build_fingerprint.js"
+      ],
       "scheduled_representative": true
     },
     "ownership_safety": {
       "kind": "static",
-      "commands": ["node tools/qa_runtime_ownership_safety_300.js"],
+      "commands": [
+        "node tools/qa_runtime_ownership_safety_300.js"
+      ],
       "scheduled_representative": true
     },
     "save_compatibility": {
       "kind": "static",
-      "commands": ["node tools/qa_save_compatibility_311.js"],
+      "commands": [
+        "node tools/qa_save_compatibility_311.js"
+      ],
       "scheduled_representative": true
     },
     "issue32_static": {
@@ -28,22 +34,30 @@
     },
     "issue32_browser": {
       "kind": "browser",
-      "commands": ["node tools/qa_issue_32_chronicle_depth_browser.js"],
+      "commands": [
+        "node tools/qa_issue_32_chronicle_depth_browser.js"
+      ],
       "scheduled_representative": true
     },
     "issue431_browser": {
       "kind": "browser",
-      "commands": ["node tools/qa_phase2_konoha_player_surfaces_431.js"],
+      "commands": [
+        "node tools/qa_phase2_konoha_player_surfaces_431.js"
+      ],
       "scheduled_representative": false
     },
     "issue461_static": {
       "kind": "static",
-      "commands": ["node tools/qa_phase2_inventory_core_461.js"],
+      "commands": [
+        "node tools/qa_phase2_inventory_core_461.js"
+      ],
       "scheduled_representative": true
     },
     "issue461_browser": {
       "kind": "browser",
-      "commands": ["node tools/qa_phase2_inventory_core_461_browser.js"],
+      "commands": [
+        "node tools/qa_phase2_inventory_core_461_browser.js"
+      ],
       "scheduled_representative": false
     },
     "issue545_static": {
@@ -58,62 +72,88 @@
     },
     "issue552_static": {
       "kind": "static",
-      "commands": ["node tools/qa_retail_kunai_durable_552.js"],
+      "commands": [
+        "node tools/qa_retail_kunai_durable_552.js"
+      ],
       "scheduled_representative": true
     },
     "issue552_browser": {
       "kind": "browser",
-      "commands": ["node tools/qa_retail_kunai_durable_552_browser.js"],
+      "commands": [
+        "node tools/qa_retail_kunai_durable_552_browser.js"
+      ],
       "scheduled_representative": false
     },
     "issue469_static": {
       "kind": "static",
-      "commands": ["node tools/qa_issue_469_ce_hotspot.js"],
+      "commands": [
+        "node tools/qa_issue_469_ce_hotspot.js"
+      ],
       "scheduled_representative": false
     },
     "issue469_browser": {
       "kind": "browser",
-      "commands": ["node tools/qa_issue_469_ce_hotspot_browser.js"],
+      "commands": [
+        "node tools/qa_issue_469_ce_hotspot_browser.js"
+      ],
       "scheduled_representative": true
     },
     "issue499_static": {
       "kind": "static",
-      "commands": ["node tools/qa_phase2_live_hud_499.js"],
+      "commands": [
+        "node tools/qa_phase2_live_hud_499.js",
+        "node tools/qa_map_canvas_unobstructed_557.js"
+      ],
       "scheduled_representative": true
     },
     "issue499_browser": {
       "kind": "browser",
-      "commands": ["node tools/qa_phase2_live_hud_499_browser.js"],
+      "commands": [
+        "node tools/qa_phase2_live_hud_499_browser.js",
+        "node tools/qa_map_canvas_unobstructed_557_browser.js"
+      ],
       "scheduled_representative": false
     },
     "issue517_static": {
       "kind": "static",
-      "commands": ["node tools/qa_phase2_basic_item_shop_517.js"],
+      "commands": [
+        "node tools/qa_phase2_basic_item_shop_517.js"
+      ],
       "scheduled_representative": true
     },
     "issue517_browser": {
       "kind": "browser",
-      "commands": ["node tools/qa_phase2_basic_item_shop_517_browser.js"],
+      "commands": [
+        "node tools/qa_phase2_basic_item_shop_517_browser.js"
+      ],
       "scheduled_representative": false
     },
     "issue524_static": {
       "kind": "static",
-      "commands": ["node tools/qa_phase2_character_card_shop_524.js"],
+      "commands": [
+        "node tools/qa_phase2_character_card_shop_524.js"
+      ],
       "scheduled_representative": true
     },
     "issue524_browser": {
       "kind": "browser",
-      "commands": ["node tools/qa_phase2_character_card_shop_524_browser.js"],
+      "commands": [
+        "node tools/qa_phase2_character_card_shop_524_browser.js"
+      ],
       "scheduled_representative": false
     },
     "issue532_static": {
       "kind": "static",
-      "commands": ["node tools/qa_phase2_team_assignment_532.js"],
+      "commands": [
+        "node tools/qa_phase2_team_assignment_532.js"
+      ],
       "scheduled_representative": false
     },
     "issue532_browser": {
       "kind": "browser",
-      "commands": ["node tools/qa_phase2_team_assignment_532_browser.js"],
+      "commands": [
+        "node tools/qa_phase2_team_assignment_532_browser.js"
+      ],
       "scheduled_representative": true
     },
     "promotion_static": {
@@ -126,7 +166,9 @@
     },
     "ui_master_browser": {
       "kind": "browser",
-      "commands": ["node tools/qa_ui_master_consumption_528_browser.js"],
+      "commands": [
+        "node tools/qa_ui_master_consumption_528_browser.js"
+      ],
       "scheduled_representative": true
     }
   },
@@ -194,7 +236,11 @@
         "deliberate_team_assignment_532",
         "frozen_origin_shared_runtime"
       ],
-      "required_lane_ids": ["runtime_fingerprint", "ownership_safety", "save_compatibility"]
+      "required_lane_ids": [
+        "runtime_fingerprint",
+        "ownership_safety",
+        "save_compatibility"
+      ]
     },
     {
       "id": "runtime_ownership_contract",
@@ -212,11 +258,16 @@
         "promotion_transition_141_63",
         "frozen_origin_shared_runtime"
       ],
-      "required_lane_ids": ["ownership_safety", "save_compatibility"]
+      "required_lane_ids": [
+        "ownership_safety",
+        "save_compatibility"
+      ]
     },
     {
       "id": "chronicle_current_team_state",
-      "changed_any": ["runtime/alpha-chronicle-state-manifest-43600.js"],
+      "changed_any": [
+        "runtime/alpha-chronicle-state-manifest-43600.js"
+      ],
       "affected_consumers": [
         "first_live_ce_hotspot_469",
         "live_hud_499",
@@ -249,7 +300,10 @@
         "victory_setback_results_141",
         "konoha_activity_surfaces_431"
       ],
-      "required_lane_ids": ["ui_master_browser", "issue431_browser"]
+      "required_lane_ids": [
+        "ui_master_browser",
+        "issue431_browser"
+      ]
     },
     {
       "id": "chronicle_reference_master",
@@ -257,8 +311,13 @@
         "Documentation/UI/UI Master Asset Classification and Consumption Registry 2026-10-05.md",
         "UI/convo.png"
       ],
-      "affected_consumers": ["chronicle_interaction_depth_32"],
-      "required_lane_ids": ["issue32_static", "issue32_browser"]
+      "affected_consumers": [
+        "chronicle_interaction_depth_32"
+      ],
+      "required_lane_ids": [
+        "issue32_static",
+        "issue32_browser"
+      ]
     },
     {
       "id": "battle_result_presentation",
@@ -273,7 +332,11 @@
         "ui_active_masters_526",
         "frozen_origin_shared_runtime"
       ],
-      "required_lane_ids": ["ui_master_browser", "issue32_static", "save_compatibility"]
+      "required_lane_ids": [
+        "ui_master_browser",
+        "issue32_static",
+        "save_compatibility"
+      ]
     },
     {
       "id": "konoha_activity_presentation",
@@ -287,7 +350,31 @@
         "konoha_activity_surfaces_431",
         "ui_active_masters_526"
       ],
-      "required_lane_ids": ["issue431_browser", "ui_master_browser"]
+      "required_lane_ids": [
+        "issue431_browser",
+        "ui_master_browser"
+      ]
+    },
+    {
+      "id": "live_hud_unobstructed_map_canvas_557",
+      "changed_any": [
+        "runtime/alpha-phase2-live-hud-49900.js",
+        "runtime/alpha-phase2-map-canvas-outboard-557.css",
+        "tools/qa_phase2_live_hud_499.js",
+        "tools/qa_map_canvas_unobstructed_557.js",
+        "tools/qa_map_canvas_unobstructed_557_browser.js",
+        ".github/workflows/issue-499-phase2-live-hud.yml"
+      ],
+      "affected_consumers": [
+        "live_hud_499"
+      ],
+      "required_lane_ids": [
+        "runtime_fingerprint",
+        "ownership_safety",
+        "save_compatibility",
+        "issue499_static",
+        "issue499_browser"
+      ]
     },
     {
       "id": "durable_object_provenance",
@@ -354,11 +441,16 @@
         "promotion_transition_141_63",
         "frozen_origin_shared_runtime"
       ],
-      "required_lane_ids": ["promotion_static", "save_compatibility"]
+      "required_lane_ids": [
+        "promotion_static",
+        "save_compatibility"
+      ]
     },
     {
       "id": "production_loader_surface",
-      "changed_any": ["index.html"],
+      "changed_any": [
+        "index.html"
+      ],
       "affected_consumers": [
         "inventory_core_461",
         "live_hud_499",
@@ -385,7 +477,10 @@
     },
     {
       "id": "shared_game_runtime",
-      "changed_any": ["game.js"],
+      "changed_any": [
+        "game.js",
+        ".github/workflows/issue-597-academy-origin-registry.yml"
+      ],
       "affected_consumers": [
         "chronicle_interaction_depth_32",
         "inventory_core_461",
