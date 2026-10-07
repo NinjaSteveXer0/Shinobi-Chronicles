@@ -1,0 +1,94 @@
+name: Issue 603 Step-7 Promotion Adversarial QA
+
+on:
+  push:
+    branches:
+      - coding/603-step7-promotion-qa
+    paths:
+      - 'tools/qa_issue_603_step7_promotion.js'
+      - 'tools/qa_issue_603_step7_promotion_browser.js'
+      - '.github/workflows/issue-603-step7-promotion.yml'
+      - 'runtime/alpha-promotion-core-60300.js'
+      - 'runtime/alpha-promotion-courier-assessment-60310.js'
+      - 'runtime/alpha-promotion-arena-ui-60320.js'
+      - 'runtime/alpha-promotion-arena-ui-60320.css'
+  pull_request:
+    branches:
+      - coding/603-step7-promotion-integration
+    paths:
+      - 'tools/qa_issue_603_step7_promotion.js'
+      - 'tools/qa_issue_603_step7_promotion_browser.js'
+      - '.github/workflows/issue-603-step7-promotion.yml'
+      - 'runtime/alpha-promotion-core-60300.js'
+      - 'runtime/alpha-promotion-courier-assessment-60310.js'
+      - 'runtime/alpha-promotion-arena-ui-60320.js'
+      - 'runtime/alpha-promotion-arena-ui-60320.css'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  step7-promotion-adversarial-qa:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: QA syntax
+        run: |
+          node --check tools/qa_issue_603_step7_promotion.js
+          node --check tools/qa_issue_603_step7_promotion_browser.js
+
+      - name: Frozen-contract oracle + integrated source guards
+        run: node tools/qa_issue_603_step7_promotion.js
+
+      - name: Existing Rank / save / ownership regression guards
+        run: |
+          if [[ -f tools/qa_save_compatibility_311.js ]]; then node tools/qa_save_compatibility_311.js; fi
+          if [[ -f tools/qa_issue_436_chronicle_state_manifest.js ]]; then node tools/qa_issue_436_chronicle_state_manifest.js; fi
+
+      - name: Detect integrated Promotion runtime
+        id: integrated
+        shell: bash
+        run: |
+          if [[ -f runtime/alpha-promotion-core-60300.js && -f runtime/alpha-promotion-courier-assessment-60310.js && -f runtime/alpha-promotion-arena-ui-60320.js ]]; then
+            echo 'present=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'present=false' >> "$GITHUB_OUTPUT"
+            echo '#603 A/B/C runtime not yet combined: browser proof remains integration-only.'
+          fi
+
+      - name: Install Playwright Chromium
+        if: steps.integrated.outputs.present == 'true'
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        if: steps.integrated.outputs.present == 'true'
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > sc603-server.log 2>&1 &
+          echo $! > sc603-server.pid
+          sleep 2
+
+      - name: Installed-browser inspection / attempt / hidden-truth gate
+        if: steps.integrated.outputs.present == 'true'
+        env:
+          SC603_REQUIRE_INTEGRATION: '1'
+        run: node tools/qa_issue_603_step7_promotion_browser.js
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: promotion-603-browser
+          path: |
+            artifacts/promotion-603
+            sc603-server.log
+          if-no-files-found: ignore
