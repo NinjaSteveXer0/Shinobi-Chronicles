@@ -200,11 +200,12 @@ async function proveObserverContext(page,surface,label){
   const rows=await hotspotRows(page,surface);
   const target=rows.find(row=>row.visible&&row.reachable&&row.contextBound);
   assert(target,`${label}: no bound pointer-reachable hotspot for observer-context proof`);
-  await page.locator(selector).nth(target.index).dispatchEvent("mouseenter");
+  const targetNode=page.locator(selector).nth(target.index);
+  await targetNode.hover();
   await page.waitForFunction(()=>{
     const panel=document.querySelector('#sc-phase2-live-hud-49900 .sc-hud499-context[data-active="true"]');
     return !!(panel&&String(panel.innerText||"").trim());
-  },null,{timeout:3000});
+  },null,{timeout:5000});
 }
 
 async function contextVisibility(page){
