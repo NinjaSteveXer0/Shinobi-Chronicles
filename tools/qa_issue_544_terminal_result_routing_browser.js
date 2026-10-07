@@ -272,14 +272,10 @@ async function setupBanditWorld(page,label){
     if(typeof setOpportunityDiscovery==="function")setOpportunityDiscovery(opportunityId,{level:"discovered",known:true},{save:false});
     if(typeof setOpportunityActionability==="function")setOpportunityActionability(opportunityId,{available:true},{save:false});
 
-    const world=ensureWorldState(playerData);
-    world.currentRegionKey="fire";
-    world.currentLocationId="bandit_hideout";
-    if(!world.currentLocationByRegion||typeof world.currentLocationByRegion!=="object")world.currentLocationByRegion={};
-    world.currentLocationByRegion.fire="bandit_hideout";
-    world.traveling=null;
-    world.opportunityPresentation=null;
-    globalThis.currentWorldHotspotInteraction=null;
+    selectedRegionKey="fire";
+    selectedLocationNode=getWorldRegionLocation("fire","bandit_hideout");
+    selectedHotspotId=definition?.hotspotId||"hotspot_fire_bandit_hideout";
+    selectedOpportunityId=opportunityId;
     savePlayerData();
 
     return{
@@ -289,7 +285,7 @@ async function setupBanditWorld(page,label){
       opportunityId,actionId,
       definition:definition?JSON.parse(JSON.stringify(definition)):null,
       encounter:JSON.parse(JSON.stringify(getEncounterData("bandit_leader")||null)),
-      world:{regionKey:world.currentRegionKey,locationId:world.currentLocationId}
+      world:{regionKey:selectedRegionKey,locationId:selectedLocationNode?.id||null,hotspotId:selectedHotspotId,opportunityId:selectedOpportunityId}
     };
   },label);
 }
@@ -309,13 +305,12 @@ async function launchBanditWorld(page,label){
     const result=routeWorldOpportunityInteraction(opportunityId,actionId);
     const player=currentBattle?.activePlayer||null;
     const enemy=currentBattle?.activeEnemy||null;
-    const world=ensureWorldState(playerData);
     return{
       result,battleId:currentBattle?.battleId||null,
       returnContext:JSON.parse(JSON.stringify(currentBattle?.returnContext||null)),
       playerId:player?.id||currentBattle?.activePlayerId||playerData.currentCharacter||null,
       enemyId:enemy?.id||currentBattle?.activeEnemyId||null,
-      world:{regionKey:world.currentRegionKey,locationId:world.currentLocationId}
+      world:{regionKey:selectedRegionKey,locationId:selectedLocationNode?.id||null,hotspotId:selectedHotspotId,opportunityId:selectedOpportunityId}
     };
   },{opportunityId:setup.opportunityId,actionId:setup.actionId});
   assert.strictEqual(launched.result?.success,true,label+" authored World Bandit route did not launch "+JSON.stringify({setup,launched}));
@@ -360,16 +355,13 @@ async function continueBanditWorld(page,outcome,baselineAutoResumed=false,commit
     }else if(!baselineAutoResumed){
       resume=typeof continueAfterSetback33100==="function"?continueAfterSetback33100():resumeBattleCallerAfterCompletion("defeat");
     }
-    const world=ensureWorldState(playerData);
     const receipts=rewardSourceId?(playerData.activityHistory||[]).filter(row=>row&&row.rewardSourceId===rewardSourceId).map(row=>JSON.parse(JSON.stringify(row))):[];
     return{
       baselineAutoResumed,claim1,claim2,resume,wallet0,wallet1,wallet2,
       walletAfter:Math.max(0,Number(playerData.ryo)||0),
       historyAfter:(playerData.activityHistory||[]).length,
       rewardReceipts:receipts,
-      world:{regionKey:world.currentRegionKey,locationId:world.currentLocationId,opportunityPresentation:JSON.parse(JSON.stringify(world.opportunityPresentation||null))},
-      selectedOpportunityId:typeof selectedOpportunityId!=="undefined"?selectedOpportunityId:null,
-      selectedHotspotId:typeof selectedHotspotId!=="undefined"?selectedHotspotId:null,
+      world:{regionKey:selectedRegionKey,locationId:selectedLocationNode?.id||null,hotspotId:selectedHotspotId,opportunityId:selectedOpportunityId},
       terminal:typeof getBattleTerminalResultPresentation54400==="function"?getBattleTerminalResultPresentation54400():null
     };
   },{outcome,baselineAutoResumed,rewardSourceId:committed?.rewards?.rewardSourceId||null});
