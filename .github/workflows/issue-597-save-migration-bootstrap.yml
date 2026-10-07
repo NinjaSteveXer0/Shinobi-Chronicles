@@ -26,7 +26,18 @@ jobs:
           node-version: '22'
 
       - name: Apply #582 save compatibility migration
-        run: python tools/apply_issue_597_save_migration.py
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path=Path('tools/apply_issue_597_save_migration.py')
+          text=path.read_text(encoding='utf-8')
+          text=text.replace(
+              'load_end = text.find("// =========================================================\\n// SAVE PLAYER DATA", load_start)',
+              'load_end = text.find("function savePlayerData()", load_start)'
+          )
+          path.write_text(text,encoding='utf-8')
+          PY
+          python tools/apply_issue_597_save_migration.py
 
       - name: Focused syntax and contract validation
         run: |
