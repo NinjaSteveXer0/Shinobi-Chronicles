@@ -67,6 +67,7 @@ EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-phase2-basic-item-shop-51700.js",
     "runtime/alpha-hud-my-clan-return-context-50600.js",
     "runtime/alpha-phase2-character-card-shop-52400.js",
+    "runtime/alpha-battle-terminal-result-54400.js",
 ]
 
 PYTHON_GATES = [
