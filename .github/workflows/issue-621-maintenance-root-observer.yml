@@ -26,28 +26,34 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
 
           runtime = Path('runtime/alpha-phase2-live-hud-49900.js')
           text = runtime.read_text()
-          old_state = '  resizeObserver:null,rootObserver:null,structureObserver:null,'
-          new_state = '  resizeObserver:null,overlayObserver:null,structureObserver:null,'
+
+          old_state = 'resizeObserver:null,rootObserver:null,structureObserver:null,'
+          new_state = 'resizeObserver:null,overlayObserver:null,structureObserver:null,'
           if old_state in text:
               text = text.replace(old_state, new_state, 1)
           elif new_state not in text:
               raise SystemExit('expected #621 scheduler state seam not found')
 
-          old = '''  const root=document.getElementById(ROOT_ID);
-          if(root){
-            state.rootObserver=new MutationObserver(()=>{
-              state.structureSignalCount+=1;
-              schedule("surface_change");
-            });
-            state.rootObserver.observe(root,{attributes:true,attributeFilter:["data-surface","hidden"]});
-          }
+          root_pattern = re.compile(
+              r'\n\s*const root=document\.getElementById\(ROOT_ID\);\s*'
+              r'if\(root\)\{\s*'
+              r'state\.rootObserver=new MutationObserver\(\(\)=>\{\s*'
+              r'state\.structureSignalCount\+=1;\s*'
+              r'schedule\("surface_change"\);\s*'
+              r'\}\);\s*'
+              r'state\.rootObserver\.observe\(root,\{attributes:true,attributeFilter:\["data-surface","hidden"\]\}\);\s*'
+              r'\}\s*'
+              r'const overlay=document\.getElementById\("screen-overlay"\);\s*'
+              r'if\(overlay\)\{\s*'
+              r'state\.structureObserver=new MutationObserver\(records=>\{',
+              re.MULTILINE,
+          )
+          replacement = '''
           const overlay=document.getElementById("screen-overlay");
-          if(overlay){
-            state.structureObserver=new MutationObserver(records=>{'''
-          new = '''  const overlay=document.getElementById("screen-overlay");
           if(overlay){
             state.overlayObserver=new MutationObserver(()=>{
               state.structureSignalCount+=1;
@@ -55,23 +61,22 @@ jobs:
             });
             state.overlayObserver.observe(overlay,{attributes:true,attributeFilter:["style","class","hidden"]});
             state.structureObserver=new MutationObserver(records=>{'''
-          if old in text:
-              text = text.replace(old, new, 1)
-          elif new not in text:
-              raise SystemExit('expected root observer seam not found')
+          hardened_marker = 'state.overlayObserver.observe(overlay,{attributes:true,attributeFilter:["style","class","hidden"]})'
+          if hardened_marker not in text:
+              text, count = root_pattern.subn(replacement, text, count=1)
+              if count != 1:
+                  raise SystemExit('expected root observer seam not found')
           runtime.write_text(text)
 
           qa = Path('tools/qa_issue_621_region_hud_stability.js')
           q = qa.read_text()
-          old_q = '''assert(source.includes('attributeFilter:["data-surface","hidden"]'),"#621 does not observe HUD surface transitions narrowly");
-          assert(source.includes('attributeFilter:["class","hidden"]'),"#621 does not observe bounded map structural transitions");'''
-          new_q = '''assert(source.includes('state.overlayObserver.observe(overlay,{attributes:true,attributeFilter:["style","class","hidden"]})'),"#621 does not observe real overlay visibility transitions narrowly");
-          assert(source.includes('attributeFilter:["class","hidden"]'),"#621 does not observe bounded map structural transitions");
+          old_line = 'assert(source.includes(\'attributeFilter:["data-surface","hidden"]\'),"#621 does not observe HUD surface transitions narrowly");'
+          new_lines = '''assert(source.includes('state.overlayObserver.observe(overlay,{attributes:true,attributeFilter:["style","class","hidden"]})'),"#621 does not observe real overlay visibility transitions narrowly");
           assert(!source.includes("rootObserver"),"#621 still wakes from #499 root projection churn");
           assert(!source.includes('attributeFilter:["data-surface","hidden"]'),"#621 still observes #499 data-surface polling churn");'''
-          if old_q in q:
-              q = q.replace(old_q, new_q, 1)
-          elif new_q not in q:
+          if old_line in q:
+              q = q.replace(old_line, new_lines, 1)
+          elif 'assert(!source.includes("rootObserver")' not in q:
               raise SystemExit('expected static QA observer assertion seam not found')
           qa.write_text(q)
           PY
