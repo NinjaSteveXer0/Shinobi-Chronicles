@@ -6,6 +6,14 @@ on:
       - coding/597-academy-origin-registry-recalibration
     paths:
       - '.github/workflows/issue-597-registry-bootstrap.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/issue-597-registry-bootstrap.yml'
+      - 'game.js'
+      - 'tools/qa_issue_597_academy_origin_registry_recalibration.js'
+      - 'tools/qa_issue_597_academy_origin_registry_recalibration_browser.js'
 
 permissions:
   contents: write
