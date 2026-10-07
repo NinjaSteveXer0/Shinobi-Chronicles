@@ -28,30 +28,33 @@ async function setup(page,runId){
     const selected=selectChronicleOrigin("academy_menma","qa490_origin");
     const identity=commitChronicleRunIdentity43600({runId:fixtureRunId,creationKind:"NEW_START"});
     const completed=completeChronicleOriginPrologue("academy_menma",["qa490_menma_origin"]);
+    const preparedPrivate=ensureAutonomousKakashiPrivateHistory46900("qa490_pre_team_run_identity_fixture");
+    const privateBeforeSelection=getKakashiPrivateOriginHistory46900();
     const desired=["academy_hinata","academy_kakashi"],snapshot=getAcademyTeamFormationSnapshot();
     if(!desired.every(id=>snapshot.eligibleCandidateVariantIds.includes(id)))return{error:"required_team_missing",eligible:snapshot.eligibleCandidateVariantIds};
     selectAcademyTeamFormationTeammate(1,desired[0]);selectAcademyTeamFormationTeammate(2,desired[1]);
-    const formed=confirmAcademyTeamFormation("qa490_team",desired),continued=continueAcademyTeamFormationJourney();
+    const privateBeforeConfirm=getKakashiPrivateOriginHistory46900();
+    const formed=confirmAcademyTeamFormation("qa490_team",desired);
+    const privateAfterConfirm=getKakashiPrivateOriginHistory46900();
+    const continued=continueAcademyTeamFormationJourney();
     updateChronicleTutorialProgress43600({sandboxPopupSeen:true,recommendedRouteEnabled:false,openingChoice:"explore",trainingTipSeen:true,practicalTipSeen:true,examsTipSeen:true,arenaTipSeen:true,arenaCompletionChoiceSeen:true,shinobiRecordTipSeen:true},{save:true});
-    getOriginParticipantContinuityStore43600({create:true}).byKey["academy_kakashi::academy_kakashi_origin_masked_interceptor"]={
-      schemaVersion:1,originId:"academy_kakashi",stableParticipantId:"academy_kakashi_origin_masked_interceptor",observerLabel:"Masked Interceptor",
-      originOccurrenceRef:"qa490_private_origin_fixture",storySceneInstanceId:"qa490_private_origin_fixture",encounteredByProtagonist:true,
-      fieldDispositionState:"AVAILABLE",fieldDispositionOccurrenceRef:"qa490_material_ref",survivedOrigin:true,hiddenPostTestReviewReached:true,
-      postTestTruthClass:"staged_konoha_test_participant",protagonistKnowsTestTruth:false,
-      materialHistory:{lethalAttempt:false,policeTransfer:false,restraintOrAnbu:false,deliberateRelease:false,miDefeatedKakashi:false,kakashiDefeatedMi:false,otherMaterialEncounter:true},
-      materialHistoryRefs:["qa490_material_ref"],captureMode:"qa_fixture_exact",capturedAt:1
-    };savePlayerData();
-    return{selected,identity,completed,formed,continued,team:getChronicleCurrentTeam43600(),gate:getKonohaCeHotspotEligibility46900()};
+    savePlayerData();
+    return{selected,identity,completed,preparedPrivate,privateBeforeSelection,privateBeforeConfirm,privateAfterConfirm,formed,continued,team:getChronicleCurrentTeam43600(),gate:getKonohaCeHotspotEligibility46900()};
   },runId);
   assert(!result.error,JSON.stringify(result));assert.strictEqual(result.selected.success,true);assert.strictEqual(result.identity.success,true);
-  assert.strictEqual(result.completed.success,true);assert.strictEqual(result.formed.success,true,JSON.stringify(result.formed));assert.strictEqual(result.continued.success,true);
+  assert.strictEqual(result.completed.success,true);assert.strictEqual(result.preparedPrivate.success,true,JSON.stringify(result.preparedPrivate));
+  assert(result.privateBeforeSelection&&result.privateAfterConfirm,"qa490 private Kakashi history was not sealed");
+  assert.strictEqual(JSON.stringify(result.privateBeforeConfirm),JSON.stringify(result.privateBeforeSelection),"qa490 teammate selection rerolled private Kakashi history");
+  assert.strictEqual(JSON.stringify(result.privateAfterConfirm),JSON.stringify(result.privateBeforeSelection),"qa490 Team Formation rerolled private Kakashi history");
+  assert.strictEqual(result.formed.success,true,JSON.stringify(result.formed));assert.strictEqual(result.continued.success,true);
   assert.deepStrictEqual(result.team.teamVariantIds,["academy_menma","academy_hinata","academy_kakashi"]);assert.strictEqual(result.gate.available,true,JSON.stringify(result.gate));
 }
 async function openScene(page){
   await page.evaluate(()=>openOverlay("village"));
   const p01=page.locator('button[data-village-hotspot-id="KON-P01"]');await p01.waitFor({state:"visible",timeout:10000});await p01.dblclick();
   await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.sceneId==="scene_konoha_ce_kakashi_masked_interceptor_admin_crossing_menma_v1",null,{timeout:10000});
-  await page.waitForSelector(".sc-scene-board-33900",{state:"visible",timeout:10000});
+  await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:10000});
+  await page.waitForSelector("#story-scene-presentation-layer .sc-scene-board-33900",{state:"visible",timeout:10000});
   await page.evaluate(()=>syncStorySceneBoardBenchmark49000());
 }
 async function stage(page){return page.evaluate(()=>[...document.querySelectorAll(".sc-scene-board-33900__actor")].map(node=>{const r=node.getBoundingClientRect(),s=getComputedStyle(node);return{id:node.dataset.actorId,x:r.x,y:r.y,right:r.right,bottom:r.bottom,opacity:Number(s.opacity),filter:s.filter,benchmark:node.dataset.sc490BenchmarkAnchor||null};}));}
