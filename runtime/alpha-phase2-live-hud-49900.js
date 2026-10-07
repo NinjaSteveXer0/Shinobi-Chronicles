@@ -573,7 +573,7 @@ function render(force=false){
   if(!root)return false;
   const data=snapshot();
   root.hidden=!data.visible;
-  root.dataset.surface=data.surface.kind;
+  if(root.dataset.surface!==data.surface.kind)root.dataset.surface=data.surface.kind;
   syncMapGutterGeometry(root,data.surface.kind);
   syncMapEchoPresentation(root,data.surface.kind);
   bindFunctionalMapContext(root,data.surface.kind);
@@ -825,7 +825,7 @@ const MAPS=Object.freeze({region:".region-map-pane",village:".village-map-screen
 const STRUCTURAL_SELECTOR=".region-info-drawer,.region-event-drawer,.alpha328-event,.region-map-pane,.village-map-screen";
 const state={
   map:null,box:null,raf:0,
-  resizeObserver:null,overlayObserver:null,structureObserver:null,
+  resizeObserver:null,surfaceObserver:null,overlayObserver:null,structureObserver:null,
   syncCount:0,scheduleCount:0,writeCount:0,resizeSignalCount:0,structureSignalCount:0,
   lastReason:"install"
 };
@@ -968,6 +968,16 @@ function installGeometryObservers(){
       schedule("resize_observer");
     });
     observeGeometryTargets(state.map,state.box);
+  }
+  const root=document.getElementById(ROOT_ID);
+  if(root){
+    state.surfaceObserver=new MutationObserver(records=>{
+      const changed=records.some(record=>record.type==="attributes"&&record.attributeName==="data-surface"&&record.oldValue!==root.dataset.surface);
+      if(!changed)return;
+      state.structureSignalCount+=1;
+      schedule("surface_change");
+    });
+    state.surfaceObserver.observe(root,{attributes:true,attributeFilter:["data-surface"],attributeOldValue:true});
   }
 const overlay=document.getElementById("screen-overlay");
 if(overlay){

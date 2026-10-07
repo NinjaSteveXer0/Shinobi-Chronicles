@@ -12,9 +12,13 @@ const source=runtime.slice(start,end);
 assert(source.includes("#621 hardens the scheduler against self-reactive geometry feedback"),"#621 repair marker missing");
 assert(source.includes('mode:"signal_coalesced"'),"#621 signal-coalesced scheduler diagnostics missing");
 assert(source.includes("ResizeObserver"),"#621 lacks bounded resize-driven geometry refresh");
+assert(runtime.includes('if(root.dataset.surface!==data.surface.kind)root.dataset.surface=data.surface.kind;'),"#621 did not make canonical #499 surface projection change-aware");
+assert(!/\n\s*root\.dataset\.surface=data\.surface\.kind;/.test(runtime),"#621 left unconditional #499 data-surface writes active");
+assert(source.includes('state.surfaceObserver.observe(root,{attributes:true,attributeFilter:["data-surface"],attributeOldValue:true})'),"#621 lacks narrow one-shot canonical surface transition observation");
+assert(source.includes('record.oldValue!==root.dataset.surface'),"#621 surface observer does not reject unchanged projection churn");
 assert(source.includes('state.overlayObserver.observe(overlay,{attributes:true,attributeFilter:["style","class","hidden"]})'),"#621 does not observe real overlay visibility transitions narrowly");
-assert(!source.includes("rootObserver"),"#621 still wakes from #499 root projection churn");
-assert(!source.includes('attributeFilter:["data-surface","hidden"]'),"#621 still observes #499 data-surface polling churn");
+assert(!source.includes("rootObserver"),"#621 resurrected the old broad root observer");
+assert(!source.includes('attributeFilter:["data-surface","hidden"]'),"#621 resurrected mixed root polling-churn observation");
 assert(source.includes('attributeFilter:["class","hidden"]'),"#621 does not observe bounded map structural transitions");
 assert(source.includes("target===state.box"),"#621 does not ignore owned/echo box class churn");
 assert(source.includes("setStyleIfChanged"),"#621 geometry writes are not change-aware");
@@ -43,7 +47,7 @@ console.log(JSON.stringify({
   pass:true,
   issue:621,
   productionOwner:"runtime/alpha-phase2-live-hud-49900.js",
-  scope:"#557 scheduler/observer only",
+  scope:"canonical #499 surface handoff + #557 scheduler/observer",
   signalCoalesced:true,
   periodicGeometryPolling:false,
   bodyWideStyleObserver:false,
