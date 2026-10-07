@@ -71,6 +71,40 @@ async function viewportScenario(browser,width,height,label){
     const hidden=normalizeHiddenDom(await hiddenProjectionRows(page));
     assert(hidden.every(row=>!JSON.stringify(row).match(/information_use|team_coordination|combat_readiness|objective_protection|academy_genin_fr_pkg_/i)),"hidden requirement truth leaked to DOM/accessibility metadata: "+JSON.stringify(hidden));
 
+    // Adversarial twin fixture: only hidden satisfaction differs. Public model + actual DOM/ARIA must be byte-identical.
+    const hiddenTwin=await page.evaluate(async()=>{
+      if(typeof globalThis.normalizePromotionArenaTruth60320!=="function"||typeof globalThis.mountPromotionArenaUI60320!=="function")return{available:false};
+      const makeTruth=satisfied=>({phase:"INSPECTION",currentRankLabel:"Academy Student",targetRankLabel:"Genin",canInspect:true,canEnterAssessment:false,readinessSlots:[
+        {revealed:true,publicLabel:"Mission comprehension",satisfied:false},
+        {revealed:false,publicLabel:"SHOULD_NOT_LEAK",domain:"judgement_under_pressure",satisfied},
+        {revealed:false,publicLabel:"SHOULD_NOT_LEAK",domain:"combat_readiness",satisfied},
+        {revealed:false,publicLabel:"SHOULD_NOT_LEAK",domain:"objective_protection",satisfied}
+      ]});
+      async function capture(satisfied){
+        const host=document.createElement("div");host.setAttribute("data-qa603-hidden-twin","true");document.body.appendChild(host);
+        const truth=makeTruth(satisfied);
+        const normalized=normalizePromotionArenaTruth60320(truth);
+        const controller=mountPromotionArenaUI60320(host,{truth});
+        if(typeof globalThis.refreshPromotionArenaUI60320==="function")await refreshPromotionArenaUI60320(controller,{announce:false});
+        await new Promise(resolve=>requestAnimationFrame(()=>resolve()));
+        const rows=[...host.querySelectorAll(".sc60320-slot")].map(node=>({
+          text:(node.textContent||"").replace(/\s+/g," ").trim(),
+          aria:node.getAttribute("aria-label"),
+          role:node.getAttribute("role"),
+          state:node.getAttribute("data-state"),
+          attrs:[...node.attributes].map(a=>[a.name,a.value]).sort()
+        }));
+        const html=host.innerHTML;
+        globalThis.unmountPromotionArenaUI60320?.(controller);host.remove();
+        return{normalized:JSON.stringify(normalized),rows:JSON.stringify(rows),html};
+      }
+      return{available:true,unsatisfied:await capture(false),satisfied:await capture(true)};
+    });
+    assert.strictEqual(hiddenTwin.available,true,"Promotion UI hidden-twin API unavailable");
+    assert.strictEqual(hiddenTwin.satisfied.normalized,hiddenTwin.unsatisfied.normalized,"hidden satisfied/unsatisfied public truth differs");
+    assert.strictEqual(hiddenTwin.satisfied.rows,hiddenTwin.unsatisfied.rows,"hidden satisfied/unsatisfied DOM/accessibility differs");
+    assert.strictEqual(hiddenTwin.satisfied.html,hiddenTwin.unsatisfied.html,"hidden satisfied/unsatisfied rendered markup differs");
+
     const attemptButton=arena.getByRole("button",{name:/begin|start|commit|accept.*assessment|attempt/i}).first();
     assert(await attemptButton.count()>0,"explicit attempt-commit control missing");
     await attemptButton.click();await page.waitForTimeout(200);
@@ -84,7 +118,7 @@ async function viewportScenario(browser,width,height,label){
 
     await page.screenshot({path:path.join(OUT,label+"-inspection-attempt.png"),fullPage:true});
     await errors.assertClean(label);
-    return{label,viewport:{width,height},inspectionMutation:false,hiddenRows:hidden.length,attemptStateRoots:attemptTruth.roots};
+    return{label,viewport:{width,height},inspectionMutation:false,hiddenRows:hidden.length,hiddenSatisfiedUnsatisfiedIndistinguishable:true,attemptStateRoots:attemptTruth.roots};
   }finally{await context.close();}
 }
 
