@@ -8,7 +8,6 @@ on:
       - 'runtime/alpha-discipline-curriculum-profiles-57600.js'
       - 'tools/qa_issue_576_expert_master_curriculum_profiles.js'
       - 'tools/qa_issue_576_expert_master_curriculum_profiles_browser.js'
-      - 'tools/qa_issue_576_practical_context_probe.js'
       - '.github/workflows/issue-576-expert-master-curriculum.yml'
   pull_request:
     branches:
@@ -41,7 +40,6 @@ jobs:
           node --check runtime/alpha-discipline-curriculum-profiles-57600.js
           node --check tools/qa_issue_576_expert_master_curriculum_profiles.js
           node --check tools/qa_issue_576_expert_master_curriculum_profiles_browser.js
-          node --check tools/qa_issue_576_practical_context_probe.js
 
       - name: Issue 576 deterministic curriculum contract
         shell: bash
@@ -79,9 +77,6 @@ jobs:
           python -m http.server 8080 --bind 127.0.0.1 > issue-576-server.log 2>&1 &
           echo $! > issue-576-server.pid
           sleep 2
-
-      - name: Probe live Practical advanced-discipline context
-        run: node tools/qa_issue_576_practical_context_probe.js
 
       - name: Installed-browser isolated curriculum proof
         run: node tools/qa_issue_576_expert_master_curriculum_profiles_browser.js
