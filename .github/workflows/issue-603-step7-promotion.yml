@@ -53,15 +53,20 @@ jobs:
           if [[ -f tools/qa_save_compatibility_311.js ]]; then node tools/qa_save_compatibility_311.js; fi
           if [[ -f tools/qa_issue_436_chronicle_state_manifest.js ]]; then node tools/qa_issue_436_chronicle_state_manifest.js; fi
 
-      - name: Detect integrated Promotion runtime
+      - name: Detect installed Promotion runtime
         id: integrated
         shell: bash
         run: |
-          if [[ -f runtime/alpha-promotion-core-60300.js && -f runtime/alpha-promotion-courier-assessment-60310.js && -f runtime/alpha-promotion-arena-ui-60320.js ]]; then
+          if [[ ! -f runtime/alpha-promotion-core-60300.js || ! -f runtime/alpha-promotion-courier-assessment-60310.js || ! -f runtime/alpha-promotion-arena-ui-60320.js ]]; then
+            echo 'present=false' >> "$GITHUB_OUTPUT"
+            echo '#603 A/B/C runtime not yet combined: browser proof remains integration-only.'
+          elif grep -Fq 'runtime/alpha-promotion-core-60300.js' index.html \
+            && grep -Fq 'runtime/alpha-promotion-courier-assessment-60310.js' index.html \
+            && grep -Fq 'runtime/alpha-promotion-arena-ui-60320.js' index.html; then
             echo 'present=true' >> "$GITHUB_OUTPUT"
           else
             echo 'present=false' >> "$GITHUB_OUTPUT"
-            echo '#603 A/B/C runtime not yet combined: browser proof remains integration-only.'
+            echo '#603 A/B/C modules are combined but not yet installed through the Alpha loader. Installed-browser proof remains downstream of #608/#544 final wiring.'
           fi
 
       - name: Install Playwright Chromium
