@@ -197,10 +197,15 @@ async function proveObserverContext(page,surface,label){
     return r.width>0&&r.height>0&&cs.display!=="none"&&cs.visibility!=="hidden"&&Number(cs.opacity||1)>0;
   }),selector,{timeout:5000});
 
-  const rows=await hotspotRows(page,surface);
-  const target=rows.find(row=>row.visible&&row.reachable&&row.contextBound);
-  assert(target,`${label}: no bound pointer-reachable hotspot for observer-context proof`);
-  const targetNode=page.locator(selector).nth(target.index);
+  const targetIndex=await page.evaluate(selector=>[...document.querySelectorAll(selector)].findIndex(node=>{
+    if(node.dataset.hud499ContextBound!=="true")return false;
+    const r=node.getBoundingClientRect(),cs=getComputedStyle(node);
+    if(!(r.width>0&&r.height>0)||cs.display==="none"||cs.visibility==="hidden"||Number(cs.opacity||1)<=0)return false;
+    const hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);
+    return !!(hit&&(hit===node||node.contains(hit)||(hit.closest&&hit.closest(selector)===node)));
+  }),selector);
+  assert(targetIndex>=0,`${label}: no bound center-pointer-reachable hotspot for observer-context proof`);
+  const targetNode=page.locator(selector).nth(targetIndex);
   await targetNode.hover();
   await page.waitForFunction(()=>{
     const panel=document.querySelector('#sc-phase2-live-hud-49900 .sc-hud499-context[data-active="true"]');
