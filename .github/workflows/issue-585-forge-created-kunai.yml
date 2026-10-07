@@ -14,11 +14,11 @@ jobs:
   adversarial-contract:
     runs-on: ubuntu-latest
     env:
-      TARGET_SHA: df0ea1bf5b223d9371805c1563a100458c6f5f85
+      TARGET_SHA: 6501839abe47f80c0b603a1d796aa80ba368674c
       TARGET_PATH: runtime/alpha-forge-created-kunai-58500.js
     steps:
       - uses: actions/checkout@v4
-      - name: Materialize exact #622 candidate
+      - name: Materialize exact #629 candidate
         shell: bash
         run: |
           set -euo pipefail
@@ -28,6 +28,8 @@ jobs:
           echo "Testing exact implementation head: $TARGET_SHA"
       - name: Syntax check candidate
         run: node --check .qa-target/alpha-forge-created-kunai-58500.js
+      - name: Syntax check Lane J harness
+        run: node --check tools/qa_issue_585_forge_created_kunai.js
       - name: Run Lane J adversarial contract
         run: node tools/qa_issue_585_forge_created_kunai.js .qa-target/alpha-forge-created-kunai-58500.js
 
