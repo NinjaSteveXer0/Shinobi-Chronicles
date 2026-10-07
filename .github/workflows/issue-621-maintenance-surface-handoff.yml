@@ -1,6 +1,7 @@
 name: Issue 621 One-Shot Surface Handoff
 
 # Temporary branch-only maintenance workflow. Delete after bounded patch lands.
+# Triggered after registration so GitHub executes the branch-local helper.
 on:
   pull_request:
     branches:
