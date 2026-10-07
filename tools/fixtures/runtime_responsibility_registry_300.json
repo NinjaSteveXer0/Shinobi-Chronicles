@@ -2358,13 +2358,15 @@
       "chain": [
         "runtime/alpha-battle-modern-33000.js",
         "runtime/alpha-metal-origin-runtime-396.js",
-        "runtime/alpha-iwabee-origin-runtime-399.js"
+        "runtime/alpha-iwabee-origin-runtime-399.js",
+        "runtime/alpha-battle-terminal-result-54400.js"
       ],
-      "canonicalActiveOwner": "runtime/alpha-iwabee-origin-runtime-399.js",
-      "activationCondition": "shared Story return plus exact Metal performance-band / Iwabee observer-safe context projection",
+      "canonicalActiveOwner": "runtime/alpha-battle-terminal-result-54400.js",
+      "activationCondition": "#544 is the final presentation-only terminal-result guard. It withholds an already-committed victory/defeat caller resume only until the canonical Victory/Setback surface has actually been presented, then delegates unchanged to the prior shared Story/World return chain.",
       "qaRefs": [
         "tools/qa_issues_396_399_400_browser.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_ui_master_consumption_528_browser.js"
       ]
     },
     {
@@ -2431,15 +2433,17 @@
         "runtime/alpha-battle-modern-33000.js",
         "runtime/alpha-alpha-sprint-33100.js",
         "runtime/alpha-kakashi-v2-rewards-36015.js",
-        "runtime/alpha-phase2-inventory-core-46100.js"
+        "runtime/alpha-phase2-inventory-core-46100.js",
+        "runtime/alpha-battle-terminal-result-54400.js"
       ],
-      "canonicalActiveOwner": "runtime/alpha-phase2-inventory-core-46100.js",
-      "activationCondition": "Existing scoped Battle/Origin wrappers retain their prior behavior and delegate normally; #461 is final only for exact type=\"inventory\" presentation and delegates every non-Inventory route unchanged.",
+      "canonicalActiveOwner": "runtime/alpha-battle-terminal-result-54400.js",
+      "activationCondition": "#544 is final only for an already-committed Battle terminal result: victory remains Victory and defeat maps to the approved Setback presentation after the #33000 immutable presentation queue settles. Every non-terminal/non-matching overlay delegates unchanged to the complete predecessor chain.",
       "qaRefs": [
         "tools/qa_phase2_inventory_core_461_browser.js",
         "tools/qa_kakashi_v2_browser.js",
         "tools/qa_issue_362_menma_three_subject_reward.js",
-        "tools/qa_runtime_ownership_safety_300.js"
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_ui_master_consumption_528_browser.js"
       ]
     },
     {

@@ -1388,6 +1388,36 @@
       "replaces": [],
       "contractChangeReason": "CE_522_CLOSED_STEP5_ACTIVATION",
       "rationale": "Master #449 Step 5 is unblocked by closed CE #522. Existing My Clan staged formation remains the only player-facing assignment surface; this tranche promotes explicit Save Formation into the canonical currentTeam assignment with exact owned-lineage identity and ordering, preserves the opening Academy receipt as history/fallback, allows the Chronicle protagonist to be absent only after the opening restriction is legitimately complete, and keeps protagonist identity/Rank, ownership, Story participants and active Battle deployment independent. HUD/My Clan person-facing identity now separates Person Name from representation title/formal Rank."
+    },
+    {
+      "changeId": "issue-544-canonical-battle-terminal-result-presentation-2026-10-07",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "battle.presentation.shared",
+        "battle.return.story_scene.shared"
+      ],
+      "owner": "runtime/alpha-battle-terminal-result-54400.js",
+      "directCallers": [
+        "index.html",
+        "completeBattleVictoryFromDamage",
+        "completeBattleDefeat",
+        "openOverlay",
+        "resumeBattleCallerAfterCompletion"
+      ],
+      "stateTouched": [
+        "read-only committed currentBattle.outcome.type / battleOver / battleId",
+        "non-enumerable in-memory currentBattle.__battleTerminalResultPresentation54400 presentation marker only",
+        "Victory/Setback overlay presentation and exact caller-resume chronology only; no reward, PL, Story, World, Chronicle or ownership mutation"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_save_compatibility_311.js",
+        "tools/qa_ui_master_consumption_528_browser.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "ALPHA_RUNTIME_REPAIR",
+      "rationale": "Consumes #544 / Lane-D failure topology without reopening Battle semantics. The seam reads only an already-committed victory/defeat, maps defeat to the approved Setback presentation, waits for #33000 immutable action presentation to settle, collapses duplicate live presentation requests, and prevents exact caller restoration from outrunning the result surface. Presentation bookkeeping is non-enumerable and non-persistent; existing reward, save/load, Story, World and Battle semantic owners remain authoritative."
     }
   ]
 }
