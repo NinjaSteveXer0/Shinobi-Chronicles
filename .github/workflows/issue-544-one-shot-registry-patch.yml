@@ -1,0 +1,124 @@
+name: Issue 544 One-Shot Registry Patch
+
+on:
+  push:
+    branches:
+      - coding/544-terminal-result-presentation
+    paths:
+      - '.github/workflows/issue-544-one-shot-registry-patch.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/544-terminal-result-presentation
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Patch exact #300 ownership declarations
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+
+          registry_path = Path('tools/fixtures/runtime_responsibility_registry_300.json')
+          declaration_path = Path('tools/fixtures/runtime_change_declarations_300.json')
+          owner = 'runtime/alpha-battle-terminal-result-54400.js'
+
+          registry = json.loads(registry_path.read_text(encoding='utf-8'))
+          chains = {row['symbol']: row for row in registry['globalWrapperChains']}
+
+          resume = chains['resumeBattleCallerAfterCompletion']
+          assert resume['canonicalActiveOwner'] == 'runtime/alpha-iwabee-origin-runtime-399.js', resume
+          assert owner not in resume['chain'], resume
+          resume['chain'].append(owner)
+          resume['canonicalActiveOwner'] = owner
+          resume['activationCondition'] = (
+              '#544 is the final presentation-only terminal-result guard. It withholds an already-committed '
+              'victory/defeat caller resume only until the canonical Victory/Setback surface has actually been '
+              'presented, then delegates unchanged to the prior shared Story/World return chain.'
+          )
+          if 'tools/qa_ui_master_consumption_528_browser.js' not in resume['qaRefs']:
+              resume['qaRefs'].append('tools/qa_ui_master_consumption_528_browser.js')
+
+          overlay = chains['openOverlay']
+          assert overlay['canonicalActiveOwner'] == 'runtime/alpha-phase2-inventory-core-46100.js', overlay
+          assert owner not in overlay['chain'], overlay
+          overlay['chain'].append(owner)
+          overlay['canonicalActiveOwner'] = owner
+          overlay['activationCondition'] = (
+              '#544 is final only for an already-committed Battle terminal result: victory remains Victory and '
+              'defeat maps to the approved Setback presentation after the #33000 immutable presentation queue '
+              'settles. Every non-terminal/non-matching overlay delegates unchanged to the complete predecessor chain.'
+          )
+          if 'tools/qa_ui_master_consumption_528_browser.js' not in overlay['qaRefs']:
+              overlay['qaRefs'].append('tools/qa_ui_master_consumption_528_browser.js')
+
+          registry_path.write_text(json.dumps(registry, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+
+          declarations = json.loads(declaration_path.read_text(encoding='utf-8'))
+          change_id = 'issue-544-canonical-battle-terminal-result-presentation-2026-10-07'
+          assert not any(row.get('changeId') == change_id for row in declarations['declarations'])
+          declarations['declarations'].append({
+              'changeId': change_id,
+              'classification': 'EXTENDS',
+              'responsibilityIds': [
+                  'battle.presentation.shared',
+                  'battle.return.story_scene.shared'
+              ],
+              'owner': owner,
+              'directCallers': [
+                  'index.html',
+                  'completeBattleVictoryFromDamage',
+                  'completeBattleDefeat',
+                  'openOverlay',
+                  'resumeBattleCallerAfterCompletion'
+              ],
+              'stateTouched': [
+                  'read-only committed currentBattle.outcome.type / battleOver / battleId',
+                  'non-enumerable in-memory currentBattle.__battleTerminalResultPresentation54400 presentation marker only',
+                  'Victory/Setback overlay presentation and exact caller-resume chronology only; no reward, PL, Story, World, Chronicle or ownership mutation'
+              ],
+              'productionLoader': 'index.html',
+              'qaRefs': [
+                  'tools/qa_runtime_ownership_safety_300.js',
+                  'tools/qa_save_compatibility_311.js',
+                  'tools/qa_ui_master_consumption_528_browser.js'
+              ],
+              'replaces': [],
+              'contractChangeReason': 'ALPHA_RUNTIME_REPAIR',
+              'rationale': (
+                  'Consumes #544 / Lane-D failure topology without reopening Battle semantics. The seam reads only '
+                  'an already-committed victory/defeat, maps defeat to the approved Setback presentation, waits for '
+                  '#33000 immutable action presentation to settle, collapses duplicate live presentation requests, '
+                  'and prevents exact caller restoration from outrunning the result surface. Presentation bookkeeping '
+                  'is non-enumerable and non-persistent; existing reward, save/load, Story, World and Battle semantic '
+                  'owners remain authoritative.'
+              )
+          })
+          declaration_path.write_text(json.dumps(declarations, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+
+      - name: Source and safety verification
+        run: |
+          node --check runtime/alpha-battle-terminal-result-54400.js
+          node tools/qa_runtime_ownership_safety_300.js
+          node tools/qa_issue_303_runtime_build_fingerprint.js
+          node tools/qa_save_compatibility_311.js
+
+      - name: Commit registry patch and remove one-shot workflow
+        run: |
+          rm .github/workflows/issue-544-one-shot-registry-patch.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/fixtures/runtime_responsibility_registry_300.json tools/fixtures/runtime_change_declarations_300.json .github/workflows/issue-544-one-shot-registry-patch.yml
+          git diff --cached --check
+          git commit -m '[CODING][#544] Register terminal-result seam in runtime ownership safety'
+          git push origin HEAD:coding/544-terminal-result-presentation
