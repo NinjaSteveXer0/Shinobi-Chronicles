@@ -233,7 +233,8 @@ function inspectIntegratedSources(){
 
   if(files.courier){
     const s=files.courier;
-    [SCENARIO_ID,BATTLE_CONFIG,BATTLE_ENCOUNTER,BATTLE_OBJECTIVE,MISSION_PREFIX,OCC_PREFIX,SNAPSHOT_PREFIX,BATTLE_PREFIX].forEach(id=>sourceRequire(s,id,"courier contract"));
+    [SCENARIO_ID,BATTLE_CONFIG,BATTLE_ENCOUNTER,BATTLE_OBJECTIVE,BATTLE_PREFIX].forEach(id=>sourceRequire(s,id,"courier contract"));
+    ["mission_${SCENARIO}::${id}","occ_${SCENARIO}::${id}","reward_snapshot_${SCENARIO}::${id}"].forEach(id=>sourceRequire(s,id,"courier compositional lineage contract"));
     ["150","100","50","field_recovery_pill"].forEach(id=>sourceRequire(s,id,"courier reward contract"));
     ARC1_NORTH_RAVINE_TOKENS.forEach(token=>{
       // Presence is allowed for collision guards, but Promotion must not claim the Arc-1 IDs as its own occurrence identity.
