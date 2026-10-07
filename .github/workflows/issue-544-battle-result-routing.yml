@@ -1,0 +1,87 @@
+name: Issue 544 Battle Result Routing
+
+on:
+  pull_request:
+    paths:
+      - 'game.js'
+      - 'runtime/alpha-alpha-sprint-33100.js'
+      - 'runtime/alpha-battle-modern-33000.js'
+      - 'runtime/alpha-menma-evolved-pl-battle-36900.js'
+      - 'runtime/alpha-iwabee-origin-runtime-399.js'
+      - 'runtime/alpha-kakashi-v2-battle-36010.js'
+      - 'tools/qa_issue_544_battle_terminal_result_routing.js'
+      - 'tools/qa_issue_544_battle_terminal_result_routing_browser.js'
+      - '.github/workflows/issue-544-battle-result-routing.yml'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: '#544 QA mode: probe current defect or assert repaired acceptance'
+        required: true
+        default: probe
+        type: choice
+        options:
+          - probe
+          - assert
+
+jobs:
+  issue-544-battle-result-routing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      ISSUE_544_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'probe' }}
+      ISSUE_544_BASE_URL: http://127.0.0.1:8080/index.html
+      ISSUE_544_BROWSER_OUT: artifacts/issue-544-battle-result-routing
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Syntax check Lane F QA
+        run: |
+          node --check tools/qa_issue_544_battle_terminal_result_routing.js
+          node --check tools/qa_issue_544_battle_terminal_result_routing_browser.js
+
+      - name: Run #544 source contract
+        run: node tools/qa_issue_544_battle_terminal_result_routing.js
+
+      - name: Preserve caller-return regression
+        run: node tools/qa_issue_141_arc1_battle_return_runtime.js
+
+      - name: Install browser runtime
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start static server
+        run: |
+          python -m http.server 8080 > /tmp/issue-544-http.log 2>&1 &
+          echo $! > /tmp/issue-544-http.pid
+          python - <<'PY'
+          import time, urllib.request
+          for _ in range(80):
+              try:
+                  urllib.request.urlopen('http://127.0.0.1:8080/index.html', timeout=1)
+                  raise SystemExit(0)
+              except Exception:
+                  time.sleep(.25)
+          raise SystemExit('static server did not become ready')
+          PY
+
+      - name: Run real Origin Battle terminal routing browser harness
+        run: node tools/qa_issue_544_battle_terminal_result_routing_browser.js
+
+      - name: Upload #544 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-544-battle-result-routing-${{ github.run_id }}
+          path: |
+            artifacts/issue-544-battle-result-routing
+            /tmp/issue-544-http.log
+          if-no-files-found: warn
