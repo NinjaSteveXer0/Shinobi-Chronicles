@@ -1,0 +1,41 @@
+name: Issue 585 Forge-created Kunai adversarial QA
+
+on:
+  pull_request:
+    paths:
+      - 'tools/qa_issue_585_forge_created_kunai.js'
+      - '.github/workflows/issue-585-forge-created-kunai.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  adversarial-contract:
+    runs-on: ubuntu-latest
+    env:
+      TARGET_SHA: df0ea1bf5b223d9371805c1563a100458c6f5f85
+      TARGET_PATH: runtime/alpha-forge-created-kunai-58500.js
+    steps:
+      - uses: actions/checkout@v4
+      - name: Materialize exact #622 candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "$TARGET_SHA"
+          mkdir -p .qa-target
+          git show "$TARGET_SHA:$TARGET_PATH" > .qa-target/alpha-forge-created-kunai-58500.js
+          echo "Testing exact implementation head: $TARGET_SHA"
+      - name: Syntax check candidate
+        run: node --check .qa-target/alpha-forge-created-kunai-58500.js
+      - name: Run Lane J adversarial contract
+        run: node tools/qa_issue_585_forge_created_kunai.js .qa-target/alpha-forge-created-kunai-58500.js
+
+  durable-regressions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preserve #545 inventory/provenance regression
+        run: node tools/qa_phase2_inventory_core_461.js
+      - name: Preserve #552 retail Kunai regression
+        run: node tools/qa_retail_kunai_durable_552.js
