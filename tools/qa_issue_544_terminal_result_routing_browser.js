@@ -45,6 +45,7 @@ async function boot(browser,label,{candidate=false}={}){
     await page.addScriptTag({content:CANDIDATE});
     await page.waitForFunction(()=>typeof globalThis.presentCommittedBattleTerminalResult54400==="function",null,{timeout:5000});
   }
+  await gate.reset();
   await installTrace(page,label);
   return{context,page,gate,assetResponses};
 }
