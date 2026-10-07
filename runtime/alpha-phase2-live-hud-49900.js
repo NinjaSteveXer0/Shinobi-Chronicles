@@ -825,7 +825,7 @@ const MAPS=Object.freeze({region:".region-map-pane",village:".village-map-screen
 const STRUCTURAL_SELECTOR=".region-info-drawer,.region-event-drawer,.alpha328-event,.region-map-pane,.village-map-screen";
 const state={
   map:null,box:null,raf:0,
-  resizeObserver:null,rootObserver:null,structureObserver:null,
+  resizeObserver:null,overlayObserver:null,structureObserver:null,
   syncCount:0,scheduleCount:0,writeCount:0,resizeSignalCount:0,structureSignalCount:0,
   lastReason:"install"
 };
@@ -969,17 +969,14 @@ function installGeometryObservers(){
     });
     observeGeometryTargets(state.map,state.box);
   }
-  const root=document.getElementById(ROOT_ID);
-  if(root){
-    state.rootObserver=new MutationObserver(()=>{
-      state.structureSignalCount+=1;
-      schedule("surface_change");
-    });
-    state.rootObserver.observe(root,{attributes:true,attributeFilter:["data-surface","hidden"]});
-  }
-  const overlay=document.getElementById("screen-overlay");
-  if(overlay){
-    state.structureObserver=new MutationObserver(records=>{
+const overlay=document.getElementById("screen-overlay");
+if(overlay){
+  state.overlayObserver=new MutationObserver(()=>{
+    state.structureSignalCount+=1;
+    schedule("overlay_visibility");
+  });
+  state.overlayObserver.observe(overlay,{attributes:true,attributeFilter:["style","class","hidden"]});
+  state.structureObserver=new MutationObserver(records=>{
       const relevant=records.some(record=>{
         if(record.type==="childList"){
           return [...record.addedNodes,...record.removedNodes].some(mutationNodeRelevant);
