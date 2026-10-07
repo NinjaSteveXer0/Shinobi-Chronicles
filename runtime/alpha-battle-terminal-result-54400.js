@@ -281,11 +281,34 @@
       const battle=activeBattle54400();
       const outcome=committedOutcome54400(battle);
       if(battle&&battle.battleOver===true){
-        if(target==="victory"&&outcome==="victory"){
-          return presentCommittedBattleTerminalResult54400("victory",{source:"open_overlay_victory"});
-        }
-        if((target==="defeat"||target==="setback")&&outcome==="defeat"){
-          return presentCommittedBattleTerminalResult54400("defeat",{source:"open_overlay_defeat"});
+        const requestedOutcome=target==="victory"&&outcome==="victory"
+          ?"victory"
+          :((target==="defeat"||target==="setback")&&outcome==="defeat"?"defeat":null);
+        if(requestedOutcome){
+          const marker=marker54400(battle,requestedOutcome,false);
+          const surface=surfaceForOutcome54400(requestedOutcome);
+          let sameSurfaceActive=false;
+          try{
+            const activeType=typeof currentOverlayType!=="undefined"?String(currentOverlayType||"").trim().toLowerCase():"";
+            sameSurfaceActive=activeType===surface;
+          }catch(_error){}
+          if(!sameSurfaceActive&&typeof document!=="undefined"){
+            try{
+              const overlay=document.getElementById("screen-overlay");
+              const visible=!!(overlay&&getComputedStyle(overlay).display!=="none");
+              const selector=surface==="victory"?".alpha-victory-code-screen":".alpha331-setback";
+              sameSurfaceActive=visible&&!!document.querySelector(selector);
+            }catch(_error){}
+          }
+          // Exactly-once governs terminal entry, not a legitimate refresh of
+          // the already-visible result surface (for example Victory CLAIM
+          // REWARDS -> CONTINUE). Presentation refresh is not semantic reroll.
+          if(marker&&marker.status==="presented"&&sameSurfaceActive){
+            return PRIOR_OPEN_OVERLAY.apply(this,arguments);
+          }
+          return presentCommittedBattleTerminalResult54400(requestedOutcome,{
+            source:requestedOutcome==="victory"?"open_overlay_victory":"open_overlay_defeat"
+          });
         }
       }
       return PRIOR_OPEN_OVERLAY.apply(this,arguments);
@@ -329,7 +352,12 @@
         battle&&battle.battleOver===true&&outcome&&requested===outcome
       ){
         const marker=marker54400(battle,outcome,false);
-        if(!marker||marker.status!=="presented"){
+        const victoryAlreadyClaimed=outcome==="victory"&&!!(battle.rewards&&battle.rewards.claimed===true);
+        // A claimed Victory is durable post-claim continuation evidence. The
+        // live presentation marker is intentionally non-persistent, so a
+        // browser reload must not force a second terminal entry before the
+        // player's explicit post-claim Continue restores the exact caller.
+        if((!marker||marker.status!=="presented")&&!victoryAlreadyClaimed){
           const presentation=presentCommittedBattleTerminalResult54400(outcome,{source:"caller_resume_intercept"});
           return{
             success:true,

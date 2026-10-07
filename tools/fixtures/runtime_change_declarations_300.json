@@ -1407,7 +1407,8 @@
       "stateTouched": [
         "read-only committed currentBattle.outcome.type / battleOver / battleId",
         "non-enumerable in-memory currentBattle.__battleTerminalResultPresentation54400 presentation marker only",
-        "Victory/Setback overlay presentation and exact caller-resume chronology only; no reward, PL, Story, World, Chronicle or ownership mutation"
+        "Victory/Setback overlay presentation and exact caller-resume chronology only; no reward, PL, Story, World, Chronicle or ownership mutation",
+        "read-only currentBattle.rewards.claimed as durable post-claim Victory continuation evidence after reload"
       ],
       "productionLoader": "index.html",
       "qaRefs": [
