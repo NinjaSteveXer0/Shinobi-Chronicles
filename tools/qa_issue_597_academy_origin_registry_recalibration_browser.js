@@ -99,7 +99,15 @@ function formula(stats){
   assert.deepStrictEqual(legacyMigrated.menma.baseStats,EXPECTED.academy_menma.stats,"legacy migration mutated canonical Menma Base");
   assert.deepStrictEqual(legacyMigrated.menma.currentStats,{nin:10,tai:8,buki:6,fuin:5,kin:14,gen:7,stamina:11},"legacy Menma Current development delta was not rebased onto new Base");
 
-  // A second reload must be idempotent because the compatibility revision is now stamped.
+  // Persist the compatibility revision through the canonical save writer, then
+  // prove the next load does not rebase an already-migrated save a second time.
+  await page.evaluate(()=>savePlayerData());
+  const persistedRevision=await page.evaluate(()=>{
+    const saved=JSON.parse(localStorage.getItem("shinobiChroniclesPlayerSave")||"{}");
+    return saved.academyOriginBaseAuthorityRevision||null;
+  });
+  assert.equal(persistedRevision,"academy_origin_base_stats_582_v1","#582 migration revision was not persisted by canonical save");
+
   await page.reload({waitUntil:"domcontentloaded"});
   await page.waitForFunction(()=>typeof window.commitDisciplineDevelopment448==="function",null,{timeout:15000});
   const legacyReloaded=await page.evaluate(()=>{
@@ -205,6 +213,9 @@ function formula(stats){
 
   const evidence={
     fresh,
+    legacyMigrated,
+    persistedRevision,
+    legacyReloaded,
     developed:{...developed,myClanHTML:undefined},
     reloaded:{...reloaded,myClanHTML:undefined},
     browserGoldenClaimed:false
@@ -214,6 +225,7 @@ function formula(stats){
   console.log(JSON.stringify({
     registryRows:Object.keys(EXPECTED).length,
     changedRuntimeRows:["academy_hinata","academy_mirai","academy_menma"],
+    legacySaveRevision:persistedRevision,
     hinataBaseNin:reloaded.baseStats.nin,
     hinataCurrentNin:reloaded.currentStats.nin,
     currentPL:reloaded.currentPL,
