@@ -1,0 +1,75 @@
+name: Issue 544 Wasabi Compatibility Proof
+
+on:
+  push:
+    branches:
+      - coding/544-wasabi-compat-proof
+    paths:
+      - '.github/workflows/issue-544-wasabi-compat-proof.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  prove-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/544-terminal-result-presentation
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Patch Wasabi defeat QA to require Setback before caller return
+        shell: python
+        run: |
+          from pathlib import Path
+          p=Path('tools/qa_issue_343_wasabi_browser.js')
+          text=p.read_text(encoding='utf-8')
+          old='''  assert(result?.success===true,label+" caller return failed "+JSON.stringify(result));\n  if(outcome==="victory"){'''
+          new='''  if(outcome==="defeat"){\n    assert.strictEqual(result?.callerResumeWithheldUntilTerminalResultContinue,true,label+" defeat bypassed #544 Setback gate "+JSON.stringify(result));\n    await page.waitForSelector(".alpha331-setback",{state:"visible",timeout:12000});\n    const setbackGate=await page.evaluate(()=>({\n      overlay:typeof currentOverlayType==="undefined"?null:currentOverlayType,\n      outcome:currentBattle?.outcome?.type||null,\n      rewardClaimed:currentBattle?.rewards?.claimed===true\n    }));\n    assert.strictEqual(setbackGate.overlay,"setback",label+" defeat did not present code-owned Setback");\n    assert.strictEqual(setbackGate.outcome,"defeat",label+" Setback mutated terminal outcome");\n    assert.strictEqual(setbackGate.rewardClaimed,false,label+" Setback incorrectly claimed reward");\n    await page.waitForSelector(".alpha331-setback button",{state:"visible",timeout:12000});\n    const continued=await page.evaluate(()=>globalThis.continueAfterSetback33100?.());\n    assert.strictEqual(continued?.success,true,label+" Setback Continue failed "+JSON.stringify(continued));\n  }else{\n    assert(result?.success===true,label+" caller return failed "+JSON.stringify(result));\n  }\n  if(outcome==="victory"){'''
+          assert old in text, 'Wasabi caller-return assertion seam drifted'
+          p.write_text(text.replace(old,new,1),encoding='utf-8')
+
+      - name: Source safety
+        run: |
+          node --check tools/qa_issue_343_wasabi_browser.js
+          node tools/qa_runtime_ownership_safety_300.js
+          node tools/qa_issue_303_runtime_build_fingerprint.js
+          node tools/qa_save_compatibility_311.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install chromium
+
+      - name: Start local Alpha server
+        run: |
+          python3 -m http.server 8080 >/tmp/issue-544-wasabi-proof-http.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/issue-544-wasabi-proof-http.log
+          exit 1
+
+      - name: Wasabi installed-browser regression
+        env:
+          ISSUE_343_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_343_BROWSER_OUT: artifacts/issue-544-wasabi-compat-proof
+        run: xvfb-run -a node tools/qa_issue_343_wasabi_browser.js
+
+      - name: Publish QA-only compatibility correction to feature branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/qa_issue_343_wasabi_browser.js
+          git diff --cached --check
+          git commit -m '[CODING][#544] Align Wasabi browser QA with Setback chronology'
+          git push origin HEAD:coding/544-terminal-result-presentation
