@@ -79,21 +79,21 @@ if mapping_start < 0 or mapping_end < 0:
 
 mapping = '''const expectedPL = {
 
-            academy_hinata:
-              12,
+    academy_hinata:
+      12,
 
-            academy_izuno:
-              9,
+    academy_izuno:
+      9,
 
-            academy_mirai:
-              12,
+    academy_mirai:
+      12,
 
-            academy_menma:
-              12,
+    academy_menma:
+      12,
 
-            academy_kushina:
-              12
+    academy_kushina:
+      12
 
-          }'''
+  }'''
 text = text[:mapping_start] + mapping + text[mapping_end + 1:]
 path.write_text(text, encoding="utf-8")
