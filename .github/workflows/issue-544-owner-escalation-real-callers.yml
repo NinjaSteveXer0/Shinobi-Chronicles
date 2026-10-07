@@ -1,0 +1,107 @@
+name: Issue 544 owner-escalation real-caller QA fast
+
+on:
+  push:
+    branches:
+      - qa/544-owner-escalation-real-callers-lane-f
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  ISSUE_544_EXACT_CANDIDATE_SHA: e70475e97331af40f7bd6c9652171878e422e63f
+
+jobs:
+  exact-production-callers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Prove exact PR head plus QA-only overlay
+        shell: bash
+        run: |
+          test "$(git rev-parse HEAD^)" = "$ISSUE_544_EXACT_CANDIDATE_SHA"
+          test -s runtime/alpha-battle-terminal-result-54400.js
+          grep -q 'runtime/alpha-battle-terminal-result-54400.js' index.html
+          git diff --name-only "$ISSUE_544_EXACT_CANDIDATE_SHA"..HEAD | sort > /tmp/issue-544-overlay.txt
+          cat > /tmp/issue-544-expected.txt <<'EOF'
+          .github/workflows/issue-544-owner-escalation-real-callers.yml
+          tools/qa_issue_544_terminal_result_routing.js
+          tools/qa_issue_544_terminal_result_routing_browser.js
+          EOF
+          sort -o /tmp/issue-544-expected.txt /tmp/issue-544-expected.txt
+          diff -u /tmp/issue-544-expected.txt /tmp/issue-544-overlay.txt
+
+      - name: Normalize Lane F probe to current production contracts
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('tools/qa_issue_544_terminal_result_routing_browser.js')
+          s=p.read_text()
+          replacements=[
+            ('enemyId:enemy?.id||currentBattle?.activeEnemyId||null,','enemyId:enemy?.id||currentBattle?.activeEnemyId||getEncounterData(result?.encounterId||"")?.enemyId||null,','world enemy identity'),
+            ('assert.strictEqual(duplicate.state.outcome,outcome,label+" duplicate presenter changed semantic outcome");','assert.strictEqual(duplicate.state.committedOutcome,outcome,label+" duplicate presenter changed semantic outcome");','committed outcome'),
+            ('  const resumeAttempt=events.find(event=>event.kind==="caller_resume_attempt");\n  const resumeReturn=events.find(event=>event.kind==="caller_resume_return");','  const resumeReturns=events.filter(event=>event.kind==="caller_resume_return");\n  const resumeReturn=candidate?resumeReturns.find(event=>event.result?.success===true&&!event.result?.callerResumeWithheldUntilTerminalResultContinue):resumeReturns.find(event=>event.result?.success===true);\n  const resumeReturnIndex=resumeReturn?events.indexOf(resumeReturn):-1;\n  const resumeAttempt=resumeReturnIndex>=0?[...events.slice(0,resumeReturnIndex)].reverse().find(event=>event.kind==="caller_resume_attempt"):null;','actual caller resume'),
+            ('  if(candidate){\n    assert(CANDIDATE,"candidate source missing");\n    await page.addScriptTag({content:CANDIDATE});\n    await page.waitForFunction(()=>typeof globalThis.presentCommittedBattleTerminalResult54400==="function",null,{timeout:5000});\n  }','  if(candidate){\n    await page.waitForFunction(()=>typeof globalThis.presentCommittedBattleTerminalResult54400==="function",null,{timeout:5000});\n  }','production load'),
+            ('    candidateHead:"803bfb270a2f43c16243da522ae534b0e67954a7",','    candidateHead:process.env.ISSUE_544_EXACT_CANDIDATE_SHA||"unknown",','candidate SHA evidence'),
+            ('    results.routes.push(await runIwabeeRoute(browser,"victory",false));\n    results.routes.push(await runIwabeeRoute(browser,"defeat",false));\n    results.routes.push(await runBanditWorldRoute(browser,"victory",false));\n    results.routes.push(await runBanditWorldRoute(browser,"defeat",false));\n    if(CANDIDATE){\n      results.routes.push(await runIwabeeRoute(browser,"victory",true));\n      results.routes.push(await runIwabeeRoute(browser,"defeat",true));\n      results.routes.push(await runBanditWorldRoute(browser,"victory",true));\n      results.routes.push(await runBanditWorldRoute(browser,"defeat",true));\n    }','    results.routes.push(await runIwabeeRoute(browser,"victory",true));\n    results.routes.push(await runIwabeeRoute(browser,"defeat",true));\n    results.routes.push(await runBanditWorldRoute(browser,"victory",true));\n    results.routes.push(await runBanditWorldRoute(browser,"defeat",true));','exact route matrix')
+          ]
+          for old,new,label in replacements:
+            if old not in s: raise SystemExit('missing normalization target: '+label)
+            s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+
+      - name: Syntax and source contract
+        env:
+          ISSUE_544_CANDIDATE_MODULE: runtime/alpha-battle-terminal-result-54400.js
+        run: |
+          node --check tools/qa_issue_544_terminal_result_routing.js
+          node --check tools/qa_issue_544_terminal_result_routing_browser.js
+          node tools/qa_issue_544_terminal_result_routing.js
+
+      - name: Install Chromium only
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install chromium
+
+      - name: Start exact PR runtime
+        shell: bash
+        run: |
+          python3 -m http.server 8080 --bind 127.0.0.1 > /tmp/issue-544-http.log 2>&1 &
+          echo $! > /tmp/issue-544-http.pid
+          for i in {1..40}; do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi
+            sleep 0.25
+          done
+          cat /tmp/issue-544-http.log
+          exit 1
+
+      - name: Run real production caller matrix
+        env:
+          ISSUE_544_CANDIDATE_MODULE: runtime/alpha-battle-terminal-result-54400.js
+        shell: bash
+        run: |
+          set -o pipefail
+          node tools/qa_issue_544_terminal_result_routing_browser.js 2>&1 | tee /tmp/issue-544-browser.log
+
+      - name: Upload owner-escalation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-544-owner-escalation-real-callers-fast
+          path: |
+            artifacts/issue-544-terminal-result-routing
+            /tmp/issue-544-http.log
+            /tmp/issue-544-browser.log
+            /tmp/issue-544-overlay.txt
+          if-no-files-found: warn
