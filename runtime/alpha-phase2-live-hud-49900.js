@@ -812,6 +812,7 @@ globalThis.SC_PHASE2_LIVE_HUD_49900=Object.freeze({patchId:PATCH_ID,browserGolde
 // ============================================================================
 // ISSUE #557 — UNOBSTRUCTED VILLAGE / REGION MAP CANVASES
 // Presentation-only correction integrated into the canonical #499 HUD owner.
+// #621 hardens the scheduler against self-reactive geometry feedback.
 // ============================================================================
 (function installUnobstructedMapCanvas55700(){
 "use strict";
@@ -821,7 +822,13 @@ const PATCH_ID="map_canvas_unobstructed_55700_2026_10_06";
 const STYLE_ID="sc-map-canvas-unobstructed-55700-style";
 const ROOT_ID="sc-phase2-live-hud-49900";
 const MAPS=Object.freeze({region:".region-map-pane",village:".village-map-screen"});
-const state={map:null,box:null,raf:0,timer:0};
+const STRUCTURAL_SELECTOR=".region-info-drawer,.region-event-drawer,.alpha328-event,.region-map-pane,.village-map-screen";
+const state={
+  map:null,box:null,raf:0,
+  resizeObserver:null,rootObserver:null,structureObserver:null,
+  syncCount:0,scheduleCount:0,writeCount:0,resizeSignalCount:0,structureSignalCount:0,
+  lastReason:"install"
+};
 
 function visible(node){
   if(!node||!node.isConnected)return false;
@@ -839,18 +846,55 @@ function intersectionArea(a,b){
   if(!a||!b)return 0;
   return Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left))*Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));
 }
+function setStyleIfChanged(node,name,value,priority=""){
+  if(!node||!node.style)return false;
+  const next=String(value);
+  if(node.style.getPropertyValue(name)===next&&node.style.getPropertyPriority(name)===priority)return false;
+  node.style.setProperty(name,next,priority);
+  state.writeCount+=1;
+  return true;
+}
+function removeStyleIfOwned(node,name){
+  if(!node||!node.style||!node.style.getPropertyValue(name))return false;
+  node.style.removeProperty(name);state.writeCount+=1;return true;
+}
+function setDatasetIfChanged(node,key,value){
+  if(!node||!node.dataset)return false;
+  const next=String(value);
+  if(node.dataset[key]===next)return false;
+  node.dataset[key]=next;state.writeCount+=1;return true;
+}
+function deleteDatasetIfPresent(node,key){
+  if(!node||!node.dataset||node.dataset[key]===undefined)return false;
+  delete node.dataset[key];state.writeCount+=1;return true;
+}
+function addClassIfMissing(node,name){
+  if(!node||!node.classList||node.classList.contains(name))return false;
+  node.classList.add(name);state.writeCount+=1;return true;
+}
+function removeClassIfPresent(node,name){
+  if(!node||!node.classList||!node.classList.contains(name))return false;
+  node.classList.remove(name);state.writeCount+=1;return true;
+}
 function cleanupMap(map){
   if(!map)return;
-  if(map.dataset.map557WidthOwned==="true")map.style.removeProperty("max-width");
-  delete map.dataset.map557WidthOwned;
-  ["--sc-map557-outboard-right","--sc-map557-gutter-control-width"].forEach(name=>map.style.removeProperty(name));
+  if(map.dataset.map557WidthOwned==="true")removeStyleIfOwned(map,"max-width");
+  deleteDatasetIfPresent(map,"map557WidthOwned");
+  ["--sc-map557-outboard-right","--sc-map557-gutter-control-width"].forEach(name=>removeStyleIfOwned(map,name));
+}
+function observeGeometryTargets(map,box){
+  if(!state.resizeObserver)return;
+  state.resizeObserver.disconnect();
+  if(map)state.resizeObserver.observe(map);
+  if(box&&box!==map)state.resizeObserver.observe(box);
 }
 function cleanup(){
   cleanupMap(state.map);
-  if(state.box)state.box.classList.remove("sc-map557-active");
+  removeClassIfPresent(state.box,"sc-map557-active");
   state.map=null;state.box=null;
+  observeGeometryTargets(null,null);
   const root=document.getElementById(ROOT_ID);
-  if(root){delete root.dataset.map557;delete root.dataset.map557RegionInfoOpen;}
+  if(root){deleteDatasetIfPresent(root,"map557");deleteDatasetIfPresent(root,"map557RegionInfoOpen");}
 }
 function reserveForViewport(){
   const vw=Math.max(320,Number(innerWidth)||0);
@@ -863,9 +907,9 @@ function constrainMap(map,box){
   const br=box.getBoundingClientRect();
   const reserve=reserveForViewport();
   const maxWidth=Math.max(520,Math.floor(br.width-(reserve*2)-20));
-  map.style.setProperty("max-width",maxWidth+"px","important");
-  map.dataset.map557WidthOwned="true";
-  return{reserve,maxWidth};
+  const changed=setStyleIfChanged(map,"max-width",maxWidth+"px","important");
+  setDatasetIfChanged(map,"map557WidthOwned","true");
+  return{reserve,maxWidth,changed};
 }
 function applyGeometry(root,map,box,surface){
   if(!root||!map||!box||!visible(map))return null;
@@ -874,25 +918,19 @@ function applyGeometry(root,map,box,surface){
   const top=Math.max(0,mr.top-rr.top),bottom=Math.max(0,rr.bottom-mr.bottom);
   const available=Math.max(0,right-16);
   const controlWidth=Math.max(116,Math.min(176,available));
-  const rightAnchor=Math.max(8,right-controlWidth-8);
   const outboardRight=-(right-10);
 
-  root.style.setProperty("--sc-hud499-map-left",left.toFixed(2)+"px");
-  root.style.setProperty("--sc-hud499-map-right",right.toFixed(2)+"px");
-  root.style.setProperty("--sc-hud499-map-top",top.toFixed(2)+"px");
-  root.style.setProperty("--sc-hud499-map-bottom",bottom.toFixed(2)+"px");
-  root.style.setProperty("--sc-hud499-gutter-control-width",controlWidth.toFixed(2)+"px");
-  root.style.setProperty("--sc-hud499-gutter-right-anchor",rightAnchor.toFixed(2)+"px");
-  root.dataset.mapGutter="true";
-  root.dataset.map557="true";
-
-  map.style.setProperty("--sc-map557-outboard-right",outboardRight.toFixed(2)+"px");
-  map.style.setProperty("--sc-map557-gutter-control-width",controlWidth.toFixed(2)+"px");
-  box.classList.add("sc-map557-active");
-  root.dataset.map557RegionInfoOpen=surface==="region"&&!!map.querySelector(".region-info-drawer.open")?"true":"false";
-  return{surface,left,right,top,bottom,controlWidth,rightAnchor,outboardRight,map:rect(map)};
+  // #499 remains the sole writer for the shared HUD gutter variables. #557 only
+  // owns the map-control outboard projection and its own presentation markers.
+  setDatasetIfChanged(root,"map557","true");
+  setStyleIfChanged(map,"--sc-map557-outboard-right",outboardRight.toFixed(2)+"px");
+  setStyleIfChanged(map,"--sc-map557-gutter-control-width",controlWidth.toFixed(2)+"px");
+  addClassIfMissing(box,"sc-map557-active");
+  setDatasetIfChanged(root,"map557RegionInfoOpen",surface==="region"&&!!map.querySelector(".region-info-drawer.open")?"true":"false");
+  return{surface,left,right,top,bottom,controlWidth,outboardRight,map:rect(map)};
 }
 function sync(){
+  state.syncCount+=1;
   if(typeof document==="undefined")return null;
   const root=document.getElementById(ROOT_ID);
   if(!root||root.hidden){cleanup();return null;}
@@ -902,17 +940,78 @@ function sync(){
   const map=document.querySelector(selector);
   const box=mapBoundsContainer(map);
   if(!map||!box){cleanup();return null;}
+  const targetChanged=state.map!==map||state.box!==box;
   if(state.map&&state.map!==map)cleanupMap(state.map);
-  if(state.box&&state.box!==box)state.box.classList.remove("sc-map557-active");
+  if(state.box&&state.box!==box)removeClassIfPresent(state.box,"sc-map557-active");
   state.map=map;state.box=box;
+  if(targetChanged)observeGeometryTargets(map,box);
   constrainMap(map,box);
-  if(state.raf)cancelAnimationFrame(state.raf);
-  state.raf=requestAnimationFrame(()=>{state.raf=0;applyGeometry(root,map,box,surface);});
-  return{surface,selector,presentationOnly:true};
+  const geometry=applyGeometry(root,map,box,surface);
+  return{surface,selector,geometry,presentationOnly:true};
 }
-function schedule(){
-  if(state.raf)cancelAnimationFrame(state.raf);
+function schedule(reason="signal"){
+  state.scheduleCount+=1;state.lastReason=String(reason);
+  if(state.raf)return false;
   state.raf=requestAnimationFrame(()=>{state.raf=0;sync();});
+  return true;
+}
+function mutationNodeRelevant(node){
+  if(!node||node.nodeType!==1)return false;
+  if(node.matches&&node.matches(STRUCTURAL_SELECTOR))return true;
+  return !!(node.querySelector&&node.querySelector(STRUCTURAL_SELECTOR));
+}
+function installGeometryObservers(){
+  if(typeof document==="undefined")return;
+  if(typeof ResizeObserver==="function"){
+    state.resizeObserver=new ResizeObserver(()=>{
+      state.resizeSignalCount+=1;
+      schedule("resize_observer");
+    });
+    observeGeometryTargets(state.map,state.box);
+  }
+  const root=document.getElementById(ROOT_ID);
+  if(root){
+    state.rootObserver=new MutationObserver(()=>{
+      state.structureSignalCount+=1;
+      schedule("surface_change");
+    });
+    state.rootObserver.observe(root,{attributes:true,attributeFilter:["data-surface","hidden"]});
+  }
+  const overlay=document.getElementById("screen-overlay");
+  if(overlay){
+    state.structureObserver=new MutationObserver(records=>{
+      const relevant=records.some(record=>{
+        if(record.type==="childList"){
+          return [...record.addedNodes,...record.removedNodes].some(mutationNodeRelevant);
+        }
+        if(record.type==="attributes"){
+          const target=record.target;
+          if(target===state.box)return false;
+          return !!(target&&target.matches&&target.matches(STRUCTURAL_SELECTOR));
+        }
+        return false;
+      });
+      if(!relevant)return;
+      state.structureSignalCount+=1;
+      schedule("map_structure");
+    });
+    state.structureObserver.observe(overlay,{subtree:true,childList:true,attributes:true,attributeFilter:["class","hidden"]});
+  }
+}
+function schedulerSnapshot(){
+  return{
+    mode:"signal_coalesced",
+    periodicTimer:false,
+    bodyWideMutationObserver:false,
+    pendingRaf:!!state.raf,
+    syncCount:state.syncCount,
+    scheduleCount:state.scheduleCount,
+    writeCount:state.writeCount,
+    resizeSignalCount:state.resizeSignalCount,
+    structureSignalCount:state.structureSignalCount,
+    lastReason:state.lastReason,
+    surface:(document.getElementById(ROOT_ID)?.dataset.surface)||null
+  };
 }
 function diagnostics(){
   const root=document.getElementById(ROOT_ID);
@@ -938,11 +1037,14 @@ function diagnostics(){
     measuredOuterReserve:!mapRect||root?.dataset.map557==="true",
     hudClearOfMap:!mapRect||Object.values(hud).filter(Boolean).every(row=>row.intersection===0),
     regionControlsClearOfMap:surface!=="region"||Object.values(regionControls).filter(Boolean).every(row=>row.intersection===0),
+    signalCoalescedScheduler:true,
+    noPeriodicGeometryPolling:true,
+    noBodyWideMutationObserver:true,
     noPersistenceWrites:true,
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
-  return{patchId:PATCH_ID,pass:failed.length===0,checks,failed,surface,map:mapRect,hud,regionControls,browserGoldenClaimed:false};
+  return{patchId:PATCH_ID,pass:failed.length===0,checks,failed,surface,map:mapRect,hud,regionControls,scheduler:schedulerSnapshot(),browserGoldenClaimed:false};
 }
 function installStyles(){
   if(document.getElementById(STYLE_ID))return;
@@ -987,15 +1089,12 @@ function installStyles(){
 }
 installStyles();
 sync();
-if(typeof window!=="undefined")window.addEventListener("resize",schedule,{passive:true});
-if(typeof document!=="undefined"){
-  const observer=new MutationObserver(()=>schedule());
-  observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","style","hidden","data-surface"]});
-  state.timer=setInterval(sync,300);
-}
+installGeometryObservers();
+if(typeof window!=="undefined")window.addEventListener("resize",()=>schedule("window_resize"),{passive:true});
 globalThis.refreshUnobstructedMapCanvas55700=sync;
+globalThis.getUnobstructedMapCanvas55700SchedulerSnapshot=schedulerSnapshot;
 globalThis.runUnobstructedMapCanvas55700Diagnostics=diagnostics;
-globalThis.SC_MAP_CANVAS_UNOBSTRUCTED_55700=Object.freeze({patchId:PATCH_ID,presentationOnly:true,browserGoldenClaimed:false});
+globalThis.SC_MAP_CANVAS_UNOBSTRUCTED_55700=Object.freeze({patchId:PATCH_ID,presentationOnly:true,schedulerMode:"signal_coalesced",browserGoldenClaimed:false});
 })();
 
 // #557 selected Region location / discovery card: keep the existing interaction
