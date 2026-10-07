@@ -1,0 +1,89 @@
+name: Issue 544 Kakashi macOS Compatibility Proof
+
+on:
+  push:
+    branches:
+      - coding/544-terminal-proof
+    paths:
+      - '.github/workflows/issue-544-kakashi-macos-proof.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  prove-and-publish:
+    runs-on: macos-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/544-terminal-result-presentation
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Apply Kakashi proof patch from isolated authority
+        shell: python
+        run: |
+          from pathlib import Path
+          import subprocess
+          proof=subprocess.check_output([
+            'git','show','origin/coding/544-terminal-proof:.github/workflows/issue-544-kakashi-direct-claim-proof.yml'
+          ],text=True)
+          anchor='      - name: Patch Kakashi legacy browser chronology only\n'
+          start=proof.index(anchor)+len(anchor)
+          run_marker='        shell: python\n        run: |\n'
+          start=proof.index(run_marker,start)+len(run_marker)
+          end=proof.index('\n      - name: Source safety',start)
+          block=proof[start:end]
+          script='\n'.join(line[10:] if line.startswith('          ') else line for line in block.splitlines())+'\n'
+          Path('/tmp/issue544_kakashi_patch.py').write_text(script,encoding='utf-8')
+          subprocess.run(['python','/tmp/issue544_kakashi_patch.py'],check=True)
+
+      - name: Source safety
+        run: |
+          node --check tools/qa_kakashi_v2_browser.js
+          node --check tools/qa_issue_343_wasabi_browser.js
+          node tools/qa_runtime_ownership_safety_300.js
+          node tools/qa_issue_303_runtime_build_fingerprint.js
+          node tools/qa_save_compatibility_311.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install chromium
+
+      - name: Start local Alpha server
+        run: |
+          python3 -m http.server 8080 >/tmp/issue-544-kakashi-macos-http.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/issue-544-kakashi-macos-http.log
+          exit 1
+
+      - name: Kakashi terminal chronology compatibility
+        env:
+          KAKASHI_V2_BASE_URL: http://127.0.0.1:8080/index.html
+          KAKASHI_V2_BROWSER_OUT: artifacts/issue-544-proof-kakashi-macos
+        run: node tools/qa_kakashi_v2_browser.js
+
+      - name: Wasabi regression on current feature head
+        env:
+          ISSUE_343_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_343_BROWSER_OUT: artifacts/issue-544-proof-wasabi-macos
+        run: node tools/qa_issue_343_wasabi_browser.js
+
+      - name: Publish Kakashi QA correction to feature branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/qa_kakashi_v2_browser.js
+          git diff --cached --check
+          git commit -m '[CODING][#544] Align Kakashi browser QA with terminal result chronology'
+          git push origin HEAD:coding/544-terminal-result-presentation
