@@ -1,0 +1,108 @@
+name: Issue 544 One-Shot Menma Terminal Compatibility
+
+on:
+  push:
+    branches:
+      - coding/544-terminal-result-presentation
+    paths:
+      - '.github/workflows/issue-544-one-shot-menma-compat.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/544-terminal-result-presentation
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Patch terminal refresh and post-claim resume compatibility
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+
+          runtime=Path('runtime/alpha-battle-terminal-result-54400.js')
+          text=runtime.read_text(encoding='utf-8')
+
+          old_overlay='''      if(battle&&battle.battleOver===true){\n        if(target==="victory"&&outcome==="victory"){\n          return presentCommittedBattleTerminalResult54400("victory",{source:"open_overlay_victory"});\n        }\n        if((target==="defeat"||target==="setback")&&outcome==="defeat"){\n          return presentCommittedBattleTerminalResult54400("defeat",{source:"open_overlay_defeat"});\n        }\n      }'''
+          new_overlay='''      if(battle&&battle.battleOver===true){\n        const requestedOutcome=target==="victory"&&outcome==="victory"\n          ?"victory"\n          :((target==="defeat"||target==="setback")&&outcome==="defeat"?"defeat":null);\n        if(requestedOutcome){\n          const marker=marker54400(battle,requestedOutcome,false);\n          const surface=surfaceForOutcome54400(requestedOutcome);\n          let sameSurfaceActive=false;\n          try{\n            const activeType=typeof currentOverlayType!=="undefined"?String(currentOverlayType||"").trim().toLowerCase():"";\n            sameSurfaceActive=activeType===surface;\n          }catch(_error){}\n          if(!sameSurfaceActive&&typeof document!=="undefined"){\n            try{\n              const overlay=document.getElementById("screen-overlay");\n              const visible=!!(overlay&&getComputedStyle(overlay).display!=="none");\n              const selector=surface==="victory"?".alpha-victory-code-screen":".alpha331-setback";\n              sameSurfaceActive=visible&&!!document.querySelector(selector);\n            }catch(_error){}\n          }\n          // Exactly-once governs terminal entry, not a legitimate refresh of\n          // the already-visible result surface (for example Victory CLAIM\n          // REWARDS -> CONTINUE). Presentation refresh is not semantic reroll.\n          if(marker&&marker.status==="presented"&&sameSurfaceActive){\n            return PRIOR_OPEN_OVERLAY.apply(this,arguments);\n          }\n          return presentCommittedBattleTerminalResult54400(requestedOutcome,{\n            source:requestedOutcome==="victory"?"open_overlay_victory":"open_overlay_defeat"\n          });\n        }\n      }'''
+          assert old_overlay in text, 'pre-compat #544 openOverlay block missing'
+          text=text.replace(old_overlay,new_overlay,1)
+
+          old_resume='''        const marker=marker54400(battle,outcome,false);\n        if(!marker||marker.status!=="presented"){\n          const presentation=presentCommittedBattleTerminalResult54400(outcome,{source:"caller_resume_intercept"});'''
+          new_resume='''        const marker=marker54400(battle,outcome,false);\n        const victoryAlreadyClaimed=outcome==="victory"&&!!(battle.rewards&&battle.rewards.claimed===true);\n        // A claimed Victory is durable post-claim continuation evidence. The\n        // live presentation marker is intentionally non-persistent, so a\n        // browser reload must not force a second terminal entry before the\n        // player's explicit post-claim Continue restores the exact caller.\n        if((!marker||marker.status!=="presented")&&!victoryAlreadyClaimed){\n          const presentation=presentCommittedBattleTerminalResult54400(outcome,{source:"caller_resume_intercept"});'''
+          assert old_resume in text, 'pre-compat #544 resume block missing'
+          text=text.replace(old_resume,new_resume,1)
+          runtime.write_text(text,encoding='utf-8')
+
+          qa=Path('tools/qa_issue_369_menma_evolved_pl_battle_browser.js')
+          qtext=qa.read_text(encoding='utf-8')
+          old_wait='''    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_party_defeat_return_01",null,{timeout:25000});\n    const defeatReturnDebug=await page.evaluate(()=> {'''
+          new_wait='''    await page.waitForSelector(".alpha331-setback",{state:"visible",timeout:25000});\n    const setbackGate=await page.evaluate(()=>({\n      overlay:typeof currentOverlayType!=="undefined"?currentOverlayType:null,\n      outcome:currentBattle?.outcome?.type||null,\n      rewardClaimed:currentBattle?.rewards?.claimed===true\n    }));\n    assert.strictEqual(setbackGate.overlay,"setback","#544 did not project the approved Setback surface before Menma defeat return");\n    assert.strictEqual(setbackGate.outcome,"defeat","Setback presentation mutated Menma defeat truth");\n    assert.strictEqual(setbackGate.rewardClaimed,false,"Setback incorrectly claimed a reward");\n    await page.locator(".alpha331-setback button").click();\n    await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_party_defeat_return_01",null,{timeout:25000});\n    const defeatReturnDebug=await page.evaluate(()=> {'''
+          assert old_wait in qtext, 'pre-#544 Menma automatic defeat-return assertion missing'
+          qtext=qtext.replace(old_wait,new_wait,1)
+          qa.write_text(qtext,encoding='utf-8')
+
+          declarations_path=Path('tools/fixtures/runtime_change_declarations_300.json')
+          declarations=json.loads(declarations_path.read_text(encoding='utf-8'))
+          row=next(r for r in declarations['declarations'] if r.get('changeId')=='issue-544-canonical-battle-terminal-result-presentation-2026-10-07')
+          touched=row.setdefault('stateTouched',[])
+          evidence='read-only currentBattle.rewards.claimed as durable post-claim Victory continuation evidence after reload'
+          if evidence not in touched:touched.append(evidence)
+          declarations_path.write_text(json.dumps(declarations,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+
+      - name: Source and safety verification
+        run: |
+          node --check runtime/alpha-battle-terminal-result-54400.js
+          node --check tools/qa_issue_369_menma_evolved_pl_battle_browser.js
+          node tools/qa_runtime_ownership_safety_300.js
+          node tools/qa_issue_303_runtime_build_fingerprint.js
+          node tools/qa_save_compatibility_311.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python3 -m http.server 8080 > /tmp/issue-544-menma-http.log 2>&1 &
+          echo $! > /tmp/issue-544-menma-http.pid
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/issue-544-menma-http.log
+          exit 1
+
+      - name: Menma evolved PL Battle terminal chronology
+        env:
+          ISSUE_369_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_369_BROWSER_OUT: artifacts/issue-544-menma-369
+        run: xvfb-run -a node tools/qa_issue_369_menma_evolved_pl_battle_browser.js
+
+      - name: Menma durable reward reload and post-claim Continue
+        env:
+          ISSUE_362_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_362_BROWSER_OUT: artifacts/issue-544-menma-362
+        run: xvfb-run -a node tools/qa_issue_362_menma_reward_browser.js
+
+      - name: Commit exact compatibility fix and remove one-shot workflow
+        run: |
+          rm .github/workflows/issue-544-one-shot-menma-compat.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add runtime/alpha-battle-terminal-result-54400.js tools/qa_issue_369_menma_evolved_pl_battle_browser.js tools/fixtures/runtime_change_declarations_300.json .github/workflows/issue-544-one-shot-menma-compat.yml
+          git diff --cached --check
+          git commit -m '[CODING][#544] Preserve terminal refresh and post-claim continuation semantics'
+          git push origin HEAD:coding/544-terminal-result-presentation
