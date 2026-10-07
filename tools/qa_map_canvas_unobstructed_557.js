@@ -18,16 +18,21 @@ assert(runtime.includes("--sc-hud499-map-left")&&runtime.includes("--sc-hud499-m
 assert(runtime.includes(".sc-hud499-state-cluster")&&runtime.includes(".sc-hud499-team")&&runtime.includes(".sc-hud499-tools")&&runtime.includes(".sc-hud499-map-nav"),"required HUD surfaces are not explicitly placed outside the map");
 assert(runtime.includes(".region-world-close")&&runtime.includes(".region-info-toggle")&&runtime.includes(".region-info-drawer")&&runtime.includes(".region-world-map-button"),"legacy Region map chrome is not moved outboard");
 assert(runtime.includes(".region-hotspot .hotspot-hover-card{display:none!important}"),"legacy Region hover card can still cover the crisp map");
-assert(runtime.includes(".region-map-pane .region-event-drawer")||outboard.includes(".region-map-pane .region-event-drawer"),"Region event/disambiguation drawer is not moved into the contextual reserve");
+assert(runtime.includes(".region-map-pane .region-event-drawer")||outboard.includes(".region-map-pane .region-event-drawer"),"Region selected-event drawer is not moved into the contextual reserve");
 assert(outboard.includes(".region-known-destinations"),"non-spatial known-destination navigation can still cover the Region map");
 assert(outboard.includes(".village-map-return")&&outboard.includes(".village-info-toggle")&&outboard.includes(".village-info-drawer"),"legacy Village navigation/info chrome can still cover the Village map");
 assert(index.includes('href="runtime/alpha-phase2-map-canvas-outboard-557.css"'),"#557 outboard completion stylesheet is not production-loaded");
 
-const deliberateEventProof=(browserQa.includes("openRegionEventDisambiguation")||browserQa.includes("proveSelectedEventDrawer"))
-  &&browserQa.includes("activateAlphaRegionHotspot")
-  &&browserQa.includes("multiple_opportunities")
-  &&browserQa.includes("OPPORTUNITIES AT THIS HOTSPOT");
-assert(deliberateEventProof,"#557 browser QA does not deliberately prove the real Region event-disambiguation route");
+const ownerSelectedEventProof=browserQa.includes("proveOwnerSelectedRegionEventCard")
+  &&browserQa.includes('preferredId="hotspot_fire_konohagakure"')
+  &&browserQa.includes("selectMapNode(regionKey,target.hotspotId)")
+  &&browserQa.includes("Konohagakure")
+  &&browserQa.includes("ENTER LOCATION")
+  &&browserQa.includes("DISCOVERY")
+  &&browserQa.includes("assertNoIntersection(g.region.eventDrawer")
+  &&browserQa.includes('assertHotspotsReachable(page,"region"')
+  &&browserQa.includes("selected-event presentation mutated Chronicle/World state");
+assert(ownerSelectedEventProof,"#557 browser QA does not deliberately open and prove the owner-visible Konohagakure selected-event card");
 assert(browserQa.includes("knownDestinations")&&browserQa.includes(".village-map-return")&&browserQa.includes(".village-info-toggle")&&browserQa.includes(".village-info-drawer"),"#557 browser QA does not measure all remaining legacy map chrome");
 assert(browserQa.includes("ordinarySingleClickDoesNotOpenDrawer")&&browserQa.includes("deliberateDoubleClickRoute"),"#557 browser QA does not preserve the deliberate Region activation contract");
 assert(runtime.includes("SC_PHASE2_LIVE_HUD_49900"),"#557 does not consume existing #499 presentation authority");
@@ -58,6 +63,7 @@ console.log(JSON.stringify({
   styleCompletion:"runtime/alpha-phase2-map-canvas-outboard-557.css",
   scope:["village","region"],
   selectedLocationInfoOutboard:true,
+  ownerSelectedEventOverlayOutboard:true,
   eventDisambiguationOutboard:true,
   deliberateRegionActivationContract:true,
   regionKnownDestinationsOutboard:true,
