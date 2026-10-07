@@ -1,0 +1,174 @@
+name: Issue 544 Kakashi Compatibility Proof v4
+
+on:
+  push:
+    branches:
+      - coding/544-terminal-proof
+    paths:
+      - '.github/workflows/issue-544-kakashi-compat-proof-v4.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  prove-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/544-terminal-result-presentation
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Patch Kakashi legacy browser chronology
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path=Path('tools/qa_kakashi_v2_browser.js')
+          text=path.read_text(encoding='utf-8')
+
+          old_visual='''  const resumed=await page.evaluate(()=>{
+            currentBattle.outcome={type:"victory",completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};
+            currentBattle.battleOver=true;
+            currentBattle.active=false;
+            return resumeBattleCallerAfterCompletion("victory");
+          });
+          assert(resumed&&resumed.success===true,JSON.stringify(resumed));
+          await page.waitForSelector("#kakashi-v2-scene-board",{state:"visible",timeout:12000});'''
+          new_visual='''  let resumed=await page.evaluate(()=>{
+            currentBattle.outcome={type:"victory",completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};
+            currentBattle.battleOver=true;
+            currentBattle.active=false;
+            return resumeBattleCallerAfterCompletion("victory");
+          });
+          assert.strictEqual(resumed?.callerResumeWithheldUntilTerminalResultContinue,true,"Kakashi visual Battle caller bypassed #544 Victory gate "+JSON.stringify(resumed));
+          await page.waitForSelector(".alpha-victory-code-screen",{state:"visible",timeout:12000});
+          const visualClaim=page.getByRole("button",{name:"CLAIM REWARDS"}).first();
+          if(await visualClaim.isVisible().catch(()=>false))await visualClaim.click();
+          const visualContinue=page.locator(".alpha-victory-footer .victory-continue").first();
+          await visualContinue.waitFor({state:"visible",timeout:12000});
+          await visualContinue.click();
+          resumed={success:true,viaVisibleVictoryContinue:true};
+          await page.waitForSelector("#kakashi-v2-scene-board",{state:"visible",timeout:12000});'''
+          assert old_visual in text, 'Kakashi visualAndBattle terminal block drifted'
+          text=text.replace(old_visual,new_visual,1)
+
+          start=text.index('async function launchAndReturnBattle(')
+          end=text.index('\nasync function toScene02Root',start)
+          fn=text[start:end]
+          old_helper='''  }else{
+            resumed=await page.evaluate(({outcome,actions})=>{
+              const prior=globalThis.getBattleActionOpportunityIndex;
+              globalThis.getBattleActionOpportunityIndex=(side,participantId)=>{
+                if(side==="player"&&participantId==="academy_kakashi")return actions;
+                return typeof prior==="function"?prior(side,participantId):0;
+              };
+              try{
+                currentBattle.outcome={...(currentBattle.outcome||{}),type:outcome,completedAt:Date.now(),finishingShinobiId:outcome==="victory"?"academy_kakashi":null};
+                currentBattle.battleOver=true;
+                currentBattle.active=false;
+                return resumeBattleCallerAfterCompletion(outcome);
+              }finally{
+                globalThis.getBattleActionOpportunityIndex=prior;
+              }
+            },{outcome,actions});
+            assert(resumed&&resumed.success===true,JSON.stringify(resumed));
+          }'''
+          new_helper='''  }else{
+            resumed=await page.evaluate(({outcome,actions})=>{
+              globalThis.__kakashiTerminalActionIndexPrior=getBattleActionOpportunityIndex;
+              globalThis.getBattleActionOpportunityIndex=(side,participantId)=>{
+                if(side==="player"&&participantId==="academy_kakashi")return actions;
+                return typeof globalThis.__kakashiTerminalActionIndexPrior==="function"
+                  ?globalThis.__kakashiTerminalActionIndexPrior(side,participantId)
+                  :0;
+              };
+              try{getBattleActionOpportunityIndex=globalThis.getBattleActionOpportunityIndex;}catch(_error){}
+              currentBattle.outcome={...(currentBattle.outcome||{}),type:outcome,completedAt:Date.now(),finishingShinobiId:outcome==="victory"?"academy_kakashi":null};
+              currentBattle.battleOver=true;
+              currentBattle.active=false;
+              return resumeBattleCallerAfterCompletion(outcome);
+            },{outcome,actions});
+            assert.strictEqual(resumed?.callerResumeWithheldUntilTerminalResultContinue,true,`Kakashi ${outcome} caller bypassed #544 terminal result gate: ${JSON.stringify(resumed)}`);
+            const terminalSelector=outcome==="defeat"?".alpha331-setback":".alpha-victory-code-screen";
+            await page.waitForSelector(terminalSelector,{state:"visible",timeout:12000});
+            await page.waitForFunction(expected=>{
+              const terminal=globalThis.getBattleTerminalResultPresentation54400?.();
+              return terminal?.status==="presented"&&terminal?.committedOutcome===expected;
+            },outcome,{timeout:12000});
+            if(outcome==="victory"){
+              const claim=page.getByRole("button",{name:"CLAIM REWARDS"}).first();
+              if(await claim.isVisible().catch(()=>false))await claim.click();
+              const continueButton=page.locator(".alpha-victory-footer .victory-continue").first();
+              await continueButton.waitFor({state:"visible",timeout:12000});
+              await continueButton.click();
+              resumed={success:true,viaVisibleVictoryContinue:true};
+            }else{
+              resumed=await page.evaluate(()=>globalThis.continueAfterSetback33100?.());
+              assert(resumed&&resumed.success===true,JSON.stringify(resumed));
+            }
+            await page.evaluate(()=>{
+              if(globalThis.__kakashiTerminalActionIndexPrior){
+                globalThis.getBattleActionOpportunityIndex=globalThis.__kakashiTerminalActionIndexPrior;
+                try{getBattleActionOpportunityIndex=globalThis.getBattleActionOpportunityIndex;}catch(_error){}
+              }
+              delete globalThis.__kakashiTerminalActionIndexPrior;
+            });
+          }'''
+          assert old_helper in fn, 'Kakashi launchAndReturnBattle terminal branch drifted'
+          fn=fn.replace(old_helper,new_helper,1)
+          text=text[:start]+fn+text[end:]
+          path.write_text(text,encoding='utf-8')
+
+      - name: Source safety
+        run: |
+          node --check tools/qa_kakashi_v2_browser.js
+          node --check tools/qa_issue_343_wasabi_browser.js
+          node tools/qa_runtime_ownership_safety_300.js
+          node tools/qa_issue_303_runtime_build_fingerprint.js
+          node tools/qa_save_compatibility_311.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install chromium
+
+      - name: Start local Alpha server
+        run: |
+          python3 -m http.server 8080 >/tmp/issue-544-kakashi-v4-http.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/issue-544-kakashi-v4-http.log
+          exit 1
+
+      - name: Kakashi full browser compatibility
+        env:
+          KAKASHI_V2_BASE_URL: http://127.0.0.1:8080/index.html
+          KAKASHI_V2_BROWSER_OUT: artifacts/issue-544-proof-kakashi-v4
+        run: xvfb-run -a node tools/qa_kakashi_v2_browser.js
+
+      - name: Wasabi full browser regression
+        env:
+          ISSUE_343_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_343_BROWSER_OUT: artifacts/issue-544-proof-wasabi-v4
+        run: xvfb-run -a node tools/qa_issue_343_wasabi_browser.js
+
+      - name: Publish Kakashi QA correction to feature branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin coding/544-terminal-result-presentation
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/coding/544-terminal-result-presentation)"
+          git add tools/qa_kakashi_v2_browser.js
+          git diff --cached --check
+          git commit -m '[CODING][#544] Align Kakashi browser QA with terminal result chronology'
+          git push origin HEAD:coding/544-terminal-result-presentation
