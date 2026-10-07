@@ -136,7 +136,7 @@ async function geometry(page,surface){
         infoToggle:rect(map.querySelector(".region-info-toggle")),
         infoDrawer:rect(map.querySelector(".region-info-drawer.open")),
         knownDestinations:rect(map.querySelector(".region-known-destinations")),
-        eventDrawer:rect(map.querySelector(".region-event-drawer")),
+        eventDrawer:rect(map.querySelector(".alpha328-event,.region-event-drawer")),
         worldMap:rect(map.querySelector(".region-world-map-button"))
       }:{},
       village:surface==="village"?{
@@ -269,7 +269,7 @@ async function proveOwnerSelectedRegionEventCard(page,label){
   assert(selected,`${label}: canonical Konohagakure selected-event card target unavailable`);
   try{
     await page.waitForFunction(()=>{
-      const drawer=document.querySelector(".region-map-pane .region-event-drawer");
+      const drawer=document.querySelector(".region-map-pane .alpha328-event,.region-map-pane .region-event-drawer");
       if(!drawer)return false;
       const r=drawer.getBoundingClientRect(),cs=getComputedStyle(drawer);
       return r.width>0&&r.height>0&&cs.display!=="none"&&cs.visibility!=="hidden";
@@ -277,15 +277,16 @@ async function proveOwnerSelectedRegionEventCard(page,label){
   }catch(error){
     const diagnostic=await page.evaluate(({regionKey,hotspotId})=>{
       const map=document.querySelector(".region-map-pane");
-      const anywhere=document.querySelector(".region-event-drawer");
-      const inside=map&&map.querySelector(".region-event-drawer");
+      const panelSelector=".alpha328-event,.region-event-drawer";
+      const anywhere=document.querySelector(panelSelector);
+      const inside=map&&map.querySelector(panelSelector);
       const projection=typeof getHotspotProjection==="function"?getHotspotProjection(regionKey,hotspotId):null;
       const beforeOpportunity=typeof selectedOpportunityId!=="undefined"?selectedOpportunityId:null;
       let directRender=null,directRenderError=null;
       try{
         if(typeof renderRegionEventDrawer==="function"){
           const html=String(renderRegionEventDrawer(regionKey)||"");
-          directRender={nonEmpty:!!html.trim(),length:html.length,includesDrawer:html.includes("region-event-drawer"),preview:html.slice(0,260)};
+          directRender={nonEmpty:!!html.trim(),length:html.length,includesDrawer:html.includes("alpha328-event")||html.includes("region-event-drawer"),preview:html.slice(0,260)};
         }
       }catch(renderError){directRenderError=String(renderError&&renderError.stack||renderError);}
       try{selectedOpportunityId=beforeOpportunity;}catch(_error){}
@@ -313,8 +314,8 @@ async function proveOwnerSelectedRegionEventCard(page,label){
         renderRegionHubUIIncludesDrawer:typeof renderRegionHubUI==="function"?String(renderRegionHubUI).includes("renderRegionEventDrawer"):false,
         drawerAnywhere:summarize(anywhere),
         drawerInsideMap:summarize(inside),
-        overlayContainsDrawer:!!document.querySelector("#overlay-content-container .region-event-drawer"),
-        overlayInnerHtmlHasDrawer:!!document.querySelector("#overlay-content-container")?.innerHTML.includes("region-event-drawer"),
+        overlayContainsDrawer:!!document.querySelector(`#overlay-content-container ${panelSelector}`),
+        overlayInnerHtmlHasDrawer:!!document.querySelector("#overlay-content-container")?.innerHTML.match(/alpha328-event|region-event-drawer/),
         directRender,
         directRenderError,
         visiblePanels
@@ -325,15 +326,17 @@ async function proveOwnerSelectedRegionEventCard(page,label){
   await settle(page);
 
   const presentation=await page.evaluate(()=>{
-    const drawer=document.querySelector(".region-map-pane .region-event-drawer");
+    const drawer=document.querySelector(".region-map-pane .alpha328-event,.region-map-pane .region-event-drawer");
     if(!drawer)return null;
     return{
+      className:String(drawer.className||""),
       text:String(drawer.innerText||""),
       selectedHotspotId:typeof selectedHotspotId!=="undefined"?selectedHotspotId:null,
       selectedOpportunityId:typeof selectedOpportunityId!=="undefined"?selectedOpportunityId:null
     };
   });
   assert(presentation,`${label}: owner-visible Region selected-event card did not render`);
+  assert(/\balpha328-event\b/.test(presentation.className),`${label}: owner-visible selected-event route did not use the modern alpha328 event surface: ${JSON.stringify(presentation)}`);
   assert(/Konohagakure/i.test(presentation.text),`${label}: selected-event card is not the owner-visible Konohagakure card: ${JSON.stringify(presentation)}`);
   assert(/ENTER LOCATION/i.test(presentation.text),`${label}: selected-event card lost its real ENTER LOCATION action: ${JSON.stringify(presentation)}`);
   assert(/DISCOVERY/i.test(presentation.text),`${label}: selected-event card lost its observer-safe Discovery presentation: ${JSON.stringify(presentation)}`);
@@ -348,7 +351,15 @@ async function proveOwnerSelectedRegionEventCard(page,label){
   const shot=label.startsWith("1366")?"05-region-selected-event-1366x768.png":"06-region-selected-event-1920x1080.png";
   await page.screenshot({path:path.join(OUT,shot),fullPage:true});
 
-  await page.evaluate(()=>closeRegionEventDrawer());
+  const closed=await page.evaluate(()=>{
+    const drawer=document.querySelector(".region-map-pane .alpha328-event,.region-map-pane .region-event-drawer");
+    const button=drawer&&drawer.querySelector('.alpha328-event__close,button[aria-label="Close"],button[aria-label="Close event drawer"]');
+    if(!button)return false;
+    button.click();
+    return true;
+  });
+  assert.strictEqual(closed,true,`${label}: owner-visible selected-event card close control unavailable`);
+  await page.waitForFunction(()=>!document.querySelector(".region-map-pane .alpha328-event,.region-map-pane .region-event-drawer"),null,{timeout:3000});
   await settle(page,180);
   assert.strictEqual(await semanticFingerprint(page),before,`${label}: selected-event presentation mutated Chronicle/World state`);
 }
@@ -427,7 +438,7 @@ async function assertSurface(page,surface,label){
       ordinarySingleClickDrawer:false,
       deliberateRegionActivation:true,
       ownerSelectedEventOverlayOutboard:true,
-      selectedEventProof:"konohagakure_discovery_enter_location",
+      selectedEventProof:"konohagakure_discovery_enter_location_alpha328",
       persistentOverlapPixels:0,
       hotspotReachability:"GREEN",
       semanticMutation:false,
