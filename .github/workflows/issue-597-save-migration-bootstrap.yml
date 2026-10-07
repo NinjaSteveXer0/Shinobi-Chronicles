@@ -35,6 +35,10 @@ jobs:
               'load_end = text.find("// =========================================================\\n// SAVE PLAYER DATA", load_start)',
               'load_end = text.find("function savePlayerData()", load_start)'
           )
+          text=text.replace(
+              'Object.entries(ACADEMY_ORIGIN_BASE_SAVE_PACKAGES_582).forEach(([characterId, packageRow]) => {',
+              '["academy_hinata","academy_mirai","academy_menma"].forEach(characterId => {\n      const packageRow = ACADEMY_ORIGIN_BASE_SAVE_PACKAGES_582[characterId];'
+          )
           path.write_text(text,encoding='utf-8')
           PY
           python tools/apply_issue_597_save_migration.py
