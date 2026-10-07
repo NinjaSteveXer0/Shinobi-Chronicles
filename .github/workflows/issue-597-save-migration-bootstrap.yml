@@ -1,5 +1,6 @@
 name: Issue 597 Legacy Save Migration Bootstrap
 
+# Temporary bounded writer. Remove after the production migration commits.
 on:
   push:
     branches:
