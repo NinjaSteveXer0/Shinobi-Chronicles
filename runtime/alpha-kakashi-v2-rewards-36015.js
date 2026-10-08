@@ -235,18 +235,6 @@ if(PRE_VICTORY_RENDER){
   try{renderVictoryOverlay=globalThis.renderVictoryOverlay;}catch(_error){}
 }
 
-const PRE_OPEN_OVERLAY=typeof openOverlay==="function"?openOverlay:null;
-function openOverlay36015(type){
-  if(String(type||"").toLowerCase()==="victory"){
-    try{ensureKakashiV2BattleRewardProjection36015();}catch(_e){}
-  }
-  return PRE_OPEN_OVERLAY?PRE_OPEN_OVERLAY.apply(this,arguments):false;
-}
-if(PRE_OPEN_OVERLAY){
-  globalThis.openOverlay=openOverlay36015;
-  try{openOverlay=globalThis.openOverlay;}catch(_error){}
-}
-
 function snapshotRewardMutation(){
   const provenanceHadKey=Object.prototype.hasOwnProperty.call(ensurePlayer(),"durableObjectProvenance14800");
   return{
@@ -462,7 +450,7 @@ function diagnostics(){
     trainingTantoUsesDurableProvenance:String(commitItemSource).includes("commitDurableInventoryAcquisition54500")&&String(commitItemSource).includes("durableInstanceId")&&String(commitItemSource).includes('acquisitionKind:"reward"'),
     rewardRollbackIncludesProvenance:String(snapshotRewardMutation).includes("durableObjectProvenance14800")&&String(restoreRewardMutation).includes("durableObjectProvenance14800"),
     victoryProjectionSelfHeals:String(ensureKakashiV2BattleRewardProjection36015).includes("authoritativeProjectionRepaired")&&String(renderVictoryOverlay36015).includes("ensureKakashiV2BattleRewardProjection36015"),
-    victoryOpenProjectsBeforeGenericRender:String(openOverlay36015).includes('"victory"')&&String(openOverlay36015).indexOf("ensureKakashiV2BattleRewardProjection36015")<String(openOverlay36015).indexOf("PRE_OPEN_OVERLAY"),
+    noBroadOpenOverlayOwnership:!String(installAcademyKakashiV2Rewards36015).includes("openOverlay36015")&&!String(installAcademyKakashiV2Rewards36015).includes("PRE_OPEN_OVERLAY"),
     exactMIBattleProjection:String(ensureKakashiV2BattleRewardProjection36015).includes("Field Recovery Pill")&&String(battlePlan).includes("participantId===MI")&&String(battlePlan).includes("ryo:cashSourceId?50:0")&&String(soloCashSource36015).includes("participantId===MI"),
     kakashiClaimBypassesDuplicateGenericPersistence:!String(claimKakashiV2BattleRewards).includes("PRE_CLAIM.call")&&String(claimKakashiV2BattleRewards).includes("directExactPackageClaim:true")&&String(claimKakashiV2BattleRewards).includes("deferredPersistenceUntilVictoryPaint:true")&&!String(claimKakashiV2BattleRewards).includes('savePlayerData==="function")savePlayerData()'),
     idempotentKakashiClaimDoesNotRewritePlayerSave:String(claimKakashiV2BattleRewards).includes("noPersistenceRewrite:true"),

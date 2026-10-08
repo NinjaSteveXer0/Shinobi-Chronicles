@@ -240,9 +240,47 @@
   function continueAfterVictory54400(){
     const battle=activeBattle54400();
     const outcome=committedOutcome54400(battle);
-    const claimed=!!(battle&&battle.rewards&&battle.rewards.claimed===true);
-    const rc=battle&&battle.returnContext||null;
-    if(battle&&battle.battleOver===true&&outcome==="victory"&&claimed&&rc&&PRIOR_RESUME_CALLER){
+    if(!battle||battle.battleOver!==true||outcome!=="victory"){
+      return{success:false,reason:"committed_victory_missing",patchId:PATCH_ID};
+    }
+    const marker=marker54400(battle,"victory",false);
+    if(!marker||marker.status!=="presented"){
+      return{success:false,reason:"victory_not_presented",patchId:PATCH_ID};
+    }
+
+    const claimed=!!(battle.rewards&&battle.rewards.claimed===true);
+    if(!claimed){
+      const claimFn=typeof globalThis.claimCurrentBattleRewards==="function"
+        ?globalThis.claimCurrentBattleRewards
+        :((typeof claimCurrentBattleRewards==="function")?claimCurrentBattleRewards:null);
+      if(!claimFn){
+        try{if(PRIOR_OPEN_OVERLAY)PRIOR_OPEN_OVERLAY.call(globalThis,"victory");}catch(_error){}
+        return{success:false,reason:"battle_reward_claim_api_missing",patchId:PATCH_ID};
+      }
+      let claimResult=null;
+      try{claimResult=claimFn.call(globalThis);}catch(error){
+        try{if(PRIOR_OPEN_OVERLAY)PRIOR_OPEN_OVERLAY.call(globalThis,"victory");}catch(_error){}
+        return{success:false,reason:"battle_reward_claim_failed",error:String(error&&error.message||error),patchId:PATCH_ID};
+      }
+      const nowClaimed=!!(battle.rewards&&battle.rewards.claimed===true);
+      if(!nowClaimed){
+        try{if(PRIOR_OPEN_OVERLAY)PRIOR_OPEN_OVERLAY.call(globalThis,"victory");}catch(_error){}
+        return{success:false,reason:"battle_reward_claim_not_committed",claimResult:clone54400(claimResult),patchId:PATCH_ID};
+      }
+      try{if(PRIOR_OPEN_OVERLAY)PRIOR_OPEN_OVERLAY.call(globalThis,"victory");}catch(_error){}
+      return{
+        success:true,
+        rewardClaimed:true,
+        callerResumeWithheldUntilExplicitContinue:true,
+        terminalResultOwner54400:true,
+        terminalOutcome:"victory",
+        claimResult:clone54400(claimResult),
+        patchId:PATCH_ID
+      };
+    }
+
+    const rc=battle.returnContext||null;
+    if(rc&&PRIOR_RESUME_CALLER){
       const result=PRIOR_RESUME_CALLER.call(globalThis,"victory");
       if(result&&result.success===true)return{...result,terminalResultOwner54400:true,terminalOutcome:"victory"};
       try{if(PRIOR_OPEN_OVERLAY)PRIOR_OPEN_OVERLAY.call(globalThis,"victory");}catch(_error){}
