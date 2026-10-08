@@ -5,7 +5,7 @@ on:
   push:
     branches: [coding/544-terminal-result-presentation]
     paths:
-      - '.github/workflows/issue-300-runtime-ownership-safety.yml'
+      - '.github/544-closure-migration-trigger.txt'
   pull_request:
     paths:
       - '.github/workflows/issue-300-runtime-ownership-safety.yml'
@@ -129,8 +129,9 @@ assert(coreBattle.includes("battlePLWithdrawal:true")&&coreBattle.includes("inju
           git show origin/main:.github/workflows/issue-300-runtime-ownership-safety.yml > .github/workflows/issue-300-runtime-ownership-safety.yml
           git show origin/main:.github/workflows/issue-278-post-battle-agency.yml > .github/workflows/issue-278-post-battle-agency.yml
           git show origin/main:.github/workflows/issue-141-pre-alpha-runtime-closure.yml > .github/workflows/issue-141-pre-alpha-runtime-closure.yml
+          rm -f .github/544-closure-migration-trigger.txt
           git config user.name 'shinobi-chronicles-runtime-bot'
           git config user.email 'actions@users.noreply.github.com'
-          git add tools/qa_issue_278_post_battle_agency.js tools/qa_issue_141_pre_alpha_runtime_closure.py .github/workflows/issue-300-runtime-ownership-safety.yml .github/workflows/issue-278-post-battle-agency.yml .github/workflows/issue-141-pre-alpha-runtime-closure.yml
+          git add tools/qa_issue_278_post_battle_agency.js tools/qa_issue_141_pre_alpha_runtime_closure.py .github/workflows/issue-300-runtime-ownership-safety.yml .github/workflows/issue-278-post-battle-agency.yml .github/workflows/issue-141-pre-alpha-runtime-closure.yml .github/544-closure-migration-trigger.txt
           git commit -m '[CODING][#544] Migrate post-Battle closure assertions to canonical owner'
           git push origin HEAD:coding/544-terminal-result-presentation
