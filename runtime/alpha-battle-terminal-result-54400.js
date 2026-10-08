@@ -250,8 +250,9 @@
 
     const claimed=!!(battle.rewards&&battle.rewards.claimed===true);
     if(!claimed){
-      const claimFn=typeof globalThis.claimCurrentBattleRewards==="function"
-        ?globalThis.claimCurrentBattleRewards
+      const liveClaimCurrentBattleRewards=globalThis["claimCurrentBattleRewards"];
+      const claimFn=typeof liveClaimCurrentBattleRewards==="function"
+        ?liveClaimCurrentBattleRewards
         :((typeof claimCurrentBattleRewards==="function")?claimCurrentBattleRewards:null);
       if(!claimFn){
         try{if(PRIOR_OPEN_OVERLAY)PRIOR_OPEN_OVERLAY.call(globalThis,"victory");}catch(_error){}
