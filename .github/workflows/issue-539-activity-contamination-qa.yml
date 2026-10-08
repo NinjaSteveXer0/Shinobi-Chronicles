@@ -1,0 +1,58 @@
+name: Issue 539 Exams Practical Contamination QA
+
+on:
+  push:
+    branches:
+      - 'coding/539-contamination-adversarial-qa-lane-c*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-canary:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Source syntax
+        run: |
+          node --check tools/qa_issue_539_activity_contamination.js
+          node --check tools/qa_issue_539_activity_contamination_browser.js
+      - name: Historical contamination source canary
+        run: node tools/qa_issue_539_activity_contamination.js
+
+  installed-route-browser-canary:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Browser harness syntax
+        run: node --check tools/qa_issue_539_activity_contamination_browser.js
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start local Alpha server
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > issue539-server.log 2>&1 &
+          echo $! > issue539-server.pid
+          sleep 2
+      - name: Exams Practical installed-route negative canary
+        run: node tools/qa_issue_539_activity_contamination_browser.js
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-539-activity-contamination
+          path: |
+            artifacts/issue-539-activity-contamination
+            issue539-server.log
+          if-no-files-found: ignore
