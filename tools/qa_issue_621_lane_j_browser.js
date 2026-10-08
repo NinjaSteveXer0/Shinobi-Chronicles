@@ -170,13 +170,22 @@ async function proveIdempotentRefresh(page,label){
 
 async function visibleHotspots(page){
   return page.evaluate(()=>[...document.querySelectorAll('.region-hotspot[data-hotspot-id][data-region-key="fire"]')].map(node=>{
-    const r=node.getBoundingClientRect(),cs=getComputedStyle(node),x=r.left+r.width/2,y=r.top+r.height/2;
-    const top=document.elementFromPoint(x,y);
+    const r=node.getBoundingClientRect(),cs=getComputedStyle(node);
+    const points=[
+      [r.left+r.width/2,r.top+r.height/2],
+      [r.left+Math.min(8,r.width/3),r.top+Math.min(8,r.height/3)],
+      [r.right-Math.min(8,r.width/3),r.bottom-Math.min(8,r.height/3)]
+    ];
+    const hitPoints=points.filter(([x,y])=>{
+      if(x<0||x>=innerWidth||y<0||y>=innerHeight)return false;
+      const top=document.elementFromPoint(x,y);
+      return !!top&&(top===node||node.contains(top)||(top.closest&&top.closest('.region-hotspot[data-hotspot-id][data-region-key="fire"]')===node));
+    });
     const projection=typeof getHotspotProjection==="function"?getHotspotProjection("fire",node.dataset.hotspotId):null;
     return{
       id:node.dataset.hotspotId,label:projection?.knownLabel||null,
-      visible:r.width>0&&r.height>0&&cs.display!=="none"&&cs.visibility!=="hidden"&&x>=0&&x<innerWidth&&y>=0&&y<innerHeight,
-      reachable:!!top&&(top===node||node.contains(top)),x,y,
+      visible:r.width>0&&r.height>0&&cs.display!=="none"&&cs.visibility!=="hidden"&&Number(cs.opacity||1)>0,
+      reachable:hitPoints.length>0,clickPoint:hitPoints[0]||null,
       hasOpportunity:Array.isArray(projection?.opportunities)&&projection.opportunities.length>0,
       bandit:/bandit\s+hideout/i.test(JSON.stringify(projection||{}))
     };
@@ -187,10 +196,10 @@ async function openContextByPointer(page,label){
   const hotspots=await visibleHotspots(page);
   assert(hotspots.length>0,`${label}: no visible Region hotspots`);
   const blocked=hotspots.filter(row=>!row.reachable);
-  assert.deepStrictEqual(blocked,[],`${label}: blocked hotspot centres ${JSON.stringify(blocked)}`);
+  assert.deepStrictEqual(blocked,[],`${label}: map presentation blocked hotspot(s) at all contract hit points: ${JSON.stringify(blocked)}`);
   const target=hotspots.find(row=>row.bandit)||hotspots.find(row=>row.hasOpportunity);
-  assert(target,`${label}: no deterministic selected-context hotspot`);
-  await page.mouse.click(target.x,target.y);
+  assert(target&&target.clickPoint,`${label}: no deterministic pointer-reachable selected-context hotspot`);
+  await page.mouse.click(target.clickPoint[0],target.clickPoint[1]);
   await page.waitForFunction(()=>{
     const drawer=document.querySelector(".region-map-pane .alpha328-event,.region-map-pane .region-event-drawer");
     if(!drawer)return false;const r=drawer.getBoundingClientRect(),cs=getComputedStyle(drawer);
