@@ -155,10 +155,10 @@ async function backToKonoha(page){
   await page.waitForFunction(()=>{const root=document.getElementById("konoha-activity-screen");return !root||getComputedStyle(root).display==="none"||!root.offsetParent;},null,{timeout:10000});
 }
 async function openFromVillage(page,kind){
-  const re=kind==="exams"?/EXAM/i:/PRACTICAL|TRAINING\s+COMPOUND/i;
+  const re=kind==="exams"?/SHINOBI\s+ACADEMY/i:/PRACTICAL\s+TRAINING\s+COMPOUND/i;
   const entry=await firstVisibleClickable(page,re,"body");
   const label=await entry.evaluate(el=>[(el.innerText||el.textContent||"").trim(),el.getAttribute("aria-label")||"",el.getAttribute("title")||""].join(" ").replace(/\s+/g," "));
-  await entry.click();
+  await entry.dblclick();
   await page.waitForSelector(`#konoha-activity-screen[data-service-id='${kind}']`,{state:"visible",timeout:10000});
   return label;
 }
