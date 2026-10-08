@@ -87,7 +87,7 @@ jobs:
                   semantic['owner']=owner
 
           terminal_symbols={'openOverlay','continueAfterVictory','handleBattleParticipantAtZeroPL'}
-          for chain in reg.get('wrapperChains',[]):
+          for chain in reg.get('globalWrapperChains',[]):
               if chain.get('symbol') in terminal_symbols and isinstance(chain.get('chain'),list):
                   chain['chain']=[p for p in chain['chain'] if p!=retired]
               if chain.get('symbol')=='openOverlay':
