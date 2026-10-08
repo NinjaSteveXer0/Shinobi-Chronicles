@@ -101,8 +101,14 @@ async function selectDisciplineCard(page,id){
   assert(/selected|active/i.test(cls),`discipline ${id} did not visibly select: ${cls}`);
 }
 async function selectBatch(page,size){
-  const re=new RegExp(`^[×xX]\\s*${size}$`,`i`);
-  const button=await firstVisibleClickable(page,re,"#konoha-activity-screen");
+  const buttons=page.locator("#konoha-activity-screen .alpha-activity-batch");
+  const count=await buttons.count();let button=null;
+  for(let i=0;i<count;i++){
+    const candidate=buttons.nth(i);if(!(await candidate.isVisible().catch(()=>false)))continue;
+    const label=(await candidate.innerText()).replace(/\s+/g,"").toLowerCase();
+    if(label===`×${size}`||label===`x${size}`){button=candidate;break;}
+  }
+  assert(button,`No visible batch control matched x${size}; inventory=${JSON.stringify(await inventory(page,"#konoha-activity-screen"))}`);
   await button.click();await page.waitForTimeout(50);
   const state=await button.evaluate(el=>({className:String(el.className||""),pressed:el.getAttribute("aria-pressed"),selected:el.getAttribute("data-selected")}));
   const runtime=await page.evaluate(()=>({
