@@ -263,9 +263,9 @@ try {
     };
     presentCommittedBattleTerminalResult54400("defeat",{source:"issue141_runtime_qa_failure"});
     const setbackFailResult=continueAfterSetback54400();
-    const projection=getBattleTerminalResultPresentation54400();
+    const failureProjection=getBattleTerminalResultPresentation54400();
     globalThis.__issue141ForceReturnFailure=false;
-    ({result:setbackFailResult,projection,overlayCalls:globalThis.__issue141OverlayCalls.slice(setbackOverlayBefore)});
+    ({result:setbackFailResult,projection:failureProjection,overlayCalls:globalThis.__issue141OverlayCalls.slice(setbackOverlayBefore)});
   `, "issue141-setback-return-fail-closed.js"));
   check(
     "story_setback_return_failure_never_opens_generic_arena",
