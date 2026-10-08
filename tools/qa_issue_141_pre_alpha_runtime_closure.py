@@ -196,7 +196,6 @@ def main() -> int:
     journey = read("runtime/alpha-journey-surface-32800.js")
     origin_integrator = read("runtime/alpha-origin-scenes-32900-integrator.js")
     terminal_result = read("runtime/alpha-battle-terminal-result-54400.js")
-    game = GAME.read_text(encoding="utf-8")
     bridge = read("runtime/alpha-traversal-bridge-33200.js")
     world_fix = read("runtime/alpha-world-konoha-112-fix.js")
     contained = read("runtime/alpha-anbu-root-contained-155-knowledge-fix.js")
@@ -256,8 +255,13 @@ def main() -> int:
     require(
         checks,
         "setback_is_withdrawal_not_injury_death",
-        contains_all(terminal_result, "Battle PL defeat does not infer death, injury, custody")
-        and contains_all(game, "battlePLWithdrawal:true", "injuryInferred:false", "deathInferred:false"),
+        contains_all(
+            terminal_result,
+            "Battle PL defeat does not infer death, injury, custody",
+            'committedOutcome54400(battle)!=="defeat"',
+            "presentationOnly:true",
+            "semanticWrite:false",
+        ),
     )
 
     # Origin package is ten-Origin and source-first; no direct PL grant in occurrence commit.
