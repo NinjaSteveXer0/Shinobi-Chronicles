@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 env:
-  ISSUE_544_TARGET_SHA: c27f947d7bcdaad6308115c3a163d216e097dc72
+  ISSUE_544_TARGET_SHA: 8bfdf97c9abae405d61723941b2795d2e264d4c0
 
 jobs:
   source-singular-owner:
@@ -38,6 +38,7 @@ jobs:
           node --check tools/qa_issue_544_lane_j_source.js
           node --check runtime/alpha-battle-terminal-result-54400.js
           node --check runtime/alpha-alpha-sprint-33100.js
+          node --check runtime/alpha-kakashi-v2-rewards-36015.js
       - name: Run singular-owner verifier
         working-directory: candidate
         run: node tools/qa_issue_544_lane_j_source.js
