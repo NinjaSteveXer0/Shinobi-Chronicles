@@ -353,7 +353,7 @@
         "UI/exams.png"
       ],
       "qa_paths": [
-        "tools/qa_phase2_konoha_player_surfaces_431.js",
+        "tools/qa_phase2_konoha-player-surfaces-431.js",
         "tools/qa_ui_master_consumption_528_browser.js"
       ],
       "workflow_path": ".github/workflows/issues-431-436-phase2-konoha-onboarding.yml",
@@ -371,7 +371,7 @@
       "invalidation_rule": {
         "match_any": [
           "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
-          "tools/qa_phase2_konoha_player_surfaces_431.js",
+          "tools/qa_phase2-konoha-player-surfaces-431.js",
           "style.css",
           "UI/practical.png",
           "UI/exams.png"
@@ -383,11 +383,11 @@
       "id": "victory_setback_results_141",
       "surface_family": "Battle / Victory + Setback Results",
       "authority_kind": "runtime_closure_and_ui_contract",
-      "authority_ref": ["#141", "#526"],
+      "authority_ref": ["#141", "#526", "#544"],
       "production_disposition": "IMPLEMENT_NOW",
       "lifecycle_stage": "OBSERVED",
       "consumer_paths": [
-        "runtime/alpha-alpha-sprint-33100.js",
+        "runtime/alpha-battle-terminal-result-54400.js",
         "UI/victory.png",
         "UI/setback.png"
       ],
@@ -397,8 +397,8 @@
       ],
       "workflow_path": ".github/workflows/issue-528-production-conformance.yml",
       "expected_evidence": {
-        "path": "runtime/alpha-alpha-sprint-33100.js",
-        "contains": "continueAfterSetback33100"
+        "path": "runtime/alpha-battle-terminal-result-54400.js",
+        "contains": "continueAfterSetback54400"
       },
       "observable_acceptance": [
         "real Battle Victory/defeat routes retain exact caller semantics in the owning Kakashi browser suite",
@@ -409,6 +409,7 @@
       "invalidation_rule": {
         "match_any": [
           "runtime/alpha-alpha-sprint-33100.js",
+          "runtime/alpha-battle-terminal-result-54400.js",
           "UI/victory.png",
           "UI/setback.png",
           "tools/qa_ui_master_consumption_528_browser.js"
@@ -431,7 +432,7 @@
       ],
       "consumer_paths": [
         "style.css",
-        "runtime/alpha-alpha-sprint-33100.js",
+        "runtime/alpha-battle-terminal-result-54400.js",
         "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
         "runtime/alpha-browser-polish-32700.js",
         "UI/victory.png",
@@ -463,6 +464,7 @@
           "Documentation/Coordination/Issue_541_Owner_UI_Correction_2026-10-05.md",
           "style.css",
           "runtime/alpha-alpha-sprint-33100.js",
+          "runtime/alpha-battle-terminal-result-54400.js",
           "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
           "runtime/alpha-browser-polish-32700.js",
           "UI/victory.png",
