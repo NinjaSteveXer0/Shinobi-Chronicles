@@ -7,53 +7,47 @@ on:
     paths:
       - 'tools/fixtures/coordination_safety_601_adversarial.json'
       - 'tools/qa_issue_601_coordination_safety_adversarial.js'
+      - 'tools/qa_issue_601_candidate_631_adversarial.js'
       - '.github/workflows/issue-601-coordination-safety-adversarial.yml'
   pull_request:
     paths:
       - 'tools/fixtures/coordination_safety_601_adversarial.json'
       - 'tools/qa_issue_601_coordination_safety_adversarial.js'
+      - 'tools/qa_issue_601_candidate_631_adversarial.js'
       - '.github/workflows/issue-601-coordination-safety-adversarial.yml'
   workflow_dispatch:
-    inputs:
-      target_sha:
-        description: 'Exact Lane-I candidate SHA to adversarially test'
-        required: false
-        type: string
-      target_path:
-        description: 'Candidate analyzer module path at target_sha'
-        required: false
-        default: 'tools/coordination_safety_601.js'
-        type: string
 
 permissions:
   contents: read
+
+env:
+  TARGET_SHA: 5b8f7c6eed9fd35b6923f0b1c43293b4500bb096
+  TARGET_PATH: tools/workforce_collision_guard_601.js
 
 jobs:
   fixture-contract:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Syntax check Lane J runner
-        run: node --check tools/qa_issue_601_coordination_safety_adversarial.js
+      - name: Syntax check Lane J runners
+        run: |
+          node --check tools/qa_issue_601_coordination_safety_adversarial.js
+          node --check tools/qa_issue_601_candidate_631_adversarial.js
       - name: Validate adversarial fixture contract
         run: node tools/qa_issue_601_coordination_safety_adversarial.js --self-test
 
   exact-candidate-adversarial:
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.target_sha != '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Materialize exact Lane I candidate
-        env:
-          TARGET_SHA: ${{ inputs.target_sha }}
-          TARGET_PATH: ${{ inputs.target_path }}
+      - name: Materialize exact Lane I PR 631 candidate
         run: |
           set -euo pipefail
           git fetch --no-tags origin "$TARGET_SHA"
           mkdir -p .qa-target
-          git show "$TARGET_SHA:$TARGET_PATH" > .qa-target/coordination-safety-601-candidate.js
+          git show "$TARGET_SHA:$TARGET_PATH" > .qa-target/workforce_collision_guard_601.js
           echo "Testing exact candidate: $TARGET_SHA:$TARGET_PATH"
       - name: Syntax check exact candidate
-        run: node --check .qa-target/coordination-safety-601-candidate.js
-      - name: Run Lane J hostile coordination-safety matrix
-        run: node tools/qa_issue_601_coordination_safety_adversarial.js .qa-target/coordination-safety-601-candidate.js
+        run: node --check .qa-target/workforce_collision_guard_601.js
+      - name: Run Lane J exact-candidate hostile matrix
+        run: node tools/qa_issue_601_candidate_631_adversarial.js .qa-target/workforce_collision_guard_601.js
