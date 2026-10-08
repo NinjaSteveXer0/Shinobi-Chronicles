@@ -102,6 +102,20 @@ const toolingOnly = run(190, [
 assert.strictEqual(toolingOnly.pass, true, JSON.stringify(toolingOnly));
 assert.strictEqual(toolingOnly.targetProductionFiles.length, 0);
 
+const wildcardReservation = run(195, [
+  pr(195, "[CODING] Target", "coding/target", ["runtime/alpha-example.js"], reservation(195, "#195", "I", "integration_owner")),
+  pr(196, "[CODING] Owner", "coding/owner", ["runtime/owner.js"], reservation(196, "#196", "A", "integration_owner", { reservedPaths: ["runtime/alpha-*.js"] }))
+]);
+assert.strictEqual(wildcardReservation.pass, false);
+assert(wildcardReservation.findings.some((x) => x.code === "RESERVED_PATH_VIOLATION" && x.path === "runtime/alpha-example.js"));
+
+const doubleWildcardReservation = run(197, [
+  pr(197, "[CODING] Target", "coding/target", ["runtime/nested/alpha-example.js"], reservation(197, "#197", "I", "integration_owner")),
+  pr(198, "[CODING] Owner", "coding/owner", ["runtime/owner.js"], reservation(198, "#198", "A", "integration_owner", { reservedPaths: ["runtime/**/alpha-*.js"] }))
+]);
+assert.strictEqual(doubleWildcardReservation.pass, false);
+assert(doubleWildcardReservation.findings.some((x) => x.code === "RESERVED_PATH_VIOLATION" && x.path === "runtime/nested/alpha-example.js"));
+
 console.log(JSON.stringify({
   pass: true,
   issue: 601,
@@ -116,7 +130,9 @@ console.log(JSON.stringify({
     ambiguousProtectedSeamOwnerBlocked: true,
     malformedCollisionFailsClosed: true,
     staleIntegrationOwnerFailsClosed: true,
-    toolingOnlyCandidateDoesNotSelfBlock: true
+    toolingOnlyCandidateDoesNotSelfBlock: true,
+    singleWildcardReservationMatches: true,
+    doubleWildcardReservationMatches: true
   },
   productionRuntimeTouched: false,
   browserGoldenClaimed: false
