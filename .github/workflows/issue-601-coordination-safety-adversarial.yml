@@ -21,7 +21,7 @@ permissions:
   contents: read
 
 env:
-  TARGET_SHA: 5b8f7c6eed9fd35b6923f0b1c43293b4500bb096
+  TARGET_SHA: 938c1955396e791e751da94f3f26de6f8e11723a
   TARGET_PATH: tools/workforce_collision_guard_601.js
 
 jobs:
