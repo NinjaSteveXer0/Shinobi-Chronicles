@@ -175,8 +175,8 @@
     },
     {
       "responsibilityId": "battle.return.story_scene.shared",
-      "canonicalOwner": "runtime/alpha-alpha-sprint-33100.js",
-      "ownerType": "shared_battle_return_runtime",
+      "canonicalOwner": "runtime/alpha-battle-terminal-result-54400.js",
+      "ownerType": "shared_battle_terminal_result_runtime",
       "directCallers": [
         "runtime/alpha-battle-modern-33000.js"
       ],
@@ -189,9 +189,12 @@
       ],
       "productionLoadPath": [
         "index.html",
-        "runtime/alpha-alpha-sprint-33100.js"
+        "runtime/alpha-battle-terminal-result-54400.js"
       ],
       "extensionHooks": [
+        "presentCommittedBattleTerminalResult54400",
+        "continueAfterSetback54400",
+        "continueAfterVictory",
         "resumeBattleCallerAfterCompletion"
       ],
       "permittedAdapters": [
@@ -2078,7 +2081,7 @@
     },
     {
       "semanticId": "battle.return.story_scene",
-      "owner": "runtime/alpha-alpha-sprint-33100.js",
+      "owner": "runtime/alpha-battle-terminal-result-54400.js",
       "responsibilityId": "battle.return.story_scene.shared"
     },
     {
@@ -2362,7 +2365,7 @@
         "runtime/alpha-battle-terminal-result-54400.js"
       ],
       "canonicalActiveOwner": "runtime/alpha-battle-terminal-result-54400.js",
-      "activationCondition": "#544 is the final presentation-only terminal-result guard. It withholds an already-committed victory/defeat caller resume only until the canonical Victory/Setback surface has actually been presented, then delegates unchanged to the prior shared Story/World return chain.",
+      "activationCondition": "#544 withholds exact caller restoration until the canonical Victory/Setback surface has been presented, then delegates to the existing Story/World return service.",
       "qaRefs": [
         "tools/qa_issues_396_399_400_browser.js",
         "tools/qa_runtime_ownership_safety_300.js",
@@ -2431,13 +2434,12 @@
       "chain": [
         "runtime/alpha-menma-origin-rewards-36200.js",
         "runtime/alpha-battle-modern-33000.js",
-        "runtime/alpha-alpha-sprint-33100.js",
         "runtime/alpha-kakashi-v2-rewards-36015.js",
         "runtime/alpha-phase2-inventory-core-46100.js",
         "runtime/alpha-battle-terminal-result-54400.js"
       ],
       "canonicalActiveOwner": "runtime/alpha-battle-terminal-result-54400.js",
-      "activationCondition": "#544 is final only for an already-committed Battle terminal result: victory remains Victory and defeat maps to the approved Setback presentation after the #33000 immutable presentation queue settles. Every non-terminal/non-matching overlay delegates unchanged to the complete predecessor chain.",
+      "activationCondition": "#544 is the sole terminal-result presentation owner for already-committed Battle victory/defeat. #33000 remains the distinct immutable presentation-queue owner; #33100 terminal overlay ownership is retired.",
       "qaRefs": [
         "tools/qa_phase2_inventory_core_461_browser.js",
         "tools/qa_kakashi_v2_browser.js",

@@ -4,10 +4,39 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
+      - 'runtime/alpha-traversal-bridge-33200.js'
+      - 'runtime/alpha-runtime-build-fingerprint-303.js'
+      - 'runtime/alpha-story-scene-board-33900.js'
+      - 'runtime/alpha-story-decision-realisation-34000.js'
+      - 'runtime/alpha-story-factual-resolver-34600.js'
+      - 'runtime/academy-kakashi-v2-content-36000.js'
+      - 'runtime/alpha-kakashi-v2-*.js'
+      - 'tools/fixtures/runtime_*_300.json'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
+      - 'tools/qa_issue_303_runtime_build_fingerprint.js'
+      - 'tools/qa_runtime_ownership_safety_300.js'
+      - 'tools/qa_kakashi_v2_legacy_exclusion.js'
+      - 'tools/qa_kakashi_v2_browser.js'
+      - '.github/workflows/issue-300-runtime-ownership-safety.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - 'runtime/alpha-traversal-bridge-33200.js'
+      - 'runtime/alpha-runtime-build-fingerprint-303.js'
+      - 'runtime/alpha-story-scene-board-33900.js'
+      - 'runtime/alpha-story-decision-realisation-34000.js'
+      - 'runtime/alpha-story-factual-resolver-34600.js'
+      - 'runtime/academy-kakashi-v2-content-36000.js'
+      - 'runtime/alpha-kakashi-v2-*.js'
+      - 'tools/fixtures/runtime_*_300.json'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
+      - 'tools/qa_issue_303_runtime_build_fingerprint.js'
+      - 'tools/qa_runtime_ownership_safety_300.js'
+      - 'tools/qa_kakashi_v2_legacy_exclusion.js'
       - '.github/workflows/issue-300-runtime-ownership-safety.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   runtime-ownership-safety:
@@ -15,94 +44,21 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: coding/544-terminal-result-presentation
-          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Migrate #544 canonical authority and retired QA selectors
-        shell: bash
+
+      - name: Runtime ownership safety gate
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          import json
-
-          owner='runtime/alpha-battle-terminal-result-54400.js'
-          predecessor='runtime/alpha-alpha-sprint-33100.js'
-
-          rp=Path('tools/fixtures/runtime_responsibility_registry_300.json')
-          reg=json.loads(rp.read_text())
-          row=next((r for r in reg.get('responsibilities',[]) if r.get('responsibilityId')=='battle.return.story_scene.shared'),None)
-          if not row: raise SystemExit('battle.return.story_scene.shared missing')
-          row['canonicalOwner']=owner
-          row['ownerType']='shared_battle_terminal_result_runtime'
-          row['productionLoadPath']=['index.html',owner]
-          row['extensionHooks']=['presentCommittedBattleTerminalResult54400','continueAfterSetback54400','continueAfterVictory','resumeBattleCallerAfterCompletion']
-          # #33100 still legitimately exists for World/Arena; only its terminal
-          # slice is replaced, so it must NOT be a full-file retiredOwner.
-          row['retiredOwners']=[x for x in row.get('retiredOwners',[]) if x!=predecessor]
-          for semantic in reg.get('semanticOwners',[]):
-              if semantic.get('semanticId')=='battle.return.story_scene': semantic['owner']=owner
-          for chain in reg.get('globalWrapperChains',[]):
-              if chain.get('symbol') in {'openOverlay','continueAfterVictory','handleBattleParticipantAtZeroPL'} and isinstance(chain.get('chain'),list):
-                  chain['chain']=[p for p in chain['chain'] if p!=predecessor]
-              if chain.get('symbol')=='openOverlay':
-                  chain['canonicalActiveOwner']=owner
-                  chain['activationCondition']='#544 is the sole terminal-result presentation owner for already-committed Battle victory/defeat. #33000 remains the distinct immutable presentation-queue owner; #33100 terminal overlay ownership is retired.'
-              if chain.get('symbol')=='resumeBattleCallerAfterCompletion':
-                  chain['canonicalActiveOwner']=owner
-                  chain['activationCondition']='#544 withholds exact caller restoration until the canonical Victory/Setback surface has been presented, then delegates to the existing Story/World return service.'
-          rp.write_text(json.dumps(reg,indent=2,ensure_ascii=False)+'\n')
-
-          dp=Path('tools/fixtures/runtime_change_declarations_300.json')
-          dec=json.loads(dp.read_text())
-          d=next((r for r in dec.get('declarations',[]) if r.get('changeId')=='issue-544-canonical-battle-terminal-result-presentation-2026-10-07'),None)
-          if not d: raise SystemExit('issue-544 declaration missing')
-          d['classification']='REPLACES'
-          d['contractChangeReason']='AUTHORITY_CHANGED_CANONICAL_OWNER_CONSOLIDATION_601_624'
-          d['rationale']='Issue #544 is the sole live Battle terminal-result presentation/continuation owner. It preserves committed victory/defeat semantics, Victory reward authority, #33000 ordered presentation receipts, and exact caller restoration while absorbing the approved Setback surface and retiring only the overlapping #33100 terminal-result slice.'
-          replacement=predecessor+'::battle_terminal_result_slice'
-          d['replaces']=list(dict.fromkeys([*d.get('replaces',[]),replacement]))
-          dp.write_text(json.dumps(dec,indent=2,ensure_ascii=False)+'\n')
-
-          for path in ['runtime/alpha-runtime-build-fingerprint-303.js','tools/fixtures/runtime_build_manifest_303.json']:
-              p=Path(path); text=p.read_text()
-              if 'SC-ALPHA-RUNTIME-R303-2026-10-07-EK' not in text: raise SystemExit('fingerprint id anchor missing: '+path)
-              if 'canonical-battle-terminal-result-routing-544' not in text: raise SystemExit('generation anchor missing: '+path)
-              p.write_text(text.replace('SC-ALPHA-RUNTIME-R303-2026-10-07-EK','SC-ALPHA-RUNTIME-R303-2026-10-08-EL').replace('canonical-battle-terminal-result-routing-544','canonical-battle-terminal-result-owner-consolidated-544'))
-
-          qa=[
-            'tools/qa_issue_105_origin_presentation_browser.js',
-            'tools/qa_issue_343_wasabi_browser.js',
-            'tools/qa_issue_369_menma_evolved_pl_battle_browser.js',
-            'tools/qa_issues_396_399_400_browser.js'
-          ]
-          for path in qa:
-              p=Path(path); text=p.read_text()
-              if '.alpha331-setback' not in text and 'continueAfterSetback33100' not in text:
-                  raise SystemExit('retired Setback QA anchors already absent: '+path)
-              text=text.replace('.alpha331-setback','.alpha544-setback').replace('continueAfterSetback33100','continueAfterSetback54400')
-              p.write_text(text)
-          PY
-      - name: Validate migrated authority
-        shell: bash
-        run: |
-          node --check runtime/alpha-battle-terminal-result-54400.js
-          node --check runtime/alpha-alpha-sprint-33100.js
-          node --check tools/qa_issue_105_origin_presentation_browser.js
-          node --check tools/qa_issue_343_wasabi_browser.js
-          node --check tools/qa_issue_369_menma_evolved_pl_battle_browser.js
-          node --check tools/qa_issues_396_399_400_browser.js
+          node --check tools/qa_runtime_ownership_safety_300.js
           node tools/qa_runtime_ownership_safety_300.js
-          node tools/qa_issue_303_runtime_build_fingerprint.js
-          node tools/qa_contract_integrity_311.js
-      - name: Publish clean migration and restore permanent workflow
-        shell: bash
+
+      - name: Kakashi V2 negative legacy gate remains GREEN
         run: |
-          git show origin/main:.github/workflows/issue-300-runtime-ownership-safety.yml > .github/workflows/issue-300-runtime-ownership-safety.yml
-          git config user.name 'shinobi-chronicles-runtime-bot'
-          git config user.email 'actions@users.noreply.github.com'
-          git add runtime/alpha-runtime-build-fingerprint-303.js tools/fixtures/runtime_build_manifest_303.json tools/fixtures/runtime_responsibility_registry_300.json tools/fixtures/runtime_change_declarations_300.json tools/qa_issue_105_origin_presentation_browser.js tools/qa_issue_343_wasabi_browser.js tools/qa_issue_369_menma_evolved_pl_battle_browser.js tools/qa_issues_396_399_400_browser.js .github/workflows/issue-300-runtime-ownership-safety.yml
-          git commit -m '[CODING][#544] Reconcile canonical terminal-result owner migration'
-          git push origin HEAD:coding/544-terminal-result-presentation
+          node --check tools/qa_kakashi_v2_legacy_exclusion.js
+          node tools/qa_kakashi_v2_legacy_exclusion.js
+
+      - name: Kakashi V2 clean-room ownership remains GREEN
+        run: |
+          node --check tools/qa_kakashi_v2_clean_room.js
+          node tools/qa_kakashi_v2_clean_room.js

@@ -555,7 +555,7 @@ async function legitimatePartyDefeat(browser){
     // exactly once to the authored defeat continuation, survive reload there,
     // and then flow into the future-ambition choice rather than the obsolete
     // LOW-performance / old Nine-Tails ending chain.
-    await page.waitForSelector(".alpha331-setback",{state:"visible",timeout:25000});
+    await page.waitForSelector(".alpha544-setback",{state:"visible",timeout:25000});
     const setbackGate=await page.evaluate(()=>({
       overlay:typeof currentOverlayType!=="undefined"?currentOverlayType:null,
       outcome:currentBattle?.outcome?.type||null,
@@ -564,7 +564,7 @@ async function legitimatePartyDefeat(browser){
     assert.strictEqual(setbackGate.overlay,"setback","#544 did not project the approved Setback surface before Menma defeat return");
     assert.strictEqual(setbackGate.outcome,"defeat","Setback presentation mutated Menma defeat truth");
     assert.strictEqual(setbackGate.rewardClaimed,false,"Setback incorrectly claimed a reward");
-    await page.locator(".alpha331-setback button").click();
+    await page.locator(".alpha544-setback button").click();
     await page.waitForFunction(()=>getActiveStorySceneRuntime()?.beatId==="menma_party_defeat_return_01",null,{timeout:25000});
     const defeatReturnDebug=await page.evaluate(()=> {
       const layer=document.getElementById("story-scene-presentation-layer");

@@ -1391,7 +1391,7 @@
     },
     {
       "changeId": "issue-544-canonical-battle-terminal-result-presentation-2026-10-07",
-      "classification": "EXTENDS",
+      "classification": "REPLACES",
       "responsibilityIds": [
         "battle.presentation.shared",
         "battle.return.story_scene.shared"
@@ -1416,9 +1416,11 @@
         "tools/qa_save_compatibility_311.js",
         "tools/qa_ui_master_consumption_528_browser.js"
       ],
-      "replaces": [],
-      "contractChangeReason": "ALPHA_RUNTIME_REPAIR",
-      "rationale": "Consumes #544 / Lane-D failure topology without reopening Battle semantics. The seam reads only an already-committed victory/defeat, maps defeat to the approved Setback presentation, waits for #33000 immutable action presentation to settle, collapses duplicate live presentation requests, and prevents exact caller restoration from outrunning the result surface. Presentation bookkeeping is non-enumerable and non-persistent; existing reward, save/load, Story, World and Battle semantic owners remain authoritative."
+      "replaces": [
+        "runtime/alpha-alpha-sprint-33100.js::battle_terminal_result_slice"
+      ],
+      "contractChangeReason": "AUTHORITY_CHANGED_CANONICAL_OWNER_CONSOLIDATION_601_624",
+      "rationale": "Issue #544 is the sole live Battle terminal-result presentation/continuation owner. It preserves committed victory/defeat semantics, Victory reward authority, #33000 ordered presentation receipts, and exact caller restoration while absorbing the approved Setback surface and retiring only the overlapping #33100 terminal-result slice."
     }
   ]
 }

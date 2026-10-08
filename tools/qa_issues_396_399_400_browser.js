@@ -210,14 +210,14 @@ async function runIwabeeBattle(browser,outcome){
     if(outcome==="defeat"){
       assert.strictEqual(result.authoritativeDefeat?.setbackPresented,true,label+" authoritative zero-PL hook did not commit Setback");
       assert.strictEqual(result.resumed?.awaitingSetbackContinue,true,label+" defeat must remain player-owned until Setback Continue");
-      await page.waitForSelector(".alpha331-setback",{state:"visible",timeout:12000});
+      await page.waitForSelector(".alpha544-setback",{state:"visible",timeout:12000});
       const setbackGate=await page.evaluate(()=>({overlay:typeof currentOverlayType==="undefined"?null:currentOverlayType,battleOver:currentBattle?.battleOver===true,outcome:currentBattle?.outcome?.type||null,rewardClaimed:currentBattle?.rewards?.claimed===true}));
       assert.strictEqual(setbackGate.overlay,"setback",label+" did not present code-owned Setback");
       assert.strictEqual(setbackGate.battleOver,true,label+" authoritative defeat was not retained");
       assert.strictEqual(setbackGate.outcome,"defeat",label+" Setback mutated terminal outcome");
       assert.strictEqual(setbackGate.rewardClaimed,false,label+" Setback incorrectly claimed reward");
-      await page.waitForSelector(".alpha331-setback button",{state:"visible",timeout:12000});
-      assert.strictEqual((await page.evaluate(()=>globalThis.continueAfterSetback33100?.()))?.success,true,"Setback Continue authority failed");
+      await page.waitForSelector(".alpha544-setback button",{state:"visible",timeout:12000});
+      assert.strictEqual((await page.evaluate(()=>globalThis.continueAfterSetback54400?.()))?.success,true,"Setback Continue authority failed");
       const post=await page.evaluate(()=>{
         for(let i=0;i<24;i++){
           const committed=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");

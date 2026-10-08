@@ -555,7 +555,7 @@ async function terminateBattleToStory(page,outcome,label){
   },{outcome,wasabi:WASABI,rogue:ROGUE});
   if(outcome==="defeat"){
     assert.strictEqual(result?.callerResumeWithheldUntilTerminalResultContinue,true,label+" defeat bypassed #544 Setback gate "+JSON.stringify(result));
-    await page.waitForSelector(".alpha331-setback",{state:"visible",timeout:12000});
+    await page.waitForSelector(".alpha544-setback",{state:"visible",timeout:12000});
     const setbackGate=await page.evaluate(()=>({
       overlay:typeof currentOverlayType==="undefined"?null:currentOverlayType,
       outcome:currentBattle?.outcome?.type||null,
@@ -564,8 +564,8 @@ async function terminateBattleToStory(page,outcome,label){
     assert.strictEqual(setbackGate.overlay,"setback",label+" defeat did not present code-owned Setback");
     assert.strictEqual(setbackGate.outcome,"defeat",label+" Setback mutated terminal outcome");
     assert.strictEqual(setbackGate.rewardClaimed,false,label+" Setback incorrectly claimed reward");
-    await page.waitForSelector(".alpha331-setback button",{state:"visible",timeout:12000});
-    const continued=await page.evaluate(()=>globalThis.continueAfterSetback33100?.());
+    await page.waitForSelector(".alpha544-setback button",{state:"visible",timeout:12000});
+    const continued=await page.evaluate(()=>globalThis.continueAfterSetback54400?.());
     assert.strictEqual(continued?.success,true,label+" Setback Continue failed "+JSON.stringify(continued));
   }else{
     assert(result?.success===true,label+" caller return failed "+JSON.stringify(result));

@@ -269,12 +269,12 @@ async function proveMiraiBattle338(browser){
     },{terminalOutcome,expectedReturnBeat});
     if(terminalOutcome==="defeat"){
       assert.strictEqual(returned.result?.callerResumeWithheldUntilTerminalResultContinue,true,"Mirai defeat bypassed #544 terminal presentation guard "+JSON.stringify(returned));
-      await page.waitForSelector(".alpha331-setback",{state:"visible",timeout:12000});
+      await page.waitForSelector(".alpha544-setback",{state:"visible",timeout:12000});
       const gate=await page.evaluate(()=>({overlay:typeof currentOverlayType==="undefined"?null:currentOverlayType,outcome:currentBattle?.outcome?.type||null}));
       assert.strictEqual(gate.overlay,"setback","Mirai defeat did not present code-owned Setback");
       assert.strictEqual(gate.outcome,"defeat","Mirai Setback mutated terminal outcome");
-      await page.waitForSelector(".alpha331-setback button",{state:"visible",timeout:12000});
-      assert.strictEqual((await page.evaluate(()=>globalThis.continueAfterSetback33100?.()))?.success,true,"Setback Continue authority failed");
+      await page.waitForSelector(".alpha544-setback button",{state:"visible",timeout:12000});
+      assert.strictEqual((await page.evaluate(()=>globalThis.continueAfterSetback54400?.()))?.success,true,"Setback Continue authority failed");
       await page.waitForFunction(expected=>globalThis.getActiveStorySceneRuntime?.()?.beatId===expected,expectedReturnBeat,{timeout:12000});
       returned={...returned,result:{success:true,viaSetbackContinue:true},beatId:await page.evaluate(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId||null)};
     }else{
