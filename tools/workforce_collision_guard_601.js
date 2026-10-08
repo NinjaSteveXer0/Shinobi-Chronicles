@@ -32,8 +32,21 @@ function parseArgs(argv) {
 function wildcardToRegExp(pattern) {
   const p = norm(pattern);
   if (!p) throw new Error("empty path pattern");
-  const escaped = p.replace(/[.+^${}()|[\]\\]/g, "\\$&");
-  return new RegExp("^" + escaped.replace(/\*\*/g, ".*").replace(/\*/g, "[^/]*") + "$");
+  let source = "^";
+  for (let i = 0; i < p.length; i += 1) {
+    const ch = p[i];
+    if (ch === "*" && p[i + 1] === "*") {
+      source += ".*";
+      i += 1;
+      continue;
+    }
+    if (ch === "*") {
+      source += "[^/]*";
+      continue;
+    }
+    source += /[\^$.*+?()[\]{}|]/.test(ch) ? "\\" + ch : ch;
+  }
+  return new RegExp(source + "$");
 }
 
 function matchesPattern(file, pattern) {
