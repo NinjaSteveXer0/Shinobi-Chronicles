@@ -122,11 +122,10 @@ CONTROL_CLASS.lastIndex=0;
 assert(!CONTROL_GATE_TOKEN.test(victoryFn),"#278: generic victory return consults hidden control gate");
 CONTROL_GATE_TOKEN.lastIndex=0;
 
-// Preserve result-layer separation. #544 projects the player-facing rule while
-// core Battle remains the factual semantic writer for withdrawal/no injury/death.
-const coreBattle=read(path.join(ROOT,"game.js"));
+// Preserve result-layer separation. #544 must project already-committed defeat
+// as withdrawal-only presentation and must not manufacture semantic consequence.
 assert(terminalResult.includes("Battle PL defeat does not infer death, injury, custody"),"#278: canonical Setback result-layer separation guard missing");
-assert(coreBattle.includes("battlePLWithdrawal:true")&&coreBattle.includes("injuryInferred:false")&&coreBattle.includes("deathInferred:false"),"#278: core Battle defeat no longer preserves withdrawal/no-injury/no-death facts");
+assert(terminalResult.includes('committedOutcome54400(battle)!=="defeat"')&&terminalResult.includes("presentationOnly:true")&&terminalResult.includes("semanticWrite:false"),"#278: canonical Setback is no longer a presentation-only projection of committed defeat");
 
 const kakashiBattle=read(path.join(ROOT,"runtime/alpha-kakashi-v2-battle-36010.js"));
 assert(kakashiBattle.includes("participantCustodyCommitted:false"),"#278: Kakashi Battle adapter must not infer Story custody");
