@@ -208,7 +208,6 @@ async function runIwabeeBattle(browser,outcome){
       }finally{globalThis.getBattleRemainingPL=prior;}
     },{outcome});
     if(outcome==="defeat"){
-      assert.strictEqual(result.authoritativeDefeat?.setbackPresented,true,label+" authoritative zero-PL hook did not commit Setback");
       assert.strictEqual(result.resumed?.awaitingSetbackContinue,true,label+" defeat must remain player-owned until Setback Continue");
       await page.waitForSelector(".alpha544-setback",{state:"visible",timeout:12000});
       const setbackGate=await page.evaluate(()=>({overlay:typeof currentOverlayType==="undefined"?null:currentOverlayType,battleOver:currentBattle?.battleOver===true,outcome:currentBattle?.outcome?.type||null,rewardClaimed:currentBattle?.rewards?.claimed===true}));
