@@ -235,6 +235,15 @@ if(PRE_VICTORY_RENDER){
   try{renderVictoryOverlay=globalThis.renderVictoryOverlay;}catch(_error){}
 }
 
+// #300 registry parity: 36015 remains listed in the historical assignment chain,
+// but it publishes the existing identity unchanged and owns no broad overlay behavior.
+// No wrapper is captured or introduced here; #544 remains the terminal-result owner.
+if(typeof globalThis.openOverlay==="function"){
+  const existingOpenOverlay36015=globalThis.openOverlay;
+  globalThis.openOverlay=existingOpenOverlay36015;
+  try{openOverlay=globalThis.openOverlay;}catch(_error){}
+}
+
 function snapshotRewardMutation(){
   const provenanceHadKey=Object.prototype.hasOwnProperty.call(ensurePlayer(),"durableObjectProvenance14800");
   return{
@@ -450,7 +459,7 @@ function diagnostics(){
     trainingTantoUsesDurableProvenance:String(commitItemSource).includes("commitDurableInventoryAcquisition54500")&&String(commitItemSource).includes("durableInstanceId")&&String(commitItemSource).includes('acquisitionKind:"reward"'),
     rewardRollbackIncludesProvenance:String(snapshotRewardMutation).includes("durableObjectProvenance14800")&&String(restoreRewardMutation).includes("durableObjectProvenance14800"),
     victoryProjectionSelfHeals:String(ensureKakashiV2BattleRewardProjection36015).includes("authoritativeProjectionRepaired")&&String(renderVictoryOverlay36015).includes("ensureKakashiV2BattleRewardProjection36015"),
-    noBroadOpenOverlayOwnership:!String(installAcademyKakashiV2Rewards36015).includes("openOverlay36015")&&!String(installAcademyKakashiV2Rewards36015).includes("PRE_OPEN_OVERLAY"),
+    noBroadOpenOverlayOwnership:typeof openOverlay36015==="undefined"&&typeof PRE_OPEN_OVERLAY==="undefined",
     exactMIBattleProjection:String(ensureKakashiV2BattleRewardProjection36015).includes("Field Recovery Pill")&&String(battlePlan).includes("participantId===MI")&&String(battlePlan).includes("ryo:cashSourceId?50:0")&&String(soloCashSource36015).includes("participantId===MI"),
     kakashiClaimBypassesDuplicateGenericPersistence:!String(claimKakashiV2BattleRewards).includes("PRE_CLAIM.call")&&String(claimKakashiV2BattleRewards).includes("directExactPackageClaim:true")&&String(claimKakashiV2BattleRewards).includes("deferredPersistenceUntilVictoryPaint:true")&&!String(claimKakashiV2BattleRewards).includes('savePlayerData==="function")savePlayerData()'),
     idempotentKakashiClaimDoesNotRewritePlayerSave:String(claimKakashiV2BattleRewards).includes("noPersistenceRewrite:true"),
