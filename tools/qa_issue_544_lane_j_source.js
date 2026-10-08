@@ -1,0 +1,24 @@
+#!/usr/bin/env node
+"use strict";
+const fs=require('fs'),assert=require('assert');
+const target=process.env.ISSUE_544_TARGET_SHA||null;
+const read=p=>fs.readFileSync(p,'utf8');
+const term=read('runtime/alpha-battle-terminal-result-54400.js');
+const old=read('runtime/alpha-alpha-sprint-33100.js');
+const index=read('index.html');
+const count=(s,re)=>(s.match(re)||[]).length;
+assert(term.includes('ISSUE #544 — CANONICAL BATTLE TERMINAL-RESULT PRESENTATION OWNER'));
+assert(term.includes('continueAfterSetback54400'));
+assert(term.includes('presentCommittedBattleTerminalResult54400'));
+assert(term.includes('.alpha544-setback'));
+assert(term.includes("UI/victory.png"));
+assert(term.includes("UI/setback.png"));
+assert(term.includes('PRIOR_COMPLETE_VICTORY'));
+assert(term.includes('PRIOR_COMPLETE_DEFEAT'));
+assert(term.includes('PRIOR_RESUME_CALLER'));
+assert(!old.includes('continueAfterSetback33100'));
+assert(!old.includes('.alpha331-setback'));
+assert(count(index,/runtime\/alpha-battle-terminal-result-54400\.js/g)===1,'#544 loader must appear exactly once');
+assert(index.indexOf('runtime/alpha-alpha-sprint-33100.js')>=0,'#33100 loader missing');
+assert(index.indexOf('runtime/alpha-battle-terminal-result-54400.js')>index.indexOf('runtime/alpha-alpha-sprint-33100.js'),'#544 successor must load after #33100');
+console.log(JSON.stringify({pass:true,issue:544,lane:'J',target,terminalOwner:'54400',retired331TerminalSlice:true,loaderCount:1,browserGoldenClaimed:false},null,2));
