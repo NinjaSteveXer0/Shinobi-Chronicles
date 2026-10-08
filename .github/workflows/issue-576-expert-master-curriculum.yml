@@ -8,6 +8,7 @@ on:
       - 'runtime/alpha-discipline-curriculum-profiles-57600.js'
       - 'tools/qa_issue_576_expert_master_curriculum_profiles.js'
       - 'tools/qa_issue_576_expert_master_curriculum_profiles_browser.js'
+      - 'tools/qa_issue_576_expert_master_curriculum_real_surface_browser.js'
       - '.github/workflows/issue-576-expert-master-curriculum.yml'
   pull_request:
     branches:
@@ -16,7 +17,7 @@ on:
       - 'runtime/alpha-discipline-curriculum-profiles-57600.js'
       - 'tools/qa_issue_576_expert_master_curriculum_profiles.js'
       - 'tools/qa_issue_576_expert_master_curriculum_profiles_browser.js'
-      - 'tools/qa_issue_576_practical_context_probe.js'
+      - 'tools/qa_issue_576_expert_master_curriculum_real_surface_browser.js'
       - '.github/workflows/issue-576-expert-master-curriculum.yml'
   workflow_dispatch:
 
@@ -40,6 +41,7 @@ jobs:
           node --check runtime/alpha-discipline-curriculum-profiles-57600.js
           node --check tools/qa_issue_576_expert_master_curriculum_profiles.js
           node --check tools/qa_issue_576_expert_master_curriculum_profiles_browser.js
+          node --check tools/qa_issue_576_expert_master_curriculum_real_surface_browser.js
 
       - name: Issue 576 deterministic curriculum contract
         shell: bash
@@ -81,6 +83,9 @@ jobs:
       - name: Installed-browser isolated curriculum proof
         run: node tools/qa_issue_576_expert_master_curriculum_profiles_browser.js
 
+      - name: Installed-browser click-driven real-surface proof
+        run: node tools/qa_issue_576_expert_master_curriculum_real_surface_browser.js
+
       - name: Upload browser evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -88,5 +93,6 @@ jobs:
           name: issue-576-isolated-browser
           path: |
             artifacts/issue-576-expert-master-curriculum
+            artifacts/issue-576-expert-master-curriculum-real-surface
             issue-576-server.log
           if-no-files-found: ignore
