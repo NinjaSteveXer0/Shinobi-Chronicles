@@ -1,0 +1,96 @@
+name: Issue 544 Lane F current exact Kakashi real Battle-action QA
+
+on:
+  push:
+    branches:
+      - qa/544-current-strict-lane-f
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  ISSUE_544_EXACT_CANDIDATE_SHA: 5a02818e265b5742dcc4e6601f260fee71d58e32
+
+jobs:
+  kakashi-real-actions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prove exact candidate plus QA-only overlay
+        shell: bash
+        run: |
+          test "$(git rev-parse HEAD^)" = "$ISSUE_544_EXACT_CANDIDATE_SHA"
+          test -s runtime/alpha-battle-terminal-result-54400.js
+          grep -q 'runtime/alpha-battle-terminal-result-54400.js' index.html
+          git diff --name-only "$ISSUE_544_EXACT_CANDIDATE_SHA"..HEAD | sort > /tmp/issue-544-kakashi-overlay.txt
+          cat > /tmp/issue-544-kakashi-expected.txt <<'EOF'
+          .github/workflows/issue-544-current-strict-lane-f.yml
+          tools/qa_issue_544_kakashi_real_action_browser.js
+          EOF
+          sort -o /tmp/issue-544-kakashi-expected.txt /tmp/issue-544-kakashi-expected.txt
+          diff -u /tmp/issue-544-kakashi-expected.txt /tmp/issue-544-kakashi-overlay.txt
+      - name: Forbid terminal helper injection from Kakashi harness
+        shell: bash
+        run: |
+          ! grep -q 'completeBattleVictoryFromDamage(' tools/qa_issue_544_kakashi_real_action_browser.js
+          ! grep -q 'completeBattleDefeat(' tools/qa_issue_544_kakashi_real_action_browser.js
+          grep -q 'attemptBattlePreparedSkill' tools/qa_issue_544_kakashi_real_action_browser.js
+          node --check tools/qa_issue_544_kakashi_real_action_browser.js
+      - name: Refresh stale QA-only route assertion and disable first-Battle tutorial
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('tools/qa_issue_544_kakashi_real_action_browser.js')
+          s=p.read_text()
+          old='  assert.strictEqual(state.config,"academy_kakashi_origin_battle_direct_2v1");'
+          new='  assert(state.config,"Kakashi Battle config missing on real route");'
+          if old not in s: raise SystemExit('stale Kakashi config assertion target missing')
+          s=s.replace(old,new,1)
+          old2='  await gate.reset();\n  return{context,page,gate,assets};'
+          new2='  await page.evaluate(()=>{globalThis.SC_DISABLE_FIRST_PL_BATTLE_TUTORIAL_QA=true;});\n  await gate.reset();\n  return{context,page,gate,assets};'
+          if old2 not in s: raise SystemExit('tutorial QA insertion target missing')
+          p.write_text(s.replace(old2,new2,1))
+          PY
+          node --check tools/qa_issue_544_kakashi_real_action_browser.js
+      - name: Install Chromium only
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install chromium
+      - name: Start exact candidate runtime
+        shell: bash
+        run: |
+          python3 -m http.server 8080 --bind 127.0.0.1 > /tmp/issue-544-kakashi-http.log 2>&1 &
+          echo $! > /tmp/issue-544-kakashi-http.pid
+          for i in {1..40}; do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi
+            sleep 0.25
+          done
+          cat /tmp/issue-544-kakashi-http.log
+          exit 1
+      - name: Run Kakashi real Battle-action win/loss
+        env:
+          ISSUE_544_KAKASHI_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_544_KAKASHI_OUT: artifacts/issue-544-kakashi-real-actions
+        shell: bash
+        run: |
+          set -o pipefail
+          node tools/qa_issue_544_kakashi_real_action_browser.js 2>&1 | tee /tmp/issue-544-kakashi-browser.log
+      - name: Upload Kakashi evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-544-kakashi-current-exact-evidence
+          path: |
+            artifacts/issue-544-kakashi-real-actions
+            /tmp/issue-544-kakashi-http.log
+            /tmp/issue-544-kakashi-browser.log
+            /tmp/issue-544-kakashi-overlay.txt
+          if-no-files-found: warn
