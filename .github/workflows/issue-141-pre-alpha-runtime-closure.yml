@@ -2,130 +2,117 @@ name: Issue 141 Pre-Alpha Runtime Closure
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'game.js'
+      - 'index.html'
+      - 'runtime/**'
+      - 'tools/qa_*.py'
+      - 'tools/qa_*.js'
+      - 'tools/story_graph_integrity_311.js'
+      - 'tools/browser_runtime_error_gate_311.js'
+      - 'tools/generate_release_candidate_evidence_311.js'
+      - 'tools/fixtures/*_311.json'
+      - 'tools/fixtures/runtime_*_300.json'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
+      - '.github/workflows/issue-141-pre-alpha-runtime-closure.yml'
   pull_request:
     paths:
+      - 'game.js'
+      - 'index.html'
+      - 'runtime/**'
+      - 'tools/qa_*.py'
+      - 'tools/qa_*.js'
+      - 'tools/story_graph_integrity_311.js'
+      - 'tools/browser_runtime_error_gate_311.js'
+      - 'tools/generate_release_candidate_evidence_311.js'
+      - 'tools/fixtures/*_311.json'
+      - 'tools/fixtures/runtime_*_300.json'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
       - '.github/workflows/issue-141-pre-alpha-runtime-closure.yml'
-
-permissions:
-  contents: write
 
 jobs:
   pre-alpha-runtime-closure:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Checkout exact #602 head
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: coding/544-terminal-result-presentation
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - uses: actions/setup-node@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Migrate stale #33100 terminal assertions to #544
-        shell: bash
+
+      - name: Install image QA dependency
+        run: python -m pip install --disable-pip-version-check Pillow
+
+      - name: Execute complete source/headless Alpha closure spine
+        run: python tools/qa_issue_141_pre_alpha_runtime_closure.py
+
+      - name: Execute Promotion roster reload Journey integration seam
+        run: node tools/qa_issue_141_traversal_runtime.js
+
+      - name: Execute Arc-1 and exact Story Battle return runtime seam
+        run: node tools/qa_issue_141_arc1_battle_return_runtime.js
+
+      - name: Execute Origin public-handler DOM-event realization seam
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
+          node --check runtime/alpha-origin-browser-realisation-33500.js
+          node --check tools/qa_issue_105_origin_browser_realisation_runtime.js
+          node tools/qa_issue_105_origin_browser_realisation_runtime.js
 
-          p=Path('tools/qa_issue_278_post_battle_agency.js')
-          s=p.read_text()
-          old='''// Canonical generic Battle -> Story return must return victory to the caller
-// without consulting a hidden target-control classification.
-const sprint=read(path.join(ROOT,"runtime/alpha-alpha-sprint-33100.js"));
-assert(sprint.includes('resumeBattleCallerAfterCompletion("victory")'),"#278: generic victory does not return to exact Story caller");
-const victoryFn=sprint.match(/function\\s+continueAfterVictory33100\\([^)]*\\)\\s*\\{[\\s\\S]*?\\n\\}/);
-assert(victoryFn,"#278: unable to inspect generic victory return");
-assert(!CONTROL_CLASS.test(victoryFn[0]),"#278: generic victory return consults hidden control classification");
-CONTROL_CLASS.lastIndex=0;
-assert(!CONTROL_GATE_TOKEN.test(victoryFn[0]),"#278: generic victory return consults hidden control gate");
-CONTROL_GATE_TOKEN.lastIndex=0;
-
-// Preserve result-layer separation.
-assert(sprint.includes("Battle PL defeat does not infer death, injury, custody"),"#278: Battle result-layer separation guard missing");
-'''
-          new='''// Canonical generic Battle -> terminal result -> exact caller return now lives
-// in #544 after #601/#624 retired the overlapping #33100 terminal slice.
-const terminalResult=read(path.join(ROOT,"runtime/alpha-battle-terminal-result-54400.js"));
-assert(terminalResult.includes('PRIOR_RESUME_CALLER.call(globalThis,"victory")'),"#278: canonical Victory Continue does not delegate to exact caller return");
-const victoryStart=terminalResult.indexOf("function continueAfterVictory54400()");
-const victoryEnd=terminalResult.indexOf("globalThis.renderBattleSetback54400",victoryStart);
-assert(victoryStart>=0&&victoryEnd>victoryStart,"#278: unable to inspect canonical Victory continuation owner");
-const victoryFn=terminalResult.slice(victoryStart,victoryEnd);
-assert(!CONTROL_CLASS.test(victoryFn),"#278: generic victory return consults hidden control classification");
-CONTROL_CLASS.lastIndex=0;
-assert(!CONTROL_GATE_TOKEN.test(victoryFn),"#278: generic victory return consults hidden control gate");
-CONTROL_GATE_TOKEN.lastIndex=0;
-
-// Preserve result-layer separation. #544 projects the player-facing rule while
-// core Battle remains the factual semantic writer for withdrawal/no injury/death.
-const coreBattle=read(path.join(ROOT,"game.js"));
-assert(terminalResult.includes("Battle PL defeat does not infer death, injury, custody"),"#278: canonical Setback result-layer separation guard missing");
-assert(coreBattle.includes("battlePLWithdrawal:true")&&coreBattle.includes("injuryInferred:false")&&coreBattle.includes("deathInferred:false"),"#278: core Battle defeat no longer preserves withdrawal/no-injury/no-death facts");
-'''
-          if old not in s: raise SystemExit('qa278 old terminal-owner block not found')
-          p.write_text(s.replace(old,new))
-
-          p=Path('tools/qa_issue_141_pre_alpha_runtime_closure.py')
-          s=p.read_text()
-          old='''    sprint = read("runtime/alpha-alpha-sprint-33100.js")
-    bridge = read("runtime/alpha-traversal-bridge-33200.js")
-'''
-          new='''    sprint = read("runtime/alpha-alpha-sprint-33100.js")
-    terminal_result = read("runtime/alpha-battle-terminal-result-54400.js")
-    game = GAME.read_text(encoding="utf-8")
-    bridge = read("runtime/alpha-traversal-bridge-33200.js")
-'''
-          if old not in s: raise SystemExit('qa141 source-read anchor not found')
-          s=s.replace(old,new)
-          old='''    require(
-        checks,
-        "story_battle_exact_caller_return_present",
-        contains_all(sprint, "resumeBattleCallerAfterCompletion", 'rc.type==="story_scene"'),
-    )
-    require(
-        checks,
-        "setback_is_withdrawal_not_injury_death",
-        contains_all(sprint, "battlePLWithdrawal:true", "injuryInferred:false", "deathInferred:false"),
-    )
-'''
-          new='''    require(
-        checks,
-        "story_battle_exact_caller_return_present",
-        contains_all(
-            terminal_result,
-            "function continueAfterVictory54400()",
-            'PRIOR_RESUME_CALLER.call(globalThis,"victory")',
-            "function continueAfterSetback54400()",
-            'PRIOR_RESUME_CALLER.call(globalThis,"defeat")',
-        ),
-    )
-    require(
-        checks,
-        "setback_is_withdrawal_not_injury_death",
-        contains_all(terminal_result, "Battle PL defeat does not infer death, injury, custody")
-        and contains_all(game, "battlePLWithdrawal:true", "injuryInferred:false", "deathInferred:false"),
-    )
-'''
-          if old not in s: raise SystemExit('qa141 old terminal-owner checks not found')
-          p.write_text(s.replace(old,new))
-          PY
-      - name: Validate #278 and full #141 closure
-        shell: bash
+      - name: Execute non-Kakashi screen-first Origin activation seam
         run: |
-          python -m pip install --disable-pip-version-check Pillow
+          node --check runtime/alpha-origin-screen-first-33700.js
+          node --check tools/qa_issue_105_origin_screen_first_activation.js
+          node tools/qa_issue_105_origin_screen_first_activation.js
+
+      - name: Execute generic Story decision and Scene Board seam
+        run: |
+          node --check runtime/alpha-story-decision-realisation-34000.js
+          node --check runtime/alpha-story-factual-resolver-34600.js
+          node --check runtime/alpha-story-scene-board-33900.js
+          node --check tools/qa_issue_188_story_decision_runtime.js
+          node --check tools/qa_story_factual_resolver_34600.js
+          node tools/qa_issue_188_story_decision_runtime.js
+          node tools/qa_story_factual_resolver_34600.js
+
+      - name: Enforce global post-Battle player agency
+        run: |
           node --check tools/qa_issue_278_post_battle_agency.js
           node tools/qa_issue_278_post_battle_agency.js
-          python tools/qa_issue_141_pre_alpha_runtime_closure.py
-      - name: Publish QA-owner migration and restore permanent workflow
-        shell: bash
+
+      - name: Verify runtime build fingerprint
         run: |
-          git show origin/main:.github/workflows/issue-141-pre-alpha-runtime-closure.yml > .github/workflows/issue-141-pre-alpha-runtime-closure.yml
-          git config user.name 'shinobi-chronicles-runtime-bot'
-          git config user.email 'actions@users.noreply.github.com'
-          git add tools/qa_issue_278_post_battle_agency.js tools/qa_issue_141_pre_alpha_runtime_closure.py .github/workflows/issue-141-pre-alpha-runtime-closure.yml
-          git commit -m '[CODING][#544] Migrate post-Battle closure assertions to canonical owner'
-          git push origin HEAD:coding/544-terminal-result-presentation
+          node --check runtime/alpha-runtime-build-fingerprint-303.js
+          node --check tools/qa_issue_303_runtime_build_fingerprint.js
+          node tools/qa_issue_303_runtime_build_fingerprint.js
+
+      - name: Enforce Kakashi V2 legacy exclusion
+        run: |
+          node --check tools/qa_kakashi_v2_legacy_exclusion.js
+          node tools/qa_kakashi_v2_legacy_exclusion.js
+
+      - name: Validate Academy Kakashi V2 clean-room runtime
+        run: |
+          node --check runtime/academy-kakashi-v2-content-36000.js
+          node --check runtime/alpha-kakashi-v2-battle-36010.js
+          node --check runtime/alpha-kakashi-v2-rewards-36015.js
+          node --check runtime/alpha-kakashi-v2-core-36020.js
+          node --check runtime/alpha-kakashi-v2-renderer-36030.js
+          node --check runtime/alpha-kakashi-v2-transition-36040.js
+          node --check tools/qa_kakashi_v2_clean_room.js
+          node tools/qa_kakashi_v2_clean_room.js
+          node --check tools/qa_kakashi_v2_route_matrix.js
+          node tools/qa_kakashi_v2_route_matrix.js
+          node --check tools/qa_kakashi_v2_assets.js
+          node tools/qa_kakashi_v2_assets.js
+          node --check tools/qa_kakashi_v2_writing_authority.js
+          node tools/qa_kakashi_v2_writing_authority.js
