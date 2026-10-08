@@ -7,6 +7,7 @@ on:
     paths:
       - 'tools/qa_issue_621_lane_j_source.js'
       - 'tools/qa_issue_621_lane_j_browser.js'
+      - 'tools/qa_issue_621_lane_j_browser_v2.js'
       - '.github/workflows/issue-621-lane-j-independent.yml'
   pull_request:
     branches:
@@ -63,9 +64,9 @@ jobs:
         with:
           python-version: '3.12'
       - name: Inject Lane J browser verifier only
-        run: cp qa/tools/qa_issue_621_lane_j_browser.js candidate/tools/qa_issue_621_lane_j_browser.js
+        run: cp qa/tools/qa_issue_621_lane_j_browser_v2.js candidate/tools/qa_issue_621_lane_j_browser_v2.js
       - name: Syntax
-        run: node --check candidate/tools/qa_issue_621_lane_j_browser.js
+        run: node --check candidate/tools/qa_issue_621_lane_j_browser_v2.js
       - name: Install Playwright Chromium
         working-directory: candidate
         run: |
@@ -77,17 +78,17 @@ jobs:
           python -m http.server 8080 --bind 127.0.0.1 > sc621j-server.log 2>&1 &
           echo $! > sc621j-server.pid
           sleep 2
-      - name: Lane J hostile temporal/browser matrix
+      - name: Lane J hostile temporal/browser matrix v2
         working-directory: candidate
         env:
           ISSUE621_TARGET_SHA: ${{ env.TARGET_SHA }}
-        run: node tools/qa_issue_621_lane_j_browser.js
+        run: node tools/qa_issue_621_lane_j_browser_v2.js
       - name: Upload Lane J evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: issue-621-lane-j-independent-${{ github.run_id }}
           path: |
-            candidate/artifacts/issue-621-lane-j-independent
+            candidate/artifacts/issue-621-lane-j-independent-v2
             candidate/sc621j-server.log
           if-no-files-found: ignore
