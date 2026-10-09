@@ -56,7 +56,7 @@ async function setupKonohaTeam(page){
   });
 }
 
-async function assetProbe(page,assetPath){
+async function assetProbe(page,assetPath,{expectedVisible=true,expectedRouteRequest=null}={}){
   const probe=await page.evaluate(async assetPath=>{
     const canonical=String(assetPath).replace(/\\/g,"/");
     const file=canonical.split("/").pop();
@@ -83,6 +83,7 @@ async function assetProbe(page,assetPath){
         }
       }
     }
+    const routeResourceSeen=performance.getEntriesByType("resource").some(entry=>matchesValue(entry.name));
     const image=await new Promise(resolve=>{
       const img=new Image();let settled=false;
       const done=ok=>{if(settled)return;settled=true;resolve({ok,naturalWidth:img.naturalWidth,naturalHeight:img.naturalHeight,src:img.src});};
@@ -90,12 +91,15 @@ async function assetProbe(page,assetPath){
       if(img.complete)setTimeout(()=>done(img.naturalWidth>0),0);
       setTimeout(()=>done(false),5000);
     });
-    const resourceSeen=performance.getEntriesByType("resource").some(entry=>matchesValue(entry.name));
-    return{assetPath:canonical,visible:hits.length>0,hits:hits.slice(0,8),image,resourceSeen};
+    const resourceSeenAfterEvidenceProbe=performance.getEntriesByType("resource").some(entry=>matchesValue(entry.name));
+    return{assetPath:canonical,visible:hits.length>0,hits:hits.slice(0,8),image,routeResourceSeen,resourceSeenAfterEvidenceProbe};
   },assetPath);
-  assert.strictEqual(probe.image.ok,true,assetPath+" did not load: "+JSON.stringify(probe));
+  assert.strictEqual(probe.image.ok,true,assetPath+" did not load as preserved evidence/current master: "+JSON.stringify(probe));
   assert(probe.image.naturalWidth>0&&probe.image.naturalHeight>0,assetPath+" has no rendered dimensions");
-  assert.strictEqual(probe.visible,true,assetPath+" is loaded but not visibly consumed: "+JSON.stringify(probe));
+  assert.strictEqual(probe.visible,expectedVisible,assetPath+(expectedVisible?" is not visibly consumed":" is historical evidence but became visibly consumed")+": "+JSON.stringify(probe));
+  if(expectedRouteRequest!==null){
+    assert.strictEqual(probe.routeResourceSeen,expectedRouteRequest,assetPath+(expectedRouteRequest?" was not requested by the live route":" was requested by the live route despite evidence-only status")+": "+JSON.stringify(probe));
+  }
   return probe;
 }
 
@@ -137,12 +141,12 @@ async function openMyClanAndProbe(page){
 async function openActivitiesAndProbe(page){
   await page.evaluate(()=>openKonohaPracticalFromVillage());
   await page.waitForSelector("#konoha-activity-screen[data-service-id='practical']",{state:"visible",timeout:10000});
-  const practical=await assetProbe(page,"UI/practical.png");
+  const practical=await assetProbe(page,"UI/practical.png",{expectedVisible:false,expectedRouteRequest:false});
   await page.locator("#konoha-activity-screen").screenshot({path:path.join(OUT,"03-practical.png")});
 
   await page.evaluate(()=>openKonohaExamFromVillage());
   await page.waitForSelector("#konoha-activity-screen[data-service-id='exams']",{state:"visible",timeout:10000});
-  const exams=await assetProbe(page,"UI/exams.png");
+  const exams=await assetProbe(page,"UI/exams.png",{expectedVisible:false,expectedRouteRequest:false});
   await page.locator("#konoha-activity-screen").screenshot({path:path.join(OUT,"04-exams.png")});
   return{practical,exams};
 }
@@ -232,9 +236,15 @@ async function openVictoryAndProbe(page){
     console.log(JSON.stringify({
       pass:true,
       issue:528,
+      historicalEvidenceOnlyMasters:{
+        practicalPreserved:activities.practical.image.ok,
+        practicalNotVisiblyConsumed:!activities.practical.visible,
+        practicalNotRequestedByRoute:!activities.practical.routeResourceSeen,
+        examsPreserved:activities.exams.image.ok,
+        examsNotVisiblyConsumed:!activities.exams.visible,
+        examsNotRequestedByRoute:!activities.exams.routeResourceSeen
+      },
       activeProductionMasters:{
-        practical:activities.practical.visible,
-        exams:activities.exams.visible,
         victory:victory.victory.visible,
         setback:setback.setback.visible
       },
