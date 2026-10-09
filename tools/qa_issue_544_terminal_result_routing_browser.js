@@ -4,427 +4,210 @@
 const fs=require("fs"),path=require("path"),assert=require("assert");
 const {chromium}=require("playwright");
 const {installBrowserRuntimeErrorGate}=require("./browser_runtime_error_gate_311.js");
-
 const BASE=process.env.ISSUE_544_BASE_URL||"http://127.0.0.1:8080/index.html";
 const OUT=process.env.ISSUE_544_BROWSER_OUT||"artifacts/issue-544-terminal-result-routing";
-const CANDIDATE_PATH=process.env.ISSUE_544_CANDIDATE_MODULE||"";
-const CANDIDATE=CANDIDATE_PATH&&fs.existsSync(CANDIDATE_PATH)?fs.readFileSync(CANDIDATE_PATH,"utf8"):"";
+const TARGET=process.env.ISSUE_544_TARGET_SHA||null;
 fs.mkdirSync(OUT,{recursive:true});
-
-const clone=v=>JSON.parse(JSON.stringify(v));
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const expectedSurface=outcome=>outcome==="defeat"?"setback":"victory";
+const clone=v=>JSON.parse(JSON.stringify(v));
 
-async function releaseFrontDoor(page){
+async function release(page){
   await page.evaluate(()=>{
+    globalThis.SC_DISABLE_FIRST_PL_BATTLE_TUTORIAL_QA=true;
     try{if(typeof releaseAlphaFrontDoor33300==="function")releaseAlphaFrontDoor33300();}catch(_e){}
     try{globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400?.release?.();}catch(_e){}
-    const game=document.querySelector(".game-container");
-    if(game){game.removeAttribute("data-alpha-front-door-locked");game.inert=false;}
-    for(const id of ["sc-alpha-front-door-33300","sc-alpha-front-door-33400"]){const node=document.getElementById(id);if(node)node.remove();}
+    const game=document.querySelector(".game-container");if(game){game.removeAttribute("data-alpha-front-door-locked");game.inert=false;}
+    for(const id of ["sc-alpha-front-door-33300","sc-alpha-front-door-33400"])document.getElementById(id)?.remove();
   });
 }
 
-async function boot(browser,label,{candidate=false}={}){
+async function boot(browser,label,{kakashi=false}={}){
   const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1});
   const page=await context.newPage();
   const gate=await installBrowserRuntimeErrorGate(page);
-  const assetResponses=[];
-  page.on("response",response=>{
-    const url=response.url();
-    if(/\/UI\/(victory|setback)\.png(?:\?|$)/.test(url))assetResponses.push({url,status:response.status()});
-  });
+  const assets=[];
+  page.on("response",r=>{if(/\/UI\/(victory|setback)\.png(?:\?|$)/.test(r.url()))assets.push({url:r.url(),status:r.status()});});
+  await page.addInitScript(()=>{try{localStorage.clear();sessionStorage.clear();}catch(_e){};globalThis.SC_DISABLE_FIRST_PL_BATTLE_TUTORIAL_QA=true;});
   await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});
-  await page.waitForFunction(()=>typeof selectChronicleOrigin==="function"&&typeof launchStorySceneBattle==="function"&&typeof routeWorldOpportunityInteraction==="function"&&typeof completeBattleVictoryFromDamage==="function"&&typeof completeBattleDefeat==="function"&&!!globalThis.SC_ACADEMY_IWABEE_ORIGIN_RUNTIME_399,null,{timeout:30000});
-  await page.evaluate(()=>{try{localStorage.clear();sessionStorage.clear();}catch(_e){}});
-  await page.reload({waitUntil:"domcontentloaded",timeout:60000});
-  await page.waitForFunction(()=>typeof selectChronicleOrigin==="function"&&typeof launchStorySceneBattle==="function"&&typeof routeWorldOpportunityInteraction==="function"&&!!globalThis.SC_ACADEMY_IWABEE_ORIGIN_RUNTIME_399,null,{timeout:30000});
-  await releaseFrontDoor(page);
-  if(candidate){
-    assert(CANDIDATE,"candidate source missing");
-    await page.addScriptTag({content:CANDIDATE});
-    await page.waitForFunction(()=>typeof globalThis.presentCommittedBattleTerminalResult54400==="function",null,{timeout:5000});
-  }
-  await gate.reset();
-  await installTrace(page,label);
-  return{context,page,gate,assetResponses};
+  await page.waitForFunction(()=>typeof attemptBattlePreparedSkill==="function"&&typeof presentCommittedBattleTerminalResult54400==="function"&&typeof pendingBattlePresentation33000==="function",null,{timeout:30000});
+  if(kakashi)await page.waitForFunction(()=>!!(globalThis.SC_ACADEMY_KAKASHI_V2_CONTENT_36000&&globalThis.SC_ACADEMY_KAKASHI_V2_CORE_36020&&globalThis.SC_ACADEMY_KAKASHI_V2_TRANSITION_36040),null,{timeout:30000});
+  await release(page);await gate.reset();
+  return{context,page,gate,assets,label};
 }
 
-async function installTrace(page,label){
-  await page.evaluate(label=>{
-    const visible=node=>!!node&&node.getClientRects().length>0&&getComputedStyle(node).display!=="none"&&getComputedStyle(node).visibility!=="hidden"&&Number(getComputedStyle(node).opacity)!==0;
-    const surface=()=>{
-      const victory=[...document.querySelectorAll(".alpha-victory-code-screen,.victory-screen")].find(visible)||null;
-      const setback=[...document.querySelectorAll(".alpha331-setback")].find(visible)||null;
-      return{type:victory?"victory":setback?"setback":null,victory:!!victory,setback:!!setback,text:(victory||setback)?.textContent?.trim().slice(0,220)||""};
-    };
-    const trace=globalThis.__ISSUE_544_TRACE={label,events:[],surface,lastSurfaceType:null};
-    const push=(kind,data={})=>trace.events.push({ordinal:trace.events.length+1,kind,at:Date.now(),surface:surface(),...(data||{})});
-    const priorResume=globalThis.resumeBattleCallerAfterCompletion;
-    if(typeof priorResume==="function"){
-      const wrapped=function(outcome){
-        push("caller_resume_attempt",{outcome,returnContext:currentBattle?.returnContext?JSON.parse(JSON.stringify(currentBattle.returnContext)):null});
-        const result=priorResume.apply(this,arguments);
-        push("caller_resume_return",{outcome,result:result&&typeof result==="object"?JSON.parse(JSON.stringify(result)):result});
-        return result;
-      };
-      globalThis.resumeBattleCallerAfterCompletion=wrapped;
-      try{resumeBattleCallerAfterCompletion=wrapped;}catch(_e){}
-    }
-    const priorClaim=globalThis.claimCurrentBattleRewards;
-    if(typeof priorClaim==="function"){
-      const wrapped=function(){
-        push("reward_claim_attempt",{outcome:currentBattle?.outcome?.type||null});
-        const result=priorClaim.apply(this,arguments);
-        push("reward_claim_return",{result});
-        return result;
-      };
-      globalThis.claimCurrentBattleRewards=wrapped;
-      try{claimCurrentBattleRewards=wrapped;}catch(_e){}
-    }
-    const observer=new MutationObserver(()=>{
-      const now=surface();
-      if(now.type&&trace.lastSurfaceType!==now.type)push("terminal_surface_visible",{terminalType:now.type});
-      trace.lastSurfaceType=now.type;
-    });
-    observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["style","class"]});
-    trace.observer=observer;
-    push("trace_installed");
-  },label);
-}
-
-async function surface(page){return page.evaluate(()=>globalThis.__ISSUE_544_TRACE?.surface?.()||{type:null});}
-async function waitSurface(page,outcome,timeout=3500){
-  const expected=expectedSurface(outcome),end=Date.now()+timeout;
-  while(Date.now()<end){const row=await surface(page);if(row.type===expected)return row;await sleep(40);}
-  return surface(page);
-}
-async function trace(page){return page.evaluate(()=>JSON.parse(JSON.stringify(globalThis.__ISSUE_544_TRACE?.events||[])));}
-
-async function assertCandidateTerminal(page,label,outcome,firstSurface){
-  const wanted=expectedSurface(outcome);
-  assert.strictEqual(firstSurface.type,wanted,label+" candidate terminal surface missing "+JSON.stringify(firstSurface));
-  const duplicate=await page.evaluate(outcome=>({
-    a:presentCommittedBattleTerminalResult(outcome,{source:"qa_duplicate_a"}),
-    b:presentCommittedBattleTerminalResult(outcome,{source:"qa_duplicate_b"}),
-    state:getBattleTerminalResultPresentation54400()
-  }),outcome);
-  await sleep(100);
-  assert.strictEqual(duplicate.state.status,"presented",label+" terminal state not presented");
-  assert.strictEqual(duplicate.state.outcome,outcome,label+" duplicate presenter changed semantic outcome");
-  return duplicate;
-}
-
-function assertChronology(events,label,outcome,candidate,callerType){
-  const wanted=expectedSurface(outcome);
-  const resumeAttempt=events.find(event=>event.kind==="caller_resume_attempt");
-  const resumeReturn=events.find(event=>event.kind==="caller_resume_return");
-  assert(resumeAttempt,label+" caller resume attempt was not observed");
-  assert.strictEqual(resumeAttempt.returnContext?.type,callerType,label+" caller envelope mutated before resume attempt");
-  assert.strictEqual(resumeReturn?.result?.success,true,label+" exact caller resume did not succeed "+JSON.stringify(resumeReturn));
-  if(candidate){
-    assert.strictEqual(resumeAttempt.surface?.type,wanted,label+" caller resume outran result presentation "+JSON.stringify(events));
-    const firstVisible=events.find(event=>event.kind==="terminal_surface_visible"&&event.terminalType===wanted);
-    assert(firstVisible,label+" expected result surface was never observed");
-    assert(firstVisible.ordinal<resumeAttempt.ordinal,label+" result surface did not precede caller resume");
-    const visibleCount=events.filter(event=>event.kind==="terminal_surface_visible"&&event.terminalType===wanted).length;
-    assert.strictEqual(visibleCount,1,label+" result surface became newly visible more than once");
-  }else if(outcome==="defeat"){
-    assert.notStrictEqual(resumeAttempt.surface?.type,"setback",label+" baseline defeat no longer reproduces early resume before Setback");
-  }
-}
-
-async function assertAsset(page,assetResponses,label,outcome,candidate){
-  await sleep(250);
-  if(!candidate)return;
-  const wanted=`/UI/${outcome==="defeat"?"setback":"victory"}.png`;
-  assert(assetResponses.some(row=>row.url.includes(wanted)&&row.status===200),label+" approved lowercase result asset did not resolve HTTP 200 "+JSON.stringify(assetResponses));
-}
-
-async function launchIwabee(page,label){
-  const launched=await page.evaluate(label=>{
-    const selected=selectChronicleOrigin("academy_iwabee",label);
-    const story=beginAlphaChronicleOriginPrologue();
-    const set=setStorySceneBeat("iwa_confront_battle",{render:false});
-    const battle=launchStorySceneBattle();
-    return{
-      selected,story,set,battle,battleId:currentBattle?.battleId||null,
-      returnContext:JSON.parse(JSON.stringify(currentBattle?.returnContext||null)),
-      sceneId:getActiveStorySceneRuntime()?.sceneId||null,
-      beatId:getActiveStorySceneRuntime()?.beatId||null
-    };
-  },label);
-  assert.strictEqual(launched.selected?.success,true,label+" origin select failed "+JSON.stringify(launched));
-  assert.strictEqual(launched.story?.success,true,label+" origin launch failed "+JSON.stringify(launched));
-  assert.strictEqual(launched.set?.success,true,label+" Battle beat set failed "+JSON.stringify(launched));
-  assert.strictEqual(launched.battle?.success,true,label+" Battle launch failed "+JSON.stringify(launched));
-  assert.strictEqual(launched.returnContext?.type,"story_scene",label+" not a real Story caller envelope");
-  return launched;
-}
-
-async function commitIwabee(page,outcome){
-  return page.evaluate(outcome=>{
-    const IWABEE="academy_iwabee",ROGUE="iwabee_origin_rogue_genin_01";
-    const walletBefore=Math.max(0,Number(playerData.ryo)||0);
-    if(outcome==="victory"){
-      const rec=getBattleRemainingPLRecord("enemy",ROGUE);
-      setBattleRemainingPLRecord("enemy",ROGUE,0,rec?.maximum||rec?.max||23);
-      const actor=getBattleParticipantByIdentity("player",IWABEE)||currentBattle.activePlayer||getPlayerCharacter(IWABEE);
-      completeBattleVictoryFromDamage(actor,null,ROGUE);
-    }else{
-      const rec=getBattleRemainingPLRecord("player",IWABEE);
-      setBattleRemainingPLRecord("player",IWABEE,0,rec?.maximum||rec?.max||13);
-      completeBattleDefeat(IWABEE,null,"issue_544_origin_adversarial_qa");
-    }
-    return{
-      walletBefore,battleId:currentBattle?.battleId||null,
-      outcome:JSON.parse(JSON.stringify(currentBattle?.outcome||null)),
-      returnContext:JSON.parse(JSON.stringify(currentBattle?.returnContext||null)),
-      rewards:JSON.parse(JSON.stringify(currentBattle?.rewards||null)),
-      terminal:typeof getBattleTerminalResultPresentation54400==="function"?getBattleTerminalResultPresentation54400():null
-    };
-  },outcome);
-}
-
-async function continueIwabee(page,outcome,baselineAutoResumed=false){
-  return page.evaluate(({outcome,baselineAutoResumed})=>{
-    const wallet0=Math.max(0,Number(playerData.ryo)||0);
-    let claim1=null,claim2=null,resume=null;
-    if(outcome==="victory"){
-      claim1=claimCurrentBattleRewards();
-      claim2=claimCurrentBattleRewards();
-      resume=resumeBattleCallerAfterCompletion("victory");
-    }else if(!baselineAutoResumed){
-      resume=typeof continueAfterSetback33100==="function"?continueAfterSetback33100():resumeBattleCallerAfterCompletion("defeat");
-    }
-    const runtime=getActiveStorySceneRuntime();
-    return{
-      baselineAutoResumed,claim1,claim2,resume,
-      walletAfter:Math.max(0,Number(playerData.ryo)||0),
-      walletDeltaFromContinue:Math.max(0,Number(playerData.ryo)||0)-wallet0,
-      sceneId:runtime?.sceneId||null,beatId:runtime?.beatId||null,
-      localContext:JSON.parse(JSON.stringify(runtime?.localContext||{})),
-      rewardReceipts:(playerData.activityHistory||[]).filter(row=>row&&row.rewardSourceId==="iwabee_origin_rogue_genin_battle_victory_ryo_01").map(row=>JSON.parse(JSON.stringify(row))),
-      sourceOccurrenceCount:(playerData.activityHistory||[]).filter(row=>row&&row.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution").length,
-      terminal:typeof getBattleTerminalResultPresentation54400==="function"?getBattleTerminalResultPresentation54400():null
-    };
-  },{outcome,baselineAutoResumed});
-}
-
-async function runIwabeeRoute(browser,outcome,candidate){
-  const label=`iwabee-${outcome}-${candidate?"candidate":"baseline"}`;
-  const {context,page,gate,assetResponses}=await boot(browser,label,{candidate});
+async function postBootOwnerProof(browser){
+  const {context,page,gate}=await boot(browser,"postboot-owner");
   try{
-    const launch=await launchIwabee(page,label);
-    const committed=await commitIwabee(page,outcome);
-    assert.strictEqual(committed.outcome?.type,outcome,label+" semantic outcome drift");
-    if(candidate||outcome==="victory")assert.strictEqual(committed.returnContext?.type,"story_scene",label+" Story caller envelope changed before terminal presentation");
-    else assert.strictEqual(committed.returnContext,null,label+" baseline defeat no longer consumes caller via early resume");
-
-    const firstSurface=await waitSurface(page,outcome);
-    let duplicate=null;
-    if(candidate)duplicate=await assertCandidateTerminal(page,label,outcome,firstSurface);
-    else if(outcome==="victory")assert.strictEqual(firstSurface.type,"victory",label+" baseline Victory surface missing");
-    else assert.notStrictEqual(firstSurface.type,"setback",label+" baseline unexpectedly already has Setback; baseline expectation must be refreshed");
-
-    const baselineAutoResumed=!candidate&&outcome==="defeat";
-    const continued=await continueIwabee(page,outcome,baselineAutoResumed);
-    if(!baselineAutoResumed)assert.strictEqual(continued.resume?.success,true,label+" exact caller resume failed "+JSON.stringify(continued.resume));
-    assert.strictEqual(continued.sceneId,launch.sceneId,label+" caller returned to wrong Story scene");
-    assert.notStrictEqual(continued.beatId,"iwa_confront_battle",label+" caller did not leave Battle beat");
-    assert(continued.sourceOccurrenceCount<=1,label+" duplicate Story occurrence commit");
-    if(outcome==="victory"){
-      assert.strictEqual(continued.walletDeltaFromContinue,50,label+" Victory did not grant exactly +50 Ryō once");
-      assert.strictEqual(continued.rewardReceipts.length,1,label+" Victory reward receipt missing/duplicated");
-    }else{
-      assert.strictEqual(continued.walletAfter,committed.walletBefore,label+" Setback/defeat changed Ryō");
-      assert.strictEqual(continued.rewardReceipts.length,0,label+" defeat wrote Victory reward receipt");
-    }
-    const events=await trace(page);
-    assertChronology(events,label,outcome,candidate,"story_scene");
-    await assertAsset(page,assetResponses,label,outcome,candidate);
-    const errors=await gate.assertClean(label);
-    return{kind:"origin_story",label,candidate,launch,committed,firstSurface,duplicate,continued,events,assetResponses:clone(assetResponses),errors,browserGoldenClaimed:false};
+    await page.waitForTimeout(900);
+    const proof=await page.evaluate(()=>({
+      installed:globalThis.__battleTerminalResultPresentation54400Installed===true,
+      presenter544:globalThis.presentCommittedBattleTerminalResult===globalThis.presentCommittedBattleTerminalResult54400,
+      presenterName:globalThis.presentCommittedBattleTerminalResult?.name||null,
+      continueVictoryName:globalThis.continueAfterVictory?.name||null,
+      continueSetback544:globalThis.continueAfterBattleSetback===globalThis.continueAfterSetback54400,
+      continueSetbackName:globalThis.continueAfterBattleSetback?.name||null,
+      openOverlayName:globalThis.openOverlay?.name||null,
+      completeVictoryName:globalThis.completeBattleVictoryFromDamage?.name||null,
+      completeDefeatName:globalThis.completeBattleDefeat?.name||null,
+      oldContinue331:typeof globalThis.continueAfterSetback33100,
+      oldRender331:typeof globalThis.renderSetback33100,
+      oldSurface:!!document.querySelector(".alpha331-setback"),
+      queueApi:typeof globalThis.pendingBattlePresentation33000,
+      queueSettleApi:typeof globalThis.hardSettleBattlePresentationQueue33000,
+      kakashiBroadOwner:typeof globalThis.openOverlay36015
+    }));
+    assert.strictEqual(proof.installed,true,"#544 install marker missing after full boot");
+    assert.strictEqual(proof.presenter544,true,"effective terminal presenter is not #544");
+    assert.strictEqual(proof.continueVictoryName,"continueAfterVictory54400","Victory continuation effective owner is not #544");
+    assert.strictEqual(proof.continueSetback544,true,"Setback continuation binding is not #544");
+    assert.strictEqual(proof.continueSetbackName,"continueAfterSetback54400","Setback continuation function drift");
+    assert.strictEqual(proof.openOverlayName,"wrappedOpenOverlay54400","openOverlay effective terminal wrapper is not #544");
+    assert.strictEqual(proof.completeVictoryName,"wrappedCompleteVictory54400","Victory completion wrapper is not #544 after full boot");
+    assert.strictEqual(proof.completeDefeatName,"wrappedCompleteDefeat54400","Defeat completion wrapper is not #544 after full boot");
+    assert.strictEqual(proof.oldContinue331,"undefined","retired #33100 continuation reactivated");
+    assert.strictEqual(proof.oldRender331,"undefined","retired #33100 renderer reactivated");
+    assert.strictEqual(proof.oldSurface,false,"retired #33100 Setback surface reappeared");
+    assert.strictEqual(proof.queueApi,"function","#33000 pending queue authority missing");
+    assert.strictEqual(proof.queueSettleApi,"function","#33000 settle authority missing");
+    assert.strictEqual(proof.kakashiBroadOwner,"undefined","36015 broad openOverlay owner reactivated");
+    await gate.assertClean("postboot-owner");
+    return proof;
   }finally{await context.close();}
 }
 
-async function setupBanditWorld(page,label){
-  return page.evaluate(label=>{
-    localStorage.clear();
-    playerData=createDefaultPlayerData();
-    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
-    savePlayerData();
+async function waitIdle(page){await page.waitForFunction(()=>{const stage=document.querySelector(".alpha-code-battle-stage");return stage?.dataset.presentationQueueBusy!=="true"&&!(typeof pendingBattlePresentation33000==="function"&&pendingBattlePresentation33000());},null,{timeout:22000});}
+async function readySkill(page){
+  await waitIdle(page);const skills=page.locator('button[data-formation-family="skills"]').first();if(await skills.count())await skills.click();
+  await page.waitForFunction(()=>[...document.querySelectorAll(".battle-dev-skill-card")].some(c=>c.dataset.skillId&&!c.disabled&&!c.classList.contains("is-locked")&&!c.classList.contains("is-disabled")),null,{timeout:12000});
+  return page.evaluate(()=>[...document.querySelectorAll(".battle-dev-skill-card")].find(c=>c.dataset.skillId&&!c.disabled&&!c.classList.contains("is-locked")&&!c.classList.contains("is-disabled"))?.dataset.skillId||null);
+}
+async function prepareEdge(page,outcome){
+  return page.evaluate(outcome=>{
+    const slots=side=>(currentBattle?.deployment?.[side]?.slots||[]).map(x=>x?.participantId).filter(Boolean);
+    let players=slots("player"),enemies=slots("enemy");
+    if(!players.length&&currentBattle?.activePlayer?.id)players=[currentBattle.activePlayer.id];
+    if(!enemies.length&&currentBattle?.activeEnemy?.id)enemies=[currentBattle.activeEnemy.id];
+    const touched=[];const set=(side,id,value)=>{const rec=getBattleRemainingPLRecord(side,id);if(!rec)return;const max=Number(rec.maximum||rec.max||rec.remaining||1)||1;setBattleRemainingPLRecord(side,id,value,max);touched.push({side,id,value,max});};
+    if(outcome==="victory"){const active=currentBattle?.activeEnemy?.id||enemies[0];for(const id of enemies)set("enemy",id,id===active?1:0);}
+    else{const active=currentBattle?.activePlayer?.id||players[0];for(const id of players)set("player",id,id===active?1:0);}
+    return{players,enemies,touched,battleId:currentBattle?.battleId||null,returnContext:clone(currentBattle?.returnContext||null),walletBefore:Number(playerData?.ryo)||0,historyBefore:(playerData?.activityHistory||[]).length};
+  },outcome);
+}
+async function crossByRealAction(page,outcome,label){
+  const used=[];
+  for(let i=0;i<6;i++){
+    if(await page.evaluate(()=>currentBattle?.battleOver===true))break;
+    const skillId=await readySkill(page);assert(skillId,label+" no ready production skill");used.push(skillId);
+    const result=await page.evaluate(id=>attemptBattlePreparedSkill(id),skillId);assert.strictEqual(result?.success,true,label+" production skill action failed "+JSON.stringify(result));
+    try{await page.waitForFunction(outcome=>currentBattle?.battleOver===true&&currentBattle?.outcome?.type===outcome,outcome,{timeout:7000});break;}catch(_e){await waitIdle(page);}
+  }
+  await page.waitForFunction(outcome=>currentBattle?.battleOver===true&&currentBattle?.outcome?.type===outcome,outcome,{timeout:25000});
+  const selector=outcome==="victory"?".alpha-victory-code-screen,.victory-screen":".alpha544-setback,.battle-terminal-setback";
+  await page.waitForSelector(selector,{state:"visible",timeout:25000});
+  const state=await page.evaluate(()=>({battleId:currentBattle?.battleId||null,outcome:currentBattle?.outcome?.type||null,returnContext:currentBattle?.returnContext?JSON.parse(JSON.stringify(currentBattle.returnContext)):null,terminal:getBattleTerminalResultPresentation54400(),queuePending:pendingBattlePresentation33000(),oldOwner:typeof continueAfterSetback33100,oldSurface:!!document.querySelector(".alpha331-setback"),rewards:JSON.parse(JSON.stringify(currentBattle?.rewards||null))}));
+  assert.strictEqual(state.outcome,outcome,label+" semantic outcome drift");
+  assert.strictEqual(state.terminal?.status,"presented",label+" terminal result was not visibly presented");
+  assert.strictEqual(state.terminal?.committedOutcome,outcome,label+" terminal presenter changed factual outcome");
+  assert.strictEqual(state.queuePending,false,label+" #33000 queue still pending after result visibility");
+  assert.strictEqual(state.oldOwner,"undefined",label+" retired #33100 terminal owner reactivated");
+  assert.strictEqual(state.oldSurface,false,label+" retired #33100 surface reappeared");
+  const dup=await page.evaluate(outcome=>({a:presentCommittedBattleTerminalResult(outcome,{source:"lane_f_duplicate_a"}),b:presentCommittedBattleTerminalResult(outcome,{source:"lane_f_duplicate_b"}),state:getBattleTerminalResultPresentation54400(),semantic:currentBattle?.outcome?.type||null}),outcome);
+  assert.strictEqual(dup.semantic,outcome,label+" duplicate terminal request rerolled outcome");
+  assert.strictEqual(dup.state?.status,"presented",label+" duplicate terminal request broke presentation");
+  return{used,state,duplicate:dup};
+}
+async function assertAsset(assets,outcome,label){await sleep(250);const wanted="/UI/"+(outcome==="victory"?"victory":"setback")+".png";assert(assets.some(r=>r.url.includes(wanted)&&r.status===200),label+" lowercase approved result asset missing HTTP 200 "+JSON.stringify(assets));}
 
-    const selected=selectChronicleOrigin("academy_kakashi",label+"_origin");
-    const completed=completeChronicleOriginPrologue("academy_kakashi",[label+":origin_complete"]);
-    const snapshot=getAcademyTeamFormationSnapshot();
-    const desired=["academy_hinata","academy_menma"];
-    const one=selectAcademyTeamFormationTeammate(1,desired[0]);
-    const two=selectAcademyTeamFormationTeammate(2,desired[1]);
-    const formed=confirmAcademyTeamFormation(label+"_team",desired);
-    const continued=continueAcademyTeamFormationJourney();
-
-    const opportunityId="alpha_bandit_hideout_battle";
-    const actionId="fight_bandit_hideout";
-    try{registerAlphaBanditHideoutAuthoredOpportunity();}catch(_e){}
-    const definition=typeof getOpportunityDefinitionIncludingLegacy==="function"?getOpportunityDefinitionIncludingLegacy(opportunityId):null;
-    if(definition?.eventId&&typeof setWorldEventLifecycle==="function")setWorldEventLifecycle(definition.eventId,{active:true,phase:"active"},{save:false});
-    if(typeof setOpportunityDiscovery==="function")setOpportunityDiscovery(opportunityId,{level:"discovered",known:true},{save:false});
-    if(typeof setOpportunityActionability==="function")setOpportunityActionability(opportunityId,{available:true},{save:false});
-
-    selectedRegionKey="fire";
-    selectedLocationNode=getWorldRegionLocation("fire","bandit_hideout");
-    selectedHotspotId=definition?.hotspotId||"hotspot_fire_bandit_hideout";
-    selectedOpportunityId=opportunityId;
-    savePlayerData();
-
-    return{
-      selected,completed,snapshot,one,two,formed,continued,
-      blocked:isAcademyTeamFormationJourneyBlockingFreePlay(),
-      freePlay:typeof isAcademyFreePlayAvailable==="function"?isAcademyFreePlayAvailable():null,
-      opportunityId,actionId,
-      definition:definition?JSON.parse(JSON.stringify(definition)):null,
-      encounter:JSON.parse(JSON.stringify(getEncounterData("bandit_leader")||null)),
-      world:{regionKey:selectedRegionKey,locationId:selectedLocationNode?.id||null,hotspotId:selectedHotspotId,opportunityId:selectedOpportunityId}
-    };
-  },label);
+async function continueTerminal(page,outcome,label){
+  if(outcome==="victory"){
+    const visibleButton=()=>page.locator(".alpha-victory-code-screen .victory-continue:visible,.victory-screen .victory-continue:visible").first();
+    let button=visibleButton();await button.waitFor({state:"visible",timeout:12000});
+    const before=await page.evaluate(()=>({wallet:Number(playerData?.ryo)||0,returnContext:currentBattle?.returnContext?JSON.parse(JSON.stringify(currentBattle.returnContext)):null,history:(playerData?.activityHistory||[]).length}));
+    const firstText=(await button.textContent()||"").trim();assert(/CLAIM/i.test(firstText),label+" first Victory action is not reward claim: "+firstText);
+    await button.click();
+    await page.waitForFunction(()=>currentBattle?.rewards?.claimed===true,null,{timeout:8000});
+    const afterClaim=await page.evaluate(()=>({wallet:Number(playerData?.ryo)||0,claimed:currentBattle?.rewards?.claimed===true,returnContext:currentBattle?.returnContext?JSON.parse(JSON.stringify(currentBattle.returnContext)):null,terminal:getBattleTerminalResultPresentation54400(),visible:!![...document.querySelectorAll(".alpha-victory-code-screen,.victory-screen")].find(n=>n.getClientRects().length>0&&getComputedStyle(n).display!=="none"&&getComputedStyle(n).visibility!=="hidden"),history:(playerData?.activityHistory||[]).length}));
+    assert.strictEqual(afterClaim.claimed,true,label+" Victory claim did not settle");
+    assert(afterClaim.returnContext,label+" caller resumed during reward claim");
+    assert.strictEqual(afterClaim.terminal?.status,"presented",label+" terminal state lost after reward claim");
+    assert.strictEqual(afterClaim.visible,true,label+" Victory surface disappeared during reward claim");
+    const repeat=await page.evaluate(()=>({result:typeof claimCurrentBattleRewards==="function"?claimCurrentBattleRewards():null,wallet:Number(playerData?.ryo)||0,history:(playerData?.activityHistory||[]).length,returnContext:currentBattle?.returnContext?JSON.parse(JSON.stringify(currentBattle.returnContext)):null}));
+    assert.strictEqual(repeat.wallet,afterClaim.wallet,label+" repeat Victory claim changed Ryō");
+    assert.strictEqual(repeat.history,afterClaim.history,label+" repeat Victory claim duplicated history");
+    assert(repeat.returnContext,label+" repeat reward claim consumed caller context");
+    button=visibleButton();await button.waitFor({state:"visible",timeout:8000});
+    await button.click();
+    return{before,afterClaim,repeat};
+  }
+  const before=await page.evaluate(()=>({wallet:Number(playerData?.ryo)||0,history:(playerData?.activityHistory||[]).length,returnContext:currentBattle?.returnContext?JSON.parse(JSON.stringify(currentBattle.returnContext)):null}));
+  assert(before.returnContext,label+" Setback caller was consumed before explicit Continue");
+  const button=page.locator(".alpha544-setback button:visible,.battle-terminal-setback button:visible").first();await button.waitFor({state:"visible",timeout:12000});await button.click();
+  const after=await page.evaluate(()=>({wallet:Number(playerData?.ryo)||0,history:(playerData?.activityHistory||[]).length}));
+  assert.strictEqual(after.wallet,before.wallet,label+" Setback claimed reward");
+  assert.strictEqual(after.history,before.history,label+" Setback wrote reward/history during Continue");
+  return{before,after};
 }
 
-async function launchBanditWorld(page,label){
-  const setup=await setupBanditWorld(page,label);
-  assert.strictEqual(setup.selected?.success,true,label+" Kakashi Origin selection failed "+JSON.stringify(setup));
-  assert.strictEqual(setup.completed?.success,true,label+" Kakashi Origin completion fixture failed "+JSON.stringify(setup));
-  assert.strictEqual(setup.one?.success,true,label+" team slot 1 failed "+JSON.stringify(setup));
-  assert.strictEqual(setup.two?.success,true,label+" team slot 2 failed "+JSON.stringify(setup));
-  assert.strictEqual(setup.formed?.success,true,label+" Academy team formation failed "+JSON.stringify(setup));
-  assert.strictEqual(setup.continued?.success,true,label+" Academy team continuation failed "+JSON.stringify(setup));
-  assert.strictEqual(setup.blocked,false,label+" free-play route still blocked "+JSON.stringify(setup));
-  assert.strictEqual(setup.encounter?.enemyId,"banditLeader",label+" authored Bandit encounter drifted "+JSON.stringify(setup.encounter));
-
-  const launched=await page.evaluate(({opportunityId,actionId})=>{
-    const result=routeWorldOpportunityInteraction(opportunityId,actionId);
-    const player=currentBattle?.activePlayer||null;
-    const enemy=currentBattle?.activeEnemy||null;
-    return{
-      result,battleId:currentBattle?.battleId||null,
-      returnContext:JSON.parse(JSON.stringify(currentBattle?.returnContext||null)),
-      playerId:player?.id||currentBattle?.activePlayerId||playerData.currentCharacter||null,
-      enemyId:enemy?.id||currentBattle?.activeEnemyId||null,
-      world:{regionKey:selectedRegionKey,locationId:selectedLocationNode?.id||null,hotspotId:selectedHotspotId,opportunityId:selectedOpportunityId}
-    };
-  },{opportunityId:setup.opportunityId,actionId:setup.actionId});
-  assert.strictEqual(launched.result?.success,true,label+" authored World Bandit route did not launch "+JSON.stringify({setup,launched}));
-  assert.strictEqual(launched.returnContext?.type,"region_hotspot",label+" World Battle did not capture region_hotspot caller envelope "+JSON.stringify(launched));
-  assert.strictEqual(launched.enemyId,"banditLeader",label+" World route launched wrong enemy "+JSON.stringify(launched));
-  assert(launched.battleId,label+" World route did not create a Battle id");
-  return{setup,launched};
-}
-
-async function commitBanditWorld(page,outcome,launch){
-  return page.evaluate(({outcome,playerId,enemyId})=>{
-    const walletBefore=Math.max(0,Number(playerData.ryo)||0);
-    const historyBefore=(playerData.activityHistory||[]).length;
-    if(outcome==="victory"){
-      const rec=getBattleRemainingPLRecord("enemy",enemyId);
-      setBattleRemainingPLRecord("enemy",enemyId,0,rec?.maximum||rec?.max||100);
-      const actor=getBattleParticipantByIdentity("player",playerId)||currentBattle.activePlayer||getPlayerCharacter(playerId);
-      completeBattleVictoryFromDamage(actor,null,enemyId);
-    }else{
-      const rec=getBattleRemainingPLRecord("player",playerId);
-      setBattleRemainingPLRecord("player",playerId,0,rec?.maximum||rec?.max||100);
-      completeBattleDefeat(playerId,null,"issue_544_world_adversarial_qa");
-    }
-    return{
-      walletBefore,historyBefore,battleId:currentBattle?.battleId||null,
-      outcome:JSON.parse(JSON.stringify(currentBattle?.outcome||null)),
-      returnContext:JSON.parse(JSON.stringify(currentBattle?.returnContext||null)),
-      rewards:JSON.parse(JSON.stringify(currentBattle?.rewards||null)),
-      terminal:typeof getBattleTerminalResultPresentation54400==="function"?getBattleTerminalResultPresentation54400():null
-    };
-  },{outcome,playerId:launch.playerId,enemyId:launch.enemyId});
-}
-
-async function continueBanditWorld(page,outcome,baselineAutoResumed=false,committed=null){
-  return page.evaluate(({outcome,baselineAutoResumed,rewardSourceId})=>{
-    const wallet0=Math.max(0,Number(playerData.ryo)||0);
-    let claim1=null,claim2=null,resume=null,wallet1=wallet0,wallet2=wallet0;
-    if(outcome==="victory"){
-      claim1=claimCurrentBattleRewards();wallet1=Math.max(0,Number(playerData.ryo)||0);
-      claim2=claimCurrentBattleRewards();wallet2=Math.max(0,Number(playerData.ryo)||0);
-      resume=resumeBattleCallerAfterCompletion("victory");
-    }else if(!baselineAutoResumed){
-      resume=typeof continueAfterSetback33100==="function"?continueAfterSetback33100():resumeBattleCallerAfterCompletion("defeat");
-    }
-    const receipts=rewardSourceId?(playerData.activityHistory||[]).filter(row=>row&&row.rewardSourceId===rewardSourceId).map(row=>JSON.parse(JSON.stringify(row))):[];
-    return{
-      baselineAutoResumed,claim1,claim2,resume,wallet0,wallet1,wallet2,
-      walletAfter:Math.max(0,Number(playerData.ryo)||0),
-      historyAfter:(playerData.activityHistory||[]).length,
-      rewardReceipts:receipts,
-      world:{regionKey:selectedRegionKey,locationId:selectedLocationNode?.id||null,hotspotId:selectedHotspotId,opportunityId:selectedOpportunityId},
-      terminal:typeof getBattleTerminalResultPresentation54400==="function"?getBattleTerminalResultPresentation54400():null
-    };
-  },{outcome,baselineAutoResumed,rewardSourceId:committed?.rewards?.rewardSourceId||null});
-}
-
-async function runBanditWorldRoute(browser,outcome,candidate){
-  const label=`world-bandit-${outcome}-${candidate?"candidate":"baseline"}`;
-  const {context,page,gate,assetResponses}=await boot(browser,label,{candidate});
+async function launchIwabee(page,label){return page.evaluate(label=>{const selected=selectChronicleOrigin("academy_iwabee",label);const story=beginAlphaChronicleOriginPrologue();const sceneId=getActiveStorySceneRuntime()?.sceneId||null;const set=setStorySceneBeat("iwa_confront_battle",{render:false});const battle=launchStorySceneBattle();return{selected,story,set,battle,sceneId,battleId:currentBattle?.battleId||null,returnContext:JSON.parse(JSON.stringify(currentBattle?.returnContext||null))};},label);}
+async function runIwabee(browser,outcome,index){
+  const label=`iwabee-origin-${outcome}-lane-f-real-action`,{context,page,gate,assets}=await boot(browser,label);
   try{
-    const {setup,launched}=await launchBanditWorld(page,label);
-    const committed=await commitBanditWorld(page,outcome,launched);
-    assert.strictEqual(committed.battleId,launched.battleId,label+" Battle instance rerolled/replaced during outcome commit");
-    assert.strictEqual(committed.outcome?.type,outcome,label+" semantic outcome drift");
-    if(candidate||outcome==="victory")assert.strictEqual(committed.returnContext?.type,"region_hotspot",label+" World caller envelope changed before terminal presentation");
-    else assert.strictEqual(committed.returnContext,null,label+" baseline World defeat no longer consumes caller via early resume");
+    const launch=await launchIwabee(page,label);assert.strictEqual(launch.selected?.success,true,label+" select failed");assert.strictEqual(launch.story?.success,true,label+" story launch failed");assert.strictEqual(launch.set?.success,true,label+" beat set failed");assert.strictEqual(launch.battle?.success,true,label+" Battle launch failed");assert.strictEqual(launch.returnContext?.type,"story_scene",label+" Story caller missing");
+    const edge=await prepareEdge(page,outcome),driven=await crossByRealAction(page,outcome,label);assert.strictEqual(driven.state.battleId,launch.battleId,label+" Battle rerolled");assert.strictEqual(driven.state.returnContext?.type,"story_scene",label+" caller resumed before visible result");
+    await page.screenshot({path:path.join(OUT,`${index}-${label}.png`),fullPage:false});await assertAsset(assets,outcome,label);
+    const continuation=await continueTerminal(page,outcome,label);await page.waitForFunction(beat=>getActiveStorySceneRuntime()?.beatId!==beat,"iwa_confront_battle",{timeout:20000});
+    const post=await page.evaluate(()=>({sceneId:getActiveStorySceneRuntime()?.sceneId||null,beatId:getActiveStorySceneRuntime()?.beatId||null,returnContext:currentBattle?.returnContext||null,occurrences:(playerData.activityHistory||[]).filter(x=>x?.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution").length,wallet:Number(playerData?.ryo)||0}));
+    assert.strictEqual(post.sceneId,launch.sceneId,label+" wrong Story scene after Continue");assert(post.occurrences<=1,label+" duplicate Story occurrence");
+    const errors=await gate.assertClean(label);return{label,outcome,launch,edge,driven,continuation,post,assets:clone(assets),errors};
+  }finally{await context.close();}
+}
 
-    const firstSurface=await waitSurface(page,outcome);
-    let duplicate=null;
-    if(candidate)duplicate=await assertCandidateTerminal(page,label,outcome,firstSurface);
-    else if(outcome==="victory")assert.strictEqual(firstSurface.type,"victory",label+" baseline Victory surface missing");
-    else assert.notStrictEqual(firstSurface.type,"setback",label+" baseline unexpectedly already has Setback; baseline expectation must be refreshed");
+async function setupBandit(page,label){return page.evaluate(label=>{playerData=createDefaultPlayerData();setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);savePlayerData();const selected=selectChronicleOrigin("academy_kakashi",label+"_origin");const completed=completeChronicleOriginPrologue("academy_kakashi",[label+":origin_complete"]);const desired=["academy_hinata","academy_menma"];const one=selectAcademyTeamFormationTeammate(1,desired[0]);const two=selectAcademyTeamFormationTeammate(2,desired[1]);const formed=confirmAcademyTeamFormation(label+"_team",desired);const continued=continueAcademyTeamFormationJourney();const sandboxOpening=typeof chooseKonohaSandboxOpening35000==="function"?chooseKonohaSandboxOpening35000("explore_konoha"):null;const opportunityId="alpha_bandit_hideout_battle",actionId="fight_bandit_hideout";try{registerAlphaBanditHideoutAuthoredOpportunity();}catch(_e){}const definition=typeof getOpportunityDefinitionIncludingLegacy==="function"?getOpportunityDefinitionIncludingLegacy(opportunityId):null;if(definition?.eventId&&typeof setWorldEventLifecycle==="function")setWorldEventLifecycle(definition.eventId,{active:true,phase:"active"},{save:false});if(typeof setOpportunityDiscovery==="function")setOpportunityDiscovery(opportunityId,{level:"discovered",known:true},{save:false});if(typeof setOpportunityActionability==="function")setOpportunityActionability(opportunityId,{available:true},{save:false});selectedRegionKey="fire";selectedLocationNode=getWorldRegionLocation("fire","bandit_hideout");selectedHotspotId=definition?.hotspotId||"hotspot_fire_bandit_hideout";selectedOpportunityId=opportunityId;savePlayerData();const result=routeWorldOpportunityInteraction(opportunityId,actionId);return{selected,completed,one,two,formed,continued,sandboxOpening,result,battleId:currentBattle?.battleId||null,returnContext:JSON.parse(JSON.stringify(currentBattle?.returnContext||null)),enemyId:(typeof getBattleDeploymentParticipant==="function"?getBattleDeploymentParticipant("enemy",1)?.id:null)||currentBattle?.activeEnemy?.id||currentBattle?.activeEnemyId||currentBattle?.enemy?.id||null,world:{regionKey:selectedRegionKey,locationId:selectedLocationNode?.id||null,hotspotId:selectedHotspotId,opportunityId:selectedOpportunityId}};},label);}
+async function runBandit(browser,outcome,index){
+  const label=`world-bandit-${outcome}-lane-f-real-action`,{context,page,gate,assets}=await boot(browser,label);
+  try{
+    const launch=await setupBandit(page,label);assert.strictEqual(launch.selected?.success,true,label+" origin select failed");assert.strictEqual(launch.completed?.success,true,label+" origin fixture failed");assert.strictEqual(launch.formed?.success,true,label+" team formation failed");assert.strictEqual(launch.continued?.success,true,label+" team journey failed");assert.strictEqual(launch.sandboxOpening?.success,true,label+" Konoha sandbox opening choice failed");assert.strictEqual(launch.result?.success,true,label+" Bandit route launch failed "+JSON.stringify(launch.result));assert.strictEqual(launch.returnContext?.type,"region_hotspot",label+" region_hotspot caller missing");assert.strictEqual(launch.enemyId,"banditLeader",label+" wrong authored enemy");
+    const edge=await prepareEdge(page,outcome),driven=await crossByRealAction(page,outcome,label);assert.strictEqual(driven.state.battleId,launch.battleId,label+" Battle rerolled");assert.strictEqual(driven.state.returnContext?.type,"region_hotspot",label+" World caller resumed before result");
+    await page.screenshot({path:path.join(OUT,`${index}-${label}.png`),fullPage:false});await assertAsset(assets,outcome,label);const continuation=await continueTerminal(page,outcome,label);await sleep(600);
+    const post=await page.evaluate(()=>({world:{regionKey:selectedRegionKey,locationId:selectedLocationNode?.id||null,hotspotId:selectedHotspotId,opportunityId:selectedOpportunityId},wallet:Number(playerData?.ryo)||0}));assert.strictEqual(post.world.regionKey,launch.world.regionKey,label+" wrong region after Continue");assert.strictEqual(post.world.locationId,launch.world.locationId,label+" wrong location after Continue");assert.strictEqual(post.world.hotspotId,launch.world.hotspotId,label+" wrong hotspot after Continue");
+    const errors=await gate.assertClean(label);return{label,outcome,launch,edge,driven,continuation,post,assets:clone(assets),errors};
+  }finally{await context.close();}
+}
 
-    const baselineAutoResumed=!candidate&&outcome==="defeat";
-    const continued=await continueBanditWorld(page,outcome,baselineAutoResumed,committed);
-    if(!baselineAutoResumed)assert.strictEqual(continued.resume?.success,true,label+" exact region_hotspot caller resume failed "+JSON.stringify(continued.resume));
-    assert.strictEqual(continued.world.regionKey,launched.world.regionKey,label+" caller returned to wrong World region");
-    assert.strictEqual(continued.world.locationId,launched.world.locationId,label+" caller returned to wrong World location");
-    if(outcome==="victory"){
-      assert.strictEqual(continued.wallet2,continued.wallet1,label+" repeat Victory reward claim changed Ryō");
-      if(committed.rewards?.rewardSourceId)assert(continued.rewardReceipts.length<=1,label+" duplicate World Victory reward receipt");
-    }else{
-      assert.strictEqual(continued.walletAfter,committed.walletBefore,label+" World Setback/defeat changed Ryō");
-      assert.strictEqual(continued.rewardReceipts.length,0,label+" World defeat wrote a Victory reward receipt");
-    }
-    const events=await trace(page);
-    assertChronology(events,label,outcome,candidate,"region_hotspot");
-    await assertAsset(page,assetResponses,label,outcome,candidate);
-    const errors=await gate.assertClean(label);
-    return{kind:"world_region_hotspot",label,candidate,setup,launch:launched,committed,firstSurface,duplicate,continued,events,assetResponses:clone(assetResponses),errors,browserGoldenClaimed:false};
+async function currentBeat(page){return page.evaluate(()=>getActiveStorySceneRuntime()?.beatId||null);}
+async function drain(page){for(let i=0;i<600;i++){const t=await page.evaluate(()=>getAcademyKakashiV2TransitionState36040());if(t.atEnd)return t;const r=await page.evaluate(()=>advanceAcademyKakashiV236040());assert.strictEqual(r?.success,true,JSON.stringify(r));}throw new Error("Kakashi cue drain guard exceeded");}
+async function fastDrain(page){const r=await page.evaluate(()=>{const rt=getActiveStorySceneRuntime?.();if(!rt)return{success:false};const p=getAcademyKakashiV2Presentation36020?.(rt.beatId),count=Array.isArray(p?.cues)?p.cues.length:0;if(!rt.localContext||typeof rt.localContext!=="object")rt.localContext={};rt.localContext.__kakashiV2Presentation36040={beatId:rt.beatId,cueIndex:Math.max(0,count-1),settled:true};renderAcademyKakashiV236030?.();return{success:true,count};});assert.strictEqual(r?.success,true,JSON.stringify(r));}
+async function waitBeatChange(page,oldBeat,expected=null){await page.waitForFunction(({oldBeat,expected})=>{const rt=getActiveStorySceneRuntime?.(),t=getAcademyKakashiV2TransitionState36040?.();return !!rt&&!!t&&t.locked===false&&(expected?rt.beatId===expected:rt.beatId!==oldBeat);},{oldBeat,expected},{timeout:12000});}
+async function nextSemantic(page,expected=null){await drain(page);const before=await currentBeat(page);const r=await page.evaluate(()=>advanceAcademyKakashiV236040());assert(r?.success===true&&!r.semanticBeatUnchanged,JSON.stringify(r));await waitBeatChange(page,before,expected);}
+async function chooseLabel(page,label,expected=null){await fastDrain(page);const before=await currentBeat(page);const r=await page.evaluate(label=>{const beat=getCurrentStorySceneBeat?.();const row=(beat?.choices||[]).find(c=>c?.label===label&&(typeof c.availability!=="function"||c.availability().available===true));if(!row)return{success:false,available:(beat?.choices||[]).map(c=>c.label)};return advanceAcademyKakashiV236040(row.choiceId);},label);assert.strictEqual(r?.success,true,JSON.stringify(r));await waitBeatChange(page,before,expected);}
+async function advanceTo(page,target,max=18){for(let i=0;i<max;i++){if(await currentBeat(page)===target)return;const meta=await page.evaluate(()=>{const b=getCurrentStorySceneBeat?.();if(!b)return null;const available=(b.choices||[]).filter(c=>typeof c.availability!=="function"||c.availability().available===true).map(c=>c.label);return{mode:b.mode||null,machineResolved:b.machineResolved===true||b.uiHints?.kakashiMachineResolved===true,available};});assert(meta,"Kakashi beat missing");if(meta.mode==="battle_transition")throw new Error("unexpected earlier Battle advancing to "+target);if(meta.machineResolved)await nextSemantic(page);else if(meta.mode==="choice"){assert.deepStrictEqual(meta.available,["CONTINUE"],"ambiguous Kakashi choice "+JSON.stringify(meta));await chooseLabel(page,"CONTINUE");}else await nextSemantic(page);}throw new Error("Kakashi advance guard exceeded "+target+" beat="+await currentBeat(page));}
+async function routeKakashi(page){
+  const started=await page.evaluate(()=>{const selected=selectChronicleOrigin("academy_kakashi","issue_544_lane_f_kakashi");const launched=beginAlphaChronicleOriginPrologue();return{selected,launched,beatId:getActiveStorySceneRuntime()?.beatId||null};});assert.strictEqual(started.selected?.success,true,JSON.stringify(started));assert.strictEqual(started.launched?.success,true,JSON.stringify(started));
+  await page.waitForSelector("#kakashi-v2-scene-board",{state:"visible",timeout:15000});assert.strictEqual(await currentBeat(page),"v2_scene01_rooftop");await nextSemantic(page,"v2_scene02_tail");await chooseLabel(page,"INTERRUPT THE HANDOFF","v2_direct_strike_setup");await advanceTo(page,"v2_battle_direct_strike_2v1");await fastDrain(page);const launched=await page.evaluate(()=>advanceAcademyKakashiV236040());assert.strictEqual(launched?.success,true,JSON.stringify(launched));
+  await page.waitForFunction(()=>currentBattle?.active===true&&currentBattle?.returnContext?.type==="story_scene"&&!!document.querySelector(".alpha-code-battle-stage"),null,{timeout:15000});
+  const state=await page.evaluate(()=>({beat:getActiveStorySceneRuntime()?.beatId||null,battleId:currentBattle?.battleId||null,config:currentBattle?.kakashiV2?.battleConfigId||null,returnContext:JSON.parse(JSON.stringify(currentBattle?.returnContext||null))}));assert.strictEqual(state.config,"academy_kakashi_origin_battle_amt_ps_2v1","Kakashi canonical direct-strike config drift");assert.strictEqual(state.returnContext?.type,"story_scene");return state;
+}
+async function runKakashi(browser,outcome,index){
+  const label=`kakashi-origin-${outcome}-lane-f-real-action`,{context,page,gate,assets}=await boot(browser,label,{kakashi:true});
+  try{
+    const launch=await routeKakashi(page),edge=await prepareEdge(page,outcome),driven=await crossByRealAction(page,outcome,label);assert.strictEqual(driven.state.battleId,launch.battleId,label+" Battle rerolled");assert.strictEqual(driven.state.returnContext?.type,"story_scene",label+" caller consumed before terminal Continue");
+    await page.screenshot({path:path.join(OUT,`${index}-${label}.png`),fullPage:false});await assertAsset(assets,outcome,label);const continuation=await continueTerminal(page,outcome,label);const expected=outcome==="victory"?"v2_direct_strike_2v1_win":"v2_direct_strike_2v1_loss";await page.waitForFunction(expected=>getActiveStorySceneRuntime()?.beatId===expected,expected,{timeout:22000});
+    const post=await page.evaluate(()=>({sceneId:getActiveStorySceneRuntime()?.sceneId||null,beatId:getActiveStorySceneRuntime()?.beatId||null}));assert.strictEqual(post.sceneId,"origin_academy_kakashi_anbu_retrieval",label+" wrong Kakashi Story scene after Continue");const errors=await gate.assertClean(label);return{label,outcome,launch,edge,driven,continuation,post,assets:clone(assets),errors};
   }finally{await context.close();}
 }
 
 (async()=>{
   const browser=await chromium.launch({headless:true});
-  const results={
-    issue:544,lane:"F",
-    candidateHead:"803bfb270a2f43c16243da522ae534b0e67954a7",
-    browserGoldenClaimed:false,
-    routes:[]
-  };
+  const evidence={issue:544,lane:"F",productionTarget:TARGET,terminalHelpersCalledByHarness:false,postBootOwner:null,routes:[],browserGoldenClaimed:false};
   try{
-    results.routes.push(await runIwabeeRoute(browser,"victory",false));
-    results.routes.push(await runIwabeeRoute(browser,"defeat",false));
-    results.routes.push(await runBanditWorldRoute(browser,"victory",false));
-    results.routes.push(await runBanditWorldRoute(browser,"defeat",false));
-    if(CANDIDATE){
-      results.routes.push(await runIwabeeRoute(browser,"victory",true));
-      results.routes.push(await runIwabeeRoute(browser,"defeat",true));
-      results.routes.push(await runBanditWorldRoute(browser,"victory",true));
-      results.routes.push(await runBanditWorldRoute(browser,"defeat",true));
-    }
-    fs.writeFileSync(path.join(OUT,"browser-evidence.json"),JSON.stringify(results,null,2));
-    console.log(JSON.stringify(results,null,2));
-    console.log("PASS #544 real-route Origin + World/PL baseline/candidate chronology; browserGoldenClaimed=false");
+    evidence.postBootOwner=await postBootOwnerProof(browser);
+    evidence.routes.push(await runIwabee(browser,"victory","01"));
+    evidence.routes.push(await runIwabee(browser,"defeat","02"));
+    evidence.routes.push(await runBandit(browser,"victory","03"));
+    evidence.routes.push(await runBandit(browser,"defeat","04"));
+    evidence.routes.push(await runKakashi(browser,"victory","05"));
+    evidence.routes.push(await runKakashi(browser,"defeat","06"));
+    fs.writeFileSync(path.join(OUT,"browser-evidence.json"),JSON.stringify(evidence,null,2));
+    console.log(JSON.stringify({pass:true,issue:544,lane:"F",productionTarget:TARGET,postBootOwner:evidence.postBootOwner,routes:evidence.routes.map(r=>r.label),browserGoldenClaimed:false},null,2));
   }finally{await browser.close();}
 })().catch(error=>{console.error(error&&error.stack||error);process.exit(1);});
