@@ -456,7 +456,10 @@ function diagnostics(){
     trainingTantoUsesDurableProvenance:String(commitItemSource).includes("commitDurableInventoryAcquisition54500")&&String(commitItemSource).includes("durableInstanceId")&&String(commitItemSource).includes('acquisitionKind:"reward"'),
     rewardRollbackIncludesProvenance:String(snapshotRewardMutation).includes("durableObjectProvenance14800")&&String(restoreRewardMutation).includes("durableObjectProvenance14800"),
     victoryProjectionSelfHeals:String(ensureKakashiV2BattleRewardProjection36015).includes("authoritativeProjectionRepaired")&&String(projectKakashiV2BattleRewardsForVictory36015).includes("ensureKakashiV2BattleRewardProjection36015")&&String(renderVictoryOverlay36015).includes("projectKakashiV2BattleRewardsForVictory36015"),
-    noBroadOpenOverlayOwnership:!String(installAcademyKakashiV2Rewards36015).includes("globalThis.openOverlay=")&&!String(installAcademyKakashiV2Rewards36015).includes("openOverlay36015")&&!String(installAcademyKakashiV2Rewards36015).includes("PRE_OPEN_OVERLAY"),
+    noBroadOpenOverlayOwnership:(()=>{
+      const operationalSource=String(installAcademyKakashiV2Rewards36015).split("function diagnostics(){")[0];
+      return !operationalSource.includes("globalThis.openOverlay=")&&!operationalSource.includes("openOverlay36015")&&!operationalSource.includes("PRE_OPEN_OVERLAY");
+    })(),
     exactMIBattleProjection:String(ensureKakashiV2BattleRewardProjection36015).includes("Field Recovery Pill")&&String(battlePlan).includes("participantId===MI")&&String(battlePlan).includes("ryo:cashSourceId?50:0")&&String(soloCashSource36015).includes("participantId===MI"),
     kakashiClaimBypassesDuplicateGenericPersistence:!String(claimKakashiV2BattleRewards).includes("PRE_CLAIM.call")&&String(claimKakashiV2BattleRewards).includes("directExactPackageClaim:true")&&String(claimKakashiV2BattleRewards).includes("deferredPersistenceUntilVictoryPaint:true")&&!String(claimKakashiV2BattleRewards).includes('savePlayerData==="function")savePlayerData()'),
     idempotentKakashiClaimDoesNotRewritePlayerSave:String(claimKakashiV2BattleRewards).includes("noPersistenceRewrite:true"),
