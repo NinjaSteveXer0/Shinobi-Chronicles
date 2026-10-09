@@ -21,6 +21,28 @@ def game_without_declared_469_save_reader(text:str)->str:
         return ''
     return text[:start]+text[end:]
 
+# #603 intentionally adds exactly two bounded game.js seams: canonical Battle
+# caller return dispatch for the Missing Courier assessment and rogue-feint expiry
+# at the existing enemy action-opportunity boundary. Strip only those exact
+# reviewed blocks before applying the frozen pre-#603 game.js blob pin.
+def game_without_declared_603_promotion_seams(text:str)->str:
+    return_block='''  if (returnContext.type==="field_readiness_assessment") {
+    if (returnContext.assessmentScenarioId==="academy_genin_missing_courier_dispatch_v1") {
+      const courier=globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310;
+      if (!courier||typeof courier.resumeFromCurrentBattle!=="function") return {success:false,reason:"promotion_courier_return_authority_missing"};
+      return courier.resumeFromCurrentBattle(returnContext);
+    }
+    return resumeFieldReadinessAssessmentFromBattle(returnContext);
+  }'''
+    prior_return='  if (returnContext.type==="field_readiness_assessment") return resumeFieldReadinessAssessmentFromBattle(returnContext);'
+    feint_block='''  if (globalThis.currentBattle&&currentBattle.promotionCourier60310&&globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310&&typeof globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.expireRogueFeintAtActionOpportunity==="function") {
+    globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.expireRogueFeintAtActionOpportunity();
+  }
+'''
+    if text.count(return_block)!=1 or text.count(feint_block)!=1:
+        return ''
+    return text.replace(return_block,prior_return,1).replace(feint_block,'',1)
+
 V1=[
 'genin_boruto','genin_chocho','genin_himawari','genin_hinata','genin_hoki','genin_karin','genin_menma','genin_mikoto','genin_mitsuki','genin_naruto','genin_orochimaru','genin_sarada','genin_sasuke'
 ]
@@ -38,7 +60,7 @@ checks={}
 # reader before comparing the previously audited game.js blob; every other byte
 # of the old audited core must remain unchanged.
 # #322's older compatibility root remains preserved immediately after it.
-checks['audited_game_blob_preserved']=git_blob_sha(game_without_declared_469_save_reader(game))=='f45dc5a147b9569862ad7f17e7f4254ddc916f8e'
+checks['audited_game_blob_preserved']=git_blob_sha(game_without_declared_603_promotion_seams(game_without_declared_469_save_reader(game)))=='f45dc5a147b9569862ad7f17e7f4254ddc916f8e'
 core_pos=index.find('runtime/alpha-world-konoha-112-core.js')
 fix_pos=index.find('runtime/alpha-world-konoha-112-fix.js')
 roster_pos=index.find('runtime/alpha-genin-roster-63.js')

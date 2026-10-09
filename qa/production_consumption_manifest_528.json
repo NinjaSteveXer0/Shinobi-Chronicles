@@ -28,8 +28,14 @@
       "issue_ref": "#490",
       "ready_action": "reclassify_to_ui_assets_queue",
       "activation_predicates": [
-        {"type": "issue_closed", "number": 469},
-        {"type": "pr_merged", "number": 475}
+        {
+          "type": "issue_closed",
+          "number": 469
+        },
+        {
+          "type": "pr_merged",
+          "number": 475
+        }
       ]
     },
     {
@@ -38,7 +44,11 @@
       "issue_ref": "#463",
       "ready_action": "retain_pre_alpha_queue_until_owner_promotes",
       "activation_predicates": [
-        {"type": "manual_gate", "satisfied": false, "reason": "pre_alpha_polish_owner_gate_not_promoted"}
+        {
+          "type": "manual_gate",
+          "satisfied": false,
+          "reason": "pre_alpha_polish_owner_gate_not_promoted"
+        }
       ]
     },
     {
@@ -47,7 +57,10 @@
       "issue_ref": "#519",
       "ready_action": "route_closed_design_to_downstream_owners",
       "activation_predicates": [
-        {"type": "issue_closed", "number": 519}
+        {
+          "type": "issue_closed",
+          "number": 519
+        }
       ]
     },
     {
@@ -56,7 +69,11 @@
       "issue_ref": "#526",
       "ready_action": "close_ui_contract_before_coding_handoff",
       "activation_predicates": [
-        {"type": "manual_gate", "satisfied": false, "reason": "selected_shinobi_loadout_ui_contract_not_closed"}
+        {
+          "type": "manual_gate",
+          "satisfied": false,
+          "reason": "selected_shinobi_loadout_ui_contract_not_closed"
+        }
       ]
     }
   ],
@@ -65,7 +82,10 @@
       "id": "chronicle_interaction_depth_32",
       "surface_family": "Story / Scene Board / Chronicle Interaction Depth",
       "authority_kind": "issue_and_ui_contract",
-      "authority_ref": ["#32", "#526"],
+      "authority_ref": [
+        "#32",
+        "#526"
+      ],
       "production_disposition": "IMPLEMENT_NOW",
       "lifecycle_stage": "OBSERVED",
       "consumer_paths": [
@@ -97,17 +117,26 @@
           ".github/workflows/issue-32-chronicle-depth.yml",
           "UI/convo.png"
         ],
-        "required_lane_ids": ["issue32_static", "issue32_browser"]
+        "required_lane_ids": [
+          "issue32_static",
+          "issue32_browser"
+        ]
       }
     },
     {
       "id": "inventory_core_461",
       "surface_family": "Inventory / Ownership Projection",
       "authority_kind": "issue_contract_with_durable_provenance_extension",
-      "authority_ref": ["#461", "#545", "#552"],
+      "authority_ref": [
+        "#461",
+        "#545",
+        "#552"
+      ],
       "production_disposition": "IMPLEMENT_NOW",
       "lifecycle_stage": "OBSERVED",
-      "consumer_paths": ["runtime/alpha-phase2-inventory-core-46100.js"],
+      "consumer_paths": [
+        "runtime/alpha-phase2-inventory-core-46100.js"
+      ],
       "qa_paths": [
         "tools/qa_phase2_inventory_core_461.js",
         "tools/qa_phase2_inventory_core_461_browser.js",
@@ -141,17 +170,27 @@
           ".github/workflows/issue-545-durable-object-provenance.yml",
           ".github/workflows/issue-552-retail-kunai-durable.yml"
         ],
-        "required_lane_ids": ["issue461_static", "issue461_browser", "issue545_static", "issue552_static", "issue552_browser"]
+        "required_lane_ids": [
+          "issue461_static",
+          "issue461_browser",
+          "issue545_static",
+          "issue552_static",
+          "issue552_browser"
+        ]
       }
     },
     {
       "id": "battle_pouch_discoverability_463",
       "surface_family": "Inventory / Battle Pouch Discoverability",
       "authority_kind": "pre_alpha_polish_issue",
-      "authority_ref": ["#463"],
+      "authority_ref": [
+        "#463"
+      ],
       "production_disposition": "QUEUED",
       "lifecycle_stage": "DECLARED",
-      "consumer_paths": ["runtime/alpha-phase2-inventory-core-46100.js"],
+      "consumer_paths": [
+        "runtime/alpha-phase2-inventory-core-46100.js"
+      ],
       "qa_paths": [],
       "workflow_path": null,
       "expected_evidence": null,
@@ -164,7 +203,10 @@
       "id": "first_live_ce_hotspot_469",
       "surface_family": "World / Chronicle Engine Live Hotspot",
       "authority_kind": "activation_receipt_and_issue_contract",
-      "authority_ref": ["#469", "#478"],
+      "authority_ref": [
+        "#469",
+        "#478"
+      ],
       "production_disposition": "IMPLEMENT_NOW",
       "lifecycle_stage": "OBSERVED",
       "consumer_paths": [
@@ -190,17 +232,25 @@
           "tools/qa_issue_469_ce_hotspot_browser.js",
           ".github/workflows/issue-469-first-live-ce-hotspot.yml"
         ],
-        "required_lane_ids": ["issue469_static", "issue469_browser"]
+        "required_lane_ids": [
+          "issue469_static",
+          "issue469_browser"
+        ]
       }
     },
     {
       "id": "live_hud_499",
       "surface_family": "World / Region / Village Live HUD",
       "authority_kind": "ui_contract_and_issue",
-      "authority_ref": ["#499", "#497"],
+      "authority_ref": [
+        "#499",
+        "#497"
+      ],
       "production_disposition": "IMPLEMENT_NOW",
       "lifecycle_stage": "OBSERVED",
-      "consumer_paths": ["runtime/alpha-phase2-live-hud-49900.js"],
+      "consumer_paths": [
+        "runtime/alpha-phase2-live-hud-49900.js"
+      ],
       "qa_paths": [
         "tools/qa_phase2_live_hud_499.js",
         "tools/qa_phase2_live_hud_499_browser.js"
@@ -220,17 +270,25 @@
           "tools/qa_phase2_live_hud_499_browser.js",
           ".github/workflows/issue-499-phase2-live-hud.yml"
         ],
-        "required_lane_ids": ["issue499_static", "issue499_browser"]
+        "required_lane_ids": [
+          "issue499_static",
+          "issue499_browser"
+        ]
       }
     },
     {
       "id": "basic_item_shop_517",
       "surface_family": "Economy / Basic Item Shop",
       "authority_kind": "issue_contract_with_durable_retail_extension",
-      "authority_ref": ["#517", "#552"],
+      "authority_ref": [
+        "#517",
+        "#552"
+      ],
       "production_disposition": "IMPLEMENT_NOW",
       "lifecycle_stage": "OBSERVED",
-      "consumer_paths": ["runtime/alpha-phase2-basic-item-shop-51700.js"],
+      "consumer_paths": [
+        "runtime/alpha-phase2-basic-item-shop-51700.js"
+      ],
       "qa_paths": [
         "tools/qa_phase2_basic_item_shop_517.js",
         "tools/qa_phase2_basic_item_shop_517_browser.js",
@@ -258,14 +316,21 @@
           ".github/workflows/issue-517-phase2-basic-item-shop.yml",
           ".github/workflows/issue-552-retail-kunai-durable.yml"
         ],
-        "required_lane_ids": ["issue517_static", "issue517_browser", "issue552_static", "issue552_browser"]
+        "required_lane_ids": [
+          "issue517_static",
+          "issue517_browser",
+          "issue552_static",
+          "issue552_browser"
+        ]
       }
     },
     {
       "id": "stats_skills_exams_combat_519",
       "surface_family": "Progression / Exams / Combat Domain Governance",
       "authority_kind": "active_design_reconciliation",
-      "authority_ref": ["#519"],
+      "authority_ref": [
+        "#519"
+      ],
       "production_disposition": "QUEUED",
       "lifecycle_stage": "DECLARED",
       "consumer_paths": [],
@@ -281,10 +346,15 @@
       "id": "character_card_shop_524",
       "surface_family": "Acquisition / Character Card Shop",
       "authority_kind": "acquisition_contract_and_issue",
-      "authority_ref": ["#524", "#520"],
+      "authority_ref": [
+        "#524",
+        "#520"
+      ],
       "production_disposition": "IMPLEMENT_NOW",
       "lifecycle_stage": "OBSERVED",
-      "consumer_paths": ["runtime/alpha-phase2-character-card-shop-52400.js"],
+      "consumer_paths": [
+        "runtime/alpha-phase2-character-card-shop-52400.js"
+      ],
       "qa_paths": [
         "tools/qa_phase2_character_card_shop_524.js",
         "tools/qa_phase2_character_card_shop_524_browser.js"
@@ -303,14 +373,20 @@
           "tools/qa_phase2_character_card_shop_524_browser.js",
           ".github/workflows/issue-524-phase2-character-card-shop.yml"
         ],
-        "required_lane_ids": ["issue524_static", "issue524_browser"]
+        "required_lane_ids": [
+          "issue524_static",
+          "issue524_browser"
+        ]
       }
     },
     {
       "id": "deliberate_team_assignment_532",
       "surface_family": "My Clan / Current Team Assignment",
       "authority_kind": "chronicle_team_separation_contract_and_issue",
-      "authority_ref": ["#532", "#522"],
+      "authority_ref": [
+        "#532",
+        "#522"
+      ],
       "production_disposition": "IMPLEMENT_NOW",
       "lifecycle_stage": "OBSERVED",
       "consumer_paths": [
@@ -336,14 +412,22 @@
           "tools/qa_phase2_team_assignment_532_browser.js",
           ".github/workflows/issue-532-phase2-team-assignment.yml"
         ],
-        "required_lane_ids": ["issue532_static", "issue532_browser"]
+        "required_lane_ids": [
+          "issue532_static",
+          "issue532_browser"
+        ]
       }
     },
     {
       "id": "konoha_activity_surfaces_431",
       "surface_family": "Konoha / Practical + Exams",
       "authority_kind": "phase2_player_surface_contract",
-      "authority_ref": ["#431", "#436", "#526", "#541"],
+      "authority_ref": [
+        "#431",
+        "#436",
+        "#526",
+        "#541"
+      ],
       "production_disposition": "IMPLEMENT_NOW",
       "lifecycle_stage": "OBSERVED",
       "consumer_paths": [
@@ -376,14 +460,21 @@
           "UI/practical.png",
           "UI/exams.png"
         ],
-        "required_lane_ids": ["issue431_browser", "ui_master_browser"]
+        "required_lane_ids": [
+          "issue431_browser",
+          "ui_master_browser"
+        ]
       }
     },
     {
       "id": "victory_setback_results_141",
       "surface_family": "Battle / Victory + Setback Results",
       "authority_kind": "runtime_closure_and_ui_contract",
-      "authority_ref": ["#141", "#526", "#544"],
+      "authority_ref": [
+        "#141",
+        "#526",
+        "#544"
+      ],
       "production_disposition": "IMPLEMENT_NOW",
       "lifecycle_stage": "OBSERVED",
       "consumer_paths": [
@@ -414,14 +505,20 @@
           "UI/setback.png",
           "tools/qa_ui_master_consumption_528_browser.js"
         ],
-        "required_lane_ids": ["ui_master_browser"]
+        "required_lane_ids": [
+          "ui_master_browser"
+        ]
       }
     },
     {
       "id": "ui_active_masters_526",
       "surface_family": "UI / Active Production Masters + My Clan Reference Composition",
       "authority_kind": "ui_master_classification_registry_with_owner_correction",
-      "authority_ref": ["#526", "#529", "#541"],
+      "authority_ref": [
+        "#526",
+        "#529",
+        "#541"
+      ],
       "production_disposition": "IMPLEMENT_NOW",
       "lifecycle_stage": "OBSERVED",
       "presentation_assets": [
@@ -440,7 +537,9 @@
         "UI/exams.png",
         "UI/practical.png"
       ],
-      "qa_paths": ["tools/qa_ui_master_consumption_528_browser.js"],
+      "qa_paths": [
+        "tools/qa_ui_master_consumption_528_browser.js"
+      ],
       "workflow_path": ".github/workflows/issue-528-production-conformance.yml",
       "expected_evidence": {
         "path": "tools/qa_ui_master_consumption_528_browser.js",
@@ -473,28 +572,44 @@
           "UI/practical.png",
           "tools/qa_ui_master_consumption_528_browser.js"
         ],
-        "required_lane_ids": ["ui_master_browser"]
+        "required_lane_ids": [
+          "ui_master_browser"
+        ]
       }
     },
     {
       "id": "promotion_transition_141_63",
       "surface_family": "Progression / Promotion Transition Continuity",
       "authority_kind": "runtime_closure_and_roster_transition_contract",
-      "authority_ref": ["#141", "#63", "#522"],
+      "authority_ref": [
+        "#141",
+        "#63",
+        "#522",
+        "#603",
+        "#608",
+        "#609"
+      ],
       "production_disposition": "IMPLEMENT_NOW",
       "lifecycle_stage": "EFFECTIVE",
       "consumer_paths": [
         "runtime/alpha-genin-roster-63.js",
-        "runtime/alpha-traversal-bridge-33200.js"
+        "runtime/alpha-traversal-bridge-33200.js",
+        "runtime/alpha-promotion-core-60300.js",
+        "runtime/alpha-promotion-courier-assessment-60310.js",
+        "runtime/alpha-promotion-arena-ui-60320.js",
+        "runtime/alpha-promotion-installed-integration-60330.js"
       ],
       "qa_paths": [
         "tools/qa_issue_141_traversal_runtime.js",
-        "tools/qa_issue_63_genin_v2_runtime.js"
+        "tools/qa_issue_63_genin_v2_runtime.js",
+        "tools/qa_issue_603_step7_promotion.js",
+        "tools/qa_issue_603_step7_promotion_browser.js",
+        "tools/qa_issue_603_installed_integration.js"
       ],
       "workflow_path": ".github/workflows/issue-141-pre-alpha-runtime-closure.yml",
       "expected_evidence": {
-        "path": "runtime/alpha-genin-roster-63.js",
-        "contains": "saveGeninRosterTransitionReservations"
+        "path": "runtime/alpha-promotion-installed-integration-60330.js",
+        "contains": "SC_PROMOTION_INSTALLED_60330"
       },
       "known_debt": [
         "A bounded installed-browser Promotion transition canary remains required before lifecycle may advance to OBSERVED."
@@ -506,16 +621,37 @@
           "runtime/alpha-genin-roster-63.js",
           "runtime/alpha-traversal-bridge-33200.js",
           "tools/qa_issue_141_traversal_runtime.js",
-          "tools/qa_issue_63_genin_v2_runtime.js"
+          "tools/qa_issue_63_genin_v2_runtime.js",
+          ".github/workflows/issue-603-step7-promotion.yml",
+          "runtime/alpha-promotion-core-60300.js",
+          "runtime/alpha-promotion-courier-assessment-60310.js",
+          "runtime/alpha-promotion-arena-ui-60320.js",
+          "runtime/alpha-promotion-installed-integration-60330.js",
+          "tools/qa_issue_603_step7_promotion.js",
+          "tools/qa_issue_603_step7_promotion_browser.js",
+          "tools/qa_issue_603_installed_integration.js"
         ],
-        "required_lane_ids": ["promotion_static", "save_compatibility"]
-      }
+        "required_lane_ids": [
+          "promotion_static",
+          "save_compatibility"
+        ]
+      },
+      "observable_acceptance": [
+        "Academy→Genin inspection remains non-committing while deliberate assessment commit persists one opaque attempt lineage and a stable package across retry/save-load",
+        "Missing Courier mission and optional Hold-Line Battle return only factual evidence/reward causes; Battle victory and mission completion do not manufacture Promotion",
+        "only a valid PASS invokes the existing authorised Genin Origin transition, idempotently, without mutating unrelated ownership/assignment/deployment truth",
+        "1366×768 and 1920×1080 installed-browser Promotion proof remains a required non-Golden acceptance class"
+      ]
     },
     {
       "id": "frozen_origin_shared_runtime",
       "surface_family": "Frozen Academy Origins / Shared Runtime Dependencies",
       "authority_kind": "phase1_golden_shared_runtime_watch",
-      "authority_ref": ["#105", "#141", "#312"],
+      "authority_ref": [
+        "#105",
+        "#141",
+        "#312"
+      ],
       "production_disposition": "IMPLEMENT_NOW",
       "lifecycle_stage": "OBSERVED",
       "consumer_paths": [
@@ -547,7 +683,10 @@
           "tools/qa_issue_312_story_battle_benchmark.js",
           "tools/qa_save_compatibility_311.js"
         ],
-        "required_lane_ids": ["issue32_static", "save_compatibility"]
+        "required_lane_ids": [
+          "issue32_static",
+          "save_compatibility"
+        ]
       }
     }
   ]
