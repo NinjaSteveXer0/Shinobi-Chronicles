@@ -16,8 +16,8 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-09-EM",
-    sourceBaselineCommit:"8828a187003ffa0f84c86fbbe10eb1a0a0fe4c28",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-09-EN",
+    sourceBaselineCommit:"6e6acfdcc96822a876a3cd5dde8d836f9587fb05",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
     runtimeGeneration:"canonical-battle-terminal-result-owner-consolidated-544",
     majorRuntimeFeatures:Object.freeze([
@@ -109,6 +109,7 @@
       "phase2-unobstructed-village-region-map-canvases-557",
       "phase2-region-village-hud-stability-621",
       "academy-origin-base-stat-recalibration-582-597",
+      "phase2-konoha-activity-contamination-539",
       "canonical-battle-terminal-result-owner-consolidated-544"
     ]),
     productionLoader:"index.html",
@@ -140,7 +141,7 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-09-EM",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-09-EN",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
       generationPresent:first.runtimeGeneration==="canonical-battle-terminal-result-owner-consolidated-544",
@@ -182,6 +183,7 @@
       unobstructedMapCanvas557Present:first.majorRuntimeFeatures.includes("phase2-unobstructed-village-region-map-canvases-557"),
       regionVillageHudStability621Present:first.majorRuntimeFeatures.includes("phase2-region-village-hud-stability-621"),
       academyOriginRegistry597Present:first.majorRuntimeFeatures.includes("academy-origin-base-stat-recalibration-582-597"),
+      konohaActivityContamination539Present:first.majorRuntimeFeatures.includes("phase2-konoha-activity-contamination-539"),
       canonicalBattleTerminalResult544Present:first.majorRuntimeFeatures.includes("canonical-battle-terminal-result-owner-consolidated-544"),
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
