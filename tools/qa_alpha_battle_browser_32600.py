@@ -1,6 +1,6 @@
 from pathlib import Path
 import sys
-# #544 exact-head owner-authored fan-out marker; no runtime semantics.
+# #544 clean exact-head owner-authored fan-out marker; no runtime semantics.
 root=Path(__file__).resolve().parents[1]
 js=(root/'runtime'/'alpha-battle-browser-32600.js').read_text(encoding='utf-8')
 index=(root/'index.html').read_text(encoding='utf-8')
