@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "buildId": "SC-ALPHA-RUNTIME-R303-2026-10-08-EL",
-  "sourceBaselineCommit": "3f9c1268120bb937d82398e1a954b6567bd6b4d3",
+  "buildId": "SC-ALPHA-RUNTIME-R303-2026-10-09-EM",
+  "sourceBaselineCommit": "8828a187003ffa0f84c86fbbe10eb1a0a0fe4c28",
   "sourceRef": "issue-303-runtime-build-fingerprint-v1",
   "runtimeGeneration": "canonical-battle-terminal-result-owner-consolidated-544",
   "majorRuntimeFeatures": [
@@ -91,6 +91,7 @@
     "durable-object-provenance-148-545",
     "durable-retail-kunai-148-552",
     "phase2-unobstructed-village-region-map-canvases-557",
+    "phase2-region-village-hud-stability-621",
     "academy-origin-base-stat-recalibration-582-597",
     "canonical-battle-terminal-result-owner-consolidated-544"
   ],

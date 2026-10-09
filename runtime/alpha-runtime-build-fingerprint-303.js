@@ -16,8 +16,8 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-08-EL",
-    sourceBaselineCommit:"3f9c1268120bb937d82398e1a954b6567bd6b4d3",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-09-EM",
+    sourceBaselineCommit:"8828a187003ffa0f84c86fbbe10eb1a0a0fe4c28",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
     runtimeGeneration:"canonical-battle-terminal-result-owner-consolidated-544",
     majorRuntimeFeatures:Object.freeze([
@@ -107,6 +107,7 @@
       "durable-object-provenance-148-545",
       "durable-retail-kunai-148-552",
       "phase2-unobstructed-village-region-map-canvases-557",
+      "phase2-region-village-hud-stability-621",
       "academy-origin-base-stat-recalibration-582-597",
       "canonical-battle-terminal-result-owner-consolidated-544"
     ]),
@@ -139,7 +140,7 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-08-EL",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-09-EM",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
       generationPresent:first.runtimeGeneration==="canonical-battle-terminal-result-owner-consolidated-544",
@@ -179,6 +180,7 @@
       durableObjectProvenance148545Present:first.majorRuntimeFeatures.includes("durable-object-provenance-148-545"),
       durableRetailKunai148552Present:first.majorRuntimeFeatures.includes("durable-retail-kunai-148-552"),
       unobstructedMapCanvas557Present:first.majorRuntimeFeatures.includes("phase2-unobstructed-village-region-map-canvases-557"),
+      regionVillageHudStability621Present:first.majorRuntimeFeatures.includes("phase2-region-village-hud-stability-621"),
       academyOriginRegistry597Present:first.majorRuntimeFeatures.includes("academy-origin-base-stat-recalibration-582-597"),
       canonicalBattleTerminalResult544Present:first.majorRuntimeFeatures.includes("canonical-battle-terminal-result-owner-consolidated-544"),
       noPlayerFacingSurface:first.playerFacing===false,
