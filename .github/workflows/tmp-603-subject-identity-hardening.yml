@@ -1,0 +1,122 @@
+name: TEMP-603-subject-identity-hardening
+
+on:
+  push:
+    branches:
+      - coding/603-step7-promotion-integration
+    paths:
+      - .github/workflows/tmp-603-subject-identity-hardening.yml
+
+permissions:
+  contents: write
+
+jobs:
+  harden:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/603-step7-promotion-integration
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Separate stable Promotion subject from Battle participant identity
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{label}: expected exactly one match, found {count}")
+              return text.replace(old, new, 1)
+
+          runtime_path = Path('runtime/alpha-promotion-courier-assessment-60310.js')
+          text = runtime_path.read_text()
+
+          old = '''function createOccurrence(spec={}){
+            const id=t(spec.assessmentAttemptId||spec.attemptId),subject=t(spec.assessmentSubjectStableId||spec.assessmentSubjectOwnedCharacterId);
+            if(!id||!subject)return{success:false,reason:"promotion_courier_attempt_identity_incomplete"};
+            const s=store();if(!s)return{success:false,reason:"player_state_unavailable"};
+            const prior=s.attemptsById[id];if(prior)return prior.assessmentSubjectStableId===subject?{success:true,idempotent:true,occurrence:c(prior)}:{success:false,reason:"promotion_courier_attempt_identity_conflict"};
+            const refs=uniq([subject,...(spec.attemptParticipantRefs||spec.participantRefs||[])]),participantStateByRef={};
+            refs.forEach(ref=>{const x=spec.participantStateByRef&&spec.participantStateByRef[ref]||{};participantStateByRef[ref]={participantRef:ref,controlClass:t(x.controlClass)||"player",positionRef:t(x.positionRef)||"KON-P01",present:x.present!==false,observedActionRefs:[]};});
+            const o={schemaVersion:1,assessmentFamilyId:FAMILY,assessmentScenarioId:SCENARIO,assessmentAttemptId:id,assessmentSubjectStableId:subject,missionInstanceId:`mission_${SCENARIO}::${id}`,occurrenceId:occurrenceId(id),rewardSnapshotId:`reward_snapshot_${SCENARIO}::${id}`,attemptParticipantRefs:refs,participantStateByRef,phase:PHASE.ATTEMPT,currentHost:"KON-P01",routeLeg:"outbound",routeIndex:0,status:"active",courier:{participantRef:COURIER,state:"agen_m01_courier_overdue_unlocated_v1",located:false,pendingRecoveryOutcome:null},dispatch:{objectRef:DISPATCH,custodyState:"agen_m01_dispatch_courier_custody_v1",custodyActorRef:COURIER,integrityState:"agen_m01_dispatch_sealed_intact_v1"},hostile:{childOccurrenceId:`occ_academy_genin_missing_courier_hostile_pressure_v1::${id}`,historicalParticipantRef:ROGUE,pressureState:"agen_m01_hostile_searching_outer_area_v1",directContactParticipantRefs:[]},battle:{battleOccurrenceId:null,active:false,returnContext:null,returnEnvelope:null},factsById:{},factOrder:[],candidateEvidenceRefs:[],rewardTransactionsByKey:{},terminalWorldState:null,missionObjectiveCompleted:null,createdAt:Date.now(),updatedAt:Date.now()};
+            s.attemptsById[id]=o;receipt(o,"agen_m01_attempt_committed_v1",{eventType:"assessment_attempt_committed",participantRefs:refs,candidateEvidence:true});save();return{success:true,idempotent:false,occurrence:c(o)};
+          }'''
+          new = '''function createOccurrence(spec={}){
+            const id=t(spec.assessmentAttemptId||spec.attemptId),subject=t(spec.assessmentSubjectStableId||spec.assessmentSubjectOwnedCharacterId),subjectBattleRef=t(spec.assessmentSubjectBattleParticipantRef||spec.assessmentSubjectRuntimeId||spec.subjectBattleParticipantRef);
+            if(!id||!subject||!subjectBattleRef)return{success:false,reason:"promotion_courier_attempt_identity_incomplete"};
+            const s=store();if(!s)return{success:false,reason:"player_state_unavailable"};
+            const prior=s.attemptsById[id];if(prior)return prior.assessmentSubjectStableId===subject&&prior.assessmentSubjectBattleParticipantRef===subjectBattleRef?{success:true,idempotent:true,occurrence:c(prior)}:{success:false,reason:"promotion_courier_attempt_identity_conflict"};
+            const refs=uniq(spec.attemptParticipantRefs||spec.participantRefs||[]),participantStateByRef={};
+            if(!refs.includes(subjectBattleRef))return{success:false,reason:"promotion_courier_subject_participant_snapshot_missing"};
+            refs.forEach(ref=>{const x=spec.participantStateByRef&&spec.participantStateByRef[ref]||{};participantStateByRef[ref]={participantRef:ref,controlClass:t(x.controlClass)||"player",positionRef:t(x.positionRef)||"KON-P01",present:x.present!==false,observedActionRefs:[]};});
+            const o={schemaVersion:1,assessmentFamilyId:FAMILY,assessmentScenarioId:SCENARIO,assessmentAttemptId:id,assessmentSubjectStableId:subject,assessmentSubjectBattleParticipantRef:subjectBattleRef,missionInstanceId:`mission_${SCENARIO}::${id}`,occurrenceId:occurrenceId(id),rewardSnapshotId:`reward_snapshot_${SCENARIO}::${id}`,attemptParticipantRefs:refs,participantStateByRef,phase:PHASE.ATTEMPT,currentHost:"KON-P01",routeLeg:"outbound",routeIndex:0,status:"active",courier:{participantRef:COURIER,state:"agen_m01_courier_overdue_unlocated_v1",located:false,pendingRecoveryOutcome:null},dispatch:{objectRef:DISPATCH,custodyState:"agen_m01_dispatch_courier_custody_v1",custodyActorRef:COURIER,integrityState:"agen_m01_dispatch_sealed_intact_v1"},hostile:{childOccurrenceId:`occ_academy_genin_missing_courier_hostile_pressure_v1::${id}`,historicalParticipantRef:ROGUE,pressureState:"agen_m01_hostile_searching_outer_area_v1",directContactParticipantRefs:[]},battle:{battleOccurrenceId:null,active:false,returnContext:null,returnEnvelope:null},factsById:{},factOrder:[],candidateEvidenceRefs:[],rewardTransactionsByKey:{},terminalWorldState:null,missionObjectiveCompleted:null,createdAt:Date.now(),updatedAt:Date.now()};
+            s.attemptsById[id]=o;receipt(o,"agen_m01_attempt_committed_v1",{eventType:"assessment_attempt_committed",assessmentSubjectStableId:subject,assessmentSubjectBattleParticipantRef:subjectBattleRef,participantRefs:refs,candidateEvidence:true});save();return{success:true,idempotent:false,occurrence:c(o)};
+          }'''
+          text = replace_once(text, old, new, 'createOccurrence identity split')
+
+          replacements = [
+            ('const actor=t(custodyActorRef)||o.assessmentSubjectStableId', 'const actor=t(custodyActorRef)||o.assessmentSubjectBattleParticipantRef', 'dispatch custody defaults to participant ref'),
+            ('o.participantStateByRef[o.assessmentSubjectStableId].positionRef', 'o.participantStateByRef[o.assessmentSubjectBattleParticipantRef].positionRef', 'cover position participant ref'),
+            ('refs.includes(o.assessmentSubjectStableId)', 'refs.includes(o.assessmentSubjectBattleParticipantRef)', 'direct-contact subject participant ref'),
+            ('direct.includes(o.assessmentSubjectStableId)', 'direct.includes(o.assessmentSubjectBattleParticipantRef)', 'hold-line subject participant ref'),
+            ('const refs=[o.assessmentSubjectStableId,...direct.filter(x=>x!==o.assessmentSubjectStableId)]', 'const refs=[o.assessmentSubjectBattleParticipantRef,...direct.filter(x=>x!==o.assessmentSubjectBattleParticipantRef)]', 'battle participant list'),
+            ('assessmentSubjectStableId:o.assessmentSubjectStableId,sourceOccurrenceId:o.occurrenceId', 'assessmentSubjectStableId:o.assessmentSubjectStableId,assessmentSubjectBattleParticipantRef:o.assessmentSubjectBattleParticipantRef,sourceOccurrenceId:o.occurrenceId', 'return context subject identities'),
+            ('b.characterId=o.assessmentSubjectStableId', 'b.characterId=o.assessmentSubjectBattleParticipantRef', 'battle active character runtime ref'),
+            ('b.promotionCourier60310={assessmentAttemptId:id,assessmentSubjectStableId:o.assessmentSubjectStableId,sourceOccurrenceId:o.occurrenceId', 'b.promotionCourier60310={assessmentAttemptId:id,assessmentSubjectStableId:o.assessmentSubjectStableId,assessmentSubjectBattleParticipantRef:o.assessmentSubjectBattleParticipantRef,sourceOccurrenceId:o.occurrenceId', 'battle metadata subject identities'),
+            ('subject=evidence[m.assessmentSubjectStableId]||participantEvidence(b,m.assessmentSubjectStableId)', 'subject=evidence[m.assessmentSubjectBattleParticipantRef]||participantEvidence(b,m.assessmentSubjectBattleParticipantRef)', 'subject evidence runtime ref'),
+            ('assessmentSubjectStableId:m.assessmentSubjectStableId,historicalHostileParticipantRef', 'assessmentSubjectStableId:m.assessmentSubjectStableId,assessmentSubjectBattleParticipantRef:m.assessmentSubjectBattleParticipantRef,historicalHostileParticipantRef', 'battle return subject identities'),
+            ('subjectWasBattleParticipant:m.participantRefs.includes(m.assessmentSubjectStableId)', 'subjectWasBattleParticipant:m.participantRefs.includes(m.assessmentSubjectBattleParticipantRef)', 'subject participant presence'),
+            ('terminal[m.assessmentSubjectStableId]?.battlePLDepleted', 'terminal[m.assessmentSubjectBattleParticipantRef]?.battlePLDepleted', 'subject terminal depletion'),
+            ('terminal[m.assessmentSubjectStableId]?.remainingBattlePL', 'terminal[m.assessmentSubjectBattleParticipantRef]?.remainingBattlePL', 'subject terminal remaining PL'),
+            ('e.assessmentSubjectStableId!==o.assessmentSubjectStableId||e.historicalHostileParticipantRef!==ROGUE', 'e.assessmentSubjectStableId!==o.assessmentSubjectStableId||e.assessmentSubjectBattleParticipantRef!==o.assessmentSubjectBattleParticipantRef||e.historicalHostileParticipantRef!==ROGUE', 'battle return identity verification')
+          ]
+          for old_s, new_s, label in replacements:
+              text = replace_once(text, old_s, new_s, label)
+
+          old_resume = 'function resumeFromCurrentBattle(ctx){if(!ctx||ctx.assessmentScenarioId!==SCENARIO)return{handled:false};const e=projectLiveBattleReturn();if(!e)return{handled:true,success:false,reason:"promotion_courier_live_battle_return_unavailable"};const result=applyBattleReturn(ctx.assessmentAttemptId,e);if(result.success&&globalThis.currentBattle)globalThis.currentBattle.returnContext=null;return{handled:true,...result,type:"field_readiness_assessment_resumed"};}'
+          new_resume = 'function resumeFromCurrentBattle(ctx){if(!ctx||ctx.assessmentScenarioId!==SCENARIO)return{handled:false};const e=projectLiveBattleReturn();if(!e)return{handled:true,success:false,reason:"promotion_courier_live_battle_return_unavailable"};if(ctx.assessmentAttemptId!==e.assessmentAttemptId||ctx.battleOccurrenceId!==e.battleOccurrenceId||ctx.assessmentSubjectStableId!==e.assessmentSubjectStableId||ctx.assessmentSubjectBattleParticipantRef!==e.assessmentSubjectBattleParticipantRef)return{handled:true,success:false,reason:"promotion_courier_resume_context_identity_mismatch"};const result=applyBattleReturn(ctx.assessmentAttemptId,e);if(result.success&&globalThis.currentBattle)globalThis.currentBattle.returnContext=null;return{handled:true,...result,type:"field_readiness_assessment_resumed"};}'
+          text = replace_once(text, old_resume, new_resume, 'resume context identity verification')
+          runtime_path.write_text(text)
+
+          qa_path = Path('tools/qa_issue_607_courier_adapter.js')
+          qa = qa_path.read_text()
+          old_call = '  ok(api.createOccurrence({assessmentAttemptId:id,assessmentSubjectStableId:participants[0],attemptParticipantRefs:participants}),`${id} create`);'
+          new_call = '  const subjectBattleParticipantRef=participants[0],subjectStableId=`owned_character_${subjectBattleParticipantRef}`;\n  ok(api.createOccurrence({assessmentAttemptId:id,assessmentSubjectStableId:subjectStableId,assessmentSubjectBattleParticipantRef:subjectBattleParticipantRef,attemptParticipantRefs:participants}),`${id} create`);\n  const created=occurrence(id);assert.strictEqual(created.assessmentSubjectStableId,subjectStableId);assert.strictEqual(created.assessmentSubjectBattleParticipantRef,subjectBattleParticipantRef);assert(!created.attemptParticipantRefs.includes(subjectStableId));'
+          qa = replace_once(qa, old_call, new_call, 'QA stable/runtime identity setup')
+
+          old_launch_assert = 'assert.deepStrictEqual(launch.participantRefs,["academy_kakashi","academy_hinata"]);'
+          new_launch_assert = 'assert.deepStrictEqual(launch.participantRefs,["academy_kakashi","academy_hinata"]);assert.strictEqual(launch.returnContext.assessmentSubjectStableId,"owned_character_academy_kakashi");assert.strictEqual(launch.returnContext.assessmentSubjectBattleParticipantRef,"academy_kakashi");assert.strictEqual(global.currentBattle.characterId,"academy_kakashi");'
+          qa = replace_once(qa, old_launch_assert, new_launch_assert, 'QA launch identity split')
+
+          old_resume_qa = 'const applied=ok(global.resumeFieldReadinessAssessmentFromBattle(ctx),"battle caller resume");'
+          new_resume_qa = 'assert.strictEqual(global.__legacyResumeCalls,0);const applied=ok(api.resumeFromCurrentBattle(ctx),"battle caller resume");assert.strictEqual(global.__legacyResumeCalls,0);'
+          qa = replace_once(qa, old_resume_qa, new_resume_qa, 'QA named Courier resume')
+
+          old_envelope = 'const envelope=api.projectLiveBattleReturn();assert.strictEqual(envelope.rogueBattlePLDepleted,true);assert.strictEqual(envelope.subjectCombatEvidenceSummary.subjectWasBattleParticipant,true);'
+          new_envelope = 'const envelope=api.projectLiveBattleReturn();assert.strictEqual(envelope.rogueBattlePLDepleted,true);assert.strictEqual(envelope.assessmentSubjectStableId,"owned_character_academy_kakashi");assert.strictEqual(envelope.assessmentSubjectBattleParticipantRef,"academy_kakashi");assert.strictEqual(envelope.subjectCombatEvidenceSummary.subjectWasBattleParticipant,true);'
+          qa = replace_once(qa, old_envelope, new_envelope, 'QA return identity split')
+
+          qa_path.write_text(qa)
+          PY
+      - name: Focused #603 Courier validation
+        run: |
+          node --check runtime/alpha-promotion-courier-assessment-60310.js
+          node --check tools/qa_issue_607_courier_adapter.js
+          node tools/qa_issue_607_courier_adapter.js
+          ! grep -q 'globalThis.chooseEnemyAuthoredBattleAction=' runtime/alpha-promotion-courier-assessment-60310.js
+          ! grep -q 'globalThis.resumeFieldReadinessAssessmentFromBattle=' runtime/alpha-promotion-courier-assessment-60310.js
+          grep -q 'assessmentSubjectBattleParticipantRef' runtime/alpha-promotion-courier-assessment-60310.js
+      - name: Commit bounded correction and remove temporary workflow
+        shell: bash
+        run: |
+          rm .github/workflows/tmp-603-subject-identity-hardening.yml
+          git config user.name 'ChatGPT Codex Connector'
+          git config user.email '14957082+openai@users.noreply.github.com'
+          git add runtime/alpha-promotion-courier-assessment-60310.js tools/qa_issue_607_courier_adapter.js .github/workflows/tmp-603-subject-identity-hardening.yml
+          git commit -m '[CODING][#603] Separate stable subject from Battle participant'
+          git push origin HEAD:coding/603-step7-promotion-integration
