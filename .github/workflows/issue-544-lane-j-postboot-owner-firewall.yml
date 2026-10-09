@@ -90,12 +90,15 @@ jobs:
               const page=await browser.newPage({viewport:{width:1440,height:900}});
               await page.addInitScript(()=>{try{localStorage.clear();sessionStorage.clear();}catch(_e){}});
               await page.goto('http://127.0.0.1:8080/index.html',{waitUntil:'domcontentloaded',timeout:60000});
-              await page.waitForFunction(()=>typeof globalThis.presentCommittedBattleTerminalResult54400==='function'&&typeof globalThis.continueAfterVictory54400==='function'&&typeof globalThis.continueAfterSetback54400==='function',null,{timeout:30000});
-              await page.waitForTimeout(250);
+              await page.waitForLoadState('load',{timeout:30000}).catch(()=>{});
+              await page.waitForFunction(()=>globalThis.__battleTerminalResultPresentation54400Installed===true&&typeof globalThis.presentCommittedBattleTerminalResult54400==='function'&&typeof globalThis.presentCommittedBattleTerminalResult==='function'&&typeof globalThis.continueAfterVictory==='function'&&typeof globalThis.continueAfterSetback54400==='function'&&typeof globalThis.continueAfterBattleSetback==='function',null,{timeout:30000});
+              await page.waitForTimeout(750);
               const proof=await page.evaluate(()=>({
                 installed:globalThis.__battleTerminalResultPresentation54400Installed===true,
-                continueVictory544:globalThis.continueAfterVictory===globalThis.continueAfterVictory54400,
+                presenter544:globalThis.presentCommittedBattleTerminalResult===globalThis.presentCommittedBattleTerminalResult54400,
+                continueVictoryName:typeof globalThis.continueAfterVictory==='function'?globalThis.continueAfterVictory.name:null,
                 continueSetback544:globalThis.continueAfterBattleSetback===globalThis.continueAfterSetback54400,
+                continueSetbackName:typeof globalThis.continueAfterBattleSetback==='function'?globalThis.continueAfterBattleSetback.name:null,
                 openOverlayName:typeof globalThis.openOverlay==='function'?globalThis.openOverlay.name:null,
                 completeVictoryName:typeof globalThis.completeBattleVictoryFromDamage==='function'?globalThis.completeBattleVictoryFromDamage.name:null,
                 completeDefeatName:typeof globalThis.completeBattleDefeat==='function'?globalThis.completeBattleDefeat.name:null,
@@ -105,8 +108,10 @@ jobs:
                 resultOwnerSurfaceCount:document.querySelectorAll('[data-terminal-result-owner="54400"]').length
               }));
               assert.strictEqual(proof.installed,true,'#544 install marker missing after full boot');
-              assert.strictEqual(proof.continueVictory544,true,'Victory continuation effective owner is not #544');
+              assert.strictEqual(proof.presenter544,true,'terminal presenter effective binding is not #544');
+              assert.strictEqual(proof.continueVictoryName,'continueAfterVictory54400','Victory continuation effective owner is not #544');
               assert.strictEqual(proof.continueSetback544,true,'Setback continuation effective owner is not #544');
+              assert.strictEqual(proof.continueSetbackName,'continueAfterSetback54400','Setback continuation binding name is not #544');
               assert.strictEqual(proof.openOverlayName,'wrappedOpenOverlay54400','openOverlay effective wrapper is not #544');
               assert.strictEqual(proof.completeVictoryName,'wrappedCompleteVictory54400','Victory terminal completion wrapper is not #544');
               assert.strictEqual(proof.completeDefeatName,'wrappedCompleteDefeat54400','Defeat terminal completion wrapper is not #544');
