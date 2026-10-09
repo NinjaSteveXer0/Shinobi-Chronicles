@@ -228,8 +228,14 @@ async function rewardState(page){
     assert.strictEqual(await page.evaluate(()=>claimCurrentBattleRewards()),false);
     assert.strictEqual((await rewardState(page)).ryo,beforeReclaim,"refresh/reclaim duplicated reward");
 
-    // CLAIM is complete before Story return; CONTINUE resumes exact Menma Story.
+    // CLAIM is complete before Story return; present Victory, then explicit CONTINUE resumes exact Menma Story.
+    await page.evaluate(()=>{
+      try{globalThis.hardSettleBattlePresentationQueue33000?.("issue_362_terminal_result");}catch(_error){}
+      return globalThis.presentCommittedBattleTerminalResult54400?.("victory",{source:"issue_362_reward_reload"});
+    });
+    await page.waitForSelector(".alpha-victory-code-screen,.victory-screen",{state:"visible",timeout:12000});
     const returned=await page.evaluate(()=>continueAfterVictory());
+    assert.strictEqual(returned?.success,true,"Menma explicit Victory Continue failed "+JSON.stringify(returned));
     await page.waitForFunction(scene=>getActiveStorySceneRuntime()?.sceneId===scene&&getActiveStorySceneRuntime()?.beatId==="menma_after_01",SCENE,{timeout:10000});
     state=await rewardState(page);
     assert.strictEqual(state.activeStory.sceneId,SCENE);

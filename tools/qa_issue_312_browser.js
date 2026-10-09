@@ -888,13 +888,15 @@ async function shot(page,name,selector=null){
       return stage?.dataset.formationTray==="skills"&&!!deck&&getComputedStyle(deck).display!=="none";
     },null,{timeout:3000});
 
-    const psVictoryOverlay=await page.evaluate(()=>{
+    const psVictoryOverlay=await page.evaluate(async()=>{
       const dep=currentBattle.kakashiV2;
       const prior={
         battleConfigId:dep.battleConfigId,
         battleOccurrenceId:dep.battleOccurrenceId,
         storyOccurrenceId:dep.storyOccurrenceId,
         encounterId:currentBattle.encounterId,
+        active:currentBattle.active,
+        battleOver:currentBattle.battleOver,
         outcome:currentBattle.outcome?cloneBattleRuntimeValue(currentBattle.outcome):null,
         rewards:currentBattle.rewards?cloneBattleRuntimeValue(currentBattle.rewards):null
       };
@@ -902,17 +904,22 @@ async function shot(page,name,selector=null){
       dep.battleOccurrenceId="issue312_ps_reward_overlay";
       dep.storyOccurrenceId="issue312_ps_reward_story";
       currentBattle.encounterId="academy_kakashi_origin_battle_seq_ps";
+      currentBattle.active=false;currentBattle.battleOver=true;
       currentBattle.outcome={type:"victory",completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};
       currentBattle.rewards={generated:true,claimed:false,ryo:0,exp:0,items:[],rareDrops:[]};
-      openOverlay("victory");
+      try{delete currentBattle.__battleTerminalResultPresentation54400;}catch(_error){}
+      presentCommittedBattleTerminalResult54400("victory",{source:"issue312_ps_reward_overlay"});
+      await new Promise(resolve=>setTimeout(resolve,80));
       const text=String(document.getElementById("screen-overlay")?.textContent||"").replace(/\s+/g," ").trim();
       const reward=cloneBattleRuntimeValue(currentBattle.rewards);
       dep.battleConfigId=prior.battleConfigId;
       dep.battleOccurrenceId=prior.battleOccurrenceId;
       dep.storyOccurrenceId=prior.storyOccurrenceId;
       currentBattle.encounterId=prior.encounterId;
+      currentBattle.active=prior.active;currentBattle.battleOver=prior.battleOver;
       currentBattle.outcome=prior.outcome;
       currentBattle.rewards=prior.rewards;
+      try{delete currentBattle.__battleTerminalResultPresentation54400;}catch(_error){}
       openOverlay("combat");
       return{reward,text};
     });

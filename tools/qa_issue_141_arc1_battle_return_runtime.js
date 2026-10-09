@@ -130,6 +130,7 @@ try {
   run(`
     globalThis.__issue141ReturnCalls=[];
     globalThis.__issue141LegacyContinueCalls=0;
+    globalThis.__issue141RewardClaimCalls=0;
     globalThis.__issue141OverlayCalls=[];
     globalThis.__issue141ForceReturnFailure=false;
     resumeBattleCallerAfterCompletion=function(outcome){
@@ -140,6 +141,12 @@ try {
     continueAfterVictory=function(){
       globalThis.__issue141LegacyContinueCalls += 1;
       return {success:true,legacy:true};
+    };
+    claimCurrentBattleRewards=function(){
+      globalThis.__issue141RewardClaimCalls += 1;
+      if(!currentBattle||!currentBattle.rewards)return false;
+      currentBattle.rewards.claimed=true;
+      return true;
     };
     openOverlay=function(type){
       globalThis.__issue141OverlayCalls.push(type);
@@ -160,28 +167,40 @@ try {
     diagnostic: typeof getBattleTerminalResultPresentation54400 === "function"
   })`, "issue141-terminal-owner.js"));
   check(
-    "54400_canonical_terminal_owner_loaded",
+    "54400_terminal_candidate_loaded",
     terminalOwner.presenter === true && terminalOwner.setbackContinue === true && terminalOwner.victoryContinue === true && terminalOwner.diagnostic === true,
     terminalOwner
   );
 
-  // Exact Story caller victory must outrank the legacy fallback after rewards
-  // have been claimed. No mission-specific outcome is fabricated here.
+  // Victory must present before CLAIM; CLAIM must stop before caller resume;
+  // the later explicit Continue restores the exact Story caller once.
   const victory = plain(run(`
     currentBattle={
       active:false,battleOver:true,
       outcome:{type:"victory"},
-      rewards:{claimed:true},
+      rewards:{claimed:false},
       returnContext:{type:"story_scene",missionId:"fixture_mission",sceneId:"fixture_scene"}
     };
-    continueAfterVictory();
+    const victoryPresented141=presentCommittedBattleTerminalResult54400("victory",{source:"issue141_runtime_qa"});
+    const victoryProjection141=getBattleTerminalResultPresentation54400();
+    const victoryClaimOnly141=continueAfterVictory();
+    const victoryCallerAfterClaim141=currentBattle.returnContext;
+    const victoryReturnCallsAfterClaim141=globalThis.__issue141ReturnCalls.slice();
+    const victoryContinued141=continueAfterVictory();
+    ({presented:victoryPresented141,projectionBeforeClaim:victoryProjection141,claimOnly:victoryClaimOnly141,callerAfterClaim:victoryCallerAfterClaim141,returnCallsAfterClaim:victoryReturnCallsAfterClaim141,continued:victoryContinued141});
   `, "issue141-victory-return.js"));
   const victoryCalls = plain(context.__issue141ReturnCalls);
   check(
-    "story_victory_returns_before_legacy",
-    victory && victory.success === true && victory.terminalResultOwner54400 === true && victory.terminalOutcome === "victory" &&
-      victoryCalls.length === 1 && victoryCalls[0] === "victory" && context.__issue141LegacyContinueCalls === 0,
-    { victory, victoryCalls, legacyCalls: context.__issue141LegacyContinueCalls }
+    "story_victory_claim_then_explicit_continue",
+    victory && victory.projectionBeforeClaim && victory.projectionBeforeClaim.status === "presented" &&
+      victory.claimOnly && victory.claimOnly.success === true && victory.claimOnly.rewardClaimed === true &&
+      victory.claimOnly.callerResumeWithheldUntilExplicitContinue === true &&
+      victory.callerAfterClaim && victory.callerAfterClaim.type === "story_scene" &&
+      victory.returnCallsAfterClaim.length === 0 &&
+      victory.continued && victory.continued.success === true && victory.continued.terminalResultOwner54400 === true &&
+      victory.continued.terminalOutcome === "victory" && victoryCalls.length === 1 && victoryCalls[0] === "victory" &&
+      context.__issue141RewardClaimCalls === 1 && context.__issue141LegacyContinueCalls === 0,
+    { victory, victoryCalls, rewardClaimCalls:context.__issue141RewardClaimCalls, legacyCalls:context.__issue141LegacyContinueCalls }
   );
 
   // A broken authored Story continuation must fail closed on Victory. It must
@@ -197,6 +216,7 @@ try {
       rewards:{claimed:true},
       returnContext:{type:"story_scene",missionId:"fixture_mission",sceneId:"fixture_scene"}
     };
+    presentCommittedBattleTerminalResult54400("victory",{source:"issue141_runtime_qa_failure"});
     const result=continueAfterVictory();
     const attemptedReturnCalls=globalThis.__issue141ReturnCalls.slice(returnCallsBefore.length);
     globalThis.__issue141ReturnCalls=returnCallsBefore;
@@ -213,20 +233,25 @@ try {
     failedVictory
   );
 
-  // Without claimed rewards, #544 must delegate to the predecessor lifecycle;
-  // it must not consume the Story return itself.
+  // A fresh unclaimed Victory is a claim-only action. It must preserve the
+  // caller envelope and must not satisfy the later explicit Continue.
   const unclaimed = plain(run(`
+    const unclaimedCallsBefore141=globalThis.__issue141ReturnCalls.length;
     currentBattle={
       active:false,battleOver:true,
       outcome:{type:"victory"},
       rewards:{claimed:false},
       returnContext:{type:"story_scene",missionId:"fixture_mission",sceneId:"fixture_scene"}
     };
-    continueAfterVictory();
+    presentCommittedBattleTerminalResult54400("victory",{source:"issue141_runtime_qa_claim_only"});
+    const unclaimedResult141=continueAfterVictory();
+    ({result:unclaimedResult141,caller:currentBattle.returnContext,returnCallsAdded:globalThis.__issue141ReturnCalls.length-unclaimedCallsBefore141});
   `, "issue141-unclaimed-return.js"));
   check(
-    "unclaimed_victory_delegates_without_story_return",
-    unclaimed && unclaimed.legacy === true && context.__issue141LegacyContinueCalls === 1 && context.__issue141ReturnCalls.length === 1,
+    "unclaimed_victory_claims_without_story_return",
+    unclaimed && unclaimed.result && unclaimed.result.success === true && unclaimed.result.rewardClaimed === true &&
+      unclaimed.result.callerResumeWithheldUntilExplicitContinue === true && unclaimed.caller &&
+      unclaimed.caller.type === "story_scene" && unclaimed.returnCallsAdded === 0 && context.__issue141LegacyContinueCalls === 0,
     { unclaimed, returnCalls: plain(context.__issue141ReturnCalls), legacyCalls: context.__issue141LegacyContinueCalls }
   );
 

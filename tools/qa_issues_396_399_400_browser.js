@@ -117,10 +117,11 @@ async function runMetalBattle(browser,remaining,expectedClass){
         const secondClaim=claimCurrentBattleRewards();
         const walletAfterSecond=Math.max(0,Number(playerData.ryo)||0);
         const rewardReceipts=(playerData.activityHistory||[]).filter(x=>x&&x.rewardSourceId==="metal_origin_controlled_spar_victory_ryo_01");
-        const resumed=resumeBattleCallerAfterCompletion("victory");
+        const earlyResume=resumeBattleCallerAfterCompletion("victory");
+        const resumed=continueAfterVictory();
         const rt=getActiveStorySceneRuntime();
         const row=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_metal_pressured_performance_resolution");
-        return{rewards:JSON.parse(JSON.stringify(rewards||null)),victoryProjection,firstClaim,secondClaim,walletDeltaFirst:walletAfterFirst-walletBefore,walletDeltaSecond:walletAfterSecond-walletBefore,rewardReceiptCount:rewardReceipts.length,rewardReceipt:JSON.parse(JSON.stringify(rewardReceipts[0]||null)),resumed,beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};
+        return{rewards:JSON.parse(JSON.stringify(rewards||null)),victoryProjection,firstClaim,secondClaim,walletDeltaFirst:walletAfterFirst-walletBefore,walletDeltaSecond:walletAfterSecond-walletBefore,rewardReceiptCount:rewardReceipts.length,rewardReceipt:JSON.parse(JSON.stringify(rewardReceipts[0]||null)),earlyResume,resumed,beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};
       }finally{globalThis.getBattleRemainingPL=prior;}
     },{remaining});
     assert.strictEqual(finished.rewards?.ryo,50,label+" reward projection");
@@ -133,7 +134,8 @@ async function runMetalBattle(browser,remaining,expectedClass){
     assert.strictEqual(finished.walletDeltaSecond,50,label+" duplicate claim duplicated Ryō");
     assert.strictEqual(finished.rewardReceiptCount,1,label+" duplicate reward receipt");
     assert.strictEqual(finished.rewardReceipt?.ryo,50,label+" reward receipt Ryō");
-    assert.strictEqual(finished.resumed?.success,true,label+" caller resume");
+    assert.strictEqual(finished.earlyResume?.callerResumeWithheldUntilTerminalResultContinue,true,label+" early caller resume was not withheld");
+    assert.strictEqual(finished.resumed?.success,true,label+" explicit Victory Continue caller resume");
     assert.strictEqual(finished.beatId,"met_spar_"+expectedClass+"_01",label+" performance route");
     assert.strictEqual(finished.local.metalSparPerformanceClass,expectedClass);
     assert.strictEqual(finished.fact?.pressuredPerformanceClass,expectedClass,label+" MET-02 class");

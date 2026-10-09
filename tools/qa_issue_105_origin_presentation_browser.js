@@ -278,7 +278,14 @@ async function proveMiraiBattle338(browser){
       await page.waitForFunction(expected=>globalThis.getActiveStorySceneRuntime?.()?.beatId===expected,expectedReturnBeat,{timeout:12000});
       returned={...returned,result:{success:true,viaSetbackContinue:true},beatId:await page.evaluate(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId||null)};
     }else{
-      assert.strictEqual(returned.result?.success,true,"Mirai #338 caller return failed "+JSON.stringify(returned));
+      assert.strictEqual(returned.result?.callerResumeWithheldUntilTerminalResultContinue,true,"Mirai victory bypassed #544 terminal presentation guard "+JSON.stringify(returned));
+      await page.waitForSelector(".alpha-victory-code-screen,.victory-screen",{state:"visible",timeout:12000});
+      const gate=await page.evaluate(()=>({overlay:typeof currentOverlayType==="undefined"?null:currentOverlayType,outcome:currentBattle?.outcome?.type||null}));
+      assert.strictEqual(gate.outcome,"victory","Mirai Victory surface mutated terminal outcome");
+      const continued=await page.evaluate(()=>globalThis.continueAfterVictory?.());
+      assert.strictEqual(continued?.success,true,"Victory Continue authority failed "+JSON.stringify(continued));
+      await page.waitForFunction(expected=>globalThis.getActiveStorySceneRuntime?.()?.beatId===expected,expectedReturnBeat,{timeout:12000});
+      returned={...returned,result:continued,beatId:await page.evaluate(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId||null)};
     }
     assert.strictEqual(returned.beatId,expectedReturnBeat,"Mirai #338 caller returned to wrong Story beat "+JSON.stringify(returned));
 
