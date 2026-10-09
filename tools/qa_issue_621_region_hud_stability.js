@@ -57,3 +57,4 @@ console.log(JSON.stringify({
 },null,2));
 
 // QA-only exact-head refresh marker after declaring the #303 contract change reason on PR #623.
+// Connector-authored final synchronize marker so GitHub schedules executable exact-head jobs.
