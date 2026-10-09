@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 env:
-  ISSUE_544_TARGET_SHA: b0c895c29323e98129d0fdb238a0d608b6b249a3
+  ISSUE_544_TARGET_SHA: 1f8642864e29dbf7a582e1dd6bac26f0f3055da9
 
 jobs:
   postboot-owner-firewall:
