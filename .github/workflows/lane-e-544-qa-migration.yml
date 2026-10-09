@@ -23,6 +23,28 @@ jobs:
           node-version: "22"
       - name: Apply fail-closed migration
         run: python tools/tmp_lane_e_544_qa_migration.py
+      - name: Scope synthetic VM fixture names
+        shell: python
+        run: |
+          from pathlib import Path
+          p=Path("tools/qa_issue_141_arc1_battle_return_runtime.js")
+          s=p.read_text(encoding="utf-8")
+          swaps={
+            'const presented=presentCommittedBattleTerminalResult54400("victory",{source:"issue141_runtime_qa"});':'const victoryPresented141=presentCommittedBattleTerminalResult54400("victory",{source:"issue141_runtime_qa"});',
+            'const projectionBeforeClaim=getBattleTerminalResultPresentation54400();':'const victoryProjection141=getBattleTerminalResultPresentation54400();',
+            'const claimOnly=continueAfterVictory();':'const victoryClaimOnly141=continueAfterVictory();',
+            'const callerAfterClaim=currentBattle.returnContext;':'const victoryCallerAfterClaim141=currentBattle.returnContext;',
+            'const returnCallsAfterClaim=globalThis.__issue141ReturnCalls.slice();':'const victoryReturnCallsAfterClaim141=globalThis.__issue141ReturnCalls.slice();',
+            'const continued=continueAfterVictory();':'const victoryContinued141=continueAfterVictory();',
+            '({presented,projectionBeforeClaim,claimOnly,callerAfterClaim,returnCallsAfterClaim,continued});':'({presented:victoryPresented141,projectionBeforeClaim:victoryProjection141,claimOnly:victoryClaimOnly141,callerAfterClaim:victoryCallerAfterClaim141,returnCallsAfterClaim:victoryReturnCallsAfterClaim141,continued:victoryContinued141});',
+            'const callsBefore=globalThis.__issue141ReturnCalls.length;':'const unclaimedCallsBefore141=globalThis.__issue141ReturnCalls.length;',
+            'const result=continueAfterVictory();\n    ({result,caller:currentBattle.returnContext,returnCallsAdded:globalThis.__issue141ReturnCalls.length-callsBefore});':'const unclaimedResult141=continueAfterVictory();\n    ({result:unclaimedResult141,caller:currentBattle.returnContext,returnCallsAdded:globalThis.__issue141ReturnCalls.length-unclaimedCallsBefore141});'
+          }
+          for old,new in swaps.items():
+            if s.count(old)!=1:
+              raise SystemExit(f"fixture scope marker mismatch: {old[:70]} count={s.count(old)}")
+            s=s.replace(old,new,1)
+          p.write_text(s,encoding="utf-8")
       - name: Focused QA
         run: |
           node --check tools/qa_issue_141_arc1_battle_return_runtime.js
