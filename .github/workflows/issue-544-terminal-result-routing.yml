@@ -1,13 +1,115 @@
 name: Issue 544 terminal-result adversarial QA
 
 on:
+  push:
+    branches:
+      - coding/544-terminal-result-adversarial-qa-lane-f
+    paths:
+      - .github/workflows/issue-544-terminal-result-routing.yml
+      - tools/qa_issue_544_terminal_result_routing.js
+      - tools/qa_issue_544_terminal_result_routing_browser.js
   workflow_dispatch:
 
 permissions:
   contents: read
 
+env:
+  ISSUE_544_TARGET_SHA: b0c895c29323e98129d0fdb238a0d608b6b249a3
+
 jobs:
-  lane-f-rebuild-in-progress:
+  source-owner-firewall:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Lane F #605 verifier rebuild in progress; push-trigger intentionally frozen until exact-tree harness is complete."
+      - name: Checkout Lane F verifier head
+        uses: actions/checkout@v4
+        with:
+          path: qa-src
+      - name: Checkout exact PR 602 candidate tree
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.ISSUE_544_TARGET_SHA }}
+          path: candidate
+      - name: Prove exact production and QA SHAs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C candidate rev-parse HEAD)" = "$ISSUE_544_TARGET_SHA"
+          QA_SHA="$(git -C qa-src rev-parse HEAD)"
+          mkdir -p candidate/artifacts/issue-544-terminal-result-routing
+          printf '{"productionCandidate":"%s","laneFQaHead":"%s","workflowRunId":"%s","browserGoldenClaimed":false}\n' "$ISSUE_544_TARGET_SHA" "$QA_SHA" "${{ github.run_id }}" > candidate/artifacts/issue-544-terminal-result-routing/provenance-source.json
+          echo "production=$ISSUE_544_TARGET_SHA"
+          echo "laneF=$QA_SHA"
+      - name: Install only Lane F source verifier into exact candidate tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp qa-src/tools/qa_issue_544_terminal_result_routing.js candidate/tools/qa_issue_544_terminal_result_routing.js
+          cp qa-src/tools/qa_issue_544_terminal_result_routing_browser.js candidate/tools/qa_issue_544_terminal_result_routing_browser.js
+          git -C candidate status --porcelain
+          test -z "$(git -C candidate status --porcelain | grep -vE '^ M tools/qa_issue_544_terminal_result_routing(_browser)?\.js$|^\?\? artifacts/' || true)"
+      - name: Run source and ownership firewall
+        working-directory: candidate
+        run: node tools/qa_issue_544_terminal_result_routing.js
+      - name: Upload source evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-544-lane-f-source-${{ github.run_id }}
+          path: candidate/artifacts/issue-544-terminal-result-routing/
+          if-no-files-found: error
+
+  strict-real-action-matrix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Lane F verifier head
+        uses: actions/checkout@v4
+        with:
+          path: qa-src
+      - name: Checkout exact PR 602 candidate tree
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.ISSUE_544_TARGET_SHA }}
+          path: candidate
+      - name: Prove exact production and QA SHAs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C candidate rev-parse HEAD)" = "$ISSUE_544_TARGET_SHA"
+          QA_SHA="$(git -C qa-src rev-parse HEAD)"
+          mkdir -p candidate/artifacts/issue-544-terminal-result-routing
+          printf '{"productionCandidate":"%s","laneFQaHead":"%s","workflowRunId":"%s","browserGoldenClaimed":false}\n' "$ISSUE_544_TARGET_SHA" "$QA_SHA" "${{ github.run_id }}" > candidate/artifacts/issue-544-terminal-result-routing/provenance-browser.json
+          echo "production=$ISSUE_544_TARGET_SHA"
+          echo "laneF=$QA_SHA"
+      - name: Install only Lane F browser verifier into exact candidate tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp qa-src/tools/qa_issue_544_terminal_result_routing_browser.js candidate/tools/qa_issue_544_terminal_result_routing_browser.js
+          git -C candidate status --porcelain
+          test -z "$(git -C candidate status --porcelain | grep -vE '^ M tools/qa_issue_544_terminal_result_routing_browser\.js$|^\?\? artifacts/' || true)"
+      - name: Install dependencies and Chromium
+        working-directory: candidate
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Start exact-tree server
+        working-directory: candidate
+        shell: bash
+        run: |
+          python3 -m http.server 8080 > /tmp/issue544-lane-f-http.log 2>&1 &
+          echo $! > /tmp/issue544-lane-f-http.pid
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8080/index.html >/dev/null && exit 0; sleep 1; done
+          cat /tmp/issue544-lane-f-http.log
+          exit 1
+      - name: Run strict six-route real-action and post-boot gate
+        working-directory: candidate
+        env:
+          ISSUE_544_BASE_URL: http://127.0.0.1:8080/index.html
+        run: node tools/qa_issue_544_terminal_result_routing_browser.js
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-544-lane-f-browser-${{ github.run_id }}
+          path: candidate/artifacts/issue-544-terminal-result-routing/
+          if-no-files-found: error
