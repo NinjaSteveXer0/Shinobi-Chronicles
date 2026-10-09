@@ -1,0 +1,132 @@
+name: Issue 544 Lane J Post-Boot Owner + Authority Firewall
+
+on:
+  push:
+    branches:
+      - qa/544-terminal-result-lane-j
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  ISSUE_544_TARGET_SHA: 19952c36d41adf227cb6dce41325f14c33ad22cb
+
+jobs:
+  postboot-owner-firewall:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Checkout exact PR 602 candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.ISSUE_544_TARGET_SHA }}
+          path: candidate
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Verify frozen full-tree candidate and authority wording firewall
+        working-directory: candidate
+        run: |
+          test "$(git rev-parse HEAD)" = "$ISSUE_544_TARGET_SHA"
+          node - <<'NODE'
+          const fs=require('fs'),assert=require('assert');
+          const term=fs.readFileSync('runtime/alpha-battle-terminal-result-54400.js','utf8');
+          const old=fs.readFileSync('runtime/alpha-alpha-sprint-33100.js','utf8');
+          const index=fs.readFileSync('index.html','utf8');
+
+          assert(!/CANONICAL BATTLE TERMINAL-RESULT PRESENTATION OWNER/i.test(term),'proof-reserved CANONICAL owner claim present');
+          assert(!/Canonical responsibility/i.test(term),'proof-reserved Canonical responsibility claim present');
+          assert(!/this module replaces the retired #33100/i.test(term),'proof-reserved replacement claim present');
+          assert(!/\bsingle[- ]owner\b/i.test(term),'proof-reserved single-owner claim present');
+          assert(!/\bfinal owner\b/i.test(term),'proof-reserved final-owner claim present');
+          assert(!/\breplacement\b/i.test(term),'proof-reserved replacement noun claim present');
+
+          const canonicalLines=term.split(/\r?\n/).filter(line=>/\bcanonical\b/i.test(line));
+          assert.strictEqual(canonicalLines.length,1,'unexpected canonical wording count: '+JSON.stringify(canonicalLines));
+          assert(/proof-reserved until independent/i.test(canonicalLines[0]),'canonical wording is not explicitly proof-reserved');
+          assert(/pending independent exact-head proof/i.test(term),'candidate status does not remain proof-pending');
+
+          assert(!old.includes('continueAfterSetback33100'),'retired #33100 Setback continuation reactivated');
+          assert(!old.includes('.alpha331-setback'),'retired #33100 Setback surface reactivated');
+          assert(index.indexOf('runtime/alpha-battle-terminal-result-54400.js')>index.indexOf('runtime/alpha-alpha-sprint-33100.js'),'#544 must load after retired #33100 terminal slice');
+
+          console.log(JSON.stringify({pass:true,target:process.env.ISSUE_544_TARGET_SHA,authorityWordingProofReserved:true,retired331TerminalSlice:true,browserGoldenClaimed:false},null,2));
+          NODE
+
+      - name: Install Chromium
+        working-directory: candidate
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start exact-candidate Alpha server
+        working-directory: candidate
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > /tmp/sc544j-owner-server.log 2>&1 &
+          echo $! > /tmp/sc544j-owner-server.pid
+          for i in {1..40}; do if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi; sleep 0.25; done
+          cat /tmp/sc544j-owner-server.log
+          exit 1
+
+      - name: Prove effective terminal-result owner after full dynamic boot
+        working-directory: candidate
+        env:
+          ISSUE_544_OUT: artifacts/issue-544-lane-j-postboot-owner
+        run: |
+          mkdir -p "$ISSUE_544_OUT"
+          cat > /tmp/qa544j-owner.js <<'NODE'
+          const fs=require('fs'),assert=require('assert');
+          const {chromium}=require('playwright');
+          (async()=>{
+            const browser=await chromium.launch({headless:true});
+            try{
+              const page=await browser.newPage({viewport:{width:1440,height:900}});
+              await page.addInitScript(()=>{try{localStorage.clear();sessionStorage.clear();}catch(_e){}});
+              await page.goto('http://127.0.0.1:8080/index.html',{waitUntil:'domcontentloaded',timeout:60000});
+              await page.waitForFunction(()=>typeof globalThis.presentCommittedBattleTerminalResult54400==='function'&&typeof globalThis.continueAfterVictory54400==='function'&&typeof globalThis.continueAfterSetback54400==='function',null,{timeout:30000});
+              await page.waitForTimeout(250);
+              const proof=await page.evaluate(()=>({
+                installed:globalThis.__battleTerminalResultPresentation54400Installed===true,
+                continueVictory544:globalThis.continueAfterVictory===globalThis.continueAfterVictory54400,
+                continueSetback544:globalThis.continueAfterBattleSetback===globalThis.continueAfterSetback54400,
+                openOverlayName:typeof globalThis.openOverlay==='function'?globalThis.openOverlay.name:null,
+                completeVictoryName:typeof globalThis.completeBattleVictoryFromDamage==='function'?globalThis.completeBattleVictoryFromDamage.name:null,
+                completeDefeatName:typeof globalThis.completeBattleDefeat==='function'?globalThis.completeBattleDefeat.name:null,
+                oldContinue331:typeof globalThis.continueAfterSetback33100,
+                oldRender331:typeof globalThis.renderSetback33100,
+                oldSurface:!!document.querySelector('.alpha331-setback'),
+                resultOwnerSurfaceCount:document.querySelectorAll('[data-terminal-result-owner="54400"]').length
+              }));
+              assert.strictEqual(proof.installed,true,'#544 install marker missing after full boot');
+              assert.strictEqual(proof.continueVictory544,true,'Victory continuation effective owner is not #544');
+              assert.strictEqual(proof.continueSetback544,true,'Setback continuation effective owner is not #544');
+              assert.strictEqual(proof.openOverlayName,'wrappedOpenOverlay54400','openOverlay effective wrapper is not #544');
+              assert.strictEqual(proof.completeVictoryName,'wrappedCompleteVictory54400','Victory terminal completion wrapper is not #544');
+              assert.strictEqual(proof.completeDefeatName,'wrappedCompleteDefeat54400','Defeat terminal completion wrapper is not #544');
+              assert.strictEqual(proof.oldContinue331,'undefined','retired #33100 continuation reactivated after full boot');
+              assert.strictEqual(proof.oldRender331,'undefined','retired #33100 Setback renderer reactivated after full boot');
+              assert.strictEqual(proof.oldSurface,false,'retired #33100 Setback surface exists after full boot');
+              const evidence={pass:true,issue:544,lane:'J',target:process.env.ISSUE_544_TARGET_SHA||null,postBootOwner:proof,browserGoldenClaimed:false};
+              fs.writeFileSync(process.env.ISSUE_544_OUT+'/evidence.json',JSON.stringify(evidence,null,2));
+              console.log(JSON.stringify(evidence,null,2));
+            } finally { await browser.close(); }
+          })().catch(error=>{console.error(error&&error.stack||error);process.exit(1);});
+          NODE
+          NODE_PATH="$PWD/node_modules" ISSUE_544_TARGET_SHA="$ISSUE_544_TARGET_SHA" node /tmp/qa544j-owner.js
+
+      - name: Upload post-boot owner evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-544-lane-j-postboot-owner-${{ github.run_id }}
+          path: |
+            candidate/artifacts/issue-544-lane-j-postboot-owner
+            /tmp/sc544j-owner-server.log
+          if-no-files-found: warn
