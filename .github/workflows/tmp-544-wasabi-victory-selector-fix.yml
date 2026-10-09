@@ -1,0 +1,37 @@
+name: TEMP 544 Wasabi Victory selector fix
+
+on:
+  push:
+    branches:
+      - coding/544-terminal-result-presentation
+    paths:
+      - 'tools/tmp_544_wasabi_victory_selector_fix.js'
+      - '.github/workflows/tmp-544-wasabi-victory-selector-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply-bounded-qa-fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/544-terminal-result-presentation
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply Wasabi Victory selector fix
+        run: node tools/tmp_544_wasabi_victory_selector_fix.js
+      - name: Validate syntax
+        run: |
+          node --check tools/qa_issue_343_wasabi_browser.js
+          git diff --check
+      - name: Commit QA selector fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/qa_issue_343_wasabi_browser.js
+          git commit -m '[QA][#544] Point Wasabi at delegated Victory surface'
+          git push origin HEAD:coding/544-terminal-result-presentation
