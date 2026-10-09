@@ -1,0 +1,49 @@
+name: Issue 646 Lane J Aggregator Hostile QA
+
+on:
+  pull_request:
+    paths:
+      - 'tools/qa_issue_646_final_integration_aggregator_hostile.js'
+      - '.github/workflows/issue-646-lane-j-aggregator-hostile.yml'
+  push:
+    branches:
+      - 'qa/646-s05-aggregator-hostile-j'
+    paths:
+      - 'tools/qa_issue_646_final_integration_aggregator_hostile.js'
+      - '.github/workflows/issue-646-lane-j-aggregator-hostile.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-target-hostile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout QA branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 5
+      - name: Verify exact implementation target remains parent
+        shell: bash
+        run: |
+          set -euo pipefail
+          git cat-file -e 1de444fa9f85bae56c4c854c3bdbb60007dc165f^{commit}
+          git merge-base --is-ancestor 1de444fa9f85bae56c4c854c3bdbb60007dc165f HEAD
+          test "$(git rev-parse 1de444fa9f85bae56c4c854c3bdbb60007dc165f:tools/workforce_final_integration_aggregator_601.js)" = "$(git rev-parse HEAD:tools/workforce_final_integration_aggregator_601.js)"
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Syntax
+        run: node --check tools/qa_issue_646_final_integration_aggregator_hostile.js
+      - name: Independent hostile matrix
+        env:
+          QA_646_SUMMARY: issue-646-lane-j-summary.json
+        run: node tools/qa_issue_646_final_integration_aggregator_hostile.js
+      - name: Upload hostile evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-646-lane-j-${{ github.run_id }}
+          path: issue-646-lane-j-summary.json
+          if-no-files-found: error
