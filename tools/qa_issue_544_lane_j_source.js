@@ -8,6 +8,10 @@ const old=read('runtime/alpha-alpha-sprint-33100.js');
 const kakashiRewards=read('runtime/alpha-kakashi-v2-rewards-36015.js');
 const index=read('index.html');
 const count=(s,re)=>(s.match(re)||[]).length;
+const executableGlobalAssignment=(source,name)=>source.split(/\r?\n/).some(line=>{
+  const trimmed=line.trim();
+  return new RegExp(`^globalThis\\.${name}\\s*=`).test(trimmed)||new RegExp(`^(?:try\\s*\\{\\s*)?${name}\\s*=\\s*globalThis\\.${name}\\b`).test(trimmed);
+});
 
 // #544 successor shape / retired predecessor slice.
 assert(term.includes('continueAfterSetback54400'),'#544 Setback continuation missing');
@@ -27,11 +31,12 @@ assert(!/Canonical responsibility/i.test(term),'#544 source prematurely claims C
 assert(!/this module replaces the retired #33100/i.test(term),'#544 source prematurely claims replacement before independent exact-head proof');
 
 // Lane-D/Overseer return: 36015 may preserve Kakashi reward projection, but may not remain a broad openOverlay writer/wrapper.
+// Match executable assignments only; quoted self-diagnostic strings such as
+// includes("globalThis.openOverlay=") are evidence about the rule, not ownership.
 assert(kakashiRewards.includes('ensureKakashiV2BattleRewardProjection36015'),'36015 Kakashi reward projection seam missing');
 assert(kakashiRewards.includes('generateBattleRewards36015'),'36015 bounded reward-generation hook missing');
 assert(kakashiRewards.includes('renderVictoryOverlay36015'),'36015 bounded Victory projection hook missing');
-assert(!/globalThis\.openOverlay\s*=/.test(kakashiRewards),'36015 still assigns broad globalThis.openOverlay');
-assert(!/(^|[^.\w])openOverlay\s*=\s*globalThis\.openOverlay/m.test(kakashiRewards),'36015 still writes broad openOverlay binding');
+assert(!executableGlobalAssignment(kakashiRewards,'openOverlay'),'36015 still assigns broad globalThis.openOverlay');
 assert(!/function\s+openOverlay36015\b/.test(kakashiRewards),'36015 broad openOverlay wrapper remains');
 
 // Exact loader shape.
