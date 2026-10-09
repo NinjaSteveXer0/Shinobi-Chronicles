@@ -43,7 +43,9 @@ const api=require(modulePath);
 function ok(result,label){assert(result&&result.success===true,`${label}: ${JSON.stringify(result)}`);return result;}
 function occurrence(id){const row=api.getOccurrence(id);assert(row,`missing occurrence ${id}`);return row;}
 function toRavine(id,participants=["academy_kakashi","academy_hinata","academy_menma"]){
-  ok(api.createOccurrence({assessmentAttemptId:id,assessmentSubjectStableId:participants[0],attemptParticipantRefs:participants}),`${id} create`);
+  const subjectBattleParticipantRef=participants[0],subjectStableId=`owned_character_${subjectBattleParticipantRef}`;
+  ok(api.createOccurrence({assessmentAttemptId:id,assessmentSubjectStableId:subjectStableId,assessmentSubjectBattleParticipantRef:subjectBattleParticipantRef,attemptParticipantRefs:participants}),`${id} create`);
+  const created=occurrence(id);assert.strictEqual(created.assessmentSubjectStableId,subjectStableId);assert.strictEqual(created.assessmentSubjectBattleParticipantRef,subjectBattleParticipantRef);assert(!created.attemptParticipantRefs.includes(subjectStableId));
   ok(api.commitBriefing(id),`${id} briefing`);
   ok(api.advanceJourney(id,"KON-P10"),`${id} gate out`);
   ok(api.advanceJourney(id,"whisper_woods"),`${id} woods out`);
@@ -88,16 +90,16 @@ toRavine("attempt-battle");
 confirm("attempt-battle",["academy_kakashi","academy_hinata"]);
 const beforeBattleRyo=global.playerData.ryo;
 const launch=ok(api.launchHoldLineBattle("attempt-battle"),"battle launch");
-assert.deepStrictEqual(launch.participantRefs,["academy_kakashi","academy_hinata"]);
+assert.deepStrictEqual(launch.participantRefs,["academy_kakashi","academy_hinata"]);assert.strictEqual(launch.returnContext.assessmentSubjectStableId,"owned_character_academy_kakashi");assert.strictEqual(launch.returnContext.assessmentSubjectBattleParticipantRef,"academy_kakashi");assert.strictEqual(global.currentBattle.characterId,"academy_kakashi");
 assert(!launch.participantRefs.includes("academy_menma"));
 assert(!launch.participantRefs.includes(api.courierRef));assert(!launch.participantRefs.includes(api.dispatchRef));assert(!launch.participantRefs.includes(api.examinerRef));
 global.currentBattle.contributions.academy_kakashi={damage:9,attacks:2};
 global.currentBattle.contributions.academy_hinata={damage:4,attacks:1};
 global.currentBattle.runtime.evidence.push({evidenceId:"ev_kakashi_hit",actionId:"academy_kakashi_kunai_quickdraw",actorRef:{side:"player",participantId:"academy_kakashi"},targetRef:{side:"enemy",participantId:api.rogueRef},eventType:"damage_applied",data:{damage:9,effective:true}},{evidenceId:"ev_hinata_guard",actionId:"academy_hinata_twin_palm_guard",actorRef:{side:"player",participantId:"academy_hinata"},eventType:"guard_resolved",data:{resolved:true}});
 global.currentBattle.__remaining.player.academy_kakashi=12;global.currentBattle.__remaining.player.academy_hinata=18;global.currentBattle.__remaining.enemy[api.rogueRef]=0;global.currentBattle.outcome={type:"victory"};
-const envelope=api.projectLiveBattleReturn();assert.strictEqual(envelope.rogueBattlePLDepleted,true);assert.strictEqual(envelope.subjectCombatEvidenceSummary.subjectWasBattleParticipant,true);assert(!Object.prototype.hasOwnProperty.call(envelope.subjectCombatEvidenceSummary,"combatReadinessSatisfied"));
+const envelope=api.projectLiveBattleReturn();assert.strictEqual(envelope.rogueBattlePLDepleted,true);assert.strictEqual(envelope.assessmentSubjectStableId,"owned_character_academy_kakashi");assert.strictEqual(envelope.assessmentSubjectBattleParticipantRef,"academy_kakashi");assert.strictEqual(envelope.subjectCombatEvidenceSummary.subjectWasBattleParticipant,true);assert(!Object.prototype.hasOwnProperty.call(envelope.subjectCombatEvidenceSummary,"combatReadinessSatisfied"));
 const ctx=JSON.parse(JSON.stringify(global.currentBattle.returnContext));
-const applied=ok(global.resumeFieldReadinessAssessmentFromBattle(ctx),"battle caller resume");
+assert.strictEqual(global.__legacyResumeCalls,0);const applied=ok(api.resumeFromCurrentBattle(ctx),"battle caller resume");assert.strictEqual(global.__legacyResumeCalls,0);
 assert.strictEqual(applied.type,"field_readiness_assessment_resumed");assert.strictEqual(global.currentBattle.returnContext,null);assert.strictEqual(applied.missionObjectiveCompleted,null);assert.strictEqual(global.playerData.ryo,beforeBattleRyo+50);
 const battleOcc=occurrence("attempt-battle");assert.strictEqual(battleOcc.currentHost,"fire_whisper_woods_north_ravine");assert.strictEqual(battleOcc.dispatch.custodyState,"agen_m01_dispatch_team_controlled_custody_v1");assert.strictEqual(battleOcc.courier.state,"agen_m01_courier_found_injured_stable_v1");
 const afterBattleReward=global.playerData.ryo;ok(api.applyBattleReturn("attempt-battle",envelope),"battle replay");assert.strictEqual(global.playerData.ryo,afterBattleReward);
