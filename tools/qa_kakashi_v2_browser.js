@@ -603,10 +603,17 @@ async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedB
         return typeof prior==="function"?prior(side,participantId):0;
       };
       try{
-        currentBattle.outcome={...(currentBattle.outcome||{}),type:outcome,completedAt:Date.now(),finishingShinobiId:outcome==="victory"?"academy_kakashi":null};
+        currentBattle.outcome={...(currentBattle.outcome||{}),type:outcome,committed:true,completedAt:Date.now(),finishingShinobiId:outcome==="victory"?"academy_kakashi":null};
         currentBattle.battleOver=true;
         currentBattle.active=false;
-        return resumeBattleCallerAfterCompletion(outcome);
+        try{globalThis.hardSettleBattlePresentationQueue33000?.("kakashi_v2_route_fixture_terminal_result");}catch(_error){}
+        const presented=globalThis.presentCommittedBattleTerminalResult54400?.(outcome,{source:"kakashi_v2_route_fixture"});
+        if(!(presented&&presented.success===true))return presented||{success:false,reason:"terminal_result_presentation_failed"};
+        let continued=outcome==="victory"?continueAfterVictory():globalThis.continueAfterSetback54400?.();
+        if(outcome==="victory"&&continued&&continued.callerResumeWithheldUntilExplicitContinue===true){
+          continued=continueAfterVictory();
+        }
+        return continued;
       }finally{
         globalThis.getBattleActionOpportunityIndex=prior;
       }
@@ -1102,10 +1109,15 @@ async function assertRepeatedBattleReentry(page){
   assert(launched&&launched.success===true,JSON.stringify(launched));
   await page.waitForFunction(()=>!!(typeof currentBattle!=="undefined"&&currentBattle&&currentBattle.returnContext&&currentBattle.returnContext.type==="story_scene"),null,{timeout:12000});
   const resumed=await page.evaluate(()=>{
-    currentBattle.outcome={type:"victory",completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};
+    currentBattle.outcome={type:"victory",committed:true,completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};
     currentBattle.battleOver=true;
     currentBattle.active=false;
-    return resumeBattleCallerAfterCompletion("victory");
+    try{globalThis.hardSettleBattlePresentationQueue33000?.("kakashi_v2_standalone_terminal_result");}catch(_error){}
+    const presented=globalThis.presentCommittedBattleTerminalResult54400?.("victory",{source:"kakashi_v2_standalone_fixture"});
+    if(!(presented&&presented.success===true))return presented||{success:false,reason:"terminal_result_presentation_failed"};
+    let continued=continueAfterVictory();
+    if(continued&&continued.callerResumeWithheldUntilExplicitContinue===true)continued=continueAfterVictory();
+    return continued;
   });
   assert(resumed&&resumed.success===true,JSON.stringify(resumed));
   await page.waitForSelector("#kakashi-v2-scene-board",{state:"visible",timeout:12000});
@@ -1320,10 +1332,15 @@ async function visualAndBattle(browser){
   await page.locator("#screen-overlay").screenshot({path:path.join(OUT,"10-pl-battle-launch.png")});
 
   const resumed=await page.evaluate(()=>{
-    currentBattle.outcome={type:"victory",completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};
+    currentBattle.outcome={type:"victory",committed:true,completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};
     currentBattle.battleOver=true;
     currentBattle.active=false;
-    return resumeBattleCallerAfterCompletion("victory");
+    try{globalThis.hardSettleBattlePresentationQueue33000?.("kakashi_v2_standalone_terminal_result");}catch(_error){}
+    const presented=globalThis.presentCommittedBattleTerminalResult54400?.("victory",{source:"kakashi_v2_standalone_fixture"});
+    if(!(presented&&presented.success===true))return presented||{success:false,reason:"terminal_result_presentation_failed"};
+    let continued=continueAfterVictory();
+    if(continued&&continued.callerResumeWithheldUntilExplicitContinue===true)continued=continueAfterVictory();
+    return continued;
   });
   assert(resumed&&resumed.success===true,JSON.stringify(resumed));
   await page.waitForSelector("#kakashi-v2-scene-board",{state:"visible",timeout:12000});

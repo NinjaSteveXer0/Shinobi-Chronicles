@@ -198,8 +198,15 @@ async function runIwabeeBattle(browser,outcome){
           };
           authoritativeDefeat=handleBattleParticipantAtZeroPL("player","academy_iwabee",enemy,envelope);
         }else{
-          currentBattle.outcome={type:"victory",committed:true,completedAt:Date.now(),finishingShinobiId:"academy_iwabee"};
-          currentBattle.battleOver=true;currentBattle.active=false;
+          const actionId="qa396_iwabee_finisher";
+          setBattleRemainingPL("enemy","iwabee_origin_rogue_genin_01",0);
+          const iwabee=getBattleParticipantByIdentity("player","academy_iwabee");
+          const envelope={
+            actionId,
+            actorRef:createBattleParticipantRef("player","academy_iwabee"),
+            targetRef:createBattleParticipantRef("enemy","iwabee_origin_rogue_genin_01")
+          };
+          handleBattleParticipantAtZeroPL("enemy","iwabee_origin_rogue_genin_01",iwabee,envelope);
         }
         const walletBefore=Math.max(0,Number(playerData.ryo)||0);
         const rewards=outcome==="victory"?generateBattleRewards():null;

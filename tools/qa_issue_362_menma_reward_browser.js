@@ -185,8 +185,11 @@ async function rewardState(page){
     assert.deepStrictEqual(generated.items,[]);
     assert.deepStrictEqual(generated.rareDrops,[]);
 
-    await page.evaluate(()=>openOverlay("victory"));
-    await page.waitForSelector(".alpha-victory-code-screen",{state:"visible",timeout:8000});
+    await page.evaluate(()=>{
+      try{globalThis.hardSettleBattlePresentationQueue33000?.("issue_362_reward_victory");}catch(_error){}
+      return globalThis.presentCommittedBattleTerminalResult54400?.("victory",{source:"issue_362_reward_victory"});
+    });
+    await page.waitForSelector(".alpha-victory-code-screen,.victory-screen",{state:"visible",timeout:8000});
     await page.waitForSelector(".menma-three-subject-reward-36200",{state:"visible",timeout:8000});
     const rewardLine=(await page.locator(".menma-three-subject-reward-36200").textContent()||"").trim();
     const visiblePageText=await page.locator("body").innerText();
