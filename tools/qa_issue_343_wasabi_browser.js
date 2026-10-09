@@ -547,7 +547,7 @@ async function terminateBattleToStory(page,outcome,label){
         try{globalThis.hardSettleBattlePresentationQueue33000?.("qa343_wasabi_victory_terminal_result");}catch(_error){}
         terminalPresented=globalThis.presentCommittedBattleTerminalResult54400?.("victory",{source:"qa343_wasabi_victory"})||null;
         await Promise.resolve();
-        const victoryNode=document.querySelector(".alpha544-victory");
+        const victoryNode=document.querySelector(".alpha-victory-code-screen,.victory-screen");
         victoryVisible=!!(victoryNode&&victoryNode.getClientRects().length>0&&getComputedStyle(victoryNode).display!=="none"&&getComputedStyle(victoryNode).visibility!=="hidden");
         const claimAction=continueAfterVictory();
         firstClaim=!!(claimAction&&claimAction.success===true&&currentBattle?.rewards?.claimed===true);
