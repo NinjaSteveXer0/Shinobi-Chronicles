@@ -87,7 +87,6 @@ async function shot(page,name,selector=null){
   const browser=await chromium.launch({headless:false});
   const {context,page,runtimeErrorGate}=await boot(browser);
   try{
-    // STORY BENCHMARK — persistent semantic anchors + adaptive prominence.
     const rooftop=await page.evaluate(()=>{
       const root=document.getElementById("kakashi-v2-scene-board");
       const actors=[...root.querySelectorAll(".kv2-actor")].map(n=>({id:n.dataset.actorId,anchor:n.dataset.scStageAnchor,width:n.getBoundingClientRect().width}));
@@ -102,9 +101,6 @@ async function shot(page,name,selector=null){
     await nextSemantic(page,"v2_scene02_tail");
     await choose(page,"WATCH THE HANDOFF","v2_watch_exchange");
 
-    // Manual #312 blocker: MI must not be visible before the narration actually
-    // reaches her entrance. The scene is mounted with all semantic participants,
-    // but presentation withholds MI until cue 10.
     const watchOpening=await page.evaluate(()=>{
       const root=document.getElementById("kakashi-v2-scene-board");
       const mi=root.querySelector('.kv2-actor[data-slot="mi"]');
@@ -138,13 +134,7 @@ async function shot(page,name,selector=null){
       const root=document.getElementById("kakashi-v2-scene-board");
       const mi=root.querySelector('.kv2-actor[data-slot="mi"]');
       const style=mi?getComputedStyle(mi):null;
-      return{
-        cue:getAcademyKakashiV2TransitionState36040()?.cueIndex,
-        hidden:mi?.hidden===true,
-        withheld:mi?.dataset.kv2CueWithheld==="true",
-        display:style?.display||null,
-        opacity:style?Number(style.opacity):1
-      };
+      return{cue:getAcademyKakashiV2TransitionState36040()?.cueIndex,hidden:mi?.hidden===true,withheld:mi?.dataset.kv2CueWithheld==="true",display:style?.display||null,opacity:style?Number(style.opacity):1};
     });
     assert.strictEqual(watchEarly.cue,1);
     assert.strictEqual(watchEarly.hidden,true,"#312 MI became mounted-visible during early WATCH narration");
@@ -173,776 +163,124 @@ async function shot(page,name,selector=null){
     assert.strictEqual(watch.packageHolder,"PS");
     assert.strictEqual(watch.packageAnchor,"OPPONENT_RIGHT","#312 package presentation did not travel with Package Smuggler");
 
-    await advanceWatchCue(7);
-    await advanceWatchCue(8);
-    await advanceWatchCue(9);
-    await page.waitForTimeout(260);
+    await advanceWatchCue(7);await advanceWatchCue(8);await advanceWatchCue(9);await page.waitForTimeout(260);
     const anticipation=await page.evaluate(()=>{
       const root=document.getElementById("kakashi-v2-scene-board");
-      return{
-        cue:getAcademyKakashiV2TransitionState36040()?.cueIndex,
-        miWithheld:root.querySelector('.kv2-actor[data-slot="mi"]')?.dataset.kv2CueWithheld==="true",
-        animations:[...root.querySelectorAll(".kv2-actor")].map(n=>getComputedStyle(n).animationName),
-        transitions:[...root.querySelectorAll(".kv2-actor")].map(n=>getComputedStyle(n).transitionDuration)
-      };
+      return{cue:getAcademyKakashiV2TransitionState36040()?.cueIndex,miWithheld:root.querySelector('.kv2-actor[data-slot="mi"]')?.dataset.kv2CueWithheld==="true",animations:[...root.querySelectorAll(".kv2-actor")].map(n=>getComputedStyle(n).animationName),transitions:[...root.querySelectorAll(".kv2-actor")].map(n=>getComputedStyle(n).transitionDuration)};
     });
-    assert.strictEqual(anticipation.cue,9);
-    assert.strictEqual(anticipation.miWithheld,true);
+    assert.strictEqual(anticipation.cue,9);assert.strictEqual(anticipation.miWithheld,true);
     assert(anticipation.animations.every(x=>x==="none"),"#312 Kakashi actor animation survived at WATCH cue 9: "+JSON.stringify(anticipation));
     assert(anticipation.transitions.every(x=>x==="0s"),"#312 Kakashi actor tween survived at WATCH cue 9: "+JSON.stringify(anticipation));
 
     await advanceWatchCue(10);
     const revealMotion=await page.evaluate(()=>{
-      const root=document.getElementById("kakashi-v2-scene-board");
-      const mi=root.querySelector('.kv2-actor[data-slot="mi"]');
-      const amt=root.querySelector('.kv2-actor[data-slot="amt"]');
-      const style=mi?getComputedStyle(mi):null;
-      return{
-        miAnchor:mi?.dataset.scStageAnchor,
-        miWithheld:mi?.dataset.kv2CueWithheld==="true",
-        miHidden:mi?.hidden===true,
-        miOpacity:style?Number(style.opacity):0,
-        miAnimation:style?.animationName||null,
-        miTransform:style?.transform||null,
-        miActive:mi?.dataset.scChoreographyActive||null,
-        amtLeft:amt?.getBoundingClientRect().left||0,
-        ghostCount:root.querySelectorAll(".kv2-actor-ghost,.kv2-departure-ghost,.kv2-outgoing-hold-ghost").length
-      };
+      const root=document.getElementById("kakashi-v2-scene-board");const mi=root.querySelector('.kv2-actor[data-slot="mi"]');const amt=root.querySelector('.kv2-actor[data-slot="amt"]');const style=mi?getComputedStyle(mi):null;
+      return{miAnchor:mi?.dataset.scStageAnchor,miWithheld:mi?.dataset.kv2CueWithheld==="true",miHidden:mi?.hidden===true,miOpacity:style?Number(style.opacity):0,miAnimation:style?.animationName||null,miTransform:style?.transform||null,miActive:mi?.dataset.scChoreographyActive||null,amtLeft:amt?.getBoundingClientRect().left||0,ghostCount:root.querySelectorAll(".kv2-actor-ghost,.kv2-departure-ghost,.kv2-outgoing-hold-ghost").length};
     });
-    assert.strictEqual(revealMotion.miAnchor,"CENTER");
-    assert.strictEqual(revealMotion.miWithheld,false,"#312 Masked Interceptor remained withheld after authored reveal cue");
-    assert.strictEqual(revealMotion.miHidden,false,"#312 Masked Interceptor remained hard-hidden after authored reveal cue");
-    assert.strictEqual(revealMotion.miTransform,"none","#312 MI surprise entrance revived the rejected transform chain: "+JSON.stringify(revealMotion));
-    assert(/kv2SafeSurprise36030|kv2SafeStrike36030/.test(String(revealMotion.miAnimation||""))||["SURPRISE_ENTRY","LUNGE"].includes(revealMotion.miActive),"#312 MI reveal did not start bounded shared choreography: "+JSON.stringify(revealMotion));
-    assert.strictEqual(revealMotion.ghostCount,0,"#312 WATCH reveal created ghost animation furniture");
+    assert.strictEqual(revealMotion.miAnchor,"CENTER");assert.strictEqual(revealMotion.miWithheld,false);assert.strictEqual(revealMotion.miHidden,false);assert.strictEqual(revealMotion.miTransform,"none");
+    assert(/kv2SafeSurprise36030|kv2SafeStrike36030/.test(String(revealMotion.miAnimation||""))||["SURPRISE_ENTRY","LUNGE"].includes(revealMotion.miActive));assert.strictEqual(revealMotion.ghostCount,0);
     await page.waitForTimeout(620);
-    watch=await page.evaluate(()=>{
-      const root=document.getElementById("kakashi-v2-scene-board");
-      const mi=root.querySelector('.kv2-actor[data-slot="mi"]');
-      const ps=root.querySelector('.kv2-actor[data-slot="ps"]');
-      const style=mi?getComputedStyle(mi):null;
-      const peerStyle=ps?getComputedStyle(ps):null;
-      return{
-        miOpacity:style?Number(style.opacity):0,
-        peerOpacity:peerStyle?Number(peerStyle.opacity):0,
-        miTransform:style?.transform||null,
-        active:root.querySelectorAll("[data-sc-choreography-active]").length,
-        rootCount:document.querySelectorAll("#kakashi-v2-scene-board").length
-      };
-    });
-    assert(watch.miOpacity>=0.9&&Math.abs(watch.miOpacity-watch.peerOpacity)<=0.03,"#312 Masked Interceptor did not settle at normal visible actor opacity after authored entrance: "+JSON.stringify(watch));
-    assert.strictEqual(watch.miTransform,"none","#312 MI transform chain survived entrance settle");
-    assert.strictEqual(watch.active,0,"#312 MI reveal choreography failed to settle");
-    assert.strictEqual(watch.rootCount,1,"#312 MI reveal remounted canonical Story root");
+    watch=await page.evaluate(()=>{const root=document.getElementById("kakashi-v2-scene-board");const mi=root.querySelector('.kv2-actor[data-slot="mi"]');const ps=root.querySelector('.kv2-actor[data-slot="ps"]');const style=mi?getComputedStyle(mi):null;const peerStyle=ps?getComputedStyle(ps):null;return{miOpacity:style?Number(style.opacity):0,peerOpacity:peerStyle?Number(peerStyle.opacity):0,miTransform:style?.transform||null,active:root.querySelectorAll("[data-sc-choreography-active]").length,rootCount:document.querySelectorAll("#kakashi-v2-scene-board").length};});
+    assert(watch.miOpacity>=0.9&&Math.abs(watch.miOpacity-watch.peerOpacity)<=0.03);assert.strictEqual(watch.miTransform,"none");assert.strictEqual(watch.active,0);assert.strictEqual(watch.rootCount,1);
     await shot(page,"02-story-handoff-motion-reveal.png","#kakashi-v2-scene-board");
 
     await advanceWatchCue(11);
-    let breakaway=await page.evaluate(()=>{
-      const root=document.getElementById("kakashi-v2-scene-board");
-      const amt=root.querySelector('.kv2-actor[data-slot="amt"]');
-      const ps=root.querySelector('.kv2-actor[data-slot="ps"]');
-      const style=amt?getComputedStyle(amt):null;
-      return{
-        amtDeparted:amt?.classList.contains("kv2-cue-departed")===true,
-        amtOpacity:style?Number(style.opacity):1,
-        amtAnimation:style?.animationName||null,
-        amtTransform:style?.transform||null,
-        amtActive:amt?.dataset.scChoreographyActive||null,
-        psAnchor:ps?.dataset.scStageAnchor,
-        ghostCount:root.querySelectorAll(".kv2-actor-ghost,.kv2-departure-ghost,.kv2-outgoing-hold-ghost").length
-      };
-    });
-    assert.strictEqual(breakaway.amtTransform,"none","#312 AMT breakaway revived the rejected transform chain: "+JSON.stringify(breakaway));
-    assert(/kv2SafeFlee36030/.test(String(breakaway.amtAnimation||""))||breakaway.amtActive==="FLEE","#312 AMT authored breakaway motion did not start: "+JSON.stringify(breakaway));
-    assert.strictEqual(breakaway.ghostCount,0,"#312 AMT cue-local breakaway created a departure ghost");
-    assert.strictEqual(breakaway.psAnchor,"OPPONENT_RIGHT");
+    let breakaway=await page.evaluate(()=>{const root=document.getElementById("kakashi-v2-scene-board");const amt=root.querySelector('.kv2-actor[data-slot="amt"]');const ps=root.querySelector('.kv2-actor[data-slot="ps"]');const style=amt?getComputedStyle(amt):null;return{amtDeparted:amt?.classList.contains("kv2-cue-departed")===true,amtOpacity:style?Number(style.opacity):1,amtAnimation:style?.animationName||null,amtTransform:style?.transform||null,amtActive:amt?.dataset.scChoreographyActive||null,psAnchor:ps?.dataset.scStageAnchor,ghostCount:root.querySelectorAll(".kv2-actor-ghost,.kv2-departure-ghost,.kv2-outgoing-hold-ghost").length};});
+    assert.strictEqual(breakaway.amtTransform,"none");assert(/kv2SafeFlee36030/.test(String(breakaway.amtAnimation||""))||breakaway.amtActive==="FLEE");assert.strictEqual(breakaway.ghostCount,0);assert.strictEqual(breakaway.psAnchor,"OPPONENT_RIGHT");
     await page.waitForTimeout(420);
-    breakaway=await page.evaluate(()=>{
-      const root=document.getElementById("kakashi-v2-scene-board");
-      const amt=root.querySelector('.kv2-actor[data-slot="amt"]');
-      const style=amt?getComputedStyle(amt):null;
-      return{
-        amtDeparted:amt?.classList.contains("kv2-cue-departed")===true,
-        amtOpacity:style?Number(style.opacity):1,
-        amtAnimation:style?.animationName||null,
-        amtTransition:style?.transitionDuration||null,
-        amtTransform:style?.transform||null,
-        active:root.querySelectorAll("[data-sc-choreography-active]").length,
-        ghostCount:root.querySelectorAll(".kv2-actor-ghost,.kv2-departure-ghost,.kv2-outgoing-hold-ghost").length
-      };
-    });
-    assert.strictEqual(breakaway.amtDeparted,true,"#312 ANBU Marked Target did not settle into authored departed state");
-    assert(breakaway.amtOpacity<=0.01,"#312 AMT remained visible after bounded breakaway settle: "+JSON.stringify(breakaway));
-    assert.strictEqual(breakaway.amtAnimation,"none","#312 AMT animation survived bounded breakaway settle");
-    assert.strictEqual(breakaway.amtTransition,"0s","#312 AMT breakaway retained a tween");
-    assert.strictEqual(breakaway.amtTransform,"none","#312 AMT transform chain survived breakaway settle");
-    assert.strictEqual(breakaway.active,0,"#312 AMT breakaway choreography failed to settle");
-    assert.strictEqual(breakaway.ghostCount,0,"#312 AMT breakaway leaked ghost presentation");
+    breakaway=await page.evaluate(()=>{const root=document.getElementById("kakashi-v2-scene-board");const amt=root.querySelector('.kv2-actor[data-slot="amt"]');const style=amt?getComputedStyle(amt):null;return{amtDeparted:amt?.classList.contains("kv2-cue-departed")===true,amtOpacity:style?Number(style.opacity):1,amtAnimation:style?.animationName||null,amtTransition:style?.transitionDuration||null,amtTransform:style?.transform||null,active:root.querySelectorAll("[data-sc-choreography-active]").length,ghostCount:root.querySelectorAll(".kv2-actor-ghost,.kv2-departure-ghost,.kv2-outgoing-hold-ghost").length};});
+    assert.strictEqual(breakaway.amtDeparted,true);assert(breakaway.amtOpacity<=0.01);assert.strictEqual(breakaway.amtAnimation,"none");assert.strictEqual(breakaway.amtTransition,"0s");assert.strictEqual(breakaway.amtTransform,"none");assert.strictEqual(breakaway.active,0);assert.strictEqual(breakaway.ghostCount,0);
 
     for(let i=12;i<watchOpening.cueCount;i++)await advanceWatchCue(i);
-    const choiceLayout=await page.evaluate(()=>{
-      const root=document.getElementById("kakashi-v2-scene-board");
-      const box=root.querySelector(".kv2-actions");
-      const buttons=[...box.querySelectorAll("button")];
-      return{
-        count:buttons.length,
-        labels:buttons.map(b=>b.textContent.trim()),
-        icons:buttons.map(b=>b.dataset.intentIcon||""),
-        scrollHeight:box.scrollHeight,
-        clientHeight:box.clientHeight,
-        overflowY:getComputedStyle(box).overflowY,
-        hasChoices:root.dataset.hasChoices,
-        canAdvance:root.dataset.canAdvance,
-        narrationRadius:getComputedStyle(root.querySelector(".kv2-dialogue")).borderRadius
-      };
-    });
-    assert.strictEqual(choiceLayout.count,5,"#312 exact WATCH choice set lost");
-    assert(choiceLayout.icons.every(Boolean),"#312 choice intent icons missing: "+JSON.stringify(choiceLayout.icons));
-    assert(choiceLayout.scrollHeight<=choiceLayout.clientHeight+2,"#312 five-choice surface still requires an internal scrollbar: "+JSON.stringify(choiceLayout));
-    assert.notStrictEqual(choiceLayout.overflowY,"scroll");
-    assert.strictEqual(choiceLayout.hasChoices,"true");
-    assert.strictEqual(choiceLayout.canAdvance,"false");
-    assert(parseFloat(choiceLayout.narrationRadius)>=10,"#312 narration/choice surface is not modern rounded presentation");
+    const choiceLayout=await page.evaluate(()=>{const root=document.getElementById("kakashi-v2-scene-board");const box=root.querySelector(".kv2-actions");const buttons=[...box.querySelectorAll("button")];return{count:buttons.length,labels:buttons.map(b=>b.textContent.trim()),icons:buttons.map(b=>b.dataset.intentIcon||""),scrollHeight:box.scrollHeight,clientHeight:box.clientHeight,overflowY:getComputedStyle(box).overflowY,hasChoices:root.dataset.hasChoices,canAdvance:root.dataset.canAdvance,narrationRadius:getComputedStyle(root.querySelector(".kv2-dialogue")).borderRadius};});
+    assert.strictEqual(choiceLayout.count,5);assert(choiceLayout.icons.every(Boolean));assert(choiceLayout.scrollHeight<=choiceLayout.clientHeight+2);assert.notStrictEqual(choiceLayout.overflowY,"scroll");assert.strictEqual(choiceLayout.hasChoices,"true");assert.strictEqual(choiceLayout.canAdvance,"false");assert(parseFloat(choiceLayout.narrationRadius)>=10);
 
-    // Semantic choice remains immediate; bounded actor motion must never delay Story truth.
-    const start=Date.now();
-    await choose(page,"INTERCEPT THE MASKED ATTACKER","v2_stop_assassin_setup");
-    const elapsed=Date.now()-start;
-    assert(elapsed<900,"#312 Story semantic choice waited for presentation: "+elapsed+"ms");
-    const stop=await page.evaluate(()=>{
-      const root=document.getElementById("kakashi-v2-scene-board");
-      return{
-        beat:getActiveStorySceneRuntime()?.beatId,
-        anchors:[...root.querySelectorAll(".kv2-actors > .kv2-actor")].map(n=>({
-          slot:n.dataset.slot,
-          anchor:n.dataset.scStageAnchor,
-          width:n.getBoundingClientRect().width,
-          transform:getComputedStyle(n).transform,
-          animation:getComputedStyle(n).animationName,
-          transition:getComputedStyle(n).transitionDuration,
-          pending:n.dataset.scChoreographyPendingEntry==="true"
-        })),
-        ghostCount:root.querySelectorAll(".kv2-actor-ghost,.kv2-departure-ghost,.kv2-outgoing-hold-ghost").length,
-        transition:runAcademyKakashiV2Transition36040Diagnostics(),
-        renderer:runAcademyKakashiV2Renderer36030Diagnostics()
-      };
-    });
-    assert.strictEqual(stop.beat,"v2_stop_assassin_setup");
-    assert.deepStrictEqual(stop.anchors.map(x=>x.anchor),["PLAYER_LEFT","OPPONENT_RIGHT"]);
-    assert(stop.anchors.every(a=>a.width>=245),"#312 battle-pair Story prominence too small");
-    assert.strictEqual(stop.ghostCount,0,"#312 STOP transition created actor ghosts");
-    assert(stop.anchors.every(a=>a.pending===false),"#312 static actor remained choreography-pending");
-    assert(stop.anchors.every(a=>a.animation==="none"&&a.transition==="0s"),"#312 STOP actor animation/tween survived: "+JSON.stringify(stop.anchors));
-    assert(stop.anchors.every(a=>a.transform==="none"||a.transform==="matrix(1, 0, 0, 1, 0, 0)"||a.transform==="matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)"),"#312 Story actors retained residual transform: "+JSON.stringify(stop.anchors));
-    assert(stop.transition.pass,JSON.stringify(stop.transition));
-    assert(stop.renderer.pass,JSON.stringify(stop.renderer));
-    await page.waitForFunction(()=>{
-      const curtain=document.getElementById("sc-story-hard-transition-33900");
-      return !curtain||(!curtain.classList.contains("is-covered")&&!curtain.classList.contains("is-releasing"));
-    },null,{timeout:3000});
+    const start=Date.now();await choose(page,"INTERCEPT THE MASKED ATTACKER","v2_stop_assassin_setup");const elapsed=Date.now()-start;assert(elapsed<900);
+    const stop=await page.evaluate(()=>{const root=document.getElementById("kakashi-v2-scene-board");return{beat:getActiveStorySceneRuntime()?.beatId,anchors:[...root.querySelectorAll(".kv2-actors > .kv2-actor")].map(n=>({slot:n.dataset.slot,anchor:n.dataset.scStageAnchor,width:n.getBoundingClientRect().width,transform:getComputedStyle(n).transform,animation:getComputedStyle(n).animationName,transition:getComputedStyle(n).transitionDuration,pending:n.dataset.scChoreographyPendingEntry==="true"})),ghostCount:root.querySelectorAll(".kv2-actor-ghost,.kv2-departure-ghost,.kv2-outgoing-hold-ghost").length,transition:runAcademyKakashiV2Transition36040Diagnostics(),renderer:runAcademyKakashiV2Renderer36030Diagnostics()};});
+    assert.strictEqual(stop.beat,"v2_stop_assassin_setup");assert.deepStrictEqual(stop.anchors.map(x=>x.anchor),["PLAYER_LEFT","OPPONENT_RIGHT"]);assert(stop.anchors.every(a=>a.width>=245));assert.strictEqual(stop.ghostCount,0);assert(stop.anchors.every(a=>a.pending===false));assert(stop.anchors.every(a=>a.animation==="none"&&a.transition==="0s"));assert(stop.transition.pass);assert(stop.renderer.pass);
+    await page.waitForFunction(()=>{const curtain=document.getElementById("sc-story-hard-transition-33900");return !curtain||(!curtain.classList.contains("is-covered")&&!curtain.classList.contains("is-releasing"));},null,{timeout:3000});
     await shot(page,"03-story-stop-assassin-static.png","#kakashi-v2-scene-board");
 
-    // BATTLE BENCHMARK — use the authorised sequential MI package against the
-    // same current Story instance. This is a QA launcher only; Battle truth and
-    // evidence remain canonical runtime structures.
     const launched=await page.evaluate(()=>{
-      const rt=getActiveStorySceneRuntime();
-      rt.beatId="v2_battle_mi_package_second";
-      rt.pendingBattle=null;rt.battleResume=null;
-      resetAcademyKakashiV2Transition36040();
-      const returnContext={
-        type:"story_scene",sceneId:rt.sceneId,sceneInstanceId:rt.instanceId,
-        sourceBeatId:"v2_battle_mi_package_second",
-        victoryBeatId:"v2_mi_package_second_win",defeatBeatId:"v2_mi_package_second_loss",
-        postBattleBeatId:null,exposeFinisher:false
-      };
-      const out=launchAcademyKakashiV2Battle36010({
-        battleConfigId:"academy_kakashi_origin_battle_seq_mi",
-        storyOccurrenceId:"issue312_browser_benchmark",
-        sourceAnchorRef:"AK_SA_015",
-        bindingRef:"mi_package_second",
-        returnContext
-      });
-      renderAcademyKakashiV236030();
-      return{out,config:currentBattle?.kakashiV2?.battleConfigId||null,enemy:getBattleDeploymentParticipant("enemy",1)?.id||null};
+      const rt=getActiveStorySceneRuntime();rt.beatId="v2_battle_mi_package_second";rt.pendingBattle=null;rt.battleResume=null;resetAcademyKakashiV2Transition36040();
+      const returnContext={type:"story_scene",sceneId:rt.sceneId,sceneInstanceId:rt.instanceId,sourceBeatId:"v2_battle_mi_package_second",victoryBeatId:"v2_mi_package_second_win",defeatBeatId:"v2_mi_package_second_loss",postBattleBeatId:null,exposeFinisher:false};
+      const out=launchAcademyKakashiV2Battle36010({battleConfigId:"academy_kakashi_origin_battle_seq_mi",storyOccurrenceId:"issue312_browser_benchmark",sourceAnchorRef:"AK_SA_015",bindingRef:"mi_package_second",returnContext});renderAcademyKakashiV236030();return{out,config:currentBattle?.kakashiV2?.battleConfigId||null,enemy:getBattleDeploymentParticipant("enemy",1)?.id||null};
     });
-    assert(launched.out?.success&&launched.config==="academy_kakashi_origin_battle_seq_mi",JSON.stringify(launched));
-    assert.strictEqual(launched.enemy,"academy_kakashi_origin_masked_interceptor");
-    await page.waitForSelector(".alpha-code-battle-stage",{state:"visible",timeout:12000});
+    assert(launched.out?.success&&launched.config==="academy_kakashi_origin_battle_seq_mi");assert.strictEqual(launched.enemy,"academy_kakashi_origin_masked_interceptor");await page.waitForSelector(".alpha-code-battle-stage",{state:"visible",timeout:12000});
 
-    // Current UI authority: Formation Stage, not the legacy four-family shell.
-    const formationOpening=await page.evaluate(()=>{
-      const stage=document.querySelector(".alpha-code-battle-stage");
-      const row=stage?.querySelector(".battle-live-action-family-row");
-      const primary=[...row.querySelectorAll("button")];
-      const withdraw=stage?.querySelector(".battle2-formation-withdraw");
-      const active=[...stage.querySelectorAll(".battle-live-active-card-player,.battle-live-active-card-enemy")];
-      const visibleSupport=[...stage.querySelectorAll(".battle2-formation-support")].filter(n=>getComputedStyle(n).display!=="none");
-      return{
-        formationStage:stage?.dataset.formationStage,
-        mode:stage?.dataset.formationMode,
-        playerCount:stage?.dataset.playerFormationCount,
-        enemyCount:stage?.dataset.enemyFormationCount,
-        tray:stage?.dataset.formationTray,
-        primaryCount:primary.length,
-        primaryLabels:primary.map(b=>b.textContent.trim()),
-        primaryDataset:row?.dataset.primaryFamilies||"",
-        withdrawOutsideDock:!!withdraw&&withdraw.parentElement===stage&&!row.contains(withdraw),
-        withdrawHandler:withdraw?.getAttribute("onclick")||"",
-        activeCount:active.length,
-        activePortraits:active.map(n=>({side:n.dataset.side,path:n.querySelector("img")?.getAttribute("src")||"",formationPortrait:n.querySelector("img")?.dataset.formationPortrait||null})),
-        visibleSupportCount:visibleSupport.length
-      };
-    });
-    assert.strictEqual(formationOpening.formationStage,"true");
-    assert.strictEqual(formationOpening.mode,"duel","#312 1v1 must use Formation Stage duel composition");
-    assert.strictEqual(formationOpening.playerCount,"1");
-    assert.strictEqual(formationOpening.enemyCount,"1");
-    assert.strictEqual(formationOpening.tray,"closed","#312 Formation Stage should open on battlefield, not a permanent inspector/tray");
-    assert.strictEqual(formationOpening.primaryCount,3,"#312 primary Battle dock must contain exactly three families");
-    assert.deepStrictEqual(formationOpening.primaryLabels,["SKILLS","ITEMS","SUMMONS"],"#312 primary Battle dock taxonomy drift");
-    assert.strictEqual(formationOpening.primaryDataset,"SKILLS|ITEMS|SUMMONS");
-    assert.strictEqual(formationOpening.withdrawOutsideDock,true,"#312 WITHDRAW must remain available without becoming a fourth primary family");
-    assert(formationOpening.withdrawHandler.includes("invokeBattleWithdrawAction"),"#312 WITHDRAW semantic API was disconnected");
-    assert.strictEqual(formationOpening.activeCount,2);
-    assert(formationOpening.activePortraits.every(row=>row.path),"#312 Formation Stage active combatant portrait authority missing: "+JSON.stringify(formationOpening.activePortraits));
-    assert.strictEqual(formationOpening.visibleSupportCount,0,"#312 duel composition retained empty/support formation furniture");
+    const formationOpening=await page.evaluate(()=>{const stage=document.querySelector(".alpha-code-battle-stage");const row=stage?.querySelector(".battle-live-action-family-row");const primary=[...row.querySelectorAll("button")];const withdraw=stage?.querySelector(".battle2-formation-withdraw");const active=[...stage.querySelectorAll(".battle-live-active-card-player,.battle-live-active-card-enemy")];const visibleSupport=[...stage.querySelectorAll(".battle2-formation-support")].filter(n=>getComputedStyle(n).display!=="none");return{formationStage:stage?.dataset.formationStage,mode:stage?.dataset.formationMode,playerCount:stage?.dataset.playerFormationCount,enemyCount:stage?.dataset.enemyFormationCount,tray:stage?.dataset.formationTray,primaryCount:primary.length,primaryLabels:primary.map(b=>b.textContent.trim()),primaryDataset:row?.dataset.primaryFamilies||"",withdrawOutsideDock:!!withdraw&&withdraw.parentElement===stage&&!row.contains(withdraw),withdrawHandler:withdraw?.getAttribute("onclick")||"",activeCount:active.length,activePortraits:active.map(n=>({side:n.dataset.side,path:n.querySelector("img")?.getAttribute("src")||"",formationPortrait:n.querySelector("img")?.dataset.formationPortrait||null})),visibleSupportCount:visibleSupport.length};});
+    assert.strictEqual(formationOpening.formationStage,"true");assert.strictEqual(formationOpening.mode,"duel");assert.strictEqual(formationOpening.playerCount,"1");assert.strictEqual(formationOpening.enemyCount,"1");assert.strictEqual(formationOpening.tray,"closed");assert.strictEqual(formationOpening.primaryCount,3);assert.deepStrictEqual(formationOpening.primaryLabels,["SKILLS","ITEMS","SUMMONS"]);assert.strictEqual(formationOpening.primaryDataset,"SKILLS|ITEMS|SUMMONS");assert.strictEqual(formationOpening.withdrawOutsideDock,true);assert(formationOpening.withdrawHandler.includes("invokeBattleWithdrawAction"));assert.strictEqual(formationOpening.activeCount,2);assert(formationOpening.activePortraits.every(row=>row.path));assert.strictEqual(formationOpening.visibleSupportCount,0);
 
-    // Manual reward blocker: prove the exact authoritative MI package reaches
-    // the Victory renderer, not only the reward adapter's internal state.
-    const rewardProjection=await page.evaluate(()=>{
-      const priorOutcome=currentBattle.outcome?cloneBattleRuntimeValue(currentBattle.outcome):null;
-      const priorRewards=currentBattle.rewards?cloneBattleRuntimeValue(currentBattle.rewards):null;
-      currentBattle.outcome={type:"victory",completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};
-      const ensured=ensureAcademyKakashiV2BattleRewardProjection36015();
-      const host=document.createElement("div");
-      host.style.position="fixed";host.style.left="-10000px";host.style.top="0";
-      document.body.appendChild(host);
-      renderVictoryOverlay(host);
-      const text=String(host.textContent||"").replace(/\s+/g," ").trim();
-      const projected=cloneBattleRuntimeValue(currentBattle.rewards);
-      host.remove();
-      currentBattle.outcome=priorOutcome;
-      currentBattle.rewards=priorRewards;
-      return{ensured,projected,text};
-    });
-    assert.strictEqual(rewardProjection.projected.ryo,50,"#312 MI Victory must project locked 50 Ryō");
-    assert.strictEqual(rewardProjection.projected.exp,0,"#312 must not invent generic Character EXP");
-    assert.deepStrictEqual(rewardProjection.projected.items.map(row=>row.name),["Field Recovery Pill"],"#312 MI Victory item projection drift");
-    assert(rewardProjection.text.includes("50")&&rewardProjection.text.includes("Field Recovery Pill"),"#312 Victory UI did not visibly consume authoritative MI rewards: "+rewardProjection.text);
+    const rewardProjection=await page.evaluate(()=>{const priorOutcome=currentBattle.outcome?cloneBattleRuntimeValue(currentBattle.outcome):null;const priorRewards=currentBattle.rewards?cloneBattleRuntimeValue(currentBattle.rewards):null;currentBattle.outcome={type:"victory",completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};const ensured=ensureAcademyKakashiV2BattleRewardProjection36015();const host=document.createElement("div");host.style.position="fixed";host.style.left="-10000px";host.style.top="0";document.body.appendChild(host);renderVictoryOverlay(host);const text=String(host.textContent||"").replace(/\s+/g," ").trim();const projected=cloneBattleRuntimeValue(currentBattle.rewards);host.remove();currentBattle.outcome=priorOutcome;currentBattle.rewards=priorRewards;return{ensured,projected,text};});
+    assert.strictEqual(rewardProjection.projected.ryo,50);assert.strictEqual(rewardProjection.projected.exp,0);assert.deepStrictEqual(rewardProjection.projected.items.map(row=>row.name),["Field Recovery Pill"]);assert(rewardProjection.text.includes("50")&&rewardProjection.text.includes("Field Recovery Pill"));
 
     await page.locator('.battle-live-action-family-row button[data-formation-family="skills"]').click();
-    await page.waitForFunction(()=>{
-      const stage=document.querySelector(".alpha-code-battle-stage");
-      const deck=stage&&stage.querySelector(".battle-live-skill-deck");
-      return stage?.dataset.formationTray==="skills"&&!!deck&&getComputedStyle(deck).display!=="none";
-    },null,{timeout:3000});
-    const skillTray=await page.evaluate(()=>{
-      const stage=document.querySelector(".alpha-code-battle-stage"),deck=stage.querySelector(".battle-live-skill-deck"),details=stage.querySelector(".battle-live-skill-details");
-      const sr=stage.getBoundingClientRect(),dr=deck.getBoundingClientRect(),ir=details?.getBoundingClientRect();
-      return{
-        tray:stage.dataset.formationTray,
-        deck:{left:dr.left-sr.left,top:dr.top-sr.top,width:dr.width,height:dr.height},
-        inspector:ir?{left:ir.left-sr.left,top:ir.top-sr.top,width:ir.width,height:ir.height}:null,
-        stageHeight:sr.height
-      };
-    });
-    assert.strictEqual(skillTray.tray,"skills");
-    assert(skillTray.deck.top>skillTray.stageHeight*.62,"#312 Skill tray is consuming the central confrontation lane: "+JSON.stringify(skillTray));
-    await page.locator('.battle-live-action-family-row button[data-formation-family="skills"]').click();
-    await page.waitForFunction(()=>document.querySelector(".alpha-code-battle-stage")?.dataset.formationTray==="closed",null,{timeout:3000});
+    await page.waitForFunction(()=>{const stage=document.querySelector(".alpha-code-battle-stage");const deck=stage&&stage.querySelector(".battle-live-skill-deck");return stage?.dataset.formationTray==="skills"&&!!deck&&getComputedStyle(deck).display!=="none";},null,{timeout:3000});
+    const skillTray=await page.evaluate(()=>{const stage=document.querySelector(".alpha-code-battle-stage"),deck=stage.querySelector(".battle-live-skill-deck"),details=stage.querySelector(".battle-live-skill-details");const sr=stage.getBoundingClientRect(),dr=deck.getBoundingClientRect(),ir=details?.getBoundingClientRect();return{tray:stage.dataset.formationTray,deck:{left:dr.left-sr.left,top:dr.top-sr.top,width:dr.width,height:dr.height},inspector:ir?{left:ir.left-sr.left,top:ir.top-sr.top,width:ir.width,height:ir.height}:null,stageHeight:sr.height};});
+    assert.strictEqual(skillTray.tray,"skills");assert(skillTray.deck.top>skillTray.stageHeight*.62);await page.locator('.battle-live-action-family-row button[data-formation-family="skills"]').click();await page.waitForFunction(()=>document.querySelector(".alpha-code-battle-stage")?.dataset.formationTray==="closed",null,{timeout:3000});
 
-    const seed=async(kind)=>page.evaluate(kind=>{
-      const runtime=ensureBattleRuntimeState(),battleId=currentBattle.battleId;
-      const actorPlayer={side:"player",participantId:"academy_kakashi"};
-      const actorEnemy={side:"enemy",participantId:"academy_kakashi_origin_masked_interceptor"};
-      const push=def=>recordBattleEvidence(def);
-      if(kind==="substitution"){
-        const actionId="issue312_substitution";
-        push({eventType:"action_attempted",actionId,actorRef:actorEnemy,targetRef:actorPlayer,skillId:"enemy_decoy_assassin_decoy_substitution",data:{actionClass:"enemy_context_technique"}});
-        push({eventType:"enemy_authored_action_completed",committedOccurrence:true,actionId,actorRef:actorEnemy,targetRef:actorPlayer,skillId:"enemy_decoy_assassin_decoy_substitution",data:{resolved:true}});
-      }else if(kind==="hit"){
-        const actionId="issue312_hit";
-        push({eventType:"action_attempted",actionId,actorRef:actorPlayer,targetRef:actorEnemy,skillId:"issue312_taijutsu",data:{actionClass:"prepared_skill"}});
-        push({eventType:"damage_resolved",actionId,actorRef:actorPlayer,targetRef:actorEnemy,skillId:"issue312_taijutsu",data:{primaryDiscipline:"Taijutsu",finalDamage:7,remainingBattlePLBefore:14,remainingBattlePLAfter:7,flatGuards:[],ratioGuards:[]}});
-        push({eventType:"skill_action_completed",committedOccurrence:true,actionId,actorRef:actorPlayer,targetRef:actorEnemy,skillId:"issue312_taijutsu",data:{resolved:true,damageApplied:true,finalDamage:7}});
-      }else{
-        const actionId="issue312_defeat";
-        push({eventType:"damage_resolved",actionId,actorRef:actorPlayer,targetRef:actorEnemy,skillId:"issue312_finish",data:{primaryDiscipline:"Taijutsu",finalDamage:7,remainingBattlePLBefore:7,remainingBattlePLAfter:0,flatGuards:[],ratioGuards:[]}});
-        push({eventType:"skill_action_completed",committedOccurrence:true,actionId,actorRef:actorPlayer,targetRef:actorEnemy,skillId:"issue312_finish",data:{resolved:true,damageApplied:true,finalDamage:7}});
-      }
-      openOverlay("combat");
-      return{kind,battleId,evidenceCount:runtime.evidence.length};
-    },kind);
+    const seed=async(kind)=>page.evaluate(kind=>{const runtime=ensureBattleRuntimeState(),battleId=currentBattle.battleId;const actorPlayer={side:"player",participantId:"academy_kakashi"};const actorEnemy={side:"enemy",participantId:"academy_kakashi_origin_masked_interceptor"};const push=def=>recordBattleEvidence(def);if(kind==="substitution"){const actionId="issue312_substitution";push({eventType:"action_attempted",actionId,actorRef:actorEnemy,targetRef:actorPlayer,skillId:"enemy_decoy_assassin_decoy_substitution",data:{actionClass:"enemy_context_technique"}});push({eventType:"enemy_authored_action_completed",committedOccurrence:true,actionId,actorRef:actorEnemy,targetRef:actorPlayer,skillId:"enemy_decoy_assassin_decoy_substitution",data:{resolved:true}});}else if(kind==="hit"){const actionId="issue312_hit";push({eventType:"action_attempted",actionId,actorRef:actorPlayer,targetRef:actorEnemy,skillId:"issue312_taijutsu",data:{actionClass:"prepared_skill"}});push({eventType:"damage_resolved",actionId,actorRef:actorPlayer,targetRef:actorEnemy,skillId:"issue312_taijutsu",data:{primaryDiscipline:"Taijutsu",finalDamage:7,remainingBattlePLBefore:14,remainingBattlePLAfter:7,flatGuards:[],ratioGuards:[]}});push({eventType:"skill_action_completed",committedOccurrence:true,actionId,actorRef:actorPlayer,targetRef:actorEnemy,skillId:"issue312_taijutsu",data:{resolved:true,damageApplied:true,finalDamage:7}});}else{const actionId="issue312_defeat";push({eventType:"damage_resolved",actionId,actorRef:actorPlayer,targetRef:actorEnemy,skillId:"issue312_finish",data:{primaryDiscipline:"Taijutsu",finalDamage:7,remainingBattlePLBefore:7,remainingBattlePLAfter:0,flatGuards:[],ratioGuards:[]}});push({eventType:"skill_action_completed",committedOccurrence:true,actionId,actorRef:actorPlayer,targetRef:actorEnemy,skillId:"issue312_finish",data:{resolved:true,damageApplied:true,finalDamage:7}});}openOverlay("combat");return{kind,battleId,evidenceCount:runtime.evidence.length};},kind);
 
-    await seed("substitution");
-    await page.waitForSelector('.battle2-performance-stage[data-result="SUBSTITUTION"]',{state:"visible",timeout:8000});
-    const substitution=await page.evaluate(()=>{
-      const p=resolveBattlePerformanceProjection33000(),lane=document.querySelector(".battle2-performance-stage"),stage=document.querySelector(".alpha-code-battle-stage");
-      const actor=stage?.querySelector(".battle2-performance-role-actor"),target=stage?.querySelector(".battle2-performance-role-target"),center=lane?.querySelector(".battle2-performance-center");
-      const chip=stage?.querySelector(".battle2-performance-result-chip");
-      const rect=node=>{const r=node?.getBoundingClientRect();return r?{left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}:null;};
-      const overlaps=(a,b)=>!!a&&!!b&&!(a.right<=b.left||a.left>=b.right||a.bottom<=b.top||a.top>=b.bottom);
-      const actorRect=rect(actor),targetRect=rect(target),centerRect=rect(center),stageRect=rect(stage);
-      return{
-        p,
-        performancePortraits:lane?.querySelectorAll("img").length||0,
-        canonicalCards:stage?.querySelectorAll(".battle-live-active-card-player,.battle-live-active-card-enemy").length||0,
-        actorRoles:stage?.querySelectorAll(".battle2-performance-role-actor").length||0,
-        targetRoles:stage?.querySelectorAll(".battle2-performance-role-target").length||0,
-        resultChips:stage?.querySelectorAll(".battle2-performance-result-chip").length||0,
-        resultChipOnExactTarget:!!(chip&&target&&chip.parentElement===target),
-        performanceActive:stage?.classList.contains("battle2-performance-active")||false,
-        centerWidthRatio:centerRect&&stageRect&&stageRect.width?centerRect.width/stageRect.width:null,
-        centerOverlapsActor:overlaps(centerRect,actorRect),
-        centerOverlapsTarget:overlaps(centerRect,targetRect)
-      };
-    });
-    assert.strictEqual(substitution.p.result,"SUBSTITUTION");
-    assert.strictEqual(substitution.p.finalDamage,0);
-    assert.strictEqual(substitution.p.exactTarget,true);
-    assert.strictEqual(substitution.performancePortraits,0,"#312 performance layer duplicated Battle portraits");
-    assert.strictEqual(substitution.canonicalCards,2,"#312 canonical current actor/opponent hierarchy missing");
-    assert.strictEqual(substitution.actorRoles,1,"#312 committed actor was not promoted on canonical Battle card");
-    assert.strictEqual(substitution.targetRoles,1,"#312 exact target was not promoted on canonical Battle card");
-    assert.strictEqual(substitution.resultChips,1,"#312 factual result feedback must have one participant-local receipt");
-    assert.strictEqual(substitution.resultChipOnExactTarget,true,"#312 result receipt is not attached to the exact target");
-    assert.strictEqual(substitution.performanceActive,true,"#312 canonical Battle performance phase not active");
-    assert(substitution.centerWidthRatio!==null&&substitution.centerWidthRatio<=0.14,"#312 action label still occupies too much battlefield center: "+substitution.centerWidthRatio);
-    assert.strictEqual(substitution.centerOverlapsActor,false,"#312 compact action label overlaps promoted actor");
-    assert.strictEqual(substitution.centerOverlapsTarget,false,"#312 compact action label overlaps promoted target");
-    const battlePaint=await page.evaluate(()=>{
-      const selectors=[
-        "#story-scene-presentation-layer","#screen-overlay",".overlay-content-box","#overlay-content-container",
-        ".battle-live-screen",".alpha-code-battle-stage",".battle2-performance-host",
-        ".battle2-performance-stage",".battle-live-active-card-player",".battle-live-active-card-enemy"
-      ];
-      const describe=selector=>{
-        const node=document.querySelector(selector);
-        if(!node)return{selector,missing:true};
-        const cs=getComputedStyle(node),r=node.getBoundingClientRect();
-        return{
-          selector,tag:node.tagName,className:node.className,
-          rect:{x:r.x,y:r.y,width:r.width,height:r.height},
-          display:cs.display,visibility:cs.visibility,opacity:cs.opacity,zIndex:cs.zIndex,
-          backgroundColor:cs.backgroundColor,backgroundImage:cs.backgroundImage,
-          transform:cs.transform,filter:cs.filter,overflow:cs.overflow,
-          childCount:node.children.length,htmlLength:node.innerHTML.length
-        };
-      };
-      const stage=document.querySelector(".alpha-code-battle-stage");
-      const r=stage&&stage.getBoundingClientRect();
-      const center=r?{x:r.left+r.width/2,y:r.top+r.height/2}:null;
-      const stack=center?document.elementsFromPoint(center.x,center.y).slice(0,12).map(node=>{
-        const cs=getComputedStyle(node);
-        return{tag:node.tagName,id:node.id,className:node.className,opacity:cs.opacity,display:cs.display,visibility:cs.visibility,zIndex:cs.zIndex,backgroundColor:cs.backgroundColor};
-      }):[];
-      return{
-        currentOverlayType:typeof currentOverlayType!=="undefined"?currentOverlayType:null,
-        screenOverlayClass:document.getElementById("screen-overlay")?.className||null,
-        screenOverlayInline:document.getElementById("screen-overlay")?.getAttribute("style")||null,
-        nodes:selectors.map(describe),center,stack
-      };
-    });
-    console.log("ISSUE312_BATTLE_PAINT_DIAGNOSTIC "+JSON.stringify(battlePaint));
+    await seed("substitution");await page.waitForSelector('.battle2-performance-stage[data-result="SUBSTITUTION"]',{state:"visible",timeout:8000});
+    const substitution=await page.evaluate(()=>{const p=resolveBattlePerformanceProjection33000(),lane=document.querySelector(".battle2-performance-stage"),stage=document.querySelector(".alpha-code-battle-stage");const actor=stage?.querySelector(".battle2-performance-role-actor"),target=stage?.querySelector(".battle2-performance-role-target"),center=lane?.querySelector(".battle2-performance-center");const chip=stage?.querySelector(".battle2-performance-result-chip");const rect=node=>{const r=node?.getBoundingClientRect();return r?{left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}:null;};const overlaps=(a,b)=>!!a&&!!b&&!(a.right<=b.left||a.left>=b.right||a.bottom<=b.top||a.top>=b.bottom);const actorRect=rect(actor),targetRect=rect(target),centerRect=rect(center),stageRect=rect(stage);return{p,performancePortraits:lane?.querySelectorAll("img").length||0,canonicalCards:stage?.querySelectorAll(".battle-live-active-card-player,.battle-live-active-card-enemy").length||0,actorRoles:stage?.querySelectorAll(".battle2-performance-role-actor").length||0,targetRoles:stage?.querySelectorAll(".battle2-performance-role-target").length||0,resultChips:stage?.querySelectorAll(".battle2-performance-result-chip").length||0,resultChipOnExactTarget:!!(chip&&target&&chip.parentElement===target),performanceActive:stage?.classList.contains("battle2-performance-active")||false,centerWidthRatio:centerRect&&stageRect&&stageRect.width?centerRect.width/stageRect.width:null,centerOverlapsActor:overlaps(centerRect,actorRect),centerOverlapsTarget:overlaps(centerRect,targetRect)};});
+    assert.strictEqual(substitution.p.result,"SUBSTITUTION");assert.strictEqual(substitution.p.finalDamage,0);assert.strictEqual(substitution.p.exactTarget,true);assert.strictEqual(substitution.performancePortraits,0);assert.strictEqual(substitution.canonicalCards,2);assert.strictEqual(substitution.actorRoles,1);assert.strictEqual(substitution.targetRoles,1);assert.strictEqual(substitution.resultChips,1);assert.strictEqual(substitution.resultChipOnExactTarget,true);assert.strictEqual(substitution.performanceActive,true);assert(substitution.centerWidthRatio!==null&&substitution.centerWidthRatio<=0.14);assert.strictEqual(substitution.centerOverlapsActor,false);assert.strictEqual(substitution.centerOverlapsTarget,false);
+    const battlePaint=await page.evaluate(()=>{const selectors=["#story-scene-presentation-layer","#screen-overlay",".overlay-content-box","#overlay-content-container",".battle-live-screen",".alpha-code-battle-stage",".battle2-performance-host",".battle2-performance-stage",".battle-live-active-card-player",".battle-live-active-card-enemy"];const describe=selector=>{const node=document.querySelector(selector);if(!node)return{selector,missing:true};const cs=getComputedStyle(node),r=node.getBoundingClientRect();return{selector,tag:node.tagName,className:node.className,rect:{x:r.x,y:r.y,width:r.width,height:r.height},display:cs.display,visibility:cs.visibility,opacity:cs.opacity,zIndex:cs.zIndex,backgroundColor:cs.backgroundColor,backgroundImage:cs.backgroundImage,transform:cs.transform,filter:cs.filter,overflow:cs.overflow,childCount:node.children.length,htmlLength:node.innerHTML.length};};const stage=document.querySelector(".alpha-code-battle-stage");const r=stage&&stage.getBoundingClientRect();const center=r?{x:r.left+r.width/2,y:r.top+r.height/2}:null;const stack=center?document.elementsFromPoint(center.x,center.y).slice(0,12).map(node=>{const cs=getComputedStyle(node);return{tag:node.tagName,id:node.id,className:node.className,opacity:cs.opacity,display:cs.display,visibility:cs.visibility,zIndex:cs.zIndex,backgroundColor:cs.backgroundColor};}):[];return{currentOverlayType:typeof currentOverlayType!=="undefined"?currentOverlayType:null,screenOverlayClass:document.getElementById("screen-overlay")?.className||null,screenOverlayInline:document.getElementById("screen-overlay")?.getAttribute("style")||null,nodes:selectors.map(describe),center,stack};});
     fs.writeFileSync(path.join(OUT,"battle-paint-diagnostic.json"),JSON.stringify(battlePaint,null,2));
-    const storyPaint=battlePaint.nodes.find(row=>row.selector==="#story-scene-presentation-layer");
-    const stagePaint=battlePaint.nodes.find(row=>row.selector===".alpha-code-battle-stage");
-    assert(storyPaint&&(storyPaint.display==="none"||storyPaint.visibility==="hidden"),"#312 preserved Story layer still occludes Battle: "+JSON.stringify(storyPaint));
-    assert(stagePaint&&stagePaint.opacity==="1"&&stagePaint.display!=="none"&&String(stagePaint.backgroundImage).includes("gradient"),"#312 Battle stage paint contract failed: "+JSON.stringify(stagePaint));
-    assert(!battlePaint.stack.some(row=>row.id==="story-scene-presentation-layer"),"#312 Story layer remains in Battle center hit-test stack: "+JSON.stringify(battlePaint.stack));
-    await page.screenshot({path:path.join(OUT,"04-battle-full-page.png"),fullPage:false,timeout:12000});
-    await shot(page,"04-battle-overlay.png","#screen-overlay");
-    await shot(page,"04-battle-performance-only.png",".battle2-performance-stage");
-    await shot(page,"04-battle-substitution-performance.png",".alpha-code-battle-stage");
-    await page.waitForTimeout(1050);
-    const settledBattle=await page.evaluate(()=>{
-      const stage=document.querySelector(".alpha-code-battle-stage");
-      return{
-        active:stage?.classList.contains("battle2-performance-active")||false,
-        roles:stage?.querySelectorAll(".battle2-performance-role-actor,.battle2-performance-role-target").length||0,
-        resultChips:stage?.querySelectorAll(".battle2-performance-result-chip").length||0,
-        actionLabelOpacity:Number(getComputedStyle(stage?.querySelector(".battle2-performance-stage")).opacity||0)
-      };
-    });
-    assert.strictEqual(settledBattle.active,false,"#312 Battle performance did not restore stable composition");
-    assert.strictEqual(settledBattle.roles,0,"#312 Battle performance roles leaked after settle");
-    assert.strictEqual(settledBattle.resultChips,0,"#312 target-local result receipt leaked after settle");
-    assert(settledBattle.actionLabelOpacity<=0.01,"#312 compact action label remained visually persistent after settle");
+    const storyPaint=battlePaint.nodes.find(row=>row.selector==="#story-scene-presentation-layer");const stagePaint=battlePaint.nodes.find(row=>row.selector===".alpha-code-battle-stage");assert(storyPaint&&(storyPaint.display==="none"||storyPaint.visibility==="hidden"));assert(stagePaint&&stagePaint.opacity==="1"&&stagePaint.display!=="none"&&String(stagePaint.backgroundImage).includes("gradient"));assert(!battlePaint.stack.some(row=>row.id==="story-scene-presentation-layer"));
+    await page.screenshot({path:path.join(OUT,"04-battle-full-page.png"),fullPage:false,timeout:12000});await shot(page,"04-battle-overlay.png","#screen-overlay");await shot(page,"04-battle-performance-only.png",".battle2-performance-stage");await shot(page,"04-battle-substitution-performance.png",".alpha-code-battle-stage");await page.waitForTimeout(1050);
+    const settledBattle=await page.evaluate(()=>{const stage=document.querySelector(".alpha-code-battle-stage");return{active:stage?.classList.contains("battle2-performance-active")||false,roles:stage?.querySelectorAll(".battle2-performance-role-actor,.battle2-performance-role-target").length||0,resultChips:stage?.querySelectorAll(".battle2-performance-result-chip").length||0,actionLabelOpacity:Number(getComputedStyle(stage?.querySelector(".battle2-performance-stage")).opacity||0)};});assert.strictEqual(settledBattle.active,false);assert.strictEqual(settledBattle.roles,0);assert.strictEqual(settledBattle.resultChips,0);assert(settledBattle.actionLabelOpacity<=0.01);
 
-    await seed("hit");
-    await page.waitForSelector('.battle2-performance-stage[data-result="HIT"]',{state:"visible",timeout:8000});
-    const hit=await page.evaluate(()=>resolveBattlePerformanceProjection33000());
-    assert(hit.result==="HIT"&&hit.finalDamage===7&&hit.beforePL===14&&hit.afterPL===7,JSON.stringify(hit));
-    assert(hit.actorRef.participantId==="academy_kakashi"&&hit.targetRef.participantId==="academy_kakashi_origin_masked_interceptor");
-    await shot(page,"05-battle-hit-performance.png",".alpha-code-battle-stage");
+    await seed("hit");await page.waitForSelector('.battle2-performance-stage[data-result="HIT"]',{state:"visible",timeout:8000});const hit=await page.evaluate(()=>resolveBattlePerformanceProjection33000());assert(hit.result==="HIT"&&hit.finalDamage===7&&hit.beforePL===14&&hit.afterPL===7);assert(hit.actorRef.participantId==="academy_kakashi"&&hit.targetRef.participantId==="academy_kakashi_origin_masked_interceptor");await shot(page,"05-battle-hit-performance.png",".alpha-code-battle-stage");
+    await seed("defeat");await page.waitForSelector('.battle2-performance-stage[data-result="WITHDRAWAL"]',{state:"visible",timeout:8000});const defeat=await page.evaluate(()=>resolveBattlePerformanceProjection33000());assert(defeat.result==="WITHDRAWAL"&&defeat.presentationClass==="DEFEAT"&&defeat.afterPL===0);assert(!JSON.stringify(defeat).toLowerCase().includes("death"));await shot(page,"06-battle-withdrawal-performance.png",".alpha-code-battle-stage");
 
-    await seed("defeat");
-    await page.waitForSelector('.battle2-performance-stage[data-result="WITHDRAWAL"]',{state:"visible",timeout:8000});
-    const defeat=await page.evaluate(()=>resolveBattlePerformanceProjection33000());
-    assert(defeat.result==="WITHDRAWAL"&&defeat.presentationClass==="DEFEAT"&&defeat.afterPL===0,JSON.stringify(defeat));
-    assert(!JSON.stringify(defeat).toLowerCase().includes("death"),"#312 withdrawal presentation leaked death semantics");
-    await shot(page,"06-battle-withdrawal-performance.png",".alpha-code-battle-stage");
+    const squadLaunch=await page.evaluate(()=>{const rt=getActiveStorySceneRuntime();const returnContext={type:"story_scene",sceneId:rt.sceneId,sceneInstanceId:rt.instanceId,sourceBeatId:"v2_battle_mi_package_second",victoryBeatId:"v2_mi_package_second_win",defeatBeatId:"v2_mi_package_second_loss",postBattleBeatId:null,exposeFinisher:false};const out=launchAcademyKakashiV2Battle36010({battleConfigId:"academy_kakashi_origin_battle_ps_mi_2v1",storyOccurrenceId:"issue312_browser_formation_2v1",sourceAnchorRef:"ISSUE312_FORMATION_STAGE",bindingRef:"ps_mi_2v1",returnContext});return{out,playerIds:[1,2,3,4].map(slot=>getBattleDeploymentParticipant("player",slot)?.id||null).filter(Boolean),enemyIds:[1,2,3,4].map(slot=>getBattleDeploymentParticipant("enemy",slot)?.id||null).filter(Boolean)};});
+    assert(squadLaunch.out?.success===true);assert.deepStrictEqual(squadLaunch.playerIds,["academy_kakashi"]);assert.deepStrictEqual(squadLaunch.enemyIds,["academy_kakashi_origin_package_smuggler","academy_kakashi_origin_masked_interceptor"]);
+    await page.waitForFunction(()=>{const stage=document.querySelector(".alpha-code-battle-stage");return stage?.dataset.formationMode==="wedge"&&stage?.dataset.enemyFormationCount==="2";},null,{timeout:8000});
+    const squadOpening=await page.evaluate(()=>{const stage=document.querySelector(".alpha-code-battle-stage");const support=[...stage.querySelectorAll('.battle2-formation-support:not([data-formation-hidden="true"])')];const dock=stage.querySelector(".battle-live-action-family-row");const rect=node=>{const r=node?.getBoundingClientRect();return r?{left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}:null;};const overlaps=(a,b)=>!!a&&!!b&&!(a.right<=b.left||a.left>=b.right||a.bottom<=b.top||a.top>=b.bottom);const dockRect=rect(dock);return{mode:stage.dataset.formationMode,playerCount:stage.dataset.playerFormationCount,enemyCount:stage.dataset.enemyFormationCount,support:support.map(node=>({id:node.dataset.participantId,side:node.dataset.formationSide,slot:node.dataset.formationSlot,image:node.querySelector("img")?.getAttribute("src")||"",rect:rect(node),overlapsDock:overlaps(rect(node),dockRect)})),primaryFamilies:[...dock.querySelectorAll("button[data-formation-family]")].map(b=>b.textContent.trim())};});
+    assert.strictEqual(squadOpening.mode,"wedge");assert.strictEqual(squadOpening.playerCount,"1");assert.strictEqual(squadOpening.enemyCount,"2");assert.strictEqual(squadOpening.support.length,1);assert.strictEqual(squadOpening.support[0].id,"academy_kakashi_origin_masked_interceptor");assert.strictEqual(squadOpening.support[0].side,"enemy");assert.strictEqual(squadOpening.support[0].slot,"2");assert(squadOpening.support[0].image);assert.strictEqual(squadOpening.support[0].overlapsDock,false);assert.deepStrictEqual(squadOpening.primaryFamilies,["SKILLS","ITEMS","SUMMONS"]);await shot(page,"07-battle-formation-wedge-2v1.png",".alpha-code-battle-stage");
 
-    // FORMATION-STAGE SQUAD PROOF — consume a real authorised Kakashi 2v1
-    // deployment rather than fabricating production roster truth. This proves
-    // the same 33000 owner adapts from duel -> wedge with an actual supporting
-    // deployed opponent. The off-slot action receipt below is deliberately a
-    // QA-only presentation fixture: it supplies exact canonical participant refs
-    // to the read-only performance projector and does not resolve damage or
-    // mutate Battle PL/Story truth.
-    const squadLaunch=await page.evaluate(()=>{
-      const rt=getActiveStorySceneRuntime();
-      const returnContext={
-        type:"story_scene",sceneId:rt.sceneId,sceneInstanceId:rt.instanceId,
-        sourceBeatId:"v2_battle_mi_package_second",
-        victoryBeatId:"v2_mi_package_second_win",defeatBeatId:"v2_mi_package_second_loss",
-        postBattleBeatId:null,exposeFinisher:false
-      };
-      const out=launchAcademyKakashiV2Battle36010({
-        battleConfigId:"academy_kakashi_origin_battle_ps_mi_2v1",
-        storyOccurrenceId:"issue312_browser_formation_2v1",
-        sourceAnchorRef:"ISSUE312_FORMATION_STAGE",
-        bindingRef:"ps_mi_2v1",
-        returnContext
-      });
-      return{
-        out,
-        playerIds:[1,2,3,4].map(slot=>getBattleDeploymentParticipant("player",slot)?.id||null).filter(Boolean),
-        enemyIds:[1,2,3,4].map(slot=>getBattleDeploymentParticipant("enemy",slot)?.id||null).filter(Boolean)
-      };
-    });
-    assert(squadLaunch.out?.success===true,JSON.stringify(squadLaunch));
-    assert.deepStrictEqual(squadLaunch.playerIds,["academy_kakashi"]);
-    assert.deepStrictEqual(squadLaunch.enemyIds,["academy_kakashi_origin_package_smuggler","academy_kakashi_origin_masked_interceptor"]);
-    await page.waitForFunction(()=>{
-      const stage=document.querySelector(".alpha-code-battle-stage");
-      return stage?.dataset.formationMode==="wedge"&&stage?.dataset.enemyFormationCount==="2";
-    },null,{timeout:8000});
+    const offSlotFixture=await page.evaluate(()=>{const actorRef={side:"player",participantId:"academy_kakashi"};const targetRef={side:"enemy",participantId:"academy_kakashi_origin_masked_interceptor"};const actionId="issue312_qa_offslot_target";recordBattleEvidence({eventType:"action_attempted",actionId,actorRef,targetRef,skillId:"issue312_qa_exact_target",data:{actionClass:"qa_presentation_fixture"}});recordBattleEvidence({eventType:"damage_resolved",actionId,actorRef,targetRef,skillId:"issue312_qa_exact_target",data:{primaryDiscipline:"Taijutsu",finalDamage:1,remainingBattlePLBefore:14,remainingBattlePLAfter:13,flatGuards:[],ratioGuards:[],qaPresentationFixture:true}});recordBattleEvidence({eventType:"skill_action_completed",committedOccurrence:true,actionId,actorRef,targetRef,skillId:"issue312_qa_exact_target",data:{resolved:true,damageApplied:true,finalDamage:1,qaPresentationFixture:true}});openOverlay("combat");return resolveBattlePerformanceProjection33000();});assert.strictEqual(offSlotFixture.targetRef.participantId,"academy_kakashi_origin_masked_interceptor");
+    await page.waitForFunction(()=>{const stage=document.querySelector(".alpha-code-battle-stage");const support=[...stage.querySelectorAll(".battle2-formation-support")].find(n=>n.dataset.participantId==="academy_kakashi_origin_masked_interceptor");return !!support&&support.classList.contains("battle2-performance-role-target");},null,{timeout:3000});
+    const offSlotFocus=await page.evaluate(()=>{const stage=document.querySelector(".alpha-code-battle-stage");const activeEnemy=stage.querySelector(".battle-live-active-card-enemy");const target=[...stage.querySelectorAll(".battle2-formation-support")].find(n=>n.dataset.participantId==="academy_kakashi_origin_masked_interceptor");const chip=target?.querySelector(".battle2-performance-result-chip");return{activeEnemyId:activeEnemy?.dataset.participantId||null,targetId:target?.dataset.participantId||null,targetRole:target?.classList.contains("battle2-performance-role-target")||false,chipLocal:!!chip&&chip.parentElement===target};});
+    assert.strictEqual(offSlotFocus.activeEnemyId,"academy_kakashi_origin_package_smuggler");assert.strictEqual(offSlotFocus.targetId,"academy_kakashi_origin_masked_interceptor");assert.strictEqual(offSlotFocus.targetRole,true);assert.strictEqual(offSlotFocus.chipLocal,true);await shot(page,"08-battle-formation-offslot-target.png",".alpha-code-battle-stage");
 
-    const squadOpening=await page.evaluate(()=>{
-      const stage=document.querySelector(".alpha-code-battle-stage");
-      const support=[...stage.querySelectorAll('.battle2-formation-support:not([data-formation-hidden="true"])')];
-      const dock=stage.querySelector(".battle-live-action-family-row");
-      const rect=node=>{const r=node?.getBoundingClientRect();return r?{left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}:null;};
-      const overlaps=(a,b)=>!!a&&!!b&&!(a.right<=b.left||a.left>=b.right||a.bottom<=b.top||a.top>=b.bottom);
-      const dockRect=rect(dock);
-      return{
-        mode:stage.dataset.formationMode,
-        playerCount:stage.dataset.playerFormationCount,
-        enemyCount:stage.dataset.enemyFormationCount,
-        support:support.map(node=>({
-          id:node.dataset.participantId,
-          side:node.dataset.formationSide,
-          slot:node.dataset.formationSlot,
-          image:node.querySelector("img")?.getAttribute("src")||"",
-          rect:rect(node),
-          overlapsDock:overlaps(rect(node),dockRect)
-        })),
-        primaryFamilies:[...dock.querySelectorAll("button[data-formation-family]")].map(b=>b.textContent.trim())
-      };
-    });
-    assert.strictEqual(squadOpening.mode,"wedge","#312 real 2v1 deployment did not select wedge formation");
-    assert.strictEqual(squadOpening.playerCount,"1");
-    assert.strictEqual(squadOpening.enemyCount,"2");
-    assert.strictEqual(squadOpening.support.length,1,"#312 2v1 wedge must show exactly one deployed supporting opponent: "+JSON.stringify(squadOpening));
-    assert.strictEqual(squadOpening.support[0].id,"academy_kakashi_origin_masked_interceptor");
-    assert.strictEqual(squadOpening.support[0].side,"enemy");
-    assert.strictEqual(squadOpening.support[0].slot,"2");
-    assert(squadOpening.support[0].image,"#312 deployed support is missing portrait authority");
-    assert.strictEqual(squadOpening.support[0].overlapsDock,false,"#312 deployed support collides with primary action dock");
-    assert.deepStrictEqual(squadOpening.primaryFamilies,["SKILLS","ITEMS","SUMMONS"]);
-    await shot(page,"07-battle-formation-wedge-2v1.png",".alpha-code-battle-stage");
+    const amtLifecycleLaunch=await page.evaluate(()=>{const rt=getActiveStorySceneRuntime();const returnContext={type:"story_scene",sceneId:rt.sceneId,sceneInstanceId:rt.instanceId,sourceBeatId:"v2_battle_amt_stop",victoryBeatId:"v2_amt_stop_win",defeatBeatId:"v2_amt_stop_loss",postBattleBeatId:null,exposeFinisher:false};const beforeEnemyTurns=globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400&&typeof globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400.getEnemyTurnsScheduled==="function"?globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400.getEnemyTurnsScheduled():null;const out=launchAcademyKakashiV2Battle36010({battleConfigId:"academy_kakashi_origin_battle_amt_1v1",storyOccurrenceId:"issue312_manual_red_regression",sourceAnchorRef:"ISSUE312_MANUAL_RED",bindingRef:"amt_second_skill_lifecycle",returnContext});return{out,beforeEnemyTurns,schedulerBefore:typeof evaluateEnemyActionScheduler==="function"?evaluateEnemyActionScheduler():null,playerOpportunityBefore:getBattleActionOpportunityIndex("player","academy_kakashi"),enemyOpportunityBefore:getBattleActionOpportunityIndex("enemy","academy_kakashi_origin_amt")};});
+    assert(amtLifecycleLaunch.out?.success===true);assert.strictEqual(amtLifecycleLaunch.schedulerBefore?.ready,true);
+    await page.waitForFunction(()=>{const stage=document.querySelector(".alpha-code-battle-stage");return stage?.dataset.formationMode==="duel"&&stage?.dataset.enemyFormationCount==="1";},null,{timeout:8000});
+    const duelComposition=await page.evaluate(()=>{const stage=document.querySelector(".alpha-code-battle-stage");const player=stage?.querySelector(".battle-live-active-card-player");const enemy=stage?.querySelector(".battle-live-active-card-enemy");const vs=stage?.querySelector(".battle-code-vs");const playerPower=stage?.querySelector(".battle-live-power-player"),enemyPower=stage?.querySelector(".battle-live-power-enemy");const playerName=player?.querySelector(".battle-live-active-nameplate"),enemyName=enemy?.querySelector(".battle-live-active-nameplate");const ticker=stage?.querySelector(".battle2-live-ticker"),status=stage?.querySelector(".battle-live-status");const sr=stage?.getBoundingClientRect(),pr=player?.getBoundingClientRect(),er=enemy?.getBoundingClientRect();const ppr=playerPower?.getBoundingClientRect(),epr=enemyPower?.getBoundingClientRect(),tr=ticker?.getBoundingClientRect();const visibleSupports=[...stage.querySelectorAll(".battle2-formation-support")].filter(node=>{const style=getComputedStyle(node),rect=node.getBoundingClientRect();return style.display!=="none"&&style.visibility!=="hidden"&&rect.width>0&&rect.height>0;}).length;return{stageWidth:sr?.width||0,stageHeight:sr?.height||0,playerWidthRatio:sr&&pr?pr.width/sr.width:0,enemyWidthRatio:sr&&er?er.width/sr.width:0,confrontationGapRatio:sr&&pr&&er?(er.left-(pr.left+pr.width))/sr.width:1,playerPowerCenterRatio:sr&&ppr?(ppr.left+ppr.width/2-sr.left)/sr.width:0,enemyPowerCenterRatio:sr&&epr?(epr.left+epr.width/2-sr.left)/sr.width:1,playerPowerCenterYRatio:sr&&ppr?(ppr.top+ppr.height/2-sr.top)/sr.height:1,enemyPowerCenterYRatio:sr&&epr?(epr.top+epr.height/2-sr.top)/sr.height:1,playerNameDisplay:playerName?getComputedStyle(playerName).display:null,enemyNameDisplay:enemyName?getComputedStyle(enemyName).display:null,statusDisplay:status?getComputedStyle(status).display:null,tickerBottomRatio:sr&&tr?(tr.bottom-sr.top)/sr.height:1,playerTopRatio:sr&&pr?(pr.top-sr.top)/sr.height:0,playerTransition:getComputedStyle(player).transitionProperty,visibleSupports,vsOpacity:vs?Number(getComputedStyle(vs).opacity):0};});
+    assert(duelComposition.playerWidthRatio>=0.33&&duelComposition.enemyWidthRatio>=0.33);assert(duelComposition.confrontationGapRatio<=0.17);assert.strictEqual(duelComposition.visibleSupports,0);assert(duelComposition.playerPowerCenterRatio>=0.425&&duelComposition.playerPowerCenterRatio<=0.445);assert(duelComposition.enemyPowerCenterRatio>=0.555&&duelComposition.enemyPowerCenterRatio<=0.575);assert(duelComposition.playerPowerCenterYRatio>=0.46&&duelComposition.playerPowerCenterYRatio<=0.50);assert(duelComposition.enemyPowerCenterYRatio>=0.46&&duelComposition.enemyPowerCenterYRatio<=0.50);assert.strictEqual(duelComposition.playerNameDisplay,"none");assert.notStrictEqual(duelComposition.enemyNameDisplay,"none");assert.strictEqual(duelComposition.statusDisplay,"none");assert(duelComposition.tickerBottomRatio<=duelComposition.playerTopRatio+0.01);assert(!String(duelComposition.playerTransition||"").includes("transform")&&!String(duelComposition.playerTransition||"").includes("left")&&!String(duelComposition.playerTransition||"").includes("top"));assert(duelComposition.vsOpacity>=0.5);
 
-    const offSlotFixture=await page.evaluate(()=>{
-      const actorRef={side:"player",participantId:"academy_kakashi"};
-      const targetRef={side:"enemy",participantId:"academy_kakashi_origin_masked_interceptor"};
-      const actionId="issue312_qa_offslot_target";
-      recordBattleEvidence({eventType:"action_attempted",actionId,actorRef,targetRef,skillId:"issue312_qa_exact_target",data:{actionClass:"qa_presentation_fixture"}});
-      recordBattleEvidence({eventType:"damage_resolved",actionId,actorRef,targetRef,skillId:"issue312_qa_exact_target",data:{primaryDiscipline:"Taijutsu",finalDamage:1,remainingBattlePLBefore:14,remainingBattlePLAfter:13,flatGuards:[],ratioGuards:[],qaPresentationFixture:true}});
-      recordBattleEvidence({eventType:"skill_action_completed",committedOccurrence:true,actionId,actorRef,targetRef,skillId:"issue312_qa_exact_target",data:{resolved:true,damageApplied:true,finalDamage:1,qaPresentationFixture:true}});
-      openOverlay("combat");
-      return resolveBattlePerformanceProjection33000();
-    });
-    assert.strictEqual(offSlotFixture.targetRef.participantId,"academy_kakashi_origin_masked_interceptor");
-    await page.waitForFunction(()=>{
-      const stage=document.querySelector(".alpha-code-battle-stage");
-      const support=[...stage.querySelectorAll(".battle2-formation-support")].find(n=>n.dataset.participantId==="academy_kakashi_origin_masked_interceptor");
-      return !!support&&support.classList.contains("battle2-performance-role-target");
-    },null,{timeout:3000});
-    const offSlotFocus=await page.evaluate(()=>{
-      const stage=document.querySelector(".alpha-code-battle-stage");
-      const activeEnemy=stage.querySelector(".battle-live-active-card-enemy");
-      const target=[...stage.querySelectorAll(".battle2-formation-support")].find(n=>n.dataset.participantId==="academy_kakashi_origin_masked_interceptor");
-      const chip=target?.querySelector(".battle2-performance-result-chip");
-      return{
-        activeEnemyId:activeEnemy?.dataset.participantId||null,
-        targetId:target?.dataset.participantId||null,
-        targetRole:target?.classList.contains("battle2-performance-role-target")||false,
-        chipLocal:!!chip&&chip.parentElement===target
-      };
-    });
-    assert.strictEqual(offSlotFocus.activeEnemyId,"academy_kakashi_origin_package_smuggler","#312 2v1 front opposition identity drift");
-    assert.strictEqual(offSlotFocus.targetId,"academy_kakashi_origin_masked_interceptor");
-    assert.strictEqual(offSlotFocus.targetRole,true,"#312 exact off-slot target did not enter confrontation focus");
-    assert.strictEqual(offSlotFocus.chipLocal,true,"#312 off-slot result feedback did not stay participant-local");
-    await shot(page,"08-battle-formation-offslot-target.png",".alpha-code-battle-stage");
+    const amtSkillsButton=page.locator('.battle-live-action-family-row button[data-formation-family="skills"]');await amtSkillsButton.click();await page.waitForFunction(()=>document.querySelector(".alpha-code-battle-stage")?.dataset.formationTray==="skills",null,{timeout:3000});
+    const amtPreparedIds=await page.evaluate(()=>[...document.querySelectorAll(".battle-live-skill-deck .battle-dev-skill-card:not(.is-empty)")].map(node=>node.dataset.skillId||null));assert.strictEqual(amtPreparedIds[1],"academy_kakashi_clone_feint");
+    const secondSkill=page.locator(".battle-live-skill-deck .battle-dev-skill-card:not(.is-empty)").nth(1);await secondSkill.click();
+    await page.waitForFunction(()=>{const battleId=currentBattle?.battleId;const rows=ensureBattleRuntimeState()?.evidence||[];return rows.some(row=>row&&row.battleId===battleId&&row.eventType==="enemy_authored_action_completed"&&row.actorRef?.participantId==="academy_kakashi_origin_amt");},null,{timeout:5000});
+    const amtLifecycleAfterFirst=await page.evaluate(beforeEnemyTurns=>{const battleId=currentBattle.battleId;const rows=(ensureBattleRuntimeState().evidence||[]).filter(row=>row&&row.battleId===battleId);const playerCompletions=rows.filter(row=>row.eventType==="skill_action_completed"&&row.actorRef?.participantId==="academy_kakashi");const enemyCompletions=rows.filter(row=>row.eventType==="enemy_authored_action_completed"&&row.actorRef?.participantId==="academy_kakashi_origin_amt");const afterEnemyTurns=globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400&&typeof globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400.getEnemyTurnsScheduled==="function"?globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400.getEnemyTurnsScheduled():null;const state=syncBattleActionRegionState();const stage=document.querySelector(".alpha-code-battle-stage");return{playerCompletions:playerCompletions.map(row=>({actionId:row.actionId,skillId:row.skillId,resolved:row.data?.resolved})),enemyCompletions:enemyCompletions.map(row=>({actionId:row.actionId,skillId:row.skillId,resolved:row.data?.resolved})),enemyTurnDelta:beforeEnemyTurns===null||afterEnemyTurns===null?null:afterEnemyTurns-beforeEnemyTurns,playerOpportunity:getBattleActionOpportunityIndex("player","academy_kakashi"),enemyOpportunity:getBattleActionOpportunityIndex("enemy","academy_kakashi_origin_amt"),selectedSkillId:state.selectedSkillId,selectedTargetRef:state.selectedTargetRef,tray:stage?.dataset.formationTray||null,schedulerAfter:evaluateEnemyActionScheduler(),amtConditions:getBattleParticipantConditions("player","academy_kakashi").map(row=>({key:row.conditionKey,id:row.conditionId}))};},amtLifecycleLaunch.beforeEnemyTurns);
+    assert.strictEqual(amtLifecycleAfterFirst.playerCompletions.length,1);assert.strictEqual(amtLifecycleAfterFirst.playerCompletions[0].skillId,"academy_kakashi_clone_feint");assert.strictEqual(amtLifecycleAfterFirst.enemyCompletions.length,1);assert.strictEqual(amtLifecycleAfterFirst.enemyCompletions[0].skillId,"enemy_anbu_style_operative_wire_capture");assert.strictEqual(amtLifecycleAfterFirst.enemyCompletions[0].resolved,true);assert.strictEqual(amtLifecycleAfterFirst.enemyTurnDelta,1);assert.strictEqual(amtLifecycleAfterFirst.playerOpportunity,amtLifecycleLaunch.playerOpportunityBefore+1);assert.strictEqual(amtLifecycleAfterFirst.enemyOpportunity,amtLifecycleLaunch.enemyOpportunityBefore+1);assert.strictEqual(amtLifecycleAfterFirst.selectedSkillId,"academy_kakashi_clone_feint");assert(amtLifecycleAfterFirst.selectedTargetRef&&amtLifecycleAfterFirst.selectedTargetRef.participantId==="academy_kakashi_origin_amt");assert.strictEqual(amtLifecycleAfterFirst.tray,"skills");
 
-    // MANUAL RED REGRESSION — exact Stephen repro:
-    // Kakashi -> SKILLS -> second prepared Skill (Clone Feint) -> USE SKILL
-    // -> exactly one authored AMT response -> player control returns -> SKILLS reopens.
-    const amtLifecycleLaunch=await page.evaluate(()=>{
-      const rt=getActiveStorySceneRuntime();
-      const returnContext={
-        type:"story_scene",sceneId:rt.sceneId,sceneInstanceId:rt.instanceId,
-        sourceBeatId:"v2_battle_amt_stop",
-        victoryBeatId:"v2_amt_stop_win",defeatBeatId:"v2_amt_stop_loss",
-        postBattleBeatId:null,exposeFinisher:false
-      };
-      const beforeEnemyTurns=globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400&&
-        typeof globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400.getEnemyTurnsScheduled==="function"
-          ?globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400.getEnemyTurnsScheduled():null;
-      const out=launchAcademyKakashiV2Battle36010({
-        battleConfigId:"academy_kakashi_origin_battle_amt_1v1",
-        storyOccurrenceId:"issue312_manual_red_regression",
-        sourceAnchorRef:"ISSUE312_MANUAL_RED",
-        bindingRef:"amt_second_skill_lifecycle",
-        returnContext
-      });
-      return{
-        out,
-        beforeEnemyTurns,
-        schedulerBefore:typeof evaluateEnemyActionScheduler==="function"?evaluateEnemyActionScheduler():null,
-        playerOpportunityBefore:getBattleActionOpportunityIndex("player","academy_kakashi"),
-        enemyOpportunityBefore:getBattleActionOpportunityIndex("enemy","academy_kakashi_origin_amt")
-      };
-    });
-    assert(amtLifecycleLaunch.out?.success===true,JSON.stringify(amtLifecycleLaunch));
-    assert.strictEqual(amtLifecycleLaunch.schedulerBefore?.ready,true,"#312 AMT scheduler must be ready before the player action: "+JSON.stringify(amtLifecycleLaunch));
+    await page.waitForFunction(()=>{const stage=document.querySelector(".alpha-code-battle-stage");const deck=stage?.querySelector(".battle-live-skill-deck");return stage?.dataset.formationTray==="skills"&&!!deck&&getComputedStyle(deck).display!=="none";},null,{timeout:3000});
+    const amtPersistent=await page.evaluate(()=>{const stage=document.querySelector(".alpha-code-battle-stage");const state=syncBattleActionRegionState();const cards=[...stage.querySelectorAll(".battle-live-skill-deck .battle-dev-skill-card:not(.is-empty)")];return{tray:stage.dataset.formationTray,selectedSkillId:state.selectedSkillId,readySkillIds:cards.filter(node=>!node.disabled).map(node=>node.dataset.skillId||null)};});assert.strictEqual(amtPersistent.tray,"skills");assert.strictEqual(amtPersistent.selectedSkillId,"academy_kakashi_clone_feint");assert(amtPersistent.readySkillIds.length>0);
+    const nextReadyId=amtPersistent.readySkillIds.find(id=>id!==amtPersistent.selectedSkillId)||amtPersistent.readySkillIds[0];await page.locator('.battle-live-skill-deck .battle-dev-skill-card[data-skill-id="'+nextReadyId+'"]').click();
+    await page.waitForFunction(()=>{const battleId=currentBattle?.battleId;const rows=(ensureBattleRuntimeState()?.evidence||[]).filter(row=>row&&row.battleId===battleId);return rows.filter(row=>row.eventType==="enemy_authored_action_completed"&&row.actorRef?.participantId==="academy_kakashi_origin_amt").length>=2;},null,{timeout:5000});
+    const amtLifecycleAfterSecond=await page.evaluate(()=>{const battleId=currentBattle.battleId;const rows=(ensureBattleRuntimeState().evidence||[]).filter(row=>row&&row.battleId===battleId);const playerCompletions=rows.filter(row=>row.eventType==="skill_action_completed"&&row.actorRef?.participantId==="academy_kakashi");const enemyCompletions=rows.filter(row=>row.eventType==="enemy_authored_action_completed"&&row.actorRef?.participantId==="academy_kakashi_origin_amt");const scheduler=evaluateEnemyActionScheduler();return{playerCompletions:playerCompletions.map(row=>({skillId:row.skillId,resolved:row.data?.resolved})),enemyCompletions:enemyCompletions.map(row=>({skillId:row.skillId,resolved:row.data?.resolved})),playerOpportunity:getBattleActionOpportunityIndex("player","academy_kakashi"),enemyOpportunity:getBattleActionOpportunityIndex("enemy","academy_kakashi_origin_amt"),tray:document.querySelector(".alpha-code-battle-stage")?.dataset.formationTray||null,schedulerReady:scheduler?.ready===true,schedulerEligibleIds:(scheduler?.eligibleActionIds||[]).slice()};});
+    assert.strictEqual(amtLifecycleAfterSecond.playerCompletions.length,2);assert.strictEqual(amtLifecycleAfterSecond.enemyCompletions.length,2);assert.strictEqual(amtLifecycleAfterSecond.enemyCompletions[1].skillId,"enemy_anbu_style_operative_tanto_flash");assert.strictEqual(amtLifecycleAfterSecond.enemyCompletions[1].resolved,true);assert.strictEqual(amtLifecycleAfterSecond.playerOpportunity,amtLifecycleLaunch.playerOpportunityBefore+2);assert.strictEqual(amtLifecycleAfterSecond.enemyOpportunity,amtLifecycleLaunch.enemyOpportunityBefore+2);assert.strictEqual(amtLifecycleAfterSecond.tray,"skills");assert.strictEqual(amtLifecycleAfterSecond.schedulerReady,true);assert(amtLifecycleAfterSecond.schedulerEligibleIds.includes("enemy_anbu_style_operative_silent_body_flicker"));
 
-    await page.waitForFunction(()=>{
-      const stage=document.querySelector(".alpha-code-battle-stage");
-      return stage?.dataset.formationMode==="duel"&&stage?.dataset.enemyFormationCount==="1";
-    },null,{timeout:8000});
-
-    const duelComposition=await page.evaluate(()=>{
-      const stage=document.querySelector(".alpha-code-battle-stage");
-      const player=stage?.querySelector(".battle-live-active-card-player");
-      const enemy=stage?.querySelector(".battle-live-active-card-enemy");
-      const vs=stage?.querySelector(".battle-code-vs");
-      const playerPower=stage?.querySelector(".battle-live-power-player"),enemyPower=stage?.querySelector(".battle-live-power-enemy");
-      const playerName=player?.querySelector(".battle-live-active-nameplate"),enemyName=enemy?.querySelector(".battle-live-active-nameplate");
-      const ticker=stage?.querySelector(".battle2-live-ticker"),status=stage?.querySelector(".battle-live-status");
-      const sr=stage?.getBoundingClientRect(),pr=player?.getBoundingClientRect(),er=enemy?.getBoundingClientRect();
-      const ppr=playerPower?.getBoundingClientRect(),epr=enemyPower?.getBoundingClientRect(),tr=ticker?.getBoundingClientRect();
-      const visibleSupports=[...stage.querySelectorAll(".battle2-formation-support")].filter(node=>{
-        const style=getComputedStyle(node),rect=node.getBoundingClientRect();
-        return style.display!=="none"&&style.visibility!=="hidden"&&rect.width>0&&rect.height>0;
-      }).length;
-      return{
-        stageWidth:sr?.width||0,
-        stageHeight:sr?.height||0,
-        playerWidthRatio:sr&&pr?pr.width/sr.width:0,
-        enemyWidthRatio:sr&&er?er.width/sr.width:0,
-        confrontationGapRatio:sr&&pr&&er?(er.left-(pr.left+pr.width))/sr.width:1,
-        playerPowerCenterRatio:sr&&ppr?(ppr.left+ppr.width/2-sr.left)/sr.width:0,
-        enemyPowerCenterRatio:sr&&epr?(epr.left+epr.width/2-sr.left)/sr.width:1,
-        playerPowerCenterYRatio:sr&&ppr?(ppr.top+ppr.height/2-sr.top)/sr.height:1,
-        enemyPowerCenterYRatio:sr&&epr?(epr.top+epr.height/2-sr.top)/sr.height:1,
-        playerNameDisplay:playerName?getComputedStyle(playerName).display:null,
-        enemyNameDisplay:enemyName?getComputedStyle(enemyName).display:null,
-        statusDisplay:status?getComputedStyle(status).display:null,
-        tickerBottomRatio:sr&&tr?(tr.bottom-sr.top)/sr.height:1,
-        playerTopRatio:sr&&pr?(pr.top-sr.top)/sr.height:0,
-        playerTransition:getComputedStyle(player).transitionProperty,
-        visibleSupports,
-        vsOpacity:vs?Number(getComputedStyle(vs).opacity):0
-      };
-    });
-    console.log("ISSUE312_DUEL_COMPOSITION "+JSON.stringify(duelComposition));
-    assert(duelComposition.playerWidthRatio>=0.33&&duelComposition.enemyWidthRatio>=0.33,"#312 sparse duel combatants are still undersized: "+JSON.stringify(duelComposition));
-    assert(duelComposition.confrontationGapRatio<=0.17,"#312 sparse duel leaves an excessive empty confrontation gap: "+JSON.stringify(duelComposition));
-    assert.strictEqual(duelComposition.visibleSupports,0,"#312 sparse duel rendered fake/empty support furniture: "+JSON.stringify(duelComposition));
-    assert(duelComposition.playerPowerCenterRatio>=0.425&&duelComposition.playerPowerCenterRatio<=0.445,"#312 player PL ring is not in the aligned confrontation lane: "+JSON.stringify(duelComposition));
-    assert(duelComposition.enemyPowerCenterRatio>=0.555&&duelComposition.enemyPowerCenterRatio<=0.575,"#312 enemy PL ring is not in the aligned confrontation lane: "+JSON.stringify(duelComposition));
-    assert(duelComposition.playerPowerCenterYRatio>=0.46&&duelComposition.playerPowerCenterYRatio<=0.50,"#312 player PL ring vertical alignment drift: "+JSON.stringify(duelComposition));
-    assert(duelComposition.enemyPowerCenterYRatio>=0.46&&duelComposition.enemyPowerCenterYRatio<=0.50,"#312 enemy PL ring vertical alignment drift: "+JSON.stringify(duelComposition));
-    assert.strictEqual(duelComposition.playerNameDisplay,"none","#312 player card must not repeat the player character name");
-    assert.notStrictEqual(duelComposition.enemyNameDisplay,"none","#312 generic Kakashi opposition must retain its readable role name");
-    assert.strictEqual(duelComposition.statusDisplay,"none","#312 redundant PLAYER ACTION status strip must not compete with the top action/ticker lane");
-    assert(duelComposition.tickerBottomRatio<=duelComposition.playerTopRatio+0.01,"#312 LAST ACTION ticker overlaps the participant stage: "+JSON.stringify(duelComposition));
-    assert(!String(duelComposition.playerTransition||"").includes("transform")&&!String(duelComposition.playerTransition||"").includes("left")&&!String(duelComposition.playerTransition||"").includes("top"),"#312 participant layout still tweening transform/position: "+JSON.stringify(duelComposition));
-    assert(duelComposition.vsOpacity>=0.5,"#312 sparse duel confrontation marker is too visually weak: "+JSON.stringify(duelComposition));
-
-    const amtSkillsButton=page.locator('.battle-live-action-family-row button[data-formation-family="skills"]');
-    await amtSkillsButton.click();
-    await page.waitForFunction(()=>document.querySelector(".alpha-code-battle-stage")?.dataset.formationTray==="skills",null,{timeout:3000});
-
-    const amtPreparedIds=await page.evaluate(()=>[...document.querySelectorAll(".battle-live-skill-deck .battle-dev-skill-card:not(.is-empty)")].map(node=>node.dataset.skillId||null));
-    assert.strictEqual(amtPreparedIds[1],"academy_kakashi_clone_feint","#312 Stephen repro no longer addresses Kakashi's second prepared Skill: "+JSON.stringify(amtPreparedIds));
-
-    const secondSkill=page.locator(".battle-live-skill-deck .battle-dev-skill-card:not(.is-empty)").nth(1);
-    await secondSkill.click();
-
-    // Production Battle UX (32700): ordinary prepared Skills execute on card
-    // click. There is intentionally no separate USE SKILL confirmation button.
-    await page.waitForFunction(()=>{
-      const battleId=currentBattle?.battleId;
-      const rows=ensureBattleRuntimeState()?.evidence||[];
-      return rows.some(row=>row&&row.battleId===battleId&&row.eventType==="enemy_authored_action_completed"&&row.actorRef?.participantId==="academy_kakashi_origin_amt");
-    },null,{timeout:5000});
-
-    const amtLifecycleAfterFirst=await page.evaluate(beforeEnemyTurns=>{
-      const battleId=currentBattle.battleId;
-      const rows=(ensureBattleRuntimeState().evidence||[]).filter(row=>row&&row.battleId===battleId);
-      const playerCompletions=rows.filter(row=>row.eventType==="skill_action_completed"&&row.actorRef?.participantId==="academy_kakashi");
-      const enemyCompletions=rows.filter(row=>row.eventType==="enemy_authored_action_completed"&&row.actorRef?.participantId==="academy_kakashi_origin_amt");
-      const afterEnemyTurns=globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400&&
-        typeof globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400.getEnemyTurnsScheduled==="function"
-          ?globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400.getEnemyTurnsScheduled():null;
-      const state=syncBattleActionRegionState();
-      const stage=document.querySelector(".alpha-code-battle-stage");
-      return{
-        playerCompletions:playerCompletions.map(row=>({actionId:row.actionId,skillId:row.skillId,resolved:row.data?.resolved})),
-        enemyCompletions:enemyCompletions.map(row=>({actionId:row.actionId,skillId:row.skillId,resolved:row.data?.resolved})),
-        enemyTurnDelta:beforeEnemyTurns===null||afterEnemyTurns===null?null:afterEnemyTurns-beforeEnemyTurns,
-        playerOpportunity:getBattleActionOpportunityIndex("player","academy_kakashi"),
-        enemyOpportunity:getBattleActionOpportunityIndex("enemy","academy_kakashi_origin_amt"),
-        selectedSkillId:state.selectedSkillId,
-        selectedTargetRef:state.selectedTargetRef,
-        tray:stage?.dataset.formationTray||null,
-        schedulerAfter:evaluateEnemyActionScheduler(),
-        amtConditions:getBattleParticipantConditions("player","academy_kakashi").map(row=>({key:row.conditionKey,id:row.conditionId}))
-      };
-    },amtLifecycleLaunch.beforeEnemyTurns);
-    console.log("ISSUE312_AMT_LIFECYCLE_AFTER_FIRST "+JSON.stringify(amtLifecycleAfterFirst));
-    assert.strictEqual(amtLifecycleAfterFirst.playerCompletions.length,1,"#312 player opportunity committed more or less than once: "+JSON.stringify(amtLifecycleAfterFirst));
-    assert.strictEqual(amtLifecycleAfterFirst.playerCompletions[0].skillId,"academy_kakashi_clone_feint");
-    assert.strictEqual(amtLifecycleAfterFirst.enemyCompletions.length,1,"#312 AMT must perform exactly one authored response: "+JSON.stringify(amtLifecycleAfterFirst));
-    assert.strictEqual(amtLifecycleAfterFirst.enemyCompletions[0].skillId,"enemy_anbu_style_operative_wire_capture","#312 AMT first response drifted from deterministic Wire Capture");
-    assert.strictEqual(amtLifecycleAfterFirst.enemyCompletions[0].resolved,true,"#312 AMT authored response did not resolve");
-    assert.strictEqual(amtLifecycleAfterFirst.enemyTurnDelta,1,"#312 browser enemy-turn bridge did not schedule exactly one AMT opportunity");
-    assert.strictEqual(amtLifecycleAfterFirst.playerOpportunity,amtLifecycleLaunch.playerOpportunityBefore+1,"#312 player opportunity did not advance exactly once");
-    assert.strictEqual(amtLifecycleAfterFirst.enemyOpportunity,amtLifecycleLaunch.enemyOpportunityBefore+1,"#312 enemy opportunity did not advance exactly once");
-    assert.strictEqual(amtLifecycleAfterFirst.selectedSkillId,"academy_kakashi_clone_feint","#312 repeat-Skill presentation did not reselect the successfully used Skill");
-    assert(amtLifecycleAfterFirst.selectedTargetRef&&amtLifecycleAfterFirst.selectedTargetRef.participantId==="academy_kakashi_origin_amt","#312 repeat-Skill presentation lost the current legal target: "+JSON.stringify(amtLifecycleAfterFirst.selectedTargetRef));
-    assert.strictEqual(amtLifecycleAfterFirst.tray,"skills","#312 Skills tray closed after the first Skill / AMT response");
-
-    await page.waitForFunction(()=>{
-      const stage=document.querySelector(".alpha-code-battle-stage");
-      const deck=stage?.querySelector(".battle-live-skill-deck");
-      return stage?.dataset.formationTray==="skills"&&!!deck&&getComputedStyle(deck).display!=="none";
-    },null,{timeout:3000});
-    const amtPersistent=await page.evaluate(()=>{
-      const stage=document.querySelector(".alpha-code-battle-stage");
-      const state=syncBattleActionRegionState();
-      const cards=[...stage.querySelectorAll(".battle-live-skill-deck .battle-dev-skill-card:not(.is-empty)")];
-      return{
-        tray:stage.dataset.formationTray,
-        selectedSkillId:state.selectedSkillId,
-        readySkillIds:cards.filter(node=>!node.disabled).map(node=>node.dataset.skillId||null)
-      };
-    });
-    assert.strictEqual(amtPersistent.tray,"skills","#312 SKILLS tray did not remain open after AMT response");
-    assert.strictEqual(amtPersistent.selectedSkillId,"academy_kakashi_clone_feint","#312 repeat-Skill presentation drifted after AMT response");
-    assert(amtPersistent.readySkillIds.length>0,"#312 no legal Skill remains selectable after AMT response: "+JSON.stringify(amtPersistent));
-
-    const nextReadyId=amtPersistent.readySkillIds.find(id=>id!==amtPersistent.selectedSkillId)||amtPersistent.readySkillIds[0];
-    await page.locator('.battle-live-skill-deck .battle-dev-skill-card[data-skill-id="'+nextReadyId+'"]').click();
-    await page.waitForFunction(()=>{
-      const battleId=currentBattle?.battleId;
-      const rows=(ensureBattleRuntimeState()?.evidence||[]).filter(row=>row&&row.battleId===battleId);
-      return rows.filter(row=>row.eventType==="enemy_authored_action_completed"&&row.actorRef?.participantId==="academy_kakashi_origin_amt").length>=2;
-    },null,{timeout:5000});
-
-    const amtLifecycleAfterSecond=await page.evaluate(()=>{
-      const battleId=currentBattle.battleId;
-      const rows=(ensureBattleRuntimeState().evidence||[]).filter(row=>row&&row.battleId===battleId);
-      const playerCompletions=rows.filter(row=>row.eventType==="skill_action_completed"&&row.actorRef?.participantId==="academy_kakashi");
-      const enemyCompletions=rows.filter(row=>row.eventType==="enemy_authored_action_completed"&&row.actorRef?.participantId==="academy_kakashi_origin_amt");
-      const scheduler=evaluateEnemyActionScheduler();
-      return{
-        playerCompletions:playerCompletions.map(row=>({skillId:row.skillId,resolved:row.data?.resolved})),
-        enemyCompletions:enemyCompletions.map(row=>({skillId:row.skillId,resolved:row.data?.resolved})),
-        playerOpportunity:getBattleActionOpportunityIndex("player","academy_kakashi"),
-        enemyOpportunity:getBattleActionOpportunityIndex("enemy","academy_kakashi_origin_amt"),
-        tray:document.querySelector(".alpha-code-battle-stage")?.dataset.formationTray||null,
-        schedulerReady:scheduler?.ready===true,
-        schedulerEligibleIds:(scheduler?.eligibleActionIds||[]).slice()
-      };
-    });
-    console.log("ISSUE312_AMT_LIFECYCLE_AFTER_SECOND "+JSON.stringify(amtLifecycleAfterSecond));
-    assert.strictEqual(amtLifecycleAfterSecond.playerCompletions.length,2,"#312 second player opportunity did not commit exactly once: "+JSON.stringify(amtLifecycleAfterSecond));
-    assert.strictEqual(amtLifecycleAfterSecond.enemyCompletions.length,2,"#312 second player opportunity did not receive exactly one AMT response: "+JSON.stringify(amtLifecycleAfterSecond));
-    assert.strictEqual(amtLifecycleAfterSecond.enemyCompletions[1].skillId,"enemy_anbu_style_operative_tanto_flash","#312 AMT must follow Wire with Tantō Flash under the authorised deterministic rhythm");
-    assert.strictEqual(amtLifecycleAfterSecond.enemyCompletions[1].resolved,true,"#312 AMT Tantō response did not resolve");
-    assert.strictEqual(amtLifecycleAfterSecond.playerOpportunity,amtLifecycleLaunch.playerOpportunityBefore+2,"#312 player lifecycle stalled after the second committed action");
-    assert.strictEqual(amtLifecycleAfterSecond.enemyOpportunity,amtLifecycleLaunch.enemyOpportunityBefore+2,"#312 enemy lifecycle stalled after the second response");
-    assert.strictEqual(amtLifecycleAfterSecond.tray,"skills","#312 Skills tray closed after the second Skill / AMT response");
-    assert.strictEqual(amtLifecycleAfterSecond.schedulerReady,true,"#312 AMT scheduler deadlocked after Wire -> Tantō");
-    assert(amtLifecycleAfterSecond.schedulerEligibleIds.includes("enemy_anbu_style_operative_silent_body_flicker"),"#312 AMT Body Flicker is not available after Tantō: "+JSON.stringify(amtLifecycleAfterSecond));
-
-    await page.waitForFunction(()=>{
-      const stage=document.querySelector(".alpha-code-battle-stage");
-      const deck=stage?.querySelector(".battle-live-skill-deck");
-      return stage?.dataset.formationTray==="skills"&&!!deck&&getComputedStyle(deck).display!=="none";
-    },null,{timeout:3000});
+    await page.waitForFunction(()=>{const stage=document.querySelector(".alpha-code-battle-stage");const deck=stage?.querySelector(".battle-live-skill-deck");return stage?.dataset.formationTray==="skills"&&!!deck&&getComputedStyle(deck).display!=="none";},null,{timeout:3000});
 
     const psVictoryOverlay=await page.evaluate(async()=>{
       const dep=currentBattle.kakashiV2;
-      const prior={
-        battleConfigId:dep.battleConfigId,
-        battleOccurrenceId:dep.battleOccurrenceId,
-        storyOccurrenceId:dep.storyOccurrenceId,
-        encounterId:currentBattle.encounterId,
-        active:currentBattle.active,
-        battleOver:currentBattle.battleOver,
-        outcome:currentBattle.outcome?cloneBattleRuntimeValue(currentBattle.outcome):null,
-        rewards:currentBattle.rewards?cloneBattleRuntimeValue(currentBattle.rewards):null
-      };
-      dep.battleConfigId="academy_kakashi_origin_battle_seq_ps";
-      dep.battleOccurrenceId="issue312_ps_reward_overlay";
-      dep.storyOccurrenceId="issue312_ps_reward_story";
-      currentBattle.encounterId="academy_kakashi_origin_battle_seq_ps";
-      currentBattle.active=false;currentBattle.battleOver=true;
-      currentBattle.outcome={type:"victory",completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};
-      currentBattle.rewards={generated:true,claimed:false,ryo:0,exp:0,items:[],rareDrops:[]};
+      const prior={battleConfigId:dep.battleConfigId,battleOccurrenceId:dep.battleOccurrenceId,storyOccurrenceId:dep.storyOccurrenceId,encounterId:currentBattle.encounterId,active:currentBattle.active,battleOver:currentBattle.battleOver,outcome:currentBattle.outcome?cloneBattleRuntimeValue(currentBattle.outcome):null,rewards:currentBattle.rewards?cloneBattleRuntimeValue(currentBattle.rewards):null};
+      dep.battleConfigId="academy_kakashi_origin_battle_seq_ps";dep.battleOccurrenceId="issue312_ps_reward_overlay";dep.storyOccurrenceId="issue312_ps_reward_story";currentBattle.encounterId="academy_kakashi_origin_battle_seq_ps";currentBattle.active=false;currentBattle.battleOver=true;currentBattle.outcome={type:"victory",completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};currentBattle.rewards={generated:true,claimed:false,ryo:0,exp:0,items:[],rareDrops:[]};
       try{delete currentBattle.__battleTerminalResultPresentation54400;}catch(_error){}
+      try{globalThis.hardSettleBattlePresentationQueue33000?.("issue312_ps_reward_overlay");}catch(_error){}
       presentCommittedBattleTerminalResult54400("victory",{source:"issue312_ps_reward_overlay"});
       await new Promise(resolve=>setTimeout(resolve,80));
-      const text=String(document.getElementById("screen-overlay")?.textContent||"").replace(/\s+/g," ").trim();
-      const reward=cloneBattleRuntimeValue(currentBattle.rewards);
-      dep.battleConfigId=prior.battleConfigId;
-      dep.battleOccurrenceId=prior.battleOccurrenceId;
-      dep.storyOccurrenceId=prior.storyOccurrenceId;
-      currentBattle.encounterId=prior.encounterId;
-      currentBattle.active=prior.active;currentBattle.battleOver=prior.battleOver;
-      currentBattle.outcome=prior.outcome;
-      currentBattle.rewards=prior.rewards;
-      try{delete currentBattle.__battleTerminalResultPresentation54400;}catch(_error){}
-      openOverlay("combat");
-      return{reward,text};
+      const text=String(document.getElementById("screen-overlay")?.textContent||"").replace(/\s+/g," ").trim();const reward=cloneBattleRuntimeValue(currentBattle.rewards);
+      dep.battleConfigId=prior.battleConfigId;dep.battleOccurrenceId=prior.battleOccurrenceId;dep.storyOccurrenceId=prior.storyOccurrenceId;currentBattle.encounterId=prior.encounterId;currentBattle.active=prior.active;currentBattle.battleOver=prior.battleOver;currentBattle.outcome=prior.outcome;currentBattle.rewards=prior.rewards;try{delete currentBattle.__battleTerminalResultPresentation54400;}catch(_error){}openOverlay("combat");return{reward,text};
     });
-    assert.strictEqual(psVictoryOverlay.reward.ryo,50,"#312 PS Victory overlay did not consume the locked 50 Ryō reward: "+JSON.stringify(psVictoryOverlay));
-    assert.strictEqual(psVictoryOverlay.reward.exp,0,"#312 PS Victory overlay invented generic Character EXP");
-    assert.deepStrictEqual(psVictoryOverlay.reward.items,[],"#312 PS Victory overlay invented an Item");
-    assert(psVictoryOverlay.text.includes("50"),"#312 actual PS Victory overlay still renders zero cash: "+psVictoryOverlay.text);
+    assert.strictEqual(psVictoryOverlay.reward.ryo,50,"#312 PS Victory overlay did not consume the locked 50 Ryō reward: "+JSON.stringify(psVictoryOverlay));assert.strictEqual(psVictoryOverlay.reward.exp,0);assert.deepStrictEqual(psVictoryOverlay.reward.items,[]);assert(psVictoryOverlay.text.includes("50"));
 
     const errors=await runtimeErrorGate.assertClean("issue312_story_battle_benchmark");
-    const result={
-      pass:true,
-      issue:312,
-      story:{rooftop,watch,stop,semanticChoiceElapsedMs:elapsed,staticGoldenMotion:true},
-      battle:{config:launched.config,substitution:substitution.p,settledBattle,hit,defeat,squadOpening,offSlotFixture,offSlotFocus},
-      browserErrors:errors,
-      sourceHeadlessGreenClaimed:false,
-      automatedBrowserGreen:true,
-      manualBrowserValidated:false,
-      browserGoldenClaimed:false
-    };
-    fs.writeFileSync(path.join(OUT,"results.json"),JSON.stringify(result,null,2));
-    console.log(JSON.stringify(result,null,2));
-  }finally{
-    await context.close();await browser.close();
-  }
+    const result={pass:true,issue:312,story:{rooftop,watch,stop,semanticChoiceElapsedMs:elapsed,staticGoldenMotion:true},battle:{config:launched.config,substitution:substitution.p,settledBattle,hit,defeat,squadOpening,offSlotFixture,offSlotFocus},browserErrors:errors,sourceHeadlessGreenClaimed:false,automatedBrowserGreen:true,manualBrowserValidated:false,browserGoldenClaimed:false};
+    fs.writeFileSync(path.join(OUT,"results.json"),JSON.stringify(result,null,2));console.log(JSON.stringify(result,null,2));
+  }finally{await context.close();await browser.close();}
 })().catch(error=>{console.error(error&&error.stack||error);process.exitCode=1;});
