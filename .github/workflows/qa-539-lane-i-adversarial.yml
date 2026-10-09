@@ -1,0 +1,56 @@
+name: QA 539 Lane I Exact Candidate Adversarial
+
+on:
+  push:
+    branches:
+      - 'qa/539-exact-candidate-lane-i'
+  pull_request:
+    branches:
+      - 'coding/539-exams-practical-contamination-lane-c'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-candidate-adversarial:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: QA syntax
+        run: node --check tools/qa_issue_539_lane_i_adversarial_v2.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > issue539-lane-i-server.log 2>&1 &
+          echo $! > issue539-lane-i-server.pid
+          sleep 2
+
+      - name: Run independent exact-candidate adversarial matrix
+        run: node tools/qa_issue_539_lane_i_adversarial_v2.js
+
+      - name: Upload Lane I evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-539-lane-i-adversarial
+          path: |
+            artifacts/issue-539-lane-i-adversarial
+            issue539-lane-i-server.log
+          if-no-files-found: error
