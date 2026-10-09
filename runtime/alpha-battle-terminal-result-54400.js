@@ -30,6 +30,7 @@
   const MARKER_KEY="__battleTerminalResultPresentation54400";
   const STYLE_ID="battle-terminal-result-54400-style";
   const VALID_OUTCOMES=new Set(["victory","defeat"]);
+  let victoryClaimTransaction54400=false;
 
   const PRIOR_OPEN_OVERLAY=typeof openOverlay==="function"?openOverlay:null;
   const PRIOR_COMPLETE_VICTORY=typeof completeBattleVictoryFromDamage==="function"?completeBattleVictoryFromDamage:null;
@@ -247,6 +248,16 @@
     if(!marker||marker.status!=="presented"){
       return{success:false,reason:"victory_not_presented",patchId:PATCH_ID};
     }
+    if(victoryClaimTransaction54400){
+      return{
+        success:true,
+        rewardClaimTransactionActive:true,
+        callerResumeWithheldUntilExplicitContinue:true,
+        terminalResultOwner54400:true,
+        terminalOutcome:"victory",
+        patchId:PATCH_ID
+      };
+    }
 
     const claimed=!!(battle.rewards&&battle.rewards.claimed===true);
     if(!claimed){
@@ -258,10 +269,18 @@
         try{if(PRIOR_OPEN_OVERLAY)PRIOR_OPEN_OVERLAY.call(globalThis,"victory");}catch(_error){}
         return{success:false,reason:"battle_reward_claim_api_missing",patchId:PATCH_ID};
       }
+      const callerBeforeClaim=battle.returnContext||null;
       let claimResult=null;
-      try{claimResult=claimFn.call(globalThis);}catch(error){
+      let claimError=null;
+      victoryClaimTransaction54400=true;
+      try{claimResult=claimFn.call(globalThis);}catch(error){claimError=error;}
+      finally{victoryClaimTransaction54400=false;}
+      if(callerBeforeClaim&&battle.returnContext!==callerBeforeClaim){
+        battle.returnContext=callerBeforeClaim;
+      }
+      if(claimError){
         try{if(PRIOR_OPEN_OVERLAY)PRIOR_OPEN_OVERLAY.call(globalThis,"victory");}catch(_error){}
-        return{success:false,reason:"battle_reward_claim_failed",error:String(error&&error.message||error),patchId:PATCH_ID};
+        return{success:false,reason:"battle_reward_claim_failed",error:String(claimError&&claimError.message||claimError),patchId:PATCH_ID};
       }
       const nowClaimed=!!(battle.rewards&&battle.rewards.claimed===true);
       if(!nowClaimed){
@@ -500,20 +519,22 @@
       const requested=normalizeOutcome54400(resultType);
       if(battle&&battle.battleOver===true&&outcome&&requested===outcome){
         const marker=marker54400(battle,outcome,false);
-        const victoryAlreadyClaimed=outcome==="victory"&&!!(battle.rewards&&battle.rewards.claimed===true);
-        if((!marker||marker.status!=="presented")&&!victoryAlreadyClaimed){
-          const presentation=presentCommittedBattleTerminalResult54400(outcome,{source:"caller_resume_intercept"});
-          return{
-            success:true,
-            callerResumeWithheldUntilTerminalResultContinue:true,
-            presentationDeferred:!!(presentation&&presentation.presentationDeferred),
-            semanticBattleAlreadyCommitted:true,
-            outcome,
-            surface:surfaceForOutcome54400(outcome),
-            terminalPresentation:presentation||null,
-            patchId:PATCH_ID
-          };
+        let presentation=null;
+        if(!marker||marker.status!=="presented"){
+          presentation=presentCommittedBattleTerminalResult54400(outcome,{source:"caller_resume_intercept"});
         }
+        return{
+          success:true,
+          callerResumeWithheldUntilTerminalResultContinue:true,
+          rewardClaimTransactionActive:outcome==="victory"&&victoryClaimTransaction54400===true,
+          presentationDeferred:!!(presentation&&presentation.presentationDeferred),
+          semanticBattleAlreadyCommitted:true,
+          outcome,
+          surface:surfaceForOutcome54400(outcome),
+          terminalResultPresented:!!(marker&&marker.status==="presented"),
+          terminalPresentation:presentation||null,
+          patchId:PATCH_ID
+        };
       }
       return PRIOR_RESUME_CALLER.apply(this,arguments);
     };
