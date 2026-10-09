@@ -310,10 +310,13 @@
     if(marker){marker.status="presenting";marker.surface=surface;}
     try{
       let result=null;
+      let rewardProjection=null;
       if(outcome==="defeat"){
         result=renderSetback54400();
         if(!result||result.success!==true)throw new Error(String(result&&result.reason||"setback_render_failed"));
       }else{
+        const projectKakashiRewards=globalThis["projectAcademyKakashiV2BattleRewardsForVictory36015"];
+        if(typeof projectKakashiRewards==="function")rewardProjection=projectKakashiRewards.call(globalThis);
         if(!PRIOR_OPEN_OVERLAY)throw new Error("terminal_overlay_authority_missing");
         result=PRIOR_OPEN_OVERLAY.call(globalThis,"victory");
       }
@@ -326,6 +329,7 @@
         presentationOnly:true,
         semanticWrite:false,
         rewardClaimed:false,
+        rewardProjection:clone54400(rewardProjection),
         patchId:PATCH_ID,
         priorResult:result||null
       };
