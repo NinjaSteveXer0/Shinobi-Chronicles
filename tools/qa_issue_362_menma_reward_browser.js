@@ -77,6 +77,7 @@ async function setupBattle(page,resolved,{terminal=false,menmaWithdrawn=false,re
     currentBattle.active=!terminal;
     currentBattle.battleOver=terminal;
     currentBattle.battleId="battle_issue_362_"+rt.instanceId;
+    currentBattle.battleConfigId=CONFIG;
     currentBattle.encounterId=ENCOUNTER;
     currentBattle.characterId="academy_menma";
     currentBattle.enemy=enemy;
@@ -210,15 +211,16 @@ async function rewardState(page){
     // authoritative either way.
     const restored=await page.evaluate(ENCOUNTER=>currentBattle&&currentBattle.encounterId===ENCOUNTER,ENCOUNTER);
     if(!restored){
-      await page.evaluate(({ENCOUNTER,SCENE})=>{
+      await page.evaluate(({ENCOUNTER,SCENE,CONFIG})=>{
         const rt=getActiveStorySceneRuntime();
         const enemy=enemyDatabase.test_subject_altered_shinobi;selectedEnemy=enemy;
         currentBattle.active=false;currentBattle.battleOver=true;currentBattle.battleId="battle_issue_362_"+rt.instanceId;
+        currentBattle.battleConfigId=CONFIG;
         currentBattle.encounterId=ENCOUNTER;currentBattle.characterId="academy_menma";currentBattle.enemy=enemy;currentBattle.encounterEnemy=enemy;
         currentBattle.outcome={type:"victory",committed:true,completedAt:Date.now(),finishingShinobiId:"academy_menma",menmaWithdrawn:false};
         currentBattle.returnContext={type:"story_scene",sceneId:SCENE,sceneInstanceId:rt.instanceId,sourceBeatId:"tutorial_battle",victoryBeatId:"menma_after_01",defeatBeatId:"tutorial_not_completed",postBattleBeatId:null,exposeFinisher:false};
         currentBattle.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],finishingShinobi:null,mvp:null};
-      },{ENCOUNTER,SCENE});
+      },{ENCOUNTER,SCENE,CONFIG});
     }
     projected=await page.evaluate(()=>ensureAcademyMenmaThreeSubjectRewardProjection36200());
     assert.strictEqual(projected.ready,true,"refresh could not rehydrate reward entitlement");
