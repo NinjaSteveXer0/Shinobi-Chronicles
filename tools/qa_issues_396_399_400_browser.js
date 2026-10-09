@@ -161,11 +161,16 @@ async function runIwabeeBattle(browser,outcome){
       for(const id of ["sc-alpha-front-door-33300","sc-alpha-front-door-33400"])document.getElementById(id)?.remove();
     });
     const launch=await page.evaluate(()=>{
+      // Real Story always establishes IWA-01 before the Rogue confrontation.
+      // Preserve that ancestry even though this focused browser fixture jumps
+      // directly to the Battle seam.
+      const prerequisite=setStorySceneBeat("iwa_expose_01",{render:false});
       const set=setStorySceneBeat("iwa_confront_battle",{render:false});
       const battle=launchStorySceneBattle();
       const stage=document.querySelector(".alpha-code-battle-stage.battle2-modern");
-      return{set,battle,battleId:currentBattle?.battleId||null,enemy:currentBattle?.enemy?.id||null,template:currentBattle?.oppositionTemplateId||null,environmentPath:currentBattle?.presentationEnvironmentPath||currentBattle?.environmentPath||null,stageEnvironmentPath:stage?.dataset?.battleEnvironmentPath||null,stageBackground:stage?getComputedStyle(stage).backgroundImage:""};
+      return{prerequisite,set,battle,battleId:currentBattle?.battleId||null,enemy:currentBattle?.enemy?.id||null,template:currentBattle?.oppositionTemplateId||null,environmentPath:currentBattle?.presentationEnvironmentPath||currentBattle?.environmentPath||null,stageEnvironmentPath:stage?.dataset?.battleEnvironmentPath||null,stageBackground:stage?getComputedStyle(stage).backgroundImage:""};
     });
+    assert.strictEqual(launch.prerequisite?.success,true,label+" prerequisite Story ancestry");
     assert.strictEqual(launch.set?.success,true);
     assert.strictEqual(launch.battle?.success,true,label+" Battle launch "+JSON.stringify(launch));
     assert.strictEqual(launch.enemy,"iwabee_origin_rogue_genin_01");
