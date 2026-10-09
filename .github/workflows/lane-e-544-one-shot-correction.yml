@@ -1,5 +1,5 @@
 name: Lane E #544 one-shot correction
-# rerun after scoping caller-owned claim assertion
+# final rerun with narrow projection ordering scoped to the terminal renderer
 
 on:
   push:
@@ -46,7 +46,7 @@ jobs:
           new312='''const kv2Rewards=read("runtime/alpha-kakashi-v2-rewards-36015.js");\nconst terminalResultSource=read("runtime/alpha-battle-terminal-result-54400.js");\nconst ownership=JSON.parse(read("tools/fixtures/runtime_responsibility_registry_300.json"));'''
           replace_once(qa312,old312,new312)
           old_assert='''assert(kv2Rewards.includes("function openOverlay36015")&&kv2Rewards.includes("ensureKakashiV2BattleRewardProjection36015")&&kv2Rewards.indexOf("ensureKakashiV2BattleRewardProjection36015",kv2Rewards.indexOf("function openOverlay36015"))<kv2Rewards.indexOf("PRE_OPEN_OVERLAY",kv2Rewards.indexOf("function openOverlay36015")),"#312 Kakashi Victory must project authored rewards before generic overlay rendering");'''
-          new_assert='''assert(kv2Rewards.includes("function projectKakashiV2BattleRewardsForVictory36015")&&!kv2Rewards.split("function diagnostics(){")[0].includes("function openOverlay36015")&&terminalResultSource.includes('globalThis["projectAcademyKakashiV2BattleRewardsForVictory36015"]')&&terminalResultSource.indexOf('projectAcademyKakashiV2BattleRewardsForVictory36015')<terminalResultSource.indexOf('PRIOR_OPEN_OVERLAY.call(globalThis,"victory")'),"#312 Kakashi Victory must project authored rewards through the narrow 36015 API before #544 terminal rendering");'''
+          new_assert='''{\n  const terminalRenderStart=terminalResultSource.indexOf("function renderCommittedTerminalSurface54400");\n  const terminalRenderEnd=terminalResultSource.indexOf("function attemptTerminalPresentation54400",terminalRenderStart);\n  const terminalRenderSource=terminalResultSource.slice(terminalRenderStart,terminalRenderEnd);\n  assert(kv2Rewards.includes("function projectKakashiV2BattleRewardsForVictory36015")&&!kv2Rewards.split("function diagnostics(){")[0].includes("function openOverlay36015")&&terminalRenderStart>=0&&terminalRenderEnd>terminalRenderStart&&terminalRenderSource.includes('globalThis["projectAcademyKakashiV2BattleRewardsForVictory36015"]')&&terminalRenderSource.indexOf("projectKakashiRewards.call(globalThis)")<terminalRenderSource.indexOf('PRIOR_OPEN_OVERLAY.call(globalThis,"victory")'),"#312 Kakashi Victory must project authored rewards through the narrow 36015 API before #544 terminal rendering");\n}'''
           replace_once(qa312,old_assert,new_assert)
 
           matrix_path=Path('qa/production_change_impact_matrix_528.json')
