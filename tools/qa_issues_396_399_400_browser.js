@@ -198,15 +198,29 @@ async function runIwabeeBattle(browser,outcome){
         }
         const walletBefore=Math.max(0,Number(playerData.ryo)||0);
         const rewards=outcome==="victory"?generateBattleRewards():null;
-        const firstClaim=outcome==="victory"?claimCurrentBattleRewards():null;
+        let terminalPresented=null;
+        let claimAction=null;
+        let firstClaim=null;
+        let secondClaim=null;
+        let callerRetained=null;
+        let resumed=outcome==="defeat"?{success:true,awaitingSetbackContinue:true}:null;
+        if(outcome==="victory"){
+          try{globalThis.hardSettleBattlePresentationQueue33000?.("qa396_iwabee_victory_terminal_result");}catch(_error){}
+          terminalPresented=globalThis.presentCommittedBattleTerminalResult54400?.("victory",{source:"qa396_iwabee_victory"})||null;
+          claimAction=continueAfterVictory();
+          firstClaim=!!(claimAction&&claimAction.success===true&&currentBattle?.rewards?.claimed===true);
+        }
         const walletAfterFirst=Math.max(0,Number(playerData.ryo)||0);
-        const secondClaim=outcome==="victory"?claimCurrentBattleRewards():null;
+        if(outcome==="victory")secondClaim=claimCurrentBattleRewards();
         const walletAfterSecond=Math.max(0,Number(playerData.ryo)||0);
         const rewardReceipts=(playerData.activityHistory||[]).filter(x=>x&&x.rewardSourceId==="iwabee_origin_rogue_genin_battle_victory_ryo_01");
-        const resumed=outcome==="defeat"?{success:true,awaitingSetbackContinue:true}:resumeBattleCallerAfterCompletion(outcome);
+        if(outcome==="victory"){
+          callerRetained=!!(currentBattle&&currentBattle.returnContext&&currentBattle.returnContext.type==="story_scene");
+          resumed=continueAfterVictory();
+        }
         const rt=getActiveStorySceneRuntime();
         const row=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");
-        return{rewards:JSON.parse(JSON.stringify(rewards||null)),firstClaim,secondClaim,walletDeltaFirst:walletAfterFirst-walletBefore,walletDeltaSecond:walletAfterSecond-walletBefore,rewardReceiptCount:rewardReceipts.length,rewardReceipt:JSON.parse(JSON.stringify(rewardReceipts[0]||null)),authoritativeDefeat:JSON.parse(JSON.stringify(authoritativeDefeat||null)),resumed,beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};
+        return{rewards:JSON.parse(JSON.stringify(rewards||null)),terminalPresented:JSON.parse(JSON.stringify(terminalPresented||null)),claimAction:JSON.parse(JSON.stringify(claimAction||null)),firstClaim,secondClaim,callerRetained,walletDeltaFirst:walletAfterFirst-walletBefore,walletDeltaSecond:walletAfterSecond-walletBefore,rewardReceiptCount:rewardReceipts.length,rewardReceipt:JSON.parse(JSON.stringify(rewardReceipts[0]||null)),authoritativeDefeat:JSON.parse(JSON.stringify(authoritativeDefeat||null)),resumed,beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};
       }finally{globalThis.getBattleRemainingPL=prior;}
     },{outcome});
     if(outcome==="defeat"){
@@ -231,11 +245,26 @@ async function runIwabeeBattle(browser,outcome){
         return{rewards:JSON.parse(JSON.stringify(rewards||null)),beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};
       });
       result={...result,rewards:post.rewards,beatId:post.beatId,local:post.local,fact:post.fact,resumed:{success:true,viaSetbackContinue:true}};
+    }else if(!result.fact?.rogueDisposition){
+      const post=await page.evaluate(()=>{
+        for(let i=0;i<24;i++){
+          const committed=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");
+          if(committed&&committed.fact&&committed.fact.rogueDisposition)break;
+          advanceStoryScene();
+        }
+        const rt=getActiveStorySceneRuntime();
+        const row=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");
+        return{beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};
+      });
+      result={...result,beatId:post.beatId,local:post.local,fact:post.fact};
     }
     assert.strictEqual(result.resumed?.success,true,label+" caller resume");
     assert.strictEqual(result.rewards?.ryo,outcome==="victory"?50:0,label+" Battle reward projection");
     assert.strictEqual(result.rewards?.exp,0,label+" Battle reward EXP");
     if(outcome==="victory"){
+      assert.strictEqual(result.terminalPresented?.success,true,label+" committed Victory was not presented through #544");
+      assert.strictEqual(result.claimAction?.success,true,label+" #544 CLAIM action failed");
+      assert.strictEqual(result.callerRetained,true,label+" caller context disappeared during CLAIM");
       assert.strictEqual(result.firstClaim,true,label+" first reward claim");
       assert.strictEqual(result.secondClaim,true,label+" idempotent reward re-claim");
       assert.strictEqual(result.walletDeltaFirst,50,label+" wallet reward delta");
