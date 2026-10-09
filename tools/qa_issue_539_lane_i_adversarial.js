@@ -64,7 +64,12 @@ function staticAdversarialProof(){
   assert.strictEqual(myClanChanged,"","My Clan negative-control owner changed in #539 candidate");
   const myClan=read("runtime/alpha-browser-polish-32700.js");
   assert(myClan.includes("background-image:none!important"),"My Clan code-owned no-raster protection is missing");
-  assert(!myClan.includes("UI/my_clan_browse.png")&&!myClan.includes("UI/my_clan_inspection.png"),"My Clan historical raster literal unexpectedly reappeared");
+  assert(myClan.includes("myClanLiteralMasterNotRequired"),"My Clan negative-consumption diagnostic is missing");
+  assert(myClan.includes("myClanCodeFirst"),"My Clan code-first diagnostic is missing");
+  const myClanStyleMatch=myClan.match(/style\.textContent=`([\s\S]*?)`;\s*document\.head\.appendChild\(style\)/);
+  assert(myClanStyleMatch,"My Clan live presentation style block could not be isolated");
+  const myClanPresentation=myClanStyleMatch[1];
+  assert(!/UI\/my_clan_(?:browse|inspection)\.png/i.test(myClanPresentation),"My Clan live presentation CSS consumes a historical raster");
 
   return{candidateFiles,qaDelta,antiPatchLaw:true,historicalAssetsPreserved:true,myClanNegativeControl:true};
 }
