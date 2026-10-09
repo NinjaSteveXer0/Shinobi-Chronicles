@@ -228,6 +228,7 @@ function ensureOfficeStyles(){
   `;
   document.head.appendChild(style);
 }
+
 function currentObserver(){
   const contextObserver=activeContext&&activeContext.observer&&typeof activeContext.observer==="object"?activeContext.observer:null;
   if(contextObserver)return{id:contextObserver.id||null,name:scalar(contextObserver)||"Current shinobi",rank:scalar(contextObserver.rank)||"Unranked",source:"caller_context"};
@@ -301,7 +302,7 @@ function discoveredLeadRows(){
       });
     }
   }
-  return rows.filter((row,index,list)=>list.findIndex(other=>other.leadId===row.leadId)===index;
+  return rows.filter((row,index,list)=>list.findIndex(other=>other.leadId===row.leadId)===index);
 }
 function dispatchProjection(){
   const issued=issuedLeadIds(),leads=discoveredLeadRows();
