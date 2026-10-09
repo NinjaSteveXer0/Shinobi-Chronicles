@@ -530,7 +530,7 @@ async function reloadBattle(page,battle,label){
   return after;
 }
 async function terminateBattleToStory(page,outcome,label){
-  const result=await page.evaluate(({outcome,wasabi,rogue})=>{
+  const result=await page.evaluate(async({outcome,wasabi,rogue})=>{
     const prior=globalThis.getBattleRemainingPL;
     globalThis.getBattleRemainingPL=(side,id)=>{
       if(outcome==="victory"&&side==="enemy"&&id===rogue)return 0;
@@ -541,20 +541,44 @@ async function terminateBattleToStory(page,outcome,label){
       const ryoBefore=Number(playerData.ryo)||0;
       currentBattle.outcome={...(currentBattle.outcome||{}),type:outcome,committed:true,completedAt:Date.now(),finishingShinobiId:outcome==="victory"?wasabi:null};
       currentBattle.battleOver=true;currentBattle.active=false;
-      let projected=null,firstClaim=null,secondClaim=null;
+      let projected=null,firstClaim=null,secondClaim=null,terminalPresented=null,victoryVisible=false;
       if(outcome==="victory"){
         projected=JSON.parse(JSON.stringify(generateBattleRewards(enemyDatabase[rogue],getPlayerCharacter(wasabi))));
-        firstClaim=claimCurrentBattleRewards();
+        try{globalThis.hardSettleBattlePresentationQueue33000?.("qa343_wasabi_victory_terminal_result");}catch(_error){}
+        terminalPresented=globalThis.presentCommittedBattleTerminalResult54400?.("victory",{source:"qa343_wasabi_victory"})||null;
+        await Promise.resolve();
+        const victoryNode=document.querySelector(".alpha-victory-code-screen,.victory-screen");
+        victoryVisible=!!(victoryNode&&victoryNode.getClientRects().length>0&&getComputedStyle(victoryNode).display!=="none"&&getComputedStyle(victoryNode).visibility!=="hidden");
+        const claimAction=continueAfterVictory();
+        firstClaim=!!(claimAction&&claimAction.success===true&&currentBattle?.rewards?.claimed===true);
         secondClaim=claimCurrentBattleRewards();
       }
       const ryoAfter=Number(playerData.ryo)||0;
       const receipts=(playerData.activityHistory||[]).filter(row=>row&&row.rewardSourceId==="wasabi_origin_rogue_genin_battle_victory_ryo_01").map(row=>JSON.parse(JSON.stringify(row)));
-      const resumed=resumeBattleCallerAfterCompletion(outcome);
-      return{...resumed,rewardAudit:{ryoBefore,ryoAfter,projected,firstClaim,secondClaim,receipts}};
+      const resumed=outcome==="victory"?continueAfterVictory():resumeBattleCallerAfterCompletion(outcome);
+      return{...resumed,terminalPresented:JSON.parse(JSON.stringify(terminalPresented||null)),victoryVisible,rewardAudit:{ryoBefore,ryoAfter,projected,firstClaim,secondClaim,receipts}};
     }finally{globalThis.getBattleRemainingPL=prior;}
   },{outcome,wasabi:WASABI,rogue:ROGUE});
-  assert(result?.success===true,label+" caller return failed "+JSON.stringify(result));
+  if(outcome==="defeat"){
+    assert.strictEqual(result?.callerResumeWithheldUntilTerminalResultContinue,true,label+" defeat bypassed #544 Setback gate "+JSON.stringify(result));
+    await page.waitForSelector(".alpha544-setback",{state:"visible",timeout:12000});
+    const setbackGate=await page.evaluate(()=>({
+      overlay:typeof currentOverlayType==="undefined"?null:currentOverlayType,
+      outcome:currentBattle?.outcome?.type||null,
+      rewardClaimed:currentBattle?.rewards?.claimed===true
+    }));
+    assert.strictEqual(setbackGate.overlay,"setback",label+" defeat did not present code-owned Setback");
+    assert.strictEqual(setbackGate.outcome,"defeat",label+" Setback mutated terminal outcome");
+    assert.strictEqual(setbackGate.rewardClaimed,false,label+" Setback incorrectly claimed reward");
+    await page.waitForSelector(".alpha544-setback button",{state:"visible",timeout:12000});
+    const continued=await page.evaluate(()=>globalThis.continueAfterSetback54400?.());
+    assert.strictEqual(continued?.success,true,label+" Setback Continue failed "+JSON.stringify(continued));
+  }else{
+    assert(result?.success===true,label+" caller return failed "+JSON.stringify(result));
+  }
   if(outcome==="victory"){
+    assert.strictEqual(result.terminalPresented?.success,true,label+" committed Victory was not accepted by #544 presenter");
+    assert.strictEqual(result.victoryVisible,true,label+" Victory surface was not visible before CLAIM");
     assert.strictEqual(result.rewardAudit.projected?.ryo,50,label+" Victory projection amount drift");
     assert.strictEqual(result.rewardAudit.projected?.exp,0,label+" Victory generic EXP returned");
     assert.deepStrictEqual(result.rewardAudit.projected?.items||[],[],label+" Victory fixed loot returned");

@@ -323,6 +323,8 @@
       "id": "battle_result_presentation",
       "changed_any": [
         "runtime/alpha-alpha-sprint-33100.js",
+        "runtime/alpha-battle-browser-32600.js",
+        "runtime/alpha-battle-terminal-result-54400.js",
         "UI/victory.png",
         "UI/setback.png",
         "tools/qa_ui_master_consumption_528_browser.js"

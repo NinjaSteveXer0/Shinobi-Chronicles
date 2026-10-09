@@ -25,7 +25,10 @@ async function waitRuntime(page){
     globalThis.SC_PHASE2_KONOHA_PLAYER_SURFACES_43110&&
     typeof globalThis.openKonohaPracticalFromVillage==="function"&&
     typeof globalThis.openKonohaExamFromVillage==="function"&&
-    typeof globalThis.runAlphaPlayableSprint33100Diagnostics==="function"
+    typeof globalThis.runAlphaPlayableSprint33100Diagnostics==="function"&&
+    globalThis.__battleTerminalResultPresentation54400Installed===true&&
+    typeof globalThis.presentCommittedBattleTerminalResult54400==="function"&&
+    typeof globalThis.getBattleTerminalResultPresentation54400==="function"
   ),null,{timeout:30000});
 }
 
@@ -158,7 +161,7 @@ async function openSetbackAndProbe(page){
       active:false,battleOver:true,
       activePlayer:actor||{id:"academy_menma",name:"Menma"},
       enemy:{id:"issue528_setback_probe",name:"QA Opposition"},
-      outcome:{type:"defeat",resultClass:"deployment_exhausted",battlePLWithdrawal:true,injuryInferred:false,deathInferred:false},
+      outcome:{type:"defeat",resultClass:"deployment_exhausted"},
       rewards:{generated:true,claimed:false,ryo:0,items:[]},
       returnContext:null
     };
@@ -166,18 +169,21 @@ async function openSetbackAndProbe(page){
     return openOverlay("setback");
   });
   assert(setup&&setup.success===true,JSON.stringify(setup));
-  await page.waitForSelector(".alpha331-setback",{state:"visible",timeout:10000});
-  const semantic=await page.evaluate(()=>({
-    text:document.querySelector(".alpha331-setback")?.innerText||"",
+  const selector='[data-terminal-result-owner="54400"].alpha544-setback';
+  await page.waitForSelector(selector,{state:"visible",timeout:10000});
+  const semantic=await page.evaluate(selector=>({
+    text:document.querySelector(selector)?.innerText||"",
     outcome:JSON.parse(JSON.stringify(globalThis.currentBattle?.outcome||null)),
-    diagnostics:runAlphaPlayableSprint33100Diagnostics()
-  }));
-  assert.strictEqual(semantic.outcome?.battlePLWithdrawal,true);
-  assert.strictEqual(semantic.outcome?.injuryInferred,false);
-  assert.strictEqual(semantic.outcome?.deathInferred,false);
-  assert.strictEqual(semantic.diagnostics?.pass,true,JSON.stringify(semantic.diagnostics));
+    terminal:getBattleTerminalResultPresentation54400()
+  }),selector);
+  assert.strictEqual(semantic.outcome?.type,"defeat");
+  assert.strictEqual(semantic.terminal?.committedOutcome,"defeat",JSON.stringify(semantic.terminal));
+  assert.strictEqual(semantic.terminal?.status,"presented",JSON.stringify(semantic.terminal));
+  assert.strictEqual(semantic.terminal?.presentationOnly,true,JSON.stringify(semantic.terminal));
+  assert.strictEqual(semantic.terminal?.semanticWrite,false,JSON.stringify(semantic.terminal));
+  assert.strictEqual(semantic.terminal?.terminalSurfaceVisible,true,JSON.stringify(semantic.terminal));
   const setback=await assetProbe(page,"UI/setback.png");
-  await page.locator(".alpha331-setback").screenshot({path:path.join(OUT,"05-setback.png")});
+  await page.locator(selector).screenshot({path:path.join(OUT,"05-setback.png")});
   return{setback,semantic};
 }
 
