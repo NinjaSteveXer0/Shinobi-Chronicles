@@ -46511,7 +46511,14 @@ function resumeBattleCallerAfterCompletion(outcomeType=null) {
   const returnContext=normalizeBattleReturnContext(currentBattle.returnContext);
   if (!returnContext) return {success:false,reason:currentBattle.returnContext?"battle_return_context_invalid":"battle_return_context_absent"};
   if (returnContext.type==="story_scene") return resumeStorySceneFromBattle(returnContext);
-  if (returnContext.type==="field_readiness_assessment") return resumeFieldReadinessAssessmentFromBattle(returnContext);
+  if (returnContext.type==="field_readiness_assessment") {
+    if (returnContext.assessmentScenarioId==="academy_genin_missing_courier_dispatch_v1") {
+      const courier=globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310;
+      if (!courier||typeof courier.resumeFromCurrentBattle!=="function") return {success:false,reason:"promotion_courier_return_authority_missing"};
+      return courier.resumeFromCurrentBattle(returnContext);
+    }
+    return resumeFieldReadinessAssessmentFromBattle(returnContext);
+  }
   if (returnContext.type==="region_hotspot") return resumeRegionHotspotFromBattle(returnContext,outcomeType);
   if (returnContext.type==="mission_area_hotspot") return resumeMissionAreaHotspotFromBattle(returnContext,outcomeType);
   return {success:false,reason:"battle_return_context_type_unhandled",type:returnContext.type||null,outcomeType};
@@ -86868,6 +86875,9 @@ function executeEnemyAuthoredActionOpportunity() {
   }
   if (typeof isArc1M7SanitisationEncounterActive === "function"&&isArc1M7SanitisationEncounterActive()) {
     return executeArc1M7SanitisationEnemyActionOpportunity();
+  }
+  if (globalThis.currentBattle&&currentBattle.promotionCourier60310&&globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310&&typeof globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.expireRogueFeintAtActionOpportunity==="function") {
+    globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.expireRogueFeintAtActionOpportunity();
   }
   const scheduler=evaluateEnemyActionScheduler();
   if (!scheduler.ready) {

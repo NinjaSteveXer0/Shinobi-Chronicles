@@ -54,7 +54,8 @@ run(roster, "runtime/alpha-genin-roster-63.js");
 // harness tests the bridge's decision seam without pretending to be a browser.
 context.openOverlay = function(route){ routes.push(route); return { success: true, route }; };
 context.openGeninRosterTransitionUI = function(){ rosterResumeCalls += 1; return { success: true, destination: "genin_roster" }; };
-context.openArenaPromotionSurface = function(subjectId){ return { success: true, destination: "promotion", subjectId: subjectId || null }; };
+context.openArenaPromotionSurface = function(subjectId){ return { success: true, destination: "legacy_promotion", subjectId: subjectId || null }; };
+context.openInstalledPromotion60330 = function(subjectId){ return { success: true, destination: "promotion", subjectId: subjectId || null, alpha60330:true }; };
 run(bridge, "runtime/alpha-traversal-bridge-33200.js");
 
 const test = `
