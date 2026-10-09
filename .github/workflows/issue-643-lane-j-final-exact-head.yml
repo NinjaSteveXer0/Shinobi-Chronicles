@@ -1,0 +1,263 @@
+name: Issue 643 Lane J Final Exact-Head Reverify
+
+on:
+  push:
+    branches:
+      - qa/544-terminal-result-lane-j
+    paths:
+      - '.github/workflows/issue-643-lane-j-final-exact-head.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  ISSUE_544_TARGET_SHA: 3c99431cc9398d64497e3af798353cea873ef0bf
+
+jobs:
+  source-singular-owner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout Lane J QA vehicle
+        uses: actions/checkout@v4
+        with:
+          path: qa
+      - name: Checkout exact PR 602 candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.ISSUE_544_TARGET_SHA }}
+          path: candidate
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Inject source verifier only
+        run: cp qa/tools/qa_issue_544_lane_j_source.js candidate/tools/qa_issue_544_lane_j_source.js
+      - name: Verify target and singular-owner firewall
+        working-directory: candidate
+        run: |
+          test "$(git rev-parse HEAD)" = "$ISSUE_544_TARGET_SHA"
+          node --check tools/qa_issue_544_lane_j_source.js
+          node --check runtime/alpha-battle-terminal-result-54400.js
+          node --check runtime/alpha-alpha-sprint-33100.js
+          node --check runtime/alpha-kakashi-v2-rewards-36015.js
+          node tools/qa_issue_544_lane_j_source.js
+
+  merged-539-528-canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout exact PR 602 candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.ISSUE_544_TARGET_SHA }}
+          path: candidate
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Prove merged #539 + #544 shared canary contracts remain active
+        working-directory: candidate
+        run: |
+          test "$(git rev-parse HEAD)" = "$ISSUE_544_TARGET_SHA"
+          node --check tools/qa_ui_master_consumption_528_browser.js
+          grep -Fq 'openKonohaPracticalFromVillage' tools/qa_ui_master_consumption_528_browser.js
+          grep -Fq 'openKonohaExamFromVillage' tools/qa_ui_master_consumption_528_browser.js
+          grep -Fq 'UI/practical.png' tools/qa_ui_master_consumption_528_browser.js
+          grep -Fq 'UI/exams.png' tools/qa_ui_master_consumption_528_browser.js
+          grep -Fq 'expectedVisible:false,expectedRouteRequest:false' tools/qa_ui_master_consumption_528_browser.js
+          grep -Fq 'globalThis.__battleTerminalResultPresentation54400Installed===true' tools/qa_ui_master_consumption_528_browser.js
+          grep -Fq '[data-terminal-result-owner="54400"].alpha544-setback' tools/qa_ui_master_consumption_528_browser.js
+          grep -Fq 'semantic.terminal?.presentationOnly' tools/qa_ui_master_consumption_528_browser.js
+          grep -Fq 'semantic.terminal?.semanticWrite' tools/qa_ui_master_consumption_528_browser.js
+          grep -Fq 'UI/setback.png' tools/qa_ui_master_consumption_528_browser.js
+          grep -Fq 'UI/victory.png' tools/qa_ui_master_consumption_528_browser.js
+
+  origin-world-real-action:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Checkout Lane J QA vehicle
+        uses: actions/checkout@v4
+        with:
+          path: qa
+      - name: Checkout exact PR 602 candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.ISSUE_544_TARGET_SHA }}
+          path: candidate
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Inject Origin + World verifier
+        run: cp qa/tools/qa_issue_544_lane_j_origin_world_real_action_browser.js candidate/tools/qa_issue_544_lane_j_origin_world_real_action_browser.js
+      - name: Apply current Lane J chronology/enemy/onboarding probes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('candidate/tools/qa_issue_544_lane_j_origin_world_real_action_browser.js')
+          s=p.read_text()
+          s=s.replace("if(/CLAIM/i.test(firstText)){await button.click();await page.waitForFunction(()=>[...document.querySelectorAll('.alpha-victory-code-screen .victory-continue,.victory-screen .victory-continue')].some(b=>b.offsetParent!==null&&/CONTINUE/i.test(b.textContent||'')),null,{timeout:8000});button=visibleButton();await button.waitFor({state:'visible',timeout:8000});}","if(/CLAIM/i.test(firstText)){await button.click();await page.waitForFunction(()=>currentBattle?.rewards?.claimed===true,null,{timeout:8000});const afterClaim=await page.evaluate(()=>({claimed:currentBattle?.rewards?.claimed===true,returnContext:currentBattle?.returnContext?JSON.parse(JSON.stringify(currentBattle.returnContext)):null,terminal:getBattleTerminalResultPresentation54400(),visible:!![...document.querySelectorAll('.alpha-victory-code-screen,.victory-screen')].find(n=>n.getClientRects().length>0&&getComputedStyle(n).display!=='none'&&getComputedStyle(n).visibility!=='hidden')}));assert.strictEqual(afterClaim.claimed,true,label+' Victory claim did not settle');assert(afterClaim.returnContext,label+' caller resumed during reward claim');assert.strictEqual(afterClaim.terminal?.status,'presented',label+' terminal state lost after reward claim');assert.strictEqual(afterClaim.visible,true,label+' Victory surface disappeared during reward claim');button=visibleButton();await button.waitFor({state:'visible',timeout:8000});}")
+          s=s.replace("enemyId:currentBattle?.activeEnemy?.id||currentBattle?.activeEnemyId||null","enemyId:(typeof getBattleDeploymentParticipant==='function'?getBattleDeploymentParticipant('enemy',1)?.id:null)||currentBattle?.activeEnemy?.id||currentBattle?.activeEnemyId||currentBattle?.enemy?.id||null")
+          s=s.replace("const continued=continueAcademyTeamFormationJourney();const opportunityId='alpha_bandit_hideout_battle'","const continued=continueAcademyTeamFormationJourney();const sandboxOpening=typeof chooseKonohaSandboxOpening35000==='function'?chooseKonohaSandboxOpening35000('explore_konoha'):null;const opportunityId='alpha_bandit_hideout_battle'")
+          s=s.replace("return{selected,completed,one,two,formed,continued,result,battleId:","return{selected,completed,one,two,formed,continued,sandboxOpening,result,battleId:")
+          s=s.replace("assert.strictEqual(launch.continued?.success,true,label+' team journey failed');assert.strictEqual(launch.result?.success,true,label+' Bandit route launch failed '","assert.strictEqual(launch.continued?.success,true,label+' team journey failed');assert.strictEqual(launch.sandboxOpening?.success,true,label+' Konoha sandbox opening choice failed');assert.strictEqual(launch.result?.success,true,label+' Bandit route launch failed '")
+          p.write_text(s)
+          PY
+      - name: Enforce real-action crossing contract
+        working-directory: candidate
+        run: |
+          test "$(git rev-parse HEAD)" = "$ISSUE_544_TARGET_SHA"
+          ! grep -q 'completeBattleVictoryFromDamage(' tools/qa_issue_544_lane_j_origin_world_real_action_browser.js
+          ! grep -q 'completeBattleDefeat(' tools/qa_issue_544_lane_j_origin_world_real_action_browser.js
+          grep -q 'attemptBattlePreparedSkill' tools/qa_issue_544_lane_j_origin_world_real_action_browser.js
+          grep -q 'Victory claim did not settle' tools/qa_issue_544_lane_j_origin_world_real_action_browser.js
+          grep -q "getBattleDeploymentParticipant('enemy',1)" tools/qa_issue_544_lane_j_origin_world_real_action_browser.js
+          grep -q "chooseKonohaSandboxOpening35000('explore_konoha')" tools/qa_issue_544_lane_j_origin_world_real_action_browser.js
+          node --check tools/qa_issue_544_lane_j_origin_world_real_action_browser.js
+      - name: Install Chromium
+        working-directory: candidate
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start exact-candidate Alpha server
+        working-directory: candidate
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > /tmp/sc643j-origin-world-server.log 2>&1 &
+          for i in {1..40}; do if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi; sleep 0.25; done
+          cat /tmp/sc643j-origin-world-server.log; exit 1
+      - name: Run Iwabee + Bandit Hideout hostile matrix
+        working-directory: candidate
+        env:
+          ISSUE_544_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_544_OUT: artifacts/issue-643-lane-j-origin-world
+        run: node tools/qa_issue_544_lane_j_origin_world_real_action_browser.js
+      - name: Upload Origin + World evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-643-lane-j-origin-world-${{ github.run_id }}
+          path: |
+            candidate/artifacts/issue-643-lane-j-origin-world
+            /tmp/sc643j-origin-world-server.log
+          if-no-files-found: warn
+
+  kakashi-real-action:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Checkout Lane J QA vehicle
+        uses: actions/checkout@v4
+        with:
+          path: qa
+      - name: Checkout exact PR 602 candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.ISSUE_544_TARGET_SHA }}
+          path: candidate
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Inject Kakashi verifier only
+        run: cp qa/tools/qa_issue_544_lane_j_kakashi_real_action_browser.js candidate/tools/qa_issue_544_lane_j_kakashi_real_action_browser.js
+      - name: Enforce real-action crossing contract
+        working-directory: candidate
+        run: |
+          test "$(git rev-parse HEAD)" = "$ISSUE_544_TARGET_SHA"
+          ! grep -q 'completeBattleVictoryFromDamage(' tools/qa_issue_544_lane_j_kakashi_real_action_browser.js
+          ! grep -q 'completeBattleDefeat(' tools/qa_issue_544_lane_j_kakashi_real_action_browser.js
+          grep -q 'attemptBattlePreparedSkill' tools/qa_issue_544_lane_j_kakashi_real_action_browser.js
+          node --check tools/qa_issue_544_lane_j_kakashi_real_action_browser.js
+      - name: Install Chromium
+        working-directory: candidate
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start exact-candidate Alpha server
+        working-directory: candidate
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > /tmp/sc643j-kakashi-server.log 2>&1 &
+          for i in {1..40}; do if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi; sleep 0.25; done
+          cat /tmp/sc643j-kakashi-server.log; exit 1
+      - name: Run Kakashi hostile win/loss
+        working-directory: candidate
+        env:
+          ISSUE_544_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_544_OUT: artifacts/issue-643-lane-j-kakashi
+        run: node tools/qa_issue_544_lane_j_kakashi_real_action_browser.js
+      - name: Upload Kakashi evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-643-lane-j-kakashi-${{ github.run_id }}
+          path: |
+            candidate/artifacts/issue-643-lane-j-kakashi
+            /tmp/sc643j-kakashi-server.log
+          if-no-files-found: warn
+
+  postboot-owner-firewall:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Checkout exact PR 602 candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.ISSUE_544_TARGET_SHA }}
+          path: candidate
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Verify source authority firewall
+        working-directory: candidate
+        run: |
+          test "$(git rev-parse HEAD)" = "$ISSUE_544_TARGET_SHA"
+          node - <<'NODE'
+          const fs=require('fs'),assert=require('assert');
+          const term=fs.readFileSync('runtime/alpha-battle-terminal-result-54400.js','utf8');
+          const old=fs.readFileSync('runtime/alpha-alpha-sprint-33100.js','utf8');
+          const index=fs.readFileSync('index.html','utf8');
+          assert(!old.includes('continueAfterSetback33100'));
+          assert(!old.includes('.alpha331-setback'));
+          assert(index.indexOf('runtime/alpha-battle-terminal-result-54400.js')>index.indexOf('runtime/alpha-alpha-sprint-33100.js'));
+          assert(/proof-reserved until independent/i.test(term));
+          NODE
+      - name: Install Chromium
+        working-directory: candidate
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start exact-candidate Alpha server
+        working-directory: candidate
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > /tmp/sc643j-owner-server.log 2>&1 &
+          for i in {1..40}; do if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi; sleep 0.25; done
+          cat /tmp/sc643j-owner-server.log; exit 1
+      - name: Prove full dynamic owner after #33200 child boot
+        working-directory: candidate
+        env:
+          ISSUE_544_OUT: artifacts/issue-643-lane-j-postboot-owner
+        run: |
+          mkdir -p "$ISSUE_544_OUT"
+          cat > /tmp/qa643j-owner.js <<'NODE'
+          const fs=require('fs'),assert=require('assert');
+          const {chromium}=require('playwright');
+          (async()=>{const browser=await chromium.launch({headless:true});try{const page=await browser.newPage({viewport:{width:1440,height:900}});await page.addInitScript(()=>{try{localStorage.clear();sessionStorage.clear();}catch(_e){}});await page.goto('http://127.0.0.1:8080/index.html',{waitUntil:'domcontentloaded',timeout:60000});await page.waitForLoadState('load',{timeout:30000}).catch(()=>{});await page.waitForFunction(()=>globalThis.__battleTerminalResultPresentation54400Installed===true&&typeof globalThis.presentCommittedBattleTerminalResult54400==='function'&&typeof globalThis.presentCommittedBattleTerminalResult==='function'&&typeof globalThis.continueAfterVictory==='function'&&typeof globalThis.continueAfterSetback54400==='function'&&typeof globalThis.continueAfterBattleSetback==='function',null,{timeout:30000});await page.waitForTimeout(750);const proof=await page.evaluate(()=>({installed:globalThis.__battleTerminalResultPresentation54400Installed===true,presenter544:globalThis.presentCommittedBattleTerminalResult===globalThis.presentCommittedBattleTerminalResult54400,continueVictoryName:globalThis.continueAfterVictory?.name||null,continueSetback544:globalThis.continueAfterBattleSetback===globalThis.continueAfterSetback54400,continueSetbackName:globalThis.continueAfterBattleSetback?.name||null,openOverlayName:globalThis.openOverlay?.name||null,completeVictoryName:globalThis.completeBattleVictoryFromDamage?.name||null,completeDefeatName:globalThis.completeBattleDefeat?.name||null,oldContinue331:typeof globalThis.continueAfterSetback33100,oldRender331:typeof globalThis.renderSetback33100,oldSurface:!!document.querySelector('.alpha331-setback')}));assert.strictEqual(proof.installed,true);assert.strictEqual(proof.presenter544,true);assert.strictEqual(proof.continueVictoryName,'continueAfterVictory54400');assert.strictEqual(proof.continueSetback544,true);assert.strictEqual(proof.continueSetbackName,'continueAfterSetback54400');assert.strictEqual(proof.openOverlayName,'wrappedOpenOverlay54400');assert.strictEqual(proof.completeVictoryName,'wrappedCompleteVictory54400');assert.strictEqual(proof.completeDefeatName,'wrappedCompleteDefeat54400');assert.strictEqual(proof.oldContinue331,'undefined');assert.strictEqual(proof.oldRender331,'undefined');assert.strictEqual(proof.oldSurface,false);const evidence={pass:true,issue:643,lane:'J',target:process.env.ISSUE_544_TARGET_SHA,postBootOwner:proof,browserGoldenClaimed:false};fs.writeFileSync(process.env.ISSUE_544_OUT+'/evidence.json',JSON.stringify(evidence,null,2));console.log(JSON.stringify(evidence,null,2));}finally{await browser.close();}})().catch(e=>{console.error(e&&e.stack||e);process.exit(1);});
+          NODE
+          NODE_PATH="$PWD/node_modules" ISSUE_544_TARGET_SHA="$ISSUE_544_TARGET_SHA" node /tmp/qa643j-owner.js
+      - name: Upload post-boot owner evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-643-lane-j-postboot-owner-${{ github.run_id }}
+          path: |
+            candidate/artifacts/issue-643-lane-j-postboot-owner
+            /tmp/sc643j-owner-server.log
+          if-no-files-found: warn
