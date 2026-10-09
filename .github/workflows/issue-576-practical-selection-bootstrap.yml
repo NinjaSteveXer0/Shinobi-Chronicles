@@ -1,0 +1,193 @@
+name: Issue 576 Practical selection bounded bootstrap
+
+on:
+  push:
+    branches:
+      - coding/576-expert-master-curriculum-profiles
+
+permissions:
+  contents: write
+
+jobs:
+  patch-bounded-practical-selection:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/576-expert-master-curriculum-profiles
+          fetch-depth: 2
+
+      - name: Verify adoption parent
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "aa488f77c8333182578fdea62dc27a42390d38db"
+
+      - name: Patch only transferred Practical selection/readiness hunks and focused QA
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          game_path = Path("game.js")
+          game = game_path.read_text(encoding="utf-8")
+
+          function_names = [
+              "getKonohaPracticalSelectedDisciplineId",
+              "selectKonohaPracticalDiscipline",
+              "validateKonohaPracticalFinalReadiness",
+          ]
+          legacy = re.compile(
+              r'const\s+validDisciplines\s*=\s*\[\s*"tai"\s*,\s*"buki"\s*,\s*"stamina"\s*\]\s*;',
+              re.S,
+          )
+          replacement = '''const validDisciplines = [
+            "tai",
+            "buki",
+            "stamina",
+            "nin",
+            "gen",
+            "fuin"
+          ];'''
+
+          def bounds_for_function(src, name):
+              marker = f"function {name}"
+              start = src.find(marker)
+              if start < 0:
+                  raise SystemExit(f"missing transferred Practical owner: {name}")
+              open_brace = src.find("{", start)
+              if open_brace < 0:
+                  raise SystemExit(f"missing opening brace: {name}")
+              depth = 0
+              i = open_brace
+              in_single = in_double = in_template = False
+              escaped = False
+              line_comment = block_comment = False
+              while i < len(src):
+                  ch = src[i]
+                  nxt = src[i + 1] if i + 1 < len(src) else ""
+                  if line_comment:
+                      if ch == "\n": line_comment = False
+                      i += 1; continue
+                  if block_comment:
+                      if ch == "*" and nxt == "/": block_comment = False; i += 2; continue
+                      i += 1; continue
+                  if in_single or in_double or in_template:
+                      if escaped:
+                          escaped = False
+                      elif ch == "\\":
+                          escaped = True
+                      elif in_single and ch == "'": in_single = False
+                      elif in_double and ch == '"': in_double = False
+                      elif in_template and ch == "`": in_template = False
+                      i += 1; continue
+                  if ch == "/" and nxt == "/": line_comment = True; i += 2; continue
+                  if ch == "/" and nxt == "*": block_comment = True; i += 2; continue
+                  if ch == "'": in_single = True; i += 1; continue
+                  if ch == '"': in_double = True; i += 1; continue
+                  if ch == "`": in_template = True; i += 1; continue
+                  if ch == "{": depth += 1
+                  elif ch == "}":
+                      depth -= 1
+                      if depth == 0:
+                          return start, i + 1
+                  i += 1
+              raise SystemExit(f"unterminated function: {name}")
+
+          for name in function_names:
+              start, end = bounds_for_function(game, name)
+              section = game[start:end]
+              matches = list(legacy.finditer(section))
+              if len(matches) != 1:
+                  raise SystemExit(f"{name}: expected exactly one legacy Practical allowlist, found {len(matches)}")
+              section = legacy.sub(replacement, section, count=1)
+              game = game[:start] + section + game[end:]
+
+          # Fail closed: exactly the transferred owners now accept the six discipline selector IDs.
+          expected_ids = ["tai", "buki", "stamina", "nin", "gen", "fuin"]
+          profile_ids = [
+              "discipline_curriculum_nin_expert_v1", "discipline_curriculum_nin_master_v1",
+              "discipline_curriculum_gen_expert_v1", "discipline_curriculum_gen_master_v1",
+              "discipline_curriculum_fuin_expert_v1", "discipline_curriculum_fuin_master_v1",
+          ]
+          for name in function_names:
+              start, end = bounds_for_function(game, name)
+              section = game[start:end]
+              m = re.search(r'const\s+validDisciplines\s*=\s*\[(.*?)\]\s*;', section, re.S)
+              if not m:
+                  raise SystemExit(f"{name}: updated allowlist missing")
+              ids = re.findall(r'"([^"]+)"', m.group(1))
+              if ids != expected_ids:
+                  raise SystemExit(f"{name}: wrong selector domain {ids!r}")
+              if any(pid in section for pid in profile_ids):
+                  raise SystemExit(f"{name}: activityProfileId leaked into selector domain")
+
+          game_path.write_text(game, encoding="utf-8")
+
+          qa_path = Path("tools/qa_issue_576_expert_master_curriculum_profiles.js")
+          qa = qa_path.read_text(encoding="utf-8")
+          if 'const GAME=fs.readFileSync(path.join(ROOT,"game.js"),"utf8");' not in qa:
+              anchor = 'const SRC576=fs.readFileSync(path.join(ROOT,"runtime/alpha-discipline-curriculum-profiles-57600.js"),"utf8");\n'
+              if qa.count(anchor) != 1:
+                  raise SystemExit("#576 QA insertion anchor drifted")
+              qa = qa.replace(anchor, anchor + 'const GAME=fs.readFileSync(path.join(ROOT,"game.js"),"utf8");\n', 1)
+
+              guard = r'''
+function practicalOwnerSource576(name){
+  const marker="function "+name;
+  const start=GAME.indexOf(marker);
+  assert(start>=0,"missing Practical root owner "+name);
+  const next=GAME.indexOf("\n// =========================================================",start+marker.length);
+  return GAME.slice(start,next>start?next:GAME.length);
+}
+{
+  const selectorIds=["tai","buki","stamina","nin","gen","fuin"];
+  const owners=["getKonohaPracticalSelectedDisciplineId","selectKonohaPracticalDiscipline","validateKonohaPracticalFinalReadiness"];
+  for(const name of owners){
+    const src=practicalOwnerSource576(name);
+    const match=src.match(/const\s+validDisciplines\s*=\s*\[([\s\S]*?)\]\s*;/);
+    assert(match,name+" missing Practical selector allowlist");
+    const ids=[...match[1].matchAll(/"([^"]+)"/g)].map(m=>m[1]);
+    assert.deepStrictEqual(ids,selectorIds,name+" selector domain drifted");
+    for(const profileId of EXACT_IDS)assert(!src.includes(profileId),name+" collapsed activityProfileId into selector identity");
+    assert(!ids.includes("kin"),name+" admitted unrelated Kin selector");
+  }
+  const rowBuilder=SRC576.slice(SRC576.indexOf("function advancedRow"),SRC576.indexOf("function advancedRow")+2200);
+  for(const id of ["nin","gen","fuin"])assert(rowBuilder.includes("id:disciplineId")||rowBuilder.includes("id: disciplineId"),"advanced Practical rows must submit discipline selector IDs");
+  assert(rowBuilder.includes("activityProfileId"),"advanced rows must preserve separate curriculum profile provenance");
+}
+'''
+              insertion = 'for(const id of EXACT_IDS)assert(SRC576.includes(id),"missing exact curriculum profile: "+id);\n'
+              if qa.count(insertion) != 1:
+                  raise SystemExit("#576 QA guard anchor drifted")
+              qa = qa.replace(insertion, insertion + guard, 1)
+          qa_path.write_text(qa, encoding="utf-8")
+
+      - name: Run bounded fail-closed checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check game.js
+          node --check runtime/alpha-discipline-curriculum-profiles-57600.js
+          node --check tools/qa_issue_576_expert_master_curriculum_profiles.js
+          node tools/qa_issue_576_expert_master_curriculum_profiles.js
+          git diff --check
+          python - <<'PY'
+          import subprocess
+          changed=subprocess.check_output(["git","diff","--name-only"],text=True).splitlines()
+          expected={"game.js","tools/qa_issue_576_expert_master_curriculum_profiles.js"}
+          if set(changed)!=expected:
+              raise SystemExit(f"unexpected bounded-write set: {changed}")
+          PY
+
+      - name: Commit bounded fix and self-remove bootstrap
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/issue-576-practical-selection-bootstrap.yml
+          git add game.js tools/qa_issue_576_expert_master_curriculum_profiles.js
+          git commit -m "[CODING][#576] Fix Practical advanced discipline selection"
+          git push origin HEAD:coding/576-expert-master-curriculum-profiles
