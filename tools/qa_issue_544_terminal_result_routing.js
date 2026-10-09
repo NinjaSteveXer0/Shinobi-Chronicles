@@ -13,7 +13,7 @@ const executableAssignment=(source,name)=>source.split(/\r?\n/).some(line=>new R
 const term=read("runtime/alpha-battle-terminal-result-54400.js");
 const old=read("runtime/alpha-alpha-sprint-33100.js");
 const modern=read("runtime/alpha-battle-modern-33000.js");
-const dynamic=read("runtime/alpha-alpha-sprint-33200.js");
+const dynamic=read("runtime/alpha-traversal-bridge-33200.js");
 const kakashiRewards=read("runtime/alpha-kakashi-v2-rewards-36015.js");
 const index=read("index.html");
 const browser=read("tools/qa_issue_544_terminal_result_routing_browser.js");
@@ -38,12 +38,13 @@ assert(!/function\s+openOverlay36015\b/.test(kakashiRewards),"36015 broad openOv
 assert(!executableAssignment(kakashiRewards,"openOverlay"),"36015 still assigns globalThis.openOverlay");
 assert(kakashiRewards.includes("projectAcademyKakashiV2BattleRewardsForVictory36015"),"narrow Kakashi Victory projection API missing");
 
-for(const name of ["completeBattleVictoryFromDamage","completeBattleDefeat","resumeBattleCallerAfterCompletion"]){
-  assert(!new RegExp(`globalThis\\.${name}\\s*=`).test(dynamic),`#33200 child rewrites terminal authority ${name}`);
+for(const name of ["completeBattleVictoryFromDamage","completeBattleDefeat","resumeBattleCallerAfterCompletion","presentCommittedBattleTerminalResult","continueAfterVictory","continueAfterBattleSetback"]){
+  assert(!new RegExp(`globalThis\\.${name}\\s*=`).test(dynamic),`#33200 traversal bridge rewrites terminal authority ${name}`);
 }
 assert(modern.includes("pendingBattlePresentation33000"),"#33000 queue authority API missing");
 assert(count(index,/runtime\/alpha-battle-terminal-result-54400\.js/g)===1,"#544 loader must appear exactly once");
 assert(index.indexOf("runtime/alpha-battle-terminal-result-54400.js")>index.indexOf("runtime/alpha-alpha-sprint-33100.js"),"#544 must load after #33100");
+assert(index.indexOf("runtime/alpha-battle-terminal-result-54400.js")>index.indexOf("runtime/alpha-traversal-bridge-33200.js"),"#544 must be parser-loaded after #33200 bootstrap owner");
 
 const forbidden=["completeBattle"+"VictoryFromDamage(","completeBattle"+"Defeat("];
 for(const token of forbidden)assert(!browser.includes(token),`Lane F acceptance harness contains forbidden terminal helper call ${token}`);
@@ -55,7 +56,7 @@ const evidence={
   pass:true,issue:544,lane:"F",productionTarget:TARGET,
   exactTreeRequired:true,terminalHelpersCalledByAcceptanceHarness:false,
   retired331TerminalSlice:true,kakashi36015BroadOpenOverlayOwner:false,
-  queue33000Distinct:true,dynamic33200DoesNotRewriteTerminalGlobals:true,
+  queue33000Distinct:true,traversal33200DoesNotRewriteTerminalGlobals:true,
   loader544Count:count(index,/runtime\/alpha-battle-terminal-result-54400\.js/g),
   browserGoldenClaimed:false
 };
