@@ -5,6 +5,7 @@ const fs=require("fs"),path=require("path"),vm=require("vm"),assert=require("ass
 const ROOT=path.resolve(__dirname,"..");
 const SRC448=fs.readFileSync(path.join(ROOT,"runtime/alpha-discipline-stat-growth-44800.js"),"utf8");
 const SRC576=fs.readFileSync(path.join(ROOT,"runtime/alpha-discipline-curriculum-profiles-57600.js"),"utf8");
+const GAME=fs.readFileSync(path.join(ROOT,"game.js"),"utf8");
 const DISC=["nin","tai","gen","buki","fuin","kin","stamina"];
 const EXACT_IDS=[
   "discipline_curriculum_nin_expert_v1","discipline_curriculum_gen_expert_v1","discipline_curriculum_fuin_expert_v1",
@@ -12,6 +13,33 @@ const EXACT_IDS=[
 ];
 
 for(const id of EXACT_IDS)assert(SRC576.includes(id),"missing exact curriculum profile: "+id);
+
+function practicalOwnerSource576(name){
+  const marker="function "+name;
+  const start=GAME.indexOf(marker);
+  assert(start>=0,"missing Practical root owner "+name);
+  const next=GAME.indexOf("// =========================================================",start+marker.length);
+  return GAME.slice(start,next>start?next:GAME.length);
+}
+{
+  const selectorIds=["tai","buki","stamina","nin","gen","fuin"];
+  const owners=["getKonohaPracticalSelectedDisciplineId","selectKonohaPracticalDiscipline","validateKonohaPracticalFinalReadiness"];
+  for(const name of owners){
+    const src=practicalOwnerSource576(name);
+    const match=src.match(/const\s+validDisciplines\s*=\s*\[([\s\S]*?)\]\s*;/);
+    assert(match,name+" missing Practical selector allowlist");
+    const ids=[...match[1].matchAll(/"([^"]+)"/g)].map(m=>m[1]);
+    assert.deepStrictEqual(ids,selectorIds,name+" selector domain drifted");
+    for(const profileId of EXACT_IDS)assert(!src.includes(profileId),name+" collapsed activityProfileId into selector identity");
+    assert(!ids.includes("kin"),name+" admitted unrelated Kin selector");
+  }
+  const rowStart=SRC576.indexOf("function advancedRow");
+  assert(rowStart>=0,"advanced row builder missing");
+  const rowEnd=SRC576.indexOf("function activityData576",rowStart);
+  const rowBuilder=SRC576.slice(rowStart,rowEnd>rowStart?rowEnd:rowStart+5000);
+  assert(/id\s*:\s*disciplineId/.test(rowBuilder),"advanced Practical rows must submit discipline selector IDs");
+  assert(/activityProfileId\s*:\s*profile\s*&&\s*profile\.id/.test(rowBuilder),"advanced rows must preserve separate curriculum profile provenance");
+}
 assert(!/currentCurriculumLevel\s*=(?!=)/.test(SRC576),"#576 must not persist semantic currentCurriculumLevel authority");
 assert(!SRC576.includes("techniquePracticeRouteId"),"#576 must not activate Technique Practice");
 assert(!SRC576.includes("playerData.ryo")&&!SRC576.includes("playerData.energy"),"#576 must not invent curriculum Ryō/Energy spend");

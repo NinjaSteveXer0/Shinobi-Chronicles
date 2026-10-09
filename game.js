@@ -64927,7 +64927,10 @@ function getKonohaPracticalSelectedDisciplineId() {
   const validDisciplines = [
     "tai",
     "buki",
-    "stamina"
+    "stamina",
+    "nin",
+    "gen",
+    "fuin"
   ];
 
 
@@ -65055,7 +65058,10 @@ function selectKonohaPracticalDiscipline(
   const validDisciplines = [
     "tai",
     "buki",
-    "stamina"
+    "stamina",
+    "nin",
+    "gen",
+    "fuin"
   ];
 
 
@@ -68112,7 +68118,10 @@ function validateKonohaPracticalFinalReadiness() {
   const validDisciplines = [
     "tai",
     "buki",
-    "stamina"
+    "stamina",
+    "nin",
+    "gen",
+    "fuin"
   ];
 
 
