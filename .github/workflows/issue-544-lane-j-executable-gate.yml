@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 env:
-  ISSUE_544_TARGET_SHA: a21bd3272a0e380a5fd981e6a6da0dac1a4b0bbf
+  ISSUE_544_TARGET_SHA: 19952c36d41adf227cb6dce41325f14c33ad22cb
 
 jobs:
   source-singular-owner:
