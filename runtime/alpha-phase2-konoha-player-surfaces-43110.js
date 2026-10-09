@@ -1,13 +1,14 @@
 // ============================================================================
-// PHASE 2 KONOHA PLAYER-FACING ACTIVITY SURFACES — #431 / #541
+// PHASE 2 KONOHA PLAYER-FACING ACTIVITY SURFACES — #431 / #541 / #539
 // Practical / Exams consume the canonical committed Current Team only.
 // Training Grounds remains owned-roster. Presentation never grants progression.
+// Historical Exams/Practical raster fixtures remain evidence, never live body.
 // ============================================================================
 (function installPhase2KonohaPlayerSurfaces43110(){
 "use strict";
 if(globalThis.SC_PHASE2_KONOHA_PLAYER_SURFACES_43110)return;
 
-const PATCH_ID="phase2_konoha_player_surfaces_43110_2026_10_05_current_team_polish_541";
+const PATCH_ID="phase2_konoha_player_surfaces_43110_2026_10_09_contamination_539";
 const STYLE_ID="sc-phase2-konoha-player-surfaces-43110";
 const priorSelectable=typeof globalThis.getKonohaSelectableCharacters==="function"?globalThis.getKonohaSelectableCharacters:null;
 const priorExamRender=typeof globalThis.renderKonohaExamVisualScreen==="function"?globalThis.renderKonohaExamVisualScreen:null;
@@ -42,8 +43,7 @@ function ensureStyles(){
   if(typeof document==="undefined"||document.getElementById(STYLE_ID))return;
   const style=document.createElement("style");style.id=STYLE_ID;
   style.textContent=[
-    '#konoha-activity-screen[data-service-id="practical"]{background-image:linear-gradient(rgba(3,7,12,.30),rgba(3,7,12,.30)),url("UI/practical.png") !important;background-size:cover !important;background-position:center !important;background-repeat:no-repeat !important}',
-    '#konoha-activity-screen[data-service-id="exams"]{background-image:linear-gradient(rgba(3,7,12,.30),rgba(3,7,12,.30)),url("UI/exams.png") !important;background-size:cover !important;background-position:center !important;background-repeat:no-repeat !important}',
+    '#konoha-activity-screen[data-service-id="practical"],#konoha-activity-screen[data-service-id="exams"]{background-color:#050c12 !important;background-image:radial-gradient(circle at 16% 8%,rgba(57,170,181,.11),transparent 34%),linear-gradient(155deg,#0a151d 0%,#071018 54%,#04090d 100%) !important;background-size:auto !important;background-position:center !important;background-repeat:no-repeat !important}',
     '#konoha-activity-screen[data-service-id="practical"] .alpha-activity-subject,#konoha-activity-screen[data-service-id="practical"] .alpha-activity-workbench,#konoha-activity-screen[data-service-id="exams"] .alpha-activity-subject,#konoha-activity-screen[data-service-id="exams"] .alpha-activity-workbench{background:rgba(5,12,18,.90)}',
     '#konoha-activity-screen .alpha-activity-grid{height:clamp(520px,calc(100vh - 190px),660px);align-items:stretch}',
     '#konoha-activity-screen .alpha-activity-subject,#konoha-activity-screen .alpha-activity-workbench{min-height:0!important;height:100%;overflow:hidden}',
@@ -122,6 +122,7 @@ function decorate(serviceId){
   ensureStyles();
   const root=document.getElementById("konoha-activity-screen");if(!root)return false;
   root.dataset.currentTeamProjection="canonical";
+  root.dataset.historicalRasterObservation="OBSERVED_BUT_WRONG";
   const data=screenData(serviceId);
   if(data&&Array.isArray(data.disciplines)){
     const buttons=[...root.querySelectorAll(".alpha-activity-discipline")];
@@ -161,7 +162,8 @@ function diagnostics(){
     noRosterMerge:!team||selectable.length===team.teamVariantIds.length,
     canonicalAuthorityFailsClosed:!hasCurrentTeamAuthority()||!!team||selectable.length===0,
     trainingGroundsUntouched:true,
-    approvedActivityMastersBound:true,
+    historicalActivityRasterConsumptionBlocked:true,
+    codeOwnedActivityPresentation:true,
     stableActionDockAndBoundedNotifications:true,
     resultStageReady:true,
     naturalExamCopy:!COPY.exams.subtitle.includes("runtime")&&!COPY.exams.note.includes("resolver"),
@@ -170,12 +172,12 @@ function diagnostics(){
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenNotClaimed"&&key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
-  return{patchId:PATCH_ID,pass:failed.length===0,checks,failed,currentTeam:clone(team),selectable:clone(selectable),browserGoldenClaimed:false};
+  return{patchId:PATCH_ID,pass:failed.length===0,checks,failed,currentTeam:clone(team),selectable:clone(selectable),historicalFixtureObservationClassification:"OBSERVED_BUT_WRONG",browserGoldenClaimed:false};
 }
 globalThis.getPhase2KonohaActivityTeam43110=()=>clone(currentTeamSelectable());
 globalThis.decoratePhase2KonohaActivitySurface43110=decorate;
 globalThis.runPhase2KonohaPlayerSurfaces43110Diagnostics=diagnostics;
-globalThis.SC_PHASE2_KONOHA_PLAYER_SURFACES_43110=Object.freeze({patchId:PATCH_ID,browserGoldenClaimed:false});
+globalThis.SC_PHASE2_KONOHA_PLAYER_SURFACES_43110=Object.freeze({patchId:PATCH_ID,historicalFixtureObservationClassification:"OBSERVED_BUT_WRONG",browserGoldenClaimed:false});
 })();
 
 // ============================================================================
@@ -226,7 +228,6 @@ function ensureOfficeStyles(){
   `;
   document.head.appendChild(style);
 }
-
 function currentObserver(){
   const contextObserver=activeContext&&activeContext.observer&&typeof activeContext.observer==="object"?activeContext.observer:null;
   if(contextObserver)return{id:contextObserver.id||null,name:scalar(contextObserver)||"Current shinobi",rank:scalar(contextObserver.rank)||"Unranked",source:"caller_context"};
@@ -300,7 +301,7 @@ function discoveredLeadRows(){
       });
     }
   }
-  return rows.filter((row,index,list)=>list.findIndex(other=>other.leadId===row.leadId)===index);
+  return rows.filter((row,index,list)=>list.findIndex(other=>other.leadId===row.leadId)===index;
 }
 function dispatchProjection(){
   const issued=issuedLeadIds(),leads=discoveredLeadRows();
