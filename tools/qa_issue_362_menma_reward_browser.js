@@ -95,6 +95,20 @@ async function setupBattle(page,resolved,{terminal=false,menmaWithdrawn=false,re
     };
     currentBattle.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],finishingShinobi:null,mvp:null};
     currentBattle.contributions={};
+    if(terminal&&battleResult==="victory"){
+      const runtime=ensureBattleRuntimeState();
+      const actionId="issue362_story_ancestry_"+rt.instanceId;
+      const exists=(runtime.evidence||[]).some(row=>row&&row.actionId===actionId&&row.eventType==="skill_action_completed");
+      if(!exists){
+        recordBattleEvidence({
+          eventType:"skill_action_completed",committedOccurrence:true,actionId,
+          actorRef:createBattleParticipantRef("player","academy_menma"),
+          targetRef:createBattleParticipantRef("enemy","test_subject_altered_shinobi"),
+          skillId:"academy_menma_chakra_knuckle",
+          data:{resolved:true,damageApplied:true,finalDamage:1,issue362StoryAncestryFixture:true}
+        });
+      }
+    }
     savePlayerData();saveTestState();
     return{occurrenceId,ryo:Number(playerData.ryo)||0};
   },{resolved,terminal,menmaWithdrawn,result,completed,CONFIG,ENCOUNTER,OBJECTIVE,SCENE,HOSTILES,ALLIES,SOURCE_ID});
@@ -222,6 +236,25 @@ async function rewardState(page){
         currentBattle.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],finishingShinobi:null,mvp:null};
       },{ENCOUNTER,SCENE,CONFIG});
     }
+    // Menma's post-Battle Story consequence is evidence-backed. This reward QA
+    // uses a synthetic whole-encounter receipt, so retain one committed player
+    // action occurrence across refresh rather than asking Story to invent ancestry.
+    await page.evaluate(()=>{
+      const rt=getActiveStorySceneRuntime();
+      const runtime=ensureBattleRuntimeState();
+      const actionId="issue362_story_ancestry_"+rt.instanceId;
+      const exists=(runtime.evidence||[]).some(row=>row&&row.actionId===actionId&&row.eventType==="skill_action_completed");
+      if(!exists){
+        recordBattleEvidence({
+          eventType:"skill_action_completed",committedOccurrence:true,actionId,
+          actorRef:createBattleParticipantRef("player","academy_menma"),
+          targetRef:createBattleParticipantRef("enemy","test_subject_altered_shinobi"),
+          skillId:"academy_menma_chakra_knuckle",
+          data:{resolved:true,damageApplied:true,finalDamage:1,issue362StoryAncestryFixture:true}
+        });
+        saveTestState();
+      }
+    });
     projected=await page.evaluate(()=>ensureAcademyMenmaThreeSubjectRewardProjection36200());
     assert.strictEqual(projected.ready,true,"refresh could not rehydrate reward entitlement");
     state=await rewardState(page);
