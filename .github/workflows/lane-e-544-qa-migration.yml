@@ -1,0 +1,115 @@
+name: Lane E #544 terminal chronology QA migration
+
+on:
+  push:
+    branches:
+      - coding/544-terminal-result-presentation
+    paths:
+      - .github/workflows/lane-e-544-qa-migration.yml
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/544-terminal-result-presentation
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply bounded QA migrations
+        shell: python
+        run: |
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p=Path(path); text=p.read_text(encoding='utf-8'); count=text.count(old)
+              if count != 1: raise SystemExit(f'{path}: expected snippet once, found {count}')
+              p.write_text(text.replace(old,new,1),encoding='utf-8')
+
+          def replace_between(path, start, end, new):
+              p=Path(path); text=p.read_text(encoding='utf-8')
+              if text.count(start)!=1 or text.count(end)!=1: raise SystemExit(f'{path}: markers not unique')
+              a=text.index(start); b=text.index(end,a)
+              p.write_text(text[:a]+new+text[b:],encoding='utf-8')
+
+          # #141: migrate synthetic return fixture to present -> claim -> explicit Continue.
+          p='tools/qa_issue_141_arc1_battle_return_runtime.js'
+          replace_once(p,
+'''    globalThis.__issue141LegacyContinueCalls=0;\n    globalThis.__issue141OverlayCalls=[];''',
+'''    globalThis.__issue141LegacyContinueCalls=0;\n    globalThis.__issue141RewardClaimCalls=0;\n    globalThis.__issue141OverlayCalls=[];''')
+          replace_once(p,
+'''    continueAfterVictory=function(){\n      globalThis.__issue141LegacyContinueCalls += 1;\n      return {success:true,legacy:true};\n    };\n    openOverlay=function(type){''',
+'''    continueAfterVictory=function(){\n      globalThis.__issue141LegacyContinueCalls += 1;\n      return {success:true,legacy:true};\n    };\n    claimCurrentBattleRewards=function(){\n      globalThis.__issue141RewardClaimCalls += 1;\n      if(!currentBattle||!currentBattle.rewards)return false;\n      currentBattle.rewards.claimed=true;\n      return true;\n    };\n    openOverlay=function(type){''')
+          replace_once(p,'"54400_canonical_terminal_owner_loaded"','"54400_terminal_candidate_loaded"')
+          start='''  // Exact Story caller victory must outrank the legacy fallback after rewards\n  // have been claimed. No mission-specific outcome is fabricated here.\n'''
+          end='''  // A broken authored Story continuation must fail closed on Victory. It must\n'''
+          new='''  // Victory must present before CLAIM; CLAIM must stop before caller resume;\n  // the later explicit Continue restores the exact Story caller once.\n  const victory = plain(run(`\n    currentBattle={\n      active:false,battleOver:true,\n      outcome:{type:"victory"},\n      rewards:{claimed:false},\n      returnContext:{type:"story_scene",missionId:"fixture_mission",sceneId:"fixture_scene"}\n    };\n    const presented=presentCommittedBattleTerminalResult54400("victory",{source:"issue141_runtime_qa"});\n    const projectionBeforeClaim=getBattleTerminalResultPresentation54400();\n    const claimOnly=continueAfterVictory();\n    const callerAfterClaim=currentBattle.returnContext;\n    const returnCallsAfterClaim=globalThis.__issue141ReturnCalls.slice();\n    const continued=continueAfterVictory();\n    ({presented,projectionBeforeClaim,claimOnly,callerAfterClaim,returnCallsAfterClaim,continued});\n  `, "issue141-victory-return.js"));\n  const victoryCalls = plain(context.__issue141ReturnCalls);\n  check(\n    "story_victory_claim_then_explicit_continue",\n    victory && victory.projectionBeforeClaim && victory.projectionBeforeClaim.status === "presented" &&\n      victory.claimOnly && victory.claimOnly.success === true && victory.claimOnly.rewardClaimed === true &&\n      victory.claimOnly.callerResumeWithheldUntilExplicitContinue === true &&\n      victory.callerAfterClaim && victory.callerAfterClaim.type === "story_scene" &&\n      victory.returnCallsAfterClaim.length === 0 &&\n      victory.continued && victory.continued.success === true && victory.continued.terminalResultOwner54400 === true &&\n      victory.continued.terminalOutcome === "victory" && victoryCalls.length === 1 && victoryCalls[0] === "victory" &&\n      context.__issue141RewardClaimCalls === 1 && context.__issue141LegacyContinueCalls === 0,\n    { victory, victoryCalls, rewardClaimCalls:context.__issue141RewardClaimCalls, legacyCalls:context.__issue141LegacyContinueCalls }\n  );\n\n'''
+          replace_between(p,start,end,new)
+          replace_once(p,
+'''    const result=continueAfterVictory();\n    const attemptedReturnCalls=globalThis.__issue141ReturnCalls.slice(returnCallsBefore.length);''',
+'''    presentCommittedBattleTerminalResult54400("victory",{source:"issue141_runtime_qa_failure"});\n    const result=continueAfterVictory();\n    const attemptedReturnCalls=globalThis.__issue141ReturnCalls.slice(returnCallsBefore.length);''')
+          start='''  // Without claimed rewards, #544 must delegate to the predecessor lifecycle;\n  // it must not consume the Story return itself.\n'''
+          end='''  // Setback is first projected from the already-committed factual defeat, then\n'''
+          new='''  // A fresh unclaimed Victory is a claim-only action. It must preserve the\n  // caller envelope and must not satisfy the later explicit Continue.\n  const unclaimed = plain(run(`\n    const callsBefore=globalThis.__issue141ReturnCalls.length;\n    currentBattle={\n      active:false,battleOver:true,\n      outcome:{type:"victory"},\n      rewards:{claimed:false},\n      returnContext:{type:"story_scene",missionId:"fixture_mission",sceneId:"fixture_scene"}\n    };\n    presentCommittedBattleTerminalResult54400("victory",{source:"issue141_runtime_qa_claim_only"});\n    const result=continueAfterVictory();\n    ({result,caller:currentBattle.returnContext,returnCallsAdded:globalThis.__issue141ReturnCalls.length-callsBefore});\n  `, "issue141-unclaimed-return.js"));\n  check(\n    "unclaimed_victory_claims_without_story_return",\n    unclaimed && unclaimed.result && unclaimed.result.success === true && unclaimed.result.rewardClaimed === true &&\n      unclaimed.result.callerResumeWithheldUntilExplicitContinue === true && unclaimed.caller &&\n      unclaimed.caller.type === "story_scene" && unclaimed.returnCallsAdded === 0 && context.__issue141LegacyContinueCalls === 0,\n    { unclaimed, returnCalls: plain(context.__issue141ReturnCalls), legacyCalls: context.__issue141LegacyContinueCalls }\n  );\n\n'''
+          replace_between(p,start,end,new)
+
+          # #105/#442: Mirai Victory must use the same explicit result Continue as defeat.
+          p='tools/qa_issue_105_origin_presentation_browser.js'
+          replace_once(p,
+'''    }else{\n      assert.strictEqual(returned.result?.success,true,"Mirai #338 caller return failed "+JSON.stringify(returned));\n    }\n    assert.strictEqual(returned.beatId,expectedReturnBeat,"Mirai #338 caller returned to wrong Story beat "+JSON.stringify(returned));''',
+'''    }else{\n      assert.strictEqual(returned.result?.callerResumeWithheldUntilTerminalResultContinue,true,"Mirai victory bypassed #544 terminal presentation guard "+JSON.stringify(returned));\n      await page.waitForSelector(".alpha-victory-code-screen,.victory-screen",{state:"visible",timeout:12000});\n      const gate=await page.evaluate(()=>({overlay:typeof currentOverlayType==="undefined"?null:currentOverlayType,outcome:currentBattle?.outcome?.type||null}));\n      assert.strictEqual(gate.outcome,"victory","Mirai Victory surface mutated terminal outcome");\n      const continued=await page.evaluate(()=>globalThis.continueAfterVictory?.());\n      assert.strictEqual(continued?.success,true,"Victory Continue authority failed "+JSON.stringify(continued));\n      await page.waitForFunction(expected=>globalThis.getActiveStorySceneRuntime?.()?.beatId===expected,expectedReturnBeat,{timeout:12000});\n      returned={...returned,result:continued,beatId:await page.evaluate(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId||null)};\n    }\n    assert.strictEqual(returned.beatId,expectedReturnBeat,"Mirai #338 caller returned to wrong Story beat "+JSON.stringify(returned));''')
+
+          # #396/#399/#400: Metal Victory caller resume now belongs to explicit #544 Continue.
+          p='tools/qa_issues_396_399_400_browser.js'
+          replace_once(p,
+'''        const resumed=resumeBattleCallerAfterCompletion("victory");\n        const rt=getActiveStorySceneRuntime();''',
+'''        const earlyResume=resumeBattleCallerAfterCompletion("victory");\n        const resumed=continueAfterVictory();\n        const rt=getActiveStorySceneRuntime();''')
+          replace_once(p,
+'''        return{rewards:JSON.parse(JSON.stringify(rewards||null)),victoryProjection,firstClaim,secondClaim,walletDeltaFirst:walletAfterFirst-walletBefore,walletDeltaSecond:walletAfterSecond-walletBefore,rewardReceiptCount:rewardReceipts.length,rewardReceipt:JSON.parse(JSON.stringify(rewardReceipts[0]||null)),resumed,beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};''',
+'''        return{rewards:JSON.parse(JSON.stringify(rewards||null)),victoryProjection,firstClaim,secondClaim,walletDeltaFirst:walletAfterFirst-walletBefore,walletDeltaSecond:walletAfterSecond-walletBefore,rewardReceiptCount:rewardReceipts.length,rewardReceipt:JSON.parse(JSON.stringify(rewardReceipts[0]||null)),earlyResume,resumed,beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};''')
+          replace_once(p,
+'''    assert.strictEqual(finished.resumed?.success,true,label+" caller resume");''',
+'''    assert.strictEqual(finished.earlyResume?.callerResumeWithheldUntilTerminalResultContinue,true,label+" early caller resume was not withheld");\n    assert.strictEqual(finished.resumed?.success,true,label+" explicit Victory Continue caller resume");''')
+
+          # #362: after durable receipt rehydrate, present terminal Victory before explicit Continue.
+          p='tools/qa_issue_362_menma_reward_browser.js'
+          replace_once(p,
+'''    // CLAIM is complete before Story return; CONTINUE resumes exact Menma Story.\n    const returned=await page.evaluate(()=>continueAfterVictory());\n    await page.waitForFunction(scene=>getActiveStorySceneRuntime()?.sceneId===scene&&getActiveStorySceneRuntime()?.beatId==="menma_after_01",SCENE,{timeout:10000});''',
+'''    // CLAIM is complete before Story return; present Victory, then explicit CONTINUE resumes exact Menma Story.\n    await page.evaluate(()=>{\n      try{globalThis.hardSettleBattlePresentationQueue33000?.("issue_362_terminal_result");}catch(_error){}\n      return globalThis.presentCommittedBattleTerminalResult54400?.("victory",{source:"issue_362_reward_reload"});\n    });\n    await page.waitForSelector(".alpha-victory-code-screen,.victory-screen",{state:"visible",timeout:12000});\n    const returned=await page.evaluate(()=>continueAfterVictory());\n    assert.strictEqual(returned?.success,true,"Menma explicit Victory Continue failed "+JSON.stringify(returned));\n    await page.waitForFunction(scene=>getActiveStorySceneRuntime()?.sceneId===scene&&getActiveStorySceneRuntime()?.beatId==="menma_after_01",SCENE,{timeout:10000});''')
+
+          # #312 browser: synthetic PS terminal probe must actually commit terminal Battle state and enter #544.
+          p='tools/qa_issue_312_browser.js'
+          replace_once(p,'const psVictoryOverlay=await page.evaluate(()=>{','const psVictoryOverlay=await page.evaluate(async()=>{')
+          replace_once(p,
+'''        encounterId:currentBattle.encounterId,\n        outcome:currentBattle.outcome?cloneBattleRuntimeValue(currentBattle.outcome):null,\n        rewards:currentBattle.rewards?cloneBattleRuntimeValue(currentBattle.rewards):null\n      };''',
+'''        encounterId:currentBattle.encounterId,\n        active:currentBattle.active,\n        battleOver:currentBattle.battleOver,\n        outcome:currentBattle.outcome?cloneBattleRuntimeValue(currentBattle.outcome):null,\n        rewards:currentBattle.rewards?cloneBattleRuntimeValue(currentBattle.rewards):null\n      };''')
+          replace_once(p,
+'''      currentBattle.encounterId="academy_kakashi_origin_battle_seq_ps";\n      currentBattle.outcome={type:"victory",completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};\n      currentBattle.rewards={generated:true,claimed:false,ryo:0,exp:0,items:[],rareDrops:[]};\n      openOverlay("victory");\n      const text=String(document.getElementById("screen-overlay")?.textContent||"").replace(/\\s+/g," ").trim();''',
+'''      currentBattle.encounterId="academy_kakashi_origin_battle_seq_ps";\n      currentBattle.active=false;currentBattle.battleOver=true;\n      currentBattle.outcome={type:"victory",completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};\n      currentBattle.rewards={generated:true,claimed:false,ryo:0,exp:0,items:[],rareDrops:[]};\n      try{delete currentBattle.__battleTerminalResultPresentation54400;}catch(_error){}\n      presentCommittedBattleTerminalResult54400("victory",{source:"issue312_ps_reward_overlay"});\n      await new Promise(resolve=>setTimeout(resolve,80));\n      const text=String(document.getElementById("screen-overlay")?.textContent||"").replace(/\\s+/g," ").trim();''')
+          replace_once(p,
+'''      currentBattle.encounterId=prior.encounterId;\n      currentBattle.outcome=prior.outcome;\n      currentBattle.rewards=prior.rewards;\n      openOverlay("combat");''',
+'''      currentBattle.encounterId=prior.encounterId;\n      currentBattle.active=prior.active;currentBattle.battleOver=prior.battleOver;\n      currentBattle.outcome=prior.outcome;\n      currentBattle.rewards=prior.rewards;\n      try{delete currentBattle.__battleTerminalResultPresentation54400;}catch(_error){}\n      openOverlay("combat");''')
+      - name: Focused source/runtime QA
+        run: |
+          node --check tools/qa_issue_141_arc1_battle_return_runtime.js
+          node --check tools/qa_issue_105_origin_presentation_browser.js
+          node --check tools/qa_issues_396_399_400_browser.js
+          node --check tools/qa_issue_362_menma_reward_browser.js
+          node --check tools/qa_issue_312_browser.js
+          node tools/qa_issue_141_arc1_battle_return_runtime.js
+          node tools/qa_issue_312_story_battle_benchmark.js
+          python tools/qa_alpha_battle_browser_32600.py
+      - name: Commit migrations and remove one-shot workflow
+        run: |
+          git config user.name "NinjaSteveXer0"
+          git config user.email "sc68957hcm@privaterelay.appleid.com"
+          git rm .github/workflows/lane-e-544-qa-migration.yml
+          git add tools/qa_issue_141_arc1_battle_return_runtime.js tools/qa_issue_105_origin_presentation_browser.js tools/qa_issues_396_399_400_browser.js tools/qa_issue_362_menma_reward_browser.js tools/qa_issue_312_browser.js
+          git diff --cached --check
+          git commit -m "[QA][#544] Migrate terminal chronology browser fixtures"
+          git push origin HEAD:coding/544-terminal-result-presentation
