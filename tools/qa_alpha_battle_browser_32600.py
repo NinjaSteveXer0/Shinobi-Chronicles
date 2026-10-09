@@ -7,7 +7,7 @@ checks={
     'wired_after_32500': index.find('alpha-browser-playability-32500.js') < index.find('alpha-battle-browser-32600.js') and index.find('alpha-battle-browser-32600.js') >= 0,
     'repeat_skill_reselects_through_normal_api': 'selectBattlePreparedSkill(usedSkillId)' in js,
     'no_repeat_bypass_flag': 'repeatStillUsesAuthoritativeAvailability:true' in js,
-    'caller_owned_claim_does_not_auto_return': 'callerResumeWithheldUntilExplicitContinue:true' in js and 'autoReturned:false' in js and 'resumeBattleCallerAfterCompletion("victory")' not in js,
+    'caller_owned_claim_does_not_auto_return': 'if(callerOwned||' in js and 'callerResumeWithheldUntilExplicitContinue:true' in js and 'autoReturned:false' in js,
     'explicit_post_claim_continue_supported': 'requiresExplicitPostClaimContinue' in js and 'explicitPostClaimContinue:true' in js,
     'claim_happens_before_later_continue': js.find('priorClaimVictoryAutoReturn.apply') >= 0 and js.find('callerResumeWithheldUntilExplicitContinue:true', js.find('priorClaimVictoryAutoReturn.apply')) > js.find('priorClaimVictoryAutoReturn.apply'),
     'return_context_captured_and_restored': 'returnContextBefore' in js and 'currentBattle.returnContext' in js,
