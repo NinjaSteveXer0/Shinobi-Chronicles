@@ -55,3 +55,5 @@ console.log(JSON.stringify({
   cssFileChanged:false,
   browserGoldenClaimed:false
 },null,2));
+
+// QA-only exact-head refresh marker after declaring the #303 contract change reason on PR #623.
