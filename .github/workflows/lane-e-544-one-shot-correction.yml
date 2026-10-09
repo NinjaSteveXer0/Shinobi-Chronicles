@@ -1,0 +1,79 @@
+name: Lane E #544 one-shot correction
+
+on:
+  push:
+    branches:
+      - coding/544-terminal-result-presentation
+    paths:
+      - .github/workflows/lane-e-544-one-shot-correction.yml
+
+permissions:
+  contents: write
+
+jobs:
+  correct:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/544-terminal-result-presentation
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply exact fail-closed corrections
+        shell: python
+        run: |
+          from pathlib import Path
+          import json
+
+          def replace_once(path, old, new):
+              p=Path(path)
+              text=p.read_text(encoding='utf-8')
+              count=text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected exact snippet once, found {count}')
+              p.write_text(text.replace(old,new,1),encoding='utf-8')
+
+          reward='runtime/alpha-kakashi-v2-rewards-36015.js'
+          old='''    noBroadOpenOverlayOwnership:!String(installAcademyKakashiV2Rewards36015).includes("globalThis.openOverlay=")&&!String(installAcademyKakashiV2Rewards36015).includes("openOverlay36015")&&!String(installAcademyKakashiV2Rewards36015).includes("PRE_OPEN_OVERLAY"),'''
+          new='''    noBroadOpenOverlayOwnership:(()=>{\n      const operationalSource=String(installAcademyKakashiV2Rewards36015).split("function diagnostics(){")[0];\n      return !operationalSource.includes("globalThis.openOverlay=")&&!operationalSource.includes("openOverlay36015")&&!operationalSource.includes("PRE_OPEN_OVERLAY");\n    })(),'''
+          replace_once(reward,old,new)
+
+          qa312='tools/qa_issue_312_story_battle_benchmark.js'
+          old312='''const kv2Rewards=read("runtime/alpha-kakashi-v2-rewards-36015.js");\nconst ownership=JSON.parse(read("tools/fixtures/runtime_responsibility_registry_300.json"));'''
+          new312='''const kv2Rewards=read("runtime/alpha-kakashi-v2-rewards-36015.js");\nconst terminalResultSource=read("runtime/alpha-battle-terminal-result-54400.js");\nconst ownership=JSON.parse(read("tools/fixtures/runtime_responsibility_registry_300.json"));'''
+          replace_once(qa312,old312,new312)
+          old_assert='''assert(kv2Rewards.includes("function openOverlay36015")&&kv2Rewards.includes("ensureKakashiV2BattleRewardProjection36015")&&kv2Rewards.indexOf("ensureKakashiV2BattleRewardProjection36015",kv2Rewards.indexOf("function openOverlay36015"))<kv2Rewards.indexOf("PRE_OPEN_OVERLAY",kv2Rewards.indexOf("function openOverlay36015")),"#312 Kakashi Victory must project authored rewards before generic overlay rendering");'''
+          new_assert='''assert(kv2Rewards.includes("function projectKakashiV2BattleRewardsForVictory36015")&&!kv2Rewards.split("function diagnostics(){")[0].includes("function openOverlay36015")&&terminalResultSource.includes('globalThis["projectAcademyKakashiV2BattleRewardsForVictory36015"]')&&terminalResultSource.indexOf('projectAcademyKakashiV2BattleRewardsForVictory36015')<terminalResultSource.indexOf('PRIOR_OPEN_OVERLAY.call(globalThis,"victory")'),"#312 Kakashi Victory must project authored rewards through the narrow 36015 API before #544 terminal rendering");'''
+          replace_once(qa312,old_assert,new_assert)
+
+          matrix_path=Path('qa/production_change_impact_matrix_528.json')
+          matrix=json.loads(matrix_path.read_text(encoding='utf-8'))
+          rules=[r for r in matrix.get('rules',[]) if r.get('id')=='battle_result_presentation']
+          if len(rules)!=1:
+              raise SystemExit(f'expected one battle_result_presentation rule, found {len(rules)}')
+          changed=rules[0].setdefault('changed_any',[])
+          target='runtime/alpha-battle-browser-32600.js'
+          if target not in changed:
+              anchor='runtime/alpha-battle-terminal-result-54400.js'
+              if anchor not in changed:
+                  raise SystemExit('battle_result_presentation anchor missing')
+              changed.insert(changed.index(anchor),target)
+          matrix_path.write_text(json.dumps(matrix,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+      - name: Run focused correction QA
+        run: |
+          node --check runtime/alpha-kakashi-v2-rewards-36015.js
+          node tools/qa_kakashi_v2_clean_room.js
+          python tools/qa_alpha_battle_browser_32600.py
+          node tools/qa_issue_312_story_battle_benchmark.js
+          node tools/qa_production_conformance_528_selftest.js
+      - name: Commit exact correction and remove one-shot workflow
+        run: |
+          git config user.name "NinjaSteveXer0"
+          git config user.email "sc68957hcm@privaterelay.appleid.com"
+          git rm .github/workflows/lane-e-544-one-shot-correction.yml
+          git add runtime/alpha-kakashi-v2-rewards-36015.js tools/qa_issue_312_story_battle_benchmark.js qa/production_change_impact_matrix_528.json
+          git diff --cached --check
+          git commit -m "[QA][#544] Reconcile terminal-result regression gates"
+          git push origin HEAD:coding/544-terminal-result-presentation
