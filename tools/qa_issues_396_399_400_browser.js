@@ -178,7 +178,7 @@ async function runIwabeeBattle(browser,outcome){
     assert.strictEqual(launch.stageEnvironmentPath,launch.environmentPath,label+" shared Battle stage did not consume Iwabee Story environment");
     assert(launch.stageBackground.includes("academy_training_ground_courtyard.png"),label+" Iwabee Story environment is not visibly painted "+JSON.stringify(launch));
     assert.strictEqual(launch.template,"rogue_genin");
-    let result=await page.evaluate(({outcome})=>{
+    let result=await page.evaluate(async({outcome})=>{
       const prior=globalThis.getBattleRemainingPL;
       globalThis.getBattleRemainingPL=(side,id)=>{
         if(side==="player"&&id==="academy_iwabee")return outcome==="defeat"?0:5;
@@ -219,6 +219,7 @@ async function runIwabeeBattle(browser,outcome){
         if(outcome==="victory"){
           try{globalThis.hardSettleBattlePresentationQueue33000?.("qa396_iwabee_victory_terminal_result");}catch(_error){}
           terminalPresented=globalThis.presentCommittedBattleTerminalResult54400?.("victory",{source:"qa396_iwabee_victory"})||null;
+          await Promise.resolve();
           claimAction=continueAfterVictory();
           firstClaim=!!(claimAction&&claimAction.success===true&&currentBattle?.rewards?.claimed===true);
         }
