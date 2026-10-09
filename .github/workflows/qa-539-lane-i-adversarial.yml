@@ -29,7 +29,7 @@ jobs:
           python-version: '3.12'
 
       - name: QA syntax
-        run: node --check tools/qa_issue_539_lane_i_adversarial.js
+        run: node --check tools/qa_issue_539_lane_i_adversarial_v2.js
 
       - name: Install Playwright Chromium
         run: |
@@ -43,7 +43,7 @@ jobs:
           sleep 2
 
       - name: Run independent exact-candidate adversarial matrix
-        run: node tools/qa_issue_539_lane_i_adversarial.js
+        run: node tools/qa_issue_539_lane_i_adversarial_v2.js
 
       - name: Upload Lane I evidence
         if: always()
