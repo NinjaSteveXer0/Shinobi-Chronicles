@@ -1,23 +1,23 @@
 // ============================================================================
-// ISSUE #544 — CANONICAL BATTLE TERMINAL-RESULT PRESENTATION OWNER
-// Lane E implementation.
+// ISSUE #544 — BATTLE TERMINAL-RESULT PRESENTATION CANDIDATE
+// Lane E implementation candidate pending independent exact-head proof.
 //
-// Canonical responsibility:
+// Intended bounded responsibility under #601/#624:
 // - present every already-committed Battle terminal result exactly once per
 //   in-memory Battle occurrence;
 // - keep semantic outcome truth as `victory` / `defeat`;
 // - map factual `defeat` to the approved player-facing Setback surface here;
-// - own explicit terminal-result continuation chronology;
+// - enforce explicit terminal-result continuation chronology;
 // - never let caller resume outrun the terminal result surface;
 // - wait for #33000 immutable Battle-presentation receipts before replacing the
 //   Battle overlay with Victory / Setback;
 // - preserve reward, Story, World, PL and Battle semantic ownership.
 //
-// #601/#624 consolidation:
-// - this module replaces the retired #33100 Battle terminal-result slice;
-// - Setback render/Continue and Victory/Setback art projection live here;
-// - no #33100 terminal function, selector, overlay interception or CSS is
-//   required by this owner.
+// Migration candidate notes:
+// - the retired #33100 terminal-result behavior has been absorbed for testing;
+// - Setback render/Continue and Victory/Setback art projection are exercised here;
+// - promotion to canonical live ownership is proof-reserved until independent
+//   exact-head validation is GREEN.
 //
 // Presentation bookkeeping is non-enumerable and never becomes Chronicle truth.
 // ============================================================================
