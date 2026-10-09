@@ -18,7 +18,7 @@ permissions:
   contents: read
 
 env:
-  TARGET_SHA: a92f382e1af8bfb13a04217b53c63c3d852b7735
+  TARGET_SHA: 8828a187003ffa0f84c86fbbe10eb1a0a0fe4c28
 
 jobs:
   source-one-owner-law:
@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: qa
-      - name: Checkout exact Lane C candidate
+      - name: Checkout exact merged main
         uses: actions/checkout@v4
         with:
           ref: ${{ env.TARGET_SHA }}
@@ -40,7 +40,7 @@ jobs:
         run: cp qa/tools/qa_issue_621_lane_j_source.js candidate/tools/qa_issue_621_lane_j_source.js
       - name: Syntax
         run: node --check candidate/tools/qa_issue_621_lane_j_source.js
-      - name: Verify exact candidate one-owner law
+      - name: Verify exact merged-main one-owner law
         env:
           ISSUE621_TARGET_SHA: ${{ env.TARGET_SHA }}
         run: node candidate/tools/qa_issue_621_lane_j_source.js
@@ -52,7 +52,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: qa
-      - name: Checkout exact Lane C candidate
+      - name: Checkout exact merged main
         uses: actions/checkout@v4
         with:
           ref: ${{ env.TARGET_SHA }}
@@ -72,13 +72,13 @@ jobs:
         run: |
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
-      - name: Start exact-candidate Alpha server
+      - name: Start exact-main Alpha server
         working-directory: candidate
         run: |
           python -m http.server 8080 --bind 127.0.0.1 > sc621j-server.log 2>&1 &
           echo $! > sc621j-server.pid
           sleep 2
-      - name: Lane J hostile temporal/browser matrix v2
+      - name: Lane J hostile merged-main temporal/browser matrix v2
         working-directory: candidate
         env:
           ISSUE621_TARGET_SHA: ${{ env.TARGET_SHA }}
