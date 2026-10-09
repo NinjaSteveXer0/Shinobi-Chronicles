@@ -616,6 +616,16 @@ function scheduleRefresh(){
   if(typeof queueMicrotask==="function")queueMicrotask(()=>render(true));
   else if(typeof setTimeout==="function")setTimeout(()=>render(true),0);
 }
+function refreshMapGeometry49900(surfaceKind=null){
+  if(typeof document==="undefined")return null;
+  const root=document.getElementById(ROOT_ID);
+  if(!root||root.hidden)return null;
+  const surface=String(surfaceKind||root.dataset.surface||"");
+  return{
+    gutter:syncMapGutterGeometry(root,surface),
+    echo:syncMapEchoPresentation(root,surface)
+  };
+}
 function routeAction(action){
   if(action==="clan"&&typeof globalThis["openOverlay"]==="function")return call("openOverlay","clan");
   if(action==="inventory"&&typeof globalThis["openOverlay"]==="function")return call("openOverlay","inventory");
@@ -804,6 +814,7 @@ if(typeof document!=="undefined"){
 
 globalThis.getPhase2LiveHudSnapshot49900=snapshot;
 globalThis.refreshPhase2LiveHud49900=()=>render(true);
+globalThis.refreshPhase2LiveHudMapGeometry49900=refreshMapGeometry49900;
 globalThis.openPhase2LiveHudRoute49900=action=>{const result=routeAction(action);scheduleRefresh();return result;};
 globalThis.runPhase2LiveHud49900Diagnostics=diagnostics;
 globalThis.SC_PHASE2_LIVE_HUD_49900=Object.freeze({patchId:PATCH_ID,browserGoldenClaimed:false});
@@ -945,7 +956,11 @@ function sync(){
   if(state.box&&state.box!==box)removeClassIfPresent(state.box,"sc-map557-active");
   state.map=map;state.box=box;
   if(targetChanged)observeGeometryTargets(map,box);
-  constrainMap(map,box);
+  const constraint=constrainMap(map,box);
+  if(constraint.changed){
+    const refresh=globalThis.refreshPhase2LiveHudMapGeometry49900;
+    if(typeof refresh==="function")refresh(surface);
+  }
   const geometry=applyGeometry(root,map,box,surface);
   return{surface,selector,geometry,presentationOnly:true};
 }
