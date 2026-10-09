@@ -1,1 +1,0 @@
-temporary #603 writer trigger; remove after bounded integration commit
