@@ -1,0 +1,80 @@
+name: Issue 597 Academy Origin Registry Recalibration
+
+on:
+  push:
+    branches:
+      - coding/597-academy-origin-registry-recalibration
+    paths:
+      - 'game.js'
+      - 'tools/qa_issue_597_academy_origin_registry_recalibration.js'
+      - 'tools/qa_issue_597_academy_origin_registry_recalibration_browser.js'
+      - '.github/workflows/issue-597-academy-origin-registry.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'game.js'
+      - 'tools/qa_issue_597_academy_origin_registry_recalibration.js'
+      - 'tools/qa_issue_597_academy_origin_registry_recalibration_browser.js'
+      - '.github/workflows/issue-597-academy-origin-registry.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  academy-origin-registry:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Source syntax
+        run: |
+          node --check game.js
+          node --check tools/qa_issue_597_academy_origin_registry_recalibration.js
+          node --check tools/qa_issue_597_academy_origin_registry_recalibration_browser.js
+
+      - name: Issue 597 deterministic Registry contract
+        run: node tools/qa_issue_597_academy_origin_registry_recalibration.js
+
+      - name: Existing Discipline Development regression
+        run: node tools/qa_issue_448_discipline_stat_growth.js
+
+      - name: Chronicle State Manifest regression
+        run: node tools/qa_phase2_chronicle_state_manifest_436.js
+
+      - name: Existing save compatibility
+        run: node tools/qa_save_compatibility_311.js
+
+      - name: Runtime ownership safety
+        run: node tools/qa_runtime_ownership_safety_300.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > issue-597-server.log 2>&1 &
+          echo $! > issue-597-server.pid
+          sleep 2
+
+      - name: Installed-browser Registry Current/PL/save proof
+        run: node tools/qa_issue_597_academy_origin_registry_recalibration_browser.js
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-597-academy-origin-registry
+          path: |
+            artifacts/issue-597-academy-origin-registry
+            issue-597-server.log
+          if-no-files-found: ignore

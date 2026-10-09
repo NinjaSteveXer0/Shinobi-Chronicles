@@ -8,6 +8,7 @@ const vm = require("vm");
 const root = path.resolve(__dirname, "..");
 const game = fs.readFileSync(path.join(root, "game.js"), "utf8");
 const sprint = fs.readFileSync(path.join(root, "runtime", "alpha-alpha-sprint-33100.js"), "utf8");
+const terminalResult = fs.readFileSync(path.join(root, "runtime", "alpha-battle-terminal-result-54400.js"), "utf8");
 
 const storage = new Map();
 const sessionStore = new Map();
@@ -24,17 +25,27 @@ const dummy = () => ({
   addEventListener(){}, removeEventListener(){}, focus(){}, click(){},
   innerHTML: "", textContent: "", value: "", checked: false, disabled: false,
 });
+const overlayHost = dummy();
+const overlayContainer = dummy();
+const documentHead = dummy();
 const silentConsole = { log(){}, info(){}, warn(){}, error(){}, table(){} };
 const context = {
   console: silentConsole,
   localStorage: storageShim(storage),
   sessionStorage: storageShim(sessionStore),
   document: {
-    getElementById(){ return null; }, querySelector(){ return null; }, querySelectorAll(){ return []; },
+    head: documentHead,
+    getElementById(id){
+      if(id === "screen-overlay") return overlayHost;
+      if(id === "overlay-content-container") return overlayContainer;
+      return null;
+    },
+    querySelector(){ return null; }, querySelectorAll(){ return []; },
     createElement(){ return dummy(); }, body: dummy(),
     addEventListener(){}, removeEventListener(){},
   },
   requestAnimationFrame(){ return 0; }, cancelAnimationFrame(){},
+  queueMicrotask(fn){ fn(); },
   alert(){}, confirm(){ return true; }, prompt(){ return null; },
   Image: function(){ return dummy(); }, navigator: { userAgent: "node-issue141-arc1" },
   location: { reload(){}, href: "http://localhost/" }, addEventListener(){}, removeEventListener(){},
@@ -113,12 +124,13 @@ try {
   const m1112Hardening = call("runAlphaBrick5499DeliveryHardeningDiagnostics");
   check("m11_m12_delivery_hardening_diagnostic", m1112Hardening.pass === true, m1112Hardening);
 
-  // Replace only the caller-return and legacy-continue functions before loading
-  // 33100. The sprint must capture these spies exactly as a browser runtime
-  // would capture the preceding implementations in parser order.
+  // Replace only the caller-return, legacy-continue and overlay functions before
+  // loading #33100 and then #544. #544 must capture these preceding authorities
+  // exactly as the production parser order does.
   run(`
     globalThis.__issue141ReturnCalls=[];
     globalThis.__issue141LegacyContinueCalls=0;
+    globalThis.__issue141RewardClaimCalls=0;
     globalThis.__issue141OverlayCalls=[];
     globalThis.__issue141ForceReturnFailure=false;
     resumeBattleCallerAfterCompletion=function(outcome){
@@ -129,6 +141,12 @@ try {
     continueAfterVictory=function(){
       globalThis.__issue141LegacyContinueCalls += 1;
       return {success:true,legacy:true};
+    };
+    claimCurrentBattleRewards=function(){
+      globalThis.__issue141RewardClaimCalls += 1;
+      if(!currentBattle||!currentBattle.rewards)return false;
+      currentBattle.rewards.claimed=true;
+      return true;
     };
     openOverlay=function(type){
       globalThis.__issue141OverlayCalls.push(type);
@@ -141,23 +159,48 @@ try {
   const sprintDiag = call("runAlphaPlayableSprint33100Diagnostics");
   check("33100_internal_diagnostic", sprintDiag.pass === true && sprintDiag.browserGoldenClaimed === false, sprintDiag);
 
-  // Exact Story caller victory must outrank the legacy fallback after rewards
-  // have been claimed. No mission-specific outcome is fabricated here.
+  run(terminalResult, "runtime/alpha-battle-terminal-result-54400.js");
+  const terminalOwner = plain(run(`({
+    presenter: typeof presentCommittedBattleTerminalResult54400 === "function",
+    setbackContinue: typeof continueAfterSetback54400 === "function",
+    victoryContinue: typeof continueAfterVictory === "function" && continueAfterVictory.toString().includes("terminalResultOwner54400"),
+    diagnostic: typeof getBattleTerminalResultPresentation54400 === "function"
+  })`, "issue141-terminal-owner.js"));
+  check(
+    "54400_terminal_candidate_loaded",
+    terminalOwner.presenter === true && terminalOwner.setbackContinue === true && terminalOwner.victoryContinue === true && terminalOwner.diagnostic === true,
+    terminalOwner
+  );
+
+  // Victory must present before CLAIM; CLAIM must stop before caller resume;
+  // the later explicit Continue restores the exact Story caller once.
   const victory = plain(run(`
     currentBattle={
       active:false,battleOver:true,
       outcome:{type:"victory"},
-      rewards:{claimed:true},
+      rewards:{claimed:false},
       returnContext:{type:"story_scene",missionId:"fixture_mission",sceneId:"fixture_scene"}
     };
-    continueAfterVictory();
+    const victoryPresented141=presentCommittedBattleTerminalResult54400("victory",{source:"issue141_runtime_qa"});
+    const victoryProjection141=getBattleTerminalResultPresentation54400();
+    const victoryClaimOnly141=continueAfterVictory();
+    const victoryCallerAfterClaim141=currentBattle.returnContext;
+    const victoryReturnCallsAfterClaim141=globalThis.__issue141ReturnCalls.slice();
+    const victoryContinued141=continueAfterVictory();
+    ({presented:victoryPresented141,projectionBeforeClaim:victoryProjection141,claimOnly:victoryClaimOnly141,callerAfterClaim:victoryCallerAfterClaim141,returnCallsAfterClaim:victoryReturnCallsAfterClaim141,continued:victoryContinued141});
   `, "issue141-victory-return.js"));
   const victoryCalls = plain(context.__issue141ReturnCalls);
   check(
-    "story_victory_returns_before_legacy",
-    victory && victory.success === true && victory.alpha33100StoryReturnPriority === true &&
-      victoryCalls.length === 1 && victoryCalls[0] === "victory" && context.__issue141LegacyContinueCalls === 0,
-    { victory, victoryCalls, legacyCalls: context.__issue141LegacyContinueCalls }
+    "story_victory_claim_then_explicit_continue",
+    victory && victory.projectionBeforeClaim && victory.projectionBeforeClaim.status === "presented" &&
+      victory.claimOnly && victory.claimOnly.success === true && victory.claimOnly.rewardClaimed === true &&
+      victory.claimOnly.callerResumeWithheldUntilExplicitContinue === true &&
+      victory.callerAfterClaim && victory.callerAfterClaim.type === "story_scene" &&
+      victory.returnCallsAfterClaim.length === 0 &&
+      victory.continued && victory.continued.success === true && victory.continued.terminalResultOwner54400 === true &&
+      victory.continued.terminalOutcome === "victory" && victoryCalls.length === 1 && victoryCalls[0] === "victory" &&
+      context.__issue141RewardClaimCalls === 1 && context.__issue141LegacyContinueCalls === 0,
+    { victory, victoryCalls, rewardClaimCalls:context.__issue141RewardClaimCalls, legacyCalls:context.__issue141LegacyContinueCalls }
   );
 
   // A broken authored Story continuation must fail closed on Victory. It must
@@ -173,6 +216,7 @@ try {
       rewards:{claimed:true},
       returnContext:{type:"story_scene",missionId:"fixture_mission",sceneId:"fixture_scene"}
     };
+    presentCommittedBattleTerminalResult54400("victory",{source:"issue141_runtime_qa_failure"});
     const result=continueAfterVictory();
     const attemptedReturnCalls=globalThis.__issue141ReturnCalls.slice(returnCallsBefore.length);
     globalThis.__issue141ReturnCalls=returnCallsBefore;
@@ -182,45 +226,53 @@ try {
   check(
     "story_victory_return_failure_never_opens_generic_arena",
     failedVictory && failedVictory.result && failedVictory.result.success === false &&
-      failedVictory.result.alpha33100StoryReturnFailClosed === true &&
-      failedVictory.result.genericBattleFallbackSuppressed === true &&
+      failedVictory.result.reason === "fixture_story_return_failed" &&
       failedVictory.attemptedReturnCalls.length === 1 && failedVictory.attemptedReturnCalls[0] === "victory" &&
       failedVictory.legacyAfter === failedVictory.legacyBefore &&
       failedVictory.overlayCalls.includes("victory") && !failedVictory.overlayCalls.includes("battle"),
     failedVictory
   );
 
-  // Without claimed rewards, the wrapper must not consume the Story return;
-  // predecessor lifecycle remains authoritative.
+  // A fresh unclaimed Victory is a claim-only action. It must preserve the
+  // caller envelope and must not satisfy the later explicit Continue.
   const unclaimed = plain(run(`
+    const unclaimedCallsBefore141=globalThis.__issue141ReturnCalls.length;
     currentBattle={
       active:false,battleOver:true,
       outcome:{type:"victory"},
       rewards:{claimed:false},
       returnContext:{type:"story_scene",missionId:"fixture_mission",sceneId:"fixture_scene"}
     };
-    continueAfterVictory();
+    presentCommittedBattleTerminalResult54400("victory",{source:"issue141_runtime_qa_claim_only"});
+    const unclaimedResult141=continueAfterVictory();
+    ({result:unclaimedResult141,caller:currentBattle.returnContext,returnCallsAdded:globalThis.__issue141ReturnCalls.length-unclaimedCallsBefore141});
   `, "issue141-unclaimed-return.js"));
   check(
-    "unclaimed_victory_delegates_without_story_return",
-    unclaimed && unclaimed.legacy === true && context.__issue141LegacyContinueCalls === 1 && context.__issue141ReturnCalls.length === 1,
+    "unclaimed_victory_claims_without_story_return",
+    unclaimed && unclaimed.result && unclaimed.result.success === true && unclaimed.result.rewardClaimed === true &&
+      unclaimed.result.callerResumeWithheldUntilExplicitContinue === true && unclaimed.caller &&
+      unclaimed.caller.type === "story_scene" && unclaimed.returnCallsAdded === 0 && context.__issue141LegacyContinueCalls === 0,
     { unclaimed, returnCalls: plain(context.__issue141ReturnCalls), legacyCalls: context.__issue141LegacyContinueCalls }
   );
 
-  // Setback uses the same exact caller mechanism but with factual defeat. The
-  // 33100 source diagnostic separately pins Battle-PL withdrawal != injury/death.
+  // Setback is first projected from the already-committed factual defeat, then
+  // Continue delegates to the exact caller through #544.
   const setback = plain(run(`
     currentBattle={
       active:false,battleOver:true,
-      outcome:{type:"defeat",battlePLWithdrawal:true,injuryInferred:false,deathInferred:false},
+      outcome:{type:"defeat"},
       rewards:{claimed:false},
       returnContext:{type:"story_scene",missionId:"fixture_mission",sceneId:"fixture_scene"}
     };
-    continueAfterSetback33100();
+    const presented=presentCommittedBattleTerminalResult54400("defeat",{source:"issue141_runtime_qa"});
+    const projection=getBattleTerminalResultPresentation54400();
+    const continued=continueAfterSetback54400();
+    ({presented,projection,continued});
   `, "issue141-setback-return.js"));
   check(
     "story_setback_returns_exact_caller",
-    setback && setback.success === true && setback.alpha33100SetbackReturn === true &&
+    setback && setback.continued && setback.continued.success === true && setback.continued.terminalResultOwner54400 === true &&
+      setback.continued.terminalOutcome === "defeat" && setback.projection && setback.projection.status === "presented" &&
       context.__issue141ReturnCalls.length === 2 && context.__issue141ReturnCalls[1] === "defeat",
     { setback, returnCalls: plain(context.__issue141ReturnCalls) }
   );
@@ -230,27 +282,30 @@ try {
     const setbackOverlayBefore=globalThis.__issue141OverlayCalls.length;
     currentBattle={
       active:false,battleOver:true,
-      outcome:{type:"defeat",battlePLWithdrawal:true,injuryInferred:false,deathInferred:false},
+      outcome:{type:"defeat"},
       rewards:{claimed:false},
       returnContext:{type:"story_scene",missionId:"fixture_mission",sceneId:"fixture_scene"}
     };
-    const setbackFailResult=continueAfterSetback33100();
+    presentCommittedBattleTerminalResult54400("defeat",{source:"issue141_runtime_qa_failure"});
+    const setbackFailResult=continueAfterSetback54400();
+    const failureProjection=getBattleTerminalResultPresentation54400();
     globalThis.__issue141ForceReturnFailure=false;
-    ({result:setbackFailResult,overlayCalls:globalThis.__issue141OverlayCalls.slice(setbackOverlayBefore)});
+    ({result:setbackFailResult,projection:failureProjection,overlayCalls:globalThis.__issue141OverlayCalls.slice(setbackOverlayBefore)});
   `, "issue141-setback-return-fail-closed.js"));
   check(
     "story_setback_return_failure_never_opens_generic_arena",
     failedSetback && failedSetback.result && failedSetback.result.success === false &&
-      failedSetback.result.alpha33100StorySetbackReturnFailClosed === true &&
-      failedSetback.result.genericBattleFallbackSuppressed === true &&
+      failedSetback.result.reason === "fixture_story_return_failed" &&
+      failedSetback.projection && failedSetback.projection.status === "presented" &&
       !failedSetback.overlayCalls.includes("battle"),
     failedSetback
   );
 
   check(
     "setback_semantics_no_injury_death_inference",
-    sprintDiag.checks && sprintDiag.checks.defeatIsBattlePLWithdrawal === true && sprintDiag.checks.defeatDoesNotInferInjuryOrDeath === true,
-    sprintDiag.checks
+    failedSetback && failedSetback.projection && failedSetback.projection.committedOutcome === "defeat" &&
+      failedSetback.projection.presentationOnly === true && failedSetback.projection.semanticWrite === false,
+    failedSetback && failedSetback.projection
   );
 
   check(

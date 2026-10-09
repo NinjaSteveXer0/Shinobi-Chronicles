@@ -214,6 +214,12 @@ function ensureKakashiV2BattleRewardProjection36015(finishingShinobi=null){
   return{handled:true,repaired:true,rewards:currentBattle.rewards,plan:clone(plan)};
 }
 
+function projectKakashiV2BattleRewardsForVictory36015(finishingShinobi=null){
+  const battle=currentBattleState36015();
+  if(!battle||battle.battleOver!==true||!battle.outcome||battle.outcome.type!=="victory")return{handled:false,reason:"not_kakashi_v2_terminal_victory"};
+  return ensureKakashiV2BattleRewardProjection36015(finishingShinobi);
+}
+
 const PRE_GENERATE=typeof generateBattleRewards==="function"?generateBattleRewards:null;
 function generateBattleRewards36015(enemy,finishingShinobi){
   const generic=PRE_GENERATE?PRE_GENERATE.apply(this,arguments):null;
@@ -227,24 +233,12 @@ if(PRE_GENERATE){
 
 const PRE_VICTORY_RENDER=typeof renderVictoryOverlay==="function"?renderVictoryOverlay:null;
 function renderVictoryOverlay36015(container){
-  try{ensureKakashiV2BattleRewardProjection36015();}catch(_e){}
+  try{projectKakashiV2BattleRewardsForVictory36015();}catch(_e){}
   return PRE_VICTORY_RENDER?PRE_VICTORY_RENDER.apply(this,arguments):false;
 }
 if(PRE_VICTORY_RENDER){
   globalThis.renderVictoryOverlay=renderVictoryOverlay36015;
   try{renderVictoryOverlay=globalThis.renderVictoryOverlay;}catch(_error){}
-}
-
-const PRE_OPEN_OVERLAY=typeof openOverlay==="function"?openOverlay:null;
-function openOverlay36015(type){
-  if(String(type||"").toLowerCase()==="victory"){
-    try{ensureKakashiV2BattleRewardProjection36015();}catch(_e){}
-  }
-  return PRE_OPEN_OVERLAY?PRE_OPEN_OVERLAY.apply(this,arguments):false;
-}
-if(PRE_OPEN_OVERLAY){
-  globalThis.openOverlay=openOverlay36015;
-  try{openOverlay=globalThis.openOverlay;}catch(_error){}
 }
 
 function snapshotRewardMutation(){
@@ -461,8 +455,11 @@ function diagnostics(){
     noParallelInventory:!String(commitItemSource).includes("inventory.push")&&String(commitItemSource).includes("addItemToInventory"),
     trainingTantoUsesDurableProvenance:String(commitItemSource).includes("commitDurableInventoryAcquisition54500")&&String(commitItemSource).includes("durableInstanceId")&&String(commitItemSource).includes('acquisitionKind:"reward"'),
     rewardRollbackIncludesProvenance:String(snapshotRewardMutation).includes("durableObjectProvenance14800")&&String(restoreRewardMutation).includes("durableObjectProvenance14800"),
-    victoryProjectionSelfHeals:String(ensureKakashiV2BattleRewardProjection36015).includes("authoritativeProjectionRepaired")&&String(renderVictoryOverlay36015).includes("ensureKakashiV2BattleRewardProjection36015"),
-    victoryOpenProjectsBeforeGenericRender:String(openOverlay36015).includes('"victory"')&&String(openOverlay36015).indexOf("ensureKakashiV2BattleRewardProjection36015")<String(openOverlay36015).indexOf("PRE_OPEN_OVERLAY"),
+    victoryProjectionSelfHeals:String(ensureKakashiV2BattleRewardProjection36015).includes("authoritativeProjectionRepaired")&&String(projectKakashiV2BattleRewardsForVictory36015).includes("ensureKakashiV2BattleRewardProjection36015")&&String(renderVictoryOverlay36015).includes("projectKakashiV2BattleRewardsForVictory36015"),
+    noBroadOpenOverlayOwnership:(()=>{
+      const operationalSource=String(installAcademyKakashiV2Rewards36015).split("function diagnostics(){")[0];
+      return !operationalSource.includes("globalThis.openOverlay=")&&!operationalSource.includes("openOverlay36015")&&!operationalSource.includes("PRE_OPEN_OVERLAY");
+    })(),
     exactMIBattleProjection:String(ensureKakashiV2BattleRewardProjection36015).includes("Field Recovery Pill")&&String(battlePlan).includes("participantId===MI")&&String(battlePlan).includes("ryo:cashSourceId?50:0")&&String(soloCashSource36015).includes("participantId===MI"),
     kakashiClaimBypassesDuplicateGenericPersistence:!String(claimKakashiV2BattleRewards).includes("PRE_CLAIM.call")&&String(claimKakashiV2BattleRewards).includes("directExactPackageClaim:true")&&String(claimKakashiV2BattleRewards).includes("deferredPersistenceUntilVictoryPaint:true")&&!String(claimKakashiV2BattleRewards).includes('savePlayerData==="function")savePlayerData()'),
     idempotentKakashiClaimDoesNotRewritePlayerSave:String(claimKakashiV2BattleRewards).includes("noPersistenceRewrite:true"),
@@ -474,6 +471,7 @@ function diagnostics(){
 
 const catalog=registerTrainingTanto();if(!catalog.success)throw new Error(catalog.reason);
 globalThis.ensureAcademyKakashiV2BattleRewardProjection36015=ensureKakashiV2BattleRewardProjection36015;
+globalThis.projectAcademyKakashiV2BattleRewardsForVictory36015=projectKakashiV2BattleRewardsForVictory36015;
 globalThis.previewAcademyKakashiV2TerminalRewards36015=previewTerminal;
 globalThis.commitAcademyKakashiV2TerminalRewards36015=commitTerminal;
 globalThis.getAcademyKakashiV2RewardReceipts36015=receiptsFor;

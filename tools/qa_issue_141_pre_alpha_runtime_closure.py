@@ -67,6 +67,7 @@ EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-phase2-basic-item-shop-51700.js",
     "runtime/alpha-hud-my-clan-return-context-50600.js",
     "runtime/alpha-phase2-character-card-shop-52400.js",
+    "runtime/alpha-battle-terminal-result-54400.js",
 ]
 
 PYTHON_GATES = [
@@ -194,7 +195,7 @@ def main() -> int:
     roster = read("runtime/alpha-genin-roster-63.js")
     journey = read("runtime/alpha-journey-surface-32800.js")
     origin_integrator = read("runtime/alpha-origin-scenes-32900-integrator.js")
-    sprint = read("runtime/alpha-alpha-sprint-33100.js")
+    terminal_result = read("runtime/alpha-battle-terminal-result-54400.js")
     bridge = read("runtime/alpha-traversal-bridge-33200.js")
     world_fix = read("runtime/alpha-world-konoha-112-fix.js")
     contained = read("runtime/alpha-anbu-root-contained-155-knowledge-fix.js")
@@ -243,12 +244,24 @@ def main() -> int:
     require(
         checks,
         "story_battle_exact_caller_return_present",
-        contains_all(sprint, "resumeBattleCallerAfterCompletion", 'rc.type==="story_scene"'),
+        contains_all(
+            terminal_result,
+            "function continueAfterVictory54400()",
+            'PRIOR_RESUME_CALLER.call(globalThis,"victory")',
+            "function continueAfterSetback54400()",
+            'PRIOR_RESUME_CALLER.call(globalThis,"defeat")',
+        ),
     )
     require(
         checks,
         "setback_is_withdrawal_not_injury_death",
-        contains_all(sprint, "battlePLWithdrawal:true", "injuryInferred:false", "deathInferred:false"),
+        contains_all(
+            terminal_result,
+            "Battle PL defeat does not infer death, injury, custody",
+            'committedOutcome54400(battle)!=="defeat"',
+            "presentationOnly:true",
+            "semanticWrite:false",
+        ),
     )
 
     # Origin package is ten-Origin and source-first; no direct PL grant in occurrence commit.
