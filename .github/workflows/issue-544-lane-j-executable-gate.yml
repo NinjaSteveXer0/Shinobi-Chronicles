@@ -64,7 +64,7 @@ jobs:
           python-version: '3.12'
       - name: Inject Lane J Origin + World verifier only
         run: cp qa/tools/qa_issue_544_lane_j_origin_world_real_action_browser.js candidate/tools/qa_issue_544_lane_j_origin_world_real_action_browser.js
-      - name: Correct Lane J Victory claimed-state chronology assertion
+      - name: Correct Lane J chronology and active-enemy probes
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -74,7 +74,12 @@ jobs:
           new="""if(/CLAIM/i.test(firstText)){await button.click();await page.waitForFunction(()=>currentBattle?.rewards?.claimed===true,null,{timeout:8000});const afterClaim=await page.evaluate(()=>({claimed:currentBattle?.rewards?.claimed===true,returnContext:currentBattle?.returnContext?JSON.parse(JSON.stringify(currentBattle.returnContext)):null,terminal:getBattleTerminalResultPresentation54400(),visible:!![...document.querySelectorAll('.alpha-victory-code-screen,.victory-screen')].find(n=>n.getClientRects().length>0&&getComputedStyle(n).display!=='none'&&getComputedStyle(n).visibility!=='hidden')}));assert.strictEqual(afterClaim.claimed,true,label+' Victory claim did not settle');assert(afterClaim.returnContext,label+' caller resumed during reward claim');assert.strictEqual(afterClaim.terminal?.status,'presented',label+' terminal state lost after reward claim');assert.strictEqual(afterClaim.visible,true,label+' Victory surface disappeared during reward claim');button=visibleButton();await button.waitFor({state:'visible',timeout:8000});}"""
           if s.count(old)!=1:
               raise SystemExit(f'expected exactly one obsolete label-mutation assertion, found {s.count(old)}')
-          p.write_text(s.replace(old,new))
+          s=s.replace(old,new)
+          old_enemy="""enemyId:currentBattle?.activeEnemy?.id||currentBattle?.activeEnemyId||null"""
+          new_enemy="""enemyId:(typeof getBattleDeploymentParticipant==='function'?getBattleDeploymentParticipant('enemy',1)?.id:null)||currentBattle?.activeEnemy?.id||currentBattle?.activeEnemyId||currentBattle?.enemy?.id||null"""
+          if s.count(old_enemy)!=1:
+              raise SystemExit(f'expected exactly one stale active-enemy probe, found {s.count(old_enemy)}')
+          p.write_text(s.replace(old_enemy,new_enemy))
           PY
       - name: Enforce real-action crossing contract
         working-directory: candidate
@@ -84,6 +89,7 @@ jobs:
           ! grep -q 'completeBattleDefeat(' tools/qa_issue_544_lane_j_origin_world_real_action_browser.js
           grep -q 'attemptBattlePreparedSkill' tools/qa_issue_544_lane_j_origin_world_real_action_browser.js
           grep -q 'Victory claim did not settle' tools/qa_issue_544_lane_j_origin_world_real_action_browser.js
+          grep -q "getBattleDeploymentParticipant('enemy',1)" tools/qa_issue_544_lane_j_origin_world_real_action_browser.js
           ! grep -q "CONTINUE/i.test(b.textContent" tools/qa_issue_544_lane_j_origin_world_real_action_browser.js
           node --check tools/qa_issue_544_lane_j_origin_world_real_action_browser.js
       - name: Install Chromium
