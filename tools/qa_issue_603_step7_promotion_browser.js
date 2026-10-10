@@ -37,22 +37,45 @@ async function releaseFrontDoor(page){
     document.getElementById("sc-alpha-front-door-33400")?.remove();
   });
 }
+async function seedPlayableAcademy(page,label){
+  const result=await page.evaluate(sourceLabel=>{
+    localStorage.clear();
+    playerData=createDefaultPlayerData();
+    if(typeof setCharacterOwnershipRuntimeAuthority==="function")setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+    savePlayerData();
+    const selected=selectChronicleOrigin("academy_menma",`${sourceLabel}:origin`);
+    const completed=completeChronicleOriginPrologue("academy_menma",[`${sourceLabel}:origin_complete`]);
+    const one=selectAcademyTeamFormationTeammate(1,"academy_hinata");
+    const two=selectAcademyTeamFormationTeammate(2,"academy_kakashi");
+    const formed=confirmAcademyTeamFormation(`${sourceLabel}:team`,["academy_hinata","academy_kakashi"]);
+    const continued=continueAcademyTeamFormationJourney();
+    return{selected,completed,one,two,formed,continued,team:typeof getChronicleCurrentTeam43600==="function"?getChronicleCurrentTeam43600():null,origin:ensurePlayerAcquisitionState().chronicleOriginOwnedCharacterId};
+  },label);
+  for(const key of ["selected","completed","one","two","formed","continued"])assert(result[key]&&result[key].success===true,`${label} Academy setup ${key} failed: ${JSON.stringify(result[key])}`);
+  assert.strictEqual(result.origin,"owned_character_academy_menma",`${label} wrong Promotion subject lineage`);
+  assert.deepStrictEqual(result.team&&result.team.teamVariantIds,["academy_menma","academy_hinata","academy_kakashi"],`${label} wrong current team fixture`);
+  return result;
+}
 async function openPromotionInspection(page){
   await page.evaluate(()=>globalThis.openOverlay?.("arena"));
   const arena=page.locator("#overlay-content-container");await arena.waitFor({state:"visible",timeout:15000});
   const promotion=arena.getByRole("button",{name:/promotion/i}).first();
   if(await promotion.count()===0)throw new Error("promotion_entry_control_missing");
   await promotion.click();
+  await page.locator("#overlay-content-container .sc60320-stage").waitFor({state:"visible",timeout:15000});
+  const inspect=arena.getByRole("button",{name:/inspect readiness/i}).first();
+  assert(await inspect.count()>0,"explicit read-only inspection control missing");
+  await inspect.click();
   await page.waitForTimeout(150);
   const body=(await arena.innerText()).toUpperCase();
-  assert(body.includes("PROMOTION"),"Promotion inspection did not render");
+  assert(body.includes("FIELD READINESS ASSESSMENT"),"Promotion inspection did not render canonical #603 UI");
   return arena;
 }
 function normalizeHiddenDom(rows){
   return rows.map(r=>({text:r.text,aria:r.aria,role:r.role,classes:r.classes,data:r.data}));
 }
 async function hiddenProjectionRows(page){
-  return page.locator('#overlay-content-container [data-promotion-requirement-slot], #overlay-content-container .promotion-readiness-slot, #overlay-content-container [class*="readiness"]')
+  return page.locator('#overlay-content-container .sc60320-slot')
     .evaluateAll(nodes=>nodes.map(node=>({
       text:(node.textContent||"").trim(),aria:node.getAttribute("aria-label"),role:node.getAttribute("role"),classes:node.className,
       data:Object.fromEntries([...node.attributes].filter(a=>a.name.startsWith("data-")).map(a=>[a.name,a.value]))
@@ -62,13 +85,15 @@ async function viewportScenario(browser,width,height,label){
   const context=await browser.newContext({viewport:{width,height}});const page=await context.newPage();const errors=await installBrowserRuntimeErrorGate(page);
   try{
     await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});await releaseFrontDoor(page);
-    await page.waitForFunction(()=>typeof globalThis.openOverlay==="function",null,{timeout:30000});
+    await page.waitForFunction(()=>typeof globalThis.openOverlay==="function"&&typeof globalThis.openInstalledPromotion60330==="function",null,{timeout:30000});
+    await seedPlayableAcademy(page,`qa603:${label}`);
     const before=await page.evaluate(semanticSnapshotScript());
     const arena=await openPromotionInspection(page);
     const afterInspection=await page.evaluate(semanticSnapshotScript());
-    assert.strictEqual(afterInspection,before,"inspection mutated semantic state / committed attempt");
+    assert.strictEqual(afterInspection,before,"inspection mutated protected semantic state / committed attempt");
 
     const hidden=normalizeHiddenDom(await hiddenProjectionRows(page));
+    assert.strictEqual(hidden.length,4,"Promotion UI did not render exactly four readiness slots");
     assert(hidden.every(row=>!JSON.stringify(row).match(/information_use|team_coordination|combat_readiness|objective_protection|academy_genin_fr_pkg_/i)),"hidden requirement truth leaked to DOM/accessibility metadata: "+JSON.stringify(hidden));
 
     // Adversarial twin fixture: only hidden satisfaction differs. Public model + actual DOM/ARIA must be byte-identical.
@@ -105,20 +130,22 @@ async function viewportScenario(browser,width,height,label){
     assert.strictEqual(hiddenTwin.satisfied.rows,hiddenTwin.unsatisfied.rows,"hidden satisfied/unsatisfied DOM/accessibility differs");
     assert.strictEqual(hiddenTwin.satisfied.html,hiddenTwin.unsatisfied.html,"hidden satisfied/unsatisfied rendered markup differs");
 
-    const attemptButton=arena.getByRole("button",{name:/enter|begin|start|commit|accept.*assessment|attempt/i}).first();
+    const attemptButton=arena.getByRole("button",{name:/enter assessment/i}).first();
     assert(await attemptButton.count()>0,"explicit attempt-commit control missing");
+    assert.strictEqual(await attemptButton.isEnabled(),true,"explicit attempt-commit control remained disabled after inspection");
     await attemptButton.click();await page.waitForTimeout(200);
     const attemptTruth=await page.evaluate(()=>{
-      const roots=[globalThis.SC_PROMOTION_CORE_60300,globalThis.SC_ACADEMY_GENIN_PROMOTION_CORE_60300,globalThis.playerData?.promotion603,globalThis.playerData?.promotionRuntime].filter(Boolean);
-      const json=JSON.stringify(roots);
-      const ids=json.match(/assessment[_A-Za-z0-9:-]*603[_A-Za-z0-9:-]*|assessmentAttemptId[^,}\]]*/g)||[];
-      return{roots:roots.length,ids};
+      const api=globalThis.SC_PROMOTION_INSTALLED_60330;
+      const attemptId=api&&typeof api.activeAttempt==="function"?api.activeAttempt():null;
+      const truth=api&&typeof api.getTruth==="function"?api.getTruth():null;
+      return{attemptId,truth};
     });
-    assert(attemptTruth.roots>0,"no discoverable committed Promotion state after explicit attempt commit");
+    assert(attemptTruth.attemptId,"no committed assessmentAttemptId after explicit attempt commit");
+    assert.strictEqual(attemptTruth.truth&&attemptTruth.truth.phase,"COMMITTED","Promotion truth did not enter COMMITTED phase");
 
     await page.screenshot({path:path.join(OUT,label+"-inspection-attempt.png"),fullPage:true});
     await errors.assertClean(label);
-    return{label,viewport:{width,height},inspectionMutation:false,hiddenRows:hidden.length,hiddenSatisfiedUnsatisfiedIndistinguishable:true,attemptStateRoots:attemptTruth.roots};
+    return{label,viewport:{width,height},inspectionMutation:false,hiddenRows:hidden.length,hiddenSatisfiedUnsatisfiedIndistinguishable:true,assessmentAttemptId:attemptTruth.attemptId};
   }finally{await context.close();}
 }
 
