@@ -1,0 +1,67 @@
+name: TMP 603 Courier Phase2 Persistence
+
+on:
+  push:
+    branches:
+      - coding/603-step7-promotion-integration
+    paths:
+      - .github/workflows/tmp-603-courier-phase2-persistence.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/603-step7-promotion-integration
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Patch Courier occurrence into registered Promotion state
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          courier=Path('runtime/alpha-promotion-courier-assessment-60310.js')
+          text=courier.read_text(encoding='utf-8')
+          old='function store(){const p=player();if(!p)return null;if(!p[ROOT]||typeof p[ROOT]!=="object")p[ROOT]={schemaVersion:1,attemptsById:{}};if(!p[ROOT].attemptsById)p[ROOT].attemptsById={};return p[ROOT];}'
+          new='function store(){const p=player();if(!p)return null;const phase2=p.phase2ChronicleState&&typeof p.phase2ChronicleState==="object"?p.phase2ChronicleState:null;const promotion=phase2&&phase2.promotionState&&typeof phase2.promotionState==="object"&&!Array.isArray(phase2.promotionState)?phase2.promotionState:null;if(promotion){if(!promotion[ROOT]||typeof promotion[ROOT]!=="object")promotion[ROOT]={schemaVersion:1,attemptsById:{}};if(!promotion[ROOT].attemptsById)promotion[ROOT].attemptsById={};return promotion[ROOT];}if(typeof globalThis.ensurePhase2ChronicleState43600==="function")return null;if(!p[ROOT]||typeof p[ROOT]!=="object")p[ROOT]={schemaVersion:1,attemptsById:{}};if(!p[ROOT].attemptsById)p[ROOT].attemptsById={};return p[ROOT];}'
+          if text.count(old)!=1:
+              raise SystemExit(f'courier store replacement count={text.count(old)}')
+          text=text.replace(old,new,1)
+          courier.write_text(text,encoding='utf-8')
+
+          installed=Path('runtime/alpha-promotion-installed-integration-60330.js')
+          text=installed.read_text(encoding='utf-8')
+          old='const TRANSITION="academy_to_genin";\nconst controllers=new Map();'
+          new='const TRANSITION="academy_to_genin";\nconst COURIER_STATE_KEY="promotionCourierAssessment60310";\nconst controllers=new Map();'
+          if text.count(old)!=1:
+              raise SystemExit(f'installed key anchor count={text.count(old)}')
+          text=text.replace(old,new,1)
+          old='  save(next){const root=phase2Root(true);if(!root)return false;root.promotionState=clone(next);if(typeof savePlayerData!=="function")return false;savePlayerData();return true;}'
+          new='  save(next){const root=phase2Root(true);if(!root)return false;const existing=root.promotionState&&typeof root.promotionState==="object"?root.promotionState[COURIER_STATE_KEY]:null;const merged=clone(next);if(existing&&typeof existing==="object")merged[COURIER_STATE_KEY]=clone(existing);root.promotionState=merged;if(typeof savePlayerData!=="function")return false;savePlayerData();return true;}'
+          if text.count(old)!=1:
+              raise SystemExit(f'installed persistence replacement count={text.count(old)}')
+          text=text.replace(old,new,1)
+          installed.write_text(text,encoding='utf-8')
+          PY
+          node --check runtime/alpha-promotion-courier-assessment-60310.js
+          node --check runtime/alpha-promotion-installed-integration-60330.js
+          node tools/qa_issue_603_step7_promotion.js
+          node tools/qa_issue_607_courier_adapter.js
+          node tools/qa_issue_603_installed_integration.js
+          node tools/qa_save_compatibility_311.js
+      - name: Commit bounded repair and remove temporary workflow
+        shell: bash
+        run: |
+          rm .github/workflows/tmp-603-courier-phase2-persistence.yml
+          git config user.name "ChatGPT Codex Connector"
+          git config user.email "codex-connector@users.noreply.github.com"
+          git add runtime/alpha-promotion-courier-assessment-60310.js runtime/alpha-promotion-installed-integration-60330.js .github/workflows/tmp-603-courier-phase2-persistence.yml
+          git commit -m "[CODING][#603] Persist Courier attempt under Promotion state"
+          git push origin HEAD:coding/603-step7-promotion-integration
