@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "buildId": "SC-ALPHA-RUNTIME-R303-2026-10-10-EP",
-  "sourceBaselineCommit": "199b57bdcc4ae537f0d47145338160340c1f7f3e",
+  "buildId": "SC-ALPHA-RUNTIME-R303-2026-10-10-EQ",
+  "sourceBaselineCommit": "b360007b26ffa5b623954a5c2adb25669331ccc0",
   "sourceRef": "issue-303-runtime-build-fingerprint-v1",
-  "runtimeGeneration": "expert-master-discipline-curriculum-integrated-576",
+  "runtimeGeneration": "forge-created-durable-kunai-integrated-585",
   "majorRuntimeFeatures": [
     "academy-kakashi-v2",
     "runtime-ownership-safety-300",
@@ -96,7 +96,8 @@
     "phase2-konoha-activity-contamination-539",
     "canonical-battle-terminal-result-owner-consolidated-544",
     "step7-academy-genin-promotion-integrated-603",
-    "expert-master-discipline-curriculum-576"
+    "expert-master-discipline-curriculum-576",
+    "forge-created-durable-kunai-585"
   ],
   "productionLoader": "index.html",
   "runtimeModule": "runtime/alpha-runtime-build-fingerprint-303.js",
