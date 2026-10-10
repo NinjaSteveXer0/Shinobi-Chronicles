@@ -62,6 +62,29 @@ function confirmHostileContact(id,spec={}){const r=need(id);if(!r.success)return
 function currentBattle60310(){try{if(typeof currentBattle==="object"&&currentBattle)return currentBattle;}catch(_){}return globalThis.currentBattle&&typeof globalThis.currentBattle==="object"?globalThis.currentBattle:null;}
 function enemyRegistry60310(){try{if(typeof enemyDatabase==="object"&&enemyDatabase)return enemyDatabase;}catch(_){}return globalThis.enemyDatabase&&typeof globalThis.enemyDatabase==="object"?globalThis.enemyDatabase:null;}
 function registerRogue(){const db=enemyRegistry60310();if(!db)return{success:false,reason:"promotion_courier_enemy_registry_missing"};if(typeof globalThis.buildReusableRogueGeninOppositionActions399!=="function")return{success:false,reason:"rogue_genin_shared_package_missing"};const profile={id:ROGUE,name:"ROGUE GENIN",rank:"Rogue Genin",power:23,calibratedBasePL:23,baseStats:{nin:23,tai:22,buki:21,fuin:10,kin:14,gen:15,stamina:24},stats:{nin:23,tai:22,buki:21,fuin:10,kin:14,gen:15,stamina:24},image:"Enemies/rogue_genin.png",oppositionTemplateId:TEMPLATE,rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},noSummon:true,noTransformation:true,noBossScaling:true};db[ROGUE]=profile;const pkg=globalThis.buildReusableRogueGeninOppositionActions399({participantId:ROGUE,metaGetter:()=>currentBattle60310()?.promotionCourier60310||null});profile.authoredBattleActions=pkg.actions;profile.promotionCourier60310PackageState=pkg;return{success:true};}
+function captureBattleSessionState60310(){
+  const battle=currentBattle60310(),meta=battle?.promotionCourier60310,ctx=battle?.returnContext;
+  if(!meta||battle.battleConfigId!==CONFIG||battle.encounterId!==ENCOUNTER||ctx?.type!=="field_readiness_assessment"||ctx?.assessmentScenarioId!==SCENARIO)return null;
+  return{schemaVersion:1,battleConfigId:CONFIG,encounterId:ENCOUNTER,oppositionTemplateId:TEMPLATE,active:battle.active===true&&battle.battleOver!==true,meta:c(meta)};
+}
+function validateBattleSessionState60310(saved){
+  return !!(saved&&typeof saved==="object"&&saved.battleConfigId===CONFIG&&saved.encounterId===ENCOUNTER&&saved.meta&&saved.meta.assessmentAttemptId&&saved.meta.battleOccurrenceId);
+}
+function prepareBattleSessionRestore60310(saved){
+  if(!validateBattleSessionState60310(saved))return{success:false,reason:"promotion_courier_saved_battle_invalid"};
+  return registerRogue();
+}
+function restoreBattleSessionState60310(saved){
+  if(!validateBattleSessionState60310(saved))return{success:false,reason:"promotion_courier_saved_battle_invalid"};
+  const registered=registerRogue();if(!registered.success)return registered;
+  const battle=currentBattle60310();if(!battle)return{success:false,reason:"promotion_courier_current_battle_missing_on_restore"};
+  battle.battleConfigId=CONFIG;
+  battle.encounterId=ENCOUNTER;
+  battle.oppositionTemplateId=TEMPLATE;
+  battle.promotionCourier60310=c(saved.meta);
+  if(saved.active===true&&battle.battleOver!==true)battle.active=true;
+  return{success:true,active:battle.active===true,battleOccurrenceId:battle.promotionCourier60310.battleOccurrenceId};
+}
 function battleApis(){const names=["launchBattleWithReturnContext","createBattleDeploymentSlots","configureBattleEnemyParticipants","syncBattleActivePlayerFromDeployment","syncBattleActiveEnemyFromDeployment","initializeBattleContributionRecordsFromDeployment","initializeBattleRemainingPLFromDeployment","getBattleRemainingPL"],missing=names.filter(n=>typeof globalThis[n]!=="function");return{ready:missing.length===0,missing};}
 function launchHoldLineBattle(id){const r=need(id);if(!r.success)return r;const o=r.o;if(o.phase!==PHASE.PRESSURE||o.hostile.pressureState!=="agen_m01_hostile_contact_confirmed_v1")return{success:false,reason:"promotion_courier_hold_line_not_actionable"};const direct=uniq(o.hostile.directContactParticipantRefs);if(!direct.includes(o.assessmentSubjectBattleParticipantRef))return{success:false,reason:"promotion_courier_hold_line_subject_missing"};const apis=battleApis();if(!apis.ready)return{success:false,reason:"promotion_courier_battle_api_missing",missing:apis.missing};const reg=registerRogue();if(!reg.success)return reg;for(const ref of direct)if(typeof globalThis.getPlayerCharacter==="function"&&!globalThis.getPlayerCharacter(ref))return{success:false,reason:"promotion_courier_battle_participant_runtime_missing",participantRef:ref};const refs=[o.assessmentSubjectBattleParticipantRef,...direct.filter(x=>x!==o.assessmentSubjectBattleParticipantRef)],bid=battleId(id);receipt(o,"agen_m01_contact_hold_line_v1",{eventType:"protagonist_contact_choice",candidateEvidence:true});o.hostile.pressureState="agen_m01_hostile_battle_requested_v1";const control={},positions={},sides={};refs.forEach(ref=>{control[ref]=o.participantStateByRef[ref].controlClass;positions[ref]=o.participantStateByRef[ref].positionRef;sides[ref]="player";});sides[ROGUE]="enemy";const ctx={type:"field_readiness_assessment",assessmentId:FAMILY,assessmentScenarioId:SCENARIO,assessmentAttemptId:id,assessmentSubjectStableId:o.assessmentSubjectStableId,assessmentSubjectBattleParticipantRef:o.assessmentSubjectBattleParticipantRef,sourceOccurrenceId:o.occurrenceId,battleOccurrenceId:bid,battleConfigId:CONFIG,encounterId:ENCOUNTER,returnPhase:o.phase,returnHost:o.currentHost,returnRouteLeg:o.routeLeg,returnRouteIndex:o.routeIndex,directContactParticipantRefs:refs,participantControlClassByRef:control,participantPositionRefs:positions,participantBattleSideByRef:sides,currentDispatchCustodyRef:o.dispatch.custodyActorRef,currentDispatchCustodyState:o.dispatch.custodyState,currentDispatchIntegrityState:o.dispatch.integrityState,currentCourierStateRef:o.courier.state};const launched=globalThis.launchBattleWithReturnContext(ROGUE,ENCOUNTER,ctx);if(!launched?.success)return launched||{success:false,reason:"promotion_courier_battle_launch_failed"};const b=currentBattle60310();if(!b)return{success:false,reason:"promotion_courier_current_battle_missing_after_launch"};b.battleId=bid;b.battleConfigId=CONFIG;b.encounterId=ENCOUNTER;b.oppositionTemplateId=TEMPLATE;b.deployment=b.deployment||{};b.deployment.player={slots:globalThis.createBattleDeploymentSlots(refs)};b.characterId=o.assessmentSubjectBattleParticipantRef;globalThis.syncBattleActivePlayerFromDeployment();globalThis.configureBattleEnemyParticipants([ROGUE]);b.deployment.enemy={slots:globalThis.createBattleDeploymentSlots([ROGUE])};globalThis.syncBattleActiveEnemyFromDeployment();globalThis.initializeBattleContributionRecordsFromDeployment();globalThis.initializeBattleRemainingPLFromDeployment({preserveExistingEnemyPower:true});b.enemyPower=23;b.enemyMaxPower=23;b.promotionCourier60310={assessmentAttemptId:id,assessmentSubjectStableId:o.assessmentSubjectStableId,assessmentSubjectBattleParticipantRef:o.assessmentSubjectBattleParticipantRef,sourceOccurrenceId:o.occurrenceId,battleOccurrenceId:bid,participantRefs:refs,participantControlClassByRef:control,participantBattleSideByRef:sides};o.battle={battleOccurrenceId:bid,active:true,returnContext:c(ctx),returnEnvelope:null};touch(o);try{globalThis.openOverlay?.("combat");}catch(_){}return{success:true,battleOccurrenceId:bid,battleConfigId:CONFIG,encounterId:ENCOUNTER,participantRefs:refs,returnContext:c(ctx)};}
 function evidenceFor(b,ref){return(b?.runtime?.evidence||[]).filter(x=>x&&((x.actorRef?.participantId===ref)||(x.targetRef?.participantId===ref)));}
@@ -82,65 +105,6 @@ function projectJourney(id){const r=need(id);if(!r.success)return r;const o=r.o;
 function projectRankEvidence(id){const r=need(id);if(!r.success)return r;const o=r.o;return{success:true,assessmentAttemptId:o.assessmentAttemptId,sourceOccurrenceId:o.occurrenceId,candidateEvidenceRefs:[...o.candidateEvidenceRefs],battleReturn:c(o.battle.returnEnvelope),missionObjectiveCompleted:o.missionObjectiveCompleted,terminalWorldState:o.terminalWorldState};}
 function diagnostics(){const checks={stableScenarioIds:occurrenceId("qa")==="occ_academy_genin_missing_courier_dispatch_v1::qa",exactRoute:JSON.stringify(ROUTE)===JSON.stringify(["KON-P01","KON-P10","whisper_woods","fire_whisper_woods_north_ravine","whisper_woods","KON-P10","KON-P01"]),exactBattleIds:CONFIG==="battle_cfg_academy_genin_missing_courier_hold_line_v1"&&ENCOUNTER==="enc_academy_genin_missing_courier_rogue_hold_line_v1",exactRewards:Object.values(REWARD).length===4,arc1Firewall:ARC1.every(x=>!SCENARIO.includes(x)),noRankVerdictManufacture:!String(projectRankEvidence).includes("combatReadinessSatisfied")&&!String(projectRankEvidence).includes("promotionPassed"),browserGoldenClaimed:false};const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);return{pass:failed.length===0,checks,failed,browserGoldenClaimed:false};}
 
-function readPromotionCourierBattleTestState60310(){
-  if(typeof sessionStorage==="undefined")return null;
-  try{
-    const raw=sessionStorage.getItem("shinobiTestState"),state=raw?JSON.parse(raw):null,saved=state&&state.promotionCourier60310;
-    if(!saved||saved.battleConfigId!==CONFIG||saved.encounterId!==ENCOUNTER||saved.returnContext?.assessmentScenarioId!==SCENARIO)return null;
-    return saved;
-  }catch(_){return null;}
-}
-function applyPromotionCourierBattleTestState60310(saved){
-  if(!saved)return false;
-  const battle=currentBattle60310();if(!battle)return false;
-  battle.promotionCourier60310=c(saved.meta||{});
-  battle.battleId=saved.battleId||battle.battleId;
-  battle.battleConfigId=CONFIG;
-  battle.encounterId=ENCOUNTER;
-  battle.oppositionTemplateId=saved.oppositionTemplateId||TEMPLATE;
-  if(saved.returnContext&&typeof saved.returnContext==="object")battle.returnContext=c(saved.returnContext);
-  if(saved.active===true&&battle.battleOver!==true)battle.active=true;
-  if(typeof globalThis.buildReusableRogueGeninOppositionActions399==="function")registerRogue();
-  return true;
-}
-const PRE_SAVE_TEST_STATE_60310=typeof saveTestState==="function"?saveTestState:null;
-if(PRE_SAVE_TEST_STATE_60310){
-  globalThis.saveTestState=function savePromotionCourier60310TestState(){
-    const result=PRE_SAVE_TEST_STATE_60310.apply(this,arguments),battle=currentBattle60310();
-    if(battle?.promotionCourier60310&&typeof sessionStorage!=="undefined"){
-      try{
-        const raw=sessionStorage.getItem("shinobiTestState"),state=raw?JSON.parse(raw):{};
-        state.promotionCourier60310={
-          meta:c(battle.promotionCourier60310),
-          battleId:battle.battleId||null,
-          battleConfigId:battle.battleConfigId||CONFIG,
-          encounterId:battle.encounterId||ENCOUNTER,
-          oppositionTemplateId:battle.oppositionTemplateId||TEMPLATE,
-          returnContext:c(battle.returnContext||null),
-          active:battle.active===true&&battle.battleOver!==true
-        };
-        sessionStorage.setItem("shinobiTestState",JSON.stringify(state));
-      }catch(_){}
-    }
-    return result;
-  };
-  try{saveTestState=globalThis.saveTestState;}catch(_){}
-}
-const PRE_RESTORE_TEST_STATE_60310=typeof restoreTestState==="function"?restoreTestState:null;
-if(PRE_RESTORE_TEST_STATE_60310){
-  globalThis.restoreTestState=function restorePromotionCourier60310TestState(){
-    const saved=readPromotionCourierBattleTestState60310();
-    const result=PRE_RESTORE_TEST_STATE_60310.apply(this,arguments);
-    if(saved)applyPromotionCourierBattleTestState60310(saved);
-    return result;
-  };
-  try{restoreTestState=globalThis.restoreTestState;}catch(_){}
-}
-if(typeof addEventListener==="function")addEventListener("load",()=>{
-  const saved=readPromotionCourierBattleTestState60310();
-  if(saved)applyPromotionCourierBattleTestState60310(saved);
-},{once:true});
-
 function expireRogueFeintAtActionOpportunity60310(){
   const battle=currentBattle60310();
   if(!battle?.promotionCourier60310)return{handled:false,expired:false};
@@ -150,7 +114,7 @@ function expireRogueFeintAtActionOpportunity60310(){
   return{handled:true,success:true,expired:pkg.expireFeint()===true};
 }
 
-const api=Object.freeze({patchId:PATCH,assessmentFamilyId:FAMILY,assessmentScenarioId:SCENARIO,courierRef:COURIER,dispatchRef:DISPATCH,rogueRef:ROGUE,examinerRef:EXAMINER,oppositionTemplateId:TEMPLATE,battleConfigId:CONFIG,encounterId:ENCOUNTER,battleObjectiveId:OBJECTIVE,route:ROUTE,phases:PHASE,terminalStates:TERMINAL,rewardSourceIds:REWARD,arc1ForbiddenRefs:ARC1,browserGoldenClaimed:false,createOccurrence,getOccurrence:id=>c(row(id)),commitBriefing,advanceJourney,resolveSearch,recordParticipantFact,resolvePriority,confirmHostileContact,launchHoldLineBattle,projectLiveBattleReturn,applyBattleReturn,resumeFromCurrentBattle,resolveNonBattleContact,beginExtraction,handoffDispatch,commitDebrief,commitTerminal,projectJourney,projectRankEvidence,applyEligibleRewards,expireRogueFeintAtActionOpportunity:expireRogueFeintAtActionOpportunity60310,runDiagnostics:diagnostics});
+const api=Object.freeze({patchId:PATCH,assessmentFamilyId:FAMILY,assessmentScenarioId:SCENARIO,courierRef:COURIER,dispatchRef:DISPATCH,rogueRef:ROGUE,examinerRef:EXAMINER,oppositionTemplateId:TEMPLATE,battleConfigId:CONFIG,encounterId:ENCOUNTER,battleObjectiveId:OBJECTIVE,route:ROUTE,phases:PHASE,terminalStates:TERMINAL,rewardSourceIds:REWARD,arc1ForbiddenRefs:ARC1,browserGoldenClaimed:false,createOccurrence,getOccurrence:id=>c(row(id)),commitBriefing,advanceJourney,resolveSearch,recordParticipantFact,resolvePriority,confirmHostileContact,launchHoldLineBattle,projectLiveBattleReturn,applyBattleReturn,resumeFromCurrentBattle,resolveNonBattleContact,beginExtraction,handoffDispatch,commitDebrief,commitTerminal,projectJourney,projectRankEvidence,applyEligibleRewards,registerBattleEnemyProfile:registerRogue,captureBattleSessionState:captureBattleSessionState60310,prepareBattleSessionRestore:prepareBattleSessionRestore60310,restoreBattleSessionState:restoreBattleSessionState60310,expireRogueFeintAtActionOpportunity:expireRogueFeintAtActionOpportunity60310,runDiagnostics:diagnostics});
 globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310=api;
 globalThis.createPromotionCourierOccurrence60310=createOccurrence;
 globalThis.launchPromotionCourierHoldLineBattle60310=launchHoldLineBattle;

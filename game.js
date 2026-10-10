@@ -42598,6 +42598,11 @@ function saveTestState() {
     // authored scene definitions or hidden story truth into Battle state.
     battleReturnContext:
       normalizeBattleReturnContext(currentBattle.returnContext),
+    promotionCourier60310Battle:
+      globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310&&typeof globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.captureBattleSessionState==="function"
+        ? globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.captureBattleSessionState()
+        : null,
+
 
 
     observerSafeResultContext:
@@ -89161,6 +89166,11 @@ function restoreTestState() {
     return;
   }
   const state=parsedSessionState.state;
+    const promotionCourier60310BattleState=state.promotionCourier60310Battle&&typeof state.promotionCourier60310Battle==="object"?state.promotionCourier60310Battle:null;
+    if(promotionCourier60310BattleState&&globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310&&typeof globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.prepareBattleSessionRestore==="function"){
+      globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.prepareBattleSessionRestore(promotionCourier60310BattleState);
+    }
+
 
 
   // =========================================
@@ -89521,6 +89531,10 @@ function restoreTestState() {
     return;
   }
 
+
+    if(promotionCourier60310BattleState&&globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310&&typeof globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.restoreBattleSessionState==="function"){
+      globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.restoreBattleSessionState(promotionCourier60310BattleState);
+    }
 
   if (
     state.overlayType ===

@@ -14,7 +14,7 @@ const checks={
   promotionStateRegistered:state.includes('stateDomainId:"promotionState"')&&state.includes('promotionState:existing.promotionState'),
   canonicalCourierCallerDispatch:game.includes('returnContext.assessmentScenarioId==="academy_genin_missing_courier_dispatch_v1"')&&game.includes('courier.resumeFromCurrentBattle(returnContext)'),
   courierFeintAtCanonicalOpportunity:enemyFn.indexOf('expireRogueFeintAtActionOpportunity')>=0&&enemyFn.indexOf('expireRogueFeintAtActionOpportunity')<enemyFn.indexOf('const scheduler=evaluateEnemyActionScheduler();'),
-  courierMidBattleRestore:read('runtime/alpha-promotion-courier-assessment-60310.js').includes('PRE_SAVE_TEST_STATE_60310')&&read('runtime/alpha-promotion-courier-assessment-60310.js').includes('PRE_RESTORE_TEST_STATE_60310'),
+  courierMidBattleRestore:game.includes('promotionCourier60310Battle')&&game.includes('prepareBattleSessionRestore')&&game.includes('restoreBattleSessionState')&&read('runtime/alpha-promotion-courier-assessment-60310.js').includes('captureBattleSessionState60310')&&!read('runtime/alpha-promotion-courier-assessment-60310.js').includes('globalThis.saveTestState=function')&&!read('runtime/alpha-promotion-courier-assessment-60310.js').includes('globalThis.restoreTestState=function'),
   no603GlobalChooserWrapper:!installed.includes('chooseEnemyAuthoredBattleAction=')&&!installed.includes('resumeBattleCallerAfterCompletion='),
   sprintPromotionRetired:!sprint.includes('openArenaPromotionSurface33100')&&sprint.includes('promotionOwnerRetiredTo603:true'),
   traversalKeepsRosterGate:bridge.includes('isIncompleteTransition33200(state)')&&bridge.includes('openInstalledPromotion60330(subjectId)')&&!bridge.includes('priorPromotion33200'),
