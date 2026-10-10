@@ -10,7 +10,7 @@
 if(globalThis.SC_STORY_SCENE_BOARD_EXPRESSIVE_49000)return;
 if(!globalThis.SC_STORY_SCENE_BOARD_33900)throw new Error("scene_board_expressive_49000_requires_33900");
 
-const PATCH_ID="story_scene_board_expressive_49000_2026_10_07_benchmark";
+const PATCH_ID="story_scene_board_expressive_49000_2026_10_10_current_main_refresh";
 const BENCHMARK_SCENE_ID="scene_konoha_ce_kakashi_masked_interceptor_admin_crossing_menma_v1";
 const MENMA_ID="academy_menma";
 const HINATA_ID="academy_hinata";
@@ -38,6 +38,12 @@ const BENCHMARK_WEDGE=Object.freeze({
   [HINATA_ID]:Object.freeze({x:14,rise:7,width:15,z:3}),
   [KAKASHI_ID]:Object.freeze({x:48,rise:5,width:15,z:4}),
   [MI_ID]:Object.freeze({x:80,rise:8,width:16,z:2})
+});
+const BENCHMARK_PRESENTATION=Object.freeze({
+  [MENMA_ID]:Object.freeze({label:"MENMA",anchor:"PLAYER_LEFT",role:"protagonist",authority:"authorised_current_team"}),
+  [HINATA_ID]:Object.freeze({label:"HINATA",anchor:"INNER_LEFT",role:"current_teammate",authority:"authorised_current_team"}),
+  [KAKASHI_ID]:Object.freeze({label:"KAKASHI",anchor:"INNER_RIGHT",role:"private_history_owner",authority:"authorised_current_team"}),
+  [MI_ID]:Object.freeze({label:"MASKED WOMAN",anchor:"OPPONENT_RIGHT",role:"returning_participant",authority:"authorised_active_scene"})
 });
 const actorAnimations=new WeakMap();
 const rootState=new WeakMap();
@@ -95,27 +101,33 @@ function resolveCardPath49000(id){
   };
   return fallback[id]||null;
 }
-function ensureAuthorisedHinata49000(root,runtime){
-  if(!root||!benchmarkEligible49000(runtime))return null;
-  const existing=actorNode49000(root,HINATA_ID);if(existing)return existing;
+function ensureAuthorisedActor49000(root,runtime,id){
+  if(!root||!benchmarkEligible49000(runtime)||!BENCHMARK_ACTORS.includes(id))return null;
+  const existing=actorNode49000(root,id);if(existing)return existing;
   const actors=root.querySelector&&root.querySelector(".sc-scene-board-33900__actors");
-  if(!actors||typeof document==="undefined")return null;
+  const meta=BENCHMARK_PRESENTATION[id];
+  if(!actors||!meta||typeof document==="undefined")return null;
+  if(id!==MI_ID&&!authorisedTeam49000(runtime).has(id))return null;
   const figure=document.createElement("figure");
   figure.className="sc-scene-board-33900__actor sc490-benchmark-authorised-actor";
-  figure.dataset.actorId=HINATA_ID;
-  figure.dataset.actorLabel="HINATA";
-  figure.dataset.scStageAnchor="INNER_LEFT";
-  figure.dataset.scStageRole="current_teammate";
-  figure.dataset.sc490PresentationOnly="authorised_current_team";
+  figure.dataset.actorId=id;
+  figure.dataset.actorLabel=meta.label;
+  figure.dataset.scStageAnchor=meta.anchor;
+  figure.dataset.scStageRole=meta.role;
+  figure.dataset.sc490PresentationOnly=meta.authority;
   const frame=document.createElement("div");frame.className="sc-scene-board-33900__actor-frame";
-  const img=document.createElement("img");img.alt="";img.src=resolveCardPath49000(HINATA_ID)||"";
+  const img=document.createElement("img");img.alt="";img.src=resolveCardPath49000(id)||"";
   figure.append(frame,img);
   actors.appendChild(figure);
   return figure;
 }
+function ensureBenchmarkActors49000(root,runtime){
+  if(!root||!benchmarkEligible49000(runtime))return[];
+  return BENCHMARK_ACTORS.map(id=>ensureAuthorisedActor49000(root,runtime,id)).filter(Boolean);
+}
 function applyBenchmarkWedge49000(root,runtime=activeRuntime49000()){
   if(!root||!benchmarkEligible49000(runtime))return{success:false,reason:"benchmark_not_authorised"};
-  ensureAuthorisedHinata49000(root,runtime);
+  ensureBenchmarkActors49000(root,runtime);
   const applied=[];
   for(const id of BENCHMARK_ACTORS){
     const node=actorNode49000(root,id),slot=BENCHMARK_WEDGE[id];
@@ -292,6 +304,7 @@ function diagnostics49000(){
     canonicalRendererExtended:!!globalThis.SC_STORY_SCENE_BOARD_33900&&rendererWrapInstalled===true,
     benchmarkOnlyScene:BENCHMARK_SCENE_ID==="scene_konoha_ce_kakashi_masked_interceptor_admin_crossing_menma_v1",
     exactFourActors:JSON.stringify(BENCHMARK_ACTORS)===JSON.stringify([MENMA_ID,HINATA_ID,KAKASHI_ID,MI_ID]),
+    exactSceneProjectionSelfSufficient:String(ensureBenchmarkActors49000).includes("BENCHMARK_ACTORS")&&String(ensureAuthorisedActor49000).includes("benchmarkEligible49000"),
     expressiveVocabulary:EXPRESSIVE_PRIMITIVES.length>=28&&["STEP_BACK","SHORT_PACE","DOUBLE_BOUNCE","TILT","SHORT_SHAKE","RECOMPOSE_GROUP"].every(kind=>EXPRESSIVE_SET.has(kind)),
     compositorSafeLonghands:source.includes('translate:"-7vw 0"')&&source.includes('rotate:"0deg"')&&source.includes('scale:1')&&!String(animationFrames49000).includes("transform:"),
     boundedDurations:Object.values(DURATIONS).every(ms=>ms>=100&&ms<=650),
