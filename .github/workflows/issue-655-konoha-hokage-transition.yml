@@ -1,0 +1,64 @@
+name: Issue 655 Konoha Hokage Transition
+
+on:
+  push:
+    branches:
+      - coding/655-konoha-hokage-transition-lane-f
+    paths:
+      - 'runtime/alpha-phase2-konoha-player-surfaces-43110.js'
+      - 'tools/qa_issue_655_konoha_hokage_transition_browser.js'
+      - '.github/workflows/issue-655-konoha-hokage-transition.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'runtime/alpha-phase2-konoha-player-surfaces-43110.js'
+      - 'tools/qa_issue_655_konoha_hokage_transition_browser.js'
+      - '.github/workflows/issue-655-konoha-hokage-transition.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  transition-proof:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Syntax and source guards
+        run: |
+          node --check runtime/alpha-phase2-konoha-player-surfaces-43110.js
+          node --check tools/qa_issue_655_konoha_hokage_transition_browser.js
+          node tools/qa_issue_621_region_hud_stability.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > sc655-server.log 2>&1 &
+          echo $! > sc655-server.pid
+          sleep 2
+
+      - name: 1366x768 and 1920x1080 exact round-trip proof
+        env:
+          ISSUE_655_OUT: artifacts/issue-655-konoha-hokage-transition
+        run: node tools/qa_issue_655_konoha_hokage_transition_browser.js
+
+      - name: Upload transition evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-655-konoha-hokage-transition
+          path: |
+            artifacts/issue-655-konoha-hokage-transition
+            sc655-server.log
+          if-no-files-found: ignore

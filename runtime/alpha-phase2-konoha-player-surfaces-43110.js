@@ -202,6 +202,7 @@ const CE469_SCENE_IDS=new Set([
   "scene_konoha_ce_kakashi_masked_interceptor_admin_crossing_menma_v1"
 ]);
 let activeContext=null;
+let preservedVillagePresentation=null;
 
 function clone(value){try{return value&&typeof value==="object"?JSON.parse(JSON.stringify(value)):value;}catch(_error){return value;}}
 function esc(value){return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
@@ -352,12 +353,44 @@ function syncOfficeAnchor(){
   node.classList.add("is-actionable");
   return true;
 }
+function captureVillagePresentation53300(container){
+  if(!container||typeof document==="undefined"||!activeContext||activeContext.returnMode!=="village")return false;
+  let overlayType=null;
+  try{overlayType=typeof currentOverlayType!=="undefined"&&currentOverlayType?String(currentOverlayType):null;}catch(_error){}
+  if(overlayType!=="village")return false;
+  const village=container.querySelector(".village-map-screen");
+  if(!village)return false;
+  const fragment=document.createDocumentFragment();
+  while(container.firstChild)fragment.appendChild(container.firstChild);
+  preservedVillagePresentation={fragment,village,scrollTop:Number(container.scrollTop)||0};
+  return true;
+}
+function restoreVillagePresentation53300(){
+  const saved=preservedVillagePresentation;
+  preservedVillagePresentation=null;
+  if(!saved||!saved.fragment||typeof document==="undefined")return false;
+  const overlay=document.getElementById("screen-overlay"),container=document.getElementById("overlay-content-container");
+  if(!container)return false;
+  container.replaceChildren(saved.fragment);
+  try{currentOverlayType="village";}catch(_error){}
+  try{globalThis.currentOverlayType="village";}catch(_error){}
+  if(overlay)overlay.style.display="flex";
+  container.scrollTop=saved.scrollTop;
+  syncOfficeAnchor();
+  try{if(typeof globalThis.refreshPhase2LiveHud49900==="function")globalThis.refreshPhase2LiveHud49900();}catch(_error){}
+  return container.querySelector(".village-map-screen")===saved.village;
+}
 function returnFromOffice(){
   const context=activeContext;
   activeContext=null;
   if(context&&context.returnMode==="caller"&&typeof context.onReturn==="function"){
+    preservedVillagePresentation=null;
     try{return context.onReturn();}catch(_error){}
   }
+  if(context&&context.returnMode==="village"&&restoreVillagePresentation53300()){
+    return{success:true,type:"hokage_office_return",surface:"village",presentationRestored:true,remounted:false};
+  }
+  preservedVillagePresentation=null;
   if(typeof globalThis["openOverlay"]==="function")return globalThis.openOverlay("village");
   return{success:false,reason:"village_router_missing"};
 }
@@ -389,6 +422,7 @@ function renderOffice(context){
   if(typeof document==="undefined")return{success:true,presentationOnly:true,historyCommitted:false,context:clone(activeContext)};
   const overlay=document.getElementById("screen-overlay"),container=document.getElementById("overlay-content-container");
   if(!container)return{success:false,reason:"office_overlay_container_missing",historyCommitted:false};
+  if(activeContext.returnMode==="village")captureVillagePresentation53300(container);else preservedVillagePresentation=null;
   const observer=currentObserver(),holder=officeHolder(),assignment=currentAssignment(),dispatch=dispatchProjection();
   if(overlay)overlay.style.display="flex";
   try{currentOverlayType="hokage_office";}catch(_error){}
@@ -414,6 +448,7 @@ function onOfficeActivation(event){
 function diagnostics(){
   const before=semanticFingerprint(),dispatch=dispatchProjection(),assignment=currentAssignment(),observer=currentObserver(),holder=officeHolder();
   const after=semanticFingerprint();
+  const returnSource=String(returnFromOffice),captureSource=String(captureVillagePresentation53300),restoreSource=String(restoreVillagePresentation53300);
   const checks={
     officeHostExact:OFFICE_HOST_ID==="KON-P01",
     consumesExistingP01Control:String(activationTarget).includes("data-hokage-office-anchor")&&!String(syncOfficeAnchor).includes("createElement"),
@@ -434,6 +469,9 @@ function diagnostics(){
     promotionsFailClosed:true,
     noSeedDenominatorFabricated:dispatch.countMode==="known_only_no_seed_denominator_claimed",
     noSecondSemanticStore:before===after,
+    villageRoundTripPreservesMountedDom:captureSource.includes("createDocumentFragment")&&restoreSource.includes("replaceChildren(saved.fragment)")&&restoreSource.includes("===saved.village"),
+    villageRestorePrecedesRemountFallback:returnSource.indexOf("restoreVillagePresentation53300()")>=0&&returnSource.indexOf("restoreVillagePresentation53300()")<returnSource.indexOf('openOverlay(\"village\")'),
+    transitionFixAddsNoTimerOrObserver:![captureSource,restoreSource].some(source=>/setTimeout|requestAnimationFrame|MutationObserver/.test(source)),
     ownerBrowserAcceptanceRequired:true,
     browserGoldenClaimed:false
   };
