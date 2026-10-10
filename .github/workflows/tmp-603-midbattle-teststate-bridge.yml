@@ -1,0 +1,120 @@
+name: TMP 603 Mid Battle Test State Bridge
+
+on:
+  push:
+    branches:
+      - coding/603-step7-promotion-integration
+    paths:
+      - .github/workflows/tmp-603-midbattle-teststate-bridge.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/603-step7-promotion-integration
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Patch bounded Courier mid-Battle test-state extension
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path=Path('runtime/alpha-promotion-courier-assessment-60310.js')
+          text=path.read_text(encoding='utf-8')
+          anchor='function expireRogueFeintAtActionOpportunity60310(){\n'
+          if text.count(anchor)!=1:
+              raise SystemExit(f'anchor count={text.count(anchor)}')
+          block=r'''function readPromotionCourierBattleTestState60310(){
+  if(typeof sessionStorage==="undefined")return null;
+  try{
+    const raw=sessionStorage.getItem("shinobiTestState"),state=raw?JSON.parse(raw):null,saved=state&&state.promotionCourier60310;
+    if(!saved||saved.battleConfigId!==CONFIG||saved.encounterId!==ENCOUNTER||saved.returnContext?.assessmentScenarioId!==SCENARIO)return null;
+    return saved;
+  }catch(_){return null;}
+}
+function applyPromotionCourierBattleTestState60310(saved){
+  if(!saved)return false;
+  const battle=currentBattle60310();if(!battle)return false;
+  battle.promotionCourier60310=c(saved.meta||{});
+  battle.battleId=saved.battleId||battle.battleId;
+  battle.battleConfigId=CONFIG;
+  battle.encounterId=ENCOUNTER;
+  battle.oppositionTemplateId=saved.oppositionTemplateId||TEMPLATE;
+  if(saved.returnContext&&typeof saved.returnContext==="object")battle.returnContext=c(saved.returnContext);
+  if(saved.active===true&&battle.battleOver!==true)battle.active=true;
+  if(typeof globalThis.buildReusableRogueGeninOppositionActions399==="function")registerRogue();
+  return true;
+}
+const PRE_SAVE_TEST_STATE_60310=typeof saveTestState==="function"?saveTestState:null;
+if(PRE_SAVE_TEST_STATE_60310){
+  globalThis.saveTestState=function savePromotionCourier60310TestState(){
+    const result=PRE_SAVE_TEST_STATE_60310.apply(this,arguments),battle=currentBattle60310();
+    if(battle?.promotionCourier60310&&typeof sessionStorage!=="undefined"){
+      try{
+        const raw=sessionStorage.getItem("shinobiTestState"),state=raw?JSON.parse(raw):{};
+        state.promotionCourier60310={
+          meta:c(battle.promotionCourier60310),
+          battleId:battle.battleId||null,
+          battleConfigId:battle.battleConfigId||CONFIG,
+          encounterId:battle.encounterId||ENCOUNTER,
+          oppositionTemplateId:battle.oppositionTemplateId||TEMPLATE,
+          returnContext:c(battle.returnContext||null),
+          active:battle.active===true&&battle.battleOver!==true
+        };
+        sessionStorage.setItem("shinobiTestState",JSON.stringify(state));
+      }catch(_){}
+    }
+    return result;
+  };
+  try{saveTestState=globalThis.saveTestState;}catch(_){}
+}
+const PRE_RESTORE_TEST_STATE_60310=typeof restoreTestState==="function"?restoreTestState:null;
+if(PRE_RESTORE_TEST_STATE_60310){
+  globalThis.restoreTestState=function restorePromotionCourier60310TestState(){
+    const saved=readPromotionCourierBattleTestState60310();
+    const result=PRE_RESTORE_TEST_STATE_60310.apply(this,arguments);
+    if(saved)applyPromotionCourierBattleTestState60310(saved);
+    return result;
+  };
+  try{restoreTestState=globalThis.restoreTestState;}catch(_){}
+}
+if(typeof addEventListener==="function")addEventListener("load",()=>{
+  const saved=readPromotionCourierBattleTestState60310();
+  if(saved)applyPromotionCourierBattleTestState60310(saved);
+},{once:true});
+
+'''
+          text=text.replace(anchor,block+anchor,1)
+          path.write_text(text,encoding='utf-8')
+
+          guard=Path('tools/qa_issue_603_installed_integration.js')
+          lines=guard.read_text(encoding='utf-8').splitlines()
+          target='  courierFeintAtCanonicalOpportunity:'
+          idx=[i for i,line in enumerate(lines) if line.startswith(target)]
+          if len(idx)!=1:
+              raise SystemExit(f'guard anchor count={len(idx)}')
+          lines.insert(idx[0]+1,"  courierMidBattleRestore:read('runtime/alpha-promotion-courier-assessment-60310.js').includes('promotionCourier60310')&&read('runtime/alpha-promotion-courier-assessment-60310.js').includes('PRE_SAVE_TEST_STATE_60310')&&read('runtime/alpha-promotion-courier-assessment-60310.js').includes('PRE_RESTORE_TEST_STATE_60310'),")
+          guard.write_text('\n'.join(lines)+'\n',encoding='utf-8')
+          PY
+          node --check runtime/alpha-promotion-courier-assessment-60310.js
+          node --check tools/qa_issue_603_installed_integration.js
+          node tools/qa_issue_603_step7_promotion.js
+          node tools/qa_issue_607_courier_adapter.js
+          node tools/qa_issue_603_installed_integration.js
+          node tools/qa_save_compatibility_311.js
+      - name: Commit bounded repair and remove temporary workflow
+        shell: bash
+        run: |
+          rm .github/workflows/tmp-603-midbattle-teststate-bridge.yml
+          git config user.name "ChatGPT Codex Connector"
+          git config user.email "codex-connector@users.noreply.github.com"
+          git add runtime/alpha-promotion-courier-assessment-60310.js tools/qa_issue_603_installed_integration.js .github/workflows/tmp-603-midbattle-teststate-bridge.yml
+          git commit -m "[CODING][#603] Restore Courier Battle runtime across reload"
+          git push origin HEAD:coding/603-step7-promotion-integration
