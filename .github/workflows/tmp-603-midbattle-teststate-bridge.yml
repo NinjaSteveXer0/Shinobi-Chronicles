@@ -26,81 +26,21 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          import base64
           path=Path('runtime/alpha-promotion-courier-assessment-60310.js')
           text=path.read_text(encoding='utf-8')
           anchor='function expireRogueFeintAtActionOpportunity60310(){\n'
           if text.count(anchor)!=1:
               raise SystemExit(f'anchor count={text.count(anchor)}')
-          block=r'''function readPromotionCourierBattleTestState60310(){
-  if(typeof sessionStorage==="undefined")return null;
-  try{
-    const raw=sessionStorage.getItem("shinobiTestState"),state=raw?JSON.parse(raw):null,saved=state&&state.promotionCourier60310;
-    if(!saved||saved.battleConfigId!==CONFIG||saved.encounterId!==ENCOUNTER||saved.returnContext?.assessmentScenarioId!==SCENARIO)return null;
-    return saved;
-  }catch(_){return null;}
-}
-function applyPromotionCourierBattleTestState60310(saved){
-  if(!saved)return false;
-  const battle=currentBattle60310();if(!battle)return false;
-  battle.promotionCourier60310=c(saved.meta||{});
-  battle.battleId=saved.battleId||battle.battleId;
-  battle.battleConfigId=CONFIG;
-  battle.encounterId=ENCOUNTER;
-  battle.oppositionTemplateId=saved.oppositionTemplateId||TEMPLATE;
-  if(saved.returnContext&&typeof saved.returnContext==="object")battle.returnContext=c(saved.returnContext);
-  if(saved.active===true&&battle.battleOver!==true)battle.active=true;
-  if(typeof globalThis.buildReusableRogueGeninOppositionActions399==="function")registerRogue();
-  return true;
-}
-const PRE_SAVE_TEST_STATE_60310=typeof saveTestState==="function"?saveTestState:null;
-if(PRE_SAVE_TEST_STATE_60310){
-  globalThis.saveTestState=function savePromotionCourier60310TestState(){
-    const result=PRE_SAVE_TEST_STATE_60310.apply(this,arguments),battle=currentBattle60310();
-    if(battle?.promotionCourier60310&&typeof sessionStorage!=="undefined"){
-      try{
-        const raw=sessionStorage.getItem("shinobiTestState"),state=raw?JSON.parse(raw):{};
-        state.promotionCourier60310={
-          meta:c(battle.promotionCourier60310),
-          battleId:battle.battleId||null,
-          battleConfigId:battle.battleConfigId||CONFIG,
-          encounterId:battle.encounterId||ENCOUNTER,
-          oppositionTemplateId:battle.oppositionTemplateId||TEMPLATE,
-          returnContext:c(battle.returnContext||null),
-          active:battle.active===true&&battle.battleOver!==true
-        };
-        sessionStorage.setItem("shinobiTestState",JSON.stringify(state));
-      }catch(_){}
-    }
-    return result;
-  };
-  try{saveTestState=globalThis.saveTestState;}catch(_){}
-}
-const PRE_RESTORE_TEST_STATE_60310=typeof restoreTestState==="function"?restoreTestState:null;
-if(PRE_RESTORE_TEST_STATE_60310){
-  globalThis.restoreTestState=function restorePromotionCourier60310TestState(){
-    const saved=readPromotionCourierBattleTestState60310();
-    const result=PRE_RESTORE_TEST_STATE_60310.apply(this,arguments);
-    if(saved)applyPromotionCourierBattleTestState60310(saved);
-    return result;
-  };
-  try{restoreTestState=globalThis.restoreTestState;}catch(_){}
-}
-if(typeof addEventListener==="function")addEventListener("load",()=>{
-  const saved=readPromotionCourierBattleTestState60310();
-  if(saved)applyPromotionCourierBattleTestState60310(saved);
-},{once:true});
-
-'''
+          block=base64.b64decode('ZnVuY3Rpb24gcmVhZFByb21vdGlvbkNvdXJpZXJCYXR0bGVUZXN0U3RhdGU2MDMxMCgpewogIGlmKHR5cGVvZiBzZXNzaW9uU3RvcmFnZT09PSJ1bmRlZmluZWQiKXJldHVybiBudWxsOwogIHRyeXsKICAgIGNvbnN0IHJhdz1zZXNzaW9uU3RvcmFnZS5nZXRJdGVtKCJzaGlub2JpVGVzdFN0YXRlIiksc3RhdGU9cmF3P0pTT04ucGFyc2UocmF3KTpudWxsLHNhdmVkPXN0YXRlJiZzdGF0ZS5wcm9tb3Rpb25Db3VyaWVyNjAzMTA7CiAgICBpZighc2F2ZWR8fHNhdmVkLmJhdHRsZUNvbmZpZ0lkIT09Q09ORklHfHxzYXZlZC5lbmNvdW50ZXJJZCE9PUVOQ09VTlRFUnx8c2F2ZWQucmV0dXJuQ29udGV4dD8uYXNzZXNzbWVudFNjZW5hcmlvSWQhPT1TQ0VOQVJJTylyZXR1cm4gbnVsbDsKICAgIHJldHVybiBzYXZlZDsKICB9Y2F0Y2goXyl7cmV0dXJuIG51bGw7fQp9CmZ1bmN0aW9uIGFwcGx5UHJvbW90aW9uQ291cmllckJhdHRsZVRlc3RTdGF0ZTYwMzEwKHNhdmVkKXsKICBpZighc2F2ZWQpcmV0dXJuIGZhbHNlOwogIGNvbnN0IGJhdHRsZT1jdXJyZW50QmF0dGxlNjAzMTAoKTtpZighYmF0dGxlKXJldHVybiBmYWxzZTsKICBiYXR0bGUucHJvbW90aW9uQ291cmllcjYwMzEwPWMoc2F2ZWQubWV0YXx8e30pOwogIGJhdHRsZS5iYXR0bGVJZD1zYXZlZC5iYXR0bGVJZHx8YmF0dGxlLmJhdHRsZUlkOwogIGJhdHRsZS5iYXR0bGVDb25maWdJZD1DT05GSUc7CiAgYmF0dGxlLmVuY291bnRlcklkPUVOQ09VTlRFUjsKICBiYXR0bGUub3Bwb3NpdGlvblRlbXBsYXRlSWQ9c2F2ZWQub3Bwb3NpdGlvblRlbXBsYXRlSWR8fFRFTVBMQVRFOwogIGlmKHNhdmVkLnJldHVybkNvbnRleHQmJnR5cGVvZiBzYXZlZC5yZXR1cm5Db250ZXh0PT09Im9iamVjdCIpYmF0dGxlLnJldHVybkNvbnRleHQ9YyhzYXZlZC5yZXR1cm5Db250ZXh0KTsKICBpZihzYXZlZC5hY3RpdmU9PT10cnVlJiZiYXR0bGUuYmF0dGxlT3ZlciE9PXRydWUpYmF0dGxlLmFjdGl2ZT10cnVlOwogIGlmKHR5cGVvZiBnbG9iYWxUaGlzLmJ1aWxkUmV1c2FibGVSb2d1ZUdlbmluT3Bwb3NpdGlvbkFjdGlvbnMzOTk9PT0iZnVuY3Rpb24iKXJlZ2lzdGVyUm9ndWUoKTsKICByZXR1cm4gdHJ1ZTsKfQpjb25zdCBQUkVfU0FWRV9URVNUX1NUQVRFXzYwMzEwPXR5cGVvZiBzYXZlVGVzdFN0YXRlPT09ImZ1bmN0aW9uIj9zYXZlVGVzdFN0YXRlOm51bGw7CmlmKFBSRV9TQVZFX1RFU1RfU1RBVEVfNjAzMTApewogIGdsb2JhbFRoaXMuc2F2ZVRlc3RTdGF0ZT1mdW5jdGlvbiBzYXZlUHJvbW90aW9uQ291cmllcjYwMzEwVGVzdFN0YXRlKCl7CiAgICBjb25zdCByZXN1bHQ9UFJFX1NBVkVfVEVTVF9TVEFURV82MDMxMC5hcHBseSh0aGlzLGFyZ3VtZW50cyksYmF0dGxlPWN1cnJlbnRCYXR0bGU2MDMxMCgpOwogICAgaWYoYmF0dGxlPy5wcm9tb3Rpb25Db3VyaWVyNjAzMTAmJnR5cGVvZiBzZXNzaW9uU3RvcmFnZSE9PSJ1bmRlZmluZWQiKXsKICAgICAgdHJ5ewogICAgICAgIGNvbnN0IHJhdz1zZXNzaW9uU3RvcmFnZS5nZXRJdGVtKCJzaGlub2JpVGVzdFN0YXRlIiksc3RhdGU9cmF3P0pTT04ucGFyc2UocmF3KTp7fTsKICAgICAgICBzdGF0ZS5wcm9tb3Rpb25Db3VyaWVyNjAzMTA9ewogICAgICAgICAgbWV0YTpjKGJhdHRsZS5wcm9tb3Rpb25Db3VyaWVyNjAzMTApLAogICAgICAgICAgYmF0dGxlSWQ6YmF0dGxlLmJhdHRsZUlkfHxudWxsLAogICAgICAgICAgYmF0dGxlQ29uZmlnSWQ6YmF0dGxlLmJhdHRsZUNvbmZpZ0lkfHxDT05GSUcsCiAgICAgICAgICBlbmNvdW50ZXJJZDpiYXR0bGUuZW5jb3VudGVySWR8fEVOQ09VTlRFUiwKICAgICAgICAgIG9wcG9zaXRpb25UZW1wbGF0ZUlkOmJhdHRsZS5vcHBvc2l0aW9uVGVtcGxhdGVJZHx8VEVNUExBVEUsCiAgICAgICAgICByZXR1cm5Db250ZXh0OmMoYmF0dGxlLnJldHVybkNvbnRleHR8fG51bGwpLAogICAgICAgICAgYWN0aXZlOmJhdHRsZS5hY3RpdmU9PT10cnVlJiZiYXR0bGUuYmF0dGxlT3ZlciE9PXRydWUKICAgICAgICB9OwogICAgICAgIHNlc3Npb25TdG9yYWdlLnNldEl0ZW0oInNoaW5vYmlUZXN0U3RhdGUiLEpTT04uc3RyaW5naWZ5KHN0YXRlKSk7CiAgICAgIH1jYXRjaChfKXt9CiAgICB9CiAgICByZXR1cm4gcmVzdWx0OwogIH07CiAgdHJ5e3NhdmVUZXN0U3RhdGU9Z2xvYmFsVGhpcy5zYXZlVGVzdFN0YXRlO31jYXRjaChfKXt9Cn0KY29uc3QgUFJFX1JFU1RPUkVfVEVTVF9TVEFURV82MDMxMD10eXBlb2YgcmVzdG9yZVRlc3RTdGF0ZT09PSJmdW5jdGlvbiI/cmVzdG9yZVRlc3RTdGF0ZTpudWxsOwppZihQUkVfUkVTVE9SRV9URVNUX1NUQVRFXzYwMzEwKXsKICBnbG9iYWxUaGlzLnJlc3RvcmVUZXN0U3RhdGU9ZnVuY3Rpb24gcmVzdG9yZVByb21vdGlvbkNvdXJpZXI2MDMxMFRlc3RTdGF0ZSgpewogICAgY29uc3Qgc2F2ZWQ9cmVhZFByb21vdGlvbkNvdXJpZXJCYXR0bGVUZXN0U3RhdGU2MDMxMCgpOwogICAgY29uc3QgcmVzdWx0PVBSRV9SRVNUT1JFX1RFU1RfU1RBVEVfNjAzMTAuYXBwbHkodGhpcyxhcmd1bWVudHMpOwogICAgaWYoc2F2ZWQpYXBwbHlQcm9tb3Rpb25Db3VyaWVyQmF0dGxlVGVzdFN0YXRlNjAzMTAoc2F2ZWQpOwogICAgcmV0dXJuIHJlc3VsdDsKICB9OwogIHRyeXtyZXN0b3JlVGVzdFN0YXRlPWdsb2JhbFRoaXMucmVzdG9yZVRlc3RTdGF0ZTt9Y2F0Y2goXyl7fQp9CmlmKHR5cGVvZiBhZGRFdmVudExpc3RlbmVyPT09ImZ1bmN0aW9uIilhZGRFdmVudExpc3RlbmVyKCJsb2FkIiwoKT0+ewogIGNvbnN0IHNhdmVkPXJlYWRQcm9tb3Rpb25Db3VyaWVyQmF0dGxlVGVzdFN0YXRlNjAzMTAoKTsKICBpZihzYXZlZClhcHBseVByb21vdGlvbkNvdXJpZXJCYXR0bGVUZXN0U3RhdGU2MDMxMChzYXZlZCk7Cn0se29uY2U6dHJ1ZX0pOwoK').decode()
           text=text.replace(anchor,block+anchor,1)
           path.write_text(text,encoding='utf-8')
-
           guard=Path('tools/qa_issue_603_installed_integration.js')
           lines=guard.read_text(encoding='utf-8').splitlines()
-          target='  courierFeintAtCanonicalOpportunity:'
-          idx=[i for i,line in enumerate(lines) if line.startswith(target)]
+          idx=[i for i,line in enumerate(lines) if line.startswith('  courierFeintAtCanonicalOpportunity:')]
           if len(idx)!=1:
               raise SystemExit(f'guard anchor count={len(idx)}')
-          lines.insert(idx[0]+1,"  courierMidBattleRestore:read('runtime/alpha-promotion-courier-assessment-60310.js').includes('promotionCourier60310')&&read('runtime/alpha-promotion-courier-assessment-60310.js').includes('PRE_SAVE_TEST_STATE_60310')&&read('runtime/alpha-promotion-courier-assessment-60310.js').includes('PRE_RESTORE_TEST_STATE_60310'),")
+          lines.insert(idx[0]+1,"  courierMidBattleRestore:read('runtime/alpha-promotion-courier-assessment-60310.js').includes('PRE_SAVE_TEST_STATE_60310')&&read('runtime/alpha-promotion-courier-assessment-60310.js').includes('PRE_RESTORE_TEST_STATE_60310'),")
           guard.write_text('\n'.join(lines)+'\n',encoding='utf-8')
           PY
           node --check runtime/alpha-promotion-courier-assessment-60310.js
