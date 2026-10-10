@@ -93,7 +93,12 @@ async function openScene(page){
   await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.sceneId==="scene_konoha_ce_kakashi_masked_interceptor_admin_crossing_menma_v1",null,{timeout:10000});
   await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:10000});
   await page.waitForSelector("#story-scene-presentation-layer .sc-scene-board-33900",{state:"visible",timeout:10000});
-  await page.evaluate(()=>syncStorySceneBoardBenchmark49000());
+  await page.waitForFunction(()=>{
+    const sync=globalThis.syncStorySceneBoardBenchmark49000?.();
+    if(!sync||sync.success!==true)return false;
+    const ids=[...document.querySelectorAll(".sc-scene-board-33900__actor")].map(node=>node.dataset.actorId);
+    return ["academy_menma","academy_hinata","academy_kakashi","academy_kakashi_origin_masked_interceptor"].every(id=>ids.includes(id));
+  },null,{timeout:10000});
 }
 async function stage(page){return page.evaluate(()=>[...document.querySelectorAll(".sc-scene-board-33900__actor")].map(node=>{const r=node.getBoundingClientRect(),s=getComputedStyle(node);return{id:node.dataset.actorId,x:r.x,y:r.y,right:r.right,bottom:r.bottom,opacity:Number(s.opacity),filter:s.filter,benchmark:node.dataset.sc490BenchmarkAnchor||null};}));}
 function overlap(a,b){return Math.max(0,Math.min(a.right,b.right)-Math.max(a.x,b.x))*Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.y,b.y));}
@@ -101,7 +106,7 @@ async function advanceBeat(page,id){for(let i=0;i<20;i++){const beat=await page.
 async function scenario(browser,width,height,reduced,label){
   const context=await browser.newContext({viewport:{width,height},reducedMotion:reduced?"reduce":"no-preference"});const page=await context.newPage();const errors=await installBrowserRuntimeErrorGate(page);
   try{
-    await boot(page);const runId=await setup(page,"sc_run_v1_qa490_"+label.replace(/\W+/g,"_"));await openScene(page);await page.waitForTimeout(520);
+    await boot(page);const runId=await setup(page,"sc_run_v1_qa490_"+label.replace(/\W+/g,"_"));await openScene(page);await page.waitForTimeout(120);
     const rows=await stage(page),ids=rows.map(r=>r.id);
     assert.deepStrictEqual([...ids].sort(),["academy_hinata","academy_kakashi","academy_kakashi_origin_masked_interceptor","academy_menma"].sort());
     assert(rows.every(r=>r.opacity>=.99&&r.filter==="none"&&r.benchmark==="true"),label+" present-actor presentation drift: "+JSON.stringify(rows));
