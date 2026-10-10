@@ -369,8 +369,8 @@
       "invalidation_rule": {
         "match_any": [
           "runtime/alpha-phase2-character-card-shop-52400.js",
-          "tools/qa_phase2_character_card_shop_524.js",
-          "tools/qa_phase2_character_card_shop_524_browser.js",
+          "tools/qa_phase2_character-card-shop-524.js",
+          "tools/qa_phase2_character-card-shop-524_browser.js",
           ".github/workflows/issue-524-phase2-character-card-shop.yml"
         ],
         "required_lane_ids": [
@@ -623,6 +623,7 @@
           "tools/qa_issue_141_traversal_runtime.js",
           "tools/qa_issue_63_genin_v2_runtime.js",
           ".github/workflows/issue-603-step7-promotion.yml",
+          ".github/workflows/issue-603-final-integration.yml",
           "runtime/alpha-promotion-core-60300.js",
           "runtime/alpha-promotion-courier-assessment-60310.js",
           "runtime/alpha-promotion-arena-ui-60320.js",
