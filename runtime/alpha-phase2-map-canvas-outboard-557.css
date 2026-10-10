@@ -37,16 +37,17 @@
 }
 
 /*
-   #614 — AUTHORED VILLAGE GUTTER BODY
+   #614 — AUTHORED VILLAGE GUTTER BODY / COMPONENT ATLAS CONSUMPTION
 
-   Reuse the canonical #499 presentation stage instead of adding another HUD
-   renderer. The approved Kitsunemori body is clipped to the measured non-map
-   reserves using the existing #499 map rectangle variables. The central crisp
-   Village map therefore remains visually and interactively untouched.
+   UI/kitsunemori_gutter.png is a 1448x1086 component atlas, not a stage
+   wallpaper. Keep the canonical #499 presentation stage, use it only for the
+   quiet dark gutter material, then project intended atlas components into the
+   intended measured reserve. The crisp Village map remains the hard 0px
+   exclusion zone and #499 remains the sole shared-gutter geometry writer.
 */
 .overlay-content-box.sc-hud499-map-echo-active:has(.village-map-screen) .sc-hud499-stage-echo-layer {
   inset: 0 !important;
-  background-image: url("../UI/kitsunemori_gutter.png") !important;
+  background-image: linear-gradient(155deg,rgba(4,9,14,.99),rgba(9,16,23,.97) 46%,rgba(4,9,14,.99)) !important;
   background-repeat: no-repeat !important;
   background-position: center !important;
   background-size: cover !important;
@@ -71,6 +72,50 @@
     #000 calc(var(--sc-hud499-echo-map-left) + var(--sc-hud499-echo-map-width)),
     #000 100%
   ) !important;
+}
+
+/* Left Squad Rail Body: atlas x20..272 / y14..1071 (252x1057).
+   Its right edge is attached to the measured map-left edge so Current Team
+   remains seated in the authored rail rather than over a magnified atlas crop. */
+.overlay-content-box.sc-hud499-map-echo-active:has(.village-map-screen) .sc-hud499-stage-echo-layer::before {
+  content:"";
+  position:absolute;
+  top:0;
+  right:calc(100% - var(--sc-hud499-echo-map-left));
+  width:min(var(--sc-hud499-echo-map-left),196px);
+  aspect-ratio:252 / 1057;
+  display:block;
+  pointer-events:none!important;
+  user-select:none;
+  background-image:url("../UI/kitsunemori_gutter.png");
+  background-repeat:no-repeat;
+  background-size:574.603175% 102.743614%;
+  background-position:1.672241% 48.275862%;
+  filter:saturate(.97) brightness(.98) contrast(1.02);
+  opacity:.98;
+}
+
+/* Primary Tall Command/Dossier Body: atlas x302..807 / y10..1071
+   (505x1061). Preserve its authored aspect ratio; do not compress it to the
+   112–176px live-control width. It begins 12px outside the measured map edge,
+   giving the existing 22px-inset state cluster quiet authored structure behind
+   it while the remaining right reserve stays dark/neutral for Context/Compass. */
+.overlay-content-box.sc-hud499-map-echo-active:has(.village-map-screen) .sc-hud499-stage-echo-layer::after {
+  content:"";
+  position:absolute;
+  top:10px;
+  left:calc(var(--sc-hud499-echo-map-left) + var(--sc-hud499-echo-map-width) + 12px);
+  width:min(176px,calc(100% - var(--sc-hud499-echo-map-left) - var(--sc-hud499-echo-map-width) - 12px));
+  aspect-ratio:505 / 1061;
+  display:block;
+  pointer-events:none!important;
+  user-select:none;
+  background-image:url("../UI/kitsunemori_gutter.png");
+  background-repeat:no-repeat;
+  background-size:286.732673% 102.356268%;
+  background-position:32.025451% 40%;
+  filter:saturate(.96) brightness(.97) contrast(1.02);
+  opacity:.97;
 }
 
 .overlay-content-box.sc-hud499-map-echo-active:has(.village-map-screen) .sc-hud499-stage-echo-vignette {
