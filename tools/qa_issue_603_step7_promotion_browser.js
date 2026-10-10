@@ -390,7 +390,12 @@ async function battlePassScenario(browser){
       savedPlayer:savePlayerData(),savedSession:typeof saveTestState==="function"?saveTestState():null
     }),committed.attemptId);
     assert(beforeReload.battle.active&&!beforeReload.battle.over,"Battle terminated before mid-Battle persistence proof");
-    await page.reload({waitUntil:"domcontentloaded",timeout:60000});await waitRuntime(page);await releaseFrontDoor(page);await clearTutorialChrome(page);
+    await page.reload({waitUntil:"domcontentloaded",timeout:60000});
+    await waitRuntime(page);
+    const returningLogin=page.locator('[data-afd2-action="login"]');
+    if(await returningLogin.count()>0&&await returningLogin.isEnabled())await returningLogin.click();
+    else await releaseFrontDoor(page);
+    await clearTutorialChrome(page);
     const afterReload=await page.evaluate(id=>({
       attemptId:SC_PROMOTION_INSTALLED_60330.activeAttempt(),
       occurrence:SC_PROMOTION_COURIER_ASSESSMENT_60310.getOccurrence(id),
