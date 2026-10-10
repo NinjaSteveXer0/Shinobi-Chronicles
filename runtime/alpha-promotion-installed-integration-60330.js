@@ -70,7 +70,7 @@ function teamSnapshot(subject){
 }
 function latestAttemptId(row){
   if(row.lastAttemptId)return row.lastAttemptId;
-  try{const snap=row.core.getDiagnosticSnapshot();const attempts=snap&&snap.state&&Array.isArray(snap.state.attempts)?snap.state.attempts:[];const active=[...attempts].reverse().find(x=>x&&x.status==="IN_PROGRESS");return active&&active.assessmentAttemptId||null;}catch(_){return null;}
+  try{const snap=row.core.getDiagnosticSnapshot();const attempts=snap&&snap.state&&Array.isArray(snap.state.attempts)?snap.state.attempts:[];const active=[...attempts].reverse().find(x=>x&&x.status==="COMMITTED");return active&&active.assessmentAttemptId||null;}catch(_){return null;}
 }
 function courier(){return globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310||null;}
 function beginAssessment(row){
