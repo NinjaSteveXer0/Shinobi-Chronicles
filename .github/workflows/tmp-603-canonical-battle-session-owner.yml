@@ -1,0 +1,160 @@
+name: TMP 603 Canonical Battle Session Owner
+
+on:
+  push:
+    branches: [coding/603-step7-promotion-integration]
+    paths: [.github/workflows/tmp-603-canonical-battle-session-owner.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/603-step7-promotion-integration
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Patch canonical Battle session ownership
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          courier=Path('runtime/alpha-promotion-courier-assessment-60310.js')
+          text=courier.read_text(encoding='utf-8')
+
+          start=text.find('function readPromotionCourierBattleTestState60310(){')
+          end=text.find('function expireRogueFeintAtActionOpportunity60310(){')
+          if start<0 or end<0 or end<=start:
+              raise SystemExit(f'wrapper block not found start={start} end={end}')
+          text=text[:start]+text[end:]
+
+          anchor='function battleApis(){'
+          if text.count(anchor)!=1:
+              raise SystemExit(f'battleApis anchor count={text.count(anchor)}')
+          session_helpers=r'''function captureBattleSessionState60310(){
+  const battle=currentBattle60310(),meta=battle?.promotionCourier60310,ctx=battle?.returnContext;
+  if(!meta||battle.battleConfigId!==CONFIG||battle.encounterId!==ENCOUNTER||ctx?.type!=="field_readiness_assessment"||ctx?.assessmentScenarioId!==SCENARIO)return null;
+  return{schemaVersion:1,battleConfigId:CONFIG,encounterId:ENCOUNTER,oppositionTemplateId:TEMPLATE,active:battle.active===true&&battle.battleOver!==true,meta:c(meta)};
+}
+function validateBattleSessionState60310(saved){
+  return !!(saved&&typeof saved==="object"&&saved.battleConfigId===CONFIG&&saved.encounterId===ENCOUNTER&&saved.meta&&saved.meta.assessmentAttemptId&&saved.meta.battleOccurrenceId);
+}
+function prepareBattleSessionRestore60310(saved){
+  if(!validateBattleSessionState60310(saved))return{success:false,reason:"promotion_courier_saved_battle_invalid"};
+  return registerRogue();
+}
+function restoreBattleSessionState60310(saved){
+  if(!validateBattleSessionState60310(saved))return{success:false,reason:"promotion_courier_saved_battle_invalid"};
+  const registered=registerRogue();if(!registered.success)return registered;
+  const battle=currentBattle60310();if(!battle)return{success:false,reason:"promotion_courier_current_battle_missing_on_restore"};
+  battle.battleConfigId=CONFIG;
+  battle.encounterId=ENCOUNTER;
+  battle.oppositionTemplateId=TEMPLATE;
+  battle.promotionCourier60310=c(saved.meta);
+  if(saved.active===true&&battle.battleOver!==true)battle.active=true;
+  return{success:true,active:battle.active===true,battleOccurrenceId:battle.promotionCourier60310.battleOccurrenceId};
+}
+'''
+          text=text.replace(anchor,session_helpers+anchor,1)
+
+          old_api='applyEligibleRewards,expireRogueFeintAtActionOpportunity:expireRogueFeintAtActionOpportunity60310,runDiagnostics:diagnostics'
+          new_api='applyEligibleRewards,registerBattleEnemyProfile:registerRogue,captureBattleSessionState:captureBattleSessionState60310,prepareBattleSessionRestore:prepareBattleSessionRestore60310,restoreBattleSessionState:restoreBattleSessionState60310,expireRogueFeintAtActionOpportunity:expireRogueFeintAtActionOpportunity60310,runDiagnostics:diagnostics'
+          if text.count(old_api)!=1:
+              raise SystemExit(f'api export anchor count={text.count(old_api)}')
+          text=text.replace(old_api,new_api,1)
+
+          forbidden=['globalThis.saveTestState=function','globalThis.restoreTestState=function','PRE_SAVE_TEST_STATE_60310','PRE_RESTORE_TEST_STATE_60310']
+          leftovers=[x for x in forbidden if x in text]
+          if leftovers:
+              raise SystemExit(f'wrapper leftovers: {leftovers}')
+          courier.write_text(text,encoding='utf-8')
+
+          game=Path('game.js')
+          g=game.read_text(encoding='utf-8')
+          save_start=g.find('function saveTestState()')
+          restore_start=g.find('function restoreTestState()')
+          if save_start<0 or restore_start<0:
+              raise SystemExit('canonical save/restore owner missing')
+
+          save_slice=g[save_start:restore_start]
+          pat=r'(\n\s*battleReturnContext:\s*\n\s*normalizeBattleReturnContext\(currentBattle\.returnContext\),)'
+          repl=r'''\1
+    promotionCourier60310Battle:
+      globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310&&typeof globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.captureBattleSessionState==="function"
+        ? globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.captureBattleSessionState()
+        : null,'''
+          save_slice,count=re.subn(pat,repl,save_slice,count=1)
+          if count!=1:
+              raise SystemExit(f'canonical save insertion count={count}')
+          g=g[:save_start]+save_slice+g[restore_start:]
+
+          restore_start=g.find('function restoreTestState()')
+          tail=g[restore_start:]
+          state_anchor='const state=parsed.state;'
+          idx=tail.find(state_anchor)
+          if idx<0:
+              raise SystemExit('restore state anchor missing')
+          pre=r'''
+    const promotionCourier60310BattleState=state.promotionCourier60310Battle&&typeof state.promotionCourier60310Battle==="object"?state.promotionCourier60310Battle:null;
+    if(promotionCourier60310BattleState&&globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310&&typeof globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.prepareBattleSessionRestore==="function") {
+      globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.prepareBattleSessionRestore(promotionCourier60310BattleState);
+    }
+'''
+          tail=tail[:idx+len(state_anchor)]+pre+tail[idx+len(state_anchor):]
+
+          # Reattach only bounded Courier metadata after canonical runtime/deployment restore,
+          # before the existing screen/terminal presentation branch decides what to display.
+          marker='// BRICK 156 — DEVELOPMENT BATTLE STATE RESTORE'
+          # Work inside restore function: insert before its final presentation branch using first
+          # exact `if (currentBattle.defeat` occurrence after state restore.
+          present_idx=tail.find('if (currentBattle.defeat')
+          if present_idx<0:
+              present_idx=tail.find('if(currentBattle.defeat')
+          if present_idx<0:
+              raise SystemExit('restore presentation branch anchor missing')
+          post=r'''    if(promotionCourier60310BattleState&&globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310&&typeof globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.restoreBattleSessionState==="function") {
+      globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.restoreBattleSessionState(promotionCourier60310BattleState);
+    }
+
+'''
+          tail=tail[:present_idx]+post+tail[present_idx:]
+          g=g[:restore_start]+tail
+
+          # Singular-owner sanity: only canonical game.js owns these persistence functions for #603.
+          if 'promotionCourier60310Battle' not in g or 'prepareBattleSessionRestore' not in g or 'restoreBattleSessionState' not in g:
+              raise SystemExit('canonical #603 session seam missing after patch')
+          game.write_text(g,encoding='utf-8')
+
+          guard=Path('tools/qa_issue_603_installed_integration.js')
+          q=guard.read_text(encoding='utf-8')
+          old="  courierMidBattleRestore:read('runtime/alpha-promotion-courier-assessment-60310.js').includes('PRE_SAVE_TEST_STATE_60310')&&read('runtime/alpha-promotion-courier-assessment-60310.js').includes('PRE_RESTORE_TEST_STATE_60310'),"
+          new="  courierMidBattleRestore:game.includes('promotionCourier60310Battle')&&game.includes('prepareBattleSessionRestore')&&game.includes('restoreBattleSessionState')&&read('runtime/alpha-promotion-courier-assessment-60310.js').includes('captureBattleSessionState60310')&&!read('runtime/alpha-promotion-courier-assessment-60310.js').includes('globalThis.saveTestState=function')&&!read('runtime/alpha-promotion-courier-assessment-60310.js').includes('globalThis.restoreTestState=function'),"
+          if q.count(old)!=1:
+              raise SystemExit(f'guard replacement count={q.count(old)}')
+          guard.write_text(q.replace(old,new,1),encoding='utf-8')
+          PY
+          node --check game.js
+          node --check runtime/alpha-promotion-courier-assessment-60310.js
+          node --check tools/qa_issue_603_installed_integration.js
+          node tools/qa_issue_603_step7_promotion.js
+          node tools/qa_issue_607_courier_adapter.js
+          node tools/qa_issue_603_installed_integration.js
+          node tools/qa_issue_141_traversal_runtime.js
+          node tools/qa_save_compatibility_311.js
+          node tools/qa_runtime_ownership_safety_300.js
+      - name: Commit canonical repair and remove temporary workflow
+        shell: bash
+        run: |
+          rm .github/workflows/tmp-603-canonical-battle-session-owner.yml
+          git config user.name "ChatGPT Codex Connector"
+          git config user.email "codex-connector@users.noreply.github.com"
+          git add game.js runtime/alpha-promotion-courier-assessment-60310.js tools/qa_issue_603_installed_integration.js .github/workflows/tmp-603-canonical-battle-session-owner.yml
+          git commit -m "[CODING][#603] Restore Courier Battle through canonical session owner"
+          git push origin HEAD:coding/603-step7-promotion-integration
