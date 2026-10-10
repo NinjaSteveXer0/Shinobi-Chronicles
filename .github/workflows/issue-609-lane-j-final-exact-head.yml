@@ -1,0 +1,90 @@
+name: Issue 609 Lane J Final Exact-Head Promotion Reverify
+
+on:
+  push:
+    branches:
+      - qa/609-final-exact-head-j
+    paths:
+      - '.github/workflows/issue-609-lane-j-final-exact-head.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  ISSUE_603_TARGET_SHA: 9d1c5fd148025feae22627bc449d672b44b4f819
+
+jobs:
+  exact-head-promotion-hostile:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Prove QA-only child of exact production target
+        run: |
+          test "$(git rev-parse HEAD^)" = "$ISSUE_603_TARGET_SHA"
+          test "$(git diff --name-only HEAD^ HEAD)" = ".github/workflows/issue-609-lane-j-final-exact-head.yml"
+
+      - name: Apply bounded Lane J harness correction in runner only
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/qa_issue_603_step7_promotion_browser.js')
+          s=p.read_text()
+          old='assert.strictEqual(/50 Ryō/.test(receiptText),terminal.outcome==="victory","Receipt Battle reward projection did not match factual outcome");'
+          new='assert.strictEqual(/(?:^|\\D)50 Ryō(?:\\D|$)/.test(receiptText),terminal.outcome==="victory","Receipt Battle reward projection did not match factual outcome");'
+          assert s.count(old)==1, 'expected exact stale substring assertion once'
+          p.write_text(s.replace(old,new))
+          PY
+          git diff -- tools/qa_issue_603_step7_promotion_browser.js
+
+      - name: Exact source and semantic adversarial guards
+        run: |
+          node --check runtime/alpha-promotion-core-60300.js
+          node --check runtime/alpha-promotion-courier-assessment-60310.js
+          node --check runtime/alpha-promotion-arena-ui-60320.js
+          node --check runtime/alpha-promotion-installed-integration-60330.js
+          node --check tools/qa_issue_603_step7_promotion.js
+          node --check tools/qa_issue_603_step7_promotion_browser.js
+          node tools/qa_issue_603_step7_promotion.js
+          node tools/qa_issue_607_courier_adapter.js
+          node tools/qa_issue_603_installed_integration.js
+          node tools/qa_issue_141_traversal_runtime.js
+          node tools/qa_save_compatibility_311.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start exact-candidate Alpha server
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > /tmp/sc609j-server.log 2>&1 &
+          for i in {1..40}; do if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then exit 0; fi; sleep 0.25; done
+          cat /tmp/sc609j-server.log
+          exit 1
+
+      - name: Run exact installed browser matrix 1366x768 and 1920x1080
+        env:
+          SC603_REQUIRE_INTEGRATION: '1'
+          SC603_OUT: artifacts/issue-609-lane-j-final
+        run: node tools/qa_issue_603_step7_promotion_browser.js
+
+      - name: Upload Lane J exact-head evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-609-lane-j-${{ github.run_id }}
+          path: |
+            artifacts/issue-609-lane-j-final
+            /tmp/sc609j-server.log
+          if-no-files-found: warn
