@@ -1,0 +1,81 @@
+name: TMP603 Hold Line Resume Diagnostic
+on:
+  push:
+    branches:
+      - coding/603-step7-promotion-integration
+    paths:
+      - .github/workflows/tmp-603-battle-resume-diagnostic.yml
+permissions:
+  contents: write
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/603-step7-promotion-integration
+          fetch-depth: 1
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Instrument Hold-Line continuation only
+        shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/qa_issue_603_step7_promotion_browser.js')
+          s=p.read_text(encoding='utf-8')
+          start=s.index('async function driveBattleToTerminal(page){')
+          end=s.index('\nasync function continueTerminalResult', start)
+          diagnostic='''async function driveBattleToTerminal(page){
+            for(let i=0;i<16;i+=1){
+              const state=await page.evaluate(()=>{
+                const b=currentBattle||{};
+                const primitive={};
+                for(const [k,v] of Object.entries(b))if(/turn|action|pending|phase|timer|busy|lock|resolv|enemy|player/i.test(k)&&["string","number","boolean"].includes(typeof v))primitive[k]=v;
+                const actor=b.characterId||getBattleDeploymentParticipant?.("player",1)?.id||null;
+                return{active:!!b.active,over:!!b.battleOver,outcome:b.outcome?.type||null,actor,activePlayer:b.activePlayer?.id||null,enemy:b.enemy?.id||null,playerSlots:(b.deployment?.player?.slots||[]).map(x=>x&&x.participantId),enemySlots:(b.deployment?.enemy?.slots||[]).map(x=>x&&x.participantId),playerPL:typeof getBattleRemainingPL==="function"?getBattleRemainingPL("player",actor):null,enemyPL:typeof getBattleRemainingPL==="function"?getBattleRemainingPL("enemy",SC_PROMOTION_COURIER_ASSESSMENT_60310.rogueRef):null,skills:typeof getProductionPreparedSkillIds==="function"?getProductionPreparedSkillIds(actor):[],primitive};
+              });
+              console.error("SC603_DIAG_STATE",i,JSON.stringify(state));
+              if(state.over)return state;
+              const action=await battleAction(page);
+              console.error("SC603_DIAG_ACTION",i,JSON.stringify(action));
+              if(!action.success){await page.waitForTimeout(450);continue;}
+              await page.waitForTimeout(950);
+            }
+            return page.evaluate(()=>({active:!!currentBattle?.active,over:!!currentBattle?.battleOver,outcome:currentBattle?.outcome?.type||null}));
+          }
+'''
+          s=s[:start]+diagnostic+s[end:]
+          old='''    results.viewport1366=await viewportSmoke(browser,1366,768,"1366x768");
+    results.viewport1920=await viewportSmoke(browser,1920,1080,"1920x1080");
+    results.nonBattle=await fullNonBattleScenario(browser);
+    results.partialRetryReload=await partialRetryReloadScenario(browser);
+    results.courierOnly=await courierOnlyScenario(browser);
+    results.battlePass=await battlePassScenario(browser);'''
+          new='''    results.battlePass=await battlePassScenario(browser);'''
+          if old not in s: raise SystemExit('bottom execution block missing')
+          s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+          python -m http.server 8080 --bind 127.0.0.1 > sc603-diag-server.log 2>&1 &
+          sleep 2
+          set +e
+          SC603_REQUIRE_INTEGRATION=1 SC603_OUT=artifacts/promotion-603-diagnostic node tools/qa_issue_603_step7_promotion_browser.js
+          echo "SC603_DIAG_EXIT=$?"
+          exit 0
+      - name: Remove temporary workflow
+        if: always()
+        shell: bash
+        run: |
+          rm .github/workflows/tmp-603-battle-resume-diagnostic.yml
+          git config user.name "ChatGPT Codex Connector"
+          git config user.email "codex-connector@users.noreply.github.com"
+          git add .github/workflows/tmp-603-battle-resume-diagnostic.yml
+          git commit -m "[TMP603] Remove Hold-Line post-reload diagnostic"
+          git push origin HEAD:coding/603-step7-promotion-integration
