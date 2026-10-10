@@ -77,15 +77,15 @@ function actorNode49000(root,id){
   return root.querySelector('[data-actor-id="'+safe+'"]');
 }
 function authorisedTeam49000(runtime=activeRuntime49000()){
-  const localIds=runtime&&runtime.localContext&&Array.isArray(runtime.localContext.teamVariantIds)
-    ?runtime.localContext.teamVariantIds.map(String):[];
-  if(localIds.length)return new Set(localIds);
+  const ids=new Set(runtime&&runtime.localContext&&Array.isArray(runtime.localContext.teamVariantIds)
+    ?runtime.localContext.teamVariantIds.map(String):[]);
   try{
     const committed=typeof globalThis.getChronicleCurrentTeam43600==="function"
       ?globalThis.getChronicleCurrentTeam43600():null;
     const committedIds=committed&&Array.isArray(committed.teamVariantIds)?committed.teamVariantIds.map(String):[];
-    return new Set(committedIds);
-  }catch(_error){return new Set();}
+    for(const id of committedIds)ids.add(id);
+  }catch(_error){}
+  return ids;
 }
 function benchmarkEligible49000(runtime=activeRuntime49000()){
   if(!runtime||runtime.sceneId!==BENCHMARK_SCENE_ID)return false;
@@ -227,7 +227,7 @@ function playActorPrimitive49000(root,raw={}){
 function playCueGroup49000(root,cues=[]){
   const rows=Array.isArray(cues)?cues:[];
   const timers=[];const results=[];
-  for(const [index,row] of rows.entries()){
+  for(const row of rows){
     const delay=Math.max(0,Math.min(240,Number(row&&row.delayMs)||0));
     if(delay===0)results.push(playActorPrimitive49000(root,row));
     else{
