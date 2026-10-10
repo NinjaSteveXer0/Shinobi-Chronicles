@@ -117,10 +117,11 @@ async function runMetalBattle(browser,remaining,expectedClass){
         const secondClaim=claimCurrentBattleRewards();
         const walletAfterSecond=Math.max(0,Number(playerData.ryo)||0);
         const rewardReceipts=(playerData.activityHistory||[]).filter(x=>x&&x.rewardSourceId==="metal_origin_controlled_spar_victory_ryo_01");
-        const resumed=resumeBattleCallerAfterCompletion("victory");
+        const earlyResume=resumeBattleCallerAfterCompletion("victory");
+        const resumed=continueAfterVictory();
         const rt=getActiveStorySceneRuntime();
         const row=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_metal_pressured_performance_resolution");
-        return{rewards:JSON.parse(JSON.stringify(rewards||null)),victoryProjection,firstClaim,secondClaim,walletDeltaFirst:walletAfterFirst-walletBefore,walletDeltaSecond:walletAfterSecond-walletBefore,rewardReceiptCount:rewardReceipts.length,rewardReceipt:JSON.parse(JSON.stringify(rewardReceipts[0]||null)),resumed,beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};
+        return{rewards:JSON.parse(JSON.stringify(rewards||null)),victoryProjection,firstClaim,secondClaim,walletDeltaFirst:walletAfterFirst-walletBefore,walletDeltaSecond:walletAfterSecond-walletBefore,rewardReceiptCount:rewardReceipts.length,rewardReceipt:JSON.parse(JSON.stringify(rewardReceipts[0]||null)),earlyResume,resumed,beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};
       }finally{globalThis.getBattleRemainingPL=prior;}
     },{remaining});
     assert.strictEqual(finished.rewards?.ryo,50,label+" reward projection");
@@ -133,7 +134,8 @@ async function runMetalBattle(browser,remaining,expectedClass){
     assert.strictEqual(finished.walletDeltaSecond,50,label+" duplicate claim duplicated Ryō");
     assert.strictEqual(finished.rewardReceiptCount,1,label+" duplicate reward receipt");
     assert.strictEqual(finished.rewardReceipt?.ryo,50,label+" reward receipt Ryō");
-    assert.strictEqual(finished.resumed?.success,true,label+" caller resume");
+    assert.strictEqual(finished.earlyResume?.callerResumeWithheldUntilTerminalResultContinue,true,label+" early caller resume was not withheld");
+    assert.strictEqual(finished.resumed?.success,true,label+" explicit Victory Continue caller resume");
     assert.strictEqual(finished.beatId,"met_spar_"+expectedClass+"_01",label+" performance route");
     assert.strictEqual(finished.local.metalSparPerformanceClass,expectedClass);
     assert.strictEqual(finished.fact?.pressuredPerformanceClass,expectedClass,label+" MET-02 class");
@@ -147,12 +149,28 @@ async function runIwabeeBattle(browser,outcome){
   const label="iwabee-"+outcome;
   const {context,page,gate}=await boot(browser,label,"academy_iwabee");
   try{
+    // #544 terminal presentation is a real overlay lifecycle. This legacy QA
+    // used to inspect semantic DOM while the Alpha front door still kept the
+    // overlay host visibility-hidden. Match the accepted Lane-F browser setup
+    // before asserting player-facing Victory / Setback presentation.
+    await page.evaluate(()=>{
+      try{if(typeof releaseAlphaFrontDoor33300==="function")releaseAlphaFrontDoor33300();}catch(_error){}
+      try{globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400?.release?.();}catch(_error){}
+      const game=document.querySelector(".game-container");
+      if(game){game.removeAttribute("data-alpha-front-door-locked");game.inert=false;}
+      for(const id of ["sc-alpha-front-door-33300","sc-alpha-front-door-33400"])document.getElementById(id)?.remove();
+    });
     const launch=await page.evaluate(()=>{
+      // Real Story always establishes IWA-01 before the Rogue confrontation.
+      // Preserve that ancestry even though this focused browser fixture jumps
+      // directly to the Battle seam.
+      const prerequisite=setStorySceneBeat("iwa_expose_01",{render:false});
       const set=setStorySceneBeat("iwa_confront_battle",{render:false});
       const battle=launchStorySceneBattle();
       const stage=document.querySelector(".alpha-code-battle-stage.battle2-modern");
-      return{set,battle,battleId:currentBattle?.battleId||null,enemy:currentBattle?.enemy?.id||null,template:currentBattle?.oppositionTemplateId||null,environmentPath:currentBattle?.presentationEnvironmentPath||currentBattle?.environmentPath||null,stageEnvironmentPath:stage?.dataset?.battleEnvironmentPath||null,stageBackground:stage?getComputedStyle(stage).backgroundImage:""};
+      return{prerequisite,set,battle,battleId:currentBattle?.battleId||null,enemy:currentBattle?.enemy?.id||null,template:currentBattle?.oppositionTemplateId||null,environmentPath:currentBattle?.presentationEnvironmentPath||currentBattle?.environmentPath||null,stageEnvironmentPath:stage?.dataset?.battleEnvironmentPath||null,stageBackground:stage?getComputedStyle(stage).backgroundImage:""};
     });
+    assert.strictEqual(launch.prerequisite?.success,true,label+" prerequisite Story ancestry");
     assert.strictEqual(launch.set?.success,true);
     assert.strictEqual(launch.battle?.success,true,label+" Battle launch "+JSON.stringify(launch));
     assert.strictEqual(launch.enemy,"iwabee_origin_rogue_genin_01");
@@ -160,7 +178,7 @@ async function runIwabeeBattle(browser,outcome){
     assert.strictEqual(launch.stageEnvironmentPath,launch.environmentPath,label+" shared Battle stage did not consume Iwabee Story environment");
     assert(launch.stageBackground.includes("academy_training_ground_courtyard.png"),label+" Iwabee Story environment is not visibly painted "+JSON.stringify(launch));
     assert.strictEqual(launch.template,"rogue_genin");
-    const result=await page.evaluate(({outcome})=>{
+    let result=await page.evaluate(async({outcome})=>{
       const prior=globalThis.getBattleRemainingPL;
       globalThis.getBattleRemainingPL=(side,id)=>{
         if(side==="player"&&id==="academy_iwabee")return outcome==="defeat"?0:5;
@@ -168,35 +186,98 @@ async function runIwabeeBattle(browser,outcome){
         return prior(side,id);
       };
       try{
-        currentBattle.outcome={type:outcome,committed:true,completedAt:Date.now(),finishingShinobiId:outcome==="victory"?"academy_iwabee":null};
-        currentBattle.battleOver=true;currentBattle.active=false;
+        let authoritativeDefeat=null;
+        if(outcome==="defeat"){
+          const actionId="qa396_iwabee_rogue_finisher";
+          setBattleRemainingPL("player","academy_iwabee",0);
+          const enemy=getBattleParticipantByIdentity("enemy","iwabee_origin_rogue_genin_01");
+          const envelope={
+            actionId,
+            actorRef:createBattleParticipantRef("enemy","iwabee_origin_rogue_genin_01"),
+            targetRef:createBattleParticipantRef("player","academy_iwabee")
+          };
+          authoritativeDefeat=handleBattleParticipantAtZeroPL("player","academy_iwabee",enemy,envelope);
+        }else{
+          const actionId="qa396_iwabee_finisher";
+          setBattleRemainingPL("enemy","iwabee_origin_rogue_genin_01",0);
+          const iwabee=getBattleParticipantByIdentity("player","academy_iwabee");
+          const envelope={
+            actionId,
+            actorRef:createBattleParticipantRef("player","academy_iwabee"),
+            targetRef:createBattleParticipantRef("enemy","iwabee_origin_rogue_genin_01")
+          };
+          handleBattleParticipantAtZeroPL("enemy","iwabee_origin_rogue_genin_01",iwabee,envelope);
+        }
         const walletBefore=Math.max(0,Number(playerData.ryo)||0);
-        const rewards=generateBattleRewards();
-        const firstClaim=outcome==="victory"?claimCurrentBattleRewards():null;
+        const rewards=outcome==="victory"?generateBattleRewards():null;
+        let terminalPresented=null;
+        let claimAction=null;
+        let firstClaim=null;
+        let secondClaim=null;
+        let callerRetained=null;
+        let resumed=outcome==="defeat"?{success:true,awaitingSetbackContinue:true}:null;
+        if(outcome==="victory"){
+          try{globalThis.hardSettleBattlePresentationQueue33000?.("qa396_iwabee_victory_terminal_result");}catch(_error){}
+          terminalPresented=globalThis.presentCommittedBattleTerminalResult54400?.("victory",{source:"qa396_iwabee_victory"})||null;
+          await Promise.resolve();
+          claimAction=continueAfterVictory();
+          firstClaim=!!(claimAction&&claimAction.success===true&&currentBattle?.rewards?.claimed===true);
+        }
         const walletAfterFirst=Math.max(0,Number(playerData.ryo)||0);
-        const secondClaim=outcome==="victory"?claimCurrentBattleRewards():null;
+        if(outcome==="victory")secondClaim=claimCurrentBattleRewards();
         const walletAfterSecond=Math.max(0,Number(playerData.ryo)||0);
         const rewardReceipts=(playerData.activityHistory||[]).filter(x=>x&&x.rewardSourceId==="iwabee_origin_rogue_genin_battle_victory_ryo_01");
-        const resumed=resumeBattleCallerAfterCompletion(outcome);
-        if(outcome==="defeat"){
-          // The frozen natural-voice Story can paginate one authored beat across
-          // multiple presentation cues. Advance the real Story until the
-          // canonical World consequence commits instead of assuming five clicks.
-          for(let i=0;i<24;i++){
-            const committed=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");
-            if(committed&&committed.fact&&committed.fact.rogueDisposition)break;
-            advanceStoryScene();
-          }
+        if(outcome==="victory"){
+          callerRetained=!!(currentBattle&&currentBattle.returnContext&&currentBattle.returnContext.type==="story_scene");
+          resumed=continueAfterVictory();
         }
         const rt=getActiveStorySceneRuntime();
         const row=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");
-        return{rewards:JSON.parse(JSON.stringify(rewards||null)),firstClaim,secondClaim,walletDeltaFirst:walletAfterFirst-walletBefore,walletDeltaSecond:walletAfterSecond-walletBefore,rewardReceiptCount:rewardReceipts.length,rewardReceipt:JSON.parse(JSON.stringify(rewardReceipts[0]||null)),resumed,beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};
+        return{rewards:JSON.parse(JSON.stringify(rewards||null)),terminalPresented:JSON.parse(JSON.stringify(terminalPresented||null)),claimAction:JSON.parse(JSON.stringify(claimAction||null)),firstClaim,secondClaim,callerRetained,walletDeltaFirst:walletAfterFirst-walletBefore,walletDeltaSecond:walletAfterSecond-walletBefore,rewardReceiptCount:rewardReceipts.length,rewardReceipt:JSON.parse(JSON.stringify(rewardReceipts[0]||null)),authoritativeDefeat:JSON.parse(JSON.stringify(authoritativeDefeat||null)),resumed,beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};
       }finally{globalThis.getBattleRemainingPL=prior;}
     },{outcome});
+    if(outcome==="defeat"){
+      assert.strictEqual(result.resumed?.awaitingSetbackContinue,true,label+" defeat must remain player-owned until Setback Continue");
+      await page.waitForSelector(".alpha544-setback",{state:"visible",timeout:12000});
+      const setbackGate=await page.evaluate(()=>({overlay:typeof currentOverlayType==="undefined"?null:currentOverlayType,battleOver:currentBattle?.battleOver===true,outcome:currentBattle?.outcome?.type||null,rewardClaimed:currentBattle?.rewards?.claimed===true}));
+      assert.strictEqual(setbackGate.overlay,"setback",label+" did not present code-owned Setback");
+      assert.strictEqual(setbackGate.battleOver,true,label+" authoritative defeat was not retained");
+      assert.strictEqual(setbackGate.outcome,"defeat",label+" Setback mutated terminal outcome");
+      assert.strictEqual(setbackGate.rewardClaimed,false,label+" Setback incorrectly claimed reward");
+      await page.waitForSelector(".alpha544-setback button",{state:"visible",timeout:12000});
+      assert.strictEqual((await page.evaluate(()=>globalThis.continueAfterSetback54400?.()))?.success,true,"Setback Continue authority failed");
+      const post=await page.evaluate(()=>{
+        for(let i=0;i<24;i++){
+          const committed=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");
+          if(committed&&committed.fact&&committed.fact.rogueDisposition)break;
+          advanceStoryScene();
+        }
+        const rt=getActiveStorySceneRuntime();
+        const row=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");
+        const rewards=generateBattleRewards();
+        return{rewards:JSON.parse(JSON.stringify(rewards||null)),beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};
+      });
+      result={...result,rewards:post.rewards,beatId:post.beatId,local:post.local,fact:post.fact,resumed:{success:true,viaSetbackContinue:true}};
+    }else if(!result.fact?.rogueDisposition){
+      const post=await page.evaluate(()=>{
+        for(let i=0;i<24;i++){
+          const committed=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");
+          if(committed&&committed.fact&&committed.fact.rogueDisposition)break;
+          advanceStoryScene();
+        }
+        const rt=getActiveStorySceneRuntime();
+        const row=(playerData.activityHistory||[]).find(x=>x&&x.occurrenceId==="occ_origin_iwabee_rogue_genin_response_resolution");
+        return{beatId:rt?.beatId||null,local:JSON.parse(JSON.stringify(rt?.localContext||{})),fact:JSON.parse(JSON.stringify(row?.fact||null))};
+      });
+      result={...result,beatId:post.beatId,local:post.local,fact:post.fact};
+    }
     assert.strictEqual(result.resumed?.success,true,label+" caller resume");
     assert.strictEqual(result.rewards?.ryo,outcome==="victory"?50:0,label+" Battle reward projection");
     assert.strictEqual(result.rewards?.exp,0,label+" Battle reward EXP");
     if(outcome==="victory"){
+      assert.strictEqual(result.terminalPresented?.success,true,label+" committed Victory was not presented through #544");
+      assert.strictEqual(result.claimAction?.success,true,label+" #544 CLAIM action failed");
+      assert.strictEqual(result.callerRetained,true,label+" caller context disappeared during CLAIM");
       assert.strictEqual(result.firstClaim,true,label+" first reward claim");
       assert.strictEqual(result.secondClaim,true,label+" idempotent reward re-claim");
       assert.strictEqual(result.walletDeltaFirst,50,label+" wallet reward delta");

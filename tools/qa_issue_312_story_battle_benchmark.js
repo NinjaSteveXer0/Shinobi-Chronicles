@@ -16,6 +16,7 @@ const kv2Transition=read("runtime/alpha-kakashi-v2-transition-36040.js");
 const kv2Core=read("runtime/alpha-kakashi-v2-core-36020.js");
 const kv2Battle=read("runtime/alpha-kakashi-v2-battle-36010.js");
 const kv2Rewards=read("runtime/alpha-kakashi-v2-rewards-36015.js");
+const terminalResultSource=read("runtime/alpha-battle-terminal-result-54400.js");
 const ownership=JSON.parse(read("tools/fixtures/runtime_responsibility_registry_300.json"));
 
 assert(!storySource.includes("new MutationObserver"),"#312 shared Story owner must not depend on MutationObserver");
@@ -110,7 +111,12 @@ assert(battleSource.includes("battle2-formation-withdraw")&&battleSource.include
 assert(battleSource.includes("selectedTargetRef")&&battleSource.includes("formationNodeForRef33000"),"#312 contextual exact-target formation focus missing");
 assert(battleSource.includes("battle2SelectedSkillRestore")&&battleSource.includes("panel.innerHTML=panel.dataset.battle2SelectedSkillRestore")&&battleSource.includes("delete panel.dataset.battle2SelectedSkillRestore"),"#312 hover inspector must preserve and restore the canonical selected-Skill action/mode/cancel surface");
 assert(battleSource.includes('const preserveSkills=formationTrayMode33000==="skills"||stage.dataset.formationTray==="skills"')&&battleSource.includes("if(!preserveSkills)"),"#312 committed Skill playback must preserve an already-open Skills tray for fast Battle flow");
-assert(kv2Rewards.includes("function openOverlay36015")&&kv2Rewards.includes("ensureKakashiV2BattleRewardProjection36015")&&kv2Rewards.indexOf("ensureKakashiV2BattleRewardProjection36015",kv2Rewards.indexOf("function openOverlay36015"))<kv2Rewards.indexOf("PRE_OPEN_OVERLAY",kv2Rewards.indexOf("function openOverlay36015")),"#312 Kakashi Victory must project authored rewards before generic overlay rendering");
+{
+  const terminalRenderStart=terminalResultSource.indexOf("function renderCommittedTerminalSurface54400");
+  const terminalRenderEnd=terminalResultSource.indexOf("function attemptTerminalPresentation54400",terminalRenderStart);
+  const terminalRenderSource=terminalResultSource.slice(terminalRenderStart,terminalRenderEnd);
+  assert(kv2Rewards.includes("function projectKakashiV2BattleRewardsForVictory36015")&&!kv2Rewards.split("function diagnostics(){")[0].includes("function openOverlay36015")&&terminalRenderStart>=0&&terminalRenderEnd>terminalRenderStart&&terminalRenderSource.includes('globalThis["projectAcademyKakashiV2BattleRewardsForVictory36015"]')&&terminalRenderSource.indexOf("projectKakashiRewards.call(globalThis)")<terminalRenderSource.indexOf('PRIOR_OPEN_OVERLAY.call(globalThis,"victory")'),"#312 Kakashi Victory must project authored rewards through the narrow 36015 API before #544 terminal rendering");
+}
 assert(battleSource.includes("const played=playedBattlePerformanceKeys33000.has(key)")&&battleSource.includes("if(!played){"),"#312 settled performance receipts must not replay tray mutations");
 assert(battleSource.includes('data-formation-hidden="true"')||battleSource.includes('dataset.formationHidden="true"'),"#312 undeployed/reserve formation furniture is not being suppressed");
 

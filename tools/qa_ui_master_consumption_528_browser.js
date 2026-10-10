@@ -25,7 +25,10 @@ async function waitRuntime(page){
     globalThis.SC_PHASE2_KONOHA_PLAYER_SURFACES_43110&&
     typeof globalThis.openKonohaPracticalFromVillage==="function"&&
     typeof globalThis.openKonohaExamFromVillage==="function"&&
-    typeof globalThis.runAlphaPlayableSprint33100Diagnostics==="function"
+    typeof globalThis.runAlphaPlayableSprint33100Diagnostics==="function"&&
+    globalThis.__battleTerminalResultPresentation54400Installed===true&&
+    typeof globalThis.presentCommittedBattleTerminalResult54400==="function"&&
+    typeof globalThis.getBattleTerminalResultPresentation54400==="function"
   ),null,{timeout:30000});
 }
 
@@ -56,7 +59,7 @@ async function setupKonohaTeam(page){
   });
 }
 
-async function assetProbe(page,assetPath){
+async function assetProbe(page,assetPath,{expectedVisible=true,expectedRouteRequest=null}={}){
   const probe=await page.evaluate(async assetPath=>{
     const canonical=String(assetPath).replace(/\\/g,"/");
     const file=canonical.split("/").pop();
@@ -83,6 +86,7 @@ async function assetProbe(page,assetPath){
         }
       }
     }
+    const routeResourceSeen=performance.getEntriesByType("resource").some(entry=>matchesValue(entry.name));
     const image=await new Promise(resolve=>{
       const img=new Image();let settled=false;
       const done=ok=>{if(settled)return;settled=true;resolve({ok,naturalWidth:img.naturalWidth,naturalHeight:img.naturalHeight,src:img.src});};
@@ -90,12 +94,15 @@ async function assetProbe(page,assetPath){
       if(img.complete)setTimeout(()=>done(img.naturalWidth>0),0);
       setTimeout(()=>done(false),5000);
     });
-    const resourceSeen=performance.getEntriesByType("resource").some(entry=>matchesValue(entry.name));
-    return{assetPath:canonical,visible:hits.length>0,hits:hits.slice(0,8),image,resourceSeen};
+    const resourceSeenAfterEvidenceProbe=performance.getEntriesByType("resource").some(entry=>matchesValue(entry.name));
+    return{assetPath:canonical,visible:hits.length>0,hits:hits.slice(0,8),image,routeResourceSeen,resourceSeenAfterEvidenceProbe};
   },assetPath);
-  assert.strictEqual(probe.image.ok,true,assetPath+" did not load: "+JSON.stringify(probe));
+  assert.strictEqual(probe.image.ok,true,assetPath+" did not load as preserved evidence/current master: "+JSON.stringify(probe));
   assert(probe.image.naturalWidth>0&&probe.image.naturalHeight>0,assetPath+" has no rendered dimensions");
-  assert.strictEqual(probe.visible,true,assetPath+" is loaded but not visibly consumed: "+JSON.stringify(probe));
+  assert.strictEqual(probe.visible,expectedVisible,assetPath+(expectedVisible?" is not visibly consumed":" is historical evidence but became visibly consumed")+": "+JSON.stringify(probe));
+  if(expectedRouteRequest!==null){
+    assert.strictEqual(probe.routeResourceSeen,expectedRouteRequest,assetPath+(expectedRouteRequest?" was not requested by the live route":" was requested by the live route despite evidence-only status")+": "+JSON.stringify(probe));
+  }
   return probe;
 }
 
@@ -137,12 +144,12 @@ async function openMyClanAndProbe(page){
 async function openActivitiesAndProbe(page){
   await page.evaluate(()=>openKonohaPracticalFromVillage());
   await page.waitForSelector("#konoha-activity-screen[data-service-id='practical']",{state:"visible",timeout:10000});
-  const practical=await assetProbe(page,"UI/practical.png");
+  const practical=await assetProbe(page,"UI/practical.png",{expectedVisible:false,expectedRouteRequest:false});
   await page.locator("#konoha-activity-screen").screenshot({path:path.join(OUT,"03-practical.png")});
 
   await page.evaluate(()=>openKonohaExamFromVillage());
   await page.waitForSelector("#konoha-activity-screen[data-service-id='exams']",{state:"visible",timeout:10000});
-  const exams=await assetProbe(page,"UI/exams.png");
+  const exams=await assetProbe(page,"UI/exams.png",{expectedVisible:false,expectedRouteRequest:false});
   await page.locator("#konoha-activity-screen").screenshot({path:path.join(OUT,"04-exams.png")});
   return{practical,exams};
 }
@@ -154,7 +161,7 @@ async function openSetbackAndProbe(page){
       active:false,battleOver:true,
       activePlayer:actor||{id:"academy_menma",name:"Menma"},
       enemy:{id:"issue528_setback_probe",name:"QA Opposition"},
-      outcome:{type:"defeat",resultClass:"deployment_exhausted",battlePLWithdrawal:true,injuryInferred:false,deathInferred:false},
+      outcome:{type:"defeat",resultClass:"deployment_exhausted"},
       rewards:{generated:true,claimed:false,ryo:0,items:[]},
       returnContext:null
     };
@@ -162,18 +169,21 @@ async function openSetbackAndProbe(page){
     return openOverlay("setback");
   });
   assert(setup&&setup.success===true,JSON.stringify(setup));
-  await page.waitForSelector(".alpha331-setback",{state:"visible",timeout:10000});
-  const semantic=await page.evaluate(()=>({
-    text:document.querySelector(".alpha331-setback")?.innerText||"",
+  const selector='[data-terminal-result-owner="54400"].alpha544-setback';
+  await page.waitForSelector(selector,{state:"visible",timeout:10000});
+  const semantic=await page.evaluate(selector=>({
+    text:document.querySelector(selector)?.innerText||"",
     outcome:JSON.parse(JSON.stringify(globalThis.currentBattle?.outcome||null)),
-    diagnostics:runAlphaPlayableSprint33100Diagnostics()
-  }));
-  assert.strictEqual(semantic.outcome?.battlePLWithdrawal,true);
-  assert.strictEqual(semantic.outcome?.injuryInferred,false);
-  assert.strictEqual(semantic.outcome?.deathInferred,false);
-  assert.strictEqual(semantic.diagnostics?.pass,true,JSON.stringify(semantic.diagnostics));
+    terminal:getBattleTerminalResultPresentation54400()
+  }),selector);
+  assert.strictEqual(semantic.outcome?.type,"defeat");
+  assert.strictEqual(semantic.terminal?.committedOutcome,"defeat",JSON.stringify(semantic.terminal));
+  assert.strictEqual(semantic.terminal?.status,"presented",JSON.stringify(semantic.terminal));
+  assert.strictEqual(semantic.terminal?.presentationOnly,true,JSON.stringify(semantic.terminal));
+  assert.strictEqual(semantic.terminal?.semanticWrite,false,JSON.stringify(semantic.terminal));
+  assert.strictEqual(semantic.terminal?.terminalSurfaceVisible,true,JSON.stringify(semantic.terminal));
   const setback=await assetProbe(page,"UI/setback.png");
-  await page.locator(".alpha331-setback").screenshot({path:path.join(OUT,"05-setback.png")});
+  await page.locator(selector).screenshot({path:path.join(OUT,"05-setback.png")});
   return{setback,semantic};
 }
 
@@ -232,9 +242,15 @@ async function openVictoryAndProbe(page){
     console.log(JSON.stringify({
       pass:true,
       issue:528,
+      historicalEvidenceOnlyMasters:{
+        practicalPreserved:activities.practical.image.ok,
+        practicalNotVisiblyConsumed:!activities.practical.visible,
+        practicalNotRequestedByRoute:!activities.practical.routeResourceSeen,
+        examsPreserved:activities.exams.image.ok,
+        examsNotVisiblyConsumed:!activities.exams.visible,
+        examsNotRequestedByRoute:!activities.exams.routeResourceSeen
+      },
       activeProductionMasters:{
-        practical:activities.practical.visible,
-        exams:activities.exams.visible,
         victory:victory.victory.visible,
         setback:setback.setback.visible
       },

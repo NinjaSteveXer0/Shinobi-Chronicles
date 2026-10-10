@@ -109,19 +109,23 @@ assert.deepStrictEqual(controlTokenGates,[],"#278: hidden control-state token st
 assert.deepStrictEqual(preexistingControlGates,[],"#278: direct disposition still depends on a pre-existing Battle bind/stun/control condition");
 assert.deepStrictEqual(finisherGates,[],"#278: Battle finisher/control method still appears to gate ordinary post-Battle Story agency");
 
-// Canonical generic Battle -> Story return must return victory to the caller
-// without consulting a hidden target-control classification.
-const sprint=read(path.join(ROOT,"runtime/alpha-alpha-sprint-33100.js"));
-assert(sprint.includes('resumeBattleCallerAfterCompletion("victory")'),"#278: generic victory does not return to exact Story caller");
-const victoryFn=sprint.match(/function\s+continueAfterVictory33100\([^)]*\)\s*\{[\s\S]*?\n\}/);
-assert(victoryFn,"#278: unable to inspect generic victory return");
-assert(!CONTROL_CLASS.test(victoryFn[0]),"#278: generic victory return consults hidden control classification");
+// Canonical generic Battle -> terminal result -> exact caller return now lives
+// in #544 after #601/#624 retired the overlapping #33100 terminal slice.
+const terminalResult=read(path.join(ROOT,"runtime/alpha-battle-terminal-result-54400.js"));
+assert(terminalResult.includes('PRIOR_RESUME_CALLER.call(globalThis,"victory")'),"#278: canonical Victory Continue does not delegate to exact caller return");
+const victoryStart=terminalResult.indexOf("function continueAfterVictory54400()");
+const victoryEnd=terminalResult.indexOf("globalThis.renderBattleSetback54400",victoryStart);
+assert(victoryStart>=0&&victoryEnd>victoryStart,"#278: unable to inspect canonical Victory continuation owner");
+const victoryFn=terminalResult.slice(victoryStart,victoryEnd);
+assert(!CONTROL_CLASS.test(victoryFn),"#278: generic victory return consults hidden control classification");
 CONTROL_CLASS.lastIndex=0;
-assert(!CONTROL_GATE_TOKEN.test(victoryFn[0]),"#278: generic victory return consults hidden control gate");
+assert(!CONTROL_GATE_TOKEN.test(victoryFn),"#278: generic victory return consults hidden control gate");
 CONTROL_GATE_TOKEN.lastIndex=0;
 
-// Preserve result-layer separation.
-assert(sprint.includes("Battle PL defeat does not infer death, injury, custody"),"#278: Battle result-layer separation guard missing");
+// Preserve result-layer separation. #544 must project already-committed defeat
+// as withdrawal-only presentation and must not manufacture semantic consequence.
+assert(terminalResult.includes("Battle PL defeat does not infer death, injury, custody"),"#278: canonical Setback result-layer separation guard missing");
+assert(terminalResult.includes('committedOutcome54400(battle)!=="defeat"')&&terminalResult.includes("presentationOnly:true")&&terminalResult.includes("semanticWrite:false"),"#278: canonical Setback is no longer a presentation-only projection of committed defeat");
 
 const kakashiBattle=read(path.join(ROOT,"runtime/alpha-kakashi-v2-battle-36010.js"));
 assert(kakashiBattle.includes("participantCustodyCommitted:false"),"#278: Kakashi Battle adapter must not infer Story custody");

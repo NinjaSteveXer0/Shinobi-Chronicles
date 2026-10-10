@@ -38,7 +38,11 @@ def main() -> int:
             'state&&state.completed===true' in runtime
             and 'openOverlay("missions")' in runtime
         ),
-        "ordinary_promotion_delegates": 'priorPromotion33200.apply(this,arguments)' in runtime,
+        "ordinary_promotion_delegates": (
+            'typeof globalThis.openInstalledPromotion60330!=="function"' in runtime
+            and 'return globalThis.openInstalledPromotion60330(subjectId);' in runtime
+            and 'promotion_step7_integration_authority_missing' in runtime
+        ),
         "no_candidate_assignment_mutation": 'selectedTeamVariantIds=' not in operational,
         "no_ownership_commit": 'commitCharacterAcquisition' not in operational,
         "runtime_diagnostic_present": 'runAlphaTraversalBridge33200Diagnostics' in runtime,

@@ -77,6 +77,7 @@ async function setupBattle(page,resolved,{terminal=false,menmaWithdrawn=false,re
     currentBattle.active=!terminal;
     currentBattle.battleOver=terminal;
     currentBattle.battleId="battle_issue_362_"+rt.instanceId;
+    currentBattle.battleConfigId=CONFIG;
     currentBattle.encounterId=ENCOUNTER;
     currentBattle.characterId="academy_menma";
     currentBattle.enemy=enemy;
@@ -94,6 +95,20 @@ async function setupBattle(page,resolved,{terminal=false,menmaWithdrawn=false,re
     };
     currentBattle.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],finishingShinobi:null,mvp:null};
     currentBattle.contributions={};
+    if(terminal&&battleResult==="victory"){
+      const runtime=ensureBattleRuntimeState();
+      const actionId="issue362_story_ancestry_"+rt.instanceId;
+      const exists=(runtime.evidence||[]).some(row=>row&&row.actionId===actionId&&row.eventType==="skill_action_completed");
+      if(!exists){
+        recordBattleEvidence({
+          eventType:"skill_action_completed",committedOccurrence:true,actionId,
+          actorRef:createBattleParticipantRef("player","academy_menma"),
+          targetRef:createBattleParticipantRef("enemy","test_subject_altered_shinobi"),
+          skillId:"academy_menma_chakra_knuckle",
+          data:{resolved:true,damageApplied:true,finalDamage:1,issue362StoryAncestryFixture:true}
+        });
+      }
+    }
     savePlayerData();saveTestState();
     return{occurrenceId,ryo:Number(playerData.ryo)||0};
   },{resolved,terminal,menmaWithdrawn,result,completed,CONFIG,ENCOUNTER,OBJECTIVE,SCENE,HOSTILES,ALLIES,SOURCE_ID});
@@ -170,8 +185,11 @@ async function rewardState(page){
     assert.deepStrictEqual(generated.items,[]);
     assert.deepStrictEqual(generated.rareDrops,[]);
 
-    await page.evaluate(()=>openOverlay("victory"));
-    await page.waitForSelector(".alpha-victory-code-screen",{state:"visible",timeout:8000});
+    await page.evaluate(()=>{
+      try{globalThis.hardSettleBattlePresentationQueue33000?.("issue_362_reward_victory");}catch(_error){}
+      return globalThis.presentCommittedBattleTerminalResult54400?.("victory",{source:"issue_362_reward_victory"});
+    });
+    await page.waitForSelector(".alpha-victory-code-screen,.victory-screen",{state:"visible",timeout:8000});
     await page.waitForSelector(".menma-three-subject-reward-36200",{state:"visible",timeout:8000});
     const rewardLine=(await page.locator(".menma-three-subject-reward-36200").textContent()||"").trim();
     const visiblePageText=await page.locator("body").innerText();
@@ -210,16 +228,36 @@ async function rewardState(page){
     // authoritative either way.
     const restored=await page.evaluate(ENCOUNTER=>currentBattle&&currentBattle.encounterId===ENCOUNTER,ENCOUNTER);
     if(!restored){
-      await page.evaluate(({ENCOUNTER,SCENE})=>{
+      await page.evaluate(({ENCOUNTER,SCENE,CONFIG})=>{
         const rt=getActiveStorySceneRuntime();
         const enemy=enemyDatabase.test_subject_altered_shinobi;selectedEnemy=enemy;
         currentBattle.active=false;currentBattle.battleOver=true;currentBattle.battleId="battle_issue_362_"+rt.instanceId;
+        currentBattle.battleConfigId=CONFIG;
         currentBattle.encounterId=ENCOUNTER;currentBattle.characterId="academy_menma";currentBattle.enemy=enemy;currentBattle.encounterEnemy=enemy;
         currentBattle.outcome={type:"victory",committed:true,completedAt:Date.now(),finishingShinobiId:"academy_menma",menmaWithdrawn:false};
         currentBattle.returnContext={type:"story_scene",sceneId:SCENE,sceneInstanceId:rt.instanceId,sourceBeatId:"tutorial_battle",victoryBeatId:"menma_after_01",defeatBeatId:"tutorial_not_completed",postBattleBeatId:null,exposeFinisher:false};
         currentBattle.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],finishingShinobi:null,mvp:null};
-      },{ENCOUNTER,SCENE});
+      },{ENCOUNTER,SCENE,CONFIG});
     }
+    // Menma's post-Battle Story consequence is evidence-backed. This reward QA
+    // uses a synthetic whole-encounter receipt, so retain one committed player
+    // action occurrence across refresh rather than asking Story to invent ancestry.
+    await page.evaluate(()=>{
+      const rt=getActiveStorySceneRuntime();
+      const runtime=ensureBattleRuntimeState();
+      const actionId="issue362_story_ancestry_"+rt.instanceId;
+      const exists=(runtime.evidence||[]).some(row=>row&&row.actionId===actionId&&row.eventType==="skill_action_completed");
+      if(!exists){
+        recordBattleEvidence({
+          eventType:"skill_action_completed",committedOccurrence:true,actionId,
+          actorRef:createBattleParticipantRef("player","academy_menma"),
+          targetRef:createBattleParticipantRef("enemy","test_subject_altered_shinobi"),
+          skillId:"academy_menma_chakra_knuckle",
+          data:{resolved:true,damageApplied:true,finalDamage:1,issue362StoryAncestryFixture:true}
+        });
+        saveTestState();
+      }
+    });
     projected=await page.evaluate(()=>ensureAcademyMenmaThreeSubjectRewardProjection36200());
     assert.strictEqual(projected.ready,true,"refresh could not rehydrate reward entitlement");
     state=await rewardState(page);
@@ -228,8 +266,14 @@ async function rewardState(page){
     assert.strictEqual(await page.evaluate(()=>claimCurrentBattleRewards()),false);
     assert.strictEqual((await rewardState(page)).ryo,beforeReclaim,"refresh/reclaim duplicated reward");
 
-    // CLAIM is complete before Story return; CONTINUE resumes exact Menma Story.
+    // CLAIM is complete before Story return; present Victory, then explicit CONTINUE resumes exact Menma Story.
+    await page.evaluate(()=>{
+      try{globalThis.hardSettleBattlePresentationQueue33000?.("issue_362_terminal_result");}catch(_error){}
+      return globalThis.presentCommittedBattleTerminalResult54400?.("victory",{source:"issue_362_reward_reload"});
+    });
+    await page.waitForSelector(".alpha-victory-code-screen,.victory-screen",{state:"visible",timeout:12000});
     const returned=await page.evaluate(()=>continueAfterVictory());
+    assert.strictEqual(returned?.success,true,"Menma explicit Victory Continue failed "+JSON.stringify(returned));
     await page.waitForFunction(scene=>getActiveStorySceneRuntime()?.sceneId===scene&&getActiveStorySceneRuntime()?.beatId==="menma_after_01",SCENE,{timeout:10000});
     state=await rewardState(page);
     assert.strictEqual(state.activeStory.sceneId,SCENE);

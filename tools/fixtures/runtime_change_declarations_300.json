@@ -1388,6 +1388,39 @@
       "replaces": [],
       "contractChangeReason": "CE_522_CLOSED_STEP5_ACTIVATION",
       "rationale": "Master #449 Step 5 is unblocked by closed CE #522. Existing My Clan staged formation remains the only player-facing assignment surface; this tranche promotes explicit Save Formation into the canonical currentTeam assignment with exact owned-lineage identity and ordering, preserves the opening Academy receipt as history/fallback, allows the Chronicle protagonist to be absent only after the opening restriction is legitimately complete, and keeps protagonist identity/Rank, ownership, Story participants and active Battle deployment independent. HUD/My Clan person-facing identity now separates Person Name from representation title/formal Rank."
+    },
+    {
+      "changeId": "issue-544-canonical-battle-terminal-result-presentation-2026-10-07",
+      "classification": "REPLACES",
+      "responsibilityIds": [
+        "battle.presentation.shared",
+        "battle.return.story_scene.shared"
+      ],
+      "owner": "runtime/alpha-battle-terminal-result-54400.js",
+      "directCallers": [
+        "index.html",
+        "completeBattleVictoryFromDamage",
+        "completeBattleDefeat",
+        "openOverlay",
+        "resumeBattleCallerAfterCompletion"
+      ],
+      "stateTouched": [
+        "read-only committed currentBattle.outcome.type / battleOver / battleId",
+        "non-enumerable in-memory currentBattle.__battleTerminalResultPresentation54400 presentation marker only",
+        "Victory/Setback overlay presentation and exact caller-resume chronology only; no reward, PL, Story, World, Chronicle or ownership mutation",
+        "read-only currentBattle.rewards.claimed as durable post-claim Victory continuation evidence after reload"
+      ],
+      "productionLoader": "index.html",
+      "qaRefs": [
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/qa_save_compatibility_311.js",
+        "tools/qa_ui_master_consumption_528_browser.js"
+      ],
+      "replaces": [
+        "runtime/alpha-alpha-sprint-33100.js::battle_terminal_result_slice"
+      ],
+      "contractChangeReason": "AUTHORITY_CHANGED_CANONICAL_OWNER_CONSOLIDATION_601_624",
+      "rationale": "Issue #544 is the sole live Battle terminal-result presentation/continuation owner. It preserves committed victory/defeat semantics, Victory reward authority, #33000 ordered presentation receipts, and exact caller restoration while absorbing the approved Setback surface and retiring only the overlapping #33100 terminal-result slice."
     }
   ]
 }
