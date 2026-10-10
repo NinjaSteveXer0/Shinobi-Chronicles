@@ -78,37 +78,8 @@
     return `<aside class="alpha331-order"><div><span>MY CLAN · BATTLE ORDER</span><b>${read.start?"READY":"NO START SAVED"}</b></div>${read.slots.map(row=>`<p><span>${esc(row.label)}</span><strong>${esc(row.name)}</strong></p>`).join("")}</aside>`;
   }
 
-  const priorPromotion33100=typeof openArenaPromotionSurface==="function"?openArenaPromotionSurface:null;
-  function openArenaPromotionSurface33100(subjectId){
-    const container=typeof document!=="undefined"?document.getElementById("overlay-content-container"):null;
-    let semanticAction=null,semanticDisabled=true,subjectLabel=null,legacyResult=null;
-    if(priorPromotion33100){
-      try{
-        legacyResult=priorPromotion33100.apply(this,arguments);
-        if(container){
-          const buttons=[...container.querySelectorAll("button")];
-          const action=buttons.find(btn=>/FIELD READINESS|ASSESSMENT/i.test(btn.textContent||""));
-          if(action){semanticAction=action.getAttribute("onclick")||null;semanticDisabled=!!action.disabled;}
-          const subject=[...container.querySelectorAll("strong,b,h2,h3")].find(node=>/Academy|Genin|Menma|Hinata|Mirai|Kushina|Kurenai|Iwabee|Metal|Kakashi|Obito|Wasabi/i.test(node.textContent||""));
-          if(subject)subjectLabel=subject.textContent.trim();
-        }
-      }catch(_error){}
-    }
-    const read=arenaStartReadModel33100();
-    if(!subjectLabel)subjectLabel=read.start&&read.start.name||"Current Academy Shinobi";
-    const launch=semanticAction&&!semanticDisabled
-      ? `<button class="alpha331-primary" type="button" onclick="${esc(semanticAction)}">VIEW FIELD READINESS ASSESSMENT</button>`
-      : `<button class="alpha331-primary" type="button" disabled>FIELD READINESS NOT CURRENTLY AVAILABLE</button>`;
-    if(container)container.innerHTML=arenaShell33100({
-      eyebrow:"KONOHA · PROMOTION AUTHORITY",
-      title:"PROMOTION",
-      subtitle:"Promotion is earned through the authorised assessment path. Opening this surface does not commit an attempt.",
-      body:`<div class="alpha331-two"><main class="alpha331-panel"><span>ASSESSMENT SUBJECT</span><h2>${esc(subjectLabel)}</h2><p>Academy → Genin uses the existing Field Readiness authority. Battle may support an assessment, but Battle victory does not automatically equal Promotion.</p><div class="alpha331-rule"><b>SEMANTIC STATUS</b><p>${semanticAction?semanticDisabled?"The existing Promotion authority currently reports this assessment unavailable.":"The existing Promotion authority reports an actionable Field Readiness route.":"No exact Promotion launch action was projected by the predecessor surface; this patch fails closed rather than inventing one."}</p></div>${launch}</main>${battleOrderMarkup33100()}</div>`
-    });
-    return{success:true,codeOwned:true,legacyResult,semanticActionCaptured:!!semanticAction,available:!!semanticAction&&!semanticDisabled};
-  }
-  globalThis.openArenaPromotionSurface=openArenaPromotionSurface33100;
-  try{if(typeof openArenaPromotionSurface!=="undefined")openArenaPromotionSurface=openArenaPromotionSurface33100;}catch(_error){}
+  // Promotion presentation/entry ownership retired to canonical Step-7 #603 integration.
+  // #33100 retains only its unrelated World dossier and Arena utility duties.
 
   function arenaUtilityBody33100(kind){
     const activeBattle=(()=>{try{return !!(currentBattle&&currentBattle.active===true&&currentBattle.battleOver!==true);}catch(_error){return false;}})();
@@ -154,12 +125,10 @@
   // 4. DIAGNOSTICS
   // --------------------------------------------------------------------------
   function runAlphaPlayableSprint33100Diagnostics(){
-    const promotionSrc=openArenaPromotionSurface33100.toString();
     const utilitySrc=openAlphaArenaUtilitySurface33100.toString();
     const checks={
       terminalResultOwnerRetiredTo544:true,
-      promotionReusesExistingAuthority:promotionSrc.includes("priorPromotion33100")&&promotionSrc.includes("semanticAction"),
-      promotionFailClosedWithoutAction:promotionSrc.includes("No exact Promotion launch action")&&promotionSrc.includes("disabled"),
+      promotionOwnerRetiredTo603:true,
       stagedNoFakeOpponent:utilitySrc.includes("fakeCompetitionStateCreated:false"),
       pvpNoFakeMatch:arenaUtilityBody33100.toString().includes("NO FAKE ONLINE RESULT"),
       tournamentNoFakeBracket:arenaUtilityBody33100.toString().includes("BRACKET/REWARD AUTHORITY NOT FABRICATED"),

@@ -23,6 +23,10 @@ EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-runtime-build-fingerprint-303.js",
     "game.js",
     "runtime/alpha-chronicle-state-manifest-43600.js",
+    "runtime/alpha-promotion-core-60300.js",
+    "runtime/alpha-promotion-courier-assessment-60310.js",
+    "runtime/alpha-promotion-arena-ui-60320.js",
+    "runtime/alpha-promotion-installed-integration-60330.js",
     "runtime/alpha-discipline-stat-growth-44800.js",
     "runtime/alpha-origin-starting-purse-409.js",
     "runtime/alpha-special-jonin-evidence-producer-34700.js",
@@ -113,6 +117,7 @@ NODE_GATES = [
     "tools/qa_phase2_basic_item_shop_517.js",
     "tools/qa_hud_my_clan_return_506.js",
     "tools/qa_phase2_character_card_shop_524.js",
+    "tools/qa_issue_603_installed_integration.js",
 ]
 
 EXTERNAL_ASSET_GATES = [
@@ -171,6 +176,16 @@ def main() -> int:
         checks,
         "63_before_journey_and_traversal",
         scripts.index("runtime/alpha-genin-roster-63.js") < scripts.index("runtime/alpha-journey-surface-32800.js")
+        < scripts.index("runtime/alpha-traversal-bridge-33200.js"),
+    )
+    require(
+        checks,
+        "603_promotion_modules_ordered_before_consumers",
+        scripts.index("runtime/alpha-chronicle-state-manifest-43600.js")
+        < scripts.index("runtime/alpha-promotion-core-60300.js")
+        < scripts.index("runtime/alpha-promotion-courier-assessment-60310.js")
+        < scripts.index("runtime/alpha-promotion-arena-ui-60320.js")
+        < scripts.index("runtime/alpha-promotion-installed-integration-60330.js")
         < scripts.index("runtime/alpha-traversal-bridge-33200.js"),
     )
     require(

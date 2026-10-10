@@ -436,6 +436,7 @@
       "changed_any": [
         "runtime/alpha-genin-roster-63.js",
         "runtime/alpha-traversal-bridge-33200.js",
+        "runtime/alpha-browser-onboarding-fixes-33400.js",
         "tools/qa_issue_141_traversal_runtime.js",
         "tools/qa_issue_63_genin_v2_runtime.js"
       ],

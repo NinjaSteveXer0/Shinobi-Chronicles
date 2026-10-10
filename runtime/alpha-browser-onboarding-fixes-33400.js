@@ -333,6 +333,9 @@
     if(action==="login"){
       if(hasBegunChronicle33400()){
         release33400();
+        // Explicit LOGIN / CONTINUE is the player-authorised saved-session resume boundary.
+        // Restore canonical Battle session state only after that returning-player choice.
+        try{if(typeof restoreTestState==="function")restoreTestState();}catch(_error){}
         // Returning-player login is presentation release, not navigation.
         // If an Origin Story runtime survived reload, ask its existing
         // rehydration authority to restore that exact beat. The helper already

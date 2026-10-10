@@ -16,10 +16,10 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-09-EN",
-    sourceBaselineCommit:"6e6acfdcc96822a876a3cd5dde8d836f9587fb05",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-10-EO",
+    sourceBaselineCommit:"248954c1fd3fc2d77abd8cd95af90fb2f99e5d7d",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
-    runtimeGeneration:"canonical-battle-terminal-result-owner-consolidated-544",
+    runtimeGeneration:"step7-academy-genin-promotion-integrated-603",
     majorRuntimeFeatures:Object.freeze([
       "academy-kakashi-v2",
       "runtime-ownership-safety-300",
@@ -110,7 +110,8 @@
       "phase2-region-village-hud-stability-621",
       "academy-origin-base-stat-recalibration-582-597",
       "phase2-konoha-activity-contamination-539",
-      "canonical-battle-terminal-result-owner-consolidated-544"
+      "canonical-battle-terminal-result-owner-consolidated-544",
+      "step7-academy-genin-promotion-integrated-603"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -141,10 +142,10 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-09-EN",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-10-EO",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
-      generationPresent:first.runtimeGeneration==="canonical-battle-terminal-result-owner-consolidated-544",
+      generationPresent:first.runtimeGeneration==="step7-academy-genin-promotion-integrated-603",
       repaired469FeaturePresent:first.majorRuntimeFeatures.includes("phase2-first-live-ce-hotspot-469"),
       privateHistory478FeaturePresent:first.majorRuntimeFeatures.includes("phase2-private-origin-live-ce-hotspot-478"),
       ownerRetestPresentationFeaturePresent:first.majorRuntimeFeatures.includes("story-scene-board-owner-retest-469"),
@@ -185,6 +186,7 @@
       academyOriginRegistry597Present:first.majorRuntimeFeatures.includes("academy-origin-base-stat-recalibration-582-597"),
       konohaActivityContamination539Present:first.majorRuntimeFeatures.includes("phase2-konoha-activity-contamination-539"),
       canonicalBattleTerminalResult544Present:first.majorRuntimeFeatures.includes("canonical-battle-terminal-result-owner-consolidated-544"),
+      step7Promotion603Present:first.majorRuntimeFeatures.includes("step7-academy-genin-promotion-integrated-603"),
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)

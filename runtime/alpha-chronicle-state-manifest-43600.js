@@ -333,7 +333,8 @@ function migratePhase2ChronicleState(save){
       ?{...defaultTutorialProgress(team&&team.assignmentId),...existing.tutorialProgress,schemaVersion:TUTORIAL_SCHEMA_VERSION}
       :legacyTutorialProjection(source,defaultTutorialProgress(team&&team.assignmentId)),
     originParticipantContinuity:normalizeOriginParticipantContinuity(existing.originParticipantContinuity),
-    privateOriginHistories:normalizePrivateOriginHistories(existing.privateOriginHistories)
+    privateOriginHistories:normalizePrivateOriginHistories(existing.privateOriginHistories),
+    promotionState:existing.promotionState&&typeof existing.promotionState==="object"&&!Array.isArray(existing.promotionState)?clone(existing.promotionState):null
   };
   const runIdentity=normalizeChronicleRunIdentity43600(existing.chronicleRunIdentity);
   if(runIdentity)root.chronicleRunIdentity=runIdentity;
@@ -385,6 +386,24 @@ function getChronicleIdentity(save=currentPlayerData()){
 function getCurrentRyo(save=currentPlayerData()){return Math.max(0,Number(save&&save.ryo)||0);}
 
 const DOMAINS=Object.freeze([
+  Object.freeze({
+    stateDomainId:"promotionState",
+    semanticOwner:"PL / Registry / Rank + Coding #603",
+    canonicalWritePath:"SC_PROMOTION_INSTALLED_60330 scoped persistence adapter",
+    stableIdentityKey:"immutable Chronicle root + stableCharacterId + academy_to_genin",
+    savePath:"playerData.phase2ChronicleState.promotionState",
+    schemaVersion:1,
+    sourceOccurrenceIdFormat:"occ_academy_genin_missing_courier_dispatch_v1::<assessmentAttemptId>",
+    idempotenceKeyFormat:"assessmentAttemptId / academy_to_genin_promotion::<assessmentAttemptId>",
+    derivedFields:["observer-safe Assessment Record / Receipt projection"],
+    projectionConsumers:["Arena Promotion","Assessment Record","Promotion Chronicle Receipt"],
+    migrationRule:"preserve committed state verbatim; absent state remains null",
+    resetRule:"new Chronicle/New Game root only",
+    difficultyScope:"none",
+    inheritanceRule:"same Chronicle + stable Character + transition keeps fixed package",
+    devOverridePolicy:"no ordinary-player override",
+    qaRefs:["#603","#608","#609"]
+  }),
   Object.freeze({
     stateDomainId:"currentTeam",
     semanticOwner:"Current Team Assignment / game.js",
