@@ -93,13 +93,30 @@ async function openScene(page){
   await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.sceneId==="scene_konoha_ce_kakashi_masked_interceptor_admin_crossing_menma_v1",null,{timeout:10000});
   const rehydrate=await page.evaluate(()=>{
     const before=globalThis.getActiveStorySceneRuntime?.();
-    const sceneId=before&&before.sceneId||null,beatId=before&&before.beatId||null;
     const layer=document.getElementById("story-scene-presentation-layer");
-    const wasPreserved=layer&&layer.dataset.scPresentationHiddenReason==="preserved_runtime_hidden";
-    if(wasPreserved&&typeof globalThis.renderStoryScenePresentationLayer==="function")globalThis.renderStoryScenePresentationLayer();
-    const after=globalThis.getActiveStorySceneRuntime?.();
-    return{wasPreserved,sceneId,beatId,afterSceneId:after&&after.sceneId||null,afterBeatId:after&&after.beatId||null};
+    return{
+      wasPreserved:layer&&layer.dataset.scPresentationHiddenReason==="preserved_runtime_hidden",
+      sceneId:before&&before.sceneId||null,
+      beatId:before&&before.beatId||null
+    };
   });
+  await page.waitForFunction(expected=>{
+    const before=globalThis.getActiveStorySceneRuntime?.();
+    if(!before||before.sceneId!==expected.sceneId||before.beatId!==expected.beatId)return false;
+    let layer=document.getElementById("story-scene-presentation-layer");
+    if(layer&&layer.dataset.scPresentationHiddenReason==="preserved_runtime_hidden"&&typeof globalThis.renderStoryScenePresentationLayer==="function"){
+      globalThis.renderStoryScenePresentationLayer();
+      layer=document.getElementById("story-scene-presentation-layer");
+    }
+    const after=globalThis.getActiveStorySceneRuntime?.();
+    if(!after||after.sceneId!==expected.sceneId||after.beatId!==expected.beatId||!layer)return false;
+    const style=getComputedStyle(layer),board=layer.querySelector(".sc-scene-board-33900");
+    return layer.dataset.scPresentationHidden!=="true"&&style.display!=="none"&&style.visibility!=="hidden"&&Number(style.opacity||1)>0&&!!board;
+  },{sceneId:rehydrate.sceneId,beatId:rehydrate.beatId},{timeout:10000,polling:50});
+  Object.assign(rehydrate,await page.evaluate(()=>{
+    const after=globalThis.getActiveStorySceneRuntime?.();
+    return{afterSceneId:after&&after.sceneId||null,afterBeatId:after&&after.beatId||null};
+  }));
   assert.strictEqual(rehydrate.afterSceneId,rehydrate.sceneId,"canonical presentation rehydrate changed active scene");
   assert.strictEqual(rehydrate.afterBeatId,rehydrate.beatId,"canonical presentation rehydrate changed active beat");
   await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:10000});
