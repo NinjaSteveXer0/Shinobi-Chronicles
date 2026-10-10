@@ -31,6 +31,7 @@ def game_without_declared_603_promotion_seams(text:str)->str:
       globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310&&typeof globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.captureBattleSessionState==="function"
         ? globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.captureBattleSessionState()
         : null,
+
 '''
     return_block='''  if (returnContext.type==="field_readiness_assessment") {
     if (returnContext.assessmentScenarioId==="academy_genin_missing_courier_dispatch_v1") {
@@ -49,10 +50,12 @@ def game_without_declared_603_promotion_seams(text:str)->str:
     if(promotionCourier60310BattleState&&globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310&&typeof globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.prepareBattleSessionRestore==="function"){
       globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.prepareBattleSessionRestore(promotionCourier60310BattleState);
     }
+
 '''
     apply_restore_block='''    if(promotionCourier60310BattleState&&globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310&&typeof globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.restoreBattleSessionState==="function"){
       globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.restoreBattleSessionState(promotionCourier60310BattleState);
     }
+
 '''
     blocks=[save_block,return_block,feint_block,prepare_restore_block,apply_restore_block]
     if any(text.count(block)!=1 for block in blocks):
