@@ -1,0 +1,77 @@
+name: Issue 585 Lane J Exact-Head Forge QA
+
+on:
+  push:
+    branches:
+      - qa/585-refresh-lane-i
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-head-forge-contract:
+    runs-on: ubuntu-24.04
+    env:
+      TARGET_SHA: 32bec8a12ecf92ff5fd2f2b167f0d77f5d5d11c3
+      MAIN_SHA: b360007b26ffa5b623954a5c2adb25669331ccc0
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Pin exact current #629 production candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "$TARGET_SHA" "$MAIN_SHA"
+          test "$(git rev-parse "$TARGET_SHA")" = "$TARGET_SHA"
+          test "$(git rev-parse "$MAIN_SHA")" = "$MAIN_SHA"
+          git merge-base --is-ancestor "$MAIN_SHA" "$TARGET_SHA"
+          rm -rf .qa-candidate artifacts/forge-585-lane-j
+          git worktree add --detach .qa-candidate "$TARGET_SHA"
+          mkdir -p artifacts/forge-585-lane-j
+          printf '%s\n' "$TARGET_SHA" > artifacts/forge-585-lane-j/target-sha.txt
+          printf '%s\n' "$MAIN_SHA" > artifacts/forge-585-lane-j/main-sha.txt
+      - name: Prove bounded production wiring
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(grep -c 'runtime/alpha-forge-created-kunai-58500.js' .qa-candidate/index.html)" -eq 1
+          grep -q 'SC-ALPHA-RUNTIME-R303-2026-10-10-EQ' .qa-candidate/runtime/alpha-runtime-build-fingerprint-303.js
+          grep -q 'forge-created-durable-kunai-integrated-585' .qa-candidate/tools/fixtures/runtime_build_manifest_303.json
+          grep -q 'forge_created_durable_kunai_585' .qa-candidate/qa/production_change_impact_matrix_528.json
+          grep -q 'runtime/alpha-forge-created-kunai-58500.js' .qa-candidate/tools/qa_issue_141_pre_alpha_runtime_closure.py
+      - name: Independent Lane J hostile transaction contract
+        run: |
+          node --check .qa-candidate/runtime/alpha-forge-created-kunai-58500.js
+          node --check tools/qa_issue_585_refresh_lane_j.js
+          node tools/qa_issue_585_refresh_lane_j.js .qa-candidate/runtime/alpha-forge-created-kunai-58500.js | tee artifacts/forge-585-lane-j/node-contract.json
+      - name: Candidate regressions and save compatibility
+        working-directory: .qa-candidate
+        run: |
+          node tools/qa_phase2_inventory_core_461.js
+          node tools/qa_retail_kunai_durable_552.js
+          node tools/qa_issue_603_step7_promotion.js
+          node tools/qa_save_compatibility_311.js
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Independent Lane J browser proof
+        env:
+          FORGE_585_TARGET: .qa-candidate/runtime/alpha-forge-created-kunai-58500.js
+          FORGE_585_OUT: artifacts/forge-585-lane-j
+        run: node tools/qa_issue_585_refresh_browser_lane_j.js
+      - name: Supplemental candidate-owned installed-browser proof
+        working-directory: .qa-candidate
+        run: node tools/qa_issue_585_forge_created_kunai_browser.js
+      - name: Upload Lane J exact-head evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-585-lane-j-exact-head-${{ github.run_id }}
+          path: artifacts/forge-585-lane-j
+          if-no-files-found: error
