@@ -50,8 +50,8 @@
   background-repeat: no-repeat !important;
   background-position: center !important;
   background-size: cover !important;
-  filter: none !important;
-  opacity: 1 !important;
+  filter: blur(1px) saturate(.96) brightness(.94) contrast(1.01) !important;
+  opacity: .98 !important;
   transform: none !important;
   -webkit-mask-image: linear-gradient(
     to right,
