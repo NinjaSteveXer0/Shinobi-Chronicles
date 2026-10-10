@@ -67,7 +67,18 @@ jobs:
         run: node tools/qa_issue_585_refresh_browser_lane_j.js
       - name: Supplemental candidate-owned installed-browser proof
         working-directory: .qa-candidate
-        run: node tools/qa_issue_585_forge_created_kunai_browser.js
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8080 --bind 127.0.0.1 > /tmp/issue585-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:8080/index.html >/dev/null; then break; fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:8080/index.html >/dev/null
+          node tools/qa_issue_585_forge_created_kunai_browser.js
       - name: Upload Lane J exact-head evidence
         if: always()
         uses: actions/upload-artifact@v4
