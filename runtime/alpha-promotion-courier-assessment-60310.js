@@ -82,6 +82,65 @@ function projectJourney(id){const r=need(id);if(!r.success)return r;const o=r.o;
 function projectRankEvidence(id){const r=need(id);if(!r.success)return r;const o=r.o;return{success:true,assessmentAttemptId:o.assessmentAttemptId,sourceOccurrenceId:o.occurrenceId,candidateEvidenceRefs:[...o.candidateEvidenceRefs],battleReturn:c(o.battle.returnEnvelope),missionObjectiveCompleted:o.missionObjectiveCompleted,terminalWorldState:o.terminalWorldState};}
 function diagnostics(){const checks={stableScenarioIds:occurrenceId("qa")==="occ_academy_genin_missing_courier_dispatch_v1::qa",exactRoute:JSON.stringify(ROUTE)===JSON.stringify(["KON-P01","KON-P10","whisper_woods","fire_whisper_woods_north_ravine","whisper_woods","KON-P10","KON-P01"]),exactBattleIds:CONFIG==="battle_cfg_academy_genin_missing_courier_hold_line_v1"&&ENCOUNTER==="enc_academy_genin_missing_courier_rogue_hold_line_v1",exactRewards:Object.values(REWARD).length===4,arc1Firewall:ARC1.every(x=>!SCENARIO.includes(x)),noRankVerdictManufacture:!String(projectRankEvidence).includes("combatReadinessSatisfied")&&!String(projectRankEvidence).includes("promotionPassed"),browserGoldenClaimed:false};const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);return{pass:failed.length===0,checks,failed,browserGoldenClaimed:false};}
 
+function readPromotionCourierBattleTestState60310(){
+  if(typeof sessionStorage==="undefined")return null;
+  try{
+    const raw=sessionStorage.getItem("shinobiTestState"),state=raw?JSON.parse(raw):null,saved=state&&state.promotionCourier60310;
+    if(!saved||saved.battleConfigId!==CONFIG||saved.encounterId!==ENCOUNTER||saved.returnContext?.assessmentScenarioId!==SCENARIO)return null;
+    return saved;
+  }catch(_){return null;}
+}
+function applyPromotionCourierBattleTestState60310(saved){
+  if(!saved)return false;
+  const battle=currentBattle60310();if(!battle)return false;
+  battle.promotionCourier60310=c(saved.meta||{});
+  battle.battleId=saved.battleId||battle.battleId;
+  battle.battleConfigId=CONFIG;
+  battle.encounterId=ENCOUNTER;
+  battle.oppositionTemplateId=saved.oppositionTemplateId||TEMPLATE;
+  if(saved.returnContext&&typeof saved.returnContext==="object")battle.returnContext=c(saved.returnContext);
+  if(saved.active===true&&battle.battleOver!==true)battle.active=true;
+  if(typeof globalThis.buildReusableRogueGeninOppositionActions399==="function")registerRogue();
+  return true;
+}
+const PRE_SAVE_TEST_STATE_60310=typeof saveTestState==="function"?saveTestState:null;
+if(PRE_SAVE_TEST_STATE_60310){
+  globalThis.saveTestState=function savePromotionCourier60310TestState(){
+    const result=PRE_SAVE_TEST_STATE_60310.apply(this,arguments),battle=currentBattle60310();
+    if(battle?.promotionCourier60310&&typeof sessionStorage!=="undefined"){
+      try{
+        const raw=sessionStorage.getItem("shinobiTestState"),state=raw?JSON.parse(raw):{};
+        state.promotionCourier60310={
+          meta:c(battle.promotionCourier60310),
+          battleId:battle.battleId||null,
+          battleConfigId:battle.battleConfigId||CONFIG,
+          encounterId:battle.encounterId||ENCOUNTER,
+          oppositionTemplateId:battle.oppositionTemplateId||TEMPLATE,
+          returnContext:c(battle.returnContext||null),
+          active:battle.active===true&&battle.battleOver!==true
+        };
+        sessionStorage.setItem("shinobiTestState",JSON.stringify(state));
+      }catch(_){}
+    }
+    return result;
+  };
+  try{saveTestState=globalThis.saveTestState;}catch(_){}
+}
+const PRE_RESTORE_TEST_STATE_60310=typeof restoreTestState==="function"?restoreTestState:null;
+if(PRE_RESTORE_TEST_STATE_60310){
+  globalThis.restoreTestState=function restorePromotionCourier60310TestState(){
+    const saved=readPromotionCourierBattleTestState60310();
+    const result=PRE_RESTORE_TEST_STATE_60310.apply(this,arguments);
+    if(saved)applyPromotionCourierBattleTestState60310(saved);
+    return result;
+  };
+  try{restoreTestState=globalThis.restoreTestState;}catch(_){}
+}
+if(typeof addEventListener==="function")addEventListener("load",()=>{
+  const saved=readPromotionCourierBattleTestState60310();
+  if(saved)applyPromotionCourierBattleTestState60310(saved);
+},{once:true});
+
 function expireRogueFeintAtActionOpportunity60310(){
   const battle=currentBattle60310();
   if(!battle?.promotionCourier60310)return{handled:false,expired:false};
