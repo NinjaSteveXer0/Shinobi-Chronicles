@@ -1,0 +1,106 @@
+name: TMP 603 Canonical Battle Session Owner V2
+on:
+  push:
+    branches:
+      - coding/603-step7-promotion-integration
+    paths:
+      - .github/workflows/tmp-603-canonical-battle-session-owner-v2.yml
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/603-step7-promotion-integration
+          fetch-depth: 1
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Apply canonical session-owner repair
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re,base64
+
+          courier=Path('runtime/alpha-promotion-courier-assessment-60310.js')
+          text=courier.read_text(encoding='utf-8')
+          start=text.find('function readPromotionCourierBattleTestState60310(){')
+          end=text.find('function expireRogueFeintAtActionOpportunity60310(){')
+          if start<0 or end<0 or end<=start:
+              raise SystemExit(f'wrapper block not found start={start} end={end}')
+          text=text[:start]+text[end:]
+          anchor='function battleApis(){'
+          if text.count(anchor)!=1:
+              raise SystemExit(f'battleApis anchor count={text.count(anchor)}')
+          helpers=base64.b64decode('ZnVuY3Rpb24gY2FwdHVyZUJhdHRsZVNlc3Npb25TdGF0ZTYwMzEwKCl7CiAgY29uc3QgYmF0dGxlPWN1cnJlbnRCYXR0bGU2MDMxMCgpLG1ldGE9YmF0dGxlPy5wcm9tb3Rpb25Db3VyaWVyNjAzMTAsY3R4PWJhdHRsZT8ucmV0dXJuQ29udGV4dDsKICBpZighbWV0YXx8YmF0dGxlLmJhdHRsZUNvbmZpZ0lkIT09Q09ORklHfHxiYXR0bGUuZW5jb3VudGVySWQhPT1FTkNPVU5URVJ8fGN0eD8udHlwZSE9PSJmaWVsZF9yZWFkaW5lc3NfYXNzZXNzbWVudCJ8fGN0eD8uYXNzZXNzbWVudFNjZW5hcmlvSWQhPT1TQ0VOQVJJTylyZXR1cm4gbnVsbDsKICByZXR1cm57c2NoZW1hVmVyc2lvbjoxLGJhdHRsZUNvbmZpZ0lkOkNPTkZJRyxlbmNvdW50ZXJJZDpFTkNPVU5URVIsb3Bwb3NpdGlvblRlbXBsYXRlSWQ6VEVNUExBVEUsYWN0aXZlOmJhdHRsZS5hY3RpdmU9PT10cnVlJiZiYXR0bGUuYmF0dGxlT3ZlciE9PXRydWUsbWV0YTpjKG1ldGEpfTsKfQpmdW5jdGlvbiB2YWxpZGF0ZUJhdHRsZVNlc3Npb25TdGF0ZTYwMzEwKHNhdmVkKXsKICByZXR1cm4gISEoc2F2ZWQmJnR5cGVvZiBzYXZlZD09PSJvYmplY3QiJiZzYXZlZC5iYXR0bGVDb25maWdJZD09PUNPTkZJRyYmc2F2ZWQuZW5jb3VudGVySWQ9PT1FTkNPVU5URVImJnNhdmVkLm1ldGEmJnNhdmVkLm1ldGEuYXNzZXNzbWVudEF0dGVtcHRJZCYmc2F2ZWQubWV0YS5iYXR0bGVPY2N1cnJlbmNlSWQpOwp9CmZ1bmN0aW9uIHByZXBhcmVCYXR0bGVTZXNzaW9uUmVzdG9yZTYwMzEwKHNhdmVkKXsKICBpZighdmFsaWRhdGVCYXR0bGVTZXNzaW9uU3RhdGU2MDMxMChzYXZlZCkpcmV0dXJue3N1Y2Nlc3M6ZmFsc2UscmVhc29uOiJwcm9tb3Rpb25fY291cmllcl9zYXZlZF9iYXR0bGVfaW52YWxpZCJ9OwogIHJldHVybiByZWdpc3RlclJvZ3VlKCk7Cn0KZnVuY3Rpb24gcmVzdG9yZUJhdHRsZVNlc3Npb25TdGF0ZTYwMzEwKHNhdmVkKXsKICBpZighdmFsaWRhdGVCYXR0bGVTZXNzaW9uU3RhdGU2MDMxMChzYXZlZCkpcmV0dXJue3N1Y2Nlc3M6ZmFsc2UscmVhc29uOiJwcm9tb3Rpb25fY291cmllcl9zYXZlZF9iYXR0bGVfaW52YWxpZCJ9OwogIGNvbnN0IHJlZ2lzdGVyZWQ9cmVnaXN0ZXJSb2d1ZSgpO2lmKCFyZWdpc3RlcmVkLnN1Y2Nlc3MpcmV0dXJuIHJlZ2lzdGVyZWQ7CiAgY29uc3QgYmF0dGxlPWN1cnJlbnRCYXR0bGU2MDMxMCgpO2lmKCFiYXR0bGUpcmV0dXJue3N1Y2Nlc3M6ZmFsc2UscmVhc29uOiJwcm9tb3Rpb25fY291cmllcl9jdXJyZW50X2JhdHRsZV9taXNzaW5nX29uX3Jlc3RvcmUifTsKICBiYXR0bGUuYmF0dGxlQ29uZmlnSWQ9Q09ORklHOwogIGJhdHRsZS5lbmNvdW50ZXJJZD1FTkNPVU5URVI7CiAgYmF0dGxlLm9wcG9zaXRpb25UZW1wbGF0ZUlkPVRFTVBMQVRFOwogIGJhdHRsZS5wcm9tb3Rpb25Db3VyaWVyNjAzMTA9YyhzYXZlZC5tZXRhKTsKICBpZihzYXZlZC5hY3RpdmU9PT10cnVlJiZiYXR0bGUuYmF0dGxlT3ZlciE9PXRydWUpYmF0dGxlLmFjdGl2ZT10cnVlOwogIHJldHVybntzdWNjZXNzOnRydWUsYWN0aXZlOmJhdHRsZS5hY3RpdmU9PT10cnVlLGJhdHRsZU9jY3VycmVuY2VJZDpiYXR0bGUucHJvbW90aW9uQ291cmllcjYwMzEwLmJhdHRsZU9jY3VycmVuY2VJZH07Cn0K').decode()
+          text=text.replace(anchor,helpers+anchor,1)
+          old_api='applyEligibleRewards,expireRogueFeintAtActionOpportunity:expireRogueFeintAtActionOpportunity60310,runDiagnostics:diagnostics'
+          new_api='applyEligibleRewards,registerBattleEnemyProfile:registerRogue,captureBattleSessionState:captureBattleSessionState60310,prepareBattleSessionRestore:prepareBattleSessionRestore60310,restoreBattleSessionState:restoreBattleSessionState60310,expireRogueFeintAtActionOpportunity:expireRogueFeintAtActionOpportunity60310,runDiagnostics:diagnostics'
+          if text.count(old_api)!=1:
+              raise SystemExit(f'api export anchor count={text.count(old_api)}')
+          text=text.replace(old_api,new_api,1)
+          for forbidden in ['globalThis.saveTestState=function','globalThis.restoreTestState=function','PRE_SAVE_TEST_STATE_60310','PRE_RESTORE_TEST_STATE_60310']:
+              if forbidden in text: raise SystemExit(f'wrapper leftover: {forbidden}')
+          courier.write_text(text,encoding='utf-8')
+
+          game=Path('game.js')
+          g=game.read_text(encoding='utf-8')
+          save_start=g.find('function saveTestState()')
+          restore_start=g.find('function restoreTestState()')
+          if save_start<0 or restore_start<0 or restore_start<=save_start:
+              raise SystemExit('canonical save/restore owner missing')
+          save_slice=g[save_start:restore_start]
+          m=re.search(r'\n\s*battleReturnContext:\s*\n\s*normalizeBattleReturnContext\(currentBattle\.returnContext\),',save_slice)
+          if not m: raise SystemExit('battleReturnContext save anchor missing')
+          savefield=base64.b64decode('ICAgIHByb21vdGlvbkNvdXJpZXI2MDMxMEJhdHRsZToKICAgICAgZ2xvYmFsVGhpcy5TQ19QUk9NT1RJT05fQ09VUklFUl9BU1NFU1NNRU5UXzYwMzEwJiZ0eXBlb2YgZ2xvYmFsVGhpcy5TQ19QUk9NT1RJT05fQ09VUklFUl9BU1NFU1NNRU5UXzYwMzEwLmNhcHR1cmVCYXR0bGVTZXNzaW9uU3RhdGU9PT0iZnVuY3Rpb24iCiAgICAgICAgPyBnbG9iYWxUaGlzLlNDX1BST01PVElPTl9DT1VSSUVSX0FTU0VTU01FTlRfNjAzMTAuY2FwdHVyZUJhdHRsZVNlc3Npb25TdGF0ZSgpCiAgICAgICAgOiBudWxsLAo=').decode()
+          save_slice=save_slice[:m.end()]+"\n"+savefield+save_slice[m.end():]
+          g=g[:save_start]+save_slice+g[restore_start:]
+
+          restore_start=g.find('function restoreTestState()')
+          tail=g[restore_start:]
+          sm=re.search(r'(?m)^[ \t]*(?:const|let)\s+state\s*=\s*[^;\n]+;',tail[:14000])
+          if not sm:
+              print(tail[:7000])
+              raise SystemExit('restore state binding missing')
+          pre=base64.b64decode('ICAgIGNvbnN0IHByb21vdGlvbkNvdXJpZXI2MDMxMEJhdHRsZVN0YXRlPXN0YXRlLnByb21vdGlvbkNvdXJpZXI2MDMxMEJhdHRsZSYmdHlwZW9mIHN0YXRlLnByb21vdGlvbkNvdXJpZXI2MDMxMEJhdHRsZT09PSJvYmplY3QiP3N0YXRlLnByb21vdGlvbkNvdXJpZXI2MDMxMEJhdHRsZTpudWxsOwogICAgaWYocHJvbW90aW9uQ291cmllcjYwMzEwQmF0dGxlU3RhdGUmJmdsb2JhbFRoaXMuU0NfUFJPTU9USU9OX0NPVVJJRVJfQVNTRVNTTUVOVF82MDMxMCYmdHlwZW9mIGdsb2JhbFRoaXMuU0NfUFJPTU9USU9OX0NPVVJJRVJfQVNTRVNTTUVOVF82MDMxMC5wcmVwYXJlQmF0dGxlU2Vzc2lvblJlc3RvcmU9PT0iZnVuY3Rpb24iKXsKICAgICAgZ2xvYmFsVGhpcy5TQ19QUk9NT1RJT05fQ09VUklFUl9BU1NFU1NNRU5UXzYwMzEwLnByZXBhcmVCYXR0bGVTZXNzaW9uUmVzdG9yZShwcm9tb3Rpb25Db3VyaWVyNjAzMTBCYXR0bGVTdGF0ZSk7CiAgICB9Cg==').decode()
+          tail=tail[:sm.end()]+"\n"+pre+tail[sm.end():]
+
+          pm=re.search(r'(?m)^[ \t]*if\s*\(\s*state\.overlayType\s*===?\s*["\']combat["\']',tail)
+          if not pm:
+              pm=re.search(r'(?m)^[ \t]*if\s*\(\s*currentBattle\.defeat',tail)
+          if not pm:
+              print(tail[:14000])
+              raise SystemExit('restore presentation anchor missing')
+          post=base64.b64decode('ICAgIGlmKHByb21vdGlvbkNvdXJpZXI2MDMxMEJhdHRsZVN0YXRlJiZnbG9iYWxUaGlzLlNDX1BST01PVElPTl9DT1VSSUVSX0FTU0VTU01FTlRfNjAzMTAmJnR5cGVvZiBnbG9iYWxUaGlzLlNDX1BST01PVElPTl9DT1VSSUVSX0FTU0VTU01FTlRfNjAzMTAucmVzdG9yZUJhdHRsZVNlc3Npb25TdGF0ZT09PSJmdW5jdGlvbiIpewogICAgICBnbG9iYWxUaGlzLlNDX1BST01PVElPTl9DT1VSSUVSX0FTU0VTU01FTlRfNjAzMTAucmVzdG9yZUJhdHRsZVNlc3Npb25TdGF0ZShwcm9tb3Rpb25Db3VyaWVyNjAzMTBCYXR0bGVTdGF0ZSk7CiAgICB9Cgo=').decode()
+          tail=tail[:pm.start()]+post+tail[pm.start():]
+          g=g[:restore_start]+tail
+          game.write_text(g,encoding='utf-8')
+
+          guard=Path('tools/qa_issue_603_installed_integration.js')
+          q=guard.read_text(encoding='utf-8')
+          old="  courierMidBattleRestore:read('runtime/alpha-promotion-courier-assessment-60310.js').includes('PRE_SAVE_TEST_STATE_60310')&&read('runtime/alpha-promotion-courier-assessment-60310.js').includes('PRE_RESTORE_TEST_STATE_60310'),"
+          new="  courierMidBattleRestore:game.includes('promotionCourier60310Battle')&&game.includes('prepareBattleSessionRestore')&&game.includes('restoreBattleSessionState')&&read('runtime/alpha-promotion-courier-assessment-60310.js').includes('captureBattleSessionState60310')&&!read('runtime/alpha-promotion-courier-assessment-60310.js').includes('globalThis.saveTestState=function')&&!read('runtime/alpha-promotion-courier-assessment-60310.js').includes('globalThis.restoreTestState=function'),"
+          if q.count(old)!=1: raise SystemExit(f'guard replacement count={q.count(old)}')
+          guard.write_text(q.replace(old,new,1),encoding='utf-8')
+          PY
+          node --check game.js
+          node --check runtime/alpha-promotion-courier-assessment-60310.js
+          node --check tools/qa_issue_603_installed_integration.js
+          node tools/qa_issue_603_step7_promotion.js
+          node tools/qa_issue_607_courier_adapter.js
+          node tools/qa_issue_603_installed_integration.js
+          node tools/qa_issue_141_traversal_runtime.js
+          node tools/qa_save_compatibility_311.js
+          node tools/qa_runtime_ownership_safety_300.js
+      - name: Commit repair and remove temporary workflow
+        shell: bash
+        run: |
+          rm .github/workflows/tmp-603-canonical-battle-session-owner-v2.yml
+          git config user.name "ChatGPT Codex Connector"
+          git config user.email "codex-connector@users.noreply.github.com"
+          git add game.js runtime/alpha-promotion-courier-assessment-60310.js tools/qa_issue_603_installed_integration.js .github/workflows/tmp-603-canonical-battle-session-owner-v2.yml
+          git commit -m "[CODING][#603] Restore Courier Battle through canonical session owner"
+          git push origin HEAD:coding/603-step7-promotion-integration
