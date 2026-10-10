@@ -22,11 +22,40 @@ async function boot(page){
   const diag=await page.evaluate(()=>runStorySceneBoardExpressive49000Diagnostics());
   assert.strictEqual(diag.pass,true,JSON.stringify(diag.failed));
 }
-async function setup(page,runId){
-  const result=await page.evaluate(fixtureRunId=>{
-    localStorage.clear();playerData=createDefaultPlayerData();setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);savePlayerData();
+async function setup(page,runIdPrefix){
+  const result=await page.evaluate(fixtureRunIdPrefix=>{
+    localStorage.clear();
+    playerData=createDefaultPlayerData();
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+
+    const eligibleRunId=(()=>{
+      const originalSave=globalThis.savePlayerData;
+      globalThis.savePlayerData=()=>true;
+      try{savePlayerData=globalThis.savePlayerData;}catch(_error){}
+      try{
+        for(let i=0;i<2200;i++){
+          const candidate=fixtureRunIdPrefix+"_"+String(i).padStart(4,"0");
+          const seed=["sc.privateOriginHistory.v1",candidate,"academy_kakashi","academy_kakashi_v2","v3"].join("::");
+          const preview=previewAutonomousKakashiPrivateOrigin46900(seed);
+          const continuity=preview&&preview.success===true&&preview.history&&preview.history.miContinuity;
+          if(!continuity)continue;
+          if(continuity.survivedOrigin===false||continuity.encounteredByProtagonist!==true)continue;
+          if(["KILLED","UNSEEN"].includes(String(continuity.fieldDispositionState||"")))continue;
+          return candidate;
+        }
+        return null;
+      }finally{
+        globalThis.savePlayerData=originalSave;
+        try{savePlayerData=originalSave;}catch(_error){}
+      }
+    })();
+    if(!eligibleRunId)return{error:"eligible_private_history_seed_not_found",runIdPrefix:fixtureRunIdPrefix};
+
+    playerData=createDefaultPlayerData();
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+    savePlayerData();
     const selected=selectChronicleOrigin("academy_menma","qa490_origin");
-    const identity=commitChronicleRunIdentity43600({runId:fixtureRunId,creationKind:"NEW_START"});
+    const identity=commitChronicleRunIdentity43600({runId:eligibleRunId,creationKind:"NEW_START"});
     const completed=completeChronicleOriginPrologue("academy_menma",["qa490_menma_origin"]);
     const preparedPrivate=ensureAutonomousKakashiPrivateHistory46900("qa490_pre_team_run_identity_fixture");
     const privateBeforeSelection=getKakashiPrivateOriginHistory46900();
@@ -39,8 +68,8 @@ async function setup(page,runId){
     const continued=continueAcademyTeamFormationJourney();
     updateChronicleTutorialProgress43600({sandboxPopupSeen:true,recommendedRouteEnabled:false,openingChoice:"explore",trainingTipSeen:true,practicalTipSeen:true,examsTipSeen:true,arenaTipSeen:true,arenaCompletionChoiceSeen:true,shinobiRecordTipSeen:true},{save:true});
     savePlayerData();
-    return{selected,identity,completed,preparedPrivate,privateBeforeSelection,privateBeforeConfirm,privateAfterConfirm,formed,continued,team:getChronicleCurrentTeam43600(),gate:getKonohaCeHotspotEligibility46900()};
-  },runId);
+    return{runId:eligibleRunId,selected,identity,completed,preparedPrivate,privateBeforeSelection,privateBeforeConfirm,privateAfterConfirm,formed,continued,team:getChronicleCurrentTeam43600(),gate:getKonohaCeHotspotEligibility46900()};
+  },runIdPrefix);
   assert(!result.error,JSON.stringify(result));assert.strictEqual(result.selected.success,true);assert.strictEqual(result.identity.success,true);
   assert.strictEqual(result.completed.success,true);assert.strictEqual(result.preparedPrivate.success,true,JSON.stringify(result.preparedPrivate));
   assert(result.privateBeforeSelection&&result.privateAfterConfirm,"qa490 private Kakashi history was not sealed");
@@ -48,6 +77,7 @@ async function setup(page,runId){
   assert.strictEqual(JSON.stringify(result.privateAfterConfirm),JSON.stringify(result.privateBeforeSelection),"qa490 Team Formation rerolled private Kakashi history");
   assert.strictEqual(result.formed.success,true,JSON.stringify(result.formed));assert.strictEqual(result.continued.success,true);
   assert.deepStrictEqual(result.team.teamVariantIds,["academy_menma","academy_hinata","academy_kakashi"]);assert.strictEqual(result.gate.available,true,JSON.stringify(result.gate));
+  return result.runId;
 }
 async function openScene(page){
   await page.evaluate(()=>openOverlay("village"));
@@ -63,7 +93,7 @@ async function advanceBeat(page,id){for(let i=0;i<20;i++){const beat=await page.
 async function scenario(browser,width,height,reduced,label){
   const context=await browser.newContext({viewport:{width,height},reducedMotion:reduced?"reduce":"no-preference"});const page=await context.newPage();const errors=await installBrowserRuntimeErrorGate(page);
   try{
-    await boot(page);await setup(page,"sc_run_v1_qa490_"+label.replace(/\W+/g,"_"));await openScene(page);await page.waitForTimeout(520);
+    await boot(page);const runId=await setup(page,"sc_run_v1_qa490_"+label.replace(/\W+/g,"_"));await openScene(page);await page.waitForTimeout(520);
     const rows=await stage(page),ids=rows.map(r=>r.id);
     assert.deepStrictEqual([...ids].sort(),["academy_hinata","academy_kakashi","academy_kakashi_origin_masked_interceptor","academy_menma"].sort());
     assert(rows.every(r=>r.opacity>=.99&&r.filter==="none"&&r.benchmark==="true"),label+" present-actor presentation drift: "+JSON.stringify(rows));
@@ -83,7 +113,7 @@ async function scenario(browser,width,height,reduced,label){
     assert.deepStrictEqual(choices,["Ask Kakashi what happened.","Ask her how she knows Kakashi.","Let Kakashi handle it.","Keep moving."]);
     const listeners=await stage(page);assert(listeners.every(r=>r.opacity>=.99),label+" speaker focus dimmed listeners");
     await page.screenshot({path:path.join(OUT,label+".png"),fullPage:true});await errors.assertClean(label);
-    return{label,viewport:{width,height},reducedMotion:reduced,choices,primitive:primitive.r};
+    return{label,runId,viewport:{width,height},reducedMotion:reduced,choices,primitive:primitive.r};
   }finally{await context.close();}
 }
 (async()=>{const browser=await chromium.launch({headless:true});try{const results=[];results.push(await scenario(browser,1366,768,false,"1366x768"));results.push(await scenario(browser,1920,1080,false,"1920x1080"));results.push(await scenario(browser,1366,768,true,"1366x768-reduced-motion"));console.log(JSON.stringify({pass:true,results,browserGoldenClaimed:false},null,2));}finally{await browser.close();}})().catch(e=>{console.error(e&&e.stack||e);process.exit(1);});
