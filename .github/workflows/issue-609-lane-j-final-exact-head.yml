@@ -1,0 +1,79 @@
+name: Issue 609 Lane J Final Exact-Head Reverify
+
+on:
+  push:
+    branches:
+      - qa/609-final-7790808-j
+
+permissions:
+  contents: read
+
+jobs:
+  exact-head-hostile-browser:
+    runs-on: ubuntu-24.04
+    env:
+      SC609_TARGET_SHA: 7790808e8718554ea3a9ba35ee091638bd692883
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Exact production parent and QA-only delta guard
+        run: |
+          test "$(git rev-parse HEAD^)" = "$SC609_TARGET_SHA"
+          changed="$(git diff --name-only HEAD^ HEAD)"
+          test "$changed" = ".github/workflows/issue-609-lane-j-final-exact-head.yml"
+          mkdir -p artifacts/issue-609-lane-j-final
+          printf '{"productionSha":"%s","qaSha":"%s","browserGoldenClaimed":false}\n' \
+            "$SC609_TARGET_SHA" "$(git rev-parse HEAD)" \
+            > artifacts/issue-609-lane-j-final/exact-head.json
+
+      - name: Independent Promotion hostile/source matrix
+        run: |
+          node --check tools/qa_issue_603_step7_promotion.js
+          node --check tools/qa_issue_603_step7_promotion_browser.js
+          node tools/qa_issue_603_step7_promotion.js
+          node tools/qa_issue_603_installed_integration.js
+          node tools/qa_issue_141_traversal_runtime.js
+          node tools/qa_save_compatibility_311.js
+          node tools/qa_phase2_chronicle_state_manifest_436.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > sc609-server.log 2>&1 &
+          echo $! > sc609-server.pid
+          sleep 2
+
+      - name: Exact installed browser matrix 1366x768 and 1920x1080
+        env:
+          SC603_REQUIRE_INTEGRATION: '1'
+          SC603_OUT: artifacts/issue-609-lane-j-final/browser
+        run: node tools/qa_issue_603_step7_promotion_browser.js
+
+      - name: Stop local Alpha server
+        if: always()
+        run: |
+          if test -f sc609-server.pid; then kill "$(cat sc609-server.pid)" || true; fi
+
+      - name: Upload Lane J exact-head evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-609-lane-j-final-exact-head
+          path: |
+            artifacts/issue-609-lane-j-final
+            sc609-server.log
+          if-no-files-found: error
