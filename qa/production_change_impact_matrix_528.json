@@ -412,7 +412,7 @@
         "tools/qa_phase2_inventory_core_461.js",
         "tools/qa_retail_kunai_durable_552.js",
         "tools/qa_retail_kunai_durable_552_browser.js",
-        ".github/workflows/issue-552-durable-retail-kunai.yml"
+        ".github/workflows/issue-552-retail-kunai-durable.yml"
       ],
       "affected_consumers": [
         "basic_item_shop_517",
