@@ -23,38 +23,18 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-
           onboarding=Path('runtime/alpha-browser-onboarding-fixes-33400.js')
           text=onboarding.read_text(encoding='utf-8')
-          old='''        release33400();
-        // Returning-player login is presentation release, not navigation.
-'''
-          new='''        release33400();
-        // Explicit LOGIN / CONTINUE is the player-authorised saved-session resume boundary.
-        // Restore canonical Battle session state only after that returning-player choice.
-        try{if(typeof restoreTestState==="function")restoreTestState();}catch(_error){}
-        // Returning-player login is presentation release, not navigation.
-'''
-          if text.count(old)!=1:
-              raise SystemExit(f'login anchor count={text.count(old)}')
-          text=text.replace(old,new,1)
-          onboarding.write_text(text,encoding='utf-8')
-
+          old='        release33400();\n        // Returning-player login is presentation release, not navigation.\n'
+          new='        release33400();\n        // Explicit LOGIN / CONTINUE is the player-authorised saved-session resume boundary.\n        // Restore canonical Battle session state only after that returning-player choice.\n        try{if(typeof restoreTestState==="function")restoreTestState();}catch(_error){}\n        // Returning-player login is presentation release, not navigation.\n'
+          if text.count(old)!=1: raise SystemExit(f'login anchor count={text.count(old)}')
+          onboarding.write_text(text.replace(old,new,1),encoding='utf-8')
           browser=Path('tools/qa_issue_603_step7_promotion_browser.js')
           text=browser.read_text(encoding='utf-8')
-          old='''    await page.reload({waitUntil:"domcontentloaded",timeout:60000});await waitRuntime(page);await releaseFrontDoor(page);await clearTutorialChrome(page);
-'''
-          new='''    await page.reload({waitUntil:"domcontentloaded",timeout:60000});
-    await waitRuntime(page);
-    const returningLogin=page.locator('[data-afd2-action="login"]');
-    if(await returningLogin.count()>0&&await returningLogin.isEnabled())await returningLogin.click();
-    else await releaseFrontDoor(page);
-    await clearTutorialChrome(page);
-'''
-          if text.count(old)!=1:
-              raise SystemExit(f'browser reload anchor count={text.count(old)}')
-          text=text.replace(old,new,1)
-          browser.write_text(text,encoding='utf-8')
+          old='    await page.reload({waitUntil:"domcontentloaded",timeout:60000});await waitRuntime(page);await releaseFrontDoor(page);await clearTutorialChrome(page);\n'
+          new='    await page.reload({waitUntil:"domcontentloaded",timeout:60000});\n    await waitRuntime(page);\n    const returningLogin=page.locator(\'[data-afd2-action="login"]\');\n    if(await returningLogin.count()>0&&await returningLogin.isEnabled())await returningLogin.click();\n    else await releaseFrontDoor(page);\n    await clearTutorialChrome(page);\n'
+          if text.count(old)!=1: raise SystemExit(f'browser reload anchor count={text.count(old)}')
+          browser.write_text(text.replace(old,new,1),encoding='utf-8')
           PY
           node --check runtime/alpha-browser-onboarding-fixes-33400.js
           node --check tools/qa_issue_603_step7_promotion_browser.js
