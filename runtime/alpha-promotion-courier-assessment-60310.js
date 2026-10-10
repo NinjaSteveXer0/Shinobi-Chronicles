@@ -28,7 +28,7 @@ const t=v=>typeof v==="string"?v.trim():"";
 const uniq=v=>[...new Set((Array.isArray(v)?v:[]).map(t).filter(Boolean))];
 function player(){try{return typeof playerData==="object"&&playerData?playerData:globalThis.playerData||null;}catch(_){return globalThis.playerData||null;}}
 function save(){try{if(typeof globalThis.savePlayerData==="function")globalThis.savePlayerData();}catch(_){}}
-function store(){const p=player();if(!p)return null;if(!p[ROOT]||typeof p[ROOT]!=="object")p[ROOT]={schemaVersion:1,attemptsById:{}};if(!p[ROOT].attemptsById)p[ROOT].attemptsById={};return p[ROOT];}
+function store(){const p=player();if(!p)return null;const phase2=p.phase2ChronicleState&&typeof p.phase2ChronicleState==="object"?p.phase2ChronicleState:null;const promotion=phase2&&phase2.promotionState&&typeof phase2.promotionState==="object"&&!Array.isArray(phase2.promotionState)?phase2.promotionState:null;if(promotion){if(!promotion[ROOT]||typeof promotion[ROOT]!=="object")promotion[ROOT]={schemaVersion:1,attemptsById:{}};if(!promotion[ROOT].attemptsById)promotion[ROOT].attemptsById={};return promotion[ROOT];}if(typeof globalThis.ensurePhase2ChronicleState43600==="function")return null;if(!p[ROOT]||typeof p[ROOT]!=="object")p[ROOT]={schemaVersion:1,attemptsById:{}};if(!p[ROOT].attemptsById)p[ROOT].attemptsById={};return p[ROOT];}
 function history(){const p=player();if(!p)return null;if(!Array.isArray(p.activityHistory))p.activityHistory=[];return p.activityHistory;}
 const occurrenceId=id=>`occ_${SCENARIO}::${id}`;
 const battleId=id=>`battle_occ_academy_genin_missing_courier_hold_line_v1::${id}`;

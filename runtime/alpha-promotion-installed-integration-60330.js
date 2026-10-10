@@ -10,6 +10,7 @@ if(globalThis.SC_PROMOTION_INSTALLED_60330)return;
 const PATCH_ID="academy_genin_promotion_installed_60330_v1_2026_10_09";
 const SCENARIO="academy_genin_missing_courier_dispatch_v1";
 const TRANSITION="academy_to_genin";
+const COURIER_STATE_KEY="promotionCourierAssessment60310";
 const controllers=new Map();
 const clone=v=>{try{return v==null?v:JSON.parse(JSON.stringify(v));}catch(_){return v;}};
 function pd(){return typeof playerData!=="undefined"&&playerData?playerData:null;}
@@ -40,7 +41,7 @@ function phase2Root(create=false){
 }
 function persistence(){return{
   load(){const root=phase2Root(false);return root&&root.promotionState?clone(root.promotionState):null;},
-  save(next){const root=phase2Root(true);if(!root)return false;root.promotionState=clone(next);if(typeof savePlayerData!=="function")return false;savePlayerData();return true;}
+  save(next){const root=phase2Root(true);if(!root)return false;const existing=root.promotionState&&typeof root.promotionState==="object"?root.promotionState[COURIER_STATE_KEY]:null;const merged=clone(next);if(existing&&typeof existing==="object")merged[COURIER_STATE_KEY]=clone(existing);root.promotionState=merged;if(typeof savePlayerData!=="function")return false;savePlayerData();return true;}
 };}
 function geninAdapter(payload){
   if(!payload||payload.rankTransitionId!==TRANSITION)return{success:false,reason:"promotion_transition_id_mismatch"};

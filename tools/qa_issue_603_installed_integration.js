@@ -19,7 +19,7 @@ const checks={
   traversalKeepsRosterGate:bridge.includes('isIncompleteTransition33200(state)')&&bridge.includes('openInstalledPromotion60330(subjectId)')&&!bridge.includes('priorPromotion33200'),
   authorisedGeninAdapter:installed.includes('recordOwnedCharacterGeninPromotion(payload.stableCharacterId'),
   immutableChronicleSeedRef:installed.includes('chronicle_seed_ref_v1::${identity.runId}'),
-  scopedPersistence:installed.includes('root.promotionState=clone(next)')&&installed.includes('ensurePhase2ChronicleState43600({save:false})'),
+  scopedPersistence:installed.includes('const existing=root.promotionState')&&installed.includes('root.promotionState[COURIER_STATE_KEY]')&&installed.includes('merged[COURIER_STATE_KEY]=clone(existing)')&&installed.includes('root.promotionState=merged')&&installed.includes('ensurePhase2ChronicleState43600({save:false})'),
   workerModulesLoaded:["alpha-promotion-core-60300.js","alpha-promotion-courier-assessment-60310.js","alpha-promotion-arena-ui-60320.js","alpha-promotion-installed-integration-60330.js"].every(x=>html.includes(x)),
   loaderBeforeTraversal:html.indexOf('alpha-promotion-installed-integration-60330.js')<html.indexOf('alpha-traversal-bridge-33200.js'),
   browserGoldenClaimedFalse:installed.includes('browserGoldenClaimed:false')
