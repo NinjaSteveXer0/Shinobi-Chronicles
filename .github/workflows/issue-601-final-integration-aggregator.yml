@@ -1,0 +1,30 @@
+name: Issue 601 Final Integration Aggregator
+
+on:
+  pull_request:
+    paths:
+      - 'tools/workforce_final_integration_aggregator_601.js'
+      - 'tools/qa_workforce_final_integration_aggregator_601.js'
+      - 'tools/fixtures/workforce_final_integration_601_snapshot_example.json'
+      - '.github/workflows/issue-601-final-integration-aggregator.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Syntax
+        run: |
+          node --check tools/workforce_final_integration_aggregator_601.js
+          node --check tools/qa_workforce_final_integration_aggregator_601.js
+      - name: Deterministic hostile matrix
+        run: node tools/qa_workforce_final_integration_aggregator_601.js
+      - name: Example exact-head aggregation
+        run: node tools/workforce_final_integration_aggregator_601.js --snapshot tools/fixtures/workforce_final_integration_601_snapshot_example.json

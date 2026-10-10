@@ -1,0 +1,49 @@
+{
+  "schema": "sc.workforce-final-integration-evidence.601.v1",
+  "workCell": "#example-work-cell",
+  "integrationOwnerPr": 999,
+  "integratedHeadSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "requirements": [
+    {
+      "family": "targeted_qa",
+      "required": true,
+      "checks": [
+        { "name": "targeted-qa", "requireArtifact": true }
+      ]
+    },
+    {
+      "family": "production_conformance",
+      "required": true,
+      "checks": [
+        { "name": "production-conformance", "requireArtifact": false }
+      ]
+    },
+    { "family": "save_compatibility", "required": false, "checks": [] },
+    { "family": "build_fingerprint", "required": false, "checks": [] },
+    { "family": "browser_runtime", "required": false, "checks": [] }
+  ],
+  "evidence": [
+    {
+      "family": "targeted_qa",
+      "checkName": "targeted-qa",
+      "headSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "source": "github_actions",
+      "runId": 1001,
+      "jobId": 2001,
+      "status": "completed",
+      "conclusion": "success",
+      "artifactIds": [3001]
+    },
+    {
+      "family": "production_conformance",
+      "checkName": "production-conformance",
+      "headSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "source": "github_actions",
+      "runId": 1002,
+      "jobId": 2002,
+      "status": "completed",
+      "conclusion": "success",
+      "artifactIds": []
+    }
+  ]
+}
