@@ -96,8 +96,15 @@ function syncQualifiedEvidence(row,attemptId=null){
     combat_readiness:o.battle&&o.battle.returnEnvelope&&o.battle.returnEnvelope.subjectCombatEvidenceSummary&&Array.isArray(o.battle.returnEnvelope.subjectCombatEvidenceSummary.subjectCommittedActionRefs)&&o.battle.returnEnvelope.subjectCombatEvidenceSummary.subjectCommittedActionRefs.length?o.battle.returnEnvelope.subjectCombatEvidenceSummary.subjectCommittedActionRefs[0]:null,
     objective_protection:has("agen_m01_dispatch_returned_to_examiner_v1")&&o.dispatch&&o.dispatch.integrityState==="agen_m01_dispatch_sealed_intact_v1"?"agen_m01_dispatch_returned_to_examiner_v1":null
   };
-  const results=[];for(const [domain,ref] of Object.entries(rules)){if(ref)results.push({domain,ref,result:row.core.recordQualifiedReadinessEvidence({domain,evidenceRef:`${o.occurrenceId}::${ref}`})});}
-  return{success:results.every(x=>x.result&&x.result.success!==false),assessmentAttemptId:id,qualified:results};
+  let snap=null;try{snap=row.core.getDiagnosticSnapshot();}catch(_error){snap=null;}
+  const required=new Set(Object.values(snap&&snap.state&&snap.state.readinessSlots||{}).map(slot=>slot&&slot.domain).filter(Boolean));
+  if(!required.size)return{success:false,reason:"promotion_required_domains_unavailable",assessmentAttemptId:id};
+  const results=[];
+  for(const [domain,ref] of Object.entries(rules)){
+    if(!ref||!required.has(domain))continue;
+    results.push({domain,ref,result:row.core.recordQualifiedReadinessEvidence({domain,evidenceRef:`${o.occurrenceId}::${ref}`})});
+  }
+  return{success:results.every(x=>x.result&&x.result.success!==false),assessmentAttemptId:id,requiredDomains:[...required],qualified:results};
 }
 function receiptFor(row){
   const o=factsFor(row);if(!o)return null;const rewards=Object.values(o.rewardTransactionsByKey||{}).map(x=>x&&x.playerFacingLine).filter(Boolean);
@@ -109,7 +116,7 @@ function occurrenceRef(id){return`occ_${SCENARIO}::${id}`;}
 function finalize(row,attemptId=null){
   const id=attemptId||latestAttemptId(row);if(!id)return{success:false,reason:"promotion_attempt_not_active"};const c=courier();if(!c)return{success:false,reason:"promotion_courier_authority_missing"};
   const ranked=c.projectRankEvidence(id);if(!ranked||!ranked.success)return ranked||{success:false,reason:"promotion_rank_evidence_unavailable"};
-  syncQualifiedEvidence(row,id);
+  const sync=syncQualifiedEvidence(row,id);if(!sync||!sync.success)return sync||{success:false,reason:"promotion_readiness_evidence_sync_failed"};
   const safety=[c.terminalStates.INTEGRITY,c.terminalStates.SAFETY].includes(ranked.terminalWorldState);
   const resolved=row.core.resolveAssessment({assessmentAttemptId:id,missionObjectiveCompleted:ranked.missionObjectiveCompleted===true,safetyIntegrityAbort:safety,disqualified:false});if(!resolved||!resolved.success)return resolved;
   for(const slotId of globalThis.SC_PROMOTION_CORE_60300.readinessSlotIds||[])row.core.revealReadinessSlot(slotId,{revealRef:`${occurrenceRef(id)}::examiner_debrief`});
