@@ -107,7 +107,6 @@ async function inspectMyClan(page,characterId){
     assert.deepStrictEqual(setup.team.teamVariantIds,["academy_menma","academy_hinata","academy_kakashi"]);
     assert.strictEqual(setup.stat,10);
 
-    // Player-facing Exam projection: no numeric Mastery/fixed 50 fossil.
     await page.evaluate(()=>openKonohaExamFromVillage());
     await page.waitForSelector("#konoha-activity-screen[data-service-id='exams']",{state:"visible",timeout:10000});
     await page.evaluate(()=>selectKonohaExamDiscipline("nin"));
@@ -127,7 +126,6 @@ async function inspectMyClan(page,characterId){
     assert(!/\/\s*50\b/.test(exam.text),"fixed 50 denominator fossil still visible");
     await page.screenshot({path:path.join(OUT,"01-exam-dynamic-development.png"),fullPage:true});
 
-    // A committed material failure still develops +1 under the shared action-derived law.
     const materialFailure=await page.evaluate(()=>{
       const old=Math.random;Math.random=()=>0;
       try{
@@ -145,7 +143,6 @@ async function inspectMyClan(page,characterId){
     assert.strictEqual(materialFailure.after.currentStat,10);
     assert.strictEqual(materialFailure.after.developmentExp,1);
 
-    // Real existing Exam batch path: five effective passes x +2 crosses Stat 10 -> 11 and preserves overflow.
     const batch=await page.evaluate(()=>{
       const old=Math.random;Math.random=()=>0.999999;
       try{
@@ -172,7 +169,6 @@ async function inspectMyClan(page,characterId){
     assert.strictEqual(teamNoPassive.hinata.developmentExp,0,"Hinata received passive team development");
     assert.strictEqual(teamNoPassive.kakashi.developmentExp,0,"Kakashi received passive team development");
 
-    // My Clan reads the same Character Current Stats and formula PL — no local shadow cache.
     const clan=await inspectMyClan(page,"academy_menma");
     assert.strictEqual(clan.selected?.success,true,"My Clan could not inspect persistent subject: "+JSON.stringify(clan));
     assert(clan.roster.includes("academy_menma"),"My Clan manageable roster lost persistent subject: "+JSON.stringify(clan));
@@ -182,7 +178,6 @@ async function inspectMyClan(page,characterId){
     assert(clan.text.includes("PL "+clan.pl)||clan.text.includes("CURRENT PL")||clan.html.includes(String(clan.pl)),"My Clan PL projection missing");
     await page.screenshot({path:path.join(OUT,"02-my-clan-current-stat.png"),fullPage:true});
 
-    // Save/reload preserves exact Current Stat, remaining EXP and formula PL.
     const beforeReload=await page.evaluate(()=>{
       const c=getPlayerCharacter("academy_menma");
       const rows=playerData.activityHistory||[];
@@ -212,11 +207,13 @@ async function inspectMyClan(page,characterId){
     assert.strictEqual(afterReload.developmentReceipts,beforeReload.developmentReceipts,"reload duplicated/lost development receipts");
     assert.strictEqual(afterReload.breakthroughReceipts,beforeReload.breakthroughReceipts,"reload duplicated/lost breakthrough receipts");
 
-    // Reload returns to the normal shell; reopen the real Exam surface before validating its ceiling presentation.
     await page.evaluate(()=>openKonohaExamFromVillage());
     await page.waitForSelector("#konoha-activity-screen",{state:"visible",timeout:10000});
 
-    // Ceiling/batch semantics: last eligible attempt reaches 15 with overflow; ×10 stops immediately afterward.
+    // #448 remains the Foundation owner and correctly reports that source's
+    // ceiling at 15. Once #576 is production-loaded, the player-facing Exam
+    // immediately projects the legitimately earned Expert source instead of
+    // leaving stale Foundation-limit copy on screen.
     const ceiling=await page.evaluate(()=>{
       const c=getPlayerCharacter("academy_menma"),p=getCharacterDisciplineProgression(c.id,"nin");
       c.stats.nin=14;p.exp=14;p.level=1;p.statLevelApplied=1;savePlayerData();
@@ -228,26 +225,30 @@ async function inspectMyClan(page,characterId){
           results:JSON.parse(JSON.stringify(results)),
           snapshot:getDisciplineDevelopmentSnapshot448(c.id,"nin","exam"),
           preflight:preflightDisciplineDevelopment448(c.id,"nin","exam"),
+          curriculum:typeof resolveDisciplineCurriculumProfile576==="function"?JSON.parse(JSON.stringify(resolveDisciplineCurriculumProfile576(c.id,"nin","exam"))):null,
           meta:JSON.parse(JSON.stringify(KONOHA_EXAM_ATTEMPT_STATE.lastBatchMeta||null)),
           text:document.getElementById("konoha-activity-screen")?.innerText||"",
           history:playerData.activityHistory.filter(row=>row&&["discipline_stat_breakthrough","activity_development_ceiling_reached"].includes(row.type)).map(row=>JSON.parse(JSON.stringify(row)))
         };
       }finally{Math.random=old;}
     });
-    assert.strictEqual(ceiling.results.length,1,"×10 Exam did not stop immediately at development ceiling");
+    assert.strictEqual(ceiling.results.length,1,"×10 Exam did not stop immediately at Foundation source ceiling");
     assert.strictEqual(ceiling.results[0].success,true);
     assert.strictEqual(ceiling.snapshot.currentStat,15);
-    assert.strictEqual(ceiling.snapshot.developmentExp,1,"final eligible repetition lost legitimate overflow");
+    assert.strictEqual(ceiling.snapshot.developmentExp,1,"final eligible Foundation repetition lost legitimate overflow");
     assert.strictEqual(ceiling.preflight.allowed,false);
     assert.strictEqual(ceiling.preflight.reason,"activity_development_ceiling_reached");
     assert.strictEqual(ceiling.meta.stoppedAtCeiling,true);
-    assert(ceiling.text.includes("FOUNDATION TRAINING LIMIT REACHED"),"source-efficacy primary label missing at Foundation limit");
-    assert(ceiling.text.includes("This activity can no longer advance NINJUTSU. Further development requires a more demanding source."),"source-scoped supporting copy missing at Foundation limit");
-    assert(!/STAT DEVELOPMENT COMPLETE FOR THIS ACTIVITY|FOUNDATION DEVELOPMENT COMPLETE AT STAT|MAX STAT 15|DISCIPLINE MAXED|STAT COMPLETE/i.test(ceiling.text),"global-cap-suggestive wording visible at Foundation source limit");
-    assert(ceiling.history.some(row=>row.type==="activity_development_ceiling_reached"),"ceiling milestone receipt missing");
+    assert.strictEqual(ceiling.curriculum?.allowed,true,"earned Expert curriculum did not become available at Stat 15");
+    assert.strictEqual(ceiling.curriculum?.tier,"expert");
+    assert.strictEqual(ceiling.curriculum?.activityProfileId,"discipline_curriculum_nin_expert_v1");
+    assert(ceiling.text.includes("EXPERT NINJUTSU CURRICULUM — EFFECTIVE THROUGH STAT 30"),"earned Expert source is not the current player-facing source after Foundation ceiling");
+    assert(!ceiling.text.includes("FOUNDATION TRAINING LIMIT REACHED"),"stale Foundation-limit label remained after Expert source became available");
+    assert(!ceiling.text.includes("This activity can no longer advance NINJUTSU. Further development requires a more demanding source."),"stale Foundation-limit supporting copy remained after Expert source became available");
+    assert(!/STAT DEVELOPMENT COMPLETE FOR THIS ACTIVITY|FOUNDATION DEVELOPMENT COMPLETE AT STAT|MAX STAT 15|DISCIPLINE MAXED|STAT COMPLETE/i.test(ceiling.text),"global-cap-suggestive wording visible at Foundation source transition");
+    assert(ceiling.history.some(row=>row.type==="activity_development_ceiling_reached"),"Foundation ceiling milestone receipt missing");
     await page.screenshot({path:path.join(OUT,"03-exam-ceiling-complete.png"),fullPage:true});
 
-    // Practical gets the same dynamic player-facing semantics.
     const practicalAction=await page.evaluate(()=>{
       const c=getPlayerCharacter("academy_menma"),p=getCharacterDisciplineProgression(c.id,"tai");
       c.stats.tai=10;p.exp=0;p.level=1;p.statLevelApplied=1;savePlayerData();
@@ -285,7 +286,7 @@ async function inspectMyClan(page,characterId){
       developmentPerEffectiveFoundationAction:2,
       dynamicThresholdUI:true,numericMasteryRetired:true,
       myClanCanonicalProjection:true,saveReload:true,
-      foundationSourceLimit15:true,noGlobalStatCapSemantics:true,batchStopsAtCeiling:true,overflowPreserved:true,
+      foundationSourceLimit15:true,expertSourceTransition15:true,noGlobalStatCapSemantics:true,batchStopsAtCeiling:true,overflowPreserved:true,
       passiveTeamSharing:false,techniquePracticeActivated:false,
       browserGoldenClaimed:false
     },null,2));
