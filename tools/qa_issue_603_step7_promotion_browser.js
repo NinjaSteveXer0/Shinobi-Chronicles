@@ -105,7 +105,7 @@ async function viewportScenario(browser,width,height,label){
     assert.strictEqual(hiddenTwin.satisfied.rows,hiddenTwin.unsatisfied.rows,"hidden satisfied/unsatisfied DOM/accessibility differs");
     assert.strictEqual(hiddenTwin.satisfied.html,hiddenTwin.unsatisfied.html,"hidden satisfied/unsatisfied rendered markup differs");
 
-    const attemptButton=arena.getByRole("button",{name:/begin|start|commit|accept.*assessment|attempt/i}).first();
+    const attemptButton=arena.getByRole("button",{name:/enter|begin|start|commit|accept.*assessment|attempt/i}).first();
     assert(await attemptButton.count()>0,"explicit attempt-commit control missing");
     await attemptButton.click();await page.waitForTimeout(200);
     const attemptTruth=await page.evaluate(()=>{
