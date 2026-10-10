@@ -77,9 +77,15 @@ function actorNode49000(root,id){
   return root.querySelector('[data-actor-id="'+safe+'"]');
 }
 function authorisedTeam49000(runtime=activeRuntime49000()){
-  const ids=runtime&&runtime.localContext&&Array.isArray(runtime.localContext.teamVariantIds)
+  const localIds=runtime&&runtime.localContext&&Array.isArray(runtime.localContext.teamVariantIds)
     ?runtime.localContext.teamVariantIds.map(String):[];
-  return new Set(ids);
+  if(localIds.length)return new Set(localIds);
+  try{
+    const committed=typeof globalThis.getChronicleCurrentTeam43600==="function"
+      ?globalThis.getChronicleCurrentTeam43600():null;
+    const committedIds=committed&&Array.isArray(committed.teamVariantIds)?committed.teamVariantIds.map(String):[];
+    return new Set(committedIds);
+  }catch(_error){return new Set();}
 }
 function benchmarkEligible49000(runtime=activeRuntime49000()){
   if(!runtime||runtime.sceneId!==BENCHMARK_SCENE_ID)return false;
@@ -311,7 +317,7 @@ function diagnostics49000(){
     oneActorMotionOwner:source.includes("actorAnimations=new WeakMap")&&String(playActorPrimitive49000).includes('cancelActorMotion49000(node,"new_cue")'),
     nonSemanticSettle:String(playActorPrimitive49000).includes("settleActor49000(node)")&&String(cancelActorMotion49000).includes('removeProperty("translate")'),
     reducedMotionEquivalent:String(playActorPrimitive49000).includes("reducedMotion49000")&&String(playActorPrimitive49000).includes('translate:"0 0"'),
-    currentTeamAuthorisesHinata:String(benchmarkEligible49000).includes("teamVariantIds")||String(authorisedTeam49000).includes("teamVariantIds"),
+    currentTeamAuthorisesHinata:String(authorisedTeam49000).includes("getChronicleCurrentTeam43600")&&String(benchmarkEligible49000).includes("team.has"),
     presentationOnlyApiSurface:typeof globalThis.playStoryExpressivePrimitive49000!=="undefined"||typeof playActorPrimitive49000==="function",
     benchmarkReturnsToAnchor:String(playActorPrimitive49000).includes("settleActor49000(node)"),
     browserGoldenClaimed:false
