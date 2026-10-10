@@ -1,0 +1,57 @@
+name: Issue 601 Workforce Collision Guard
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+    paths:
+      - 'tools/workforce_collision_guard_601.js'
+      - 'tools/qa_workforce_collision_guard_601.js'
+      - 'tools/fixtures/workforce_protected_seams_601.json'
+      - '.github/workflows/issue-601-workforce-collision.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  source-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Syntax
+        run: |
+          node --check tools/workforce_collision_guard_601.js
+          node --check tools/qa_workforce_collision_guard_601.js
+      - name: Focused S0.5 contract QA
+        run: node tools/qa_workforce_collision_guard_601.js
+
+  live-advisory:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Inspect target against current open Coding PRs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          mkdir -p artifacts/issue-601-workforce-collision
+          node tools/workforce_collision_guard_601.js \
+            --live \
+            --repo "${GITHUB_REPOSITORY}" \
+            --target-pr "${PR_NUMBER}" \
+            --json-out artifacts/issue-601-workforce-collision/report.json
+      - name: Upload advisory evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-601-workforce-collision
+          path: artifacts/issue-601-workforce-collision
+          if-no-files-found: error

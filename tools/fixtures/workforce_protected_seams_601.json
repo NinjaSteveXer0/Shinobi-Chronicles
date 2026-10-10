@@ -1,0 +1,28 @@
+{
+  "schema": "sc.workforce-protected-seams.601.v1",
+  "seams": [
+    {
+      "id": "root_game_runtime",
+      "description": "Root gameplay runtime seam",
+      "patterns": ["game.js"]
+    },
+    {
+      "id": "production_loader",
+      "description": "Production loader/order seam",
+      "patterns": ["index.html"]
+    },
+    {
+      "id": "runtime_fingerprint",
+      "description": "Runtime fingerprint source and committed manifest",
+      "patterns": [
+        "runtime/alpha-runtime-build-fingerprint-303.js",
+        "tools/fixtures/runtime_build_manifest_303.json"
+      ]
+    },
+    {
+      "id": "production_conformance_matrix",
+      "description": "#528 production change impact matrix",
+      "patterns": ["qa/production_change_impact_matrix_528.json"]
+    }
+  ]
+}

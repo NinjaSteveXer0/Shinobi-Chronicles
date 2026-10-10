@@ -1,0 +1,13 @@
+{
+  "targetPr": 100,
+  "openPrs": [
+    {
+      "number": 100,
+      "title": "[CODING] Example integrator",
+      "headRef": "coding/example-integrator",
+      "state": "open",
+      "changedFiles": ["runtime/example.js"],
+      "body": "<!-- SC-WORKFORCE-RESERVATION-601\n{\"schema\":\"sc.workforce-reservation.601.v1\",\"workCell\":\"#100\",\"lane\":\"I\",\"role\":\"integration_owner\",\"issue\":100,\"integrationOwnerPr\":100,\"reservedPaths\":[\"runtime/example.js\"],\"sharedSeams\":[],\"sameCellOverlapPaths\":[]}\nSC-WORKFORCE-RESERVATION-601 -->"
+    }
+  ]
+}
