@@ -51,8 +51,10 @@ jobs:
           node --check tools/qa_issue_609_player_controls_browser.js
           ! grep -E 'SC_PROMOTION_(INSTALLED_60330|COURIER_ASSESSMENT_60310)\.(commitBriefing|advanceJourney|resolveSearch|resolvePriority|confirmHostileContact|launchHoldLineBattle|resolveNonBattleContact|beginExtraction|handoffDispatch|commitDebrief|commitTerminal|executePlayerMissionAction|finalize)\s*\(' tools/qa_issue_609_player_controls_browser.js
 
-      - name: Install Chromium
-        run: npx --yes playwright@1.55.0 install --with-deps chromium
+      - name: Install Playwright + Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
 
       - name: Start exact-head app server
         shell: bash
