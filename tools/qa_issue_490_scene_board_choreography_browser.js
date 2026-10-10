@@ -28,12 +28,19 @@ async function setup(page,runIdPrefix){
     playerData=createDefaultPlayerData();
     setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
 
+    const originalSave=globalThis.savePlayerData;
+    const originalDecision=JSON.parse(JSON.stringify(playerData.storyDecisionRuntime34000||null));
+    const originalFactual=JSON.parse(JSON.stringify(playerData.storyFactualResolver34600||null));
+    const resetSemanticRoots=()=>{
+      playerData.storyDecisionRuntime34000=originalDecision?JSON.parse(JSON.stringify(originalDecision)):undefined;
+      playerData.storyFactualResolver34600=originalFactual?JSON.parse(JSON.stringify(originalFactual)):undefined;
+    };
     const eligibleRunId=(()=>{
-      const originalSave=globalThis.savePlayerData;
       globalThis.savePlayerData=()=>true;
       try{savePlayerData=globalThis.savePlayerData;}catch(_error){}
       try{
         for(let i=0;i<2200;i++){
+          resetSemanticRoots();
           const candidate=fixtureRunIdPrefix+"_"+String(i).padStart(4,"0");
           const seed=["sc.privateOriginHistory.v1",candidate,"academy_kakashi","academy_kakashi_v2","v3"].join("::");
           const preview=previewAutonomousKakashiPrivateOrigin46900(seed);
@@ -45,6 +52,7 @@ async function setup(page,runIdPrefix){
         }
         return null;
       }finally{
+        resetSemanticRoots();
         globalThis.savePlayerData=originalSave;
         try{savePlayerData=originalSave;}catch(_error){}
       }
