@@ -31,15 +31,15 @@ jobs:
           onboarding.write_text(text.replace(old,new,1),encoding='utf-8')
           browser=Path('tools/qa_issue_603_step7_promotion_browser.js')
           text=browser.read_text(encoding='utf-8')
-          old='    await page.reload({waitUntil:"domcontentloaded",timeout:60000});await waitRuntime(page);await releaseFrontDoor(page);await clearTutorialChrome(page);\n'
-          new='    await page.reload({waitUntil:"domcontentloaded",timeout:60000});\n    await waitRuntime(page);\n    const returningLogin=page.locator(\'[data-afd2-action="login"]\');\n    if(await returningLogin.count()>0&&await returningLogin.isEnabled())await returningLogin.click();\n    else await releaseFrontDoor(page);\n    await clearTutorialChrome(page);\n'
-          if text.count(old)!=1: raise SystemExit(f'browser reload anchor count={text.count(old)}')
+          old='    assert(beforeReload.battle.active&&!beforeReload.battle.over,"Battle terminated before mid-Battle persistence proof");\n    await page.reload({waitUntil:"domcontentloaded",timeout:60000});await waitRuntime(page);await releaseFrontDoor(page);await clearTutorialChrome(page);\n    const afterReload=await page.evaluate(id=>({\n'
+          new='    assert(beforeReload.battle.active&&!beforeReload.battle.over,"Battle terminated before mid-Battle persistence proof");\n    await page.reload({waitUntil:"domcontentloaded",timeout:60000});\n    await waitRuntime(page);\n    const returningLogin=page.locator(\'[data-afd2-action="login"]\');\n    if(await returningLogin.count()>0&&await returningLogin.isEnabled())await returningLogin.click();\n    else await releaseFrontDoor(page);\n    await clearTutorialChrome(page);\n    const afterReload=await page.evaluate(id=>({\n'
+          if text.count(old)!=1: raise SystemExit(f'mid-Battle reload anchor count={text.count(old)}')
           browser.write_text(text.replace(old,new,1),encoding='utf-8')
           PY
           node --check runtime/alpha-browser-onboarding-fixes-33400.js
           node --check tools/qa_issue_603_step7_promotion_browser.js
           grep -F 'typeof restoreTestState==="function"' runtime/alpha-browser-onboarding-fixes-33400.js
-          grep -F 'data-afd2-action="login"' tools/qa_issue_603_step7_promotion_browser.js
+          grep -F 'const returningLogin=page.locator' tools/qa_issue_603_step7_promotion_browser.js
           node tools/qa_issue_165_front_door_runtime.js
           node tools/qa_issue_165_front_door_v2_runtime.js
           node tools/qa_issue_603_step7_promotion.js
