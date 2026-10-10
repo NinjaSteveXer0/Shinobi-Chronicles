@@ -184,6 +184,20 @@
         "node tools/qa_issue_576_production_integration_browser.js"
       ],
       "scheduled_representative": false
+    },
+    "issue585_static": {
+      "kind": "static",
+      "commands": [
+        "node tools/qa_issue_585_forge_created_kunai.js"
+      ],
+      "scheduled_representative": false
+    },
+    "issue585_browser": {
+      "kind": "browser",
+      "commands": [
+        "node tools/qa_issue_585_forge_created_kunai_browser.js"
+      ],
+      "scheduled_representative": false
     }
   },
   "rules": [
@@ -392,6 +406,32 @@
         "issue431_browser",
         "issue576_static",
         "issue576_browser"
+      ]
+    },
+    {
+      "id": "forge_created_durable_kunai_585",
+      "changed_any": [
+        "runtime/alpha-forge-created-kunai-58500.js",
+        "tools/qa_issue_585_forge_created_kunai.js",
+        "tools/qa_issue_585_forge_created_kunai_browser.js"
+      ],
+      "affected_consumers": [
+        "inventory_core_461",
+        "basic_item_shop_517"
+      ],
+      "required_lane_ids": [
+        "runtime_fingerprint",
+        "ownership_safety",
+        "save_compatibility",
+        "issue461_static",
+        "issue461_browser",
+        "issue545_static",
+        "issue517_static",
+        "issue517_browser",
+        "issue552_static",
+        "issue552_browser",
+        "issue585_static",
+        "issue585_browser"
       ]
     },
     {

@@ -16,10 +16,10 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-10-EP",
-    sourceBaselineCommit:"199b57bdcc4ae537f0d47145338160340c1f7f3e",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-10-10-EQ",
+    sourceBaselineCommit:"b360007b26ffa5b623954a5c2adb25669331ccc0",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
-    runtimeGeneration:"expert-master-discipline-curriculum-integrated-576",
+    runtimeGeneration:"forge-created-durable-kunai-integrated-585",
     majorRuntimeFeatures:Object.freeze([
       "academy-kakashi-v2",
       "runtime-ownership-safety-300",
@@ -112,7 +112,8 @@
       "phase2-konoha-activity-contamination-539",
       "canonical-battle-terminal-result-owner-consolidated-544",
       "step7-academy-genin-promotion-integrated-603",
-      "expert-master-discipline-curriculum-576"
+      "expert-master-discipline-curriculum-576",
+      "forge-created-durable-kunai-585"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -143,10 +144,10 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-10-EP",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-10-10-EQ",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
-      generationPresent:first.runtimeGeneration==="expert-master-discipline-curriculum-integrated-576",
+      generationPresent:first.runtimeGeneration==="forge-created-durable-kunai-integrated-585",
       repaired469FeaturePresent:first.majorRuntimeFeatures.includes("phase2-first-live-ce-hotspot-469"),
       privateHistory478FeaturePresent:first.majorRuntimeFeatures.includes("phase2-private-origin-live-ce-hotspot-478"),
       ownerRetestPresentationFeaturePresent:first.majorRuntimeFeatures.includes("story-scene-board-owner-retest-469"),
@@ -189,6 +190,7 @@
       canonicalBattleTerminalResult544Present:first.majorRuntimeFeatures.includes("canonical-battle-terminal-result-owner-consolidated-544"),
       step7Promotion603Present:first.majorRuntimeFeatures.includes("step7-academy-genin-promotion-integrated-603"),
       expertMasterCurriculum576Present:first.majorRuntimeFeatures.includes("expert-master-discipline-curriculum-576"),
+      forgeCreatedDurableKunai585Present:first.majorRuntimeFeatures.includes("forge-created-durable-kunai-585"),
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)
