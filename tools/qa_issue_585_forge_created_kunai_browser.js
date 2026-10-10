@@ -79,17 +79,34 @@ function commissionSpec(operationId){
     const seeded=await page.evaluate(()=>{
       localStorage.clear();
       playerData=createDefaultPlayerData();
+      if(typeof setCharacterOwnershipRuntimeAuthority==="function")setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+      if(typeof savePlayerData==="function")savePlayerData();
+      const selected=selectChronicleOrigin("academy_kakashi","qa585_forge_origin");
+      if(!selected||selected.success!==true)throw new Error("#585 canonical academy_kakashi Origin selection failed: "+JSON.stringify(selected));
+      const owned=playerData.acquisition?.ownedCharactersByVariantId?.academy_kakashi||null;
+      if(!owned||!owned.ownedCharacterId)throw new Error("#585 canonical academy_kakashi ownership missing after Origin selection");
+      const kakashi=typeof getPlayerCharacter==="function"?getPlayerCharacter("academy_kakashi"):null;
+      if(!kakashi)throw new Error("#585 canonical academy_kakashi commissioner missing after Origin selection");
+      if(!Array.isArray(kakashi.equipment))kakashi.equipment=[];
       playerData.ryo=100;
       if(!Array.isArray(playerData.inventory))playerData.inventory=[];
       if(!Array.isArray(playerData.activityHistory))playerData.activityHistory=[];
+      playerData.inventory=playerData.inventory.filter(row=>!(!row?.instanceId&&(row?.id||row?.itemId)==="weapon_materials"));
       playerData.inventory.push({id:"weapon_materials",itemId:"weapon_materials",name:"Weapon Materials",quantity:2,rarity:"Common"});
-      const kakashi=typeof getPlayerCharacter==="function"?getPlayerCharacter("academy_kakashi"):null;
-      if(!kakashi)throw new Error("#585 canonical academy_kakashi commissioner missing");
-      if(!Array.isArray(kakashi.equipment))kakashi.equipment=[];
       savePlayerData();
-      return{ryo:playerData.ryo,materials:playerData.inventory.filter(row=>row&&!row.instanceId&&(row.id||row.itemId)==="weapon_materials").reduce((sum,row)=>sum+(Number(row.quantity)||0),0)};
+      return{
+        selectedSuccess:selected.success===true,
+        ownedCharacterId:owned.ownedCharacterId,
+        commissionerId:kakashi.id||null,
+        ryo:playerData.ryo,
+        materials:playerData.inventory.filter(row=>row&&!row.instanceId&&(row.id||row.itemId)==="weapon_materials").reduce((sum,row)=>sum+(Number(row.quantity)||0),0)
+      };
     });
-    assert.deepStrictEqual(seeded,{ryo:100,materials:2});
+    assert.strictEqual(seeded.selectedSuccess,true);
+    assert.ok(seeded.ownedCharacterId,"#585 canonical owned Character id missing");
+    assert.strictEqual(seeded.commissionerId,"academy_kakashi");
+    assert.strictEqual(seeded.ryo,100);
+    assert.strictEqual(seeded.materials,2);
 
     const spec=commissionSpec("forge585:browser:001");
     const made=await page.evaluate(input=>commitForgeCreatedKunai58500(input),spec);
@@ -167,7 +184,7 @@ function commissionSpec(operationId){
 
     await gate.assertClean("forge-created-kunai-585");
     console.log(JSON.stringify({
-      issue:585,pass:true,productionLoaded:true,dependencyOrder:"#545 -> #552 -> #585",exactInstanceId:made.instanceId,
+      issue:585,pass:true,productionLoaded:true,dependencyOrder:"#545 -> #552 -> #585",canonicalCommissionerRoute:"academy_kakashi Origin ownership",exactInstanceId:made.instanceId,
       transaction:{weaponMaterials:"2 -> 1",ryo:"100 -> 75",durability:"10/10",autoEquip:false},
       exactForgedEquippedUsableBonus:1,idempotentReplay:true,wearProof:"10 -> 9",saveReloadWornProof:"9/10",repairProof:"9 -> 10",
       exactCreationProvenance:true,reloadImageAbortEvidence:reloadImageAborts,browserGoldenClaimed:false
