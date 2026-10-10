@@ -21,17 +21,36 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - name: Correct browser harness to follow factual active slot
+      - name: Correct browser harness to follow factual Battle state
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
           p=Path('tools/qa_issue_603_step7_promotion_browser.js')
           s=p.read_text(encoding='utf-8')
-          old='    const actor=currentBattle.characterId||getBattleDeploymentParticipant?.("player",1)?.id||null;'
-          new='    const actor=currentBattle.activePlayer?.id||getBattleDeploymentParticipant?.("player",1)?.id||currentBattle.characterId||null;'
-          if s.count(old)!=1: raise SystemExit(f'actor selector count={s.count(old)}')
-          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          replacements=[
+            ('    const actor=currentBattle.characterId||getBattleDeploymentParticipant?.("player",1)?.id||null;',
+             '    const actor=currentBattle.activePlayer?.id||getBattleDeploymentParticipant?.("player",1)?.id||currentBattle.characterId||null;'),
+            ('    assert.strictEqual(terminal.outcome,"victory","real-action Hold-Line route failed to produce Victory: "+JSON.stringify(terminal));',
+             '    assert(["victory","defeat"].includes(terminal.outcome),"real-action Hold-Line route produced invalid factual outcome: "+JSON.stringify(terminal));'),
+            ('    assert.strictEqual(returned.battle.returnEnvelope?.battleResult,"victory");',
+             '    assert.strictEqual(returned.battle.returnEnvelope?.battleResult,terminal.outcome);'),
+            ('    assert.strictEqual(returned.missionObjectiveCompleted,null,"Battle victory manufactured mission completion");\n    const battleRewards=(await rewardSnapshot(page)).rows.filter(r=>r.cause==="battle_victory");\n    assert.strictEqual(battleRewards.length,1,"Hold-Line Victory must award one separate 50 Ryō cause");\n    assert.strictEqual(battleRewards[0].ryo,50);',
+             '    assert.strictEqual(returned.missionObjectiveCompleted,null,"Battle result manufactured mission completion");\n    const battleRewards=(await rewardSnapshot(page)).rows.filter(r=>r.cause==="battle_victory");\n    if(terminal.outcome==="victory"){assert.strictEqual(battleRewards.length,1,"Hold-Line Victory must award one separate 50 Ryō cause");assert.strictEqual(battleRewards[0].ryo,50);}\n    else assert.strictEqual(battleRewards.length,0,"Hold-Line defeat manufactured Battle-victory reward");'),
+            ('    assert.strictEqual(afterFinalize.ryo-beforeRewards.ryo,300,"Battle+mission route should award exact 300 Ryō total");',
+             '    const expectedRyo=terminal.outcome==="victory"?300:250;\n    assert.strictEqual(afterFinalize.ryo-beforeRewards.ryo,expectedRyo,"Battle+mission route reward total drift");'),
+            ('    const causes=afterFinalize.rows.map(r=>r.cause).sort();\n    for(const cause of ["battle_victory","courier_recovered_alive","dispatch_returned_intact","full_mission_objective_completion"])assert(causes.includes(cause),"missing reward cause "+cause+": "+JSON.stringify(causes));',
+             '    const causes=afterFinalize.rows.map(r=>r.cause).sort();\n    for(const cause of ["courier_recovered_alive","dispatch_returned_intact","full_mission_objective_completion"])assert(causes.includes(cause),"missing reward cause "+cause+": "+JSON.stringify(causes));\n    assert.strictEqual(causes.includes("battle_victory"),terminal.outcome==="victory","Battle reward cause did not match factual Battle result");'),
+            ('    assert(/150 Ryō/.test(receiptText)&&/100 Ryō/.test(receiptText)&&/50 Ryō/.test(receiptText)&&/Field Recovery Pill/i.test(receiptText),"Receipt did not project exact causal rewards");',
+             '    assert(/150 Ryō/.test(receiptText)&&/100 Ryō/.test(receiptText)&&/Field Recovery Pill/i.test(receiptText),"Receipt did not project exact mission reward causes");\n    assert.strictEqual(/50 Ryō/.test(receiptText),terminal.outcome==="victory","Receipt Battle reward projection did not match factual outcome");'),
+            ('    return{attemptId:committed.attemptId,packageId:committed.packageId,battleOutcome:terminal.outcome,midBattleReloadStable:true,pass:true,genin:true,ryoDelta:300,pillDelta:1};',
+             '    return{attemptId:committed.attemptId,packageId:committed.packageId,battleOutcome:terminal.outcome,midBattleReloadStable:true,pass:true,genin:true,ryoDelta:terminal.outcome==="victory"?300:250,pillDelta:1};')
+          ]
+          for old,new in replacements:
+              count=s.count(old)
+              if count!=1: raise SystemExit(f'replacement count={count} for {old[:90]}')
+              s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
           PY
           node --check tools/qa_issue_603_step7_promotion_browser.js
           node tools/qa_issue_603_step7_promotion.js
@@ -52,5 +71,5 @@ jobs:
           git config user.name "ChatGPT Codex Connector"
           git config user.email "codex-connector@users.noreply.github.com"
           git add tools/qa_issue_603_step7_promotion_browser.js .github/workflows/tmp-603-active-player-browser-qa.yml
-          git commit -m "[QA][#603] Follow active Battle participant after withdrawal"
+          git commit -m "[QA][#603] Follow factual Hold-Line Battle outcome"
           git push origin HEAD:coding/603-step7-promotion-integration
