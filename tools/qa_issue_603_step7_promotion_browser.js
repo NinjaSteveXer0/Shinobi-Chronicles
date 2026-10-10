@@ -29,10 +29,12 @@ function semanticSnapshotScript(){
   });
 }
 async function releaseFrontDoor(page){
+  await page.waitForFunction(()=>!!globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400||!!document.getElementById("sc-alpha-front-door-33400"),null,{timeout:10000}).catch(()=>{});
   await page.evaluate(()=>{
     try{globalThis.releaseAlphaFrontDoor33300?.();}catch(_error){}
     try{globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400?.release?.();}catch(_error){}
-    document.querySelector(".game-container")?.removeAttribute("data-alpha-front-door-locked");
+    const game=document.querySelector(".game-container");
+    if(game){game.removeAttribute("data-alpha-front-door-locked");game.inert=false;}
     document.getElementById("sc-alpha-front-door-33300")?.remove();
     document.getElementById("sc-alpha-front-door-33400")?.remove();
   });
@@ -57,8 +59,10 @@ async function seedPlayableAcademy(page,label){
   return result;
 }
 async function openPromotionInspection(page){
+  await releaseFrontDoor(page);
   await page.evaluate(()=>globalThis.openOverlay?.("arena"));
   const arena=page.locator("#overlay-content-container");await arena.waitFor({state:"visible",timeout:15000});
+  await releaseFrontDoor(page);
   const guide=page.locator("#sc-konoha-onboarding-35000");
   if(await guide.count()>0&&await guide.isVisible()){
     const continueButton=guide.getByRole("button",{name:/^continue$/i}).first();
@@ -93,9 +97,11 @@ async function hiddenProjectionRows(page){
 async function viewportScenario(browser,width,height,label){
   const context=await browser.newContext({viewport:{width,height}});const page=await context.newPage();const errors=await installBrowserRuntimeErrorGate(page);
   try{
-    await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});await releaseFrontDoor(page);
+    await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});
     await page.waitForFunction(()=>typeof globalThis.openOverlay==="function"&&typeof globalThis.openInstalledPromotion60330==="function",null,{timeout:30000});
+    await releaseFrontDoor(page);
     await seedPlayableAcademy(page,`qa603:${label}`);
+    await releaseFrontDoor(page);
     const before=await page.evaluate(semanticSnapshotScript());
     const arena=await openPromotionInspection(page);
     const afterInspection=await page.evaluate(semanticSnapshotScript());
