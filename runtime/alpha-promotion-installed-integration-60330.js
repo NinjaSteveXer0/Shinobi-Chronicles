@@ -69,9 +69,17 @@ function teamSnapshot(subject){
   const states={};refs.forEach(ref=>{states[ref]={controlClass:"player",positionRef:"KON-P01",present:true};});
   return{success:true,participantRefs:refs,subjectBattleRef:subjectRef,participantStateByRef:states};
 }
+function attemptState(row){try{const snap=row.core.getDiagnosticSnapshot();return snap&&snap.state&&typeof snap.state==="object"?snap.state:null;}catch(_){return null;}}
 function latestAttemptId(row){
   if(row.lastAttemptId)return row.lastAttemptId;
-  try{const snap=row.core.getDiagnosticSnapshot();const attempts=snap&&snap.state&&Array.isArray(snap.state.attempts)?snap.state.attempts:[];const active=[...attempts].reverse().find(x=>x&&x.status==="COMMITTED");return active&&active.assessmentAttemptId||null;}catch(_){return null;}
+  const state=attemptState(row),attempts=state&&Array.isArray(state.attempts)?state.attempts:[],latest=attempts.length?attempts[attempts.length-1]:null;
+  return latest&&latest.assessmentAttemptId||null;
+}
+function activeAttemptId(row){
+  const state=attemptState(row);if(!state)return null;
+  if(state.activeAttemptId)return state.activeAttemptId;
+  const attempts=Array.isArray(state.attempts)?state.attempts:[],active=[...attempts].reverse().find(x=>x&&x.status==="COMMITTED");
+  return active&&active.assessmentAttemptId||null;
 }
 function courier(){return globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310||null;}
 function beginAssessment(row){
@@ -124,7 +132,7 @@ function finalize(row,attemptId=null){
   let promotion=null;if(resolved.attempt&&resolved.attempt.status==="PASS")promotion=row.core.commitAuthorisedGeninTransition({assessmentAttemptId:id});
   return{...resolved,promotion,projection:truth(row)};
 }
-function withdraw(row){const id=latestAttemptId(row);if(!id)return{success:false,reason:"promotion_attempt_not_active"};const c=courier();if(c&&typeof c.commitTerminal==="function")c.commitTerminal(id,c.terminalStates.WITHDRAWN);return row.core.withdrawAssessment({assessmentAttemptId:id});}
+function withdraw(row){const id=activeAttemptId(row);if(!id)return{success:false,reason:"promotion_attempt_not_active"};const c=courier();if(c&&typeof c.commitTerminal==="function")c.commitTerminal(id,c.terminalStates.WITHDRAWN);return row.core.withdrawAssessment({assessmentAttemptId:id});}
 function mount(row){
   if(typeof openOverlay==="function")openOverlay("arena_promotion");
   const host=typeof document!=="undefined"?document.getElementById("overlay-content-container"):null;
@@ -134,8 +142,8 @@ function mount(row){
 }
 function openInstalledPromotion60330(subjectId=null){const got=getController(subjectId);if(!got.success)return got;return mount(got.row);}
 function activeRow(subjectId=null){const got=getController(subjectId);return got.success?got.row:null;}
-function activeAttempt(subjectId=null){const row=activeRow(subjectId);return row?latestAttemptId(row):null;}
-function scenarioCall(method,args=[],subjectId=null){const row=activeRow(subjectId);if(!row)return{success:false,reason:"promotion_controller_unavailable"};const id=latestAttemptId(row);const c=courier();if(!id||!c||typeof c[method]!=="function")return{success:false,reason:"promotion_scenario_action_unavailable"};return c[method](id,...args);}
+function activeAttempt(subjectId=null){const row=activeRow(subjectId);return row?activeAttemptId(row):null;}
+function scenarioCall(method,args=[],subjectId=null){const row=activeRow(subjectId);if(!row)return{success:false,reason:"promotion_controller_unavailable"};const id=activeAttemptId(row);const c=courier();if(!id||!c||typeof c[method]!=="function")return{success:false,reason:"promotion_scenario_action_unavailable"};return c[method](id,...args);}
 const api=Object.freeze({patchId:PATCH_ID,open:openInstalledPromotion60330,getController,activeAttempt,projectJourney:(subjectId=null)=>scenarioCall("projectJourney",[],subjectId),commitBriefing:(subjectId=null)=>scenarioCall("commitBriefing",[],subjectId),advanceJourney:(destination,subjectId=null)=>scenarioCall("advanceJourney",[destination],subjectId),resolveSearch:(choice,subjectId=null)=>scenarioCall("resolveSearch",[choice],subjectId),recordParticipantFact:(spec,subjectId=null)=>scenarioCall("recordParticipantFact",[spec],subjectId),resolvePriority:(choice,spec={},subjectId=null)=>scenarioCall("resolvePriority",[choice,spec],subjectId),confirmHostileContact:(spec,subjectId=null)=>scenarioCall("confirmHostileContact",[spec],subjectId),launchHoldLineBattle:(subjectId=null)=>scenarioCall("launchHoldLineBattle",[],subjectId),resolveNonBattleContact:(choice,result,subjectId=null)=>scenarioCall("resolveNonBattleContact",[choice,result],subjectId),beginExtraction:(spec={},subjectId=null)=>scenarioCall("beginExtraction",[spec],subjectId),handoffDispatch:(subjectId=null)=>scenarioCall("handoffDispatch",[],subjectId),commitDebrief:(spec={},subjectId=null)=>scenarioCall("commitDebrief",[spec],subjectId),commitTerminal:(state,subjectId=null)=>scenarioCall("commitTerminal",[state],subjectId),syncQualifiedEvidence:(subjectId=null)=>{const row=activeRow(subjectId);return row?syncQualifiedEvidence(row):{success:false,reason:"promotion_controller_unavailable"};},finalize:(subjectId=null)=>{const row=activeRow(subjectId);return row?finalize(row):{success:false,reason:"promotion_controller_unavailable"};},getTruth:(subjectId=null)=>{const row=activeRow(subjectId);return row?truth(row):null;},browserGoldenClaimed:false});
 globalThis.SC_PROMOTION_INSTALLED_60330=api;
 globalThis.openInstalledPromotion60330=openInstalledPromotion60330;
