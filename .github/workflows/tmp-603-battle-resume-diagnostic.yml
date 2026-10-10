@@ -28,39 +28,16 @@ jobs:
           npx playwright install --with-deps chromium
           python - <<'PY'
           from pathlib import Path
+          import base64
           p=Path('tools/qa_issue_603_step7_promotion_browser.js')
           s=p.read_text(encoding='utf-8')
           start=s.index('async function driveBattleToTerminal(page){')
           end=s.index('\nasync function continueTerminalResult', start)
-          diagnostic='''async function driveBattleToTerminal(page){
-            for(let i=0;i<16;i+=1){
-              const state=await page.evaluate(()=>{
-                const b=currentBattle||{};
-                const primitive={};
-                for(const [k,v] of Object.entries(b))if(/turn|action|pending|phase|timer|busy|lock|resolv|enemy|player/i.test(k)&&["string","number","boolean"].includes(typeof v))primitive[k]=v;
-                const actor=b.characterId||getBattleDeploymentParticipant?.("player",1)?.id||null;
-                return{active:!!b.active,over:!!b.battleOver,outcome:b.outcome?.type||null,actor,activePlayer:b.activePlayer?.id||null,enemy:b.enemy?.id||null,playerSlots:(b.deployment?.player?.slots||[]).map(x=>x&&x.participantId),enemySlots:(b.deployment?.enemy?.slots||[]).map(x=>x&&x.participantId),playerPL:typeof getBattleRemainingPL==="function"?getBattleRemainingPL("player",actor):null,enemyPL:typeof getBattleRemainingPL==="function"?getBattleRemainingPL("enemy",SC_PROMOTION_COURIER_ASSESSMENT_60310.rogueRef):null,skills:typeof getProductionPreparedSkillIds==="function"?getProductionPreparedSkillIds(actor):[],primitive};
-              });
-              console.error("SC603_DIAG_STATE",i,JSON.stringify(state));
-              if(state.over)return state;
-              const action=await battleAction(page);
-              console.error("SC603_DIAG_ACTION",i,JSON.stringify(action));
-              if(!action.success){await page.waitForTimeout(450);continue;}
-              await page.waitForTimeout(950);
-            }
-            return page.evaluate(()=>({active:!!currentBattle?.active,over:!!currentBattle?.battleOver,outcome:currentBattle?.outcome?.type||null}));
-          }
-'''
+          diagnostic=base64.b64decode('YXN5bmMgZnVuY3Rpb24gZHJpdmVCYXR0bGVUb1Rlcm1pbmFsKHBhZ2UpewogIGZvcihsZXQgaT0wO2k8MTY7aSs9MSl7CiAgICBjb25zdCBzdGF0ZT1hd2FpdCBwYWdlLmV2YWx1YXRlKCgpPT57CiAgICAgIGNvbnN0IGI9Y3VycmVudEJhdHRsZXx8e307CiAgICAgIGNvbnN0IHByaW1pdGl2ZT17fTsKICAgICAgZm9yKGNvbnN0IFtrLHZdIG9mIE9iamVjdC5lbnRyaWVzKGIpKWlmKC90dXJufGFjdGlvbnxwZW5kaW5nfHBoYXNlfHRpbWVyfGJ1c3l8bG9ja3xyZXNvbHZ8ZW5lbXl8cGxheWVyL2kudGVzdChrKSYmWyJzdHJpbmciLCJudW1iZXIiLCJib29sZWFuIl0uaW5jbHVkZXModHlwZW9mIHYpKXByaW1pdGl2ZVtrXT12OwogICAgICBjb25zdCBhY3Rvcj1iLmNoYXJhY3RlcklkfHxnZXRCYXR0bGVEZXBsb3ltZW50UGFydGljaXBhbnQ/LigicGxheWVyIiwxKT8uaWR8fG51bGw7CiAgICAgIHJldHVybnthY3RpdmU6ISFiLmFjdGl2ZSxvdmVyOiEhYi5iYXR0bGVPdmVyLG91dGNvbWU6Yi5vdXRjb21lPy50eXBlfHxudWxsLGFjdG9yLGFjdGl2ZVBsYXllcjpiLmFjdGl2ZVBsYXllcj8uaWR8fG51bGwsZW5lbXk6Yi5lbmVteT8uaWR8fG51bGwscGxheWVyU2xvdHM6KGIuZGVwbG95bWVudD8ucGxheWVyPy5zbG90c3x8W10pLm1hcCh4PT54JiZ4LnBhcnRpY2lwYW50SWQpLGVuZW15U2xvdHM6KGIuZGVwbG95bWVudD8uZW5lbXk/LnNsb3RzfHxbXSkubWFwKHg9PngmJngucGFydGljaXBhbnRJZCkscGxheWVyUEw6dHlwZW9mIGdldEJhdHRsZVJlbWFpbmluZ1BMPT09ImZ1bmN0aW9uIj9nZXRCYXR0bGVSZW1haW5pbmdQTCgicGxheWVyIixhY3Rvcik6bnVsbCxlbmVteVBMOnR5cGVvZiBnZXRCYXR0bGVSZW1haW5pbmdQTD09PSJmdW5jdGlvbiI/Z2V0QmF0dGxlUmVtYWluaW5nUEwoImVuZW15IixTQ19QUk9NT1RJT05fQ09VUklFUl9BU1NFU1NNRU5UXzYwMzEwLnJvZ3VlUmVmKTpudWxsLHNraWxsczp0eXBlb2YgZ2V0UHJvZHVjdGlvblByZXBhcmVkU2tpbGxJZHM9PT0iZnVuY3Rpb24iP2dldFByb2R1Y3Rpb25QcmVwYXJlZFNraWxsSWRzKGFjdG9yKTpbXSxwcmltaXRpdmV9OwogICAgfSk7CiAgICBjb25zb2xlLmVycm9yKCJTQzYwM19ESUFHX1NUQVRFIixpLEpTT04uc3RyaW5naWZ5KHN0YXRlKSk7CiAgICBpZihzdGF0ZS5vdmVyKXJldHVybiBzdGF0ZTsKICAgIGNvbnN0IGFjdGlvbj1hd2FpdCBiYXR0bGVBY3Rpb24ocGFnZSk7CiAgICBjb25zb2xlLmVycm9yKCJTQzYwM19ESUFHX0FDVElPTiIsaSxKU09OLnN0cmluZ2lmeShhY3Rpb24pKTsKICAgIGlmKCFhY3Rpb24uc3VjY2Vzcyl7YXdhaXQgcGFnZS53YWl0Rm9yVGltZW91dCg0NTApO2NvbnRpbnVlO30KICAgIGF3YWl0IHBhZ2Uud2FpdEZvclRpbWVvdXQoOTUwKTsKICB9CiAgcmV0dXJuIHBhZ2UuZXZhbHVhdGUoKCk9Pih7YWN0aXZlOiEhY3VycmVudEJhdHRsZT8uYWN0aXZlLG92ZXI6ISFjdXJyZW50QmF0dGxlPy5iYXR0bGVPdmVyLG91dGNvbWU6Y3VycmVudEJhdHRsZT8ub3V0Y29tZT8udHlwZXx8bnVsbH0pKTsKfQo=').decode()
           s=s[:start]+diagnostic+s[end:]
-          old='''    results.viewport1366=await viewportSmoke(browser,1366,768,"1366x768");
-    results.viewport1920=await viewportSmoke(browser,1920,1080,"1920x1080");
-    results.nonBattle=await fullNonBattleScenario(browser);
-    results.partialRetryReload=await partialRetryReloadScenario(browser);
-    results.courierOnly=await courierOnlyScenario(browser);
-    results.battlePass=await battlePassScenario(browser);'''
-          new='''    results.battlePass=await battlePassScenario(browser);'''
+          old='    results.viewport1366=await viewportSmoke(browser,1366,768,"1366x768");\n    results.viewport1920=await viewportSmoke(browser,1920,1080,"1920x1080");\n    results.nonBattle=await fullNonBattleScenario(browser);\n    results.partialRetryReload=await partialRetryReloadScenario(browser);\n    results.courierOnly=await courierOnlyScenario(browser);\n    results.battlePass=await battlePassScenario(browser);'
           if old not in s: raise SystemExit('bottom execution block missing')
-          s=s.replace(old,new,1)
+          s=s.replace(old,'    results.battlePass=await battlePassScenario(browser);',1)
           p.write_text(s,encoding='utf-8')
           PY
           python -m http.server 8080 --bind 127.0.0.1 > sc603-diag-server.log 2>&1 &
