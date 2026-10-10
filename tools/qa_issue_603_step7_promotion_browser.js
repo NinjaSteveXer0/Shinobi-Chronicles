@@ -29,6 +29,9 @@ async function releaseFrontDoor(page){
     document.getElementById("sc-alpha-front-door-33400")?.remove();
   });
 }
+async function clearTutorialChrome(page){
+  await page.evaluate(()=>document.getElementById("sc-konoha-onboarding-35000")?.remove());
+}
 
 async function waitRuntime(page){
   await page.waitForFunction(()=>!!(
@@ -96,8 +99,10 @@ async function openViaArenaGuide(page){
 }
 
 async function openInstalled(page){
+  await clearTutorialChrome(page);
   const opened=await page.evaluate(()=>globalThis.openInstalledPromotion60330());
   assert.strictEqual(opened?.success,true,`installed Promotion open failed: ${JSON.stringify(opened)}`);
+  await clearTutorialChrome(page);
   await page.locator("#overlay-content-container .sc60320-stage").waitFor({state:"visible",timeout:15000});
   return page.locator("#overlay-content-container");
 }
@@ -279,7 +284,7 @@ async function partialRetryReloadScenario(browser){
     assert.notStrictEqual(retry.attemptId,first.attemptId,"retry reused assessmentAttemptId");
     assert.strictEqual(retry.packageId,first.packageId,"retry rerolled immutable Promotion package");
     await page.evaluate(()=>{const r=SC_PROMOTION_INSTALLED_60330.commitBriefing();if(!r?.success)throw new Error(JSON.stringify(r));savePlayerData();});
-    await page.reload({waitUntil:"domcontentloaded",timeout:60000});await waitRuntime(page);await releaseFrontDoor(page);
+    await page.reload({waitUntil:"domcontentloaded",timeout:60000});await waitRuntime(page);await releaseFrontDoor(page);await clearTutorialChrome(page);
     const loaded=await page.evaluate(()=>{const api=SC_PROMOTION_INSTALLED_60330,s=api.getController().row.core.getDiagnosticSnapshot();return{attemptId:api.activeAttempt(),packageId:s.state.promotionRequirementPackageId,attempts:s.state.attempts.map(x=>({id:x.assessmentAttemptId,status:x.status,number:x.attemptNumber}))};});
     assert.strictEqual(loaded.attemptId,retry.attemptId,"save/reload lost active retry attempt lineage");
     assert.strictEqual(loaded.packageId,first.packageId,"save/reload rerolled immutable package");
@@ -385,7 +390,7 @@ async function battlePassScenario(browser){
       savedPlayer:savePlayerData(),savedSession:typeof saveTestState==="function"?saveTestState():null
     }),committed.attemptId);
     assert(beforeReload.battle.active&&!beforeReload.battle.over,"Battle terminated before mid-Battle persistence proof");
-    await page.reload({waitUntil:"domcontentloaded",timeout:60000});await waitRuntime(page);await releaseFrontDoor(page);
+    await page.reload({waitUntil:"domcontentloaded",timeout:60000});await waitRuntime(page);await releaseFrontDoor(page);await clearTutorialChrome(page);
     const afterReload=await page.evaluate(id=>({
       attemptId:SC_PROMOTION_INSTALLED_60330.activeAttempt(),
       occurrence:SC_PROMOTION_COURIER_ASSESSMENT_60310.getOccurrence(id),
