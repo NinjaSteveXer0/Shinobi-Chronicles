@@ -170,6 +170,20 @@
         "node tools/qa_ui_master_consumption_528_browser.js"
       ],
       "scheduled_representative": true
+    },
+    "issue576_static": {
+      "kind": "static",
+      "commands": [
+        "node tools/qa_issue_576_expert_master_curriculum_profiles.js"
+      ],
+      "scheduled_representative": false
+    },
+    "issue576_browser": {
+      "kind": "browser",
+      "commands": [
+        "node tools/qa_issue_576_production_integration_browser.js"
+      ],
+      "scheduled_representative": false
     }
   },
   "rules": [
@@ -355,6 +369,29 @@
       "required_lane_ids": [
         "issue431_browser",
         "ui_master_browser"
+      ]
+    },
+    {
+      "id": "expert_master_curriculum_576",
+      "changed_any": [
+        "runtime/alpha-discipline-curriculum-profiles-57600.js",
+        "tools/qa_issue_576_expert_master_curriculum_profiles.js",
+        "tools/qa_issue_576_expert_master_curriculum_profiles_browser.js",
+        "tools/qa_issue_576_expert_master_curriculum_real_surface_browser.js",
+        "tools/qa_issue_576_production_integration_browser.js",
+        ".github/workflows/issue-576-expert-master-curriculum.yml"
+      ],
+      "affected_consumers": [
+        "konoha_activity_surfaces_431",
+        "frozen_origin_shared_runtime"
+      ],
+      "required_lane_ids": [
+        "runtime_fingerprint",
+        "ownership_safety",
+        "save_compatibility",
+        "issue431_browser",
+        "issue576_static",
+        "issue576_browser"
       ]
     },
     {
