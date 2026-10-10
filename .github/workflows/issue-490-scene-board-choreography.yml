@@ -1,0 +1,72 @@
+name: Issue 490 Scene Board Choreography Benchmark
+
+on:
+  push:
+    branches:
+      - coding/490-scene-board-benchmark-lane-c
+    paths:
+      - 'runtime/alpha-story-scene-board-expressive-49000.js'
+      - 'tools/qa_issue_490_scene_board_choreography.js'
+      - 'tools/qa_issue_490_scene_board_choreography_browser.js'
+      - '.github/workflows/issue-490-scene-board-choreography.yml'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scene-board-choreography-benchmark:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Source syntax
+        run: |
+          node --check runtime/alpha-story-scene-board-expressive-49000.js
+          node --check tools/qa_issue_490_scene_board_choreography.js
+          node --check tools/qa_issue_490_scene_board_choreography_browser.js
+
+      - name: Presentation-only source contract
+        run: node tools/qa_issue_490_scene_board_choreography.js
+
+      - name: Existing live hotspot regression
+        run: node tools/qa_issue_469_ce_hotspot.js
+
+      - name: Story decision authority regression
+        run: node tools/qa_issue_188_story_decision_runtime.js
+
+      - name: Save compatibility regression
+        run: node tools/qa_save_compatibility_311.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > sc490-server.log 2>&1 &
+          echo $! > sc490-server.pid
+          sleep 2
+
+      - name: Isolated installed-browser choreography benchmark
+        run: node tools/qa_issue_490_scene_board_choreography_browser.js
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scene-board-490-browser
+          path: |
+            artifacts/scene-board-490
+            sc490-server.log
+          if-no-files-found: ignore

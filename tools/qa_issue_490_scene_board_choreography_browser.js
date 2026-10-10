@@ -1,0 +1,182 @@
+#!/usr/bin/env node
+"use strict";
+const fs=require("fs"),path=require("path"),assert=require("assert");
+const {chromium}=require("playwright");
+const {installBrowserRuntimeErrorGate}=require("./browser_runtime_error_gate_311.js");
+const BASE=process.env.SC490_BASE_URL||"http://127.0.0.1:8080/index.html";
+const OUT=process.env.SC490_OUT||"artifacts/scene-board-490";
+const EXTENSION=fs.readFileSync(path.join(__dirname,"../runtime/alpha-story-scene-board-expressive-49000.js"),"utf8");
+fs.mkdirSync(OUT,{recursive:true});
+
+async function boot(page){
+  await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});
+  await page.waitForFunction(()=>!!(globalThis.SC_STORY_SCENE_BOARD_33900&&globalThis.SC_PHASE2_CE_HOTSPOT_46900&&globalThis.renderStoryScenePresentationLayer),null,{timeout:45000});
+  await page.evaluate(()=>{
+    try{releaseAlphaFrontDoor33300?.();}catch(_error){}
+    try{globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400?.release?.();}catch(_error){}
+    document.querySelector(".game-container")?.removeAttribute("data-alpha-front-door-locked");
+    document.getElementById("sc-alpha-front-door-33300")?.remove();
+    document.getElementById("sc-alpha-front-door-33400")?.remove();
+  });
+  await page.addScriptTag({content:EXTENSION});
+  const diag=await page.evaluate(()=>runStorySceneBoardExpressive49000Diagnostics());
+  assert.strictEqual(diag.pass,true,JSON.stringify(diag.failed));
+}
+async function setup(page,runIdPrefix){
+  const result=await page.evaluate(fixtureRunIdPrefix=>{
+    localStorage.clear();
+    playerData=createDefaultPlayerData();
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+
+    const originalSave=globalThis.savePlayerData;
+    const originalDecision=JSON.parse(JSON.stringify(playerData.storyDecisionRuntime34000||null));
+    const originalFactual=JSON.parse(JSON.stringify(playerData.storyFactualResolver34600||null));
+    const resetSemanticRoots=()=>{
+      playerData.storyDecisionRuntime34000=originalDecision?JSON.parse(JSON.stringify(originalDecision)):undefined;
+      playerData.storyFactualResolver34600=originalFactual?JSON.parse(JSON.stringify(originalFactual)):undefined;
+    };
+    const eligibleRunId=(()=>{
+      globalThis.savePlayerData=()=>true;
+      try{savePlayerData=globalThis.savePlayerData;}catch(_error){}
+      try{
+        for(let i=0;i<2200;i++){
+          resetSemanticRoots();
+          const candidate=fixtureRunIdPrefix+"_"+String(i).padStart(4,"0");
+          const seed=["sc.privateOriginHistory.v1",candidate,"academy_kakashi","academy_kakashi_v2","v3"].join("::");
+          const preview=previewAutonomousKakashiPrivateOrigin46900(seed);
+          const continuity=preview&&preview.success===true&&preview.history&&preview.history.miContinuity;
+          if(!continuity)continue;
+          if(continuity.survivedOrigin===false||continuity.encounteredByProtagonist!==true)continue;
+          if(["KILLED","UNSEEN"].includes(String(continuity.fieldDispositionState||"")))continue;
+          return candidate;
+        }
+        return null;
+      }finally{
+        resetSemanticRoots();
+        globalThis.savePlayerData=originalSave;
+        try{savePlayerData=originalSave;}catch(_error){}
+      }
+    })();
+    if(!eligibleRunId)return{error:"eligible_private_history_seed_not_found",runIdPrefix:fixtureRunIdPrefix};
+
+    playerData=createDefaultPlayerData();
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+    savePlayerData();
+    const selected=selectChronicleOrigin("academy_menma","qa490_origin");
+    const identity=commitChronicleRunIdentity43600({runId:eligibleRunId,creationKind:"NEW_START"});
+    const completed=completeChronicleOriginPrologue("academy_menma",["qa490_menma_origin"]);
+    const preparedPrivate=ensureAutonomousKakashiPrivateHistory46900("qa490_pre_team_run_identity_fixture");
+    const privateBeforeSelection=getKakashiPrivateOriginHistory46900();
+    const desired=["academy_hinata","academy_kakashi"],snapshot=getAcademyTeamFormationSnapshot();
+    if(!desired.every(id=>snapshot.eligibleCandidateVariantIds.includes(id)))return{error:"required_team_missing",eligible:snapshot.eligibleCandidateVariantIds};
+    selectAcademyTeamFormationTeammate(1,desired[0]);selectAcademyTeamFormationTeammate(2,desired[1]);
+    const privateBeforeConfirm=getKakashiPrivateOriginHistory46900();
+    const formed=confirmAcademyTeamFormation("qa490_team",desired);
+    const privateAfterConfirm=getKakashiPrivateOriginHistory46900();
+    const continued=continueAcademyTeamFormationJourney();
+    updateChronicleTutorialProgress43600({sandboxPopupSeen:true,recommendedRouteEnabled:false,openingChoice:"explore",trainingTipSeen:true,practicalTipSeen:true,examsTipSeen:true,arenaTipSeen:true,arenaCompletionChoiceSeen:true,shinobiRecordTipSeen:true},{save:true});
+    savePlayerData();
+    return{runId:eligibleRunId,selected,identity,completed,preparedPrivate,privateBeforeSelection,privateBeforeConfirm,privateAfterConfirm,formed,continued,team:getChronicleCurrentTeam43600(),gate:getKonohaCeHotspotEligibility46900()};
+  },runIdPrefix);
+  assert(!result.error,JSON.stringify(result));assert.strictEqual(result.selected.success,true);assert.strictEqual(result.identity.success,true);
+  assert.strictEqual(result.completed.success,true);assert.strictEqual(result.preparedPrivate.success,true,JSON.stringify(result.preparedPrivate));
+  assert(result.privateBeforeSelection&&result.privateAfterConfirm,"qa490 private Kakashi history was not sealed");
+  assert.strictEqual(JSON.stringify(result.privateBeforeConfirm),JSON.stringify(result.privateBeforeSelection),"qa490 teammate selection rerolled private Kakashi history");
+  assert.strictEqual(JSON.stringify(result.privateAfterConfirm),JSON.stringify(result.privateBeforeSelection),"qa490 Team Formation rerolled private Kakashi history");
+  assert.strictEqual(result.formed.success,true,JSON.stringify(result.formed));assert.strictEqual(result.continued.success,true);
+  assert.deepStrictEqual(result.team.teamVariantIds,["academy_menma","academy_hinata","academy_kakashi"]);assert.strictEqual(result.gate.available,true,JSON.stringify(result.gate));
+  return result.runId;
+}
+async function openScene(page){
+  await page.evaluate(()=>openOverlay("village"));
+  const p01=page.locator('button[data-village-hotspot-id="KON-P01"]');await p01.waitFor({state:"visible",timeout:10000});await p01.dblclick();
+  await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.sceneId==="scene_konoha_ce_kakashi_masked_interceptor_admin_crossing_menma_v1",null,{timeout:10000});
+  const rehydrate=await page.evaluate(()=>{
+    const before=globalThis.getActiveStorySceneRuntime?.();
+    const layer=document.getElementById("story-scene-presentation-layer");
+    delete globalThis.__qa490PresentationStableSince;
+    return{
+      wasPreserved:layer&&layer.dataset.scPresentationHiddenReason==="preserved_runtime_hidden",
+      sceneId:before&&before.sceneId||null,
+      beatId:before&&before.beatId||null
+    };
+  });
+  await page.waitForFunction(expected=>{
+    const before=globalThis.getActiveStorySceneRuntime?.();
+    if(!before||before.sceneId!==expected.sceneId||before.beatId!==expected.beatId){delete globalThis.__qa490PresentationStableSince;return false;}
+    let layer=document.getElementById("story-scene-presentation-layer");
+    const preserveHidden=layer&&layer.dataset.scPresentationHiddenReason==="preserved_runtime_hidden";
+    if(preserveHidden){
+      delete globalThis.__qa490PresentationStableSince;
+      if(typeof globalThis.renderStoryScenePresentationLayer==="function"){
+        globalThis.renderStoryScenePresentationLayer();
+        layer=document.getElementById("story-scene-presentation-layer");
+      }
+    }
+    const after=globalThis.getActiveStorySceneRuntime?.();
+    if(!after||after.sceneId!==expected.sceneId||after.beatId!==expected.beatId||!layer){delete globalThis.__qa490PresentationStableSince;return false;}
+    const style=getComputedStyle(layer),board=layer.querySelector(".sc-scene-board-33900");
+    const visible=layer.dataset.scPresentationHidden!=="true"&&style.display!=="none"&&style.visibility!=="hidden"&&Number(style.opacity||1)>0&&!!board;
+    if(!visible){delete globalThis.__qa490PresentationStableSince;return false;}
+    const now=performance.now();
+    if(!Number.isFinite(globalThis.__qa490PresentationStableSince))globalThis.__qa490PresentationStableSince=now;
+    return now-globalThis.__qa490PresentationStableSince>=200;
+  },{sceneId:rehydrate.sceneId,beatId:rehydrate.beatId},{timeout:10000,polling:50});
+  Object.assign(rehydrate,await page.evaluate(()=>{
+    delete globalThis.__qa490PresentationStableSince;
+    const after=globalThis.getActiveStorySceneRuntime?.();
+    return{afterSceneId:after&&after.sceneId||null,afterBeatId:after&&after.beatId||null};
+  }));
+  assert.strictEqual(rehydrate.afterSceneId,rehydrate.sceneId,"canonical presentation rehydrate changed active scene");
+  assert.strictEqual(rehydrate.afterBeatId,rehydrate.beatId,"canonical presentation rehydrate changed active beat");
+  await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:10000});
+  await page.waitForSelector("#story-scene-presentation-layer .sc-scene-board-33900",{state:"visible",timeout:10000});
+  await page.waitForFunction(()=>{
+    const sync=globalThis.syncStorySceneBoardBenchmark49000?.();
+    if(!sync||sync.success!==true)return false;
+    const ids=[...document.querySelectorAll(".sc-scene-board-33900__actor")].map(node=>node.dataset.actorId);
+    return ["academy_menma","academy_hinata","academy_kakashi","academy_kakashi_origin_masked_interceptor"].every(id=>ids.includes(id));
+  },null,{timeout:10000});
+  return rehydrate;
+}
+async function waitForMotionSettled(page){
+  await page.waitForFunction(()=>{
+    const actors=[...document.querySelectorAll(".sc-scene-board-33900__actor")];
+    if(actors.length!==4)return false;
+    return actors.every(node=>{
+      const active=node.getAnimations?node.getAnimations().some(animation=>animation.playState==="running"||animation.playState==="pending"):false;
+      const style=getComputedStyle(node);
+      return !active&&!node.dataset.sc490Motion&&Number(style.opacity)>=0.99&&style.filter==="none";
+    });
+  },null,{timeout:3000});
+}
+async function stage(page){return page.evaluate(()=>[...document.querySelectorAll(".sc-scene-board-33900__actor")].map(node=>{const r=node.getBoundingClientRect(),s=getComputedStyle(node);return{id:node.dataset.actorId,x:r.x,y:r.y,right:r.right,bottom:r.bottom,opacity:Number(s.opacity),filter:s.filter,benchmark:node.dataset.sc490BenchmarkAnchor||null};}));}
+function overlap(a,b){return Math.max(0,Math.min(a.right,b.right)-Math.max(a.x,b.x))*Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.y,b.y));}
+async function advanceBeat(page,id){for(let i=0;i<20;i++){const beat=await page.evaluate(()=>globalThis.getActiveStorySceneRuntime?.()?.beatId||null);if(beat!==id)return;const r=await page.evaluate(()=>advanceStoryScene());assert(r&&r.success===true,JSON.stringify(r));await page.waitForTimeout(25);}throw new Error("beat_stuck:"+id);}
+async function scenario(browser,width,height,reduced,label){
+  const context=await browser.newContext({viewport:{width,height},reducedMotion:reduced?"reduce":"no-preference"});const page=await context.newPage();const errors=await installBrowserRuntimeErrorGate(page);
+  try{
+    await boot(page);const runId=await setup(page,"sc_run_v1_qa490_"+label.replace(/\W+/g,"_"));const rehydrate=await openScene(page);await waitForMotionSettled(page);
+    const rows=await stage(page),ids=rows.map(r=>r.id);
+    assert.deepStrictEqual([...ids].sort(),["academy_hinata","academy_kakashi","academy_kakashi_origin_masked_interceptor","academy_menma"].sort());
+    assert(rows.every(r=>r.opacity>=.99&&r.filter==="none"&&r.benchmark==="true"),label+" present-actor presentation drift: "+JSON.stringify(rows));
+    for(let i=0;i<rows.length;i++)for(let j=i+1;j<rows.length;j++)assert(overlap(rows[i],rows[j])<1,label+" overlap "+rows[i].id+" / "+rows[j].id);
+
+    const semanticBefore=await page.evaluate(()=>JSON.stringify({decision:playerData.storyDecisionRuntime34000||null,history:playerData.activityHistory||[],ryo:playerData.ryo,inventory:playerData.inventory}));
+    const sync=await page.evaluate(()=>syncStorySceneBoardBenchmark49000());assert.strictEqual(sync.success,true);
+    const semanticAfter=await page.evaluate(()=>JSON.stringify({decision:playerData.storyDecisionRuntime34000||null,history:playerData.activityHistory||[],ryo:playerData.ryo,inventory:playerData.inventory}));
+    assert.strictEqual(semanticAfter,semanticBefore,label+" sync mutated semantic/player state");
+
+    const primitive=await page.evaluate(()=>{const root=document.querySelector(".sc-scene-board-33900"),r=playStoryExpressivePrimitive49000(root,{kind:"SMALL_RECOIL",actorId:"academy_kakashi",durationMs:190,direction:-1}),node=root.querySelector('[data-actor-id="academy_kakashi"]'),a=node.getAnimations()[0];return{r,frames:a?.effect?.getKeyframes?.()||[]};});
+    assert.strictEqual(primitive.r.success,true);assert(primitive.frames.length>=2);assert(primitive.frames.every(f=>!f.transform));
+    if(reduced){assert(primitive.r.durationMs<=100);assert(primitive.frames.every(f=>!String(f.translate||"").includes("vw")));}else{assert.strictEqual(primitive.r.durationMs,190);assert(primitive.frames.some(f=>String(f.translate||"").includes("vw")));}
+
+    for(const beat of ["ce478_opening","ce478_history","ce478_kakashi_response","ce478_hinata_response"])await advanceBeat(page,beat);
+    const choices=await page.locator("#story-scene-presentation-layer .sc-story-choice").allInnerTexts();
+    assert.deepStrictEqual(choices,["Ask Kakashi what happened.","Ask her how she knows Kakashi.","Let Kakashi handle it.","Keep moving."]);
+    const listeners=await stage(page);assert(listeners.every(r=>r.opacity>=.99),label+" speaker focus dimmed listeners");
+    await page.screenshot({path:path.join(OUT,label+".png"),fullPage:true});await errors.assertClean(label);
+    return{label,runId,viewport:{width,height},reducedMotion:reduced,rehydrate,choices,primitive:primitive.r};
+  }finally{await context.close();}
+}
+(async()=>{const browser=await chromium.launch({headless:true});try{const results=[];results.push(await scenario(browser,1366,768,false,"1366x768"));results.push(await scenario(browser,1920,1080,false,"1920x1080"));results.push(await scenario(browser,1366,768,true,"1366x768-reduced-motion"));console.log(JSON.stringify({pass:true,results,browserGoldenClaimed:false},null,2));}finally{await browser.close();}})().catch(e=>{console.error(e&&e.stack||e);process.exit(1);});
