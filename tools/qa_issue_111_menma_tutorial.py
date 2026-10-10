@@ -30,11 +30,17 @@ def game_without_declared_469_save_reader(text:str)->str:
         return ''
     return text[:start]+text[end:]
 
-# #603 intentionally adds exactly two bounded game.js seams: canonical Battle
-# caller return dispatch for the Missing Courier assessment and rogue-feint expiry
-# at the existing enemy action-opportunity boundary. Strip only those exact
+# #603 intentionally adds exactly five bounded game.js seams: Promotion Battle
+# session capture, canonical Missing Courier caller return dispatch, rogue-feint
+# expiry at the existing enemy action-opportunity boundary, and the two restore
+# hooks around canonical Battle-session rehydration. Strip only those exact
 # reviewed blocks before applying the frozen pre-#603 game.js blob pin.
 def game_without_declared_603_promotion_seams(text:str)->str:
+    save_block='''    promotionCourier60310Battle:
+      globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310&&typeof globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.captureBattleSessionState==="function"
+        ? globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.captureBattleSessionState()
+        : null,
+'''
     return_block='''  if (returnContext.type==="field_readiness_assessment") {
     if (returnContext.assessmentScenarioId==="academy_genin_missing_courier_dispatch_v1") {
       const courier=globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310;
@@ -48,9 +54,24 @@ def game_without_declared_603_promotion_seams(text:str)->str:
     globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.expireRogueFeintAtActionOpportunity();
   }
 '''
-    if text.count(return_block)!=1 or text.count(feint_block)!=1:
+    prepare_restore_block='''    const promotionCourier60310BattleState=state.promotionCourier60310Battle&&typeof state.promotionCourier60310Battle==="object"?state.promotionCourier60310Battle:null;
+    if(promotionCourier60310BattleState&&globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310&&typeof globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.prepareBattleSessionRestore==="function"){
+      globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.prepareBattleSessionRestore(promotionCourier60310BattleState);
+    }
+'''
+    apply_restore_block='''    if(promotionCourier60310BattleState&&globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310&&typeof globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.restoreBattleSessionState==="function"){
+      globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.restoreBattleSessionState(promotionCourier60310BattleState);
+    }
+'''
+    blocks=[save_block,return_block,feint_block,prepare_restore_block,apply_restore_block]
+    if any(text.count(block)!=1 for block in blocks):
         return ''
-    return text.replace(return_block,prior_return,1).replace(feint_block,'',1)
+    return (text
+        .replace(save_block,'',1)
+        .replace(return_block,prior_return,1)
+        .replace(feint_block,'',1)
+        .replace(prepare_restore_block,'',1)
+        .replace(apply_restore_block,'',1))
 
 five=[
  'academy_menma_chakra_knuckle',

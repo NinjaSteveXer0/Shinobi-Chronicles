@@ -455,7 +455,7 @@ async function battlePassScenario(browser){
     const host=await openInstalled(page),receiptText=(await host.innerText()).replace(/\s+/g," ");
     assert(/PASS/.test(receiptText)&&/CHRONICLE RECEIPT/i.test(receiptText),"PASS Assessment Record / Chronicle Receipt missing");
     assert(/150 Ryō/.test(receiptText)&&/100 Ryō/.test(receiptText)&&/Field Recovery Pill/i.test(receiptText),"Receipt did not project exact mission reward causes");
-    assert.strictEqual(/50 Ryō/.test(receiptText),terminal.outcome==="victory","Receipt Battle reward projection did not match factual outcome");
+    assert.strictEqual(/(?:^|\D)50 Ryō(?:\D|$)/.test(receiptText),terminal.outcome==="victory","Receipt Battle reward projection did not match factual outcome");
     await page.screenshot({path:path.join(OUT,"05-battle-pass-genin-receipt.png"),fullPage:true});
     await gate.assertClean("603-battle-pass");
     return{attemptId:committed.attemptId,packageId:committed.packageId,battleOutcome:terminal.outcome,midBattleReloadStable:true,pass:true,genin:true,ryoDelta:terminal.outcome==="victory"?300:250,pillDelta:1};

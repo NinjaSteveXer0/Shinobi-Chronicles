@@ -412,7 +412,7 @@
         "tools/qa_phase2_inventory_core_461.js",
         "tools/qa_retail_kunai_durable_552.js",
         "tools/qa_retail_kunai_durable_552_browser.js",
-        ".github/workflows/issue-552-retail-kunai-durable.yml"
+        ".github/workflows/issue-552-durable-retail-kunai.yml"
       ],
       "affected_consumers": [
         "basic_item_shop_517",
@@ -436,6 +436,7 @@
       "changed_any": [
         "runtime/alpha-genin-roster-63.js",
         "runtime/alpha-traversal-bridge-33200.js",
+        "runtime/alpha-browser-onboarding-fixes-33400.js",
         "tools/qa_issue_141_traversal_runtime.js",
         "tools/qa_issue_63_genin_v2_runtime.js"
       ],
