@@ -1,0 +1,81 @@
+name: Issue 609 Player-Controls Exact-Head Verification
+
+on:
+  push:
+    branches:
+      - qa/609-player-controls-exact-head-j
+    paths:
+      - 'tools/qa_issue_609_player_controls_browser.js'
+      - '.github/workflows/issue-609-player-controls-exact-head.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SC609_TARGET_SHA: 2d76f08158d7875b26034cabc3fa24c41b464b2a
+
+jobs:
+  player-controls-only:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Exact production target / QA-only delta guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          target="$SC609_TARGET_SHA"
+          git cat-file -e "$target^{commit}"
+          base="$(git merge-base HEAD "$target")"
+          test "$base" = "$target"
+          mapfile -t changed < <(git diff --name-only "$target"...HEAD)
+          printf '%s\n' "${changed[@]}"
+          test "${#changed[@]}" -eq 2
+          printf '%s\n' "${changed[@]}" | grep -Fx 'tools/qa_issue_609_player_controls_browser.js'
+          printf '%s\n' "${changed[@]}" | grep -Fx '.github/workflows/issue-609-player-controls-exact-head.yml'
+          test "$(git rev-parse "$target")" = '2d76f08158d7875b26034cabc3fa24c41b464b2a'
+
+      - name: Syntax + forbidden direct route-advance calls
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/qa_issue_609_player_controls_browser.js
+          ! grep -E 'SC_PROMOTION_(INSTALLED_60330|COURIER_ASSESSMENT_60310)\.(commitBriefing|advanceJourney|resolveSearch|resolvePriority|confirmHostileContact|launchHoldLineBattle|resolveNonBattleContact|beginExtraction|handoffDispatch|commitDebrief|commitTerminal|executePlayerMissionAction|finalize)\s*\(' tools/qa_issue_609_player_controls_browser.js
+
+      - name: Install Chromium
+        run: npx --yes playwright@1.55.0 install --with-deps chromium
+
+      - name: Start exact-head app server
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8080 --bind 127.0.0.1 > /tmp/sc609-http.log 2>&1 &
+          echo $! > /tmp/sc609-http.pid
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8080/index.html >/dev/null && exit 0; sleep 1; done
+          cat /tmp/sc609-http.log
+          exit 1
+
+      - name: Player-controls-only installed-browser matrix
+        env:
+          SC609_BASE_URL: http://127.0.0.1:8080/index.html
+          SC609_OUT: artifacts/issue-609-player-controls
+        run: node tools/qa_issue_609_player_controls_browser.js
+
+      - name: Archive evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-609-player-controls-${{ github.run_id }}
+          path: |
+            artifacts/issue-609-player-controls/**
+            /tmp/sc609-http.log
+          if-no-files-found: warn
