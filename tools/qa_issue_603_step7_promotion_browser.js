@@ -17,7 +17,6 @@ const UI_PATH=path.join(ROOT,"runtime/alpha-promotion-arena-ui-60320.js");
 fs.mkdirSync(OUT,{recursive:true});
 
 function integratedFilesPresent(){return[CORE_PATH,COURIER_PATH,UI_PATH].every(fs.existsSync);}
-function clone(v){return JSON.parse(JSON.stringify(v==null?null:v));}
 
 async function releaseFrontDoor(page){
   await page.waitForFunction(()=>!!globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400||!!document.getElementById("sc-alpha-front-door-33400"),null,{timeout:10000}).catch(()=>{});
@@ -241,9 +240,7 @@ async function fullNonBattleScenario(browser){
     assert.strictEqual(after.rows.filter(r=>String(r.key).startsWith("battle_reward::")).length,0,"non-Battle route manufactured Battle reward");
     assert(final.occurrence.missionObjectiveCompleted===true,"non-Battle mission objective not completed");
     assert(["PASS","FAIL"].includes(final.truth.outcome),"non-Battle assessment did not resolve factually");
-    const forbidden=JSON.stringify(playerData=>playerData);
     const arc1=await page.evaluate(()=>JSON.stringify(playerData.activityHistory||[]));
-    for(const ref of SC_FORBIDDEN||[])void ref;
     assert(!/arc1_m1_whisper_major_contact(?:_event)?|scene_arc1_m1_whisper_major_contact/.test(arc1),"North Ravine route collided with Arc-1 major contact");
     await page.screenshot({path:path.join(OUT,"03-nonbattle-complete.png"),fullPage:true});
     await gate.assertClean("603-nonbattle");
@@ -373,11 +370,10 @@ async function battlePassScenario(browser){
     assert(!launched.participantRefs.some(ref=>String(ref).includes("kakashi")),"non-contact Kakashi leaked into Hold-Line Battle");
     assert.strictEqual(launched.battleConfigId,"battle_cfg_academy_genin_missing_courier_hold_line_v1");
     assert.strictEqual(launched.encounterId,"enc_academy_genin_missing_courier_rogue_hold_line_v1");
-    const battleIdentity=await page.evaluate(()=>({battleId:currentBattle?.battleId,returnContext:cloneForQa(currentBattle?.returnContext),participantIds:(currentBattle?.deployment?.player?.slots||[]).map(x=>x&&x.participantId).filter(Boolean)})).catch(async()=>page.evaluate(()=>({battleId:currentBattle?.battleId,returnContext:JSON.parse(JSON.stringify(currentBattle?.returnContext||null)),participantIds:(currentBattle?.deployment?.player?.slots||[]).map(x=>x&&x.participantId).filter(Boolean)})));
+    const battleIdentity=await page.evaluate(()=>({battleId:currentBattle?.battleId,returnContext:JSON.parse(JSON.stringify(currentBattle?.returnContext||null)),participantIds:(currentBattle?.deployment?.player?.slots||[]).map(x=>x&&x.participantId).filter(Boolean)}));
     assert.strictEqual(battleIdentity.returnContext?.type,"field_readiness_assessment");
     assert.strictEqual(battleIdentity.returnContext?.assessmentAttemptId,committed.attemptId);
 
-    // Commit one real Skill action before persistence proof.
     let firstAction=null;
     for(let i=0;i<6&&!firstAction?.success;i+=1){firstAction=await battleAction(page);if(!firstAction.success)await page.waitForTimeout(350);}
     assert(firstAction?.success,"no real Hold-Line Skill action could be committed: "+JSON.stringify(firstAction));
