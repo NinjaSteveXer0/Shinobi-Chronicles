@@ -1,0 +1,94 @@
+name: Issue 621 Lane J Independent Verifier
+
+on:
+  push:
+    branches:
+      - qa/621-region-hud-stability-lane-j
+    paths:
+      - 'tools/qa_issue_621_lane_j_source.js'
+      - 'tools/qa_issue_621_lane_j_browser.js'
+      - 'tools/qa_issue_621_lane_j_browser_v2.js'
+      - '.github/workflows/issue-621-lane-j-independent.yml'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  TARGET_SHA: 8828a187003ffa0f84c86fbbe10eb1a0a0fe4c28
+
+jobs:
+  source-one-owner-law:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Lane J QA vehicle
+        uses: actions/checkout@v4
+        with:
+          path: qa
+      - name: Checkout exact merged main
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TARGET_SHA }}
+          path: candidate
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Inject Lane J verifier only
+        run: cp qa/tools/qa_issue_621_lane_j_source.js candidate/tools/qa_issue_621_lane_j_source.js
+      - name: Syntax
+        run: node --check candidate/tools/qa_issue_621_lane_j_source.js
+      - name: Verify exact merged-main one-owner law
+        env:
+          ISSUE621_TARGET_SHA: ${{ env.TARGET_SHA }}
+        run: node candidate/tools/qa_issue_621_lane_j_source.js
+
+  browser-hostile-verifier:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Lane J QA vehicle
+        uses: actions/checkout@v4
+        with:
+          path: qa
+      - name: Checkout exact merged main
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TARGET_SHA }}
+          path: candidate
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Inject Lane J browser verifier only
+        run: cp qa/tools/qa_issue_621_lane_j_browser_v2.js candidate/tools/qa_issue_621_lane_j_browser_v2.js
+      - name: Syntax
+        run: node --check candidate/tools/qa_issue_621_lane_j_browser_v2.js
+      - name: Install Playwright Chromium
+        working-directory: candidate
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start exact-main Alpha server
+        working-directory: candidate
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > sc621j-server.log 2>&1 &
+          echo $! > sc621j-server.pid
+          sleep 2
+      - name: Lane J hostile merged-main temporal/browser matrix v2
+        working-directory: candidate
+        env:
+          ISSUE621_TARGET_SHA: ${{ env.TARGET_SHA }}
+        run: node tools/qa_issue_621_lane_j_browser_v2.js
+      - name: Upload Lane J evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-621-lane-j-independent-${{ github.run_id }}
+          path: |
+            candidate/artifacts/issue-621-lane-j-independent-v2
+            candidate/sc621j-server.log
+          if-no-files-found: ignore
