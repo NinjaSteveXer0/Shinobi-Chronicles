@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "issue": 601,
+  "purpose": "Lane J adversarial fixtures for S0.5 changed-file collision and shared-seam reservation checks.",
+  "protectedSeams": [
+    "game.js",
+    "index.html",
+    "runtime/alpha-runtime-build-fingerprint-303.js",
+    "tools/fixtures/runtime_build_manifest_303.json",
+    "qa/production_change_impact_matrix_528.json"
+  ],
+  "requiredScenarioClasses": [
+    "clean_non_overlap",
+    "same_cell_declared_overlap",
+    "cross_cell_overlap",
+    "reserved_seam_violation",
+    "reserved_seam_authorized",
+    "reservation_ambiguous",
+    "reservation_stale",
+    "reservation_malformed"
+  ],
+  "scenarios": [
+    {
+      "id": "clean_non_overlap",
+      "class": "clean_non_overlap",
+      "targetPr": 701,
+      "input": {
+        "pullRequests": [
+          {"number": 701, "state": "open", "coding": true, "workCellId": "cell-alpha", "integrationOwner": "Lane A", "changedFiles": ["runtime/alpha-a.js"]},
+          {"number": 702, "state": "open", "coding": true, "workCellId": "cell-beta", "integrationOwner": "Lane B", "changedFiles": ["runtime/alpha-b.js"]}
+        ],
+        "reservations": []
+      },
+      "expected": {"ok": true, "requiredCodes": [], "forbiddenCodes": ["changed_file_collision", "reserved_seam_violation"]}
+    },
+    {
+      "id": "docs_overlap_ignored",
+      "class": "clean_non_overlap",
+      "targetPr": 703,
+      "input": {
+        "pullRequests": [
+          {"number": 703, "state": "open", "coding": true, "workCellId": "cell-alpha", "integrationOwner": "Lane A", "changedFiles": ["Documentation/Coordination/note.md"]},
+          {"number": 704, "state": "open", "coding": true, "workCellId": "cell-beta", "integrationOwner": "Lane B", "changedFiles": ["Documentation/Coordination/note.md"]}
+        ],
+        "reservations": []
+      },
+      "expected": {"ok": true, "requiredCodes": [], "forbiddenCodes": ["changed_file_collision", "reserved_seam_violation"]}
+    },
+    {
+      "id": "same_cell_declared_overlap",
+      "class": "same_cell_declared_overlap",
+      "targetPr": 710,
+      "input": {
+        "pullRequests": [
+          {"number": 710, "state": "open", "coding": true, "workCellId": "cell-603", "integrationOwner": "Lane A", "changedFiles": ["runtime/alpha-promotion-shared.js"]},
+          {"number": 711, "state": "open", "coding": true, "workCellId": "cell-603", "integrationOwner": "Lane A", "changedFiles": ["runtime/alpha-promotion-shared.js"]}
+        ],
+        "reservations": []
+      },
+      "expected": {"ok": true, "requiredCodes": ["declared_same_cell_overlap"], "forbiddenCodes": ["reserved_seam_violation"]}
+    },
+    {
+      "id": "cross_cell_overlap_warning",
+      "class": "cross_cell_overlap",
+      "targetPr": 720,
+      "input": {
+        "pullRequests": [
+          {"number": 720, "state": "open", "coding": true, "workCellId": "cell-544", "integrationOwner": "Lane E", "changedFiles": ["runtime/shared-result-adapter.js"]},
+          {"number": 721, "state": "open", "coding": true, "workCellId": "cell-585", "integrationOwner": "Lane I", "changedFiles": ["runtime/shared-result-adapter.js"]}
+        ],
+        "reservations": []
+      },
+      "expected": {"ok": true, "requiredCodes": ["changed_file_collision"], "forbiddenCodes": ["declared_same_cell_overlap"]}
+    },
+    {
+      "id": "undeclared_reserved_seam_collision",
+      "class": "reserved_seam_violation",
+      "targetPr": 730,
+      "input": {
+        "pullRequests": [
+          {"number": 730, "state": "open", "coding": true, "workCellId": "cell-585", "integrationOwner": "Lane I", "changedFiles": ["index.html"]},
+          {"number": 602, "state": "open", "coding": true, "workCellId": "cell-544", "integrationOwner": "Lane E", "changedFiles": ["index.html"]}
+        ],
+        "reservations": [
+          {"path": "index.html", "ownerPr": 602, "ownerLane": "Lane E", "ownerWorkCellId": "cell-544", "status": "active"}
+        ]
+      },
+      "expected": {"ok": false, "requiredCodes": ["reserved_seam_violation"], "requiredPaths": ["index.html"]}
+    },
+    {
+      "id": "authorized_reserved_seam_owner",
+      "class": "reserved_seam_authorized",
+      "targetPr": 602,
+      "input": {
+        "pullRequests": [
+          {"number": 602, "state": "open", "coding": true, "workCellId": "cell-544", "integrationOwner": "Lane E", "changedFiles": ["index.html"]},
+          {"number": 731, "state": "open", "coding": true, "workCellId": "cell-621", "integrationOwner": "Lane C", "changedFiles": ["runtime/alpha-phase2-live-hud-49900.js"]}
+        ],
+        "reservations": [
+          {"path": "index.html", "ownerPr": 602, "ownerLane": "Lane E", "ownerWorkCellId": "cell-544", "status": "active"}
+        ]
+      },
+      "expected": {"ok": true, "requiredCodes": [], "forbiddenCodes": ["reserved_seam_violation"]}
+    },
+    {
+      "id": "ambiguous_two_active_owners",
+      "class": "reservation_ambiguous",
+      "targetPr": 740,
+      "input": {
+        "pullRequests": [
+          {"number": 740, "state": "open", "coding": true, "workCellId": "cell-x", "integrationOwner": "Lane X", "changedFiles": ["game.js"]},
+          {"number": 741, "state": "open", "coding": true, "workCellId": "cell-a", "integrationOwner": "Lane A", "changedFiles": ["game.js"]},
+          {"number": 742, "state": "open", "coding": true, "workCellId": "cell-b", "integrationOwner": "Lane B", "changedFiles": ["game.js"]}
+        ],
+        "reservations": [
+          {"path": "game.js", "ownerPr": 741, "ownerLane": "Lane A", "ownerWorkCellId": "cell-a", "status": "active"},
+          {"path": "game.js", "ownerPr": 742, "ownerLane": "Lane B", "ownerWorkCellId": "cell-b", "status": "active"}
+        ]
+      },
+      "expected": {"ok": false, "requiredCodes": ["reservation_ambiguous"], "requiredPaths": ["game.js"]}
+    },
+    {
+      "id": "stale_closed_owner",
+      "class": "reservation_stale",
+      "targetPr": 750,
+      "input": {
+        "pullRequests": [
+          {"number": 750, "state": "open", "coding": true, "workCellId": "cell-new", "integrationOwner": "Lane N", "changedFiles": ["qa/production_change_impact_matrix_528.json"]},
+          {"number": 560, "state": "closed", "coding": true, "workCellId": "cell-old", "integrationOwner": "Lane A", "changedFiles": ["qa/production_change_impact_matrix_528.json"]}
+        ],
+        "reservations": [
+          {"path": "qa/production_change_impact_matrix_528.json", "ownerPr": 560, "ownerLane": "Lane A", "ownerWorkCellId": "cell-old", "status": "active"}
+        ]
+      },
+      "expected": {"ok": false, "requiredCodes": ["reservation_stale"], "requiredPaths": ["qa/production_change_impact_matrix_528.json"]}
+    },
+    {
+      "id": "malformed_missing_owner_pr",
+      "class": "reservation_malformed",
+      "targetPr": 760,
+      "input": {
+        "pullRequests": [
+          {"number": 760, "state": "open", "coding": true, "workCellId": "cell-z", "integrationOwner": "Lane Z", "changedFiles": ["runtime/alpha-runtime-build-fingerprint-303.js"]}
+        ],
+        "reservations": [
+          {"path": "runtime/alpha-runtime-build-fingerprint-303.js", "ownerLane": "Lane ?", "ownerWorkCellId": "cell-unknown", "status": "active"}
+        ]
+      },
+      "expected": {"ok": false, "requiredCodes": ["reservation_malformed"], "requiredPaths": ["runtime/alpha-runtime-build-fingerprint-303.js"]}
+    }
+  ]
+}

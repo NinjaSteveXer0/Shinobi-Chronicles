@@ -1,0 +1,53 @@
+name: Issue 601 coordination safety adversarial QA
+
+on:
+  push:
+    branches:
+      - qa/601-s05-coordination-safety-j
+    paths:
+      - 'tools/fixtures/coordination_safety_601_adversarial.json'
+      - 'tools/qa_issue_601_coordination_safety_adversarial.js'
+      - 'tools/qa_issue_601_candidate_631_adversarial.js'
+      - '.github/workflows/issue-601-coordination-safety-adversarial.yml'
+  pull_request:
+    paths:
+      - 'tools/fixtures/coordination_safety_601_adversarial.json'
+      - 'tools/qa_issue_601_coordination_safety_adversarial.js'
+      - 'tools/qa_issue_601_candidate_631_adversarial.js'
+      - '.github/workflows/issue-601-coordination-safety-adversarial.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  TARGET_SHA: 938c1955396e791e751da94f3f26de6f8e11723a
+  TARGET_PATH: tools/workforce_collision_guard_601.js
+
+jobs:
+  fixture-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax check Lane J runners
+        run: |
+          node --check tools/qa_issue_601_coordination_safety_adversarial.js
+          node --check tools/qa_issue_601_candidate_631_adversarial.js
+      - name: Validate adversarial fixture contract
+        run: node tools/qa_issue_601_coordination_safety_adversarial.js --self-test
+
+  exact-candidate-adversarial:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Materialize exact Lane I PR 631 candidate
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "$TARGET_SHA"
+          mkdir -p .qa-target
+          git show "$TARGET_SHA:$TARGET_PATH" > .qa-target/workforce_collision_guard_601.js
+          echo "Testing exact candidate: $TARGET_SHA:$TARGET_PATH"
+      - name: Syntax check exact candidate
+        run: node --check .qa-target/workforce_collision_guard_601.js
+      - name: Run Lane J exact-candidate hostile matrix
+        run: node tools/qa_issue_601_candidate_631_adversarial.js .qa-target/workforce_collision_guard_601.js
