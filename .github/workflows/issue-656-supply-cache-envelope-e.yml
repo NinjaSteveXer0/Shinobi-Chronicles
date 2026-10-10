@@ -1,0 +1,34 @@
+name: Issue 656 Supply Cache caller envelope E
+on:
+  push:
+    branches: [qa/656-supply-cache-envelope-e]
+permissions:
+  contents: read
+jobs:
+  supply-cache-envelope:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Start local Alpha server
+        run: |
+          python3 -m http.server 8080 > issue656-server.log 2>&1 &
+          echo $! > issue656-server.pid
+          sleep 2
+      - name: Supply Cache actual caller/return proof
+        env:
+          ISSUE_656_BASE_URL: http://127.0.0.1:8080/index.html
+        run: xvfb-run -a node tools/qa_issue_656_supply_cache_envelope_e.js
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-656-supply-cache-envelope-e
+          path: |
+            artifacts/issue-656-supply-cache-envelope-e
+            issue656-server.log
