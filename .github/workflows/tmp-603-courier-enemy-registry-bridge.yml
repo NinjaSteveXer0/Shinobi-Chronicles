@@ -1,0 +1,54 @@
+name: TMP 603 Courier Enemy Registry Bridge
+
+on:
+  push:
+    branches:
+      - coding/603-step7-promotion-integration
+    paths:
+      - .github/workflows/tmp-603-courier-enemy-registry-bridge.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/603-step7-promotion-integration
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Patch bounded #60310 enemy registry access
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path=Path('runtime/alpha-promotion-courier-assessment-60310.js')
+          text=path.read_text(encoding='utf-8')
+          old='function registerRogue(){if(!globalThis.enemyDatabase||typeof globalThis.buildReusableRogueGeninOppositionActions399!=="function")return{success:false,reason:"rogue_genin_shared_package_missing"};const profile={id:ROGUE,name:"ROGUE GENIN",rank:"Rogue Genin",power:23,calibratedBasePL:23,baseStats:{nin:23,tai:22,buki:21,fuin:10,kin:14,gen:15,stamina:24},stats:{nin:23,tai:22,buki:21,fuin:10,kin:14,gen:15,stamina:24},image:"Enemies/rogue_genin.png",oppositionTemplateId:TEMPLATE,rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},noSummon:true,noTransformation:true,noBossScaling:true};globalThis.enemyDatabase[ROGUE]=profile;const pkg=globalThis.buildReusableRogueGeninOppositionActions399({participantId:ROGUE,metaGetter:()=>globalThis.currentBattle?.promotionCourier60310||null});profile.authoredBattleActions=pkg.actions;profile.promotionCourier60310PackageState=pkg;return{success:true};}'
+          new='function enemyRegistry60310(){try{if(typeof enemyDatabase==="object"&&enemyDatabase)return enemyDatabase;}catch(_){}return globalThis.enemyDatabase&&typeof globalThis.enemyDatabase==="object"?globalThis.enemyDatabase:null;}\nfunction registerRogue(){const db=enemyRegistry60310();if(!db)return{success:false,reason:"promotion_courier_enemy_registry_missing"};if(typeof globalThis.buildReusableRogueGeninOppositionActions399!=="function")return{success:false,reason:"rogue_genin_shared_package_missing"};const profile={id:ROGUE,name:"ROGUE GENIN",rank:"Rogue Genin",power:23,calibratedBasePL:23,baseStats:{nin:23,tai:22,buki:21,fuin:10,kin:14,gen:15,stamina:24},stats:{nin:23,tai:22,buki:21,fuin:10,kin:14,gen:15,stamina:24},image:"Enemies/rogue_genin.png",oppositionTemplateId:TEMPLATE,rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},noSummon:true,noTransformation:true,noBossScaling:true};db[ROGUE]=profile;const pkg=globalThis.buildReusableRogueGeninOppositionActions399({participantId:ROGUE,metaGetter:()=>globalThis.currentBattle?.promotionCourier60310||null});profile.authoredBattleActions=pkg.actions;profile.promotionCourier60310PackageState=pkg;return{success:true};}'
+          if text.count(old)!=1:
+              raise SystemExit(f'registerRogue replacement count={text.count(old)}')
+          text=text.replace(old,new)
+          old2='  const pkg=globalThis.enemyDatabase?.[ROGUE]?.promotionCourier60310PackageState;'
+          new2='  const db=enemyRegistry60310();\n  const pkg=db?.[ROGUE]?.promotionCourier60310PackageState;'
+          if text.count(old2)!=1:
+              raise SystemExit(f'feint registry replacement count={text.count(old2)}')
+          text=text.replace(old2,new2)
+          path.write_text(text,encoding='utf-8')
+          PY
+          node --check runtime/alpha-promotion-courier-assessment-60310.js
+          node tools/qa_issue_607_courier_adapter.js
+          node tools/qa_issue_603_installed_integration.js
+      - name: Commit bounded repair and remove temporary workflow
+        shell: bash
+        run: |
+          rm .github/workflows/tmp-603-courier-enemy-registry-bridge.yml
+          git config user.name "ChatGPT Codex Connector"
+          git config user.email "codex-connector@users.noreply.github.com"
+          git add runtime/alpha-promotion-courier-assessment-60310.js .github/workflows/tmp-603-courier-enemy-registry-bridge.yml
+          git commit -m "[CODING][#603] Use live enemy registry in Courier Battle adapter"
+          git push origin HEAD:coding/603-step7-promotion-integration
