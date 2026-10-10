@@ -23,6 +23,10 @@ EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-runtime-build-fingerprint-303.js",
     "game.js",
     "runtime/alpha-chronicle-state-manifest-43600.js",
+    "runtime/alpha-promotion-core-60300.js",
+    "runtime/alpha-promotion-courier-assessment-60310.js",
+    "runtime/alpha-promotion-arena-ui-60320.js",
+    "runtime/alpha-promotion-installed-integration-60330.js",
     "runtime/alpha-discipline-stat-growth-44800.js",
     "runtime/alpha-origin-starting-purse-409.js",
     "runtime/alpha-special-jonin-evidence-producer-34700.js",
@@ -67,6 +71,7 @@ EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-phase2-basic-item-shop-51700.js",
     "runtime/alpha-hud-my-clan-return-context-50600.js",
     "runtime/alpha-phase2-character-card-shop-52400.js",
+    "runtime/alpha-battle-terminal-result-54400.js",
 ]
 
 PYTHON_GATES = [
@@ -112,6 +117,7 @@ NODE_GATES = [
     "tools/qa_phase2_basic_item_shop_517.js",
     "tools/qa_hud_my_clan_return_506.js",
     "tools/qa_phase2_character_card_shop_524.js",
+    "tools/qa_issue_603_installed_integration.js",
 ]
 
 EXTERNAL_ASSET_GATES = [
@@ -174,6 +180,16 @@ def main() -> int:
     )
     require(
         checks,
+        "603_promotion_modules_ordered_before_consumers",
+        scripts.index("runtime/alpha-chronicle-state-manifest-43600.js")
+        < scripts.index("runtime/alpha-promotion-core-60300.js")
+        < scripts.index("runtime/alpha-promotion-courier-assessment-60310.js")
+        < scripts.index("runtime/alpha-promotion-arena-ui-60320.js")
+        < scripts.index("runtime/alpha-promotion-installed-integration-60330.js")
+        < scripts.index("runtime/alpha-traversal-bridge-33200.js"),
+    )
+    require(
+        checks,
         "origin_packages_before_integrator",
         max(scripts.index(f"runtime/alpha-origin-scenes-32900-{part}.js") for part in ("a", "b", "c"))
         < scripts.index("runtime/alpha-origin-scenes-32900-integrator.js"),
@@ -194,7 +210,7 @@ def main() -> int:
     roster = read("runtime/alpha-genin-roster-63.js")
     journey = read("runtime/alpha-journey-surface-32800.js")
     origin_integrator = read("runtime/alpha-origin-scenes-32900-integrator.js")
-    sprint = read("runtime/alpha-alpha-sprint-33100.js")
+    terminal_result = read("runtime/alpha-battle-terminal-result-54400.js")
     bridge = read("runtime/alpha-traversal-bridge-33200.js")
     world_fix = read("runtime/alpha-world-konoha-112-fix.js")
     contained = read("runtime/alpha-anbu-root-contained-155-knowledge-fix.js")
@@ -243,12 +259,24 @@ def main() -> int:
     require(
         checks,
         "story_battle_exact_caller_return_present",
-        contains_all(sprint, "resumeBattleCallerAfterCompletion", 'rc.type==="story_scene"'),
+        contains_all(
+            terminal_result,
+            "function continueAfterVictory54400()",
+            'PRIOR_RESUME_CALLER.call(globalThis,"victory")',
+            "function continueAfterSetback54400()",
+            'PRIOR_RESUME_CALLER.call(globalThis,"defeat")',
+        ),
     )
     require(
         checks,
         "setback_is_withdrawal_not_injury_death",
-        contains_all(sprint, "battlePLWithdrawal:true", "injuryInferred:false", "deathInferred:false"),
+        contains_all(
+            terminal_result,
+            "Battle PL defeat does not infer death, injury, custody",
+            'committedOutcome54400(battle)!=="defeat"',
+            "presentationOnly:true",
+            "semanticWrite:false",
+        ),
     )
 
     # Origin package is ten-Origin and source-first; no direct PL grant in occurrence commit.

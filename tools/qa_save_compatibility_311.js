@@ -214,6 +214,38 @@ assert(free&&free.projection.onboardingStatus==="academy_free_play"&&free.projec
       updatedAt:123
     },
     originParticipantContinuity:{schemaVersion:1,byKey:{}},
+    promotionState:{
+      schemaVersion:1,
+      stateDomainId:"promotionState",
+      assessmentFamilyId:"academy_to_genin_field_readiness_assessment",
+      scenarioId:"academy_genin_missing_courier_dispatch_v1",
+      rankTransitionId:"academy_to_genin",
+      stableCharacterId:"owned_character_academy_kakashi",
+      packagePoolVersion:"academy_genin_fr_package_pool_v1",
+      promotionRequirementPackageId:"academy_genin_fr_pkg_information_team_v1",
+      packageDerivation:{algorithm:"fnv1a32_utf8_v1",seedFingerprint:"save311603",materializedAt:"2026-10-10T00:00:00.000Z"},
+      readinessSlots:{
+        academy_genin_req_mission_comprehension:{slotId:"academy_genin_req_mission_comprehension",domain:"mission_comprehension",revealed:true,satisfied:true,revealRefs:["save311603"],evidenceRefs:["save311603"]},
+        academy_genin_req_judgement_under_pressure:{slotId:"academy_genin_req_judgement_under_pressure",domain:"judgement_under_pressure",revealed:false,satisfied:false,revealRefs:[],evidenceRefs:[]},
+        academy_genin_req_secondary_1:{slotId:"academy_genin_req_secondary_1",domain:"information_use",revealed:false,satisfied:false,revealRefs:[],evidenceRefs:[]},
+        academy_genin_req_secondary_2:{slotId:"academy_genin_req_secondary_2",domain:"team_coordination",revealed:false,satisfied:false,revealRefs:[],evidenceRefs:[]}
+      },
+      attempts:[{
+        assessmentAttemptId:"assessment_save311_603",
+        attemptNumber:1,
+        status:"COMMITTED",
+        assessmentFamilyId:"academy_to_genin_field_readiness_assessment",
+        scenarioId:"academy_genin_missing_courier_dispatch_v1",
+        startedAt:"2026-10-10T00:00:01.000Z",
+        missionInstanceId:"mission_academy_genin_missing_courier_dispatch_v1::assessment_save311_603",
+        worldOccurrenceId:"occ_academy_genin_missing_courier_dispatch_v1::assessment_save311_603",
+        rewardSnapshotId:"reward_snapshot_academy_genin_missing_courier_dispatch_v1::assessment_save311_603",
+        battleOccurrenceId:"battle_occ_academy_genin_missing_courier_hold_line_v1::assessment_save311_603"
+      }],
+      activeAttemptId:"assessment_save311_603",
+      nextAttemptNumber:2,
+      geninTransitionReceipts:{}
+    },
     privateOriginHistories:{
       schemaVersion:1,
       bySubject:{
@@ -245,6 +277,7 @@ assert(free&&free.projection.onboardingStatus==="academy_free_play"&&free.projec
   const loaded=context.loadPlayerData();
   assert.strictEqual(store.get(SAVE_KEY),rawBefore,"#436 compatibility reader mutated Phase-2 save while loading");
   assert.deepStrictEqual(loaded.phase2ChronicleState,fixture.phase2ChronicleState,"#436 Phase-2 root dropped/rewritten by compatibility reader");
+  assert.strictEqual(loaded.phase2ChronicleState.promotionState.activeAttemptId,"assessment_save311_603","#603 active Promotion attempt lineage dropped on load");
   context.__phase2Loaded=loaded;
   vm.runInContext("playerData=__phase2Loaded;",context);
   const team=JSON.parse(JSON.stringify(context.getChronicleCurrentTeam43600()));
@@ -259,9 +292,11 @@ assert(free&&free.projection.onboardingStatus==="academy_free_play"&&free.projec
   assert.strictEqual(JSON.stringify(loaded),pureInput,"#436 pure migration mutated loaded save");
   const migratedAgain=JSON.parse(JSON.stringify(context.migratePhase2ChronicleState43600(migrated)));
   assert.deepStrictEqual(migratedAgain,migrated,"#436 migration rerolled Phase-2 state");
+  assert.deepStrictEqual(migrated.phase2ChronicleState.promotionState,fixture.phase2ChronicleState.promotionState,"#603 Promotion package/attempt state changed during migration");
   vm.runInContext("playerData=loadPlayerData();savePlayerData();",context);
   const reloaded=context.loadPlayerData();
   assert.deepStrictEqual(reloaded.phase2ChronicleState,fixture.phase2ChronicleState,"#436 save/reload changed tutorialProgress");
+  assert.deepStrictEqual(reloaded.phase2ChronicleState.promotionState,fixture.phase2ChronicleState.promotionState,"#603 Promotion package/attempt state changed after save/reload");
 }
 
 console.log(JSON.stringify({
@@ -287,7 +322,9 @@ console.log(JSON.stringify({
     phase2MigrationPureAndIdempotent:true,
     privateOriginHistoryPersists:true,
     privateOriginHistoryNoReroll:true,
-    chronicleRunIdentityPersists:true
+    chronicleRunIdentityPersists:true,
+    promotionStatePersists:true,
+    promotionPackageAndAttemptLineageNoReroll:true
   },
   browserGoldenClaimed:false
 },null,2));

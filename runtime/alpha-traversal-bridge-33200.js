@@ -15,7 +15,6 @@
   "use strict";
 
   const PATCH_ID="alpha_traversal_bridge_33200_2026_09_13";
-  const priorPromotion33200=typeof openArenaPromotionSurface==="function"?openArenaPromotionSurface:null;
   const priorRosterOpen33200=typeof openGeninRosterTransitionUI==="function"?openGeninRosterTransitionUI:null;
 
   function getTransition33200(){
@@ -53,13 +52,10 @@
     const state=getTransition33200();
     if(isIncompleteTransition33200(state)){
       const result=openGeninRosterTransitionUI33200();
-      if(result&&typeof result==="object"){
-        return {...result,alpha33200PromotionResume:true,subjectId:subjectId||state.subjectOwnedCharacterId||null};
-      }
-      return{success:true,alpha33200PromotionResume:true,subjectId:subjectId||state.subjectOwnedCharacterId||null};
+      return result&&typeof result==="object"?{...result,alpha33200PromotionResume:true}:result;
     }
-    if(priorPromotion33200)return priorPromotion33200.apply(this,arguments);
-    return{success:false,reason:"promotion_surface_authority_missing"};
+    if(typeof globalThis.openInstalledPromotion60330!=="function")return{success:false,reason:"promotion_step7_integration_authority_missing"};
+    return globalThis.openInstalledPromotion60330(subjectId);
   }
 
   globalThis.openGeninRosterTransitionUI=openGeninRosterTransitionUI33200;

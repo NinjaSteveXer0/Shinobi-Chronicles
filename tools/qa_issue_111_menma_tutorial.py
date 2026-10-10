@@ -30,6 +30,52 @@ def game_without_declared_469_save_reader(text:str)->str:
         return ''
     return text[:start]+text[end:]
 
+# #603 intentionally adds exactly five bounded game.js seams: Promotion Battle
+# session capture, canonical Missing Courier caller return dispatch, rogue-feint
+# expiry at the existing enemy action-opportunity boundary, and the two restore
+# hooks around canonical Battle-session rehydration. Strip only those exact
+# reviewed blocks before applying the frozen pre-#603 game.js blob pin.
+def game_without_declared_603_promotion_seams(text:str)->str:
+    save_block='''    promotionCourier60310Battle:
+      globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310&&typeof globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.captureBattleSessionState==="function"
+        ? globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.captureBattleSessionState()
+        : null,
+
+'''
+    return_block='''  if (returnContext.type==="field_readiness_assessment") {
+    if (returnContext.assessmentScenarioId==="academy_genin_missing_courier_dispatch_v1") {
+      const courier=globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310;
+      if (!courier||typeof courier.resumeFromCurrentBattle!=="function") return {success:false,reason:"promotion_courier_return_authority_missing"};
+      return courier.resumeFromCurrentBattle(returnContext);
+    }
+    return resumeFieldReadinessAssessmentFromBattle(returnContext);
+  }'''
+    prior_return='  if (returnContext.type==="field_readiness_assessment") return resumeFieldReadinessAssessmentFromBattle(returnContext);'
+    feint_block='''  if (globalThis.currentBattle&&currentBattle.promotionCourier60310&&globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310&&typeof globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.expireRogueFeintAtActionOpportunity==="function") {
+    globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.expireRogueFeintAtActionOpportunity();
+  }
+'''
+    prepare_restore_block='''    const promotionCourier60310BattleState=state.promotionCourier60310Battle&&typeof state.promotionCourier60310Battle==="object"?state.promotionCourier60310Battle:null;
+    if(promotionCourier60310BattleState&&globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310&&typeof globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.prepareBattleSessionRestore==="function"){
+      globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.prepareBattleSessionRestore(promotionCourier60310BattleState);
+    }
+
+'''
+    apply_restore_block='''    if(promotionCourier60310BattleState&&globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310&&typeof globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.restoreBattleSessionState==="function"){
+      globalThis.SC_PROMOTION_COURIER_ASSESSMENT_60310.restoreBattleSessionState(promotionCourier60310BattleState);
+    }
+
+'''
+    blocks=[save_block,return_block,feint_block,prepare_restore_block,apply_restore_block]
+    if any(text.count(block)!=1 for block in blocks):
+        return ''
+    return (text
+        .replace(save_block,'',1)
+        .replace(return_block,prior_return,1)
+        .replace(feint_block,'',1)
+        .replace(prepare_restore_block,'',1)
+        .replace(apply_restore_block,'',1))
+
 five=[
  'academy_menma_chakra_knuckle',
  'academy_menma_crescent_kunai',
@@ -44,7 +90,7 @@ legacy=[
 ]
 
 checks={}
-checks['audited_game_blob_unchanged']=git_blob_sha(game_without_declared_469_save_reader(game))==EXPECTED_BLOB
+checks['audited_game_blob_unchanged']=git_blob_sha(game_without_declared_603_promotion_seams(game_without_declared_469_save_reader(game)))==EXPECTED_BLOB
 checks['patch_loaded_after_game']=index.index('<script src="game.js"></script>') < index.index('<script src="runtime/alpha-menma-tutorial-111.js"></script>')
 checks['stable_policy_id']='alpha_combat_content_projection_v1_2026_09_11' in patch
 checks['exact_five_in_patch_order']=all(patch.index(f'"{sid}"') < patch.index(f'"{five[i+1]}"') for i,sid in enumerate(five[:-1])) and all(sid in patch for sid in five)

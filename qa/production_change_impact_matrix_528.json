@@ -323,6 +323,8 @@
       "id": "battle_result_presentation",
       "changed_any": [
         "runtime/alpha-alpha-sprint-33100.js",
+        "runtime/alpha-battle-browser-32600.js",
+        "runtime/alpha-battle-terminal-result-54400.js",
         "UI/victory.png",
         "UI/setback.png",
         "tools/qa_ui_master_consumption_528_browser.js"
@@ -434,6 +436,7 @@
       "changed_any": [
         "runtime/alpha-genin-roster-63.js",
         "runtime/alpha-traversal-bridge-33200.js",
+        "runtime/alpha-browser-onboarding-fixes-33400.js",
         "tools/qa_issue_141_traversal_runtime.js",
         "tools/qa_issue_63_genin_v2_runtime.js"
       ],

@@ -8,8 +8,8 @@
 // - Battle PL numerals are optically centered inside the radial;
 // - Combat Feed gets a small positioning refinement;
 // - My Clan keeps drag/drop + inspection, but removes click-to-assign highlight;
-// - caller-owned Victory claim returns through the exact authored Battle caller
-//   and fails closed instead of falling through to generic Combat Arena.
+// - Victory reward claiming preserves any authored Battle caller and stops before
+//   caller restoration; the later explicit terminal-result Continue owns return.
 // No Battle resolver, ownership, roster, reward-authority, or World semantic subsystem is replaced.
 // ============================================================================
 (function installAlphaBattleBrowser32600(){
@@ -52,21 +52,12 @@
   };
 
   // --------------------------------------------------------------------------
-  // 2. VICTORY UX — CLAIM REWARDS, THEN RETURN TO THE EXACT OWNING CALLER
+  // 2. VICTORY UX — CLAIM REWARDS, THEN WAIT FOR EXPLICIT CONTINUE
   // --------------------------------------------------------------------------
-  // Player interaction remains one clean CLAIM action. Internally the two
-  // semantic operations remain ordered and separate: first the existing reward
-  // claim route commits exactly once, then caller restoration uses the existing
-  // Battle return-context authority.
-  //
-  // 2026-09-17 installed-browser evidence exposed a bad fallback: a Kakashi
-  // Story Battle could claim successfully, fail its authored caller resume, and
-  // then continueAfterVictory() would fall through to generic Combat Arena.
-  // Caller-owned Battles now restore the exact pre-claim returnContext snapshot
-  // and invoke resumeBattleCallerAfterCompletion() directly. If that authored
-  // resume fails, Victory remains open and the error is returned fail-closed;
-  // generic Battle fallback is reserved for Battles that genuinely have no
-  // caller return context.
+  // Reward claim and caller continuation are distinct player actions. CLAIM
+  // commits the existing reward authority exactly once, preserves/restores the
+  // Battle returnContext snapshot if a predecessor render touched it, and stays
+  // on Victory. The later Continue is responsible for caller restoration.
   const priorClaimVictoryAutoReturn=claimVictoryRewardsFromOverlay;
   let kakashiVictoryPersistencePending32600=null;
   function patchKakashiClaimedVictory32600(){
@@ -166,9 +157,15 @@
       // memory; paint CLAIM -> CONTINUE first, then persist during browser idle.
       if(!patchKakashiClaimedVictory32600())return{success:false,reason:"kakashi_victory_control_patch_failed"};
       scheduleKakashiVictoryPersistence32600("claim");
+      if(currentBattle&&returnContextBefore){
+        currentBattle.returnContext=typeof cloneBattleRuntimeValue==="function"
+          ?cloneBattleRuntimeValue(returnContextBefore)
+          :returnContextBefore;
+      }
       return{
         success:true,claimed:true,navigated:false,autoReturned:false,
         explicitPostClaimContinue:true,
+        callerResumeWithheldUntilExplicitContinue:true,
         kakashiVictoryPaintBeforePersistence:true,
         rewardCommitBeforeCallerRestore:true
       };
@@ -177,89 +174,44 @@
     const claimResult=priorClaimVictoryAutoReturn.apply(this,arguments);
     if(!(claimResult&&claimResult.success===true))return claimResult;
 
-    // Some authored Battles require an explicit post-claim confirmation step:
-    // claim the material reward, remain on the completed Victory surface, then
-    // RETURN TO STORY. This flag is reward-authority owned; generic Battles keep
-    // the established auto-return behaviour below.
-    if(currentBattle&&currentBattle.rewards&&currentBattle.rewards.requiresExplicitPostClaimContinue===true){
-      // The predecessor Claim owner has already committed rewards and
-      // synchronously re-rendered the same Victory surface. Reopening Victory
-      // here duplicated the full renderer/terminal-overlay path and could make
-      // Kakashi's Claim/Continue controls appear unresponsive.
+    const callerOwned=!!(returnContextBefore&&typeof returnContextBefore==="object"&&returnContextBefore.type);
+    if(currentBattle&&returnContextBefore){
+      currentBattle.returnContext=typeof cloneBattleRuntimeValue==="function"
+        ?cloneBattleRuntimeValue(returnContextBefore)
+        :returnContextBefore;
+    }
+
+    // A caller-owned completed Battle always requires an explicit post-claim
+    // Continue. CLAIM must never satisfy CONTINUE or call the caller-resume API.
+    if(callerOwned||currentBattle&&currentBattle.rewards&&currentBattle.rewards.requiresExplicitPostClaimContinue===true){
       return{
         ...claimResult,
         navigated:false,
         autoReturned:false,
+        callerOwned,
+        returnContextBefore,
         explicitPostClaimContinue:true,
+        callerResumeWithheldUntilExplicitContinue:true,
         victoryAlreadyRerenderedByClaimOwner:true,
         rewardCommitBeforeCallerRestore:true
       };
     }
 
+    // Battles with no authored caller preserve the legacy generic continuation.
     let callerResult=null;
     let navigationError=null;
-    const callerOwned=!!(returnContextBefore&&typeof returnContextBefore==="object"&&returnContextBefore.type);
-
     try{
-      if(callerOwned){
-        // Claiming rewards must not erase or weaken the Battle caller identity.
-        if(currentBattle){
-          currentBattle.returnContext=typeof cloneBattleRuntimeValue==="function"
-            ?cloneBattleRuntimeValue(returnContextBefore)
-            :returnContextBefore;
-        }
-
-        if(typeof resumeBattleCallerAfterCompletion!=="function"){
-          callerResult={success:false,reason:"battle_caller_resume_api_missing"};
-        }else{
-          callerResult=resumeBattleCallerAfterCompletion("victory");
-        }
-
-        if(!(callerResult&&callerResult.success===true)){
-          navigationError=String(callerResult&&callerResult.reason||"caller_restore_failed");
-          // Fail closed on the completed Victory surface. Do not drop a Story
-          // Battle into generic Combat Arena when its caller cannot resume.
-          try{openOverlay("victory");}catch(_error){}
-          return {
-            ...claimResult,
-            navigated:false,
-            autoReturned:false,
-            callerOwned:true,
-            returnContextBefore,
-            callerResult:callerResult||null,
-            navigationError,
-            rewardCommitBeforeCallerRestore:true,
-            genericBattleFallbackSuppressed:true
-          };
-        }
-      }else{
-        callerResult=continueAfterVictory();
-      }
+      callerResult=continueAfterVictory();
     }catch(error){
-      navigationError=String(error&&error.message||error||"caller_restore_failed");
-      if(callerOwned){
-        try{openOverlay("victory");}catch(_error){}
-        return {
-          ...claimResult,
-          navigated:false,
-          autoReturned:false,
-          callerOwned:true,
-          returnContextBefore,
-          callerResult:callerResult||null,
-          navigationError,
-          rewardCommitBeforeCallerRestore:true,
-          genericBattleFallbackSuppressed:true
-        };
-      }
+      navigationError=String(error&&error.message||error||"victory_continue_failed");
     }
-
     const leftVictory=typeof currentOverlayType==="undefined"||currentOverlayType!=="victory";
     return {
       ...claimResult,
       navigated:leftVictory,
-      autoReturned:true,
-      callerOwned,
-      returnContextBefore,
+      autoReturned:leftVictory,
+      callerOwned:false,
+      returnContextBefore:null,
       callerResult:callerResult||null,
       navigationError,
       rewardCommitBeforeCallerRestore:true
@@ -366,14 +318,12 @@
       repeatStillChecksAvailability:confirmSource.includes("repeatStillUsesAuthoritativeAvailability:true"),
       academyHasNoGenericRepeatLock:!genericRepeatLockPattern.test(academyAvailabilitySource),
       closureHasNoGenericRepeatLock:!genericRepeatLockPattern.test(closureAvailabilitySource),
-      claimThenCallerRestore:claimSource.includes("priorClaimVictoryAutoReturn")&&claimSource.includes('resumeBattleCallerAfterCompletion("victory")'),
-      kakashiExplicitClaimPaintsBeforePersistence:claimSource.includes("kakashiVictoryPaintBeforePersistence:true")&&claimSource.includes("patchKakashiClaimedVictory32600")&&claimSource.includes("scheduleKakashiVictoryPersistence32600")&&!claimSource.includes('openOverlay("victory");\n      try{if(typeof refreshAlphaSurfaceTruthHUD'),
-      rewardCommitBeforeReturn:claimSource.indexOf("priorClaimVictoryAutoReturn")<claimSource.indexOf('resumeBattleCallerAfterCompletion("victory")'),
+      claimStopsBeforeCallerRestore:claimSource.includes("callerResumeWithheldUntilExplicitContinue:true")&&!claimSource.includes('resumeBattleCallerAfterCompletion("victory")'),
+      kakashiExplicitClaimPaintsBeforePersistence:claimSource.includes("kakashiVictoryPaintBeforePersistence:true")&&claimSource.includes("patchKakashiClaimedVictory32600")&&claimSource.includes("scheduleKakashiVictoryPersistence32600"),
+      rewardCommitBeforeExplicitReturn:claimSource.indexOf("priorClaimVictoryAutoReturn")<claimSource.indexOf("callerResumeWithheldUntilExplicitContinue:true"),
       callerContextPreserved:claimSource.includes("returnContextBefore")&&claimSource.includes("currentBattle.returnContext"),
-      callerOwnedCannotGenericFallback:claimSource.includes("genericBattleFallbackSuppressed:true")&&claimSource.includes('openOverlay("victory")'),
-      explicitPostClaimContinueSupported:claimSource.includes("requiresExplicitPostClaimContinue")&&claimSource.includes("explicitPostClaimContinue:true"),
-      explicitPostClaimDoesNotReopenVictory:claimSource.includes("victoryAlreadyRerenderedByClaimOwner:true"),
-      ordinaryBattleStillUsesGenericContinue:claimSource.includes("callerResult=continueAfterVictory()"),
+      callerOwnedRequiresExplicitContinue:claimSource.includes("if(callerOwned||")&&claimSource.includes("explicitPostClaimContinue:true"),
+      ordinaryNoCallerBattleStillUsesGenericContinue:claimSource.includes("callerResult=continueAfterVictory()"),
       feedStyleInstalled:typeof document==="undefined"||!!document.getElementById("alpha-battle-browser-32600-style"),
       browserGoldenNotClaimed:true
     };

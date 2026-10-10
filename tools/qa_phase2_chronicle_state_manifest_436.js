@@ -54,7 +54,7 @@ const teamSave={
   const c=boot(teamSave);
   const manifest=plain(c.getChronicleStateManifest43600());
   assert.strictEqual(manifest.manifestId,"sc.phase2.chronicle_state_manifest.v1");
-  assert.deepStrictEqual(manifest.domains.map(x=>x.stateDomainId),["currentTeam","tutorialProgress","chronicleIdentity","chronicleRunIdentity","currentRyo","disciplineDevelopment","characterStats","originParticipantContinuity","privateOriginHistory","shinobiRecordProjection"]);
+  assert.deepStrictEqual(manifest.domains.map(x=>x.stateDomainId),["promotionState","currentTeam","tutorialProgress","chronicleIdentity","chronicleRunIdentity","currentRyo","disciplineDevelopment","characterStats","originParticipantContinuity","privateOriginHistory","shinobiRecordProjection"]);
   for(const row of manifest.domains){
     for(const key of ["stateDomainId","semanticOwner","canonicalWritePath","stableIdentityKey","savePath","schemaVersion","sourceOccurrenceIdFormat","idempotenceKeyFormat","derivedFields","projectionConsumers","migrationRule","resetRule","difficultyScope","inheritanceRule","devOverridePolicy","qaRefs"]){
       assert(Object.prototype.hasOwnProperty.call(row,key),"domain "+row.stateDomainId+" missing "+key);
@@ -70,6 +70,13 @@ const teamSave={
   assert.strictEqual(runDomain.semanticOwner,"CE / Historical Scope + Meta-History");
   assert.strictEqual(runDomain.stableIdentityKey,"playerData.phase2ChronicleState.chronicleRunIdentity.runId");
   assert.strictEqual(runDomain.savePath,"playerData.phase2ChronicleState.chronicleRunIdentity");
+
+  const promotionDomain=manifest.domains.find(row=>row.stateDomainId==="promotionState");
+  assert(promotionDomain,"promotionState domain missing");
+  assert.strictEqual(promotionDomain.semanticOwner,"PL / Registry / Rank + Coding #603");
+  assert.strictEqual(promotionDomain.canonicalWritePath,"SC_PROMOTION_INSTALLED_60330 scoped persistence adapter");
+  assert.strictEqual(promotionDomain.savePath,"playerData.phase2ChronicleState.promotionState");
+  assert(promotionDomain.qaRefs.includes("#603"));
 
   const privateOriginDomain=manifest.domains.find(row=>row.stateDomainId==="privateOriginHistory");
   assert(privateOriginDomain,"privateOriginHistory domain missing");
@@ -177,6 +184,27 @@ const teamSave={
 }
 
 {
+  const promotionSave=JSON.parse(JSON.stringify(teamSave));
+  const promotionState={
+    schemaVersion:1,
+    stateDomainId:"promotionState",
+    assessmentFamilyId:"academy_to_genin_field_readiness_assessment",
+    scenarioId:"academy_genin_missing_courier_dispatch_v1",
+    rankTransitionId:"academy_to_genin",
+    stableCharacterId:"owned_character_academy_menma",
+    promotionRequirementPackageId:"academy_genin_fr_pkg_information_team_v1",
+    attempts:[{assessmentAttemptId:"assessment_save436_603",status:"COMMITTED"}],
+    activeAttemptId:"assessment_save436_603"
+  };
+  promotionSave.phase2ChronicleState={schemaVersion:1,promotionState};
+  const c=boot(promotionSave);
+  const migrated=plain(c.migratePhase2ChronicleState43600(c.playerData));
+  assert.deepStrictEqual(migrated.phase2ChronicleState.promotionState,promotionState,"#603 Promotion state dropped or rewritten by #436 migration");
+  const migratedAgain=plain(c.migratePhase2ChronicleState43600(migrated));
+  assert.deepStrictEqual(migratedAgain.phase2ChronicleState.promotionState,promotionState,"#603 Promotion state rerolled on repeated #436 migration");
+}
+
+{
   const legacy=JSON.parse(JSON.stringify(teamSave));
   legacy.acquisition.academyTeamFormation.confirmationReceipt.firstKonohaTutorial={
     tutorialId:"konoha_onboarding_first_team_orientation_v1",
@@ -240,7 +268,9 @@ console.log(JSON.stringify({
   pass:true,
   issue:436,
   manifest:"sc.phase2.chronicle_state_manifest.v1",
-  initialDomains:["currentTeam","tutorialProgress","chronicleIdentity","chronicleRunIdentity","currentRyo","disciplineDevelopment","characterStats","originParticipantContinuity","shinobiRecordProjection"],
+  initialDomains:["promotionState","currentTeam","tutorialProgress","chronicleIdentity","chronicleRunIdentity","currentRyo","disciplineDevelopment","characterStats","originParticipantContinuity","privateOriginHistory","shinobiRecordProjection"],
+  promotionStateRegistered:true,
+  promotionStateMigrationPreserved:true,
   chronicleRunIdentity:true,
   twoFreshRunsDiffer:true,
   sameRunReloadStable:true,
