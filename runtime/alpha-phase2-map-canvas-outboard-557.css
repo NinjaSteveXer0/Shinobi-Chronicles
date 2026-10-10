@@ -37,6 +37,47 @@
 }
 
 /*
+   #614 — AUTHORED VILLAGE GUTTER BODY
+
+   Reuse the canonical #499 presentation stage instead of adding another HUD
+   renderer. The approved Kitsunemori body is clipped to the measured non-map
+   reserves using the existing #499 map rectangle variables. The central crisp
+   Village map therefore remains visually and interactively untouched.
+*/
+.overlay-content-box.sc-hud499-map-echo-active:has(.village-map-screen) .sc-hud499-stage-echo-layer {
+  inset: 0 !important;
+  background-image: url("../UI/kitsunemori_gutter.png") !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: cover !important;
+  filter: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 0,
+    #000 var(--sc-hud499-echo-map-left),
+    transparent var(--sc-hud499-echo-map-left),
+    transparent calc(var(--sc-hud499-echo-map-left) + var(--sc-hud499-echo-map-width)),
+    #000 calc(var(--sc-hud499-echo-map-left) + var(--sc-hud499-echo-map-width)),
+    #000 100%
+  ) !important;
+  mask-image: linear-gradient(
+    to right,
+    #000 0,
+    #000 var(--sc-hud499-echo-map-left),
+    transparent var(--sc-hud499-echo-map-left),
+    transparent calc(var(--sc-hud499-echo-map-left) + var(--sc-hud499-echo-map-width)),
+    #000 calc(var(--sc-hud499-echo-map-left) + var(--sc-hud499-echo-map-width)),
+    #000 100%
+  ) !important;
+}
+
+.overlay-content-box.sc-hud499-map-echo-active:has(.village-map-screen) .sc-hud499-stage-echo-vignette {
+  display: none !important;
+}
+
+/*
    PERSISTENT HUD MAP-EDGE CLEARANCE
 
    Preserve the locked #499 composition: Current Team stays attached to the
@@ -63,11 +104,16 @@ body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-h
   right: auto !important;
 }
 
-/* Keep the compact identity/journey/Ryō cluster in the clear header reserve.
-   This leaves the right map-side reserve available for navigation/context. */
-body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-state-cluster,
-body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-hud499-state-cluster {
+/* Region keeps its existing clear-header placement. */
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="region"] .sc-hud499-state-cluster {
   top: 12px !important;
+}
+
+/* #614 owner-browser polish: seat the Village identity/journey/Ryō cluster
+   slightly lower inside the authored right gutter without changing its width,
+   truth projection, interaction, or the map-relative right anchor. */
+body #sc-phase2-live-hud-49900[data-map557="true"][data-surface="village"] .sc-hud499-state-cluster {
+  top: 22px !important;
 }
 
 /* Region's own navigation/info chrome is map-local presentation, not geography.
