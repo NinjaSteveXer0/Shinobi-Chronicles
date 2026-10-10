@@ -1,0 +1,45 @@
+name: TMP 603 Inspect Restore Ordering
+on:
+  push:
+    branches:
+      - coding/603-step7-promotion-integration
+    paths:
+      - .github/workflows/tmp-603-inspect-restore-order.yml
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/603-step7-promotion-integration
+          fetch-depth: 1
+      - name: Print restore ordering contexts
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text=Path('game.js').read_text(encoding='utf-8')
+          start=text.find('function restoreTestState()')
+          if start<0: raise SystemExit('restoreTestState missing')
+          tail=text[start:start+30000]
+          for needle in ['const state','promotionCourier60310BattleState','selectedEnemy','currentBattle.active','state.overlayType','currentBattle.defeat','restoreBattle','getBattleDeployment','battleRuntime']:
+              print('\n###',needle)
+              pos=0
+              while True:
+                  idx=tail.find(needle,pos)
+                  if idx<0: break
+                  print('POS',idx)
+                  print(tail[max(0,idx-700):min(len(tail),idx+1300)])
+                  pos=idx+len(needle)
+          PY
+      - name: Remove temporary workflow
+        shell: bash
+        run: |
+          rm .github/workflows/tmp-603-inspect-restore-order.yml
+          git config user.name "ChatGPT Codex Connector"
+          git config user.email "codex-connector@users.noreply.github.com"
+          git add .github/workflows/tmp-603-inspect-restore-order.yml
+          git commit -m "[CHORE][#603] Remove temporary restore-order inspection workflow"
+          git push origin HEAD:coding/603-step7-promotion-integration
