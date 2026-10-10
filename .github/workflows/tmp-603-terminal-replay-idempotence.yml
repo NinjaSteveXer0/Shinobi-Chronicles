@@ -1,0 +1,74 @@
+name: TMP603 Terminal Replay Idempotence
+on:
+  push:
+    branches:
+      - coding/603-step7-promotion-integration
+    paths:
+      - .github/workflows/tmp-603-terminal-replay-idempotence.yml
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/603-step7-promotion-integration
+          fetch-depth: 1
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Separate active attempt from latest historical attempt
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('runtime/alpha-promotion-installed-integration-60330.js')
+          s=p.read_text(encoding='utf-8')
+          old='''function latestAttemptId(row){
+  if(row.lastAttemptId)return row.lastAttemptId;
+  try{const snap=row.core.getDiagnosticSnapshot();const attempts=snap&&snap.state&&Array.isArray(snap.state.attempts)?snap.state.attempts:[];const active=[...attempts].reverse().find(x=>x&&x.status==="COMMITTED");return active&&active.assessmentAttemptId||null;}catch(_){return null;}
+}'''
+          new='''function attemptState(row){try{const snap=row.core.getDiagnosticSnapshot();return snap&&snap.state&&typeof snap.state==="object"?snap.state:null;}catch(_){return null;}}
+function latestAttemptId(row){
+  if(row.lastAttemptId)return row.lastAttemptId;
+  const state=attemptState(row),attempts=state&&Array.isArray(state.attempts)?state.attempts:[],latest=attempts.length?attempts[attempts.length-1]:null;
+  return latest&&latest.assessmentAttemptId||null;
+}
+function activeAttemptId(row){
+  const state=attemptState(row);if(!state)return null;
+  if(state.activeAttemptId)return state.activeAttemptId;
+  const attempts=Array.isArray(state.attempts)?state.attempts:[],active=[...attempts].reverse().find(x=>x&&x.status==="COMMITTED");
+  return active&&active.assessmentAttemptId||null;
+}'''
+          if s.count(old)!=1: raise SystemExit(f'latestAttemptId replacement count={s.count(old)}')
+          s=s.replace(old,new,1)
+          s=s.replace('function withdraw(row){const id=latestAttemptId(row);','function withdraw(row){const id=activeAttemptId(row);',1)
+          s=s.replace('function activeAttempt(subjectId=null){const row=activeRow(subjectId);return row?latestAttemptId(row):null;}','function activeAttempt(subjectId=null){const row=activeRow(subjectId);return row?activeAttemptId(row):null;}',1)
+          s=s.replace('function scenarioCall(method,args=[],subjectId=null){const row=activeRow(subjectId);if(!row)return{success:false,reason:"promotion_controller_unavailable"};const id=latestAttemptId(row);','function scenarioCall(method,args=[],subjectId=null){const row=activeRow(subjectId);if(!row)return{success:false,reason:"promotion_controller_unavailable"};const id=activeAttemptId(row);',1)
+          p.write_text(s,encoding='utf-8')
+          guard=Path('tools/qa_issue_603_installed_integration.js')
+          g=guard.read_text(encoding='utf-8')
+          anchor='  browserGoldenClaimedFalse:installed.includes("browserGoldenClaimed:false")'
+          if anchor not in g: raise SystemExit('installed QA anchor missing')
+          replacement='  terminalReplayUsesLatestHistoricalAttempt:installed.includes("function activeAttemptId(row)")&&installed.includes("function latestAttemptId(row)")&&installed.includes("const id=activeAttemptId(row);"),\n'+anchor
+          g=g.replace(anchor,replacement,1)
+          guard.write_text(g,encoding='utf-8')
+          PY
+          node --check runtime/alpha-promotion-installed-integration-60330.js
+          node --check tools/qa_issue_603_installed_integration.js
+          node tools/qa_issue_603_step7_promotion.js
+          node tools/qa_issue_607_courier_adapter.js
+          node tools/qa_issue_603_installed_integration.js
+          node tools/qa_issue_141_traversal_runtime.js
+          node tools/qa_runtime_ownership_safety_300.js
+          node tools/qa_save_compatibility_311.js
+      - name: Commit bounded repair and remove temporary workflow
+        shell: bash
+        run: |
+          rm .github/workflows/tmp-603-terminal-replay-idempotence.yml
+          git config user.name "ChatGPT Codex Connector"
+          git config user.email "codex-connector@users.noreply.github.com"
+          git add runtime/alpha-promotion-installed-integration-60330.js tools/qa_issue_603_installed_integration.js .github/workflows/tmp-603-terminal-replay-idempotence.yml
+          git commit -m "[CODING][#603] Keep terminal Promotion replay idempotent after reload"
+          git push origin HEAD:coding/603-step7-promotion-integration
