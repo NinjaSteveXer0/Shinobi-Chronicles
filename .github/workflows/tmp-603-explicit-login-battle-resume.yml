@@ -1,0 +1,143 @@
+name: TMP 603 Explicit Login Battle Resume
+
+on:
+  push:
+    branches:
+      - coding/603-step7-promotion-integration
+    paths:
+      - .github/workflows/tmp-603-explicit-login-battle-resume.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-prove:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/603-step7-promotion-integration
+          fetch-depth: 1
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Patch explicit returning-player resume and exact #603 browser path
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          onboarding=Path('runtime/alpha-browser-onboarding-fixes-33400.js')
+          text=onboarding.read_text(encoding='utf-8')
+          old='''      if(hasBegunChronicle33400()){
+        release33400();
+        // Returning-player login is presentation release, not navigation.
+        // If an Origin Story runtime survived reload, ask its existing
+        // rehydration authority to restore that exact beat. The helper already
+        // defers when an unresolved active Battle snapshot owns presentation.
+        try{
+          if(typeof restoreActiveOriginStoryPresentation32900==="function"){
+            restoreActiveOriginStoryPresentation32900();
+          }
+        }catch(_error){}
+      }'''
+          new='''      if(hasBegunChronicle33400()){
+        release33400();
+        // Explicit LOGIN / CONTINUE is the player-authorised session resume
+        // boundary. Restore the canonical saved session only after that choice;
+        // never auto-drop into a Battle before the returning player confirms.
+        try{if(typeof restoreTestState==="function")restoreTestState();}catch(_error){}
+        // If an Origin Story runtime survived reload, ask its existing
+        // rehydration authority to restore that exact beat. The helper already
+        // defers when an unresolved active Battle snapshot owns presentation.
+        try{
+          if(typeof restoreActiveOriginStoryPresentation32900==="function"){
+            restoreActiveOriginStoryPresentation32900();
+          }
+        }catch(_error){}
+      }'''
+          if text.count(old)!=1:
+              raise SystemExit(f'onboarding login replacement count={text.count(old)}')
+          text=text.replace(old,new,1)
+          old_diag='      registerLoginPresented:renderAccount33400.toString().includes("REGISTER / NEW NINJA")&&renderAccount33400.toString().includes("LOGIN / CONTINUE"),'
+          new_diag=old_diag+'\n      explicitLoginRestoresCanonicalSession:onClick33400.toString().includes(\'typeof restoreTestState==="function"\')&&onClick33400.toString().includes("restoreTestState()"),'
+          if text.count(old_diag)!=1:
+              raise SystemExit(f'onboarding diagnostic anchor count={text.count(old_diag)}')
+          text=text.replace(old_diag,new_diag,1)
+          onboarding.write_text(text,encoding='utf-8')
+
+          origin=Path('runtime/alpha-origin-scenes-32900-integrator.js')
+          text=origin.read_text(encoding='utf-8')
+          old_comment='''  // Presentation rehydration must never overwrite an unresolved semantic Battle
+  // snapshot before core Battle restore runs on window.load. In that case the
+  // Battle owner restores first; Story resumes through the existing caller
+  // envelope only after the Battle reaches its authored terminal boundary.'''
+          new_comment='''  // Presentation rehydration must never overwrite an unresolved semantic Battle
+  // snapshot before canonical Battle session restore runs after explicit
+  // returning-player continuation. In that case the Battle owner restores first;
+  // Story resumes through the existing caller envelope only after the Battle
+  // reaches its authored terminal boundary.'''
+          if text.count(old_comment)!=1:
+              raise SystemExit(f'origin comment replacement count={text.count(old_comment)}')
+          origin.write_text(text.replace(old_comment,new_comment,1),encoding='utf-8')
+
+          browser=Path('tools/qa_issue_603_step7_promotion_browser.js')
+          text=browser.read_text(encoding='utf-8')
+          old='''    await page.reload({waitUntil:"domcontentloaded",timeout:60000});
+    await waitRuntime(page);
+    await releaseFrontDoor(page);
+    await clearTutorialChrome(page);'''
+          new='''    await page.reload({waitUntil:"domcontentloaded",timeout:60000});
+    await waitRuntime(page);
+    const returningLogin=page.locator('[data-afd2-action="login"]');
+    if(await returningLogin.count()&&await returningLogin.isEnabled())await returningLogin.click();
+    else await releaseFrontDoor(page);
+    await clearTutorialChrome(page);'''
+          if text.count(old)!=1:
+              raise SystemExit(f'browser reload path replacement count={text.count(old)}')
+          browser.write_text(text.replace(old,new,1),encoding='utf-8')
+          PY
+          node --check runtime/alpha-browser-onboarding-fixes-33400.js
+          node --check runtime/alpha-origin-scenes-32900-integrator.js
+          node --check tools/qa_issue_603_step7_promotion_browser.js
+      - name: Focused source and ownership gates
+        shell: bash
+        run: |
+          node tools/qa_issue_165_front_door_runtime.js
+          node tools/qa_issue_165_front_door_v2_runtime.js
+          node tools/qa_issue_603_step7_promotion.js
+          node tools/qa_issue_607_courier_adapter.js
+          node tools/qa_issue_603_installed_integration.js
+          node tools/qa_issue_141_traversal_runtime.js
+          node tools/qa_save_compatibility_311.js
+          node tools/qa_runtime_ownership_safety_300.js
+      - name: Install Playwright Chromium
+        shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start local Alpha server
+        shell: bash
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > sc603-login-resume-server.log 2>&1 &
+          echo $! > sc603-login-resume-server.pid
+          sleep 2
+      - name: Exact installed #603 browser matrix
+        shell: bash
+        env:
+          SC603_REQUIRE_INTEGRATION: '1'
+          SC603_OUT: artifacts/promotion-603-login-resume
+        run: node tools/qa_issue_603_step7_promotion_browser.js
+      - name: Commit repair and remove temporary workflow
+        if: success()
+        shell: bash
+        run: |
+          rm .github/workflows/tmp-603-explicit-login-battle-resume.yml
+          git config user.name "ChatGPT Codex Connector"
+          git config user.email "codex-connector@users.noreply.github.com"
+          git add runtime/alpha-browser-onboarding-fixes-33400.js runtime/alpha-origin-scenes-32900-integrator.js tools/qa_issue_603_step7_promotion_browser.js .github/workflows/tmp-603-explicit-login-battle-resume.yml
+          git commit -m "[CODING][#603] Resume saved Battle after explicit returning-player login"
+          git push origin HEAD:coding/603-step7-promotion-integration
