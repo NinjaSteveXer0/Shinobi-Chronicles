@@ -49,9 +49,18 @@ jobs:
               raise SystemExit(f'installed persistence replacement count={text.count(old)}')
           text=text.replace(old,new,1)
           installed.write_text(text,encoding='utf-8')
+
+          guard=Path('tools/qa_issue_603_installed_integration.js')
+          lines=guard.read_text(encoding='utf-8').splitlines()
+          indexes=[i for i,line in enumerate(lines) if line.startswith('  scopedPersistence:')]
+          if len(indexes)!=1:
+              raise SystemExit(f'scopedPersistence guard count={len(indexes)}')
+          lines[indexes[0]]="  scopedPersistence:installed.includes('const existing=root.promotionState')&&installed.includes('root.promotionState[COURIER_STATE_KEY]')&&installed.includes('merged[COURIER_STATE_KEY]=clone(existing)')&&installed.includes('root.promotionState=merged')&&installed.includes('ensurePhase2ChronicleState43600({save:false})'),"
+          guard.write_text('\n'.join(lines)+'\n',encoding='utf-8')
           PY
           node --check runtime/alpha-promotion-courier-assessment-60310.js
           node --check runtime/alpha-promotion-installed-integration-60330.js
+          node --check tools/qa_issue_603_installed_integration.js
           node tools/qa_issue_603_step7_promotion.js
           node tools/qa_issue_607_courier_adapter.js
           node tools/qa_issue_603_installed_integration.js
@@ -62,6 +71,6 @@ jobs:
           rm .github/workflows/tmp-603-courier-phase2-persistence.yml
           git config user.name "ChatGPT Codex Connector"
           git config user.email "codex-connector@users.noreply.github.com"
-          git add runtime/alpha-promotion-courier-assessment-60310.js runtime/alpha-promotion-installed-integration-60330.js .github/workflows/tmp-603-courier-phase2-persistence.yml
+          git add runtime/alpha-promotion-courier-assessment-60310.js runtime/alpha-promotion-installed-integration-60330.js tools/qa_issue_603_installed_integration.js .github/workflows/tmp-603-courier-phase2-persistence.yml
           git commit -m "[CODING][#603] Persist Courier attempt under Promotion state"
           git push origin HEAD:coding/603-step7-promotion-integration
