@@ -1,0 +1,78 @@
+name: Issue 603 Final Integrated Promotion
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/issue-603-final-integration.yml'
+      - 'game.js'
+      - 'index.html'
+      - 'runtime/alpha-chronicle-state-manifest-43600.js'
+      - 'runtime/alpha-promotion-core-60300.js'
+      - 'runtime/alpha-promotion-courier-assessment-60310.js'
+      - 'runtime/alpha-promotion-arena-ui-60320.js'
+      - 'runtime/alpha-promotion-installed-integration-60330.js'
+      - 'runtime/alpha-traversal-bridge-33200.js'
+      - 'tools/qa_issue_603_step7_promotion.js'
+      - 'tools/qa_issue_603_step7_promotion_browser.js'
+      - 'tools/qa_issue_603_installed_integration.js'
+      - 'tools/qa_issue_607_courier_adapter.js'
+      - 'tools/qa_issue_141_traversal_runtime.js'
+      - 'tools/qa_save_compatibility_311.js'
+
+permissions:
+  contents: read
+
+jobs:
+  final-integrated-promotion:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Exact integrated source and runtime guards
+        run: |
+          node --check runtime/alpha-promotion-core-60300.js
+          node --check runtime/alpha-promotion-courier-assessment-60310.js
+          node --check runtime/alpha-promotion-arena-ui-60320.js
+          node --check runtime/alpha-promotion-installed-integration-60330.js
+          node --check tools/qa_issue_603_step7_promotion.js
+          node --check tools/qa_issue_603_step7_promotion_browser.js
+          node tools/qa_issue_603_step7_promotion.js
+          node tools/qa_issue_607_courier_adapter.js
+          node tools/qa_issue_603_installed_integration.js
+          node tools/qa_issue_141_traversal_runtime.js
+          node tools/qa_save_compatibility_311.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python -m http.server 8080 --bind 127.0.0.1 > sc603-final-server.log 2>&1 &
+          echo $! > sc603-final-server.pid
+          sleep 2
+
+      - name: Exact installed browser matrix 1366x768 and 1920x1080
+        env:
+          SC603_REQUIRE_INTEGRATION: '1'
+          SC603_OUT: artifacts/promotion-603-final
+        run: node tools/qa_issue_603_step7_promotion_browser.js
+
+      - name: Upload exact-head Promotion browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-603-final-integrated-promotion
+          path: |
+            artifacts/promotion-603-final
+            sc603-final-server.log
+          if-no-files-found: ignore
