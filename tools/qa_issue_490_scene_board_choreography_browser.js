@@ -91,6 +91,17 @@ async function openScene(page){
   await page.evaluate(()=>openOverlay("village"));
   const p01=page.locator('button[data-village-hotspot-id="KON-P01"]');await p01.waitFor({state:"visible",timeout:10000});await p01.dblclick();
   await page.waitForFunction(()=>globalThis.getActiveStorySceneRuntime?.()?.sceneId==="scene_konoha_ce_kakashi_masked_interceptor_admin_crossing_menma_v1",null,{timeout:10000});
+  const rehydrate=await page.evaluate(()=>{
+    const before=globalThis.getActiveStorySceneRuntime?.();
+    const sceneId=before&&before.sceneId||null,beatId=before&&before.beatId||null;
+    const layer=document.getElementById("story-scene-presentation-layer");
+    const wasPreserved=layer&&layer.dataset.scPresentationHiddenReason==="preserved_runtime_hidden";
+    if(wasPreserved&&typeof globalThis.renderStoryScenePresentationLayer==="function")globalThis.renderStoryScenePresentationLayer();
+    const after=globalThis.getActiveStorySceneRuntime?.();
+    return{wasPreserved,sceneId,beatId,afterSceneId:after&&after.sceneId||null,afterBeatId:after&&after.beatId||null};
+  });
+  assert.strictEqual(rehydrate.afterSceneId,rehydrate.sceneId,"canonical presentation rehydrate changed active scene");
+  assert.strictEqual(rehydrate.afterBeatId,rehydrate.beatId,"canonical presentation rehydrate changed active beat");
   await page.waitForSelector("#story-scene-presentation-layer",{state:"visible",timeout:10000});
   await page.waitForSelector("#story-scene-presentation-layer .sc-scene-board-33900",{state:"visible",timeout:10000});
   await page.waitForFunction(()=>{
@@ -99,6 +110,7 @@ async function openScene(page){
     const ids=[...document.querySelectorAll(".sc-scene-board-33900__actor")].map(node=>node.dataset.actorId);
     return ["academy_menma","academy_hinata","academy_kakashi","academy_kakashi_origin_masked_interceptor"].every(id=>ids.includes(id));
   },null,{timeout:10000});
+  return rehydrate;
 }
 async function stage(page){return page.evaluate(()=>[...document.querySelectorAll(".sc-scene-board-33900__actor")].map(node=>{const r=node.getBoundingClientRect(),s=getComputedStyle(node);return{id:node.dataset.actorId,x:r.x,y:r.y,right:r.right,bottom:r.bottom,opacity:Number(s.opacity),filter:s.filter,benchmark:node.dataset.sc490BenchmarkAnchor||null};}));}
 function overlap(a,b){return Math.max(0,Math.min(a.right,b.right)-Math.max(a.x,b.x))*Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.y,b.y));}
@@ -106,7 +118,7 @@ async function advanceBeat(page,id){for(let i=0;i<20;i++){const beat=await page.
 async function scenario(browser,width,height,reduced,label){
   const context=await browser.newContext({viewport:{width,height},reducedMotion:reduced?"reduce":"no-preference"});const page=await context.newPage();const errors=await installBrowserRuntimeErrorGate(page);
   try{
-    await boot(page);const runId=await setup(page,"sc_run_v1_qa490_"+label.replace(/\W+/g,"_"));await openScene(page);await page.waitForTimeout(120);
+    await boot(page);const runId=await setup(page,"sc_run_v1_qa490_"+label.replace(/\W+/g,"_"));const rehydrate=await openScene(page);await page.waitForTimeout(120);
     const rows=await stage(page),ids=rows.map(r=>r.id);
     assert.deepStrictEqual([...ids].sort(),["academy_hinata","academy_kakashi","academy_kakashi_origin_masked_interceptor","academy_menma"].sort());
     assert(rows.every(r=>r.opacity>=.99&&r.filter==="none"&&r.benchmark==="true"),label+" present-actor presentation drift: "+JSON.stringify(rows));
@@ -126,7 +138,7 @@ async function scenario(browser,width,height,reduced,label){
     assert.deepStrictEqual(choices,["Ask Kakashi what happened.","Ask her how she knows Kakashi.","Let Kakashi handle it.","Keep moving."]);
     const listeners=await stage(page);assert(listeners.every(r=>r.opacity>=.99),label+" speaker focus dimmed listeners");
     await page.screenshot({path:path.join(OUT,label+".png"),fullPage:true});await errors.assertClean(label);
-    return{label,runId,viewport:{width,height},reducedMotion:reduced,choices,primitive:primitive.r};
+    return{label,runId,viewport:{width,height},reducedMotion:reduced,rehydrate,choices,primitive:primitive.r};
   }finally{await context.close();}
 }
 (async()=>{const browser=await chromium.launch({headless:true});try{const results=[];results.push(await scenario(browser,1366,768,false,"1366x768"));results.push(await scenario(browser,1920,1080,false,"1920x1080"));results.push(await scenario(browser,1366,768,true,"1366x768-reduced-motion"));console.log(JSON.stringify({pass:true,results,browserGoldenClaimed:false},null,2));}finally{await browser.close();}})().catch(e=>{console.error(e&&e.stack||e);process.exit(1);});
