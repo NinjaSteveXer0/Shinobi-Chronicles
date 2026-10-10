@@ -66,6 +66,7 @@ EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-pl-battle-tutorial-38500.js",
     "runtime/alpha-first-konoha-tutorial-35000.js",
     "runtime/alpha-phase2-konoha-player-surfaces-43110.js",
+    "runtime/alpha-discipline-curriculum-profiles-57600.js",
     "runtime/alpha-phase2-inventory-core-46100.js",
     "runtime/alpha-phase2-live-hud-49900.js",
     "runtime/alpha-phase2-basic-item-shop-51700.js",

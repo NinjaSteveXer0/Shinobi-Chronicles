@@ -67,6 +67,42 @@ def game_without_declared_603_promotion_seams(text:str)->str:
         .replace(prepare_restore_block,'',1)
         .replace(apply_restore_block,'',1))
 
+# #576 intentionally widens exactly three Practical discipline allowlists so
+# advanced Nin/Gen/Fūin rows can use the canonical selector/readiness path.
+# Normalize only those named owner functions back to their pre-#576 list before
+# applying the older audited core pin; every other game.js byte stays protected.
+def game_without_declared_576_practical_selector_seams(text:str)->str:
+    expanded='''  const validDisciplines = [
+    "tai",
+    "buki",
+    "stamina",
+    "nin",
+    "gen",
+    "fuin"
+  ];'''
+    legacy='''  const validDisciplines = [
+    "tai",
+    "buki",
+    "stamina"
+  ];'''
+    owners=[
+        'getKonohaPracticalSelectedDisciplineId',
+        'selectKonohaPracticalDiscipline',
+        'validateKonohaPracticalFinalReadiness',
+    ]
+    for owner in owners:
+        start=text.find('function '+owner)
+        if start < 0:
+            return ''
+        pos=text.find(expanded,start)
+        if pos < 0:
+            return ''
+        next_owner=text.find('\nfunction ',start+1)
+        if next_owner >= 0 and pos >= next_owner:
+            return ''
+        text=text[:pos]+legacy+text[pos+len(expanded):]
+    return text
+
 V1=[
 'genin_boruto','genin_chocho','genin_himawari','genin_hinata','genin_hoki','genin_karin','genin_menma','genin_mikoto','genin_mitsuki','genin_naruto','genin_orochimaru','genin_sarada','genin_sasuke'
 ]
@@ -84,7 +120,9 @@ checks={}
 # reader before comparing the previously audited game.js blob; every other byte
 # of the old audited core must remain unchanged.
 # #322's older compatibility root remains preserved immediately after it.
-checks['audited_game_blob_preserved']=git_blob_sha(game_without_declared_603_promotion_seams(game_without_declared_469_save_reader(game)))=='f45dc5a147b9569862ad7f17e7f4254ddc916f8e'
+normalized_game=game_without_declared_576_practical_selector_seams(game)
+normalized_game=game_without_declared_603_promotion_seams(game_without_declared_469_save_reader(normalized_game))
+checks['audited_game_blob_preserved']=git_blob_sha(normalized_game)=='f45dc5a147b9569862ad7f17e7f4254ddc916f8e'
 core_pos=index.find('runtime/alpha-world-konoha-112-core.js')
 fix_pos=index.find('runtime/alpha-world-konoha-112-fix.js')
 roster_pos=index.find('runtime/alpha-genin-roster-63.js')
