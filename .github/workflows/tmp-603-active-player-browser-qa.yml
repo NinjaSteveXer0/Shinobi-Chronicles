@@ -1,0 +1,56 @@
+name: TMP603 Active Player Browser QA
+on:
+  push:
+    branches:
+      - coding/603-step7-promotion-integration
+    paths:
+      - .github/workflows/tmp-603-active-player-browser-qa.yml
+permissions:
+  contents: write
+jobs:
+  patch-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/603-step7-promotion-integration
+          fetch-depth: 1
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Correct browser harness to follow factual active slot
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/qa_issue_603_step7_promotion_browser.js')
+          s=p.read_text(encoding='utf-8')
+          old='    const actor=currentBattle.characterId||getBattleDeploymentParticipant?.("player",1)?.id||null;'
+          new='    const actor=currentBattle.activePlayer?.id||getBattleDeploymentParticipant?.("player",1)?.id||currentBattle.characterId||null;'
+          if s.count(old)!=1: raise SystemExit(f'actor selector count={s.count(old)}')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
+          node --check tools/qa_issue_603_step7_promotion_browser.js
+          node tools/qa_issue_603_step7_promotion.js
+          node tools/qa_issue_607_courier_adapter.js
+          node tools/qa_issue_603_installed_integration.js
+          node tools/qa_issue_141_traversal_runtime.js
+          node tools/qa_runtime_ownership_safety_300.js
+          node tools/qa_save_compatibility_311.js
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+          python -m http.server 8080 --bind 127.0.0.1 > sc603-active-player-server.log 2>&1 &
+          sleep 2
+          SC603_REQUIRE_INTEGRATION=1 SC603_OUT=artifacts/promotion-603-active-player node tools/qa_issue_603_step7_promotion_browser.js
+      - name: Commit QA correction and remove temporary workflow
+        shell: bash
+        run: |
+          rm .github/workflows/tmp-603-active-player-browser-qa.yml
+          git config user.name "ChatGPT Codex Connector"
+          git config user.email "codex-connector@users.noreply.github.com"
+          git add tools/qa_issue_603_step7_promotion_browser.js .github/workflows/tmp-603-active-player-browser-qa.yml
+          git commit -m "[QA][#603] Follow active Battle participant after withdrawal"
+          git push origin HEAD:coding/603-step7-promotion-integration
