@@ -1178,13 +1178,12 @@
 
   const BATTLE_PRESENTATION_CLASSES_33000=Object.freeze(["PHYSICAL_STRIKE","HEAVY_STRIKE","PROJECTILE","CHAKRA_RANGED","AREA_ATTACK","GUARD","EVADE","SUBSTITUTION","HEAL","BUFF","DEBUFF","RESTRAINT","SUMMON","ENVIRONMENTAL","TRANSFORMATION","DEFEAT"]);
   const playedBattlePerformanceKeys33000=new Set();
-  const BATTLE_PRESENTATION_QUEUE_VERSION_33000=2;
-  const BATTLE_PRESENTATION_DEFAULT_MS_33000=1850;
-  const BATTLE_PRESENTATION_REDUCED_MS_33000=420;
+  const BATTLE_PRESENTATION_QUEUE_VERSION_33000=3;
+  const BATTLE_PRESENTATION_COMPLETION_WATCHDOG_MS_33000=4000;
   const battlePresentationQueueState33000={
     battleId:null,queue:[],queuedKeys:new Set(),playedKeys:new Set(),active:null,timer:null,
     deferredTerminalOverlay:null,deferredCallerResume:null,terminalWatchdog:null,lastSequenceOrdinal:0,
-    receiptSettlementInProgress:false
+    receiptSettlementInProgress:false,completionSerial:0,settledWaiters:new Set()
   };
   function orderedPlaybackEnabled33000(){
     // Canonical Shinobi Chronicles Battle presentation is global. Menma is the
@@ -1221,6 +1220,12 @@
     battlePresentationQueueState33000.terminalWatchdog=null;
     battlePresentationQueueState33000.lastSequenceOrdinal=0;
     battlePresentationQueueState33000.receiptSettlementInProgress=false;
+    battlePresentationQueueState33000.completionSerial+=1;
+    if(battlePresentationQueueState33000.settledWaiters.size){
+      const stale={success:false,settled:false,reason:"battle_changed",battleId:String(battlePresentationQueueState33000.battleId||"")};
+      for(const resolve of [...battlePresentationQueueState33000.settledWaiters])try{resolve(stale);}catch(_error){}
+      battlePresentationQueueState33000.settledWaiters.clear();
+    }
     if(typeof sessionStorage!=="undefined"&&battlePresentationQueueState33000.battleId){
       try{
         const raw=sessionStorage.getItem(presentationStorageKey33000(battlePresentationQueueState33000.battleId));
@@ -1513,8 +1518,90 @@
     stage.dataset.presentationAfterPl=active.receipt.afterPL===null?"":String(active.receipt.afterPL);
     return active.receipt;
   }
-  function presentationPlaybackDuration33000(){
-    try{return matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches?BATTLE_PRESENTATION_REDUCED_MS_33000:BATTLE_PRESENTATION_DEFAULT_MS_33000;}catch(_error){return BATTLE_PRESENTATION_DEFAULT_MS_33000;}
+  function performanceAnimationNodes33000(stage,active){
+    if(!stage||!active||!active.receipt)return[];
+    const actionId=String(active.receipt.actionId||"");
+    const escaped=typeof CSS!=="undefined"&&CSS.escape?CSS.escape(actionId):actionId.replace(/["\\]/g,"\\$&");
+    const nodes=[
+      stage.querySelector('.battle2-performance-stage[data-action-id="'+escaped+'"]'),
+      ...stage.querySelectorAll(".battle2-performance-role-actor,.battle2-performance-role-target,.battle2-performance-result-chip")
+    ].filter(Boolean);
+    return [...new Set(nodes)];
+  }
+  function collectPerformanceAnimations33000(stage,active){
+    const animations=[],seen=new Set();
+    for(const node of performanceAnimationNodes33000(stage,active)){
+      if(!node||typeof node.getAnimations!=="function")continue;
+      let rows=[];
+      try{rows=node.getAnimations({subtree:true})||[];}catch(_error){rows=[];}
+      for(const animation of rows){
+        if(!animation||seen.has(animation)||animation.playState==="idle")continue;
+        let infinite=false;
+        try{infinite=animation.effect&&animation.effect.getTiming&&animation.effect.getTiming().iterations===Infinity;}catch(_error){}
+        if(infinite)continue;
+        seen.add(animation);animations.push(animation);
+      }
+    }
+    return animations;
+  }
+  function nextBattlePresentationPaint33000(){
+    return new Promise(resolve=>{
+      if(typeof requestAnimationFrame==="function")requestAnimationFrame(()=>requestAnimationFrame(resolve));
+      else setTimeout(resolve,0);
+    });
+  }
+  function notifyBattlePresentationSettled33000(reason="queue_settled"){
+    const payload={
+      success:true,settled:true,reason,
+      battleId:String(battlePresentationQueueState33000.battleId||""),
+      completion:"render_bound_animation_lifecycle",
+      semanticReplay:false
+    };
+    for(const resolve of [...battlePresentationQueueState33000.settledWaiters])try{resolve(payload);}catch(_error){}
+    battlePresentationQueueState33000.settledWaiters.clear();
+    try{
+      if(typeof globalThis.dispatchEvent==="function"&&typeof CustomEvent==="function")globalThis.dispatchEvent(new CustomEvent("sc:battle-presentation-settled",{detail:payload}));
+    }catch(_error){}
+    return payload;
+  }
+  async function settleRenderedBattlePresentation33000(stage,key,serial){
+    await nextBattlePresentationPaint33000();
+    const active=battlePresentationQueueState33000.active;
+    if(!active||active.key!==key||serial!==battlePresentationQueueState33000.completionSerial)return false;
+    stage=liveBattleStage33000(stage);
+    const animations=collectPerformanceAnimations33000(stage,active);
+    if(stage){
+      stage.dataset.presentationCompletionAuthority="render_bound_animation_lifecycle";
+      stage.dataset.presentationTrackedAnimations=String(animations.length);
+    }
+    if(animations.length){
+      await Promise.allSettled(animations.map(animation=>Promise.resolve(animation.finished).catch(()=>null)));
+    }else if(stage){
+      stage.dataset.presentationTrackedAnimations="0";
+    }
+    if(!battlePresentationQueueState33000.active||battlePresentationQueueState33000.active.key!==key||serial!==battlePresentationQueueState33000.completionSerial)return false;
+    return finishBattlePresentationReceipt33000(stage,key,"render_complete");
+  }
+  function armBattlePresentationCompletion33000(stage,active){
+    if(!active)return false;
+    if(battlePresentationQueueState33000.timer)clearTimeout(battlePresentationQueueState33000.timer);
+    const serial=++battlePresentationQueueState33000.completionSerial;
+    battlePresentationQueueState33000.timer=setTimeout(()=>{
+      if(serial!==battlePresentationQueueState33000.completionSerial)return;
+      const live=battlePresentationQueueState33000.active;
+      if(!live||live.key!==active.key)return;
+      const liveStage=liveBattleStage33000(stage);
+      if(liveStage)liveStage.dataset.presentationCompletionFallback="watchdog";
+      finishBattlePresentationReceipt33000(liveStage,active.key,"completion_watchdog");
+    },BATTLE_PRESENTATION_COMPLETION_WATCHDOG_MS_33000);
+    settleRenderedBattlePresentation33000(stage,active.key,serial).catch(error=>{
+      const liveStage=liveBattleStage33000(stage);
+      if(liveStage)liveStage.dataset.presentationCompletionError=String(error&&error.message||error);
+      if(serial===battlePresentationQueueState33000.completionSerial&&battlePresentationQueueState33000.active&&battlePresentationQueueState33000.active.key===active.key){
+        finishBattlePresentationReceipt33000(liveStage,active.key,"completion_exception");
+      }
+    });
+    return true;
   }
   function setPresentationQueueBusy33000(stage,busy){
     if(!stage)return;
@@ -1580,15 +1667,17 @@
     }catch(_error){}
     return liveBattleStage33000(stage);
   }
-    function finishBattlePresentationReceipt33000(stage,key){
+    function finishBattlePresentationReceipt33000(stage,key,completionReason="render_complete"){
     if(!battlePresentationQueueState33000.active||battlePresentationQueueState33000.active.key!==key)return false;
     stage=liveBattleStage33000(stage);
     const active=battlePresentationQueueState33000.active;
     const lane=stage&&stage.querySelector('.battle2-performance-stage[data-action-id="'+CSS.escape(active.receipt.actionId)+'"]');
     if(lane){lane.classList.remove("is-playing");lane.classList.add("is-settled");}
     clearBattlePerformanceRoles33000(stage,active.receipt.actionId);
+    if(battlePresentationQueueState33000.timer)clearTimeout(battlePresentationQueueState33000.timer);
     battlePresentationQueueState33000.active=null;
     battlePresentationQueueState33000.timer=null;
+    if(stage)stage.dataset.presentationLastCompletionReason=String(completionReason);
     battlePresentationQueueState33000.receiptSettlementInProgress=true;
     const beforeTransitionId=currentBattle&&currentBattle.deployment&&currentBattle.deployment.lastTransition
       ?String(currentBattle.deployment.lastTransition.id||""):"";
@@ -1619,6 +1708,7 @@
       else playNextBattlePresentationReceipt33000(stage);
     }else{
       setPresentationQueueBusy33000(stage,false);
+      notifyBattlePresentationSettled33000(completionReason);
       if(!tutorialPaused){
         flushDeferredTerminalOverlay33000();
         flushDeferredBattleCallerResume33000();
@@ -1650,7 +1740,7 @@
       stage.dataset.formationTray="closed";
     }
     bindActiveBattlePresentation33000(stage,next);
-    battlePresentationQueueState33000.timer=setTimeout(()=>finishBattlePresentationReceipt33000(stage,next.key),presentationPlaybackDuration33000());
+    armBattlePresentationCompletion33000(stage,next);
     return next.receipt;
   }
   function hardSettleBattlePresentationQueue33000(reason="presentation_hard_settle"){
@@ -1674,6 +1764,7 @@
       try{installFormationStage33000(stage);}catch(_error){}
     }
     persistPresentationQueueState33000();
+    notifyBattlePresentationSettled33000(reason);
     flushDeferredTerminalOverlay33000();
     flushDeferredBattleCallerResume33000();
     return{success:true,reason,semanticReplay:false};
@@ -1682,6 +1773,16 @@
     ensurePresentationQueueBattle33000();
     syncBattlePresentationQueue33000();
     return !!(battlePresentationQueueState33000.receiptSettlementInProgress||battlePresentationQueueState33000.active||battlePresentationQueueState33000.queue.length);
+  }
+  function whenBattlePresentationSettled33000(){
+    ensurePresentationQueueBattle33000();
+    syncBattlePresentationQueue33000();
+    if(!pendingBattlePresentation33000())return Promise.resolve({
+      success:true,settled:true,reason:"already_settled",
+      battleId:String(battlePresentationQueueState33000.battleId||""),
+      completion:"render_bound_animation_lifecycle",semanticReplay:false
+    });
+    return new Promise(resolve=>battlePresentationQueueState33000.settledWaiters.add(resolve));
   }
   function installBattlePerformance33000(stage){
     if(!stage)return null;
@@ -1715,6 +1816,7 @@
   }
   window.syncBattlePresentationQueue33000=syncBattlePresentationQueue33000;
   window.pendingBattlePresentation33000=pendingBattlePresentation33000;
+  window.whenBattlePresentationSettled33000=whenBattlePresentationSettled33000;
   window.hardSettleBattlePresentationQueue33000=hardSettleBattlePresentationQueue33000;
   window.installBattlePerformance33000=installBattlePerformance33000;
 
@@ -2221,6 +2323,6 @@
     return{patchId:PATCH_ID,pass:failed.length===0,checks,failed,browserGoldenClaimed:false};
   }
   window.SC_ALPHA_BATTLE_MODERN_PATCH_ID=PATCH_ID;
-  window.SC_BATTLE_PRESENTATION_33000=Object.freeze({patchId:PATCH_ID,presentationCompletion:"issue_373_ordered_playback_v1",presentationClasses:BATTLE_PRESENTATION_CLASSES_33000,browserGoldenClaimed:false});
+  window.SC_BATTLE_PRESENTATION_33000=Object.freeze({patchId:PATCH_ID,presentationCompletion:"issue_656_render_bound_animation_lifecycle_v1",presentationClasses:BATTLE_PRESENTATION_CLASSES_33000,browserGoldenClaimed:false});
   window.runAlphaBattleModern33000Diagnostics=runAlphaBattleModern33000Diagnostics;
 })();
