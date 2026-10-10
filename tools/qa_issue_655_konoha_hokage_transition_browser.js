@@ -144,7 +144,8 @@ async function runViewport(browser,viewport){
     assert.strictEqual(diagnostics.checks.villageRestorePrecedesRemountFallback,true,label+" remount fallback ordering diagnostic missing");
     assert.strictEqual(diagnostics.checks.transitionFixAddsNoTimerOrObserver,true,label+" transition helper introduced timer/observer");
 
-    gate.assertNoErrors();
+    const gateEvidence=await gate.assertClean(`issue-655-${label}`);
+    assert.strictEqual(gateEvidence.unexpectedCount,0,label+" unexpected browser runtime errors");
     const result={
       viewport:label,
       pass:true,
@@ -152,6 +153,7 @@ async function runViewport(browser,viewport){
       geometryStableAcrossThreePaints:true,
       semanticStateUnchanged:true,
       noTransitionTimerOrObserverAdded:true,
+      browserRuntimeErrors:gateEvidence.unexpectedCount,
       browserGoldenClaimed:false,
       before,
       afterFrames,
