@@ -10,6 +10,7 @@ const outboard=read("runtime/alpha-phase2-map-canvas-outboard-557.css");
 const index=read("index.html");
 const browserQa=read("tools/qa_map_canvas_unobstructed_557_browser.js");
 const legacy506=read("runtime/alpha-hud-my-clan-return-context-50600.js");
+const gutterAsset=path.join(ROOT,"UI/kitsunemori_gutter.png");
 
 assert(runtime.includes('PATCH_ID="map_canvas_unobstructed_55700_2026_10_06"'),"#557 patch identity missing from canonical #499 HUD owner");
 assert(runtime.includes('region:".region-map-pane"')&&runtime.includes('village:".village-map-screen"'),"#557 is not bounded to canonical Region/Village map frames");
@@ -22,6 +23,16 @@ assert(runtime.includes(".region-map-pane .region-event-drawer")||outboard.inclu
 assert(outboard.includes(".region-known-destinations"),"non-spatial known-destination navigation can still cover the Region map");
 assert(outboard.includes(".village-map-return")&&outboard.includes(".village-info-toggle")&&outboard.includes(".village-info-drawer"),"legacy Village navigation/info chrome can still cover the Village map");
 assert(index.includes('href="runtime/alpha-phase2-map-canvas-outboard-557.css"'),"#557 outboard completion stylesheet is not production-loaded");
+
+// #614 authored Village gutter-body integration must stay inside the canonical
+// #499/#557 presentation path. The art is presentation-only and is masked to the
+// measured non-map reserves; it must not establish a second geometry owner.
+assert(fs.existsSync(gutterAsset),"#614 approved Kitsunemori gutter asset is missing");
+assert(outboard.includes('background-image: url("../UI/kitsunemori_gutter.png")'),"#614 gutter body is not wired through canonical #557 presentation CSS");
+assert(outboard.includes("--sc-hud499-echo-map-left")&&outboard.includes("--sc-hud499-echo-map-width"),"#614 gutter body is not clipped from the canonical measured map rectangle");
+assert(outboard.includes("mask-image: linear-gradient")&&outboard.includes("transparent calc(var(--sc-hud499-echo-map-left) + var(--sc-hud499-echo-map-width))"),"#614 gutter body can bleed over the crisp map rectangle");
+assert(outboard.includes('[data-surface="region"] .sc-hud499-state-cluster {\n  top: 12px !important;'),"#614 must not move the Region identity cluster");
+assert(outboard.includes('[data-surface="village"] .sc-hud499-state-cluster {\n  top: 22px !important;'),"#614 Village identity cluster lower inset is missing");
 
 const ownerSelectedEventProof=browserQa.includes("proveOwnerSelectedRegionEventCard")
   &&browserQa.includes('preferredId="hotspot_fire_konohagakure"')
@@ -68,6 +79,10 @@ console.log(JSON.stringify({
   deliberateRegionActivationContract:true,
   regionKnownDestinationsOutboard:true,
   villageLegacyChromeOutboard:true,
+  authoredVillageGutterBody:true,
+  authoredVillageGutterAsset:"UI/kitsunemori_gutter.png",
+  villageIdentityTopPx:22,
+  regionIdentityTopPx:12,
   semanticMutation:false,
   persistentMapOverlapPolicy:"zero",
   duplicateRuntimeOwner:false,
