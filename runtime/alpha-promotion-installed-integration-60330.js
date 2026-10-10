@@ -7,13 +7,14 @@
 (function installPromotionInstalledIntegration60330(){
 "use strict";
 if(globalThis.SC_PROMOTION_INSTALLED_60330)return;
-const PATCH_ID="academy_genin_promotion_installed_60330_v2_2026_10_10_player_route";
+const PATCH_ID="academy_genin_promotion_installed_60330_v3_2026_10_10_player_route_rehydrate";
 const SCENARIO="academy_genin_missing_courier_dispatch_v1";
 const TRANSITION="academy_to_genin";
 const COURIER_STATE_KEY="promotionCourierAssessment60310";
 const HOST_LABELS=Object.freeze({"KON-P01":"Hokage Administration","KON-P10":"Konoha Village Gate",whisper_woods:"Whisper Woods",fire_whisper_woods_north_ravine:"North Ravine"});
 const controllers=new Map();
 const clone=v=>{try{return v==null?v:JSON.parse(JSON.stringify(v));}catch(_){return v;}};
+const PRIOR_RESUME_BATTLE_CALLER_60330=typeof resumeBattleCallerAfterCompletion==="function"?resumeBattleCallerAfterCompletion:null;
 function pd(){return typeof playerData!=="undefined"&&playerData?playerData:null;}
 function acquisition(){try{return typeof ensurePlayerAcquisitionState==="function"?ensurePlayerAcquisitionState():null;}catch(_){return null;}}
 function variantForOwned(ownedId){const a=acquisition();if(!a||!a.ownedCharactersByVariantId)return null;for(const [variant,record] of Object.entries(a.ownedCharactersByVariantId)){if(record&&record.ownedCharacterId===ownedId)return variant;}return null;}
@@ -52,10 +53,25 @@ function makeCore(subject){
   const factory=globalThis.SC_PROMOTION_CORE_60300;if(!factory||typeof factory.create!=="function")return{success:false,reason:"promotion_core_missing"};
   return{success:true,core:factory.create({identity:{immutableChronicleSeed:seed,stableCharacterId:subject.ownedCharacterId,rankTransitionId:TRANSITION},persistence:persistence(),geninTransitionAdapter:geninAdapter})};
 }
+function materializePersistedCore60330(core,subject){
+  let persisted=null;
+  try{persisted=persistence().load();}catch(error){return{success:false,reason:"promotion_persisted_state_read_failed",error:String(error&&error.message||error)};}
+  const ownsPersistedState=!!(persisted&&typeof persisted==="object"&&Array.isArray(persisted.attempts)&&persisted.stableCharacterId===subject.ownedCharacterId&&persisted.rankTransitionId===TRANSITION);
+  if(!ownsPersistedState)return{success:true,loaded:false};
+  try{
+    const diagnostic=core.getDiagnosticSnapshot();
+    if(!diagnostic||diagnostic.success===false||!diagnostic.state)return{success:false,reason:String(diagnostic&&diagnostic.reason||"promotion_persisted_state_materialization_failed")};
+    return{success:true,loaded:true};
+  }catch(error){return{success:false,reason:"promotion_persisted_state_materialization_failed",error:String(error&&error.message||error)};}
+}
 function getController(subjectId){
   const subject=resolveSubject(subjectId);if(!subject.success)return subject;
   let row=controllers.get(subject.ownedCharacterId);
-  if(!row){const made=makeCore(subject);if(!made.success)return made;row={subject,core:made.core,lastAttemptId:null};controllers.set(subject.ownedCharacterId,row);}
+  if(!row){
+    const made=makeCore(subject);if(!made.success)return made;
+    const materialized=materializePersistedCore60330(made.core,subject);if(!materialized.success)return materialized;
+    row={subject,core:made.core,lastAttemptId:null,persistedStateLoaded:materialized.loaded===true};controllers.set(subject.ownedCharacterId,row);
+  }
   return{success:true,row};
 }
 function teamSnapshot(subject){
@@ -218,14 +234,30 @@ function mount(row){
   return{success:true,destination:"promotion",ownedCharacterId:row.subject.ownedCharacterId,controller};
 }
 function openInstalledPromotion60330(subjectId=null){const got=getController(subjectId);if(!got.success)return got;return mount(got.row);}
+function currentBattleReturnContext60330(){
+  try{const battle=typeof currentBattle!=="undefined"&&currentBattle?currentBattle:globalThis.currentBattle;return battle&&battle.returnContext?clone(battle.returnContext):null;}catch(_){return null;}
+}
+function ownsPromotionBattleReturn60330(returnContext){return !!(returnContext&&returnContext.type==="field_readiness_assessment"&&returnContext.assessmentScenarioId===SCENARIO);}
+function installPromotionBattleReturnBridge60330(){
+  if(!PRIOR_RESUME_BATTLE_CALLER_60330)return false;
+  globalThis.resumeBattleCallerAfterCompletion=function resumePromotion60330BattleCaller(outcomeType=null){
+    const returnContext=currentBattleReturnContext60330(),ownsReturn=ownsPromotionBattleReturn60330(returnContext);
+    const result=PRIOR_RESUME_BATTLE_CALLER_60330.apply(this,arguments);
+    if(!ownsReturn||!result||result.success!==true||result.callerResumeDeferred===true)return result;
+    const reopened=openInstalledPromotion60330(returnContext.assessmentSubjectStableId||null);
+    return{...result,promotionSurfaceRehydrated60330:!!(reopened&&reopened.success===true),promotionAssessmentAttemptId:returnContext.assessmentAttemptId||null,promotionSurfaceResult:reopened||null};
+  };
+  return true;
+}
 function activeRow(subjectId=null){const got=getController(subjectId);return got.success?got.row:null;}
 function activeAttempt(subjectId=null){const row=activeRow(subjectId);return row?activeAttemptId(row):null;}
 function scenarioCall(method,args=[],subjectId=null){const row=activeRow(subjectId);if(!row)return{success:false,reason:"promotion_controller_unavailable"};const id=activeAttemptId(row);const c=courier();if(!id||!c||typeof c[method]!=="function")return{success:false,reason:"promotion_scenario_action_unavailable"};return c[method](id,...args);}
+const battleReturnBridgeInstalled=installPromotionBattleReturnBridge60330();
 const api=Object.freeze({
   patchId:PATCH_ID,open:openInstalledPromotion60330,getController,activeAttempt,
   projectJourney:(subjectId=null)=>scenarioCall("projectJourney",[],subjectId),commitBriefing:(subjectId=null)=>scenarioCall("commitBriefing",[],subjectId),advanceJourney:(destination,subjectId=null)=>scenarioCall("advanceJourney",[destination],subjectId),resolveSearch:(choice,subjectId=null)=>scenarioCall("resolveSearch",[choice],subjectId),recordParticipantFact:(spec,subjectId=null)=>scenarioCall("recordParticipantFact",[spec],subjectId),resolvePriority:(choice,spec={},subjectId=null)=>scenarioCall("resolvePriority",[choice,spec],subjectId),confirmHostileContact:(spec,subjectId=null)=>scenarioCall("confirmHostileContact",[spec],subjectId),launchHoldLineBattle:(subjectId=null)=>scenarioCall("launchHoldLineBattle",[],subjectId),resolveNonBattleContact:(choice,result,subjectId=null)=>scenarioCall("resolveNonBattleContact",[choice,result],subjectId),beginExtraction:(spec={},subjectId=null)=>scenarioCall("beginExtraction",[spec],subjectId),handoffDispatch:(subjectId=null)=>scenarioCall("handoffDispatch",[],subjectId),commitDebrief:(spec={},subjectId=null)=>scenarioCall("commitDebrief",[spec],subjectId),commitTerminal:(state,subjectId=null)=>scenarioCall("commitTerminal",[state],subjectId),
   getPlayerMission:(subjectId=null)=>{const row=activeRow(subjectId);return row?clone(missionProjection(row)):null;},executePlayerMissionAction:(actionId,subjectId=null)=>{const row=activeRow(subjectId);return row?executeMissionAction(row,actionId):{success:false,reason:"promotion_controller_unavailable"};},returnToKonoha,
-  syncQualifiedEvidence:(subjectId=null)=>{const row=activeRow(subjectId);return row?syncQualifiedEvidence(row):{success:false,reason:"promotion_controller_unavailable"};},finalize:(subjectId=null)=>{const row=activeRow(subjectId);return row?finalize(row):{success:false,reason:"promotion_controller_unavailable"};},getTruth:(subjectId=null)=>{const row=activeRow(subjectId);return row?truth(row):null;},browserGoldenClaimed:false
+  syncQualifiedEvidence:(subjectId=null)=>{const row=activeRow(subjectId);return row?syncQualifiedEvidence(row):{success:false,reason:"promotion_controller_unavailable"};},finalize:(subjectId=null)=>{const row=activeRow(subjectId);return row?finalize(row):{success:false,reason:"promotion_controller_unavailable"};},getTruth:(subjectId=null)=>{const row=activeRow(subjectId);return row?truth(row):null;},battleReturnBridgeInstalled,browserGoldenClaimed:false
 });
 globalThis.SC_PROMOTION_INSTALLED_60330=api;globalThis.openInstalledPromotion60330=openInstalledPromotion60330;
 })();
