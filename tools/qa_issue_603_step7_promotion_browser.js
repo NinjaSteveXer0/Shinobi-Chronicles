@@ -59,9 +59,18 @@ async function seedPlayableAcademy(page,label){
 async function openPromotionInspection(page){
   await page.evaluate(()=>globalThis.openOverlay?.("arena"));
   const arena=page.locator("#overlay-content-container");await arena.waitFor({state:"visible",timeout:15000});
-  const promotion=arena.getByRole("button",{name:/promotion/i}).first();
-  if(await promotion.count()===0)throw new Error("promotion_entry_control_missing");
-  await promotion.click();
+  const guide=page.locator("#sc-konoha-onboarding-35000");
+  if(await guide.count()>0&&await guide.isVisible()){
+    const continueButton=guide.getByRole("button",{name:/^continue$/i}).first();
+    if(await continueButton.count()>0){await continueButton.click();await page.waitForTimeout(80);}
+    const takePromotion=page.locator("#sc-konoha-onboarding-35000").getByRole("button",{name:/take promotion assessment/i}).first();
+    assert(await takePromotion.count()>0,"Arena guide did not expose TAKE PROMOTION ASSESSMENT");
+    await takePromotion.click();
+  }else{
+    const promotion=arena.getByRole("button",{name:/promotion/i}).first();
+    if(await promotion.count()===0)throw new Error("promotion_entry_control_missing");
+    await promotion.click();
+  }
   await page.locator("#overlay-content-container .sc60320-stage").waitFor({state:"visible",timeout:15000});
   const inspect=arena.getByRole("button",{name:/inspect readiness/i}).first();
   assert(await inspect.count()>0,"explicit read-only inspection control missing");
@@ -96,7 +105,6 @@ async function viewportScenario(browser,width,height,label){
     assert.strictEqual(hidden.length,4,"Promotion UI did not render exactly four readiness slots");
     assert(hidden.every(row=>!JSON.stringify(row).match(/information_use|team_coordination|combat_readiness|objective_protection|academy_genin_fr_pkg_/i)),"hidden requirement truth leaked to DOM/accessibility metadata: "+JSON.stringify(hidden));
 
-    // Adversarial twin fixture: only hidden satisfaction differs. Public model + actual DOM/ARIA must be byte-identical.
     const hiddenTwin=await page.evaluate(async()=>{
       if(typeof globalThis.normalizePromotionArenaTruth60320!=="function"||typeof globalThis.mountPromotionArenaUI60320!=="function")return{available:false};
       const makeTruth=satisfied=>({phase:"INSPECTION",currentRankLabel:"Academy Student",targetRankLabel:"Genin",canInspect:true,canEnterAssessment:false,readinessSlots:[
