@@ -1,0 +1,70 @@
+name: TMP 603 Current Battle Lexical Bridge
+
+on:
+  push:
+    branches:
+      - coding/603-step7-promotion-integration
+    paths:
+      - .github/workflows/tmp-603-current-battle-lexical-bridge.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/603-step7-promotion-integration
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Patch bounded #60310 current Battle reads
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path=Path('runtime/alpha-promotion-courier-assessment-60310.js')
+          text=path.read_text(encoding='utf-8')
+
+          anchor='function enemyRegistry60310(){try{if(typeof enemyDatabase==="object"&&enemyDatabase)return enemyDatabase;}catch(_){}return globalThis.enemyDatabase&&typeof globalThis.enemyDatabase==="object"?globalThis.enemyDatabase:null;}'
+          helper='function currentBattle60310(){try{if(typeof currentBattle==="object"&&currentBattle)return currentBattle;}catch(_){}return globalThis.currentBattle&&typeof globalThis.currentBattle==="object"?globalThis.currentBattle:null;}\n'+anchor
+          if 'function currentBattle60310()' not in text:
+              if text.count(anchor)!=1:
+                  raise SystemExit(f'current Battle helper anchor count={text.count(anchor)}')
+              text=text.replace(anchor,helper,1)
+
+          replacements={
+            'metaGetter:()=>globalThis.currentBattle?.promotionCourier60310||null':'metaGetter:()=>currentBattle60310()?.promotionCourier60310||null',
+            'const b=globalThis.currentBattle;if(!b)return{success:false,reason:"promotion_courier_current_battle_missing_after_launch"};':'const b=currentBattle60310();if(!b)return{success:false,reason:"promotion_courier_current_battle_missing_after_launch"};',
+            'function projectLiveBattleReturn(){const b=globalThis.currentBattle,m=b?.promotionCourier60310,outcome=b?.outcome?.type;':'function projectLiveBattleReturn(){const b=currentBattle60310(),m=b?.promotionCourier60310,outcome=b?.outcome?.type;',
+            'const result=applyBattleReturn(ctx.assessmentAttemptId,e);if(result.success&&globalThis.currentBattle)globalThis.currentBattle.returnContext=null;':'const result=applyBattleReturn(ctx.assessmentAttemptId,e);const battle=currentBattle60310();if(result.success&&battle)battle.returnContext=null;',
+            '  const battle=globalThis.currentBattle;\n  if(!battle?.promotionCourier60310)return{handled:false,expired:false};':'  const battle=currentBattle60310();\n  if(!battle?.promotionCourier60310)return{handled:false,expired:false};'
+          }
+          for old,new in replacements.items():
+              count=text.count(old)
+              if count!=1:
+                  raise SystemExit(f'replacement count {count} for {old[:90]}')
+              text=text.replace(old,new,1)
+
+          allowed='return globalThis.currentBattle&&typeof globalThis.currentBattle==="object"?globalThis.currentBattle:null;'
+          residual=text.count('globalThis.currentBattle')
+          if residual!=3 or allowed not in text:
+              raise SystemExit(f'unexpected residual globalThis.currentBattle count={residual}')
+
+          path.write_text(text,encoding='utf-8')
+          PY
+          node --check runtime/alpha-promotion-courier-assessment-60310.js
+          node tools/qa_issue_607_courier_adapter.js
+          node tools/qa_issue_603_installed_integration.js
+      - name: Commit bounded repair and remove temporary workflow
+        shell: bash
+        run: |
+          rm .github/workflows/tmp-603-current-battle-lexical-bridge.yml
+          git config user.name "ChatGPT Codex Connector"
+          git config user.email "codex-connector@users.noreply.github.com"
+          git add runtime/alpha-promotion-courier-assessment-60310.js .github/workflows/tmp-603-current-battle-lexical-bridge.yml
+          git commit -m "[CODING][#603] Read live Battle state in Courier adapter"
+          git push origin HEAD:coding/603-step7-promotion-integration
